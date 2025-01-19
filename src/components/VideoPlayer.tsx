@@ -27,6 +27,52 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const [isTranslating, setIsTranslating] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [videoError, setVideoError] = useState<string | null>(null);
+  const [isTestingApi, setIsTestingApi] = useState(false);
+
+  const testApiKey = async () => {
+    setIsTestingApi(true);
+    setVideoError(null);
+    
+    try {
+      const apiKey = process.env.ELEVEN_LABS_API_KEY;
+      
+      if (!apiKey) {
+        throw new Error('Clé API manquante. Veuillez configurer votre clé API Eleven Labs.');
+      }
+
+      // Test simple de l'API avec un court texte
+      const response = await fetch('https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM', {
+        method: 'POST',
+        headers: {
+          'Accept': 'audio/mpeg',
+          'Content-Type': 'application/json',
+          'xi-api-key': apiKey,
+        },
+        body: JSON.stringify({
+          text: "Test de l'API",
+          model_id: "eleven_multilingual_v2",
+        }),
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Clé API invalide. Veuillez vérifier votre clé.');
+        } else {
+          throw new Error(`Erreur lors du test de l'API (${response.status})`);
+        }
+      }
+
+      toast.success('Connexion à l\'API réussie !');
+      return true;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Erreur de connexion à l'API";
+      toast.error(message);
+      setVideoError(message);
+      return false;
+    } finally {
+      setIsTestingApi(false);
+    }
+  };
 
   const translateAudio = async () => {
     if (!videoUrl) {
@@ -34,6 +80,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       return;
     }
     
+    // Test de l'API avant de commencer la traduction
+    const isApiWorking = await testApiKey();
+    if (!isApiWorking) return;
+
     setIsTranslating(true);
     setVideoError(null);
 
@@ -116,7 +166,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
   useEffect(() => {
     if (videoUrl && language === 'fr') {
-      translateAudio();
+      testApiKey(); // Test de l'API au chargement
     }
   }, [videoUrl, language]);
 
@@ -141,7 +191,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
   const handleRetry = () => {
     setVideoError(null);
-    translateAudio();
+    testApiKey();
   };
 
   return (
@@ -176,8 +226,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                   onClick={handleRetry}
                   className="ml-4 bg-red-500 text-white hover:bg-red-600"
                   size="sm"
+                  disabled={isTestingApi}
                 >
-                  Réessayer
+                  {isTestingApi ? 'Test en cours...' : 'Tester la connexion'}
                 </Button>
               </AlertDescription>
             </Alert>
