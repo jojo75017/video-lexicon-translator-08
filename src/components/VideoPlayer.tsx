@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import SubtitleOverlay from './SubtitleOverlay';
 import { toast } from 'sonner';
+import { Button } from './ui/button';
 
 interface VideoPlayerProps {
   videoUrl: string;
@@ -24,19 +25,16 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const [currentTime, setCurrentTime] = useState(0);
   const [isTranslating, setIsTranslating] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [videoError, setVideoError] = useState<string | null>(null);
 
   const translateAudio = async () => {
     if (!videoUrl) return;
     
     setIsTranslating(true);
-    toast.info("Extraction de l'audio en cours...");
+    setVideoError(null);
+    toast.info("Préparation de la traduction audio...");
 
     try {
-      // Vérifier d'abord si la clé API est disponible
-      if (!process.env.ELEVEN_LABS_API_KEY) {
-        throw new Error('Clé API Eleven Labs manquante');
-      }
-
       // Extraire l'audio de la vidéo
       const audioResponse = await fetch(videoUrl);
       if (!audioResponse.ok) {
@@ -51,7 +49,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'xi-api-key': process.env.ELEVEN_LABS_API_KEY,
+          'xi-api-key': process.env.ELEVEN_LABS_API_KEY || '',
         },
         body: JSON.stringify({
           text: "Texte à traduire", // À remplacer par le texte extrait de la vidéo
@@ -73,7 +71,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       toast.success("Traduction audio terminée !");
     } catch (error) {
       console.error('Erreur lors de la traduction audio:', error);
-      toast.error("Erreur lors de la traduction audio. La vidéo sera lue sans traduction.");
+      toast.error("La vidéo sera lue sans traduction. Vérifiez votre clé API Eleven Labs.");
+      setVideoError("Erreur de traduction - lecture sans traduction");
     } finally {
       setIsTranslating(false);
     }
@@ -117,21 +116,41 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     }
   }, [audioBlob]);
 
+  const handleRetry = () => {
+    setVideoError(null);
+    translateAudio();
+  };
+
   return (
     <div className="relative w-full aspect-video bg-gray-900 rounded-lg overflow-hidden">
       {videoUrl ? (
-        <video
-          ref={videoRef}
-          src={videoUrl}
-          controls
-          className="w-full h-full object-contain"
-          onError={(e) => {
-            console.error('Erreur de lecture vidéo:', e);
-            toast.error("Erreur lors de la lecture de la vidéo");
-          }}
-        >
-          Votre navigateur ne prend pas en charge la lecture vidéo.
-        </video>
+        <>
+          <video
+            ref={videoRef}
+            src={videoUrl}
+            controls
+            className="w-full h-full object-contain"
+            onError={(e) => {
+              console.error('Erreur de lecture vidéo:', e);
+              setVideoError("Erreur lors de la lecture de la vidéo");
+              toast.error("Erreur lors de la lecture de la vidéo");
+            }}
+          >
+            Votre navigateur ne prend pas en charge la lecture vidéo.
+          </video>
+          {videoError && (
+            <div className="absolute top-4 right-4 bg-red-500/75 p-2 rounded-lg text-white">
+              <p>{videoError}</p>
+              <Button 
+                onClick={handleRetry}
+                className="mt-2 bg-white text-red-500 hover:bg-red-100"
+                size="sm"
+              >
+                Réessayer la traduction
+              </Button>
+            </div>
+          )}
+        </>
       ) : (
         <div className="flex items-center justify-center h-full text-white">
           Veuillez entrer une URL de vidéo
