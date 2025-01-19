@@ -13,21 +13,21 @@ interface LanguageSelectorProps {
 
 const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onLanguageChange }) => {
   return (
-    <Select onValueChange={onLanguageChange} defaultValue="en">
+    <Select onValueChange={onLanguageChange} defaultValue="fr">
       <SelectTrigger className="w-[200px]">
-        <SelectValue placeholder="Select Language" />
+        <SelectValue placeholder="Sélectionner une langue" />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="en">English</SelectItem>
-        <SelectItem value="es">Spanish</SelectItem>
-        <SelectItem value="fr">French</SelectItem>
-        <SelectItem value="de">German</SelectItem>
-        <SelectItem value="it">Italian</SelectItem>
-        <SelectItem value="pt">Portuguese</SelectItem>
-        <SelectItem value="ru">Russian</SelectItem>
-        <SelectItem value="zh">Chinese</SelectItem>
-        <SelectItem value="ja">Japanese</SelectItem>
-        <SelectItem value="ko">Korean</SelectItem>
+        <SelectItem value="en">Anglais</SelectItem>
+        <SelectItem value="fr">Français</SelectItem>
+        <SelectItem value="es">Espagnol</SelectItem>
+        <SelectItem value="de">Allemand</SelectItem>
+        <SelectItem value="it">Italien</SelectItem>
+        <SelectItem value="pt">Portugais</SelectItem>
+        <SelectItem value="ru">Russe</SelectItem>
+        <SelectItem value="zh">Chinois</SelectItem>
+        <SelectItem value="ja">Japonais</SelectItem>
+        <SelectItem value="ko">Coréen</SelectItem>
       </SelectContent>
     </Select>
   );

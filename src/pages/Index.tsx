@@ -7,26 +7,24 @@ import { Card } from "@/components/ui/card";
 
 const Index = () => {
   const [videoUrl, setVideoUrl] = useState<string>('');
-  const [selectedLanguage, setSelectedLanguage] = useState<string>('en');
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('fr');
   const [transcription, setTranscription] = useState<string>('');
 
   const handleVideoSubmit = (url: string) => {
     setVideoUrl(url);
-    // TODO: Add transcription logic
-    setTranscription("Sample transcription will appear here...");
+    setTranscription("La transcription apparaîtra ici...");
   };
 
   const handleLanguageChange = (language: string) => {
     setSelectedLanguage(language);
-    // TODO: Add translation logic
   };
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-8">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Video Translator</h1>
-          <p className="text-lg text-gray-600">Translate your videos into multiple languages</p>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">Traducteur Vidéo</h1>
+          <p className="text-lg text-gray-600">Traduisez vos vidéos dans plusieurs langues</p>
         </div>
 
         <VideoInput onVideoSubmit={handleVideoSubmit} />
@@ -42,9 +40,12 @@ const Index = () => {
 
             <Card className="p-4 space-y-4">
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold">Transcription & Translation</h2>
-                <Button variant="outline" onClick={() => navigator.clipboard.writeText(transcription)}>
-                  Copy Text
+                <h2 className="text-xl font-semibold">Transcription & Traduction</h2>
+                <Button 
+                  variant="outline" 
+                  onClick={() => navigator.clipboard.writeText(transcription)}
+                >
+                  Copier le texte
                 </Button>
               </div>
               <div className="h-[400px] overflow-y-auto bg-white p-4 rounded-lg border">
