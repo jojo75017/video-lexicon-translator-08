@@ -5,6 +5,7 @@ import LanguageSelector from '@/components/LanguageSelector';
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 
 const Index = () => {
   const [videoUrl, setVideoUrl] = useState<string>('');
@@ -35,20 +36,38 @@ const Index = () => {
 
   const handleVideoSubmit = async (url: string) => {
     setVideoUrl(url);
+    setProgress(0);
+    setTranscription('');
     
-    // Simulation du progrès de traitement
-    let currentProgress = 0;
-    const interval = setInterval(() => {
-      currentProgress += 10;
-      setProgress(currentProgress);
-      if (currentProgress >= 100) {
-        clearInterval(interval);
-      }
-    }, 500);
+    try {
+      // Simulation de la transcription
+      let currentProgress = 0;
+      const interval = setInterval(() => {
+        currentProgress += 10;
+        setProgress(currentProgress);
+        
+        // Ajout progressif de la transcription
+        if (currentProgress === 30) {
+          setTranscription('Début de la transcription...\n');
+        } else if (currentProgress === 60) {
+          setTranscription(prev => prev + 'Traitement en cours...\n');
+        } else if (currentProgress === 90) {
+          setTranscription(prev => prev + 'Finalisation de la transcription...\n');
+        } else if (currentProgress >= 100) {
+          clearInterval(interval);
+          setTranscription(prev => prev + 'Transcription terminée !\n\n' + demoSubtitles.map(sub => sub.text + '\n' + sub.translation + '\n').join('\n'));
+          toast.success('Transcription terminée !');
+        }
+      }, 500);
+    } catch (error) {
+      toast.error('Erreur lors de la transcription');
+      setProgress(0);
+    }
   };
 
   const handleLanguageChange = (language: string) => {
     setSelectedLanguage(language);
+    toast.info(`Langue changée pour : ${language}`);
   };
 
   return (
@@ -91,7 +110,7 @@ const Index = () => {
 
               <div className="space-y-4">
                 <h2 className="text-xl font-semibold">Transcription & Traduction</h2>
-                <div className="h-[400px] overflow-y-auto bg-white p-4 rounded-lg border">
+                <div className="h-[400px] overflow-y-auto bg-white p-4 rounded-lg border whitespace-pre-line">
                   {transcription || "La transcription apparaîtra ici..."}
                 </div>
               </div>
