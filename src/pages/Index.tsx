@@ -5,6 +5,8 @@ import LanguageSelector from '@/components/LanguageSelector';
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
 const Index = () => {
@@ -12,6 +14,7 @@ const Index = () => {
   const [selectedLanguage, setSelectedLanguage] = useState<string>('fr');
   const [transcription, setTranscription] = useState<string>('');
   const [progress, setProgress] = useState(0);
+  const [showSubtitles, setShowSubtitles] = useState(true);
 
   const demoSubtitles = [
     {
@@ -89,9 +92,20 @@ const Index = () => {
                 videoUrl={videoUrl} 
                 subtitles={demoSubtitles}
                 language={selectedLanguage}
+                showSubtitles={showSubtitles}
               />
               <div className="flex justify-between items-center">
-                <LanguageSelector onLanguageChange={handleLanguageChange} />
+                <div className="flex items-center space-x-4">
+                  <LanguageSelector onLanguageChange={handleLanguageChange} />
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="subtitles"
+                      checked={showSubtitles}
+                      onCheckedChange={setShowSubtitles}
+                    />
+                    <Label htmlFor="subtitles">Sous-titres</Label>
+                  </div>
+                </div>
                 <Badge variant="outline">
                   {selectedLanguage === 'fr' ? 'Français' : 'English'}
                 </Badge>
