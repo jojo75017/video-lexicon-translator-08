@@ -2,9 +2,7 @@ import React, { useState } from 'react';
 import VideoInput from '@/components/VideoInput';
 import VideoPlayer from '@/components/VideoPlayer';
 import LanguageSelector from '@/components/LanguageSelector';
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { toast } from "sonner";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 
@@ -14,7 +12,7 @@ const Index = () => {
   const [transcription, setTranscription] = useState<string>('');
   const [progress, setProgress] = useState(0);
 
-  // Sous-titres de démonstration plus élaborés
+  // Sous-titres de démonstration
   const demoSubtitles = [
     {
       startTime: 0,
@@ -38,7 +36,6 @@ const Index = () => {
 
   const handleVideoSubmit = async (url: string) => {
     setVideoUrl(url);
-    toast.success("Vidéo chargée avec succès !");
     
     // Simulation du progrès de traitement
     let currentProgress = 0;
@@ -47,73 +44,60 @@ const Index = () => {
       setProgress(currentProgress);
       if (currentProgress >= 100) {
         clearInterval(interval);
-        toast.success("Traitement terminé !");
       }
     }, 500);
   };
 
   const handleLanguageChange = (language: string) => {
     setSelectedLanguage(language);
-    toast.info("Changement de langue en cours...");
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-8 px-4">
       <div className="max-w-7xl mx-auto space-y-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Traducteur Vidéo</h1>
-          <p className="text-lg text-gray-600">Traduisez vos vidéos dans plusieurs langues avec des sous-titres colorés</p>
+          <p className="text-lg text-gray-600">Traduisez vos vidéos en plusieurs langues avec des sous-titres colorés</p>
         </div>
 
-        <VideoInput onVideoSubmit={handleVideoSubmit} />
+        <div className="w-full max-w-xl mx-auto">
+          <VideoInput onVideoSubmit={handleVideoSubmit} />
+        </div>
 
         {videoUrl && (
-          <>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="space-y-4">
+              <VideoPlayer 
+                videoUrl={videoUrl} 
+                subtitles={demoSubtitles}
+                language={selectedLanguage}
+              />
+              <div className="flex justify-between items-center">
+                <LanguageSelector onLanguageChange={handleLanguageChange} />
+                <Badge variant="outline">
+                  {selectedLanguage === 'fr' ? 'Français' : 'English'}
+                </Badge>
+              </div>
+            </div>
+
+            <Card className="p-6 space-y-6">
               <div className="space-y-4">
-                <VideoPlayer 
-                  videoUrl={videoUrl} 
-                  subtitles={demoSubtitles}
-                  language={selectedLanguage}
-                />
-                <div className="flex justify-between items-center">
-                  <LanguageSelector onLanguageChange={handleLanguageChange} />
-                  <Badge variant="outline" className="text-sm">
-                    {selectedLanguage === 'fr' ? 'Français' : 'English'}
-                  </Badge>
+                <h2 className="text-xl font-semibold">Progression du traitement</h2>
+                <Progress value={progress} className="w-full" />
+                <div className="flex justify-between text-sm text-gray-500">
+                  <span>Transcription</span>
+                  <span>{progress}%</span>
                 </div>
               </div>
 
-              <Card className="p-6 space-y-6">
-                <div className="space-y-4">
-                  <h2 className="text-xl font-semibold">Progression du traitement</h2>
-                  <Progress value={progress} className="w-full" />
-                  <div className="flex justify-between text-sm text-gray-500">
-                    <span>Transcription</span>
-                    <span>{progress}%</span>
-                  </div>
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold">Transcription & Traduction</h2>
+                <div className="h-[400px] overflow-y-auto bg-white p-4 rounded-lg border">
+                  {transcription || "La transcription apparaîtra ici..."}
                 </div>
-
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-semibold">Transcription & Traduction</h2>
-                    <Button 
-                      variant="outline" 
-                      onClick={() => {
-                        navigator.clipboard.writeText(transcription);
-                        toast.success("Texte copié !");
-                      }}
-                    >
-                      Copier le texte
-                    </Button>
-                  </div>
-                  <div className="h-[400px] overflow-y-auto bg-white p-4 rounded-lg border">
-                    {transcription || "La transcription apparaîtra ici..."}
-                  </div>
-                </div>
-              </Card>
-            </div>
-          </>
+              </div>
+            </Card>
+          </div>
         )}
       </div>
     </div>
