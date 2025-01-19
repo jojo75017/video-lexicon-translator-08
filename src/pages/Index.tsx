@@ -12,7 +12,6 @@ const Index = () => {
   const [transcription, setTranscription] = useState<string>('');
   const [progress, setProgress] = useState(0);
 
-  // Sous-titres de démonstration
   const demoSubtitles = [
     {
       startTime: 0,
@@ -57,10 +56,10 @@ const Index = () => {
       <div className="max-w-7xl mx-auto space-y-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Traducteur Vidéo</h1>
-          <p className="text-lg text-gray-600">Traduisez vos vidéos en plusieurs langues avec des sous-titres colorés</p>
+          <p className="text-lg text-gray-600 mb-8">Traduisez vos vidéos en plusieurs langues avec des sous-titres colorés</p>
         </div>
 
-        <div className="w-full max-w-xl mx-auto">
+        <div className="w-full max-w-xl mx-auto mb-8">
           <VideoInput onVideoSubmit={handleVideoSubmit} />
         </div>
 
