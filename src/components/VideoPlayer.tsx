@@ -32,8 +32,16 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     toast.info("Extraction de l'audio en cours...");
 
     try {
+      // Vérifier d'abord si la clé API est disponible
+      if (!process.env.ELEVEN_LABS_API_KEY) {
+        throw new Error('Clé API Eleven Labs manquante');
+      }
+
       // Extraire l'audio de la vidéo
       const audioResponse = await fetch(videoUrl);
+      if (!audioResponse.ok) {
+        throw new Error('Erreur lors de l\'extraction audio');
+      }
       const audioData = await audioResponse.blob();
       
       toast.info("Traduction audio en cours...");
@@ -43,7 +51,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'xi-api-key': process.env.ELEVEN_LABS_API_KEY || '',
+          'xi-api-key': process.env.ELEVEN_LABS_API_KEY,
         },
         body: JSON.stringify({
           text: "Texte à traduire", // À remplacer par le texte extrait de la vidéo
@@ -65,7 +73,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       toast.success("Traduction audio terminée !");
     } catch (error) {
       console.error('Erreur lors de la traduction audio:', error);
-      toast.error("Erreur lors de la traduction audio");
+      toast.error("Erreur lors de la traduction audio. La vidéo sera lue sans traduction.");
     } finally {
       setIsTranslating(false);
     }
@@ -111,14 +119,24 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
   return (
     <div className="relative w-full aspect-video bg-gray-900 rounded-lg overflow-hidden">
-      <video
-        ref={videoRef}
-        src={videoUrl}
-        controls
-        className="w-full h-full object-contain"
-      >
-        Votre navigateur ne prend pas en charge la lecture vidéo.
-      </video>
+      {videoUrl ? (
+        <video
+          ref={videoRef}
+          src={videoUrl}
+          controls
+          className="w-full h-full object-contain"
+          onError={(e) => {
+            console.error('Erreur de lecture vidéo:', e);
+            toast.error("Erreur lors de la lecture de la vidéo");
+          }}
+        >
+          Votre navigateur ne prend pas en charge la lecture vidéo.
+        </video>
+      ) : (
+        <div className="flex items-center justify-center h-full text-white">
+          Veuillez entrer une URL de vidéo
+        </div>
+      )}
       {showSubtitles && (
         <SubtitleOverlay
           subtitles={subtitles}
