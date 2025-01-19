@@ -39,25 +39,23 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
     try {
       const apiKey = process.env.ELEVEN_LABS_API_KEY;
-      console.log("Tentative de traduction...");
-      console.log("API Key présente:", !!apiKey);
-      console.log("Longueur de la clé API:", apiKey?.length);
+      console.log("Début de la traduction...");
+      console.log("Vérification de la clé API:", apiKey ? "Présente" : "Absente");
 
       if (!apiKey) {
         throw new Error('Clé API Eleven Labs manquante. Veuillez configurer votre clé API.');
       }
 
-      // Vérification basique de la clé API
-      if (apiKey.length < 32) {
-        throw new Error('Format de clé API invalide. Veuillez vérifier votre clé API.');
+      // Vérification du format de la clé
+      if (!/^[a-zA-Z0-9]{32,}$/.test(apiKey)) {
+        throw new Error('Format de clé API invalide. La clé doit contenir au moins 32 caractères alphanumériques.');
       }
 
       toast.info("Préparation de la traduction audio...");
       
       const textToTranslate = subtitles.map(sub => sub.translation).join(' ');
-      console.log("Texte à traduire:", textToTranslate.substring(0, 50) + "...");
+      console.log("Texte à traduire (début):", textToTranslate.substring(0, 50));
       
-      // Appel à l'API Eleven Labs pour la traduction
       const response = await fetch('https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM', {
         method: 'POST',
         headers: {
@@ -75,12 +73,16 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         }),
       });
 
+      console.log("Statut de la réponse:", response.status);
+      
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        console.error('Erreur API Eleven Labs:', errorData);
+        console.error('Détails de l\'erreur:', errorData);
         
         if (response.status === 401) {
-          throw new Error('Clé API invalide. Veuillez vérifier votre clé API Eleven Labs.');
+          throw new Error('Clé API non valide ou expirée. Veuillez vérifier votre clé API Eleven Labs.');
+        } else if (response.status === 429) {
+          throw new Error('Limite d\'utilisation de l\'API atteinte. Veuillez réessayer plus tard.');
         } else {
           throw new Error(`Erreur lors de la traduction audio (${response.status}): ${errorData.detail || 'Erreur inconnue'}`);
         }
@@ -89,11 +91,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       const translatedAudioBlob = await response.blob();
       setAudioBlob(translatedAudioBlob);
       
-      toast.success("Traduction audio terminée !");
+      toast.success("Traduction audio terminée avec succès !");
     } catch (error) {
-      console.error('Erreur détaillée:', error);
-      setVideoError(error instanceof Error ? error.message : "Erreur inconnue");
-      toast.error(error instanceof Error ? error.message : "Erreur de traduction");
+      console.error('Erreur complète:', error);
+      const errorMessage = error instanceof Error ? error.message : "Erreur inconnue lors de la traduction";
+      setVideoError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsTranslating(false);
     }
@@ -156,10 +159,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             src={videoUrl}
             controls
             className="w-full h-full object-contain"
-            onError={(e) => {
-              console.error('Erreur de lecture vidéo:', e);
-              setVideoError("Erreur lors de la lecture de la vidéo");
-              toast.error("Erreur lors de la lecture de la vidéo");
+            onError={() => {
+              const errorMsg = "Erreur lors de la lecture de la vidéo";
+              setVideoError(errorMsg);
+              toast.error(errorMsg);
             }}
           >
             Votre navigateur ne prend pas en charge la lecture vidéo.
