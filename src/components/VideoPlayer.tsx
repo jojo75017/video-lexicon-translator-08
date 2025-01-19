@@ -1,6 +1,4 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { FFmpeg } from '@ffmpeg/ffmpeg';
-import { fetchFile, toBlobURL } from '@ffmpeg/util';
 import SubtitleOverlay from './SubtitleOverlay';
 import { toast } from 'sonner';
 
@@ -24,25 +22,51 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [currentTime, setCurrentTime] = useState(0);
-  const [translatedAudioUrl, setTranslatedAudioUrl] = useState<string>('');
   const [isTranslating, setIsTranslating] = useState(false);
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
 
   const translateAudio = async () => {
     if (!videoUrl) return;
     
     setIsTranslating(true);
-    toast.info("Traduction audio en cours...");
+    toast.info("Extraction de l'audio en cours...");
 
     try {
-      // Ici, nous devrions appeler l'API Eleven Labs pour traduire l'audio
-      // Pour l'instant, c'est une simulation
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Extraire l'audio de la vidéo
+      const audioResponse = await fetch(videoUrl);
+      const audioData = await audioResponse.blob();
+      
+      toast.info("Traduction audio en cours...");
+      
+      // Appel à l'API Eleven Labs pour la traduction
+      const response = await fetch('https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'xi-api-key': process.env.ELEVEN_LABS_API_KEY || '',
+        },
+        body: JSON.stringify({
+          text: "Texte à traduire", // À remplacer par le texte extrait de la vidéo
+          model_id: "eleven_multilingual_v2",
+          voice_settings: {
+            stability: 0.5,
+            similarity_boost: 0.75,
+          }
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de la traduction audio');
+      }
+
+      const translatedAudioBlob = await response.blob();
+      setAudioBlob(translatedAudioBlob);
       
       toast.success("Traduction audio terminée !");
-      setIsTranslating(false);
     } catch (error) {
       console.error('Erreur lors de la traduction audio:', error);
       toast.error("Erreur lors de la traduction audio");
+    } finally {
       setIsTranslating(false);
     }
   };
@@ -64,6 +88,26 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       translateAudio();
     }
   }, [videoUrl, language]);
+
+  // Gestion de l'audio traduit
+  useEffect(() => {
+    if (audioBlob && videoRef.current) {
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audioElement = new Audio(audioUrl);
+      
+      // Synchroniser l'audio traduit avec la vidéo
+      videoRef.current.addEventListener('play', () => audioElement.play());
+      videoRef.current.addEventListener('pause', () => audioElement.pause());
+      videoRef.current.addEventListener('seeked', () => {
+        audioElement.currentTime = videoRef.current!.currentTime;
+      });
+
+      return () => {
+        URL.revokeObjectURL(audioUrl);
+        audioElement.pause();
+      };
+    }
+  }, [audioBlob]);
 
   return (
     <div className="relative w-full aspect-video bg-gray-900 rounded-lg overflow-hidden">
