@@ -4,7 +4,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
+import axios from 'axios';
 import SiteStructureVisualizer from '@/components/SiteStructureVisualizer';
+import { Loader2 } from "lucide-react";
 
 const Index = () => {
   const [url, setUrl] = useState('');
@@ -17,58 +19,47 @@ const Index = () => {
       return;
     }
 
+    // Vérification basique du format de l'URL
+    try {
+      new URL(url);
+    } catch {
+      toast.error("Format d'URL invalide. Assurez-vous d'inclure http:// ou https://");
+      return;
+    }
+
     setIsLoading(true);
     try {
-      // Simulation d'analyse pour démonstration
-      const mockStructure = {
+      const response = await axios.get(url);
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(response.data, 'text/html');
+
+      // Analyse des liens
+      const links = Array.from(doc.querySelectorAll('a')).map(link => ({
+        url: link.href,
+        text: link.textContent?.trim() || ''
+      }));
+
+      // Création de la structure
+      const structure = {
         name: "Site Web",
         children: [
           {
-            name: "Accueil",
-            path: "/",
-            children: []
-          },
-          {
-            name: "À propos",
-            path: "/about",
-            children: [
-              {
-                name: "Notre équipe",
-                path: "/about/team",
-                children: []
-              }
-            ]
-          },
-          {
-            name: "Services",
-            path: "/services",
-            children: [
-              {
-                name: "Consultation",
-                path: "/services/consulting",
-                children: []
-              },
-              {
-                name: "Formation",
-                path: "/services/training",
-                children: []
-              }
-            ]
-          },
-          {
-            name: "Contact",
-            path: "/contact",
-            children: []
+            name: "Page d'accueil",
+            path: url,
+            children: links.map(link => ({
+              name: link.text || 'Lien sans titre',
+              path: link.url,
+              children: []
+            }))
           }
         ]
       };
 
-      // Simuler un délai de chargement
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setSiteStructure(mockStructure);
+      setSiteStructure(structure);
       toast.success("Analyse terminée !");
     } catch (error) {
-      toast.error("Erreur lors de l'analyse du site");
+      console.error('Erreur lors de l\'analyse:', error);
+      toast.error("Erreur lors de l'analyse du site. Vérifiez que le site est accessible et autorise les requêtes CORS.");
     } finally {
       setIsLoading(false);
     }
@@ -96,8 +87,16 @@ const Index = () => {
                 <Button 
                   onClick={analyzeSite}
                   disabled={isLoading}
+                  className="min-w-[120px]"
                 >
-                  {isLoading ? "Analyse en cours..." : "Analyser"}
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Analyse...
+                    </>
+                  ) : (
+                    "Analyser"
+                  )}
                 </Button>
               </div>
             </div>
