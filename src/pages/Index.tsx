@@ -8,10 +8,45 @@ import axios from 'axios';
 import SiteStructureVisualizer from '@/components/SiteStructureVisualizer';
 import { Loader2 } from "lucide-react";
 
+interface SeoAnalysis {
+  title: string;
+  description: string;
+  h1Count: number;
+  imgCount: number;
+  imgWithoutAlt: number;
+  metaTagsCount: number;
+  canonicalUrl: string | null;
+  robotsMeta: string | null;
+}
+
 const Index = () => {
   const [url, setUrl] = useState('');
   const [siteStructure, setSiteStructure] = useState<any>(null);
+  const [seoAnalysis, setSeoAnalysis] = useState<SeoAnalysis | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const analyzeSEO = (doc: Document): SeoAnalysis => {
+    const title = doc.title;
+    const description = doc.querySelector('meta[name="description"]')?.getAttribute('content') || '';
+    const h1Count = doc.getElementsByTagName('h1').length;
+    const images = doc.getElementsByTagName('img');
+    const imgCount = images.length;
+    const imgWithoutAlt = Array.from(images).filter(img => !img.alt).length;
+    const metaTagsCount = doc.getElementsByTagName('meta').length;
+    const canonicalUrl = doc.querySelector('link[rel="canonical"]')?.getAttribute('href') || null;
+    const robotsMeta = doc.querySelector('meta[name="robots"]')?.getAttribute('content') || null;
+
+    return {
+      title,
+      description,
+      h1Count,
+      imgCount,
+      imgWithoutAlt,
+      metaTagsCount,
+      canonicalUrl,
+      robotsMeta
+    };
+  };
 
   const analyzeSite = async () => {
     if (!url) {
@@ -19,7 +54,6 @@ const Index = () => {
       return;
     }
 
-    // Vérification basique du format de l'URL
     try {
       new URL(url);
     } catch {
@@ -32,6 +66,10 @@ const Index = () => {
       const response = await axios.get(url);
       const parser = new DOMParser();
       const doc = parser.parseFromString(response.data, 'text/html');
+
+      // Analyse SEO
+      const seoResults = analyzeSEO(doc);
+      setSeoAnalysis(seoResults);
 
       // Analyse des liens
       const links = Array.from(doc.querySelectorAll('a')).map(link => ({
@@ -102,6 +140,32 @@ const Index = () => {
             </div>
           </div>
         </Card>
+
+        {seoAnalysis && (
+          <Card className="p-6">
+            <h2 className="text-2xl font-semibold mb-4">Analyse SEO</h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <h3 className="font-medium mb-2">Balises principales</h3>
+                <ul className="space-y-2">
+                  <li><span className="font-medium">Titre :</span> {seoAnalysis.title}</li>
+                  <li><span className="font-medium">Description :</span> {seoAnalysis.description || 'Non définie'}</li>
+                  <li><span className="font-medium">URL Canonique :</span> {seoAnalysis.canonicalUrl || 'Non définie'}</li>
+                  <li><span className="font-medium">Meta Robots :</span> {seoAnalysis.robotsMeta || 'Non définie'}</li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-medium mb-2">Statistiques</h3>
+                <ul className="space-y-2">
+                  <li><span className="font-medium">Nombre de H1 :</span> {seoAnalysis.h1Count}</li>
+                  <li><span className="font-medium">Nombre d'images :</span> {seoAnalysis.imgCount}</li>
+                  <li><span className="font-medium">Images sans alt :</span> {seoAnalysis.imgWithoutAlt}</li>
+                  <li><span className="font-medium">Nombre de meta tags :</span> {seoAnalysis.metaTagsCount}</li>
+                </ul>
+              </div>
+            </div>
+          </Card>
+        )}
 
         {siteStructure && (
           <Card className="p-6">
