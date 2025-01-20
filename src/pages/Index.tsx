@@ -63,9 +63,12 @@ const Index = () => {
 
     setIsLoading(true);
     try {
-      const response = await axios.get(url, {
+      // Utilisation du proxy CORS
+      const corsProxy = 'https://cors-anywhere.herokuapp.com/';
+      const response = await axios.get(`${corsProxy}${url}`, {
         headers: {
           'Accept': 'text/html',
+          'X-Requested-With': 'XMLHttpRequest',
         },
       });
       
@@ -106,9 +109,9 @@ const Index = () => {
       if (error instanceof AxiosError) {
         if (error.code === 'ERR_NETWORK') {
           toast.error(
-            "Erreur CORS : Le site web bloque l'accès à son contenu. " +
-            "Cela est dû aux restrictions de sécurité du navigateur. " +
-            "Essayez un autre site ou utilisez un proxy CORS."
+            "Erreur de connexion au proxy CORS. " +
+            "Veuillez d'abord activer le proxy en visitant : " +
+            "https://cors-anywhere.herokuapp.com/corsdemo"
           );
         } else {
           toast.error(`Erreur réseau : ${error.message}`);
