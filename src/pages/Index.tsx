@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import SiteStructureVisualizer from '@/components/SiteStructureVisualizer';
 import { Loader2 } from "lucide-react";
 
@@ -63,7 +63,12 @@ const Index = () => {
 
     setIsLoading(true);
     try {
-      const response = await axios.get(url);
+      const response = await axios.get(url, {
+        headers: {
+          'Accept': 'text/html',
+        },
+      });
+      
       const parser = new DOMParser();
       const doc = parser.parseFromString(response.data, 'text/html');
 
@@ -97,7 +102,20 @@ const Index = () => {
       toast.success("Analyse terminée !");
     } catch (error) {
       console.error('Erreur lors de l\'analyse:', error);
-      toast.error("Erreur lors de l'analyse du site. Vérifiez que le site est accessible et autorise les requêtes CORS.");
+      
+      if (error instanceof AxiosError) {
+        if (error.code === 'ERR_NETWORK') {
+          toast.error(
+            "Erreur CORS : Le site web bloque l'accès à son contenu. " +
+            "Cela est dû aux restrictions de sécurité du navigateur. " +
+            "Essayez un autre site ou utilisez un proxy CORS."
+          );
+        } else {
+          toast.error(`Erreur réseau : ${error.message}`);
+        }
+      } else {
+        toast.error("Une erreur inattendue s'est produite lors de l'analyse du site.");
+      }
     } finally {
       setIsLoading(false);
     }
