@@ -6,7 +6,9 @@ import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
 import axios, { AxiosError } from 'axios';
 import SiteStructureVisualizer from '@/components/SiteStructureVisualizer';
+import ResourcesAnalyzer from '@/components/ResourcesAnalyzer';
 import { Loader2 } from "lucide-react";
+import { analyzeResources, Resource } from '@/utils/resourceAnalyzer';
 
 interface SeoAnalysis {
   title: string;
@@ -17,15 +19,17 @@ interface SeoAnalysis {
   metaTagsCount: number;
   canonicalUrl: string | null;
   robotsMeta: string | null;
+  brokenLinks: number;
 }
 
 const Index = () => {
   const [url, setUrl] = useState('');
   const [siteStructure, setSiteStructure] = useState<any>(null);
   const [seoAnalysis, setSeoAnalysis] = useState<SeoAnalysis | null>(null);
+  const [resources, setResources] = useState<Resource[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const analyzeSEO = (doc: Document): SeoAnalysis => {
+  const analyzeSEO = async (doc: Document, baseUrl: string): Promise<SeoAnalysis> => {
     const title = doc.title;
     const description = doc.querySelector('meta[name="description"]')?.getAttribute('content') || '';
     const h1Count = doc.getElementsByTagName('h1').length;
@@ -36,6 +40,21 @@ const Index = () => {
     const canonicalUrl = doc.querySelector('link[rel="canonical"]')?.getAttribute('href') || null;
     const robotsMeta = doc.querySelector('meta[name="robots"]')?.getAttribute('content') || null;
 
+    // Vérification des liens morts
+    const links = Array.from(doc.getElementsByTagName('a'));
+    let brokenLinks = 0;
+    
+    for (const link of links) {
+      if (link.href) {
+        try {
+          const fullUrl = new URL(link.href, baseUrl).href;
+          await axios.head(fullUrl);
+        } catch {
+          brokenLinks++;
+        }
+      }
+    }
+
     return {
       title,
       description,
@@ -44,7 +63,8 @@ const Index = () => {
       imgWithoutAlt,
       metaTagsCount,
       canonicalUrl,
-      robotsMeta
+      robotsMeta,
+      brokenLinks
     };
   };
 
@@ -63,7 +83,6 @@ const Index = () => {
 
     setIsLoading(true);
     try {
-      // Utilisation du proxy CORS
       const corsProxy = 'https://cors-anywhere.herokuapp.com/';
       const response = await axios.get(`${corsProxy}${url}`, {
         headers: {
@@ -76,8 +95,12 @@ const Index = () => {
       const doc = parser.parseFromString(response.data, 'text/html');
 
       // Analyse SEO
-      const seoResults = analyzeSEO(doc);
+      const seoResults = await analyzeSEO(doc, url);
       setSeoAnalysis(seoResults);
+
+      // Analyse des ressources
+      const resourcesResults = await analyzeResources(doc, url);
+      setResources(resourcesResults);
 
       // Analyse des liens
       const links = Array.from(doc.querySelectorAll('a')).map(link => ({
@@ -182,10 +205,15 @@ const Index = () => {
                   <li><span className="font-medium">Nombre d'images :</span> {seoAnalysis.imgCount}</li>
                   <li><span className="font-medium">Images sans alt :</span> {seoAnalysis.imgWithoutAlt}</li>
                   <li><span className="font-medium">Nombre de meta tags :</span> {seoAnalysis.metaTagsCount}</li>
+                  <li><span className="font-medium">Liens morts détectés :</span> {seoAnalysis.brokenLinks}</li>
                 </ul>
               </div>
             </div>
           </Card>
+        )}
+
+        {resources.length > 0 && (
+          <ResourcesAnalyzer resources={resources} />
         )}
 
         {siteStructure && (
