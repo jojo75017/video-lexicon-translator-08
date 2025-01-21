@@ -9,6 +9,7 @@ import SiteStructureVisualizer from '@/components/SiteStructureVisualizer';
 import ResourcesAnalyzer from '@/components/ResourcesAnalyzer';
 import { Loader2 } from "lucide-react";
 import { analyzeResources, Resource } from '@/utils/resourceAnalyzer';
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface SeoAnalysis {
   title: string;
@@ -28,6 +29,7 @@ const Index = () => {
   const [seoAnalysis, setSeoAnalysis] = useState<SeoAnalysis | null>(null);
   const [resources, setResources] = useState<Resource[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [showCorsWarning, setShowCorsWarning] = useState(false);
 
   const analyzeSEO = async (doc: Document, baseUrl: string): Promise<SeoAnalysis> => {
     const title = doc.title;
@@ -82,6 +84,8 @@ const Index = () => {
     }
 
     setIsLoading(true);
+    setShowCorsWarning(false);
+    
     try {
       const corsProxy = 'https://cors-anywhere.herokuapp.com/';
       const response = await axios.get(`${corsProxy}${url}`, {
@@ -130,12 +134,10 @@ const Index = () => {
       console.error('Erreur lors de l\'analyse:', error);
       
       if (error instanceof AxiosError) {
-        if (error.code === 'ERR_NETWORK') {
-          toast.error(
-            "Erreur de connexion au proxy CORS. " +
-            "Veuillez d'abord activer le proxy en visitant : " +
-            "https://cors-anywhere.herokuapp.com/corsdemo"
-          );
+        if (error.response?.status === 403) {
+          setShowCorsWarning(true);
+        } else if (error.code === 'ERR_NETWORK') {
+          toast.error("Erreur de connexion au proxy CORS");
         } else {
           toast.error(`Erreur réseau : ${error.message}`);
         }
@@ -154,6 +156,23 @@ const Index = () => {
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Générateur d'Architecture Web</h1>
           <p className="text-lg text-gray-600">Analysez et visualisez la structure de n'importe quel site web</p>
         </div>
+
+        {showCorsWarning && (
+          <Alert className="bg-yellow-50 border-yellow-200">
+            <AlertDescription>
+              Pour utiliser cet outil, vous devez d'abord activer le proxy CORS en visitant{' '}
+              <a 
+                href="https://cors-anywhere.herokuapp.com/corsdemo" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="font-medium underline hover:text-blue-600"
+              >
+                https://cors-anywhere.herokuapp.com/corsdemo
+              </a>
+              {' '}et en cliquant sur le bouton d'activation.
+            </AlertDescription>
+          </Alert>
+        )}
 
         <Card className="p-6">
           <div className="space-y-4">
