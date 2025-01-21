@@ -85,18 +85,26 @@ const Index = () => {
 
     setIsLoading(true);
     setShowCorsWarning(false);
+    setSiteStructure(null);
+    setSeoAnalysis(null);
+    setResources([]);
     
     try {
       const corsProxy = 'https://cors-anywhere.herokuapp.com/';
+      toast.info("Connexion au proxy CORS en cours...");
+      
       const response = await axios.get(`${corsProxy}${url}`, {
         headers: {
           'Accept': 'text/html',
           'X-Requested-With': 'XMLHttpRequest',
         },
+        timeout: 10000, // 10 secondes de timeout
       });
       
       const parser = new DOMParser();
       const doc = parser.parseFromString(response.data, 'text/html');
+
+      toast.info("Analyse du site en cours...");
 
       // Analyse SEO
       const seoResults = await analyzeSEO(doc, url);
@@ -138,6 +146,8 @@ const Index = () => {
           setShowCorsWarning(true);
         } else if (error.code === 'ERR_NETWORK') {
           toast.error("Erreur de connexion au proxy CORS");
+        } else if (error.code === 'ECONNABORTED') {
+          toast.error("Le délai d'attente a été dépassé. Veuillez réessayer.");
         } else {
           toast.error(`Erreur réseau : ${error.message}`);
         }
@@ -184,6 +194,7 @@ const Index = () => {
                   placeholder="https://exemple.com"
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
+                  disabled={isLoading}
                 />
                 <Button 
                   onClick={analyzeSite}
@@ -204,7 +215,16 @@ const Index = () => {
           </div>
         </Card>
 
-        {seoAnalysis && (
+        {isLoading && (
+          <Card className="p-6 flex items-center justify-center">
+            <div className="text-center">
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+              <p className="text-gray-600">Analyse en cours, veuillez patienter...</p>
+            </div>
+          </Card>
+        )}
+
+        {seoAnalysis && !isLoading && (
           <Card className="p-6">
             <h2 className="text-2xl font-semibold mb-4">Analyse SEO</h2>
             <div className="grid gap-4 md:grid-cols-2">
@@ -231,11 +251,11 @@ const Index = () => {
           </Card>
         )}
 
-        {resources.length > 0 && (
+        {resources.length > 0 && !isLoading && (
           <ResourcesAnalyzer resources={resources} />
         )}
 
-        {siteStructure && (
+        {siteStructure && !isLoading && (
           <Card className="p-6">
             <h2 className="text-2xl font-semibold mb-4">Structure du Site</h2>
             <SiteStructureVisualizer structure={siteStructure} />
