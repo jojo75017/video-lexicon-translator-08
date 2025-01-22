@@ -6,6 +6,7 @@ import SiteStructureVisualizer from '@/components/SiteStructureVisualizer';
 import ResourcesAnalyzer from '@/components/ResourcesAnalyzer';
 import UrlInput from '@/components/UrlInput';
 import SeoResults from '@/components/SeoResults';
+import UrlShortener from '@/components/UrlShortener';
 import { useSiteAnalyzer } from '@/hooks/useSiteAnalyzer';
 
 const Index = () => {
@@ -47,6 +48,13 @@ const Index = () => {
 
     return (
       <>
+        {url && (
+          <Card className="p-6">
+            <h2 className="text-2xl font-semibold mb-4">Raccourcir l'URL</h2>
+            <UrlShortener longUrl={url} />
+          </Card>
+        )}
+
         {seoAnalysis && (
           <SeoResults seoAnalysis={seoAnalysis} />
         )}
