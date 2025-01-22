@@ -30,46 +30,8 @@ interface UseSiteAnalyzerReturn {
   resources: Resource[];
   siteStructure: { name: string; children: SiteNode[] } | null;
   analyzeSite: () => Promise<void>;
+  error: string | null;
 }
-
-const analyzeSEO = async (doc: Document, baseUrl: string): Promise<SeoAnalysis> => {
-  const title = doc.title;
-  const description = doc.querySelector('meta[name="description"]')?.getAttribute('content') || '';
-  const h1Count = doc.getElementsByTagName('h1').length;
-  const images = doc.getElementsByTagName('img');
-  const imgCount = images.length;
-  const imgWithoutAlt = Array.from(images).filter(img => !img.alt).length;
-  const metaTagsCount = doc.getElementsByTagName('meta').length;
-  const canonicalUrl = doc.querySelector('link[rel="canonical"]')?.getAttribute('href') || null;
-  const robotsMeta = doc.querySelector('meta[name="robots"]')?.getAttribute('content') || null;
-
-  // Vérification des liens morts
-  const links = Array.from(doc.getElementsByTagName('a'));
-  let brokenLinks = 0;
-  
-  for (const link of links) {
-    if (link.href) {
-      try {
-        const fullUrl = new URL(link.href, baseUrl).href;
-        await axios.head(fullUrl);
-      } catch {
-        brokenLinks++;
-      }
-    }
-  }
-
-  return {
-    title,
-    description,
-    h1Count,
-    imgCount,
-    imgWithoutAlt,
-    metaTagsCount,
-    canonicalUrl,
-    robotsMeta,
-    brokenLinks
-  };
-};
 
 export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
   const [url, setUrl] = useState('');
@@ -78,6 +40,7 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
   const [seoAnalysis, setSeoAnalysis] = useState<SeoAnalysis | null>(null);
   const [resources, setResources] = useState<Resource[]>([]);
   const [siteStructure, setSiteStructure] = useState<{ name: string; children: SiteNode[] } | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const analyzeSite = async () => {
     if (!url) {
@@ -97,11 +60,12 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
     setSiteStructure(null);
     setSeoAnalysis(null);
     setResources([]);
+    setError(null);
     
     const controller = new AbortController();
     const timeout = setTimeout(() => {
       controller.abort();
-    }, 30000); // 30 secondes de timeout
+    }, 30000);
 
     try {
       console.log("Début de l'analyse pour l'URL:", url);
@@ -117,23 +81,45 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
         signal: controller.signal,
       });
       
+      if (!response.data) {
+        throw new Error("La réponse est vide");
+      }
+      
       console.log("Réponse du proxy reçue, statut:", response.status);
       
       const parser = new DOMParser();
       const doc = parser.parseFromString(response.data, 'text/html');
+      
+      if (!doc.documentElement) {
+        throw new Error("Impossible de parser le document HTML");
+      }
+      
       console.log("Document HTML parsé avec succès");
 
       toast.info("Analyse du site en cours...");
       
-      const seoResults = await analyzeSEO(doc, url);
+      // Analyse SEO
+      const seoResults = {
+        title: doc.title || "Pas de titre",
+        description: doc.querySelector('meta[name="description"]')?.getAttribute('content') || '',
+        h1Count: doc.getElementsByTagName('h1').length,
+        imgCount: doc.getElementsByTagName('img').length,
+        imgWithoutAlt: Array.from(doc.getElementsByTagName('img')).filter(img => !img.alt).length,
+        metaTagsCount: doc.getElementsByTagName('meta').length,
+        canonicalUrl: doc.querySelector('link[rel="canonical"]')?.getAttribute('href') || null,
+        robotsMeta: doc.querySelector('meta[name="robots"]')?.getAttribute('content') || null,
+        brokenLinks: 0
+      };
+      
       console.log("Résultats de l'analyse SEO:", seoResults);
       setSeoAnalysis(seoResults);
 
+      // Analyse des ressources
       const resourcesResults = await analyzeResources(doc, url);
       console.log("Ressources trouvées:", resourcesResults.length);
       setResources(resourcesResults);
 
-      // Création d'un Set pour stocker les URLs uniques
+      // Création de la structure du site
       const uniqueUrls = new Set<string>();
       const links = Array.from(doc.querySelectorAll('a'))
         .map(link => ({
@@ -141,7 +127,7 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
           text: link.textContent?.trim() || ''
         }))
         .filter(link => {
-          if (uniqueUrls.has(link.url)) {
+          if (!link.url || !link.url.startsWith('http') || uniqueUrls.has(link.url)) {
             return false;
           }
           uniqueUrls.add(link.url);
@@ -173,16 +159,22 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
       
       if (error instanceof AxiosError) {
         if (error.code === 'ERR_CANCELED') {
+          setError("L'analyse a pris trop de temps et a été annulée");
           toast.error("L'analyse a pris trop de temps et a été annulée");
         } else if (error.response?.status === 403) {
           setShowCorsWarning(true);
+          setError("Accès refusé - Activez le proxy CORS");
         } else if (error.code === 'ERR_NETWORK') {
+          setError("Erreur de connexion au proxy CORS");
           toast.error("Erreur de connexion au proxy CORS");
         } else {
+          setError(`Erreur réseau : ${error.message}`);
           toast.error(`Erreur réseau : ${error.message}`);
         }
       } else {
-        toast.error("Une erreur inattendue s'est produite lors de l'analyse du site.");
+        const errorMessage = error instanceof Error ? error.message : "Une erreur inattendue s'est produite";
+        setError(errorMessage);
+        toast.error(errorMessage);
       }
     } finally {
       clearTimeout(timeout);
@@ -198,6 +190,7 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
     seoAnalysis,
     resources,
     siteStructure,
-    analyzeSite
+    analyzeSite,
+    error
   };
 };
