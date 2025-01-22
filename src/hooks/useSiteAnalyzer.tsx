@@ -98,6 +98,11 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
     setSeoAnalysis(null);
     setResources([]);
     
+    const controller = new AbortController();
+    const timeout = setTimeout(() => {
+      controller.abort();
+    }, 30000); // 30 secondes de timeout
+
     try {
       console.log("Début de l'analyse pour l'URL:", url);
       const corsProxy = 'https://cors-anywhere.herokuapp.com/';
@@ -109,34 +114,41 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
           'Accept': 'text/html',
           'X-Requested-With': 'XMLHttpRequest',
         },
-        timeout: 10000,
+        signal: controller.signal,
       });
       
       console.log("Réponse du proxy reçue, statut:", response.status);
-      console.log("Type de contenu reçu:", response.headers['content-type']);
       
       const parser = new DOMParser();
       const doc = parser.parseFromString(response.data, 'text/html');
       console.log("Document HTML parsé avec succès");
 
       toast.info("Analyse du site en cours...");
-      console.log("Début de l'analyse SEO...");
-
+      
       const seoResults = await analyzeSEO(doc, url);
       console.log("Résultats de l'analyse SEO:", seoResults);
       setSeoAnalysis(seoResults);
 
-      console.log("Début de l'analyse des ressources...");
       const resourcesResults = await analyzeResources(doc, url);
       console.log("Ressources trouvées:", resourcesResults.length);
       setResources(resourcesResults);
 
-      console.log("Début de l'analyse des liens...");
-      const links = Array.from(doc.querySelectorAll('a')).map(link => ({
-        url: link.href,
-        text: link.textContent?.trim() || ''
-      }));
-      console.log("Nombre de liens trouvés:", links.length);
+      // Création d'un Set pour stocker les URLs uniques
+      const uniqueUrls = new Set<string>();
+      const links = Array.from(doc.querySelectorAll('a'))
+        .map(link => ({
+          url: link.href,
+          text: link.textContent?.trim() || ''
+        }))
+        .filter(link => {
+          if (uniqueUrls.has(link.url)) {
+            return false;
+          }
+          uniqueUrls.add(link.url);
+          return true;
+        });
+
+      console.log("Nombre de liens uniques trouvés:", links.length);
 
       const structure = {
         name: "Site Web",
@@ -160,26 +172,20 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
       console.error('Erreur complète:', error);
       
       if (error instanceof AxiosError) {
-        console.log("Type d'erreur Axios détecté");
-        console.log("Code d'erreur:", error.code);
-        console.log("Message d'erreur:", error.message);
-        console.log("Statut de la réponse:", error.response?.status);
-        console.log("Headers de la réponse:", error.response?.headers);
-        
-        if (error.response?.status === 403) {
+        if (error.code === 'ERR_CANCELED') {
+          toast.error("L'analyse a pris trop de temps et a été annulée");
+        } else if (error.response?.status === 403) {
           setShowCorsWarning(true);
         } else if (error.code === 'ERR_NETWORK') {
           toast.error("Erreur de connexion au proxy CORS");
-        } else if (error.code === 'ECONNABORTED') {
-          toast.error("Le délai d'attente a été dépassé. Veuillez réessayer.");
         } else {
           toast.error(`Erreur réseau : ${error.message}`);
         }
       } else {
-        console.error("Erreur non-Axios:", error);
         toast.error("Une erreur inattendue s'est produite lors de l'analyse du site.");
       }
     } finally {
+      clearTimeout(timeout);
       setIsLoading(false);
     }
   };
