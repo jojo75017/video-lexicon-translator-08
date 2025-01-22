@@ -90,35 +90,47 @@ const Index = () => {
     setResources([]);
     
     try {
+      console.log("Début de l'analyse pour l'URL:", url);
       const corsProxy = 'https://cors-anywhere.herokuapp.com/';
       toast.info("Connexion au proxy CORS en cours...");
       
+      console.log("Tentative de connexion au proxy CORS...");
       const response = await axios.get(`${corsProxy}${url}`, {
         headers: {
           'Accept': 'text/html',
           'X-Requested-With': 'XMLHttpRequest',
         },
-        timeout: 10000, // 10 secondes de timeout
+        timeout: 10000,
       });
+      
+      console.log("Réponse du proxy reçue, statut:", response.status);
+      console.log("Type de contenu reçu:", response.headers['content-type']);
       
       const parser = new DOMParser();
       const doc = parser.parseFromString(response.data, 'text/html');
+      console.log("Document HTML parsé avec succès");
 
       toast.info("Analyse du site en cours...");
+      console.log("Début de l'analyse SEO...");
 
       // Analyse SEO
       const seoResults = await analyzeSEO(doc, url);
+      console.log("Résultats de l'analyse SEO:", seoResults);
       setSeoAnalysis(seoResults);
 
       // Analyse des ressources
+      console.log("Début de l'analyse des ressources...");
       const resourcesResults = await analyzeResources(doc, url);
+      console.log("Ressources trouvées:", resourcesResults.length);
       setResources(resourcesResults);
 
       // Analyse des liens
+      console.log("Début de l'analyse des liens...");
       const links = Array.from(doc.querySelectorAll('a')).map(link => ({
         url: link.href,
         text: link.textContent?.trim() || ''
       }));
+      console.log("Nombre de liens trouvés:", links.length);
 
       // Création de la structure
       const structure = {
@@ -137,11 +149,18 @@ const Index = () => {
       };
 
       setSiteStructure(structure);
+      console.log("Structure du site générée avec succès");
       toast.success("Analyse terminée !");
     } catch (error) {
-      console.error('Erreur lors de l\'analyse:', error);
+      console.error('Erreur complète:', error);
       
       if (error instanceof AxiosError) {
+        console.log("Type d'erreur Axios détecté");
+        console.log("Code d'erreur:", error.code);
+        console.log("Message d'erreur:", error.message);
+        console.log("Statut de la réponse:", error.response?.status);
+        console.log("Headers de la réponse:", error.response?.headers);
+        
         if (error.response?.status === 403) {
           setShowCorsWarning(true);
         } else if (error.code === 'ERR_NETWORK') {
@@ -152,6 +171,7 @@ const Index = () => {
           toast.error(`Erreur réseau : ${error.message}`);
         }
       } else {
+        console.error("Erreur non-Axios:", error);
         toast.error("Une erreur inattendue s'est produite lors de l'analyse du site.");
       }
     } finally {
