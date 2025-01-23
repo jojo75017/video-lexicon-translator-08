@@ -3,10 +3,19 @@ import axios, { AxiosError } from 'axios';
 import { toast } from "sonner";
 import { analyzeResources, Resource } from '@/utils/resourceAnalyzer';
 
+interface HeadingStructure {
+  text: string;
+  level: number;
+  position: number;
+}
+
 interface SeoAnalysis {
   title: string;
   description: string;
   h1Count: number;
+  h2Count: number;
+  h3Count: number;
+  headings: HeadingStructure[];
   imgCount: number;
   imgWithoutAlt: number;
   metaTagsCount: number;
@@ -98,11 +107,25 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
 
       toast.info("Analyse du site en cours...");
       
-      // Analyse SEO
+      // Analyse SEO mise à jour
+      const headings: HeadingStructure[] = [];
+      ['h1', 'h2', 'h3'].forEach(tag => {
+        Array.from(doc.getElementsByTagName(tag)).forEach((heading, index) => {
+          headings.push({
+            text: heading.textContent?.trim() || '',
+            level: parseInt(tag.charAt(1)),
+            position: index
+          });
+        });
+      });
+
       const seoResults = {
         title: doc.title || "Pas de titre",
         description: doc.querySelector('meta[name="description"]')?.getAttribute('content') || '',
         h1Count: doc.getElementsByTagName('h1').length,
+        h2Count: doc.getElementsByTagName('h2').length,
+        h3Count: doc.getElementsByTagName('h3').length,
+        headings: headings,
         imgCount: doc.getElementsByTagName('img').length,
         imgWithoutAlt: Array.from(doc.getElementsByTagName('img')).filter(img => !img.alt).length,
         metaTagsCount: doc.getElementsByTagName('meta').length,
