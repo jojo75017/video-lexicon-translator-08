@@ -2,6 +2,8 @@ import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { ExternalLink } from "lucide-react";
 import SiteStructureVisualizer from '@/components/SiteStructureVisualizer';
 import ResourcesAnalyzer from '@/components/ResourcesAnalyzer';
 import UrlInput from '@/components/UrlInput';
@@ -21,6 +23,10 @@ const Index = () => {
     analyzeSite,
     error
   } = useSiteAnalyzer();
+
+  const handleActivateProxy = () => {
+    window.open('https://cors-anywhere.herokuapp.com/corsdemo', '_blank');
+  };
 
   const renderContent = () => {
     if (error) {
@@ -87,21 +93,19 @@ const Index = () => {
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Générateur d'Architecture Web</h1>
           <p className="text-lg text-gray-600">Analysez et visualisez la structure de n'importe quel site web</p>
+          <Button 
+            variant="outline"
+            className="mt-4"
+            onClick={handleActivateProxy}
+          >
+            Activer le Proxy CORS <ExternalLink className="ml-2 h-4 w-4" />
+          </Button>
         </div>
 
         {showCorsWarning && (
           <Alert className="bg-yellow-50 border-yellow-200">
             <AlertDescription>
-              Pour utiliser cet outil, vous devez d'abord activer le proxy CORS en visitant{' '}
-              <a 
-                href="https://cors-anywhere.herokuapp.com/corsdemo" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="font-medium underline hover:text-blue-600"
-              >
-                https://cors-anywhere.herokuapp.com/corsdemo
-              </a>
-              {' '}et en cliquant sur le bouton d'activation.
+              Pour utiliser cet outil, vous devez d'abord activer le proxy CORS en cliquant sur le bouton ci-dessus.
             </AlertDescription>
           </Alert>
         )}
