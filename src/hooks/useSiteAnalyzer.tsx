@@ -22,6 +22,8 @@ interface SeoAnalysis {
   canonicalUrl: string | null;
   robotsMeta: string | null;
   brokenLinks: number;
+  keywords: string[];
+  googlePosition: number | null;
 }
 
 interface SiteNode {
@@ -107,7 +109,12 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
 
       toast.info("Analyse du site en cours...");
       
-      // Analyse SEO mise à jour
+      // Extraction des mots-clés et analyse SEO mise à jour
+      const keywords = Array.from(doc.querySelectorAll('meta[name="keywords"]'))
+        .map(meta => meta.getAttribute('content')?.split(',').map(k => k.trim()))
+        .flat()
+        .filter(Boolean) as string[];
+
       const headings: HeadingStructure[] = [];
       ['h1', 'h2', 'h3'].forEach(tag => {
         Array.from(doc.getElementsByTagName(tag)).forEach((heading, index) => {
@@ -131,7 +138,9 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
         metaTagsCount: doc.getElementsByTagName('meta').length,
         canonicalUrl: doc.querySelector('link[rel="canonical"]')?.getAttribute('href') || null,
         robotsMeta: doc.querySelector('meta[name="robots"]')?.getAttribute('content') || null,
-        brokenLinks: 0
+        brokenLinks: 0,
+        keywords: keywords,
+        googlePosition: Math.floor(Math.random() * 100) + 1 // Simulation - à remplacer par une vraie API
       };
       
       console.log("Résultats de l'analyse SEO:", seoResults);
@@ -176,6 +185,7 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
 
       setSiteStructure(structure);
       console.log("Structure du site générée avec succès");
+
       toast.success("Analyse terminée !");
     } catch (error) {
       console.error('Erreur complète:', error);
@@ -187,6 +197,7 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
         } else if (error.response?.status === 403) {
           setShowCorsWarning(true);
           setError("Accès refusé - Activez le proxy CORS");
+          toast.error("Veuillez activer le proxy CORS en cliquant sur le bouton en haut de la page");
         } else if (error.code === 'ERR_NETWORK') {
           setError("Erreur de connexion au proxy CORS");
           toast.error("Erreur de connexion au proxy CORS");

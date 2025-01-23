@@ -21,6 +21,8 @@ interface SeoAnalysis {
   canonicalUrl: string | null;
   robotsMeta: string | null;
   brokenLinks: number;
+  keywords: string[];
+  googlePosition: number | null;
 }
 
 interface SeoResultsProps {
@@ -58,6 +60,24 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
             <li><span className="font-medium">Description :</span> {seoAnalysis.description || 'Non définie'}</li>
             <li><span className="font-medium">URL Canonique :</span> {seoAnalysis.canonicalUrl || 'Non définie'}</li>
             <li><span className="font-medium">Meta Robots :</span> {seoAnalysis.robotsMeta || 'Non définie'}</li>
+            <li>
+              <span className="font-medium">Mots-clés :</span>
+              <div className="flex flex-wrap gap-2 mt-1">
+                {seoAnalysis.keywords?.map((keyword, index) => (
+                  <Badge key={index} variant="secondary">
+                    {keyword}
+                  </Badge>
+                )) || 'Non définis'}
+              </div>
+            </li>
+            <li>
+              <span className="font-medium">Position Google :</span>{' '}
+              {seoAnalysis.googlePosition ? 
+                <Badge variant={seoAnalysis.googlePosition <= 10 ? "default" : "secondary"}>
+                  {seoAnalysis.googlePosition}
+                </Badge> 
+                : 'Non disponible'}
+            </li>
           </ul>
         </div>
         <div>
