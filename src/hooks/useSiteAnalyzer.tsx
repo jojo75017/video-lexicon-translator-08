@@ -81,7 +81,6 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
     try {
       console.log("Début de l'analyse pour l'URL:", url);
       const corsProxy = 'https://cors-anywhere.herokuapp.com/';
-      toast.info("Connexion au proxy CORS en cours...");
       
       console.log("Tentative de connexion au proxy CORS...");
       const response = await axios.get(`${corsProxy}${url}`, {
@@ -109,7 +108,6 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
 
       toast.info("Analyse du site en cours...");
       
-      // Extraction des mots-clés et analyse SEO mise à jour
       const keywords = Array.from(doc.querySelectorAll('meta[name="keywords"]'))
         .map(meta => meta.getAttribute('content')?.split(',').map(k => k.trim()))
         .flat()
@@ -154,12 +152,10 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
       console.log("Résultats de l'analyse SEO:", seoResults);
       setSeoAnalysis(seoResults);
 
-      // Analyse des ressources
       const resourcesResults = await analyzeResources(doc, url);
       console.log("Ressources trouvées:", resourcesResults.length);
       setResources(resourcesResults);
 
-      // Création de la structure du site
       const uniqueUrls = new Set<string>();
       const links = Array.from(doc.querySelectorAll('a'))
         .map(link => ({
@@ -192,9 +188,10 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
       };
 
       setSiteStructure(structure);
+      setError(null); // Réinitialisation explicite de l'erreur en cas de succès
       console.log("Structure du site générée avec succès");
-
       toast.success("Analyse terminée !");
+
     } catch (error) {
       console.error('Erreur complète:', error);
       
@@ -204,8 +201,8 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
           toast.error("L'analyse a pris trop de temps et a été annulée");
         } else if (error.response?.status === 403) {
           setShowCorsWarning(true);
-          setError("Accès refusé - Activez le proxy CORS");
-          toast.error("Veuillez activer le proxy CORS en cliquant sur le bouton en haut de la page");
+          setError(null); // On ne montre pas d'erreur si c'est juste le proxy qui n'est pas activé
+          toast.warning("Veuillez activer le proxy CORS en cliquant sur le bouton en haut de la page");
         } else if (error.code === 'ERR_NETWORK') {
           setError("Erreur de connexion au proxy CORS");
           toast.error("Erreur de connexion au proxy CORS");
