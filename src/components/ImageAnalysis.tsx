@@ -15,29 +15,45 @@ const ImageAnalysis: React.FC<Props> = ({ images }) => {
   const handleImageClick = (url: string) => {
     // Vérifier si c'est une image en base64
     if (url.startsWith('data:image')) {
-      // Ouvrir l'image base64 dans un nouvel onglet
-      const newWindow = window.open();
-      if (newWindow) {
-        newWindow.document.write(`
+      const win = window.open('', '_blank');
+      if (win) {
+        win.document.write(`
           <html>
             <head>
-              <title>Image Preview</title>
+              <title>Aperçu de l'image</title>
               <style>
-                body { margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f1f5f9; }
-                img { max-width: 100%; max-height: 100vh; object-fit: contain; }
+                body {
+                  margin: 0;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  min-height: 100vh;
+                  background: #f1f5f9;
+                }
+                img {
+                  max-width: 100%;
+                  max-height: 100vh;
+                  object-fit: contain;
+                }
               </style>
             </head>
             <body>
-              <img src="${url}" alt="Image Preview" />
+              <img src="${url}" alt="Aperçu de l'image" />
             </body>
           </html>
         `);
+        win.document.close(); // Important pour finaliser le chargement
+      } else {
+        toast.error("Impossible d'ouvrir la fenêtre. Vérifiez que les popups sont autorisés.");
       }
     } else {
       try {
-        // Pour les URLs normales
-        new URL(url);
-        window.open(url, '_blank', 'noopener,noreferrer');
+        // Pour les URLs normales, on vérifie d'abord si l'URL est valide
+        const validUrl = new URL(url);
+        const win = window.open(validUrl.href, '_blank');
+        if (!win) {
+          toast.error("Impossible d'ouvrir la fenêtre. Vérifiez que les popups sont autorisés.");
+        }
       } catch (error) {
         toast.error("URL d'image invalide : " + url);
       }
