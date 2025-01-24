@@ -13,49 +13,102 @@ const ImageAnalysis: React.FC<Props> = ({ images }) => {
   const imagesWithoutAlt = images.filter(img => !img.hasAlt);
 
   const handleImageClick = (url: string) => {
+    console.log("Tentative d'ouverture de l'image:", url);
+
     // Vérifier si c'est une image en base64
     if (url.startsWith('data:image')) {
-      const win = window.open('', '_blank');
+      console.log("Ouverture d'une image base64");
+      const win = window.open();
       if (win) {
         win.document.write(`
-          <html>
+          <!DOCTYPE html>
+          <html lang="fr">
             <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
               <title>Aperçu de l'image</title>
               <style>
                 body {
                   margin: 0;
+                  padding: 20px;
                   display: flex;
+                  flex-direction: column;
                   justify-content: center;
                   align-items: center;
                   min-height: 100vh;
                   background: #f1f5f9;
+                  font-family: system-ui, -apple-system, sans-serif;
                 }
                 img {
                   max-width: 100%;
-                  max-height: 100vh;
+                  max-height: 80vh;
                   object-fit: contain;
+                  border-radius: 8px;
+                  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+                }
+                .controls {
+                  margin-top: 20px;
+                  display: flex;
+                  gap: 10px;
+                }
+                button {
+                  padding: 8px 16px;
+                  border-radius: 6px;
+                  border: none;
+                  background: #2563eb;
+                  color: white;
+                  cursor: pointer;
+                }
+                button:hover {
+                  background: #1d4ed8;
                 }
               </style>
             </head>
             <body>
               <img src="${url}" alt="Aperçu de l'image" />
+              <div class="controls">
+                <button onclick="window.close()">Fermer</button>
+                <button onclick="document.querySelector('img').requestFullscreen()">Plein écran</button>
+              </div>
             </body>
           </html>
         `);
-        win.document.close(); // Important pour finaliser le chargement
+        win.document.close();
       } else {
-        toast.error("Impossible d'ouvrir la fenêtre. Vérifiez que les popups sont autorisés.");
+        console.error("Impossible d'ouvrir la fenêtre");
+        toast.error("Impossible d'ouvrir la fenêtre. Vérifiez que les popups sont autorisés.", {
+          duration: 5000,
+        });
       }
     } else {
+      console.log("Ouverture d'une image depuis une URL");
       try {
-        // Pour les URLs normales, on vérifie d'abord si l'URL est valide
         const validUrl = new URL(url);
-        const win = window.open(validUrl.href, '_blank');
-        if (!win) {
-          toast.error("Impossible d'ouvrir la fenêtre. Vérifiez que les popups sont autorisés.");
-        }
+        // Tester si l'image existe avant de l'ouvrir
+        fetch(validUrl.href, { method: 'HEAD' })
+          .then(response => {
+            if (response.ok) {
+              const win = window.open(validUrl.href, '_blank');
+              if (!win) {
+                toast.error("Impossible d'ouvrir la fenêtre. Vérifiez que les popups sont autorisés.", {
+                  duration: 5000,
+                });
+              }
+            } else {
+              throw new Error(`L'image n'est pas accessible (${response.status})`);
+            }
+          })
+          .catch(error => {
+            console.error("Erreur lors de la vérification de l'image:", error);
+            toast.error(`Erreur: ${error.message}`, {
+              duration: 5000,
+            });
+          });
       } catch (error) {
-        toast.error("URL d'image invalide : " + url);
+        console.error("URL invalide:", error);
+        toast.error(`URL d'image invalide : ${url}`, {
+          duration: 5000,
+        });
       }
     }
   };
