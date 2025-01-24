@@ -1,29 +1,8 @@
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-
-interface HeadingStructure {
-  text: string;
-  level: number;
-  position: number;
-}
-
-interface SeoAnalysis {
-  title: string;
-  description: string;
-  h1Count: number;
-  h2Count: number;
-  h3Count: number;
-  headings: HeadingStructure[];
-  imgCount: number;
-  imgWithoutAlt: number;
-  metaTagsCount: number;
-  canonicalUrl: string | null;
-  robotsMeta: string | null;
-  brokenLinks: number;
-  keywords: string[];
-  googlePosition: number | null;
-}
+import { SeoAnalysis } from '@/types/seo';
+import ImageAnalysis from './ImageAnalysis';
 
 interface SeoResultsProps {
   seoAnalysis: SeoAnalysis;
@@ -50,76 +29,80 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
   };
 
   return (
-    <Card className="p-6">
-      <h2 className="text-2xl font-semibold mb-4">Analyse SEO</h2>
-      <div className="grid gap-6 md:grid-cols-2">
-        <div>
-          <h3 className="font-medium mb-2">Balises principales</h3>
-          <ul className="space-y-2">
-            <li><span className="font-medium">Titre :</span> {seoAnalysis.title}</li>
-            <li><span className="font-medium">Description :</span> {seoAnalysis.description || 'Non définie'}</li>
-            <li><span className="font-medium">URL Canonique :</span> {seoAnalysis.canonicalUrl || 'Non définie'}</li>
-            <li><span className="font-medium">Meta Robots :</span> {seoAnalysis.robotsMeta || 'Non définie'}</li>
-            <li>
-              <span className="font-medium">Mots-clés :</span>
-              <div className="flex flex-wrap gap-2 mt-1">
-                {seoAnalysis.keywords?.map((keyword, index) => (
-                  <Badge key={index} variant="secondary">
-                    {keyword}
-                  </Badge>
-                )) || 'Non définis'}
-              </div>
-            </li>
-            <li>
-              <span className="font-medium">Position Google :</span>{' '}
-              {seoAnalysis.googlePosition ? 
-                <Badge variant={seoAnalysis.googlePosition <= 10 ? "default" : "secondary"}>
-                  {seoAnalysis.googlePosition}
-                </Badge> 
-                : 'Non disponible'}
-            </li>
-          </ul>
-        </div>
-        <div>
-          <h3 className="font-medium mb-2">Statistiques</h3>
-          <ul className="space-y-2">
-            <li className={getStatusColor(seoAnalysis.h1Count, 'h1')}>
-              <span className="font-medium">Nombre de H1 :</span> {seoAnalysis.h1Count}
-              <div className="text-sm mt-1">{getStatusExplanation(seoAnalysis.h1Count, 'h1')}</div>
-            </li>
-            <li><span className="font-medium">Nombre de H2 :</span> {seoAnalysis.h2Count || 0}</li>
-            <li><span className="font-medium">Nombre de H3 :</span> {seoAnalysis.h3Count || 0}</li>
-            <li><span className="font-medium">Nombre d'images :</span> {seoAnalysis.imgCount}</li>
-            <li className={getStatusColor(seoAnalysis.imgWithoutAlt, 'img')}>
-              <span className="font-medium">Images sans alt :</span> {seoAnalysis.imgWithoutAlt}
-              <div className="text-sm mt-1">{getStatusExplanation(seoAnalysis.imgWithoutAlt, 'img')}</div>
-            </li>
-            <li><span className="font-medium">Nombre de meta tags :</span> {seoAnalysis.metaTagsCount}</li>
-            <li><span className="font-medium">Liens morts détectés :</span> {seoAnalysis.brokenLinks}</li>
-          </ul>
-        </div>
-      </div>
-
-      {seoAnalysis.headings && seoAnalysis.headings.length > 0 && (
-        <div className="mt-6">
-          <h3 className="font-medium mb-2">Structure des titres</h3>
-          <div className="space-y-2 bg-gray-50 p-4 rounded-lg">
-            {seoAnalysis.headings.map((heading, index) => (
-              <div 
-                key={index}
-                style={{ marginLeft: `${(heading.level - 1) * 20}px` }}
-                className="flex items-center gap-2"
-              >
-                <Badge variant={heading.level === 1 ? "default" : "secondary"}>
-                  H{heading.level}
-                </Badge>
-                <span>{heading.text}</span>
-              </div>
-            ))}
+    <>
+      <Card className="p-6">
+        <h2 className="text-2xl font-semibold mb-4">Analyse SEO</h2>
+        <div className="grid gap-6 md:grid-cols-2">
+          <div>
+            <h3 className="font-medium mb-2">Balises principales</h3>
+            <ul className="space-y-2">
+              <li><span className="font-medium">Titre :</span> {seoAnalysis.title}</li>
+              <li><span className="font-medium">Description :</span> {seoAnalysis.description || 'Non définie'}</li>
+              <li><span className="font-medium">URL Canonique :</span> {seoAnalysis.canonicalUrl || 'Non définie'}</li>
+              <li><span className="font-medium">Meta Robots :</span> {seoAnalysis.robotsMeta || 'Non définie'}</li>
+              <li>
+                <span className="font-medium">Mots-clés :</span>
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {seoAnalysis.keywords?.map((keyword, index) => (
+                    <Badge key={index} variant="secondary">
+                      {keyword}
+                    </Badge>
+                  )) || 'Non définis'}
+                </div>
+              </li>
+              <li>
+                <span className="font-medium">Position Google :</span>{' '}
+                {seoAnalysis.googlePosition ? 
+                  <Badge variant={seoAnalysis.googlePosition <= 10 ? "default" : "secondary"}>
+                    {seoAnalysis.googlePosition}
+                  </Badge> 
+                  : 'Non disponible'}
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="font-medium mb-2">Statistiques</h3>
+            <ul className="space-y-2">
+              <li className={getStatusColor(seoAnalysis.h1Count, 'h1')}>
+                <span className="font-medium">Nombre de H1 :</span> {seoAnalysis.h1Count}
+                <div className="text-sm mt-1">{getStatusExplanation(seoAnalysis.h1Count, 'h1')}</div>
+              </li>
+              <li><span className="font-medium">Nombre de H2 :</span> {seoAnalysis.h2Count || 0}</li>
+              <li><span className="font-medium">Nombre de H3 :</span> {seoAnalysis.h3Count || 0}</li>
+              <li><span className="font-medium">Nombre d'images :</span> {seoAnalysis.imgCount}</li>
+              <li className={getStatusColor(seoAnalysis.imgWithoutAlt, 'img')}>
+                <span className="font-medium">Images sans alt :</span> {seoAnalysis.imgWithoutAlt}
+                <div className="text-sm mt-1">{getStatusExplanation(seoAnalysis.imgWithoutAlt, 'img')}</div>
+              </li>
+              <li><span className="font-medium">Nombre de meta tags :</span> {seoAnalysis.metaTagsCount}</li>
+              <li><span className="font-medium">Liens morts détectés :</span> {seoAnalysis.brokenLinks}</li>
+            </ul>
           </div>
         </div>
-      )}
-    </Card>
+
+        {seoAnalysis.headings && seoAnalysis.headings.length > 0 && (
+          <div className="mt-6">
+            <h3 className="font-medium mb-2">Structure des titres</h3>
+            <div className="space-y-2 bg-gray-50 p-4 rounded-lg">
+              {seoAnalysis.headings.map((heading, index) => (
+                <div 
+                  key={index}
+                  style={{ marginLeft: `${(heading.level - 1) * 20}px` }}
+                  className="flex items-center gap-2"
+                >
+                  <Badge variant={heading.level === 1 ? "default" : "secondary"}>
+                    H{heading.level}
+                  </Badge>
+                  <span>{heading.text}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </Card>
+      
+      <ImageAnalysis images={seoAnalysis.imagesDetails} />
+    </>
   );
 };
 

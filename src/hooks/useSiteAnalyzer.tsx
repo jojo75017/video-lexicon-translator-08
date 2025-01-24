@@ -2,29 +2,8 @@ import { useState } from 'react';
 import axios, { AxiosError } from 'axios';
 import { toast } from "sonner";
 import { analyzeResources, Resource } from '@/utils/resourceAnalyzer';
-
-interface HeadingStructure {
-  text: string;
-  level: number;
-  position: number;
-}
-
-interface SeoAnalysis {
-  title: string;
-  description: string;
-  h1Count: number;
-  h2Count: number;
-  h3Count: number;
-  headings: HeadingStructure[];
-  imgCount: number;
-  imgWithoutAlt: number;
-  metaTagsCount: number;
-  canonicalUrl: string | null;
-  robotsMeta: string | null;
-  brokenLinks: number;
-  keywords: string[];
-  googlePosition: number | null;
-}
+import { analyzeSeo } from '@/utils/seoAnalyzer';
+import { SeoAnalysis } from '@/types/seo';
 
 interface SiteNode {
   name: string;
@@ -74,9 +53,7 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
     setError(null);
     
     const controller = new AbortController();
-    const timeout = setTimeout(() => {
-      controller.abort();
-    }, 30000);
+    const timeout = setTimeout(() => controller.abort(), 30000);
 
     try {
       console.log("Début de l'analyse pour l'URL:", url);
@@ -105,57 +82,19 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
       }
       
       console.log("Document HTML parsé avec succès");
-
       toast.info("Analyse du site en cours...");
       
-      const keywords = Array.from(doc.querySelectorAll('meta[name="keywords"]'))
-        .map(meta => meta.getAttribute('content')?.split(',').map(k => k.trim()))
-        .flat()
-        .filter(Boolean) as string[];
-
-      const headings: HeadingStructure[] = [];
-      ['h1', 'h2', 'h3'].forEach(tag => {
-        Array.from(doc.getElementsByTagName(tag)).forEach((heading, index) => {
-          headings.push({
-            text: heading.textContent?.trim() || '',
-            level: parseInt(tag.charAt(1)),
-            position: index
-          });
-        });
-      });
-
-      // Déterminer une position Google plus réaliste pour aquarioslands.com
-      let googlePosition = 1;
-      if (url.includes('aquarioslands.com')) {
-        googlePosition = Math.floor(Math.random() * 10) + 1; // Position entre 1 et 10 pour aquarioslands
-      } else {
-        googlePosition = Math.floor(Math.random() * 100) + 1; // Position aléatoire pour les autres sites
-      }
-
-      const seoResults = {
-        title: doc.title || "Pas de titre",
-        description: doc.querySelector('meta[name="description"]')?.getAttribute('content') || '',
-        h1Count: doc.getElementsByTagName('h1').length,
-        h2Count: doc.getElementsByTagName('h2').length,
-        h3Count: doc.getElementsByTagName('h3').length,
-        headings: headings,
-        imgCount: doc.getElementsByTagName('img').length,
-        imgWithoutAlt: Array.from(doc.getElementsByTagName('img')).filter(img => !img.alt).length,
-        metaTagsCount: doc.getElementsByTagName('meta').length,
-        canonicalUrl: doc.querySelector('link[rel="canonical"]')?.getAttribute('href') || null,
-        robotsMeta: doc.querySelector('meta[name="robots"]')?.getAttribute('content') || null,
-        brokenLinks: 0,
-        keywords: keywords,
-        googlePosition: googlePosition
-      };
-      
+      // Analyse SEO
+      const seoResults = analyzeSeo(doc, url);
       console.log("Résultats de l'analyse SEO:", seoResults);
       setSeoAnalysis(seoResults);
 
+      // Analyse des ressources
       const resourcesResults = await analyzeResources(doc, url);
       console.log("Ressources trouvées:", resourcesResults.length);
       setResources(resourcesResults);
 
+      // Structure du site
       const uniqueUrls = new Set<string>();
       const links = Array.from(doc.querySelectorAll('a'))
         .map(link => ({
@@ -188,7 +127,7 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
       };
 
       setSiteStructure(structure);
-      setError(null); // Réinitialisation explicite de l'erreur en cas de succès
+      setError(null);
       console.log("Structure du site générée avec succès");
       toast.success("Analyse terminée !");
 
@@ -201,7 +140,7 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
           toast.error("L'analyse a pris trop de temps et a été annulée");
         } else if (error.response?.status === 403) {
           setShowCorsWarning(true);
-          setError(null); // On ne montre pas d'erreur si c'est juste le proxy qui n'est pas activé
+          setError(null);
           toast.warning("Veuillez activer le proxy CORS en cliquant sur le bouton en haut de la page");
         } else if (error.code === 'ERR_NETWORK') {
           setError("Erreur de connexion au proxy CORS");
