@@ -2,7 +2,7 @@ import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ImageAnalysis as ImageAnalysisType } from '@/types/seo';
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Image } from "lucide-react";
 import { toast } from "sonner";
 
 interface Props {
@@ -13,22 +13,49 @@ const ImageAnalysis: React.FC<Props> = ({ images }) => {
   const imagesWithoutAlt = images.filter(img => !img.hasAlt);
 
   const handleImageClick = (url: string) => {
-    try {
-      // Vérifier si l'URL est valide
-      new URL(url);
-      window.open(url, '_blank', 'noopener,noreferrer');
-    } catch (error) {
-      toast.error("URL d'image invalide : " + url);
+    // Vérifier si c'est une image en base64
+    if (url.startsWith('data:image')) {
+      // Ouvrir l'image base64 dans un nouvel onglet
+      const newWindow = window.open();
+      if (newWindow) {
+        newWindow.document.write(`
+          <html>
+            <head>
+              <title>Image Preview</title>
+              <style>
+                body { margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f1f5f9; }
+                img { max-width: 100%; max-height: 100vh; object-fit: contain; }
+              </style>
+            </head>
+            <body>
+              <img src="${url}" alt="Image Preview" />
+            </body>
+          </html>
+        `);
+      }
+    } else {
+      try {
+        // Pour les URLs normales
+        new URL(url);
+        window.open(url, '_blank', 'noopener,noreferrer');
+      } catch (error) {
+        toast.error("URL d'image invalide : " + url);
+      }
     }
   };
 
   const formatUrl = (url: string) => {
+    // Si c'est une image en base64
+    if (url.startsWith('data:image')) {
+      const type = url.split(';')[0].split('/')[1];
+      return `Image ${type.toUpperCase()}`;
+    }
+
     try {
-      // Essayer de créer une URL valide
+      // Pour les URLs normales
       const urlObject = new URL(url);
       return urlObject.pathname.split('/').pop() || url;
     } catch {
-      // Si l'URL n'est pas valide, retourner la dernière partie du chemin
       return url.split('/').pop() || url;
     }
   };
@@ -51,7 +78,7 @@ const ImageAnalysis: React.FC<Props> = ({ images }) => {
                   className="text-blue-600 hover:underline flex items-center gap-1 cursor-pointer"
                 >
                   {formatUrl(img.url)}
-                  <ExternalLink className="h-4 w-4" />
+                  {img.url.startsWith('data:image') ? <Image className="h-4 w-4" /> : <ExternalLink className="h-4 w-4" />}
                 </button>
               </div>
             ))}
@@ -72,7 +99,7 @@ const ImageAnalysis: React.FC<Props> = ({ images }) => {
                 className="text-blue-600 hover:underline flex items-center gap-1 cursor-pointer"
               >
                 {formatUrl(img.url)}
-                <ExternalLink className="h-4 w-4" />
+                {img.url.startsWith('data:image') ? <Image className="h-4 w-4" /> : <ExternalLink className="h-4 w-4" />}
               </button>
             </div>
           ))}
