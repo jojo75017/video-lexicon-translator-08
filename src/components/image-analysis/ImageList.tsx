@@ -6,7 +6,7 @@ import ImagePreview from './ImagePreview';
 interface ImageListProps {
   images: ImageAnalysis[];
   loadingStates: { [key: string]: 'loading' | 'success' | 'error' | null };
-  onImageClick: (url: string) => void;
+  onImageClick: (url: string, alt?: string) => void;
   formatUrl: (url: string) => string;
 }
 
@@ -26,7 +26,7 @@ const ImageList: React.FC<ImageListProps> = ({
           <ImagePreview
             url={img.url}
             loadingState={loadingStates[img.url]}
-            onClick={() => onImageClick(img.url)}
+            onClick={() => onImageClick(img.url, img.alt)}
             fileName={formatUrl(img.url)}
           />
         </div>

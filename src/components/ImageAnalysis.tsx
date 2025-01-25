@@ -17,18 +17,18 @@ const ImageAnalysis: React.FC<Props> = ({ images }) => {
     setLoadingStates(prev => ({ ...prev, [url]: state }));
   };
 
-  const handleImageClick = async (url: string) => {
+  const handleImageClick = async (url: string, alt?: string) => {
     console.log("Tentative d'ouverture de l'image:", url);
     setImageLoadingState(url, 'loading');
 
     try {
       if (url.startsWith('data:image')) {
         console.log("Ouverture d'une image base64");
-        openBase64Image(url);
+        openBase64Image(url, alt);
         setImageLoadingState(url, 'success');
       } else {
         console.log("Ouverture d'une image depuis une URL");
-        await openExternalImage(url);
+        await openExternalImage(url, alt);
       }
     } catch (error) {
       console.error("Erreur lors de l'ouverture de l'image:", error);
@@ -39,16 +39,16 @@ const ImageAnalysis: React.FC<Props> = ({ images }) => {
     }
   };
 
-  const openBase64Image = (url: string) => {
+  const openBase64Image = (url: string, alt?: string) => {
     const win = window.open();
     if (!win) {
       throw new Error("Impossible d'ouvrir la fenêtre. Vérifiez que les popups sont autorisés.");
     }
-    win.document.write(ImageViewer({ url }));
+    win.document.write(ImageViewer({ url, alt }));
     win.document.close();
   };
 
-  const openExternalImage = async (url: string) => {
+  const openExternalImage = async (url: string, alt?: string) => {
     const validUrl = new URL(url);
     const response = await fetch(validUrl.href, { method: 'HEAD' });
     
@@ -61,14 +61,16 @@ const ImageAnalysis: React.FC<Props> = ({ images }) => {
       throw new Error("Le lien ne pointe pas vers une image valide");
     }
 
-    const win = window.open(validUrl.href, '_blank');
+    const win = window.open('', '_blank');
     if (!win) {
       throw new Error("Impossible d'ouvrir la fenêtre. Vérifiez que les popups sont autorisés.");
     }
+    win.document.write(ImageViewer({ url: validUrl.href, alt }));
+    win.document.close();
     setImageLoadingState(url, 'success');
   };
 
-  const formatUrl = (url: string) => {
+  const formatUrl = (url: string): string => {
     if (url.startsWith('data:image')) {
       const type = url.split(';')[0].split('/')[1];
       return `Image ${type.toUpperCase()}`;

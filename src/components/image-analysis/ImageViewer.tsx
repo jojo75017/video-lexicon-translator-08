@@ -2,14 +2,16 @@ import React from 'react';
 
 interface ImageViewerProps {
   url: string;
-  format?: string;
+  alt?: string;
 }
 
-const ImageViewer: React.FC<ImageViewerProps> = ({ url, format }) => {
+const ImageViewer: React.FC<ImageViewerProps> = ({ url, alt }) => {
   const handleRotate = () => {
     const img = document.querySelector('img');
     if (img) {
-      img.style.transform = img.style.transform === 'rotate(90deg)' ? 'rotate(0deg)' : 'rotate(90deg)';
+      const currentRotation = img.style.transform.match(/rotate\((.*?)deg\)/) || ['', '0'];
+      const newRotation = (parseInt(currentRotation[1]) + 90) % 360;
+      img.style.transform = `rotate(${newRotation}deg) scale(${img.style.transform.match(/scale\((.*?)\)/)?.[1] || 1})`;
     }
   };
 
@@ -19,7 +21,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ url, format }) => {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Aperçu de l'image</title>
+        <title>${alt || 'Aperçu de l\'image'}</title>
         <style>
           body {
             margin: 0;
@@ -77,13 +79,15 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ url, format }) => {
             padding: 8px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 4px;
           }
         </style>
       </head>
       <body>
-        <img src="${url}" alt="Aperçu de l'image" />
+        <img src="${url}" alt="${alt || 'Image sans description'}" />
         <div class="image-info">
-          Format: ${format || url.split(';')[0].split('/')[1].toUpperCase()}
+          ${alt ? `Description: ${alt}` : 'Aucune description disponible'}
         </div>
         <div class="controls">
           <button onclick="window.close()">Fermer</button>
@@ -95,10 +99,10 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ url, format }) => {
           </button>
         </div>
         <div class="zoom-controls">
-          <button onclick="const img = document.querySelector('img'); img.style.transform = \`scale(\${(parseFloat(img.style.transform.match(/scale\\((.*?)\\)/)?.[1] || 1) * 1.2})\`">
+          <button onclick="const img = document.querySelector('img'); img.style.transform = \`\${img.style.transform.replace(/scale\\(.*?\\)/, '')} scale(\${(parseFloat(img.style.transform.match(/scale\\((.*?)\\)/)?.[1] || 1) * 1.2})\`">
             Zoom +
           </button>
-          <button onclick="const img = document.querySelector('img'); img.style.transform = \`scale(\${(parseFloat(img.style.transform.match(/scale\\((.*?)\\)/)?.[1] || 1) / 1.2})\`">
+          <button onclick="const img = document.querySelector('img'); img.style.transform = \`\${img.style.transform.replace(/scale\\(.*?\\)/, '')} scale(\${(parseFloat(img.style.transform.match(/scale\\((.*?)\\)/)?.[1] || 1) / 1.2})\`">
             Zoom -
           </button>
         </div>
