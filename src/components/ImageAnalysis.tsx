@@ -4,6 +4,8 @@ import { toast } from "sonner";
 import { ImageAnalysis as ImageAnalysisType } from '@/types/seo';
 import ImageList from './image-analysis/ImageList';
 import ImageViewer from './image-analysis/ImageViewer';
+import { Button } from './ui/button';
+import { Download, Copy } from 'lucide-react';
 
 interface Props {
   images: ImageAnalysisType[];
@@ -12,6 +14,7 @@ interface Props {
 const ImageAnalysis: React.FC<Props> = ({ images }) => {
   const [loadingStates, setLoadingStates] = useState<{ [key: string]: 'loading' | 'success' | 'error' | null }>({});
   const imagesWithoutAlt = images.filter(img => !img.hasAlt);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const setImageLoadingState = (url: string, state: 'loading' | 'success' | 'error' | null) => {
     setLoadingStates(prev => ({ ...prev, [url]: state }));
@@ -20,6 +23,7 @@ const ImageAnalysis: React.FC<Props> = ({ images }) => {
   const handleImageClick = async (url: string, alt?: string) => {
     console.log("Tentative d'ouverture de l'image:", url);
     setImageLoadingState(url, 'loading');
+    setSelectedImage(url);
 
     try {
       if (url.startsWith('data:image')) {
@@ -50,26 +54,62 @@ const ImageAnalysis: React.FC<Props> = ({ images }) => {
   };
 
   const openExternalImage = async (url: string, alt?: string) => {
-    const validUrl = new URL(url);
-    const response = await fetch(validUrl.href, { method: 'HEAD' });
-    
-    if (!response.ok) {
-      throw new Error(`L'image n'est pas accessible (${response.status})`);
-    }
+    try {
+      const validUrl = new URL(url);
+      const proxyUrl = `https://cors-anywhere.herokuapp.com/${validUrl.href}`;
+      
+      const response = await fetch(proxyUrl, { 
+        method: 'HEAD',
+        headers: {
+          'Origin': window.location.origin
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`L'image n'est pas accessible (${response.status})`);
+      }
 
-    const contentType = response.headers.get('content-type');
-    if (!contentType?.startsWith('image/')) {
-      throw new Error("Le lien ne pointe pas vers une image valide");
-    }
+      const contentType = response.headers.get('content-type');
+      if (!contentType?.startsWith('image/')) {
+        throw new Error("Le lien ne pointe pas vers une image valide");
+      }
 
-    const win = window.open('', '_blank');
-    if (!win) {
-      throw new Error("Impossible d'ouvrir la fenêtre. Vérifiez que les popups sont autorisés.");
+      const win = window.open('', '_blank');
+      if (!win) {
+        throw new Error("Impossible d'ouvrir la fenêtre. Vérifiez que les popups sont autorisés.");
+      }
+      const htmlContent = ImageViewer({ url: validUrl.href, alt });
+      win.document.write(typeof htmlContent === 'string' ? htmlContent : htmlContent.toString());
+      win.document.close();
+      setImageLoadingState(url, 'success');
+    } catch (error) {
+      console.error('Erreur lors de la vérification de l\'image:', error);
+      throw new Error("Impossible d'accéder à l'image. Vérifiez l'URL et réessayez.");
     }
-    const htmlContent = ImageViewer({ url: validUrl.href, alt });
-    win.document.write(typeof htmlContent === 'string' ? htmlContent : htmlContent.toString());
-    win.document.close();
-    setImageLoadingState(url, 'success');
+  };
+
+  const handleDownload = async (url: string) => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = formatUrl(url);
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(downloadUrl);
+      toast.success('Image téléchargée avec succès');
+    } catch (error) {
+      toast.error('Erreur lors du téléchargement de l\'image');
+    }
+  };
+
+  const handleCopyUrl = (url: string) => {
+    navigator.clipboard.writeText(url)
+      .then(() => toast.success('URL copiée dans le presse-papier'))
+      .catch(() => toast.error('Erreur lors de la copie de l\'URL'));
   };
 
   const formatUrl = (url: string): string => {
@@ -100,6 +140,8 @@ const ImageAnalysis: React.FC<Props> = ({ images }) => {
             loadingStates={loadingStates}
             onImageClick={handleImageClick}
             formatUrl={formatUrl}
+            onDownload={handleDownload}
+            onCopyUrl={handleCopyUrl}
           />
         </div>
       )}
@@ -111,6 +153,8 @@ const ImageAnalysis: React.FC<Props> = ({ images }) => {
           loadingStates={loadingStates}
           onImageClick={handleImageClick}
           formatUrl={formatUrl}
+          onDownload={handleDownload}
+          onCopyUrl={handleCopyUrl}
         />
       </div>
     </Card>

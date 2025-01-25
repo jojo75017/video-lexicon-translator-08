@@ -46,6 +46,8 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ url, alt }) => {
             margin-top: 20px;
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
           }
           button {
             padding: 8px 16px;
@@ -70,6 +72,9 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ url, alt }) => {
             background: white;
             padding: 8px 16px;
             border-radius: 6px;
+            text-align: center;
+            max-width: 80%;
+            word-wrap: break-word;
           }
           .zoom-controls {
             position: fixed;
@@ -82,12 +87,20 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ url, alt }) => {
             display: flex;
             gap: 4px;
           }
+          .download-button {
+            background: #059669;
+          }
+          .download-button:hover {
+            background: #047857;
+          }
         </style>
       </head>
       <body>
         <img src="${url}" alt="${alt || 'Image sans description'}" />
         <div class="image-info">
           ${alt ? `Description: ${alt}` : 'Aucune description disponible'}
+          <br>
+          <small>URL: ${url}</small>
         </div>
         <div class="controls">
           <button onclick="window.close()">Fermer</button>
@@ -96,6 +109,9 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ url, alt }) => {
           </button>
           <button onclick="handleRotate()">
             Rotation
+          </button>
+          <button class="download-button" onclick="window.location.href='${url}'; return false;">
+            Télécharger
           </button>
         </div>
         <div class="zoom-controls">
