@@ -44,7 +44,8 @@ const ImageAnalysis: React.FC<Props> = ({ images }) => {
     if (!win) {
       throw new Error("Impossible d'ouvrir la fenêtre. Vérifiez que les popups sont autorisés.");
     }
-    win.document.write(ImageViewer({ url, alt }));
+    const htmlContent = ImageViewer({ url, alt });
+    win.document.write(typeof htmlContent === 'string' ? htmlContent : htmlContent.toString());
     win.document.close();
   };
 
@@ -65,7 +66,8 @@ const ImageAnalysis: React.FC<Props> = ({ images }) => {
     if (!win) {
       throw new Error("Impossible d'ouvrir la fenêtre. Vérifiez que les popups sont autorisés.");
     }
-    win.document.write(ImageViewer({ url: validUrl.href, alt }));
+    const htmlContent = ImageViewer({ url: validUrl.href, alt });
+    win.document.write(typeof htmlContent === 'string' ? htmlContent : htmlContent.toString());
     win.document.close();
     setImageLoadingState(url, 'success');
   };
