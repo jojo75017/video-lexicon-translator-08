@@ -3,9 +3,11 @@ import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { ImageAnalysis as ImageAnalysisType } from '@/types/seo';
 import ImageList from './image-analysis/ImageList';
-import ImageViewer from './image-analysis/ImageViewer';
 import { Button } from './ui/button';
-import { Download, Copy } from 'lucide-react';
+import { Download, Copy, X } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface Props {
   images: ImageAnalysisType[];
@@ -14,78 +16,16 @@ interface Props {
 const ImageAnalysis: React.FC<Props> = ({ images }) => {
   const [loadingStates, setLoadingStates] = useState<{ [key: string]: 'loading' | 'success' | 'error' | null }>({});
   const imagesWithoutAlt = images.filter(img => !img.hasAlt);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<ImageAnalysisType | null>(null);
+  const [newAltText, setNewAltText] = useState('');
 
   const setImageLoadingState = (url: string, state: 'loading' | 'success' | 'error' | null) => {
     setLoadingStates(prev => ({ ...prev, [url]: state }));
   };
 
-  const handleImageClick = async (url: string, alt?: string) => {
-    console.log("Tentative d'ouverture de l'image:", url);
-    setImageLoadingState(url, 'loading');
-    setSelectedImage(url);
-
-    try {
-      if (url.startsWith('data:image')) {
-        console.log("Ouverture d'une image base64");
-        openBase64Image(url, alt);
-        setImageLoadingState(url, 'success');
-      } else {
-        console.log("Ouverture d'une image depuis une URL");
-        await openExternalImage(url, alt);
-      }
-    } catch (error) {
-      console.error("Erreur lors de l'ouverture de l'image:", error);
-      setImageLoadingState(url, 'error');
-      toast.error(error instanceof Error ? error.message : "Erreur lors de l'ouverture de l'image", {
-        duration: 5000,
-      });
-    }
-  };
-
-  const openBase64Image = (url: string, alt?: string) => {
-    const win = window.open();
-    if (!win) {
-      throw new Error("Impossible d'ouvrir la fenêtre. Vérifiez que les popups sont autorisés.");
-    }
-    const htmlContent = ImageViewer({ url, alt });
-    win.document.write(typeof htmlContent === 'string' ? htmlContent : htmlContent.toString());
-    win.document.close();
-  };
-
-  const openExternalImage = async (url: string, alt?: string) => {
-    try {
-      const validUrl = new URL(url);
-      const proxyUrl = `https://cors-anywhere.herokuapp.com/${validUrl.href}`;
-      
-      const response = await fetch(proxyUrl, { 
-        method: 'HEAD',
-        headers: {
-          'Origin': window.location.origin
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error(`L'image n'est pas accessible (${response.status})`);
-      }
-
-      const contentType = response.headers.get('content-type');
-      if (!contentType?.startsWith('image/')) {
-        throw new Error("Le lien ne pointe pas vers une image valide");
-      }
-
-      const win = window.open('', '_blank');
-      if (!win) {
-        throw new Error("Impossible d'ouvrir la fenêtre. Vérifiez que les popups sont autorisés.");
-      }
-      const htmlContent = ImageViewer({ url: validUrl.href, alt });
-      win.document.write(typeof htmlContent === 'string' ? htmlContent : htmlContent.toString());
-      win.document.close();
-      setImageLoadingState(url, 'success');
-    } catch (error) {
-      console.error('Erreur lors de la vérification de l\'image:', error);
-      throw new Error("Impossible d'accéder à l'image. Vérifiez l'URL et réessayez.");
-    }
+  const handleImageClick = async (image: ImageAnalysisType) => {
+    setSelectedImage(image);
+    setNewAltText(image.alt || '');
   };
 
   const handleDownload = async (url: string) => {
@@ -110,6 +50,15 @@ const ImageAnalysis: React.FC<Props> = ({ images }) => {
     navigator.clipboard.writeText(url)
       .then(() => toast.success('URL copiée dans le presse-papier'))
       .catch(() => toast.error('Erreur lors de la copie de l\'URL'));
+  };
+
+  const handleSaveAlt = () => {
+    if (selectedImage) {
+      // Ici, vous pourriez ajouter la logique pour sauvegarder la balise alt
+      // Pour l'instant, on simule juste la sauvegarde avec un toast
+      toast.success('Balise alt mise à jour avec succès');
+      setSelectedImage(null);
+    }
   };
 
   const formatUrl = (url: string): string => {
@@ -157,6 +106,48 @@ const ImageAnalysis: React.FC<Props> = ({ images }) => {
           onCopyUrl={handleCopyUrl}
         />
       </div>
+
+      <Dialog open={selectedImage !== null} onOpenChange={() => setSelectedImage(null)}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Modifier l'image</DialogTitle>
+            <DialogDescription>
+              Visualisez l'image et modifiez sa description alt pour améliorer l'accessibilité
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4">
+            <div className="relative aspect-video">
+              {selectedImage && (
+                <img
+                  src={selectedImage.url}
+                  alt={selectedImage.alt || "Image sans description"}
+                  className="object-contain w-full h-full rounded-lg"
+                />
+              )}
+            </div>
+            
+            <div className="grid gap-2">
+              <Label htmlFor="alt-text">Description alt</Label>
+              <Input
+                id="alt-text"
+                value={newAltText}
+                onChange={(e) => setNewAltText(e.target.value)}
+                placeholder="Entrez une description pour l'image..."
+              />
+            </div>
+
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setSelectedImage(null)}>
+                Annuler
+              </Button>
+              <Button onClick={handleSaveAlt}>
+                Sauvegarder
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };

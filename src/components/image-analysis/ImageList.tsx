@@ -1,14 +1,13 @@
 import React from 'react';
 import { Badge } from "@/components/ui/badge";
 import { ImageAnalysis } from '@/types/seo';
-import ImagePreview from './ImagePreview';
 import { Button } from "@/components/ui/button";
-import { Download, Copy } from 'lucide-react';
+import { Download, Copy, Image } from 'lucide-react';
 
 interface ImageListProps {
   images: ImageAnalysis[];
   loadingStates: { [key: string]: 'loading' | 'success' | 'error' | null };
-  onImageClick: (url: string, alt?: string) => void;
+  onImageClick: (image: ImageAnalysis) => void;
   formatUrl: (url: string) => string;
   onDownload: (url: string) => void;
   onCopyUrl: (url: string) => void;
@@ -30,12 +29,15 @@ const ImageList: React.FC<ImageListProps> = ({
             <Badge variant={img.hasAlt ? "default" : "destructive"}>
               {img.hasAlt ? 'Alt: ' + img.alt : 'Sans alt'}
             </Badge>
-            <ImagePreview
-              url={img.url}
-              loadingState={loadingStates[img.url]}
-              onClick={() => onImageClick(img.url, img.alt)}
-              fileName={formatUrl(img.url)}
-            />
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-blue-600 hover:text-blue-800 p-0 h-auto font-normal"
+              onClick={() => onImageClick(img)}
+            >
+              {formatUrl(img.url)}
+              <Image className="ml-2 h-4 w-4" />
+            </Button>
           </div>
           <div className="flex gap-2">
             <Button
