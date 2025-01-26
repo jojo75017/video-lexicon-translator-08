@@ -1,14 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { SeoAnalysis } from '@/types/seo';
+import { SeoAnalysis, ImageAnalysis as ImageAnalysisType } from '@/types/seo';
 import ImageAnalysis from './ImageAnalysis';
 
 interface SeoResultsProps {
   seoAnalysis: SeoAnalysis;
 }
 
-const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
+const SeoResults = ({ seoAnalysis: initialSeoAnalysis }: SeoResultsProps) => {
+  const [seoAnalysis, setSeoAnalysis] = useState(initialSeoAnalysis);
+
+  const handleUpdateImages = (updatedImages: ImageAnalysisType[]) => {
+    setSeoAnalysis(prev => ({
+      ...prev,
+      imagesDetails: updatedImages,
+      imgWithoutAlt: updatedImages.filter(img => !img.hasAlt).length
+    }));
+  };
+
   const getStatusColor = (count: number, type: string) => {
     if (type === 'h1' && count !== 1) return 'text-red-500';
     if (type === 'img' && count > 0) return 'text-red-500';
@@ -101,7 +111,10 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
         )}
       </Card>
       
-      <ImageAnalysis images={seoAnalysis.imagesDetails} />
+      <ImageAnalysis 
+        images={seoAnalysis.imagesDetails} 
+        onUpdateImages={handleUpdateImages}
+      />
     </>
   );
 };

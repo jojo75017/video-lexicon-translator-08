@@ -11,9 +11,10 @@ import { Label } from "@/components/ui/label";
 
 interface Props {
   images: ImageAnalysisType[];
+  onUpdateImages?: (images: ImageAnalysisType[]) => void;
 }
 
-const ImageAnalysis: React.FC<Props> = ({ images: initialImages }) => {
+const ImageAnalysis: React.FC<Props> = ({ images: initialImages, onUpdateImages }) => {
   const [images, setImages] = useState<ImageAnalysisType[]>(initialImages);
   const [loadingStates, setLoadingStates] = useState<{ [key: string]: 'loading' | 'success' | 'error' | null }>({});
   const [selectedImage, setSelectedImage] = useState<ImageAnalysisType | null>(null);
@@ -68,6 +69,9 @@ const ImageAnalysis: React.FC<Props> = ({ images: initialImages }) => {
       });
       
       setImages(updatedImages);
+      if (onUpdateImages) {
+        onUpdateImages(updatedImages);
+      }
       toast.success('Balise alt mise à jour avec succès');
       setSelectedImage(null);
     }
