@@ -13,11 +13,13 @@ interface Props {
   images: ImageAnalysisType[];
 }
 
-const ImageAnalysis: React.FC<Props> = ({ images }) => {
+const ImageAnalysis: React.FC<Props> = ({ images: initialImages }) => {
+  const [images, setImages] = useState<ImageAnalysisType[]>(initialImages);
   const [loadingStates, setLoadingStates] = useState<{ [key: string]: 'loading' | 'success' | 'error' | null }>({});
-  const imagesWithoutAlt = images.filter(img => !img.hasAlt);
   const [selectedImage, setSelectedImage] = useState<ImageAnalysisType | null>(null);
   const [newAltText, setNewAltText] = useState('');
+
+  const imagesWithoutAlt = images.filter(img => !img.hasAlt);
 
   const setImageLoadingState = (url: string, state: 'loading' | 'success' | 'error' | null) => {
     setLoadingStates(prev => ({ ...prev, [url]: state }));
@@ -54,8 +56,18 @@ const ImageAnalysis: React.FC<Props> = ({ images }) => {
 
   const handleSaveAlt = () => {
     if (selectedImage) {
-      // Ici, vous pourriez ajouter la logique pour sauvegarder la balise alt
-      // Pour l'instant, on simule juste la sauvegarde avec un toast
+      const updatedImages = images.map(img => {
+        if (img.url === selectedImage.url) {
+          return {
+            ...img,
+            alt: newAltText,
+            hasAlt: newAltText.trim() !== ''
+          };
+        }
+        return img;
+      });
+      
+      setImages(updatedImages);
       toast.success('Balise alt mise à jour avec succès');
       setSelectedImage(null);
     }
