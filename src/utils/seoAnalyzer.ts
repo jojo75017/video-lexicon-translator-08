@@ -31,6 +31,11 @@ export const analyzeSeo = (doc: Document, url: string): SeoAnalysis => {
     googlePosition = Math.floor(Math.random() * 100) + 1;
   }
 
+  // Simulation des métriques SEO avancées
+  const authorityScore = Math.floor(Math.random() * 100);
+  const organicTraffic = Math.floor(Math.random() * 100000);
+  const backlinks = Math.floor(Math.random() * 10000);
+
   return {
     title: doc.title || "Pas de titre",
     description: doc.querySelector('meta[name="description"]')?.getAttribute('content') || '',
@@ -46,6 +51,9 @@ export const analyzeSeo = (doc: Document, url: string): SeoAnalysis => {
     robotsMeta: doc.querySelector('meta[name="robots"]')?.getAttribute('content') || null,
     brokenLinks: 0,
     keywords,
-    googlePosition
+    googlePosition,
+    authorityScore,
+    organicTraffic,
+    backlinks
   };
 };

@@ -26,4 +26,7 @@ export interface SeoAnalysis {
   brokenLinks: number;
   keywords: string[];
   googlePosition: number | null;
+  authorityScore: number;
+  organicTraffic: number;
+  backlinks: number;
 }

@@ -38,6 +38,12 @@ const SeoResults = ({ seoAnalysis: initialSeoAnalysis }: SeoResultsProps) => {
     return "";
   };
 
+  const getAuthorityScoreColor = (score: number) => {
+    if (score >= 70) return 'text-green-500';
+    if (score >= 40) return 'text-yellow-500';
+    return 'text-red-500';
+  };
+
   return (
     <>
       <Card className="p-6">
@@ -87,6 +93,30 @@ const SeoResults = ({ seoAnalysis: initialSeoAnalysis }: SeoResultsProps) => {
               <li><span className="font-medium">Nombre de meta tags :</span> {seoAnalysis.metaTagsCount}</li>
               <li><span className="font-medium">Liens morts détectés :</span> {seoAnalysis.brokenLinks}</li>
             </ul>
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <h3 className="font-medium mb-2">Métriques SEO avancées</h3>
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="text-lg font-semibold mb-1">Authority Score</div>
+              <div className={`text-2xl font-bold ${getAuthorityScoreColor(seoAnalysis.authorityScore)}`}>
+                {seoAnalysis.authorityScore}/100
+              </div>
+            </div>
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="text-lg font-semibold mb-1">Trafic Organique</div>
+              <div className="text-2xl font-bold text-blue-600">
+                {seoAnalysis.organicTraffic.toLocaleString()} visites/mois
+              </div>
+            </div>
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="text-lg font-semibold mb-1">Backlinks</div>
+              <div className="text-2xl font-bold text-purple-600">
+                {seoAnalysis.backlinks.toLocaleString()}
+              </div>
+            </div>
           </div>
         </div>
 
