@@ -1,6 +1,40 @@
 import { SeoAnalysis, ImageAnalysis } from '@/types/seo';
+import axios from 'axios';
 
-export const analyzeSeo = (doc: Document, url: string): SeoAnalysis => {
+const SEMRUSH_API_KEY = process.env.NEXT_PUBLIC_SEMRUSH_API_KEY;
+const SEMRUSH_API_URL = 'https://api.semrush.com/analytics/v1/';
+
+async function getSemrushMetrics(domain: string) {
+  try {
+    // Récupération des données d'autorité du domaine
+    const authorityResponse = await axios.get(`${SEMRUSH_API_URL}?type=domain_ranks&key=${SEMRUSH_API_KEY}&export_columns=Ot,Ob,Ot&domain=${domain}&database=fr`);
+    
+    // Récupération du trafic organique
+    const trafficResponse = await axios.get(`${SEMRUSH_API_URL}?type=domain_organic&key=${SEMRUSH_API_KEY}&export_columns=Tr&domain=${domain}&database=fr`);
+    
+    // Récupération des backlinks
+    const backlinksResponse = await axios.get(`${SEMRUSH_API_URL}?type=backlinks_overview&key=${SEMRUSH_API_KEY}&export_columns=total&target=${domain}`);
+
+    return {
+      authorityScore: parseInt(authorityResponse.data.split('\n')[1].split(';')[0]),
+      organicTraffic: parseInt(trafficResponse.data.split('\n')[1]),
+      backlinks: parseInt(backlinksResponse.data.split('\n')[1])
+    };
+  } catch (error) {
+    console.error('Erreur lors de la récupération des métriques SEMrush:', error);
+    // En cas d'erreur, on retourne des valeurs par défaut
+    return {
+      authorityScore: 0,
+      organicTraffic: 0,
+      backlinks: 0
+    };
+  }
+}
+
+export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysis> => {
+  // Extraction du domaine de l'URL
+  const domain = new URL(url).hostname;
+
   // Analyse des images
   const images = Array.from(doc.getElementsByTagName('img'));
   const imagesDetails: ImageAnalysis[] = images.map(img => ({
@@ -23,18 +57,8 @@ export const analyzeSeo = (doc: Document, url: string): SeoAnalysis => {
     }))];
   }, [] as any[]);
 
-  // Position Google spéciale pour aquarioslands.com
-  let googlePosition = null;
-  if (url.includes('aquarioslands.com')) {
-    googlePosition = Math.floor(Math.random() * 10) + 1; // Position entre 1 et 10
-  } else {
-    googlePosition = Math.floor(Math.random() * 100) + 1;
-  }
-
-  // Simulation des métriques SEO avancées
-  const authorityScore = Math.floor(Math.random() * 100);
-  const organicTraffic = Math.floor(Math.random() * 100000);
-  const backlinks = Math.floor(Math.random() * 10000);
+  // Récupération des métriques SEMrush
+  const semrushMetrics = await getSemrushMetrics(domain);
 
   return {
     title: doc.title || "Pas de titre",
@@ -51,9 +75,7 @@ export const analyzeSeo = (doc: Document, url: string): SeoAnalysis => {
     robotsMeta: doc.querySelector('meta[name="robots"]')?.getAttribute('content') || null,
     brokenLinks: 0,
     keywords,
-    googlePosition,
-    authorityScore,
-    organicTraffic,
-    backlinks
+    googlePosition: null,
+    ...semrushMetrics
   };
 };
