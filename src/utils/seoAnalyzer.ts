@@ -1,7 +1,7 @@
 import { SeoAnalysis, ImageAnalysis, BacklinkInfo } from '@/types/seo';
 import axios from 'axios';
 
-const SEMRUSH_API_KEY = process.env.NEXT_PUBLIC_SEMRUSH_API_KEY;
+const SEMRUSH_API_KEY = import.meta.env.VITE_SEMRUSH_API_KEY;
 const SEMRUSH_API_URL = 'https://api.semrush.com/analytics/v1/';
 
 async function getSemrushMetrics(domain: string) {
