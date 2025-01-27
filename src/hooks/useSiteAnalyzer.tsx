@@ -85,7 +85,7 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
       toast.info("Analyse du site en cours...");
       
       // Analyse SEO
-      const seoResults = analyzeSeo(doc, url);
+      const seoResults = await analyzeSeo(doc, url);
       console.log("Résultats de l'analyse SEO:", seoResults);
       setSeoAnalysis(seoResults);
 
