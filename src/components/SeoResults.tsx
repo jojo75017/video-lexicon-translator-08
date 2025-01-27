@@ -1,9 +1,17 @@
 import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { SeoAnalysis, ImageAnalysis as ImageAnalysisType } from '@/types/seo';
+import { SeoAnalysis, ImageAnalysis as ImageAnalysisType, BacklinkInfo } from '@/types/seo';
 import ImageAnalysis from './ImageAnalysis';
-import { FileText, Link2, Shield, Gauge } from 'lucide-react';
+import { FileText, Link2, Shield, Gauge, ExternalLink } from 'lucide-react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 interface SeoResultsProps {
   seoAnalysis: SeoAnalysis;
@@ -11,6 +19,7 @@ interface SeoResultsProps {
 
 const SeoResults = ({ seoAnalysis: initialSeoAnalysis }: SeoResultsProps) => {
   const [seoAnalysis, setSeoAnalysis] = useState(initialSeoAnalysis);
+  const [showBacklinks, setShowBacklinks] = useState(false);
 
   const handleUpdateImages = (updatedImages: ImageAnalysisType[]) => {
     setSeoAnalysis(prev => ({
@@ -51,6 +60,10 @@ const SeoResults = ({ seoAnalysis: initialSeoAnalysis }: SeoResultsProps) => {
     if (k < 1024) return k.toFixed(2) + ' KB';
     const m = k / 1024;
     return m.toFixed(2) + ' MB';
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString();
   };
 
   return (
@@ -194,6 +207,102 @@ const SeoResults = ({ seoAnalysis: initialSeoAnalysis }: SeoResultsProps) => {
               <div><span className="font-medium">Styles :</span> {seoAnalysis.performance.styleCount}</div>
               <div><span className="font-medium">Temps de réponse :</span> {Math.round(seoAnalysis.performance.responseTime)}ms</div>
             </div>
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <h3 className="font-medium mb-2">Analyse des Backlinks</h3>
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="text-lg font-semibold mb-1">Total Backlinks</div>
+              <div className="text-2xl font-bold text-purple-600">
+                {seoAnalysis.backlinks.toLocaleString()}
+              </div>
+            </div>
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="text-lg font-semibold mb-1">Backlinks DoFollow</div>
+              <div className="text-2xl font-bold text-green-600">
+                {seoAnalysis.doFollowBacklinks.toLocaleString()}
+              </div>
+            </div>
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="text-lg font-semibold mb-1">Backlinks NoFollow</div>
+              <div className="text-2xl font-bold text-orange-600">
+                {seoAnalysis.noFollowBacklinks.toLocaleString()}
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <h4 className="font-medium mb-2">Top 10 Domaines Sources</h4>
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Domaine</TableHead>
+                    <TableHead className="text-right">Nombre de Backlinks</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {seoAnalysis.topBacklinkDomains.map((domain, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{domain.domain}</TableCell>
+                      <TableCell className="text-right">{domain.count}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <button
+              onClick={() => setShowBacklinks(!showBacklinks)}
+              className="text-blue-600 hover:text-blue-800 font-medium"
+            >
+              {showBacklinks ? "Masquer les détails" : "Voir tous les backlinks"}
+            </button>
+
+            {showBacklinks && (
+              <div className="mt-2 bg-gray-50 p-4 rounded-lg overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Source</TableHead>
+                      <TableHead>Texte d'ancrage</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Autorité</TableHead>
+                      <TableHead>Première détection</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {seoAnalysis.backlinkDetails.map((backlink, index) => (
+                      <TableRow key={index}>
+                        <TableCell>
+                          <a
+                            href={backlink.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center text-blue-600 hover:text-blue-800"
+                          >
+                            {backlink.domain}
+                            <ExternalLink className="h-4 w-4 ml-1" />
+                          </a>
+                        </TableCell>
+                        <TableCell>{backlink.anchorText}</TableCell>
+                        <TableCell>
+                          <Badge variant={backlink.isDoFollow ? "default" : "secondary"}>
+                            {backlink.isDoFollow ? "DoFollow" : "NoFollow"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{backlink.authority}/100</TableCell>
+                        <TableCell>{formatDate(backlink.firstSeen)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
           </div>
         </div>
 

@@ -10,6 +10,15 @@ export interface ImageAnalysis {
   alt?: string;
 }
 
+export interface BacklinkInfo {
+  url: string;
+  domain: string;
+  authority: number;
+  isDoFollow: boolean;
+  anchorText: string;
+  firstSeen: string;
+}
+
 export interface SeoAnalysis {
   title: string;
   description: string;
@@ -29,7 +38,10 @@ export interface SeoAnalysis {
   authorityScore: number;
   organicTraffic: number;
   backlinks: number;
-  // Nouvelles métriques
+  backlinkDetails: BacklinkInfo[];
+  topBacklinkDomains: { domain: string; count: number }[];
+  doFollowBacklinks: number;
+  noFollowBacklinks: number;
   wordCount: number;
   textToHtmlRatio: number;
   internalLinks: number;
@@ -50,9 +62,9 @@ export interface SeoAnalysis {
     contentSecurityPolicy: boolean;
   };
   performance: {
-    totalSize: number; // en Ko
+    totalSize: number;
     scriptCount: number;
     styleCount: number;
-    responseTime: number; // en ms
+    responseTime: number;
   };
 }
