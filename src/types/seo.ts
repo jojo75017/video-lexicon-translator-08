@@ -29,4 +29,30 @@ export interface SeoAnalysis {
   authorityScore: number;
   organicTraffic: number;
   backlinks: number;
+  // Nouvelles métriques
+  wordCount: number;
+  textToHtmlRatio: number;
+  internalLinks: number;
+  externalLinks: number;
+  socialMetaTags: {
+    ogTitle: string | null;
+    ogDescription: string | null;
+    ogImage: string | null;
+    twitterCard: string | null;
+    twitterTitle: string | null;
+    twitterDescription: string | null;
+    twitterImage: string | null;
+  };
+  securityHeaders: {
+    https: boolean;
+    hsts: boolean;
+    xFrameOptions: boolean;
+    contentSecurityPolicy: boolean;
+  };
+  performance: {
+    totalSize: number; // en Ko
+    scriptCount: number;
+    styleCount: number;
+    responseTime: number; // en ms
+  };
 }

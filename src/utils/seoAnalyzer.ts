@@ -6,13 +6,8 @@ const SEMRUSH_API_URL = 'https://api.semrush.com/analytics/v1/';
 
 async function getSemrushMetrics(domain: string) {
   try {
-    // Récupération des données d'autorité du domaine
     const authorityResponse = await axios.get(`${SEMRUSH_API_URL}?type=domain_ranks&key=${SEMRUSH_API_KEY}&export_columns=Ot,Ob,Ot&domain=${domain}&database=fr`);
-    
-    // Récupération du trafic organique
     const trafficResponse = await axios.get(`${SEMRUSH_API_URL}?type=domain_organic&key=${SEMRUSH_API_KEY}&export_columns=Tr&domain=${domain}&database=fr`);
-    
-    // Récupération des backlinks
     const backlinksResponse = await axios.get(`${SEMRUSH_API_URL}?type=backlinks_overview&key=${SEMRUSH_API_KEY}&export_columns=total&target=${domain}`);
 
     return {
@@ -22,7 +17,6 @@ async function getSemrushMetrics(domain: string) {
     };
   } catch (error) {
     console.error('Erreur lors de la récupération des métriques SEMrush:', error);
-    // En cas d'erreur, on retourne des valeurs par défaut
     return {
       authorityScore: 0,
       organicTraffic: 0,
@@ -31,9 +25,41 @@ async function getSemrushMetrics(domain: string) {
   }
 }
 
+function countWords(text: string): number {
+  return text.trim().split(/\s+/).length;
+}
+
+function calculateTextToHtmlRatio(doc: Document): number {
+  const htmlSize = doc.documentElement.outerHTML.length;
+  const textSize = doc.body.textContent?.length || 0;
+  return Math.round((textSize / htmlSize) * 100);
+}
+
+function getSocialMetaTags(doc: Document) {
+  return {
+    ogTitle: doc.querySelector('meta[property="og:title"]')?.getAttribute('content') || null,
+    ogDescription: doc.querySelector('meta[property="og:description"]')?.getAttribute('content') || null,
+    ogImage: doc.querySelector('meta[property="og:image"]')?.getAttribute('content') || null,
+    twitterCard: doc.querySelector('meta[name="twitter:card"]')?.getAttribute('content') || null,
+    twitterTitle: doc.querySelector('meta[name="twitter:title"]')?.getAttribute('content') || null,
+    twitterDescription: doc.querySelector('meta[name="twitter:description"]')?.getAttribute('content') || null,
+    twitterImage: doc.querySelector('meta[name="twitter:image"]')?.getAttribute('content') || null,
+  };
+}
+
+function getSecurityHeaders(doc: Document) {
+  const isHttps = window.location.protocol === 'https:';
+  return {
+    https: isHttps,
+    hsts: document.querySelector('meta[http-equiv="Strict-Transport-Security"]') !== null,
+    xFrameOptions: document.querySelector('meta[http-equiv="X-Frame-Options"]') !== null,
+    contentSecurityPolicy: document.querySelector('meta[http-equiv="Content-Security-Policy"]') !== null,
+  };
+}
+
 export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysis> => {
-  // Extraction du domaine de l'URL
   const domain = new URL(url).hostname;
+  const startTime = performance.now();
 
   // Analyse des images
   const images = Array.from(doc.getElementsByTagName('img'));
@@ -57,6 +83,19 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     }))];
   }, [] as any[]);
 
+  // Nouvelles métriques
+  const internalLinks = Array.from(doc.querySelectorAll('a'))
+    .filter(link => link.href.includes(domain)).length;
+
+  const externalLinks = Array.from(doc.querySelectorAll('a'))
+    .filter(link => !link.href.includes(domain)).length;
+
+  const scripts = doc.getElementsByTagName('script');
+  const styles = doc.getElementsByTagName('link');
+  const totalSize = doc.documentElement.outerHTML.length / 1024; // Conversion en Ko
+
+  const responseTime = performance.now() - startTime;
+
   // Récupération des métriques SEMrush
   const semrushMetrics = await getSemrushMetrics(domain);
 
@@ -76,6 +115,19 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     brokenLinks: 0,
     keywords,
     googlePosition: null,
-    ...semrushMetrics
+    ...semrushMetrics,
+    // Nouvelles métriques
+    wordCount: countWords(doc.body.textContent || ''),
+    textToHtmlRatio: calculateTextToHtmlRatio(doc),
+    internalLinks,
+    externalLinks,
+    socialMetaTags: getSocialMetaTags(doc),
+    securityHeaders: getSecurityHeaders(doc),
+    performance: {
+      totalSize,
+      scriptCount: scripts.length,
+      styleCount: styles.length,
+      responseTime
+    }
   };
 };

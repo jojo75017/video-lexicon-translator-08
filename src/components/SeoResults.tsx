@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SeoAnalysis, ImageAnalysis as ImageAnalysisType } from '@/types/seo';
 import ImageAnalysis from './ImageAnalysis';
+import { FileText, Link2, Shield, Gauge } from 'lucide-react';
 
 interface SeoResultsProps {
   seoAnalysis: SeoAnalysis;
@@ -44,10 +45,19 @@ const SeoResults = ({ seoAnalysis: initialSeoAnalysis }: SeoResultsProps) => {
     return 'text-red-500';
   };
 
+  const formatBytes = (bytes: number) => {
+    if (bytes < 1024) return bytes + ' B';
+    const k = bytes / 1024;
+    if (k < 1024) return k.toFixed(2) + ' KB';
+    const m = k / 1024;
+    return m.toFixed(2) + ' MB';
+  };
+
   return (
     <>
       <Card className="p-6">
         <h2 className="text-2xl font-semibold mb-4">Analyse SEO</h2>
+        
         <div className="grid gap-6 md:grid-cols-2">
           <div>
             <h3 className="font-medium mb-2">Balises principales</h3>
@@ -98,7 +108,7 @@ const SeoResults = ({ seoAnalysis: initialSeoAnalysis }: SeoResultsProps) => {
 
         <div className="mt-6">
           <h3 className="font-medium mb-2">Métriques SEO avancées</h3>
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-4">
             <div className="bg-gray-50 p-4 rounded-lg">
               <div className="text-lg font-semibold mb-1">Authority Score</div>
               <div className={`text-2xl font-bold ${getAuthorityScoreColor(seoAnalysis.authorityScore)}`}>
@@ -116,6 +126,73 @@ const SeoResults = ({ seoAnalysis: initialSeoAnalysis }: SeoResultsProps) => {
               <div className="text-2xl font-bold text-purple-600">
                 {seoAnalysis.backlinks.toLocaleString()}
               </div>
+            </div>
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="text-lg font-semibold mb-1">Ratio Texte/HTML</div>
+              <div className="text-2xl font-bold text-emerald-600">
+                {seoAnalysis.textToHtmlRatio}%
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-6 grid gap-6 md:grid-cols-2">
+          <div>
+            <h3 className="font-medium mb-2 flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Contenu
+            </h3>
+            <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+              <div><span className="font-medium">Nombre de mots :</span> {seoAnalysis.wordCount}</div>
+              <div><span className="font-medium">Liens internes :</span> {seoAnalysis.internalLinks}</div>
+              <div><span className="font-medium">Liens externes :</span> {seoAnalysis.externalLinks}</div>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="font-medium mb-2 flex items-center gap-2">
+              <Link2 className="h-5 w-5" />
+              Méta-données sociales
+            </h3>
+            <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+              <div>
+                <span className="font-medium">Open Graph :</span>
+                {seoAnalysis.socialMetaTags.ogTitle ? "✅" : "❌"} Titre
+                {seoAnalysis.socialMetaTags.ogDescription ? "✅" : "❌"} Description
+                {seoAnalysis.socialMetaTags.ogImage ? "✅" : "❌"} Image
+              </div>
+              <div>
+                <span className="font-medium">Twitter Card :</span>
+                {seoAnalysis.socialMetaTags.twitterCard ? "✅" : "❌"} Card
+                {seoAnalysis.socialMetaTags.twitterTitle ? "✅" : "❌"} Titre
+                {seoAnalysis.socialMetaTags.twitterImage ? "✅" : "❌"} Image
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="font-medium mb-2 flex items-center gap-2">
+              <Shield className="h-5 w-5" />
+              Sécurité
+            </h3>
+            <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+              <div>{seoAnalysis.securityHeaders.https ? "✅" : "❌"} HTTPS</div>
+              <div>{seoAnalysis.securityHeaders.hsts ? "✅" : "❌"} HSTS</div>
+              <div>{seoAnalysis.securityHeaders.xFrameOptions ? "✅" : "❌"} X-Frame-Options</div>
+              <div>{seoAnalysis.securityHeaders.contentSecurityPolicy ? "✅" : "❌"} Content Security Policy</div>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="font-medium mb-2 flex items-center gap-2">
+              <Gauge className="h-5 w-5" />
+              Performance
+            </h3>
+            <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+              <div><span className="font-medium">Taille totale :</span> {formatBytes(seoAnalysis.performance.totalSize * 1024)}</div>
+              <div><span className="font-medium">Scripts :</span> {seoAnalysis.performance.scriptCount}</div>
+              <div><span className="font-medium">Styles :</span> {seoAnalysis.performance.styleCount}</div>
+              <div><span className="font-medium">Temps de réponse :</span> {Math.round(seoAnalysis.performance.responseTime)}ms</div>
             </div>
           </div>
         </div>
