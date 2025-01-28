@@ -15,12 +15,20 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     alt: img.alt || undefined
   }));
 
+  // Analyse des titres
+  const headings = Array.from(doc.querySelectorAll('h1, h2, h3, h4, h5, h6')).map((heading, index) => ({
+    text: heading.textContent || '',
+    level: parseInt(heading.tagName.substring(1)),
+    position: index
+  }));
+
   return {
     title: doc.title || "Pas de titre",
     description: doc.querySelector('meta[name="description"]')?.getAttribute('content') || '',
     h1Count: doc.getElementsByTagName('h1').length,
     h2Count: doc.getElementsByTagName('h2').length,
     h3Count: doc.getElementsByTagName('h3').length,
+    headings,
     imgCount: images.length,
     imgWithoutAlt: images.filter(img => !img.alt).length,
     imagesDetails,
