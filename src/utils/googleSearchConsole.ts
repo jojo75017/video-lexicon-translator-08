@@ -15,7 +15,12 @@ export const getSearchAnalytics = async (siteUrl: string): Promise<SearchAnalyti
     if (!import.meta.env.VITE_GOOGLE_CLIENT_ID || 
         !import.meta.env.VITE_GOOGLE_CLIENT_SECRET) {
       console.log('Identifiants Google manquants');
-      return null;
+      return {
+        clicks: 0,
+        impressions: 0,
+        position: 0,
+        ctr: 0
+      };
     }
 
     const auth = new google.auth.OAuth2(
@@ -37,9 +42,9 @@ export const getSearchAnalytics = async (siteUrl: string): Promise<SearchAnalyti
     // Utiliser le token existant
     auth.setCredentials({ access_token: localStorage.getItem('gsc_token') });
 
-    // Obtenir les données des 30 derniers jours
+    // Obtenir les données des 7 derniers jours
     const endDate = new Date().toISOString().split('T')[0];
-    const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const startDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
     const response = await searchconsole.searchanalytics.query({
       auth,
@@ -52,10 +57,15 @@ export const getSearchAnalytics = async (siteUrl: string): Promise<SearchAnalyti
     });
 
     if (!response.data.rows?.length) {
-      return null;
+      return {
+        clicks: 0,
+        impressions: 0,
+        position: 0,
+        ctr: 0
+      };
     }
 
-    // Calculer les moyennes
+    // Calculer les totaux sur 7 jours
     const totals = response.data.rows.reduce((acc, row) => ({
       clicks: acc.clicks + (row.clicks || 0),
       impressions: acc.impressions + (row.impressions || 0),
@@ -74,6 +84,11 @@ export const getSearchAnalytics = async (siteUrl: string): Promise<SearchAnalyti
 
   } catch (error) {
     console.error('Erreur lors de la récupération des données GSC:', error);
-    return null;
+    return {
+      clicks: 0,
+      impressions: 0,
+      position: 0,
+      ctr: 0
+    };
   }
 };
