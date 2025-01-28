@@ -1,5 +1,6 @@
 import { SeoAnalysis, ImageAnalysis, BacklinkInfo } from '@/types/seo';
 import axios from 'axios';
+import { getSearchAnalytics } from './googleSearchConsole';
 
 const SEMRUSH_API_KEY = import.meta.env.VITE_SEMRUSH_API_KEY;
 const SEMRUSH_API_URL = 'https://api.semrush.com/analytics/v1/';
@@ -152,6 +153,9 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
   const domain = new URL(url).hostname;
   const startTime = performance.now();
 
+  // Récupérer les données de Google Search Console
+  const searchConsoleData = await getSearchAnalytics(url);
+  
   // Analyse des images
   const images = Array.from(doc.getElementsByTagName('img'));
   const imagesDetails: ImageAnalysis[] = images.map(img => ({
@@ -207,7 +211,8 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     robotsMeta: doc.querySelector('meta[name="robots"]')?.getAttribute('content') || null,
     brokenLinks: 0,
     keywords,
-    googlePosition: null,
+    googlePosition: searchConsoleData?.position || null,
+    organicTraffic: searchConsoleData?.clicks || 0,
     ...semrushMetrics,
     wordCount: countWords(doc.body.textContent || ''),
     textToHtmlRatio: calculateTextToHtmlRatio(doc),
@@ -219,7 +224,9 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
       totalSize,
       scriptCount: scripts.length,
       styleCount: styles.length,
-      responseTime
+      responseTime,
+      impressions: searchConsoleData?.impressions || 0,
+      clickThroughRate: searchConsoleData?.ctr || 0
     }
   };
 };

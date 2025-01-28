@@ -19,6 +19,15 @@ export interface BacklinkInfo {
   firstSeen: string;
 }
 
+interface Performance {
+  totalSize: number;
+  scriptCount: number;
+  styleCount: number;
+  responseTime: number;
+  impressions: number;
+  clickThroughRate: number;
+}
+
 export interface SeoAnalysis {
   title: string;
   description: string;
@@ -61,10 +70,5 @@ export interface SeoAnalysis {
     xFrameOptions: boolean;
     contentSecurityPolicy: boolean;
   };
-  performance: {
-    totalSize: number;
-    scriptCount: number;
-    styleCount: number;
-    responseTime: number;
-  };
+  performance: Performance;
 }
