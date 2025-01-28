@@ -4,9 +4,6 @@ import { getSearchAnalytics } from './googleSearchConsole';
 export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysis> => {
   const startTime = performance.now();
 
-  // Récupérer uniquement les données de Google Search Console
-  const searchConsoleData = await getSearchAnalytics(url);
-  
   // Analyse basique des images
   const images = Array.from(doc.getElementsByTagName('img'));
   const imagesDetails: ImageAnalysis[] = images.map(img => ({
@@ -22,6 +19,24 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     position: index
   }));
 
+  // Analyse des liens
+  const links = Array.from(doc.getElementsByTagName('a'));
+  const internalLinks = links.filter(link => {
+    try {
+      const linkUrl = new URL(link.href);
+      const pageUrl = new URL(url);
+      return linkUrl.hostname === pageUrl.hostname;
+    } catch {
+      return false;
+    }
+  }).length;
+
+  const externalLinks = links.length - internalLinks;
+
+  // Analyse du contenu
+  const text = doc.body.textContent || '';
+  const wordCount = text.trim().split(/\s+/).length;
+
   return {
     title: doc.title || "Pas de titre",
     description: doc.querySelector('meta[name="description"]')?.getAttribute('content') || '',
@@ -36,41 +51,44 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     canonicalUrl: doc.querySelector('link[rel="canonical"]')?.getAttribute('href') || null,
     robotsMeta: doc.querySelector('meta[name="robots"]')?.getAttribute('content') || null,
     brokenLinks: 0,
-    keywords: [],
-    googlePosition: searchConsoleData?.position || null,
-    organicTraffic: searchConsoleData?.clicks || 0,
+    keywords: Array.from(doc.querySelectorAll('meta[name="keywords"]'))
+      .map(meta => meta.getAttribute('content') || '')
+      .filter(content => content !== '')
+      .flatMap(content => content.split(',').map(keyword => keyword.trim())),
+    googlePosition: null,
     authorityScore: 0,
+    organicTraffic: 0,
     backlinks: 0,
-    doFollowBacklinks: 0,
-    noFollowBacklinks: 0,
     backlinkDetails: [],
     topBacklinkDomains: [],
-    wordCount: 0,
+    doFollowBacklinks: 0,
+    noFollowBacklinks: 0,
+    wordCount,
     textToHtmlRatio: 0,
-    internalLinks: 0,
-    externalLinks: 0,
+    internalLinks,
+    externalLinks,
     socialMetaTags: {
-      ogTitle: null,
-      ogDescription: null,
-      ogImage: null,
-      twitterCard: null,
-      twitterTitle: null,
-      twitterDescription: null,
-      twitterImage: null,
+      ogTitle: doc.querySelector('meta[property="og:title"]')?.getAttribute('content') || null,
+      ogDescription: doc.querySelector('meta[property="og:description"]')?.getAttribute('content') || null,
+      ogImage: doc.querySelector('meta[property="og:image"]')?.getAttribute('content') || null,
+      twitterCard: doc.querySelector('meta[name="twitter:card"]')?.getAttribute('content') || null,
+      twitterTitle: doc.querySelector('meta[name="twitter:title"]')?.getAttribute('content') || null,
+      twitterDescription: doc.querySelector('meta[name="twitter:description"]')?.getAttribute('content') || null,
+      twitterImage: doc.querySelector('meta[name="twitter:image"]')?.getAttribute('content') || null,
     },
     securityHeaders: {
-      https: false,
+      https: url.startsWith('https'),
       hsts: false,
       xFrameOptions: false,
       contentSecurityPolicy: false,
     },
     performance: {
       totalSize: 0,
-      scriptCount: 0,
-      styleCount: 0,
+      scriptCount: doc.getElementsByTagName('script').length,
+      styleCount: doc.getElementsByTagName('link').length + doc.getElementsByTagName('style').length,
       responseTime: performance.now() - startTime,
-      impressions: searchConsoleData?.impressions || 0,
-      clickThroughRate: searchConsoleData?.ctr || 0
+      impressions: 0,
+      clickThroughRate: 0
     }
   };
 };
