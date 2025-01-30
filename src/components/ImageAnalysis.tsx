@@ -4,10 +4,11 @@ import { toast } from "sonner";
 import { ImageAnalysis as ImageAnalysisType } from '@/types/seo';
 import ImageList from './image-analysis/ImageList';
 import { Button } from './ui/button';
-import { Download, Copy, X } from 'lucide-react';
+import { Download, Copy, X, AlertCircle } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface Props {
   images: ImageAnalysisType[];
@@ -21,6 +22,7 @@ const ImageAnalysis: React.FC<Props> = ({ images: initialImages, onUpdateImages 
   const [newAltText, setNewAltText] = useState('');
 
   const imagesWithoutAlt = images.filter(img => !img.hasAlt);
+  const imagesWithAlt = images.filter(img => img.hasAlt);
 
   const setImageLoadingState = (url: string, state: 'loading' | 'success' | 'error' | null) => {
     setLoadingStates(prev => ({ ...prev, [url]: state }));
@@ -96,32 +98,49 @@ const ImageAnalysis: React.FC<Props> = ({ images: initialImages, onUpdateImages 
       <h2 className="text-2xl font-semibold mb-4">Analyse des Images</h2>
       
       {imagesWithoutAlt.length > 0 && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            {imagesWithoutAlt.length} image{imagesWithoutAlt.length > 1 ? 's' : ''} sans attribut alt détectée{imagesWithoutAlt.length > 1 ? 's' : ''}. 
+            Cliquez sur une image pour ajouter une description.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {imagesWithoutAlt.length > 0 && (
         <div className="mb-6">
-          <h3 className="text-lg font-medium mb-2 text-red-500">
+          <h3 className="text-lg font-medium mb-2 text-red-500 flex items-center gap-2">
+            <AlertCircle className="h-4 w-4" />
             Images sans attribut alt ({imagesWithoutAlt.length})
           </h3>
-          <ImageList
-            images={imagesWithoutAlt}
-            loadingStates={loadingStates}
-            onImageClick={handleImageClick}
-            formatUrl={formatUrl}
-            onDownload={handleDownload}
-            onCopyUrl={handleCopyUrl}
-          />
+          <div className="bg-red-50 p-4 rounded-lg">
+            <ImageList
+              images={imagesWithoutAlt}
+              loadingStates={loadingStates}
+              onImageClick={handleImageClick}
+              formatUrl={formatUrl}
+              onDownload={handleDownload}
+              onCopyUrl={handleCopyUrl}
+            />
+          </div>
         </div>
       )}
 
-      <div>
-        <h3 className="text-lg font-medium mb-2">Toutes les images ({images.length})</h3>
-        <ImageList
-          images={images}
-          loadingStates={loadingStates}
-          onImageClick={handleImageClick}
-          formatUrl={formatUrl}
-          onDownload={handleDownload}
-          onCopyUrl={handleCopyUrl}
-        />
-      </div>
+      {imagesWithAlt.length > 0 && (
+        <div>
+          <h3 className="text-lg font-medium mb-2 text-green-600">Images avec attribut alt ({imagesWithAlt.length})</h3>
+          <div className="bg-green-50 p-4 rounded-lg">
+            <ImageList
+              images={imagesWithAlt}
+              loadingStates={loadingStates}
+              onImageClick={handleImageClick}
+              formatUrl={formatUrl}
+              onDownload={handleDownload}
+              onCopyUrl={handleCopyUrl}
+            />
+          </div>
+        </div>
+      )}
 
       <Dialog open={selectedImage !== null} onOpenChange={() => setSelectedImage(null)}>
         <DialogContent className="max-w-4xl">
