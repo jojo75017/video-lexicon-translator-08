@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Resource } from '@/utils/resourceAnalyzer';
-import { ExternalLink, FileText, Image as ImageIcon, Code } from 'lucide-react';
+import { ExternalLink, FileText, Image as ImageIcon, Code, FolderOpen } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -30,16 +30,53 @@ const ResourcesAnalyzer: React.FC<Props> = ({ resources }) => {
   };
 
   const handleResourceClick = (resource: Resource) => {
-    if (resource.type === 'image') {
-      window.open(resource.url, '_blank', 'width=800,height=600');
-    } else {
-      window.open(resource.url, '_blank');
+    try {
+      if (resource.type === 'image') {
+        const win = window.open('', '_blank');
+        if (win) {
+          win.document.write(`
+            <html>
+              <head>
+                <title>Aperçu de l'image</title>
+                <style>
+                  body {
+                    margin: 0;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    min-height: 100vh;
+                    background: #f1f5f9;
+                  }
+                  img {
+                    max-width: 90vw;
+                    max-height: 90vh;
+                    object-fit: contain;
+                  }
+                </style>
+              </head>
+              <body>
+                <img src="${resource.url}" alt="Aperçu" />
+              </body>
+            </html>
+          `);
+        }
+      } else {
+        window.open(resource.url, '_blank');
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'ouverture de la ressource:', error);
+      toast.error("Impossible d'ouvrir cette ressource");
     }
   };
 
   const copyUrl = (url: string) => {
-    navigator.clipboard.writeText(url);
-    toast.success("URL copiée dans le presse-papier");
+    try {
+      navigator.clipboard.writeText(url);
+      toast.success("URL copiée dans le presse-papier");
+    } catch (error) {
+      console.error('Erreur lors de la copie:', error);
+      toast.error("Impossible de copier l'URL");
+    }
   };
 
   return (
@@ -56,7 +93,8 @@ const ResourcesAnalyzer: React.FC<Props> = ({ resources }) => {
               {resources.map((resource, index) => (
                 <div 
                   key={index} 
-                  className="p-4 bg-white/50 hover:bg-white/80 rounded-lg border border-gray-200 transition-all"
+                  className="p-4 bg-white hover:bg-gray-50 rounded-lg border border-gray-200 transition-all cursor-pointer"
+                  onClick={() => handleResourceClick(resource)}
                 >
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-2 min-w-0">
@@ -66,14 +104,17 @@ const ResourcesAnalyzer: React.FC<Props> = ({ resources }) => {
                         }`} 
                       />
                       <span className="truncate text-sm text-gray-600">
-                        {new URL(resource.url).pathname.split('/').pop()}
+                        {resource.url.split('/').pop() || resource.url}
                       </span>
                     </div>
                     <div className="flex gap-2 shrink-0">
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => copyUrl(resource.url)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          copyUrl(resource.url);
+                        }}
                         className="text-gray-600"
                       >
                         Copier l'URL
@@ -81,11 +122,14 @@ const ResourcesAnalyzer: React.FC<Props> = ({ resources }) => {
                       <Button
                         variant="default"
                         size="sm"
-                        onClick={() => handleResourceClick(resource)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleResourceClick(resource);
+                        }}
                         className="gap-2"
                       >
                         Ouvrir
-                        <ExternalLink className="h-4 w-4" />
+                        <FolderOpen className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
