@@ -14,6 +14,8 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
     window.open(image.url, '_blank', 'width=800,height=600');
   };
 
+  console.log("Mots-clés reçus:", seoAnalysis.keywords); // Pour déboguer
+
   return (
     <div className="space-y-6">
       <Card className="p-6">
@@ -30,9 +32,9 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
                   <Tag className="h-4 w-4" />
                   <span className="font-medium">Mots-clés :</span>
                 </div>
-                {seoAnalysis.keywords && seoAnalysis.keywords.length > 0 ? (
-                  <div className="flex flex-wrap gap-2">
-                    {seoAnalysis.keywords.map((keyword, index) => (
+                <div className="flex flex-wrap gap-2">
+                  {Array.isArray(seoAnalysis.keywords) && seoAnalysis.keywords.length > 0 ? (
+                    seoAnalysis.keywords.map((keyword, index) => (
                       <Badge 
                         key={index} 
                         variant="secondary"
@@ -40,11 +42,11 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
                       >
                         {keyword}
                       </Badge>
-                    ))}
-                  </div>
-                ) : (
-                  <span className="text-gray-500 italic">Aucun mot-clé défini</span>
-                )}
+                    ))
+                  ) : (
+                    <span className="text-gray-500 italic">Aucun mot-clé défini</span>
+                  )}
+                </div>
               </li>
             </ul>
           </div>
