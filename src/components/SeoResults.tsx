@@ -2,7 +2,7 @@ import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SeoAnalysis } from '@/types/seo';
-import { FileText } from 'lucide-react';
+import { FileText, Tag } from 'lucide-react';
 import ImageDetails from './ImageDetails';
 
 interface SeoResultsProps {
@@ -22,18 +22,29 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
         <div className="grid gap-6 md:grid-cols-2">
           <div>
             <h3 className="font-medium mb-2">Balises principales</h3>
-            <ul className="space-y-2">
+            <ul className="space-y-4">
               <li><span className="font-medium">Titre :</span> {seoAnalysis.title || 'Non défini'}</li>
               <li><span className="font-medium">Description :</span> {seoAnalysis.description || 'Non définie'}</li>
               <li>
-                <span className="font-medium">Mots-clés :</span>
-                <div className="flex flex-wrap gap-2 mt-1">
-                  {seoAnalysis.keywords?.map((keyword, index) => (
-                    <Badge key={index} variant="secondary">
-                      {keyword}
-                    </Badge>
-                  )) || 'Non définis'}
+                <div className="flex items-center gap-2 mb-2">
+                  <Tag className="h-4 w-4" />
+                  <span className="font-medium">Mots-clés :</span>
                 </div>
+                {seoAnalysis.keywords && seoAnalysis.keywords.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {seoAnalysis.keywords.map((keyword, index) => (
+                      <Badge 
+                        key={index} 
+                        variant="secondary"
+                        className="bg-blue-100 text-blue-800 hover:bg-blue-200"
+                      >
+                        {keyword}
+                      </Badge>
+                    ))}
+                  </div>
+                ) : (
+                  <span className="text-gray-500 italic">Aucun mot-clé défini</span>
+                )}
               </li>
             </ul>
           </div>
