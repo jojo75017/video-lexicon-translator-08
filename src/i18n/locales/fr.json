@@ -1,0 +1,31 @@
+{
+  "seo": {
+    "analysis": "Analyse SEO",
+    "score": "Score SEO",
+    "mainTags": "Balises principales",
+    "title": "Titre",
+    "description": "Description",
+    "keywords": "Mots-clés",
+    "structure": "Structure",
+    "content": "Contenu",
+    "wordCount": "Nombre de mots",
+    "internalLinks": "Liens internes",
+    "externalLinks": "Liens externes",
+    "imageCount": "Nombre d'images",
+    "notDefined": "Non défini",
+    "notDefined_female": "Non définie",
+    "noKeywords": "Aucun mot-clé défini",
+    "suggestions": {
+      "title": "Suggestions d'amélioration",
+      "noTitle": "Le titre est manquant",
+      "titleTooShort": "Le titre est trop court (minimum 30 caractères recommandé)",
+      "titleTooLong": "Le titre est trop long (maximum 60 caractères recommandé)",
+      "noDescription": "La description est manquante",
+      "descriptionTooShort": "La description est trop courte (minimum 120 caractères recommandé)",
+      "descriptionTooLong": "La description est trop longue (maximum 160 caractères recommandé)",
+      "noKeywords": "Aucun mot-clé n'est défini",
+      "imagesNoAlt": "{{count}} image(s) sans attribut alt",
+      "h1Count": "Une seule balise H1 est recommandée"
+    }
+  }
+}
