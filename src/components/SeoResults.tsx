@@ -8,6 +8,8 @@ import SeoSuggestions from './seo/SeoSuggestions';
 import SeoMainTags from './seo/SeoMainTags';
 import SeoStructure from './seo/SeoStructure';
 import SeoContent from './seo/SeoContent';
+import ShareResults from './ShareResults';
+import PerformanceMetrics from './PerformanceMetrics';
 
 interface SeoResultsProps {
   seoAnalysis: SeoAnalysis;
@@ -87,7 +89,11 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
           internalLinks={seoAnalysis.internalLinks}
           externalLinks={seoAnalysis.externalLinks}
         />
+
+        <ShareResults seoAnalysis={seoAnalysis} />
       </Card>
+
+      <PerformanceMetrics performance={seoAnalysis.performance} />
 
       <ImageDetails 
         images={seoAnalysis.imagesDetails} 
