@@ -162,7 +162,7 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
             <ul className="space-y-2">
               <li className="flex items-center gap-2">
                 <span className="font-medium">H1 :</span> 
-                <Badge variant={seoAnalysis.h1Count === 1 ? "success" : "destructive"}>
+                <Badge variant={seoAnalysis.h1Count === 1 ? "secondary" : "destructive"}>
                   {seoAnalysis.h1Count || 0}
                 </Badge>
                 {seoAnalysis.h1Count !== 1 && (
