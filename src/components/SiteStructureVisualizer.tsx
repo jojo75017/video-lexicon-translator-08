@@ -1,5 +1,7 @@
 import React from 'react';
 import { Card } from "@/components/ui/card";
+import { ExternalLink } from 'lucide-react';
+import { toast } from "sonner";
 
 interface SiteNode {
   name: string;
@@ -15,16 +17,35 @@ interface Props {
 }
 
 const SiteStructureVisualizer: React.FC<Props> = ({ structure }) => {
+  const handleLinkClick = (url: string) => {
+    try {
+      window.open(url, '_blank');
+    } catch (error) {
+      toast.error("Impossible d'ouvrir ce lien");
+    }
+  };
+
   const renderNode = (node: SiteNode, level: number = 0, parentPath: string = '') => {
-    // Créer une clé unique en combinant le chemin parent et le chemin actuel
     const uniqueKey = `${parentPath}-${node.path}`;
+    const isValidUrl = node.path.startsWith('http');
     
     return (
       <div key={uniqueKey} className="ml-6">
         <div className="flex items-center gap-2 py-2">
           <div className="w-2 h-2 rounded-full bg-blue-500" />
           <span className="font-medium">{node.name}</span>
-          <span className="text-sm text-gray-500">{node.path}</span>
+          {isValidUrl && (
+            <button
+              onClick={() => handleLinkClick(node.path)}
+              className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 transition-colors"
+            >
+              <span className="truncate max-w-[300px]">{node.path}</span>
+              <ExternalLink className="h-4 w-4" />
+            </button>
+          )}
+          {!isValidUrl && (
+            <span className="text-sm text-gray-500">{node.path}</span>
+          )}
         </div>
         {node.children && node.children.length > 0 && (
           <div className="border-l-2 border-gray-200 ml-1">
