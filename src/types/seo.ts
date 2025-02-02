@@ -35,6 +35,7 @@ export interface SeoAnalysis {
   h2Count: number;
   h3Count: number;
   headings: HeadingStructure[];
+  paragraphs: { text: string; position: number; }[];
   imgCount: number;
   imgWithoutAlt: number;
   imagesDetails: ImageAnalysis[];

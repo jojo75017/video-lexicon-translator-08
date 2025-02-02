@@ -3,9 +3,9 @@ import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Search, FileSearch, Globe, AlertCircle } from "lucide-react";
+import { ExternalLink, Search, Globe, AlertCircle } from "lucide-react";
 import SiteStructureVisualizer from '@/components/SiteStructureVisualizer';
-import ResourcesAnalyzer from '@/components/ResourcesAnalyzer';
+import ContentHierarchy from '@/components/ContentHierarchy';
 import UrlInput from '@/components/UrlInput';
 import SeoResults from '@/components/SeoResults';
 import UrlShortener from '@/components/UrlShortener';
@@ -19,7 +19,6 @@ const Index = () => {
     isLoading,
     showCorsWarning,
     seoAnalysis,
-    resources,
     siteStructure,
     analyzeSite,
     error
@@ -89,13 +88,6 @@ const Index = () => {
                 <Skeleton className="h-4 w-3/4" />
               </div>
             </Card>
-            <Card className="p-6">
-              <div className="space-y-3">
-                <Skeleton className="h-8 w-1/2" />
-                <Skeleton className="h-4 w-3/4" />
-                <Skeleton className="h-4 w-2/3" />
-              </div>
-            </Card>
           </div>
         )}
 
@@ -106,9 +98,9 @@ const Index = () => {
                 <Search className="h-4 w-4" />
                 <span>SEO</span>
               </TabsTrigger>
-              <TabsTrigger value="resources" className="space-x-2 data-[state=active]:bg-blue-50">
-                <FileSearch className="h-4 w-4" />
-                <span>Ressources</span>
+              <TabsTrigger value="hierarchy" className="space-x-2 data-[state=active]:bg-blue-50">
+                <Globe className="h-4 w-4" />
+                <span>Hiérarchie</span>
               </TabsTrigger>
               <TabsTrigger value="structure" className="space-x-2 data-[state=active]:bg-blue-50">
                 <Globe className="h-4 w-4" />
@@ -127,9 +119,12 @@ const Index = () => {
               )}
             </TabsContent>
 
-            <TabsContent value="resources">
-              {resources && resources.length > 0 && (
-                <ResourcesAnalyzer resources={resources} />
+            <TabsContent value="hierarchy">
+              {seoAnalysis && (
+                <ContentHierarchy 
+                  headings={seoAnalysis.headings || []} 
+                  paragraphs={seoAnalysis.paragraphs || []} 
+                />
               )}
             </TabsContent>
 
