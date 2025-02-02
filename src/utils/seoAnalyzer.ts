@@ -1,5 +1,4 @@
 import { SeoAnalysis, ImageAnalysis } from '@/types/seo';
-import { getSearchAnalytics } from './googleSearchConsole';
 
 export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysis> => {
   const startTime = performance.now();
@@ -16,6 +15,12 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
   const headings = Array.from(doc.querySelectorAll('h1, h2, h3, h4, h5, h6')).map((heading, index) => ({
     text: heading.textContent || '',
     level: parseInt(heading.tagName.substring(1)),
+    position: index
+  }));
+
+  // Analyse des paragraphes
+  const paragraphs = Array.from(doc.getElementsByTagName('p')).map((p, index) => ({
+    text: p.textContent || '',
     position: index
   }));
 
@@ -44,6 +49,7 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     h2Count: doc.getElementsByTagName('h2').length,
     h3Count: doc.getElementsByTagName('h3').length,
     headings,
+    paragraphs,
     imgCount: images.length,
     imgWithoutAlt: images.filter(img => !img.alt).length,
     imagesDetails,
