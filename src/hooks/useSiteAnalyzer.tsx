@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import axios, { AxiosError } from 'axios';
 import { toast } from "sonner";
 import { analyzeResources, Resource } from '@/utils/resourceAnalyzer';
@@ -32,7 +32,7 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
   const [siteStructure, setSiteStructure] = useState<{ name: string; children: SiteNode[] } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const analyzeSite = async () => {
+  const analyzeSite = useCallback(async () => {
     if (!url) {
       toast.error("Veuillez entrer une URL valide");
       return;
@@ -41,7 +41,7 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
     try {
       new URL(url);
     } catch {
-      toast.error("Format d'URL invalide. Assurez-vous d'inclure http:// ou https://");
+      toast.error("Format d'URL invalide");
       return;
     }
 
@@ -53,26 +53,23 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
     setError(null);
     
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 30000);
+    const timeout = setTimeout(() => controller.abort(), 15000); // Réduit à 15 secondes
 
     try {
-      console.log("Début de l'analyse pour l'URL:", url);
       const corsProxy = 'https://cors-anywhere.herokuapp.com/';
       
-      console.log("Tentative de connexion au proxy CORS...");
       const response = await axios.get(`${corsProxy}${url}`, {
         headers: {
           'Accept': 'text/html',
           'X-Requested-With': 'XMLHttpRequest',
         },
         signal: controller.signal,
+        timeout: 15000, // Timeout explicite
       });
       
       if (!response.data) {
         throw new Error("La réponse est vide");
       }
-      
-      console.log("Réponse du proxy reçue, statut:", response.status);
       
       const parser = new DOMParser();
       const doc = parser.parseFromString(response.data, 'text/html');
@@ -81,17 +78,12 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
         throw new Error("Impossible de parser le document HTML");
       }
       
-      console.log("Document HTML parsé avec succès");
-      toast.info("Analyse du site en cours...");
-      
       // Analyse SEO
       const seoResults = await analyzeSeo(doc, url);
-      console.log("Résultats de l'analyse SEO:", seoResults);
       setSeoAnalysis(seoResults);
 
-      // Analyse des ressources
+      // Analyse des ressources en parallèle
       const resourcesResults = await analyzeResources(doc, url);
-      console.log("Ressources trouvées:", resourcesResults.length);
       setResources(resourcesResults);
 
       // Structure du site
@@ -108,8 +100,6 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
           uniqueUrls.add(link.url);
           return true;
         });
-
-      console.log("Nombre de liens uniques trouvés:", links.length);
 
       const structure = {
         name: "Site Web",
@@ -128,20 +118,19 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
 
       setSiteStructure(structure);
       setError(null);
-      console.log("Structure du site générée avec succès");
-      toast.success("Analyse terminée !");
+      toast.success("Analyse terminée avec succès !");
 
     } catch (error) {
-      console.error('Erreur complète:', error);
+      console.error('Erreur:', error);
       
       if (error instanceof AxiosError) {
         if (error.code === 'ERR_CANCELED') {
-          setError("L'analyse a pris trop de temps et a été annulée");
-          toast.error("L'analyse a pris trop de temps et a été annulée");
+          setError("L'analyse a été interrompue car elle prenait trop de temps");
+          toast.error("Analyse interrompue - délai dépassé");
         } else if (error.response?.status === 403) {
           setShowCorsWarning(true);
           setError(null);
-          toast.warning("Veuillez activer le proxy CORS en cliquant sur le bouton en haut de la page");
+          toast.warning("Activation du proxy CORS requise");
         } else if (error.code === 'ERR_NETWORK') {
           setError("Erreur de connexion au proxy CORS");
           toast.error("Erreur de connexion au proxy CORS");
@@ -158,7 +147,7 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
       clearTimeout(timeout);
       setIsLoading(false);
     }
-  };
+  }, [url]);
 
   return {
     url,
