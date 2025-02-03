@@ -9,29 +9,50 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
   const firstContentfulPaint = performanceEntries ? performanceEntries.domContentLoadedEventEnd - performanceEntries.startTime : 0;
   const domLoadTime = performanceEntries ? performanceEntries.domComplete - performanceEntries.startTime : 0;
 
-  // Analyse des liens cassés
+  // Analyse des liens cassés améliorée
   const links = Array.from(doc.getElementsByTagName('a'));
   const brokenLinks = await Promise.all(
     links.map(async (link) => {
       try {
-        const response = await fetch(link.href, { method: 'HEAD' });
+        // Vérifie si le lien est valide et complet
+        if (!link.href || link.href.startsWith('javascript:') || link.href.startsWith('#')) {
+          return null;
+        }
+
+        // Normalise l'URL
+        const linkUrl = new URL(link.href, url).href;
+        
+        console.log('Vérification du lien:', linkUrl);
+        
+        const response = await fetch(linkUrl, { 
+          method: 'HEAD',
+          mode: 'no-cors' // Permet de vérifier les liens externes
+        });
+        
+        // Si le statut est >= 400, c'est un lien cassé
         if (response.status >= 400) {
+          console.log('Lien cassé trouvé:', linkUrl, 'Status:', response.status);
           return {
-            url: link.href,
+            url: linkUrl,
             statusCode: response.status,
-            location: link.closest('h1,h2,h3,p')?.textContent || 'Unknown location'
+            location: link.closest('h1,h2,h3,p')?.textContent?.trim() || 'Emplacement inconnu'
           };
         }
         return null;
-      } catch {
+      } catch (error) {
+        console.log('Erreur lors de la vérification du lien:', link.href, error);
+        // Si on ne peut pas accéder au lien, on le considère comme cassé
         return {
           url: link.href,
           statusCode: 404,
-          location: link.closest('h1,h2,h3,p')?.textContent || 'Unknown location'
+          location: link.closest('h1,h2,h3,p')?.textContent?.trim() || 'Emplacement inconnu'
         };
       }
     })
-  ).then(results => results.filter(Boolean));
+  );
+
+  // Filtre les résultats null et garde uniquement les liens cassés
+  const filteredBrokenLinks = brokenLinks.filter((link): link is NonNullable<typeof link> => link !== null);
 
   // Analyse des balises sociales
   const socialTags = {
@@ -114,7 +135,7 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     metaTagsCount: doc.getElementsByTagName('meta').length,
     canonicalUrl: doc.querySelector('link[rel="canonical"]')?.getAttribute('href') || null,
     robotsMeta: doc.querySelector('meta[name="robots"]')?.getAttribute('content') || null,
-    brokenLinks,
+    brokenLinks: filteredBrokenLinks,
     keywords: Array.from(doc.querySelectorAll('meta[name="keywords"]'))
       .map(meta => meta.getAttribute('content') || '')
       .filter(content => content !== '')
