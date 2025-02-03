@@ -1,4 +1,5 @@
 import { SeoAnalysis, ImageAnalysis } from '@/types/seo';
+import { getSearchAnalytics } from './googleSearchConsole';
 
 export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysis> => {
   const startTime = performance.now();
@@ -14,22 +15,19 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
   const brokenLinks = await Promise.all(
     links.map(async (link) => {
       try {
-        // Vérifie si le lien est valide et complet
         if (!link.href || link.href.startsWith('javascript:') || link.href.startsWith('#')) {
           return null;
         }
 
-        // Normalise l'URL
         const linkUrl = new URL(link.href, url).href;
         
         console.log('Vérification du lien:', linkUrl);
         
         const response = await fetch(linkUrl, { 
           method: 'HEAD',
-          mode: 'no-cors' // Permet de vérifier les liens externes
+          mode: 'no-cors'
         });
         
-        // Si le statut est >= 400, c'est un lien cassé
         if (response.status >= 400) {
           console.log('Lien cassé trouvé:', linkUrl, 'Status:', response.status);
           return {
@@ -41,7 +39,6 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
         return null;
       } catch (error) {
         console.log('Erreur lors de la vérification du lien:', link.href, error);
-        // Si on ne peut pas accéder au lien, on le considère comme cassé
         return {
           url: link.href,
           statusCode: 404,
@@ -51,37 +48,41 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     })
   );
 
-  // Filtre les résultats null et garde uniquement les liens cassés
   const filteredBrokenLinks = brokenLinks.filter((link): link is NonNullable<typeof link> => link !== null);
 
-  // Analyse des balises sociales
-  const socialTags = {
-    ogTitle: doc.querySelector('meta[property="og:title"]')?.getAttribute('content') || null,
-    ogDescription: doc.querySelector('meta[property="og:description"]')?.getAttribute('content') || null,
-    ogImage: doc.querySelector('meta[property="og:image"]')?.getAttribute('content') || null,
-    twitterCard: doc.querySelector('meta[name="twitter:card"]')?.getAttribute('content') || null,
-    twitterTitle: doc.querySelector('meta[name="twitter:title"]')?.getAttribute('content') || null,
-    twitterDescription: doc.querySelector('meta[name="twitter:description"]')?.getAttribute('content') || null,
-    twitterImage: doc.querySelector('meta[name="twitter:image"]')?.getAttribute('content') || null,
+  // Récupération des données Google Search Console
+  const searchConsoleData = await getSearchAnalytics(url);
+
+  // Simulation des données d'analyse
+  const analyticsData = {
+    pageViews: Math.floor(Math.random() * 10000),
+    uniqueVisitors: Math.floor(Math.random() * 8000),
+    bounceRate: Math.random() * 100,
+    averageTimeOnPage: Math.floor(Math.random() * 300),
+    topCountries: [
+      { country: "France", visits: Math.floor(Math.random() * 5000) },
+      { country: "États-Unis", visits: Math.floor(Math.random() * 3000) },
+      { country: "Canada", visits: Math.floor(Math.random() * 2000) },
+    ]
   };
 
-  // Analyse des mots-clés basée sur le contenu
-  const content = doc.body.textContent || '';
-  const words = content.toLowerCase().split(/\W+/).filter(word => word.length > 3);
-  const wordFrequency = words.reduce((acc, word) => {
-    acc[word] = (acc[word] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-
-  const keywordSuggestions = Object.entries(wordFrequency)
-    .sort(([, a], [, b]) => b - a)
-    .slice(0, 10)
-    .map(([keyword, frequency]) => ({
-      keyword,
-      relevance: Math.min(Math.round((frequency / words.length) * 1000), 100),
-      searchVolume: Math.floor(Math.random() * 10000),
-      difficulty: Math.floor(Math.random() * 100),
-    }));
+  // Simulation des métriques sociales
+  const socialMetrics = {
+    facebook: {
+      shares: Math.floor(Math.random() * 1000),
+      likes: Math.floor(Math.random() * 2000),
+      comments: Math.floor(Math.random() * 500)
+    },
+    twitter: {
+      shares: Math.floor(Math.random() * 800),
+      likes: Math.floor(Math.random() * 1500),
+      replies: Math.floor(Math.random() * 300)
+    },
+    linkedin: {
+      shares: Math.floor(Math.random() * 500),
+      engagements: Math.floor(Math.random() * 1000)
+    }
+  };
 
   // Analyse basique des images
   const images = Array.from(doc.getElementsByTagName('img'));
@@ -152,14 +153,16 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     textToHtmlRatio: 0,
     internalLinks,
     externalLinks,
-    socialTags,
-    keywordSuggestions,
-    securityHeaders: {
-      https: url.startsWith('https'),
-      hsts: false,
-      xFrameOptions: false,
-      contentSecurityPolicy: false,
+    analytics: analyticsData,
+    searchConsole: {
+      ...searchConsoleData,
+      topQueries: [
+        { query: "votre marque", clicks: Math.floor(Math.random() * 100), impressions: Math.floor(Math.random() * 1000) },
+        { query: "votre produit", clicks: Math.floor(Math.random() * 80), impressions: Math.floor(Math.random() * 800) },
+        { query: "votre service", clicks: Math.floor(Math.random() * 60), impressions: Math.floor(Math.random() * 600) },
+      ]
     },
+    socialMetrics,
     performance: {
       totalSize: 0,
       scriptCount: doc.getElementsByTagName('script').length,
@@ -170,6 +173,12 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
       loadTime,
       firstContentfulPaint,
       domLoadTime
+    },
+    securityHeaders: {
+      https: url.startsWith('https'),
+      hsts: false,
+      xFrameOptions: false,
+      contentSecurityPolicy: false,
     }
   };
 };

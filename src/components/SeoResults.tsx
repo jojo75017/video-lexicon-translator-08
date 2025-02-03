@@ -13,6 +13,7 @@ import LoadingPerformance from './seo/LoadingPerformance';
 import SocialTags from './seo/SocialTags';
 import BrokenLinks from './seo/BrokenLinks';
 import KeywordSuggestions from './seo/KeywordSuggestions';
+import SocialMetrics from './seo/SocialMetrics';
 
 interface SeoResultsProps {
   seoAnalysis: SeoAnalysis;
@@ -115,6 +116,8 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
       />
 
       <SocialTags socialTags={seoAnalysis.socialTags} />
+      
+      <SocialMetrics metrics={seoAnalysis.socialMetrics} />
 
       <BrokenLinks brokenLinks={seoAnalysis.brokenLinks} />
 

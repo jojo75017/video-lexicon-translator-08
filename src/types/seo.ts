@@ -19,6 +19,39 @@ export interface BacklinkInfo {
   firstSeen: string;
 }
 
+export interface AnalyticsData {
+  pageViews: number;
+  uniqueVisitors: number;
+  bounceRate: number;
+  averageTimeOnPage: number;
+  topCountries: { country: string; visits: number }[];
+}
+
+export interface SearchConsoleData {
+  clicks: number;
+  impressions: number;
+  ctr: number;
+  position: number;
+  topQueries: { query: string; clicks: number; impressions: number }[];
+}
+
+export interface SocialMetrics {
+  facebook: {
+    shares: number;
+    likes: number;
+    comments: number;
+  };
+  twitter: {
+    shares: number;
+    likes: number;
+    replies: number;
+  };
+  linkedin: {
+    shares: number;
+    engagements: number;
+  };
+}
+
 interface Performance {
   totalSize: number;
   scriptCount: number;
@@ -85,6 +118,9 @@ export interface SeoAnalysis {
   socialTags: SocialTags;
   keywordSuggestions: KeywordSuggestion[];
   performance: Performance;
+  analytics: AnalyticsData;
+  searchConsole: SearchConsoleData;
+  socialMetrics: SocialMetrics;
   securityHeaders: {
     https: boolean;
     hsts: boolean;

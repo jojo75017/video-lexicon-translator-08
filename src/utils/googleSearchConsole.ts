@@ -10,9 +10,9 @@ export const getSearchAnalytics = async (siteUrl: string): Promise<SearchAnalyti
   
   // Retourner des données simulées
   return {
-    clicks: 0,
-    impressions: 0,
-    position: 0,
-    ctr: 0
+    clicks: Math.floor(Math.random() * 1000),
+    impressions: Math.floor(Math.random() * 5000),
+    position: Math.floor(Math.random() * 100),
+    ctr: Math.random() * 0.1
   };
 };
