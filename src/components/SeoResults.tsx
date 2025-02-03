@@ -9,7 +9,10 @@ import SeoMainTags from './seo/SeoMainTags';
 import SeoStructure from './seo/SeoStructure';
 import SeoContent from './seo/SeoContent';
 import ShareResults from './ShareResults';
-import PerformanceMetrics from './PerformanceMetrics';
+import LoadingPerformance from './seo/LoadingPerformance';
+import SocialTags from './seo/SocialTags';
+import BrokenLinks from './seo/BrokenLinks';
+import KeywordSuggestions from './seo/KeywordSuggestions';
 
 interface SeoResultsProps {
   seoAnalysis: SeoAnalysis;
@@ -25,6 +28,8 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
     if (!seoAnalysis.description) score -= 20;
     else if (seoAnalysis.description.length < 120 || seoAnalysis.description.length > 160) score -= 10;
     if (!seoAnalysis.keywords || seoAnalysis.keywords.length === 0) score -= 15;
+    if (seoAnalysis.brokenLinks.length > 0) score -= (seoAnalysis.brokenLinks.length * 5);
+    if (!seoAnalysis.socialTags.ogTitle || !seoAnalysis.socialTags.ogDescription) score -= 10;
     const imagesWithoutAlt = seoAnalysis.imagesDetails.filter(img => !img.hasAlt).length;
     if (imagesWithoutAlt > 0) score -= (imagesWithoutAlt * 5);
     return Math.max(0, score);
@@ -52,6 +57,16 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
     const imagesWithoutAlt = seoAnalysis.imagesDetails.filter(img => !img.hasAlt).length;
     if (imagesWithoutAlt > 0) {
       suggestions.push(t('seo.suggestions.imagesNoAlt', { count: imagesWithoutAlt }));
+    }
+    
+    if (seoAnalysis.brokenLinks.length > 0) {
+      suggestions.push(t('seo.suggestions.brokenLinks', { count: seoAnalysis.brokenLinks.length }));
+    }
+    if (!seoAnalysis.socialTags.ogTitle || !seoAnalysis.socialTags.ogDescription) {
+      suggestions.push(t('seo.suggestions.noSocialTags'));
+    }
+    if (seoAnalysis.performance.loadTime > 3000) {
+      suggestions.push(t('seo.suggestions.slowLoading'));
     }
     return suggestions;
   };
@@ -93,7 +108,17 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
         <ShareResults seoAnalysis={seoAnalysis} />
       </Card>
 
-      <PerformanceMetrics performance={seoAnalysis.performance} />
+      <LoadingPerformance 
+        loadTime={seoAnalysis.performance.loadTime}
+        firstContentfulPaint={seoAnalysis.performance.firstContentfulPaint}
+        domLoadTime={seoAnalysis.performance.domLoadTime}
+      />
+
+      <SocialTags socialTags={seoAnalysis.socialTags} />
+
+      <BrokenLinks brokenLinks={seoAnalysis.brokenLinks} />
+
+      <KeywordSuggestions suggestions={seoAnalysis.keywordSuggestions} />
 
       <ImageDetails 
         images={seoAnalysis.imagesDetails} 

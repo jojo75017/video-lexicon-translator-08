@@ -26,6 +26,32 @@ interface Performance {
   responseTime: number;
   impressions: number;
   clickThroughRate: number;
+  loadTime: number;
+  firstContentfulPaint: number;
+  domLoadTime: number;
+}
+
+interface BrokenLink {
+  url: string;
+  statusCode: number;
+  location: string;
+}
+
+interface SocialTags {
+  ogTitle: string | null;
+  ogDescription: string | null;
+  ogImage: string | null;
+  twitterCard: string | null;
+  twitterTitle: string | null;
+  twitterDescription: string | null;
+  twitterImage: string | null;
+}
+
+interface KeywordSuggestion {
+  keyword: string;
+  relevance: number;
+  searchVolume?: number;
+  difficulty?: number;
 }
 
 export interface SeoAnalysis {
@@ -42,7 +68,7 @@ export interface SeoAnalysis {
   metaTagsCount: number;
   canonicalUrl: string | null;
   robotsMeta: string | null;
-  brokenLinks: number;
+  brokenLinks: BrokenLink[];
   keywords: string[];
   googlePosition: number | null;
   authorityScore: number;
@@ -56,20 +82,13 @@ export interface SeoAnalysis {
   textToHtmlRatio: number;
   internalLinks: number;
   externalLinks: number;
-  socialMetaTags: {
-    ogTitle: string | null;
-    ogDescription: string | null;
-    ogImage: string | null;
-    twitterCard: string | null;
-    twitterTitle: string | null;
-    twitterDescription: string | null;
-    twitterImage: string | null;
-  };
+  socialTags: SocialTags;
+  keywordSuggestions: KeywordSuggestion[];
+  performance: Performance;
   securityHeaders: {
     https: boolean;
     hsts: boolean;
     xFrameOptions: boolean;
     contentSecurityPolicy: boolean;
   };
-  performance: Performance;
 }
