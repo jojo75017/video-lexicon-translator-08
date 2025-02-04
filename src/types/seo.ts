@@ -115,16 +115,47 @@ export interface SeoAnalysis {
   textToHtmlRatio: number;
   internalLinks: number;
   externalLinks: number;
-  socialTags: SocialTags;
-  keywordSuggestions: KeywordSuggestion[];
-  performance: Performance;
   analytics: AnalyticsData;
   searchConsole: SearchConsoleData;
   socialMetrics: SocialMetrics;
+  performance: Performance;
   securityHeaders: {
     https: boolean;
     hsts: boolean;
     xFrameOptions: boolean;
     contentSecurityPolicy: boolean;
   };
+  socialTags: SocialTags;
+  keywordSuggestions: KeywordSuggestion[];
+  semanticStructure: Record<string, number>;
+  linkAnalysis: {
+    total: number;
+    internal: number;
+    external: number;
+    withTitle: number;
+    withDescription: number;
+    nofollow: number;
+    dofollow: number;
+  };
+  readabilityScore: number;
+  topKeywords: {
+    keyword: string;
+    frequency: number;
+    density: number;
+  }[];
+  technologies: {
+    frameworks: string[];
+    analytics: string[];
+    advertising: string[];
+    cms: string[];
+    server: string[];
+  };
+  mobilePerformance: {
+    viewportMeta: boolean;
+    responsiveImages: boolean;
+    touchTargetSize: boolean;
+    fontScale: boolean;
+    score: number;
+  };
+  metaTagsAnalysis: Record<string, string>;
 }
