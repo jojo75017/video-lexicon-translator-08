@@ -49,7 +49,7 @@
     "cors-anywhere": "^0.4.4",
     "date-fns": "^3.6.0",
     "embla-carousel-react": "^8.3.0",
-    "framer-motion": "^11.18.1",
+    "framer-motion": "^12.0.11",
     "googleapis": "^144.0.0",
     "i18next": "^24.2.2",
     "input-otp": "^1.2.4",
