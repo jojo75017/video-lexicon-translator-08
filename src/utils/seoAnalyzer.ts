@@ -1,3 +1,4 @@
+
 import { SeoAnalysis, ImageAnalysis } from '@/types/seo';
 import { getSearchAnalytics } from './googleSearchConsole';
 
@@ -179,6 +180,21 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
       hsts: false,
       xFrameOptions: false,
       contentSecurityPolicy: false,
-    }
+    },
+    // Ajout des propriétés manquantes
+    socialTags: {
+      ogTitle: doc.querySelector('meta[property="og:title"]')?.getAttribute('content') || null,
+      ogDescription: doc.querySelector('meta[property="og:description"]')?.getAttribute('content') || null,
+      ogImage: doc.querySelector('meta[property="og:image"]')?.getAttribute('content') || null,
+      twitterCard: doc.querySelector('meta[name="twitter:card"]')?.getAttribute('content') || null,
+      twitterTitle: doc.querySelector('meta[name="twitter:title"]')?.getAttribute('content') || null,
+      twitterDescription: doc.querySelector('meta[name="twitter:description"]')?.getAttribute('content') || null,
+      twitterImage: doc.querySelector('meta[name="twitter:image"]')?.getAttribute('content') || null,
+    },
+    keywordSuggestions: [
+      { keyword: "votre marque principale", relevance: 95, searchVolume: 1000, difficulty: 45 },
+      { keyword: "produits associés", relevance: 85, searchVolume: 800, difficulty: 35 },
+      { keyword: "services liés", relevance: 75, searchVolume: 600, difficulty: 25 },
+    ],
   };
 };
