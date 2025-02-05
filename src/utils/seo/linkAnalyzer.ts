@@ -18,6 +18,8 @@ export const analyzeLinkStructure = (doc: Document, url: string) => {
     withTitle: links.filter(link => link.title).length,
     withDescription: links.filter(link => link.getAttribute('aria-label')).length,
     nofollow: links.filter(link => link.rel.includes('nofollow')).length,
-    dofollow: links.filter(link => !link.rel.includes('nofollow')).length
+    dofollow: links.filter(link => !link.rel.includes('nofollow')).length,
+    broken: 0, // À implémenter avec une vérification réelle des liens
+    redirects: 0 // À implémenter avec une vérification réelle des redirections
   };
 };

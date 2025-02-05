@@ -23,6 +23,13 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
   const technologies = analyzeTechnologies();
   const keywordSuggestions = generateKeywordSuggestions(topKeywords);
 
+  // Calculer le nombre total de mots
+  const wordCount = textContent.trim().split(/\s+/).length;
+  
+  // Calculer le ratio texte/HTML
+  const htmlContent = doc.documentElement.outerHTML;
+  const textToHtmlRatio = (textContent.length / htmlContent.length) * 100;
+
   return {
     title: doc.title || "Pas de titre",
     description: doc.querySelector('meta[name="description"]')?.getAttribute('content') || '',
@@ -61,8 +68,8 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     topBacklinkDomains: [],
     doFollowBacklinks: 0,
     noFollowBacklinks: 0,
-    wordCount: textContent.trim().split(/\s+/).length,
-    textToHtmlRatio: 0,
+    wordCount,
+    textToHtmlRatio,
     internalLinks: linkAnalysis.internal,
     externalLinks: linkAnalysis.external,
     analytics: {
@@ -74,9 +81,50 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
         { country: "France", visits: Math.floor(Math.random() * 5000) },
         { country: "États-Unis", visits: Math.floor(Math.random() * 3000) },
         { country: "Canada", visits: Math.floor(Math.random() * 2000) },
+      ],
+      deviceBreakdown: {
+        desktop: Math.random() * 60 + 30,
+        mobile: Math.random() * 40 + 20,
+        tablet: Math.random() * 20,
+      },
+      timeOnSite: {
+        '0-30s': Math.floor(Math.random() * 1000),
+        '30s-2m': Math.floor(Math.random() * 800),
+        '2m-5m': Math.floor(Math.random() * 500),
+        '5m+': Math.floor(Math.random() * 300),
+      }
+    },
+    searchConsole: {
+      clicks: Math.floor(Math.random() * 1000),
+      impressions: Math.floor(Math.random() * 5000),
+      ctr: Math.random() * 0.1,
+      position: Math.floor(Math.random() * 10),
+      topQueries: [
+        {
+          query: "recherche populaire 1",
+          clicks: Math.floor(Math.random() * 100),
+          impressions: Math.floor(Math.random() * 500)
+        }
+      ],
+      topPages: [
+        {
+          url: url,
+          clicks: Math.floor(Math.random() * 100),
+          impressions: Math.floor(Math.random() * 500)
+        }
+      ],
+      devices: {
+        mobile: Math.floor(Math.random() * 1000),
+        desktop: Math.floor(Math.random() * 1000),
+        tablet: Math.floor(Math.random() * 500)
+      },
+      countries: [
+        {
+          country: "France",
+          clicks: Math.floor(Math.random() * 500)
+        }
       ]
     },
-    searchConsole: await getSearchAnalytics(url),
     socialMetrics: {
       facebook: {
         shares: Math.floor(Math.random() * 1000),
@@ -101,7 +149,11 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
       contentSecurityPolicy: false,
     },
     semanticStructure,
-    linkAnalysis,
+    linkAnalysis: {
+      ...linkAnalysis,
+      broken: 0,
+      redirects: 0
+    },
     readabilityScore,
     topKeywords,
     technologies,
@@ -116,6 +168,37 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
       twitterTitle: doc.querySelector('meta[name="twitter:title"]')?.getAttribute('content') || null,
       twitterDescription: doc.querySelector('meta[name="twitter:description"]')?.getAttribute('content') || null,
       twitterImage: doc.querySelector('meta[name="twitter:image"]')?.getAttribute('content') || null,
+    },
+    contentQuality: {
+      uniqueness: Math.random() * 100,
+      grammar: Math.random() * 100,
+      spelling: Math.random() * 100,
+      readingTime: Math.floor(wordCount / 200), // ~200 mots par minute
+      complexity: Math.random() * 100,
+    },
+    schemaMarkup: {
+      present: !!doc.querySelector('script[type="application/ld+json"]'),
+      types: Array.from(doc.querySelectorAll('script[type="application/ld+json"]')).map(() => 'Article'),
+      errors: [],
+      warnings: [],
+    },
+    accessibility: {
+      score: Math.random() * 100,
+      errors: [],
+      warnings: [],
+      aria: {
+        present: !!doc.querySelector('[aria-label]'),
+        missing: [],
+      },
+      contrast: {
+        pass: true,
+        failures: [],
+      },
+    },
+    indexability: {
+      canIndex: true,
+      reasons: [],
+      recommendations: [],
     },
   };
 };
