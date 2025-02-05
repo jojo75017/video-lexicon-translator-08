@@ -1,3 +1,4 @@
+```typescript
 export interface HeadingStructure {
   text: string;
   level: number;
@@ -159,3 +160,4 @@ export interface SeoAnalysis {
   };
   metaTagsAnalysis: Record<string, string>;
 }
+```

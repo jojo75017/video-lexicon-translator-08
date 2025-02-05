@@ -10,11 +10,11 @@ import { analyzeSemanticStructure, analyzeReadability } from './seo/semanticAnal
 import { analyzeTechnologies } from './seo/technologiesAnalyzer';
 
 export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysis> => {
-  const startTime = performance.now();
+  const startTime = window.performance.now();
   const textContent = doc.body.textContent?.toLowerCase() || '';
 
   const topKeywords = analyzeKeywords(textContent);
-  const performance = analyzePerformance(doc, startTime);
+  const performanceMetrics = analyzePerformance(doc, startTime);
   const linkAnalysis = analyzeLinkStructure(doc, url);
   const mobilePerformance = analyzeMobilePerformance(doc);
   const metaTagsAnalysis = analyzeMetaTags(doc);
@@ -93,7 +93,7 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
         engagements: Math.floor(Math.random() * 1000)
       }
     },
-    performance,
+    performance: performanceMetrics,
     securityHeaders: {
       https: url.startsWith('https'),
       hsts: false,

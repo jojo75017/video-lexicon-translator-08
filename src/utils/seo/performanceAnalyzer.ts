@@ -11,7 +11,7 @@ export const analyzePerformance = (doc: Document, startTime: number): Performanc
     totalSize: 0,
     scriptCount: doc.getElementsByTagName('script').length,
     styleCount: doc.getElementsByTagName('link').length + doc.getElementsByTagName('style').length,
-    responseTime: performance.now() - startTime,
+    responseTime: window.performance.now() - startTime,
     impressions: 0,
     clickThroughRate: 0,
     loadTime,
