@@ -1,4 +1,4 @@
-```typescript
+
 export interface HeadingStructure {
   text: string;
   level: number;
@@ -9,6 +9,13 @@ export interface ImageAnalysis {
   url: string;
   hasAlt: boolean;
   alt?: string;
+  size?: number;
+  dimensions?: {
+    width: number;
+    height: number;
+  };
+  format?: string;
+  compression?: number;
 }
 
 export interface BacklinkInfo {
@@ -26,6 +33,17 @@ export interface AnalyticsData {
   bounceRate: number;
   averageTimeOnPage: number;
   topCountries: { country: string; visits: number }[];
+  deviceBreakdown: {
+    desktop: number;
+    mobile: number;
+    tablet: number;
+  };
+  timeOnSite: {
+    '0-30s': number;
+    '30s-2m': number;
+    '2m-5m': number;
+    '5m+': number;
+  };
 }
 
 export interface SearchConsoleData {
@@ -34,6 +52,20 @@ export interface SearchConsoleData {
   ctr: number;
   position: number;
   topQueries: { query: string; clicks: number; impressions: number }[];
+  topPages: { 
+    url: string;
+    clicks: number;
+    impressions: number;
+  }[];
+  devices: {
+    mobile: number;
+    desktop: number;
+    tablet: number;
+  };
+  countries: {
+    country: string;
+    clicks: number;
+  }[];
 }
 
 export interface SocialMetrics {
@@ -41,19 +73,27 @@ export interface SocialMetrics {
     shares: number;
     likes: number;
     comments: number;
+    reach?: number;
   };
   twitter: {
     shares: number;
     likes: number;
     replies: number;
+    impressions?: number;
   };
   linkedin: {
     shares: number;
     engagements: number;
+    clickThroughRate?: number;
+  };
+  instagram?: {
+    likes: number;
+    comments: number;
+    reach: number;
   };
 }
 
-interface Performance {
+export interface Performance {
   totalSize: number;
   scriptCount: number;
   styleCount: number;
@@ -63,15 +103,27 @@ interface Performance {
   loadTime: number;
   firstContentfulPaint: number;
   domLoadTime: number;
+  speedIndex?: number;
+  largestContentfulPaint?: number;
+  timeToInteractive?: number;
+  resourceBreakdown?: {
+    images: number;
+    scripts: number;
+    styles: number;
+    fonts: number;
+    other: number;
+  };
 }
 
-interface BrokenLink {
+export interface BrokenLink {
   url: string;
   statusCode: number;
   location: string;
+  lastChecked?: string;
+  type?: 'internal' | 'external';
 }
 
-interface SocialTags {
+export interface SocialTags {
   ogTitle: string | null;
   ogDescription: string | null;
   ogImage: string | null;
@@ -81,11 +133,18 @@ interface SocialTags {
   twitterImage: string | null;
 }
 
-interface KeywordSuggestion {
+export interface KeywordSuggestion {
   keyword: string;
   relevance: number;
   searchVolume?: number;
   difficulty?: number;
+  trend?: 'up' | 'down' | 'stable';
+  competition?: number;
+  cpc?: number;
+  seasonality?: {
+    peak: string[];
+    low: string[];
+  };
 }
 
 export interface SeoAnalysis {
@@ -125,6 +184,12 @@ export interface SeoAnalysis {
     hsts: boolean;
     xFrameOptions: boolean;
     contentSecurityPolicy: boolean;
+    permissions?: string[];
+    cookies?: {
+      secure: boolean;
+      httpOnly: boolean;
+      sameSite: string;
+    };
   };
   socialTags: SocialTags;
   keywordSuggestions: KeywordSuggestion[];
@@ -137,12 +202,16 @@ export interface SeoAnalysis {
     withDescription: number;
     nofollow: number;
     dofollow: number;
+    broken: number;
+    redirects: number;
   };
   readabilityScore: number;
   topKeywords: {
     keyword: string;
     frequency: number;
     density: number;
+    competition?: number;
+    difficulty?: number;
   }[];
   technologies: {
     frameworks: string[];
@@ -150,6 +219,9 @@ export interface SeoAnalysis {
     advertising: string[];
     cms: string[];
     server: string[];
+    libraries?: string[];
+    hosting?: string;
+    cdn?: string[];
   };
   mobilePerformance: {
     viewportMeta: boolean;
@@ -157,7 +229,40 @@ export interface SeoAnalysis {
     touchTargetSize: boolean;
     fontScale: boolean;
     score: number;
+    speedScore?: number;
+    usabilityScore?: number;
+    viewportScore?: number;
   };
   metaTagsAnalysis: Record<string, string>;
+  contentQuality?: {
+    uniqueness: number;
+    grammar: number;
+    spelling: number;
+    readingTime: number;
+    complexity: number;
+  };
+  schemaMarkup?: {
+    present: boolean;
+    types: string[];
+    errors: string[];
+    warnings: string[];
+  };
+  accessibility?: {
+    score: number;
+    errors: string[];
+    warnings: string[];
+    aria: {
+      present: boolean;
+      missing: string[];
+    };
+    contrast: {
+      pass: boolean;
+      failures: string[];
+    };
+  };
+  indexability?: {
+    canIndex: boolean;
+    reasons: string[];
+    recommendations: string[];
+  };
 }
-```
