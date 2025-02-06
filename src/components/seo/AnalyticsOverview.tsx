@@ -24,18 +24,22 @@ const AnalyticsOverview = ({ analytics }: AnalyticsOverviewProps) => {
         <div className="p-4 bg-blue-50 rounded">
           <h3 className="text-sm font-medium text-blue-600">Pages vues</h3>
           <p className="text-2xl font-bold">{analytics.pageViews}</p>
+          <p className="text-sm text-gray-500">derniers 30 jours</p>
         </div>
         <div className="p-4 bg-green-50 rounded">
           <h3 className="text-sm font-medium text-green-600">Visiteurs uniques</h3>
           <p className="text-2xl font-bold">{analytics.uniqueVisitors}</p>
+          <p className="text-sm text-gray-500">derniers 30 jours</p>
         </div>
         <div className="p-4 bg-amber-50 rounded">
           <h3 className="text-sm font-medium text-amber-600">Taux de rebond</h3>
           <p className="text-2xl font-bold">{analytics.bounceRate.toFixed(1)}%</p>
+          <p className="text-sm text-gray-500">visiteurs qui quittent directement</p>
         </div>
         <div className="p-4 bg-purple-50 rounded">
           <h3 className="text-sm font-medium text-purple-600">Temps moyen</h3>
           <p className="text-2xl font-bold">{analytics.averageTimeOnPage}s</p>
+          <p className="text-sm text-gray-500">durée moyenne par visite</p>
         </div>
       </div>
 

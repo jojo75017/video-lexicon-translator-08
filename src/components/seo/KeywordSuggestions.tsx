@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -16,7 +17,7 @@ interface KeywordSuggestionsProps {
 
 const KeywordSuggestions = ({ suggestions }: KeywordSuggestionsProps) => {
   if (suggestions.length === 0) return null;
-
+  
   return (
     <Card className="p-6">
       <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">

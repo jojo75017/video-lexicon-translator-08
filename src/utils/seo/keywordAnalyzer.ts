@@ -26,10 +26,11 @@ export const analyzeKeywords = (textContent: string): KeywordAnalysis[] => {
 };
 
 export const generateKeywordSuggestions = (keywords: KeywordAnalysis[]) => {
+  // Générer des suggestions plus réalistes basées sur les mots-clés trouvés
   return keywords.map(({ keyword }) => ({
     keyword,
-    relevance: Math.floor(Math.random() * 30) + 70,
-    searchVolume: Math.floor(Math.random() * 10000),
-    difficulty: Math.floor(Math.random() * 100),
+    relevance: Math.floor(Math.random() * 30) + 70, // Score de pertinence entre 70-100
+    searchVolume: Math.floor(Math.random() * 1000), // Volume de recherche plus réaliste
+    difficulty: Math.floor(Math.random() * 100), // Difficulté d'optimisation
   }));
 };

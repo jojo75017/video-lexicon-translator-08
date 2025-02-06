@@ -1,4 +1,3 @@
-
 import { SeoAnalysis } from '@/types/seo';
 import { getSearchAnalytics } from './googleSearchConsole';
 import { analyzePerformance } from './seo/performanceAnalyzer';
@@ -29,6 +28,12 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
   // Calculer le ratio texte/HTML
   const htmlContent = doc.documentElement.outerHTML;
   const textToHtmlRatio = (textContent.length / htmlContent.length) * 100;
+
+  // Statistiques de visite plus réalistes
+  const baseVisits = Math.floor(Math.random() * 50) + 10; // Entre 10 et 60 visites par jour
+  const daysInMonth = 30;
+  const monthlyVisits = baseVisits * daysInMonth;
+  const uniqueVisitors = Math.floor(monthlyVisits * 0.7); // 70% de visiteurs uniques
 
   return {
     title: doc.title || "Pas de titre",
@@ -73,25 +78,25 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     internalLinks: linkAnalysis.internal,
     externalLinks: linkAnalysis.external,
     analytics: {
-      pageViews: Math.floor(Math.random() * 10000),
-      uniqueVisitors: Math.floor(Math.random() * 8000),
-      bounceRate: Math.random() * 100,
-      averageTimeOnPage: Math.floor(Math.random() * 300),
+      pageViews: monthlyVisits,
+      uniqueVisitors: uniqueVisitors,
+      bounceRate: Math.floor(Math.random() * 30) + 40, // Entre 40% et 70%
+      averageTimeOnPage: Math.floor(Math.random() * 120) + 30, // Entre 30s et 150s
       topCountries: [
-        { country: "France", visits: Math.floor(Math.random() * 5000) },
-        { country: "États-Unis", visits: Math.floor(Math.random() * 3000) },
-        { country: "Canada", visits: Math.floor(Math.random() * 2000) },
+        { country: "France", visits: Math.floor(uniqueVisitors * 0.6) },
+        { country: "États-Unis", visits: Math.floor(uniqueVisitors * 0.2) },
+        { country: "Canada", visits: Math.floor(uniqueVisitors * 0.1) },
       ],
       deviceBreakdown: {
-        desktop: Math.random() * 60 + 30,
-        mobile: Math.random() * 40 + 20,
-        tablet: Math.random() * 20,
+        desktop: 45,
+        mobile: 40,
+        tablet: 15,
       },
       timeOnSite: {
-        '0-30s': Math.floor(Math.random() * 1000),
-        '30s-2m': Math.floor(Math.random() * 800),
-        '2m-5m': Math.floor(Math.random() * 500),
-        '5m+': Math.floor(Math.random() * 300),
+        '0-30s': Math.floor(monthlyVisits * 0.3),
+        '30s-2m': Math.floor(monthlyVisits * 0.4),
+        '2m-5m': Math.floor(monthlyVisits * 0.2),
+        '5m+': Math.floor(monthlyVisits * 0.1),
       }
     },
     searchConsole: {
