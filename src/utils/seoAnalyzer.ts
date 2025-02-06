@@ -13,6 +13,8 @@ import { analyzeContent } from './seo/contentAnalyzer';
 import { analyzeSearchConsole } from './seo/searchConsoleAnalyzer';
 import { analyzeAccessibility } from './seo/accessibilityAnalyzer';
 import { analyzeSchema } from './seo/schemaAnalyzer';
+import { analyzeSecurityHeaders } from './seo/securityAnalyzer';
+import { analyzeIndexability } from './seo/indexabilityAnalyzer';
 
 export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysis> => {
   const startTime = window.performance.now();
@@ -33,6 +35,8 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
   const searchConsole = analyzeSearchConsole(url);
   const accessibility = analyzeAccessibility(doc);
   const schemaMarkup = analyzeSchema(doc);
+  const securityHeaders = analyzeSecurityHeaders(url);
+  const indexability = analyzeIndexability(doc);
 
   return {
     title: doc.title || "Pas de titre",
@@ -80,12 +84,7 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     searchConsole,
     socialMetrics,
     performance: performanceMetrics,
-    securityHeaders: {
-      https: url.startsWith('https'),
-      hsts: false,
-      xFrameOptions: false,
-      contentSecurityPolicy: false,
-    },
+    securityHeaders,
     semanticStructure,
     linkAnalysis: {
       ...linkAnalysis,
@@ -110,11 +109,7 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     contentQuality: content.contentQuality,
     schemaMarkup,
     accessibility,
-    indexability: {
-      canIndex: true,
-      reasons: [],
-      recommendations: [],
-    },
+    indexability,
   };
 };
 
