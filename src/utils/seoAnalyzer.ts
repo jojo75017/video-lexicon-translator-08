@@ -11,6 +11,8 @@ import { analyzeAnalytics } from './seo/analyticsAnalyzer';
 import { analyzeSocialMetrics } from './seo/socialAnalyzer';
 import { analyzeContent } from './seo/contentAnalyzer';
 import { analyzeSearchConsole } from './seo/searchConsoleAnalyzer';
+import { analyzeAccessibility } from './seo/accessibilityAnalyzer';
+import { analyzeSchema } from './seo/schemaAnalyzer';
 
 export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysis> => {
   const startTime = window.performance.now();
@@ -29,6 +31,8 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
   const analytics = analyzeAnalytics();
   const socialMetrics = analyzeSocialMetrics();
   const searchConsole = analyzeSearchConsole(url);
+  const accessibility = analyzeAccessibility(doc);
+  const schemaMarkup = analyzeSchema(doc);
 
   return {
     title: doc.title || "Pas de titre",
@@ -104,25 +108,8 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
       twitterImage: doc.querySelector('meta[name="twitter:image"]')?.getAttribute('content') || null,
     },
     contentQuality: content.contentQuality,
-    schemaMarkup: {
-      present: !!doc.querySelector('script[type="application/ld+json"]'),
-      types: Array.from(doc.querySelectorAll('script[type="application/ld+json"]')).map(() => 'Article'),
-      errors: [],
-      warnings: [],
-    },
-    accessibility: {
-      score: Math.random() * 100,
-      errors: [],
-      warnings: [],
-      aria: {
-        present: !!doc.querySelector('[aria-label]'),
-        missing: [],
-      },
-      contrast: {
-        pass: true,
-        failures: [],
-      },
-    },
+    schemaMarkup,
+    accessibility,
     indexability: {
       canIndex: true,
       reasons: [],
@@ -130,3 +117,4 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     },
   };
 };
+

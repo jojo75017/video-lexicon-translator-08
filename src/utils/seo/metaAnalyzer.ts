@@ -9,3 +9,4 @@ export const analyzeMetaTags = (doc: Document) => {
     return acc;
   }, {} as Record<string, string>);
 };
+
