@@ -86,12 +86,12 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
       const resourcesResults = await analyzeResources(doc, url);
       setResources(resourcesResults);
 
-      // Structure du site
+      // Structure du site améliorée
       const uniqueUrls = new Set<string>();
       const links = Array.from(doc.querySelectorAll('a'))
         .map(link => ({
           url: link.href,
-          text: link.textContent?.trim() || ''
+          text: link.textContent?.trim() || link.getAttribute('title') || link.getAttribute('aria-label') || ''
         }))
         .filter(link => {
           if (!link.url || !link.url.startsWith('http') || uniqueUrls.has(link.url)) {
@@ -108,7 +108,7 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
             name: "Page d'accueil",
             path: url,
             children: links.map(link => ({
-              name: link.text || 'Lien sans titre',
+              name: link.text || (new URL(link.url)).pathname,
               path: link.url,
               children: []
             }))

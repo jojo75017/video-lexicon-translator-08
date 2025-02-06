@@ -5,6 +5,8 @@ import { SeoAnalysis } from '@/types/seo';
 import SeoOverview from './seo/SeoOverview';
 import SearchTrends from './seo/SearchTrends';
 import DetailedMetrics from './seo/DetailedMetrics';
+import SiteComparison from './seo/SiteComparison';
+import AnalyticsOverview from './seo/AnalyticsOverview';
 
 interface SeoResultsProps {
   seoAnalysis: SeoAnalysis;
@@ -12,6 +14,7 @@ interface SeoResultsProps {
 
 const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
   const [showAllMetrics, setShowAllMetrics] = useState(false);
+  const [comparisonSite, setComparisonSite] = useState<{url: string; analysis: SeoAnalysis} | undefined>();
   
   const calculateSeoScore = () => {
     let score = 100;
@@ -66,6 +69,14 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
     window.open(image.url, '_blank', 'width=800,height=600');
   };
 
+  const handleCompare = (url: string) => {
+    // Dans un cas réel, ceci déclencherait une nouvelle analyse
+    setComparisonSite({
+      url: "https://example.com",
+      analysis: seoAnalysis // Simulation avec les mêmes données
+    });
+  };
+
   const seoScore = calculateSeoScore();
   const suggestions = getSeoSuggestions();
 
@@ -81,6 +92,14 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
         <SearchTrends 
           clicks={seoAnalysis.searchConsole.clicks}
           impressions={seoAnalysis.searchConsole.impressions}
+        />
+
+        <AnalyticsOverview analytics={seoAnalysis.analytics} />
+
+        <SiteComparison 
+          site1={{url: window.location.href, analysis: seoAnalysis}}
+          site2={comparisonSite}
+          onCompare={handleCompare}
         />
 
         <DetailedMetrics 
