@@ -15,6 +15,9 @@ import { analyzeAccessibility } from './seo/accessibilityAnalyzer';
 import { analyzeSchema } from './seo/schemaAnalyzer';
 import { analyzeSecurityHeaders } from './seo/securityAnalyzer';
 import { analyzeIndexability } from './seo/indexabilityAnalyzer';
+import { analyzeImages } from './seo/imageAnalyzer';
+import { analyzeHeadings } from './seo/headingAnalyzer';
+import { analyzeBacklinks } from './seo/backlinkAnalyzer';
 
 export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysis> => {
   const startTime = window.performance.now();
@@ -37,29 +40,25 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
   const schemaMarkup = analyzeSchema(doc);
   const securityHeaders = analyzeSecurityHeaders(url);
   const indexability = analyzeIndexability(doc);
+  
+  const { imgCount, imgWithoutAlt, imagesDetails } = analyzeImages(doc, url);
+  const { h1Count, h2Count, h3Count, headings } = analyzeHeadings(doc);
+  const { backlinks, backlinkDetails, topBacklinkDomains, doFollowBacklinks, noFollowBacklinks } = analyzeBacklinks();
 
   return {
     title: doc.title || "Pas de titre",
     description: doc.querySelector('meta[name="description"]')?.getAttribute('content') || '',
-    h1Count: doc.getElementsByTagName('h1').length,
-    h2Count: doc.getElementsByTagName('h2').length,
-    h3Count: doc.getElementsByTagName('h3').length,
-    headings: Array.from(doc.querySelectorAll('h1, h2, h3, h4, h5, h6')).map((heading, index) => ({
-      text: heading.textContent || '',
-      level: parseInt(heading.tagName.substring(1)),
-      position: index
-    })),
+    h1Count,
+    h2Count,
+    h3Count,
+    headings,
     paragraphs: Array.from(doc.getElementsByTagName('p')).map((p, index) => ({
       text: p.textContent || '',
       position: index
     })),
-    imgCount: Array.from(doc.getElementsByTagName('img')).length,
-    imgWithoutAlt: Array.from(doc.getElementsByTagName('img')).filter(img => !img.alt).length,
-    imagesDetails: Array.from(doc.getElementsByTagName('img')).map(img => ({
-      url: new URL(img.src, url).href,
-      hasAlt: !!img.alt,
-      alt: img.alt || undefined
-    })),
+    imgCount,
+    imgWithoutAlt,
+    imagesDetails,
     metaTagsCount: doc.getElementsByTagName('meta').length,
     canonicalUrl: doc.querySelector('link[rel="canonical"]')?.getAttribute('href') || null,
     robotsMeta: doc.querySelector('meta[name="robots"]')?.getAttribute('content') || null,
@@ -71,11 +70,11 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     googlePosition: null,
     authorityScore: 0,
     organicTraffic: 0,
-    backlinks: 0,
-    backlinkDetails: [],
-    topBacklinkDomains: [],
-    doFollowBacklinks: 0,
-    noFollowBacklinks: 0,
+    backlinks,
+    backlinkDetails,
+    topBacklinkDomains,
+    doFollowBacklinks,
+    noFollowBacklinks,
     wordCount: content.wordCount,
     textToHtmlRatio: content.textToHtmlRatio,
     internalLinks: linkAnalysis.internal,
@@ -112,4 +111,3 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     indexability,
   };
 };
-
