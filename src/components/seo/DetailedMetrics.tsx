@@ -9,6 +9,7 @@ import SocialMetrics from './SocialMetrics';
 import SocialTags from './SocialTags';
 import BrokenLinks from './BrokenLinks';
 import KeywordSuggestions from './KeywordSuggestions';
+import BacklinksAnalysis from './BacklinksAnalysis';
 import ImageDetails from '../ImageDetails';
 import { SeoAnalysis } from '@/types/seo';
 import { Button } from '@/components/ui/button';
@@ -64,6 +65,20 @@ const DetailedMetrics = ({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.2 }}
+      >
+        <BacklinksAnalysis
+          backlinks={seoAnalysis.backlinks}
+          backlinkDetails={seoAnalysis.backlinkDetails}
+          topBacklinkDomains={seoAnalysis.topBacklinkDomains}
+          doFollowBacklinks={seoAnalysis.doFollowBacklinks}
+          noFollowBacklinks={seoAnalysis.noFollowBacklinks}
+        />
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.4 }}
         className="grid gap-6 md:grid-cols-2"
       >
         <LoadingPerformance 
@@ -79,7 +94,7 @@ const DetailedMetrics = ({
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.4 }}
+            transition={{ delay: 1.6 }}
           >
             <SocialTags socialTags={seoAnalysis.socialTags} />
           </motion.div>
@@ -87,7 +102,7 @@ const DetailedMetrics = ({
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.6 }}
+            transition={{ delay: 1.8 }}
           >
             <BrokenLinks brokenLinks={seoAnalysis.brokenLinks} />
           </motion.div>
@@ -95,7 +110,7 @@ const DetailedMetrics = ({
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.8 }}
+            transition={{ delay: 2 }}
           >
             <KeywordSuggestions suggestions={seoAnalysis.keywordSuggestions} />
           </motion.div>
@@ -103,7 +118,7 @@ const DetailedMetrics = ({
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 2 }}
+            transition={{ delay: 2.2 }}
           >
             <ImageDetails 
               images={seoAnalysis.imagesDetails} 
