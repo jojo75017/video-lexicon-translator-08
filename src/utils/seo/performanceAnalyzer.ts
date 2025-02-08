@@ -33,12 +33,16 @@ export const analyzePerformance = (doc: Document, startTime: number): Performanc
   });
 
   const totalSize = Object.values(resourceSizes).reduce((a, b) => a + b, 0);
-
-  // Mesure du Speed Index (approximation)
   const speedIndex = window.performance.now() - startTime;
-  
-  // Temps jusqu'à l'interactivité (approximation)
   const timeToInteractive = performanceEntries ? performanceEntries.domInteractive - performanceEntries.startTime : 0;
+
+  // Calcul du score de performance
+  let score = 100;
+  if (loadTime > 3000) score -= 20;
+  if (firstContentfulPaint > 1000) score -= 15;
+  if (domLoadTime > 2000) score -= 15;
+  if (totalSize > 5000000) score -= 20; // Pénalité si plus de 5MB
+  if (resources.length > 50) score -= 10; // Pénalité si trop de ressources
 
   return {
     totalSize,
@@ -51,8 +55,10 @@ export const analyzePerformance = (doc: Document, startTime: number): Performanc
     firstContentfulPaint,
     domLoadTime,
     speedIndex,
-    largestContentfulPaint: firstContentfulPaint * 1.2, // Approximation
+    score: Math.max(0, score),
+    largestContentfulPaint: firstContentfulPaint * 1.2,
     timeToInteractive,
     resourceBreakdown: resourceSizes
   };
 };
+

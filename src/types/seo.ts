@@ -1,4 +1,3 @@
-
 export interface HeadingStructure {
   text: string;
   level: number;
@@ -106,6 +105,7 @@ export interface Performance {
   speedIndex?: number;
   largestContentfulPaint?: number;
   timeToInteractive?: number;
+  score: number; // Ajout de la propriété score
   resourceBreakdown?: {
     images: number;
     scripts: number;
