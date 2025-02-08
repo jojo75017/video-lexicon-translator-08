@@ -21,6 +21,7 @@ type CrawlResponse = CrawlStatusResponse | ErrorResponse;
 export class FirecrawlService {
   private static API_KEY_STORAGE_KEY = 'firecrawl_api_key';
   private static firecrawlApp: FirecrawlApp | null = null;
+  private static TIMEOUT = 30000; // 30 secondes de timeout
 
   static saveApiKey(apiKey: string): void {
     localStorage.setItem(this.API_KEY_STORAGE_KEY, apiKey);
@@ -36,9 +37,12 @@ export class FirecrawlService {
     try {
       console.log('Testing API key with Firecrawl API');
       this.firecrawlApp = new FirecrawlApp({ apiKey });
-      const testResponse = await this.firecrawlApp.crawlUrl('https://example.com', {
-        limit: 1
-      });
+      const testResponse = await Promise.race([
+        this.firecrawlApp.crawlUrl('https://example.com', { limit: 1 }),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Timeout testing API key')), this.TIMEOUT)
+        )
+      ]);
       return testResponse.success;
     } catch (error) {
       console.error('Error testing API key:', error);
@@ -58,12 +62,17 @@ export class FirecrawlService {
         this.firecrawlApp = new FirecrawlApp({ apiKey });
       }
 
-      const crawlResponse = await this.firecrawlApp.crawlUrl(url, {
-        limit: 100,
-        scrapeOptions: {
-          formats: ['markdown', 'html'],
-        }
-      }) as CrawlResponse;
+      const crawlResponse = await Promise.race([
+        this.firecrawlApp.crawlUrl(url, {
+          limit: 100,
+          scrapeOptions: {
+            formats: ['markdown', 'html'],
+          }
+        }),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Le crawl a pris trop de temps, veuillez réessayer')), this.TIMEOUT)
+        )
+      ]) as CrawlResponse;
 
       if (!crawlResponse.success) {
         console.error('Crawl failed:', (crawlResponse as ErrorResponse).error);

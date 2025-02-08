@@ -43,11 +43,21 @@ export const CrawlForm = () => {
     }
 
     try {
+      // Sauvegarde de la clé API
       FirecrawlService.saveApiKey(apiKey);
+      
+      // Simulation de progression
+      const progressInterval = setInterval(() => {
+        setProgress(prev => Math.min(prev + 10, 90));
+      }, 1000);
+
       console.log('Starting crawl for URL:', url);
       const result = await FirecrawlService.crawlWebsite(url);
       
+      clearInterval(progressInterval);
+      
       if (result.success) {
+        setProgress(100);
         toast({
           title: "Succès",
           description: "Site web crawlé avec succès",
@@ -91,6 +101,9 @@ export const CrawlForm = () => {
                 placeholder="Votre clé API Firecrawl"
                 required
               />
+              <p className="text-xs text-gray-500 mt-1">
+                Obtenir une clé sur <a href="https://firecrawl.co" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">firecrawl.co</a>
+              </p>
             </div>
             
             <div>
@@ -110,7 +123,12 @@ export const CrawlForm = () => {
           </div>
 
           {isLoading && (
-            <Progress value={progress} className="w-full" />
+            <div className="space-y-2">
+              <Progress value={progress} className="w-full" />
+              <p className="text-sm text-gray-500 text-center">
+                Crawl en cours... {progress}%
+              </p>
+            </div>
           )}
 
           <Button
