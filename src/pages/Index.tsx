@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -13,6 +12,7 @@ import UrlShortener from '@/components/UrlShortener';
 import { useSiteAnalyzer } from '@/hooks/useSiteAnalyzer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BacklinksAnalysis from '@/components/seo/BacklinksAnalysis';
+import { CrawlForm } from '@/components/CrawlForm';
 
 const Index = () => {
   const {
@@ -184,8 +184,8 @@ const Index = () => {
               <Card className="p-6 shadow-md bg-white/50 backdrop-blur-sm">
                 <h2 className="text-2xl font-semibold mb-4">Outils SEO</h2>
                 <div className="space-y-6">
+                  <CrawlForm />
                   <UrlShortener longUrl={url} />
-                  {/* Autres outils à venir */}
                 </div>
               </Card>
             </TabsContent>
