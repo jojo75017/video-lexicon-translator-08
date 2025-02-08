@@ -262,6 +262,7 @@ export interface SeoAnalysis {
   };
   indexability?: {
     canIndex: boolean;
+    indexablePages: number; // Ajout de la propriété manquante
     reasons: string[];
     recommendations: string[];
   };
