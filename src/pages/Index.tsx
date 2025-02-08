@@ -1,9 +1,10 @@
+
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Search, Globe, AlertCircle } from "lucide-react";
+import { ExternalLink, Search, Globe, AlertCircle, Link2, ChartBar, Database } from "lucide-react";
 import SiteStructureVisualizer from '@/components/SiteStructureVisualizer';
 import ContentHierarchy from '@/components/ContentHierarchy';
 import UrlInput from '@/components/UrlInput';
@@ -11,6 +12,7 @@ import SeoResults from '@/components/SeoResults';
 import UrlShortener from '@/components/UrlShortener';
 import { useSiteAnalyzer } from '@/hooks/useSiteAnalyzer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import BacklinksAnalysis from '@/components/seo/BacklinksAnalysis';
 
 const Index = () => {
   const {
@@ -93,29 +95,45 @@ const Index = () => {
 
         {url && !isLoading && !error && (
           <Tabs defaultValue="seo" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3 bg-white/50 backdrop-blur-sm">
+            <TabsList className="grid w-full grid-cols-6 bg-white/50 backdrop-blur-sm">
               <TabsTrigger value="seo" className="space-x-2 data-[state=active]:bg-blue-50">
                 <Search className="h-4 w-4" />
                 <span>SEO</span>
-              </TabsTrigger>
-              <TabsTrigger value="hierarchy" className="space-x-2 data-[state=active]:bg-blue-50">
-                <Globe className="h-4 w-4" />
-                <span>Hiérarchie</span>
               </TabsTrigger>
               <TabsTrigger value="structure" className="space-x-2 data-[state=active]:bg-blue-50">
                 <Globe className="h-4 w-4" />
                 <span>Structure</span>
               </TabsTrigger>
+              <TabsTrigger value="hierarchy" className="space-x-2 data-[state=active]:bg-blue-50">
+                <Database className="h-4 w-4" />
+                <span>Hiérarchie</span>
+              </TabsTrigger>
+              <TabsTrigger value="backlinks" className="space-x-2 data-[state=active]:bg-blue-50">
+                <Link2 className="h-4 w-4" />
+                <span>Backlinks</span>
+              </TabsTrigger>
+              <TabsTrigger value="metrics" className="space-x-2 data-[state=active]:bg-blue-50">
+                <ChartBar className="h-4 w-4" />
+                <span>Métriques</span>
+              </TabsTrigger>
+              <TabsTrigger value="tools" className="space-x-2 data-[state=active]:bg-blue-50">
+                <Globe className="h-4 w-4" />
+                <span>Outils</span>
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="seo" className="space-y-6">
-              <Card className="p-6 shadow-md bg-white/50 backdrop-blur-sm hover:shadow-lg transition-shadow">
-                <h2 className="text-2xl font-semibold mb-4">Raccourcir l'URL</h2>
-                <UrlShortener longUrl={url} />
-              </Card>
-
               {seoAnalysis && (
                 <SeoResults seoAnalysis={seoAnalysis} />
+              )}
+            </TabsContent>
+
+            <TabsContent value="structure">
+              {siteStructure && (
+                <Card className="p-6 shadow-md bg-white/50 backdrop-blur-sm">
+                  <h2 className="text-2xl font-semibold mb-4">Structure du Site</h2>
+                  <SiteStructureVisualizer structure={siteStructure} />
+                </Card>
               )}
             </TabsContent>
 
@@ -128,13 +146,48 @@ const Index = () => {
               )}
             </TabsContent>
 
-            <TabsContent value="structure">
-              {siteStructure && (
-                <Card className="p-6 shadow-md bg-white/50 backdrop-blur-sm">
-                  <h2 className="text-2xl font-semibold mb-4">Structure du Site</h2>
-                  <SiteStructureVisualizer structure={siteStructure} />
-                </Card>
+            <TabsContent value="backlinks">
+              {seoAnalysis && (
+                <BacklinksAnalysis 
+                  backlinks={seoAnalysis.backlinks}
+                  backlinkDetails={seoAnalysis.backlinkDetails}
+                  topBacklinkDomains={seoAnalysis.topBacklinkDomains}
+                  doFollowBacklinks={seoAnalysis.doFollowBacklinks}
+                  noFollowBacklinks={seoAnalysis.noFollowBacklinks}
+                />
               )}
+            </TabsContent>
+
+            <TabsContent value="metrics" className="space-y-6">
+              <Card className="p-6 shadow-md bg-white/50 backdrop-blur-sm">
+                <h2 className="text-2xl font-semibold mb-4">Métriques Détaillées</h2>
+                {seoAnalysis && (
+                  <div className="grid gap-4 md:grid-cols-3">
+                    <div className="p-4 bg-blue-50 rounded-lg">
+                      <p className="text-sm text-gray-600">Pages Indexées</p>
+                      <p className="text-2xl font-bold text-blue-600">{seoAnalysis.indexability.indexablePages || 0}</p>
+                    </div>
+                    <div className="p-4 bg-green-50 rounded-lg">
+                      <p className="text-sm text-gray-600">Score de Performance</p>
+                      <p className="text-2xl font-bold text-green-600">{seoAnalysis.performance.score || 0}/100</p>
+                    </div>
+                    <div className="p-4 bg-purple-50 rounded-lg">
+                      <p className="text-sm text-gray-600">Score Mobile</p>
+                      <p className="text-2xl font-bold text-purple-600">{seoAnalysis.mobilePerformance.score || 0}/100</p>
+                    </div>
+                  </div>
+                )}
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="tools" className="space-y-6">
+              <Card className="p-6 shadow-md bg-white/50 backdrop-blur-sm">
+                <h2 className="text-2xl font-semibold mb-4">Outils SEO</h2>
+                <div className="space-y-6">
+                  <UrlShortener longUrl={url} />
+                  {/* Autres outils à venir */}
+                </div>
+              </Card>
             </TabsContent>
           </Tabs>
         )}
