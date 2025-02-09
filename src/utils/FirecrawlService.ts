@@ -1,107 +1,89 @@
 
-import FirecrawlApp from '@mendable/firecrawl-js';
-
-interface ErrorResponse {
-  success: false;
-  error: string;
+interface CrawlResponse {
+  success: boolean;
+  status?: string;
+  completed?: number;
+  total?: number;
+  data?: any[];
+  error?: string;
 }
-
-interface CrawlStatusResponse {
-  success: true;
-  status: string;
-  completed: number;
-  total: number;
-  creditsUsed: number;
-  expiresAt: string;
-  data: any[];
-}
-
-type CrawlResponse = CrawlStatusResponse | ErrorResponse;
 
 export class FirecrawlService {
-  private static API_KEY_STORAGE_KEY = 'firecrawl_api_key';
-  private static firecrawlApp: FirecrawlApp | null = null;
-  private static TIMEOUT = 30000; // 30 secondes de timeout
+  private static readonly TIMEOUT = 15000; // 15 secondes de timeout
 
-  static saveApiKey(apiKey: string): void {
-    localStorage.setItem(this.API_KEY_STORAGE_KEY, apiKey);
-    this.firecrawlApp = new FirecrawlApp({ apiKey });
-    console.log('API key saved successfully');
-  }
-
-  static getApiKey(): string | null {
-    return localStorage.getItem(this.API_KEY_STORAGE_KEY);
-  }
-
-  static async testApiKey(apiKey: string): Promise<boolean> {
+  static async crawlWebsite(url: string): Promise<CrawlResponse> {
     try {
-      console.log('Testing API key with Firecrawl API');
-      this.firecrawlApp = new FirecrawlApp({ apiKey });
-      const testResponse = await Promise.race([
-        this.firecrawlApp.crawlUrl('https://example.com', { limit: 1 }) as Promise<CrawlResponse>,
-        new Promise<CrawlResponse>((_, reject) => 
-          setTimeout(() => reject(new Error('Timeout testing API key')), this.TIMEOUT)
-        )
-      ]);
-      return testResponse.success;
-    } catch (error) {
-      console.error('Error testing API key:', error);
-      return false;
-    }
-  }
-
-  static async crawlWebsite(url: string): Promise<{ success: boolean; error?: string; data?: any }> {
-    const apiKey = this.getApiKey();
-    if (!apiKey) {
-      return { success: false, error: 'API key not found' };
-    }
-
-    try {
-      console.log('Making crawl request to Firecrawl API');
-      if (!this.firecrawlApp) {
-        this.firecrawlApp = new FirecrawlApp({ apiKey });
-      }
-
-      const crawlResponse = await Promise.race([
-        this.firecrawlApp.crawlUrl(url, {
-          limit: 10, // Réduit à 10 pages au lieu de 100
-          scrapeOptions: {
-            formats: ['markdown', 'html'],
+      console.log('Démarrage de l\'analyse du site:', url);
+      const corsProxy = 'https://cors-anywhere.herokuapp.com/';
+      
+      const response = await Promise.race([
+        fetch(`${corsProxy}${url}`, {
+          headers: {
+            'Accept': 'text/html',
+            'X-Requested-With': 'XMLHttpRequest',
           }
-        }) as Promise<CrawlResponse>,
-        new Promise<CrawlResponse>((_, reject) => 
-          setTimeout(() => reject(new Error('Le crawl a pris trop de temps, veuillez réessayer')), this.TIMEOUT)
+        }),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('L\'analyse a pris trop de temps')), this.TIMEOUT)
         )
       ]);
 
-      if (!crawlResponse.success) {
-        const error = (crawlResponse as ErrorResponse).error;
-        console.error('Crawl failed:', error);
-        
-        // Gestion spécifique de l'erreur 402
-        if (error.includes('402') || error.toLowerCase().includes('insufficient credits')) {
-          return { 
-            success: false, 
-            error: 'Crédits insuffisants. Veuillez mettre à jour votre plan sur firecrawl.dev/pricing ou réduire le nombre de pages à crawler.' 
-          };
-        }
-        
-        return { 
-          success: false, 
-          error: error || 'Échec du crawl du site' 
-        };
+      if (!response || !('ok' in response) || !response.ok) {
+        throw new Error('Impossible d\'accéder au site');
       }
 
-      console.log('Crawl successful:', crawlResponse);
-      return { 
+      const html = await response.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+
+      // Analyse basique du site
+      const title = doc.title;
+      const meta = Array.from(doc.getElementsByTagName('meta'))
+        .map(meta => ({
+          name: meta.getAttribute('name') || meta.getAttribute('property'),
+          content: meta.getAttribute('content')
+        }))
+        .filter(meta => meta.name && meta.content);
+
+      const links = Array.from(doc.getElementsByTagName('a'))
+        .map(a => ({
+          href: a.href,
+          text: a.textContent?.trim()
+        }))
+        .filter(link => link.href.startsWith('http'));
+
+      const images = Array.from(doc.getElementsByTagName('img'))
+        .map(img => ({
+          src: img.src,
+          alt: img.alt
+        }));
+
+      return {
         success: true,
-        data: crawlResponse 
+        status: 'completed',
+        completed: 1,
+        total: 1,
+        data: [{
+          url,
+          title,
+          meta,
+          links: links.slice(0, 20), // Limite à 20 liens
+          images: images.slice(0, 20), // Limite à 20 images
+          headings: Array.from(doc.querySelectorAll('h1, h2, h3'))
+            .map(h => ({
+              level: h.tagName.toLowerCase(),
+              text: h.textContent?.trim()
+            }))
+        }]
       };
+
     } catch (error) {
-      console.error('Error during crawl:', error);
+      console.error('Erreur lors de l\'analyse:', error);
       return { 
         success: false, 
-        error: error instanceof Error ? error.message : 'Échec de la connexion à l\'API Firecrawl' 
+        error: error instanceof Error ? error.message : 'Erreur lors de l\'analyse du site',
+        completed: 0,
+        total: 1
       };
     }
   }

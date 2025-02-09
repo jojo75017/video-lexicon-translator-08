@@ -13,15 +13,12 @@ interface CrawlResult {
   status?: string;
   completed?: number;
   total?: number;
-  creditsUsed?: number;
-  expiresAt?: string;
   data?: any[];
 }
 
 export const CrawlForm = () => {
   const { toast } = useToast();
   const [url, setUrl] = useState('');
-  const [apiKey, setApiKey] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [crawlResult, setCrawlResult] = useState<CrawlResult | null>(null);
@@ -31,27 +28,14 @@ export const CrawlForm = () => {
     setIsLoading(true);
     setProgress(0);
     setCrawlResult(null);
-    
-    if (!apiKey) {
-      toast({
-        title: "Erreur",
-        description: "Veuillez d'abord entrer votre clé API",
-        variant: "destructive",
-      });
-      setIsLoading(false);
-      return;
-    }
 
     try {
-      // Sauvegarde de la clé API
-      FirecrawlService.saveApiKey(apiKey);
-      
       // Simulation de progression
       const progressInterval = setInterval(() => {
-        setProgress(prev => Math.min(prev + 10, 90));
-      }, 1000);
+        setProgress(prev => Math.min(prev + 20, 90));
+      }, 500);
 
-      console.log('Starting crawl for URL:', url);
+      console.log('Starting analysis for URL:', url);
       const result = await FirecrawlService.crawlWebsite(url);
       
       clearInterval(progressInterval);
@@ -60,21 +44,21 @@ export const CrawlForm = () => {
         setProgress(100);
         toast({
           title: "Succès",
-          description: "Site web crawlé avec succès",
+          description: "Site web analysé avec succès",
         });
-        setCrawlResult(result.data);
+        setCrawlResult(result);
       } else {
         toast({
           title: "Erreur",
-          description: result.error || "Échec du crawl du site",
+          description: result.error || "Échec de l'analyse du site",
           variant: "destructive",
         });
       }
     } catch (error) {
-      console.error('Error crawling website:', error);
+      console.error('Error analyzing website:', error);
       toast({
         title: "Erreur",
-        description: "Échec du crawl du site",
+        description: "Échec de l'analyse du site",
         variant: "destructive",
       });
     } finally {
@@ -87,46 +71,26 @@ export const CrawlForm = () => {
     <div className="w-full max-w-2xl mx-auto p-6 space-y-6">
       <Card className="p-6 backdrop-blur-sm bg-white/30 dark:bg-black/30 border border-gray-200 dark:border-gray-800">
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="apiKey" className="block text-sm font-medium mb-1">
-                Clé API Firecrawl
-              </label>
-              <Input
-                id="apiKey"
-                type="password"
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                className="w-full"
-                placeholder="Votre clé API Firecrawl"
-                required
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Obtenir une clé sur <a href="https://firecrawl.co" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">firecrawl.co</a>
-              </p>
-            </div>
-            
-            <div>
-              <label htmlFor="url" className="block text-sm font-medium mb-1">
-                URL du site
-              </label>
-              <Input
-                id="url"
-                type="url"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                className="w-full"
-                placeholder="https://exemple.com"
-                required
-              />
-            </div>
+          <div>
+            <label htmlFor="url" className="block text-sm font-medium mb-1">
+              URL du site
+            </label>
+            <Input
+              id="url"
+              type="url"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              className="w-full"
+              placeholder="https://exemple.com"
+              required
+            />
           </div>
 
           {isLoading && (
             <div className="space-y-2">
               <Progress value={progress} className="w-full" />
               <p className="text-sm text-gray-500 text-center">
-                Crawl en cours... {progress}%
+                Analyse en cours... {progress}%
               </p>
             </div>
           )}
@@ -136,31 +100,63 @@ export const CrawlForm = () => {
             disabled={isLoading}
             className="w-full"
           >
-            {isLoading ? "Crawl en cours..." : "Démarrer le crawl"}
+            {isLoading ? "Analyse en cours..." : "Analyser le site"}
           </Button>
         </form>
 
-        {crawlResult && (
+        {crawlResult && crawlResult.data && crawlResult.data[0] && (
           <div className="mt-6 space-y-4">
-            <h3 className="text-lg font-semibold">Résultats du crawl</h3>
-            <div className="space-y-2 text-sm">
-              <p>Statut : {crawlResult.status}</p>
-              <p>Pages complétées : {crawlResult.completed}</p>
-              <p>Total des pages : {crawlResult.total}</p>
-              <p>Crédits utilisés : {crawlResult.creditsUsed}</p>
-              {crawlResult.expiresAt && (
-                <p>Expire le : {new Date(crawlResult.expiresAt).toLocaleString()}</p>
-              )}
-            </div>
-
-            {crawlResult.data && (
-              <div className="mt-4">
-                <p className="font-semibold mb-2">Données crawlées :</p>
-                <pre className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg overflow-auto max-h-60">
-                  {JSON.stringify(crawlResult.data, null, 2)}
-                </pre>
+            <h3 className="text-lg font-semibold">Résultats de l'analyse</h3>
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-medium">Titre du site</h4>
+                <p className="text-sm">{crawlResult.data[0].title}</p>
               </div>
-            )}
+              
+              <div>
+                <h4 className="font-medium">Méta-données</h4>
+                <div className="text-sm space-y-1">
+                  {crawlResult.data[0].meta.map((meta: any, index: number) => (
+                    <p key={index}>
+                      {meta.name}: {meta.content}
+                    </p>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-medium">Structure</h4>
+                <div className="text-sm space-y-1">
+                  {crawlResult.data[0].headings.map((heading: any, index: number) => (
+                    <p key={index} className={`ml-${heading.level === 'h1' ? '0' : heading.level === 'h2' ? '2' : '4'}`}>
+                      {heading.level}: {heading.text}
+                    </p>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-medium">Liens trouvés ({crawlResult.data[0].links.length})</h4>
+                <div className="text-sm space-y-1 max-h-40 overflow-y-auto">
+                  {crawlResult.data[0].links.map((link: any, index: number) => (
+                    <p key={index}>
+                      {link.text || link.href}
+                    </p>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-medium">Images ({crawlResult.data[0].images.length})</h4>
+                <div className="text-sm space-y-1 max-h-40 overflow-y-auto">
+                  {crawlResult.data[0].images.map((img: any, index: number) => (
+                    <p key={index}>
+                      {img.alt || img.src}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </Card>
@@ -168,8 +164,8 @@ export const CrawlForm = () => {
       <div className="flex items-start gap-2 text-sm text-amber-600 dark:text-amber-500">
         <AlertTriangle className="h-4 w-4 mt-0.5" />
         <p>
-          Note : Cette clé API est temporairement stockée dans votre navigateur. 
-          Pour une utilisation en production, il est recommandé d'utiliser un stockage sécurisé côté serveur.
+          Note : Cette analyse est basique et gratuite. Pour une analyse plus approfondie, 
+          vous pouvez utiliser des services spécialisés.
         </p>
       </div>
     </div>
