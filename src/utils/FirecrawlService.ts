@@ -58,6 +58,13 @@ export class FirecrawlService {
           alt: img.alt
         }));
 
+      // Ajouter le code source formaté
+      const formattedHtml = html
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\n/g, '<br>')
+        .replace(/\s{2}/g, '&nbsp;&nbsp;');
+
       return {
         success: true,
         status: 'completed',
@@ -73,7 +80,8 @@ export class FirecrawlService {
             .map(h => ({
               level: h.tagName.toLowerCase(),
               text: h.textContent?.trim()
-            }))
+            })),
+          sourceCode: formattedHtml // Ajout du code source
         }]
       };
 
@@ -88,3 +96,4 @@ export class FirecrawlService {
     }
   }
 }
+

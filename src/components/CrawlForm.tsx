@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { FirecrawlService } from '@/utils/FirecrawlService';
 import { Card } from "@/components/ui/card";
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Code } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface CrawlResult {
   success: boolean;
@@ -105,9 +106,16 @@ export const CrawlForm = () => {
         </form>
 
         {crawlResult && crawlResult.data && crawlResult.data[0] && (
-          <div className="mt-6 space-y-4">
-            <h3 className="text-lg font-semibold">Résultats de l'analyse</h3>
-            <div className="space-y-4">
+          <Tabs defaultValue="info" className="mt-6">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="info">Informations</TabsTrigger>
+              <TabsTrigger value="source">
+                <Code className="w-4 h-4 mr-2" />
+                Code Source
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="info" className="space-y-4">
               <div>
                 <h4 className="font-medium">Titre du site</h4>
                 <p className="text-sm">{crawlResult.data[0].title}</p>
@@ -156,8 +164,20 @@ export const CrawlForm = () => {
                   ))}
                 </div>
               </div>
-            </div>
-          </div>
+            </TabsContent>
+
+            <TabsContent value="source">
+              <div className="mt-4">
+                <h4 className="font-medium mb-2">Code Source HTML</h4>
+                <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
+                  <div 
+                    className="text-sm font-mono overflow-x-auto max-h-[500px] overflow-y-auto whitespace-pre-wrap"
+                    dangerouslySetInnerHTML={{ __html: crawlResult.data[0].sourceCode }}
+                  />
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
         )}
       </Card>
 
@@ -171,3 +191,4 @@ export const CrawlForm = () => {
     </div>
   );
 };
+
