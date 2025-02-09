@@ -26,9 +26,9 @@ export class FirecrawlService {
         new Promise((_, reject) => 
           setTimeout(() => reject(new Error('L\'analyse a pris trop de temps')), this.TIMEOUT)
         )
-      ]);
+      ]) as Response;
 
-      if (!response || !('ok' in response) || !response.ok) {
+      if (!response.ok) {
         throw new Error('Impossible d\'accéder au site');
       }
 
