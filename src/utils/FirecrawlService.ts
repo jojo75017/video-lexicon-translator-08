@@ -64,7 +64,7 @@ export class FirecrawlService {
 
       const crawlResponse = await Promise.race([
         this.firecrawlApp.crawlUrl(url, {
-          limit: 100,
+          limit: 10, // Réduit à 10 pages au lieu de 100
           scrapeOptions: {
             formats: ['markdown', 'html'],
           }
@@ -75,10 +75,20 @@ export class FirecrawlService {
       ]);
 
       if (!crawlResponse.success) {
-        console.error('Crawl failed:', (crawlResponse as ErrorResponse).error);
+        const error = (crawlResponse as ErrorResponse).error;
+        console.error('Crawl failed:', error);
+        
+        // Gestion spécifique de l'erreur 402
+        if (error.includes('402') || error.toLowerCase().includes('insufficient credits')) {
+          return { 
+            success: false, 
+            error: 'Crédits insuffisants. Veuillez mettre à jour votre plan sur firecrawl.dev/pricing ou réduire le nombre de pages à crawler.' 
+          };
+        }
+        
         return { 
           success: false, 
-          error: (crawlResponse as ErrorResponse).error || 'Failed to crawl website' 
+          error: error || 'Échec du crawl du site' 
         };
       }
 
@@ -91,7 +101,7 @@ export class FirecrawlService {
       console.error('Error during crawl:', error);
       return { 
         success: false, 
-        error: error instanceof Error ? error.message : 'Failed to connect to Firecrawl API' 
+        error: error instanceof Error ? error.message : 'Échec de la connexion à l\'API Firecrawl' 
       };
     }
   }
