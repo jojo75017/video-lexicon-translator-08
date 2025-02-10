@@ -106,78 +106,90 @@ export const CrawlForm = () => {
         </form>
 
         {crawlResult && crawlResult.data && crawlResult.data[0] && (
-          <Tabs defaultValue="info" className="mt-6">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="info">Informations</TabsTrigger>
-              <TabsTrigger value="source">
-                <Code className="w-4 h-4 mr-2" />
-                Code Source
-              </TabsTrigger>
-            </TabsList>
+          <div className="mt-6">
+            <Tabs defaultValue="info" className="w-full">
+              <TabsList className="w-full grid grid-cols-2 mb-4">
+                <TabsTrigger 
+                  value="info"
+                  className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                >
+                  Informations
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="source"
+                  className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                >
+                  <Code className="w-4 h-4 mr-2" />
+                  Code Source
+                </TabsTrigger>
+              </TabsList>
 
-            <TabsContent value="info" className="space-y-4">
-              <div>
-                <h4 className="font-medium">Titre du site</h4>
-                <p className="text-sm">{crawlResult.data[0].title}</p>
-              </div>
-              
-              <div>
-                <h4 className="font-medium">Méta-données</h4>
-                <div className="text-sm space-y-1">
-                  {crawlResult.data[0].meta.map((meta: any, index: number) => (
-                    <p key={index}>
-                      {meta.name}: {meta.content}
-                    </p>
-                  ))}
+              <TabsContent value="info" className="space-y-4">
+                <div>
+                  <h4 className="font-medium">Titre du site</h4>
+                  <p className="text-sm">{crawlResult.data[0].title}</p>
                 </div>
-              </div>
+                
+                <div>
+                  <h4 className="font-medium">Méta-données</h4>
+                  <div className="text-sm space-y-1">
+                    {crawlResult.data[0].meta.map((meta: any, index: number) => (
+                      <p key={index}>
+                        {meta.name}: {meta.content}
+                      </p>
+                    ))}
+                  </div>
+                </div>
 
-              <div>
-                <h4 className="font-medium">Structure</h4>
-                <div className="text-sm space-y-1">
-                  {crawlResult.data[0].headings.map((heading: any, index: number) => (
-                    <p key={index} className={`ml-${heading.level === 'h1' ? '0' : heading.level === 'h2' ? '2' : '4'}`}>
-                      {heading.level}: {heading.text}
-                    </p>
-                  ))}
+                <div>
+                  <h4 className="font-medium">Structure</h4>
+                  <div className="text-sm space-y-1">
+                    {crawlResult.data[0].headings.map((heading: any, index: number) => (
+                      <p key={index} className={`ml-${heading.level === 'h1' ? '0' : heading.level === 'h2' ? '2' : '4'}`}>
+                        {heading.level}: {heading.text}
+                      </p>
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              <div>
-                <h4 className="font-medium">Liens trouvés ({crawlResult.data[0].links.length})</h4>
-                <div className="text-sm space-y-1 max-h-40 overflow-y-auto">
-                  {crawlResult.data[0].links.map((link: any, index: number) => (
-                    <p key={index}>
-                      {link.text || link.href}
-                    </p>
-                  ))}
+                <div>
+                  <h4 className="font-medium">Liens trouvés ({crawlResult.data[0].links.length})</h4>
+                  <div className="text-sm space-y-1 max-h-40 overflow-y-auto">
+                    {crawlResult.data[0].links.map((link: any, index: number) => (
+                      <p key={index}>
+                        {link.text || link.href}
+                      </p>
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              <div>
-                <h4 className="font-medium">Images ({crawlResult.data[0].images.length})</h4>
-                <div className="text-sm space-y-1 max-h-40 overflow-y-auto">
-                  {crawlResult.data[0].images.map((img: any, index: number) => (
-                    <p key={index}>
-                      {img.alt || img.src}
-                    </p>
-                  ))}
+                <div>
+                  <h4 className="font-medium">Images ({crawlResult.data[0].images.length})</h4>
+                  <div className="text-sm space-y-1 max-h-40 overflow-y-auto">
+                    {crawlResult.data[0].images.map((img: any, index: number) => (
+                      <p key={index}>
+                        {img.alt || img.src}
+                      </p>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </TabsContent>
+              </TabsContent>
 
-            <TabsContent value="source">
-              <div className="mt-4">
-                <h4 className="font-medium mb-2">Code Source HTML</h4>
-                <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
-                  <div 
-                    className="text-sm font-mono overflow-x-auto max-h-[500px] overflow-y-auto whitespace-pre-wrap"
-                    dangerouslySetInnerHTML={{ __html: crawlResult.data[0].sourceCode }}
-                  />
+              <TabsContent value="source" className="mt-0">
+                <div className="border rounded-lg overflow-hidden">
+                  <div className="bg-gray-100 dark:bg-gray-800 p-2 border-b">
+                    <h4 className="font-medium text-sm">Code Source HTML</h4>
+                  </div>
+                  <div className="bg-white dark:bg-gray-900 p-4">
+                    <pre 
+                      className="text-sm font-mono overflow-x-auto max-h-[500px] overflow-y-auto whitespace-pre-wrap"
+                      dangerouslySetInnerHTML={{ __html: crawlResult.data[0].sourceCode }}
+                    />
+                  </div>
                 </div>
-              </div>
-            </TabsContent>
-          </Tabs>
+              </TabsContent>
+            </Tabs>
+          </div>
         )}
       </Card>
 
@@ -191,4 +203,3 @@ export const CrawlForm = () => {
     </div>
   );
 };
-
