@@ -158,7 +158,7 @@ export const CrawlForm = () => {
                   <h4 className="font-medium mb-2">
                     Liens trouvés ({crawlResult.data[0].links.length})
                   </h4>
-                  <div className="text-sm space-y-1 max-h-40 overflow-y-auto custom-scrollbar">
+                  <div className="text-sm space-y-1 max-h-40 overflow-y-auto">
                     {crawlResult.data[0].links.map((link: any, index: number) => (
                       <a 
                         key={index}
@@ -177,7 +177,7 @@ export const CrawlForm = () => {
                   <h4 className="font-medium mb-2">
                     Images ({crawlResult.data[0].images.length})
                   </h4>
-                  <div className="text-sm space-y-1 max-h-40 overflow-y-auto custom-scrollbar">
+                  <div className="text-sm space-y-1 max-h-40 overflow-y-auto">
                     {crawlResult.data[0].images.map((img: any, index: number) => (
                       <div key={index} className="flex gap-2">
                         <span className="font-medium">Alt:</span>
@@ -195,7 +195,7 @@ export const CrawlForm = () => {
                     <h4 className="font-medium text-sm">Code Source HTML</h4>
                   </div>
                   <div className="bg-white dark:bg-gray-900 p-4">
-                    <pre className="text-sm font-mono overflow-x-auto max-h-[500px] overflow-y-auto whitespace-pre-wrap custom-scrollbar">
+                    <pre className="text-sm font-mono overflow-x-auto max-h-[500px] overflow-y-auto whitespace-pre-wrap">
                       {crawlResult.data[0].sourceCode}
                     </pre>
                   </div>
@@ -214,22 +214,24 @@ export const CrawlForm = () => {
         </p>
       </div>
 
-      <style jsx global>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 8px;
-          height: 8px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background-color: rgba(156, 163, 175, 0.5);
-          border-radius: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background-color: rgba(156, 163, 175, 0.7);
-        }
-      `}</style>
+      <style>
+        {`
+          .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+          }
+          .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+          }
+          .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: rgba(156, 163, 175, 0.5);
+            border-radius: 4px;
+          }
+          .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(156, 163, 175, 0.7);
+          }
+        `}
+      </style>
     </div>
   );
 };
