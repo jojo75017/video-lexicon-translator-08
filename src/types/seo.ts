@@ -191,8 +191,6 @@ export interface SeoAnalysis {
       sameSite: string;
     };
   };
-  socialTags: SocialTags;
-  keywordSuggestions: KeywordSuggestion[];
   semanticStructure: Record<string, number>;
   linkAnalysis: {
     total: number;
@@ -262,8 +260,10 @@ export interface SeoAnalysis {
   };
   indexability?: {
     canIndex: boolean;
-    indexablePages: number; // Ajout de la propriété manquante
+    indexablePages: number;
     reasons: string[];
     recommendations: string[];
   };
 }
+
+export type { SeoAnalysis };
