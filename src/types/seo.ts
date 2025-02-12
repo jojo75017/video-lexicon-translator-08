@@ -1,3 +1,4 @@
+
 export interface HeadingStructure {
   text: string;
   level: number;
@@ -105,7 +106,7 @@ export interface Performance {
   speedIndex?: number;
   largestContentfulPaint?: number;
   timeToInteractive?: number;
-  score: number; // Ajout de la propriété score
+  score: number;
   resourceBreakdown?: {
     images: number;
     scripts: number;
@@ -264,6 +265,6 @@ export interface SeoAnalysis {
     reasons: string[];
     recommendations: string[];
   };
+  socialTags: SocialTags;
+  keywordSuggestions: KeywordSuggestion[];
 }
-
-export type { SeoAnalysis };
