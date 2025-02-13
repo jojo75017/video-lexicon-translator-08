@@ -70,6 +70,27 @@ const SocialTags = ({ socialTags }: SocialTagsProps) => {
       suggestions.push("Le nom du site (og:site_name) n'est pas spécifié");
     }
 
+    // Analyse des mots-clés dans les titres/descriptions
+    if (socialTags.ogTitle) {
+      const keywordsInTitle = socialTags.ogTitle.toLowerCase().split(' ');
+      if (keywordsInTitle.length < 3) {
+        suggestions.push("Le titre pourrait inclure plus de mots-clés pertinents");
+      }
+      if (keywordsInTitle.some(word => word.length > 15)) {
+        suggestions.push("Évitez les mots trop longs dans le titre pour une meilleure lisibilité");
+      }
+    }
+
+    // Recommandations pour l'engagement
+    if (socialTags.ogDescription) {
+      if (!socialTags.ogDescription.includes('?') && !socialTags.ogDescription.includes('!')) {
+        suggestions.push("Ajoutez une question ou une exclamation dans la description pour augmenter l'engagement");
+      }
+      if (socialTags.ogDescription.length < 100) {
+        suggestions.push("Une description plus longue pourrait augmenter l'engagement");
+      }
+    }
+
     return suggestions;
   };
 
@@ -262,15 +283,49 @@ const SocialTags = ({ socialTags }: SocialTagsProps) => {
           </Alert>
         )}
 
-        {/* Bonnes pratiques */}
+        {/* Bonnes pratiques par secteur */}
         <Alert className="bg-green-50">
           <AlertDescription className="space-y-2">
-            <p className="font-medium">Bonnes pratiques :</p>
+            <p className="font-medium">Bonnes pratiques selon votre secteur :</p>
+            <div className="space-y-4">
+              <div>
+                <h6 className="font-medium text-sm">E-commerce</h6>
+                <ul className="list-disc pl-4 text-sm">
+                  <li>Incluez le prix et la disponibilité dans le titre</li>
+                  <li>Mettez en avant les promotions dans la description</li>
+                  <li>Utilisez des photos de produits de haute qualité</li>
+                </ul>
+              </div>
+              <div>
+                <h6 className="font-medium text-sm">Blog / Contenu</h6>
+                <ul className="list-disc pl-4 text-sm">
+                  <li>Commencez le titre avec des chiffres ou "Comment"</li>
+                  <li>Incluez des citations percutantes dans la description</li>
+                  <li>Ajoutez une image avec du texte superposé</li>
+                </ul>
+              </div>
+              <div>
+                <h6 className="font-medium text-sm">B2B / Services</h6>
+                <ul className="list-disc pl-4 text-sm">
+                  <li>Mentionnez des statistiques clés dans le titre</li>
+                  <li>Incluez un appel à l'action dans la description</li>
+                  <li>Utilisez des images professionnelles et sobres</li>
+                </ul>
+              </div>
+            </div>
+          </AlertDescription>
+        </Alert>
+
+        {/* Recommandations d'engagement */}
+        <Alert className="bg-yellow-50">
+          <AlertDescription className="space-y-2">
+            <p className="font-medium">Astuces pour augmenter l'engagement :</p>
             <ul className="list-disc pl-4 space-y-1">
-              <li>Utilisez des images de haute qualité mais optimisées pour le web</li>
-              <li>Assurez-vous que le texte est lisible sur l'image de partage</li>
-              <li>Testez vos balises avec les outils de débogage des réseaux sociaux</li>
-              <li>Personnalisez les méta-tags pour chaque réseau social</li>
+              <li>Utilisez des verbes d'action dans vos titres</li>
+              <li>Posez des questions ouvertes dans la description</li>
+              <li>Incluez des émojis stratégiquement placés</li>
+              <li>Mentionnez des chiffres ou statistiques impactants</li>
+              <li>Créez un sentiment d'urgence ou d'exclusivité</li>
             </ul>
           </AlertDescription>
         </Alert>
