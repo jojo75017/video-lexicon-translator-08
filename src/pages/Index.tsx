@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Search, Globe, AlertCircle, Link2, ChartBar, Database } from "lucide-react";
+import { ExternalLink, Search, Globe, AlertCircle, Link2, ChartBar, Database, Hash } from "lucide-react";
 import SiteStructureVisualizer from '@/components/SiteStructureVisualizer';
 import ContentHierarchy from '@/components/ContentHierarchy';
 import UrlInput from '@/components/UrlInput';
@@ -13,6 +13,7 @@ import { useSiteAnalyzer } from '@/hooks/useSiteAnalyzer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BacklinksAnalysis from '@/components/seo/BacklinksAnalysis';
 import { CrawlForm } from '@/components/CrawlForm';
+import SocialTags from '@/components/seo/SocialTags';
 
 const Index = () => {
   const {
@@ -95,7 +96,7 @@ const Index = () => {
 
         {url && !isLoading && !error && (
           <Tabs defaultValue="seo" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-6 bg-white/50 backdrop-blur-sm">
+            <TabsList className="grid w-full grid-cols-7 bg-white/50 backdrop-blur-sm">
               <TabsTrigger value="seo" className="space-x-2 data-[state=active]:bg-blue-50">
                 <Search className="h-4 w-4" />
                 <span>SEO</span>
@@ -115,6 +116,10 @@ const Index = () => {
               <TabsTrigger value="metrics" className="space-x-2 data-[state=active]:bg-blue-50">
                 <ChartBar className="h-4 w-4" />
                 <span>Métriques</span>
+              </TabsTrigger>
+              <TabsTrigger value="hashtags" className="space-x-2 data-[state=active]:bg-blue-50">
+                <Hash className="h-4 w-4" />
+                <span>Hashtags</span>
               </TabsTrigger>
               <TabsTrigger value="tools" className="space-x-2 data-[state=active]:bg-blue-50">
                 <Globe className="h-4 w-4" />
@@ -178,6 +183,15 @@ const Index = () => {
                   </div>
                 )}
               </Card>
+            </TabsContent>
+
+            <TabsContent value="hashtags" className="space-y-6">
+              {seoAnalysis && (
+                <Card className="p-6 shadow-md bg-white/50 backdrop-blur-sm">
+                  <h2 className="text-2xl font-semibold mb-4">Suggestions de Hashtags</h2>
+                  <SocialTags socialTags={seoAnalysis.socialTags} />
+                </Card>
+              )}
             </TabsContent>
 
             <TabsContent value="tools" className="space-y-6">
