@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { motion } from "framer-motion";
 import SeoMainTags from './SeoMainTags';
@@ -96,7 +95,18 @@ const DetailedMetrics = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.6 }}
           >
-            <SocialTags socialTags={seoAnalysis.socialTags} />
+            <SocialTags socialTags={{
+              ogTitle: seoAnalysis.socialTags.ogTitle || null,
+              ogDescription: seoAnalysis.socialTags.ogDescription || null,
+              ogImage: seoAnalysis.socialTags.ogImage || null,
+              twitterCard: seoAnalysis.socialTags.twitterCard || null,
+              twitterTitle: seoAnalysis.socialTags.twitterTitle || null,
+              twitterDescription: seoAnalysis.socialTags.twitterDescription || null,
+              twitterImage: seoAnalysis.socialTags.twitterImage || null,
+              ogUrl: seoAnalysis.socialTags.ogUrl || null,
+              ogType: seoAnalysis.socialTags.ogType || null,
+              ogSiteName: seoAnalysis.socialTags.ogSiteName || null
+            }} />
           </motion.div>
 
           <motion.div
