@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Share2, Twitter, Globe, AlertCircle, ImageIcon } from 'lucide-react';
+import { Share2, Twitter, Globe, AlertCircle, ImageIcon, Hash, Smile, Meh, Frown } from 'lucide-react';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface SocialTagsProps {
@@ -96,6 +96,48 @@ const SocialTags = ({ socialTags }: SocialTagsProps) => {
 
   const missingTags = getMissingSocialTags();
   const suggestions = getSocialSuggestions();
+
+  const getSentimentScore = (text: string | null): { score: number; sentiment: 'positive' | 'neutral' | 'negative' } => {
+    if (!text) return { score: 0, sentiment: 'neutral' };
+    
+    const positiveWords = ['excellent', 'incroyable', 'meilleur', 'super', 'génial', 'extraordinaire', 'fantastique', 'gratuit', 'nouveau', 'exclusif'];
+    const negativeWords = ['mauvais', 'problème', 'erreur', 'difficile', 'compliqué', 'cher', 'pire'];
+    
+    const words = text.toLowerCase().split(' ');
+    let score = 0;
+    
+    words.forEach(word => {
+      if (positiveWords.includes(word)) score += 1;
+      if (negativeWords.includes(word)) score -= 1;
+    });
+    
+    return {
+      score,
+      sentiment: score > 0 ? 'positive' : score < 0 ? 'negative' : 'neutral'
+    };
+  };
+
+  const getHashtagSuggestions = (text: string | null): string[] => {
+    if (!text) return [];
+    
+    const commonWords = ['le', 'la', 'les', 'un', 'une', 'des', 'de', 'du', 'et', 'ou', 'à', 'en'];
+    const words = text.toLowerCase()
+      .split(' ')
+      .filter(word => word.length > 3 && !commonWords.includes(word))
+      .map(word => word.replace(/[^a-zà-ÿ]/g, ''));
+    
+    const uniqueWords = Array.from(new Set(words));
+    return uniqueWords
+      .slice(0, 5)
+      .map(word => `#${word}`);
+  };
+
+  const titleSentiment = getSentimentScore(socialTags.ogTitle);
+  const descriptionSentiment = getSentimentScore(socialTags.ogDescription);
+  const hashtags = [
+    ...getHashtagSuggestions(socialTags.ogTitle),
+    ...getHashtagSuggestions(socialTags.ogDescription)
+  ].slice(0, 8);
 
   return (
     <Card className="p-6">
@@ -329,6 +371,94 @@ const SocialTags = ({ socialTags }: SocialTagsProps) => {
             </ul>
           </AlertDescription>
         </Alert>
+      </div>
+
+      {/* Analyse du sentiment */}
+      <div className="mt-6 space-y-4">
+        <h4 className="font-medium">Analyse du sentiment</h4>
+        
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium">Titre :</span>
+            <div className="flex items-center gap-1">
+              {titleSentiment.sentiment === 'positive' && <Smile className="h-4 w-4 text-green-500" />}
+              {titleSentiment.sentiment === 'neutral' && <Meh className="h-4 w-4 text-yellow-500" />}
+              {titleSentiment.sentiment === 'negative' && <Frown className="h-4 w-4 text-red-500" />}
+              <Badge 
+                variant="outline" 
+                className={`
+                  ${titleSentiment.sentiment === 'positive' ? 'bg-green-50 text-green-700' : ''}
+                  ${titleSentiment.sentiment === 'neutral' ? 'bg-yellow-50 text-yellow-700' : ''}
+                  ${titleSentiment.sentiment === 'negative' ? 'bg-red-50 text-red-700' : ''}
+                `}
+              >
+                {titleSentiment.sentiment === 'positive' ? 'Positif' : titleSentiment.sentiment === 'negative' ? 'Négatif' : 'Neutre'}
+              </Badge>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium">Description :</span>
+            <div className="flex items-center gap-1">
+              {descriptionSentiment.sentiment === 'positive' && <Smile className="h-4 w-4 text-green-500" />}
+              {descriptionSentiment.sentiment === 'neutral' && <Meh className="h-4 w-4 text-yellow-500" />}
+              {descriptionSentiment.sentiment === 'negative' && <Frown className="h-4 w-4 text-red-500" />}
+              <Badge 
+                variant="outline"
+                className={`
+                  ${descriptionSentiment.sentiment === 'positive' ? 'bg-green-50 text-green-700' : ''}
+                  ${descriptionSentiment.sentiment === 'neutral' ? 'bg-yellow-50 text-yellow-700' : ''}
+                  ${descriptionSentiment.sentiment === 'negative' ? 'bg-red-50 text-red-700' : ''}
+                `}
+              >
+                {descriptionSentiment.sentiment === 'positive' ? 'Positif' : descriptionSentiment.sentiment === 'negative' ? 'Négatif' : 'Neutre'}
+              </Badge>
+            </div>
+          </div>
+        </div>
+
+        {(titleSentiment.sentiment === 'neutral' || descriptionSentiment.sentiment === 'neutral') && (
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Essayez d'utiliser un langage plus positif pour augmenter l'engagement
+            </AlertDescription>
+          </Alert>
+        )}
+      </div>
+
+      {/* Suggestions de hashtags */}
+      <div className="mt-6">
+        <h4 className="font-medium flex items-center gap-2 mb-3">
+          <Hash className="h-4 w-4" />
+          Suggestions de hashtags
+        </h4>
+        
+        <div className="flex flex-wrap gap-2">
+          {hashtags.length > 0 ? (
+            hashtags.map((hashtag, index) => (
+              <Badge 
+                key={index}
+                variant="secondary"
+                className="bg-purple-100 text-purple-800 hover:bg-purple-200 cursor-pointer"
+              >
+                {hashtag}
+              </Badge>
+            ))
+          ) : (
+            <span className="text-sm text-gray-500 italic">
+              Aucun hashtag suggéré. Ajoutez plus de contenu descriptif pour obtenir des suggestions.
+            </span>
+          )}
+        </div>
+
+        {hashtags.length > 0 && (
+          <Alert className="mt-3 bg-purple-50">
+            <AlertDescription>
+              Utilisez 3-5 hashtags pertinents pour maximiser la visibilité sans surcharger votre publication
+            </AlertDescription>
+          </Alert>
+        )}
       </div>
     </Card>
   );
