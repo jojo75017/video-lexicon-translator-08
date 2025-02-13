@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,10 +13,26 @@ interface SocialTagsProps {
     twitterTitle: string | null;
     twitterDescription: string | null;
     twitterImage: string | null;
+    ogUrl: string | null;
+    ogType: string | null;
+    ogSiteName: string | null;
   };
 }
 
 const SocialTags = ({ socialTags }: SocialTagsProps) => {
+  const validateImageDimensions = async (imageUrl: string): Promise<boolean> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const isValidFacebook = img.width >= 1200 && img.height >= 630;
+        const isValidTwitter = img.width >= 1200 && img.height >= 600;
+        resolve(isValidFacebook && isValidTwitter);
+      };
+      img.onerror = () => resolve(false);
+      img.src = imageUrl;
+    });
+  };
+
   const getMissingSocialTags = () => {
     const missing = [];
     if (!socialTags.ogTitle) missing.push('og:title');
@@ -29,7 +44,37 @@ const SocialTags = ({ socialTags }: SocialTagsProps) => {
     return missing;
   };
 
+  const getSocialSuggestions = () => {
+    const suggestions = [];
+    
+    // Vérification des longueurs de titre
+    if (socialTags.ogTitle && socialTags.ogTitle.length > 60) {
+      suggestions.push("Le titre Open Graph dépasse 60 caractères, ce qui pourrait être tronqué sur Facebook");
+    }
+    if (socialTags.twitterTitle && socialTags.twitterTitle.length > 70) {
+      suggestions.push("Le titre Twitter dépasse 70 caractères, ce qui pourrait être tronqué");
+    }
+
+    // Vérification de la présence d'URL canonique
+    if (!socialTags.ogUrl) {
+      suggestions.push("L'URL canonique (og:url) est manquante");
+    }
+
+    // Vérification du type de contenu
+    if (!socialTags.ogType) {
+      suggestions.push("Le type de contenu (og:type) n'est pas spécifié");
+    }
+
+    // Vérification du site name
+    if (!socialTags.ogSiteName) {
+      suggestions.push("Le nom du site (og:site_name) n'est pas spécifié");
+    }
+
+    return suggestions;
+  };
+
   const missingTags = getMissingSocialTags();
+  const suggestions = getSocialSuggestions();
 
   return (
     <Card className="p-6">
@@ -193,6 +238,42 @@ const SocialTags = ({ socialTags }: SocialTagsProps) => {
             </AlertDescription>
           </Alert>
         )}
+      </div>
+
+      {/* Ajout des suggestions avancées après les prévisualisations */}
+      <div className="mt-6 space-y-2">
+        {suggestions.map((suggestion, index) => (
+          <Alert key={index}>
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{suggestion}</AlertDescription>
+          </Alert>
+        ))}
+
+        {socialTags.ogImage && (
+          <Alert className="bg-blue-50">
+            <AlertDescription className="space-y-2">
+              <p className="font-medium">Dimensions recommandées pour les images :</p>
+              <ul className="list-disc pl-4 space-y-1">
+                <li>Facebook : 1200 x 630 pixels minimum</li>
+                <li>Twitter : 1200 x 600 pixels minimum</li>
+                <li>LinkedIn : 1200 x 627 pixels recommandé</li>
+              </ul>
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Bonnes pratiques */}
+        <Alert className="bg-green-50">
+          <AlertDescription className="space-y-2">
+            <p className="font-medium">Bonnes pratiques :</p>
+            <ul className="list-disc pl-4 space-y-1">
+              <li>Utilisez des images de haute qualité mais optimisées pour le web</li>
+              <li>Assurez-vous que le texte est lisible sur l'image de partage</li>
+              <li>Testez vos balises avec les outils de débogage des réseaux sociaux</li>
+              <li>Personnalisez les méta-tags pour chaque réseau social</li>
+            </ul>
+          </AlertDescription>
+        </Alert>
       </div>
     </Card>
   );
