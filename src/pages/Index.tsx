@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -15,7 +14,8 @@ import {
   Hash, 
   Trophy,
   Zap,
-  BarChart3
+  BarChart3,
+  BookOpen
 } from "lucide-react";
 import SiteStructureVisualizer from '@/components/SiteStructureVisualizer';
 import ContentHierarchy from '@/components/ContentHierarchy';
@@ -28,6 +28,7 @@ import BacklinksAnalysis from '@/components/seo/BacklinksAnalysis';
 import { CrawlForm } from '@/components/CrawlForm';
 import SocialTags from '@/components/seo/SocialTags';
 import { motion } from "framer-motion";
+import EbookMockupGenerator from '@/components/ebook/EbookMockupGenerator';
 
 const Index = () => {
   const {
@@ -71,7 +72,6 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-blue-50">
       <div className="relative overflow-hidden">
-        {/* Hero Section avec pattern de fond */}
         <div className="absolute inset-0 bg-grid-pattern opacity-5" />
         
         <div className="relative max-w-7xl mx-auto px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
@@ -99,7 +99,6 @@ const Index = () => {
             </div>
           </motion.div>
 
-          {/* Grid des fonctionnalités */}
           <motion.div 
             className="mt-20 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4"
             initial={{ opacity: 0, y: 20 }}
@@ -164,7 +163,7 @@ const Index = () => {
 
         {url && !isLoading && !error && (
           <Tabs defaultValue="seo" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-7 bg-white/50 backdrop-blur-sm">
+            <TabsList className="grid w-full grid-cols-8 bg-white/50 backdrop-blur-sm">
               <TabsTrigger value="seo" className="space-x-2 data-[state=active]:bg-blue-50">
                 <Search className="h-4 w-4" />
                 <span>SEO</span>
@@ -192,6 +191,10 @@ const Index = () => {
               <TabsTrigger value="tools" className="space-x-2 data-[state=active]:bg-blue-50">
                 <Globe className="h-4 w-4" />
                 <span>Outils</span>
+              </TabsTrigger>
+              <TabsTrigger value="ebook" className="space-x-2 data-[state=active]:bg-blue-50">
+                <BookOpen className="h-4 w-4" />
+                <span>eBook</span>
               </TabsTrigger>
             </TabsList>
 
@@ -271,11 +274,14 @@ const Index = () => {
                 </div>
               </Card>
             </TabsContent>
+
+            <TabsContent value="ebook" className="space-y-6">
+              <EbookMockupGenerator />
+            </TabsContent>
           </Tabs>
         )}
       </div>
 
-      {/* Footer section */}
       <footer className="bg-gray-50 mt-20 py-12 border-t border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
