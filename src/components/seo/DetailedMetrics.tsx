@@ -102,10 +102,7 @@ const DetailedMetrics = ({
               twitterCard: seoAnalysis.socialTags.twitterCard || null,
               twitterTitle: seoAnalysis.socialTags.twitterTitle || null,
               twitterDescription: seoAnalysis.socialTags.twitterDescription || null,
-              twitterImage: seoAnalysis.socialTags.twitterImage || null,
-              ogUrl: seoAnalysis.socialTags.ogUrl || null,
-              ogType: seoAnalysis.socialTags.ogType || null,
-              ogSiteName: seoAnalysis.socialTags.ogSiteName || null
+              twitterImage: seoAnalysis.socialTags.twitterImage || null
             }} />
           </motion.div>
 

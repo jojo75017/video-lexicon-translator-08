@@ -1,9 +1,11 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Share2, Twitter, Globe, AlertCircle, ImageIcon, Hash, Smile, Meh, Frown } from 'lucide-react';
+import { Share2, Twitter, Globe, AlertCircle, ImageIcon, Hash, Smile, Meh, Frown, Calendar } from 'lucide-react';
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { addDays, format } from "date-fns";
+import { fr } from "date-fns/locale";
 
 interface SocialTagsProps {
   socialTags: {
@@ -18,6 +20,8 @@ interface SocialTagsProps {
 }
 
 const SocialTags = ({ socialTags }: SocialTagsProps) => {
+  const [date, setDate] = useState<Date | undefined>(new Date());
+
   const validateImageDimensions = async (imageUrl: string): Promise<boolean> => {
     return new Promise((resolve) => {
       const img = new Image();
@@ -112,9 +116,22 @@ const SocialTags = ({ socialTags }: SocialTagsProps) => {
   ].slice(0, 8);
   const popularHashtags = getPopularHashtags();
 
+  const getBestPostingTimes = () => {
+    const today = new Date();
+    const bestTimes = [
+      { day: 'Lundi', times: ['10:00', '15:00', '19:00'] },
+      { day: 'Mardi', times: ['9:00', '14:00', '18:00'] },
+      { day: 'Mercredi', times: ['11:00', '16:00', '20:00'] },
+      { day: 'Jeudi', times: ['9:30', '14:30', '18:30'] },
+      { day: 'Vendredi', times: ['10:30', '15:30', '17:30'] },
+      { day: 'Samedi', times: ['11:30', '15:00', '20:00'] },
+      { day: 'Dimanche', times: ['12:00', '16:00', '19:00'] }
+    ];
+    return bestTimes;
+  };
+
   return (
     <Card className="p-6 space-y-6">
-      {/* Analyse du sentiment */}
       <div className="space-y-4">
         <h4 className="text-lg font-semibold">Analyse du sentiment</h4>
         <div className="grid gap-4 md:grid-cols-2">
@@ -167,7 +184,6 @@ const SocialTags = ({ socialTags }: SocialTagsProps) => {
         )}
       </div>
 
-      {/* Hashtags générés */}
       <div>
         <h4 className="text-lg font-semibold mb-3 flex items-center gap-2">
           <Hash className="h-5 w-5" />
@@ -221,6 +237,55 @@ const SocialTags = ({ socialTags }: SocialTagsProps) => {
               <li>Alternez entre hashtags populaires et spécifiques</li>
               <li>Évitez les hashtags trop génériques</li>
             </ul>
+          </AlertDescription>
+        </Alert>
+      </div>
+
+      <div className="space-y-4">
+        <h4 className="text-lg font-semibold flex items-center gap-2">
+          <Calendar className="h-5 w-5" />
+          Planification des publications
+        </h4>
+        
+        <div className="grid gap-6 md:grid-cols-2">
+          <Card className="p-4">
+            <h5 className="text-sm font-medium mb-4">Sélectionnez une date</h5>
+            <CalendarComponent
+              mode="single"
+              selected={date}
+              onSelect={setDate}
+              locale={fr}
+              className="rounded-md border"
+            />
+          </Card>
+
+          <Card className="p-4">
+            <h5 className="text-sm font-medium mb-4">Meilleurs moments de publication</h5>
+            <div className="space-y-3">
+              {getBestPostingTimes().map((item, index) => (
+                <div key={index} className="flex items-center justify-between">
+                  <span className="font-medium">{item.day}</span>
+                  <div className="flex gap-2">
+                    {item.times.map((time, timeIndex) => (
+                      <Badge 
+                        key={timeIndex}
+                        variant="secondary"
+                        className="bg-green-100 text-green-800"
+                      >
+                        {time}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+
+        <Alert className="bg-green-50">
+          <AlertDescription>
+            Les meilleurs moments pour publier sont généralement en milieu de matinée, début d'après-midi et début de soirée.
+            Adaptez ces horaires en fonction de votre audience cible.
           </AlertDescription>
         </Alert>
       </div>
