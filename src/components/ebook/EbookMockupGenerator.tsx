@@ -1,14 +1,16 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookOpen, Image as ImageIcon, Download, Upload } from "lucide-react";
+import { BookOpen, Image as ImageIcon, Download, Upload, Type, Move } from "lucide-react";
 import { toast } from "sonner";
+import html2canvas from 'html2canvas';
 
 const EbookMockupGenerator: React.FC = () => {
   const [title, setTitle] = useState("");
@@ -16,6 +18,11 @@ const EbookMockupGenerator: React.FC = () => {
   const [description, setDescription] = useState("");
   const [coverImage, setCoverImage] = useState<string | null>(null);
   const [template, setTemplate] = useState("classic");
+  const [titleColor, setTitleColor] = useState("#1a1f2c");
+  const [titleRotation, setTitleRotation] = useState(0);
+  const [titleSize, setTitleSize] = useState(24);
+  const [authorColor, setAuthorColor] = useState("#1a1f2c");
+  const previewRef = useRef<HTMLDivElement>(null);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -36,10 +43,35 @@ const EbookMockupGenerator: React.FC = () => {
     { id: "creative", name: "Créatif", description: "Mise en page artistique et unique" }
   ];
 
-  const generateMockup = () => {
-    // Ici nous simulons la génération du mockup
-    toast.success("Mockup généré avec succès! Vous pouvez maintenant le télécharger.");
+  const downloadMockup = async () => {
+    if (!previewRef.current) return;
+    
+    try {
+      const canvas = await html2canvas(previewRef.current, {
+        backgroundColor: null,
+        scale: 2, // Meilleure qualité
+      });
+      
+      const link = document.createElement('a');
+      link.download = `${title.toLowerCase().replace(/\s+/g, '-')}-mockup.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      
+      toast.success("Mockup téléchargé avec succès!");
+    } catch (error) {
+      toast.error("Erreur lors du téléchargement du mockup");
+    }
   };
+
+  const colorOptions = [
+    { value: "#1a1f2c", label: "Noir" },
+    { value: "#9b87f5", label: "Violet" },
+    { value: "#7E69AB", label: "Violet foncé" },
+    { value: "#F97316", label: "Orange" },
+    { value: "#0EA5E9", label: "Bleu" },
+    { value: "#ea384c", label: "Rouge" },
+    { value: "#D946EF", label: "Rose" }
+  ];
 
   return (
     <Card className="p-6">
@@ -68,6 +100,60 @@ const EbookMockupGenerator: React.FC = () => {
               </div>
 
               <div>
+                <Label>Couleur du titre</Label>
+                <Select value={titleColor} onValueChange={setTitleColor}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choisissez une couleur" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {colorOptions.map((color) => (
+                      <SelectItem key={color.value} value={color.value}>
+                        <div className="flex items-center gap-2">
+                          <div 
+                            className="w-4 h-4 rounded-full" 
+                            style={{ backgroundColor: color.value }}
+                          />
+                          {color.label}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Taille du titre</Label>
+                <div className="flex items-center gap-4">
+                  <Type className="h-4 w-4 text-gray-500" />
+                  <Slider
+                    value={[titleSize]}
+                    onValueChange={(value) => setTitleSize(value[0])}
+                    min={16}
+                    max={48}
+                    step={1}
+                    className="flex-1"
+                  />
+                  <span className="text-sm text-gray-500">{titleSize}px</span>
+                </div>
+              </div>
+
+              <div>
+                <Label>Rotation du titre</Label>
+                <div className="flex items-center gap-4">
+                  <Move className="h-4 w-4 text-gray-500" />
+                  <Slider
+                    value={[titleRotation]}
+                    onValueChange={(value) => setTitleRotation(value[0])}
+                    min={-45}
+                    max={45}
+                    step={1}
+                    className="flex-1"
+                  />
+                  <span className="text-sm text-gray-500">{titleRotation}°</span>
+                </div>
+              </div>
+
+              <div>
                 <Label htmlFor="author">Auteur</Label>
                 <Input
                   id="author"
@@ -78,14 +164,25 @@ const EbookMockupGenerator: React.FC = () => {
               </div>
 
               <div>
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  placeholder="Description de l'eBook..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  className="h-24"
-                />
+                <Label>Couleur de l'auteur</Label>
+                <Select value={authorColor} onValueChange={setAuthorColor}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choisissez une couleur" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {colorOptions.map((color) => (
+                      <SelectItem key={color.value} value={color.value}>
+                        <div className="flex items-center gap-2">
+                          <div 
+                            className="w-4 h-4 rounded-full" 
+                            style={{ backgroundColor: color.value }}
+                          />
+                          {color.label}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>
@@ -154,12 +251,12 @@ const EbookMockupGenerator: React.FC = () => {
           <div className="flex justify-end gap-4">
             <Button
               variant="default"
-              onClick={generateMockup}
+              onClick={downloadMockup}
               className="gap-2"
               disabled={!title || !coverImage}
             >
               <Download className="h-4 w-4" />
-              Générer le mockup
+              Télécharger le mockup
             </Button>
           </div>
         </TabsContent>
@@ -167,7 +264,7 @@ const EbookMockupGenerator: React.FC = () => {
         <TabsContent value="preview" className="min-h-[400px]">
           {coverImage ? (
             <div className="flex justify-center items-center">
-              <div className="relative max-w-md">
+              <div ref={previewRef} className="relative max-w-md">
                 <div className="aspect-[3/4] rounded-lg shadow-2xl overflow-hidden">
                   <img
                     src={coverImage}
@@ -176,8 +273,22 @@ const EbookMockupGenerator: React.FC = () => {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent">
                     <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                      <h3 className="text-2xl font-bold mb-2">{title || "Titre de l'eBook"}</h3>
-                      <p className="text-sm opacity-90">{author || "Nom de l'auteur"}</p>
+                      <h3 
+                        className="mb-2 transform origin-left transition-all duration-300"
+                        style={{
+                          color: titleColor,
+                          fontSize: `${titleSize}px`,
+                          transform: `rotate(${titleRotation}deg)`,
+                        }}
+                      >
+                        {title || "Titre de l'eBook"}
+                      </h3>
+                      <p 
+                        className="text-sm opacity-90"
+                        style={{ color: authorColor }}
+                      >
+                        {author || "Nom de l'auteur"}
+                      </p>
                     </div>
                   </div>
                 </div>
