@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -137,41 +136,22 @@ const EbookMockupGenerator: React.FC = () => {
   const renderMockup = () => {
     if (!coverImage) return null;
 
-    const mockupStyle = {
-      position: 'relative' as const,
-      maxWidth: '400px',
-      margin: '0 auto'
-    };
-
-    const titleStyle = {
-      color: titleColor,
-      fontSize: `${titleSize}px`,
-      transform: `rotate(${titleRotation}deg)`,
-      transformOrigin: 'left bottom',
-      transition: 'all 0.3s ease',
-      marginBottom: '0.5rem',
-      fontWeight: 'bold' as const
-    };
-
-    const authorStyle = {
-      color: authorColor,
-      fontSize: '16px',
-      transition: 'all 0.3s ease'
-    };
-
-    switch (template) {
-      case 'stack':
-        return (
-          <div style={mockupStyle}>
-            {[...Array(3)].map((_, index) => (
-              <div
-                key={index}
-                className="absolute w-full aspect-[3/4] rounded-lg shadow-2xl overflow-hidden"
-                style={{
-                  transform: `translate(${index * 20}px, ${-index * 10}px) rotate(${index * 2}deg)`,
-                  zIndex: 3 - index
-                }}
-              >
+    if (template === 'stack') {
+      return (
+        <div className="relative w-full max-w-md mx-auto" style={{ height: '500px' }}>
+          {[...Array(3)].map((_, index) => (
+            <div
+              key={index}
+              style={{
+                position: 'absolute',
+                width: '100%',
+                height: '100%',
+                transform: `translate(${index * 20}px, ${-index * 10}px) rotate(${index * 2}deg)`,
+                zIndex: 3 - index,
+              }}
+              className="rounded-lg shadow-2xl overflow-hidden"
+            >
+              <div className="w-full h-full relative">
                 <img
                   src={coverImage}
                   alt={`Book stack ${index + 1}`}
@@ -179,55 +159,98 @@ const EbookMockupGenerator: React.FC = () => {
                 />
                 {index === 0 && (
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent">
-                    <div className="absolute bottom-0 left-0 right-0 p-6">
-                      <h3 className="book-title" style={titleStyle}>{title}</h3>
-                      <p className="book-author" style={authorStyle}>{author}</p>
+                    <div 
+                      className="absolute bottom-0 left-0 right-0 p-6"
+                      style={{
+                        transform: `rotate(${titleRotation}deg)`,
+                        transformOrigin: 'left bottom'
+                      }}
+                    >
+                      <h3 
+                        className="text-2xl font-bold mb-2"
+                        style={{
+                          color: titleColor,
+                          fontSize: `${titleSize}px`,
+                        }}
+                      >
+                        {title}
+                      </h3>
+                      <p style={{ color: authorColor }}>{author}</p>
                     </div>
                   </div>
                 )}
               </div>
-            ))}
-          </div>
-        );
-
-      case 'single':
-        return (
-          <div style={mockupStyle} className="transform hover:scale-105 transition-transform duration-300">
-            <div className="relative aspect-[3/4] rounded-lg shadow-2xl overflow-hidden">
-              <img
-                src={coverImage}
-                alt="Book cover"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent">
-                <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <h3 className="book-title" style={titleStyle}>{title}</h3>
-                  <p className="book-author" style={authorStyle}>{author}</p>
-                </div>
-              </div>
             </div>
-          </div>
-        );
-
-      default: // flat
-        return (
-          <div style={mockupStyle}>
-            <div className="relative aspect-[3/4] rounded-lg shadow-lg overflow-hidden">
-              <img
-                src={coverImage}
-                alt="Book cover"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent">
-                <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <h3 className="book-title" style={titleStyle}>{title}</h3>
-                  <p className="book-author" style={authorStyle}>{author}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
+          ))}
+        </div>
+      );
     }
+
+    if (template === 'single') {
+      return (
+        <div className="relative w-full max-w-md mx-auto transform transition-all duration-500 hover:scale-105" style={{ height: '500px' }}>
+          <div className="w-full h-full rounded-lg shadow-2xl overflow-hidden">
+            <img
+              src={coverImage}
+              alt="Book cover"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent">
+              <div 
+                className="absolute bottom-0 left-0 right-0 p-6"
+                style={{
+                  transform: `rotate(${titleRotation}deg)`,
+                  transformOrigin: 'left bottom'
+                }}
+              >
+                <h3 
+                  className="text-2xl font-bold mb-2"
+                  style={{
+                    color: titleColor,
+                    fontSize: `${titleSize}px`,
+                  }}
+                >
+                  {title}
+                </h3>
+                <p style={{ color: authorColor }}>{author}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="relative w-full max-w-md mx-auto" style={{ height: '500px' }}>
+        <div className="w-full h-full rounded-lg shadow-lg overflow-hidden">
+          <img
+            src={coverImage}
+            alt="Book cover"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent">
+            <div 
+              className="absolute bottom-0 left-0 right-0 p-6"
+              style={{
+                transform: `rotate(${titleRotation}deg)`,
+                transformOrigin: 'left bottom'
+              }}
+            >
+              <h3 
+                className="text-2xl font-bold mb-2"
+                style={{
+                  color: titleColor,
+                  fontSize: `${titleSize}px`,
+                }}
+              >
+                {title}
+              </h3>
+              <p style={{ color: authorColor }}>{author}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -418,10 +441,10 @@ const EbookMockupGenerator: React.FC = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="preview" className="min-h-[400px]">
-          <div ref={previewRef} className="flex justify-center items-center p-8 bg-white">
+        <TabsContent value="preview" className="min-h-[500px] bg-gray-50 p-8">
+          <div ref={previewRef} className="w-full h-full flex items-center justify-center">
             {coverImage ? renderMockup() : (
-              <div className="flex flex-col items-center justify-center h-full text-gray-500">
+              <div className="flex flex-col items-center justify-center text-gray-500">
                 <BookOpen className="h-12 w-12 mb-4" />
                 <p>Téléchargez une image de couverture pour voir l'aperçu</p>
               </div>
