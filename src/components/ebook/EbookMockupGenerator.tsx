@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -37,10 +36,21 @@ const EbookMockupGenerator: React.FC = () => {
   };
 
   const mockupTemplates = [
-    { id: "classic", name: "Classique", description: "Design épuré et professionnel" },
-    { id: "modern", name: "Moderne", description: "Style contemporain avec des angles nets" },
-    { id: "minimal", name: "Minimaliste", description: "Design simple et élégant" },
-    { id: "creative", name: "Créatif", description: "Mise en page artistique et unique" }
+    { 
+      id: "stack", 
+      name: "Stack 3D", 
+      description: "Pile de livres en 3D avec perspective" 
+    },
+    { 
+      id: "single", 
+      name: "Single 3D", 
+      description: "Livre unique en 3D avec ombre" 
+    },
+    { 
+      id: "flat", 
+      name: "Flat Design", 
+      description: "Design plat moderne avec overlay" 
+    }
   ];
 
   const downloadMockup = async () => {
@@ -49,16 +59,32 @@ const EbookMockupGenerator: React.FC = () => {
     try {
       const canvas = await html2canvas(previewRef.current, {
         backgroundColor: null,
-        scale: 2, // Meilleure qualité
+        scale: 2,
+        logging: true,
+        useCORS: true,
+        allowTaint: true
       });
+      
+      const tempCanvas = document.createElement('canvas');
+      const ctx = tempCanvas.getContext('2d');
+      if (!ctx) return;
+      
+      tempCanvas.width = canvas.width;
+      tempCanvas.height = canvas.height;
+      
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+      
+      ctx.drawImage(canvas, 0, 0);
       
       const link = document.createElement('a');
       link.download = `${title.toLowerCase().replace(/\s+/g, '-')}-mockup.png`;
-      link.href = canvas.toDataURL('image/png');
+      link.href = tempCanvas.toDataURL('image/png');
       link.click();
       
       toast.success("Mockup téléchargé avec succès!");
     } catch (error) {
+      console.error("Erreur lors du téléchargement:", error);
       toast.error("Erreur lors du téléchargement du mockup");
     }
   };
@@ -265,33 +291,95 @@ const EbookMockupGenerator: React.FC = () => {
           {coverImage ? (
             <div className="flex justify-center items-center">
               <div ref={previewRef} className="relative max-w-md">
-                <div className="aspect-[3/4] rounded-lg shadow-2xl overflow-hidden">
-                  <img
-                    src={coverImage}
-                    alt="Mockup preview"
-                    className="object-cover w-full h-full"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent">
-                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                      <h3 
-                        className="mb-2 transform origin-left transition-all duration-300"
+                {template === "stack" ? (
+                  <div className="relative">
+                    {[...Array(3)].map((_, index) => (
+                      <div
+                        key={index}
+                        className="absolute aspect-[3/4] rounded-lg shadow-2xl overflow-hidden transition-all duration-300"
                         style={{
-                          color: titleColor,
-                          fontSize: `${titleSize}px`,
-                          transform: `rotate(${titleRotation}deg)`,
+                          transform: `translate(${index * 20}px, ${-index * 10}px) rotate(${index * 2}deg)`,
+                          zIndex: 3 - index,
+                          width: '100%'
                         }}
                       >
-                        {title || "Titre de l'eBook"}
-                      </h3>
-                      <p 
-                        className="text-sm opacity-90"
-                        style={{ color: authorColor }}
-                      >
-                        {author || "Nom de l'auteur"}
-                      </p>
+                        <img
+                          src={coverImage}
+                          alt={`Book stack ${index + 1}`}
+                          className="object-cover w-full h-full"
+                        />
+                        {index === 0 && (
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent">
+                            <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                              <h3 
+                                style={{
+                                  color: titleColor,
+                                  fontSize: `${titleSize}px`,
+                                  transform: `rotate(${titleRotation}deg)`,
+                                }}
+                              >
+                                {title || "Titre de l'eBook"}
+                              </h3>
+                              <p style={{ color: authorColor }}>
+                                {author || "Nom de l'auteur"}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : template === "single" ? (
+                  <div className="transform perspective-1000 hover:rotate-y-10 transition-transform duration-500">
+                    <div className="aspect-[3/4] rounded-lg shadow-2xl overflow-hidden">
+                      <img
+                        src={coverImage}
+                        alt="Book cover"
+                        className="object-cover w-full h-full"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent">
+                        <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                          <h3 
+                            style={{
+                              color: titleColor,
+                              fontSize: `${titleSize}px`,
+                              transform: `rotate(${titleRotation}deg)`,
+                            }}
+                          >
+                            {title || "Titre de l'eBook"}
+                          </h3>
+                          <p style={{ color: authorColor }}>
+                            {author || "Nom de l'auteur"}
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="aspect-[3/4] rounded-lg shadow-2xl overflow-hidden">
+                    <img
+                      src={coverImage}
+                      alt="Book cover"
+                      className="object-cover w-full h-full"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent">
+                      <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                        <h3 
+                          style={{
+                            color: titleColor,
+                            fontSize: `${titleSize}px`,
+                            transform: `rotate(${titleRotation}deg)`,
+                          }}
+                        >
+                          {title || "Titre de l'eBook"}
+                        </h3>
+                        <p style={{ color: authorColor }}>
+                          {author || "Nom de l'auteur"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           ) : (
