@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,8 +20,10 @@ const EbookMockupGenerator: React.FC = () => {
   const [titleSize, setTitleSize] = useState(24);
   const [authorColor, setAuthorColor] = useState("#1a1f2c");
   const [titlePosition, setTitlePosition] = useState<"top" | "center" | "bottom">("center");
-  const [bannerColor, setBannerColor] = useState("#9b87f5");
-  const [showBanner, setShowBanner] = useState(false);
+  const [titleFont, setTitleFont] = useState("font-sans");
+  const [authorFont, setAuthorFont] = useState("font-sans");
+  const [titleShadow, setTitleShadow] = useState("shadow-none");
+  const [authorShadow, setAuthorShadow] = useState("shadow-none");
   const previewRef = useRef<HTMLDivElement>(null);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,16 +47,22 @@ const EbookMockupGenerator: React.FC = () => {
     toast.loading("Génération du mockup en cours...");
 
     try {
-      const elementToCapture = previewRef.current.querySelector('#preview-container');
-      if (!elementToCapture) {
+      const element = previewRef.current.querySelector('#preview-container');
+      if (!element) {
         throw new Error("Élément de prévisualisation introuvable");
       }
 
-      const canvas = await html2canvas(elementToCapture as HTMLElement, {
+      const canvas = await html2canvas(element as HTMLElement, {
         backgroundColor: '#ffffff',
         scale: 2,
         useCORS: true,
         allowTaint: true,
+        onclone: (clonedDoc) => {
+          const clonedElement = clonedDoc.querySelector('#preview-container');
+          if (clonedElement) {
+            clonedElement.classList.add('transform-none');
+          }
+        }
       });
 
       const link = document.createElement('a');
@@ -87,41 +94,33 @@ const EbookMockupGenerator: React.FC = () => {
     };
 
     const bookContent = (
-      <>
-        {showBanner && (
-          <div 
-            className="absolute top-0 left-0 right-0 h-12"
-            style={{ backgroundColor: bannerColor }}
-          />
-        )}
+      <div 
+        className={`absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex ${getPositionClasses()} justify-center p-6`}
+      >
         <div 
-          className={`absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex ${getPositionClasses()} justify-center p-6`}
+          className="text-center space-y-2 relative w-full"
+          style={{
+            transform: `rotate(${titleRotation}deg)`,
+            transformOrigin: 'center center'
+          }}
         >
-          <div 
-            className="text-center space-y-2 relative"
+          <h3 
+            className={`font-bold text-center break-words max-w-[80%] mx-auto ${titleFont} ${titleShadow}`}
             style={{
-              transform: `rotate(${titleRotation}deg)`,
-              transformOrigin: 'center center'
+              color: titleColor,
+              fontSize: `${titleSize}px`,
             }}
           >
-            <h3 
-              className="font-bold text-center break-words max-w-[80%] mx-auto"
-              style={{
-                color: titleColor,
-                fontSize: `${titleSize}px`,
-              }}
-            >
-              {title}
-            </h3>
-            <p 
-              className="text-center absolute -bottom-8 left-1/2 transform -translate-x-1/2"
-              style={{ color: authorColor }}
-            >
-              {author}
-            </p>
-          </div>
+            {title}
+          </h3>
+          <p 
+            className={`absolute bottom-0 left-0 right-0 text-center mt-8 ${authorFont} ${authorShadow}`}
+            style={{ color: authorColor }}
+          >
+            {author}
+          </p>
         </div>
-      </>
+      </div>
     );
 
     if (template === 'stack') {
@@ -195,6 +194,24 @@ const EbookMockupGenerator: React.FC = () => {
     }
   ];
 
+  const fontOptions = [
+    { value: "font-sans", label: "Sans Serif" },
+    { value: "font-serif", label: "Serif" },
+    { value: "font-mono", label: "Monospace" },
+    { value: "font-playfair", label: "Playfair" },
+    { value: "font-poppins", label: "Poppins" },
+    { value: "font-roboto", label: "Roboto" }
+  ];
+
+  const shadowOptions = [
+    { value: "shadow-none", label: "Aucun" },
+    { value: "shadow-sm", label: "Léger" },
+    { value: "shadow-md", label: "Moyen" },
+    { value: "shadow-lg", label: "Large" },
+    { value: "drop-shadow-md", label: "Drop Shadow" },
+    { value: "text-shadow-sm", label: "Text Shadow" }
+  ];
+
   const colorOptions = [
     { value: "#1a1f2c", label: "Noir" },
     { value: "#9b87f5", label: "Violet" },
@@ -237,6 +254,38 @@ const EbookMockupGenerator: React.FC = () => {
               </div>
 
               <div>
+                <Label>Police du titre</Label>
+                <Select value={titleFont} onValueChange={setTitleFont}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choisissez une police" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {fontOptions.map((font) => (
+                      <SelectItem key={font.value} value={font.value}>
+                        {font.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Ombre du titre</Label>
+                <Select value={titleShadow} onValueChange={setTitleShadow}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choisissez un effet d'ombre" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {shadowOptions.map((shadow) => (
+                      <SelectItem key={shadow.value} value={shadow.value}>
+                        {shadow.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
                 <Label>Position du titre</Label>
                 <div className="flex gap-2 mt-2">
                   <Button
@@ -261,28 +310,6 @@ const EbookMockupGenerator: React.FC = () => {
                     <ArrowDown className="h-4 w-4" />
                   </Button>
                 </div>
-              </div>
-
-              <div>
-                <Label>Couleur du titre</Label>
-                <Select value={titleColor} onValueChange={setTitleColor}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Choisissez une couleur" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {colorOptions.map((color) => (
-                      <SelectItem key={color.value} value={color.value}>
-                        <div className="flex items-center gap-2">
-                          <div 
-                            className="w-4 h-4 rounded-full border border-gray-200" 
-                            style={{ backgroundColor: color.value }}
-                          />
-                          {color.label}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
               </div>
 
               <div>
@@ -328,6 +355,38 @@ const EbookMockupGenerator: React.FC = () => {
               </div>
 
               <div>
+                <Label>Police de l'auteur</Label>
+                <Select value={authorFont} onValueChange={setAuthorFont}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choisissez une police" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {fontOptions.map((font) => (
+                      <SelectItem key={font.value} value={font.value}>
+                        {font.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Ombre de l'auteur</Label>
+                <Select value={authorShadow} onValueChange={setAuthorShadow}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choisissez un effet d'ombre" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {shadowOptions.map((shadow) => (
+                      <SelectItem key={shadow.value} value={shadow.value}>
+                        {shadow.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
                 <Label>Couleur de l'auteur</Label>
                 <Select value={authorColor} onValueChange={setAuthorColor}>
                   <SelectTrigger>
@@ -366,42 +425,6 @@ const EbookMockupGenerator: React.FC = () => {
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
-
-              <div>
-                <Label>Bannière décorative</Label>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id="showBanner"
-                      checked={showBanner}
-                      onChange={(e) => setShowBanner(e.target.checked)}
-                      className="rounded border-gray-300"
-                    />
-                    <label htmlFor="showBanner">Afficher la bannière</label>
-                  </div>
-                  {showBanner && (
-                    <Select value={bannerColor} onValueChange={setBannerColor}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Couleur de la bannière" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {colorOptions.map((color) => (
-                          <SelectItem key={color.value} value={color.value}>
-                            <div className="flex items-center gap-2">
-                              <div 
-                                className="w-4 h-4 rounded-full border border-gray-200" 
-                                style={{ backgroundColor: color.value }}
-                              />
-                              {color.label}
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                </div>
               </div>
             </div>
 
@@ -471,6 +494,15 @@ const EbookMockupGenerator: React.FC = () => {
           </div>
         </TabsContent>
       </Tabs>
+
+      <style jsx global>{`
+        .text-shadow-sm {
+          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .transform-none {
+          transform: none !important;
+        }
+      `}</style>
     </Card>
   );
 };
