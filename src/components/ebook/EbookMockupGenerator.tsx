@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookOpen, Image as ImageIcon, Download, Upload, Type, Move } from "lucide-react";
+import { BookOpen, Image as ImageIcon, Download, Upload, Type, Move, AlignCenter, AlignTop, AlignBottom } from "lucide-react";
 import { toast } from "sonner";
 import html2canvas from 'html2canvas';
 
@@ -20,6 +19,9 @@ const EbookMockupGenerator: React.FC = () => {
   const [titleRotation, setTitleRotation] = useState(0);
   const [titleSize, setTitleSize] = useState(24);
   const [authorColor, setAuthorColor] = useState("#1a1f2c");
+  const [titlePosition, setTitlePosition] = useState<"top" | "center" | "bottom">("center");
+  const [bannerColor, setBannerColor] = useState("#9b87f5");
+  const [showBanner, setShowBanner] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,32 +74,55 @@ const EbookMockupGenerator: React.FC = () => {
   const renderMockup = () => {
     if (!coverImage) return null;
 
+    const getPositionClasses = () => {
+      switch (titlePosition) {
+        case "top":
+          return "items-start pt-16";
+        case "center":
+          return "items-center";
+        case "bottom":
+          return "items-end pb-16";
+        default:
+          return "items-center";
+      }
+    };
+
     const bookContent = (
-      <div 
-        className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-center justify-center p-6"
-        style={{
-          transform: `rotate(${titleRotation}deg)`,
-          transformOrigin: 'center center'
-        }}
-      >
-        <div className="text-center space-y-2">
-          <h3 
-            className="font-bold text-center break-words max-w-[80%] mx-auto"
+      <>
+        {showBanner && (
+          <div 
+            className="absolute top-0 left-0 right-0 h-12"
+            style={{ backgroundColor: bannerColor }}
+          />
+        )}
+        <div 
+          className={`absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex ${getPositionClasses()} justify-center p-6`}
+        >
+          <div 
+            className="text-center space-y-2 relative"
             style={{
-              color: titleColor,
-              fontSize: `${titleSize}px`,
+              transform: `rotate(${titleRotation}deg)`,
+              transformOrigin: 'center center'
             }}
           >
-            {title}
-          </h3>
-          <p 
-            className="text-center"
-            style={{ color: authorColor }}
-          >
-            {author}
-          </p>
+            <h3 
+              className="font-bold text-center break-words max-w-[80%] mx-auto"
+              style={{
+                color: titleColor,
+                fontSize: `${titleSize}px`,
+              }}
+            >
+              {title}
+            </h3>
+            <p 
+              className="text-center absolute bottom-0 left-1/2 transform -translate-x-1/2 translate 4"
+              style={{ color: authorColor }}
+            >
+              {author}
+            </p>
+          </div>
         </div>
-      </div>
+      </>
     );
 
     if (template === 'stack') {
@@ -139,7 +164,6 @@ const EbookMockupGenerator: React.FC = () => {
       );
     }
 
-    // Template 'flat'
     return (
       <div id="preview-container" className="relative w-[300px] h-[400px]">
         <div className="absolute inset-0 rounded-lg shadow-lg overflow-hidden bg-white">
@@ -180,7 +204,11 @@ const EbookMockupGenerator: React.FC = () => {
     { value: "#0EA5E9", label: "Bleu" },
     { value: "#ea384c", label: "Rouge" },
     { value: "#D946EF", label: "Rose" },
-    { value: "#ffffff", label: "Blanc" }
+    { value: "#ffffff", label: "Blanc" },
+    { value: "#fde68a", label: "Doré" },
+    { value: "#a7f3d0", label: "Menthe" },
+    { value: "#bfdbfe", label: "Bleu clair" },
+    { value: "#fecaca", label: "Corail" }
   ];
 
   return (
@@ -312,6 +340,69 @@ const EbookMockupGenerator: React.FC = () => {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div>
+                <Label>Position du titre</Label>
+                <div className="flex gap-2 mt-2">
+                  <Button
+                    variant={titlePosition === "top" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setTitlePosition("top")}
+                  >
+                    <AlignTop className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant={titlePosition === "center" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setTitlePosition("center")}
+                  >
+                    <AlignCenter className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant={titlePosition === "bottom" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setTitlePosition("bottom")}
+                  >
+                    <AlignBottom className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+
+              <div>
+                <Label>Bannière décorative</Label>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="showBanner"
+                      checked={showBanner}
+                      onChange={(e) => setShowBanner(e.target.checked)}
+                      className="rounded border-gray-300"
+                    />
+                    <label htmlFor="showBanner">Afficher la bannière</label>
+                  </div>
+                  {showBanner && (
+                    <Select value={bannerColor} onValueChange={setBannerColor}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Couleur de la bannière" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {colorOptions.map((color) => (
+                          <SelectItem key={color.value} value={color.value}>
+                            <div className="flex items-center gap-2">
+                              <div 
+                                className="w-4 h-4 rounded-full border border-gray-200" 
+                                style={{ backgroundColor: color.value }}
+                              />
+                              {color.label}
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
               </div>
             </div>
 
