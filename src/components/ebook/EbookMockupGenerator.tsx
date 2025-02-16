@@ -58,10 +58,14 @@ const EbookMockupGenerator: React.FC = () => {
         useCORS: true,
         allowTaint: true,
         onclone: (clonedDoc) => {
-          const clonedElement = clonedDoc.querySelector('#preview-container');
-          if (clonedElement) {
-            clonedElement.classList.add('transform-none');
-          }
+          const clonedElements = clonedDoc.querySelectorAll('.transform-preserve');
+          clonedElements.forEach((el) => {
+            const originalEl = element.querySelector(`#${el.id}`);
+            if (originalEl) {
+              const style = window.getComputedStyle(originalEl);
+              (el as HTMLElement).style.transform = style.transform;
+            }
+          });
         }
       });
 
@@ -105,17 +109,21 @@ const EbookMockupGenerator: React.FC = () => {
           }}
         >
           <h3 
-            className={`font-bold text-center break-words max-w-[80%] mx-auto ${titleFont} ${titleShadow}`}
+            className={`font-bold text-center break-words max-w-[80%] mx-auto ${titleFont} ${titleShadow} drop-shadow-2xl`}
             style={{
               color: titleColor,
               fontSize: `${titleSize}px`,
+              textShadow: '2px 2px 4px rgba(0,0,0,0.5), -2px -2px 4px rgba(255,255,255,0.5)'
             }}
           >
             {title}
           </h3>
           <p 
             className={`absolute bottom-0 left-0 right-0 text-center mt-8 ${authorFont} ${authorShadow}`}
-            style={{ color: authorColor }}
+            style={{ 
+              color: authorColor,
+              textShadow: '1px 1px 2px rgba(0,0,0,0.3)'
+            }}
           >
             {author}
           </p>
@@ -129,7 +137,8 @@ const EbookMockupGenerator: React.FC = () => {
           {[...Array(3)].map((_, i) => (
             <div
               key={i}
-              className="absolute inset-0 rounded-lg shadow-xl overflow-hidden bg-white"
+              id={`stack-book-${i}`}
+              className="absolute inset-0 rounded-lg shadow-xl overflow-hidden bg-white transform-preserve"
               style={{
                 transform: `translate(${i * 15}px, ${-i * 8}px) rotate(${i * 3}deg)`,
                 zIndex: 2 - i,
