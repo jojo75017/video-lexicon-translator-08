@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,126 @@ const EbookMockupGenerator: React.FC = () => {
     }
   };
 
+  const downloadMockup = async () => {
+    if (!previewRef.current || !coverImage) {
+      toast.error("Erreur: Veuillez d'abord ajouter une image de couverture");
+      return;
+    }
+
+    toast.loading("Génération du mockup en cours...");
+
+    try {
+      const canvas = await html2canvas(previewRef.current, {
+        backgroundColor: '#ffffff',
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        onclone: (clonedDoc) => {
+          const element = clonedDoc.querySelector('#preview-container');
+          if (element) {
+            element.style.transform = 'scale(1)';
+            element.style.overflow = 'visible';
+          }
+        }
+      });
+
+      const link = document.createElement('a');
+      link.download = `${title.toLowerCase().replace(/\s+/g, '-')}-mockup.png`;
+      link.href = canvas.toDataURL('image/png', 1.0);
+      link.click();
+      toast.dismiss();
+      toast.success("Mockup téléchargé avec succès!");
+    } catch (error) {
+      console.error("Erreur lors du téléchargement:", error);
+      toast.error("Erreur lors de la génération du mockup");
+    }
+  };
+
+  const renderMockup = () => {
+    if (!coverImage) return null;
+
+    const bookContent = (
+      <div 
+        className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-center justify-center p-6"
+        style={{
+          transform: `rotate(${titleRotation}deg)`,
+          transformOrigin: 'center center'
+        }}
+      >
+        <div className="text-center space-y-2">
+          <h3 
+            className="font-bold text-center break-words max-w-[80%] mx-auto"
+            style={{
+              color: titleColor,
+              fontSize: `${titleSize}px`,
+            }}
+          >
+            {title}
+          </h3>
+          <p 
+            className="text-center"
+            style={{ color: authorColor }}
+          >
+            {author}
+          </p>
+        </div>
+      </div>
+    );
+
+    if (template === 'stack') {
+      return (
+        <div id="preview-container" className="relative w-[300px] h-[400px]">
+          {[...Array(3)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute inset-0 rounded-lg shadow-xl overflow-hidden bg-white"
+              style={{
+                transform: `translate(${i * 15}px, ${-i * 8}px) rotate(${i * 3}deg)`,
+                zIndex: 2 - i,
+              }}
+            >
+              <img
+                src={coverImage}
+                alt={`Book cover ${i + 1}`}
+                className="w-full h-full object-cover"
+              />
+              {i === 0 && bookContent}
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    if (template === 'single') {
+      return (
+        <div id="preview-container" className="relative w-[300px] h-[400px]">
+          <div className="absolute inset-0 rounded-lg shadow-xl overflow-hidden bg-white transform hover:scale-105 transition-transform duration-300">
+            <img
+              src={coverImage}
+              alt="Book cover"
+              className="w-full h-full object-cover"
+            />
+            {bookContent}
+          </div>
+        </div>
+      );
+    }
+
+    // Template 'flat'
+    return (
+      <div id="preview-container" className="relative w-[300px] h-[400px]">
+        <div className="absolute inset-0 rounded-lg shadow-lg overflow-hidden bg-white">
+          <img
+            src={coverImage}
+            alt="Book cover"
+            className="w-full h-full object-cover"
+          />
+          {bookContent}
+        </div>
+      </div>
+    );
+  };
+
   const mockupTemplates = [
     { 
       id: "stack", 
@@ -51,78 +172,6 @@ const EbookMockupGenerator: React.FC = () => {
     }
   ];
 
-  const downloadMockup = async () => {
-    if (!previewRef.current) {
-      toast.error("Erreur: Impossible de générer l'aperçu");
-      return;
-    }
-    
-    try {
-      console.log("Début de la génération du mockup...");
-      
-      const canvas = await html2canvas(previewRef.current, {
-        backgroundColor: null,
-        scale: 2,
-        logging: true,
-        useCORS: true,
-        allowTaint: true,
-        onclone: (document, element) => {
-          console.log("Clonage de l'élément pour la capture...");
-          // Assurez-vous que les styles sont bien appliqués
-          const titleElement = element.querySelector('.book-title');
-          const authorElement = element.querySelector('.book-author');
-          if (titleElement) {
-            console.log("Styles du titre appliqués");
-          }
-          if (authorElement) {
-            console.log("Styles de l'auteur appliqués");
-          }
-        }
-      });
-      
-      console.log("Canvas généré avec succès");
-      
-      // Création d'un nouveau canvas avec fond blanc
-      const finalCanvas = document.createElement('canvas');
-      finalCanvas.width = canvas.width;
-      finalCanvas.height = canvas.height;
-      
-      const ctx = finalCanvas.getContext('2d');
-      if (!ctx) {
-        toast.error("Erreur: Contexte de canvas invalide");
-        return;
-      }
-      
-      // Fond blanc
-      ctx.fillStyle = 'white';
-      ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
-      
-      // Dessin du mockup
-      ctx.drawImage(canvas, 0, 0);
-      
-      // Création du lien de téléchargement
-      const link = document.createElement('a');
-      const filename = title ? 
-        `${title.toLowerCase().replace(/\s+/g, '-')}-mockup.png` : 
-        'ebook-mockup.png';
-      
-      link.download = filename;
-      link.href = finalCanvas.toDataURL('image/png', 1.0);
-      
-      console.log("Lien de téléchargement créé");
-      
-      // Déclencher le téléchargement
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      toast.success("Mockup téléchargé avec succès!");
-    } catch (error) {
-      console.error("Erreur lors du téléchargement:", error);
-      toast.error("Erreur lors du téléchargement du mockup");
-    }
-  };
-
   const colorOptions = [
     { value: "#1a1f2c", label: "Noir" },
     { value: "#9b87f5", label: "Violet" },
@@ -130,97 +179,9 @@ const EbookMockupGenerator: React.FC = () => {
     { value: "#F97316", label: "Orange" },
     { value: "#0EA5E9", label: "Bleu" },
     { value: "#ea384c", label: "Rouge" },
-    { value: "#D946EF", label: "Rose" }
+    { value: "#D946EF", label: "Rose" },
+    { value: "#ffffff", label: "Blanc" }
   ];
-
-  const renderMockup = () => {
-    if (!coverImage) return null;
-
-    const bookContent = (
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-6">
-        <div 
-          className="text-center w-full"
-          style={{
-            transform: `rotate(${titleRotation}deg)`,
-            transformOrigin: 'center center'
-          }}
-        >
-          <h3 
-            className="text-2xl font-bold mb-2 text-center"
-            style={{
-              color: titleColor,
-              fontSize: `${titleSize}px`,
-            }}
-          >
-            {title}
-          </h3>
-          <p 
-            className="text-center"
-            style={{ 
-              color: authorColor 
-            }}
-          >
-            {author}
-          </p>
-        </div>
-      </div>
-    );
-
-    if (template === 'stack') {
-      return (
-        <div className="relative w-full h-[500px] max-w-md mx-auto">
-          {[...Array(3)].map((_, index) => (
-            <div
-              key={index}
-              className="absolute inset-0 rounded-lg shadow-2xl overflow-hidden"
-              style={{
-                transform: `translateX(${index * 20}px) translateY(${-index * 10}px) rotate(${index * 2}deg)`,
-                zIndex: 3 - index,
-              }}
-            >
-              <div className="relative w-full h-full">
-                <img
-                  src={coverImage}
-                  alt={`Book stack ${index + 1}`}
-                  className="w-full h-full object-cover"
-                />
-                {index === 0 && bookContent}
-              </div>
-            </div>
-          ))}
-        </div>
-      );
-    }
-
-    if (template === 'single') {
-      return (
-        <div className="relative w-full h-[500px] max-w-md mx-auto">
-          <div className="absolute inset-0 rounded-lg shadow-2xl overflow-hidden transform transition-transform duration-300 hover:scale-105">
-            <img
-              src={coverImage}
-              alt="Book cover"
-              className="w-full h-full object-cover"
-            />
-            {bookContent}
-          </div>
-        </div>
-      );
-    }
-
-    // Template 'flat'
-    return (
-      <div className="relative w-full h-[500px] max-w-md mx-auto">
-        <div className="absolute inset-0 rounded-lg shadow-lg overflow-hidden">
-          <img
-            src={coverImage}
-            alt="Book cover"
-            className="w-full h-full object-cover"
-          />
-          {bookContent}
-        </div>
-      </div>
-    );
-  };
 
   return (
     <Card className="p-6">
@@ -259,7 +220,7 @@ const EbookMockupGenerator: React.FC = () => {
                       <SelectItem key={color.value} value={color.value}>
                         <div className="flex items-center gap-2">
                           <div 
-                            className="w-4 h-4 rounded-full" 
+                            className="w-4 h-4 rounded-full border border-gray-200" 
                             style={{ backgroundColor: color.value }}
                           />
                           {color.label}
@@ -323,7 +284,7 @@ const EbookMockupGenerator: React.FC = () => {
                       <SelectItem key={color.value} value={color.value}>
                         <div className="flex items-center gap-2">
                           <div 
-                            className="w-4 h-4 rounded-full" 
+                            className="w-4 h-4 rounded-full border border-gray-200" 
                             style={{ backgroundColor: color.value }}
                           />
                           {color.label}
@@ -396,21 +357,9 @@ const EbookMockupGenerator: React.FC = () => {
               </Card>
             </div>
           </div>
-
-          <div className="flex justify-end gap-4">
-            <Button
-              variant="default"
-              onClick={downloadMockup}
-              className="gap-2"
-              disabled={!title || !coverImage}
-            >
-              <Download className="h-4 w-4" />
-              Télécharger le mockup
-            </Button>
-          </div>
         </TabsContent>
 
-        <TabsContent value="preview" className="min-h-[600px] bg-gray-50 p-8">
+        <TabsContent value="preview" className="min-h-[600px] bg-gray-50 rounded-lg p-8">
           <div ref={previewRef} className="w-full h-full flex items-center justify-center">
             {coverImage ? renderMockup() : (
               <div className="flex flex-col items-center justify-center text-gray-500">
@@ -418,6 +367,17 @@ const EbookMockupGenerator: React.FC = () => {
                 <p>Téléchargez une image de couverture pour voir l'aperçu</p>
               </div>
             )}
+          </div>
+          <div className="mt-6 flex justify-center">
+            <Button
+              variant="default"
+              onClick={downloadMockup}
+              className="gap-2"
+              disabled={!coverImage}
+            >
+              <Download className="h-4 w-4" />
+              Télécharger le mockup
+            </Button>
           </div>
         </TabsContent>
       </Tabs>
