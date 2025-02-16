@@ -506,7 +506,7 @@ const EbookMockupGenerator: React.FC = () => {
         </TabsContent>
       </Tabs>
 
-      <style jsx global>{`
+      <style>{`
         .text-shadow-sm {
           text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
