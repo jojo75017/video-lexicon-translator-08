@@ -133,15 +133,17 @@ const EbookMockupGenerator: React.FC = () => {
 
     if (template === 'stack') {
       return (
-        <div id="preview-container" className="relative w-[300px] h-[400px]">
+        <div id="preview-container" className="relative w-[300px] h-[400px] perspective-1000">
           {[...Array(3)].map((_, i) => (
             <div
               key={i}
               id={`stack-book-${i}`}
               className="absolute inset-0 rounded-lg shadow-xl overflow-hidden bg-white transform-preserve"
               style={{
-                transform: `translate(${i * 15}px, ${-i * 8}px) rotate(${i * 3}deg)`,
+                transform: `perspective(1000px) translate(${i * 15}px, ${-i * 8}px) rotate3d(0, 1, 0, 15deg) rotate(${i * 2}deg)`,
                 zIndex: 2 - i,
+                transformStyle: 'preserve-3d',
+                backfaceVisibility: 'hidden'
               }}
             >
               <img
@@ -510,6 +512,12 @@ const EbookMockupGenerator: React.FC = () => {
         }
         .transform-none {
           transform: none !important;
+        }
+        .perspective-1000 {
+          perspective: 1000px;
+        }
+        .transform-preserve {
+          transform-style: preserve-3d;
         }
       `}</style>
     </Card>
