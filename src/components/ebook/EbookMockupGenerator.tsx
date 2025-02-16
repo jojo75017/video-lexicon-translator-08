@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookOpen, Image as ImageIcon, Download, Upload, Type, Move, AlignCenter, AlignTop, AlignBottom } from "lucide-react";
+import { BookOpen, Image as ImageIcon, Download, Upload, Type, Move, ArrowUp, ArrowDown, AlignCenterHorizontal } from "lucide-react";
 import { toast } from "sonner";
 import html2canvas from 'html2canvas';
 
@@ -45,18 +46,16 @@ const EbookMockupGenerator: React.FC = () => {
     toast.loading("Génération du mockup en cours...");
 
     try {
-      const canvas = await html2canvas(previewRef.current, {
+      const elementToCapture = previewRef.current.querySelector('#preview-container');
+      if (!elementToCapture) {
+        throw new Error("Élément de prévisualisation introuvable");
+      }
+
+      const canvas = await html2canvas(elementToCapture as HTMLElement, {
         backgroundColor: '#ffffff',
         scale: 2,
         useCORS: true,
         allowTaint: true,
-        onclone: (clonedDoc) => {
-          const element = clonedDoc.querySelector('#preview-container');
-          if (element) {
-            element.style.transform = 'scale(1)';
-            element.style.overflow = 'visible';
-          }
-        }
       });
 
       const link = document.createElement('a');
@@ -115,7 +114,7 @@ const EbookMockupGenerator: React.FC = () => {
               {title}
             </h3>
             <p 
-              className="text-center absolute bottom-0 left-1/2 transform -translate-x-1/2 translate 4"
+              className="text-center absolute -bottom-8 left-1/2 transform -translate-x-1/2"
               style={{ color: authorColor }}
             >
               {author}
@@ -238,6 +237,33 @@ const EbookMockupGenerator: React.FC = () => {
               </div>
 
               <div>
+                <Label>Position du titre</Label>
+                <div className="flex gap-2 mt-2">
+                  <Button
+                    variant={titlePosition === "top" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setTitlePosition("top")}
+                  >
+                    <ArrowUp className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant={titlePosition === "center" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setTitlePosition("center")}
+                  >
+                    <AlignCenterHorizontal className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant={titlePosition === "bottom" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setTitlePosition("bottom")}
+                  >
+                    <ArrowDown className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+
+              <div>
                 <Label>Couleur du titre</Label>
                 <Select value={titleColor} onValueChange={setTitleColor}>
                   <SelectTrigger>
@@ -340,33 +366,6 @@ const EbookMockupGenerator: React.FC = () => {
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
-
-              <div>
-                <Label>Position du titre</Label>
-                <div className="flex gap-2 mt-2">
-                  <Button
-                    variant={titlePosition === "top" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setTitlePosition("top")}
-                  >
-                    <AlignTop className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant={titlePosition === "center" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setTitlePosition("center")}
-                  >
-                    <AlignCenter className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant={titlePosition === "bottom" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setTitlePosition("bottom")}
-                  >
-                    <AlignBottom className="h-4 w-4" />
-                  </Button>
-                </div>
               </div>
 
               <div>
