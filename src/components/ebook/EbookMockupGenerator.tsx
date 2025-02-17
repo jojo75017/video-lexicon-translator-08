@@ -42,75 +42,6 @@ const EbookMockupGenerator: React.FC = () => {
     }
   };
 
-  const downloadMockup = async () => {
-    if (!previewRef.current || !coverImage) {
-      toast.error("Erreur: Veuillez d'abord ajouter une image de couverture");
-      return;
-    }
-
-    toast.loading("Génération du mockup en cours...");
-
-    try {
-      const previewContainer = previewRef.current.querySelector('#preview-container');
-      if (!previewContainer) {
-        throw new Error("Élément de prévisualisation introuvable");
-      }
-
-      const tempContainer = previewContainer.cloneNode(true) as HTMLElement;
-      tempContainer.style.position = 'fixed';
-      tempContainer.style.top = '0';
-      tempContainer.style.left = '0';
-      tempContainer.style.width = '300px';
-      tempContainer.style.height = '400px';
-      tempContainer.style.zIndex = '-1000';
-      document.body.appendChild(tempContainer);
-
-      const books = tempContainer.querySelectorAll('.book-cover');
-      books.forEach((book, index) => {
-        const originalBook = previewContainer.querySelectorAll('.book-cover')[index];
-        const computedStyle = window.getComputedStyle(originalBook);
-        const transformStyle = computedStyle.transform;
-        const bookElement = book as HTMLElement;
-        
-        bookElement.style.transform = transformStyle;
-        bookElement.style.transformStyle = 'preserve-3d';
-        bookElement.style.backfaceVisibility = 'hidden';
-        bookElement.style.perspective = '1000px';
-      });
-
-      await new Promise(resolve => setTimeout(resolve, 100));
-
-      const canvas = await html2canvas(tempContainer, {
-        backgroundColor: '#ffffff',
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        logging: true,
-        windowWidth: 300,
-        windowHeight: 400,
-        onclone: (clonedDoc) => {
-          const clonedElement = clonedDoc.querySelector('#preview-container') as HTMLElement;
-          if (clonedElement) {
-            clonedElement.style.transform = 'none';
-          }
-        }
-      });
-
-      document.body.removeChild(tempContainer);
-
-      const link = document.createElement('a');
-      link.download = `${title.toLowerCase().replace(/\s+/g, '-')}-mockup.png`;
-      link.href = canvas.toDataURL('image/png', 1.0);
-      link.click();
-      
-      toast.dismiss();
-      toast.success("Mockup téléchargé avec succès!");
-    } catch (error) {
-      console.error("Erreur lors du téléchargement:", error);
-      toast.error("Erreur lors de la génération du mockup");
-    }
-  };
-
   const renderMockup = () => {
     if (!coverImage) return null;
 
@@ -158,27 +89,48 @@ const EbookMockupGenerator: React.FC = () => {
       </div>
     );
 
+    const renderBookSpine = (offset: number) => (
+      <div
+        className="absolute right-0 top-0 bottom-0 w-[20px] bg-gray-200 transform-preserve"
+        style={{
+          transform: `translateX(${offset}px) rotateY(90deg)`,
+          transformOrigin: 'right',
+          background: 'linear-gradient(to right, #e5e7eb, #d1d5db)'
+        }}
+      />
+    );
+
     if (template === 'stack') {
       return (
         <div id="preview-container" className="relative w-[300px] h-[400px] perspective-1000">
           {[...Array(3)].map((_, i) => (
             <div
               key={i}
-              id={`stack-book-${i}`}
-              className="book-cover absolute inset-0 rounded-lg shadow-xl overflow-hidden bg-white transform-preserve"
+              className="relative"
               style={{
-                transform: `perspective(1000px) translate(${i * stackSpacing}px, ${-i * (stackSpacing/2)}px) rotate3d(0, 1, 0, ${bookRotation}deg) rotate(${i * 2}deg)`,
-                zIndex: 2 - i,
+                position: 'absolute',
+                inset: 0,
                 transformStyle: 'preserve-3d',
-                backfaceVisibility: 'hidden'
+                transform: `translate(${i * stackSpacing}px, ${-i * (stackSpacing/2)}px)`,
+                zIndex: 2 - i
               }}
             >
-              <img
-                src={coverImage}
-                alt={`Book cover ${i + 1}`}
-                className="w-full h-full object-cover"
-              />
-              {i === 0 && bookContent}
+              <div
+                className="book-cover absolute inset-0 rounded-lg shadow-xl overflow-hidden bg-white"
+                style={{
+                  transform: `perspective(2000px) rotateY(-${bookRotation}deg)`,
+                  transformStyle: 'preserve-3d',
+                  backfaceVisibility: 'hidden'
+                }}
+              >
+                <img
+                  src={coverImage}
+                  alt={`Book cover ${i + 1}`}
+                  className="w-full h-full object-cover"
+                />
+                {i === 0 && bookContent}
+                {renderBookSpine(0)}
+              </div>
             </div>
           ))}
         </div>
@@ -187,14 +139,22 @@ const EbookMockupGenerator: React.FC = () => {
 
     if (template === 'single') {
       return (
-        <div id="preview-container" className="relative w-[300px] h-[400px]">
-          <div className="absolute inset-0 rounded-lg shadow-xl overflow-hidden bg-white transform hover:scale-105 transition-transform duration-300">
+        <div id="preview-container" className="relative w-[300px] h-[400px] perspective-1000">
+          <div
+            className="book-cover absolute inset-0 rounded-lg shadow-xl overflow-hidden bg-white"
+            style={{
+              transform: `perspective(2000px) rotateY(-${bookRotation}deg)`,
+              transformStyle: 'preserve-3d',
+              backfaceVisibility: 'hidden'
+            }}
+          >
             <img
               src={coverImage}
               alt="Book cover"
               className="w-full h-full object-cover"
             />
             {bookContent}
+            {renderBookSpine(0)}
           </div>
         </div>
       );
@@ -212,6 +172,76 @@ const EbookMockupGenerator: React.FC = () => {
         </div>
       </div>
     );
+  };
+
+  const downloadMockup = async () => {
+    if (!previewRef.current || !coverImage) {
+      toast.error("Erreur: Veuillez d'abord ajouter une image de couverture");
+      return;
+    }
+
+    toast.loading("Génération du mockup en cours...");
+
+    try {
+      const previewContainer = previewRef.current.querySelector('#preview-container');
+      if (!previewContainer) {
+        throw new Error("Élément de prévisualisation introuvable");
+      }
+
+      const tempContainer = previewContainer.cloneNode(true) as HTMLElement;
+      tempContainer.style.position = 'fixed';
+      tempContainer.style.top = '0';
+      tempContainer.style.left = '0';
+      tempContainer.style.width = '300px';
+      tempContainer.style.height = '400px';
+      tempContainer.style.backgroundColor = 'white';
+      tempContainer.style.zIndex = '-1000';
+      document.body.appendChild(tempContainer);
+
+      const books = tempContainer.querySelectorAll('.book-cover');
+      books.forEach((book, index) => {
+        const originalBook = previewContainer.querySelectorAll('.book-cover')[index];
+        const computedStyle = window.getComputedStyle(originalBook);
+        const transformStyle = computedStyle.transform;
+        const bookElement = book as HTMLElement;
+        
+        bookElement.style.transform = transformStyle;
+        bookElement.style.transformStyle = 'preserve-3d';
+        bookElement.style.backfaceVisibility = 'hidden';
+        bookElement.style.perspective = '2000px';
+      });
+
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const canvas = await html2canvas(tempContainer, {
+        backgroundColor: '#ffffff',
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        logging: true,
+        width: 300,
+        height: 400,
+        onclone: (clonedDoc) => {
+          const clonedElement = clonedDoc.querySelector('#preview-container') as HTMLElement;
+          if (clonedElement) {
+            clonedElement.style.transform = 'none';
+          }
+        }
+      });
+
+      document.body.removeChild(tempContainer);
+
+      const link = document.createElement('a');
+      link.download = `${title.toLowerCase().replace(/\s+/g, '-')}-mockup.png`;
+      link.href = canvas.toDataURL('image/png', 1.0);
+      link.click();
+      
+      toast.dismiss();
+      toast.success("Mockup téléchargé avec succès!");
+    } catch (error) {
+      console.error("Erreur lors du téléchargement:", error);
+      toast.error("Erreur lors de la génération du mockup");
+    }
   };
 
   const mockupTemplates = [
