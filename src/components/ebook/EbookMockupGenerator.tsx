@@ -221,10 +221,17 @@ const EbookMockupGenerator: React.FC = () => {
         logging: true,
         width: 300,
         height: 400,
+        foreignObjectRendering: true,
+        removeContainer: false,
         onclone: (clonedDoc) => {
           const clonedElement = clonedDoc.querySelector('#preview-container') as HTMLElement;
           if (clonedElement) {
             clonedElement.style.transform = 'none';
+            const books = clonedElement.querySelectorAll('.book-cover');
+            books.forEach((book) => {
+              const bookElement = book as HTMLElement;
+              bookElement.style.transformStyle = 'preserve-3d';
+            });
           }
         }
       });
