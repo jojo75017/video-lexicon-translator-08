@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookOpen, Image as ImageIcon, Download, Upload, Type, Move, ArrowUp, ArrowDown, AlignCenterHorizontal } from "lucide-react";
+import { BookOpen, Image as ImageIcon, Download, Upload, Type, Move, ArrowUp, ArrowDown, AlignCenterHorizontal, ArrowRight, Sun } from "lucide-react";
 import { toast } from "sonner";
 import html2canvas from 'html2canvas';
 
@@ -24,6 +24,10 @@ const EbookMockupGenerator: React.FC = () => {
   const [authorFont, setAuthorFont] = useState("font-sans");
   const [titleShadow, setTitleShadow] = useState("shadow-none");
   const [authorShadow, setAuthorShadow] = useState("shadow-none");
+  const [bookRotation, setBookRotation] = useState(15);
+  const [stackSpacing, setStackSpacing] = useState(15);
+  const [coverOpacity, setCoverOpacity] = useState(1);
+  const [backgroundGradient, setBackgroundGradient] = useState("from-black/60");
   const previewRef = useRef<HTMLDivElement>(null);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,32 +51,35 @@ const EbookMockupGenerator: React.FC = () => {
     toast.loading("Génération du mockup en cours...");
 
     try {
-      const element = previewRef.current.querySelector('#preview-container');
-      if (!element) {
+      const previewContainer = previewRef.current.querySelector('#preview-container');
+      if (!previewContainer) {
         throw new Error("Élément de prévisualisation introuvable");
       }
 
-      const canvas = await html2canvas(element as HTMLElement, {
+      const tempContainer = previewContainer.cloneNode(true) as HTMLElement;
+      document.body.appendChild(tempContainer);
+      
+      const books = tempContainer.querySelectorAll('.book-cover');
+      books.forEach((book, index) => {
+        const originalBook = previewContainer.querySelectorAll('.book-cover')[index];
+        const computedStyle = window.getComputedStyle(originalBook);
+        (book as HTMLElement).style.transform = computedStyle.transform;
+      });
+
+      const canvas = await html2canvas(tempContainer, {
         backgroundColor: '#ffffff',
         scale: 2,
         useCORS: true,
         allowTaint: true,
-        onclone: (clonedDoc) => {
-          const clonedElements = clonedDoc.querySelectorAll('.transform-preserve');
-          clonedElements.forEach((el) => {
-            const originalEl = element.querySelector(`#${el.id}`);
-            if (originalEl) {
-              const style = window.getComputedStyle(originalEl);
-              (el as HTMLElement).style.transform = style.transform;
-            }
-          });
-        }
       });
+
+      document.body.removeChild(tempContainer);
 
       const link = document.createElement('a');
       link.download = `${title.toLowerCase().replace(/\s+/g, '-')}-mockup.png`;
       link.href = canvas.toDataURL('image/png', 1.0);
       link.click();
+      
       toast.dismiss();
       toast.success("Mockup téléchargé avec succès!");
     } catch (error) {
@@ -86,20 +93,17 @@ const EbookMockupGenerator: React.FC = () => {
 
     const getPositionClasses = () => {
       switch (titlePosition) {
-        case "top":
-          return "items-start pt-16";
-        case "center":
-          return "items-center";
-        case "bottom":
-          return "items-end pb-16";
-        default:
-          return "items-center";
+        case "top": return "items-start pt-16";
+        case "center": return "items-center";
+        case "bottom": return "items-end pb-16";
+        default: return "items-center";
       }
     };
 
     const bookContent = (
       <div 
-        className={`absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex ${getPositionClasses()} justify-center p-6`}
+        className={`absolute inset-0 bg-gradient-to-t ${backgroundGradient} to-transparent flex ${getPositionClasses()} justify-center p-6`}
+        style={{ opacity: coverOpacity }}
       >
         <div 
           className="text-center space-y-2 relative w-full"
@@ -138,9 +142,9 @@ const EbookMockupGenerator: React.FC = () => {
             <div
               key={i}
               id={`stack-book-${i}`}
-              className="absolute inset-0 rounded-lg shadow-xl overflow-hidden bg-white transform-preserve"
+              className="book-cover absolute inset-0 rounded-lg shadow-xl overflow-hidden bg-white transform-preserve"
               style={{
-                transform: `perspective(1000px) translate(${i * 15}px, ${-i * 8}px) rotate3d(0, 1, 0, 15deg) rotate(${i * 2}deg)`,
+                transform: `perspective(1000px) translate(${i * stackSpacing}px, ${-i * (stackSpacing/2)}px) rotate3d(0, 1, 0, ${bookRotation}deg) rotate(${i * 2}deg)`,
                 zIndex: 2 - i,
                 transformStyle: 'preserve-3d',
                 backfaceVisibility: 'hidden'
@@ -434,6 +438,64 @@ const EbookMockupGenerator: React.FC = () => {
                         </div>
                       </SelectItem>
                     ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Rotation 3D</Label>
+                <div className="flex items-center gap-4">
+                  <Move className="h-4 w-4 text-gray-500" />
+                  <Slider
+                    value={[bookRotation]}
+                    onValueChange={(value) => setBookRotation(value[0])}
+                    min={0}
+                    max={45}
+                    step={1}
+                    className="flex-1"
+                  />
+                  <span className="text-sm text-gray-500">{bookRotation}°</span>
+                </div>
+
+                <Label>Espacement</Label>
+                <div className="flex items-center gap-4">
+                  <ArrowRight className="h-4 w-4 text-gray-500" />
+                  <Slider
+                    value={[stackSpacing]}
+                    onValueChange={(value) => setStackSpacing(value[0])}
+                    min={5}
+                    max={30}
+                    step={1}
+                    className="flex-1"
+                  />
+                  <span className="text-sm text-gray-500">{stackSpacing}px</span>
+                </div>
+
+                <Label>Opacité du gradient</Label>
+                <div className="flex items-center gap-4">
+                  <Sun className="h-4 w-4 text-gray-500" />
+                  <Slider
+                    value={[coverOpacity * 100]}
+                    onValueChange={(value) => setCoverOpacity(value[0] / 100)}
+                    min={0}
+                    max={100}
+                    step={1}
+                    className="flex-1"
+                  />
+                  <span className="text-sm text-gray-500">{Math.round(coverOpacity * 100)}%</span>
+                </div>
+
+                <Label>Style du gradient</Label>
+                <Select value={backgroundGradient} onValueChange={setBackgroundGradient}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choisissez un style" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="from-black/60">Standard</SelectItem>
+                    <SelectItem value="from-blue-500/60">Bleu</SelectItem>
+                    <SelectItem value="from-purple-500/60">Violet</SelectItem>
+                    <SelectItem value="from-red-500/60">Rouge</SelectItem>
+                    <SelectItem value="from-green-500/60">Vert</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
