@@ -211,7 +211,7 @@ const EbookMockupGenerator: React.FC = () => {
         bookElement.style.perspective = '2000px';
       });
 
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       const canvas = await html2canvas(tempContainer, {
         backgroundColor: '#ffffff',
@@ -221,8 +221,6 @@ const EbookMockupGenerator: React.FC = () => {
         logging: true,
         width: 300,
         height: 400,
-        foreignObjectRendering: true,
-        removeContainer: false,
         onclone: (clonedDoc) => {
           const clonedElement = clonedDoc.querySelector('#preview-container') as HTMLElement;
           if (clonedElement) {
