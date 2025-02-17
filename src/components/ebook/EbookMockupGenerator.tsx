@@ -57,20 +57,43 @@ const EbookMockupGenerator: React.FC = () => {
       }
 
       const tempContainer = previewContainer.cloneNode(true) as HTMLElement;
+      tempContainer.style.position = 'fixed';
+      tempContainer.style.top = '0';
+      tempContainer.style.left = '0';
+      tempContainer.style.width = '300px';
+      tempContainer.style.height = '400px';
+      tempContainer.style.zIndex = '-1000';
       document.body.appendChild(tempContainer);
-      
+
       const books = tempContainer.querySelectorAll('.book-cover');
       books.forEach((book, index) => {
         const originalBook = previewContainer.querySelectorAll('.book-cover')[index];
         const computedStyle = window.getComputedStyle(originalBook);
-        (book as HTMLElement).style.transform = computedStyle.transform;
+        const transformStyle = computedStyle.transform;
+        const bookElement = book as HTMLElement;
+        
+        bookElement.style.transform = transformStyle;
+        bookElement.style.transformStyle = 'preserve-3d';
+        bookElement.style.backfaceVisibility = 'hidden';
+        bookElement.style.perspective = '1000px';
       });
+
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       const canvas = await html2canvas(tempContainer, {
         backgroundColor: '#ffffff',
         scale: 2,
         useCORS: true,
         allowTaint: true,
+        logging: true,
+        windowWidth: 300,
+        windowHeight: 400,
+        onclone: (clonedDoc) => {
+          const clonedElement = clonedDoc.querySelector('#preview-container') as HTMLElement;
+          if (clonedElement) {
+            clonedElement.style.transform = 'none';
+          }
+        }
       });
 
       document.body.removeChild(tempContainer);
