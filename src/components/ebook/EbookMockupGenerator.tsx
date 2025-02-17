@@ -4,7 +4,6 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload, Download } from "lucide-react";
 import { toast } from "sonner";
 import html2canvas from 'html2canvas';
@@ -30,33 +29,40 @@ const EbookMockupGenerator: React.FC = () => {
     if (!coverImage) return null;
 
     return (
-      <div id="preview-container" className="relative w-[300px] h-[400px] perspective-1000">
-        <div className="absolute inset-0" style={{ transformStyle: 'preserve-3d' }}>
+      <div className="w-[300px] h-[400px] relative" style={{ perspective: '1000px' }}>
+        {/* Container principal avec la rotation */}
+        <div 
+          className="w-full h-full absolute" 
+          style={{ 
+            transform: 'rotateY(-20deg)',
+            transformStyle: 'preserve-3d',
+            transformOrigin: 'left center'
+          }}
+        >
           {/* Face avant (couverture) */}
-          <div
-            className="absolute inset-0 rounded-sm shadow-xl overflow-hidden bg-white"
+          <div 
+            className="w-full h-full absolute"
             style={{
-              transform: 'rotateY(-20deg)',
-              transformOrigin: 'left center',
+              backfaceVisibility: 'hidden',
               transformStyle: 'preserve-3d'
             }}
           >
             <img
               src={coverImage}
               alt="Book cover"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover shadow-xl"
             />
           </div>
 
           {/* Tranche du livre */}
           <div
-            className="absolute top-0 bottom-0 w-[40px] bg-white"
+            className="absolute top-0 h-full"
             style={{
+              width: '40px',
               right: '-20px',
-              transform: 'rotateY(70deg) translateX(-20px)',
-              transformOrigin: 'left center',
-              background: 'linear-gradient(to right, #ffffff, #e5e7eb)',
-              boxShadow: 'inset -4px 0 4px rgba(0, 0, 0, 0.1)'
+              transform: 'rotateY(70deg)',
+              background: 'linear-gradient(to right, #e0e0e0, #ffffff)',
+              boxShadow: 'inset -2px 0 5px rgba(0,0,0,0.1)'
             }}
           />
         </div>
@@ -134,7 +140,7 @@ const EbookMockupGenerator: React.FC = () => {
             </Card>
           </div>
 
-          <div ref={previewRef} className="flex items-center justify-center min-h-[500px] bg-gray-50 rounded-lg">
+          <div ref={previewRef} className="flex items-center justify-center min-h-[500px] bg-gray-50 rounded-lg p-8">
             {renderMockup()}
           </div>
 
