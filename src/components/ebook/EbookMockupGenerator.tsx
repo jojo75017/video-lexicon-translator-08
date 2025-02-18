@@ -29,68 +29,52 @@ const EbookMockupGenerator: React.FC = () => {
     if (!coverImage) return null;
 
     return (
-      <div className="book-container">
-        <div className="book">
+      <div 
+        style={{
+          width: '300px',
+          height: '400px',
+          position: 'relative',
+          perspective: '1000px'
+        }}
+      >
+        <div 
+          style={{
+            width: '100%',
+            height: '100%',
+            position: 'relative',
+            transformStyle: 'preserve-3d',
+            transform: 'rotateY(-20deg)',
+            transition: 'transform 0.3s ease'
+          }}
+        >
+          {/* Couverture */}
           <img
             src={coverImage}
             alt="Couverture"
-            className="cover"
+            style={{
+              width: '100%',
+              height: '100%',
+              position: 'absolute',
+              objectFit: 'cover',
+              backfaceVisibility: 'hidden',
+              boxShadow: '2px 4px 7px rgba(0, 0, 0, 0.2)'
+            }}
           />
-          <div className="spine"></div>
-          <div className="shadow"></div>
+          
+          {/* Tranche */}
+          <div
+            style={{
+              position: 'absolute',
+              left: 0,
+              width: '20px',
+              height: '100%',
+              background: '#f0f0f0',
+              transformOrigin: 'left',
+              transform: 'rotateY(90deg)',
+              boxShadow: 'inset -2px 0 5px rgba(0, 0, 0, 0.1)'
+            }}
+          />
         </div>
-        <style jsx>{`
-          .book-container {
-            width: 300px;
-            height: 400px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            perspective: 2000px;
-            perspective-origin: 50% 50%;
-          }
-
-          .book {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            transform-style: preserve-3d;
-            transform: rotateY(-30deg);
-            transition: transform 0.5s;
-          }
-
-          .cover {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transform-origin: left;
-            transform: translateZ(0);
-            box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.2);
-          }
-
-          .spine {
-            position: absolute;
-            left: 0;
-            width: 40px;
-            height: 100%;
-            transform-origin: left;
-            transform: rotateY(90deg) translateX(-20px);
-            background: linear-gradient(to right, #e0e0e0, #f5f5f5);
-            box-shadow: inset -5px 0 10px rgba(0, 0, 0, 0.1);
-          }
-
-          .shadow {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 10px;
-            left: 20px;
-            transform: translateZ(-10px);
-            background: rgba(0, 0, 0, 0.1);
-            filter: blur(10px);
-          }
-        `}</style>
       </div>
     );
   };
@@ -168,10 +152,6 @@ const EbookMockupGenerator: React.FC = () => {
           <div 
             ref={previewRef}
             className="flex items-center justify-center min-h-[500px] bg-gradient-to-br from-gray-50 to-white rounded-lg p-12"
-            style={{
-              perspective: '2000px',
-              perspectiveOrigin: '50% 50%'
-            }}
           >
             {renderMockup()}
           </div>
