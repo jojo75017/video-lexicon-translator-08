@@ -15,7 +15,8 @@ import {
   Trophy,
   Zap,
   BarChart3,
-  BookOpen
+  BookOpen,
+  Signature
 } from "lucide-react";
 import SiteStructureVisualizer from '@/components/SiteStructureVisualizer';
 import ContentHierarchy from '@/components/ContentHierarchy';
@@ -29,6 +30,7 @@ import { CrawlForm } from '@/components/CrawlForm';
 import SocialTags from '@/components/seo/SocialTags';
 import { motion } from "framer-motion";
 import EbookMockupGenerator from '@/components/ebook/EbookMockupGenerator';
+import SignatureGenerator from '@/components/signature/SignatureGenerator';
 
 const Index = () => {
   const {
@@ -192,9 +194,9 @@ const Index = () => {
                 <Globe className="h-4 w-4" />
                 <span>Outils</span>
               </TabsTrigger>
-              <TabsTrigger value="ebook" className="space-x-2 data-[state=active]:bg-blue-50">
-                <BookOpen className="h-4 w-4" />
-                <span>eBook</span>
+              <TabsTrigger value="signature" className="space-x-2 data-[state=active]:bg-blue-50">
+                <Signature className="h-4 w-4" />
+                <span>Signature</span>
               </TabsTrigger>
             </TabsList>
 
@@ -275,8 +277,8 @@ const Index = () => {
               </Card>
             </TabsContent>
 
-            <TabsContent value="ebook" className="space-y-6">
-              <EbookMockupGenerator />
+            <TabsContent value="signature" className="space-y-6">
+              <SignatureGenerator />
             </TabsContent>
           </Tabs>
         )}
