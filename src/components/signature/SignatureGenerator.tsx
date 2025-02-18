@@ -23,6 +23,10 @@ const SignatureGenerator = () => {
   const [useStyleFont, setUseStyleFont] = useState(false);
   const [nameIcon, setNameIcon] = useState<'none' | 'user' | 'userRound' | 'emoji'>('none');
   const [companyIcon, setCompanyIcon] = useState<'none' | 'building' | 'emoji'>('none');
+  const [titleEmoji, setTitleEmoji] = useState('💼');
+  const [emailEmoji, setEmailEmoji] = useState('📧');
+  const [phoneEmoji, setPhoneEmoji] = useState('📱');
+  const [websiteEmoji, setWebsiteEmoji] = useState('🌐');
 
   const signatureRef = useRef<HTMLDivElement>(null);
 
@@ -90,6 +94,13 @@ const SignatureGenerator = () => {
       default:
         return null;
     }
+  };
+
+  const emojiOptions = {
+    title: ['💼', '👔', '🎯', '⭐️', '📊', '🎩', '🚀'],
+    email: ['📧', '✉️', '📨', '📬', '📫', '📪'],
+    phone: ['📱', '☎️', '📞', '📲', '💻', '🤙'],
+    website: ['🌐', '💻', '🔗', '🎯', '🌍', '💡']
   };
 
   return (
@@ -160,6 +171,18 @@ const SignatureGenerator = () => {
                 onChange={handleInputChange}
                 placeholder="Directeur Marketing"
               />
+              <div className="mt-2 flex items-center gap-2 flex-wrap">
+                <span className="text-sm text-gray-500">Emoji:</span>
+                {emojiOptions.title.map((emoji) => (
+                  <button
+                    key={emoji}
+                    onClick={() => setTitleEmoji(emoji)}
+                    className={`p-1 rounded hover:bg-gray-100 ${titleEmoji === emoji ? 'bg-gray-200' : ''}`}
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div>
@@ -212,6 +235,18 @@ const SignatureGenerator = () => {
                 onChange={handleInputChange}
                 placeholder="jean.dupont@entreprise.com"
               />
+              <div className="mt-2 flex items-center gap-2 flex-wrap">
+                <span className="text-sm text-gray-500">Emoji:</span>
+                {emojiOptions.email.map((emoji) => (
+                  <button
+                    key={emoji}
+                    onClick={() => setEmailEmoji(emoji)}
+                    className={`p-1 rounded hover:bg-gray-100 ${emailEmoji === emoji ? 'bg-gray-200' : ''}`}
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div>
@@ -223,6 +258,18 @@ const SignatureGenerator = () => {
                 onChange={handleInputChange}
                 placeholder="+33 6 12 34 56 78"
               />
+              <div className="mt-2 flex items-center gap-2 flex-wrap">
+                <span className="text-sm text-gray-500">Emoji:</span>
+                {emojiOptions.phone.map((emoji) => (
+                  <button
+                    key={emoji}
+                    onClick={() => setPhoneEmoji(emoji)}
+                    className={`p-1 rounded hover:bg-gray-100 ${phoneEmoji === emoji ? 'bg-gray-200' : ''}`}
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div>
@@ -234,6 +281,18 @@ const SignatureGenerator = () => {
                 onChange={handleInputChange}
                 placeholder="www.monentreprise.com"
               />
+              <div className="mt-2 flex items-center gap-2 flex-wrap">
+                <span className="text-sm text-gray-500">Emoji:</span>
+                {emojiOptions.website.map((emoji) => (
+                  <button
+                    key={emoji}
+                    onClick={() => setWebsiteEmoji(emoji)}
+                    className={`p-1 rounded hover:bg-gray-100 ${websiteEmoji === emoji ? 'bg-gray-200' : ''}`}
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="flex items-center gap-4">
@@ -269,16 +328,18 @@ const SignatureGenerator = () => {
                   {renderNamePrefix()}
                   {formData.name || "Votre Nom"}
                 </p>
-                <p className="text-gray-600">{formData.title || "Votre Titre"}</p>
+                <p className="text-gray-600">
+                  {titleEmoji} {formData.title || "Votre Titre"}
+                </p>
                 <p className="font-semibold text-gray-700 flex items-center">
                   {renderCompanyPrefix()}
                   {formData.company || "Votre Entreprise"}
                 </p>
                 <Separator className="my-2" />
                 <div className="space-y-1 text-sm text-gray-600">
-                  {formData.email && <p>📧 {formData.email}</p>}
-                  {formData.phone && <p>📱 {formData.phone}</p>}
-                  {formData.website && <p>🌐 {formData.website}</p>}
+                  {formData.email && <p>{emailEmoji} {formData.email}</p>}
+                  {formData.phone && <p>{phoneEmoji} {formData.phone}</p>}
+                  {formData.website && <p>{websiteEmoji} {formData.website}</p>}
                 </div>
               </div>
             </div>
