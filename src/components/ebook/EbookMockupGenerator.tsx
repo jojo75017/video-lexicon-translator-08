@@ -29,63 +29,74 @@ const EbookMockupGenerator: React.FC = () => {
     if (!coverImage) return null;
 
     return (
-      <div className="relative" style={{ width: '300px', height: '400px' }}>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div 
-            className="relative w-full h-full"
+      <div
+        style={{
+          width: '300px',
+          height: '400px',
+          position: 'relative',
+          perspective: '1500px'
+        }}
+      >
+        {/* Conteneur du livre avec rotation */}
+        <div
+          style={{
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            transformStyle: 'preserve-3d',
+            transform: 'rotateY(-25deg)',
+            transition: 'transform 0.6s'
+          }}
+        >
+          {/* Couverture avant */}
+          <div
             style={{
-              perspective: '1500px',
-              transformStyle: 'preserve-3d'
+              position: 'absolute',
+              width: '100%',
+              height: '100%',
+              transformStyle: 'preserve-3d',
+              backfaceVisibility: 'hidden'
             }}
           >
-            {/* Le livre */}
-            <div
-              className="absolute inset-0"
+            <img
+              src={coverImage}
+              alt="Couverture"
               style={{
-                transform: 'rotateY(-30deg)',
-                transformStyle: 'preserve-3d',
-                transformOrigin: 'left center'
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                boxShadow: '2px 4px 8px rgba(0,0,0,0.3)'
               }}
-            >
-              {/* Couverture */}
-              <div
-                className="absolute inset-0 bg-white rounded-sm overflow-hidden shadow-2xl"
-                style={{
-                  transformStyle: 'preserve-3d',
-                  backfaceVisibility: 'hidden'
-                }}
-              >
-                <img
-                  src={coverImage}
-                  alt="Couverture du livre"
-                  className="w-full h-full object-cover"
-                  style={{ transform: 'translateZ(1px)' }}
-                />
-              </div>
-
-              {/* Tranche du livre */}
-              <div
-                className="absolute top-0 right-0 h-full w-16"
-                style={{
-                  transform: 'rotateY(90deg) translateZ(-8px) translateX(8px)',
-                  background: 'linear-gradient(90deg, #e4e4e4 0%, #ffffff 100%)',
-                  transformOrigin: 'left center',
-                  boxShadow: 'inset -8px 0 12px -10px rgba(0,0,0,0.3)'
-                }}
-              />
-
-              {/* Ombre portée */}
-              <div
-                className="absolute inset-0"
-                style={{
-                  transform: 'translateX(20px) rotateY(-30deg)',
-                  background: 'linear-gradient(90deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0) 100%)',
-                  filter: 'blur(20px)',
-                  zIndex: -1
-                }}
-              />
-            </div>
+            />
           </div>
+
+          {/* Tranche du livre */}
+          <div
+            style={{
+              position: 'absolute',
+              width: '30px',
+              height: '100%',
+              right: '-30px',
+              background: 'linear-gradient(to right, #f0f0f0, #ffffff)',
+              transformOrigin: 'left center',
+              transform: 'rotateY(90deg)',
+              boxShadow: 'inset -5px 0 10px rgba(0,0,0,0.1)'
+            }}
+          />
+
+          {/* Pages (effet de profondeur) */}
+          <div
+            style={{
+              position: 'absolute',
+              width: '98%',
+              height: '98%',
+              top: '1%',
+              left: '1%',
+              background: 'white',
+              transform: 'translateZ(-2px)',
+              boxShadow: 'inset 0 0 10px rgba(0,0,0,0.1)'
+            }}
+          />
         </div>
       </div>
     );
@@ -162,7 +173,7 @@ const EbookMockupGenerator: React.FC = () => {
           </div>
 
           <div 
-            ref={previewRef} 
+            ref={previewRef}
             className="flex items-center justify-center min-h-[500px] bg-gradient-to-br from-gray-50 to-white rounded-lg p-12"
           >
             {renderMockup()}
