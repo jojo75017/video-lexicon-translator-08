@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -29,7 +30,6 @@ import BacklinksAnalysis from '@/components/seo/BacklinksAnalysis';
 import { CrawlForm } from '@/components/CrawlForm';
 import SocialTags from '@/components/seo/SocialTags';
 import { motion } from "framer-motion";
-import EbookMockupGenerator from '@/components/ebook/EbookMockupGenerator';
 import SignatureGenerator from '@/components/signature/SignatureGenerator';
 
 const Index = () => {

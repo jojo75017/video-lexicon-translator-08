@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Download, Signature } from "lucide-react";
+import { Download, Signature, Type } from "lucide-react";
 import { toast } from "sonner";
 import html2canvas from 'html2canvas';
 
@@ -18,6 +18,9 @@ const SignatureGenerator = () => {
     phone: '',
     website: ''
   });
+  
+  const [isItalic, setIsItalic] = useState(false);
+  const [useStyleFont, setUseStyleFont] = useState(false);
 
   const signatureRef = useRef<HTMLDivElement>(null);
 
@@ -54,6 +57,13 @@ const SignatureGenerator = () => {
       console.error("Erreur lors du téléchargement:", error);
       toast.error("Erreur lors de la génération de la signature");
     }
+  };
+
+  const getSignatureStyle = () => {
+    let style = '';
+    if (useStyleFont) style += 'font-playfair ';
+    if (isItalic) style += 'italic ';
+    return style;
   };
 
   return (
@@ -132,6 +142,27 @@ const SignatureGenerator = () => {
                 placeholder="www.monentreprise.com"
               />
             </div>
+
+            <div className="flex items-center gap-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isItalic}
+                  onChange={(e) => setIsItalic(e.target.checked)}
+                  className="rounded border-gray-300"
+                />
+                <span>Italique</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={useStyleFont}
+                  onChange={(e) => setUseStyleFont(e.target.checked)}
+                  className="rounded border-gray-300"
+                />
+                <span>Police stylée</span>
+              </label>
+            </div>
           </div>
 
           <div className="space-y-4">
@@ -140,7 +171,7 @@ const SignatureGenerator = () => {
               ref={signatureRef}
               className="p-6 bg-white rounded-lg border"
             >
-              <div className="space-y-2 font-sans">
+              <div className={`space-y-2 ${getSignatureStyle()}`}>
                 <p className="text-xl font-bold text-gray-800">{formData.name || "Votre Nom"}</p>
                 <p className="text-gray-600">{formData.title || "Votre Titre"}</p>
                 <p className="font-semibold text-gray-700">{formData.company || "Votre Entreprise"}</p>
