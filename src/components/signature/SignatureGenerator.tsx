@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Download, Signature, Type } from "lucide-react";
+import { Download, Signature, Building, User, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import html2canvas from 'html2canvas';
 
@@ -21,6 +21,8 @@ const SignatureGenerator = () => {
   
   const [isItalic, setIsItalic] = useState(false);
   const [useStyleFont, setUseStyleFont] = useState(false);
+  const [nameIcon, setNameIcon] = useState<'none' | 'user' | 'userRound' | 'emoji'>('none');
+  const [companyIcon, setCompanyIcon] = useState<'none' | 'building' | 'emoji'>('none');
 
   const signatureRef = useRef<HTMLDivElement>(null);
 
@@ -66,6 +68,30 @@ const SignatureGenerator = () => {
     return style;
   };
 
+  const renderNamePrefix = () => {
+    switch (nameIcon) {
+      case 'user':
+        return <User className="h-5 w-5 inline mr-2 text-primary" />;
+      case 'userRound':
+        return <UserRound className="h-5 w-5 inline mr-2 text-primary" />;
+      case 'emoji':
+        return <span className="mr-2">👤</span>;
+      default:
+        return null;
+    }
+  };
+
+  const renderCompanyPrefix = () => {
+    switch (companyIcon) {
+      case 'building':
+        return <Building className="h-5 w-5 inline mr-2 text-primary" />;
+      case 'emoji':
+        return <span className="mr-2">🏢</span>;
+      default:
+        return null;
+    }
+  };
+
   return (
     <Card className="p-6">
       <div className="space-y-6">
@@ -85,6 +111,44 @@ const SignatureGenerator = () => {
                 onChange={handleInputChange}
                 placeholder="Jean Dupont"
               />
+              <div className="mt-2 flex items-center gap-4">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="nameIcon"
+                    checked={nameIcon === 'none'}
+                    onChange={() => setNameIcon('none')}
+                  />
+                  <span>Aucun</span>
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="nameIcon"
+                    checked={nameIcon === 'user'}
+                    onChange={() => setNameIcon('user')}
+                  />
+                  <User className="h-4 w-4" />
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="nameIcon"
+                    checked={nameIcon === 'userRound'}
+                    onChange={() => setNameIcon('userRound')}
+                  />
+                  <UserRound className="h-4 w-4" />
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="nameIcon"
+                    checked={nameIcon === 'emoji'}
+                    onChange={() => setNameIcon('emoji')}
+                  />
+                  <span>👤</span>
+                </label>
+              </div>
             </div>
 
             <div>
@@ -107,6 +171,35 @@ const SignatureGenerator = () => {
                 onChange={handleInputChange}
                 placeholder="Ma Société"
               />
+              <div className="mt-2 flex items-center gap-4">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="companyIcon"
+                    checked={companyIcon === 'none'}
+                    onChange={() => setCompanyIcon('none')}
+                  />
+                  <span>Aucun</span>
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="companyIcon"
+                    checked={companyIcon === 'building'}
+                    onChange={() => setCompanyIcon('building')}
+                  />
+                  <Building className="h-4 w-4" />
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="companyIcon"
+                    checked={companyIcon === 'emoji'}
+                    onChange={() => setCompanyIcon('emoji')}
+                  />
+                  <span>🏢</span>
+                </label>
+              </div>
             </div>
 
             <div>
@@ -172,9 +265,15 @@ const SignatureGenerator = () => {
               className="p-6 bg-white rounded-lg border"
             >
               <div className={`space-y-2 ${getSignatureStyle()}`}>
-                <p className="text-xl font-bold text-gray-800">{formData.name || "Votre Nom"}</p>
+                <p className="text-xl font-bold text-gray-800 flex items-center">
+                  {renderNamePrefix()}
+                  {formData.name || "Votre Nom"}
+                </p>
                 <p className="text-gray-600">{formData.title || "Votre Titre"}</p>
-                <p className="font-semibold text-gray-700">{formData.company || "Votre Entreprise"}</p>
+                <p className="font-semibold text-gray-700 flex items-center">
+                  {renderCompanyPrefix()}
+                  {formData.company || "Votre Entreprise"}
+                </p>
                 <Separator className="my-2" />
                 <div className="space-y-1 text-sm text-gray-600">
                   {formData.email && <p>📧 {formData.email}</p>}
