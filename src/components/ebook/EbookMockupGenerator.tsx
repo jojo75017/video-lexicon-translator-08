@@ -29,75 +29,68 @@ const EbookMockupGenerator: React.FC = () => {
     if (!coverImage) return null;
 
     return (
-      <div
-        style={{
-          width: '300px',
-          height: '400px',
-          position: 'relative',
-          perspective: '1500px'
-        }}
-      >
-        {/* Conteneur du livre avec rotation */}
-        <div
-          style={{
-            position: 'absolute',
-            width: '100%',
-            height: '100%',
-            transformStyle: 'preserve-3d',
-            transform: 'rotateY(-25deg)',
-            transition: 'transform 0.6s'
-          }}
-        >
-          {/* Couverture avant */}
-          <div
-            style={{
-              position: 'absolute',
-              width: '100%',
-              height: '100%',
-              transformStyle: 'preserve-3d',
-              backfaceVisibility: 'hidden'
-            }}
-          >
-            <img
-              src={coverImage}
-              alt="Couverture"
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                boxShadow: '2px 4px 8px rgba(0,0,0,0.3)'
-              }}
-            />
-          </div>
-
-          {/* Tranche du livre */}
-          <div
-            style={{
-              position: 'absolute',
-              width: '30px',
-              height: '100%',
-              right: '-30px',
-              background: 'linear-gradient(to right, #f0f0f0, #ffffff)',
-              transformOrigin: 'left center',
-              transform: 'rotateY(90deg)',
-              boxShadow: 'inset -5px 0 10px rgba(0,0,0,0.1)'
-            }}
+      <div className="book-container">
+        <div className="book">
+          <img
+            src={coverImage}
+            alt="Couverture"
+            className="cover"
           />
-
-          {/* Pages (effet de profondeur) */}
-          <div
-            style={{
-              position: 'absolute',
-              width: '98%',
-              height: '98%',
-              top: '1%',
-              left: '1%',
-              background: 'white',
-              transform: 'translateZ(-2px)',
-              boxShadow: 'inset 0 0 10px rgba(0,0,0,0.1)'
-            }}
-          />
+          <div className="spine"></div>
+          <div className="shadow"></div>
         </div>
+        <style jsx>{`
+          .book-container {
+            width: 300px;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 2000px;
+            perspective-origin: 50% 50%;
+          }
+
+          .book {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transform: rotateY(-30deg);
+            transition: transform 0.5s;
+          }
+
+          .cover {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform-origin: left;
+            transform: translateZ(0);
+            box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.2);
+          }
+
+          .spine {
+            position: absolute;
+            left: 0;
+            width: 40px;
+            height: 100%;
+            transform-origin: left;
+            transform: rotateY(90deg) translateX(-20px);
+            background: linear-gradient(to right, #e0e0e0, #f5f5f5);
+            box-shadow: inset -5px 0 10px rgba(0, 0, 0, 0.1);
+          }
+
+          .shadow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 10px;
+            left: 20px;
+            transform: translateZ(-10px);
+            background: rgba(0, 0, 0, 0.1);
+            filter: blur(10px);
+          }
+        `}</style>
       </div>
     );
   };
@@ -175,6 +168,10 @@ const EbookMockupGenerator: React.FC = () => {
           <div 
             ref={previewRef}
             className="flex items-center justify-center min-h-[500px] bg-gradient-to-br from-gray-50 to-white rounded-lg p-12"
+            style={{
+              perspective: '2000px',
+              perspectiveOrigin: '50% 50%'
+            }}
           >
             {renderMockup()}
           </div>
