@@ -1,3 +1,4 @@
+
 import { SeoAnalysis } from '@/types/seo';
 import { analyzeKeywords, generateKeywordSuggestions } from './seo/keywordAnalyzer';
 import { analyzePerformance } from './seo/performanceAnalyzer';
@@ -35,6 +36,14 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
   const { imgCount, imgWithoutAlt, imagesDetails } = analyzeImages(doc, url);
   const { h1Count, h2Count, h3Count, headings } = analyzeHeadings(doc);
   const { backlinks, backlinkDetails, topBacklinkDomains, doFollowBacklinks, noFollowBacklinks } = analyzeBacklinks();
+  const contentAnalysis = analyzeContent(doc, textContent);
+  const analytics = analyzeAnalytics();
+  const socialMetrics = analyzeSocialMetrics();
+  const searchConsole = analyzeSearchConsole(url);
+  const accessibility = analyzeAccessibility(doc);
+  const schemaMarkup = analyzeSchema(doc);
+  const securityHeaders = analyzeSecurityHeaders(url);
+  const indexability = analyzeIndexability(doc);
 
   return {
     title: doc.title || "Pas de titre",
@@ -66,8 +75,8 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     topBacklinkDomains,
     doFollowBacklinks,
     noFollowBacklinks,
-    wordCount: content.wordCount,
-    textToHtmlRatio: content.textToHtmlRatio,
+    wordCount: contentAnalysis.wordCount,
+    textToHtmlRatio: contentAnalysis.textToHtmlRatio,
     internalLinks: linkAnalysis.internal,
     externalLinks: linkAnalysis.external,
     analytics,
@@ -96,7 +105,7 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
       twitterDescription: doc.querySelector('meta[name="twitter:description"]')?.getAttribute('content') || null,
       twitterImage: doc.querySelector('meta[name="twitter:image"]')?.getAttribute('content') || null,
     },
-    contentQuality: content.contentQuality,
+    contentQuality: contentAnalysis.contentQuality,
     schemaMarkup,
     accessibility,
     indexability,
