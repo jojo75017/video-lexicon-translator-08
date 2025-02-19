@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SeoAnalysis } from '@/types/seo';
@@ -88,7 +89,17 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
           performance={seoAnalysis.performance}
         />
 
-        <LoadingSpeedAnalysis performance={seoAnalysis.performance} />
+        <LoadingSpeedAnalysis performance={{
+          ...seoAnalysis.performance,
+          speedIndex: seoAnalysis.performance.speedIndex || 0,
+          resourceBreakdown: seoAnalysis.performance.resourceBreakdown || {
+            images: 0,
+            scripts: 0,
+            styles: 0,
+            fonts: 0,
+            other: 0
+          }
+        }} />
 
         <SearchTrends 
           clicks={seoAnalysis.searchConsole.clicks}
