@@ -21,6 +21,9 @@ interface SignaturePreviewProps {
   emailEmoji: string;
   phoneEmoji: string;
   websiteEmoji: string;
+  textColor: string;
+  iconColor: string;
+  separatorColor: string;
 }
 
 const SignaturePreview = ({ 
@@ -31,14 +34,17 @@ const SignaturePreview = ({
   titleEmoji,
   emailEmoji,
   phoneEmoji,
-  websiteEmoji
+  websiteEmoji,
+  textColor,
+  iconColor,
+  separatorColor
 }: SignaturePreviewProps) => {
   const renderNamePrefix = () => {
     switch (nameIcon) {
       case 'user':
-        return <User className="h-5 w-5 inline mr-2 text-primary" />;
+        return <User className="h-5 w-5 inline mr-2" style={{ color: iconColor }} />;
       case 'userRound':
-        return <UserRound className="h-5 w-5 inline mr-2 text-primary" />;
+        return <UserRound className="h-5 w-5 inline mr-2" style={{ color: iconColor }} />;
       case 'emoji':
         return <span className="mr-2">👤</span>;
       default:
@@ -49,7 +55,7 @@ const SignaturePreview = ({
   const renderCompanyPrefix = () => {
     switch (companyIcon) {
       case 'building':
-        return <Building className="h-5 w-5 inline mr-2 text-primary" />;
+        return <Building className="h-5 w-5 inline mr-2" style={{ color: iconColor }} />;
       case 'emoji':
         return <span className="mr-2">🏢</span>;
       default:
@@ -58,20 +64,20 @@ const SignaturePreview = ({
   };
 
   return (
-    <div className={`space-y-2 ${style}`}>
-      <p className="text-xl font-bold text-gray-800 flex items-center">
+    <div className={`space-y-2 ${style}`} style={{ color: textColor }}>
+      <p className="text-xl font-bold flex items-center">
         {renderNamePrefix()}
         {formData.name || "Votre Nom"}
       </p>
-      <p className="text-gray-600">
+      <p>
         {titleEmoji} {formData.title || "Votre Titre"}
       </p>
-      <p className="font-semibold text-gray-700 flex items-center">
+      <p className="font-semibold flex items-center">
         {renderCompanyPrefix()}
         {formData.company || "Votre Entreprise"}
       </p>
-      <Separator className="my-2" />
-      <div className="space-y-1 text-sm text-gray-600">
+      <Separator className="my-2" style={{ backgroundColor: separatorColor }} />
+      <div className="space-y-1 text-sm">
         {formData.email && <p>{emailEmoji} {formData.email}</p>}
         {formData.phone && <p>{phoneEmoji} {formData.phone}</p>}
         {formData.website && <p>{websiteEmoji} {formData.website}</p>}

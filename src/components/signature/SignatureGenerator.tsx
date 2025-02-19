@@ -8,6 +8,8 @@ import { toast } from "sonner";
 import html2canvas from 'html2canvas';
 import SignatureForm from './SignatureForm';
 import SignaturePreview from './SignaturePreview';
+import StyleSelector from './StyleSelector';
+import type { StyleTemplate } from './StyleSelector';
 
 const SignatureGenerator = () => {
   const [formData, setFormData] = useState({
@@ -27,6 +29,11 @@ const SignatureGenerator = () => {
   const [emailEmoji, setEmailEmoji] = useState('📧');
   const [phoneEmoji, setPhoneEmoji] = useState('📱');
   const [websiteEmoji, setWebsiteEmoji] = useState('🌐');
+  
+  // Nouvelles options de style
+  const [textColor, setTextColor] = useState('#1e293b');
+  const [iconColor, setIconColor] = useState('#2563eb');
+  const [separatorColor, setSeparatorColor] = useState('#e2e8f0');
 
   const signatureRef = useRef<HTMLDivElement>(null);
 
@@ -36,6 +43,13 @@ const SignatureGenerator = () => {
       ...prev,
       [name]: value
     }));
+  };
+
+  const handleTemplateSelect = (template: StyleTemplate) => {
+    setTextColor(template.textColor);
+    setIconColor(template.iconColor);
+    setSeparatorColor(template.separatorColor);
+    setUseStyleFont(template.font === 'font-playfair');
   };
 
   const downloadSignature = async () => {
@@ -87,28 +101,40 @@ const SignatureGenerator = () => {
           <h2>Générateur de Signature Email</h2>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <SignatureForm
-            formData={formData}
-            handleInputChange={handleInputChange}
-            nameIcon={nameIcon}
-            setNameIcon={setNameIcon}
-            companyIcon={companyIcon}
-            setCompanyIcon={setCompanyIcon}
-            titleEmoji={titleEmoji}
-            setTitleEmoji={setTitleEmoji}
-            emailEmoji={emailEmoji}
-            setEmailEmoji={setEmailEmoji}
-            phoneEmoji={phoneEmoji}
-            setPhoneEmoji={setPhoneEmoji}
-            websiteEmoji={websiteEmoji}
-            setWebsiteEmoji={setWebsiteEmoji}
-            isItalic={isItalic}
-            setIsItalic={setIsItalic}
-            useStyleFont={useStyleFont}
-            setUseStyleFont={setUseStyleFont}
-            emojiOptions={emojiOptions}
-          />
+        <div className="grid gap-6 md:grid-cols-2">
+          <div className="space-y-6">
+            <SignatureForm
+              formData={formData}
+              handleInputChange={handleInputChange}
+              nameIcon={nameIcon}
+              setNameIcon={setNameIcon}
+              companyIcon={companyIcon}
+              setCompanyIcon={setCompanyIcon}
+              titleEmoji={titleEmoji}
+              setTitleEmoji={setTitleEmoji}
+              emailEmoji={emailEmoji}
+              setEmailEmoji={setEmailEmoji}
+              phoneEmoji={phoneEmoji}
+              setPhoneEmoji={setPhoneEmoji}
+              websiteEmoji={websiteEmoji}
+              setWebsiteEmoji={setWebsiteEmoji}
+              isItalic={isItalic}
+              setIsItalic={setIsItalic}
+              useStyleFont={useStyleFont}
+              setUseStyleFont={setUseStyleFont}
+              emojiOptions={emojiOptions}
+            />
+
+            <StyleSelector
+              textColor={textColor}
+              setTextColor={setTextColor}
+              iconColor={iconColor}
+              setIconColor={setIconColor}
+              separatorColor={separatorColor}
+              setSeparatorColor={setSeparatorColor}
+              onSelectTemplate={handleTemplateSelect}
+            />
+          </div>
 
           <div className="space-y-4">
             <Label>Aperçu de la signature</Label>
@@ -125,6 +151,9 @@ const SignatureGenerator = () => {
                 emailEmoji={emailEmoji}
                 phoneEmoji={phoneEmoji}
                 websiteEmoji={websiteEmoji}
+                textColor={textColor}
+                iconColor={iconColor}
+                separatorColor={separatorColor}
               />
             </div>
 
