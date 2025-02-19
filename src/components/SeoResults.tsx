@@ -13,6 +13,7 @@ import KeywordAnalysis from './seo/KeywordAnalysis';
 import SiteStructureVisualizer from './SiteStructureVisualizer';
 import { Card } from '@/components/ui/card';
 import { analyzeKeywords } from '@/utils/seo/keywordAnalyzer';
+import { analyzeLinkStructure } from '@/utils/seo/linkAnalyzer';
 
 interface SeoResultsProps {
   seoAnalysis: SeoAnalysis;
@@ -77,14 +78,16 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
   const suggestions = getSeoSuggestions(seoAnalysis);
   const keywordAnalysis = analyzeKeywords(seoAnalysis.title + " " + seoAnalysis.description);
 
+  // Créer une structure de site à partir des liens analysés
+  const linkAnalysis = analyzeLinkStructure(document, window.location.href);
   const siteStructure = {
     name: "Structure du site",
     children: [
       {
         name: "Page d'accueil",
         path: window.location.origin,
-        children: seoAnalysis.internalLinks.map(link => ({
-          name: link.text || link.url,
+        children: linkAnalysis.links.map(link => ({
+          name: link.text || new URL(link.url).pathname,
           path: link.url,
           children: []
         }))

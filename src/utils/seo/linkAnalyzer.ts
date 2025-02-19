@@ -20,6 +20,14 @@ export const analyzeLinkStructure = (doc: Document, url: string) => {
     nofollow: links.filter(link => link.rel.includes('nofollow')).length,
     dofollow: links.filter(link => !link.rel.includes('nofollow')).length,
     broken: 0, // À implémenter avec une vérification réelle des liens
-    redirects: 0 // À implémenter avec une vérification réelle des redirections
+    redirects: 0, // À implémenter avec une vérification réelle des redirections
+    links: internalLinks.map(link => ({
+      url: link.href,
+      text: link.textContent?.trim() || link.title || link.getAttribute('aria-label') || '',
+      isInternal: true,
+      hasTitle: !!link.title,
+      hasDescription: !!link.getAttribute('aria-label'),
+      rel: link.rel
+    }))
   };
 };
