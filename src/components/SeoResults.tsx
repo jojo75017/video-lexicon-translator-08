@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SeoAnalysis } from '@/types/seo';
@@ -11,9 +10,15 @@ import LoadingSpeedAnalysis from './seo/LoadingSpeedAnalysis';
 import SeoStructure from './seo/SeoStructure';
 import KeywordAnalysis from './seo/KeywordAnalysis';
 import SiteStructureVisualizer from './SiteStructureVisualizer';
+import ReadabilityAnalysis from './seo/ReadabilityAnalysis';
+import AccessibilityReport from './seo/AccessibilityReport';
+import MobileAnalysis from './seo/MobileAnalysis';
 import { Card } from '@/components/ui/card';
 import { analyzeKeywords } from '@/utils/seo/keywordAnalyzer';
 import { analyzeLinkStructure } from '@/utils/seo/linkAnalyzer';
+import { analyzeAccessibility } from '@/utils/seo/accessibilityAnalyzer';
+import { analyzeReadability } from '@/utils/seo/semanticAnalyzer';
+import { analyzeMobilePerformance } from '@/utils/seo/mobileAnalyzer';
 
 interface SeoResultsProps {
   seoAnalysis: SeoAnalysis;
@@ -77,8 +82,10 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
   const seoScore = calculateSeoScore(seoAnalysis);
   const suggestions = getSeoSuggestions(seoAnalysis);
   const keywordAnalysis = analyzeKeywords(seoAnalysis.title + " " + seoAnalysis.description);
+  const accessibilityResults = analyzeAccessibility(document);
+  const readabilityScore = analyzeReadability(document.body.textContent || '');
+  const mobileResults = analyzeMobilePerformance(document);
 
-  // Créer une structure de site à partir des liens analysés
   const linkAnalysis = analyzeLinkStructure(document, window.location.href);
   const siteStructure = {
     name: "Structure du site",
@@ -114,6 +121,17 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
         </Card>
 
         <SiteStructureVisualizer structure={siteStructure} />
+
+        <ReadabilityAnalysis 
+          score={readabilityScore}
+          readingTime={seoAnalysis.contentQuality?.readingTime || 0}
+          wordCount={seoAnalysis.wordCount}
+          complexity={seoAnalysis.contentQuality?.complexity || 0}
+        />
+
+        <AccessibilityReport {...accessibilityResults} />
+
+        <MobileAnalysis {...mobileResults} />
 
         <KeywordAnalysis keywords={keywordAnalysis} />
 
