@@ -94,6 +94,13 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     topKeywords,
     technologies,
     mobileAnalysis,
+    mobilePerformance: {
+      viewportMeta: mobileAnalysis.viewportMeta,
+      responsiveImages: mobileAnalysis.responsiveImages,
+      touchTargetSize: mobileAnalysis.touchTargetSize,
+      fontScale: mobileAnalysis.fontScale,
+      score: mobileAnalysis.score,
+    },
     metaTagsAnalysis,
     keywordSuggestions,
     socialTags: {
