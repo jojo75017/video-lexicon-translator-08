@@ -28,7 +28,7 @@ const SeoStructure = ({ h1Count, h2Count, h3Count, imgCount }: SeoStructureProps
             <span className="font-medium">Titres H1</span>
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant={h1Count === 1 ? "success" : "destructive"}>
+            <Badge variant={h1Count === 1 ? "default" : "destructive"}>
               {h1Count || 0}
             </Badge>
             {h1Count !== 1 && (
