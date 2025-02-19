@@ -24,6 +24,7 @@ interface SignaturePreviewProps {
   textColor: string;
   iconColor: string;
   separatorColor: string;
+  logo?: string | null;
 }
 
 const SignaturePreview = ({ 
@@ -37,7 +38,8 @@ const SignaturePreview = ({
   websiteEmoji,
   textColor,
   iconColor,
-  separatorColor
+  separatorColor,
+  logo
 }: SignaturePreviewProps) => {
   const renderNamePrefix = () => {
     switch (nameIcon) {
@@ -64,23 +66,34 @@ const SignaturePreview = ({
   };
 
   return (
-    <div className={`space-y-2 ${style}`} style={{ color: textColor }}>
-      <p className="text-xl font-bold flex items-center">
-        {renderNamePrefix()}
-        {formData.name || "Votre Nom"}
-      </p>
-      <p>
-        {titleEmoji} {formData.title || "Votre Titre"}
-      </p>
-      <p className="font-semibold flex items-center">
-        {renderCompanyPrefix()}
-        {formData.company || "Votre Entreprise"}
-      </p>
-      <Separator className="my-2" style={{ backgroundColor: separatorColor }} />
-      <div className="space-y-1 text-sm">
-        {formData.email && <p>{emailEmoji} {formData.email}</p>}
-        {formData.phone && <p>{phoneEmoji} {formData.phone}</p>}
-        {formData.website && <p>{websiteEmoji} {formData.website}</p>}
+    <div className="flex gap-4">
+      {logo && (
+        <div className="flex-shrink-0">
+          <img 
+            src={logo} 
+            alt="Logo entreprise" 
+            className="w-16 h-16 object-contain"
+          />
+        </div>
+      )}
+      <div className={`space-y-2 ${style}`} style={{ color: textColor }}>
+        <p className="text-xl font-bold flex items-center">
+          {renderNamePrefix()}
+          {formData.name || "Votre Nom"}
+        </p>
+        <p>
+          {titleEmoji} {formData.title || "Votre Titre"}
+        </p>
+        <p className="font-semibold flex items-center">
+          {renderCompanyPrefix()}
+          {formData.company || "Votre Entreprise"}
+        </p>
+        <Separator className="my-2" style={{ backgroundColor: separatorColor }} />
+        <div className="space-y-1 text-sm">
+          {formData.email && <p>{emailEmoji} {formData.email}</p>}
+          {formData.phone && <p>{phoneEmoji} {formData.phone}</p>}
+          {formData.website && <p>{websiteEmoji} {formData.website}</p>}
+        </div>
       </div>
     </div>
   );

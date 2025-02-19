@@ -1,9 +1,8 @@
-
 import React, { useState, useRef } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Signature, Download } from "lucide-react";
+import { Signature, Download, Upload } from "lucide-react";
 import { toast } from "sonner";
 import html2canvas from 'html2canvas';
 import SignatureForm from './SignatureForm';
@@ -29,13 +28,14 @@ const SignatureGenerator = () => {
   const [emailEmoji, setEmailEmoji] = useState('📧');
   const [phoneEmoji, setPhoneEmoji] = useState('📱');
   const [websiteEmoji, setWebsiteEmoji] = useState('🌐');
+  const [logo, setLogo] = useState<string | null>(null);
   
-  // Nouvelles options de style
   const [textColor, setTextColor] = useState('#1e293b');
   const [iconColor, setIconColor] = useState('#2563eb');
   const [separatorColor, setSeparatorColor] = useState('#e2e8f0');
 
   const signatureRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -50,6 +50,31 @@ const SignatureGenerator = () => {
     setIconColor(template.iconColor);
     setSeparatorColor(template.separatorColor);
     setUseStyleFont(template.font === 'font-playfair');
+  };
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 500000) { // 500KB max
+      toast.error("Le logo est trop volumineux (max: 500KB)");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setLogo(event.target?.result as string);
+      toast.success("Logo ajouté avec succès!");
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeLogo = () => {
+    setLogo(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+    toast.success("Logo supprimé");
   };
 
   const downloadSignature = async () => {
@@ -103,13 +128,52 @@ const SignatureGenerator = () => {
 
         <div className="grid gap-6 md:grid-cols-2">
           <div className="space-y-6">
+            <div className="space-y-4">
+              <Label>Logo de l'entreprise</Label>
+              <div className="flex gap-4 items-center">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  accept="image/*"
+                  onChange={handleLogoUpload}
+                  className="hidden"
+                  id="logo-upload"
+                />
+                <Button
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="gap-2"
+                >
+                  <Upload className="h-4 w-4" />
+                  {logo ? "Changer le logo" : "Ajouter un logo"}
+                </Button>
+                {logo && (
+                  <Button
+                    variant="destructive"
+                    onClick={removeLogo}
+                  >
+                    Supprimer
+                  </Button>
+                )}
+              </div>
+              {logo && (
+                <div className="mt-2">
+                  <img 
+                    src={logo} 
+                    alt="Logo entreprise" 
+                    className="max-h-16 object-contain"
+                  />
+                </div>
+              )}
+            </div>
+
             <SignatureForm
               formData={formData}
               handleInputChange={handleInputChange}
               nameIcon={nameIcon}
-              setNameIcon={setNameIcon}
+              setNameIcon={setNameIcon as (value: 'none' | 'user' | 'userRound' | 'emoji') => void}
               companyIcon={companyIcon}
-              setCompanyIcon={setCompanyIcon}
+              setCompanyIcon={setCompanyIcon as (value: 'none' | 'building' | 'emoji') => void}
               titleEmoji={titleEmoji}
               setTitleEmoji={setTitleEmoji}
               emailEmoji={emailEmoji}
@@ -154,6 +218,7 @@ const SignatureGenerator = () => {
                 textColor={textColor}
                 iconColor={iconColor}
                 separatorColor={separatorColor}
+                logo={logo}
               />
             </div>
 
