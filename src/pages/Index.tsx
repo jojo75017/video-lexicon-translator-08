@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -23,6 +22,7 @@ import UrlInput from '@/components/UrlInput';
 import SeoResults from '@/components/SeoResults';
 import { useSiteAnalyzer } from '@/hooks/useSiteAnalyzer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import BacklinksAnalysis from '@/components/seo/BacklinksAnalysis';
 
 const Index = () => {
   const {
@@ -160,6 +160,23 @@ const Index = () => {
                     headings={seoAnalysis.headings || []} 
                     paragraphs={seoAnalysis.paragraphs || []} 
                   />
+                </TabsContent>
+
+                <TabsContent value="backlinks">
+                  <BacklinksAnalysis 
+                    backlinks={seoAnalysis.backlinks}
+                    backlinkDetails={seoAnalysis.backlinkDetails}
+                    topBacklinkDomains={seoAnalysis.topBacklinkDomains}
+                    doFollowBacklinks={seoAnalysis.doFollowBacklinks}
+                    noFollowBacklinks={seoAnalysis.noFollowBacklinks}
+                  />
+                </TabsContent>
+
+                <TabsContent value="metrics">
+                  <Card className="p-6">
+                    <h2 className="text-2xl font-semibold mb-4">Métriques détaillées</h2>
+                    {/* Ajoutez ici les métriques détaillées */}
+                  </Card>
                 </TabsContent>
               </Tabs>
             </div>
