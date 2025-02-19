@@ -35,6 +35,7 @@ export const analyzePerformance = (doc: Document, startTime: number): Performanc
   const totalSize = Object.values(resourceSizes).reduce((a, b) => a + b, 0);
   const speedIndex = window.performance.now() - startTime;
   const timeToInteractive = performanceEntries ? performanceEntries.domInteractive - performanceEntries.startTime : 0;
+  const largestContentfulPaint = firstContentfulPaint * 1.2;
 
   // Calcul du score de performance
   let score = 100;
@@ -56,7 +57,7 @@ export const analyzePerformance = (doc: Document, startTime: number): Performanc
     domLoadTime,
     speedIndex,
     score: Math.max(0, score),
-    largestContentfulPaint: firstContentfulPaint * 1.2,
+    largestContentfulPaint,
     timeToInteractive,
     resourceBreakdown: resourceSizes
   };

@@ -92,6 +92,8 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
         <LoadingSpeedAnalysis performance={{
           ...seoAnalysis.performance,
           speedIndex: seoAnalysis.performance.speedIndex || 0,
+          largestContentfulPaint: seoAnalysis.performance.largestContentfulPaint || seoAnalysis.performance.firstContentfulPaint * 1.2,
+          timeToInteractive: seoAnalysis.performance.timeToInteractive || seoAnalysis.performance.domLoadTime,
           resourceBreakdown: seoAnalysis.performance.resourceBreakdown || {
             images: 0,
             scripts: 0,
