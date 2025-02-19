@@ -8,6 +8,8 @@ import DetailedMetrics from './seo/DetailedMetrics';
 import SiteComparison from './seo/SiteComparison';
 import AnalyticsOverview from './seo/AnalyticsOverview';
 import LoadingSpeedAnalysis from './seo/LoadingSpeedAnalysis';
+import SeoStructure from './seo/SeoStructure';
+import { Card } from '@/components/ui/card';
 
 interface SeoResultsProps {
   seoAnalysis: SeoAnalysis;
@@ -88,6 +90,15 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
           suggestions={suggestions}
           performance={seoAnalysis.performance}
         />
+
+        <Card className="p-6">
+          <SeoStructure 
+            h1Count={seoAnalysis.h1Count}
+            h2Count={seoAnalysis.h2Count}
+            h3Count={seoAnalysis.h3Count}
+            imgCount={seoAnalysis.imgCount}
+          />
+        </Card>
 
         <LoadingSpeedAnalysis performance={{
           ...seoAnalysis.performance,
