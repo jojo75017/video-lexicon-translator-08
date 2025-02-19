@@ -1,4 +1,3 @@
-
 import { SeoAnalysis } from '@/types/seo';
 import { analyzeKeywords, generateKeywordSuggestions } from './seo/keywordAnalyzer';
 import { analyzePerformance } from './seo/performanceAnalyzer';
@@ -26,21 +25,13 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
   const topKeywords = analyzeKeywords(textContent);
   const performanceMetrics = analyzePerformance(doc, startTime);
   const linkAnalysis = analyzeLinkStructure(doc, url);
-  const mobilePerformance = analyzeMobilePerformance(doc);
+  const mobileAnalysis = analyzeMobilePerformance(doc);
   const metaTagsAnalysis = analyzeMetaTags(doc);
   const semanticStructure = analyzeSemanticStructure(doc);
   const readabilityScore = analyzeReadability(textContent);
   const technologies = analyzeTechnologies();
   const keywordSuggestions = generateKeywordSuggestions(topKeywords);
-  const content = analyzeContent(doc, textContent);
-  const analytics = analyzeAnalytics();
-  const socialMetrics = analyzeSocialMetrics();
-  const searchConsole = analyzeSearchConsole(url);
-  const accessibility = analyzeAccessibility(doc);
-  const schemaMarkup = analyzeSchema(doc);
-  const securityHeaders = analyzeSecurityHeaders(url);
-  const indexability = analyzeIndexability(doc);
-  
+
   const { imgCount, imgWithoutAlt, imagesDetails } = analyzeImages(doc, url);
   const { h1Count, h2Count, h3Count, headings } = analyzeHeadings(doc);
   const { backlinks, backlinkDetails, topBacklinkDomains, doFollowBacklinks, noFollowBacklinks } = analyzeBacklinks();
@@ -93,7 +84,7 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     readabilityScore,
     topKeywords,
     technologies,
-    mobilePerformance,
+    mobileAnalysis,
     metaTagsAnalysis,
     keywordSuggestions,
     socialTags: {
@@ -109,5 +100,12 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     schemaMarkup,
     accessibility,
     indexability,
+    technicalSuggestions: [
+      "Optimisez les images pour le web",
+      "Améliorez la vitesse de chargement",
+      "Ajoutez des balises meta description manquantes",
+      "Optimisez le contenu pour les mots-clés principaux",
+      "Corrigez les liens cassés",
+    ],
   };
 };

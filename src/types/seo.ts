@@ -1,4 +1,3 @@
-
 export interface HeadingStructure {
   text: string;
   level: number;
@@ -266,5 +265,28 @@ export interface SeoAnalysis {
     recommendations: string[];
   };
   socialTags: SocialTags;
-  keywordSuggestions: KeywordSuggestion[];
+  keywordSuggestions: {
+    keyword: string;
+    relevance: number;
+    searchVolume?: number;
+    difficulty?: number;
+    trend?: 'up' | 'down' | 'stable';
+    competition?: number;
+    cpc?: number;
+    seasonality?: {
+      peak: string[];
+      low: string[];
+    };
+  }[];
+  mobileAnalysis: {
+    viewportMeta: boolean;
+    responsiveImages: boolean;
+    touchTargetSize: boolean;
+    fontScale: boolean;
+    score: number;
+    speedScore?: number;
+    usabilityScore?: number;
+    viewportScore?: number;
+  };
+  technicalSuggestions: string[];
 }
