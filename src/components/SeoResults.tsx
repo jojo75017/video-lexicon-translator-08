@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SeoAnalysis } from '@/types/seo';
@@ -7,6 +6,7 @@ import SearchTrends from './seo/SearchTrends';
 import DetailedMetrics from './seo/DetailedMetrics';
 import SiteComparison from './seo/SiteComparison';
 import AnalyticsOverview from './seo/AnalyticsOverview';
+import LoadingSpeedAnalysis from './seo/LoadingSpeedAnalysis';
 
 interface SeoResultsProps {
   seoAnalysis: SeoAnalysis;
@@ -70,10 +70,9 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
   };
 
   const handleCompare = (url: string) => {
-    // Dans un cas réel, ceci déclencherait une nouvelle analyse
     setComparisonSite({
       url: "https://example.com",
-      analysis: seoAnalysis // Simulation avec les mêmes données
+      analysis: seoAnalysis
     });
   };
 
@@ -88,6 +87,8 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
           suggestions={suggestions}
           performance={seoAnalysis.performance}
         />
+
+        <LoadingSpeedAnalysis performance={seoAnalysis.performance} />
 
         <SearchTrends 
           clicks={seoAnalysis.searchConsole.clicks}
