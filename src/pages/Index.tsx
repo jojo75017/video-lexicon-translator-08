@@ -23,6 +23,9 @@ import SeoResults from '@/components/SeoResults';
 import { useSiteAnalyzer } from '@/hooks/useSiteAnalyzer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BacklinksAnalysis from '@/components/seo/BacklinksAnalysis';
+import KeywordSuggestions from '@/components/seo/KeywordSuggestions';
+import MobileAnalysis from '@/components/seo/MobileAnalysis';
+import SeoSuggestions from '@/components/seo/SeoSuggestions';
 
 const Index = () => {
   const {
@@ -143,7 +146,18 @@ const Index = () => {
                 </TabsList>
 
                 <TabsContent value="seo">
-                  <SeoResults seoAnalysis={seoAnalysis} />
+                  <div className="space-y-6">
+                    <SeoResults seoAnalysis={seoAnalysis} />
+                    <KeywordSuggestions suggestions={seoAnalysis.keywordSuggestions || []} />
+                    <MobileAnalysis 
+                      viewportMeta={seoAnalysis.mobileAnalysis?.viewportMeta || false}
+                      responsiveImages={seoAnalysis.mobileAnalysis?.responsiveImages || false}
+                      touchTargetSize={seoAnalysis.mobileAnalysis?.touchTargetSize || false}
+                      fontScale={seoAnalysis.mobileAnalysis?.fontScale || false}
+                      score={seoAnalysis.mobileAnalysis?.score || 0}
+                    />
+                    <SeoSuggestions suggestions={seoAnalysis.technicalSuggestions || []} />
+                  </div>
                 </TabsContent>
 
                 <TabsContent value="structure">
