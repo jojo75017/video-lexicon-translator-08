@@ -3,24 +3,12 @@ import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { 
-  ExternalLink, 
-  Search, 
-  Globe, 
-  AlertCircle,
-  Link2, 
-  ChartBar, 
-  Database,
-  Hash, 
-  Trophy,
-  Zap,
-  BarChart3,
-  Settings,
-  Rocket,
-  Pen,
-} from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AlertCircle, Search, BarChart3, Hash } from "lucide-react";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useSiteAnalyzer } from '@/hooks/useSiteAnalyzer';
+import DashboardHeader from '@/components/dashboard/DashboardHeader';
+import FeatureGrid from '@/components/dashboard/FeatureGrid';
+import TabNavigation from '@/components/dashboard/TabNavigation';
 import SiteStructureVisualizer from '@/components/SiteStructureVisualizer';
 import ContentHierarchy from '@/components/ContentHierarchy';
 import UrlInput from '@/components/UrlInput';
@@ -52,116 +40,10 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
       <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-        <div className="text-center space-y-8 mb-16">
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 blur-3xl" />
-            <div className="relative">
-              <div className="inline-flex items-center justify-center p-3 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl mb-6 shadow-lg">
-                <Rocket className="h-8 w-8 text-white" />
-              </div>
-              <h1 className="text-6xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 mb-6 drop-shadow-sm">
-                Optimisez votre visibilité
-              </h1>
-              <p className="text-xl text-gray-700 max-w-2xl mx-auto leading-relaxed">
-                Une suite complète d'outils professionnels pour analyser et améliorer votre SEO
-              </p>
-            </div>
-          </div>
-        </div>
+        <DashboardHeader />
 
         <div className="mb-12">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4 mb-8">
-            <Card 
-              className="group p-4 cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl border-t-4 border-blue-500"
-              onClick={() => document.getElementById('signature')?.click()}
-            >
-              <div className="flex flex-col items-center text-center space-y-3">
-                <div className="p-3 rounded-xl bg-blue-100 transform transition-all duration-300 group-hover:scale-110">
-                  <Pen className="h-6 w-6 text-blue-600" />
-                </div>
-                <h3 className="font-semibold text-gray-800">Signature</h3>
-                <p className="text-xs text-gray-500 hidden lg:block">Générateur de signature</p>
-              </div>
-            </Card>
-
-            <Card 
-              className="group p-4 cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl border-t-4 border-red-500"
-              onClick={() => document.getElementById('structure')?.click()}
-            >
-              <div className="flex flex-col items-center text-center space-y-3">
-                <div className="p-3 rounded-xl bg-red-100 transform transition-all duration-300 group-hover:scale-110">
-                  <Globe className="h-6 w-6 text-red-600" />
-                </div>
-                <h3 className="font-semibold text-gray-800">Structure</h3>
-                <p className="text-xs text-gray-500 hidden lg:block">Architecture du site</p>
-              </div>
-            </Card>
-
-            <Card 
-              className="group p-4 cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl border-t-4 border-green-500"
-              onClick={() => document.getElementById('hierarchy')?.click()}
-            >
-              <div className="flex flex-col items-center text-center space-y-3">
-                <div className="p-3 rounded-xl bg-green-100 transform transition-all duration-300 group-hover:scale-110">
-                  <Database className="h-6 w-6 text-green-600" />
-                </div>
-                <h3 className="font-semibold text-gray-800">Hiérarchie</h3>
-                <p className="text-xs text-gray-500 hidden lg:block">Organisation du contenu</p>
-              </div>
-            </Card>
-
-            <Card 
-              className="group p-4 cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl border-t-4 border-orange-500"
-              onClick={() => document.getElementById('backlinks')?.click()}
-            >
-              <div className="flex flex-col items-center text-center space-y-3">
-                <div className="p-3 rounded-xl bg-orange-100 transform transition-all duration-300 group-hover:scale-110">
-                  <Link2 className="h-6 w-6 text-orange-600" />
-                </div>
-                <h3 className="font-semibold text-gray-800">Backlinks</h3>
-                <p className="text-xs text-gray-500 hidden lg:block">Analyse des liens</p>
-              </div>
-            </Card>
-
-            <Card 
-              className="group p-4 cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl border-t-4 border-pink-500"
-              onClick={() => document.getElementById('metrics')?.click()}
-            >
-              <div className="flex flex-col items-center text-center space-y-3">
-                <div className="p-3 rounded-xl bg-pink-100 transform transition-all duration-300 group-hover:scale-110">
-                  <ChartBar className="h-6 w-6 text-pink-600" />
-                </div>
-                <h3 className="font-semibold text-gray-800">Métriques</h3>
-                <p className="text-xs text-gray-500 hidden lg:block">Statistiques</p>
-              </div>
-            </Card>
-
-            <Card 
-              className="group p-4 cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl border-t-4 border-yellow-500"
-              onClick={() => document.getElementById('advanced')?.click()}
-            >
-              <div className="flex flex-col items-center text-center space-y-3">
-                <div className="p-3 rounded-xl bg-yellow-100 transform transition-all duration-300 group-hover:scale-110">
-                  <Settings className="h-6 w-6 text-yellow-600" />
-                </div>
-                <h3 className="font-semibold text-gray-800">Avancé</h3>
-                <p className="text-xs text-gray-500 hidden lg:block">Options avancées</p>
-              </div>
-            </Card>
-
-            <Card 
-              className="group p-4 cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl border-t-4 border-teal-500"
-              onClick={() => document.getElementById('integrations')?.click()}
-            >
-              <div className="flex flex-col items-center text-center space-y-3">
-                <div className="p-3 rounded-xl bg-teal-100 transform transition-all duration-300 group-hover:scale-110">
-                  <Hash className="h-6 w-6 text-teal-600" />
-                </div>
-                <h3 className="font-semibold text-gray-800">Intégrations</h3>
-                <p className="text-xs text-gray-500 hidden lg:block">Outils externes</p>
-              </div>
-            </Card>
-          </div>
+          <FeatureGrid />
 
           <Card className="p-8 shadow-xl bg-gradient-to-br from-purple-50 to-blue-50 border-0">
             <UrlInput 
@@ -186,7 +68,7 @@ const Index = () => {
                   <div className="flex flex-col items-center w-full">
                     <span className="flex items-center mb-1">
                       Étape 1: Activer le Proxy CORS
-                      <ExternalLink className="ml-2 h-4 w-4" />
+                      <AlertCircle className="ml-2 h-4 w-4" />
                     </span>
                     <span className="text-sm text-yellow-600">
                       Une fois activé, revenez ici pour analyser votre site
@@ -208,72 +90,7 @@ const Index = () => {
         </div>
 
         <Tabs defaultValue="seo" className="space-y-6">
-          <TabsList className="w-full border-b flex overflow-x-auto space-x-2 mb-4 bg-white/50 backdrop-blur-sm">
-            <TabsTrigger 
-              value="seo" 
-              id="seo" 
-              className="border-b-2 border-transparent data-[state=active]:border-purple-500 data-[state=active]:text-purple-600 data-[state=active]:bg-purple-50"
-            >
-              <Search className="w-4 h-4 mr-2" />
-              SEO
-            </TabsTrigger>
-            <TabsTrigger 
-              value="structure" 
-              id="structure" 
-              className="border-b-2 border-transparent data-[state=active]:border-red-500 data-[state=active]:text-red-600 data-[state=active]:bg-red-50"
-            >
-              <Globe className="w-4 h-4 mr-2" />
-              Structure
-            </TabsTrigger>
-            <TabsTrigger 
-              value="hierarchy" 
-              id="hierarchy" 
-              className="border-b-2 border-transparent data-[state=active]:border-green-500 data-[state=active]:text-green-600 data-[state=active]:bg-green-50"
-            >
-              <Database className="w-4 h-4 mr-2" />
-              Hiérarchie
-            </TabsTrigger>
-            <TabsTrigger 
-              value="backlinks" 
-              id="backlinks" 
-              className="border-b-2 border-transparent data-[state=active]:border-orange-500 data-[state=active]:text-orange-600 data-[state=active]:bg-orange-50"
-            >
-              <Link2 className="w-4 h-4 mr-2" />
-              Backlinks
-            </TabsTrigger>
-            <TabsTrigger 
-              value="metrics" 
-              id="metrics" 
-              className="border-b-2 border-transparent data-[state=active]:border-pink-500 data-[state=active]:text-pink-600 data-[state=active]:bg-pink-50"
-            >
-              <ChartBar className="w-4 h-4 mr-2" />
-              Métriques
-            </TabsTrigger>
-            <TabsTrigger 
-              value="advanced" 
-              id="advanced" 
-              className="border-b-2 border-transparent data-[state=active]:border-yellow-500 data-[state=active]:text-yellow-600 data-[state=active]:bg-yellow-50"
-            >
-              <Settings className="w-4 h-4 mr-2" />
-              Avancé
-            </TabsTrigger>
-            <TabsTrigger 
-              value="integrations" 
-              id="integrations" 
-              className="border-b-2 border-transparent data-[state=active]:border-teal-500 data-[state=active]:text-teal-600 data-[state=active]:bg-teal-50"
-            >
-              <Hash className="w-4 h-4 mr-2" />
-              Intégrations
-            </TabsTrigger>
-            <TabsTrigger 
-              value="signature" 
-              id="signature" 
-              className="border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:text-blue-600 data-[state=active]:bg-blue-50"
-            >
-              <Pen className="w-4 h-4 mr-2" />
-              Signature
-            </TabsTrigger>
-          </TabsList>
+          <TabNavigation />
 
           <TabsContent value="seo">
             {isLoading ? (
