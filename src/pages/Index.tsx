@@ -1,9 +1,10 @@
+
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, Search, BarChart3, Hash } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useSiteAnalyzer } from '@/hooks/useSiteAnalyzer';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
@@ -114,22 +115,7 @@ const Index = () => {
                 />
                 <SeoSuggestions suggestions={seoAnalysis.technicalSuggestions || []} />
               </div>
-            ) : (
-              <Card className="p-12 text-center bg-gradient-to-br from-purple-50 to-blue-50">
-                <Rocket className="h-16 w-16 mx-auto mb-6 text-purple-600" />
-                <h3 className="text-2xl font-semibold mb-4 text-gray-800">Prêt à commencer ?</h3>
-                <p className="text-gray-600 max-w-md mx-auto mb-8">
-                  Entrez l'URL de votre site ci-dessus pour obtenir une analyse SEO complète et détaillée
-                </p>
-                <Button 
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 font-medium px-8 py-3"
-                  onClick={() => document.querySelector('input')?.focus()}
-                >
-                  Commencer l'analyse
-                  <Search className="ml-2 h-5 w-5" />
-                </Button>
-              </Card>
-            )}
+            ) : null}
           </TabsContent>
 
           <TabsContent value="structure">
@@ -142,11 +128,7 @@ const Index = () => {
                 <h2 className="text-2xl font-semibold mb-4">Structure du Site</h2>
                 <SiteStructureVisualizer structure={siteStructure} />
               </Card>
-            ) : (
-              <Card className="p-6">
-                <p className="text-center text-gray-500">Entrez une URL et lancez l'analyse pour voir la structure du site</p>
-              </Card>
-            )}
+            ) : null}
           </TabsContent>
 
           <TabsContent value="hierarchy">
@@ -159,11 +141,7 @@ const Index = () => {
                 headings={seoAnalysis.headings || []} 
                 paragraphs={seoAnalysis.paragraphs || []} 
               />
-            ) : (
-              <Card className="p-6">
-                <p className="text-center text-gray-500">Entrez une URL et lancez l'analyse pour voir la hiérarchie du contenu</p>
-              </Card>
-            )}
+            ) : null}
           </TabsContent>
 
           <TabsContent value="backlinks">
@@ -179,11 +157,7 @@ const Index = () => {
                 doFollowBacklinks={seoAnalysis.doFollowBacklinks}
                 noFollowBacklinks={seoAnalysis.noFollowBacklinks}
               />
-            ) : (
-              <Card className="p-6">
-                <p className="text-center text-gray-500">Entrez une URL et lancez l'analyse pour voir les backlinks</p>
-              </Card>
-            )}
+            ) : null}
           </TabsContent>
 
           <TabsContent value="metrics">
@@ -206,50 +180,21 @@ const Index = () => {
                 content={seoAnalysis.paragraphs.map(p => p.text).join(' ')}
                 links={seoAnalysis.backlinkDetails.map(b => b.url)}
               />
-            ) : (
-              <Card className="p-6">
-                <p className="text-center text-gray-500">Entrez une URL et lancez l'analyse pour voir les optimisations avancées</p>
-              </Card>
-            )}
+            ) : null}
           </TabsContent>
 
           <TabsContent value="integrations">
             <Card className="p-6">
-              <h2 className="text-2xl font-semibold mb-4">Intégrations</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Button
                   variant="outline"
-                  className="p-6 h-auto flex flex-col items-center gap-4"
+                  className="p-6 h-auto flex flex-col items-center gap-4 text-center"
                   onClick={() => window.open('https://search.google.com/search-console', '_blank')}
                 >
-                  <Search className="h-8 w-8" />
-                  <div className="text-center">
+                  <AlertCircle className="h-8 w-8" />
+                  <div>
                     <h3 className="font-semibold mb-2">Google Search Console</h3>
                     <p className="text-sm text-gray-600">Connectez-vous pour voir les données en temps réel</p>
-                  </div>
-                </Button>
-
-                <Button
-                  variant="outline"
-                  className="p-6 h-auto flex flex-col items-center gap-4"
-                  onClick={() => window.open('https://analytics.google.com', '_blank')}
-                >
-                  <BarChart3 className="h-8 w-8" />
-                  <div className="text-center">
-                    <h3 className="font-semibold mb-2">Google Analytics</h3>
-                    <p className="text-sm text-gray-600">Visualisez vos statistiques de trafic</p>
-                  </div>
-                </Button>
-
-                <Button
-                  variant="outline"
-                  className="p-6 h-auto flex flex-col items-center gap-4"
-                  disabled
-                >
-                  <Hash className="h-8 w-8" />
-                  <div className="text-center">
-                    <h3 className="font-semibold mb-2">Réseaux Sociaux</h3>
-                    <p className="text-sm text-gray-600">Bientôt disponible</p>
                   </div>
                 </Button>
               </div>
