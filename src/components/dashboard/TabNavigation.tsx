@@ -16,24 +16,18 @@ const TabNavigation = () => {
   ];
 
   return (
-    <TabsList className="w-full flex overflow-x-auto space-x-1 bg-white/50 backdrop-blur-sm p-1 rounded-lg shadow-inner">
-      {tabs.map(({ id, icon: Icon, label, color }) => (
+    <TabsList className="w-full flex overflow-x-auto justify-between bg-white shadow-lg rounded-xl p-2">
+      {tabs.map(({ id, icon: Icon, label }) => (
         <TabsTrigger 
           key={id}
           value={id}
-          className={`
-            flex items-center gap-2 px-4 py-2.5 rounded-md font-medium
-            transition-all duration-300
-            data-[state=active]:bg-gradient-to-br 
-            data-[state=active]:from-${color}-500/20 
-            data-[state=active]:to-${color}-600/20
-            data-[state=active]:text-${color}-700
-            data-[state=active]:shadow-sm
-            hover:bg-${color}-50
-          `}
+          className="group relative flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all duration-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50"
         >
-          <Icon className="w-4 h-4" />
-          {label}
+          <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 group-data-[state=active]:opacity-100 rounded-lg transition-opacity" />
+          <Icon className="w-5 h-5 text-gray-600 group-hover:text-indigo-600 group-data-[state=active]:text-indigo-600" />
+          <span className="text-gray-700 group-hover:text-indigo-700 group-data-[state=active]:text-indigo-700">
+            {label}
+          </span>
         </TabsTrigger>
       ))}
     </TabsList>
