@@ -13,24 +13,24 @@ interface FeatureCardProps {
 
 const FeatureCard = ({ icon: Icon, title, description, onClick }: FeatureCardProps) => {
   return (
-    <Card 
+    <div 
       onClick={onClick}
-      className="feature-card glass-card fade-in p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-xl"
+      className="group bg-white/80 backdrop-blur-lg rounded-2xl p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-2xl border border-gray-100 hover:border-blue-200"
     >
       <div className="flex flex-col items-center text-center space-y-4">
-        <div className="p-4 rounded-full animated-gradient transform transition-transform duration-500 hover:scale-110">
-          <Icon className="h-8 w-8 text-white animate-pulse" />
+        <div className="p-4 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transform transition-transform duration-500 group-hover:scale-110 shadow-lg">
+          <Icon className="h-8 w-8 text-white" />
         </div>
         
-        <h3 className="text-xl font-semibold gradient-text">
+        <h3 className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
           {title}
         </h3>
         
-        <p className="text-gray-600">
+        <p className="text-gray-600 leading-relaxed">
           {description}
         </p>
       </div>
-    </Card>
+    </div>
   );
 };
 
