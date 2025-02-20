@@ -206,14 +206,35 @@ const Index = () => {
         </div>
 
         <Tabs defaultValue="seo" className="space-y-6">
-          <TabsList className="hidden">
-            <TabsTrigger value="seo" id="seo">SEO</TabsTrigger>
-            <TabsTrigger value="structure" id="structure">Structure</TabsTrigger>
-            <TabsTrigger value="hierarchy" id="hierarchy">Hiérarchie</TabsTrigger>
-            <TabsTrigger value="backlinks" id="backlinks">Backlinks</TabsTrigger>
-            <TabsTrigger value="metrics" id="metrics">Métriques</TabsTrigger>
-            <TabsTrigger value="advanced" id="advanced">Avancé</TabsTrigger>
-            <TabsTrigger value="integrations" id="integrations">Intégrations</TabsTrigger>
+          <TabsList className="w-full border-b flex overflow-x-auto space-x-2 mb-4">
+            <TabsTrigger value="seo" id="seo" className="data-[state=active]:border-purple-500">
+              <Search className="w-4 h-4 mr-2" />
+              SEO
+            </TabsTrigger>
+            <TabsTrigger value="structure" id="structure" className="data-[state=active]:border-red-500">
+              <Globe className="w-4 h-4 mr-2" />
+              Structure
+            </TabsTrigger>
+            <TabsTrigger value="hierarchy" id="hierarchy" className="data-[state=active]:border-green-500">
+              <Database className="w-4 h-4 mr-2" />
+              Hiérarchie
+            </TabsTrigger>
+            <TabsTrigger value="backlinks" id="backlinks" className="data-[state=active]:border-orange-500">
+              <Link2 className="w-4 h-4 mr-2" />
+              Backlinks
+            </TabsTrigger>
+            <TabsTrigger value="metrics" id="metrics" className="data-[state=active]:border-pink-500">
+              <ChartBar className="w-4 h-4 mr-2" />
+              Métriques
+            </TabsTrigger>
+            <TabsTrigger value="advanced" id="advanced" className="data-[state=active]:border-yellow-500">
+              <Settings className="w-4 h-4 mr-2" />
+              Avancé
+            </TabsTrigger>
+            <TabsTrigger value="integrations" id="integrations" className="data-[state=active]:border-teal-500">
+              <Hash className="w-4 h-4 mr-2" />
+              Intégrations
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="seo">
