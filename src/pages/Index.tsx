@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -14,7 +15,8 @@ import {
   Hash, 
   Trophy,
   Zap,
-  BarChart3
+  BarChart3,
+  Tool
 } from "lucide-react";
 import SiteStructureVisualizer from '@/components/SiteStructureVisualizer';
 import ContentHierarchy from '@/components/ContentHierarchy';
@@ -26,6 +28,7 @@ import BacklinksAnalysis from '@/components/seo/BacklinksAnalysis';
 import KeywordSuggestions from '@/components/seo/KeywordSuggestions';
 import MobileAnalysis from '@/components/seo/MobileAnalysis';
 import SeoSuggestions from '@/components/seo/SeoSuggestions';
+import AdvancedOptimizations from '@/components/seo/AdvancedOptimizations';
 
 const Index = () => {
   const {
@@ -122,7 +125,7 @@ const Index = () => {
           {url && !isLoading && !error && seoAnalysis && (
             <div className="mt-8">
               <Tabs defaultValue="seo" className="space-y-6">
-                <TabsList className="grid w-full grid-cols-5">
+                <TabsList className="grid w-full grid-cols-7">
                   <TabsTrigger value="seo" className="space-x-2">
                     <Search className="h-4 w-4" />
                     <span>SEO</span>
@@ -142,6 +145,14 @@ const Index = () => {
                   <TabsTrigger value="metrics" className="space-x-2">
                     <ChartBar className="h-4 w-4" />
                     <span>Métriques</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="advanced" className="space-x-2">
+                    <Tool className="h-4 w-4" />
+                    <span>Avancé</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="integrations" className="space-x-2">
+                    <Hash className="h-4 w-4" />
+                    <span>Intégrations</span>
                   </TabsTrigger>
                 </TabsList>
 
@@ -189,7 +200,56 @@ const Index = () => {
                 <TabsContent value="metrics">
                   <Card className="p-6">
                     <h2 className="text-2xl font-semibold mb-4">Métriques détaillées</h2>
-                    {/* Ajoutez ici les métriques détaillées */}
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="advanced">
+                  <AdvancedOptimizations 
+                    content={seoAnalysis.paragraphs.map(p => p.text).join(' ')}
+                    links={seoAnalysis.backlinkDetails.map(b => b.url)}
+                  />
+                </TabsContent>
+
+                <TabsContent value="integrations">
+                  <Card className="p-6">
+                    <h2 className="text-2xl font-semibold mb-4">Intégrations</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <Button
+                        variant="outline"
+                        className="p-6 h-auto flex flex-col items-center gap-4"
+                        onClick={() => window.open('https://search.google.com/search-console', '_blank')}
+                      >
+                        <Search className="h-8 w-8" />
+                        <div className="text-center">
+                          <h3 className="font-semibold mb-2">Google Search Console</h3>
+                          <p className="text-sm text-gray-600">Connectez-vous pour voir les données en temps réel</p>
+                        </div>
+                      </Button>
+
+                      <Button
+                        variant="outline"
+                        className="p-6 h-auto flex flex-col items-center gap-4"
+                        onClick={() => window.open('https://analytics.google.com', '_blank')}
+                      >
+                        <BarChart3 className="h-8 w-8" />
+                        <div className="text-center">
+                          <h3 className="font-semibold mb-2">Google Analytics</h3>
+                          <p className="text-sm text-gray-600">Visualisez vos statistiques de trafic</p>
+                        </div>
+                      </Button>
+
+                      <Button
+                        variant="outline"
+                        className="p-6 h-auto flex flex-col items-center gap-4"
+                        disabled
+                      >
+                        <Hash className="h-8 w-8" />
+                        <div className="text-center">
+                          <h3 className="font-semibold mb-2">Réseaux Sociaux</h3>
+                          <p className="text-sm text-gray-600">Bientôt disponible</p>
+                        </div>
+                      </Button>
+                    </div>
                   </Card>
                 </TabsContent>
               </Tabs>
