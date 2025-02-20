@@ -31,9 +31,14 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
         site2: site2.analysis.readabilityScore,
       },
       {
-        metric: 'Temps de chargement',
-        site1: site1.analysis.performance.loadTime,
-        site2: site2.analysis.performance.loadTime,
+        metric: 'Performance',
+        site1: site1.analysis.performance.score,
+        site2: site2.analysis.performance.score,
+      },
+      {
+        metric: 'Temps de chargement (s)',
+        site1: Math.round(site1.analysis.performance.loadTime / 1000 * 10) / 10,
+        site2: Math.round(site2.analysis.performance.loadTime / 1000 * 10) / 10,
       },
       {
         metric: 'Mots clés',
@@ -50,6 +55,26 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
         site1: site1.analysis.externalLinks,
         site2: site2.analysis.externalLinks,
       },
+      {
+        metric: 'Score Mobile',
+        site1: site1.analysis.mobileAnalysis?.score || 0,
+        site2: site2.analysis.mobileAnalysis?.score || 0,
+      },
+      {
+        metric: 'Images sans alt',
+        site1: site1.analysis.imgWithoutAlt,
+        site2: site2.analysis.imgWithoutAlt,
+      },
+      {
+        metric: 'Backlinks',
+        site1: site1.analysis.backlinks?.length || 0,
+        site2: site2.analysis.backlinks?.length || 0,
+      },
+      {
+        metric: 'Nombre de titres',
+        site1: site1.analysis.h1Count + site1.analysis.h2Count + site1.analysis.h3Count,
+        site2: site2.analysis.h1Count + site2.analysis.h2Count + site2.analysis.h3Count,
+      }
     ];
   };
 
@@ -111,13 +136,22 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
             </div>
           </div>
 
-          <div className="h-[400px]">
+          <div className="h-[600px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={getComparisonData()} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis type="number" />
-                <YAxis dataKey="metric" type="category" width={120} />
-                <Tooltip />
+                <YAxis dataKey="metric" type="category" width={150} />
+                <Tooltip 
+                  formatter={(value) => [value, '']}
+                  labelStyle={{ color: '#111' }}
+                  contentStyle={{ 
+                    backgroundColor: 'white',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '6px',
+                    padding: '8px'
+                  }}
+                />
                 <Bar dataKey="site1" fill="#3b82f6" name="Votre site" />
                 <Bar dataKey="site2" fill="#22c55e" name="Site concurrent" />
               </BarChart>
@@ -141,4 +175,3 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
 };
 
 export default SiteComparison;
-
