@@ -6,25 +6,33 @@ import { Search, Globe, Database, Link2, ChartBar, Settings, Hash, Pen } from 'l
 const TabNavigation = () => {
   const tabs = [
     { id: 'seo', icon: Search, label: 'SEO', color: 'purple' },
-    { id: 'structure', icon: Globe, label: 'Structure', color: 'red' },
-    { id: 'hierarchy', icon: Database, label: 'Hiérarchie', color: 'green' },
-    { id: 'backlinks', icon: Link2, label: 'Backlinks', color: 'orange' },
-    { id: 'metrics', icon: ChartBar, label: 'Métriques', color: 'pink' },
-    { id: 'advanced', icon: Settings, label: 'Avancé', color: 'yellow' },
-    { id: 'integrations', icon: Hash, label: 'Intégrations', color: 'teal' },
-    { id: 'signature', icon: Pen, label: 'Signature', color: 'blue' }
+    { id: 'structure', icon: Globe, label: 'Structure', color: 'blue' },
+    { id: 'hierarchy', icon: Database, label: 'Hiérarchie', color: 'indigo' },
+    { id: 'backlinks', icon: Link2, label: 'Backlinks', color: 'pink' },
+    { id: 'metrics', icon: ChartBar, label: 'Métriques', color: 'violet' },
+    { id: 'advanced', icon: Settings, label: 'Avancé', color: 'fuchsia' },
+    { id: 'integrations', icon: Hash, label: 'Intégrations', color: 'rose' },
+    { id: 'signature', icon: Pen, label: 'Signature', color: 'purple' }
   ];
 
   return (
-    <TabsList className="w-full border-b flex overflow-x-auto space-x-2 mb-4 bg-white/50 backdrop-blur-sm">
+    <TabsList className="w-full flex overflow-x-auto space-x-1 bg-white/50 backdrop-blur-sm p-1 rounded-lg shadow-inner">
       {tabs.map(({ id, icon: Icon, label, color }) => (
         <TabsTrigger 
           key={id}
-          value={id} 
-          id={id} 
-          className={`border-b-2 border-transparent data-[state=active]:border-${color}-500 data-[state=active]:text-${color}-600 data-[state=active]:bg-${color}-50`}
+          value={id}
+          className={`
+            flex items-center gap-2 px-4 py-2.5 rounded-md font-medium
+            transition-all duration-300
+            data-[state=active]:bg-gradient-to-br 
+            data-[state=active]:from-${color}-500/20 
+            data-[state=active]:to-${color}-600/20
+            data-[state=active]:text-${color}-700
+            data-[state=active]:shadow-sm
+            hover:bg-${color}-50
+          `}
         >
-          <Icon className="w-4 h-4 mr-2" />
+          <Icon className="w-4 h-4" />
           {label}
         </TabsTrigger>
       ))}

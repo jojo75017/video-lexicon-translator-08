@@ -1,70 +1,70 @@
 
 import React from 'react';
 import FeatureCard from './FeatureCard';
-import { Pen, Search, Globe, Database, Link2, ChartBar, Settings, Hash } from 'lucide-react';
+import { Search, Globe, Database, Link2, ChartBar, Settings, Hash, Pen } from 'lucide-react';
 
 const FeatureGrid = () => {
   const features = [
     {
       icon: Pen,
       title: "Signature",
-      description: "Générateur de signature",
-      color: "border-blue-500",
+      description: "Créez votre signature professionnelle",
+      color: "border-purple-500",
       id: "signature"
     },
     {
       icon: Search,
       title: "SEO",
       description: "Analyse complète des facteurs SEO",
-      color: "border-purple-500",
+      color: "border-blue-500",
       id: "seo"
     },
     {
       icon: Globe,
       title: "Structure",
       description: "Architecture du site",
-      color: "border-red-500",
+      color: "border-indigo-500",
       id: "structure"
     },
     {
       icon: Database,
       title: "Hiérarchie",
       description: "Organisation du contenu",
-      color: "border-green-500",
+      color: "border-violet-500",
       id: "hierarchy"
     },
     {
       icon: Link2,
       title: "Backlinks",
       description: "Analyse des liens",
-      color: "border-orange-500",
+      color: "border-pink-500",
       id: "backlinks"
     },
     {
       icon: ChartBar,
       title: "Métriques",
-      description: "Statistiques",
-      color: "border-pink-500",
+      description: "Statistiques détaillées",
+      color: "border-fuchsia-500",
       id: "metrics"
     },
     {
       icon: Settings,
       title: "Avancé",
       description: "Options avancées",
-      color: "border-yellow-500",
+      color: "border-rose-500",
       id: "advanced"
     },
     {
       icon: Hash,
       title: "Intégrations",
       description: "Outils externes",
-      color: "border-teal-500",
+      color: "border-purple-500",
       id: "integrations"
     }
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       {features.map((feature) => (
         <FeatureCard
           key={feature.id}

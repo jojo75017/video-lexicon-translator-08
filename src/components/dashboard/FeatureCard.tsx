@@ -14,15 +14,28 @@ interface FeatureCardProps {
 const FeatureCard = ({ icon: Icon, title, description, color, onClick }: FeatureCardProps) => {
   return (
     <Card 
-      className={`group p-4 cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl border-t-4 ${color}`}
+      className={`relative group cursor-pointer overflow-hidden ${color}`}
       onClick={onClick}
     >
-      <div className="flex flex-col items-center text-center space-y-3">
-        <div className={`p-3 rounded-xl transform transition-all duration-300 group-hover:scale-110 ${color.replace('border', 'bg').replace('500', '100')}`}>
-          <Icon className={`h-6 w-6 ${color.replace('border', 'text').replace('500', '600')}`} />
+      {/* Background gradient effect */}
+      <div className="absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out"
+           style={{
+             backgroundImage: `linear-gradient(to bottom right, ${color.includes('purple') ? '#9b87f5' : '#60a5fa'}15, transparent)`
+           }} />
+      
+      {/* Content */}
+      <div className="relative p-6 flex flex-col items-center text-center space-y-4">
+        <div className={`p-3 rounded-xl bg-white shadow-lg transform transition-all duration-300 group-hover:scale-110 group-hover:shadow-xl`}>
+          <Icon className={`h-6 w-6 ${color.replace('border', 'text')}`} />
         </div>
-        <h3 className="font-semibold text-gray-800">{title}</h3>
-        <p className="text-xs text-gray-500 hidden lg:block">{description}</p>
+        
+        <div className="space-y-2">
+          <h3 className="font-semibold text-gray-800 group-hover:text-gray-900">{title}</h3>
+          <p className="text-sm text-gray-500 group-hover:text-gray-600 transition-colors duration-300">{description}</p>
+        </div>
+        
+        {/* Hover effect overlay */}
+        <div className="absolute inset-0 border-2 border-transparent group-hover:border-current opacity-0 group-hover:opacity-10 transition-all duration-300 rounded-lg" />
       </div>
     </Card>
   );
