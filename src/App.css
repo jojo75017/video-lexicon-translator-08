@@ -17,18 +17,30 @@
   background: linear-gradient(135deg, #2563eb, #9333ea);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-size: 200% auto;
+  animation: shine 3s ease-in-out infinite;
+}
+
+@keyframes shine {
+  from {
+    background-position: 0% center;
+  }
+  to {
+    background-position: 200% center;
+  }
 }
 
 .feature-card {
   transition: all 0.3s ease;
   border-radius: 1rem;
-  background: white;
+  background: rgba(255, 255, 255, 0.9);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .feature-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  background: rgba(255, 255, 255, 0.95);
 }
 
 /* Effets de glassmorphisme */
@@ -36,7 +48,7 @@
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
 }
 
 /* Animations améliorées */
@@ -100,4 +112,21 @@
 /* Conteneurs avec ombres douces */
 .soft-shadow {
   box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Animations pour les icônes */
+@keyframes floating {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.floating {
+  animation: floating 3s ease-in-out infinite;
 }
