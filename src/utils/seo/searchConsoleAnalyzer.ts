@@ -1,60 +1,75 @@
 
-export const analyzeSearchConsole = (url: string) => {
-  const clicks = Math.floor(Math.random() * 30) + 10; // Entre 10-40 clics
-  const impressions = clicks * (Math.floor(Math.random() * 15) + 10); // Entre 10-25 fois plus d'impressions que de clics
-  
-  return {
-    clicks,
-    impressions,
-    ctr: (clicks / impressions) * 100, // CTR réaliste basé sur le rapport clics/impressions
-    position: Math.floor(Math.random() * 7) + 3, // Position moyenne entre 3-10
-    topQueries: [
-      {
-        query: "votre secteur d'activité",
-        clicks: Math.floor(clicks * 0.3),
-        impressions: Math.floor(impressions * 0.3)
+import { GoogleSearchConsole } from '@/utils/googleSearchConsole';
+
+export const analyzeSearchConsole = async (url: string) => {
+  try {
+    const searchConsole = new GoogleSearchConsole();
+    const data = await searchConsole.getSearchAnalytics(url);
+    
+    return {
+      clicks: data.clicks || 0,
+      impressions: data.impressions || 0,
+      ctr: data.ctr || 0,
+      position: data.position || 0,
+      topQueries: data.queries || [
+        {
+          query: "chargement...",
+          clicks: 0,
+          impressions: 0
+        }
+      ],
+      topPages: data.pages || [
+        {
+          url: url,
+          clicks: 0,
+          impressions: 0
+        }
+      ],
+      devices: data.devices || {
+        mobile: 0,
+        desktop: 0,
+        tablet: 0
       },
-      {
-        query: "votre service principal",
-        clicks: Math.floor(clicks * 0.2),
-        impressions: Math.floor(impressions * 0.2)
+      countries: data.countries || [
+        {
+          country: "France",
+          clicks: 0
+        }
+      ]
+    };
+  } catch (error) {
+    console.error('Erreur lors de la récupération des données Search Console:', error);
+    // En cas d'erreur, on retourne les données simulées comme fallback
+    return {
+      clicks: 0,
+      impressions: 0,
+      ctr: 0,
+      position: 0,
+      topQueries: [
+        {
+          query: "erreur de connexion",
+          clicks: 0,
+          impressions: 0
+        }
+      ],
+      topPages: [
+        {
+          url: url,
+          clicks: 0,
+          impressions: 0
+        }
+      ],
+      devices: {
+        mobile: 0,
+        desktop: 0,
+        tablet: 0
       },
-      {
-        query: "votre localisation",
-        clicks: Math.floor(clicks * 0.15),
-        impressions: Math.floor(impressions * 0.15)
-      }
-    ],
-    topPages: [
-      {
-        url,
-        clicks: Math.floor(clicks * 0.6),
-        impressions: Math.floor(impressions * 0.6)
-      },
-      {
-        url: url + '/services',
-        clicks: Math.floor(clicks * 0.25),
-        impressions: Math.floor(impressions * 0.25)
-      }
-    ],
-    devices: {
-      mobile: Math.floor(clicks * 0.55),
-      desktop: Math.floor(clicks * 0.35),
-      tablet: Math.floor(clicks * 0.1)
-    },
-    countries: [
-      {
-        country: "France",
-        clicks: Math.floor(clicks * 0.7)
-      },
-      {
-        country: "Belgique",
-        clicks: Math.floor(clicks * 0.15)
-      },
-      {
-        country: "Suisse",
-        clicks: Math.floor(clicks * 0.1)
-      }
-    ]
-  };
+      countries: [
+        {
+          country: "France",
+          clicks: 0
+        }
+      ]
+    };
+  }
 };
