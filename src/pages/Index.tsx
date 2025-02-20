@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -110,53 +111,49 @@ const Index = () => {
             </Alert>
           )}
 
-          {isLoading && (
-            <div className="mt-8 space-y-4">
-              <Card className="p-6">
-                <div className="space-y-3">
-                  <Skeleton className="h-8 w-2/3" />
-                  <Skeleton className="h-4 w-1/2" />
-                  <Skeleton className="h-4 w-3/4" />
-                </div>
-              </Card>
-            </div>
-          )}
+          <div className="mt-8">
+            <Tabs defaultValue="seo" className="space-y-6">
+              <TabsList className="grid w-full grid-cols-7">
+                <TabsTrigger value="seo" className="space-x-2">
+                  <Search className="h-4 w-4" />
+                  <span>SEO</span>
+                </TabsTrigger>
+                <TabsTrigger value="structure" className="space-x-2">
+                  <Globe className="h-4 w-4" />
+                  <span>Structure</span>
+                </TabsTrigger>
+                <TabsTrigger value="hierarchy" className="space-x-2">
+                  <Database className="h-4 w-4" />
+                  <span>Hiérarchie</span>
+                </TabsTrigger>
+                <TabsTrigger value="backlinks" className="space-x-2">
+                  <Link2 className="h-4 w-4" />
+                  <span>Backlinks</span>
+                </TabsTrigger>
+                <TabsTrigger value="metrics" className="space-x-2">
+                  <ChartBar className="h-4 w-4" />
+                  <span>Métriques</span>
+                </TabsTrigger>
+                <TabsTrigger value="advanced" className="space-x-2">
+                  <Settings className="h-4 w-4" />
+                  <span>Avancé</span>
+                </TabsTrigger>
+                <TabsTrigger value="integrations" className="space-x-2">
+                  <Hash className="h-4 w-4" />
+                  <span>Intégrations</span>
+                </TabsTrigger>
+              </TabsList>
 
-          {url && !isLoading && !error && seoAnalysis && (
-            <div className="mt-8">
-              <Tabs defaultValue="seo" className="space-y-6">
-                <TabsList className="grid w-full grid-cols-7">
-                  <TabsTrigger value="seo" className="space-x-2">
-                    <Search className="h-4 w-4" />
-                    <span>SEO</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="structure" className="space-x-2">
-                    <Globe className="h-4 w-4" />
-                    <span>Structure</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="hierarchy" className="space-x-2">
-                    <Database className="h-4 w-4" />
-                    <span>Hiérarchie</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="backlinks" className="space-x-2">
-                    <Link2 className="h-4 w-4" />
-                    <span>Backlinks</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="metrics" className="space-x-2">
-                    <ChartBar className="h-4 w-4" />
-                    <span>Métriques</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="advanced" className="space-x-2">
-                    <Settings className="h-4 w-4" />
-                    <span>Avancé</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="integrations" className="space-x-2">
-                    <Hash className="h-4 w-4" />
-                    <span>Intégrations</span>
-                  </TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="seo">
+              <TabsContent value="seo">
+                {isLoading ? (
+                  <Card className="p-6">
+                    <div className="space-y-3">
+                      <Skeleton className="h-8 w-2/3" />
+                      <Skeleton className="h-4 w-1/2" />
+                      <Skeleton className="h-4 w-3/4" />
+                    </div>
+                  </Card>
+                ) : seoAnalysis ? (
                   <div className="space-y-6">
                     <SeoResults seoAnalysis={seoAnalysis} />
                     <KeywordSuggestions suggestions={seoAnalysis.keywordSuggestions || []} />
@@ -169,25 +166,53 @@ const Index = () => {
                     />
                     <SeoSuggestions suggestions={seoAnalysis.technicalSuggestions || []} />
                   </div>
-                </TabsContent>
+                ) : (
+                  <Card className="p-6">
+                    <p className="text-center text-gray-500">Entrez une URL et lancez l'analyse pour voir les résultats SEO</p>
+                  </Card>
+                )}
+              </TabsContent>
 
-                <TabsContent value="structure">
-                  {siteStructure && (
-                    <Card className="p-6">
-                      <h2 className="text-2xl font-semibold mb-4">Structure du Site</h2>
-                      <SiteStructureVisualizer structure={siteStructure} />
-                    </Card>
-                  )}
-                </TabsContent>
+              <TabsContent value="structure">
+                {isLoading ? (
+                  <Card className="p-6">
+                    <Skeleton className="h-[400px]" />
+                  </Card>
+                ) : siteStructure ? (
+                  <Card className="p-6">
+                    <h2 className="text-2xl font-semibold mb-4">Structure du Site</h2>
+                    <SiteStructureVisualizer structure={siteStructure} />
+                  </Card>
+                ) : (
+                  <Card className="p-6">
+                    <p className="text-center text-gray-500">Entrez une URL et lancez l'analyse pour voir la structure du site</p>
+                  </Card>
+                )}
+              </TabsContent>
 
-                <TabsContent value="hierarchy">
+              <TabsContent value="hierarchy">
+                {isLoading ? (
+                  <Card className="p-6">
+                    <Skeleton className="h-[300px]" />
+                  </Card>
+                ) : seoAnalysis ? (
                   <ContentHierarchy 
                     headings={seoAnalysis.headings || []} 
                     paragraphs={seoAnalysis.paragraphs || []} 
                   />
-                </TabsContent>
+                ) : (
+                  <Card className="p-6">
+                    <p className="text-center text-gray-500">Entrez une URL et lancez l'analyse pour voir la hiérarchie du contenu</p>
+                  </Card>
+                )}
+              </TabsContent>
 
-                <TabsContent value="backlinks">
+              <TabsContent value="backlinks">
+                {isLoading ? (
+                  <Card className="p-6">
+                    <Skeleton className="h-[300px]" />
+                  </Card>
+                ) : seoAnalysis ? (
                   <BacklinksAnalysis 
                     backlinks={seoAnalysis.backlinks}
                     backlinkDetails={seoAnalysis.backlinkDetails}
@@ -195,66 +220,84 @@ const Index = () => {
                     doFollowBacklinks={seoAnalysis.doFollowBacklinks}
                     noFollowBacklinks={seoAnalysis.noFollowBacklinks}
                   />
-                </TabsContent>
+                ) : (
+                  <Card className="p-6">
+                    <p className="text-center text-gray-500">Entrez une URL et lancez l'analyse pour voir les backlinks</p>
+                  </Card>
+                )}
+              </TabsContent>
 
-                <TabsContent value="metrics">
-                  <div className="space-y-6">
-                    <AnalyticsOverview />
-                  </div>
-                </TabsContent>
+              <TabsContent value="metrics">
+                {isLoading ? (
+                  <Card className="p-6">
+                    <Skeleton className="h-[400px]" />
+                  </Card>
+                ) : (
+                  <AnalyticsOverview />
+                )}
+              </TabsContent>
 
-                <TabsContent value="advanced">
+              <TabsContent value="advanced">
+                {isLoading ? (
+                  <Card className="p-6">
+                    <Skeleton className="h-[300px]" />
+                  </Card>
+                ) : seoAnalysis ? (
                   <AdvancedOptimizations 
                     content={seoAnalysis.paragraphs.map(p => p.text).join(' ')}
                     links={seoAnalysis.backlinkDetails.map(b => b.url)}
                   />
-                </TabsContent>
-
-                <TabsContent value="integrations">
+                ) : (
                   <Card className="p-6">
-                    <h2 className="text-2xl font-semibold mb-4">Intégrations</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      <Button
-                        variant="outline"
-                        className="p-6 h-auto flex flex-col items-center gap-4"
-                        onClick={() => window.open('https://search.google.com/search-console', '_blank')}
-                      >
-                        <Search className="h-8 w-8" />
-                        <div className="text-center">
-                          <h3 className="font-semibold mb-2">Google Search Console</h3>
-                          <p className="text-sm text-gray-600">Connectez-vous pour voir les données en temps réel</p>
-                        </div>
-                      </Button>
-
-                      <Button
-                        variant="outline"
-                        className="p-6 h-auto flex flex-col items-center gap-4"
-                        onClick={() => window.open('https://analytics.google.com', '_blank')}
-                      >
-                        <BarChart3 className="h-8 w-8" />
-                        <div className="text-center">
-                          <h3 className="font-semibold mb-2">Google Analytics</h3>
-                          <p className="text-sm text-gray-600">Visualisez vos statistiques de trafic</p>
-                        </div>
-                      </Button>
-
-                      <Button
-                        variant="outline"
-                        className="p-6 h-auto flex flex-col items-center gap-4"
-                        disabled
-                      >
-                        <Hash className="h-8 w-8" />
-                        <div className="text-center">
-                          <h3 className="font-semibold mb-2">Réseaux Sociaux</h3>
-                          <p className="text-sm text-gray-600">Bientôt disponible</p>
-                        </div>
-                      </Button>
-                    </div>
+                    <p className="text-center text-gray-500">Entrez une URL et lancez l'analyse pour voir les optimisations avancées</p>
                   </Card>
-                </TabsContent>
-              </Tabs>
-            </div>
-          )}
+                )}
+              </TabsContent>
+
+              <TabsContent value="integrations">
+                <Card className="p-6">
+                  <h2 className="text-2xl font-semibold mb-4">Intégrations</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <Button
+                      variant="outline"
+                      className="p-6 h-auto flex flex-col items-center gap-4"
+                      onClick={() => window.open('https://search.google.com/search-console', '_blank')}
+                    >
+                      <Search className="h-8 w-8" />
+                      <div className="text-center">
+                        <h3 className="font-semibold mb-2">Google Search Console</h3>
+                        <p className="text-sm text-gray-600">Connectez-vous pour voir les données en temps réel</p>
+                      </div>
+                    </Button>
+
+                    <Button
+                      variant="outline"
+                      className="p-6 h-auto flex flex-col items-center gap-4"
+                      onClick={() => window.open('https://analytics.google.com', '_blank')}
+                    >
+                      <BarChart3 className="h-8 w-8" />
+                      <div className="text-center">
+                        <h3 className="font-semibold mb-2">Google Analytics</h3>
+                        <p className="text-sm text-gray-600">Visualisez vos statistiques de trafic</p>
+                      </div>
+                    </Button>
+
+                    <Button
+                      variant="outline"
+                      className="p-6 h-auto flex flex-col items-center gap-4"
+                      disabled
+                    >
+                      <Hash className="h-8 w-8" />
+                      <div className="text-center">
+                        <h3 className="font-semibold mb-2">Réseaux Sociaux</h3>
+                        <p className="text-sm text-gray-600">Bientôt disponible</p>
+                      </div>
+                    </Button>
+                  </div>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </div>
         </div>
 
         <div className="mt-20 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
