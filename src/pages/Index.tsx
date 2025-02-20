@@ -206,32 +206,60 @@ const Index = () => {
         </div>
 
         <Tabs defaultValue="seo" className="space-y-6">
-          <TabsList className="w-full border-b flex overflow-x-auto space-x-2 mb-4">
-            <TabsTrigger value="seo" id="seo" className="data-[state=active]:border-purple-500">
+          <TabsList className="w-full border-b flex overflow-x-auto space-x-2 mb-4 bg-white/50 backdrop-blur-sm">
+            <TabsTrigger 
+              value="seo" 
+              id="seo" 
+              className="border-b-2 border-transparent data-[state=active]:border-purple-500 data-[state=active]:text-purple-600 data-[state=active]:bg-purple-50"
+            >
               <Search className="w-4 h-4 mr-2" />
               SEO
             </TabsTrigger>
-            <TabsTrigger value="structure" id="structure" className="data-[state=active]:border-red-500">
+            <TabsTrigger 
+              value="structure" 
+              id="structure" 
+              className="border-b-2 border-transparent data-[state=active]:border-red-500 data-[state=active]:text-red-600 data-[state=active]:bg-red-50"
+            >
               <Globe className="w-4 h-4 mr-2" />
               Structure
             </TabsTrigger>
-            <TabsTrigger value="hierarchy" id="hierarchy" className="data-[state=active]:border-green-500">
+            <TabsTrigger 
+              value="hierarchy" 
+              id="hierarchy" 
+              className="border-b-2 border-transparent data-[state=active]:border-green-500 data-[state=active]:text-green-600 data-[state=active]:bg-green-50"
+            >
               <Database className="w-4 h-4 mr-2" />
               Hiérarchie
             </TabsTrigger>
-            <TabsTrigger value="backlinks" id="backlinks" className="data-[state=active]:border-orange-500">
+            <TabsTrigger 
+              value="backlinks" 
+              id="backlinks" 
+              className="border-b-2 border-transparent data-[state=active]:border-orange-500 data-[state=active]:text-orange-600 data-[state=active]:bg-orange-50"
+            >
               <Link2 className="w-4 h-4 mr-2" />
               Backlinks
             </TabsTrigger>
-            <TabsTrigger value="metrics" id="metrics" className="data-[state=active]:border-pink-500">
+            <TabsTrigger 
+              value="metrics" 
+              id="metrics" 
+              className="border-b-2 border-transparent data-[state=active]:border-pink-500 data-[state=active]:text-pink-600 data-[state=active]:bg-pink-50"
+            >
               <ChartBar className="w-4 h-4 mr-2" />
               Métriques
             </TabsTrigger>
-            <TabsTrigger value="advanced" id="advanced" className="data-[state=active]:border-yellow-500">
+            <TabsTrigger 
+              value="advanced" 
+              id="advanced" 
+              className="border-b-2 border-transparent data-[state=active]:border-yellow-500 data-[state=active]:text-yellow-600 data-[state=active]:bg-yellow-50"
+            >
               <Settings className="w-4 h-4 mr-2" />
               Avancé
             </TabsTrigger>
-            <TabsTrigger value="integrations" id="integrations" className="data-[state=active]:border-teal-500">
+            <TabsTrigger 
+              value="integrations" 
+              id="integrations" 
+              className="border-b-2 border-transparent data-[state=active]:border-teal-500 data-[state=active]:text-teal-600 data-[state=active]:bg-teal-50"
+            >
               <Hash className="w-4 h-4 mr-2" />
               Intégrations
             </TabsTrigger>
