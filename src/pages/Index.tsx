@@ -16,7 +16,8 @@ import {
   Zap,
   BarChart3,
   Settings,
-  Rocket
+  Rocket,
+  Pen,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSiteAnalyzer } from '@/hooks/useSiteAnalyzer';
@@ -30,6 +31,7 @@ import MobileAnalysis from '@/components/seo/MobileAnalysis';
 import SeoSuggestions from '@/components/seo/SeoSuggestions';
 import AdvancedOptimizations from '@/components/seo/AdvancedOptimizations';
 import AnalyticsOverview from '@/components/seo/AnalyticsOverview';
+import SignatureGenerator from '@/components/signature/SignatureGenerator';
 
 const Index = () => {
   const {
@@ -70,15 +72,15 @@ const Index = () => {
         <div className="mb-12">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4 mb-8">
             <Card 
-              className="group p-4 cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl border-t-4 border-purple-500"
-              onClick={() => document.getElementById('seo')?.click()}
+              className="group p-4 cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-xl border-t-4 border-blue-500"
+              onClick={() => document.getElementById('signature')?.click()}
             >
               <div className="flex flex-col items-center text-center space-y-3">
-                <div className="p-3 rounded-xl bg-purple-100 transform transition-all duration-300 group-hover:scale-110">
-                  <Search className="h-6 w-6 text-purple-600" />
+                <div className="p-3 rounded-xl bg-blue-100 transform transition-all duration-300 group-hover:scale-110">
+                  <Pen className="h-6 w-6 text-blue-600" />
                 </div>
-                <h3 className="font-semibold text-gray-800">SEO</h3>
-                <p className="text-xs text-gray-500 hidden lg:block">Analyse complète des facteurs SEO</p>
+                <h3 className="font-semibold text-gray-800">Signature</h3>
+                <p className="text-xs text-gray-500 hidden lg:block">Générateur de signature</p>
               </div>
             </Card>
 
@@ -263,6 +265,14 @@ const Index = () => {
               <Hash className="w-4 h-4 mr-2" />
               Intégrations
             </TabsTrigger>
+            <TabsTrigger 
+              value="signature" 
+              id="signature" 
+              className="border-b-2 border-transparent data-[state=active]:border-blue-500 data-[state=active]:text-blue-600 data-[state=active]:bg-blue-50"
+            >
+              <Pen className="w-4 h-4 mr-2" />
+              Signature
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="seo">
@@ -426,6 +436,12 @@ const Index = () => {
                   </div>
                 </Button>
               </div>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="signature">
+            <Card className="p-6">
+              <SignatureGenerator />
             </Card>
           </TabsContent>
         </Tabs>
