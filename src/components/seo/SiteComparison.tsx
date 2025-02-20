@@ -67,8 +67,8 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
       },
       {
         metric: 'Backlinks',
-        site1: (site1.analysis.backlinks || []).length,
-        site2: (site2.analysis.backlinks || []).length,
+        site1: Array.isArray(site1.analysis.backlinks) ? site1.analysis.backlinks.length : 0,
+        site2: Array.isArray(site2.analysis.backlinks) ? site2.analysis.backlinks.length : 0,
       },
       {
         metric: 'Nombre de titres',
@@ -175,3 +175,4 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
 };
 
 export default SiteComparison;
+
