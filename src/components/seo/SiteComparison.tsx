@@ -6,6 +6,15 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { SeoAnalysis } from '@/types/seo';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ChevronRight, Sparkles, TrendingUp } from 'lucide-react';
+import { toast } from "sonner";
+
+interface KeywordSuggestion {
+  keyword: string;
+  volume: number;
+  difficulty: number;
+  cpc: number;
+  competition: number;
+}
 
 interface SiteComparisonProps {
   site1: {
@@ -21,10 +30,12 @@ interface SiteComparisonProps {
 
 const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
   const [competitorUrl, setCompetitorUrl] = React.useState('');
+  const [keywordSuggestions, setKeywordSuggestions] = React.useState<KeywordSuggestion[]>([]);
+  const [isLoadingKeywords, setIsLoadingKeywords] = React.useState(false);
 
   const getComparisonData = () => {
     if (!site2) return [];
-
+    
     return [
       {
         metric: 'Score SEO',
@@ -79,16 +90,44 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
     ];
   };
 
-  const getKeywordSuggestions = () => {
-    const baseKeywords = site1.analysis.keywords || [];
-    return baseKeywords.slice(0, 5).map(keyword => ({
-      keyword: typeof keyword === 'string' ? keyword : keyword.keyword,
+  const fetchKeywordData = async (keyword: string): Promise<KeywordSuggestion> => {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return {
+      keyword,
       volume: Math.floor(Math.random() * 10000),
       difficulty: Math.floor(Math.random() * 100),
-      cpc: (Math.random() * 5).toFixed(2),
+      cpc: parseFloat((Math.random() * 5).toFixed(2)),
       competition: Math.random()
-    }));
+    };
   };
+
+  const getKeywordSuggestions = async () => {
+    setIsLoadingKeywords(true);
+    try {
+      const baseKeywords = site1.analysis.keywords || [];
+      const keywords = baseKeywords.slice(0, 5);
+      
+      const suggestions = await Promise.all(
+        keywords.map(kw => {
+          const keyword = typeof kw === 'string' ? kw : kw.toString();
+          return fetchKeywordData(keyword);
+        })
+      );
+      
+      setKeywordSuggestions(suggestions);
+    } catch (error) {
+      console.error('Erreur lors de la récupération des données de mots-clés:', error);
+      toast.error("Erreur lors de la récupération des suggestions de mots-clés");
+    } finally {
+      setIsLoadingKeywords(false);
+    }
+  };
+
+  React.useEffect(() => {
+    if (site1.analysis.keywords?.length) {
+      getKeywordSuggestions();
+    }
+  }, [site1.analysis.keywords]);
 
   const handleCompare = (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,8 +136,6 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
       setCompetitorUrl('');
     }
   };
-
-  const keywordSuggestions = getKeywordSuggestions();
 
   return (
     <Card className="p-6">
@@ -192,68 +229,75 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
 
           <TabsContent value="keywords">
             <div className="space-y-6">
-              <div className="grid gap-4">
-                {keywordSuggestions.map((suggestion, index) => (
-                  <div 
-                    key={index} 
-                    className="p-4 bg-white rounded-lg border border-gray-200 hover:border-blue-400 transition-colors"
-                  >
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center space-x-2">
-                        <Sparkles className="h-5 w-5 text-blue-500" />
-                        <h3 className="font-semibold text-lg">{suggestion.keyword}</h3>
-                      </div>
-                      <div className="flex items-center space-x-2 text-sm">
-                        <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded">
-                          CPC: {suggestion.cpc}€
-                        </span>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-3 gap-4">
-                      <div className="space-y-1">
-                        <div className="text-sm text-gray-500 flex items-center">
-                          <TrendingUp className="h-4 w-4 mr-1" />
-                          Volume mensuel
+              {isLoadingKeywords ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+                  <p className="mt-2 text-gray-600">Chargement des suggestions...</p>
+                </div>
+              ) : (
+                <div className="grid gap-4">
+                  {keywordSuggestions.map((suggestion, index) => (
+                    <div 
+                      key={index} 
+                      className="p-4 bg-white rounded-lg border border-gray-200 hover:border-blue-400 transition-colors"
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center space-x-2">
+                          <Sparkles className="h-5 w-5 text-blue-500" />
+                          <h3 className="font-semibold text-lg">{suggestion.keyword}</h3>
                         </div>
-                        <div className="font-semibold">{suggestion.volume}</div>
-                      </div>
-                      
-                      <div className="space-y-1">
-                        <div className="text-sm text-gray-500">Difficulté</div>
-                        <div className="flex items-center">
-                          <div className="w-full bg-gray-200 rounded-full h-2 mr-2">
-                            <div 
-                              className="bg-blue-600 h-2 rounded-full" 
-                              style={{ width: `${suggestion.difficulty}%` }}
-                            />
-                          </div>
-                          <span className="text-sm font-medium">{suggestion.difficulty}</span>
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-1">
-                        <div className="text-sm text-gray-500">Compétition</div>
-                        <div className="flex items-center">
-                          <div className="w-full bg-gray-200 rounded-full h-2 mr-2">
-                            <div 
-                              className="bg-green-600 h-2 rounded-full" 
-                              style={{ width: `${suggestion.competition * 100}%` }}
-                            />
-                          </div>
-                          <span className="text-sm font-medium">
-                            {Math.round(suggestion.competition * 100)}%
+                        <div className="flex items-center space-x-2 text-sm">
+                          <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded">
+                            CPC: {suggestion.cpc}€
                           </span>
                         </div>
                       </div>
+                      
+                      <div className="grid grid-cols-3 gap-4">
+                        <div className="space-y-1">
+                          <div className="text-sm text-gray-500 flex items-center">
+                            <TrendingUp className="h-4 w-4 mr-1" />
+                            Volume mensuel
+                          </div>
+                          <div className="font-semibold">{suggestion.volume}</div>
+                        </div>
+                        
+                        <div className="space-y-1">
+                          <div className="text-sm text-gray-500">Difficulté</div>
+                          <div className="flex items-center">
+                            <div className="w-full bg-gray-200 rounded-full h-2 mr-2">
+                              <div 
+                                className="bg-blue-600 h-2 rounded-full" 
+                                style={{ width: `${suggestion.difficulty}%` }}
+                              />
+                            </div>
+                            <span className="text-sm font-medium">{suggestion.difficulty}</span>
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-1">
+                          <div className="text-sm text-gray-500">Compétition</div>
+                          <div className="flex items-center">
+                            <div className="w-full bg-gray-200 rounded-full h-2 mr-2">
+                              <div 
+                                className="bg-green-600 h-2 rounded-full" 
+                                style={{ width: `${suggestion.competition * 100}%` }}
+                              />
+                            </div>
+                            <span className="text-sm font-medium">
+                              {Math.round(suggestion.competition * 100)}%
+                            </span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
 
               <div className="p-4 bg-blue-50 rounded-lg">
                 <p className="text-sm text-blue-800">
-                  Les données de volume, CPC et difficulté sont des estimations basées sur les tendances actuelles.
+                  Pour obtenir des données réelles de volume de recherche, CPC et difficulté, vous devrez intégrer une API comme DataForSEO, SEMrush ou Ahrefs.
                 </p>
               </div>
             </div>
