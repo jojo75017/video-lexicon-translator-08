@@ -15,7 +15,7 @@ import {
   Trophy,
   Zap,
   BarChart3,
-  Tool
+  Settings
 } from "lucide-react";
 import SiteStructureVisualizer from '@/components/SiteStructureVisualizer';
 import ContentHierarchy from '@/components/ContentHierarchy';
@@ -147,7 +147,7 @@ const Index = () => {
                     <span>Métriques</span>
                   </TabsTrigger>
                   <TabsTrigger value="advanced" className="space-x-2">
-                    <Tool className="h-4 w-4" />
+                    <Settings className="h-4 w-4" />
                     <span>Avancé</span>
                   </TabsTrigger>
                   <TabsTrigger value="integrations" className="space-x-2">

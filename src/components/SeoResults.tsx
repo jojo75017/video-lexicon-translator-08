@@ -5,7 +5,6 @@ import SeoOverview from './seo/SeoOverview';
 import SearchTrends from './seo/SearchTrends';
 import DetailedMetrics from './seo/DetailedMetrics';
 import SiteComparison from './seo/SiteComparison';
-import AnalyticsOverview from './seo/AnalyticsOverview';
 import LoadingSpeedAnalysis from './seo/LoadingSpeedAnalysis';
 import SeoStructure from './seo/SeoStructure';
 import KeywordAnalysis from './seo/KeywordAnalysis';
@@ -19,6 +18,7 @@ import { analyzeLinkStructure } from '@/utils/seo/linkAnalyzer';
 import { analyzeAccessibility } from '@/utils/seo/accessibilityAnalyzer';
 import { analyzeReadability } from '@/utils/seo/semanticAnalyzer';
 import { analyzeMobilePerformance } from '@/utils/seo/mobileAnalyzer';
+import AnalyticsOverview from './seo/AnalyticsOverview';
 
 interface SeoResultsProps {
   seoAnalysis: SeoAnalysis;
@@ -154,7 +154,7 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
           impressions={seoAnalysis.searchConsole.impressions}
         />
 
-        <AnalyticsOverview analytics={seoAnalysis.analytics} />
+        <AnalyticsOverview />
 
         <SiteComparison 
           site1={{url: window.location.href, analysis: seoAnalysis}}
