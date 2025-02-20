@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -171,13 +170,26 @@ const Index = () => {
             />
             {showCorsWarning && (
               <div className="mt-6">
+                <Alert className="bg-yellow-50 border-yellow-200 mb-4">
+                  <AlertCircle className="h-5 w-5 text-yellow-600" />
+                  <AlertDescription className="text-yellow-800">
+                    Pour accéder aux sites web, vous devez d'abord activer le proxy CORS. Cliquez sur le bouton ci-dessous, puis sur "Request temporary access".
+                  </AlertDescription>
+                </Alert>
                 <Button 
                   onClick={handleActivateProxy}
                   variant="outline"
-                  className="w-full bg-white hover:bg-gray-50 border-2 border-purple-200 text-purple-600 font-medium"
+                  className="w-full bg-yellow-50 hover:bg-yellow-100 border-2 border-yellow-400 text-yellow-700 font-medium h-auto py-4"
                 >
-                  Activer le Proxy CORS 
-                  <ExternalLink className="ml-2 h-4 w-4" />
+                  <div className="flex flex-col items-center w-full">
+                    <span className="flex items-center mb-1">
+                      Étape 1: Activer le Proxy CORS
+                      <ExternalLink className="ml-2 h-4 w-4" />
+                    </span>
+                    <span className="text-sm text-yellow-600">
+                      Une fois activé, revenez ici pour analyser votre site
+                    </span>
+                  </div>
                 </Button>
               </div>
             )}
