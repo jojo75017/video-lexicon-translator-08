@@ -2,6 +2,7 @@
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { SeoAnalysis } from '@/types/seo';
 
@@ -18,6 +19,8 @@ interface SiteComparisonProps {
 }
 
 const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
+  const [competitorUrl, setCompetitorUrl] = React.useState('');
+
   const getComparisonData = () => {
     if (!site2) return [];
 
@@ -50,18 +53,42 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
     ];
   };
 
+  const handleCompare = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (competitorUrl) {
+      onCompare(competitorUrl);
+      setCompetitorUrl('');
+    }
+  };
+
   return (
     <Card className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Comparaison de sites</h2>
-        {!site2 && (
-          <Button onClick={() => onCompare('')} variant="outline">
-            Ajouter un site à comparer
-          </Button>
-        )}
       </div>
 
-      {site2 ? (
+      {!site2 ? (
+        <form onSubmit={handleCompare} className="space-y-4">
+          <div className="flex flex-col space-y-2">
+            <label htmlFor="competitor-url" className="text-sm font-medium text-gray-700">
+              URL du site concurrent
+            </label>
+            <div className="flex gap-2">
+              <Input
+                id="competitor-url"
+                type="url"
+                value={competitorUrl}
+                onChange={(e) => setCompetitorUrl(e.target.value)}
+                placeholder="https://concurrent.com"
+                className="flex-1"
+              />
+              <Button type="submit" className="bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:opacity-90">
+                Comparer
+              </Button>
+            </div>
+          </div>
+        </form>
+      ) : (
         <>
           <div className="mb-4">
             <div className="grid grid-cols-2 gap-4 mb-4">
@@ -70,6 +97,13 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
               </div>
               <div className="text-center p-4 bg-green-50 rounded">
                 <h3 className="font-semibold">{site2.url}</h3>
+                <Button 
+                  variant="ghost" 
+                  className="mt-2 text-sm"
+                  onClick={() => onCompare('')}
+                >
+                  Changer de concurrent
+                </Button>
               </div>
             </div>
           </div>
@@ -87,10 +121,6 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
             </ResponsiveContainer>
           </div>
         </>
-      ) : (
-        <div className="text-center p-8 text-gray-500">
-          Ajoutez un second site pour voir la comparaison
-        </div>
       )}
     </Card>
   );
