@@ -90,17 +90,20 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
         </form>
       ) : (
         <>
-          <div className="mb-4">
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <div className="text-center p-4 bg-blue-50 rounded">
-                <h3 className="font-semibold">{site1.url}</h3>
+          <div className="mb-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
+                <div className="text-blue-800 font-semibold mb-1">Votre site</div>
+                <div className="text-lg font-bold text-blue-900 break-all">{site1.url}</div>
               </div>
-              <div className="text-center p-4 bg-green-50 rounded">
-                <h3 className="font-semibold">{site2.url}</h3>
+              <div className="p-4 bg-green-50 rounded-lg border-2 border-green-200">
+                <div className="text-green-800 font-semibold mb-1">Site concurrent</div>
+                <div className="text-lg font-bold text-green-900 break-all">{site2.url}</div>
                 <Button 
                   variant="ghost" 
-                  className="mt-2 text-sm"
+                  size="sm"
                   onClick={() => onCompare('')}
+                  className="mt-2 text-sm text-green-700 hover:text-green-800 hover:bg-green-100"
                 >
                   Changer de concurrent
                 </Button>
@@ -115,10 +118,21 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
                 <XAxis type="number" />
                 <YAxis dataKey="metric" type="category" width={120} />
                 <Tooltip />
-                <Bar dataKey="site1" fill="#3b82f6" name={site1.url} />
-                <Bar dataKey="site2" fill="#22c55e" name={site2.url} />
+                <Bar dataKey="site1" fill="#3b82f6" name="Votre site" />
+                <Bar dataKey="site2" fill="#22c55e" name="Site concurrent" />
               </BarChart>
             </ResponsiveContainer>
+          </div>
+
+          <div className="mt-4 text-sm text-gray-600 flex items-center justify-center space-x-6">
+            <div className="flex items-center">
+              <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+              <span>Votre site</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+              <span>Site concurrent</span>
+            </div>
           </div>
         </>
       )}
@@ -127,3 +141,4 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
 };
 
 export default SiteComparison;
+
