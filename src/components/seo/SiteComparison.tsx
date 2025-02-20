@@ -5,8 +5,9 @@ import { Input } from "@/components/ui/input";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { SeoAnalysis } from '@/types/seo';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { ChevronRight, Sparkles, TrendingUp } from 'lucide-react';
+import { ChevronRight, Sparkles, TrendingUp, AlertTriangle } from 'lucide-react';
 import { toast } from "sonner";
+import { createDataForSEOService } from '@/services/dataForSeoService';
 
 interface KeywordSuggestion {
   keyword: string;
@@ -32,6 +33,11 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
   const [competitorUrl, setCompetitorUrl] = React.useState('');
   const [keywordSuggestions, setKeywordSuggestions] = React.useState<KeywordSuggestion[]>([]);
   const [isLoadingKeywords, setIsLoadingKeywords] = React.useState(false);
+  const [useRealData, setUseRealData] = React.useState(false);
+  const [apiCredentials, setApiCredentials] = React.useState({
+    login: '',
+    password: ''
+  });
 
   const getComparisonData = () => {
     if (!site2) return [];
@@ -91,6 +97,11 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
   };
 
   const fetchKeywordData = async (keyword: string): Promise<KeywordSuggestion> => {
+    if (useRealData && apiCredentials.login && apiCredentials.password) {
+      const service = createDataForSEOService(apiCredentials.login, apiCredentials.password);
+      return service.getKeywordData(keyword);
+    }
+
     await new Promise(resolve => setTimeout(resolve, 500));
     return {
       keyword,
@@ -128,6 +139,15 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
       getKeywordSuggestions();
     }
   }, [site1.analysis.keywords]);
+
+  const handleApiCredentialsSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (apiCredentials.login && apiCredentials.password) {
+      setUseRealData(true);
+      toast.success("Identifiants DataForSEO enregistrés");
+      getKeywordSuggestions();
+    }
+  };
 
   const handleCompare = (e: React.FormEvent) => {
     e.preventDefault();
@@ -229,6 +249,44 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
 
           <TabsContent value="keywords">
             <div className="space-y-6">
+              {!useRealData && (
+                <form onSubmit={handleApiCredentialsSubmit} className="space-y-4 p-4 bg-blue-50 rounded-lg">
+                  <div className="flex items-center gap-2 mb-4">
+                    <AlertTriangle className="h-5 w-5 text-blue-600" />
+                    <h3 className="font-medium text-blue-800">Configuration DataForSEO</h3>
+                  </div>
+                  <p className="text-sm text-blue-700 mb-4">
+                    Pour obtenir des données réelles, veuillez entrer vos identifiants DataForSEO.
+                    Vous pouvez créer un compte sur{' '}
+                    <a 
+                      href="https://app.dataforseo.com/register" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="underline hover:text-blue-900"
+                    >
+                      DataForSEO
+                    </a>
+                  </p>
+                  <div className="grid gap-4">
+                    <Input
+                      type="text"
+                      placeholder="Login DataForSEO"
+                      value={apiCredentials.login}
+                      onChange={(e) => setApiCredentials(prev => ({ ...prev, login: e.target.value }))}
+                    />
+                    <Input
+                      type="password"
+                      placeholder="Mot de passe DataForSEO"
+                      value={apiCredentials.password}
+                      onChange={(e) => setApiCredentials(prev => ({ ...prev, password: e.target.value }))}
+                    />
+                    <Button type="submit" className="w-full">
+                      Configurer l'API
+                    </Button>
+                  </div>
+                </form>
+              )}
+
               {isLoadingKeywords ? (
                 <div className="text-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
@@ -295,11 +353,14 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
                 </div>
               )}
 
-              <div className="p-4 bg-blue-50 rounded-lg">
-                <p className="text-sm text-blue-800">
-                  Pour obtenir des données réelles de volume de recherche, CPC et difficulté, vous devrez intégrer une API comme DataForSEO, SEMrush ou Ahrefs.
-                </p>
-              </div>
+              {!useRealData && (
+                <div className="p-4 bg-yellow-50 rounded-lg">
+                  <p className="text-sm text-yellow-800">
+                    Vous visualisez actuellement des données simulées. Pour obtenir des données réelles,
+                    veuillez configurer vos identifiants DataForSEO ci-dessus.
+                  </p>
+                </div>
+              )}
             </div>
           </TabsContent>
         </Tabs>
