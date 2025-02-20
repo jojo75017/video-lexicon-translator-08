@@ -37,13 +37,17 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
   const { h1Count, h2Count, h3Count, headings } = analyzeHeadings(doc);
   const { backlinks, backlinkDetails, topBacklinkDomains, doFollowBacklinks, noFollowBacklinks } = analyzeBacklinks();
   const contentAnalysis = analyzeContent(doc, textContent);
-  const analytics = analyzeAnalytics();
   const socialMetrics = analyzeSocialMetrics();
-  const searchConsole = analyzeSearchConsole(url);
   const accessibility = analyzeAccessibility(doc);
   const schemaMarkup = analyzeSchema(doc);
   const securityHeaders = analyzeSecurityHeaders(url);
   const indexability = analyzeIndexability(doc);
+
+  // Attendre les résultats des appels API asynchrones
+  const [analytics, searchConsoleData] = await Promise.all([
+    analyzeAnalytics(),
+    analyzeSearchConsole(url)
+  ]);
 
   return {
     title: doc.title || "Pas de titre",
@@ -80,7 +84,7 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     internalLinks: linkAnalysis.internal,
     externalLinks: linkAnalysis.external,
     analytics,
-    searchConsole,
+    searchConsole: searchConsoleData,
     socialMetrics,
     performance: performanceMetrics,
     securityHeaders,
