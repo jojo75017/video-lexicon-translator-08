@@ -2,6 +2,7 @@
 import React from 'react';
 import FeatureCard from './FeatureCard';
 import { Search, Globe, Database, Link2, ChartBar, Settings, Hash, Pen } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const FeatureGrid = () => {
   const features = [
@@ -63,6 +64,15 @@ const FeatureGrid = () => {
     }
   ];
 
+  const handleFeatureClick = (id: string) => {
+    const element = document.querySelector(`[data-value="${id}"]`) as HTMLElement;
+    if (element) {
+      element.click();
+      // Faire défiler jusqu'à l'élément
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       {features.map((feature) => (
@@ -72,7 +82,7 @@ const FeatureGrid = () => {
           title={feature.title}
           description={feature.description}
           color={feature.color}
-          onClick={() => document.getElementById(feature.id)?.click()}
+          onClick={() => handleFeatureClick(feature.id)}
         />
       ))}
     </div>

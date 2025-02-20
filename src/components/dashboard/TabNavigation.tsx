@@ -21,6 +21,7 @@ const TabNavigation = () => {
         <TabsTrigger 
           key={id}
           value={id}
+          data-value={id}
           className="group relative flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all duration-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50"
         >
           <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 group-data-[state=active]:opacity-100 rounded-lg transition-opacity" />

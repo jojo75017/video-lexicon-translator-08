@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,11 @@ interface UrlInputProps {
 }
 
 const UrlInput = ({ url, setUrl, onAnalyze, isLoading }: UrlInputProps) => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleAnalyze();
+  };
+
   const handleAnalyze = () => {
     if (!url) {
       toast.error("Veuillez entrer une URL");
@@ -33,7 +39,7 @@ const UrlInput = ({ url, setUrl, onAnalyze, isLoading }: UrlInputProps) => {
   };
 
   return (
-    <div className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <Label htmlFor="url" className="text-lg font-medium">URL du site</Label>
       <div className="flex gap-2">
         <div className="relative flex-1">
@@ -48,7 +54,7 @@ const UrlInput = ({ url, setUrl, onAnalyze, isLoading }: UrlInputProps) => {
           <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
         </div>
         <Button 
-          onClick={handleAnalyze}
+          type="submit"
           disabled={isLoading}
           className="min-w-[120px] relative"
           variant="default"
@@ -71,7 +77,7 @@ const UrlInput = ({ url, setUrl, onAnalyze, isLoading }: UrlInputProps) => {
           Analyse en cours, veuillez patienter...
         </div>
       )}
-    </div>
+    </form>
   );
 };
 
