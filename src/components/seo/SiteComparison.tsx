@@ -42,8 +42,8 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
       },
       {
         metric: 'Mots clés',
-        site1: site1.analysis.keywords.length,
-        site2: site2.analysis.keywords.length,
+        site1: (site1.analysis.keywords || []).length,
+        site2: (site2.analysis.keywords || []).length,
       },
       {
         metric: 'Liens internes',
@@ -67,8 +67,8 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
       },
       {
         metric: 'Backlinks',
-        site1: site1.analysis.backlinks?.length || 0,
-        site2: site2.analysis.backlinks?.length || 0,
+        site1: (site1.analysis.backlinks || []).length,
+        site2: (site2.analysis.backlinks || []).length,
       },
       {
         metric: 'Nombre de titres',
