@@ -15,10 +15,10 @@ const FeatureCard = ({ icon: Icon, title, description, onClick }: FeatureCardPro
   return (
     <div 
       onClick={onClick}
-      className="feature-card glass-card fade-in p-6 cursor-pointer"
+      className="feature-card glass-card fade-in p-6 cursor-pointer transition-all duration-300 hover:scale-105"
     >
       <div className="flex flex-col items-center text-center space-y-4">
-        <div className="p-4 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500">
+        <div className="p-4 rounded-full animated-gradient">
           <Icon className="h-8 w-8 text-white" />
         </div>
         

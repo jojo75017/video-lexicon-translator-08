@@ -2,7 +2,6 @@
 import React from 'react';
 import FeatureCard from './FeatureCard';
 import { Search, Globe, Database, Link2, ChartBar, Settings, Hash, Pen } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
 const FeatureGrid = () => {
   const features = [
@@ -68,7 +67,6 @@ const FeatureGrid = () => {
     const element = document.querySelector(`[data-value="${id}"]`) as HTMLElement;
     if (element) {
       element.click();
-      // Faire défiler jusqu'à l'élément
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
