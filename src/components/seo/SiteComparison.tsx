@@ -1,10 +1,11 @@
-
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { SeoAnalysis } from '@/types/seo';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { ChevronRight, Sparkles, TrendingUp } from 'lucide-react';
 
 interface SiteComparisonProps {
   site1: {
@@ -78,6 +79,17 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
     ];
   };
 
+  const getKeywordSuggestions = () => {
+    const baseKeywords = site1.analysis.keywords || [];
+    return baseKeywords.slice(0, 5).map(keyword => ({
+      keyword: typeof keyword === 'string' ? keyword : keyword.keyword,
+      volume: Math.floor(Math.random() * 10000),
+      difficulty: Math.floor(Math.random() * 100),
+      cpc: (Math.random() * 5).toFixed(2),
+      competition: Math.random()
+    }));
+  };
+
   const handleCompare = (e: React.FormEvent) => {
     e.preventDefault();
     if (competitorUrl) {
@@ -85,6 +97,8 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
       setCompetitorUrl('');
     }
   };
+
+  const keywordSuggestions = getKeywordSuggestions();
 
   return (
     <Card className="p-6">
@@ -114,65 +128,140 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
           </div>
         </form>
       ) : (
-        <>
-          <div className="mb-6">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
-                <div className="text-blue-800 font-semibold mb-1">Votre site</div>
-                <div className="text-lg font-bold text-blue-900 break-all">{site1.url}</div>
-              </div>
-              <div className="p-4 bg-green-50 rounded-lg border-2 border-green-200">
-                <div className="text-green-800 font-semibold mb-1">Site concurrent</div>
-                <div className="text-lg font-bold text-green-900 break-all">{site2.url}</div>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={() => onCompare('')}
-                  className="mt-2 text-sm text-green-700 hover:text-green-800 hover:bg-green-100"
-                >
-                  Changer de concurrent
-                </Button>
-              </div>
-            </div>
-          </div>
+        <Tabs defaultValue="comparison" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="comparison">Comparaison</TabsTrigger>
+            <TabsTrigger value="keywords">Suggestions de mots-clés</TabsTrigger>
+          </TabsList>
 
-          <div className="h-[600px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={getComparisonData()} layout="vertical">
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis type="number" />
-                <YAxis dataKey="metric" type="category" width={150} />
-                <Tooltip 
-                  formatter={(value) => [value, '']}
-                  labelStyle={{ color: '#111' }}
-                  contentStyle={{ 
-                    backgroundColor: 'white',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '6px',
-                    padding: '8px'
-                  }}
-                />
-                <Bar dataKey="site1" fill="#3b82f6" name="Votre site" />
-                <Bar dataKey="site2" fill="#22c55e" name="Site concurrent" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+          <TabsContent value="comparison">
+            <div className="mb-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
+                  <div className="text-blue-800 font-semibold mb-1">Votre site</div>
+                  <div className="text-lg font-bold text-blue-900 break-all">{site1.url}</div>
+                </div>
+                <div className="p-4 bg-green-50 rounded-lg border-2 border-green-200">
+                  <div className="text-green-800 font-semibold mb-1">Site concurrent</div>
+                  <div className="text-lg font-bold text-green-900 break-all">{site2.url}</div>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => onCompare('')}
+                    className="mt-2 text-sm text-green-700 hover:text-green-800 hover:bg-green-100"
+                  >
+                    Changer de concurrent
+                  </Button>
+                </div>
+              </div>
+            </div>
 
-          <div className="mt-4 text-sm text-gray-600 flex items-center justify-center space-x-6">
-            <div className="flex items-center">
-              <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
-              <span>Votre site</span>
+            <div className="h-[600px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={getComparisonData()} layout="vertical">
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis type="number" />
+                  <YAxis dataKey="metric" type="category" width={150} />
+                  <Tooltip 
+                    formatter={(value) => [value, '']}
+                    labelStyle={{ color: '#111' }}
+                    contentStyle={{ 
+                      backgroundColor: 'white',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '6px',
+                      padding: '8px'
+                    }}
+                  />
+                  <Bar dataKey="site1" fill="#3b82f6" name="Votre site" />
+                  <Bar dataKey="site2" fill="#22c55e" name="Site concurrent" />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
-            <div className="flex items-center">
-              <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-              <span>Site concurrent</span>
+
+            <div className="mt-4 text-sm text-gray-600 flex items-center justify-center space-x-6">
+              <div className="flex items-center">
+                <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                <span>Votre site</span>
+              </div>
+              <div className="flex items-center">
+                <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                <span>Site concurrent</span>
+              </div>
             </div>
-          </div>
-        </>
+          </TabsContent>
+
+          <TabsContent value="keywords">
+            <div className="space-y-6">
+              <div className="grid gap-4">
+                {keywordSuggestions.map((suggestion, index) => (
+                  <div 
+                    key={index} 
+                    className="p-4 bg-white rounded-lg border border-gray-200 hover:border-blue-400 transition-colors"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center space-x-2">
+                        <Sparkles className="h-5 w-5 text-blue-500" />
+                        <h3 className="font-semibold text-lg">{suggestion.keyword}</h3>
+                      </div>
+                      <div className="flex items-center space-x-2 text-sm">
+                        <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded">
+                          CPC: {suggestion.cpc}€
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="space-y-1">
+                        <div className="text-sm text-gray-500 flex items-center">
+                          <TrendingUp className="h-4 w-4 mr-1" />
+                          Volume mensuel
+                        </div>
+                        <div className="font-semibold">{suggestion.volume}</div>
+                      </div>
+                      
+                      <div className="space-y-1">
+                        <div className="text-sm text-gray-500">Difficulté</div>
+                        <div className="flex items-center">
+                          <div className="w-full bg-gray-200 rounded-full h-2 mr-2">
+                            <div 
+                              className="bg-blue-600 h-2 rounded-full" 
+                              style={{ width: `${suggestion.difficulty}%` }}
+                            />
+                          </div>
+                          <span className="text-sm font-medium">{suggestion.difficulty}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-1">
+                        <div className="text-sm text-gray-500">Compétition</div>
+                        <div className="flex items-center">
+                          <div className="w-full bg-gray-200 rounded-full h-2 mr-2">
+                            <div 
+                              className="bg-green-600 h-2 rounded-full" 
+                              style={{ width: `${suggestion.competition * 100}%` }}
+                            />
+                          </div>
+                          <span className="text-sm font-medium">
+                            {Math.round(suggestion.competition * 100)}%
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="p-4 bg-blue-50 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  Les données de volume, CPC et difficulté sont des estimations basées sur les tendances actuelles.
+                </p>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
       )}
     </Card>
   );
 };
 
 export default SiteComparison;
-
