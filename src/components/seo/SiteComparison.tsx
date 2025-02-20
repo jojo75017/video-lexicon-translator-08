@@ -109,7 +109,7 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
       
       const suggestions = await Promise.all(
         keywords.map(kw => {
-          const keyword = typeof kw === 'string' ? kw : kw.toString();
+          const keyword = typeof kw === 'string' ? kw : kw.keyword || kw.toString();
           return fetchKeywordData(keyword);
         })
       );
