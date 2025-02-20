@@ -21,6 +21,7 @@ import SeoSuggestions from '@/components/seo/SeoSuggestions';
 import AdvancedOptimizations from '@/components/seo/AdvancedOptimizations';
 import AnalyticsOverview from '@/components/seo/AnalyticsOverview';
 import SignatureGenerator from '@/components/signature/SignatureGenerator';
+import SiteComparison from '@/components/seo/SiteComparison';
 
 const Index = () => {
   const {
@@ -37,6 +38,8 @@ const Index = () => {
   const handleActivateProxy = () => {
     window.open('https://cors-anywhere.herokuapp.com/corsdemo', '_blank');
   };
+
+  const [comparisonSite, setComparisonSite] = React.useState('');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
@@ -105,6 +108,11 @@ const Index = () => {
             ) : seoAnalysis ? (
               <div className="space-y-6">
                 <SeoResults seoAnalysis={seoAnalysis} />
+                <SiteComparison 
+                  site1={{ url, analysis: seoAnalysis }}
+                  site2={comparisonSite ? { url: comparisonSite, analysis: seoAnalysis } : undefined}
+                  onCompare={setComparisonSite}
+                />
                 <KeywordSuggestions suggestions={seoAnalysis.keywordSuggestions || []} />
                 <MobileAnalysis 
                   viewportMeta={seoAnalysis.mobileAnalysis?.viewportMeta || false}
