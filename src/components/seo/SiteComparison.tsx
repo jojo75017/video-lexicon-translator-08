@@ -165,14 +165,14 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
   return (
     <Card className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Comparaison de sites</h2>
+        <h2 className="text-2xl font-bold">Comparaison de pages</h2>
       </div>
 
       {!site2 ? (
         <form onSubmit={handleCompare} className="space-y-4">
           <div className="flex flex-col space-y-2">
             <label htmlFor="competitor-url" className="text-sm font-medium text-gray-700">
-              URL du site concurrent
+              URL de la page à comparer
             </label>
             <div className="flex gap-2">
               <Input
@@ -180,7 +180,7 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
                 type="url"
                 value={competitorUrl}
                 onChange={(e) => setCompetitorUrl(e.target.value)}
-                placeholder="https://concurrent.com"
+                placeholder="https://monsite.com/autre-page"
                 className="flex-1"
               />
               <Button type="submit" className="bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:opacity-90">
@@ -200,11 +200,11 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
             <div className="mb-6">
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
-                  <div className="text-blue-800 font-semibold mb-1">Votre site</div>
+                  <div className="text-blue-800 font-semibold mb-1">Page principale</div>
                   <div className="text-lg font-bold text-blue-900 break-all">{site1.url}</div>
                 </div>
                 <div className="p-4 bg-green-50 rounded-lg border-2 border-green-200">
-                  <div className="text-green-800 font-semibold mb-1">Site concurrent</div>
+                  <div className="text-green-800 font-semibold mb-1">Page comparée</div>
                   <div className="text-lg font-bold text-green-900 break-all">{site2.url}</div>
                   <Button 
                     variant="ghost" 
@@ -212,7 +212,7 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
                     onClick={() => onCompare('')}
                     className="mt-2 text-sm text-green-700 hover:text-green-800 hover:bg-green-100"
                   >
-                    Changer de concurrent
+                    Changer de page
                   </Button>
                 </div>
               </div>
@@ -234,8 +234,8 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
                       padding: '8px'
                     }}
                   />
-                  <Bar dataKey="site1" fill="#3b82f6" name="Votre site" />
-                  <Bar dataKey="site2" fill="#22c55e" name="Site concurrent" />
+                  <Bar dataKey="site1" fill="#3b82f6" name="Page principale" />
+                  <Bar dataKey="site2" fill="#22c55e" name="Page comparée" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -243,11 +243,11 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
             <div className="mt-4 text-sm text-gray-600 flex items-center justify-center space-x-6">
               <div className="flex items-center">
                 <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
-                <span>Votre site</span>
+                <span>Page principale</span>
               </div>
               <div className="flex items-center">
                 <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-                <span>Site concurrent</span>
+                <span>Page comparée</span>
               </div>
             </div>
           </TabsContent>
