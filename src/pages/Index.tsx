@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -29,6 +28,7 @@ import KeywordSuggestions from '@/components/seo/KeywordSuggestions';
 import MobileAnalysis from '@/components/seo/MobileAnalysis';
 import SeoSuggestions from '@/components/seo/SeoSuggestions';
 import AdvancedOptimizations from '@/components/seo/AdvancedOptimizations';
+import AnalyticsOverview from '@/components/seo/AnalyticsOverview';
 
 const Index = () => {
   const {
@@ -198,9 +198,9 @@ const Index = () => {
                 </TabsContent>
 
                 <TabsContent value="metrics">
-                  <Card className="p-6">
-                    <h2 className="text-2xl font-semibold mb-4">Métriques détaillées</h2>
-                  </Card>
+                  <div className="space-y-6">
+                    <AnalyticsOverview />
+                  </div>
                 </TabsContent>
 
                 <TabsContent value="advanced">
