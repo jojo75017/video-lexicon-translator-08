@@ -1,7 +1,7 @@
 
-import { AnalyticsStats } from './analysisTypes';
+import { AnalyticsData } from '@/types/seo';
 
-export const analyzeAnalytics = async () => {
+export const analyzeAnalytics = async (): Promise<AnalyticsData> => {
   try {
     // Appel à l'API Google Analytics
     const response = await fetch('/api/analytics');

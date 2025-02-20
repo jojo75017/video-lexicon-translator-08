@@ -1,7 +1,8 @@
 
+import { SearchConsoleData } from '@/types/seo';
 import { GoogleSearchConsole } from '@/utils/googleSearchConsole';
 
-export const analyzeSearchConsole = async (url: string) => {
+export const analyzeSearchConsole = async (url: string): Promise<SearchConsoleData> => {
   try {
     const searchConsole = new GoogleSearchConsole();
     const data = await searchConsole.getSearchAnalytics(url);
@@ -39,7 +40,6 @@ export const analyzeSearchConsole = async (url: string) => {
     };
   } catch (error) {
     console.error('Erreur lors de la récupération des données Search Console:', error);
-    // En cas d'erreur, on retourne les données simulées comme fallback
     return {
       clicks: 0,
       impressions: 0,
