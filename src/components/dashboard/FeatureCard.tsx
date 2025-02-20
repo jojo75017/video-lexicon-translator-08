@@ -13,7 +13,7 @@ interface FeatureCardProps {
 
 const FeatureCard = ({ icon: Icon, title, description, onClick }: FeatureCardProps) => {
   return (
-    <div 
+    <Card 
       onClick={onClick}
       className="feature-card glass-card fade-in p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-xl"
     >
@@ -30,7 +30,7 @@ const FeatureCard = ({ icon: Icon, title, description, onClick }: FeatureCardPro
           {description}
         </p>
       </div>
-    </div>
+    </Card>
   );
 };
 
