@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -22,6 +23,7 @@ import AnalyticsOverview from '@/components/seo/AnalyticsOverview';
 import SignatureGenerator from '@/components/signature/SignatureGenerator';
 import SiteComparison from '@/components/seo/SiteComparison';
 import KeywordGenerator from '@/components/seo/KeywordGenerator';
+import AiWriter from '@/components/seo/AiWriter';
 
 const Index = () => {
   const {
@@ -32,22 +34,30 @@ const Index = () => {
     seoAnalysis,
     siteStructure,
     analyzeSite,
-    error
+    error,
+    setSeoAnalysis
   } = useSiteAnalyzer();
 
-  const handleActivateProxy = () => {
-    window.open('https://cors-anywhere.herokuapp.com/corsdemo', '_blank');
-  };
-
   const [comparisonSite, setComparisonSite] = React.useState('');
+  const [generatedKeywords, setGeneratedKeywords] = useState<Array<{ keyword: string; volume: number; difficulty: number; }>>([]);
 
   const handleGeneratedKeywords = (keywords: Array<{ keyword: string; volume: number; difficulty: number; }>) => {
+    setGeneratedKeywords(keywords);
     if (seoAnalysis) {
       setSeoAnalysis({
         ...seoAnalysis,
         keywordSuggestions: keywords
       });
     }
+  };
+
+  const handleContentGenerated = (content: { title: string; intro: string; sections: Array<{ heading: string; content: string; }> }) => {
+    console.log('Contenu généré:', content);
+    // Ici vous pouvez ajouter la logique pour sauvegarder ou afficher le contenu généré
+  };
+
+  const handleActivateProxy = () => {
+    window.open('https://cors-anywhere.herokuapp.com/corsdemo', '_blank');
   };
 
   return (
@@ -119,6 +129,12 @@ const Index = () => {
                 <Card className="p-6">
                   <KeywordGenerator onKeywordsGenerated={handleGeneratedKeywords} />
                 </Card>
+                {generatedKeywords.length > 0 && (
+                  <AiWriter 
+                    keywords={generatedKeywords}
+                    onContentGenerated={handleContentGenerated}
+                  />
+                )}
                 <SeoResults seoAnalysis={seoAnalysis} />
                 <SiteComparison 
                   site1={{ url, analysis: seoAnalysis }}
