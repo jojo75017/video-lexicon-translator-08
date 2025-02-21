@@ -19,6 +19,7 @@ import { analyzeAccessibility } from '@/utils/seo/accessibilityAnalyzer';
 import { analyzeReadability } from '@/utils/seo/semanticAnalyzer';
 import { analyzeMobilePerformance } from '@/utils/seo/mobileAnalyzer';
 import AnalyticsOverview from './seo/AnalyticsOverview';
+import ContentHierarchy from './seo/ContentHierarchy';
 
 interface SeoResultsProps {
   seoAnalysis: SeoAnalysis;
@@ -121,6 +122,12 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
         </Card>
 
         <SiteStructureVisualizer structure={siteStructure} />
+
+        <ContentHierarchy 
+          headings={seoAnalysis.headings} 
+          paragraphs={seoAnalysis.paragraphs}
+          recommendations={seoAnalysis.technicalSuggestions} 
+        />
 
         <ReadabilityAnalysis 
           score={readabilityScore}

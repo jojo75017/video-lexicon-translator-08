@@ -1,8 +1,9 @@
+
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useTranslation } from 'react-i18next';
-import { ChevronRight, Heading1, Heading2, Heading3, Type, AlertCircle, CheckCircle2, BarChart2 } from 'lucide-react';
+import { ChevronRight, Heading1, Heading2, Heading3, Type, AlertCircle, CheckCircle2, BarChart2, Lightbulb } from 'lucide-react';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -23,9 +24,10 @@ interface ContentHierarchyProps {
     text: string;
     position: number;
   }[];
+  recommendations?: string[];
 }
 
-const ContentHierarchy = ({ headings, paragraphs }: ContentHierarchyProps) => {
+const ContentHierarchy = ({ headings, paragraphs, recommendations = [] }: ContentHierarchyProps) => {
   const { t } = useTranslation();
 
   const getAllContent = (): ContentItem[] => {
@@ -215,6 +217,23 @@ const ContentHierarchy = ({ headings, paragraphs }: ContentHierarchyProps) => {
                 </AlertDescription>
               </Alert>
             )}
+
+            {recommendations && recommendations.length > 0 && (
+              <div className="bg-blue-50 rounded-lg p-4">
+                <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                  <Lightbulb className="h-4 w-4 text-blue-600" />
+                  Recommandations
+                </h3>
+                <ul className="space-y-2">
+                  {recommendations.map((recommendation, index) => (
+                    <li key={index} className="flex items-start gap-2 text-sm text-blue-700">
+                      <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                      {recommendation}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         </div>
 
@@ -243,3 +262,4 @@ const ContentHierarchy = ({ headings, paragraphs }: ContentHierarchyProps) => {
 };
 
 export default ContentHierarchy;
+
