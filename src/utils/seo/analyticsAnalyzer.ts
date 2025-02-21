@@ -32,8 +32,10 @@ interface AnalyticsData {
     tablet: number;
   };
   timeOnSite: {
-    average: number;
-    total: number;
+    '0-30s': number;
+    '30s-2m': number;
+    '2m-5m': number;
+    '5m+': number;
   };
 }
 
@@ -105,8 +107,10 @@ export const analyzeAnalytics = (): AnalyticsData => {
       tablet: Math.random() * 100
     },
     timeOnSite: {
-      average: Math.floor(Math.random() * 600),
-      total: Math.floor(Math.random() * 1000000)
+      '0-30s': Math.floor(Math.random() * 1000),
+      '30s-2m': Math.floor(Math.random() * 800),
+      '2m-5m': Math.floor(Math.random() * 500),
+      '5m+': Math.floor(Math.random() * 300)
     }
   };
 };
