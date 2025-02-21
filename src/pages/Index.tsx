@@ -23,6 +23,7 @@ import SignatureGenerator from '@/components/signature/SignatureGenerator';
 import SiteComparison from '@/components/seo/SiteComparison';
 import KeywordGenerator from '@/components/seo/KeywordGenerator';
 import AiWriter from '@/components/seo/AiWriter';
+import { KeywordSuggestion } from '@/types/seo';
 
 const Index = () => {
   const {
@@ -39,6 +40,11 @@ const Index = () => {
 
   const [comparisonSite, setComparisonSite] = React.useState('');
   const [generatedKeywords, setGeneratedKeywords] = useState<KeywordSuggestion[]>([]);
+  const [generatedContent, setGeneratedContent] = useState<{
+    title: string;
+    intro: string;
+    sections: Array<{ heading: string; content: string; }>;
+  } | null>(null);
 
   const handleGeneratedKeywords = (keywords: KeywordSuggestion[]) => {
     setGeneratedKeywords(keywords);
@@ -51,8 +57,8 @@ const Index = () => {
   };
 
   const handleContentGenerated = (content: { title: string; intro: string; sections: Array<{ heading: string; content: string; }> }) => {
-    console.log('Contenu généré:', content);
-    // Ici vous pouvez ajouter la logique pour sauvegarder ou afficher le contenu généré
+    setGeneratedContent(content);
+    toast.success("Contenu généré avec succès !");
   };
 
   const handleActivateProxy = () => {
@@ -129,10 +135,24 @@ const Index = () => {
                   <KeywordGenerator onKeywordsGenerated={handleGeneratedKeywords} />
                 </Card>
                 {generatedKeywords.length > 0 && (
-                  <AiWriter 
-                    keywords={generatedKeywords}
-                    onContentGenerated={handleContentGenerated}
-                  />
+                  <Card className="p-6">
+                    <AiWriter 
+                      keywords={generatedKeywords}
+                      onContentGenerated={handleContentGenerated}
+                    />
+                    {generatedContent && (
+                      <div className="mt-8 space-y-6">
+                        <h2 className="text-2xl font-bold">{generatedContent.title}</h2>
+                        <p className="text-gray-700">{generatedContent.intro}</p>
+                        {generatedContent.sections.map((section, index) => (
+                          <div key={index} className="mt-6">
+                            <h3 className="text-xl font-semibold mb-4">{section.heading}</h3>
+                            <p className="text-gray-600">{section.content}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </Card>
                 )}
                 <SeoResults seoAnalysis={seoAnalysis} />
                 <SiteComparison 
