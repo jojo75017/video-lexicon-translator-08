@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -27,6 +26,7 @@ import KeywordGenerator from '@/components/seo/KeywordGenerator';
 import AiWriter from '@/components/seo/AiWriter';
 import { KeywordSuggestion } from '@/types/seo';
 import { toast } from "sonner";
+import ContentIdeas from '@/components/seo/ContentIdeas';
 
 const Index = () => {
   const {
@@ -48,6 +48,42 @@ const Index = () => {
     intro: string;
     sections: Array<{ heading: string; content: string; }>;
   } | null>(null);
+
+  const mockContentIdeas = [
+    {
+      title: "CELINE: BOUTIQUE EN LIGNE OFFICIELLE FRANCE",
+      url: "celine.com",
+      visits: 10717,
+      backlinks: 1603,
+      socialShares: {
+        facebook: 646,
+        pinterest: 1781,
+        reddit: 0
+      }
+    },
+    {
+      title: "Boutique en ligne officielle Harley-Davidson",
+      url: "harley-davidson.com",
+      visits: 8325,
+      backlinks: 8924,
+      socialShares: {
+        facebook: 21194,
+        pinterest: 92,
+        reddit: 0
+      }
+    },
+    {
+      title: "Linge de table haut de gamme • Boutique en ligne",
+      url: "beauville.com",
+      visits: 588,
+      backlinks: 10,
+      socialShares: {
+        facebook: 11849,
+        pinterest: 17,
+        reddit: 0
+      }
+    }
+  ];
 
   const handleGeneratedKeywords = (keywords: KeywordSuggestion[]) => {
     setGeneratedKeywords(keywords);
@@ -183,6 +219,10 @@ const Index = () => {
                   score={seoAnalysis.mobileAnalysis?.score || 0}
                 />
                 <SeoSuggestions suggestions={seoAnalysis.technicalSuggestions || []} />
+                <ContentIdeas 
+                  keyword={url ? new URL(url).hostname : 'boutique en ligne'}
+                  ideas={mockContentIdeas}
+                />
               </div>
             ) : null}
           </TabsContent>
