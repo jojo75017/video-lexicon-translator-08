@@ -22,6 +22,16 @@ const AiWriter: React.FC<AiWriterProps> = ({ keywords, onContentGenerated }) => 
   const [language, setLanguage] = useState('fr');
   const [wordCount, setWordCount] = useState(500);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [quoraTitle, setQuoraTitle] = useState<string>('');
+  const [quoraQuestion, setQuoraQuestion] = useState<string>('');
+
+  const handleQuoraClick = () => {
+    toast.info("Ouverture du générateur de réponses Quora");
+    // Pour l'instant, on simule juste un titre et une question Quora
+    setQuoraTitle("Comment améliorer son référencement ?");
+    setQuoraQuestion("Quelles sont les meilleures pratiques SEO en 2024 ?");
+    handleNext();
+  };
 
   const handleNext = () => {
     if (step === 1 && !selectedKeyword) {
@@ -67,6 +77,7 @@ const AiWriter: React.FC<AiWriterProps> = ({ keywords, onContentGenerated }) => 
             selectedKeyword={selectedKeyword}
             keywords={keywords}
             onKeywordChange={setSelectedKeyword}
+            onQuoraClick={handleQuoraClick}
           />
         )}
 
@@ -84,6 +95,8 @@ const AiWriter: React.FC<AiWriterProps> = ({ keywords, onContentGenerated }) => 
             selectedKeyword={selectedKeyword}
             language={language}
             wordCount={wordCount}
+            quoraTitle={quoraTitle}
+            quoraQuestion={quoraQuestion}
           />
         )}
 
