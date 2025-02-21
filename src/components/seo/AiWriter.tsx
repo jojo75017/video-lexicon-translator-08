@@ -9,6 +9,7 @@ import { KeywordSuggestion } from "@/types/seo";
 import KeywordStep from './writer/KeywordStep';
 import LanguageStep from './writer/LanguageStep';
 import SummaryStep from './writer/SummaryStep';
+import QuoraStep from './writer/QuoraStep';
 import { generateContentWithWordCount } from '@/utils/seo/contentGenerator';
 
 interface AiWriterProps {
@@ -22,15 +23,25 @@ const AiWriter: React.FC<AiWriterProps> = ({ keywords, onContentGenerated }) => 
   const [language, setLanguage] = useState('fr');
   const [wordCount, setWordCount] = useState(500);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [quoraTitle, setQuoraTitle] = useState<string>('');
-  const [quoraQuestion, setQuoraQuestion] = useState<string>('');
+  
+  const [quoraTitle, setQuoraTitle] = useState('');
+  const [quoraQuestion, setQuoraQuestion] = useState('');
+  const [quoraAnswer, setQuoraAnswer] = useState('');
+  const [quoraLink, setQuoraLink] = useState('');
+  const [isQuoraMode, setIsQuoraMode] = useState(false);
 
   const handleQuoraClick = () => {
-    toast.info("Ouverture du générateur de réponses Quora");
-    // Pour l'instant, on simule juste un titre et une question Quora
-    setQuoraTitle("Comment améliorer son référencement ?");
-    setQuoraQuestion("Quelles sont les meilleures pratiques SEO en 2024 ?");
-    handleNext();
+    setIsQuoraMode(true);
+    setStep(2);
+  };
+
+  const handleQuoraSubmit = () => {
+    if (!quoraTitle || !quoraQuestion || !quoraAnswer) {
+      toast.error("Veuillez remplir tous les champs obligatoires");
+      return;
+    }
+    toast.success("Réponse Quora générée avec succès !");
+    // Ici vous pouvez ajouter la logique pour sauvegarder ou utiliser la réponse Quora
   };
 
   const handleNext = () => {
@@ -68,7 +79,9 @@ const AiWriter: React.FC<AiWriterProps> = ({ keywords, onContentGenerated }) => 
     <Card className="p-6">
       <div className="space-y-6">
         <div className="space-y-2">
-          <h3 className="text-lg font-semibold">Rédacteur IA 2.0</h3>
+          <h3 className="text-lg font-semibold">
+            {isQuoraMode ? 'Générateur de réponses Quora' : 'Rédacteur IA 2.0'}
+          </h3>
           <Progress value={step * 33.33} className="h-2" />
         </div>
 
@@ -81,7 +94,19 @@ const AiWriter: React.FC<AiWriterProps> = ({ keywords, onContentGenerated }) => 
           />
         )}
 
-        {step === 2 && (
+        {step === 2 && isQuoraMode ? (
+          <QuoraStep
+            quoraTitle={quoraTitle}
+            setQuoraTitle={setQuoraTitle}
+            quoraQuestion={quoraQuestion}
+            setQuoraQuestion={setQuoraQuestion}
+            quoraAnswer={quoraAnswer}
+            setQuoraAnswer={setQuoraAnswer}
+            quoraLink={quoraLink}
+            setQuoraLink={setQuoraLink}
+            onSubmit={handleQuoraSubmit}
+          />
+        ) : step === 2 && (
           <LanguageStep
             language={language}
             wordCount={wordCount}
@@ -90,7 +115,7 @@ const AiWriter: React.FC<AiWriterProps> = ({ keywords, onContentGenerated }) => 
           />
         )}
 
-        {step === 3 && (
+        {step === 3 && !isQuoraMode && (
           <SummaryStep
             selectedKeyword={selectedKeyword}
             language={language}
@@ -110,12 +135,14 @@ const AiWriter: React.FC<AiWriterProps> = ({ keywords, onContentGenerated }) => 
             Retour
           </Button>
 
-          {step < 3 ? (
+          {!isQuoraMode && step < 3 && (
             <Button onClick={handleNext}>
               Suivant
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
-          ) : (
+          )}
+
+          {!isQuoraMode && step === 3 && (
             <Button 
               onClick={handleGenerate}
               disabled={isGenerating}

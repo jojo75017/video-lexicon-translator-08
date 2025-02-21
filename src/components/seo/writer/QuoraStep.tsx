@@ -3,6 +3,7 @@ import React from 'react';
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 
 interface QuoraStepProps {
   quoraTitle: string;
@@ -13,9 +14,10 @@ interface QuoraStepProps {
   setQuoraAnswer: (value: string) => void;
   quoraLink: string;
   setQuoraLink: (value: string) => void;
+  onSubmit: () => void;
 }
 
-const QuoraStep: React.FC<QuoraStepProps> = ({
+const QuoraStep = ({
   quoraTitle,
   setQuoraTitle,
   quoraQuestion,
@@ -24,61 +26,59 @@ const QuoraStep: React.FC<QuoraStepProps> = ({
   setQuoraAnswer,
   quoraLink,
   setQuoraLink,
-}) => {
+  onSubmit,
+}: QuoraStepProps) => {
   return (
-    <div className="space-y-4">
-      <div>
-        <Label htmlFor="quora-title" className="font-medium text-blue-800">
-          Titre Quora *
-        </Label>
+    <div className="space-y-6">
+      <div className="space-y-2">
+        <Label htmlFor="quora-title">Titre Quora</Label>
         <Input
           id="quora-title"
-          placeholder="Ex: Tendance du marketing numérique"
           value={quoraTitle}
           onChange={(e) => setQuoraTitle(e.target.value)}
-          className="mt-1"
+          placeholder="Ex: Comment améliorer son référencement ?"
         />
       </div>
 
-      <div>
-        <Label htmlFor="quora-question" className="font-medium text-blue-800">
-          Question Quora *
-        </Label>
+      <div className="space-y-2">
+        <Label htmlFor="quora-question">Question Quora</Label>
         <Textarea
           id="quora-question"
-          placeholder="Ex: Quelle est la tendance majeure en matière de marketing numérique en 2024 ?"
           value={quoraQuestion}
           onChange={(e) => setQuoraQuestion(e.target.value)}
-          className="mt-1"
+          placeholder="Ex: Quelles sont les meilleures pratiques SEO en 2024 ?"
+          className="min-h-[100px]"
         />
       </div>
 
-      <div>
-        <Label htmlFor="quora-answer" className="font-medium text-blue-800">
-          Réponse Quora
-        </Label>
+      <div className="space-y-2">
+        <Label htmlFor="quora-answer">Votre réponse</Label>
         <Textarea
           id="quora-answer"
-          placeholder="Ex: L'intelligence artificielle est utilisée dans tous les aspects du marketing numérique..."
           value={quoraAnswer}
           onChange={(e) => setQuoraAnswer(e.target.value)}
-          className="mt-1 min-h-[150px]"
+          placeholder="Écrivez votre réponse détaillée ici..."
+          className="min-h-[200px]"
         />
       </div>
 
-      <div>
-        <Label htmlFor="quora-link" className="font-medium text-blue-800">
-          Lien (optionnel)
-        </Label>
+      <div className="space-y-2">
+        <Label htmlFor="quora-link">Lien (optionnel)</Label>
         <Input
           id="quora-link"
-          placeholder="https://example.com"
           value={quoraLink}
           onChange={(e) => setQuoraLink(e.target.value)}
-          className="mt-1"
+          placeholder="https://votre-site.com"
           type="url"
         />
       </div>
+
+      <Button 
+        onClick={onSubmit}
+        className="w-full bg-[#ea384c] hover:bg-[#ea384c]/90 text-white"
+      >
+        Générer la réponse Quora
+      </Button>
     </div>
   );
 };
