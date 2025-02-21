@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { AlertTriangle, ExternalLink } from 'lucide-react';
@@ -49,3 +50,4 @@ const BrokenLinks = ({ brokenLinks }: BrokenLinksProps) => {
 };
 
 export default BrokenLinks;
+

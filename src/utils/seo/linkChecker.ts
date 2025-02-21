@@ -39,3 +39,4 @@ export const checkLinks = async (links: string[]): Promise<BrokenLinkResult[]> =
 
   return results;
 };
+
