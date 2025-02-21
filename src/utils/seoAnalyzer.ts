@@ -1,4 +1,3 @@
-
 import { SeoAnalysis } from '@/types/seo';
 import { analyzeKeywords, generateKeywordSuggestions } from './seo/keywordAnalyzer';
 import { analyzePerformance } from './seo/performanceAnalyzer';
@@ -43,11 +42,72 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
   const securityHeaders = analyzeSecurityHeaders(url);
   const indexability = analyzeIndexability(doc);
 
-  // Attendre les résultats des appels API asynchrones
   const [analytics, searchConsoleData] = await Promise.all([
     analyzeAnalytics(),
     analyzeSearchConsole(url)
   ]);
+
+  const technicalSuggestions = [
+    ...(linkAnalysis.internal < 10 ? [
+      "Développez la structure interne du site avec plus de pages pertinentes",
+      "Créez une hiérarchie claire avec des sections thématiques"
+    ] : []),
+    ...(h1Count !== 1 ? [
+      "Assurez-vous d'avoir exactement une balise H1 par page pour une structure claire"
+    ] : []),
+    ...(linkAnalysis.broken > 0 ? [
+      `Corrigez les ${linkAnalysis.broken} liens cassés détectés`
+    ] : []),
+
+    ...(performanceMetrics.loadTime > 3000 ? [
+      `Réduisez le temps de chargement (actuellement ${(performanceMetrics.loadTime / 1000).toFixed(1)}s)`,
+      "Utilisez la compression GZIP pour les ressources statiques",
+      "Mettez en cache les ressources statiques côté navigateur"
+    ] : []),
+    ...(performanceMetrics.resourceBreakdown.images > 1000000 ? [
+      "Optimisez les images lourdes en utilisant WebP et des dimensions appropriées",
+      "Implémentez le chargement progressif des images"
+    ] : []),
+    ...(performanceMetrics.scriptCount > 15 ? [
+      "Réduisez le nombre de scripts JavaScript",
+      "Consolidez et minifiez les fichiers JavaScript"
+    ] : []),
+
+    ...(metaTagsAnalysis.hasDescriptionTag ? [
+      "Ajoutez des meta descriptions uniques et pertinentes"
+    ] : []),
+    ...(readabilityScore < 60 ? [
+      "Améliorez la lisibilité du contenu avec des paragraphes plus courts",
+      "Utilisez des listes à puces pour structurer l'information"
+    ] : []),
+    ...(!semanticStructure.article ? [
+      "Utilisez des balises sémantiques (article, section, nav) pour une meilleure structure"
+    ] : []),
+
+    ...(imgWithoutAlt > 0 ? [
+      `Ajoutez des attributs alt descriptifs aux ${imgWithoutAlt} images qui en manquent`
+    ] : []),
+    ...(!accessibility.aria.present ? [
+      "Implémentez les attributs ARIA pour améliorer l'accessibilité"
+    ] : []),
+
+    ...(!schemaMarkup ? [
+      "Ajoutez des données structurées Schema.org appropriées",
+      "Implémentez le balisage JSON-LD pour les informations clés"
+    ] : []),
+    ...(!metaTagsAnalysis.hasOpenGraphTags ? [
+      "Ajoutez les balises Open Graph pour optimiser le partage social"
+    ] : []),
+
+    ...(!securityHeaders.hsts ? [
+      "Activez HSTS pour forcer les connexions HTTPS",
+      "Configurez les en-têtes de sécurité Content-Security-Policy"
+    ] : []),
+    ...(mobileAnalysis.score < 85 ? [
+      "Optimisez l'expérience mobile avec un design responsive",
+      "Améliorez la taille des zones tactiles pour les appareils mobiles"
+    ] : [])
+  ];
 
   return {
     title: doc.title || "Pas de titre",
@@ -120,13 +180,6 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     accessibility,
     indexability,
     keywordSuggestions,
-    technicalSuggestions: [
-      "Optimisez les images pour le web",
-      "Améliorez la vitesse de chargement",
-      "Ajoutez des balises meta description manquantes",
-      "Optimisez le contenu pour les mots-clés principaux",
-      "Corrigez les liens cassés",
-    ],
+    technicalSuggestions: technicalSuggestions.filter(Boolean),
   };
 };
-
