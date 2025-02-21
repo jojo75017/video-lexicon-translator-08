@@ -29,10 +29,12 @@ const AiWriter: React.FC<AiWriterProps> = ({ keywords, onContentGenerated }) => 
   const [quoraAnswer, setQuoraAnswer] = useState('');
   const [quoraLink, setQuoraLink] = useState('');
   const [isQuoraMode, setIsQuoraMode] = useState(false);
+  const [showQuoraResponse, setShowQuoraResponse] = useState(false);
 
   const handleQuoraClick = () => {
     setIsQuoraMode(true);
     setStep(2);
+    setShowQuoraResponse(false);
   };
 
   const handleQuoraSubmit = () => {
@@ -40,8 +42,8 @@ const AiWriter: React.FC<AiWriterProps> = ({ keywords, onContentGenerated }) => 
       toast.error("Veuillez remplir tous les champs obligatoires");
       return;
     }
+    setShowQuoraResponse(true);
     toast.success("Réponse Quora générée avec succès !");
-    // Ici vous pouvez ajouter la logique pour sauvegarder ou utiliser la réponse Quora
   };
 
   const handleNext = () => {
@@ -94,19 +96,42 @@ const AiWriter: React.FC<AiWriterProps> = ({ keywords, onContentGenerated }) => 
           />
         )}
 
-        {step === 2 && isQuoraMode ? (
-          <QuoraStep
-            quoraTitle={quoraTitle}
-            setQuoraTitle={setQuoraTitle}
-            quoraQuestion={quoraQuestion}
-            setQuoraQuestion={setQuoraQuestion}
-            quoraAnswer={quoraAnswer}
-            setQuoraAnswer={setQuoraAnswer}
-            quoraLink={quoraLink}
-            setQuoraLink={setQuoraLink}
-            onSubmit={handleQuoraSubmit}
-          />
-        ) : step === 2 && (
+        {step === 2 && isQuoraMode && (
+          <>
+            <QuoraStep
+              quoraTitle={quoraTitle}
+              setQuoraTitle={setQuoraTitle}
+              quoraQuestion={quoraQuestion}
+              setQuoraQuestion={setQuoraQuestion}
+              quoraAnswer={quoraAnswer}
+              setQuoraAnswer={setQuoraAnswer}
+              quoraLink={quoraLink}
+              setQuoraLink={setQuoraLink}
+              onSubmit={handleQuoraSubmit}
+            />
+            {showQuoraResponse && (
+              <Card className="mt-6 p-4 bg-gray-50">
+                <h4 className="font-semibold mb-2">{quoraTitle}</h4>
+                <p className="text-gray-700 mb-4">{quoraQuestion}</p>
+                <div className="bg-white p-4 rounded-lg">
+                  <p className="whitespace-pre-wrap">{quoraAnswer}</p>
+                  {quoraLink && (
+                    <a 
+                      href={quoraLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline mt-4 block"
+                    >
+                      En savoir plus
+                    </a>
+                  )}
+                </div>
+              </Card>
+            )}
+          </>
+        )}
+
+        {step === 2 && !isQuoraMode && (
           <LanguageStep
             language={language}
             wordCount={wordCount}
