@@ -7,7 +7,7 @@ export const analyzePerformance = (doc: Document, startTime: number): Performanc
   const firstContentfulPaint = performanceEntries ? performanceEntries.domContentLoadedEventEnd - performanceEntries.startTime : 0;
   const domLoadTime = performanceEntries ? performanceEntries.domComplete - performanceEntries.startTime : 0;
 
-  // Calculer la taille des ressources
+  // Analyse détaillée des ressources
   const resources = window.performance.getEntriesByType('resource') as PerformanceResourceTiming[];
   const resourceSizes = {
     images: 0,

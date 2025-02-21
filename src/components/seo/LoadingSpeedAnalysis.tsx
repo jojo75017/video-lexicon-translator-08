@@ -171,3 +171,4 @@ const LoadingSpeedAnalysis = ({ performance }: LoadingSpeedAnalysisProps) => {
 };
 
 export default LoadingSpeedAnalysis;
+
