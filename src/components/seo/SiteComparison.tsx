@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,11 +30,11 @@ interface SiteComparisonProps {
 }
 
 const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
-  const [competitorUrl, setCompetitorUrl] = React.useState('');
-  const [keywordSuggestions, setKeywordSuggestions] = React.useState<KeywordSuggestion[]>([]);
-  const [isLoadingKeywords, setIsLoadingKeywords] = React.useState(false);
-  const [useRealData, setUseRealData] = React.useState(false);
-  const [apiCredentials, setApiCredentials] = React.useState({
+  const [competitorUrl, setCompetitorUrl] = useState('');
+  const [keywordSuggestions, setKeywordSuggestions] = useState<KeywordSuggestion[]>([]);
+  const [isLoadingKeywords, setIsLoadingKeywords] = useState(false);
+  const [useRealData, setUseRealData] = useState(false);
+  const [apiCredentials, setApiCredentials] = useState({
     login: '',
     password: ''
   });
