@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +7,7 @@ import { StepBack, StepForward, Check, ArrowRight } from 'lucide-react';
 import { toast } from "sonner";
 
 interface KeywordGeneratorProps {
-  onKeywordsGenerated: (keywords: Array<{ keyword: string; volume: number; difficulty: number; }>) => void;
+  onKeywordsGenerated: (keywords: Array<{ keyword: string; volume: number; difficulty: number; relevance: number; searchVolume: number; trend: string; competition: number; cpc: number; seasonality: { peak: string[]; low: string[]; }; }>) => void;
 }
 
 const KeywordGenerator = ({ onKeywordsGenerated }: KeywordGeneratorProps) => {
@@ -45,11 +44,31 @@ const KeywordGenerator = ({ onKeywordsGenerated }: KeywordGeneratorProps) => {
     try {
       // Simulation de la génération de mots-clés
       const simulatedKeywords = [
-        { keyword: `${domain} ${location}`, volume: Math.floor(Math.random() * 1000), difficulty: Math.floor(Math.random() * 100) },
-        { keyword: `services ${domain}`, volume: Math.floor(Math.random() * 1000), difficulty: Math.floor(Math.random() * 100) },
-        { keyword: `${domain} près de ${location}`, volume: Math.floor(Math.random() * 1000), difficulty: Math.floor(Math.random() * 100) },
-        { keyword: `meilleur ${domain}`, volume: Math.floor(Math.random() * 1000), difficulty: Math.floor(Math.random() * 100) },
-        { keyword: `${domain} professionnel`, volume: Math.floor(Math.random() * 1000), difficulty: Math.floor(Math.random() * 100) }
+        { 
+          keyword: `${domain} ${location}`, 
+          relevance: 85,
+          searchVolume: Math.floor(Math.random() * 1000), 
+          difficulty: Math.floor(Math.random() * 100),
+          trend: 'up' as const,
+          competition: Math.random(),
+          cpc: Math.random() * 5,
+          seasonality: {
+            peak: ['Jun', 'Jul', 'Aug'],
+            low: ['Jan', 'Feb']
+          }
+        },
+        { 
+          keyword: `services ${domain}`,
+          relevance: 75,
+          searchVolume: Math.floor(Math.random() * 1000),
+          difficulty: Math.floor(Math.random() * 100)
+        },
+        { 
+          keyword: `${domain} près de ${location}`,
+          relevance: 90,
+          searchVolume: Math.floor(Math.random() * 1000),
+          difficulty: Math.floor(Math.random() * 100)
+        }
       ];
 
       toast.success("Suggestions générées avec succès!");

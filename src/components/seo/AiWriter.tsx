@@ -8,9 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Progress } from "@/components/ui/progress";
 import { StepBack, StepForward, ArrowRight, Languages } from 'lucide-react';
 import { toast } from "sonner";
+import { KeywordSuggestion } from "@/types/seo";
 
 interface AiWriterProps {
-  keywords: Array<{ keyword: string; volume: number; difficulty: number; }>;
+  keywords: KeywordSuggestion[];
   onContentGenerated: (content: { title: string; intro: string; sections: Array<{ heading: string; content: string; }> }) => void;
 }
 
@@ -85,7 +86,7 @@ const AiWriter: React.FC<AiWriterProps> = ({ keywords, onContentGenerated }) => 
               <SelectContent>
                 {keywords.map((kw, index) => (
                   <SelectItem key={index} value={kw.keyword}>
-                    {kw.keyword} (Volume: {kw.volume})
+                    {kw.keyword} (Volume: {kw.searchVolume || 0})
                   </SelectItem>
                 ))}
               </SelectContent>
