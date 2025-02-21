@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -70,6 +71,15 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
       <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-blue-600">
+            Optimisation SEO Avancée
+          </h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Découvrez comment améliorer votre visibilité en ligne grâce à nos outils d'analyse SEO et nos stratégies d'optimisation sur mesure.
+          </p>
+        </div>
+
         <DashboardHeader />
         
         <SeoActionButtons />

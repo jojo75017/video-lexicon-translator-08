@@ -4,6 +4,7 @@ interface AnalyticsData {
   uniqueVisitors: number;
   bounceRate: number;
   avgSessionDuration: number;
+  averageTimeOnPage: number;
   conversionRate: number;
   topPages: Array<{
     url: string;
@@ -14,6 +15,10 @@ interface AnalyticsData {
     keyword: string;
     clicks: number;
     impressions: number;
+  }>;
+  topCountries: Array<{
+    country: string;
+    visits: number;
   }>;
   trafficSources: {
     organic: number;
@@ -26,6 +31,10 @@ interface AnalyticsData {
     mobile: number;
     tablet: number;
   };
+  timeOnSite: {
+    average: number;
+    total: number;
+  };
 }
 
 export const analyzeAnalytics = (): AnalyticsData => {
@@ -34,6 +43,7 @@ export const analyzeAnalytics = (): AnalyticsData => {
     uniqueVisitors: Math.floor(Math.random() * 50000),
     bounceRate: Math.random() * 100,
     avgSessionDuration: Math.floor(Math.random() * 300),
+    averageTimeOnPage: Math.floor(Math.random() * 180),
     conversionRate: Math.random() * 10,
     topPages: [
       {
@@ -69,6 +79,20 @@ export const analyzeAnalytics = (): AnalyticsData => {
         impressions: Math.floor(Math.random() * 3000)
       }
     ],
+    topCountries: [
+      {
+        country: "France",
+        visits: Math.floor(Math.random() * 50000)
+      },
+      {
+        country: "Belgique",
+        visits: Math.floor(Math.random() * 20000)
+      },
+      {
+        country: "Canada",
+        visits: Math.floor(Math.random() * 15000)
+      }
+    ],
     trafficSources: {
       organic: Math.random() * 100,
       direct: Math.random() * 100,
@@ -79,6 +103,11 @@ export const analyzeAnalytics = (): AnalyticsData => {
       desktop: Math.random() * 100,
       mobile: Math.random() * 100,
       tablet: Math.random() * 100
+    },
+    timeOnSite: {
+      average: Math.floor(Math.random() * 600),
+      total: Math.floor(Math.random() * 1000000)
     }
   };
 };
+
