@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -22,6 +21,7 @@ import AdvancedOptimizations from '@/components/seo/AdvancedOptimizations';
 import AnalyticsOverview from '@/components/seo/AnalyticsOverview';
 import SignatureGenerator from '@/components/signature/SignatureGenerator';
 import SiteComparison from '@/components/seo/SiteComparison';
+import KeywordGenerator from '@/components/seo/KeywordGenerator';
 
 const Index = () => {
   const {
@@ -40,6 +40,15 @@ const Index = () => {
   };
 
   const [comparisonSite, setComparisonSite] = React.useState('');
+
+  const handleGeneratedKeywords = (keywords: Array<{ keyword: string; volume: number; difficulty: number; }>) => {
+    if (seoAnalysis) {
+      setSeoAnalysis({
+        ...seoAnalysis,
+        keywordSuggestions: keywords
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
@@ -107,6 +116,9 @@ const Index = () => {
               </Card>
             ) : seoAnalysis ? (
               <div className="space-y-6">
+                <Card className="p-6">
+                  <KeywordGenerator onKeywordsGenerated={handleGeneratedKeywords} />
+                </Card>
                 <SeoResults seoAnalysis={seoAnalysis} />
                 <SiteComparison 
                   site1={{ url, analysis: seoAnalysis }}
