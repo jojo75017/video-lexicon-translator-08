@@ -24,6 +24,7 @@ import SiteComparison from '@/components/seo/SiteComparison';
 import KeywordGenerator from '@/components/seo/KeywordGenerator';
 import AiWriter from '@/components/seo/AiWriter';
 import { KeywordSuggestion } from '@/types/seo';
+import { toast } from "sonner";
 
 const Index = () => {
   const {

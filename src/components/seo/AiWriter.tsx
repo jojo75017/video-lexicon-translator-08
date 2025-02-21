@@ -38,27 +38,33 @@ const AiWriter: React.FC<AiWriterProps> = ({ keywords, onContentGenerated }) => 
     }
   };
 
+  const generateFrenchContent = (keyword: string) => {
+    return {
+      title: `Guide Complet : ${keyword} - Tout ce que vous devez savoir`,
+      intro: `Découvrez notre guide détaillé sur ${keyword}. Dans cet article, nous explorons les aspects essentiels, les meilleures pratiques et les conseils d'experts pour optimiser votre approche.`,
+      sections: [
+        {
+          heading: `Les Fondamentaux de ${keyword}`,
+          content: `Pour bien comprendre ${keyword}, il est essentiel de maîtriser les bases. Notre expertise nous permet d'identifier les éléments clés qui font la différence. Nous avons analysé les meilleures pratiques du marché et compilé les stratégies les plus efficaces pour vous aider à exceller dans ce domaine.`
+        },
+        {
+          heading: `Optimisation et Stratégies pour ${keyword}`,
+          content: `L'optimisation de ${keyword} nécessite une approche méthodique et bien planifiée. Nos experts ont développé des stratégies éprouvées qui vous permettront d'obtenir des résultats concrets. Découvrez comment maximiser votre potentiel et atteindre vos objectifs avec des techniques innovantes et efficaces.`
+        },
+        {
+          heading: `L'Avenir de ${keyword}`,
+          content: `Les tendances actuelles indiquent que ${keyword} continuera d'évoluer rapidement. Restez en avance sur la concurrence en adoptant les dernières innovations et en préparant votre stratégie pour l'avenir. Notre analyse des tendances émergentes vous aide à anticiper les changements et à adapter votre approche en conséquence.`
+        }
+      ]
+    };
+  };
+
   const handleGenerate = async () => {
     setIsGenerating(true);
     toast.info("Génération du contenu en cours...");
 
     try {
-      // Pour l'instant, nous simulons la génération
-      const content = {
-        title: `Comment ${selectedKeyword} peut améliorer votre entreprise`,
-        intro: `Découvrez comment ${selectedKeyword} peut transformer votre approche et optimiser vos résultats.`,
-        sections: [
-          {
-            heading: "Comprendre l'importance de " + selectedKeyword,
-            content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit..."
-          },
-          {
-            heading: "Les meilleures pratiques pour " + selectedKeyword,
-            content: "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua..."
-          }
-        ]
-      };
-
+      const content = generateFrenchContent(selectedKeyword);
       onContentGenerated(content);
       toast.success("Contenu généré avec succès !");
     } catch (error) {
