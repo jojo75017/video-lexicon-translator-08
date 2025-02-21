@@ -1,5 +1,18 @@
 
-export const analyzeMetaTags = (doc: Document) => {
+interface MetaTagsResult {
+  tags: Record<string, string>;
+  metaStatus: {
+    hasSeoTitleTag: boolean;
+    hasDescriptionTag: boolean;
+    hasRobotsTag: boolean;
+    hasCanonicalTag: boolean;
+    hasOpenGraphTags: boolean;
+    hasTwitterTags: boolean;
+    hasViewportTag: boolean;
+  };
+}
+
+export const analyzeMetaTags = (doc: Document): Record<string, string> => {
   const metaTags = Array.from(doc.getElementsByTagName('meta'));
   
   // Analyse détaillée des meta tags
@@ -21,17 +34,15 @@ export const analyzeMetaTags = (doc: Document) => {
   const hasTwitterTags = metaTags.some(tag => tag.getAttribute('name')?.startsWith('twitter:'));
   const hasViewportTag = metaTags.some(tag => tag.getAttribute('name') === 'viewport');
 
-  return {
-    tags: analysis,
-    metaStatus: {
-      hasSeoTitleTag,
-      hasDescriptionTag,
-      hasRobotsTag,
-      hasCanonicalTag,
-      hasOpenGraphTags,
-      hasTwitterTags,
-      hasViewportTag
-    }
-  };
+  // Ajout des statuts dans l'analyse
+  analysis['hasSeoTitleTag'] = String(hasSeoTitleTag);
+  analysis['hasDescriptionTag'] = String(hasDescriptionTag);
+  analysis['hasRobotsTag'] = String(hasRobotsTag);
+  analysis['hasCanonicalTag'] = String(hasCanonicalTag);
+  analysis['hasOpenGraphTags'] = String(hasOpenGraphTags);
+  analysis['hasTwitterTags'] = String(hasTwitterTags);
+  analysis['hasViewportTag'] = String(hasViewportTag);
+
+  return analysis;
 };
 

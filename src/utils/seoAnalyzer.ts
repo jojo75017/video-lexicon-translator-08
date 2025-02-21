@@ -27,7 +27,7 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
   const performanceMetrics = analyzePerformance(doc, startTime);
   const linkAnalysis = analyzeLinkStructure(doc, url);
   const mobileAnalysis = analyzeMobilePerformance(doc);
-  const metaTagsResult = analyzeMetaTags(doc);
+  const metaTagsAnalysis = analyzeMetaTags(doc);
   const semanticStructure = analyzeSemanticStructure(doc);
   const readabilityScore = analyzeReadability(textContent);
   const technologies = analyzeTechnologies();
@@ -64,7 +64,7 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     imgWithoutAlt,
     imagesDetails,
     metaTagsCount: doc.getElementsByTagName('meta').length,
-    metaTagsAnalysis: metaTagsResult,
+    metaTagsAnalysis,
     canonicalUrl: doc.querySelector('link[rel="canonical"]')?.getAttribute('href') || null,
     robotsMeta: doc.querySelector('meta[name="robots"]')?.getAttribute('content') || null,
     brokenLinks: [],
@@ -119,6 +119,7 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     schemaMarkup,
     accessibility,
     indexability,
+    keywordSuggestions,
     technicalSuggestions: [
       "Optimisez les images pour le web",
       "Améliorez la vitesse de chargement",
