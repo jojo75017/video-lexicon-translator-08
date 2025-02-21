@@ -38,22 +38,52 @@ const AiWriter: React.FC<AiWriterProps> = ({ keywords, onContentGenerated }) => 
     }
   };
 
-  const generateFrenchContent = (keyword: string) => {
+  const generateContentWithWordCount = (keyword: string, targetWordCount: number) => {
+    // Phrases de base pour la génération de contenu
+    const phrases = [
+      `Une approche innovante de ${keyword} permet d'obtenir des résultats remarquables.`,
+      `Les experts du domaine recommandent fortement l'utilisation de ${keyword} pour optimiser les performances.`,
+      `L'impact de ${keyword} sur le marché actuel est indéniable.`,
+      `Les dernières études montrent que ${keyword} devient de plus en plus important dans notre secteur.`,
+      `Pour maximiser les résultats avec ${keyword}, il est essentiel de suivre les meilleures pratiques.`,
+      `L'évolution constante de ${keyword} nécessite une adaptation continue des stratégies.`,
+      `Les professionnels qui maîtrisent ${keyword} obtiennent généralement de meilleurs résultats.`,
+      `L'intégration de ${keyword} dans votre stratégie peut transformer votre approche.`,
+    ];
+
+    // Fonction pour générer un paragraphe avec un nombre de mots cible
+    const generateParagraph = (targetWords: number) => {
+      let paragraph = '';
+      let currentWords = 0;
+
+      while (currentWords < targetWords) {
+        const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+        paragraph += ' ' + randomPhrase;
+        currentWords = paragraph.split(/\s+/).length;
+      }
+
+      return paragraph.trim();
+    };
+
+    // Calcul de la répartition des mots
+    const introWords = Math.floor(targetWordCount * 0.2); // 20% pour l'intro
+    const sectionWords = Math.floor((targetWordCount * 0.8) / 3); // Le reste divisé en 3 sections
+
     return {
       title: `Guide Complet : ${keyword} - Tout ce que vous devez savoir`,
-      intro: `Découvrez notre guide détaillé sur ${keyword}. Dans cet article, nous explorons les aspects essentiels, les meilleures pratiques et les conseils d'experts pour optimiser votre approche.`,
+      intro: generateParagraph(introWords),
       sections: [
         {
           heading: `Les Fondamentaux de ${keyword}`,
-          content: `Pour bien comprendre ${keyword}, il est essentiel de maîtriser les bases. Notre expertise nous permet d'identifier les éléments clés qui font la différence. Nous avons analysé les meilleures pratiques du marché et compilé les stratégies les plus efficaces pour vous aider à exceller dans ce domaine.`
+          content: generateParagraph(sectionWords)
         },
         {
           heading: `Optimisation et Stratégies pour ${keyword}`,
-          content: `L'optimisation de ${keyword} nécessite une approche méthodique et bien planifiée. Nos experts ont développé des stratégies éprouvées qui vous permettront d'obtenir des résultats concrets. Découvrez comment maximiser votre potentiel et atteindre vos objectifs avec des techniques innovantes et efficaces.`
+          content: generateParagraph(sectionWords)
         },
         {
           heading: `L'Avenir de ${keyword}`,
-          content: `Les tendances actuelles indiquent que ${keyword} continuera d'évoluer rapidement. Restez en avance sur la concurrence en adoptant les dernières innovations et en préparant votre stratégie pour l'avenir. Notre analyse des tendances émergentes vous aide à anticiper les changements et à adapter votre approche en conséquence.`
+          content: generateParagraph(sectionWords)
         }
       ]
     };
@@ -64,7 +94,7 @@ const AiWriter: React.FC<AiWriterProps> = ({ keywords, onContentGenerated }) => 
     toast.info("Génération du contenu en cours...");
 
     try {
-      const content = generateFrenchContent(selectedKeyword);
+      const content = generateContentWithWordCount(selectedKeyword, wordCount);
       onContentGenerated(content);
       toast.success("Contenu généré avec succès !");
     } catch (error) {
