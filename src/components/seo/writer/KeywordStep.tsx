@@ -26,8 +26,7 @@ const KeywordStep: React.FC<KeywordStepProps> = ({
         {onQuoraClick && (
           <Button
             onClick={onQuoraClick}
-            variant="outline"
-            className="gap-2"
+            className="bg-[#ea384c] hover:bg-[#ea384c]/90 text-white border-none gap-2 shadow-md transition-all duration-200 hover:scale-105"
           >
             <MessagesSquare className="h-4 w-4" />
             Réponses Quora
@@ -51,3 +50,4 @@ const KeywordStep: React.FC<KeywordStepProps> = ({
 };
 
 export default KeywordStep;
+
