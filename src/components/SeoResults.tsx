@@ -20,6 +20,7 @@ import { analyzeReadability } from '@/utils/seo/semanticAnalyzer';
 import { analyzeMobilePerformance } from '@/utils/seo/mobileAnalyzer';
 import AnalyticsOverview from './seo/AnalyticsOverview';
 import ContentHierarchy from './ContentHierarchy';
+import SeoIntegrations from './seo/SeoIntegrations';
 
 interface SeoResultsProps {
   seoAnalysis: SeoAnalysis;
@@ -111,6 +112,8 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
           suggestions={suggestions}
           performance={seoAnalysis.performance}
         />
+
+        <SeoIntegrations />
 
         <Card className="p-6">
           <SeoStructure 
