@@ -27,7 +27,7 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
   const performanceMetrics = analyzePerformance(doc, startTime);
   const linkAnalysis = analyzeLinkStructure(doc, url);
   const mobileAnalysis = analyzeMobilePerformance(doc);
-  const metaTagsAnalysis = analyzeMetaTags(doc);
+  const metaTagsResult = analyzeMetaTags(doc);
   const semanticStructure = analyzeSemanticStructure(doc);
   const readabilityScore = analyzeReadability(textContent);
   const technologies = analyzeTechnologies();
@@ -64,6 +64,7 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     imgWithoutAlt,
     imagesDetails,
     metaTagsCount: doc.getElementsByTagName('meta').length,
+    metaTagsAnalysis: metaTagsResult,
     canonicalUrl: doc.querySelector('link[rel="canonical"]')?.getAttribute('href') || null,
     robotsMeta: doc.querySelector('meta[name="robots"]')?.getAttribute('content') || null,
     brokenLinks: [],
@@ -105,8 +106,6 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
       fontScale: mobileAnalysis.fontScale,
       score: mobileAnalysis.score,
     },
-    metaTagsAnalysis,
-    keywordSuggestions,
     socialTags: {
       ogTitle: doc.querySelector('meta[property="og:title"]')?.getAttribute('content') || null,
       ogDescription: doc.querySelector('meta[property="og:description"]')?.getAttribute('content') || null,
@@ -129,3 +128,4 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     ],
   };
 };
+
