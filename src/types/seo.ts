@@ -136,6 +136,7 @@ export interface SocialTags {
 export interface KeywordSuggestion {
   keyword: string;
   relevance: number;
+  volume: number;
   searchVolume?: number;
   difficulty?: number;
   trend?: 'up' | 'down' | 'stable';
@@ -268,6 +269,7 @@ export interface SeoAnalysis {
   keywordSuggestions: {
     keyword: string;
     relevance: number;
+    volume: number;
     searchVolume?: number;
     difficulty?: number;
     trend?: 'up' | 'down' | 'stable';

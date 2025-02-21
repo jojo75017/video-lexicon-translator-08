@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -39,9 +38,9 @@ const Index = () => {
   } = useSiteAnalyzer();
 
   const [comparisonSite, setComparisonSite] = React.useState('');
-  const [generatedKeywords, setGeneratedKeywords] = useState<Array<{ keyword: string; volume: number; difficulty: number; }>>([]);
+  const [generatedKeywords, setGeneratedKeywords] = useState<KeywordSuggestion[]>([]);
 
-  const handleGeneratedKeywords = (keywords: Array<{ keyword: string; volume: number; difficulty: number; }>) => {
+  const handleGeneratedKeywords = (keywords: KeywordSuggestion[]) => {
     setGeneratedKeywords(keywords);
     if (seoAnalysis) {
       setSeoAnalysis({

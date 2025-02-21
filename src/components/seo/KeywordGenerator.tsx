@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -5,9 +6,10 @@ import { Progress } from "@/components/ui/progress";
 import { Label } from "@/components/ui/label";
 import { StepBack, StepForward, Check, ArrowRight } from 'lucide-react';
 import { toast } from "sonner";
+import { KeywordSuggestion } from "@/types/seo";
 
 interface KeywordGeneratorProps {
-  onKeywordsGenerated: (keywords: Array<{ keyword: string; volume: number; difficulty: number; relevance: number; searchVolume: number; trend: string; competition: number; cpc: number; seasonality: { peak: string[]; low: string[]; }; }>) => void;
+  onKeywordsGenerated: (keywords: KeywordSuggestion[]) => void;
 }
 
 const KeywordGenerator = ({ onKeywordsGenerated }: KeywordGeneratorProps) => {
@@ -43,13 +45,14 @@ const KeywordGenerator = ({ onKeywordsGenerated }: KeywordGeneratorProps) => {
 
     try {
       // Simulation de la génération de mots-clés
-      const simulatedKeywords = [
+      const simulatedKeywords: KeywordSuggestion[] = [
         { 
           keyword: `${domain} ${location}`, 
           relevance: 85,
           searchVolume: Math.floor(Math.random() * 1000), 
           difficulty: Math.floor(Math.random() * 100),
-          trend: 'up' as const,
+          volume: Math.floor(Math.random() * 1000),
+          trend: 'up',
           competition: Math.random(),
           cpc: Math.random() * 5,
           seasonality: {
@@ -61,13 +64,29 @@ const KeywordGenerator = ({ onKeywordsGenerated }: KeywordGeneratorProps) => {
           keyword: `services ${domain}`,
           relevance: 75,
           searchVolume: Math.floor(Math.random() * 1000),
-          difficulty: Math.floor(Math.random() * 100)
+          volume: Math.floor(Math.random() * 1000),
+          difficulty: Math.floor(Math.random() * 100),
+          trend: 'stable',
+          competition: Math.random(),
+          cpc: Math.random() * 5,
+          seasonality: {
+            peak: ['Mar', 'Apr', 'May'],
+            low: ['Nov', 'Dec']
+          }
         },
         { 
           keyword: `${domain} près de ${location}`,
           relevance: 90,
           searchVolume: Math.floor(Math.random() * 1000),
-          difficulty: Math.floor(Math.random() * 100)
+          volume: Math.floor(Math.random() * 1000),
+          difficulty: Math.floor(Math.random() * 100),
+          trend: 'up',
+          competition: Math.random(),
+          cpc: Math.random() * 5,
+          seasonality: {
+            peak: ['Sep', 'Oct'],
+            low: ['Jul', 'Aug']
+          }
         }
       ];
 
