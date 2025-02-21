@@ -5,12 +5,16 @@ interface SummaryStepProps {
   selectedKeyword: string;
   language: string;
   wordCount: number;
+  quoraTitle?: string;
+  quoraQuestion?: string;
 }
 
 const SummaryStep: React.FC<SummaryStepProps> = ({
   selectedKeyword,
   language,
   wordCount,
+  quoraTitle,
+  quoraQuestion,
 }) => {
   return (
     <div className="space-y-4">
@@ -20,6 +24,8 @@ const SummaryStep: React.FC<SummaryStepProps> = ({
           <li>Mot-clé : {selectedKeyword}</li>
           <li>Langue : {language === 'fr' ? 'Français' : language === 'en' ? 'Anglais' : 'Espagnol'}</li>
           <li>Nombre de mots : {wordCount}</li>
+          {quoraTitle && <li>Titre Quora : {quoraTitle}</li>}
+          {quoraQuestion && <li>Question Quora : {quoraQuestion}</li>}
         </ul>
       </div>
     </div>
