@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Card } from "@/components/ui/card";
-import { BarChart3, Users, Clock, ArrowRight, Globe, DevicePhoneIcon } from "lucide-react";
+import { BarChart3, Users, Clock, ArrowRight, Globe, Smartphone } from "lucide-react";
 import {
   Area,
   AreaChart,
