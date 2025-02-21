@@ -19,7 +19,7 @@ import { analyzeAccessibility } from '@/utils/seo/accessibilityAnalyzer';
 import { analyzeReadability } from '@/utils/seo/semanticAnalyzer';
 import { analyzeMobilePerformance } from '@/utils/seo/mobileAnalyzer';
 import AnalyticsOverview from './seo/AnalyticsOverview';
-import ContentHierarchy from './seo/ContentHierarchy';
+import ContentHierarchy from './ContentHierarchy';
 
 interface SeoResultsProps {
   seoAnalysis: SeoAnalysis;
