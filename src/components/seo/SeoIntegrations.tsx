@@ -10,7 +10,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { InfoIcon, WordPress, Globe } from 'lucide-react';
+import { InfoIcon, Globe, Database } from 'lucide-react';
 
 interface IntegrationConfig {
   type: string;
@@ -32,15 +32,17 @@ const SeoIntegrations = () => {
 
     try {
       // Vérifier si l'URL est un site WordPress valide
-      const response = await fetch(`${wpUrl}/wp-json`);
-      const data = await response.json();
-      
-      if (data) {
+      const response = await fetch(`${wpUrl}/wp-json/wp/v2/posts`);
+      if (response.ok) {
         setIntegrations([...integrations, { type: 'wordpress', url: wpUrl }]);
         toast.success("Site WordPress connecté avec succès");
+        console.log("WordPress API disponible :", response.headers.get("x-wp-total"), "articles trouvés");
+      } else {
+        throw new Error("API WordPress non accessible");
       }
     } catch (error) {
       toast.error("Erreur lors de la connexion au site WordPress. Vérifiez l'URL et assurez-vous que l'API REST est activée.");
+      console.error("Erreur WordPress :", error);
     }
   };
 
@@ -80,7 +82,7 @@ const SeoIntegrations = () => {
 
       <div className="space-y-4">
         <div className="flex items-center gap-4">
-          <WordPress className="h-6 w-6 text-blue-500" />
+          <Database className="h-6 w-6 text-blue-500" />
           <Input 
             placeholder="URL de votre site WordPress"
             value={wpUrl}
@@ -128,7 +130,7 @@ const SeoIntegrations = () => {
             {integrations.map((integration, index) => (
               <div key={index} className="flex items-center gap-2 text-sm text-gray-600">
                 {integration.type === 'wordpress' ? (
-                  <WordPress className="h-4 w-4" />
+                  <Database className="h-4 w-4" />
                 ) : (
                   <Globe className="h-4 w-4" />
                 )}
