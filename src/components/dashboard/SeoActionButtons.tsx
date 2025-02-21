@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import RankingTracker from "@/components/seo/RankingTracker";
 
 const projectSchema = z.object({
   name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
@@ -20,6 +21,8 @@ type ProjectFormData = z.infer<typeof projectSchema>;
 
 const SeoActionButtons = () => {
   const [showNewProjectDialog, setShowNewProjectDialog] = useState(false);
+  const [showRankingDialog, setShowRankingDialog] = useState(false);
+  const [selectedUrl, setSelectedUrl] = useState('');
 
   const form = useForm<ProjectFormData>({
     resolver: zodResolver(projectSchema),
@@ -35,6 +38,12 @@ const SeoActionButtons = () => {
     toast.success("Projet créé avec succès !");
     setShowNewProjectDialog(false);
     form.reset();
+  };
+
+  const handleRankingClick = () => {
+    // Pour la démo, on utilise une URL fixe
+    setSelectedUrl('https://example.com');
+    setShowRankingDialog(true);
   };
 
   const handleAction = (action: string) => {
@@ -103,15 +112,25 @@ const SeoActionButtons = () => {
           </Form>
         </DialogContent>
       </Dialog>
-      
-      <Button
-        variant="outline"
-        className="flex flex-col items-center gap-2 h-auto py-4 px-2 text-center hover:bg-purple-50"
-        onClick={() => handleAction("Suivi des classements")}
-      >
-        <ChartLine className="h-6 w-6 text-purple-600" />
-        <span className="text-xs">Suivre les classements</span>
-      </Button>
+
+      <Dialog open={showRankingDialog} onOpenChange={setShowRankingDialog}>
+        <DialogTrigger asChild>
+          <Button
+            variant="outline"
+            className="flex flex-col items-center gap-2 h-auto py-4 px-2 text-center hover:bg-purple-50"
+            onClick={handleRankingClick}
+          >
+            <ChartLine className="h-6 w-6 text-purple-600" />
+            <span className="text-xs">Suivre les classements</span>
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[800px]">
+          <DialogHeader>
+            <DialogTitle>Suivi des classements SEO</DialogTitle>
+          </DialogHeader>
+          <RankingTracker url={selectedUrl} />
+        </DialogContent>
+      </Dialog>
       
       <Button
         variant="outline"
@@ -153,4 +172,3 @@ const SeoActionButtons = () => {
 };
 
 export default SeoActionButtons;
-

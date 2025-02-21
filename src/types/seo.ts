@@ -50,21 +50,25 @@ export interface SearchConsoleData {
   impressions: number;
   ctr: number;
   position: number;
-  topQueries: { query: string; clicks: number; impressions: number }[];
-  topPages: { 
+  topQueries: Array<{
+    query: string;
+    clicks: number;
+    impressions: number;
+  }>;
+  topPages: Array<{ 
     url: string;
     clicks: number;
     impressions: number;
-  }[];
+  }>;
   devices: {
     mobile: number;
     desktop: number;
     tablet: number;
   };
-  countries: {
+  countries: Array<{
     country: string;
     clicks: number;
-  }[];
+  }>;
 }
 
 export interface SocialMetrics {
