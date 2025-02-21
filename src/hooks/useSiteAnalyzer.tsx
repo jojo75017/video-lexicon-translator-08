@@ -18,6 +18,7 @@ interface UseSiteAnalyzerReturn {
   isLoading: boolean;
   showCorsWarning: boolean;
   seoAnalysis: SeoAnalysis | null;
+  setSeoAnalysis: (analysis: SeoAnalysis) => void;
   resources: Resource[];
   siteStructure: { name: string; children: SiteNode[] } | null;
   analyzeSite: () => Promise<void>;
@@ -156,6 +157,7 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
     isLoading,
     showCorsWarning,
     seoAnalysis,
+    setSeoAnalysis,
     resources,
     siteStructure,
     analyzeSite,
