@@ -55,7 +55,7 @@ export const generateContentWithWordCount = (keyword: string, targetWordCount: n
 
   const generateBulletPoints = (count: number) => {
     const shuffled = [...bulletPoints].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, count).map(point => `- ${point}`).join('\n');
+    return shuffled.slice(0, count).map(point => `<li>${point}</li>`).join('\n');
   };
 
   const generateParagraph = (phrases: string[], minWords: number, useContext = true) => {
@@ -89,16 +89,17 @@ export const generateContentWithWordCount = (keyword: string, targetWordCount: n
     sections: [
       {
         heading: `Les Fondamentaux de ${boldKeyword}`,
-        content: `${generateParagraph(bodyPhrases, sectionWords)}\n\n${generateBulletPoints(3)}`
+        content: `${generateParagraph(bodyPhrases, sectionWords)}\n\n<ul class="list-disc pl-6 my-4">\n${generateBulletPoints(3)}\n</ul>`
       },
       {
         heading: `Optimisation et Mise en Œuvre de ${boldKeyword}`,
-        content: `${generateParagraph(bodyPhrases, sectionWords)}\n\n${generateBulletPoints(3)}`
+        content: `${generateParagraph(bodyPhrases, sectionWords)}\n\n<ul class="list-disc pl-6 my-4">\n${generateBulletPoints(3)}\n</ul>`
       },
       {
         heading: `Tendances et Innovations pour ${boldKeyword}`,
-        content: `${generateParagraph(bodyPhrases, sectionWords)}\n\n${generateBulletPoints(3)}`
+        content: `${generateParagraph(bodyPhrases, sectionWords)}\n\n<ul class="list-disc pl-6 my-4">\n${generateBulletPoints(3)}\n</ul>`
       }
     ]
   };
 };
+
