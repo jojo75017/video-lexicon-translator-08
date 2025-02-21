@@ -2,22 +2,32 @@
 export const generateContentWithWordCount = (keyword: string, targetWordCount: number) => {
   const boldKeyword = `**${keyword}**`;
   
-  const bulletPoints = [
-    `L'importance de ${boldKeyword} dans le contexte actuel`,
-    `Les meilleures pratiques pour utiliser ${boldKeyword}`,
-    `Comment optimiser ${boldKeyword} pour de meilleurs résultats`,
-    `Les avantages concurrentiels de ${boldKeyword}`,
-    `Les dernières tendances concernant ${boldKeyword}`,
-    `Les outils essentiels pour gérer ${boldKeyword}`,
-    `Les stratégies avancées pour ${boldKeyword}`,
-    `L'impact de ${boldKeyword} sur votre performance`
+  const introductoryPhrases = [
+    `Dans le monde professionnel d'aujourd'hui, ${boldKeyword} joue un rôle crucial.`,
+    `L'émergence de ${boldKeyword} a transformé notre façon de travailler.`,
+    `La maîtrise de ${boldKeyword} est devenue incontournable pour réussir.`,
+    `Les innovations liées à ${boldKeyword} ne cessent de se multiplier.`
   ];
 
-  const phrases = [
-    `Une approche innovante de ${boldKeyword} permet d'obtenir des résultats remarquables.`,
-    `Les experts du domaine recommandent fortement l'utilisation de ${boldKeyword} pour optimiser les performances.`,
-    `L'impact de ${boldKeyword} sur le marché actuel est indéniable.`,
-    `Les dernières études montrent que ${boldKeyword} devient de plus en plus important dans notre secteur.`
+  const bodyPhrases = [
+    `Les études récentes démontrent que ${boldKeyword} améliore significativement la productivité.`,
+    `Les experts s'accordent sur l'importance croissante de ${boldKeyword} dans notre secteur.`,
+    `L'adoption de ${boldKeyword} permet d'obtenir un avantage concurrentiel notable.`,
+    `De plus en plus d'entreprises investissent dans ${boldKeyword} pour leur développement.`,
+    `Les analyses montrent que ${boldKeyword} représente un facteur clé de succès.`,
+    `La mise en place de ${boldKeyword} nécessite une stratégie bien planifiée.`,
+    `Les retours d'expérience sur ${boldKeyword} sont très encourageants.`
+  ];
+
+  const bulletPoints = [
+    `Les avantages stratégiques de ${boldKeyword}`,
+    `Comment maximiser l'efficacité de ${boldKeyword}`,
+    `Les meilleures pratiques pour implémenter ${boldKeyword}`,
+    `Les tendances futures concernant ${boldKeyword}`,
+    `L'impact mesurable de ${boldKeyword} sur les performances`,
+    `Les facteurs clés de succès pour ${boldKeyword}`,
+    `Les innovations récentes dans ${boldKeyword}`,
+    `Comment optimiser l'utilisation de ${boldKeyword}`
   ];
 
   const generateBulletPoints = (count: number) => {
@@ -25,26 +35,18 @@ export const generateContentWithWordCount = (keyword: string, targetWordCount: n
     return shuffled.slice(0, count).map(point => `- ${point}`).join('\n');
   };
 
-  const generateParagraph = (targetWords: number, includeBullets: boolean = false) => {
+  const generateParagraph = (phrases: string[], minWords: number) => {
     let content = '';
-    let currentWords = 0;
-
-    while (currentWords < targetWords * 0.6) {
-      const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
-      content += ' ' + randomPhrase;
-      currentWords = content.split(/\s+/).length;
-    }
-
-    if (includeBullets) {
-      content += '\n\n' + generateBulletPoints(3) + '\n\n';
-      const remainingWords = targetWords - currentWords;
-      
-      if (remainingWords > 0) {
-        content += phrases[Math.floor(Math.random() * phrases.length)];
+    const shuffledPhrases = [...phrases].sort(() => 0.5 - Math.random());
+    
+    while (content.split(/\s+/).length < minWords && shuffledPhrases.length > 0) {
+      const phrase = shuffledPhrases.pop();
+      if (phrase) {
+        content += (content ? ' ' : '') + phrase;
       }
     }
-
-    return content.trim();
+    
+    return content;
   };
 
   const introWords = Math.floor(targetWordCount * 0.2);
@@ -52,19 +54,19 @@ export const generateContentWithWordCount = (keyword: string, targetWordCount: n
 
   return {
     title: `Guide Complet : ${boldKeyword} - Tout ce que vous devez savoir`,
-    intro: generateParagraph(introWords),
+    intro: generateParagraph(introductoryPhrases, introWords),
     sections: [
       {
         heading: `Les Fondamentaux de ${boldKeyword}`,
-        content: generateParagraph(sectionWords, true)
+        content: `${generateParagraph(bodyPhrases, sectionWords)}\n\n${generateBulletPoints(3)}`
       },
       {
-        heading: `Optimisation et Stratégies pour ${boldKeyword}`,
-        content: generateParagraph(sectionWords, true)
+        heading: `Stratégies et Optimisation de ${boldKeyword}`,
+        content: `${generateParagraph(bodyPhrases, sectionWords)}\n\n${generateBulletPoints(3)}`
       },
       {
-        heading: `L'Avenir de ${boldKeyword}`,
-        content: generateParagraph(sectionWords, true)
+        heading: `Perspectives d'Avenir pour ${boldKeyword}`,
+        content: `${generateParagraph(bodyPhrases, sectionWords)}\n\n${generateBulletPoints(3)}`
       }
     ]
   };
