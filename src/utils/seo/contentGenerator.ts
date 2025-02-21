@@ -1,6 +1,6 @@
 
 export const generateContentWithWordCount = (keyword: string, targetWordCount: number) => {
-  const boldKeyword = `**${keyword}**`;
+  const boldKeyword = `<strong>${keyword}</strong>`;
 
   const introductoryPhrases = [
     `Dans un marché en constante évolution, ${boldKeyword} représente un enjeu majeur.`,
@@ -80,7 +80,6 @@ export const generateContentWithWordCount = (keyword: string, targetWordCount: n
     return content;
   };
 
-  // Calculer la répartition des mots pour chaque section
   const introWords = Math.max(Math.floor(targetWordCount * 0.2), 30);
   const sectionWords = Math.max(Math.floor((targetWordCount - introWords) / 3), 50);
 
@@ -103,4 +102,3 @@ export const generateContentWithWordCount = (keyword: string, targetWordCount: n
     ]
   };
 };
-
