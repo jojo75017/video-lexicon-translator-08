@@ -62,9 +62,9 @@ const ComparisonChart = ({ site1, site2 }: ComparisonChartProps) => {
       site2: Array.isArray(site2.analysis.backlinks) ? site2.analysis.backlinks.length : 0,
     },
     {
-      metric: 'Nombre de titres',
-      site1: site1.analysis.h1Count + site1.analysis.h2Count + site1.analysis.h3Count,
-      site2: site2.analysis.h1Count + site2.analysis.h2Count + site2.analysis.h3Count,
+      metric: 'Visiteurs mensuels',
+      site1: site1.analysis.searchConsole?.impressions || 0,
+      site2: site2.analysis.searchConsole?.impressions || 0,
     }
   ];
 
