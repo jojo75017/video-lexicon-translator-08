@@ -1,72 +1,84 @@
 
-import { AnalyticsData } from '@/types/seo';
+interface AnalyticsData {
+  pageViews: number;
+  uniqueVisitors: number;
+  bounceRate: number;
+  avgSessionDuration: number;
+  conversionRate: number;
+  topPages: Array<{
+    url: string;
+    views: number;
+    conversions: number;
+  }>;
+  topKeywords: Array<{
+    keyword: string;
+    clicks: number;
+    impressions: number;
+  }>;
+  trafficSources: {
+    organic: number;
+    direct: number;
+    referral: number;
+    social: number;
+  };
+  deviceBreakdown: {
+    desktop: number;
+    mobile: number;
+    tablet: number;
+  };
+}
 
-export const analyzeAnalytics = async (): Promise<AnalyticsData> => {
-  try {
-    // Appel à l'API Google Analytics
-    const response = await fetch('/api/analytics');
-    const data = await response.json();
-    
-    return {
-      pageViews: data.pageViews || Math.floor(Math.random() * 50000),
-      uniqueVisitors: data.uniqueVisitors || Math.floor(Math.random() * 30000),
-      bounceRate: data.bounceRate || Math.floor(Math.random() * 100),
-      averageTimeOnPage: data.averageTimeOnPage || Math.floor(Math.random() * 300),
-      topPages: data.topPages || [
-        { url: '/blog/seo-guide', visits: 2800, seoTraffic: 65 },
-        { url: '/services', visits: 2400, seoTraffic: 58 },
-        { url: '/about', visits: 1900, seoTraffic: 45 },
-        { url: '/blog/marketing', visits: 1600, seoTraffic: 42 },
-        { url: '/contact', visits: 1200, seoTraffic: 35 }
-      ],
-      topCountries: data.topCountries || [
-        { country: "France", visits: Math.floor(Math.random() * 10000) },
-        { country: "Belgique", visits: Math.floor(Math.random() * 5000) },
-        { country: "Suisse", visits: Math.floor(Math.random() * 3000) },
-        { country: "Canada", visits: Math.floor(Math.random() * 2000) }
-      ],
-      deviceBreakdown: data.deviceBreakdown || {
-        desktop: Math.floor(Math.random() * 60) + 20,
-        mobile: Math.floor(Math.random() * 40) + 20,
-        tablet: Math.floor(Math.random() * 20)
+export const analyzeAnalytics = (): AnalyticsData => {
+  return {
+    pageViews: Math.floor(Math.random() * 100000),
+    uniqueVisitors: Math.floor(Math.random() * 50000),
+    bounceRate: Math.random() * 100,
+    avgSessionDuration: Math.floor(Math.random() * 300),
+    conversionRate: Math.random() * 10,
+    topPages: [
+      {
+        url: '/accueil',
+        views: Math.floor(Math.random() * 10000),
+        conversions: Math.floor(Math.random() * 100)
       },
-      timeOnSite: data.timeOnSite || {
-        '0-30s': Math.floor(Math.random() * 1000),
-        '30s-2m': Math.floor(Math.random() * 800),
-        '2m-5m': Math.floor(Math.random() * 500),
-        '5m+': Math.floor(Math.random() * 300)
+      {
+        url: '/produits',
+        views: Math.floor(Math.random() * 8000),
+        conversions: Math.floor(Math.random() * 80)
       },
-      topKeywords: data.topKeywords || [
-        { keyword: "marketing digital", volume: 2800, competition: 0.75 },
-        { keyword: "seo optimisation", volume: 2400, competition: 0.65 },
-        { keyword: "référencement naturel", volume: 1900, competition: 0.55 },
-        { keyword: "analytics web", volume: 1600, competition: 0.45 },
-        { keyword: "marketing contenu", volume: 1200, competition: 0.40 }
-      ]
-    };
-  } catch (error) {
-    console.error('Erreur Analytics:', error);
-    return {
-      pageViews: 0,
-      uniqueVisitors: 0,
-      bounceRate: 0,
-      averageTimeOnPage: 0,
-      topCountries: [
-        { country: "France", visits: 0 }
-      ],
-      deviceBreakdown: {
-        desktop: 0,
-        mobile: 0,
-        tablet: 0,
+      {
+        url: '/blog',
+        views: Math.floor(Math.random() * 5000),
+        conversions: Math.floor(Math.random() * 50)
+      }
+    ],
+    topKeywords: [
+      {
+        keyword: 'marketing digital',
+        clicks: Math.floor(Math.random() * 1000),
+        impressions: Math.floor(Math.random() * 5000)
       },
-      timeOnSite: {
-        '0-30s': 0,
-        '30s-2m': 0,
-        '2m-5m': 0,
-        '5m+': 0,
+      {
+        keyword: 'seo optimisation',
+        clicks: Math.floor(Math.random() * 800),
+        impressions: Math.floor(Math.random() * 4000)
       },
-      topPages: [],
-      topKeywords: []
-    };
-  }
+      {
+        keyword: 'stratégie digitale',
+        clicks: Math.floor(Math.random() * 600),
+        impressions: Math.floor(Math.random() * 3000)
+      }
+    ],
+    trafficSources: {
+      organic: Math.random() * 100,
+      direct: Math.random() * 100,
+      referral: Math.random() * 100,
+      social: Math.random() * 100
+    },
+    deviceBreakdown: {
+      desktop: Math.random() * 100,
+      mobile: Math.random() * 100,
+      tablet: Math.random() * 100
+    }
+  };
 };
