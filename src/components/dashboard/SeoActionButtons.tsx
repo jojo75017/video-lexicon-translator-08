@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { ChartLine, BellRing, ShieldCheck, Database, Plus, Rocket } from 'lucide-react';
@@ -23,6 +22,9 @@ const SeoActionButtons = () => {
   const [showNewProjectDialog, setShowNewProjectDialog] = useState(false);
   const [showRankingDialog, setShowRankingDialog] = useState(false);
   const [showUpdatesDialog, setShowUpdatesDialog] = useState(false);
+  const [showAlertsDialog, setShowAlertsDialog] = useState(false);
+  const [showHealthDialog, setShowHealthDialog] = useState(false);
+  const [showOrgDialog, setShowOrgDialog] = useState(false);
   const [selectedUrl, setSelectedUrl] = useState('');
 
   const form = useForm<ProjectFormData>({
@@ -73,6 +75,46 @@ const SeoActionButtons = () => {
 
   const handleAction = (action: string) => {
     toast.info(`Action "${action}" en cours de développement`);
+  };
+
+  const getAlerts = () => {
+    return [
+      {
+        severity: 'high',
+        message: 'Chute brutale du trafic organique (-45%)',
+        time: '2h ago'
+      },
+      {
+        severity: 'medium',
+        message: 'Temps de chargement > 3s sur 5 pages',
+        time: '4h ago'
+      },
+      {
+        severity: 'high',
+        message: 'Perte de position sur 3 mots-clés principaux',
+        time: '6h ago'
+      }
+    ];
+  };
+
+  const getHealthMetrics = () => {
+    return {
+      performance: 85,
+      accessibility: 92,
+      seo: 88,
+      security: 95,
+      mobile: 90
+    };
+  };
+
+  const getOrganizationStats = () => {
+    return [
+      { category: 'Pages indexées', count: 245 },
+      { category: 'Pages en attente', count: 12 },
+      { category: 'Redirections', count: 34 },
+      { category: 'Erreurs 404', count: 8 },
+      { category: 'Pages bloquées', count: 3 }
+    ];
   };
 
   return (
@@ -193,36 +235,107 @@ const SeoActionButtons = () => {
           </div>
         </DialogContent>
       </Dialog>
-      
-      <Button
-        variant="outline"
-        className="flex flex-col items-center gap-2 h-auto py-4 px-2 text-center hover:bg-red-50"
-        onClick={() => handleAction("Alertes critiques")}
-      >
-        <BellRing className="h-6 w-6 text-red-600" />
-        <span className="text-xs">Alertes critiques</span>
-      </Button>
-      
-      <Button
-        variant="outline"
-        className="flex flex-col items-center gap-2 h-auto py-4 px-2 text-center hover:bg-teal-50"
-        onClick={() => handleAction("Santé SEO")}
-      >
-        <ShieldCheck className="h-6 w-6 text-teal-600" />
-        <span className="text-xs">Santé SEO</span>
-      </Button>
-      
-      <Button
-        variant="outline"
-        className="flex flex-col items-center gap-2 h-auto py-4 px-2 text-center hover:bg-indigo-50"
-        onClick={() => handleAction("Organisation")}
-      >
-        <Database className="h-6 w-6 text-indigo-600" />
-        <span className="text-xs">Organiser</span>
-      </Button>
+
+      <Dialog open={showAlertsDialog} onOpenChange={setShowAlertsDialog}>
+        <DialogTrigger asChild>
+          <Button
+            variant="outline"
+            className="flex flex-col items-center gap-2 h-auto py-4 px-2 text-center hover:bg-red-50"
+          >
+            <BellRing className="h-6 w-6 text-red-600" />
+            <span className="text-xs">Alertes critiques</span>
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Alertes SEO Critiques</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            {getAlerts().map((alert, index) => (
+              <div 
+                key={index}
+                className={`p-4 rounded-lg border ${
+                  alert.severity === 'high' ? 'bg-red-50 border-red-200' : 'bg-yellow-50 border-yellow-200'
+                }`}
+              >
+                <div className="flex justify-between items-center">
+                  <p className={`text-sm font-medium ${
+                    alert.severity === 'high' ? 'text-red-700' : 'text-yellow-700'
+                  }`}>
+                    {alert.message}
+                  </p>
+                  <span className="text-xs text-gray-500">{alert.time}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showHealthDialog} onOpenChange={setShowHealthDialog}>
+        <DialogTrigger asChild>
+          <Button
+            variant="outline"
+            className="flex flex-col items-center gap-2 h-auto py-4 px-2 text-center hover:bg-teal-50"
+          >
+            <ShieldCheck className="h-6 w-6 text-teal-600" />
+            <span className="text-xs">Santé SEO</span>
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>État de Santé SEO</DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-2 gap-4 mt-4">
+            {Object.entries(getHealthMetrics()).map(([metric, score]) => (
+              <div key={metric} className="p-4 rounded-lg border bg-white">
+                <h3 className="text-sm font-medium capitalize mb-2">{metric}</h3>
+                <div className="flex items-center">
+                  <div className="h-2 flex-1 bg-gray-200 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full ${
+                        score >= 90 ? 'bg-green-500' :
+                        score >= 80 ? 'bg-teal-500' :
+                        score >= 70 ? 'bg-yellow-500' :
+                        'bg-red-500'
+                      }`}
+                      style={{ width: `${score}%` }}
+                    />
+                  </div>
+                  <span className="ml-2 text-sm font-medium">{score}%</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showOrgDialog} onOpenChange={setShowOrgDialog}>
+        <DialogTrigger asChild>
+          <Button
+            variant="outline"
+            className="flex flex-col items-center gap-2 h-auto py-4 px-2 text-center hover:bg-indigo-50"
+          >
+            <Database className="h-6 w-6 text-indigo-600" />
+            <span className="text-xs">Organiser</span>
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Organisation du Site</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            {getOrganizationStats().map((stat, index) => (
+              <div key={index} className="flex justify-between items-center p-4 rounded-lg border bg-white">
+                <span className="text-sm font-medium">{stat.category}</span>
+                <span className="text-sm font-bold text-indigo-600">{stat.count}</span>
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
 
 export default SeoActionButtons;
-
