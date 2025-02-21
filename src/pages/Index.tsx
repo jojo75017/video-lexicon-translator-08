@@ -9,6 +9,7 @@ import { useSiteAnalyzer } from '@/hooks/useSiteAnalyzer';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import FeatureGrid from '@/components/dashboard/FeatureGrid';
 import TabNavigation from '@/components/dashboard/TabNavigation';
+import SeoActionButtons from '@/components/dashboard/SeoActionButtons';
 import SiteStructureVisualizer from '@/components/SiteStructureVisualizer';
 import ContentHierarchy from '@/components/ContentHierarchy';
 import UrlInput from '@/components/UrlInput';
@@ -70,10 +71,12 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
       <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
         <DashboardHeader />
+        
+        <SeoActionButtons />
 
         <div className="mb-12">
           <FeatureGrid />
-
+          
           <Card className="p-8 shadow-xl bg-gradient-to-br from-purple-50 to-blue-50 border-0">
             <UrlInput 
               url={url}
