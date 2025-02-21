@@ -22,6 +22,7 @@ type ProjectFormData = z.infer<typeof projectSchema>;
 const SeoActionButtons = () => {
   const [showNewProjectDialog, setShowNewProjectDialog] = useState(false);
   const [showRankingDialog, setShowRankingDialog] = useState(false);
+  const [showUpdatesDialog, setShowUpdatesDialog] = useState(false);
   const [selectedUrl, setSelectedUrl] = useState('');
 
   const form = useForm<ProjectFormData>({
@@ -41,9 +42,33 @@ const SeoActionButtons = () => {
   };
 
   const handleRankingClick = () => {
-    // Pour la démo, on utilise une URL fixe
     setSelectedUrl('https://example.com');
     setShowRankingDialog(true);
+  };
+
+  const getDailyUpdates = () => {
+    return [
+      {
+        type: 'success',
+        message: 'Position moyenne améliorée de 2.3 positions'
+      },
+      {
+        type: 'info',
+        message: '3 nouveaux backlinks détectés'
+      },
+      {
+        type: 'warning',
+        message: 'Temps de chargement augmenté de 0.5 secondes'
+      },
+      {
+        type: 'success',
+        message: 'Score de performance mobile amélioré de 8 points'
+      },
+      {
+        type: 'info',
+        message: '12 nouvelles visites organiques'
+      }
+    ];
   };
 
   const handleAction = (action: string) => {
@@ -131,15 +156,43 @@ const SeoActionButtons = () => {
           <RankingTracker url={selectedUrl} />
         </DialogContent>
       </Dialog>
-      
-      <Button
-        variant="outline"
-        className="flex flex-col items-center gap-2 h-auto py-4 px-2 text-center hover:bg-green-50"
-        onClick={() => handleAction("Mises à jour quotidiennes")}
-      >
-        <Rocket className="h-6 w-6 text-green-600" />
-        <span className="text-xs">Mises à jour quotidiennes</span>
-      </Button>
+
+      <Dialog open={showUpdatesDialog} onOpenChange={setShowUpdatesDialog}>
+        <DialogTrigger asChild>
+          <Button
+            variant="outline"
+            className="flex flex-col items-center gap-2 h-auto py-4 px-2 text-center hover:bg-green-50"
+          >
+            <Rocket className="h-6 w-6 text-green-600" />
+            <span className="text-xs">Mises à jour quotidiennes</span>
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Mises à jour quotidiennes</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            {getDailyUpdates().map((update, index) => (
+              <div 
+                key={index} 
+                className={`p-4 rounded-lg border ${
+                  update.type === 'success' ? 'bg-green-50 border-green-200' :
+                  update.type === 'warning' ? 'bg-yellow-50 border-yellow-200' :
+                  'bg-blue-50 border-blue-200'
+                }`}
+              >
+                <p className={`text-sm ${
+                  update.type === 'success' ? 'text-green-700' :
+                  update.type === 'warning' ? 'text-yellow-700' :
+                  'text-blue-700'
+                }`}>
+                  {update.message}
+                </p>
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
       
       <Button
         variant="outline"
@@ -172,3 +225,4 @@ const SeoActionButtons = () => {
 };
 
 export default SeoActionButtons;
+
