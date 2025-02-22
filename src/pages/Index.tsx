@@ -10,6 +10,7 @@ import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import FeatureGrid from '@/components/dashboard/FeatureGrid';
 import TabNavigation from '@/components/dashboard/TabNavigation';
 import SeoActionButtons from '@/components/dashboard/SeoActionButtons';
+import LocalBusinessSection from '@/components/LocalBusinessSection';
 import SiteStructureVisualizer from '@/components/SiteStructureVisualizer';
 import ContentHierarchy from '@/components/ContentHierarchy';
 import UrlInput from '@/components/UrlInput';
@@ -150,7 +151,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
       <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
+        <div className="text-center mb-8">
           <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-blue-600">
             Optimisation SEO Avancée
           </h1>
@@ -159,6 +160,8 @@ const Index = () => {
           </p>
         </div>
 
+        <LocalBusinessSection />
+        
         <DashboardHeader />
         
         <SeoActionButtons />
