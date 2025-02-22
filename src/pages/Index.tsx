@@ -170,7 +170,7 @@ const Index = () => {
         <Tabs defaultValue="seo" className="space-y-6">
           <TabNavigation />
 
-          <TabsContent value="seo">
+          <TabsContent value="seo" className="space-y-6">
             {isLoading ? (
               <Card className="p-6">
                 <div className="space-y-3">
@@ -224,7 +224,14 @@ const Index = () => {
                   ideas={mockContentIdeas}
                 />
               </div>
-            ) : null}
+            ) : (
+              <Card className="p-6">
+                <ContentIdeas 
+                  keyword="boutique en ligne"
+                  ideas={mockContentIdeas}
+                />
+              </Card>
+            )}
           </TabsContent>
 
           <TabsContent value="structure">
