@@ -6,6 +6,23 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Building2, MapPin, Phone } from 'lucide-react';
 import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+const countries = [
+  { value: "france", label: "France" },
+  { value: "belgique", label: "Belgique" },
+  { value: "suisse", label: "Suisse" },
+  { value: "luxembourg", label: "Luxembourg" },
+  { value: "allemagne", label: "Allemagne" },
+  { value: "espagne", label: "Espagne" },
+  { value: "italie", label: "Italie" },
+];
 
 const LocalBusinessSection = () => {
   const handleSubmit = (e: React.FormEvent) => {
@@ -28,29 +45,40 @@ const LocalBusinessSection = () => {
           <div className="grid md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="country">Pays</Label>
-              <Input 
-                id="country" 
-                placeholder="France"
-                className="bg-white/80"
-              />
+              <Select>
+                <SelectTrigger id="country" className="bg-white/80">
+                  <SelectValue placeholder="Sélectionnez un pays" />
+                </SelectTrigger>
+                <SelectContent>
+                  {countries.map((country) => (
+                    <SelectItem key={country.value} value={country.value}>
+                      {country.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="business-name">Nom de l'entreprise</Label>
-              <Input 
-                id="business-name"
-                placeholder="Votre entreprise"
-                className="bg-white/80"
-                icon={<Building2 className="h-4 w-4 text-gray-500" />}
-              />
+              <div className="relative">
+                <Input 
+                  id="business-name"
+                  placeholder="Votre entreprise"
+                  className="bg-white/80 pl-10"
+                />
+                <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="street">Rue</Label>
-              <Input 
-                id="street"
-                placeholder="par ex. 47 rue de la Paix"
-                className="bg-white/80"
-                icon={<MapPin className="h-4 w-4 text-gray-500" />}
-              />
+              <div className="relative">
+                <Input 
+                  id="street"
+                  placeholder="par ex. 47 rue de la Paix"
+                  className="bg-white/80 pl-10"
+                />
+                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="postal-code">Code postal</Label>
@@ -62,12 +90,14 @@ const LocalBusinessSection = () => {
             </div>
             <div className="space-y-2 md:col-span-2">
               <Label htmlFor="phone">Numéro de téléphone</Label>
-              <Input 
-                id="phone"
-                placeholder="+33 1 23 45 67 89"
-                className="bg-white/80"
-                icon={<Phone className="h-4 w-4 text-gray-500" />}
-              />
+              <div className="relative">
+                <Input 
+                  id="phone"
+                  placeholder="+33 1 23 45 67 89"
+                  className="bg-white/80 pl-10"
+                />
+                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+              </div>
             </div>
           </div>
           <div className="text-center pt-4">
@@ -86,3 +116,4 @@ const LocalBusinessSection = () => {
 };
 
 export default LocalBusinessSection;
+
