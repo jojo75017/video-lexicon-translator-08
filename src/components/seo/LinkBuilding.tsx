@@ -74,7 +74,7 @@ const LinkBuilding = () => {
     },
     {
       name: 'news',
-      description: 'Cible les sites d'actualités et blogs',
+      description: 'Cible les sites d\'actualités et blogs',
       minimumAuthority: 45,
       relevanceThreshold: 0.65
     },
