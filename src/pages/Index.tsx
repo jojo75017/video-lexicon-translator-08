@@ -48,6 +48,7 @@ const Index = () => {
     intro: string;
     sections: Array<{ heading: string; content: string; }>;
   } | null>(null);
+  const [contentKeyword, setContentKeyword] = useState('boutique en ligne');
 
   const mockContentIdeas = [
     {
@@ -102,6 +103,11 @@ const Index = () => {
 
   const handleActivateProxy = () => {
     window.open('https://cors-anywhere.herokuapp.com/corsdemo', '_blank');
+  };
+
+  const handleContentKeywordChange = (newKeyword: string) => {
+    setContentKeyword(newKeyword);
+    toast.success(`Recherche d'idées de contenu pour "${newKeyword}"`);
   };
 
   return (
@@ -220,15 +226,17 @@ const Index = () => {
                 />
                 <SeoSuggestions suggestions={seoAnalysis.technicalSuggestions || []} />
                 <ContentIdeas 
-                  keyword={url ? new URL(url).hostname : 'boutique en ligne'}
+                  keyword={contentKeyword}
                   ideas={mockContentIdeas}
+                  onKeywordChange={handleContentKeywordChange}
                 />
               </div>
             ) : (
               <Card className="p-6">
                 <ContentIdeas 
-                  keyword="boutique en ligne"
+                  keyword={contentKeyword}
                   ideas={mockContentIdeas}
+                  onKeywordChange={handleContentKeywordChange}
                 />
               </Card>
             )}

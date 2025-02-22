@@ -1,17 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ExternalLink, Share2 } from 'lucide-react';
-import { Badge } from "@/components/ui/badge";
+import { Facebook, Pinterest, BookOpen, ArrowRight } from "lucide-react";
 
 interface ContentIdea {
   title: string;
@@ -28,81 +20,67 @@ interface ContentIdea {
 interface ContentIdeasProps {
   keyword: string;
   ideas: ContentIdea[];
+  onKeywordChange?: (keyword: string) => void;
 }
 
-const ContentIdeas = ({ keyword, ideas }: ContentIdeasProps) => {
-  return (
-    <Card className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold flex items-center gap-2">
-          Idées de contenu
-          <span className="text-gray-500 font-normal">: {keyword}</span>
-        </h2>
-        <div className="flex gap-2">
-          <Button variant="outline" className="flex items-center gap-2">
-            EXPORTER EN FORMAT CSV
-            <ChevronDown className="h-4 w-4" />
-          </Button>
-          <Button variant="outline" className="flex items-center gap-2">
-            COPIER DANS LE PRESSE-PAPIERS
-            <ChevronDown className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
+const ContentIdeas = ({ keyword, ideas, onKeywordChange }: ContentIdeasProps) => {
+  const [inputKeyword, setInputKeyword] = useState(keyword);
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[45%]">TITRE DE LA PAGE / URL</TableHead>
-            <TableHead className="text-right">VISITES EST.</TableHead>
-            <TableHead className="text-right">BACKLINKS</TableHead>
-            <TableHead className="text-center">PARTAGES SOCIAUX</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {ideas.map((idea, index) => (
-            <TableRow key={index}>
-              <TableCell className="font-medium">
-                <div className="space-y-1">
-                  <div className="font-semibold text-blue-600 hover:underline cursor-pointer">
-                    {idea.title}
-                  </div>
-                  <div className="text-sm text-gray-500 flex items-center gap-2">
-                    {idea.url}
-                    <ExternalLink className="h-4 w-4 cursor-pointer hover:text-blue-600" />
-                  </div>
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (onKeywordChange) {
+      onKeywordChange(inputKeyword);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <form onSubmit={handleSubmit} className="flex gap-2">
+        <Input
+          placeholder="Entrez un mot-clé pour générer des idées..."
+          value={inputKeyword}
+          onChange={(e) => setInputKeyword(e.target.value)}
+          className="flex-1"
+        />
+        <Button type="submit">
+          Rechercher
+          <ArrowRight className="ml-2 h-4 w-4" />
+        </Button>
+      </form>
+
+      <div className="grid gap-4">
+        {ideas.map((idea, index) => (
+          <Card key={index} className="p-4 hover:bg-gray-50 transition-colors">
+            <div className="flex flex-col space-y-4">
+              <h3 className="text-lg font-medium">
+                <a href={idea.url} target="_blank" rel="noopener noreferrer" className="hover:text-blue-600">
+                  {idea.title}
+                </a>
+              </h3>
+              
+              <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="h-4 w-4" />
+                  {idea.visits.toLocaleString()} visites
                 </div>
-              </TableCell>
-              <TableCell className="text-right">{idea.visits.toLocaleString()}</TableCell>
-              <TableCell className="text-right">
-                <Badge variant="outline" className="cursor-pointer hover:bg-gray-100">
-                  {idea.backlinks.toLocaleString()}
-                </Badge>
-              </TableCell>
-              <TableCell>
-                <div className="flex justify-center gap-4">
-                  <div className="text-center">
-                    <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded">
-                      {idea.socialShares.facebook}
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="bg-red-100 text-red-800 px-4 py-2 rounded">
-                      {idea.socialShares.pinterest}
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="bg-orange-100 text-orange-800 px-4 py-2 rounded">
-                      {idea.socialShares.reddit}
-                    </div>
-                  </div>
+                <div className="flex items-center gap-2">
+                  <ArrowRight className="h-4 w-4" />
+                  {idea.backlinks.toLocaleString()} backlinks
                 </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </Card>
+                <div className="flex items-center gap-2">
+                  <Facebook className="h-4 w-4" />
+                  {idea.socialShares.facebook.toLocaleString()}
+                </div>
+                <div className="flex items-center gap-2">
+                  <Pinterest className="h-4 w-4" />
+                  {idea.socialShares.pinterest.toLocaleString()}
+                </div>
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
   );
 };
 
