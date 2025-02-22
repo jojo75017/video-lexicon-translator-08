@@ -28,6 +28,7 @@ import DomainOverview from '@/components/seo/DomainOverview';
 import { KeywordSuggestion } from '@/types/seo';
 import { toast } from "sonner";
 import ContentIdeas from '@/components/seo/ContentIdeas';
+import OrganicSearch from '@/components/seo/OrganicSearch';
 
 const Index = () => {
   const {
@@ -164,6 +165,10 @@ const Index = () => {
         <div className="mb-12">
           <FeatureGrid />
           
+          <Card className="p-8 shadow-xl bg-gradient-to-br from-purple-50 to-blue-50 border-0 mb-8">
+            <OrganicSearch />
+          </Card>
+
           <Card className="p-8 shadow-xl bg-gradient-to-br from-purple-50 to-blue-50 border-0 mb-8">
             <DomainOverview />
           </Card>
