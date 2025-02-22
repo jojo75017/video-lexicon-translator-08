@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-import { Link2, LineChart, Award, Search } from "lucide-react";
+import { Link2, LineChart, Award, Search, Globe } from "lucide-react";
 
 interface OrganicMetrics {
   serpRanking: number;
@@ -35,24 +35,23 @@ const OrganicSearch = () => {
   const analyzeDomain = async (domainToAnalyze: string) => {
     setIsLoading(true);
     try {
-      // Simulation de l'analyse pour la démo
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       const mockMetrics: OrganicMetrics = {
         serpRanking: Math.floor(Math.random() * 20) + 1,
         topKeywords: [
           {
-            keyword: "développement durable",
+            keyword: "boutique en ligne",
             position: Math.floor(Math.random() * 10) + 1,
             volume: Math.floor(Math.random() * 10000) + 1000
           },
           {
-            keyword: "protection environnement",
+            keyword: "e-commerce solution",
             position: Math.floor(Math.random() * 10) + 1,
             volume: Math.floor(Math.random() * 8000) + 1000
           },
           {
-            keyword: "écologie solutions",
+            keyword: "acheter en ligne",
             position: Math.floor(Math.random() * 10) + 1,
             volume: Math.floor(Math.random() * 6000) + 1000
           }
@@ -75,7 +74,7 @@ const OrganicSearch = () => {
       };
       
       setMetrics(mockMetrics);
-      toast.success(`Analyse SERP de ${domainToAnalyze} terminée`);
+      toast.success(`Analyse du trafic organique de ${domainToAnalyze} terminée`);
     } catch (error) {
       toast.error("Erreur lors de l'analyse du domaine");
       console.error(error);
@@ -94,40 +93,49 @@ const OrganicSearch = () => {
   return (
     <Card className="p-6 space-y-6">
       <div className="space-y-2">
-        <h2 className="text-2xl font-bold">Recherche organique</h2>
+        <h2 className="text-2xl font-bold">Insights de Trafic Organique</h2>
         <p className="text-gray-600">
-          Souhaitez-vous atteindre le haut de la page SERP ?
-          Commencez par découvrir ce qui fonctionne le mieux pour vos concurrents.
+          Solution facile pour les mots clés « not provided » qui combine les données de Google Analytics, 
+          de Search Console et de Semrush. Découvrez les véritables moteurs de votre trafic organique.
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="domain-input" className="block text-sm font-medium text-gray-700 mb-2">
-            Entrez le domaine, le sous-domaine ou l'URL
+            Saisissez un domaine, sous-domaine ou URL
           </label>
           <div className="flex gap-2">
-            <Input
-              id="domain-input"
-              value={domain}
-              onChange={(e) => setDomain(e.target.value)}
-              placeholder="exemple.com"
-              className="flex-1"
-            />
+            <div className="relative flex-1">
+              <Input
+                id="domain-input"
+                value={domain}
+                onChange={(e) => setDomain(e.target.value)}
+                placeholder="exemple.com"
+                className="pl-10"
+              />
+              <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            </div>
             <Button 
               type="submit" 
               disabled={isLoading}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white min-w-[120px]"
             >
-              <Search className="mr-2 h-4 w-4" />
-              Analyser
+              {isLoading ? (
+                <>Analyse...</>
+              ) : (
+                <>
+                  <Search className="mr-2 h-4 w-4" />
+                  Analyser
+                </>
+              )}
             </Button>
           </div>
         </div>
       </form>
 
       <div className="mb-6">
-        <p className="text-sm text-gray-500 mb-2">Exemples :</p>
+        <p className="text-sm text-gray-500 mb-2">Exemples de domaines :</p>
         <div className="flex flex-wrap gap-2">
           {exampleDomains.map((example) => (
             <Button
@@ -154,7 +162,7 @@ const OrganicSearch = () => {
         </div>
       ) : metrics ? (
         <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card className="p-4 bg-gradient-to-br from-green-50 to-emerald-50">
               <div className="flex items-start justify-between">
                 <div>
@@ -187,7 +195,7 @@ const OrganicSearch = () => {
           </div>
 
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Mots-clés principaux</h3>
+            <h3 className="text-lg font-semibold">Mots-clés principaux (sans « not provided »)</h3>
             <div className="space-y-2">
               {metrics.topKeywords.map((keyword, index) => (
                 <div
@@ -236,3 +244,4 @@ const OrganicSearch = () => {
 };
 
 export default OrganicSearch;
+
