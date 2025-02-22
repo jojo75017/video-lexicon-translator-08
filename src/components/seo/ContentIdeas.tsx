@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Facebook, Pinterest, BookOpen, ArrowRight } from "lucide-react";
+import { Facebook, BookOpen, ArrowRight, Share2 } from "lucide-react";
 
 interface ContentIdea {
   title: string;
@@ -35,18 +35,21 @@ const ContentIdeas = ({ keyword, ideas, onKeywordChange }: ContentIdeasProps) =>
 
   return (
     <div className="space-y-6">
-      <form onSubmit={handleSubmit} className="flex gap-2">
-        <Input
-          placeholder="Entrez un mot-clé pour générer des idées..."
-          value={inputKeyword}
-          onChange={(e) => setInputKeyword(e.target.value)}
-          className="flex-1"
-        />
-        <Button type="submit">
-          Rechercher
-          <ArrowRight className="ml-2 h-4 w-4" />
-        </Button>
-      </form>
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold mb-4">Idées de Contenu</h2>
+        <form onSubmit={handleSubmit} className="flex gap-2">
+          <Input
+            placeholder="Entrez un mot-clé pour générer des idées..."
+            value={inputKeyword}
+            onChange={(e) => setInputKeyword(e.target.value)}
+            className="flex-1"
+          />
+          <Button type="submit">
+            Rechercher
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        </form>
+      </div>
 
       <div className="grid gap-4">
         {ideas.map((idea, index) => (
@@ -72,7 +75,7 @@ const ContentIdeas = ({ keyword, ideas, onKeywordChange }: ContentIdeasProps) =>
                   {idea.socialShares.facebook.toLocaleString()}
                 </div>
                 <div className="flex items-center gap-2">
-                  <Pinterest className="h-4 w-4" />
+                  <Share2 className="h-4 w-4" />
                   {idea.socialShares.pinterest.toLocaleString()}
                 </div>
               </div>
