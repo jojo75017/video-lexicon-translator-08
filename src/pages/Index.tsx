@@ -49,8 +49,7 @@ const Index = () => {
     sections: Array<{ heading: string; content: string; }>;
   } | null>(null);
   const [contentKeyword, setContentKeyword] = useState('boutique en ligne');
-
-  const mockContentIdeas = [
+  const [mockContentIdeas, setMockContentIdeas] = useState([
     {
       title: "CELINE: BOUTIQUE EN LIGNE OFFICIELLE FRANCE",
       url: "celine.com",
@@ -84,7 +83,7 @@ const Index = () => {
         reddit: 0
       }
     }
-  ];
+  ]);
 
   const handleGeneratedKeywords = (keywords: KeywordSuggestion[]) => {
     setGeneratedKeywords(keywords);
@@ -107,6 +106,41 @@ const Index = () => {
 
   const handleContentKeywordChange = (newKeyword: string) => {
     setContentKeyword(newKeyword);
+    setMockContentIdeas([
+      {
+        title: `${newKeyword} - Résultat Populaire #1`,
+        url: "example1.com",
+        visits: Math.floor(Math.random() * 15000),
+        backlinks: Math.floor(Math.random() * 1000),
+        socialShares: {
+          facebook: Math.floor(Math.random() * 5000),
+          pinterest: Math.floor(Math.random() * 2000),
+          reddit: Math.floor(Math.random() * 100)
+        }
+      },
+      {
+        title: `${newKeyword} - Guide Complet`,
+        url: "example2.com",
+        visits: Math.floor(Math.random() * 15000),
+        backlinks: Math.floor(Math.random() * 1000),
+        socialShares: {
+          facebook: Math.floor(Math.random() * 5000),
+          pinterest: Math.floor(Math.random() * 2000),
+          reddit: Math.floor(Math.random() * 100)
+        }
+      },
+      {
+        title: `Meilleurs conseils pour ${newKeyword}`,
+        url: "example3.com",
+        visits: Math.floor(Math.random() * 15000),
+        backlinks: Math.floor(Math.random() * 1000),
+        socialShares: {
+          facebook: Math.floor(Math.random() * 5000),
+          pinterest: Math.floor(Math.random() * 2000),
+          reddit: Math.floor(Math.random() * 100)
+        }
+      }
+    ]);
     toast.success(`Recherche d'idées de contenu pour "${newKeyword}"`);
   };
 
