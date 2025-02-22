@@ -4,7 +4,7 @@ import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Building2, MapPin, Phone } from 'lucide-react';
+import { Building2, MapPin, Phone, Flag } from 'lucide-react';
 import { toast } from "sonner";
 import {
   Select,
@@ -51,7 +51,8 @@ const LocalBusinessSection = () => {
                 </SelectTrigger>
                 <SelectContent>
                   {countries.map((country) => (
-                    <SelectItem key={country.value} value={country.value}>
+                    <SelectItem key={country.value} value={country.value} className="flex items-center gap-2">
+                      <Flag className="h-4 w-4" />
                       {country.label}
                     </SelectItem>
                   ))}
