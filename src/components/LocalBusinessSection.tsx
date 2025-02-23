@@ -216,59 +216,62 @@ const LocalBusinessSection = () => {
         </Form>
 
         <div className="mt-12 grid gap-8 md:grid-cols-3">
-          {/* Premier bouton */}
-          <div className="space-y-4 text-center">
-            <Button
-              variant="outline"
-              size="lg"
-              className="w-full h-auto p-6 flex flex-col items-center gap-4 bg-white/80 hover:bg-white/90"
-              onClick={() => toast.info("Saisie du nom de l'entreprise...")}
-            >
-              <Search className="h-8 w-8 text-blue-600" />
-              <div>
-                <h3 className="font-semibold mb-2">Saisir le nom de l'entreprise</h3>
+          <Card className="bg-white/80 hover:bg-white/90 transition-all duration-200 hover:shadow-lg">
+            <CardContent className="p-6">
+              <Button
+                variant="ghost"
+                size="lg"
+                className="w-full h-full flex flex-col items-center gap-4"
+                onClick={() => toast.info("Saisie du nom de l'entreprise...")}
+              >
+                <div className="p-4 bg-blue-50 rounded-full">
+                  <Search className="h-8 w-8 text-blue-600" />
+                </div>
+                <h3 className="font-semibold text-lg mb-2">Saisir le nom de l'entreprise</h3>
                 <p className="text-sm text-gray-600">
                   Effectuez une analyse de la visibilité de votre entreprise locale en quelques secondes
                 </p>
-              </div>
-            </Button>
-          </div>
+              </Button>
+            </CardContent>
+          </Card>
 
-          {/* Deuxième bouton */}
-          <div className="space-y-4 text-center">
-            <Button
-              variant="outline"
-              size="lg"
-              className="w-full h-auto p-6 flex flex-col items-center gap-4 bg-white/80 hover:bg-white/90"
-              onClick={() => toast.info("Génération du rapport gratuit...")}
-            >
-              <FileText className="h-8 w-8 text-blue-600" />
-              <div>
-                <h3 className="font-semibold mb-2">Obtenir un rapport gratuit</h3>
+          <Card className="bg-white/80 hover:bg-white/90 transition-all duration-200 hover:shadow-lg">
+            <CardContent className="p-6">
+              <Button
+                variant="ghost"
+                size="lg"
+                className="w-full h-full flex flex-col items-center gap-4"
+                onClick={() => toast.info("Génération du rapport gratuit...")}
+              >
+                <div className="p-4 bg-blue-50 rounded-full">
+                  <FileText className="h-8 w-8 text-blue-600" />
+                </div>
+                <h3 className="font-semibold text-lg mb-2">Obtenir un rapport gratuit</h3>
                 <p className="text-sm text-gray-600">
                   Découvrez les répertoires dans lesquels votre entreprise doit être inscrite ou corrigée + les notes attribuées dans les avis
                 </p>
-              </div>
-            </Button>
-          </div>
+              </Button>
+            </CardContent>
+          </Card>
 
-          {/* Troisième bouton */}
-          <div className="space-y-4 text-center">
-            <Button
-              variant="outline"
-              size="lg"
-              className="w-full h-auto p-6 flex flex-col items-center gap-4 bg-white/80 hover:bg-white/90"
-              onClick={() => toast.info("Analyse des classements locaux...")}
-            >
-              <TrendingUp className="h-8 w-8 text-blue-600" />
-              <div>
-                <h3 className="font-semibold mb-2">Dopez vos classements locaux</h3>
+          <Card className="bg-white/80 hover:bg-white/90 transition-all duration-200 hover:shadow-lg">
+            <CardContent className="p-6">
+              <Button
+                variant="ghost"
+                size="lg"
+                className="w-full h-full flex flex-col items-center gap-4"
+                onClick={() => toast.info("Analyse des classements locaux...")}
+              >
+                <div className="p-4 bg-blue-50 rounded-full">
+                  <TrendingUp className="h-8 w-8 text-blue-600" />
+                </div>
+                <h3 className="font-semibold text-lg mb-2">Dopez vos classements locaux</h3>
                 <p className="text-sm text-gray-600">
                   Découvrez les améliorations que vous pouvez apporter pour occuper la première place dans la recherche locale
                 </p>
-              </div>
-            </Button>
-          </div>
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </CardContent>
     </Card>
