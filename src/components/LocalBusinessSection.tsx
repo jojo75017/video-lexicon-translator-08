@@ -4,8 +4,9 @@ import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Building2, MapPin, Phone, Flag } from 'lucide-react';
+import { Building2, MapPin, Phone } from 'lucide-react';
 import { toast } from "sonner";
+import Flag from 'react-world-flags';
 import {
   Select,
   SelectContent,
@@ -15,13 +16,13 @@ import {
 } from "@/components/ui/select";
 
 const countries = [
-  { value: "france", label: "France" },
-  { value: "belgique", label: "Belgique" },
-  { value: "suisse", label: "Suisse" },
-  { value: "luxembourg", label: "Luxembourg" },
-  { value: "allemagne", label: "Allemagne" },
-  { value: "espagne", label: "Espagne" },
-  { value: "italie", label: "Italie" },
+  { value: "FR", label: "France", code: "FR" },
+  { value: "BE", label: "Belgique", code: "BE" },
+  { value: "CH", label: "Suisse", code: "CH" },
+  { value: "LU", label: "Luxembourg", code: "LU" },
+  { value: "DE", label: "Allemagne", code: "DE" },
+  { value: "ES", label: "Espagne", code: "ES" },
+  { value: "IT", label: "Italie", code: "IT" },
 ];
 
 const LocalBusinessSection = () => {
@@ -52,7 +53,11 @@ const LocalBusinessSection = () => {
                 <SelectContent>
                   {countries.map((country) => (
                     <SelectItem key={country.value} value={country.value} className="flex items-center gap-2">
-                      <Flag className="h-4 w-4" />
+                      <Flag 
+                        code={country.code} 
+                        height={16} 
+                        className="rounded-sm"
+                      />
                       {country.label}
                     </SelectItem>
                   ))}
@@ -117,4 +122,3 @@ const LocalBusinessSection = () => {
 };
 
 export default LocalBusinessSection;
-
