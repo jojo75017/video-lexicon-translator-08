@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -216,62 +215,62 @@ const LocalBusinessSection = () => {
         </Form>
 
         <div className="mt-12 grid gap-8 md:grid-cols-3">
-          <Card className="bg-white/80 hover:bg-white/90 transition-all duration-200 hover:shadow-lg">
-            <CardContent className="p-6">
-              <Button
-                variant="ghost"
-                size="lg"
-                className="w-full h-full flex flex-col items-center gap-4"
-                onClick={() => toast.info("Saisie du nom de l'entreprise...")}
-              >
-                <div className="p-4 bg-blue-50 rounded-full">
-                  <Search className="h-8 w-8 text-blue-600" />
-                </div>
-                <h3 className="font-semibold text-lg mb-2">Saisir le nom de l'entreprise</h3>
-                <p className="text-sm text-gray-600">
+          <div className="bg-purple-900 p-6 rounded-xl text-white hover:bg-purple-800 transition-all duration-200">
+            <Button
+              variant="ghost"
+              size="lg"
+              className="w-full h-full flex flex-col items-start gap-4 text-white hover:text-white/90"
+              onClick={() => toast.info("Saisie du nom de l'entreprise...")}
+            >
+              <div className="w-16 h-16 bg-purple-800 rounded-full flex items-center justify-center">
+                <Search className="h-8 w-8" />
+              </div>
+              <div className="text-left">
+                <h3 className="font-semibold text-xl mb-2">Saisir le nom de l'entreprise</h3>
+                <p className="text-sm opacity-90">
                   Effectuez une analyse de la visibilité de votre entreprise locale en quelques secondes
                 </p>
-              </Button>
-            </CardContent>
-          </Card>
+              </div>
+            </Button>
+          </div>
 
-          <Card className="bg-white/80 hover:bg-white/90 transition-all duration-200 hover:shadow-lg">
-            <CardContent className="p-6">
-              <Button
-                variant="ghost"
-                size="lg"
-                className="w-full h-full flex flex-col items-center gap-4"
-                onClick={() => toast.info("Génération du rapport gratuit...")}
-              >
-                <div className="p-4 bg-blue-50 rounded-full">
-                  <FileText className="h-8 w-8 text-blue-600" />
-                </div>
-                <h3 className="font-semibold text-lg mb-2">Obtenir un rapport gratuit</h3>
-                <p className="text-sm text-gray-600">
+          <div className="bg-purple-900 p-6 rounded-xl text-white hover:bg-purple-800 transition-all duration-200">
+            <Button
+              variant="ghost"
+              size="lg"
+              className="w-full h-full flex flex-col items-start gap-4 text-white hover:text-white/90"
+              onClick={() => toast.info("Génération du rapport gratuit...")}
+            >
+              <div className="w-16 h-16 bg-purple-800 rounded-full flex items-center justify-center">
+                <FileText className="h-8 w-8" />
+              </div>
+              <div className="text-left">
+                <h3 className="font-semibold text-xl mb-2">Obtenir un rapport gratuit</h3>
+                <p className="text-sm opacity-90">
                   Découvrez les répertoires dans lesquels votre entreprise doit être inscrite ou corrigée + les notes attribuées dans les avis
                 </p>
-              </Button>
-            </CardContent>
-          </Card>
+              </div>
+            </Button>
+          </div>
 
-          <Card className="bg-white/80 hover:bg-white/90 transition-all duration-200 hover:shadow-lg">
-            <CardContent className="p-6">
-              <Button
-                variant="ghost"
-                size="lg"
-                className="w-full h-full flex flex-col items-center gap-4"
-                onClick={() => toast.info("Analyse des classements locaux...")}
-              >
-                <div className="p-4 bg-blue-50 rounded-full">
-                  <TrendingUp className="h-8 w-8 text-blue-600" />
-                </div>
-                <h3 className="font-semibold text-lg mb-2">Dopez vos classements locaux</h3>
-                <p className="text-sm text-gray-600">
+          <div className="bg-purple-900 p-6 rounded-xl text-white hover:bg-purple-800 transition-all duration-200">
+            <Button
+              variant="ghost"
+              size="lg"
+              className="w-full h-full flex flex-col items-start gap-4 text-white hover:text-white/90"
+              onClick={() => toast.info("Analyse des classements locaux...")}
+            >
+              <div className="w-16 h-16 bg-purple-800 rounded-full flex items-center justify-center">
+                <TrendingUp className="h-8 w-8" />
+              </div>
+              <div className="text-left">
+                <h3 className="font-semibold text-xl mb-2">Dopez vos classements locaux</h3>
+                <p className="text-sm opacity-90">
                   Découvrez les améliorations que vous pouvez apporter pour occuper la première place dans la recherche locale
                 </p>
-              </Button>
-            </CardContent>
-          </Card>
+              </div>
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>
@@ -279,4 +278,3 @@ const LocalBusinessSection = () => {
 };
 
 export default LocalBusinessSection;
-
