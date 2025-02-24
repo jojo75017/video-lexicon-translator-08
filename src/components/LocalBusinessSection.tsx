@@ -1,153 +1,48 @@
+
 import React, { useState } from 'react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Building2, MapPin, Phone, Search, FileText, TrendingUp, ExternalLink } from 'lucide-react';
 import { toast } from "sonner";
-import Flag from 'react-world-flags';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
-import { Progress } from "@/components/ui/progress";
+import { BusinessForm } from './BusinessForm';
+import { FeatureCards } from './FeatureCards';
+import { ReportModal } from './ReportModal';
+import type { FormValues, Report } from '@/types/localBusiness';
 
-const countries = [
-  { value: "FR", label: "France", code: "FR" },
-  { value: "BE", label: "Belgique", code: "BE" },
-  { value: "CH", label: "Suisse", code: "CH" },
-  { value: "LU", label: "Luxembourg", code: "LU" },
-  { value: "DE", label: "Allemagne", code: "DE" },
-  { value: "ES", label: "Espagne", code: "ES" },
-  { value: "IT", label: "Italie", code: "IT" },
-];
-
-const getPhoneRegexForCountry = (country: string) => {
-  switch (country) {
-    case 'FR':
-      return /^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/;
-    case 'BE':
-      return /^(?:(?:\+|00)32|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/;
-    case 'CH':
-      return /^(?:(?:\+|00)41|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/;
-    case 'LU':
-      return /^(?:(?:\+|00)352|0)\s*[1-9](?:[\s.-]*\d{2}){3,4}$/;
-    case 'DE':
-      return /^(?:(?:\+|00)49|0)\s*[1-9](?:[\s.-]*\d{2}){4,5}$/;
-    case 'ES':
-      return /^(?:(?:\+|00)34|0)\s*[6-9](?:[\s.-]*\d{2}){4}$/;
-    case 'IT':
-      return /^(?:(?:\+|00)39|0)\s*[1-9](?:[\s.-]*\d{2}){4,5}$/;
-    default:
-      return /^(?:\+|00)[1-9]\d{1,14}$/;
-  }
+const generateMockReport = (data: FormValues): Report => {
+  return {
+    directoryScore: Math.floor(Math.random() * 40) + 60,
+    reviewScore: Math.floor(Math.random() * 50) + 50,
+    visibilityScore: Math.floor(Math.random() * 45) + 55,
+    recommendations: [
+      "Créez des profils sur les principaux répertoires manquants",
+      "Uniformisez vos informations d'entreprise sur tous les répertoires",
+      "Encouragez vos clients satisfaits à laisser des avis",
+      "Répondez aux avis existants, positifs comme négatifs"
+    ],
+    directories: [
+      {
+        name: "Google Business Profile",
+        status: Math.random() > 0.5 ? 'present' : 'missing',
+        url: "https://business.google.com"
+      },
+      {
+        name: "Pages Jaunes",
+        status: Math.random() > 0.7 ? 'present' : 'incorrect',
+        url: "https://pagesjaunes.fr"
+      },
+      {
+        name: "TripAdvisor",
+        status: Math.random() > 0.6 ? 'present' : 'missing',
+        url: "https://tripadvisor.com"
+      }
+    ]
+  };
 };
-
-const formSchema = z.object({
-  country: z.string({
-    required_error: "Veuillez sélectionner un pays",
-  }),
-  businessName: z.string().min(2, {
-    message: "Le nom de l'entreprise doit contenir au moins 2 caractères",
-  }),
-  street: z.string().min(5, {
-    message: "L'adresse doit contenir au moins 5 caractères",
-  }),
-  postalCode: z.string().refine((val) => {
-    const postalCodeRegex = /^\d{4,5}$/;
-    return postalCodeRegex.test(val);
-  }, {
-    message: "Le code postal doit contenir 4 ou 5 chiffres",
-  }),
-  phone: z.string().refine((val, ctx) => {
-    const phoneRegex = getPhoneRegexForCountry(ctx.path[0]);
-    return phoneRegex.test(val);
-  }, {
-    message: "Veuillez entrer un numéro de téléphone valide pour ce pays",
-  }),
-});
-
-type FormValues = z.infer<typeof formSchema>;
-
-interface Report {
-  directoryScore: number;
-  reviewScore: number;
-  visibilityScore: number;
-  recommendations: string[];
-  directories: Array<{
-    name: string;
-    status: 'present' | 'missing' | 'incorrect';
-    url?: string;
-  }>;
-}
 
 const LocalBusinessSection = () => {
   const [showReport, setShowReport] = useState(false);
   const [report, setReport] = useState<Report | null>(null);
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      country: "",
-      businessName: "",
-      street: "",
-      postalCode: "",
-      phone: "",
-    },
-  });
-
-  const generateMockReport = (data: FormValues): Report => {
-    return {
-      directoryScore: Math.floor(Math.random() * 40) + 60,
-      reviewScore: Math.floor(Math.random() * 50) + 50,
-      visibilityScore: Math.floor(Math.random() * 45) + 55,
-      recommendations: [
-        "Créez des profils sur les principaux répertoires manquants",
-        "Uniformisez vos informations d'entreprise sur tous les répertoires",
-        "Encouragez vos clients satisfaits à laisser des avis",
-        "Répondez aux avis existants, positifs comme négatifs"
-      ],
-      directories: [
-        {
-          name: "Google Business Profile",
-          status: Math.random() > 0.5 ? 'present' : 'missing',
-          url: "https://business.google.com"
-        },
-        {
-          name: "Pages Jaunes",
-          status: Math.random() > 0.7 ? 'present' : 'incorrect',
-          url: "https://pagesjaunes.fr"
-        },
-        {
-          name: "TripAdvisor",
-          status: Math.random() > 0.6 ? 'present' : 'missing',
-          url: "https://tripadvisor.com"
-        }
-      ]
-    };
-  };
-
-  const onSubmit = async (data: FormValues) => {
+  const handleSubmit = async (data: FormValues) => {
     try {
       console.log("Form data:", data);
       toast.success("Vérification des répertoires locaux en cours...");
@@ -176,262 +71,16 @@ const LocalBusinessSection = () => {
           </p>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-2xl mx-auto">
-              <div className="grid md:grid-cols-2 gap-6">
-                <FormField
-                  control={form.control}
-                  name="country"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Pays</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger className="bg-white/80">
-                            <SelectValue placeholder="Sélectionnez un pays" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {countries.map((country) => (
-                            <SelectItem key={country.value} value={country.value} className="flex items-center gap-2">
-                              <span className="w-4 h-3 inline-flex items-center">
-                                <Flag 
-                                  code={country.code}
-                                  className="h-full w-auto object-contain"
-                                />
-                              </span>
-                              {country.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="businessName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nom de l'entreprise</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Input 
-                            {...field}
-                            placeholder="Votre entreprise"
-                            className="bg-white/80 pl-10"
-                          />
-                          <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="street"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Rue</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Input 
-                            {...field}
-                            placeholder="par ex. 47 rue de la Paix"
-                            className="bg-white/80 pl-10"
-                          />
-                          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="postalCode"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Code postal</FormLabel>
-                      <FormControl>
-                        <Input 
-                          {...field}
-                          placeholder="75000"
-                          className="bg-white/80"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="phone"
-                  render={({ field }) => (
-                    <FormItem className="md:col-span-2">
-                      <FormLabel>Numéro de téléphone</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Input 
-                            {...field}
-                            placeholder="+33 1 23 45 67 89"
-                            className="bg-white/80 pl-10"
-                          />
-                          <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className="text-center pt-4">
-                <Button 
-                  type="submit"
-                  size="lg"
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
-                >
-                  Vérifiez vos répertoires locaux gratuitement
-                </Button>
-              </div>
-            </form>
-          </Form>
-
-          <div className="mt-12 grid gap-8 md:grid-cols-3">
-            <div className="bg-purple-900 p-6 rounded-xl text-white hover:bg-purple-800 transition-colors duration-200 cursor-pointer hover:shadow-lg">
-              <div className="flex flex-col items-start gap-4 h-full">
-                <div className="w-16 h-16 bg-purple-800 rounded-full flex items-center justify-center">
-                  <Search className="h-8 w-8" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-xl mb-2">Saisir le nom de l'entreprise</h3>
-                  <p className="text-sm opacity-90">
-                    Effectuez une analyse de la visibilité de votre entreprise locale en quelques secondes
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-purple-900 p-6 rounded-xl text-white hover:bg-purple-800 transition-colors duration-200 cursor-pointer hover:shadow-lg">
-              <div className="flex flex-col items-start gap-4 h-full">
-                <div className="w-16 h-16 bg-purple-800 rounded-full flex items-center justify-center">
-                  <FileText className="h-8 w-8" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-xl mb-2">Obtenir un rapport gratuit</h3>
-                  <p className="text-sm opacity-90">
-                    Découvrez les répertoires dans lesquels votre entreprise doit être inscrite ou corrigée + les notes attribuées dans les avis
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-purple-900 p-6 rounded-xl text-white hover:bg-purple-800 transition-colors duration-200 cursor-pointer hover:shadow-lg">
-              <div className="flex flex-col items-start gap-4 h-full">
-                <div className="w-16 h-16 bg-purple-800 rounded-full flex items-center justify-center">
-                  <TrendingUp className="h-8 w-8" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-xl mb-2">Dopez vos classements locaux</h3>
-                  <p className="text-sm opacity-90">
-                    Découvrez les améliorations que vous pouvez apporter pour occuper la première place dans la recherche locale
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+          <BusinessForm onSubmit={handleSubmit} />
+          <FeatureCards />
         </CardContent>
       </Card>
 
-      <Dialog open={showReport} onOpenChange={setShowReport}>
-        <DialogContent className="max-w-3xl">
-          <DialogHeader>
-            <DialogTitle>Rapport d'analyse de votre présence locale</DialogTitle>
-            <DialogDescription>
-              Voici une analyse détaillée de votre présence sur les répertoires locaux
-            </DialogDescription>
-          </DialogHeader>
-
-          {report && (
-            <div className="space-y-8 py-4">
-              <div className="grid grid-cols-3 gap-4">
-                <div className="space-y-2 text-center">
-                  <p className="text-sm font-medium text-gray-500">Score Répertoires</p>
-                  <div className="relative pt-1">
-                    <Progress value={report.directoryScore} className="h-2" />
-                    <p className="mt-1 text-lg font-semibold">{report.directoryScore}%</p>
-                  </div>
-                </div>
-                <div className="space-y-2 text-center">
-                  <p className="text-sm font-medium text-gray-500">Score Avis</p>
-                  <div className="relative pt-1">
-                    <Progress value={report.reviewScore} className="h-2" />
-                    <p className="mt-1 text-lg font-semibold">{report.reviewScore}%</p>
-                  </div>
-                </div>
-                <div className="space-y-2 text-center">
-                  <p className="text-sm font-medium text-gray-500">Score Visibilité</p>
-                  <div className="relative pt-1">
-                    <Progress value={report.visibilityScore} className="h-2" />
-                    <p className="mt-1 text-lg font-semibold">{report.visibilityScore}%</p>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-semibold mb-3">Recommandations</h3>
-                <ul className="space-y-2">
-                  {report.recommendations.map((recommendation, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <span className="mt-1 text-blue-500">•</span>
-                      {recommendation}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-semibold mb-3">État des répertoires</h3>
-                <div className="space-y-3">
-                  {report.directories.map((directory, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`w-2 h-2 rounded-full ${
-                            directory.status === 'present'
-                              ? 'bg-green-500'
-                              : directory.status === 'missing'
-                              ? 'bg-red-500'
-                              : 'bg-yellow-500'
-                          }`}
-                        />
-                        <span className="font-medium">{directory.name}</span>
-                      </div>
-                      {directory.url && (
-                        <a
-                          href={directory.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800 flex items-center gap-1"
-                        >
-                          Voir <ExternalLink className="h-4 w-4" />
-                        </a>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      <ReportModal 
+        report={report}
+        open={showReport}
+        onOpenChange={setShowReport}
+      />
     </>
   );
 };
