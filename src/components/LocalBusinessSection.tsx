@@ -42,6 +42,27 @@ const countries = [
   { value: "IT", label: "Italie", code: "IT" },
 ];
 
+const getPhoneRegexForCountry = (country: string) => {
+  switch (country) {
+    case 'FR':
+      return /^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/;
+    case 'BE':
+      return /^(?:(?:\+|00)32|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/;
+    case 'CH':
+      return /^(?:(?:\+|00)41|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/;
+    case 'LU':
+      return /^(?:(?:\+|00)352|0)\s*[1-9](?:[\s.-]*\d{2}){3,4}$/;
+    case 'DE':
+      return /^(?:(?:\+|00)49|0)\s*[1-9](?:[\s.-]*\d{2}){4,5}$/;
+    case 'ES':
+      return /^(?:(?:\+|00)34|0)\s*[6-9](?:[\s.-]*\d{2}){4}$/;
+    case 'IT':
+      return /^(?:(?:\+|00)39|0)\s*[1-9](?:[\s.-]*\d{2}){4,5}$/;
+    default:
+      return /^(?:\+|00)[1-9]\d{1,14}$/;
+  }
+};
+
 const formSchema = z.object({
   country: z.string({
     required_error: "Veuillez sélectionner un pays",
@@ -58,11 +79,11 @@ const formSchema = z.object({
   }, {
     message: "Le code postal doit contenir 4 ou 5 chiffres",
   }),
-  phone: z.string().refine((val) => {
-    const phoneRegex = /^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/;
+  phone: z.string().refine((val, ctx) => {
+    const phoneRegex = getPhoneRegexForCountry(ctx.path[0]);
     return phoneRegex.test(val);
   }, {
-    message: "Veuillez entrer un numéro de téléphone français valide",
+    message: "Veuillez entrer un numéro de téléphone valide pour ce pays",
   }),
 });
 
@@ -173,10 +194,10 @@ const LocalBusinessSection = () => {
                         <SelectContent>
                           {countries.map((country) => (
                             <SelectItem key={country.value} value={country.value} className="flex items-center gap-2">
-                              <span className="w-6 h-4 overflow-hidden inline-flex items-center">
+                              <span className="w-4 h-3 inline-flex items-center">
                                 <Flag 
                                   code={country.code}
-                                  className="h-full w-auto object-cover"
+                                  className="h-full w-auto object-contain"
                                 />
                               </span>
                               {country.label}
