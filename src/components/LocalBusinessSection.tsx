@@ -74,9 +74,16 @@ const LocalBusinessSection = () => {
     },
   });
 
-  const onSubmit = (data: FormValues) => {
-    console.log("Form data:", data);
-    toast.success("Vérification des répertoires locaux en cours...");
+  const onSubmit = async (data: FormValues) => {
+    try {
+      console.log("Form data:", data);
+      toast.success("Vérification des répertoires locaux en cours...");
+      // Ici, vous pourriez ajouter une requête API réelle
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      toast.success("Analyse terminée ! Consultez votre rapport.");
+    } catch (error) {
+      toast.error("Une erreur est survenue lors de l'analyse.");
+    }
   };
 
   return (
@@ -108,11 +115,12 @@ const LocalBusinessSection = () => {
                       <SelectContent>
                         {countries.map((country) => (
                           <SelectItem key={country.value} value={country.value} className="flex items-center gap-2">
-                            <Flag 
-                              code={country.code} 
-                              height="12" 
-                              className="rounded-sm"
-                            />
+                            <span className="w-6 h-4 overflow-hidden inline-flex items-center">
+                              <Flag 
+                                code={country.code}
+                                className="h-full w-auto object-cover"
+                              />
+                            </span>
                             {country.label}
                           </SelectItem>
                         ))}
@@ -218,61 +226,46 @@ const LocalBusinessSection = () => {
         </Form>
 
         <div className="mt-12 grid gap-8 md:grid-cols-3">
-          <div className="bg-purple-900 p-6 rounded-xl text-white hover:bg-purple-800 transition-all duration-200">
-            <Button
-              variant="ghost"
-              size="lg"
-              className="w-full h-full flex flex-col items-start gap-4 text-white hover:text-white/90"
-              onClick={() => toast.info("Saisie du nom de l'entreprise...")}
-            >
+          <div className="bg-purple-900 p-6 rounded-xl text-white hover:bg-purple-800 transition-colors duration-200 cursor-pointer hover:shadow-lg">
+            <div className="flex flex-col items-start gap-4 h-full">
               <div className="w-16 h-16 bg-purple-800 rounded-full flex items-center justify-center">
                 <Search className="h-8 w-8" />
               </div>
-              <div className="text-left">
+              <div>
                 <h3 className="font-semibold text-xl mb-2">Saisir le nom de l'entreprise</h3>
                 <p className="text-sm opacity-90">
                   Effectuez une analyse de la visibilité de votre entreprise locale en quelques secondes
                 </p>
               </div>
-            </Button>
+            </div>
           </div>
 
-          <div className="bg-purple-900 p-6 rounded-xl text-white hover:bg-purple-800 transition-all duration-200">
-            <Button
-              variant="ghost"
-              size="lg"
-              className="w-full h-full flex flex-col items-start gap-4 text-white hover:text-white/90"
-              onClick={() => toast.info("Génération du rapport gratuit...")}
-            >
+          <div className="bg-purple-900 p-6 rounded-xl text-white hover:bg-purple-800 transition-colors duration-200 cursor-pointer hover:shadow-lg">
+            <div className="flex flex-col items-start gap-4 h-full">
               <div className="w-16 h-16 bg-purple-800 rounded-full flex items-center justify-center">
                 <FileText className="h-8 w-8" />
               </div>
-              <div className="text-left">
+              <div>
                 <h3 className="font-semibold text-xl mb-2">Obtenir un rapport gratuit</h3>
                 <p className="text-sm opacity-90">
                   Découvrez les répertoires dans lesquels votre entreprise doit être inscrite ou corrigée + les notes attribuées dans les avis
                 </p>
               </div>
-            </Button>
+            </div>
           </div>
 
-          <div className="bg-purple-900 p-6 rounded-xl text-white hover:bg-purple-800 transition-all duration-200">
-            <Button
-              variant="ghost"
-              size="lg"
-              className="w-full h-full flex flex-col items-start gap-4 text-white hover:text-white/90"
-              onClick={() => toast.info("Analyse des classements locaux...")}
-            >
+          <div className="bg-purple-900 p-6 rounded-xl text-white hover:bg-purple-800 transition-colors duration-200 cursor-pointer hover:shadow-lg">
+            <div className="flex flex-col items-start gap-4 h-full">
               <div className="w-16 h-16 bg-purple-800 rounded-full flex items-center justify-center">
                 <TrendingUp className="h-8 w-8" />
               </div>
-              <div className="text-left">
+              <div>
                 <h3 className="font-semibold text-xl mb-2">Dopez vos classements locaux</h3>
                 <p className="text-sm opacity-90">
                   Découvrez les améliorations que vous pouvez apporter pour occuper la première place dans la recherche locale
                 </p>
               </div>
-            </Button>
+            </div>
           </div>
         </div>
       </CardContent>
@@ -281,4 +274,3 @@ const LocalBusinessSection = () => {
 };
 
 export default LocalBusinessSection;
-
