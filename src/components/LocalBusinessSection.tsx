@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -59,8 +60,10 @@ const formSchema = z.object({
   }),
 });
 
+type FormValues = z.infer<typeof formSchema>;
+
 const LocalBusinessSection = () => {
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       country: "",
@@ -71,8 +74,8 @@ const LocalBusinessSection = () => {
     },
   });
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
-    console.log(data);
+  const onSubmit = (data: FormValues) => {
+    console.log("Form data:", data);
     toast.success("Vérification des répertoires locaux en cours...");
   };
 
@@ -107,7 +110,7 @@ const LocalBusinessSection = () => {
                           <SelectItem key={country.value} value={country.value} className="flex items-center gap-2">
                             <Flag 
                               code={country.code} 
-                              height={16} 
+                              height="12" 
                               className="rounded-sm"
                             />
                             {country.label}
@@ -278,3 +281,4 @@ const LocalBusinessSection = () => {
 };
 
 export default LocalBusinessSection;
+
