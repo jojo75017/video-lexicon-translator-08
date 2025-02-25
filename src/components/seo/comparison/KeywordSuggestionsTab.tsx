@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AlertTriangle, Sparkles, TrendingUp, RefreshCcw } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -38,6 +38,16 @@ const KeywordSuggestionsTab = ({
   const [perplexityKey, setPerplexityKey] = useState('');
   const [showPerplexityConfig, setShowPerplexityConfig] = useState(false);
 
+  useEffect(() => {
+    // Initialiser les identifiants par défaut
+    if (!apiCredentials.login && !apiCredentials.password) {
+      onApiCredentialsChange({
+        login: 'aa95cc2bbed069d8',
+        password: 'contact@business-affiliations.com'
+      });
+    }
+  }, []);
+
   const handleServiceChange = (value: string) => {
     setSelectedService(value as 'dataforseo' | 'perplexity');
     setShowPerplexityConfig(value === 'perplexity');
@@ -47,7 +57,6 @@ const KeywordSuggestionsTab = ({
     e.preventDefault();
     if (perplexityKey) {
       toast.success("Clé API Perplexity enregistrée");
-      // Store the key in localStorage
       localStorage.setItem('perplexityKey', perplexityKey);
     }
   };
@@ -208,3 +217,4 @@ const KeywordSuggestionsTab = ({
 };
 
 export default KeywordSuggestionsTab;
+
