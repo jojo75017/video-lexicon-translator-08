@@ -39,12 +39,17 @@ const KeywordSuggestionsTab = ({
   const [showPerplexityConfig, setShowPerplexityConfig] = useState(false);
 
   useEffect(() => {
-    // Initialiser les identifiants par défaut
     if (!apiCredentials.login && !apiCredentials.password) {
       onApiCredentialsChange({
         login: 'aa95cc2bbed069d8',
         password: 'contact@business-affiliations.com'
       });
+      // Automatiquement soumettre les identifiants pour activer les données réelles
+      setTimeout(() => {
+        const event = new Event('submit');
+        onApiCredentialsSubmit(event);
+      }, 0);
+      toast.success("Identifiants DataForSEO chargés automatiquement");
     }
   }, []);
 
