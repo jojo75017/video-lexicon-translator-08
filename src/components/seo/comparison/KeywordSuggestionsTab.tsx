@@ -44,12 +44,30 @@ const KeywordSuggestionsTab = ({
         login: 'aa95cc2bbed069d8',
         password: 'contact@business-affiliations.com'
       });
-      // Automatiquement soumettre les identifiants pour activer les données réelles
+      
+      // Créer un événement FormEvent synthétique
+      const syntheticEvent = {
+        preventDefault: () => {},
+        target: null,
+        currentTarget: null,
+        bubbles: true,
+        cancelable: true,
+        defaultPrevented: false,
+        eventPhase: 0,
+        isTrusted: true,
+        nativeEvent: new Event('submit'),
+        stopPropagation: () => {},
+        isPropagationStopped: () => false,
+        persist: () => {},
+        isDefaultPrevented: () => false,
+        type: 'submit'
+      } as React.FormEvent;
+
+      // Appeler onApiCredentialsSubmit avec l'événement synthétique
       setTimeout(() => {
-        const event = new Event('submit');
-        onApiCredentialsSubmit(event);
+        onApiCredentialsSubmit(syntheticEvent);
+        toast.success("Identifiants DataForSEO chargés automatiquement");
       }, 0);
-      toast.success("Identifiants DataForSEO chargés automatiquement");
     }
   }, []);
 
