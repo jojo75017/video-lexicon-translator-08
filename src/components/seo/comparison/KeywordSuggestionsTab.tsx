@@ -1,8 +1,9 @@
 
-import React from 'react';
-import { AlertTriangle, Sparkles, TrendingUp } from 'lucide-react';
+import React, { useState } from 'react';
+import { AlertTriangle, Sparkles, TrendingUp, RefreshCcw } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 
 interface KeywordSuggestion {
@@ -33,43 +34,98 @@ const KeywordSuggestionsTab = ({
   onApiCredentialsChange,
   onApiCredentialsSubmit
 }: KeywordSuggestionsTabProps) => {
+  const [selectedService, setSelectedService] = useState<'dataforseo' | 'perplexity'>('dataforseo');
+  const [perplexityKey, setPerplexityKey] = useState('');
+  const [showPerplexityConfig, setShowPerplexityConfig] = useState(false);
+
+  const handleServiceChange = (value: string) => {
+    setSelectedService(value as 'dataforseo' | 'perplexity');
+    setShowPerplexityConfig(value === 'perplexity');
+  };
+
+  const handlePerplexitySubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (perplexityKey) {
+      toast.success("Clé API Perplexity enregistrée");
+      // Store the key in localStorage
+      localStorage.setItem('perplexityKey', perplexityKey);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {!useRealData && (
-        <form onSubmit={onApiCredentialsSubmit} className="space-y-4 p-4 bg-blue-50 rounded-lg">
+        <form onSubmit={selectedService === 'dataforseo' ? onApiCredentialsSubmit : handlePerplexitySubmit} 
+              className="space-y-4 p-4 bg-blue-50 rounded-lg">
           <div className="flex items-center gap-2 mb-4">
             <AlertTriangle className="h-5 w-5 text-blue-600" />
-            <h3 className="font-medium text-blue-800">Configuration DataForSEO</h3>
+            <h3 className="font-medium text-blue-800">Configuration API</h3>
           </div>
-          <p className="text-sm text-blue-700 mb-4">
-            Pour obtenir des données réelles, veuillez entrer vos identifiants DataForSEO.
-            Vous pouvez créer un compte sur{' '}
-            <a 
-              href="https://app.dataforseo.com/register" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="underline hover:text-blue-900"
-            >
-              DataForSEO
-            </a>
-          </p>
-          <div className="grid gap-4">
-            <Input
-              type="text"
-              placeholder="Login DataForSEO"
-              value={apiCredentials.login}
-              onChange={(e) => onApiCredentialsChange({ ...apiCredentials, login: e.target.value })}
-            />
-            <Input
-              type="password"
-              placeholder="Mot de passe DataForSEO"
-              value={apiCredentials.password}
-              onChange={(e) => onApiCredentialsChange({ ...apiCredentials, password: e.target.value })}
-            />
-            <Button type="submit" className="w-full">
-              Configurer l'API
-            </Button>
-          </div>
+
+          <Select value={selectedService} onValueChange={handleServiceChange}>
+            <SelectTrigger>
+              <SelectValue placeholder="Choisissez un service" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="dataforseo">DataForSEO</SelectItem>
+              <SelectItem value="perplexity">Perplexity AI</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {selectedService === 'dataforseo' ? (
+            <div className="grid gap-4">
+              <p className="text-sm text-blue-700 mb-4">
+                Pour obtenir des données réelles, veuillez entrer vos identifiants DataForSEO.
+                Vous pouvez créer un compte sur{' '}
+                <a 
+                  href="https://app.dataforseo.com/register" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="underline hover:text-blue-900"
+                >
+                  DataForSEO
+                </a>
+              </p>
+              <Input
+                type="text"
+                placeholder="Login DataForSEO"
+                value={apiCredentials.login}
+                onChange={(e) => onApiCredentialsChange({ ...apiCredentials, login: e.target.value })}
+              />
+              <Input
+                type="password"
+                placeholder="Mot de passe DataForSEO"
+                value={apiCredentials.password}
+                onChange={(e) => onApiCredentialsChange({ ...apiCredentials, password: e.target.value })}
+              />
+            </div>
+          ) : (
+            <div className="grid gap-4">
+              <p className="text-sm text-blue-700 mb-4">
+                Entrez votre clé API Perplexity pour obtenir des suggestions de mots-clés intelligentes.
+                Vous pouvez obtenir une clé sur{' '}
+                <a 
+                  href="https://www.perplexity.ai/settings/api" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="underline hover:text-blue-900"
+                >
+                  Perplexity
+                </a>
+              </p>
+              <Input
+                type="password"
+                placeholder="Clé API Perplexity"
+                value={perplexityKey}
+                onChange={(e) => setPerplexityKey(e.target.value)}
+              />
+            </div>
+          )}
+
+          <Button type="submit" className="w-full">
+            <RefreshCcw className="mr-2 h-4 w-4" />
+            Configurer l'API
+          </Button>
         </form>
       )}
 
@@ -143,7 +199,7 @@ const KeywordSuggestionsTab = ({
         <div className="p-4 bg-yellow-50 rounded-lg">
           <p className="text-sm text-yellow-800">
             Vous visualisez actuellement des données simulées. Pour obtenir des données réelles,
-            veuillez configurer vos identifiants DataForSEO ci-dessus.
+            veuillez configurer vos identifiants API ci-dessus.
           </p>
         </div>
       )}
