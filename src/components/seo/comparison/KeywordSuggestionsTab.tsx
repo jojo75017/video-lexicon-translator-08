@@ -1,10 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
-import { AlertTriangle, Sparkles, TrendingUp, RefreshCcw } from 'lucide-react';
+import { AlertTriangle, Sparkles, TrendingUp, RefreshCcw, BarChart } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import KeywordVisualizations from './KeywordVisualizations';
 
 interface KeywordSuggestion {
   keyword: string;
@@ -161,71 +163,94 @@ const KeywordSuggestionsTab = ({
         </form>
       )}
 
-      {isLoadingKeywords ? (
-        <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Chargement des suggestions...</p>
-        </div>
-      ) : (
-        <div className="grid gap-4">
-          {keywordSuggestions.map((suggestion, index) => (
-            <div 
-              key={index} 
-              className="p-4 bg-white rounded-lg border border-gray-200 hover:border-blue-400 transition-colors"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center space-x-2">
-                  <Sparkles className="h-5 w-5 text-blue-500" />
-                  <h3 className="font-semibold text-lg">{suggestion.keyword}</h3>
-                </div>
-                <div className="flex items-center space-x-2 text-sm">
-                  <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded">
-                    CPC: {suggestion.cpc}€
-                  </span>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-3 gap-4">
-                <div className="space-y-1">
-                  <div className="text-sm text-gray-500 flex items-center">
-                    <TrendingUp className="h-4 w-4 mr-1" />
-                    Volume mensuel
-                  </div>
-                  <div className="font-semibold">{suggestion.volume}</div>
-                </div>
-                
-                <div className="space-y-1">
-                  <div className="text-sm text-gray-500">Difficulté</div>
-                  <div className="flex items-center">
-                    <div className="w-full bg-gray-200 rounded-full h-2 mr-2">
-                      <div 
-                        className="bg-blue-600 h-2 rounded-full" 
-                        style={{ width: `${suggestion.difficulty}%` }}
-                      />
-                    </div>
-                    <span className="text-sm font-medium">{suggestion.difficulty}</span>
-                  </div>
-                </div>
-                
-                <div className="space-y-1">
-                  <div className="text-sm text-gray-500">Compétition</div>
-                  <div className="flex items-center">
-                    <div className="w-full bg-gray-200 rounded-full h-2 mr-2">
-                      <div 
-                        className="bg-green-600 h-2 rounded-full" 
-                        style={{ width: `${suggestion.competition * 100}%` }}
-                      />
-                    </div>
-                    <span className="text-sm font-medium">
-                      {Math.round(suggestion.competition * 100)}%
-                    </span>
-                  </div>
-                </div>
-              </div>
+      <Tabs defaultValue="list" className="w-full">
+        <TabsList className="grid w-full grid-cols-2 mb-4">
+          <TabsTrigger value="list">Liste</TabsTrigger>
+          <TabsTrigger value="visualizations">
+            <BarChart className="w-4 h-4 mr-2" />
+            Visualisations
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="list">
+          {isLoadingKeywords ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+              <p className="mt-2 text-gray-600">Chargement des suggestions...</p>
             </div>
-          ))}
-        </div>
-      )}
+          ) : (
+            <div className="grid gap-4">
+              {keywordSuggestions.map((suggestion, index) => (
+                <div 
+                  key={index} 
+                  className="p-4 bg-white rounded-lg border border-gray-200 hover:border-blue-400 transition-colors"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center space-x-2">
+                      <Sparkles className="h-5 w-5 text-blue-500" />
+                      <h3 className="font-semibold text-lg">{suggestion.keyword}</h3>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm">
+                      <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded">
+                        CPC: {suggestion.cpc}€
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="space-y-1">
+                      <div className="text-sm text-gray-500 flex items-center">
+                        <TrendingUp className="h-4 w-4 mr-1" />
+                        Volume mensuel
+                      </div>
+                      <div className="font-semibold">{suggestion.volume}</div>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <div className="text-sm text-gray-500">Difficulté</div>
+                      <div className="flex items-center">
+                        <div className="w-full bg-gray-200 rounded-full h-2 mr-2">
+                          <div 
+                            className="bg-blue-600 h-2 rounded-full" 
+                            style={{ width: `${suggestion.difficulty}%` }}
+                          />
+                        </div>
+                        <span className="text-sm font-medium">{suggestion.difficulty}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <div className="text-sm text-gray-500">Compétition</div>
+                      <div className="flex items-center">
+                        <div className="w-full bg-gray-200 rounded-full h-2 mr-2">
+                          <div 
+                            className="bg-green-600 h-2 rounded-full" 
+                            style={{ width: `${suggestion.competition * 100}%` }}
+                          />
+                        </div>
+                        <span className="text-sm font-medium">
+                          {Math.round(suggestion.competition * 100)}%
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="visualizations">
+          {isLoadingKeywords ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+              <p className="mt-2 text-gray-600">Chargement des visualisations...</p>
+            </div>
+          ) : (
+            <KeywordVisualizations keywordSuggestions={keywordSuggestions} />
+          )}
+        </TabsContent>
+      </Tabs>
 
       {!useRealData && (
         <div className="p-4 bg-yellow-50 rounded-lg">
@@ -240,4 +265,3 @@ const KeywordSuggestionsTab = ({
 };
 
 export default KeywordSuggestionsTab;
-
