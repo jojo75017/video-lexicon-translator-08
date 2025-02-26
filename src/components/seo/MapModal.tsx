@@ -1,11 +1,8 @@
 
-import React, { useEffect, useRef, useState } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import React, { useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 interface MapModalProps {
   isOpen: boolean;
@@ -15,58 +12,31 @@ interface MapModalProps {
 
 const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: MapModalProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
-  const [mapboxToken, setMapboxToken] = useState<string>("");
+  const map = useRef<L.Map | null>(null);
 
   useEffect(() => {
-    if (!mapContainer.current || !isOpen || !mapboxToken) return;
+    if (!mapContainer.current || !isOpen) return;
 
-    try {
-      mapboxgl.accessToken = mapboxToken;
-      
-      map.current = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/light-v11',
-        projection: 'globe',
-        zoom: 1.5,
-        center: [2.3522, 48.8566], // Paris
-        pitch: 45,
-      });
+    // Initialize map
+    map.current = L.map(mapContainer.current).setView([48.8566, 2.3522], 13);
 
-      map.current.addControl(
-        new mapboxgl.NavigationControl({
-          visualizePitch: true,
-        }),
-        'top-right'
-      );
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map.current);
 
-      map.current.scrollZoom.disable();
+    // Add a marker
+    const marker = L.marker([48.8566, 2.3522]).addTo(map.current);
+    marker.bindPopup("Paris").openPopup();
 
-      map.current.on('style.load', () => {
-        map.current?.setFog({
-          color: 'rgb(255, 255, 255)',
-          'high-color': 'rgb(200, 200, 225)',
-          'horizon-blend': 0.2,
-        });
-      });
+    // Enable scroll wheel zoom
+    map.current.scrollWheelZoom.enable();
 
-      return () => {
-        map.current?.remove();
-      };
-    } catch (error) {
-      console.error('Error initializing map:', error);
-      toast.error("Erreur lors de l'initialisation de la carte. Vérifiez votre token Mapbox.");
-    }
-  }, [isOpen, mapboxToken]);
-
-  const handleTokenSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (mapboxToken) {
-      toast.success("Token Mapbox configuré");
-    } else {
-      toast.error("Veuillez entrer un token Mapbox valide");
-    }
-  };
+    return () => {
+      map.current?.remove();
+    };
+  }, [isOpen]);
 
   return (
     <Dialog open={isOpen} onOpenChange={() => onClose()}>
@@ -74,29 +44,9 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
-        
-        {!mapboxToken ? (
-          <form onSubmit={handleTokenSubmit} className="space-y-4">
-            <div>
-              <p className="text-sm text-gray-600 mb-2">
-                Pour utiliser la carte, vous devez fournir votre token public Mapbox.
-                Vous pouvez le trouver sur <a href="https://www.mapbox.com/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">votre compte Mapbox</a>.
-              </p>
-              <Input
-                type="text"
-                placeholder="Entrez votre token public Mapbox..."
-                value={mapboxToken}
-                onChange={(e) => setMapboxToken(e.target.value)}
-                className="w-full"
-              />
-            </div>
-            <Button type="submit">Configurer la carte</Button>
-          </form>
-        ) : (
-          <div className="relative w-full h-[60vh]">
-            <div ref={mapContainer} className="absolute inset-0 rounded-lg" />
-          </div>
-        )}
+        <div className="relative w-full h-[60vh]">
+          <div ref={mapContainer} className="absolute inset-0 rounded-lg" />
+        </div>
       </DialogContent>
     </Dialog>
   );
