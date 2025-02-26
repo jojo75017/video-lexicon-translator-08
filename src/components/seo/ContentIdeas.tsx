@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,7 +12,6 @@ import {
   Copy, 
   Bookmark,
   ThumbsUp,
-  Map
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -19,7 +19,6 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import MapModal from './MapModal';
 
 interface ContentIdea {
   title: string;
@@ -43,7 +42,6 @@ const ContentIdeas = ({ keyword, ideas, onKeywordChange }: ContentIdeasProps) =>
   const [inputKeyword, setInputKeyword] = useState(keyword);
   const [savedArticles, setSavedArticles] = useState<string[]>([]);
   const [likedArticles, setLikedArticles] = useState<string[]>([]);
-  const [showMap, setShowMap] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,15 +90,6 @@ const ContentIdeas = ({ keyword, ideas, onKeywordChange }: ContentIdeasProps) =>
           <Button type="submit">
             Rechercher
             <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
-          <Button 
-            type="button" 
-            variant="outline"
-            onClick={() => setShowMap(true)}
-            className="gap-2"
-          >
-            <Map className="h-4 w-4" />
-            Créer une carte
           </Button>
         </form>
       </div>
@@ -217,14 +206,9 @@ const ContentIdeas = ({ keyword, ideas, onKeywordChange }: ContentIdeasProps) =>
           </Card>
         ))}
       </div>
-
-      <MapModal 
-        isOpen={showMap}
-        onClose={() => setShowMap(false)}
-        title={`Carte interactive pour "${keyword}"`}
-      />
     </div>
   );
 };
 
 export default ContentIdeas;
+
