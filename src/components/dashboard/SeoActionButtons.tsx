@@ -34,14 +34,12 @@ const SeoActionButtons = () => {
         <MapButton onClick={handleOpenMap} />
       </div>
 
-      {/* Mount the MapModal only when needed */}
-      {showMap && (
-        <MapModal 
-          isOpen={showMap}
-          onClose={handleCloseMap}
-          title="Créer une carte interactive"
-        />
-      )}
+      {/* Rendu conditionnel du composant MapModal */}
+      <MapModal 
+        isOpen={showMap}
+        onClose={handleCloseMap}
+        title="Créer une carte interactive"
+      />
     </>
   );
 };

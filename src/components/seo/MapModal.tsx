@@ -11,7 +11,7 @@ interface MapModalProps {
   title?: string;
 }
 
-// Fix Leaflet icon issue outside of component
+// Fix Leaflet icon issue
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -25,70 +25,80 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
   const { toast } = useToast();
   const [isMapInitialized, setIsMapInitialized] = useState(false);
 
-  // Initialize map when the modal is open and visible
+  // Créer et initialiser la carte seulement quand le modal est ouvert
   useEffect(() => {
-    if (!isOpen || !mapContainer.current) return;
-
-    // Add a significant delay to ensure the modal is fully rendered
-    const timer = setTimeout(() => {
+    // Ne rien faire si le modal n'est pas ouvert
+    if (!isOpen) return;
+    
+    // Fonction d'initialisation de la carte
+    const initializeMap = () => {
       try {
-        console.log("Initializing map after delay, container exists:", !!mapContainer.current);
+        console.log("Tentative d'initialisation de la carte");
         
-        // Clean up existing map if it exists
+        // Nettoyer la carte existante si elle existe
         if (mapInstance.current) {
-          console.log("Removing existing map");
+          console.log("Suppression de la carte existante");
           mapInstance.current.remove();
           mapInstance.current = null;
         }
         
+        // Vérifier si le conteneur de la carte existe
         if (!mapContainer.current) {
-          console.error("Map container ref is null after delay");
+          console.error("Le conteneur de carte est null");
           return;
         }
         
-        // Create map instance with explicit dimensions
-        const mapContainerElement = mapContainer.current;
-        console.log("Map container dimensions:", mapContainerElement.clientWidth, "x", mapContainerElement.clientHeight);
-        
-        const map = L.map(mapContainerElement, {
-          center: [48.8566, 2.3522],
-          zoom: 13,
-          scrollWheelZoom: true,
-        });
-        
-        // Add OpenStreetMap tiles
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          maxZoom: 19,
-          attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
-        
-        // Add a marker
-        L.marker([48.8566, 2.3522])
-          .addTo(map)
-          .bindPopup("Paris")
-          .openPopup();
-        
-        // Store map instance for cleanup
-        mapInstance.current = map;
-        setIsMapInitialized(true);
-        
-        // Force a redraw after everything is set up
-        map.invalidateSize(true);
-        console.log("Map initialized successfully");
+        // Assurez-vous que le DOM est complètement chargé
+        setTimeout(() => {
+          if (!mapContainer.current) return;
+          
+          console.log("Création de la carte", mapContainer.current.clientWidth, mapContainer.current.clientHeight);
+          
+          // Créer une nouvelle instance de carte
+          const map = L.map(mapContainer.current, {
+            center: [48.8566, 2.3522], // Paris
+            zoom: 13,
+            scrollWheelZoom: true,
+          });
+          
+          // Ajouter les tuiles OpenStreetMap
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors'
+          }).addTo(map);
+          
+          // Ajouter un marqueur
+          L.marker([48.8566, 2.3522]).addTo(map)
+            .bindPopup("Paris")
+            .openPopup();
+          
+          // Stocker l'instance de carte pour le nettoyage
+          mapInstance.current = map;
+          
+          // Forcer une mise à jour de la taille de la carte
+          map.invalidateSize(true);
+          
+          console.log("Carte initialisée avec succès");
+          setIsMapInitialized(true);
+        }, 300);
       } catch (error) {
-        console.error("Failed to initialize map:", error);
+        console.error("Erreur d'initialisation de la carte:", error);
         toast({
           title: "Erreur",
           description: "Impossible de charger la carte. Veuillez réessayer.",
           variant: "destructive",
         });
       }
-    }, 500); // Increased delay to 500ms to ensure DOM is ready
+    };
+
+    // Initialiser la carte après un court délai pour s'assurer que le DOM est prêt
+    const timer = setTimeout(initializeMap, 300);
     
+    // Nettoyer lors du démontage
     return () => {
       clearTimeout(timer);
       if (mapInstance.current) {
-        console.log("Cleaning up map on unmount");
+        console.log("Nettoyage de la carte");
         mapInstance.current.remove();
         mapInstance.current = null;
         setIsMapInitialized(false);
@@ -96,33 +106,26 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
     };
   }, [isOpen, toast]);
 
-  // Additional handler for when dialog content becomes visible
+  // Pour gérer le redimensionnement du DOM quand le modal est ouvert
   useEffect(() => {
     if (isOpen && mapInstance.current) {
-      // Add a delay to ensure the modal transition is complete
-      const timer = setTimeout(() => {
+      const resizeMap = () => {
         if (mapInstance.current) {
-          console.log("Invalidating map size after modal transition");
+          console.log("Mise à jour de la taille de la carte");
           mapInstance.current.invalidateSize(true);
         }
-      }, 300);
+      };
       
-      return () => clearTimeout(timer);
+      // Utilisé pour redimensionner la carte après l'animation d'ouverture du modal
+      window.addEventListener('resize', resizeMap);
+      const timer = setTimeout(resizeMap, 500);
+      
+      return () => {
+        window.removeEventListener('resize', resizeMap);
+        clearTimeout(timer);
+      };
     }
   }, [isOpen]);
-
-  // Handle window resize
-  useEffect(() => {
-    const handleResize = () => {
-      if (mapInstance.current) {
-        console.log("Invalidating map size due to window resize");
-        mapInstance.current.invalidateSize(true);
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -137,7 +140,6 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
           <div 
             ref={mapContainer} 
             className="absolute inset-0 rounded-lg z-10" 
-            id="map-container"
             style={{ width: '100%', height: '100%' }}
           />
           {!isMapInitialized && (
