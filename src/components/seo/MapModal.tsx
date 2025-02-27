@@ -3,6 +3,7 @@ import React, { useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
 
 interface MapModalProps {
   isOpen: boolean;
@@ -10,9 +11,18 @@ interface MapModalProps {
   title?: string;
 }
 
+// Fix Leaflet icon issue
+// This needs to be outside the component to avoid re-assignment on re-renders
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+});
+
 const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: MapModalProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const mapInstance = useRef<any>(null);
+  const mapInstance = useRef<L.Map | null>(null);
   const { toast } = useToast();
   const leafletLoaded = useRef<boolean>(false);
 
@@ -22,30 +32,27 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
 
     const initializeMap = async () => {
       try {
-        // Dynamically import Leaflet
-        const L = await import('leaflet');
-        leafletLoaded.current = true;
-        
         // Clean up existing map
         if (mapInstance.current) {
           mapInstance.current.remove();
           mapInstance.current = null;
         }
-
-        // Fix Leaflet icon issue
-        delete L.Icon.Default.prototype._getIconUrl;
-        L.Icon.Default.mergeOptions({
-          iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-          iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-          shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-        });
-
+        
         console.log("Creating map in element:", mapContainer.current);
         
         // Create map with a short delay to ensure DOM is ready
         setTimeout(() => {
+          if (!mapContainer.current) {
+            console.error("Map container not found");
+            return;
+          }
+          
           // Create map instance
-          const map = L.map(mapContainer.current).setView([48.8566, 2.3522], 13);
+          const map = L.map(mapContainer.current, {
+            center: [48.8566, 2.3522],
+            zoom: 13,
+            scrollWheelZoom: true
+          });
           
           // Add OpenStreetMap tiles
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -57,11 +64,9 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
           const marker = L.marker([48.8566, 2.3522]).addTo(map);
           marker.bindPopup("Paris").openPopup();
           
-          // Enable scroll zoom
-          map.scrollWheelZoom.enable();
-          
           // Store map instance for cleanup
           mapInstance.current = map;
+          leafletLoaded.current = true;
           
           // Force a redraw after the modal is fully visible
           setTimeout(() => {
