@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import 'leaflet/dist/leaflet.css';
@@ -11,8 +11,7 @@ interface MapModalProps {
   title?: string;
 }
 
-// Fix Leaflet icon issue
-// This needs to be outside the component to avoid re-assignment on re-renders
+// Fix Leaflet icon issue outside of component
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -24,58 +23,58 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<L.Map | null>(null);
   const { toast } = useToast();
-  const leafletLoaded = useRef<boolean>(false);
+  const [isMapInitialized, setIsMapInitialized] = useState(false);
 
+  // Initialize map when the modal is open and visible
   useEffect(() => {
-    // Only initialize map when modal is open and container exists
     if (!isOpen || !mapContainer.current) return;
 
-    const initializeMap = async () => {
+    // Add a significant delay to ensure the modal is fully rendered
+    const timer = setTimeout(() => {
       try {
-        // Clean up existing map
+        console.log("Initializing map after delay, container exists:", !!mapContainer.current);
+        
+        // Clean up existing map if it exists
         if (mapInstance.current) {
+          console.log("Removing existing map");
           mapInstance.current.remove();
           mapInstance.current = null;
         }
         
-        console.log("Creating map in element:", mapContainer.current);
+        if (!mapContainer.current) {
+          console.error("Map container ref is null after delay");
+          return;
+        }
         
-        // Create map with a short delay to ensure DOM is ready
-        setTimeout(() => {
-          if (!mapContainer.current) {
-            console.error("Map container not found");
-            return;
-          }
-          
-          // Create map instance
-          const map = L.map(mapContainer.current, {
-            center: [48.8566, 2.3522],
-            zoom: 13,
-            scrollWheelZoom: true
-          });
-          
-          // Add OpenStreetMap tiles
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap contributors'
-          }).addTo(map);
-          
-          // Add a marker
-          const marker = L.marker([48.8566, 2.3522]).addTo(map);
-          marker.bindPopup("Paris").openPopup();
-          
-          // Store map instance for cleanup
-          mapInstance.current = map;
-          leafletLoaded.current = true;
-          
-          // Force a redraw after the modal is fully visible
-          setTimeout(() => {
-            map.invalidateSize(true);
-            console.log("Map size invalidated");
-          }, 250);
-          
-          console.log("Map initialized successfully");
-        }, 100);
+        // Create map instance with explicit dimensions
+        const mapContainerElement = mapContainer.current;
+        console.log("Map container dimensions:", mapContainerElement.clientWidth, "x", mapContainerElement.clientHeight);
+        
+        const map = L.map(mapContainerElement, {
+          center: [48.8566, 2.3522],
+          zoom: 13,
+          scrollWheelZoom: true,
+        });
+        
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+        
+        // Add a marker
+        L.marker([48.8566, 2.3522])
+          .addTo(map)
+          .bindPopup("Paris")
+          .openPopup();
+        
+        // Store map instance for cleanup
+        mapInstance.current = map;
+        setIsMapInitialized(true);
+        
+        // Force a redraw after everything is set up
+        map.invalidateSize(true);
+        console.log("Map initialized successfully");
       } catch (error) {
         console.error("Failed to initialize map:", error);
         toast({
@@ -84,24 +83,39 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
           variant: "destructive",
         });
       }
-    };
-
-    initializeMap();
-
-    // Cleanup function
+    }, 500); // Increased delay to 500ms to ensure DOM is ready
+    
     return () => {
+      clearTimeout(timer);
       if (mapInstance.current) {
+        console.log("Cleaning up map on unmount");
         mapInstance.current.remove();
         mapInstance.current = null;
-        console.log("Map cleaned up");
+        setIsMapInitialized(false);
       }
     };
   }, [isOpen, toast]);
 
-  // Handle window resize to fix map size
+  // Additional handler for when dialog content becomes visible
+  useEffect(() => {
+    if (isOpen && mapInstance.current) {
+      // Add a delay to ensure the modal transition is complete
+      const timer = setTimeout(() => {
+        if (mapInstance.current) {
+          console.log("Invalidating map size after modal transition");
+          mapInstance.current.invalidateSize(true);
+        }
+      }, 300);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  // Handle window resize
   useEffect(() => {
     const handleResize = () => {
       if (mapInstance.current) {
+        console.log("Invalidating map size due to window resize");
         mapInstance.current.invalidateSize(true);
       }
     };
@@ -119,14 +133,15 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
             Explorez et interagissez avec la carte ci-dessous.
           </DialogDescription>
         </DialogHeader>
-        <div className="relative w-full h-[60vh] bg-gray-100 rounded-lg">
+        <div className="relative w-full h-[60vh] bg-gray-100 rounded-lg overflow-hidden">
           <div 
             ref={mapContainer} 
             className="absolute inset-0 rounded-lg z-10" 
+            id="map-container"
             style={{ width: '100%', height: '100%' }}
           />
-          {!leafletLoaded.current && isOpen && (
-            <div className="absolute inset-0 flex items-center justify-center">
+          {!isMapInitialized && (
+            <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-70 z-20">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-700"></div>
             </div>
           )}
