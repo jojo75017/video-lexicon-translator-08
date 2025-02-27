@@ -14,45 +14,63 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
   const { toast } = useToast();
+  const leafletLoaded = useRef<boolean>(false);
 
   useEffect(() => {
-    // Only attempt to initialize map if the modal is open and container exists
+    // Only initialize map when modal is open and container exists
     if (!isOpen || !mapContainer.current) return;
 
-    // Dynamically import Leaflet to avoid SSR issues
-    import('leaflet').then((L) => {
+    const initializeMap = async () => {
       try {
-        // Clean up any existing map instance
+        // Dynamically import Leaflet
+        const L = await import('leaflet');
+        leafletLoaded.current = true;
+        
+        // Clean up existing map
         if (mapInstance.current) {
           mapInstance.current.remove();
           mapInstance.current = null;
         }
 
-        // Create a new map instance
-        const map = L.map(mapContainer.current).setView([48.8566, 2.3522], 13);
+        // Fix Leaflet icon issue
+        delete L.Icon.Default.prototype._getIconUrl;
+        L.Icon.Default.mergeOptions({
+          iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+          iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+          shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+        });
+
+        console.log("Creating map in element:", mapContainer.current);
         
-        // Add OpenStreetMap tiles
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          maxZoom: 19,
-          attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
-
-        // Add a marker
-        const marker = L.marker([48.8566, 2.3522]).addTo(map);
-        marker.bindPopup("Paris").openPopup();
-
-        // Enable scroll wheel zoom
-        map.scrollWheelZoom.enable();
-
-        // Store the map instance for cleanup
-        mapInstance.current = map;
-
-        // Invalidate the map size after a small delay to ensure proper rendering
+        // Create map with a short delay to ensure DOM is ready
         setTimeout(() => {
-          map.invalidateSize();
+          // Create map instance
+          const map = L.map(mapContainer.current).setView([48.8566, 2.3522], 13);
+          
+          // Add OpenStreetMap tiles
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors'
+          }).addTo(map);
+          
+          // Add a marker
+          const marker = L.marker([48.8566, 2.3522]).addTo(map);
+          marker.bindPopup("Paris").openPopup();
+          
+          // Enable scroll zoom
+          map.scrollWheelZoom.enable();
+          
+          // Store map instance for cleanup
+          mapInstance.current = map;
+          
+          // Force a redraw after the modal is fully visible
+          setTimeout(() => {
+            map.invalidateSize(true);
+            console.log("Map size invalidated");
+          }, 250);
+          
+          console.log("Map initialized successfully");
         }, 100);
-
-        console.log("Map initialized successfully");
       } catch (error) {
         console.error("Failed to initialize map:", error);
         toast({
@@ -61,16 +79,11 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
           variant: "destructive",
         });
       }
-    }).catch(err => {
-      console.error("Failed to load Leaflet:", err);
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger la bibliothèque de cartographie.",
-        variant: "destructive",
-      });
-    });
+    };
 
-    // Cleanup function to remove the map when the component unmounts or the modal closes
+    initializeMap();
+
+    // Cleanup function
     return () => {
       if (mapInstance.current) {
         mapInstance.current.remove();
@@ -80,8 +93,20 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
     };
   }, [isOpen, toast]);
 
+  // Handle window resize to fix map size
+  useEffect(() => {
+    const handleResize = () => {
+      if (mapInstance.current) {
+        mapInstance.current.invalidateSize(true);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
-    <Dialog open={isOpen} onOpenChange={() => onClose()}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-4xl">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
@@ -89,12 +114,17 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
             Explorez et interagissez avec la carte ci-dessous.
           </DialogDescription>
         </DialogHeader>
-        <div className="relative w-full h-[60vh]">
+        <div className="relative w-full h-[60vh] bg-gray-100 rounded-lg">
           <div 
             ref={mapContainer} 
-            className="absolute inset-0 rounded-lg" 
+            className="absolute inset-0 rounded-lg z-10" 
             style={{ width: '100%', height: '100%' }}
           />
+          {!leafletLoaded.current && isOpen && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-700"></div>
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>

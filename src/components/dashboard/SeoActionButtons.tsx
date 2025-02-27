@@ -31,9 +31,7 @@ const SeoActionButtons = () => {
         <AlertsButton />
         <HealthButton />
         <OrganizeButton />
-        <div onClick={handleOpenMap}>
-          <MapButton />
-        </div>
+        <MapButton onClick={handleOpenMap} />
       </div>
 
       <MapModal 
