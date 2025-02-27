@@ -12,6 +12,16 @@ import MapModal from '../seo/MapModal';
 const SeoActionButtons = () => {
   const [showMap, setShowMap] = useState(false);
 
+  const handleOpenMap = () => {
+    console.log("Opening map modal");
+    setShowMap(true);
+  };
+
+  const handleCloseMap = () => {
+    console.log("Closing map modal");
+    setShowMap(false);
+  };
+
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-7 gap-4 mb-8">
@@ -21,14 +31,14 @@ const SeoActionButtons = () => {
         <AlertsButton />
         <HealthButton />
         <OrganizeButton />
-        <div onClick={() => setShowMap(true)}>
+        <div onClick={handleOpenMap}>
           <MapButton />
         </div>
       </div>
 
       <MapModal 
         isOpen={showMap}
-        onClose={() => setShowMap(false)}
+        onClose={handleCloseMap}
         title="Créer une carte interactive"
       />
     </>
@@ -36,4 +46,3 @@ const SeoActionButtons = () => {
 };
 
 export default SeoActionButtons;
-
