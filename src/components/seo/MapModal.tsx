@@ -4,11 +4,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Download } from "lucide-react";
+import { Search, Download, MapPin, Square, Pencil, Circle } from "lucide-react";
 import { Form, FormField, FormItem, FormControl } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import 'leaflet/dist/leaflet.css';
+import 'leaflet-draw/dist/leaflet.draw.css';
 import L from 'leaflet';
+import 'leaflet-draw';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -27,16 +29,25 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
-// Schema pour la validation du formulaire
+// Schéma pour la validation du formulaire
 const searchFormSchema = z.object({
   searchQuery: z.string().min(2, "Entrez au moins 2 caractères")
 });
 
 type SearchFormValues = z.infer<typeof searchFormSchema>;
 
+// Types pour les éléments dessinés
+interface DrawnItems {
+  markers: L.Marker[];
+  polygons: L.Polygon[];
+  polylines: L.Polyline[];
+  circles: L.Circle[];
+}
+
 const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: MapModalProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<L.Map | null>(null);
+  const drawControlRef = useRef<L.Control.Draw | null>(null);
   const [marker, setMarker] = useState<L.Marker | null>(null);
   const { toast } = useToast();
   const [isMapInitialized, setIsMapInitialized] = useState(false);
@@ -46,6 +57,14 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
     name: "Paris"
   });
   const [iframeCode, setIframeCode] = useState<string>("");
+  const [activeDrawTool, setActiveDrawTool] = useState<string | null>(null);
+  const [drawnItems, setDrawnItems] = useState<DrawnItems>({
+    markers: [],
+    polygons: [],
+    polylines: [],
+    circles: []
+  });
+  const drawnItemsLayerRef = useRef<L.FeatureGroup | null>(null);
 
   // Initialisation du formulaire
   const form = useForm<SearchFormValues>({
@@ -87,7 +106,7 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
         }
         
         // Générer le code iframe pour ce lieu
-        generateIframeCode(newLocation);
+        generateIframeCode();
         
         toast({
           title: "Lieu trouvé",
@@ -110,14 +129,191 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
     }
   };
 
-  // Générer le code iframe pour le lieu actuel
-  const generateIframeCode = (loc = location) => {
+  // Activer un outil de dessin
+  const enableDrawTool = (tool: string) => {
+    if (!mapInstance.current || !drawnItemsLayerRef.current) return;
+    
+    // Désactiver l'outil actif
+    if (drawControlRef.current) {
+      mapInstance.current.removeControl(drawControlRef.current);
+    }
+
+    // Options de base pour tous les outils
+    const drawOptions: L.Control.DrawOptions = {
+      draw: {
+        rectangle: false,
+        circlemarker: false,
+        marker: false,
+        circle: false,
+        polygon: false,
+        polyline: false,
+      },
+      edit: {
+        featureGroup: drawnItemsLayerRef.current,
+        remove: true
+      }
+    };
+
+    // Activer l'outil sélectionné
+    switch (tool) {
+      case 'marker':
+        drawOptions.draw.marker = true;
+        break;
+      case 'polygon':
+        drawOptions.draw.polygon = {
+          allowIntersection: false,
+          showArea: true,
+        };
+        break;
+      case 'polyline':
+        drawOptions.draw.polyline = {
+          shapeOptions: {
+            color: '#3388ff',
+            weight: 4
+          }
+        };
+        break;
+      case 'circle':
+        drawOptions.draw.circle = {
+          shapeOptions: {
+            color: '#3388ff'
+          }
+        };
+        break;
+      default:
+        break;
+    }
+
+    // Créer et ajouter le contrôle de dessin
+    const drawControl = new L.Control.Draw(drawOptions);
+    mapInstance.current.addControl(drawControl);
+    drawControlRef.current = drawControl;
+    setActiveDrawTool(tool);
+    
+    toast({
+      title: "Outil activé",
+      description: `Outil de dessin "${tool}" activé. Cliquez sur la carte pour dessiner.`,
+    });
+  };
+
+  // Désactiver tous les outils de dessin
+  const disableDrawTools = () => {
+    if (!mapInstance.current || !drawControlRef.current) return;
+    
+    mapInstance.current.removeControl(drawControlRef.current);
+    drawControlRef.current = null;
+    setActiveDrawTool(null);
+  };
+
+  // Effacer tous les éléments dessinés
+  const clearDrawnItems = () => {
+    if (!drawnItemsLayerRef.current) return;
+
+    drawnItemsLayerRef.current.clearLayers();
+    setDrawnItems({
+      markers: [],
+      polygons: [],
+      polylines: [],
+      circles: []
+    });
+    
+    toast({
+      title: "Éléments effacés",
+      description: "Tous les éléments dessinés ont été supprimés.",
+    });
+    
+    // Mettre à jour l'iframe
+    generateIframeCode();
+  };
+
+  // Générer le code iframe pour le lieu actuel et les éléments dessinés
+  const generateIframeCode = () => {
     const iframeWidth = 600;
     const iframeHeight = 400;
     const zoom = 13;
     
-    const code = `<iframe width="${iframeWidth}" height="${iframeHeight}" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://www.openstreetmap.org/export/embed.html?bbox=${loc.lng - 0.05},${loc.lat - 0.05},${loc.lng + 0.05},${loc.lat + 0.05}&amp;layer=mapnik&amp;marker=${loc.lat},${loc.lng}" style="border: 1px solid black"></iframe><br/><small><a href="https://www.openstreetmap.org/?mlat=${loc.lat}&amp;mlon=${loc.lng}#map=${zoom}/${loc.lat}/${loc.lng}">Voir sur OpenStreetMap</a></small>`;
+    // Base iframe code with marker for location
+    let code = `<!DOCTYPE html>
+<html>
+<head>
+  <title>Carte interactive</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    body { margin: 0; padding: 0; }
+    #map { width: ${iframeWidth}px; height: ${iframeHeight}px; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script>
+    // Initialiser la carte
+    const map = L.map('map').setView([${location.lat}, ${location.lng}], ${zoom});
     
+    // Ajouter les tuiles OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    
+    // Ajouter le marqueur principal
+    L.marker([${location.lat}, ${location.lng}])
+      .addTo(map)
+      .bindPopup("${location.name}")
+      .openPopup();
+`;
+
+    // Ajouter du code pour les éléments dessinés
+    if (drawnItemsLayerRef.current) {
+      // Ajouter les marqueurs additionnels
+      drawnItems.markers.forEach((marker, i) => {
+        const latlng = marker.getLatLng();
+        code += `
+    // Marqueur additionnel ${i + 1}
+    L.marker([${latlng.lat}, ${latlng.lng}]).addTo(map);`;
+      });
+
+      // Ajouter les polygones
+      drawnItems.polygons.forEach((polygon, i) => {
+        const coordinates = polygon.getLatLngs()[0];
+        if (Array.isArray(coordinates)) {
+          const points = (coordinates as L.LatLng[]).map(latlng => `[${latlng.lat}, ${latlng.lng}]`).join(', ');
+          code += `
+    // Polygone ${i + 1}
+    L.polygon([${points}], {color: '${polygon.options.color || 'blue'}'}).addTo(map);`;
+        }
+      });
+
+      // Ajouter les polylines
+      drawnItems.polylines.forEach((polyline, i) => {
+        const coordinates = polyline.getLatLngs();
+        const points = (coordinates as L.LatLng[]).map(latlng => `[${latlng.lat}, ${latlng.lng}]`).join(', ');
+        code += `
+    // Ligne ${i + 1}
+    L.polyline([${points}], {color: '${polyline.options.color || 'blue'}'}).addTo(map);`;
+      });
+
+      // Ajouter les cercles
+      drawnItems.circles.forEach((circle, i) => {
+        const center = circle.getLatLng();
+        const radius = circle.getRadius();
+        code += `
+    // Cercle ${i + 1}
+    L.circle([${center.lat}, ${center.lng}], {
+      radius: ${radius},
+      color: '${circle.options.color || 'blue'}'
+    }).addTo(map);`;
+      });
+    }
+
+    // Fermer le script et le HTML
+    code += `
+  </script>
+</body>
+</html>`;
+
     setIframeCode(code);
     return code;
   };
@@ -134,7 +330,7 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
     
     toast({
       title: "Téléchargement réussi",
-      description: "Le code iframe a été téléchargé avec succès",
+      description: "Le code HTML de la carte a été téléchargé avec succès",
     });
   };
 
@@ -186,6 +382,94 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
             attribution: '© OpenStreetMap contributors'
           }).addTo(map);
           
+          // Initialiser le groupe de features pour les éléments dessinés
+          const drawnItemsLayer = new L.FeatureGroup();
+          map.addLayer(drawnItemsLayer);
+          drawnItemsLayerRef.current = drawnItemsLayer;
+          
+          // Écouter les événements de dessin
+          map.on(L.Draw.Event.CREATED, (event: any) => {
+            const { layerType, layer } = event;
+            
+            // Ajouter la couche au groupe de features
+            drawnItemsLayer.addLayer(layer);
+            
+            // Mettre à jour l'état des éléments dessinés
+            setDrawnItems(prev => {
+              const newItems = { ...prev };
+              
+              switch (layerType) {
+                case 'marker':
+                  newItems.markers = [...prev.markers, layer as L.Marker];
+                  break;
+                case 'polygon':
+                  newItems.polygons = [...prev.polygons, layer as L.Polygon];
+                  break;
+                case 'polyline':
+                  newItems.polylines = [...prev.polylines, layer as L.Polyline];
+                  break;
+                case 'circle':
+                  newItems.circles = [...prev.circles, layer as L.Circle];
+                  break;
+                default:
+                  break;
+              }
+              
+              return newItems;
+            });
+            
+            // Mettre à jour l'iframe
+            setTimeout(generateIframeCode, 100);
+            
+            toast({
+              title: "Élément ajouté",
+              description: `Un ${layerType} a été ajouté à la carte.`,
+            });
+          });
+          
+          // Écouter les événements d'édition
+          map.on(L.Draw.Event.EDITED, () => {
+            toast({
+              title: "Édition terminée",
+              description: "Les éléments ont été modifiés.",
+            });
+            
+            // Mettre à jour l'iframe
+            setTimeout(generateIframeCode, 100);
+          });
+          
+          // Écouter les événements de suppression
+          map.on(L.Draw.Event.DELETED, (event: any) => {
+            const layers = event.layers;
+            
+            // Mettre à jour l'état des éléments dessinés
+            layers.eachLayer((layer: any) => {
+              setDrawnItems(prev => {
+                const newItems = { ...prev };
+                
+                if (layer instanceof L.Marker) {
+                  newItems.markers = prev.markers.filter(m => m !== layer);
+                } else if (layer instanceof L.Polygon) {
+                  newItems.polygons = prev.polygons.filter(p => p !== layer);
+                } else if (layer instanceof L.Polyline) {
+                  newItems.polylines = prev.polylines.filter(p => p !== layer);
+                } else if (layer instanceof L.Circle) {
+                  newItems.circles = prev.circles.filter(c => c !== layer);
+                }
+                
+                return newItems;
+              });
+            });
+            
+            toast({
+              title: "Éléments supprimés",
+              description: "Les éléments sélectionnés ont été supprimés.",
+            });
+            
+            // Mettre à jour l'iframe
+            setTimeout(generateIframeCode, 100);
+          });
+          
           // Ajouter un marqueur
           const newMarker = L.marker([location.lat, location.lng]).addTo(map)
             .bindPopup(location.name)
@@ -226,9 +510,15 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
         mapInstance.current = null;
         setMarker(null);
         setIsMapInitialized(false);
+        setDrawnItems({
+          markers: [],
+          polygons: [],
+          polylines: [],
+          circles: []
+        });
       }
     };
-  }, [isOpen, location.lat, location.lng, toast]);
+  }, [isOpen, location.lat, location.lng]);
 
   // Pour gérer le redimensionnement du DOM quand le modal est ouvert
   useEffect(() => {
@@ -257,7 +547,7 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>
-            Recherchez un lieu et créez une carte interactive à intégrer sur votre site.
+            Recherchez un lieu, ajoutez des marqueurs, dessinez des zones et créez une carte interactive à intégrer sur votre site.
           </DialogDescription>
         </DialogHeader>
         
@@ -286,6 +576,59 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
           </form>
         </Form>
         
+        {/* Outils de dessin */}
+        <div className="flex gap-2 mb-4">
+          <Button 
+            onClick={() => enableDrawTool('marker')}
+            variant={activeDrawTool === 'marker' ? 'default' : 'outline'}
+            size="sm"
+          >
+            <MapPin className="h-4 w-4 mr-2" />
+            Marqueur
+          </Button>
+          <Button 
+            onClick={() => enableDrawTool('polygon')}
+            variant={activeDrawTool === 'polygon' ? 'default' : 'outline'}
+            size="sm"
+          >
+            <Square className="h-4 w-4 mr-2" />
+            Zone
+          </Button>
+          <Button 
+            onClick={() => enableDrawTool('polyline')}
+            variant={activeDrawTool === 'polyline' ? 'default' : 'outline'}
+            size="sm"
+          >
+            <Pencil className="h-4 w-4 mr-2" />
+            Chemin
+          </Button>
+          <Button 
+            onClick={() => enableDrawTool('circle')}
+            variant={activeDrawTool === 'circle' ? 'default' : 'outline'}
+            size="sm"
+          >
+            <Circle className="h-4 w-4 mr-2" />
+            Cercle
+          </Button>
+          {activeDrawTool && (
+            <Button 
+              onClick={disableDrawTools}
+              variant="destructive"
+              size="sm"
+            >
+              Désactiver
+            </Button>
+          )}
+          <Button 
+            onClick={clearDrawnItems}
+            variant="secondary"
+            size="sm"
+            className="ml-auto"
+          >
+            Effacer tout
+          </Button>
+        </div>
+        
         <div className="relative w-full h-[40vh] bg-gray-100 rounded-lg overflow-hidden">
           <div 
             ref={mapContainer} 
@@ -300,7 +643,7 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
         </div>
         
         <div className="mt-4 space-y-4">
-          <h3 className="text-lg font-medium">Code iframe pour intégration</h3>
+          <h3 className="text-lg font-medium">Code HTML pour intégration</h3>
           <Textarea
             value={iframeCode}
             readOnly
@@ -309,7 +652,7 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
           <div className="flex justify-end">
             <Button onClick={downloadIframeCode} className="bg-blue-600 hover:bg-blue-700">
               <Download className="h-4 w-4 mr-2" />
-              Télécharger l'iframe
+              Télécharger le code
             </Button>
           </div>
         </div>
