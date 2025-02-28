@@ -151,14 +151,15 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
       edit: {
         featureGroup: drawnItemsLayerRef.current,
         remove: true
-      }
+      },
+      draw: {} // Initialiser avec un objet vide
     };
 
     // Activer l'outil sélectionné
     switch (tool) {
       case 'marker':
         drawOptions.draw = {
-          marker: true,
+          marker: {},
           polyline: false,
           polygon: false,
           rectangle: false,
