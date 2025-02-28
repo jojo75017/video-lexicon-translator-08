@@ -147,15 +147,7 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
     }
 
     // Options de base pour tous les outils
-    const drawOptions: L.Control.DrawOptions = {
-      draw: {
-        rectangle: false,
-        circlemarker: false,
-        marker: false,
-        circle: false,
-        polygon: false,
-        polyline: false,
-      },
+    const drawOptions: L.Control.DrawConstructorOptions = {
       edit: {
         featureGroup: drawnItemsLayerRef.current,
         remove: true
@@ -165,27 +157,55 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
     // Activer l'outil sélectionné
     switch (tool) {
       case 'marker':
-        drawOptions.draw.marker = true;
+        drawOptions.draw = {
+          marker: true,
+          polyline: false,
+          polygon: false,
+          rectangle: false,
+          circle: false,
+          circlemarker: false
+        };
         break;
       case 'polygon':
-        drawOptions.draw.polygon = {
-          allowIntersection: false,
-          showArea: true,
+        drawOptions.draw = {
+          marker: false,
+          polyline: false,
+          polygon: {
+            allowIntersection: false,
+            showArea: true
+          },
+          rectangle: false,
+          circle: false,
+          circlemarker: false
         };
         break;
       case 'polyline':
-        drawOptions.draw.polyline = {
-          shapeOptions: {
-            color: '#3388ff',
-            weight: 4
-          }
+        drawOptions.draw = {
+          marker: false,
+          polyline: {
+            shapeOptions: {
+              color: '#3388ff',
+              weight: 4
+            }
+          },
+          polygon: false,
+          rectangle: false,
+          circle: false,
+          circlemarker: false
         };
         break;
       case 'circle':
-        drawOptions.draw.circle = {
-          shapeOptions: {
-            color: '#3388ff'
-          }
+        drawOptions.draw = {
+          marker: false,
+          polyline: false,
+          polygon: false,
+          rectangle: false,
+          circle: {
+            shapeOptions: {
+              color: '#3388ff'
+            }
+          },
+          circlemarker: false
         };
         break;
       default:
