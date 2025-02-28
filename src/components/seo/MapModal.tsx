@@ -4,8 +4,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Download, MapPin, Square, Pencil, Circle } from "lucide-react";
-import { Form, FormField, FormItem, FormControl } from "@/components/ui/form";
+import { Search, Download, MapPin, Square, Pencil, Circle, Type } from "lucide-react";
+import { Form, FormField, FormItem, FormControl, FormLabel } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
@@ -64,6 +64,7 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
     polylines: [],
     circles: []
   });
+  const [legendText, setLegendText] = useState<string>("");
   const drawnItemsLayerRef = useRef<L.FeatureGroup | null>(null);
 
   // Initialisation du formulaire
@@ -73,6 +74,13 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
       searchQuery: "",
     },
   });
+
+  // Gérer le changement de texte de la légende
+  const handleLegendChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setLegendText(e.target.value);
+    // Mettre à jour le code iframe lorsque la légende change
+    setTimeout(generateIframeCode, 100);
+  };
 
   // Fonction de recherche de lieu via l'API Nominatim d'OpenStreetMap
   const searchLocation = async (searchQuery: string) => {
@@ -232,7 +240,7 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
     const iframeHeight = 400;
     const zoom = 13;
     
-    // Base iframe code with marker for location
+    // Code de base avec le marqueur pour l'emplacement
     let code = `<!DOCTYPE html>
 <html>
 <head>
@@ -244,10 +252,25 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
   <style>
     body { margin: 0; padding: 0; }
     #map { width: ${iframeWidth}px; height: ${iframeHeight}px; }
+    .map-legend {
+      position: absolute;
+      bottom: 30px;
+      left: 10px;
+      z-index: 1000;
+      background-color: white;
+      padding: 8px 15px;
+      border-radius: 5px;
+      max-width: 70%;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+    }
   </style>
 </head>
 <body>
   <div id="map"></div>
+  ${legendText ? `<div class="map-legend">${legendText}</div>` : ''}
   <script>
     // Initialiser la carte
     const map = L.map('map').setView([${location.lat}, ${location.lng}], ${zoom});
@@ -640,6 +663,26 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-700"></div>
             </div>
           )}
+        </div>
+        
+        {/* Champ pour la légende */}
+        <div className="mt-4">
+          <FormItem>
+            <FormLabel>
+              <div className="flex items-center gap-2">
+                <Type className="h-4 w-4" />
+                Légende de la carte
+              </div>
+            </FormLabel>
+            <FormControl>
+              <Textarea
+                placeholder="Ajoutez une légende descriptive (ex: randonnée en Savoie, meilleurs restaurants au Vietnam...)"
+                value={legendText}
+                onChange={handleLegendChange}
+                className="h-20"
+              />
+            </FormControl>
+          </FormItem>
         </div>
         
         <div className="mt-4 space-y-4">
