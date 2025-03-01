@@ -1,11 +1,11 @@
 
 import React from 'react';
-import NewProjectButton from '../seo/buttons/NewProjectButton';
-import RankingButton from '../seo/buttons/RankingButton';
-import HealthButton from '../seo/buttons/HealthButton';
-import AlertsButton from '../seo/buttons/AlertsButton';
-import DailyUpdatesButton from '../seo/buttons/DailyUpdatesButton';
-import OrganizeButton from '../seo/buttons/OrganizeButton';
+import { NewProjectButton } from '../seo/buttons/NewProjectButton';
+import { RankingButton } from '../seo/buttons/RankingButton';
+import { HealthButton } from '../seo/buttons/HealthButton';
+import { AlertsButton } from '../seo/buttons/AlertsButton';
+import { DailyUpdatesButton } from '../seo/buttons/DailyUpdatesButton';
+import { OrganizeButton } from '../seo/buttons/OrganizeButton';
 import MapButton from '../seo/buttons/MapButton';
 import { Card } from '@/components/ui/card';
 
