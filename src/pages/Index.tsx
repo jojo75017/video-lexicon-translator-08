@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { Card } from "@/components/ui/card";
 import { useSiteAnalyzer } from '@/hooks/useSiteAnalyzer';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import FeatureGrid from '@/components/dashboard/FeatureGrid';
