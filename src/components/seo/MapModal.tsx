@@ -66,14 +66,7 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
   });
   const [legendText, setLegendText] = useState<string>("");
   const drawnItemsLayerRef = useRef<L.FeatureGroup | null>(null);
-
-  // Initialisation du formulaire
-  const form = useForm<SearchFormValues>({
-    resolver: zodResolver(searchFormSchema),
-    defaultValues: {
-      searchQuery: "",
-    },
-  });
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   // Gérer le changement de texte de la légende
   const handleLegendChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -82,8 +75,22 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
     setTimeout(generateIframeCode, 100);
   };
 
+  // Gérer le changement de la recherche
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
   // Fonction de recherche de lieu via l'API Nominatim d'OpenStreetMap
-  const searchLocation = async (searchQuery: string) => {
+  const searchLocation = async () => {
+    if (!searchQuery || searchQuery.length < 2) {
+      toast({
+        title: "Requête trop courte",
+        description: "Veuillez entrer au moins 2 caractères",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}`);
       const data = await response.json();
@@ -378,11 +385,6 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
     });
   };
 
-  // Soumettre le formulaire de recherche
-  const onSubmit = (values: SearchFormValues) => {
-    searchLocation(values.searchQuery);
-  };
-
   // Créer et initialiser la carte seulement quand le modal est ouvert
   useEffect(() => {
     // Ne rien faire si le modal n'est pas ouvert
@@ -595,30 +597,19 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
           </DialogDescription>
         </DialogHeader>
         
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mb-4">
-            <div className="flex gap-2">
-              <FormField
-                control={form.control}
-                name="searchQuery"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormControl>
-                      <Input 
-                        placeholder="Entrez une ville, un pays ou une adresse..." 
-                        {...field} 
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <Button type="submit">
-                <Search className="h-4 w-4 mr-2" />
-                Rechercher
-              </Button>
-            </div>
-          </form>
-        </Form>
+        <div className="space-y-4 mb-4">
+          <div className="flex gap-2">
+            <Input 
+              placeholder="Entrez une ville, un pays ou une adresse..." 
+              value={searchQuery}
+              onChange={handleSearchChange}
+            />
+            <Button onClick={searchLocation}>
+              <Search className="h-4 w-4 mr-2" />
+              Rechercher
+            </Button>
+          </div>
+        </div>
         
         {/* Outils de dessin */}
         <div className="flex gap-2 mb-4">
