@@ -1,46 +1,28 @@
 
-import React, { useState } from 'react';
-import { NewProjectButton } from '../seo/buttons/NewProjectButton';
-import { RankingButton } from '../seo/buttons/RankingButton';
-import { DailyUpdatesButton } from '../seo/buttons/DailyUpdatesButton';
-import { AlertsButton } from '../seo/buttons/AlertsButton';
-import { HealthButton } from '../seo/buttons/HealthButton';
-import { OrganizeButton } from '../seo/buttons/OrganizeButton';
-import { MapButton } from '../seo/buttons/MapButton';
-import MapModal from '../seo/MapModal';
+import React from 'react';
+import NewProjectButton from '../seo/buttons/NewProjectButton';
+import RankingButton from '../seo/buttons/RankingButton';
+import HealthButton from '../seo/buttons/HealthButton';
+import AlertsButton from '../seo/buttons/AlertsButton';
+import DailyUpdatesButton from '../seo/buttons/DailyUpdatesButton';
+import OrganizeButton from '../seo/buttons/OrganizeButton';
+import MapButton from '../seo/buttons/MapButton';
+import { Card } from '@/components/ui/card';
 
 const SeoActionButtons = () => {
-  const [showMap, setShowMap] = useState(false);
-
-  const handleOpenMap = () => {
-    console.log("Opening map modal");
-    setShowMap(true);
-  };
-
-  const handleCloseMap = () => {
-    console.log("Closing map modal");
-    setShowMap(false);
-  };
-
   return (
-    <>
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-7 gap-4 mb-8">
+    <Card className="p-8 shadow-xl bg-white border-0 mb-8">
+      <h2 className="text-2xl font-bold text-purple-800 mb-6">Outils SEO essentiels</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         <NewProjectButton />
         <RankingButton />
-        <DailyUpdatesButton />
-        <AlertsButton />
         <HealthButton />
+        <MapButton />
+        <AlertsButton />
+        <DailyUpdatesButton />
         <OrganizeButton />
-        <MapButton onClick={handleOpenMap} />
       </div>
-
-      {/* Rendu conditionnel du composant MapModal */}
-      <MapModal 
-        isOpen={showMap}
-        onClose={handleCloseMap}
-        title="Créer une carte interactive"
-      />
-    </>
+    </Card>
   );
 };
 

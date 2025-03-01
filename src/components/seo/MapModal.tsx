@@ -1,68 +1,60 @@
 
-import React, { useEffect, useRef, useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
-import { Input } from "@/components/ui/input";
+import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Search, Download, MapPin, Square, Pencil, Circle, Type } from "lucide-react";
-import { Form, FormField, FormItem, FormControl, FormLabel } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Separator } from "@/components/ui/separator";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useToast } from "@/components/ui/use-toast";
+import { Copy, Search, Map, Circle, Square, Minus, Edit3 } from "lucide-react";
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
 import L from 'leaflet';
 import 'leaflet-draw';
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
 
-interface MapModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  title?: string;
-}
-
-// Fix Leaflet icon issue
-delete (L.Icon.Default.prototype as any)._getIconUrl;
+// Solve Leaflet's icon issue
+// @ts-ignore - nécessaire car les ressources statiques ne sont pas typées
+delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-// Schéma pour la validation du formulaire
-const searchFormSchema = z.object({
-  searchQuery: z.string().min(2, "Entrez au moins 2 caractères")
-});
-
-type SearchFormValues = z.infer<typeof searchFormSchema>;
-
-// Types pour les éléments dessinés
-interface DrawnItems {
-  markers: L.Marker[];
-  polygons: L.Polygon[];
-  polylines: L.Polyline[];
-  circles: L.Circle[];
+// Types
+interface MapModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: MapModalProps) => {
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const mapInstance = useRef<L.Map | null>(null);
-  const drawControlRef = useRef<L.Control.Draw | null>(null);
-  const [marker, setMarker] = useState<L.Marker | null>(null);
+const ZOOM_LEVEL = 13;
+const DEFAULT_CENTER: [number, number] = [48.866667, 2.333333]; // Paris
+
+const MapModal = ({ open, onOpenChange }: MapModalProps) => {
   const { toast } = useToast();
-  const [isMapInitialized, setIsMapInitialized] = useState(false);
-  const [location, setLocation] = useState<{ lat: number; lng: number; name: string }>({
-    lat: 48.8566,
-    lng: 2.3522,
-    name: "Paris"
-  });
+  const mapRef = useRef<L.Map | null>(null);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const [mapInitialized, setMapInitialized] = useState(false);
   const [iframeCode, setIframeCode] = useState<string>("");
-  const [activeDrawTool, setActiveDrawTool] = useState<string | null>(null);
-  const [drawnItems, setDrawnItems] = useState<DrawnItems>({
-    markers: [],
-    polygons: [],
-    polylines: [],
-    circles: []
+  const [mapSettings, setMapSettings] = useState({
+    mapType: "streets",
+    zoom: ZOOM_LEVEL,
+    width: "100%",
+    height: "400px",
   });
   const [legendText, setLegendText] = useState<string>("");
   const drawnItemsLayerRef = useRef<L.FeatureGroup | null>(null);
@@ -71,7 +63,7 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
   // Gérer le changement de texte de la légende
   const handleLegendChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setLegendText(e.target.value);
-    // Mettre à jour le code iframe lorsque la légende change
+    // Générer le code après un court délai
     setTimeout(generateIframeCode, 100);
   };
 
@@ -94,506 +86,371 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
     try {
       const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}`);
       const data = await response.json();
-      
+
       if (data && data.length > 0) {
-        const result = data[0];
-        const newLocation = {
-          lat: parseFloat(result.lat),
-          lng: parseFloat(result.lon),
-          name: result.display_name
-        };
-        
-        setLocation(newLocation);
-        
-        // Mettre à jour la carte
-        if (mapInstance.current) {
-          mapInstance.current.setView([newLocation.lat, newLocation.lng], 13);
+        // Prendre le premier résultat
+        const location = data[0];
+        const lat = parseFloat(location.lat);
+        const lon = parseFloat(location.lon);
+
+        if (mapRef.current) {
+          mapRef.current.setView([lat, lon], ZOOM_LEVEL);
           
-          // Mettre à jour le marqueur
-          if (marker) {
-            marker.setLatLng([newLocation.lat, newLocation.lng]);
-            marker.bindPopup(newLocation.name).openPopup();
-          } else {
-            const newMarker = L.marker([newLocation.lat, newLocation.lng]).addTo(mapInstance.current);
-            newMarker.bindPopup(newLocation.name).openPopup();
-            setMarker(newMarker);
-          }
+          // Ajouter un marqueur à l'emplacement trouvé
+          L.marker([lat, lon])
+            .addTo(mapRef.current)
+            .bindPopup(`<b>${location.display_name}</b>`)
+            .openPopup();
+
+          // Mettre à jour le code iframe après avoir ajouté le marqueur
+          setTimeout(generateIframeCode, 100);
+          
+          toast({
+            title: "Emplacement trouvé",
+            description: location.display_name,
+          });
         }
-        
-        // Générer le code iframe pour ce lieu
-        generateIframeCode();
-        
-        toast({
-          title: "Lieu trouvé",
-          description: `Carte centrée sur ${newLocation.name}`,
-        });
       } else {
         toast({
           title: "Aucun résultat",
-          description: "Aucun lieu trouvé pour cette recherche",
+          description: "Aucun emplacement trouvé pour cette recherche",
           variant: "destructive",
         });
       }
     } catch (error) {
       console.error("Erreur lors de la recherche:", error);
       toast({
-        title: "Erreur",
-        description: "Impossible de rechercher ce lieu. Veuillez réessayer.",
+        title: "Erreur de recherche",
+        description: "Impossible de rechercher cet emplacement",
         variant: "destructive",
       });
     }
   };
 
-  // Activer un outil de dessin
-  const enableDrawTool = (tool: string) => {
-    if (!mapInstance.current || !drawnItemsLayerRef.current) return;
+  // Changer le fond de carte
+  const changeMapType = (type: string) => {
+    if (!mapRef.current) return;
     
-    // Désactiver l'outil actif
-    if (drawControlRef.current) {
-      mapInstance.current.removeControl(drawControlRef.current);
+    // Supprimer les couches de tuiles existantes
+    mapRef.current.eachLayer((layer) => {
+      if (layer instanceof L.TileLayer) {
+        mapRef.current?.removeLayer(layer);
+      }
+    });
+    
+    // Ajouter la nouvelle couche de tuiles
+    if (type === "streets") {
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(mapRef.current);
+    } else if (type === "satellite") {
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+      }).addTo(mapRef.current);
+    } else if (type === "terrain") {
+      L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.png', {
+        attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(mapRef.current);
+    } else if (type === "dark") {
+      L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
+      }).addTo(mapRef.current);
     }
 
-    // Options de base pour tous les outils
-    const drawOptions: L.Control.DrawConstructorOptions = {
-      edit: {
-        featureGroup: drawnItemsLayerRef.current,
-        remove: true
-      },
-      draw: {} // Initialiser avec un objet vide
-    };
-
-    // Activer l'outil sélectionné
-    switch (tool) {
-      case 'marker':
-        drawOptions.draw = {
-          marker: {},
-          polyline: false,
-          polygon: false,
-          rectangle: false,
-          circle: false,
-          circlemarker: false
-        };
-        break;
-      case 'polygon':
-        drawOptions.draw = {
-          marker: false,
-          polyline: false,
-          polygon: {
-            allowIntersection: false,
-            showArea: true
-          },
-          rectangle: false,
-          circle: false,
-          circlemarker: false
-        };
-        break;
-      case 'polyline':
-        drawOptions.draw = {
-          marker: false,
-          polyline: {
-            shapeOptions: {
-              color: '#3388ff',
-              weight: 4
-            }
-          },
-          polygon: false,
-          rectangle: false,
-          circle: false,
-          circlemarker: false
-        };
-        break;
-      case 'circle':
-        drawOptions.draw = {
-          marker: false,
-          polyline: false,
-          polygon: false,
-          rectangle: false,
-          circle: {
-            shapeOptions: {
-              color: '#3388ff'
-            }
-          },
-          circlemarker: false
-        };
-        break;
-      default:
-        break;
-    }
-
-    // Créer et ajouter le contrôle de dessin
-    const drawControl = new L.Control.Draw(drawOptions);
-    mapInstance.current.addControl(drawControl);
-    drawControlRef.current = drawControl;
-    setActiveDrawTool(tool);
-    
-    toast({
-      title: "Outil activé",
-      description: `Outil de dessin "${tool}" activé. Cliquez sur la carte pour dessiner.`,
-    });
-  };
-
-  // Désactiver tous les outils de dessin
-  const disableDrawTools = () => {
-    if (!mapInstance.current || !drawControlRef.current) return;
-    
-    mapInstance.current.removeControl(drawControlRef.current);
-    drawControlRef.current = null;
-    setActiveDrawTool(null);
-  };
-
-  // Effacer tous les éléments dessinés
-  const clearDrawnItems = () => {
-    if (!drawnItemsLayerRef.current) return;
-
-    drawnItemsLayerRef.current.clearLayers();
-    setDrawnItems({
-      markers: [],
-      polygons: [],
-      polylines: [],
-      circles: []
+    // Mettre à jour les paramètres de la carte
+    setMapSettings({
+      ...mapSettings,
+      mapType: type
     });
     
-    toast({
-      title: "Éléments effacés",
-      description: "Tous les éléments dessinés ont été supprimés.",
-    });
-    
-    // Mettre à jour l'iframe
-    generateIframeCode();
+    // Régénérer le code iframe après un court délai
+    setTimeout(generateIframeCode, 100);
   };
 
-  // Générer le code iframe pour le lieu actuel et les éléments dessinés
+  // Fonction pour générer le code iframe pour intégrer la carte
   const generateIframeCode = () => {
-    const iframeWidth = 600;
-    const iframeHeight = 400;
-    const zoom = 13;
+    if (!mapRef.current || !drawnItemsLayerRef.current) return;
     
-    // Code de base avec le marqueur pour l'emplacement
-    let code = `<!DOCTYPE html>
+    try {
+      // Obtenir les limites actuelles de la carte
+      const bounds = mapRef.current.getBounds();
+      const center = mapRef.current.getCenter();
+      const zoom = mapRef.current.getZoom();
+      
+      // Préparer les données GeoJSON pour les éléments dessinés
+      const drawnItems = drawnItemsLayerRef.current.toGeoJSON();
+      const drawnItemsJson = JSON.stringify(drawnItems);
+
+      // Créer le contenu HTML de l'iframe
+      let iframeContent = `
+<!DOCTYPE html>
 <html>
 <head>
+  <meta charset="utf-8">
   <title>Carte interactive</title>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
   <style>
-    body { margin: 0; padding: 0; }
-    #map { width: ${iframeWidth}px; height: ${iframeHeight}px; }
-    .map-legend {
-      position: absolute;
-      bottom: 30px;
-      left: 10px;
-      z-index: 1000;
-      background-color: white;
-      padding: 8px 15px;
+    body, html, #map {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    .legend {
+      padding: 10px;
+      background: white;
       border-radius: 5px;
-      max-width: 70%;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
-      font-family: Arial, sans-serif;
-      font-size: 14px;
-      line-height: 1.5;
+      max-width: 300px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
     }
   </style>
 </head>
 <body>
   <div id="map"></div>
-  ${legendText ? `<div class="map-legend">${legendText}</div>` : ''}
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
   <script>
     // Initialiser la carte
-    const map = L.map('map').setView([${location.lat}, ${location.lng}], ${zoom});
+    var map = L.map('map').setView([${center.lat}, ${center.lng}], ${zoom});
     
-    // Ajouter les tuiles OpenStreetMap
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    // Ajouter le fond de carte
+    ${getMapLayerCode(mapSettings.mapType)}
+    
+    // Ajouter les éléments dessinés
+    var drawnItems = ${drawnItemsJson};
+    L.geoJSON(drawnItems, {
+      style: function(feature) {
+        return {
+          color: feature.properties.color || '#3388ff',
+          weight: feature.properties.weight || 3,
+          opacity: feature.properties.opacity || 0.5,
+          fillOpacity: feature.properties.fillOpacity || 0.2
+        };
+      },
+      pointToLayer: function(feature, latlng) {
+        return L.marker(latlng);
+      }
     }).addTo(map);
     
-    // Ajouter le marqueur principal
-    L.marker([${location.lat}, ${location.lng}])
-      .addTo(map)
-      .bindPopup("${location.name}")
-      .openPopup();
-`;
-
-    // Ajouter du code pour les éléments dessinés
-    if (drawnItemsLayerRef.current) {
-      // Ajouter les marqueurs additionnels
-      drawnItems.markers.forEach((marker, i) => {
-        const latlng = marker.getLatLng();
-        code += `
-    // Marqueur additionnel ${i + 1}
-    L.marker([${latlng.lat}, ${latlng.lng}]).addTo(map);`;
-      });
-
-      // Ajouter les polygones
-      drawnItems.polygons.forEach((polygon, i) => {
-        const coordinates = polygon.getLatLngs()[0];
-        if (Array.isArray(coordinates)) {
-          const points = (coordinates as L.LatLng[]).map(latlng => `[${latlng.lat}, ${latlng.lng}]`).join(', ');
-          code += `
-    // Polygone ${i + 1}
-    L.polygon([${points}], {color: '${polygon.options.color || 'blue'}'}).addTo(map);`;
-        }
-      });
-
-      // Ajouter les polylines
-      drawnItems.polylines.forEach((polyline, i) => {
-        const coordinates = polyline.getLatLngs();
-        const points = (coordinates as L.LatLng[]).map(latlng => `[${latlng.lat}, ${latlng.lng}]`).join(', ');
-        code += `
-    // Ligne ${i + 1}
-    L.polyline([${points}], {color: '${polyline.options.color || 'blue'}'}).addTo(map);`;
-      });
-
-      // Ajouter les cercles
-      drawnItems.circles.forEach((circle, i) => {
-        const center = circle.getLatLng();
-        const radius = circle.getRadius();
-        code += `
-    // Cercle ${i + 1}
-    L.circle([${center.lat}, ${center.lng}], {
-      radius: ${radius},
-      color: '${circle.options.color || 'blue'}'
-    }).addTo(map);`;
-      });
-    }
-
-    // Fermer le script et le HTML
-    code += `
+    ${legendText ? `
+    // Ajouter la légende
+    var legend = L.control({position: 'bottomright'});
+    legend.onAdd = function(map) {
+      var div = L.DomUtil.create('div', 'legend');
+      div.innerHTML = \`${legendText.replace(/`/g, '\\`')}\`;
+      return div;
+    };
+    legend.addTo(map);
+    ` : ''}
   </script>
 </body>
-</html>`;
-
-    setIframeCode(code);
-    return code;
+</html>
+      `;
+      
+      // Coder le contenu en base64 pour l'iframe
+      const encodedContent = btoa(iframeContent);
+      
+      // Créer le code iframe
+      const iframeCodeStr = `<iframe src="data:text/html;base64,${encodedContent}" width="${mapSettings.width}" height="${mapSettings.height}" style="border:none;"></iframe>`;
+      
+      setIframeCode(iframeCodeStr);
+    } catch (error) {
+      console.error("Erreur lors de la génération du code iframe:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de générer le code d'intégration",
+        variant: "destructive",
+      });
+    }
   };
 
-  // Télécharger le code iframe
-  const downloadIframeCode = () => {
-    const element = document.createElement('a');
-    const file = new Blob([iframeCode], {type: 'text/html'});
-    element.href = URL.createObjectURL(file);
-    element.download = `carte_${location.name.substring(0, 20).replace(/\W+/g, '_')}.html`;
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
+  // Fonction pour obtenir le code JavaScript du fond de carte
+  const getMapLayerCode = (mapType: string) => {
+    switch (mapType) {
+      case "streets":
+        return `L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);`;
+      case "satellite":
+        return `L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+          attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+        }).addTo(map);`;
+      case "terrain":
+        return `L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.png', {
+          attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);`;
+      case "dark":
+        return `L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}{r}.png', {
+          attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
+        }).addTo(map);`;
+      default:
+        return `L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);`;
+    }
+  };
+
+  // Activer l'outil de dessin sur la carte
+  const enableDrawTool = (drawType: string) => {
+    if (!mapRef.current || !drawnItemsLayerRef.current) return;
+    
+    // Supprimer tout contrôle de dessin existant
+    mapRef.current.eachLayer((layer) => {
+      if (layer instanceof L.Control) {
+        mapRef.current?.removeControl(layer);
+      }
+    });
+    
+    // Options de l'outil de dessin
+    const drawOptions: L.Control.DrawConstructorOptions = {
+      draw: {
+        polyline: false,
+        polygon: false,
+        circle: false,
+        rectangle: false,
+        marker: false,
+        circlemarker: false,
+      },
+      edit: {
+        featureGroup: drawnItemsLayerRef.current,
+      }
+    };
+    
+    // Activer l'outil spécifique
+    switch (drawType) {
+      case "marker":
+        drawOptions.draw.marker = true;
+        break;
+      case "polyline":
+        drawOptions.draw.polyline = true;
+        break;
+      case "polygon":
+        drawOptions.draw.polygon = true;
+        break;
+      case "rectangle":
+        drawOptions.draw.rectangle = true;
+        break;
+      case "circle":
+        drawOptions.draw.circle = true;
+        break;
+    }
+    
+    // Créer et ajouter le contrôle de dessin
+    const drawControl = new L.Control.Draw(drawOptions);
+    mapRef.current.addControl(drawControl);
     
     toast({
-      title: "Téléchargement réussi",
-      description: "Le code HTML de la carte a été téléchargé avec succès",
+      title: "Outil de dessin activé",
+      description: `Vous pouvez maintenant dessiner un ${drawType} sur la carte`,
     });
   };
 
   // Créer et initialiser la carte seulement quand le modal est ouvert
   useEffect(() => {
     // Ne rien faire si le modal n'est pas ouvert
-    if (!isOpen) return;
+    if (!open || !mapContainerRef.current) return;
+
+    console.log("Initialisation de la carte");
     
-    // Fonction d'initialisation de la carte
-    const initializeMap = () => {
+    // Vérifier si la carte est déjà initialisée
+    if (!mapInitialized && !mapRef.current) {
       try {
-        console.log("Tentative d'initialisation de la carte");
+        // Créer la carte
+        const map = L.map(mapContainerRef.current).setView(DEFAULT_CENTER, ZOOM_LEVEL);
+        mapRef.current = map;
         
-        // Nettoyer la carte existante si elle existe
-        if (mapInstance.current) {
-          console.log("Suppression de la carte existante");
-          mapInstance.current.remove();
-          mapInstance.current = null;
-          setMarker(null);
-        }
+        // Ajouter le fond de carte par défaut
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
         
-        // Vérifier si le conteneur de la carte existe
-        if (!mapContainer.current) {
-          console.error("Le conteneur de carte est null");
-          return;
-        }
+        // Créer une couche pour les éléments dessinés
+        const drawnItems = new L.FeatureGroup();
+        map.addLayer(drawnItems);
+        drawnItemsLayerRef.current = drawnItems;
         
-        // Assurez-vous que le DOM est complètement chargé
-        setTimeout(() => {
-          if (!mapContainer.current) return;
+        // Ajouter les gestionnaires d'événements pour le dessin
+        map.on(L.Draw.Event.CREATED, (event: any) => {
+          const layer = event.layer;
+          drawnItems.addLayer(layer);
           
-          console.log("Création de la carte", mapContainer.current.clientWidth, mapContainer.current.clientHeight);
-          
-          // Créer une nouvelle instance de carte
-          const map = L.map(mapContainer.current, {
-            center: [location.lat, location.lng],
-            zoom: 13,
-            scrollWheelZoom: true,
-          });
-          
-          // Ajouter les tuiles OpenStreetMap
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap contributors'
-          }).addTo(map);
-          
-          // Initialiser le groupe de features pour les éléments dessinés
-          const drawnItemsLayer = new L.FeatureGroup();
-          map.addLayer(drawnItemsLayer);
-          drawnItemsLayerRef.current = drawnItemsLayer;
-          
-          // Écouter les événements de dessin
-          map.on(L.Draw.Event.CREATED, (event: any) => {
-            const { layerType, layer } = event;
-            
-            // Ajouter la couche au groupe de features
-            drawnItemsLayer.addLayer(layer);
-            
-            // Mettre à jour l'état des éléments dessinés
-            setDrawnItems(prev => {
-              const newItems = { ...prev };
-              
-              switch (layerType) {
-                case 'marker':
-                  newItems.markers = [...prev.markers, layer as L.Marker];
-                  break;
-                case 'polygon':
-                  newItems.polygons = [...prev.polygons, layer as L.Polygon];
-                  break;
-                case 'polyline':
-                  newItems.polylines = [...prev.polylines, layer as L.Polyline];
-                  break;
-                case 'circle':
-                  newItems.circles = [...prev.circles, layer as L.Circle];
-                  break;
-                default:
-                  break;
-              }
-              
-              return newItems;
-            });
-            
-            // Mettre à jour l'iframe
-            setTimeout(generateIframeCode, 100);
-            
-            toast({
-              title: "Élément ajouté",
-              description: `Un ${layerType} a été ajouté à la carte.`,
-            });
-          });
-          
-          // Écouter les événements d'édition
-          map.on(L.Draw.Event.EDITED, () => {
-            toast({
-              title: "Édition terminée",
-              description: "Les éléments ont été modifiés.",
-            });
-            
-            // Mettre à jour l'iframe
-            setTimeout(generateIframeCode, 100);
-          });
-          
-          // Écouter les événements de suppression
-          map.on(L.Draw.Event.DELETED, (event: any) => {
-            const layers = event.layers;
-            
-            // Mettre à jour l'état des éléments dessinés
-            layers.eachLayer((layer: any) => {
-              setDrawnItems(prev => {
-                const newItems = { ...prev };
-                
-                if (layer instanceof L.Marker) {
-                  newItems.markers = prev.markers.filter(m => m !== layer);
-                } else if (layer instanceof L.Polygon) {
-                  newItems.polygons = prev.polygons.filter(p => p !== layer);
-                } else if (layer instanceof L.Polyline) {
-                  newItems.polylines = prev.polylines.filter(p => p !== layer);
-                } else if (layer instanceof L.Circle) {
-                  newItems.circles = prev.circles.filter(c => c !== layer);
-                }
-                
-                return newItems;
-              });
-            });
-            
-            toast({
-              title: "Éléments supprimés",
-              description: "Les éléments sélectionnés ont été supprimés.",
-            });
-            
-            // Mettre à jour l'iframe
-            setTimeout(generateIframeCode, 100);
-          });
-          
-          // Ajouter un marqueur
-          const newMarker = L.marker([location.lat, location.lng]).addTo(map)
-            .bindPopup(location.name)
-            .openPopup();
-          
-          // Stocker le marqueur et l'instance de carte pour le nettoyage
-          setMarker(newMarker);
-          mapInstance.current = map;
-          
-          // Forcer une mise à jour de la taille de la carte
-          map.invalidateSize(true);
-          
-          // Générer le code iframe initial
-          generateIframeCode();
-          
-          console.log("Carte initialisée avec succès");
-          setIsMapInitialized(true);
-        }, 300);
+          // Générer le code iframe après l'ajout d'un élément
+          setTimeout(generateIframeCode, 100);
+        });
+        
+        map.on(L.Draw.Event.EDITED, () => {
+          // Régénérer le code iframe après l'édition
+          setTimeout(generateIframeCode, 100);
+        });
+        
+        map.on(L.Draw.Event.DELETED, () => {
+          // Régénérer le code iframe après la suppression
+          setTimeout(generateIframeCode, 100);
+        });
+        
+        // Générer le code iframe initial
+        setTimeout(generateIframeCode, 500);
+        
+        setMapInitialized(true);
+        console.log("Carte initialisée avec succès");
       } catch (error) {
-        console.error("Erreur d'initialisation de la carte:", error);
+        console.error("Erreur lors de l'initialisation de la carte:", error);
         toast({
-          title: "Erreur",
-          description: "Impossible de charger la carte. Veuillez réessayer.",
+          title: "Erreur d'initialisation",
+          description: "Impossible d'initialiser la carte",
           variant: "destructive",
         });
       }
-    };
-
-    // Initialiser la carte après un court délai pour s'assurer que le DOM est prêt
-    const timer = setTimeout(initializeMap, 300);
+    }
     
-    // Nettoyer lors du démontage
+    // Nettoyage lors de la fermeture du modal
     return () => {
-      clearTimeout(timer);
-      if (mapInstance.current) {
+      if (mapRef.current && open) {
         console.log("Nettoyage de la carte");
-        mapInstance.current.remove();
-        mapInstance.current = null;
-        setMarker(null);
-        setIsMapInitialized(false);
-        setDrawnItems({
-          markers: [],
-          polygons: [],
-          polylines: [],
-          circles: []
-        });
+        mapRef.current.remove();
+        mapRef.current = null;
+        setMapInitialized(false);
+        drawnItemsLayerRef.current = null;
       }
     };
-  }, [isOpen, location.lat, location.lng]);
+  }, [open, mapInitialized]);
 
-  // Pour gérer le redimensionnement du DOM quand le modal est ouvert
-  useEffect(() => {
-    if (isOpen && mapInstance.current) {
-      const resizeMap = () => {
-        if (mapInstance.current) {
-          console.log("Mise à jour de la taille de la carte");
-          mapInstance.current.invalidateSize(true);
-        }
-      };
-      
-      // Utilisé pour redimensionner la carte après l'animation d'ouverture du modal
-      window.addEventListener('resize', resizeMap);
-      const timer = setTimeout(resizeMap, 500);
-      
-      return () => {
-        window.removeEventListener('resize', resizeMap);
-        clearTimeout(timer);
-      };
+  // Copier le code iframe dans le presse-papier
+  const copyIframeCode = () => {
+    if (!iframeCode) {
+      toast({
+        title: "Aucun code à copier",
+        description: "Veuillez d'abord générer un code d'intégration",
+        variant: "destructive",
+      });
+      return;
     }
-  }, [isOpen]);
+    
+    navigator.clipboard.writeText(iframeCode)
+      .then(() => {
+        toast({
+          title: "Code copié",
+          description: "Le code d'intégration a été copié dans le presse-papier",
+        });
+      })
+      .catch((error) => {
+        console.error("Erreur lors de la copie:", error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de copier le code",
+          variant: "destructive",
+        });
+      });
+  };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-4xl">
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>
-            Recherchez un lieu, ajoutez des marqueurs, dessinez des zones et créez une carte interactive à intégrer sur votre site.
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="w-full max-w-6xl h-[90vh] flex flex-col">
+        <DialogHeader className="mb-4">
+          <DialogTitle className="text-2xl font-bold text-purple-800">
+            Créer une carte interactive
+          </DialogTitle>
+          <DialogDescription className="text-gray-600">
+            Personnalisez votre carte et obtenez le code d'intégration pour votre site web
           </DialogDescription>
         </DialogHeader>
         
@@ -614,103 +471,116 @@ const MapModal = ({ isOpen, onClose, title = "Créer une carte interactive" }: M
         {/* Outils de dessin */}
         <div className="flex gap-2 mb-4">
           <Button 
-            onClick={() => enableDrawTool('marker')}
-            variant={activeDrawTool === 'marker' ? 'default' : 'outline'}
-            size="sm"
+            variant="outline" 
+            onClick={() => enableDrawTool("marker")}
+            className="flex-1"
           >
-            <MapPin className="h-4 w-4 mr-2" />
+            <Map className="h-4 w-4 mr-2" />
             Marqueur
           </Button>
           <Button 
-            onClick={() => enableDrawTool('polygon')}
-            variant={activeDrawTool === 'polygon' ? 'default' : 'outline'}
-            size="sm"
+            variant="outline" 
+            onClick={() => enableDrawTool("polyline")}
+            className="flex-1"
+          >
+            <Minus className="h-4 w-4 mr-2" />
+            Ligne
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={() => enableDrawTool("polygon")}
+            className="flex-1"
+          >
+            <Edit3 className="h-4 w-4 mr-2" />
+            Polygone
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={() => enableDrawTool("rectangle")}
+            className="flex-1"
           >
             <Square className="h-4 w-4 mr-2" />
-            Zone
+            Rectangle
           </Button>
           <Button 
-            onClick={() => enableDrawTool('polyline')}
-            variant={activeDrawTool === 'polyline' ? 'default' : 'outline'}
-            size="sm"
-          >
-            <Pencil className="h-4 w-4 mr-2" />
-            Chemin
-          </Button>
-          <Button 
-            onClick={() => enableDrawTool('circle')}
-            variant={activeDrawTool === 'circle' ? 'default' : 'outline'}
-            size="sm"
+            variant="outline" 
+            onClick={() => enableDrawTool("circle")}
+            className="flex-1"
           >
             <Circle className="h-4 w-4 mr-2" />
             Cercle
           </Button>
-          {activeDrawTool && (
-            <Button 
-              onClick={disableDrawTools}
-              variant="destructive"
-              size="sm"
-            >
-              Désactiver
-            </Button>
-          )}
-          <Button 
-            onClick={clearDrawnItems}
-            variant="secondary"
-            size="sm"
-            className="ml-auto"
-          >
-            Effacer tout
-          </Button>
         </div>
         
-        <div className="relative w-full h-[40vh] bg-gray-100 rounded-lg overflow-hidden">
-          <div 
-            ref={mapContainer} 
-            className="absolute inset-0 rounded-lg z-10" 
-            style={{ width: '100%', height: '100%' }}
-          />
-          {!isMapInitialized && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-70 z-20">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-700"></div>
-            </div>
-          )}
-        </div>
-        
-        {/* Champ pour la légende */}
-        <div className="mt-4">
-          <FormItem>
-            <FormLabel>
-              <div className="flex items-center gap-2">
-                <Type className="h-4 w-4" />
-                Légende de la carte
+        {/* Carte */}
+        <div className="flex flex-1 gap-4 overflow-hidden">
+          <div className="flex-1 overflow-hidden">
+            <div 
+              ref={mapContainerRef} 
+              className="w-full h-full rounded-md overflow-hidden border border-gray-200"
+            />
+          </div>
+          
+          <div className="w-1/3 overflow-auto">
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-sm font-medium mb-2">Type de carte</h3>
+                <Select 
+                  value={mapSettings.mapType} 
+                  onValueChange={(value) => changeMapType(value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sélectionnez un type de carte" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="streets">Rues</SelectItem>
+                    <SelectItem value="satellite">Satellite</SelectItem>
+                    <SelectItem value="terrain">Terrain</SelectItem>
+                    <SelectItem value="dark">Sombre</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-            </FormLabel>
-            <FormControl>
-              <Textarea
-                placeholder="Ajoutez une légende descriptive (ex: randonnée en Savoie, meilleurs restaurants au Vietnam...)"
-                value={legendText}
-                onChange={handleLegendChange}
-                className="h-20"
-              />
-            </FormControl>
-          </FormItem>
-        </div>
-        
-        <div className="mt-4 space-y-4">
-          <h3 className="text-lg font-medium">Code HTML pour intégration</h3>
-          <Textarea
-            value={iframeCode}
-            readOnly
-            className="font-mono text-sm h-24"
-          />
-          <div className="flex justify-end">
-            <Button onClick={downloadIframeCode} className="bg-blue-600 hover:bg-blue-700">
-              <Download className="h-4 w-4 mr-2" />
-              Télécharger le code
-            </Button>
+              
+              <div>
+                <h3 className="text-sm font-medium mb-2">Légende</h3>
+                <Textarea 
+                  placeholder="Ajoutez une légende pour votre carte..."
+                  value={legendText}
+                  onChange={handleLegendChange}
+                  className="h-32"
+                />
+              </div>
+              
+              <Separator />
+              
+              <div>
+                <h3 className="text-sm font-medium mb-2">Code d'intégration</h3>
+                <Textarea 
+                  value={iframeCode} 
+                  readOnly 
+                  className="h-32 font-mono text-xs"
+                />
+                <Button 
+                  variant="outline" 
+                  onClick={copyIframeCode}
+                  className="mt-2 w-full"
+                >
+                  <Copy className="h-4 w-4 mr-2" />
+                  Copier le code
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
+        
+        <DialogFooter className="mt-4">
+          <Button 
+            variant="outline" 
+            onClick={() => onOpenChange(false)}
+          >
+            Fermer
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
