@@ -32,9 +32,7 @@ const MapButton = () => {
         </div>
       </Button>
 
-      {isOpen && (
-        <MapModal open={isOpen} onOpenChange={setIsOpen} />
-      )}
+      <MapModal open={isOpen} onOpenChange={setIsOpen} />
     </>
   );
 };

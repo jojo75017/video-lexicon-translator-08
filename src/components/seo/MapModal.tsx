@@ -8,7 +8,6 @@ import { toast } from "sonner";
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css';
-import 'leaflet-draw';
 
 interface MapModalProps {
   open: boolean;
@@ -18,7 +17,6 @@ interface MapModalProps {
 const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const leafletMapRef = useRef<L.Map | null>(null);
-  const drawControlRef = useRef<L.Control.Draw | null>(null);
   const [address, setAddress] = useState('');
   const [iframeCode, setIframeCode] = useState('');
   const [showIframeCode, setShowIframeCode] = useState(false);
@@ -41,10 +39,11 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
       const drawnItems = new L.FeatureGroup();
       map.addLayer(drawnItems);
 
+      // @ts-ignore - Type definition issues with leaflet-draw
       const drawControl = new L.Control.Draw({
         draw: {
-          marker: {} as L.DrawOptions.MarkerOptions,
-          polyline: {} as L.DrawOptions.PolylineOptions,
+          marker: true,
+          polyline: true,
           polygon: {
             allowIntersection: false,
             drawError: {
@@ -54,17 +53,17 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
             shapeOptions: {
               color: '#97009c'
             }
-          } as L.DrawOptions.PolygonOptions,
+          },
           rectangle: {
             shapeOptions: {
               color: '#0000ff'
             }
-          } as L.DrawOptions.RectangleOptions,
+          },
           circle: {
             shapeOptions: {
               color: '#662d91'
             }
-          } as L.DrawOptions.CircleOptions
+          }
         },
         edit: {
           featureGroup: drawnItems
@@ -73,14 +72,14 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
 
       map.addControl(drawControl);
       
-      map.on(L.Draw.Event.CREATED, function (e: any) {
+      // @ts-ignore - Type definition issues with leaflet-draw
+      map.on(L.Draw.Event.CREATED, function (e) {
         const layer = e.layer;
         drawnItems.addLayer(layer);
         generateIframeCode(map.getCenter(), map.getZoom());
       });
 
       leafletMapRef.current = map;
-      drawControlRef.current = drawControl;
 
       // Generate initial iframe code
       generateIframeCode(map.getCenter(), map.getZoom());
@@ -94,7 +93,6 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
       if (leafletMapRef.current && !open) {
         leafletMapRef.current.remove();
         leafletMapRef.current = null;
-        drawControlRef.current = null;
       }
     };
   }, [open]);
