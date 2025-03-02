@@ -7,7 +7,6 @@ import { Search, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import 'leaflet-draw/dist/leaflet.draw.css';
 
 interface MapModalProps {
   open: boolean;
@@ -17,99 +16,54 @@ interface MapModalProps {
 const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const leafletMapRef = useRef<L.Map | null>(null);
+  const markersLayerRef = useRef<L.LayerGroup | null>(null);
   const [address, setAddress] = useState('');
   const [iframeCode, setIframeCode] = useState('');
   const [showIframeCode, setShowIframeCode] = useState(false);
 
-  // Initialize the map when the component is mounted and modal is open
+  // Initialiser la carte lorsque le composant est monté et que le modal est ouvert
   useEffect(() => {
     if (!open || !mapRef.current) return;
 
-    // Check if map is already initialized
+    // Vérifier si la carte est déjà initialisée
     if (!leafletMapRef.current) {
-      console.log("Initializing map");
+      console.log("Initialisation de la carte");
       try {
-        // Initialize map
+        // Initialiser la carte
         const map = L.map(mapRef.current).setView([48.8566, 2.3522], 13);
         
-        // Add tile layer
+        // Ajouter la couche de tuiles
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
-        // Initialize draw control
-        const drawnItems = new L.FeatureGroup();
-        map.addLayer(drawnItems);
+        // Créer une couche pour les marqueurs
+        const markersLayer = L.layerGroup().addTo(map);
+        markersLayerRef.current = markersLayer;
 
-        // @ts-ignore - Type definition issues with leaflet-draw
-        const drawControl = new L.Control.Draw({
-          draw: {
-            marker: {},
-            polyline: {},
-            polygon: {
-              allowIntersection: false,
-              drawError: {
-                color: '#e1e100',
-                message: "<strong>Erreur:</strong> Les polygones ne peuvent pas s'intersecter!"
-              },
-              shapeOptions: {
-                color: '#97009c'
-              }
-            },
-            rectangle: {
-              shapeOptions: {
-                color: '#0000ff'
-              }
-            },
-            circle: {
-              shapeOptions: {
-                color: '#662d91'
-              }
-            }
-          },
-          edit: {
-            featureGroup: drawnItems
-          }
-        });
-
-        map.addControl(drawControl);
+        // Ajouter un marqueur par défaut pour Paris
+        L.marker([48.8566, 2.3522]).addTo(markersLayer);
         
-        // @ts-ignore - Type definition issues with leaflet-draw
-        map.on(L.Draw.Event.CREATED, function (e) {
-          const layer = e.layer;
-          drawnItems.addLayer(layer);
-          
-          if (layer instanceof L.Marker) {
-            const center = layer.getLatLng();
-            generateIframeCode(center, map.getZoom());
-          } else {
-            generateIframeCode(map.getCenter(), map.getZoom());
-          }
-        });
-
-        leafletMapRef.current = map;
-
-        // Add a default marker for Paris
-        L.marker([48.8566, 2.3522]).addTo(map);
-        
-        // Generate initial iframe code
+        // Générer le code iframe initial
         generateIframeCode(map.getCenter(), map.getZoom());
         
-        // Force a map resize to ensure it's visible
+        leafletMapRef.current = map;
+        
+        // Forcer un redimensionnement de la carte pour s'assurer qu'elle est visible
         setTimeout(() => {
           map.invalidateSize();
         }, 100);
         
       } catch (error) {
-        console.error("Error initializing map:", error);
+        console.error("Erreur lors de l'initialisation de la carte:", error);
         toast.error("Erreur lors de l'initialisation de la carte");
       }
     } else {
-      // If map already exists, just invalidate size to handle container resizing
-      console.log("Map already exists, invalidating size");
+      // Si la carte existe déjà, invalidez simplement la taille pour gérer le redimensionnement du conteneur
+      console.log("La carte existe déjà, invalidation de la taille");
       leafletMapRef.current.invalidateSize();
       
-      // Force a map resize to ensure it's visible
+      // Forcer un redimensionnement de la carte pour s'assurer qu'elle est visible
       setTimeout(() => {
         if (leafletMapRef.current) {
           leafletMapRef.current.invalidateSize();
@@ -117,60 +71,71 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
       }, 100);
     }
 
-    // Cleanup function to run when component unmounts
+    // Fonction de nettoyage à exécuter lorsque le composant est démonté
     return () => {
-      console.log("Cleanup map");
-      if (leafletMapRef.current && !open) {
+      if (!open && leafletMapRef.current) {
         leafletMapRef.current.remove();
         leafletMapRef.current = null;
+        markersLayerRef.current = null;
       }
     };
   }, [open]);
 
   const searchAddress = async () => {
-    if (!address.trim() || !leafletMapRef.current) return;
+    if (!address.trim() || !leafletMapRef.current || !markersLayerRef.current) {
+      toast.error("Veuillez saisir une adresse valide");
+      return;
+    }
 
-    console.log("Searching for address:", address);
+    console.log("Recherche d'adresse:", address);
     toast.info(`Recherche de l'adresse: ${address}`);
     
     try {
       const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`);
+      
+      if (!response.ok) {
+        throw new Error(`Erreur réseau: ${response.status}`);
+      }
+      
       const data = await response.json();
-      console.log("Search results:", data);
+      console.log("Résultats de recherche:", data);
 
       if (data && data.length > 0) {
         const { lat, lon } = data[0];
         const latLng = L.latLng(parseFloat(lat), parseFloat(lon));
         
-        // Clear existing markers
-        leafletMapRef.current.eachLayer((layer) => {
-          if (layer instanceof L.Marker) {
-            leafletMapRef.current?.removeLayer(layer);
-          }
-        });
+        // Nettoyer tous les marqueurs existants
+        if (markersLayerRef.current) {
+          markersLayerRef.current.clearLayers();
+        }
         
-        // Add new marker
-        L.marker(latLng).addTo(leafletMapRef.current);
+        // Ajouter un nouveau marqueur
+        if (markersLayerRef.current) {
+          L.marker(latLng).addTo(markersLayerRef.current);
+        }
         
-        // Set view to the found location with animation
-        leafletMapRef.current.setView(latLng, 16, {
-          animate: true,
-          duration: 1
-        });
+        // Définir la vue sur l'emplacement trouvé avec animation
+        if (leafletMapRef.current) {
+          leafletMapRef.current.setView(latLng, 16, {
+            animate: true,
+            duration: 1
+          });
+          
+          generateIframeCode(latLng, 16);
+        }
         
-        generateIframeCode(latLng, 16);
         toast.success(`Adresse trouvée: ${data[0].display_name}`);
       } else {
         toast.error("Adresse non trouvée");
       }
     } catch (error) {
-      console.error("Error searching address:", error);
+      console.error("Erreur lors de la recherche d'adresse:", error);
       toast.error("Erreur lors de la recherche");
     }
   };
 
   const generateIframeCode = (center: L.LatLng, zoom: number) => {
-    console.log("Generating iframe code for center:", center, "zoom:", zoom);
+    console.log("Génération du code iframe pour le centre:", center, "zoom:", zoom);
     const iframeHtml = `<iframe 
       width="100%" 
       height="400" 
@@ -221,7 +186,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
         <div 
           ref={mapRef} 
           className="w-full h-[400px] rounded-md border mb-4"
-          style={{ zIndex: 0 }} // Ensure the map doesn't have z-index issues
+          style={{ zIndex: 0 }} 
         ></div>
         
         <div className="flex justify-between items-center mb-2">
