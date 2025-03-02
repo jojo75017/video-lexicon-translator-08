@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Search, Share2 } from "lucide-react";
 import { toast } from "sonner";
@@ -27,6 +27,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
 
     // Check if map is already initialized
     if (!leafletMapRef.current) {
+      console.log("Initializing map");
       // Initialize map
       const map = L.map(mapRef.current).setView([48.8566, 2.3522], 13);
       
@@ -42,8 +43,8 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
       // @ts-ignore - Type definition issues with leaflet-draw
       const drawControl = new L.Control.Draw({
         draw: {
-          marker: true,
-          polyline: true,
+          marker: {},
+          polyline: {},
           polygon: {
             allowIntersection: false,
             drawError: {
@@ -100,15 +101,28 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
   const searchAddress = async () => {
     if (!address.trim() || !leafletMapRef.current) return;
 
+    console.log("Searching for address:", address);
+    
     try {
       const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`);
       const data = await response.json();
+      console.log("Search results:", data);
 
       if (data && data.length > 0) {
         const { lat, lon } = data[0];
         const latLng = L.latLng(parseFloat(lat), parseFloat(lon));
         leafletMapRef.current.setView(latLng, 16);
+        
+        // Clear existing markers
+        leafletMapRef.current.eachLayer((layer) => {
+          if (layer instanceof L.Marker) {
+            leafletMapRef.current?.removeLayer(layer);
+          }
+        });
+        
+        // Add new marker
         L.marker(latLng).addTo(leafletMapRef.current);
+        
         generateIframeCode(latLng, 16);
         toast.success(`Adresse trouvée: ${data[0].display_name}`);
       } else {
@@ -150,6 +164,9 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Carte Locale SEO</DialogTitle>
+          <DialogDescription>
+            Recherchez une adresse ou un lieu pour créer une carte personnalisée
+          </DialogDescription>
         </DialogHeader>
         
         <div className="mb-4 flex items-center space-x-2">
