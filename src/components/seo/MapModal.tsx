@@ -20,6 +20,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
   const [address, setAddress] = useState('');
   const [iframeCode, setIframeCode] = useState('');
   const [showIframeCode, setShowIframeCode] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
 
   // Initialiser la carte lorsque le composant est monté et que le modal est ouvert
   useEffect(() => {
@@ -30,7 +31,10 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
       console.log("Initialisation de la carte");
       try {
         // Initialiser la carte
-        const map = L.map(mapRef.current).setView([48.8566, 2.3522], 13);
+        const map = L.map(mapRef.current, {
+          zoomControl: true,
+          attributionControl: true
+        }).setView([48.8566, 2.3522], 4); // Zoom plus éloigné pour une vue plus large
         
         // Ajouter la couche de tuiles
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -42,7 +46,9 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
         markersLayerRef.current = markersLayer;
 
         // Ajouter un marqueur par défaut pour Paris
-        L.marker([48.8566, 2.3522]).addTo(markersLayer);
+        L.marker([48.8566, 2.3522]).addTo(markersLayer)
+          .bindPopup("Paris, France")
+          .openPopup();
         
         // Générer le code iframe initial
         generateIframeCode(map.getCenter(), map.getZoom());
@@ -52,7 +58,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
         // Forcer un redimensionnement de la carte pour s'assurer qu'elle est visible
         setTimeout(() => {
           map.invalidateSize();
-        }, 100);
+        }, 300);
         
       } catch (error) {
         console.error("Erreur lors de l'initialisation de la carte:", error);
@@ -68,12 +74,13 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
         if (leafletMapRef.current) {
           leafletMapRef.current.invalidateSize();
         }
-      }, 100);
+      }, 300);
     }
 
     // Fonction de nettoyage à exécuter lorsque le composant est démonté
     return () => {
       if (!open && leafletMapRef.current) {
+        console.log("Nettoyage de la carte");
         leafletMapRef.current.remove();
         leafletMapRef.current = null;
         markersLayerRef.current = null;
@@ -82,16 +89,24 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
   }, [open]);
 
   const searchAddress = async () => {
-    if (!address.trim() || !leafletMapRef.current || !markersLayerRef.current) {
-      toast.error("Veuillez saisir une adresse valide");
+    if (!address.trim()) {
+      toast.error("Veuillez saisir une adresse");
+      return;
+    }
+
+    if (!leafletMapRef.current || !markersLayerRef.current) {
+      toast.error("La carte n'est pas initialisée correctement");
       return;
     }
 
     console.log("Recherche d'adresse:", address);
-    toast.info(`Recherche de l'adresse: ${address}`);
+    setIsSearching(true);
+    toast.info(`Recherche en cours pour: ${address}`);
     
     try {
-      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`);
+      // Utilisation du service Nominatim pour la géocodification
+      const encodedAddress = encodeURIComponent(address.trim());
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodedAddress}&limit=1`);
       
       if (!response.ok) {
         throw new Error(`Erreur réseau: ${response.status}`);
@@ -101,36 +116,45 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
       console.log("Résultats de recherche:", data);
 
       if (data && data.length > 0) {
-        const { lat, lon } = data[0];
-        const latLng = L.latLng(parseFloat(lat), parseFloat(lon));
+        const { lat, lon, display_name } = data[0];
+        const latitude = parseFloat(lat);
+        const longitude = parseFloat(lon);
+        const latLng = L.latLng(latitude, longitude);
+        
+        console.log(`Emplacement trouvé: ${display_name} (${latitude}, ${longitude})`);
         
         // Nettoyer tous les marqueurs existants
         if (markersLayerRef.current) {
           markersLayerRef.current.clearLayers();
         }
         
-        // Ajouter un nouveau marqueur
+        // Ajouter un nouveau marqueur avec popup
         if (markersLayerRef.current) {
-          L.marker(latLng).addTo(markersLayerRef.current);
+          L.marker(latLng).addTo(markersLayerRef.current)
+            .bindPopup(display_name)
+            .openPopup();
         }
         
         // Définir la vue sur l'emplacement trouvé avec animation
         if (leafletMapRef.current) {
-          leafletMapRef.current.setView(latLng, 16, {
+          leafletMapRef.current.setView(latLng, 12, {
             animate: true,
-            duration: 1
+            duration: 1.5
           });
           
-          generateIframeCode(latLng, 16);
+          generateIframeCode(latLng, 12);
         }
         
-        toast.success(`Adresse trouvée: ${data[0].display_name}`);
+        toast.success(`Emplacement trouvé: ${display_name}`);
       } else {
-        toast.error("Adresse non trouvée");
+        console.log("Aucun résultat trouvé pour:", address);
+        toast.error(`Aucun résultat trouvé pour: ${address}`);
       }
     } catch (error) {
       console.error("Erreur lors de la recherche d'adresse:", error);
-      toast.error("Erreur lors de la recherche");
+      toast.error("Erreur lors de la recherche. Veuillez réessayer.");
+    } finally {
+      setIsSearching(false);
     }
   };
 
@@ -166,18 +190,23 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
         <DialogHeader>
           <DialogTitle>Carte Locale SEO</DialogTitle>
           <DialogDescription>
-            Recherchez une adresse ou un lieu pour créer une carte personnalisée
+            Recherchez une adresse, une ville ou un pays pour créer une carte personnalisée
           </DialogDescription>
         </DialogHeader>
         
         <div className="mb-4 flex items-center space-x-2">
           <Input
-            placeholder="Rechercher une adresse..."
+            placeholder="Entrez une adresse, ville ou pays..."
             value={address}
             onChange={(e) => setAddress(e.target.value)}
             onKeyPress={handleKeyPress}
+            className="flex-1"
           />
-          <Button onClick={searchAddress} variant="outline">
+          <Button 
+            onClick={searchAddress} 
+            variant="outline" 
+            disabled={isSearching}
+          >
             <Search className="h-4 w-4 mr-2" />
             Rechercher
           </Button>
