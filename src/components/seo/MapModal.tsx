@@ -28,69 +28,98 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
     // Check if map is already initialized
     if (!leafletMapRef.current) {
       console.log("Initializing map");
-      // Initialize map
-      const map = L.map(mapRef.current).setView([48.8566, 2.3522], 13);
-      
-      // Add tile layer
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      }).addTo(map);
+      try {
+        // Initialize map
+        const map = L.map(mapRef.current).setView([48.8566, 2.3522], 13);
+        
+        // Add tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
 
-      // Initialize draw control
-      const drawnItems = new L.FeatureGroup();
-      map.addLayer(drawnItems);
+        // Initialize draw control
+        const drawnItems = new L.FeatureGroup();
+        map.addLayer(drawnItems);
 
-      // @ts-ignore - Type definition issues with leaflet-draw
-      const drawControl = new L.Control.Draw({
-        draw: {
-          marker: {},
-          polyline: {},
-          polygon: {
-            allowIntersection: false,
-            drawError: {
-              color: '#e1e100',
-              message: "<strong>Erreur:</strong> Les polygones ne peuvent pas s'intersecter!"
+        // @ts-ignore - Type definition issues with leaflet-draw
+        const drawControl = new L.Control.Draw({
+          draw: {
+            marker: {},
+            polyline: {},
+            polygon: {
+              allowIntersection: false,
+              drawError: {
+                color: '#e1e100',
+                message: "<strong>Erreur:</strong> Les polygones ne peuvent pas s'intersecter!"
+              },
+              shapeOptions: {
+                color: '#97009c'
+              }
             },
-            shapeOptions: {
-              color: '#97009c'
+            rectangle: {
+              shapeOptions: {
+                color: '#0000ff'
+              }
+            },
+            circle: {
+              shapeOptions: {
+                color: '#662d91'
+              }
             }
           },
-          rectangle: {
-            shapeOptions: {
-              color: '#0000ff'
-            }
-          },
-          circle: {
-            shapeOptions: {
-              color: '#662d91'
-            }
+          edit: {
+            featureGroup: drawnItems
           }
-        },
-        edit: {
-          featureGroup: drawnItems
-        }
-      });
+        });
 
-      map.addControl(drawControl);
-      
-      // @ts-ignore - Type definition issues with leaflet-draw
-      map.on(L.Draw.Event.CREATED, function (e) {
-        const layer = e.layer;
-        drawnItems.addLayer(layer);
+        map.addControl(drawControl);
+        
+        // @ts-ignore - Type definition issues with leaflet-draw
+        map.on(L.Draw.Event.CREATED, function (e) {
+          const layer = e.layer;
+          drawnItems.addLayer(layer);
+          
+          if (layer instanceof L.Marker) {
+            const center = layer.getLatLng();
+            generateIframeCode(center, map.getZoom());
+          } else {
+            generateIframeCode(map.getCenter(), map.getZoom());
+          }
+        });
+
+        leafletMapRef.current = map;
+
+        // Add a default marker for Paris
+        L.marker([48.8566, 2.3522]).addTo(map);
+        
+        // Generate initial iframe code
         generateIframeCode(map.getCenter(), map.getZoom());
-      });
-
-      leafletMapRef.current = map;
-
-      // Generate initial iframe code
-      generateIframeCode(map.getCenter(), map.getZoom());
+        
+        // Force a map resize to ensure it's visible
+        setTimeout(() => {
+          map.invalidateSize();
+        }, 100);
+        
+      } catch (error) {
+        console.error("Error initializing map:", error);
+        toast.error("Erreur lors de l'initialisation de la carte");
+      }
     } else {
       // If map already exists, just invalidate size to handle container resizing
+      console.log("Map already exists, invalidating size");
       leafletMapRef.current.invalidateSize();
+      
+      // Force a map resize to ensure it's visible
+      setTimeout(() => {
+        if (leafletMapRef.current) {
+          leafletMapRef.current.invalidateSize();
+        }
+      }, 100);
     }
 
     // Cleanup function to run when component unmounts
     return () => {
+      console.log("Cleanup map");
       if (leafletMapRef.current && !open) {
         leafletMapRef.current.remove();
         leafletMapRef.current = null;
@@ -102,6 +131,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
     if (!address.trim() || !leafletMapRef.current) return;
 
     console.log("Searching for address:", address);
+    toast.info(`Recherche de l'adresse: ${address}`);
     
     try {
       const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`);
@@ -111,7 +141,6 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
       if (data && data.length > 0) {
         const { lat, lon } = data[0];
         const latLng = L.latLng(parseFloat(lat), parseFloat(lon));
-        leafletMapRef.current.setView(latLng, 16);
         
         // Clear existing markers
         leafletMapRef.current.eachLayer((layer) => {
@@ -122,6 +151,12 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
         
         // Add new marker
         L.marker(latLng).addTo(leafletMapRef.current);
+        
+        // Set view to the found location with animation
+        leafletMapRef.current.setView(latLng, 16, {
+          animate: true,
+          duration: 1
+        });
         
         generateIframeCode(latLng, 16);
         toast.success(`Adresse trouvée: ${data[0].display_name}`);
@@ -135,6 +170,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
   };
 
   const generateIframeCode = (center: L.LatLng, zoom: number) => {
+    console.log("Generating iframe code for center:", center, "zoom:", zoom);
     const iframeHtml = `<iframe 
       width="100%" 
       height="400" 
@@ -185,6 +221,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
         <div 
           ref={mapRef} 
           className="w-full h-[400px] rounded-md border mb-4"
+          style={{ zIndex: 0 }} // Ensure the map doesn't have z-index issues
         ></div>
         
         <div className="flex justify-between items-center mb-2">
