@@ -26,65 +26,52 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
   useEffect(() => {
     if (!open || !mapRef.current) return;
 
-    // Vérifier si la carte est déjà initialisée
-    if (!leafletMapRef.current) {
-      console.log("Initialisation de la carte");
-      try {
-        // Initialiser la carte
-        const map = L.map(mapRef.current, {
-          zoomControl: true,
-          attributionControl: true
-        }).setView([48.8566, 2.3522], 4); // Zoom plus éloigné pour une vue plus large
-        
-        // Ajouter la couche de tuiles
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
+    // Nettoyage des instances précédentes si présentes
+    if (leafletMapRef.current) {
+      leafletMapRef.current.remove();
+      leafletMapRef.current = null;
+      markersLayerRef.current = null;
+    }
 
-        // Créer une couche pour les marqueurs
-        const markersLayer = L.layerGroup().addTo(map);
-        markersLayerRef.current = markersLayer;
+    console.log("Initialisation d'une nouvelle carte");
+    try {
+      // Initialiser la carte
+      const map = L.map(mapRef.current, {
+        zoomControl: true,
+        attributionControl: true
+      }).setView([48.8566, 2.3522], 4); // Vue mondiale pour débuter
+      
+      // Ajouter la couche de tuiles
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
 
-        // Ajouter un marqueur par défaut pour Paris
-        L.marker([48.8566, 2.3522]).addTo(markersLayer)
-          .bindPopup("Paris, France")
-          .openPopup();
-        
-        // Générer le code iframe initial
-        generateIframeCode(map.getCenter(), map.getZoom());
-        
-        leafletMapRef.current = map;
-        
-        // Forcer un redimensionnement de la carte pour s'assurer qu'elle est visible
-        setTimeout(() => {
-          map.invalidateSize();
-        }, 300);
-        
-      } catch (error) {
-        console.error("Erreur lors de l'initialisation de la carte:", error);
-        toast.error("Erreur lors de l'initialisation de la carte");
-      }
-    } else {
-      // Si la carte existe déjà, invalidez simplement la taille pour gérer le redimensionnement du conteneur
-      console.log("La carte existe déjà, invalidation de la taille");
-      leafletMapRef.current.invalidateSize();
+      // Créer une couche pour les marqueurs
+      const markersLayer = L.layerGroup().addTo(map);
+      markersLayerRef.current = markersLayer;
+
+      // Ajouter un marqueur par défaut pour Paris
+      L.marker([48.8566, 2.3522]).addTo(markersLayer)
+        .bindPopup("Paris, France")
+        .openPopup();
+      
+      // Générer le code iframe initial
+      generateIframeCode(map.getCenter(), map.getZoom());
+      
+      leafletMapRef.current = map;
       
       // Forcer un redimensionnement de la carte pour s'assurer qu'elle est visible
       setTimeout(() => {
-        if (leafletMapRef.current) {
-          leafletMapRef.current.invalidateSize();
-        }
+        map.invalidateSize();
       }, 300);
+      
+    } catch (error) {
+      console.error("Erreur lors de l'initialisation de la carte:", error);
+      toast.error("Erreur lors de l'initialisation de la carte");
     }
 
-    // Fonction de nettoyage à exécuter lorsque le composant est démonté
     return () => {
-      if (!open && leafletMapRef.current) {
-        console.log("Nettoyage de la carte");
-        leafletMapRef.current.remove();
-        leafletMapRef.current = null;
-        markersLayerRef.current = null;
-      }
+      // Ne pas supprimer la carte lors de la fermeture pour éviter les problèmes de ré-initialisation
     };
   }, [open]);
 
@@ -95,7 +82,8 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
     }
 
     if (!leafletMapRef.current || !markersLayerRef.current) {
-      toast.error("La carte n'est pas initialisée correctement");
+      console.error("La carte n'est pas initialisée correctement");
+      toast.error("La carte n'est pas initialisée correctement. Veuillez réessayer.");
       return;
     }
 
@@ -106,7 +94,11 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
     try {
       // Utilisation du service Nominatim pour la géocodification
       const encodedAddress = encodeURIComponent(address.trim());
-      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodedAddress}&limit=1`);
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodedAddress}&limit=1`, {
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
       
       if (!response.ok) {
         throw new Error(`Erreur réseau: ${response.status}`);
@@ -119,7 +111,6 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
         const { lat, lon, display_name } = data[0];
         const latitude = parseFloat(lat);
         const longitude = parseFloat(lon);
-        const latLng = L.latLng(latitude, longitude);
         
         console.log(`Emplacement trouvé: ${display_name} (${latitude}, ${longitude})`);
         
@@ -129,26 +120,32 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
         }
         
         // Ajouter un nouveau marqueur avec popup
-        if (markersLayerRef.current) {
-          L.marker(latLng).addTo(markersLayerRef.current)
-            .bindPopup(display_name)
-            .openPopup();
-        }
-        
-        // Définir la vue sur l'emplacement trouvé avec animation
-        if (leafletMapRef.current) {
-          leafletMapRef.current.setView(latLng, 12, {
+        if (markersLayerRef.current && leafletMapRef.current) {
+          const marker = L.marker([latitude, longitude]).addTo(markersLayerRef.current);
+          marker.bindPopup(display_name).openPopup();
+          
+          // Définir la vue sur l'emplacement trouvé avec animation
+          leafletMapRef.current.setView([latitude, longitude], 12, {
             animate: true,
-            duration: 1.5
+            duration: 1
           });
           
-          generateIframeCode(latLng, 12);
+          // Forcer un rafraîchissement de la carte
+          setTimeout(() => {
+            if (leafletMapRef.current) {
+              leafletMapRef.current.invalidateSize();
+            }
+          }, 100);
+          
+          // Générer le nouveau code iframe
+          const center = L.latLng(latitude, longitude);
+          generateIframeCode(center, 12);
         }
         
         toast.success(`Emplacement trouvé: ${display_name}`);
       } else {
         console.log("Aucun résultat trouvé pour:", address);
-        toast.error(`Aucun résultat trouvé pour: ${address}`);
+        toast.error(`Aucun résultat trouvé pour: ${address}. Essayez d'être plus précis.`);
       }
     } catch (error) {
       console.error("Erreur lors de la recherche d'adresse:", error);

@@ -10,10 +10,10 @@ const MapButton = () => {
 
   const handleOpenMap = () => {
     try {
-      console.log("Opening map modal");
+      console.log("Ouverture de la carte");
       setIsOpen(true);
     } catch (error) {
-      console.error("Error opening map modal:", error);
+      console.error("Erreur lors de l'ouverture de la carte:", error);
       toast.error("Impossible d'ouvrir la carte. Veuillez réessayer.");
     }
   };
