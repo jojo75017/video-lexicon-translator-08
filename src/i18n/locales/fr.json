@@ -52,6 +52,7 @@
     "added": "ajouté",
     "markerDeleted": "Marqueur supprimé !",
     "markers": "Marqueurs",
+    "noMarkers": "Aucun marqueur ajouté",
     "add": "Ajouter",
     "cancel": "Annuler",
     "north": "Nord",
@@ -65,6 +66,24 @@
     "codeCopied": "Code d'intégration copié !",
     "openSuccess": "Carte interactive ouverte. Vous pouvez ajouter des marqueurs et personnaliser votre carte.",
     "openError": "Impossible d'ouvrir la carte. Veuillez réessayer.",
-    "clickToAddMarker": "Cliquez sur la carte pour ajouter un marqueur"
+    "clickToAddMarker": "Cliquez sur la carte pour ajouter un marqueur",
+    "chooseMarkerColor": "Choisir la couleur du marqueur",
+    "legend": "Légende",
+    "showLegend": "Afficher la légende",
+    "hideLegend": "Masquer la légende",
+    "color": {
+      "red": "Rouge",
+      "blue": "Bleu",
+      "green": "Vert",
+      "yellow": "Jaune",
+      "purple": "Violet"
+    },
+    "legend": {
+      "importantPlaces": "Lieux importants",
+      "clientLocation": "Emplacement client",
+      "competitors": "Concurrents",
+      "pointsOfInterest": "Points d'intérêt",
+      "targetAreas": "Zones cibles"
+    }
   }
 }

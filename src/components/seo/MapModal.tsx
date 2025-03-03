@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Search, Share2, AlertTriangle, MapPin, X, Plus, Move, Trash2 } from "lucide-react";
+import { Search, Share2, AlertTriangle, MapPin, X, Plus, Move, Trash2, Info } from "lucide-react";
 import { toast } from "sonner";
 import 'leaflet/dist/leaflet.css';
 import { useTranslation } from "react-i18next";
@@ -18,12 +18,21 @@ interface Marker {
   lat: number;
   lng: number;
   label: string;
+  color?: string;
 }
+
+const MARKER_COLORS = [
+  { name: 'red', hex: '#ef4444' },
+  { name: 'blue', hex: '#3b82f6' },
+  { name: 'green', hex: '#22c55e' },
+  { name: 'yellow', hex: '#eab308' },
+  { name: 'purple', hex: '#a855f7' }
+];
 
 const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
   const { t } = useTranslation();
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const mapRef = useRef<any>(null);
   const [address, setAddress] = useState('');
   const [iframeCode, setIframeCode] = useState('');
   const [showIframeCode, setShowIframeCode] = useState(false);
@@ -36,53 +45,102 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
   const [newMarkerLabel, setNewMarkerLabel] = useState('');
   const [showLabelInput, setShowLabelInput] = useState(false);
   const [tempMarkerPosition, setTempMarkerPosition] = useState<{lat: number, lng: number} | null>(null);
+  const [selectedMarkerColor, setSelectedMarkerColor] = useState(MARKER_COLORS[0]);
+  const [showLegend, setShowLegend] = useState(true);
 
   // Fonction pour initialiser la carte avec les coordonnées actuelles
   useEffect(() => {
     if (!open || !mapContainerRef.current) return;
     
-    // Générer la carte avec les coordonnées actuelles
-    generateMapEmbed(currentLat, currentLng, markers);
-    
-    console.log("Carte initialisée avec succès");
-  }, [open, currentLat, currentLng, markers]);
-
-  // Fonction pour générer l'embed de carte avec les marqueurs
-  const generateMapEmbed = (latitude: number, longitude: number, currentMarkers: Marker[]) => {
-    if (!mapContainerRef.current) return;
-
-    // Nettoyer le conteneur de carte
-    mapContainerRef.current.innerHTML = '';
-
-    // Créer une iframe pour la carte
-    const iframe = document.createElement('iframe');
-    iframe.width = '100%';
-    iframe.height = '100%';
-    iframe.style.border = 'none';
-    
-    // Construire l'URL avec les coordonnées actuelles
-    let iframeUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude - 0.05}%2C${latitude - 0.05}%2C${longitude + 0.05}%2C${latitude + 0.05}&amp;layer=mapnik`;
-    
-    // Ajouter des marqueurs si présents
-    if (currentMarkers && currentMarkers.length > 0) {
-      currentMarkers.forEach((marker) => {
-        iframeUrl += `&amp;marker=${marker.lat}%2C${marker.lng}`;
-      });
+    try {
+      // Charger la bibliothèque Leaflet dynamiquement si nécessaire
+      if (typeof window !== 'undefined' && typeof L !== 'undefined') {
+        initializeMap();
+      } else {
+        console.error("Leaflet n'est pas disponible");
+      }
+      
+      console.log("Carte initialisée avec succès");
+    } catch (error) {
+      console.error("Erreur lors de l'initialisation de la carte:", error);
     }
     
-    iframe.src = iframeUrl;
-    iframe.id = 'map-iframe';
-    
-    // Ajouter l'iframe au conteneur
-    mapContainerRef.current.appendChild(iframe);
-    iframeRef.current = iframe;
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
+  }, [open]);
 
-    // Générer le code d'intégration avec les marqueurs
-    updateIframeCode(latitude, longitude, currentMarkers);
+  // Mettre à jour la carte lorsque les marqueurs ou les coordonnées changent
+  useEffect(() => {
+    if (mapRef.current) {
+      updateMapMarkers();
+    }
+  }, [markers, currentLat, currentLng]);
+
+  // Initialisation de la carte
+  const initializeMap = () => {
+    if (!mapContainerRef.current) return;
+    
+    // Nettoyer la carte existante si elle existe
+    if (mapRef.current) {
+      mapRef.current.remove();
+    }
+    
+    // Créer une nouvelle carte
+    mapRef.current = L.map(mapContainerRef.current).setView([currentLat, currentLng], 13);
+    
+    // Ajouter la couche de tuiles OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(mapRef.current);
+    
+    // Ajouter les marqueurs
+    updateMapMarkers();
+    
+    // Ajouter un gestionnaire de clic pour ajouter des marqueurs
+    mapRef.current.on('click', handleMapClick);
+  };
+
+  // Fonction pour mettre à jour les marqueurs sur la carte
+  const updateMapMarkers = () => {
+    if (!mapRef.current) return;
+    
+    // Supprimer tous les marqueurs existants
+    mapRef.current.eachLayer((layer: any) => {
+      if (layer instanceof L.Marker) {
+        mapRef.current.removeLayer(layer);
+      }
+    });
+    
+    // Ajouter les marqueurs actuels
+    markers.forEach(marker => {
+      const markerColor = marker.color || '#ef4444'; // Rouge par défaut
+      
+      // Créer une icône personnalisée avec la couleur spécifiée
+      const markerIcon = L.divIcon({
+        className: 'custom-map-marker',
+        html: `<div style="background-color: ${markerColor}; width: 24px; height: 24px; border-radius: 50%; border: 2px solid white; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              </div>`,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
+      });
+      
+      // Ajouter le marqueur avec un popup
+      L.marker([marker.lat, marker.lng], { icon: markerIcon })
+        .addTo(mapRef.current)
+        .bindPopup(`<b>${marker.label}</b>`);
+    });
+    
+    // Mettre à jour le code d'intégration
+    updateIframeCode();
   };
 
   // Fonction pour mettre à jour le code d'intégration
-  const updateIframeCode = (latitude: number, longitude: number, currentMarkers: Marker[]) => {
+  const updateIframeCode = () => {
     // Code HTML de base pour l'iframe
     let iframeHtml = `<iframe 
       width="100%" 
@@ -91,18 +149,18 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
       scrolling="no" 
       marginheight="0" 
       marginwidth="0" 
-      src="https://www.openstreetmap.org/export/embed.html?bbox=${longitude - 0.05}%2C${latitude - 0.05}%2C${longitude + 0.05}%2C${latitude + 0.05}&amp;layer=mapnik`;
+      src="https://www.openstreetmap.org/export/embed.html?bbox=${currentLng - 0.05}%2C${currentLat - 0.05}%2C${currentLng + 0.05}%2C${currentLat + 0.05}&amp;layer=mapnik`;
     
     // Ajouter les marqueurs au code
-    if (currentMarkers && currentMarkers.length > 0) {
-      currentMarkers.forEach(marker => {
+    if (markers && markers.length > 0) {
+      markers.forEach(marker => {
         iframeHtml += `&amp;marker=${marker.lat}%2C${marker.lng}`;
       });
     }
     
     iframeHtml += `" style="border: 1px solid black"></iframe>
     <p>
-      <small><a href="https://www.openstreetmap.org/?mlat=${latitude}&amp;mlon=${longitude}#map=15/${latitude}/${longitude}" target="_blank">Voir en plein écran</a></small>
+      <small><a href="https://www.openstreetmap.org/?mlat=${currentLat}&amp;mlon=${currentLng}#map=15/${currentLat}/${currentLng}" target="_blank">Voir en plein écran</a></small>
     </p>`;
 
     setIframeCode(iframeHtml);
@@ -148,8 +206,12 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
         setCurrentLat(latitude);
         setCurrentLng(longitude);
         
-        // Générer la carte avec les nouvelles coordonnées et marqueurs existants
-        generateMapEmbed(latitude, longitude, markers);
+        // Mettre à jour la vue de la carte
+        if (mapRef.current) {
+          mapRef.current.setView([latitude, longitude], 13);
+        } else {
+          initializeMap();
+        }
         
         toast.success(`${t("map.locationFound", "Emplacement trouvé")}: ${display_name}`);
       } else {
@@ -167,24 +229,14 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
   };
 
   // Gestionnaire pour ajouter un marqueur
-  const handleMapClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (activeMode !== 'addMarker' || !mapContainerRef.current) return;
+  const handleMapClick = (e: any) => {
+    if (activeMode !== 'addMarker' || !mapRef.current) return;
     
-    // Afficher une info pour indiquer que l'utilisateur doit cliquer sur la carte
-    if (!showLabelInput) {
-      toast.info(t("map.clickToAddMarker", "Cliquez sur la carte pour ajouter un marqueur"));
-    }
-    
-    // Simuler l'ajout en utilisant le centre de la carte avec un décalage
-    const offsetLat = (Math.random() - 0.5) * 0.01;
-    const offsetLng = (Math.random() - 0.5) * 0.01;
-    
-    // Coordonnées du nouveau marqueur
-    const newLat = currentLat + offsetLat;
-    const newLng = currentLng + offsetLng;
+    const { lat, lng } = e.latlng;
+    console.log(`Clic sur la carte à: ${lat}, ${lng}`);
     
     // Enregistrer temporairement la position du marqueur
-    setTempMarkerPosition({lat: newLat, lng: newLng});
+    setTempMarkerPosition({ lat, lng });
     
     // Afficher l'input pour le label
     setShowLabelInput(true);
@@ -200,14 +252,12 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
       id: `marker-${Date.now()}`,
       lat: tempMarkerPosition.lat,
       lng: tempMarkerPosition.lng,
-      label: newMarkerLabel || `${t("map.marker", "Marqueur")} ${markers.length + 1}`
+      label: newMarkerLabel || `${t("map.marker", "Marqueur")} ${markers.length + 1}`,
+      color: selectedMarkerColor.hex
     };
     
     const updatedMarkers = [...markers, newMarker];
     setMarkers(updatedMarkers);
-    
-    // Mise à jour de la carte avec le nouveau marqueur
-    generateMapEmbed(currentLat, currentLng, updatedMarkers);
     
     // Réinitialiser
     setTempMarkerPosition(null);
@@ -231,17 +281,19 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
     const updatedMarkers = markers.filter(marker => marker.id !== id);
     setMarkers(updatedMarkers);
     
-    // Mise à jour de la carte sans le marqueur supprimé
-    generateMapEmbed(currentLat, currentLng, updatedMarkers);
-    
     toast.success(t("map.markerDeleted", "Marqueur supprimé !"));
   };
 
   // Mode déplacement de la carte
   const moveMap = (direction: 'north' | 'south' | 'east' | 'west') => {
+    if (!mapRef.current) return;
+    
+    const center = mapRef.current.getCenter();
+    const zoom = mapRef.current.getZoom();
     const moveStep = 0.02;
-    let newLat = currentLat;
-    let newLng = currentLng;
+    
+    let newLat = center.lat;
+    let newLng = center.lng;
     
     switch (direction) {
       case 'north':
@@ -258,11 +310,9 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
         break;
     }
     
+    mapRef.current.setView([newLat, newLng], zoom);
     setCurrentLat(newLat);
     setCurrentLng(newLng);
-    
-    // La carte sera mise à jour automatiquement via l'effet useEffect
-    generateMapEmbed(newLat, newLng, markers);
   };
 
   // Copier le code d'intégration
@@ -276,6 +326,16 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
     if (e.key === 'Enter') {
       searchAddress();
     }
+  };
+
+  // Changer la couleur du marqueur
+  const handleMarkerColorChange = (color: typeof MARKER_COLORS[0]) => {
+    setSelectedMarkerColor(color);
+  };
+
+  // Basculer l'affichage de la légende
+  const toggleLegend = () => {
+    setShowLegend(!showLegend);
   };
 
   return (
@@ -354,6 +414,15 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
             <Move className="h-4 w-4 mr-1" />
             {t("map.moveMap", "Déplacer la carte")}
           </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={toggleLegend}
+            className="flex items-center ml-auto"
+          >
+            <Info className="h-4 w-4 mr-1" />
+            {showLegend ? t("map.hideLegend", "Masquer la légende") : t("map.showLegend", "Afficher la légende")}
+          </Button>
         </div>
         
         {/* Contrôles de déplacement */}
@@ -371,13 +440,93 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
           </div>
         )}
         
-        {/* Zone d'affichage de la carte avec gestion des clics */}
-        <div 
-          ref={mapContainerRef} 
-          className="w-full h-[400px] rounded-md border mb-4 relative cursor-crosshair"
-          style={{ zIndex: 0 }} 
-          onClick={handleMapClick}
-        ></div>
+        {/* Choix de couleur pour les marqueurs */}
+        {activeMode === 'addMarker' && (
+          <div className="mb-4">
+            <p className="text-sm font-medium mb-2">{t("map.chooseMarkerColor", "Choisir la couleur du marqueur")}:</p>
+            <div className="flex gap-2">
+              {MARKER_COLORS.map((color) => (
+                <button
+                  key={color.name}
+                  onClick={() => handleMarkerColorChange(color)}
+                  className={`w-6 h-6 rounded-full border ${selectedMarkerColor.name === color.name ? 'border-gray-900 ring-2 ring-gray-400' : 'border-gray-300'}`}
+                  style={{ backgroundColor: color.hex }}
+                  title={t(`map.color.${color.name}`, color.name)}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          {/* Zone d'affichage de la carte */}
+          <div className="md:col-span-2">
+            <div 
+              ref={mapContainerRef} 
+              className="w-full h-[400px] rounded-md border relative"
+              style={{ cursor: activeMode === 'addMarker' ? 'crosshair' : 'grab' }}
+            ></div>
+          </div>
+          
+          {/* Légende et liste des marqueurs */}
+          <div className="space-y-4">
+            {/* Légende */}
+            {showLegend && (
+              <div className="border rounded-md p-3 bg-gray-50">
+                <h3 className="text-sm font-semibold mb-2">{t("map.legend", "Légende")}</h3>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded-full bg-red-500"></div>
+                    <span className="text-xs">{t("map.legend.importantPlaces", "Lieux importants")}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded-full bg-blue-500"></div>
+                    <span className="text-xs">{t("map.legend.clientLocation", "Emplacement client")}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded-full bg-green-500"></div>
+                    <span className="text-xs">{t("map.legend.competitors", "Concurrents")}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded-full bg-yellow-500"></div>
+                    <span className="text-xs">{t("map.legend.pointsOfInterest", "Points d'intérêt")}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded-full bg-purple-500"></div>
+                    <span className="text-xs">{t("map.legend.targetAreas", "Zones cibles")}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Liste des marqueurs */}
+            <div className="border rounded-md p-3">
+              <h3 className="text-sm font-semibold mb-2">{t("map.markers", "Marqueurs")} ({markers.length})</h3>
+              {markers.length > 0 ? (
+                <div className="max-h-[250px] overflow-y-auto space-y-2">
+                  {markers.map((marker) => (
+                    <div key={marker.id} className="flex justify-between items-center p-2 border rounded-md text-sm">
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: marker.color || '#ef4444' }}></div>
+                        <span className="font-medium">{marker.label}</span>
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => deleteMarker(marker.id)} 
+                        className="h-6 w-6 p-0 text-red-500"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500">{t("map.noMarkers", "Aucun marqueur ajouté")}</p>
+              )}
+            </div>
+          </div>
+        </div>
         
         {/* Interface pour ajouter un label au marqueur */}
         {showLabelInput && (
@@ -399,33 +548,6 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
                 <X className="h-4 w-4 mr-1" />
                 {t("map.cancel", "Annuler")}
               </Button>
-            </div>
-          </div>
-        )}
-        
-        {/* Liste des marqueurs */}
-        {markers.length > 0 && (
-          <div className="mb-4">
-            <h3 className="text-lg font-medium mb-2">{t("map.markers", "Marqueurs")} ({markers.length})</h3>
-            <div className="space-y-2">
-              {markers.map((marker) => (
-                <div key={marker.id} className="flex justify-between items-center p-2 border rounded-md">
-                  <div>
-                    <span className="font-medium">{marker.label}</span>
-                    <span className="text-xs text-gray-500 ml-2">
-                      ({marker.lat.toFixed(4)}, {marker.lng.toFixed(4)})
-                    </span>
-                  </div>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => deleteMarker(marker.id)} 
-                    className="text-red-500"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
             </div>
           </div>
         )}
