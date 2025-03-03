@@ -11,14 +11,9 @@ const MapButton = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleOpenMap = () => {
-    try {
-      console.log("Ouverture de la carte interactive");
-      setIsOpen(true);
-      toast.info(t("map.openSuccess", "Carte interactive ouverte. Vous pouvez ajouter des marqueurs et personnaliser votre carte."));
-    } catch (error) {
-      console.error("Erreur lors de l'ouverture de la carte:", error);
-      toast.error(t("map.openError", "Impossible d'ouvrir la carte. Veuillez réessayer."));
-    }
+    console.log("Ouverture de la carte interactive");
+    setIsOpen(true);
+    toast.info(t("map.openSuccess", "Carte interactive ouverte. Vous pouvez ajouter des marqueurs et personnaliser votre carte."));
   };
 
   return (

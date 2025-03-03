@@ -37,22 +37,18 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
   const [showLabelInput, setShowLabelInput] = useState(false);
   const [tempMarkerPosition, setTempMarkerPosition] = useState<{lat: number, lng: number} | null>(null);
 
-  // Fonction pour initialiser la carte
+  // Fonction pour initialiser la carte avec les coordonnées actuelles
   useEffect(() => {
     if (!open || !mapContainerRef.current) return;
-
-    // On utilise une carte OpenStreetMap comme base
-    const defaultLatitude = currentLat;
-    const defaultLongitude = currentLng;
     
-    // Création d'une iframe pour la carte de base
-    generateMapEmbed(defaultLatitude, defaultLongitude);
+    // Générer la carte avec les coordonnées actuelles
+    generateMapEmbed(currentLat, currentLng, markers);
     
     console.log("Carte initialisée avec succès");
-  }, [open, currentLat, currentLng]);
+  }, [open, currentLat, currentLng, markers]);
 
-  // Fonction pour générer l'embed de carte
-  const generateMapEmbed = (latitude: number, longitude: number) => {
+  // Fonction pour générer l'embed de carte avec les marqueurs
+  const generateMapEmbed = (latitude: number, longitude: number, currentMarkers: Marker[]) => {
     if (!mapContainerRef.current) return;
 
     // Nettoyer le conteneur de carte
@@ -63,15 +59,18 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
     iframe.width = '100%';
     iframe.height = '100%';
     iframe.style.border = 'none';
-    iframe.src = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude - 0.05}%2C${latitude - 0.05}%2C${longitude + 0.05}%2C${latitude + 0.05}&amp;layer=mapnik`;
+    
+    // Construire l'URL avec les coordonnées actuelles
+    let iframeUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude - 0.05}%2C${latitude - 0.05}%2C${longitude + 0.05}%2C${latitude + 0.05}&amp;layer=mapnik`;
     
     // Ajouter des marqueurs si présents
-    if (markers.length > 0) {
-      markers.forEach((marker) => {
-        iframe.src += `&amp;marker=${marker.lat}%2C${marker.lng}`;
+    if (currentMarkers && currentMarkers.length > 0) {
+      currentMarkers.forEach((marker) => {
+        iframeUrl += `&amp;marker=${marker.lat}%2C${marker.lng}`;
       });
     }
     
+    iframe.src = iframeUrl;
     iframe.id = 'map-iframe';
     
     // Ajouter l'iframe au conteneur
@@ -79,7 +78,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
     iframeRef.current = iframe;
 
     // Générer le code d'intégration avec les marqueurs
-    updateIframeCode(latitude, longitude, markers);
+    updateIframeCode(latitude, longitude, currentMarkers);
   };
 
   // Fonction pour mettre à jour le code d'intégration
@@ -95,7 +94,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
       src="https://www.openstreetmap.org/export/embed.html?bbox=${longitude - 0.05}%2C${latitude - 0.05}%2C${longitude + 0.05}%2C${latitude + 0.05}&amp;layer=mapnik`;
     
     // Ajouter les marqueurs au code
-    if (currentMarkers.length > 0) {
+    if (currentMarkers && currentMarkers.length > 0) {
       currentMarkers.forEach(marker => {
         iframeHtml += `&amp;marker=${marker.lat}%2C${marker.lng}`;
       });
@@ -149,14 +148,14 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
         setCurrentLat(latitude);
         setCurrentLng(longitude);
         
-        // Générer la carte avec les nouvelles coordonnées
-        generateMapEmbed(latitude, longitude);
+        // Générer la carte avec les nouvelles coordonnées et marqueurs existants
+        generateMapEmbed(latitude, longitude, markers);
         
         toast.success(`${t("map.locationFound", "Emplacement trouvé")}: ${display_name}`);
       } else {
         console.log("Aucun résultat trouvé pour:", address);
         setSearchError(`${t("map.noResults", "Aucun résultat trouvé pour")} "${address}". ${t("map.tryMorePrecise", "Essayez d'être plus précis en incluant la ville ou le pays.")}`);
-        toast.error(`${t("map.noResults", "Aucun résultat trouvé pour")}: ${address}. ${t("map.tryMorePrecise", "Essayez d'être plus précis.")}`);
+        toast.error(`${t("map.noResults", "Aucun résultat trouvé pour")}: ${address}`);
       }
     } catch (error) {
       console.error("Erreur lors de la recherche d'adresse:", error);
@@ -170,6 +169,11 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
   // Gestionnaire pour ajouter un marqueur
   const handleMapClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (activeMode !== 'addMarker' || !mapContainerRef.current) return;
+    
+    // Afficher une info pour indiquer que l'utilisateur doit cliquer sur la carte
+    if (!showLabelInput) {
+      toast.info(t("map.clickToAddMarker", "Cliquez sur la carte pour ajouter un marqueur"));
+    }
     
     // Simuler l'ajout en utilisant le centre de la carte avec un décalage
     const offsetLat = (Math.random() - 0.5) * 0.01;
@@ -202,8 +206,8 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
     const updatedMarkers = [...markers, newMarker];
     setMarkers(updatedMarkers);
     
-    // Mise à jour du code d'intégration
-    updateIframeCode(currentLat, currentLng, updatedMarkers);
+    // Mise à jour de la carte avec le nouveau marqueur
+    generateMapEmbed(currentLat, currentLng, updatedMarkers);
     
     // Réinitialiser
     setTempMarkerPosition(null);
@@ -212,9 +216,6 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
     setActiveMode('view');
     
     toast.success(`${t("map.markerAdded", "Marqueur")} "${newMarker.label}" ${t("map.added", "ajouté")}!`);
-    
-    // Rafraîchir la carte pour montrer le nouveau marqueur
-    generateMapEmbed(currentLat, currentLng);
   };
 
   // Annuler l'ajout d'un marqueur
@@ -230,13 +231,10 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
     const updatedMarkers = markers.filter(marker => marker.id !== id);
     setMarkers(updatedMarkers);
     
-    // Mise à jour du code d'intégration
-    updateIframeCode(currentLat, currentLng, updatedMarkers);
+    // Mise à jour de la carte sans le marqueur supprimé
+    generateMapEmbed(currentLat, currentLng, updatedMarkers);
     
     toast.success(t("map.markerDeleted", "Marqueur supprimé !"));
-    
-    // Rafraîchir la carte
-    generateMapEmbed(currentLat, currentLng);
   };
 
   // Mode déplacement de la carte
@@ -264,6 +262,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
     setCurrentLng(newLng);
     
     // La carte sera mise à jour automatiquement via l'effet useEffect
+    generateMapEmbed(newLat, newLng, markers);
   };
 
   // Copier le code d'intégration

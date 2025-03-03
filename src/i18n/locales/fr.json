@@ -37,7 +37,7 @@
     "moveMap": "Déplacer la carte",
     "view": "Visualiser",
     "search": "Rechercher",
-    "searching": "Recherche...",
+    "searching": "Recherche en cours...",
     "addressPlaceholder": "Entrez une adresse, ville ou pays...",
     "enterAddress": "Veuillez saisir une adresse",
     "searchingFor": "Recherche en cours pour",
@@ -64,6 +64,7 @@
     "copy": "Copier",
     "codeCopied": "Code d'intégration copié !",
     "openSuccess": "Carte interactive ouverte. Vous pouvez ajouter des marqueurs et personnaliser votre carte.",
-    "openError": "Impossible d'ouvrir la carte. Veuillez réessayer."
+    "openError": "Impossible d'ouvrir la carte. Veuillez réessayer.",
+    "clickToAddMarker": "Cliquez sur la carte pour ajouter un marqueur"
   }
 }
