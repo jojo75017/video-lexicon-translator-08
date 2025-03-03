@@ -10,8 +10,9 @@ const MapButton = () => {
 
   const handleOpenMap = () => {
     try {
-      console.log("Ouverture de la carte");
+      console.log("Ouverture de la carte interactive");
       setIsOpen(true);
+      toast.info("Carte interactive ouverte. Vous pouvez ajouter des marqueurs et personnaliser votre carte.");
     } catch (error) {
       console.error("Erreur lors de l'ouverture de la carte:", error);
       toast.error("Impossible d'ouvrir la carte. Veuillez réessayer.");
@@ -28,7 +29,7 @@ const MapButton = () => {
         <MapIcon className="h-8 w-8" />
         <div>
           <h3 className="font-semibold mb-2">Carte interactive</h3>
-          <p className="text-sm text-gray-600">Créez une carte personnalisée pour visualiser vos données</p>
+          <p className="text-sm text-gray-600">Créez une carte personnalisée avec des marqueurs et des points d'intérêt</p>
         </div>
       </Button>
 
