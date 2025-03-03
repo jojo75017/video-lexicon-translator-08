@@ -3,9 +3,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Search, Share2 } from "lucide-react";
+import { Search, Share2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
-import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 interface MapModalProps {
@@ -15,65 +14,59 @@ interface MapModalProps {
 
 const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
   const mapRef = useRef<HTMLDivElement>(null);
-  const leafletMapRef = useRef<L.Map | null>(null);
-  const markersLayerRef = useRef<L.LayerGroup | null>(null);
   const [address, setAddress] = useState('');
   const [iframeCode, setIframeCode] = useState('');
   const [showIframeCode, setShowIframeCode] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
 
-  // Initialiser la carte lorsque le composant est monté et que le modal est ouvert
+  // Fonction pour initialiser la carte avec une iframe OpenStreetMap directement
   useEffect(() => {
     if (!open || !mapRef.current) return;
 
-    // Nettoyage des instances précédentes si présentes
-    if (leafletMapRef.current) {
-      leafletMapRef.current.remove();
-      leafletMapRef.current = null;
-      markersLayerRef.current = null;
-    }
-
-    console.log("Initialisation d'une nouvelle carte");
-    try {
-      // Initialiser la carte
-      const map = L.map(mapRef.current, {
-        zoomControl: true,
-        attributionControl: true
-      }).setView([48.8566, 2.3522], 4); // Vue mondiale pour débuter
-      
-      // Ajouter la couche de tuiles
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      }).addTo(map);
-
-      // Créer une couche pour les marqueurs
-      const markersLayer = L.layerGroup().addTo(map);
-      markersLayerRef.current = markersLayer;
-
-      // Ajouter un marqueur par défaut pour Paris
-      L.marker([48.8566, 2.3522]).addTo(markersLayer)
-        .bindPopup("Paris, France")
-        .openPopup();
-      
-      // Générer le code iframe initial
-      generateIframeCode(map.getCenter(), map.getZoom());
-      
-      leafletMapRef.current = map;
-      
-      // Forcer un redimensionnement de la carte pour s'assurer qu'elle est visible
-      setTimeout(() => {
-        map.invalidateSize();
-      }, 300);
-      
-    } catch (error) {
-      console.error("Erreur lors de l'initialisation de la carte:", error);
-      toast.error("Erreur lors de l'initialisation de la carte");
-    }
-
-    return () => {
-      // Ne pas supprimer la carte lors de la fermeture pour éviter les problèmes de ré-initialisation
-    };
+    // Initialisation de la carte avec Paris comme point central par défaut
+    const defaultLatitude = 48.8566;
+    const defaultLongitude = 2.3522;
+    generateDirectMapEmbed(defaultLatitude, defaultLongitude, "Paris, France");
+    
+    console.log("Carte initialisée avec succès");
   }, [open]);
+
+  // Fonction pour générer l'embed de carte directement depuis OpenStreetMap
+  const generateDirectMapEmbed = (latitude: number, longitude: number, placeName: string) => {
+    if (!mapRef.current) return;
+
+    // Nettoyer le conteneur de carte
+    mapRef.current.innerHTML = '';
+
+    // Créer une iframe pour la carte
+    const iframe = document.createElement('iframe');
+    iframe.width = '100%';
+    iframe.height = '100%';
+    iframe.style.border = 'none';
+    iframe.src = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude - 0.02}%2C${latitude - 0.02}%2C${longitude + 0.02}%2C${latitude + 0.02}&amp;layer=mapnik&amp;marker=${latitude}%2C${longitude}`;
+
+    // Ajouter l'iframe au conteneur
+    mapRef.current.appendChild(iframe);
+
+    // Générer le code d'intégration
+    const iframeHtml = `<iframe 
+      width="100%" 
+      height="400" 
+      frameborder="0" 
+      scrolling="no" 
+      marginheight="0" 
+      marginwidth="0" 
+      src="https://www.openstreetmap.org/export/embed.html?bbox=${longitude - 0.02}%2C${latitude - 0.02}%2C${longitude + 0.02}%2C${latitude + 0.02}&amp;layer=mapnik&amp;marker=${latitude}%2C${longitude}" 
+      style="border: 1px solid black">
+    </iframe>
+    <p>
+      <small><a href="https://www.openstreetmap.org/?mlat=${latitude}&amp;mlon=${longitude}#map=15/${latitude}/${longitude}" target="_blank">Voir en plein écran</a></small>
+    </p>`;
+
+    setIframeCode(iframeHtml);
+    setSearchError(null);
+  };
 
   const searchAddress = async () => {
     if (!address.trim()) {
@@ -81,14 +74,9 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
       return;
     }
 
-    if (!leafletMapRef.current || !markersLayerRef.current) {
-      console.error("La carte n'est pas initialisée correctement");
-      toast.error("La carte n'est pas initialisée correctement. Veuillez réessayer.");
-      return;
-    }
-
     console.log("Recherche d'adresse:", address);
     setIsSearching(true);
+    setSearchError(null);
     toast.info(`Recherche en cours pour: ${address}`);
     
     try {
@@ -96,7 +84,8 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
       const encodedAddress = encodeURIComponent(address.trim());
       const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodedAddress}&limit=1`, {
         headers: {
-          'Accept': 'application/json'
+          'Accept': 'application/json',
+          'User-Agent': 'LocalSEOApp'
         }
       });
       
@@ -114,60 +103,22 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
         
         console.log(`Emplacement trouvé: ${display_name} (${latitude}, ${longitude})`);
         
-        // Nettoyer tous les marqueurs existants
-        if (markersLayerRef.current) {
-          markersLayerRef.current.clearLayers();
-        }
-        
-        // Ajouter un nouveau marqueur avec popup
-        if (markersLayerRef.current && leafletMapRef.current) {
-          const marker = L.marker([latitude, longitude]).addTo(markersLayerRef.current);
-          marker.bindPopup(display_name).openPopup();
-          
-          // Définir la vue sur l'emplacement trouvé avec animation
-          leafletMapRef.current.setView([latitude, longitude], 12, {
-            animate: true,
-            duration: 1
-          });
-          
-          // Forcer un rafraîchissement de la carte
-          setTimeout(() => {
-            if (leafletMapRef.current) {
-              leafletMapRef.current.invalidateSize();
-            }
-          }, 100);
-          
-          // Générer le nouveau code iframe
-          const center = L.latLng(latitude, longitude);
-          generateIframeCode(center, 12);
-        }
+        // Générer la carte avec les nouvelles coordonnées
+        generateDirectMapEmbed(latitude, longitude, display_name);
         
         toast.success(`Emplacement trouvé: ${display_name}`);
       } else {
         console.log("Aucun résultat trouvé pour:", address);
+        setSearchError(`Aucun résultat trouvé pour "${address}". Essayez d'être plus précis en incluant la ville ou le pays.`);
         toast.error(`Aucun résultat trouvé pour: ${address}. Essayez d'être plus précis.`);
       }
     } catch (error) {
       console.error("Erreur lors de la recherche d'adresse:", error);
+      setSearchError("Erreur lors de la recherche. Veuillez réessayer avec une autre adresse.");
       toast.error("Erreur lors de la recherche. Veuillez réessayer.");
     } finally {
       setIsSearching(false);
     }
-  };
-
-  const generateIframeCode = (center: L.LatLng, zoom: number) => {
-    console.log("Génération du code iframe pour le centre:", center, "zoom:", zoom);
-    const iframeHtml = `<iframe 
-      width="100%" 
-      height="400" 
-      frameborder="0" 
-      scrolling="no" 
-      marginheight="0" 
-      marginwidth="0" 
-      src="https://www.openstreetmap.org/export/embed.html?bbox=${center.lng - 0.01}%2C${center.lat - 0.01}%2C${center.lng + 0.01}%2C${center.lat + 0.01}&amp;layer=mapnik&amp;marker=${center.lat}%2C${center.lng}" 
-      style="border: 1px solid black">
-    </iframe>`;
-    setIframeCode(iframeHtml);
   };
 
   const copyIframeCode = () => {
@@ -204,10 +155,29 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
             variant="outline" 
             disabled={isSearching}
           >
-            <Search className="h-4 w-4 mr-2" />
-            Rechercher
+            {isSearching ? (
+              <span className="inline-flex items-center">
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Recherche...
+              </span>
+            ) : (
+              <>
+                <Search className="h-4 w-4 mr-2" />
+                Rechercher
+              </>
+            )}
           </Button>
         </div>
+
+        {searchError && (
+          <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-md flex items-start">
+            <AlertTriangle className="h-5 w-5 flex-shrink-0 mr-2 mt-0.5" />
+            <p className="text-sm">{searchError}</p>
+          </div>
+        )}
         
         <div 
           ref={mapRef} 
@@ -228,7 +198,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
         
         {showIframeCode && (
           <div className="relative">
-            <pre className="bg-gray-100 p-4 rounded-md text-sm overflow-x-auto">
+            <pre className="bg-gray-100 p-4 rounded-md text-sm overflow-x-auto whitespace-pre-wrap">
               {iframeCode}
             </pre>
             <Button 
