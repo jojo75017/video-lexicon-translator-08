@@ -1,3 +1,4 @@
+
 {
   "seo": {
     "analysis": "Analyse SEO",
@@ -27,5 +28,42 @@
       "imagesNoAlt": "{{count}} image(s) sans attribut alt",
       "h1Count": "Une seule balise H1 est recommandée"
     }
+  },
+  "map": {
+    "title": "Carte Interactive SEO",
+    "description": "Recherchez une adresse et ajoutez des marqueurs pour créer une carte personnalisée",
+    "interactiveMap": "Carte interactive",
+    "addMarker": "Ajouter un marqueur",
+    "moveMap": "Déplacer la carte",
+    "view": "Visualiser",
+    "search": "Rechercher",
+    "searching": "Recherche...",
+    "addressPlaceholder": "Entrez une adresse, ville ou pays...",
+    "enterAddress": "Veuillez saisir une adresse",
+    "searchingFor": "Recherche en cours pour",
+    "locationFound": "Emplacement trouvé",
+    "noResults": "Aucun résultat trouvé pour",
+    "tryMorePrecise": "Essayez d'être plus précis en incluant la ville ou le pays",
+    "searchError": "Erreur lors de la recherche. Veuillez réessayer",
+    "markerPositionSet": "Position du marqueur définie. Veuillez entrer un libellé",
+    "marker": "Marqueur",
+    "markerName": "Nom du marqueur...",
+    "markerAdded": "Marqueur",
+    "added": "ajouté",
+    "markerDeleted": "Marqueur supprimé !",
+    "markers": "Marqueurs",
+    "add": "Ajouter",
+    "cancel": "Annuler",
+    "north": "Nord",
+    "south": "Sud",
+    "east": "Est",
+    "west": "Ouest",
+    "embedCode": "Code d'intégration",
+    "show": "Afficher",
+    "hide": "Masquer",
+    "copy": "Copier",
+    "codeCopied": "Code d'intégration copié !",
+    "openSuccess": "Carte interactive ouverte. Vous pouvez ajouter des marqueurs et personnaliser votre carte.",
+    "openError": "Impossible d'ouvrir la carte. Veuillez réessayer."
   }
 }

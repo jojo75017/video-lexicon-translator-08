@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Search, Share2, AlertTriangle, MapPin, X, Plus, Move, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
+import { useTranslation } from "react-i18next";
 
 interface MapModalProps {
   open: boolean;
@@ -21,6 +21,7 @@ interface Marker {
 }
 
 const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
+  const { t } = useTranslation();
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const [address, setAddress] = useState('');
@@ -63,6 +64,14 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
     iframe.height = '100%';
     iframe.style.border = 'none';
     iframe.src = `https://www.openstreetmap.org/export/embed.html?bbox=${longitude - 0.05}%2C${latitude - 0.05}%2C${longitude + 0.05}%2C${latitude + 0.05}&amp;layer=mapnik`;
+    
+    // Ajouter des marqueurs si présents
+    if (markers.length > 0) {
+      markers.forEach((marker) => {
+        iframe.src += `&amp;marker=${marker.lat}%2C${marker.lng}`;
+      });
+    }
+    
     iframe.id = 'map-iframe';
     
     // Ajouter l'iframe au conteneur
@@ -97,36 +106,20 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
       <small><a href="https://www.openstreetmap.org/?mlat=${latitude}&amp;mlon=${longitude}#map=15/${latitude}/${longitude}" target="_blank">Voir en plein écran</a></small>
     </p>`;
 
-    // JavaScript pour ajouter les marqueurs avec des labels
-    if (currentMarkers.length > 0) {
-      iframeHtml += `
-<script>
-  // Attendre que la page soit chargée
-  window.onload = function() {
-    // Ajouter les marqueurs avec leurs labels
-    ${currentMarkers.map(marker => `
-      // Création du marqueur ${marker.id}
-      var marker${marker.id.replace(/-/g, '_')} = L.marker([${marker.lat}, ${marker.lng}]).addTo(map);
-      marker${marker.id.replace(/-/g, '_')}.bindPopup("${marker.label}").openPopup();
-    `).join('\n')}
-  };
-</script>`;
-    }
-
     setIframeCode(iframeHtml);
   };
 
   // Fonction pour rechercher une adresse
   const searchAddress = async () => {
     if (!address.trim()) {
-      toast.error("Veuillez saisir une adresse");
+      toast.error(t("map.enterAddress", "Veuillez saisir une adresse"));
       return;
     }
 
     console.log("Recherche d'adresse:", address);
     setIsSearching(true);
     setSearchError(null);
-    toast.info(`Recherche en cours pour: ${address}`);
+    toast.info(`${t("map.searchingFor", "Recherche en cours pour")}: ${address}`);
     
     try {
       // Utilisation du service Nominatim pour la géocodification
@@ -159,16 +152,16 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
         // Générer la carte avec les nouvelles coordonnées
         generateMapEmbed(latitude, longitude);
         
-        toast.success(`Emplacement trouvé: ${display_name}`);
+        toast.success(`${t("map.locationFound", "Emplacement trouvé")}: ${display_name}`);
       } else {
         console.log("Aucun résultat trouvé pour:", address);
-        setSearchError(`Aucun résultat trouvé pour "${address}". Essayez d'être plus précis en incluant la ville ou le pays.`);
-        toast.error(`Aucun résultat trouvé pour: ${address}. Essayez d'être plus précis.`);
+        setSearchError(`${t("map.noResults", "Aucun résultat trouvé pour")} "${address}". ${t("map.tryMorePrecise", "Essayez d'être plus précis en incluant la ville ou le pays.")}`);
+        toast.error(`${t("map.noResults", "Aucun résultat trouvé pour")}: ${address}. ${t("map.tryMorePrecise", "Essayez d'être plus précis.")}`);
       }
     } catch (error) {
       console.error("Erreur lors de la recherche d'adresse:", error);
-      setSearchError("Erreur lors de la recherche. Veuillez réessayer avec une autre adresse.");
-      toast.error("Erreur lors de la recherche. Veuillez réessayer.");
+      setSearchError(t("map.searchError", "Erreur lors de la recherche. Veuillez réessayer avec une autre adresse."));
+      toast.error(t("map.searchError", "Erreur lors de la recherche. Veuillez réessayer."));
     } finally {
       setIsSearching(false);
     }
@@ -178,12 +171,9 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
   const handleMapClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (activeMode !== 'addMarker' || !mapContainerRef.current) return;
     
-    // On ne peut pas vraiment interagir directement avec l'iframe, donc on simule l'ajout
-    // en demandant à l'utilisateur les coordonnées ou en utilisant des coordonnées relatives à la position actuelle
-
-    // Pour simplifier, on ajoute un marqueur à un décalage aléatoire par rapport au centre
-    const offsetLat = (Math.random() - 0.5) * 0.02;
-    const offsetLng = (Math.random() - 0.5) * 0.02;
+    // Simuler l'ajout en utilisant le centre de la carte avec un décalage
+    const offsetLat = (Math.random() - 0.5) * 0.01;
+    const offsetLng = (Math.random() - 0.5) * 0.01;
     
     // Coordonnées du nouveau marqueur
     const newLat = currentLat + offsetLat;
@@ -195,7 +185,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
     // Afficher l'input pour le label
     setShowLabelInput(true);
     
-    toast.info("Position du marqueur définie. Veuillez entrer un libellé.");
+    toast.info(t("map.markerPositionSet", "Position du marqueur définie. Veuillez entrer un libellé."));
   };
 
   // Confirmer l'ajout d'un marqueur avec son label
@@ -206,7 +196,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
       id: `marker-${Date.now()}`,
       lat: tempMarkerPosition.lat,
       lng: tempMarkerPosition.lng,
-      label: newMarkerLabel || `Marqueur ${markers.length + 1}`
+      label: newMarkerLabel || `${t("map.marker", "Marqueur")} ${markers.length + 1}`
     };
     
     const updatedMarkers = [...markers, newMarker];
@@ -221,7 +211,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
     setNewMarkerLabel('');
     setActiveMode('view');
     
-    toast.success(`Marqueur "${newMarker.label}" ajouté!`);
+    toast.success(`${t("map.markerAdded", "Marqueur")} "${newMarker.label}" ${t("map.added", "ajouté")}!`);
     
     // Rafraîchir la carte pour montrer le nouveau marqueur
     generateMapEmbed(currentLat, currentLng);
@@ -243,7 +233,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
     // Mise à jour du code d'intégration
     updateIframeCode(currentLat, currentLng, updatedMarkers);
     
-    toast.success("Marqueur supprimé!");
+    toast.success(t("map.markerDeleted", "Marqueur supprimé !"));
     
     // Rafraîchir la carte
     generateMapEmbed(currentLat, currentLng);
@@ -279,7 +269,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
   // Copier le code d'intégration
   const copyIframeCode = () => {
     navigator.clipboard.writeText(iframeCode);
-    toast.success("Code d'intégration copié !");
+    toast.success(t("map.codeCopied", "Code d'intégration copié !"));
   };
 
   // Gestion des touches pour la recherche
@@ -293,15 +283,15 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Carte Interactive SEO</DialogTitle>
+          <DialogTitle>{t("map.title", "Carte Interactive SEO")}</DialogTitle>
           <DialogDescription>
-            Recherchez une adresse et ajoutez des marqueurs pour créer une carte personnalisée
+            {t("map.description", "Recherchez une adresse et ajoutez des marqueurs pour créer une carte personnalisée")}
           </DialogDescription>
         </DialogHeader>
         
         <div className="mb-4 flex items-center space-x-2">
           <Input
-            placeholder="Entrez une adresse, ville ou pays..."
+            placeholder={t("map.addressPlaceholder", "Entrez une adresse, ville ou pays...")}
             value={address}
             onChange={(e) => setAddress(e.target.value)}
             onKeyPress={handleKeyPress}
@@ -318,12 +308,12 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                Recherche...
+                {t("map.searching", "Recherche...")}
               </span>
             ) : (
               <>
                 <Search className="h-4 w-4 mr-2" />
-                Rechercher
+                {t("map.search", "Rechercher")}
               </>
             )}
           </Button>
@@ -345,7 +335,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
             className="flex items-center"
           >
             <Search className="h-4 w-4 mr-1" />
-            Visualiser
+            {t("map.view", "Visualiser")}
           </Button>
           <Button 
             variant={activeMode === 'addMarker' ? "default" : "outline"} 
@@ -354,7 +344,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
             className="flex items-center"
           >
             <MapPin className="h-4 w-4 mr-1" />
-            Ajouter un marqueur
+            {t("map.addMarker", "Ajouter un marqueur")}
           </Button>
           <Button 
             variant={activeMode === 'move' ? "default" : "outline"} 
@@ -363,7 +353,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
             className="flex items-center"
           >
             <Move className="h-4 w-4 mr-1" />
-            Déplacer la carte
+            {t("map.moveMap", "Déplacer la carte")}
           </Button>
         </div>
         
@@ -371,13 +361,13 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
         {activeMode === 'move' && (
           <div className="grid grid-cols-3 gap-2 mb-4">
             <div></div>
-            <Button variant="outline" size="sm" onClick={() => moveMap('north')}>Nord</Button>
+            <Button variant="outline" size="sm" onClick={() => moveMap('north')}>{t("map.north", "Nord")}</Button>
             <div></div>
-            <Button variant="outline" size="sm" onClick={() => moveMap('west')}>Ouest</Button>
+            <Button variant="outline" size="sm" onClick={() => moveMap('west')}>{t("map.west", "Ouest")}</Button>
             <div></div>
-            <Button variant="outline" size="sm" onClick={() => moveMap('east')}>Est</Button>
+            <Button variant="outline" size="sm" onClick={() => moveMap('east')}>{t("map.east", "Est")}</Button>
             <div></div>
-            <Button variant="outline" size="sm" onClick={() => moveMap('south')}>Sud</Button>
+            <Button variant="outline" size="sm" onClick={() => moveMap('south')}>{t("map.south", "Sud")}</Button>
             <div></div>
           </div>
         )}
@@ -385,7 +375,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
         {/* Zone d'affichage de la carte avec gestion des clics */}
         <div 
           ref={mapContainerRef} 
-          className="w-full h-[400px] rounded-md border mb-4 relative"
+          className="w-full h-[400px] rounded-md border mb-4 relative cursor-crosshair"
           style={{ zIndex: 0 }} 
           onClick={handleMapClick}
         ></div>
@@ -393,10 +383,10 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
         {/* Interface pour ajouter un label au marqueur */}
         {showLabelInput && (
           <div className="mb-4 p-4 border rounded-md bg-gray-50">
-            <p className="mb-2 font-medium">Ajouter un marqueur</p>
+            <p className="mb-2 font-medium">{t("map.addMarker", "Ajouter un marqueur")}</p>
             <div className="flex gap-2 items-center">
               <Input
-                placeholder="Nom du marqueur..."
+                placeholder={t("map.markerName", "Nom du marqueur...")}
                 value={newMarkerLabel}
                 onChange={(e) => setNewMarkerLabel(e.target.value)}
                 className="flex-1"
@@ -404,11 +394,11 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
               />
               <Button variant="outline" size="sm" onClick={confirmAddMarker}>
                 <Plus className="h-4 w-4 mr-1" />
-                Ajouter
+                {t("map.add", "Ajouter")}
               </Button>
               <Button variant="outline" size="sm" onClick={cancelAddMarker}>
                 <X className="h-4 w-4 mr-1" />
-                Annuler
+                {t("map.cancel", "Annuler")}
               </Button>
             </div>
           </div>
@@ -417,7 +407,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
         {/* Liste des marqueurs */}
         {markers.length > 0 && (
           <div className="mb-4">
-            <h3 className="text-lg font-medium mb-2">Marqueurs ({markers.length})</h3>
+            <h3 className="text-lg font-medium mb-2">{t("map.markers", "Marqueurs")} ({markers.length})</h3>
             <div className="space-y-2">
               {markers.map((marker) => (
                 <div key={marker.id} className="flex justify-between items-center p-2 border rounded-md">
@@ -443,13 +433,13 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
         
         {/* Section code d'intégration */}
         <div className="flex justify-between items-center mb-2">
-          <h3 className="text-lg font-medium">Code d'intégration</h3>
+          <h3 className="text-lg font-medium">{t("map.embedCode", "Code d'intégration")}</h3>
           <Button 
             variant="outline" 
             size="sm" 
             onClick={() => setShowIframeCode(!showIframeCode)}
           >
-            {showIframeCode ? 'Masquer' : 'Afficher'}
+            {showIframeCode ? t("map.hide", "Masquer") : t("map.show", "Afficher")}
           </Button>
         </div>
         
@@ -464,7 +454,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
               onClick={copyIframeCode}
             >
               <Share2 className="h-4 w-4 mr-2" />
-              Copier
+              {t("map.copy", "Copier")}
             </Button>
           </div>
         )}
