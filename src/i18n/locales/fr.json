@@ -44,7 +44,7 @@
     "locationFound": "Emplacement trouvé",
     "noResults": "Aucun résultat trouvé pour",
     "tryMorePrecise": "Essayez d'être plus précis en incluant la ville ou le pays",
-    "searchError": "Erreur lors de la recherche. Veuillez réessayer",
+    "searchError": "Erreur lors de la recherche. Veuillez réessayer avec une autre adresse",
     "markerPositionSet": "Position du marqueur définie. Veuillez entrer un libellé",
     "marker": "Marqueur",
     "markerName": "Nom du marqueur...",

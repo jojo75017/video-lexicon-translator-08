@@ -26,7 +26,7 @@ const MapButton = () => {
         <MapIcon className="h-8 w-8" />
         <div>
           <h3 className="font-semibold mb-2">{t("map.interactiveMap", "Carte interactive")}</h3>
-          <p className="text-sm text-gray-600">{t("map.description", "Créez une carte personnalisée avec des marqueurs et des points d'intérêt")}</p>
+          <p className="text-sm text-gray-600">{t("map.description", "Recherchez une adresse et ajoutez des marqueurs pour créer une carte personnalisée")}</p>
         </div>
       </Button>
 

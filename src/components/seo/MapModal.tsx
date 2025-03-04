@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Search, Share2, AlertTriangle, MapPin, X, Plus, Move, Trash2, Info } from "lucide-react";
 import { toast } from "sonner";
+import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useTranslation } from "react-i18next";
 
@@ -32,7 +32,7 @@ const MARKER_COLORS = [
 const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
   const { t } = useTranslation();
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<any>(null);
+  const mapRef = useRef<L.Map | null>(null);
   const [address, setAddress] = useState('');
   const [iframeCode, setIframeCode] = useState('');
   const [showIframeCode, setShowIframeCode] = useState(false);
@@ -41,7 +41,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
   const [markers, setMarkers] = useState<Marker[]>([]);
   const [currentLat, setCurrentLat] = useState(48.8566);
   const [currentLng, setCurrentLng] = useState(2.3522);
-  const [activeMode, setActiveMode] = useState<'view' | 'addMarker' | 'move'>('view');
+  const [activeMode, setActiveMode<'view' | 'addMarker' | 'move'>( 'view');
   const [newMarkerLabel, setNewMarkerLabel] = useState('');
   const [showLabelInput, setShowLabelInput] = useState(false);
   const [tempMarkerPosition, setTempMarkerPosition] = useState<{lat: number, lng: number} | null>(null);
@@ -53,16 +53,11 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
     if (!open || !mapContainerRef.current) return;
     
     try {
-      // Charger la bibliothèque Leaflet dynamiquement si nécessaire
-      if (typeof window !== 'undefined' && typeof L !== 'undefined') {
-        initializeMap();
-      } else {
-        console.error("Leaflet n'est pas disponible");
-      }
-      
+      initializeMap();
       console.log("Carte initialisée avec succès");
     } catch (error) {
       console.error("Erreur lors de l'initialisation de la carte:", error);
+      toast.error(t("map.openError", "Impossible d'ouvrir la carte. Veuillez réessayer."));
     }
     
     return () => {
@@ -109,9 +104,9 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
     if (!mapRef.current) return;
     
     // Supprimer tous les marqueurs existants
-    mapRef.current.eachLayer((layer: any) => {
+    mapRef.current.eachLayer((layer: L.Layer) => {
       if (layer instanceof L.Marker) {
-        mapRef.current.removeLayer(layer);
+        mapRef.current?.removeLayer(layer);
       }
     });
     
