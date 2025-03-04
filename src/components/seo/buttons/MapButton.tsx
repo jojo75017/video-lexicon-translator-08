@@ -13,7 +13,7 @@ const MapButton = () => {
   const handleOpenMap = () => {
     console.log("Ouverture de la carte interactive");
     setIsOpen(true);
-    toast.info(t("map.openSuccess", "Carte interactive ouverte. Vous pouvez ajouter des marqueurs et personnaliser votre carte."));
+    toast.info(t("map.openSuccess"));
   };
 
   return (
@@ -25,8 +25,8 @@ const MapButton = () => {
       >
         <MapIcon className="h-8 w-8" />
         <div>
-          <h3 className="font-semibold mb-2">{t("map.interactiveMap", "Carte interactive")}</h3>
-          <p className="text-sm text-gray-600">{t("map.description", "Recherchez une adresse et ajoutez des marqueurs pour créer une carte personnalisée")}</p>
+          <h3 className="font-semibold mb-2">{t("map.interactiveMap")}</h3>
+          <p className="text-sm text-gray-600">{t("map.description")}</p>
         </div>
       </Button>
 

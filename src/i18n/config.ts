@@ -10,6 +10,8 @@ const resources = {
   en: {
     translation: {
       "seo": {
+        "analysis": "SEO Analysis",
+        "score": "SEO Score",
         "title": "Title",
         "description": "Description",
         "keywords": "Keywords",
@@ -79,7 +81,54 @@ const resources = {
           "competitors": "Competitors",
           "pointsOfInterest": "Points of interest",
           "targetAreas": "Target areas"
-        }
+        },
+        "countrySearch": "Country search",
+        "citySearch": "City search",
+        "addressSearch": "Address search",
+        "invalidSearch": "Invalid search",
+        "tryAgain": "Please try again",
+        "locationDetails": "Location details",
+        "latitude": "Latitude",
+        "longitude": "Longitude",
+        "zoomLevel": "Zoom level"
+      },
+      "common": {
+        "loading": "Loading...",
+        "error": "Error",
+        "success": "Success",
+        "warning": "Warning",
+        "info": "Info",
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "edit": "Edit",
+        "view": "View",
+        "search": "Search",
+        "next": "Next",
+        "previous": "Previous",
+        "submit": "Submit",
+        "reset": "Reset",
+        "close": "Close",
+        "open": "Open",
+        "yes": "Yes",
+        "no": "No"
+      },
+      "dashboard": {
+        "title": "Dashboard",
+        "overview": "Overview",
+        "analytics": "Analytics",
+        "reports": "Reports",
+        "settings": "Settings",
+        "profile": "Profile",
+        "logout": "Logout",
+        "login": "Login",
+        "register": "Register",
+        "welcome": "Welcome",
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "lastWeek": "Last week",
+        "lastMonth": "Last month",
+        "custom": "Custom"
       }
     }
   }

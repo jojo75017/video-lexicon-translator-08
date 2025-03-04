@@ -68,7 +68,6 @@
     "openError": "Impossible d'ouvrir la carte. Veuillez réessayer.",
     "clickToAddMarker": "Cliquez sur la carte pour ajouter un marqueur",
     "chooseMarkerColor": "Choisir la couleur du marqueur",
-    "legendTitle": "Légende",
     "showLegend": "Afficher la légende",
     "hideLegend": "Masquer la légende",
     "color": {
@@ -78,12 +77,60 @@
       "yellow": "Jaune",
       "purple": "Violet"
     },
+    "legendTitle": "Légende",
     "legendItems": {
       "importantPlaces": "Lieux importants",
       "clientLocation": "Emplacement client",
       "competitors": "Concurrents",
       "pointsOfInterest": "Points d'intérêt",
       "targetAreas": "Zones cibles"
-    }
+    },
+    "countrySearch": "Recherche pour le pays",
+    "citySearch": "Recherche pour la ville",
+    "addressSearch": "Recherche pour l'adresse",
+    "invalidSearch": "Recherche invalide",
+    "tryAgain": "Veuillez réessayer",
+    "locationDetails": "Détails de l'emplacement",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "zoomLevel": "Niveau de zoom"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "warning": "Avertissement",
+    "info": "Information",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "view": "Voir",
+    "search": "Rechercher",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "submit": "Soumettre",
+    "reset": "Réinitialiser",
+    "close": "Fermer",
+    "open": "Ouvrir",
+    "yes": "Oui",
+    "no": "Non"
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "overview": "Vue d'ensemble",
+    "analytics": "Analytiques",
+    "reports": "Rapports",
+    "settings": "Paramètres",
+    "profile": "Profil",
+    "logout": "Déconnexion",
+    "login": "Connexion",
+    "register": "S'inscrire",
+    "welcome": "Bienvenue",
+    "today": "Aujourd'hui",
+    "yesterday": "Hier",
+    "lastWeek": "Semaine dernière",
+    "lastMonth": "Mois dernier",
+    "custom": "Personnalisé"
   }
 }
