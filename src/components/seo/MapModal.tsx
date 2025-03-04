@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -41,7 +42,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
   const [markers, setMarkers] = useState<Marker[]>([]);
   const [currentLat, setCurrentLat] = useState(48.8566);
   const [currentLng, setCurrentLng] = useState(2.3522);
-  const [activeMode, setActiveMode<'view' | 'addMarker' | 'move'>( 'view');
+  const [activeMode, setActiveMode] = useState<'view' | 'addMarker' | 'move'>('view');
   const [newMarkerLabel, setNewMarkerLabel] = useState('');
   const [showLabelInput, setShowLabelInput] = useState(false);
   const [tempMarkerPosition, setTempMarkerPosition] = useState<{lat: number, lng: number} | null>(null);
@@ -53,8 +54,13 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
     if (!open || !mapContainerRef.current) return;
     
     try {
-      initializeMap();
-      console.log("Carte initialisée avec succès");
+      if (typeof L !== 'undefined') {
+        initializeMap();
+        console.log("Carte initialisée avec succès");
+      } else {
+        console.error("Leaflet n'est pas disponible");
+        toast.error(t("map.openError", "Impossible d'ouvrir la carte. Veuillez réessayer."));
+      }
     } catch (error) {
       console.error("Erreur lors de l'initialisation de la carte:", error);
       toast.error(t("map.openError", "Impossible d'ouvrir la carte. Veuillez réessayer."));
@@ -66,7 +72,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
         mapRef.current = null;
       }
     };
-  }, [open]);
+  }, [open, t]);
 
   // Mettre à jour la carte lorsque les marqueurs ou les coordonnées changent
   useEffect(() => {
@@ -204,11 +210,18 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
         // Mettre à jour la vue de la carte
         if (mapRef.current) {
           mapRef.current.setView([latitude, longitude], 13);
+          toast.success(`${t("map.locationFound", "Emplacement trouvé")}: ${display_name}`);
         } else {
-          initializeMap();
+          // Si la carte n'est pas encore initialisée, essayons de l'initialiser
+          try {
+            initializeMap();
+            toast.success(`${t("map.locationFound", "Emplacement trouvé")}: ${display_name}`);
+          } catch (error) {
+            console.error("Erreur lors de l'initialisation de la carte après recherche:", error);
+            setSearchError(t("map.openError", "Impossible d'ouvrir la carte. Veuillez réessayer."));
+            toast.error(t("map.openError", "Impossible d'ouvrir la carte. Veuillez réessayer."));
+          }
         }
-        
-        toast.success(`${t("map.locationFound", "Emplacement trouvé")}: ${display_name}`);
       } else {
         console.log("Aucun résultat trouvé pour:", address);
         setSearchError(`${t("map.noResults", "Aucun résultat trouvé pour")} "${address}". ${t("map.tryMorePrecise", "Essayez d'être plus précis en incluant la ville ou le pays.")}`);
@@ -217,14 +230,14 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
     } catch (error) {
       console.error("Erreur lors de la recherche d'adresse:", error);
       setSearchError(t("map.searchError", "Erreur lors de la recherche. Veuillez réessayer avec une autre adresse."));
-      toast.error(t("map.searchError", "Erreur lors de la recherche. Veuillez réessayer."));
+      toast.error(t("map.searchError", "Erreur lors de la recherche. Veuillez réessayer avec une autre adresse."));
     } finally {
       setIsSearching(false);
     }
   };
 
   // Gestionnaire pour ajouter un marqueur
-  const handleMapClick = (e: any) => {
+  const handleMapClick = (e: L.LeafletMouseEvent) => {
     if (activeMode !== 'addMarker' || !mapRef.current) return;
     
     const { lat, lng } = e.latlng;
