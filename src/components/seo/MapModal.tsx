@@ -49,7 +49,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
   const [selectedMarkerColor, setSelectedMarkerColor] = useState(MARKER_COLORS[0]);
   const [showLegend, setShowLegend] = useState(true);
 
-  // Fonction pour initialiser la carte avec les coordonnées actuelles
+  // Initialize map when the modal opens
   useEffect(() => {
     if (!open || !mapContainerRef.current) return;
     
@@ -74,53 +74,53 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
     };
   }, [open, t]);
 
-  // Mettre à jour la carte lorsque les marqueurs ou les coordonnées changent
+  // Update markers when they change
   useEffect(() => {
     if (mapRef.current) {
       updateMapMarkers();
     }
   }, [markers, currentLat, currentLng]);
 
-  // Initialisation de la carte
+  // Initialize the map with current coordinates
   const initializeMap = () => {
     if (!mapContainerRef.current) return;
     
-    // Nettoyer la carte existante si elle existe
+    // Clean up existing map if it exists
     if (mapRef.current) {
       mapRef.current.remove();
     }
     
-    // Créer une nouvelle carte
+    // Create a new map
     mapRef.current = L.map(mapContainerRef.current).setView([currentLat, currentLng], 13);
     
-    // Ajouter la couche de tuiles OpenStreetMap
+    // Add OpenStreetMap tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(mapRef.current);
     
-    // Ajouter les marqueurs
+    // Add markers
     updateMapMarkers();
     
-    // Ajouter un gestionnaire de clic pour ajouter des marqueurs
-    mapRef.current.on('click', handleMapClick);
+    // Add click handler for adding markers
+    mapRef.current.on('click', (e: L.LeafletMouseEvent) => handleMapClick(e));
   };
 
-  // Fonction pour mettre à jour les marqueurs sur la carte
+  // Update markers on the map
   const updateMapMarkers = () => {
     if (!mapRef.current) return;
     
-    // Supprimer tous les marqueurs existants
+    // Remove all existing markers
     mapRef.current.eachLayer((layer: L.Layer) => {
       if (layer instanceof L.Marker) {
         mapRef.current?.removeLayer(layer);
       }
     });
     
-    // Ajouter les marqueurs actuels
+    // Add current markers
     markers.forEach(marker => {
-      const markerColor = marker.color || '#ef4444'; // Rouge par défaut
+      const markerColor = marker.color || '#ef4444'; // Default: red
       
-      // Créer une icône personnalisée avec la couleur spécifiée
+      // Create custom marker icon with specified color
       const markerIcon = L.divIcon({
         className: 'custom-map-marker',
         html: `<div style="background-color: ${markerColor}; width: 24px; height: 24px; border-radius: 50%; border: 2px solid white; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold;">
@@ -130,19 +130,19 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
         iconAnchor: [12, 12]
       });
       
-      // Ajouter le marqueur avec un popup
+      // Add marker with popup
       L.marker([marker.lat, marker.lng], { icon: markerIcon })
         .addTo(mapRef.current)
         .bindPopup(`<b>${marker.label}</b>`);
     });
     
-    // Mettre à jour le code d'intégration
+    // Update embed code
     updateIframeCode();
   };
 
-  // Fonction pour mettre à jour le code d'intégration
+  // Update embed iframe code
   const updateIframeCode = () => {
-    // Code HTML de base pour l'iframe
+    // Base HTML for iframe
     let iframeHtml = `<iframe 
       width="100%" 
       height="400" 
@@ -152,7 +152,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
       marginwidth="0" 
       src="https://www.openstreetmap.org/export/embed.html?bbox=${currentLng - 0.05}%2C${currentLat - 0.05}%2C${currentLng + 0.05}%2C${currentLat + 0.05}&amp;layer=mapnik`;
     
-    // Ajouter les marqueurs au code
+    // Add markers to code
     if (markers && markers.length > 0) {
       markers.forEach(marker => {
         iframeHtml += `&amp;marker=${marker.lat}%2C${marker.lng}`;
@@ -167,7 +167,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
     setIframeCode(iframeHtml);
   };
 
-  // Fonction pour rechercher une adresse
+  // Search for an address
   const searchAddress = async () => {
     if (!address.trim()) {
       toast.error(t("map.enterAddress", "Veuillez saisir une adresse"));
@@ -180,9 +180,9 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
     toast.info(`${t("map.searchingFor", "Recherche en cours pour")}: ${address}`);
     
     try {
-      // Utilisation du service Nominatim pour la géocodification
+      // Use Nominatim for geocoding with improved parameters
       const encodedAddress = encodeURIComponent(address.trim());
-      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodedAddress}&limit=1`, {
+      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodedAddress}&limit=1&addressdetails=1`, {
         headers: {
           'Accept': 'application/json',
           'User-Agent': 'LocalSEOApp'
@@ -203,16 +203,32 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
         
         console.log(`Emplacement trouvé: ${display_name} (${latitude}, ${longitude})`);
         
-        // Mettre à jour les coordonnées actuelles
+        // Update current coordinates
         setCurrentLat(latitude);
         setCurrentLng(longitude);
         
-        // Mettre à jour la vue de la carte
+        // Update map view with appropriate zoom level based on location type
         if (mapRef.current) {
-          mapRef.current.setView([latitude, longitude], 13);
+          // Adjust zoom level based on place_rank (country=4, city=~16, street=~18)
+          const placeRank = data[0].place_rank || 10;
+          let zoomLevel = 13; // default
+          
+          if (placeRank <= 4) { // Country
+            zoomLevel = 5;
+          } else if (placeRank <= 8) { // Region/Province
+            zoomLevel = 7;
+          } else if (placeRank <= 12) { // City/County
+            zoomLevel = 10;
+          } else if (placeRank <= 16) { // District/Suburb
+            zoomLevel = 13;
+          } else { // Street/Address
+            zoomLevel = 16;
+          }
+          
+          mapRef.current.setView([latitude, longitude], zoomLevel);
           toast.success(`${t("map.locationFound", "Emplacement trouvé")}: ${display_name}`);
         } else {
-          // Si la carte n'est pas encore initialisée, essayons de l'initialiser
+          // Initialize map if it doesn't exist yet
           try {
             initializeMap();
             toast.success(`${t("map.locationFound", "Emplacement trouvé")}: ${display_name}`);
@@ -236,23 +252,23 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
     }
   };
 
-  // Gestionnaire pour ajouter un marqueur
+  // Handle map click for adding markers
   const handleMapClick = (e: L.LeafletMouseEvent) => {
     if (activeMode !== 'addMarker' || !mapRef.current) return;
     
     const { lat, lng } = e.latlng;
     console.log(`Clic sur la carte à: ${lat}, ${lng}`);
     
-    // Enregistrer temporairement la position du marqueur
+    // Store marker position temporarily
     setTempMarkerPosition({ lat, lng });
     
-    // Afficher l'input pour le label
+    // Show label input
     setShowLabelInput(true);
     
     toast.info(t("map.markerPositionSet", "Position du marqueur définie. Veuillez entrer un libellé."));
   };
 
-  // Confirmer l'ajout d'un marqueur avec son label
+  // Confirm adding a marker with label
   const confirmAddMarker = () => {
     if (!tempMarkerPosition) return;
     
@@ -267,7 +283,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
     const updatedMarkers = [...markers, newMarker];
     setMarkers(updatedMarkers);
     
-    // Réinitialiser
+    // Reset
     setTempMarkerPosition(null);
     setShowLabelInput(false);
     setNewMarkerLabel('');
@@ -276,7 +292,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
     toast.success(`${t("map.markerAdded", "Marqueur")} "${newMarker.label}" ${t("map.added", "ajouté")}!`);
   };
 
-  // Annuler l'ajout d'un marqueur
+  // Cancel adding a marker
   const cancelAddMarker = () => {
     setTempMarkerPosition(null);
     setShowLabelInput(false);
@@ -284,7 +300,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
     setActiveMode('view');
   };
 
-  // Supprimer un marqueur
+  // Delete a marker
   const deleteMarker = (id: string) => {
     const updatedMarkers = markers.filter(marker => marker.id !== id);
     setMarkers(updatedMarkers);
@@ -292,7 +308,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
     toast.success(t("map.markerDeleted", "Marqueur supprimé !"));
   };
 
-  // Mode déplacement de la carte
+  // Move map in specified direction
   const moveMap = (direction: 'north' | 'south' | 'east' | 'west') => {
     if (!mapRef.current) return;
     
@@ -323,25 +339,25 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
     setCurrentLng(newLng);
   };
 
-  // Copier le code d'intégration
+  // Copy embed code
   const copyIframeCode = () => {
     navigator.clipboard.writeText(iframeCode);
     toast.success(t("map.codeCopied", "Code d'intégration copié !"));
   };
 
-  // Gestion des touches pour la recherche
+  // Handle key press for search input
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       searchAddress();
     }
   };
 
-  // Changer la couleur du marqueur
+  // Change marker color
   const handleMarkerColorChange = (color: typeof MARKER_COLORS[0]) => {
     setSelectedMarkerColor(color);
   };
 
-  // Basculer l'affichage de la légende
+  // Toggle legend display
   const toggleLegend = () => {
     setShowLegend(!showLegend);
   };
@@ -393,7 +409,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
           </div>
         )}
         
-        {/* Contrôles de la carte */}
+        {/* Map controls */}
         <div className="flex flex-wrap gap-2 mb-4">
           <Button 
             variant={activeMode === 'view' ? "default" : "outline"} 
@@ -433,7 +449,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
           </Button>
         </div>
         
-        {/* Contrôles de déplacement */}
+        {/* Movement controls */}
         {activeMode === 'move' && (
           <div className="grid grid-cols-3 gap-2 mb-4">
             <div></div>
@@ -448,7 +464,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
           </div>
         )}
         
-        {/* Choix de couleur pour les marqueurs */}
+        {/* Marker color chooser */}
         {activeMode === 'addMarker' && (
           <div className="mb-4">
             <p className="text-sm font-medium mb-2">{t("map.chooseMarkerColor", "Choisir la couleur du marqueur")}:</p>
@@ -467,7 +483,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
         )}
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          {/* Zone d'affichage de la carte */}
+          {/* Map display area */}
           <div className="md:col-span-2">
             <div 
               ref={mapContainerRef} 
@@ -476,38 +492,38 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
             ></div>
           </div>
           
-          {/* Légende et liste des marqueurs */}
+          {/* Legend and marker list */}
           <div className="space-y-4">
-            {/* Légende */}
+            {/* Legend */}
             {showLegend && (
               <div className="border rounded-md p-3 bg-gray-50">
-                <h3 className="text-sm font-semibold mb-2">{t("map.legend", "Légende")}</h3>
+                <h3 className="text-sm font-semibold mb-2">{t("map.legendTitle", "Légende")}</h3>
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 rounded-full bg-red-500"></div>
-                    <span className="text-xs">{t("map.legend.importantPlaces", "Lieux importants")}</span>
+                    <span className="text-xs">{t("map.legendItems.importantPlaces", "Lieux importants")}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 rounded-full bg-blue-500"></div>
-                    <span className="text-xs">{t("map.legend.clientLocation", "Emplacement client")}</span>
+                    <span className="text-xs">{t("map.legendItems.clientLocation", "Emplacement client")}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 rounded-full bg-green-500"></div>
-                    <span className="text-xs">{t("map.legend.competitors", "Concurrents")}</span>
+                    <span className="text-xs">{t("map.legendItems.competitors", "Concurrents")}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 rounded-full bg-yellow-500"></div>
-                    <span className="text-xs">{t("map.legend.pointsOfInterest", "Points d'intérêt")}</span>
+                    <span className="text-xs">{t("map.legendItems.pointsOfInterest", "Points d'intérêt")}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 rounded-full bg-purple-500"></div>
-                    <span className="text-xs">{t("map.legend.targetAreas", "Zones cibles")}</span>
+                    <span className="text-xs">{t("map.legendItems.targetAreas", "Zones cibles")}</span>
                   </div>
                 </div>
               </div>
             )}
             
-            {/* Liste des marqueurs */}
+            {/* Marker list */}
             <div className="border rounded-md p-3">
               <h3 className="text-sm font-semibold mb-2">{t("map.markers", "Marqueurs")} ({markers.length})</h3>
               {markers.length > 0 ? (
@@ -536,7 +552,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
           </div>
         </div>
         
-        {/* Interface pour ajouter un label au marqueur */}
+        {/* Marker label input interface */}
         {showLabelInput && (
           <div className="mb-4 p-4 border rounded-md bg-gray-50">
             <p className="mb-2 font-medium">{t("map.addMarker", "Ajouter un marqueur")}</p>
@@ -560,7 +576,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
           </div>
         )}
         
-        {/* Section code d'intégration */}
+        {/* Embed code section */}
         <div className="flex justify-between items-center mb-2">
           <h3 className="text-lg font-medium">{t("map.embedCode", "Code d'intégration")}</h3>
           <Button 

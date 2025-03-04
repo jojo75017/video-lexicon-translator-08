@@ -68,7 +68,7 @@
     "openError": "Impossible d'ouvrir la carte. Veuillez réessayer.",
     "clickToAddMarker": "Cliquez sur la carte pour ajouter un marqueur",
     "chooseMarkerColor": "Choisir la couleur du marqueur",
-    "legend": "Légende",
+    "legendTitle": "Légende",
     "showLegend": "Afficher la légende",
     "hideLegend": "Masquer la légende",
     "color": {
@@ -78,7 +78,7 @@
       "yellow": "Jaune",
       "purple": "Violet"
     },
-    "legend": {
+    "legendItems": {
       "importantPlaces": "Lieux importants",
       "clientLocation": "Emplacement client",
       "competitors": "Concurrents",

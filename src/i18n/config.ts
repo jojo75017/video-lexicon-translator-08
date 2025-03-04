@@ -63,7 +63,6 @@ const resources = {
         "openError": "Unable to open the map. Please try again.",
         "clickToAddMarker": "Click on the map to add a marker",
         "chooseMarkerColor": "Choose marker color",
-        "legend": "Legend",
         "showLegend": "Show legend",
         "hideLegend": "Hide legend",
         "color": {
@@ -73,7 +72,8 @@ const resources = {
           "yellow": "Yellow",
           "purple": "Purple"
         },
-        "legend": {
+        "legendTitle": "Legend",
+        "legendItems": {
           "importantPlaces": "Important places",
           "clientLocation": "Client location",
           "competitors": "Competitors",
