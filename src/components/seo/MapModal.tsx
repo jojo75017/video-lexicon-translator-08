@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import * as L from 'leaflet';
 
 interface MapModalProps {
   open: boolean;
@@ -35,20 +36,15 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
   const mapRef = useRef<L.Map | null>(null);
   const searchAbortController = useRef<AbortController | null>(null);
   const mapContainer = useRef<HTMLDivElement>(null);
+  const markersLayerRef = useRef<L.LayerGroup | null>(null);
 
   // Initialiser la carte lors du montage du composant
   useEffect(() => {
     if (!open) return;
 
-    let leaflet: typeof import('leaflet');
-    let map: L.Map;
-
     // Fonction d'initialisation de la carte
     const initMap = async () => {
       try {
-        leaflet = await import('leaflet');
-        await import('leaflet/dist/leaflet.css');
-
         if (!mapContainer.current || mapContainer.current.innerHTML !== '') {
           return;
         }
@@ -56,13 +52,17 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
         const defaultView = [48.856614, 2.3522219] as [number, number]; // Paris
         const defaultZoom = 13;
 
-        map = leaflet.map(mapContainer.current).setView(defaultView, defaultZoom);
+        const map = L.map(mapContainer.current).setView(defaultView, defaultZoom);
         
-        leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
-        map.on('click', (e) => {
+        // Create a layer group for markers
+        const markersLayer = L.layerGroup().addTo(map);
+        markersLayerRef.current = markersLayer;
+
+        map.on('click', (e: L.LeafletMouseEvent) => {
           if (activeMode === 'addMarker') {
             handleMapClick(e);
           }
@@ -70,6 +70,11 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
 
         mapRef.current = map;
         setMapLoaded(true);
+        
+        // Add existing markers when map is initialized
+        if (markers.length > 0) {
+          updateMapMarkers();
+        }
       } catch (error) {
         console.error("Erreur lors de l'initialisation de la carte:", error);
         toast.error(t("map.openError"));
@@ -82,25 +87,28 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
+        markersLayerRef.current = null;
         setMapLoaded(false);
       }
     };
   }, [open, t]);
 
-  // Mettre à jour les marqueurs sur la carte
+  // Update markers when they change
   useEffect(() => {
-    if (!mapRef.current || !mapLoaded) return;
+    if (mapLoaded) {
+      updateMapMarkers();
+    }
+  }, [markers, tempMarker, mapLoaded, markerColor]);
 
-    // Supprimer tous les marqueurs existants
-    mapRef.current.eachLayer((layer) => {
-      if (layer instanceof L.Marker) {
-        mapRef.current?.removeLayer(layer);
-      }
-    });
+  // Mettre à jour les marqueurs sur la carte
+  const updateMapMarkers = () => {
+    if (!mapRef.current || !markersLayerRef.current) return;
 
-    // Ajouter les nouveaux marqueurs
-    markers.forEach(async (marker) => {
-      const L = await import('leaflet');
+    // Clear existing markers
+    markersLayerRef.current.clearLayers();
+
+    // Add permanent markers
+    markers.forEach((marker) => {
       const markerIcon = L.icon({
         iconUrl: getMarkerIconUrl(marker.color),
         iconSize: [25, 41],
@@ -111,16 +119,31 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
       });
 
       L.marker([marker.lat, marker.lng], { icon: markerIcon })
-        .addTo(mapRef.current!)
-        .bindPopup(marker.label);
+        .bindPopup(marker.label)
+        .addTo(markersLayerRef.current!);
     });
 
-    // Ajouter le marqueur temporaire s'il existe
+    // Add temp marker if exists
     if (tempMarker) {
-      addTempMarker(tempMarker.lat, tempMarker.lng);
-    }
+      const markerIcon = L.icon({
+        iconUrl: getMarkerIconUrl(markerColor),
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+        shadowSize: [41, 41]
+      });
 
-  }, [markers, tempMarker, mapLoaded]);
+      L.marker([tempMarker.lat, tempMarker.lng], { icon: markerIcon })
+        .bindPopup(`<div>
+          <p>${t("map.markerPositionSet")}</p>
+          <p>${t("map.latitude")}: ${tempMarker.lat.toFixed(6)}</p>
+          <p>${t("map.longitude")}: ${tempMarker.lng.toFixed(6)}</p>
+        </div>`)
+        .openPopup()
+        .addTo(markersLayerRef.current);
+    }
+  };
 
   // Fonction pour obtenir l'URL de l'icône de marqueur en fonction de la couleur
   const getMarkerIconUrl = (color: string) => {
@@ -133,36 +156,6 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
     };
 
     return colorMapping[color] || colorMapping.red;
-  };
-
-  // Ajouter un marqueur temporaire à la carte
-  const addTempMarker = async (lat: number, lng: number) => {
-    if (!mapRef.current) return;
-
-    // Supprimer le marqueur temporaire existant s'il existe
-    mapRef.current.eachLayer((layer) => {
-      if (layer instanceof L.Marker && layer.options.title === 'temp-marker') {
-        mapRef.current?.removeLayer(layer);
-      }
-    });
-
-    const L = await import('leaflet');
-    const markerIcon = L.icon({
-      iconUrl: getMarkerIconUrl(markerColor),
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
-      popupAnchor: [1, -34],
-      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-      shadowSize: [41, 41]
-    });
-
-    L.marker([lat, lng], { icon: markerIcon, title: 'temp-marker' })
-      .addTo(mapRef.current)
-      .bindPopup(`<div>
-        <p>${t("map.markerPositionSet")}</p>
-        <p>${t("map.latitude")}: ${lat.toFixed(6)}</p>
-        <p>${t("map.longitude")}: ${lng.toFixed(6)}</p>
-      </div>`).openPopup();
   };
 
   // Gérer le clic sur la carte
@@ -211,7 +204,6 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
       if (!data || data.length === 0) {
         setSearchError(t("map.noResults") + " " + address);
         toast.warning(`${t("map.noResults")} "${address}". ${t("map.tryMorePrecise")}`);
-        setIsSearching(false);
         return;
       }
 
