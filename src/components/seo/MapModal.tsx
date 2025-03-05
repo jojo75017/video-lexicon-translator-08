@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -234,6 +235,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
       const data = await response.json();
       console.log("Résultats de recherche:", data);
 
+      // CORRECTION: Assurons-nous que isSearching est mis à false même si aucun résultat n'est trouvé
       if (data && data.length > 0) {
         const { lat, lon, display_name, place_rank, boundingbox } = data[0];
         const latitude = parseFloat(lat);
@@ -275,6 +277,7 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
       setSearchError(t("map.searchError"));
       toast.error(t("map.searchError"));
     } finally {
+      // CORRECTION: Assurons-nous que isSearching est toujours mis à false à la fin
       setIsSearching(false);
     }
   };
@@ -364,7 +367,10 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      searchAddress();
+      // CORRECTION: Empêcher de lancer plusieurs recherches en même temps
+      if (!isSearching) {
+        searchAddress();
+      }
     }
   };
 
@@ -393,6 +399,8 @@ const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
             onChange={(e) => setAddress(e.target.value)}
             onKeyPress={handleKeyPress}
             className="flex-1"
+            // CORRECTION: Désactiver l'input pendant la recherche
+            disabled={isSearching}
           />
           <Button 
             onClick={searchAddress} 
