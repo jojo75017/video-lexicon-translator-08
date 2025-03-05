@@ -3,633 +3,602 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Search, Share2, AlertTriangle, MapPin, X, Plus, Move, Trash2, Info } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
+import { Copy, Plus, XCircle, MapPin, Map, Eye, EyeOff, Trash2, Layers } from 'lucide-react';
 import { toast } from "sonner";
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
 import { useTranslation } from "react-i18next";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 
 interface MapModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-interface Marker {
-  id: string;
-  lat: number;
-  lng: number;
-  label: string;
-  color?: string;
-}
-
-const MARKER_COLORS = [
-  { name: 'red', hex: '#ef4444' },
-  { name: 'blue', hex: '#3b82f6' },
-  { name: 'green', hex: '#22c55e' },
-  { name: 'yellow', hex: '#eab308' },
-  { name: 'purple', hex: '#a855f7' }
-];
-
-const MapModal: React.FC<MapModalProps> = ({ open, onOpenChange }) => {
+const MapModal = ({ open, onOpenChange }: MapModalProps) => {
   const { t } = useTranslation();
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<L.Map | null>(null);
   const [address, setAddress] = useState('');
-  const [iframeCode, setIframeCode] = useState('');
-  const [showIframeCode, setShowIframeCode] = useState(false);
-  const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
-  const [markers, setMarkers] = useState<Marker[]>([]);
-  const [currentLat, setCurrentLat] = useState(48.8566);
-  const [currentLng, setCurrentLng] = useState(2.3522);
-  const [activeMode, setActiveMode] = useState<'view' | 'addMarker' | 'move'>('view');
-  const [newMarkerLabel, setNewMarkerLabel] = useState('');
-  const [showLabelInput, setShowLabelInput] = useState(false);
-  const [tempMarkerPosition, setTempMarkerPosition] = useState<{lat: number, lng: number} | null>(null);
-  const [selectedMarkerColor, setSelectedMarkerColor] = useState(MARKER_COLORS[0]);
-  const [showLegend, setShowLegend] = useState(true);
-  const [searchType, setSearchType] = useState<'country' | 'city' | 'address' | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const [lastSearch, setLastSearch] = useState('');
+  const [showEmbedCode, setShowEmbedCode] = useState(false);
+  const [activeMode, setActiveMode] = useState<'search' | 'addMarker' | 'move'>('search');
+  const [tempMarker, setTempMarker] = useState<{ lat: number; lng: number } | null>(null);
+  const [markerLabel, setMarkerLabel] = useState('');
+  const [markerColor, setMarkerColor] = useState<'red' | 'blue' | 'green' | 'yellow' | 'purple'>('red');
+  const [markers, setMarkers] = useState<Array<{ lat: number; lng: number; label: string; color: string }>>([]);
+  const [showLegend, setShowLegend] = useState(false);
+  const [searchType, setSearchType] = useState<'country' | 'city' | 'address'>('address');
+  const [mapLoaded, setMapLoaded] = useState(false);
+  const searchTimeout = useRef<NodeJS.Timeout | null>(null);
+  const mapRef = useRef<L.Map | null>(null);
+  const searchAbortController = useRef<AbortController | null>(null);
+  const mapContainer = useRef<HTMLDivElement>(null);
 
+  // Initialiser la carte lors du montage du composant
   useEffect(() => {
-    if (!open || !mapContainerRef.current) return;
-    
-    try {
-      if (typeof L !== 'undefined') {
-        initializeMap();
-        console.log("Carte initialisée avec succès");
-      } else {
-        console.error("Leaflet n'est pas disponible");
+    if (!open) return;
+
+    let leaflet: typeof import('leaflet');
+    let map: L.Map;
+
+    // Fonction d'initialisation de la carte
+    const initMap = async () => {
+      try {
+        leaflet = await import('leaflet');
+        await import('leaflet/dist/leaflet.css');
+
+        if (!mapContainer.current || mapContainer.current.innerHTML !== '') {
+          return;
+        }
+
+        const defaultView = [48.856614, 2.3522219] as [number, number]; // Paris
+        const defaultZoom = 13;
+
+        map = leaflet.map(mapContainer.current).setView(defaultView, defaultZoom);
+        
+        leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        map.on('click', (e) => {
+          if (activeMode === 'addMarker') {
+            handleMapClick(e);
+          }
+        });
+
+        mapRef.current = map;
+        setMapLoaded(true);
+      } catch (error) {
+        console.error("Erreur lors de l'initialisation de la carte:", error);
         toast.error(t("map.openError"));
       }
-    } catch (error) {
-      console.error("Erreur lors de l'initialisation de la carte:", error);
-      toast.error(t("map.openError"));
-    }
-    
+    };
+
+    initMap();
+
     return () => {
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
+        setMapLoaded(false);
       }
     };
   }, [open, t]);
 
+  // Mettre à jour les marqueurs sur la carte
   useEffect(() => {
-    if (mapRef.current) {
-      updateMapMarkers();
-    }
-  }, [markers, currentLat, currentLng]);
+    if (!mapRef.current || !mapLoaded) return;
 
-  const initializeMap = () => {
-    if (!mapContainerRef.current) return;
-    
-    if (mapRef.current) {
-      mapRef.current.remove();
-    }
-    
-    mapRef.current = L.map(mapContainerRef.current).setView([currentLat, currentLng], 13);
-    
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(mapRef.current);
-    
-    updateMapMarkers();
-    
-    mapRef.current.on('click', (e: L.LeafletMouseEvent) => handleMapClick(e));
-  };
-
-  const updateMapMarkers = () => {
-    if (!mapRef.current) return;
-    
-    mapRef.current.eachLayer((layer: L.Layer) => {
+    // Supprimer tous les marqueurs existants
+    mapRef.current.eachLayer((layer) => {
       if (layer instanceof L.Marker) {
         mapRef.current?.removeLayer(layer);
       }
     });
-    
-    markers.forEach(marker => {
-      const markerColor = marker.color || '#ef4444';
-      
-      const markerIcon = L.divIcon({
-        className: 'custom-map-marker',
-        html: `<div style="background-color: ${markerColor}; width: 24px; height: 24px; border-radius: 50%; border: 2px solid white; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-              </div>`,
-        iconSize: [24, 24],
-        iconAnchor: [12, 12]
+
+    // Ajouter les nouveaux marqueurs
+    markers.forEach(async (marker) => {
+      const L = await import('leaflet');
+      const markerIcon = L.icon({
+        iconUrl: getMarkerIconUrl(marker.color),
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+        shadowSize: [41, 41]
       });
-      
+
       L.marker([marker.lat, marker.lng], { icon: markerIcon })
-        .addTo(mapRef.current)
-        .bindPopup(`<b>${marker.label}</b>`);
+        .addTo(mapRef.current!)
+        .bindPopup(marker.label);
     });
-    
-    updateIframeCode();
-  };
 
-  const updateIframeCode = () => {
-    let iframeHtml = `<iframe 
-      width="100%" 
-      height="400" 
-      frameborder="0" 
-      scrolling="no" 
-      marginheight="0" 
-      marginwidth="0" 
-      src="https://www.openstreetmap.org/export/embed.html?bbox=${currentLng - 0.05}%2C${currentLat - 0.05}%2C${currentLng + 0.05}%2C${currentLat + 0.05}&amp;layer=mapnik`;
-    
-    if (markers && markers.length > 0) {
-      markers.forEach(marker => {
-        iframeHtml += `&amp;marker=${marker.lat}%2C${marker.lng}`;
-      });
+    // Ajouter le marqueur temporaire s'il existe
+    if (tempMarker) {
+      addTempMarker(tempMarker.lat, tempMarker.lng);
     }
-    
-    iframeHtml += `" style="border: 1px solid black"></iframe>
-    <p>
-      <small><a href="https://www.openstreetmap.org/?mlat=${currentLat}&amp;mlon=${currentLng}#map=15/${currentLat}/${currentLng}" target="_blank">Voir en plein écran</a></small>
-    </p>`;
 
-    setIframeCode(iframeHtml);
+  }, [markers, tempMarker, mapLoaded]);
+
+  // Fonction pour obtenir l'URL de l'icône de marqueur en fonction de la couleur
+  const getMarkerIconUrl = (color: string) => {
+    const colorMapping: Record<string, string> = {
+      red: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+      blue: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+      green: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+      yellow: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-yellow.png',
+      purple: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-violet.png'
+    };
+
+    return colorMapping[color] || colorMapping.red;
   };
 
-  const getZoomLevelForPlaceType = (placeRank: number, boundingBox?: string[]): number => {
-    if (placeRank <= 4) {
-      if (boundingBox && boundingBox.length === 4) {
-        const latDiff = Math.abs(parseFloat(boundingBox[1]) - parseFloat(boundingBox[0]));
-        const lngDiff = Math.abs(parseFloat(boundingBox[3]) - parseFloat(boundingBox[2]));
-        
-        const maxDiff = Math.max(latDiff, lngDiff);
-        
-        if (maxDiff > 50) return 2;
-        if (maxDiff > 20) return 3;
-        if (maxDiff > 10) return 4;
-        return 5;
+  // Ajouter un marqueur temporaire à la carte
+  const addTempMarker = async (lat: number, lng: number) => {
+    if (!mapRef.current) return;
+
+    // Supprimer le marqueur temporaire existant s'il existe
+    mapRef.current.eachLayer((layer) => {
+      if (layer instanceof L.Marker && layer.options.title === 'temp-marker') {
+        mapRef.current?.removeLayer(layer);
       }
-      return 5;
-    } 
-    
-    if (placeRank <= 8) return 7;
-    if (placeRank <= 12) return 10;
-    if (placeRank <= 16) return 13;
-    return 16;
+    });
+
+    const L = await import('leaflet');
+    const markerIcon = L.icon({
+      iconUrl: getMarkerIconUrl(markerColor),
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+      shadowSize: [41, 41]
+    });
+
+    L.marker([lat, lng], { icon: markerIcon, title: 'temp-marker' })
+      .addTo(mapRef.current)
+      .bindPopup(`<div>
+        <p>${t("map.markerPositionSet")}</p>
+        <p>${t("map.latitude")}: ${lat.toFixed(6)}</p>
+        <p>${t("map.longitude")}: ${lng.toFixed(6)}</p>
+      </div>`).openPopup();
   };
 
-  const fitMapToBounds = (boundingBox: string[]) => {
-    if (!mapRef.current || boundingBox.length !== 4) return;
-    
-    try {
-      const southWest = L.latLng(parseFloat(boundingBox[0]), parseFloat(boundingBox[2]));
-      const northEast = L.latLng(parseFloat(boundingBox[1]), parseFloat(boundingBox[3]));
-      const bounds = L.latLngBounds(southWest, northEast);
-      
-      mapRef.current.fitBounds(bounds, {
-        padding: [50, 50],
-        maxZoom: 15
-      });
-      
-      const center = bounds.getCenter();
-      setCurrentLat(center.lat);
-      setCurrentLng(center.lng);
-      
-      const latDiff = Math.abs(parseFloat(boundingBox[1]) - parseFloat(boundingBox[0]));
-      const lngDiff = Math.abs(parseFloat(boundingBox[3]) - parseFloat(boundingBox[2]));
-      const maxDiff = Math.max(latDiff, lngDiff);
-      
-      if (maxDiff > 5) {
-        setSearchType('country');
-      } else if (maxDiff > 0.5) {
-        setSearchType('city');
-      } else {
-        setSearchType('address');
-      }
-      
-    } catch (error) {
-      console.error("Erreur lors de l'ajustement des limites de la carte:", error);
-    }
+  // Gérer le clic sur la carte
+  const handleMapClick = (e: L.LeafletMouseEvent) => {
+    const { lat, lng } = e.latlng;
+    setTempMarker({ lat, lng });
+    toast.info(t("map.markerPositionSet"));
   };
 
+  // Rechercher une adresse
   const searchAddress = async () => {
-    if (!address.trim()) {
-      toast.error(t("map.enterAddress"));
-      return;
+    if (!address.trim() || isSearching) return;
+
+    // Annuler la recherche précédente si elle existe
+    if (searchAbortController.current) {
+      searchAbortController.current.abort();
     }
 
-    console.log("Recherche d'adresse:", address);
+    searchAbortController.current = new AbortController();
+
     setIsSearching(true);
     setSearchError(null);
-    setSearchType(null);
-    toast.info(`${t("map.searchingFor")}: ${address}`);
-    
+    setLastSearch(address);
+
+    console.log(`Recherche d'adresse: ${address}`);
+
     try {
-      const encodedAddress = encodeURIComponent(address.trim());
-      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodedAddress}&limit=1&addressdetails=1`, {
-        headers: {
-          'Accept': 'application/json',
-          'User-Agent': 'LocalSEOApp'
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1&addressdetails=1`,
+        {
+          headers: {
+            "Accept": "application/json",
+            "User-Agent": "LocalSEOApp"
+          },
+          signal: searchAbortController.current.signal
         }
-      });
-      
+      );
+
       if (!response.ok) {
-        throw new Error(`Erreur réseau: ${response.status}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
       console.log("Résultats de recherche:", data);
 
-      // CORRECTION: Assurons-nous que isSearching est mis à false même si aucun résultat n'est trouvé
-      if (data && data.length > 0) {
-        const { lat, lon, display_name, place_rank, boundingbox } = data[0];
-        const latitude = parseFloat(lat);
-        const longitude = parseFloat(lon);
+      if (!data || data.length === 0) {
+        setSearchError(t("map.noResults") + " " + address);
+        toast.warning(`${t("map.noResults")} "${address}". ${t("map.tryMorePrecise")}`);
+        setIsSearching(false);
+        return;
+      }
+
+      const { lat, lon, display_name, place_rank, boundingbox } = data[0];
+      const latitude = parseFloat(lat);
+      const longitude = parseFloat(lon);
+
+      // Déterminer le type de recherche
+      let searchTypeResult: 'country' | 'city' | 'address' = 'address';
+      if (place_rank <= 4) {
+        searchTypeResult = 'country';
+      } else if (place_rank <= 12) {
+        searchTypeResult = 'city';
+      }
+      setSearchType(searchTypeResult);
+
+      if (!mapRef.current) return;
+
+      // Zoomer sur les résultats
+      if (searchTypeResult === 'country' && boundingbox) {
+        const southWest = [parseFloat(boundingbox[0]), parseFloat(boundingbox[2])] as [number, number];
+        const northEast = [parseFloat(boundingbox[1]), parseFloat(boundingbox[3])] as [number, number];
         
-        console.log(`Emplacement trouvé: ${display_name} (${latitude}, ${longitude})`);
-        
-        setCurrentLat(latitude);
-        setCurrentLng(longitude);
-        
-        if (place_rank <= 8 && boundingbox && boundingbox.length === 4) {
-          if (mapRef.current) {
-            fitMapToBounds(boundingbox);
-            toast.success(`${t("map.locationFound")}: ${display_name}`);
-          }
-        } else {
-          if (mapRef.current) {
-            const zoomLevel = getZoomLevelForPlaceType(place_rank);
-            mapRef.current.setView([latitude, longitude], zoomLevel);
-            
-            if (place_rank <= 4) {
-              setSearchType('country');
-            } else if (place_rank <= 12) {
-              setSearchType('city');
-            } else {
-              setSearchType('address');
-            }
-            
-            toast.success(`${t("map.locationFound")}: ${display_name}`);
-          }
-        }
+        const bounds = L.latLngBounds(southWest, northEast);
+        mapRef.current.fitBounds(bounds);
       } else {
-        console.log("Aucun résultat trouvé pour:", address);
-        setSearchError(`${t("map.noResults")} "${address}". ${t("map.tryMorePrecise")}`);
-        toast.error(`${t("map.noResults")}: ${address}`);
+        const zoom = searchTypeResult === 'city' ? 12 : 16;
+        mapRef.current.setView([latitude, longitude], zoom);
+      }
+
+      toast.success(`${t("map.locationFound")}: ${display_name} (${latitude.toFixed(6)}, ${longitude.toFixed(6)})`);
+      console.log(`Emplacement trouvé: ${display_name} (${latitude}, ${longitude})`);
+
+      // Placer un marqueur temporaire
+      if (activeMode === 'addMarker') {
+        setTempMarker({ lat: latitude, lng: longitude });
       }
     } catch (error) {
-      console.error("Erreur lors de la recherche d'adresse:", error);
-      setSearchError(t("map.searchError"));
-      toast.error(t("map.searchError"));
-    } finally {
-      // CORRECTION: Assurons-nous que isSearching est toujours mis à false à la fin
-      setIsSearching(false);
-    }
-  };
-
-  const handleMapClick = (e: L.LeafletMouseEvent) => {
-    if (activeMode !== 'addMarker' || !mapRef.current) return;
-    
-    const { lat, lng } = e.latlng;
-    console.log(`Clic sur la carte à: ${lat}, ${lng}`);
-    
-    setTempMarkerPosition({ lat, lng });
-    setShowLabelInput(true);
-    
-    toast.info(t("map.markerPositionSet", "Position du marqueur définie. Veuillez entrer un libellé."));
-  };
-
-  const confirmAddMarker = () => {
-    if (!tempMarkerPosition) return;
-    
-    const newMarker: Marker = {
-      id: `marker-${Date.now()}`,
-      lat: tempMarkerPosition.lat,
-      lng: tempMarkerPosition.lng,
-      label: newMarkerLabel || `${t("map.marker", "Marqueur")} ${markers.length + 1}`,
-      color: selectedMarkerColor.hex
-    };
-    
-    const updatedMarkers = [...markers, newMarker];
-    setMarkers(updatedMarkers);
-    
-    setTempMarkerPosition(null);
-    setShowLabelInput(false);
-    setNewMarkerLabel('');
-    setActiveMode('view');
-    
-    toast.success(`${t("map.markerAdded", "Marqueur")} "${newMarker.label}" ${t("map.added", "ajouté")}!`);
-  };
-
-  const cancelAddMarker = () => {
-    setTempMarkerPosition(null);
-    setShowLabelInput(false);
-    setNewMarkerLabel('');
-    setActiveMode('view');
-  };
-
-  const deleteMarker = (id: string) => {
-    const updatedMarkers = markers.filter(marker => marker.id !== id);
-    setMarkers(updatedMarkers);
-    
-    toast.success(t("map.markerDeleted", "Marqueur supprimé !"));
-  };
-
-  const moveMap = (direction: 'north' | 'south' | 'east' | 'west') => {
-    if (!mapRef.current) return;
-    
-    const center = mapRef.current.getCenter();
-    const zoom = mapRef.current.getZoom();
-    const moveStep = 0.02;
-    
-    let newLat = center.lat;
-    let newLng = center.lng;
-    
-    switch (direction) {
-      case 'north':
-        newLat += moveStep;
-        break;
-      case 'south':
-        newLat -= moveStep;
-        break;
-      case 'east':
-        newLng += moveStep;
-        break;
-      case 'west':
-        newLng -= moveStep;
-        break;
-    }
-    
-    mapRef.current.setView([newLat, newLng], zoom);
-    setCurrentLat(newLat);
-    setCurrentLng(newLng);
-  };
-
-  const copyIframeCode = () => {
-    navigator.clipboard.writeText(iframeCode);
-    toast.success(t("map.codeCopied", "Code d'intégration copié !"));
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      // CORRECTION: Empêcher de lancer plusieurs recherches en même temps
-      if (!isSearching) {
-        searchAddress();
+      if ((error as Error).name === 'AbortError') {
+        console.log('Recherche annulée');
+      } else {
+        console.error("Erreur de recherche:", error);
+        setSearchError(t("map.searchError"));
+        toast.error(t("map.searchError"));
       }
+    } finally {
+      setIsSearching(false);
+      searchAbortController.current = null;
     }
   };
 
-  const handleMarkerColorChange = (color: typeof MARKER_COLORS[0]) => {
-    setSelectedMarkerColor(color);
+  // Ajouter un marqueur à la liste
+  const addMarker = () => {
+    if (!tempMarker) return;
+    if (!markerLabel.trim()) {
+      toast.warning(t("map.enterAddress"));
+      return;
+    }
+
+    const newMarker = {
+      lat: tempMarker.lat,
+      lng: tempMarker.lng,
+      label: markerLabel,
+      color: markerColor
+    };
+
+    setMarkers([...markers, newMarker]);
+    setTempMarker(null);
+    setMarkerLabel('');
+    toast.success(`${t("map.markerAdded")} "${markerLabel}" ${t("map.added")}`);
+    setActiveMode('search');
   };
 
-  const toggleLegend = () => {
-    setShowLegend(!showLegend);
+  // Supprimer un marqueur
+  const deleteMarker = (index: number) => {
+    const updatedMarkers = [...markers];
+    updatedMarkers.splice(index, 1);
+    setMarkers(updatedMarkers);
+    toast.success(t("map.markerDeleted"));
+  };
+
+  // Gérer l'appui sur la touche Entrée
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !isSearching) {
+      // Annuler le timeout précédent s'il existe
+      if (searchTimeout.current) {
+        clearTimeout(searchTimeout.current);
+      }
+      
+      // Lancer la recherche immédiatement
+      searchAddress();
+    }
+  };
+
+  // Annuler l'ajout d'un marqueur
+  const cancelAddMarker = () => {
+    setTempMarker(null);
+    setMarkerLabel('');
+    setActiveMode('search');
+  };
+
+  // Générer le code d'intégration
+  const generateEmbedCode = () => {
+    let markersStr = markers.map(m => 
+      `L.marker([${m.lat}, ${m.lng}]).addTo(map).bindPopup("${m.label.replace(/"/g, '\\"')}")`
+    ).join(';\n    ');
+
+    return `<!DOCTYPE html>
+<html>
+<head>
+  <title>Ma Carte Personnalisée</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <style>
+    #map { height: 500px; width: 100%; }
+    body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
+  </style>
+</head>
+<body>
+  <h2>Ma Carte Personnalisée</h2>
+  <div id="map"></div>
+  <script>
+    var map = L.map('map').setView([${mapRef.current?.getCenter().lat || 48.856614}, ${mapRef.current?.getCenter().lng || 2.3522219}], ${mapRef.current?.getZoom() || 13});
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    
+    ${markersStr}
+  </script>
+</body>
+</html>`;
+  };
+
+  // Copier le code d'intégration
+  const copyEmbedCode = () => {
+    const code = generateEmbedCode();
+    navigator.clipboard.writeText(code);
+    toast.success(t("map.codeCopied"));
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-6xl h-[80vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>{t("map.title")}</DialogTitle>
-          <DialogDescription>
-            {t("map.description")}
-          </DialogDescription>
+          <DialogDescription>{t("map.description")}</DialogDescription>
         </DialogHeader>
-        
-        <div className="mb-4 flex items-center space-x-2">
-          <Input
-            placeholder={t("map.addressPlaceholder")}
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            onKeyPress={handleKeyPress}
-            className="flex-1"
-            // CORRECTION: Désactiver l'input pendant la recherche
-            disabled={isSearching}
-          />
-          <Button 
-            onClick={searchAddress} 
-            variant="outline" 
-            disabled={isSearching}
-          >
-            {isSearching ? (
-              <span className="inline-flex items-center">
-                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                {t("map.searching")}
-              </span>
-            ) : (
-              <>
-                <Search className="h-4 w-4 mr-2" />
-                {t("map.search")}
-              </>
-            )}
-          </Button>
-        </div>
 
-        {searchError && (
-          <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-md flex items-start">
-            <AlertTriangle className="h-5 w-5 flex-shrink-0 mr-2 mt-0.5" />
-            <p className="text-sm">{searchError}</p>
-          </div>
-        )}
-        
-        {searchType && (
-          <div className="mb-4 p-3 bg-blue-50 text-blue-700 rounded-md flex items-start">
-            <Info className="h-5 w-5 flex-shrink-0 mr-2 mt-0.5" />
-            <div className="text-sm">
-              <p className="font-medium">
-                {searchType === 'country' ? t("map.countrySearch") : 
-                 searchType === 'city' ? t("map.citySearch") : 
-                 t("map.addressSearch")}
-              </p>
-              <p className="mt-1">
-                <span className="font-medium">{t("map.locationDetails")}:</span> {t("map.latitude")} {currentLat.toFixed(4)}, {t("map.longitude")} {currentLng.toFixed(4)}
-              </p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-grow overflow-hidden">
+          <div className="md:col-span-2 flex flex-col h-full">
+            <div className="flex items-center gap-2 mb-4">
+              <Input
+                placeholder={t("map.addressPlaceholder")}
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                onKeyPress={handleKeyPress}
+                className="flex-1"
+                disabled={isSearching}
+              />
+              <Button 
+                onClick={searchAddress} 
+                disabled={isSearching || !address.trim()}
+              >
+                {isSearching ? t("map.searching") : t("map.search")}
+              </Button>
             </div>
-          </div>
-        )}
-        
-        <div className="flex flex-wrap gap-2 mb-4">
-          <Button 
-            variant={activeMode === 'view' ? "default" : "outline"} 
-            size="sm" 
-            onClick={() => setActiveMode('view')}
-            className="flex items-center"
-          >
-            <Search className="h-4 w-4 mr-1" />
-            {t("map.view")}
-          </Button>
-          <Button 
-            variant={activeMode === 'addMarker' ? "default" : "outline"} 
-            size="sm" 
-            onClick={() => setActiveMode('addMarker')}
-            className="flex items-center"
-          >
-            <MapPin className="h-4 w-4 mr-1" />
-            {t("map.addMarker")}
-          </Button>
-          <Button 
-            variant={activeMode === 'move' ? "default" : "outline"} 
-            size="sm" 
-            onClick={() => setActiveMode('move')}
-            className="flex items-center"
-          >
-            <Move className="h-4 w-4 mr-1" />
-            {t("map.moveMap")}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={toggleLegend}
-            className="flex items-center ml-auto"
-          >
-            <Info className="h-4 w-4 mr-1" />
-            {showLegend ? t("map.hideLegend") : t("map.showLegend")}
-          </Button>
-        </div>
-        
-        {activeMode === 'move' && (
-          <div className="grid grid-cols-3 gap-2 mb-4">
-            <div></div>
-            <Button variant="outline" size="sm" onClick={() => moveMap('north')}>{t("map.north")}</Button>
-            <div></div>
-            <Button variant="outline" size="sm" onClick={() => moveMap('west')}>{t("map.west")}</Button>
-            <div></div>
-            <Button variant="outline" size="sm" onClick={() => moveMap('east')}>{t("map.east")}</Button>
-            <div></div>
-            <Button variant="outline" size="sm" onClick={() => moveMap('south')}>{t("map.south")}</Button>
-            <div></div>
-          </div>
-        )}
-        
-        {activeMode === 'addMarker' && (
-          <div className="mb-4">
-            <p className="text-sm font-medium mb-2">{t("map.chooseMarkerColor")}:</p>
-            <div className="flex gap-2">
-              {MARKER_COLORS.map((color) => (
-                <button
-                  key={color.name}
-                  onClick={() => handleMarkerColorChange(color)}
-                  className={`w-6 h-6 rounded-full border ${selectedMarkerColor.name === color.name ? 'border-gray-900 ring-2 ring-gray-400' : 'border-gray-300'}`}
-                  style={{ backgroundColor: color.hex }}
-                  title={t(`map.color.${color.name}`, color.name)}
-                />
-              ))}
+
+            <div className="flex items-center gap-4 mb-4">
+              <Button
+                variant={activeMode === 'search' ? "default" : "outline"}
+                onClick={() => setActiveMode('search')}
+                className="flex-1"
+              >
+                {t("map.search")}
+              </Button>
+              <Button
+                variant={activeMode === 'addMarker' ? "default" : "outline"}
+                onClick={() => setActiveMode('addMarker')}
+                className="flex-1"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                {t("map.addMarker")}
+              </Button>
+              <Button
+                variant={activeMode === 'move' ? "default" : "outline"}
+                onClick={() => setActiveMode('move')}
+                className="flex-1"
+              >
+                <Map className="h-4 w-4 mr-2" />
+                {t("map.moveMap")}
+              </Button>
             </div>
-          </div>
-        )}
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          <div className="md:col-span-2">
-            <div 
-              ref={mapContainerRef} 
-              className="w-full h-[400px] rounded-md border relative"
-              style={{ cursor: activeMode === 'addMarker' ? 'crosshair' : 'grab' }}
-            ></div>
-          </div>
-          
-          <div className="space-y-4">
-            <div className="border rounded-md p-3 bg-gray-50">
-              <h3 className="text-sm font-semibold mb-2">{t("map.legendTitle")}</h3>
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full bg-red-500"></div>
-                  <span className="text-xs">{t("map.legendItems.importantPlaces")}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full bg-blue-500"></div>
-                  <span className="text-xs">{t("map.legendItems.clientLocation")}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full bg-green-500"></div>
-                  <span className="text-xs">{t("map.legendItems.competitors")}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full bg-yellow-500"></div>
-                  <span className="text-xs">{t("map.legendItems.pointsOfInterest")}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded-full bg-purple-500"></div>
-                  <span className="text-xs">{t("map.legendItems.targetAreas")}</span>
-                </div>
+
+            {searchError && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-lg mb-4">
+                {searchError}
               </div>
-            </div>
-            
-            <div className="border rounded-md p-3">
-              <h3 className="text-sm font-semibold mb-2">{t("map.markers")} ({markers.length})</h3>
-              {markers.length > 0 ? (
-                <div className="max-h-[250px] overflow-y-auto space-y-2">
-                  {markers.map((marker) => (
-                    <div key={marker.id} className="flex justify-between items-center p-2 border rounded-md text-sm">
+            )}
+
+            {activeMode === 'addMarker' && (
+              <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-2 rounded-lg mb-4">
+                {tempMarker 
+                  ? (
+                    <div className="space-y-2">
+                      <p>{t("map.markerPositionSet")}</p>
+                      <Input
+                        placeholder={t("map.markerName")}
+                        value={markerLabel}
+                        onChange={(e) => setMarkerLabel(e.target.value)}
+                        className="mb-2"
+                      />
                       <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: marker.color || '#ef4444' }}></div>
-                        <span className="font-medium">{marker.label}</span>
+                        <p className="text-sm">{t("map.chooseMarkerColor")}:</p>
+                        <RadioGroup value={markerColor} onValueChange={(val) => setMarkerColor(val as any)} className="flex items-center gap-2">
+                          {['red', 'blue', 'green', 'yellow', 'purple'].map((color) => (
+                            <div key={color} className="flex items-center space-x-1">
+                              <RadioGroupItem value={color} id={`color-${color}`} className={`bg-${color}-500`} />
+                              <Label htmlFor={`color-${color}`}>{t(`map.color.${color}`)}</Label>
+                            </div>
+                          ))}
+                        </RadioGroup>
                       </div>
+                      <div className="flex gap-2 mt-2">
+                        <Button onClick={addMarker} disabled={!markerLabel.trim()}>
+                          {t("map.add")}
+                        </Button>
+                        <Button variant="outline" onClick={cancelAddMarker}>
+                          {t("map.cancel")}
+                        </Button>
+                      </div>
+                    </div>
+                  )
+                  : <p>{t("map.clickToAddMarker")}</p>
+                }
+              </div>
+            )}
+
+            <div 
+              ref={mapContainer} 
+              className="flex-grow border rounded-lg overflow-hidden relative"
+            >
+              {!mapLoaded && (
+                <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                </div>
+              )}
+
+              {showLegend && (
+                <div className="absolute bottom-5 right-5 bg-white p-4 rounded-lg shadow-lg z-[1000] max-w-xs">
+                  <h3 className="font-bold mb-2">{t("map.legendTitle")}</h3>
+                  <ul className="space-y-2">
+                    <li className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-red-500 rounded-full"></div>
+                      <span>{t("map.legendItems.importantPlaces")}</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
+                      <span>{t("map.legendItems.clientLocation")}</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-green-500 rounded-full"></div>
+                      <span>{t("map.legendItems.competitors")}</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-yellow-500 rounded-full"></div>
+                      <span>{t("map.legendItems.pointsOfInterest")}</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-4 h-4 bg-purple-500 rounded-full"></div>
+                      <span>{t("map.legendItems.targetAreas")}</span>
+                    </li>
+                  </ul>
+                </div>
+              )}
+            </div>
+
+            <div className="flex justify-between mt-3">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowLegend(!showLegend)}
+                className="text-xs"
+              >
+                {showLegend ? (
+                  <>
+                    <EyeOff className="h-3 w-3 mr-1" />
+                    {t("map.hideLegend")}
+                  </>
+                ) : (
+                  <>
+                    <Eye className="h-3 w-3 mr-1" />
+                    {t("map.showLegend")}
+                  </>
+                )}
+              </Button>
+
+              <div className="text-xs text-gray-500">
+                {searchType === 'country' && <span>{t("map.countrySearch")}</span>}
+                {searchType === 'city' && <span>{t("map.citySearch")}</span>}
+                {searchType === 'address' && <span>{t("map.addressSearch")}</span>}
+                {lastSearch && <span> - {lastSearch}</span>}
+              </div>
+
+              <Button 
+                variant="outline" 
+                onClick={() => setShowEmbedCode(!showEmbedCode)}
+                className="text-xs"
+              >
+                {showEmbedCode ? t("map.hide") : t("map.show")} {t("map.embedCode")}
+              </Button>
+            </div>
+
+            {showEmbedCode && (
+              <div className="mt-3 relative">
+                <pre className="bg-gray-100 p-3 rounded text-xs overflow-auto max-h-32">{generateEmbedCode()}</pre>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={copyEmbedCode}
+                  className="absolute top-2 right-2"
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </div>
+
+          <div className="border rounded-lg p-4 overflow-auto max-h-full">
+            <h3 className="font-semibold flex items-center mb-3">
+              <MapPin className="h-4 w-4 mr-2" />
+              {t("map.markers")}
+            </h3>
+            
+            {markers.length === 0 ? (
+              <p className="text-gray-500 text-sm">{t("map.noMarkers")}</p>
+            ) : (
+              <div className="space-y-3">
+                {markers.map((marker, index) => (
+                  <div 
+                    key={index} 
+                    className="flex justify-between items-start border-b pb-2 last:border-0"
+                  >
+                    <div>
+                      <p className="font-medium">{marker.label}</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {marker.lat.toFixed(6)}, {marker.lng.toFixed(6)}
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
                       <Button 
                         variant="ghost" 
                         size="sm" 
-                        onClick={() => deleteMarker(marker.id)} 
-                        className="h-6 w-6 p-0 text-red-500"
+                        onClick={() => {
+                          if (mapRef.current) {
+                            mapRef.current.setView([marker.lat, marker.lng], 16);
+                          }
+                        }}
                       >
-                        <Trash2 className="h-3 w-3" />
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => deleteMarker(index)}
+                      >
+                        <Trash2 className="h-4 w-4 text-red-500" />
                       </Button>
                     </div>
-                  ))}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {mapRef.current && (
+              <div className="mt-4 pt-4 border-t">
+                <h4 className="font-semibold text-sm mb-2">{t("map.locationDetails")}</h4>
+                <div className="space-y-1 text-sm">
+                  <p>{t("map.latitude")}: {mapRef.current.getCenter().lat.toFixed(6)}</p>
+                  <p>{t("map.longitude")}: {mapRef.current.getCenter().lng.toFixed(6)}</p>
+                  <p>{t("map.zoomLevel")}: {mapRef.current.getZoom()}</p>
                 </div>
-              ) : (
-                <p className="text-sm text-gray-500">{t("map.noMarkers")}</p>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
-        
-        {showLabelInput && (
-          <div className="mb-4 p-4 border rounded-md bg-gray-50">
-            <p className="mb-2 font-medium">{t("map.addMarker")}</p>
-            <div className="flex gap-2 items-center">
-              <Input
-                placeholder={t("map.markerName")}
-                value={newMarkerLabel}
-                onChange={(e) => setNewMarkerLabel(e.target.value)}
-                className="flex-1"
-                autoFocus
-              />
-              <Button variant="outline" size="sm" onClick={confirmAddMarker}>
-                <Plus className="h-4 w-4 mr-1" />
-                {t("map.add")}
-              </Button>
-              <Button variant="outline" size="sm" onClick={cancelAddMarker}>
-                <X className="h-4 w-4 mr-1" />
-                {t("map.cancel")}
-              </Button>
-            </div>
-          </div>
-        )}
-        
-        <div className="flex justify-between items-center mb-2">
-          <h3 className="text-lg font-medium">{t("map.embedCode")}</h3>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => setShowIframeCode(!showIframeCode)}
-          >
-            {showIframeCode ? t("map.hide") : t("map.show")}
-          </Button>
-        </div>
-        
-        {showIframeCode && (
-          <div className="relative">
-            <pre className="bg-gray-100 p-4 rounded-md text-sm overflow-x-auto whitespace-pre-wrap">
-              {iframeCode}
-            </pre>
-            <Button 
-              className="absolute top-2 right-2" 
-              size="sm" 
-              onClick={copyIframeCode}
-            >
-              <Share2 className="h-4 w-4 mr-2" />
-              {t("map.copy")}
-            </Button>
-          </div>
-        )}
       </DialogContent>
     </Dialog>
   );
