@@ -2,28 +2,28 @@
 import React, { useState, useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import 'leaflet-draw/dist/leaflet.draw.css';
-import { Search, MapPin, Plus, X, Copy, Eye, EyeOff } from 'lucide-react';
+import { Search, Plus, X, Copy, Eye, EyeOff } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
-// Ensure leaflet icons work properly
+// Fix Leaflet icon issues
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
-let DefaultIcon = L.icon({
+const DefaultIcon = L.icon({
   iconUrl: icon,
   shadowUrl: iconShadow,
   iconSize: [25, 41],
-  iconAnchor: [12, 41],
+  iconAnchor: [12, 41]
 });
 
 L.Marker.prototype.options.icon = DefaultIcon;
@@ -45,9 +45,10 @@ const DEFAULT_ZOOM = 13;
 
 const MapModal = ({ open, onOpenChange }: MapModalProps) => {
   const { t } = useTranslation();
+  const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const markersLayerRef = useRef<L.LayerGroup | null>(null);
-  const searchControllerRef = useRef<AbortController | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
   
   const [searchAddress, setSearchAddress] = useState("");
   const [isSearching, setIsSearching] = useState(false);
@@ -58,69 +59,103 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
   const [markerColor, setMarkerColor] = useState("red");
   const [showEmbedCode, setShowEmbedCode] = useState(false);
   const [showLegend, setShowLegend] = useState(true);
-  const mapContainerRef = useRef<HTMLDivElement>(null);
 
   // Initialize map when component mounts
   useEffect(() => {
-    if (!open) return;
+    if (!open || !mapContainerRef.current) return;
 
-    if (!mapRef.current && mapContainerRef.current) {
-      mapRef.current = L.map(mapContainerRef.current).setView(DEFAULT_POSITION as L.LatLngExpression, DEFAULT_ZOOM);
-      
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      }).addTo(mapRef.current);
-
-      markersLayerRef.current = L.layerGroup().addTo(mapRef.current);
-
-      // Map click event for adding markers
-      mapRef.current.on('click', (e) => {
-        if (currentMode === 'addMarker') {
-          handleMapClick(e);
-        }
-      });
+    // Clean up any previous instances
+    if (mapRef.current) {
+      mapRef.current.remove();
+      mapRef.current = null;
+      markersLayerRef.current = null;
     }
 
+    const initMap = () => {
+      try {
+        console.log("Initializing map");
+        mapRef.current = L.map(mapContainerRef.current).setView(DEFAULT_POSITION as L.LatLngExpression, DEFAULT_ZOOM);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(mapRef.current);
+
+        markersLayerRef.current = L.layerGroup().addTo(mapRef.current);
+
+        // Map click event for adding markers
+        mapRef.current.on('click', (e) => {
+          if (currentMode === 'addMarker') {
+            handleMapClick(e);
+          }
+        });
+
+        console.log("Map initialized");
+      } catch (error) {
+        console.error("Map initialization error:", error);
+        toast.error(t('map.initError'));
+      }
+    };
+
+    // Timeout to ensure the container is fully rendered
+    setTimeout(initMap, 100);
+
     return () => {
-      // Clean up when component unmounts or closes
-      if (mapRef.current && !open) {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+        abortControllerRef.current = null;
+      }
+      
+      if (mapRef.current) {
+        console.log("Cleaning up map");
         mapRef.current.remove();
         mapRef.current = null;
         markersLayerRef.current = null;
-        searchControllerRef.current?.abort();
-        searchControllerRef.current = null;
       }
     };
-  }, [open, currentMode]);
+  }, [open, t]);
 
   // Update markers on the map when markers state changes
   useEffect(() => {
     if (!mapRef.current || !markersLayerRef.current) return;
+    
+    console.log("Updating markers:", markers.length);
     
     // Clear existing markers
     markersLayerRef.current.clearLayers();
     
     // Add all markers to the map
     markers.forEach(marker => {
-      const markerIcon = L.divIcon({
-        className: 'custom-div-icon',
-        html: `<div style="background-color: ${marker.color}; width: 25px; height: 25px; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold;">${marker.name.charAt(0)}</div>`,
-        iconSize: [25, 25],
-        iconAnchor: [12, 12]
-      });
-      
-      const leafletMarker = L.marker(marker.latlng, { icon: markerIcon })
-        .addTo(markersLayerRef.current!);
-      
-      leafletMarker.bindPopup(`
-        <div>
-          <strong>${marker.name}</strong><br>
-          ${t('map.latitude')}: ${marker.latlng.lat.toFixed(5)}<br>
-          ${t('map.longitude')}: ${marker.latlng.lng.toFixed(5)}
-        </div>
-      `);
+      try {
+        const markerIcon = L.divIcon({
+          className: 'custom-div-icon',
+          html: `<div style="background-color: ${marker.color}; width: 25px; height: 25px; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold;">${marker.name.charAt(0)}</div>`,
+          iconSize: [25, 25],
+          iconAnchor: [12, 12]
+        });
+        
+        const leafletMarker = L.marker(marker.latlng, { icon: markerIcon })
+          .addTo(markersLayerRef.current!);
+        
+        leafletMarker.bindPopup(`
+          <div>
+            <strong>${marker.name}</strong><br>
+            ${t('map.latitude')}: ${marker.latlng.lat.toFixed(5)}<br>
+            ${t('map.longitude')}: ${marker.latlng.lng.toFixed(5)}
+          </div>
+        `);
+      } catch (error) {
+        console.error("Error adding marker:", error);
+      }
     });
   }, [markers, t]);
+
+  // Update current mode effect
+  useEffect(() => {
+    if (currentMode === 'search' && tempMarker) {
+      tempMarker.remove();
+      setTempMarker(null);
+    }
+  }, [currentMode, tempMarker]);
 
   const handleSearch = async () => {
     if (!searchAddress.trim() || !mapRef.current) {
@@ -129,11 +164,11 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
     }
     
     // Abort any ongoing search
-    if (searchControllerRef.current) {
-      searchControllerRef.current.abort();
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
     }
     
-    searchControllerRef.current = new AbortController();
+    abortControllerRef.current = new AbortController();
     setIsSearching(true);
     
     try {
@@ -142,10 +177,14 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchAddress)}`,
         { 
-          signal: searchControllerRef.current.signal,
+          signal: abortControllerRef.current.signal,
           headers: { 'Accept-Language': 'fr' }
         }
       );
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`);
+      }
       
       const data = await response.json();
       
@@ -157,7 +196,7 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
         toast.error(`${t('map.noResults')} "${searchAddress}". ${t('map.tryMorePrecise')}`);
       }
     } catch (error) {
-      if (searchControllerRef.current?.signal.aborted) {
+      if (abortControllerRef.current?.signal.aborted) {
         console.log("Search aborted");
       } else {
         console.error("Search error:", error);
@@ -169,7 +208,7 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
   };
 
   const handleMapClick = (e: L.LeafletMouseEvent) => {
-    if (currentMode !== 'addMarker') return;
+    if (currentMode !== 'addMarker' || !mapRef.current) return;
     
     // Remove any temporary marker
     if (tempMarker) {
@@ -177,7 +216,7 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
     }
     
     // Add a temporary marker
-    const newTempMarker = L.marker(e.latlng).addTo(mapRef.current!);
+    const newTempMarker = L.marker(e.latlng).addTo(mapRef.current);
     setTempMarker(newTempMarker);
     
     // Show toast and focus on marker name input
@@ -239,11 +278,19 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
     { name: t('map.color.purple'), value: 'purple' }
   ];
 
+  const handleDialogChange = (isOpen: boolean) => {
+    if (!isOpen && abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    onOpenChange(isOpen);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleDialogChange}>
       <DialogContent className="max-w-5xl h-[80vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>{t('map.title')}</DialogTitle>
+          <DialogDescription>{t('map.subtitle')}</DialogDescription>
         </DialogHeader>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-grow overflow-hidden">
