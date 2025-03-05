@@ -30,7 +30,11 @@ const MapButton = () => {
         </div>
       </Button>
 
-      <MapModal open={isOpen} onOpenChange={setIsOpen} />
+      <MapModal 
+        open={isOpen} 
+        onOpenChange={setIsOpen} 
+        key={isOpen ? 'open-map' : 'closed-map'} // Force re-render when opened to reset state
+      />
     </>
   );
 };
