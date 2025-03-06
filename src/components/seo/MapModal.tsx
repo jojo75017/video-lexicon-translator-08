@@ -65,56 +65,68 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
   useEffect(() => {
     if (!open) return;
 
-    const initializeMap = () => {
-      // Clean up previous map if it exists
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-      }
+    // Wait a moment for the modal to fully render
+    const timer = setTimeout(() => {
+      initializeMap();
+    }, 300);
 
-      // Check if the container is available
-      if (!mapContainerRef.current) {
-        console.error("Map container not found");
-        return;
-      }
-
-      try {
-        console.log("Initializing map with container:", mapContainerRef.current);
-        
-        // Create map instance
-        mapRef.current = L.map(mapContainerRef.current).setView(DEFAULT_POSITION as L.LatLngExpression, DEFAULT_ZOOM);
-        
-        // Add tile layer
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(mapRef.current);
-        
-        // Create markers layer
-        markersLayerRef.current = L.layerGroup().addTo(mapRef.current);
-        
-        // Add click handler for adding markers
-        mapRef.current.on('click', handleMapClick);
-        
-        console.log("Map initialized successfully");
-        setMapInitialized(true);
-      } catch (error) {
-        console.error("Error initializing map:", error);
-        toast.error(t('map.openError'));
-      }
-    };
-
-    // Allow DOM to fully render before initializing map
-    const timer = setTimeout(initializeMap, 300);
-    
     return () => {
       clearTimeout(timer);
       cleanupMap();
     };
-  }, [open, t]);
+  }, [open]);
+
+  const initializeMap = () => {
+    console.log("Initializing map");
+    
+    // Clean up previous map if it exists
+    if (mapRef.current) {
+      mapRef.current.remove();
+      mapRef.current = null;
+    }
+
+    if (!mapContainerRef.current) {
+      console.error("Map container not found");
+      return;
+    }
+
+    try {
+      // Create map instance
+      mapRef.current = L.map(mapContainerRef.current).setView(DEFAULT_POSITION as L.LatLngExpression, DEFAULT_ZOOM);
+      
+      // Add tile layer
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(mapRef.current);
+      
+      // Create markers layer
+      markersLayerRef.current = L.layerGroup().addTo(mapRef.current);
+      
+      // Add click handler for adding markers
+      mapRef.current.on('click', handleMapClick);
+      
+      console.log("Map initialized successfully");
+      setMapInitialized(true);
+      
+      // Refresh markers if any exist
+      if (markers.length > 0) {
+        updateMarkers();
+      }
+    } catch (error) {
+      console.error("Error initializing map:", error);
+      toast.error(t('map.openError'));
+    }
+  };
 
   // Update markers on the map when markers state changes
   useEffect(() => {
-    if (!mapInitialized || !mapRef.current || !markersLayerRef.current) {
+    if (mapInitialized && markers.length > 0) {
+      updateMarkers();
+    }
+  }, [markers, mapInitialized]);
+
+  const updateMarkers = () => {
+    if (!mapRef.current || !markersLayerRef.current) {
       return;
     }
     
@@ -166,7 +178,7 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
         console.error("Error adding marker:", error, marker);
       }
     });
-  }, [markers, mapInitialized, t]);
+  };
 
   // Cleanup function for map resources
   const cleanupMap = () => {
@@ -217,8 +229,14 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
 
   // Address search function
   const handleSearch = async () => {
-    if (!searchAddress.trim() || !mapRef.current) {
+    if (!searchAddress.trim()) {
       toast.error(t('map.enterAddress'));
+      return;
+    }
+    
+    if (!mapRef.current) {
+      console.error("Map not initialized for search");
+      toast.error(t('map.openError'));
       return;
     }
     
@@ -240,7 +258,7 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
         { 
           signal: searchControllerRef.current.signal,
           headers: {
-            'Accept-Language': navigator.language || 'fr'
+            'Accept-Language': 'fr' // Force French results
           }
         }
       );
@@ -250,6 +268,7 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
       }
       
       const data = await response.json();
+      console.log("Search results:", data);
       
       if (data && data.length > 0) {
         const location = [parseFloat(data[0].lat), parseFloat(data[0].lon)];
