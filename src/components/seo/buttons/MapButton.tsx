@@ -11,7 +11,7 @@ const MapButton = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleOpenMap = () => {
-    console.log("Ouverture de la carte interactive");
+    console.log("Opening interactive map");
     setIsOpen(true);
     toast.info(t("map.openSuccess"));
   };
@@ -30,12 +30,10 @@ const MapButton = () => {
         </div>
       </Button>
 
-      {isOpen && (
-        <MapModal 
-          open={isOpen} 
-          onOpenChange={setIsOpen}
-        />
-      )}
+      <MapModal 
+        open={isOpen} 
+        onOpenChange={setIsOpen}
+      />
     </>
   );
 };

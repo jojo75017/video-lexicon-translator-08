@@ -19,7 +19,7 @@ import { toast } from "sonner";
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
-const DefaultIcon = L.icon({
+let DefaultIcon = L.icon({
   iconUrl: icon,
   shadowUrl: iconShadow,
   iconSize: [25, 41],
@@ -45,10 +45,10 @@ const DEFAULT_ZOOM = 13;
 
 const MapModal = ({ open, onOpenChange }: MapModalProps) => {
   const { t } = useTranslation();
-  const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
   const markersLayerRef = useRef<L.LayerGroup | null>(null);
-  const abortControllerRef = useRef<AbortController | null>(null);
+  const searchControllerRef = useRef<AbortController | null>(null);
   
   const [searchAddress, setSearchAddress] = useState("");
   const [isSearching, setIsSearching] = useState(false);
@@ -59,83 +59,102 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
   const [markerColor, setMarkerColor] = useState("red");
   const [showEmbedCode, setShowEmbedCode] = useState(false);
   const [showLegend, setShowLegend] = useState(true);
+  const [mapInitialized, setMapInitialized] = useState(false);
 
-  // Initialize map when component mounts
+  // Initialize map when component mounts and dialog opens
   useEffect(() => {
-    if (!open || !mapContainerRef.current) return;
+    if (!open) return;
 
-    // Clean up any previous instances
-    if (mapRef.current) {
-      mapRef.current.remove();
-      mapRef.current = null;
-      markersLayerRef.current = null;
-    }
+    const initializeMap = () => {
+      // Clean up previous map if it exists
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
 
-    const initMap = () => {
+      // Check if the container is available
+      if (!mapContainerRef.current) {
+        console.error("Map container not found");
+        return;
+      }
+
       try {
-        console.log("Initializing map");
+        console.log("Initializing map with container:", mapContainerRef.current);
+        
+        // Create map instance
         mapRef.current = L.map(mapContainerRef.current).setView(DEFAULT_POSITION as L.LatLngExpression, DEFAULT_ZOOM);
         
+        // Add tile layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(mapRef.current);
-
+        
+        // Create markers layer
         markersLayerRef.current = L.layerGroup().addTo(mapRef.current);
-
-        // Map click event for adding markers
-        mapRef.current.on('click', (e) => {
-          if (currentMode === 'addMarker') {
-            handleMapClick(e);
-          }
-        });
-
-        console.log("Map initialized");
+        
+        // Add click handler for adding markers
+        mapRef.current.on('click', handleMapClick);
+        
+        console.log("Map initialized successfully");
+        setMapInitialized(true);
       } catch (error) {
-        console.error("Map initialization error:", error);
-        toast.error(t('map.initError'));
+        console.error("Error initializing map:", error);
+        toast.error(t('map.openError'));
       }
     };
 
-    // Timeout to ensure the container is fully rendered
-    setTimeout(initMap, 100);
-
+    // Allow DOM to fully render before initializing map
+    const timer = setTimeout(initializeMap, 300);
+    
     return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-        abortControllerRef.current = null;
-      }
-      
-      if (mapRef.current) {
-        console.log("Cleaning up map");
-        mapRef.current.remove();
-        mapRef.current = null;
-        markersLayerRef.current = null;
-      }
+      clearTimeout(timer);
+      cleanupMap();
     };
   }, [open, t]);
 
   // Update markers on the map when markers state changes
   useEffect(() => {
-    if (!mapRef.current || !markersLayerRef.current) return;
+    if (!mapInitialized || !mapRef.current || !markersLayerRef.current) {
+      return;
+    }
     
     console.log("Updating markers:", markers.length);
     
-    // Clear existing markers
+    // Clear all existing markers
     markersLayerRef.current.clearLayers();
     
     // Add all markers to the map
     markers.forEach(marker => {
       try {
+        // Create custom marker icon with color
         const markerIcon = L.divIcon({
           className: 'custom-div-icon',
-          html: `<div style="background-color: ${marker.color}; width: 25px; height: 25px; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold;">${marker.name.charAt(0)}</div>`,
+          html: `
+            <div style="
+              background-color: ${marker.color}; 
+              width: 25px; 
+              height: 25px; 
+              border-radius: 50%; 
+              display: flex; 
+              justify-content: center; 
+              align-items: center; 
+              color: white; 
+              font-weight: bold;
+              border: 2px solid white;
+              box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            ">
+              ${marker.name.charAt(0).toUpperCase()}
+            </div>
+          `,
           iconSize: [25, 25],
           iconAnchor: [12, 12]
         });
         
+        // Create and add marker to the layer
         const leafletMarker = L.marker(marker.latlng, { icon: markerIcon })
           .addTo(markersLayerRef.current!);
         
+        // Add popup with marker information
         leafletMarker.bindPopup(`
           <div>
             <strong>${marker.name}</strong><br>
@@ -144,19 +163,59 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
           </div>
         `);
       } catch (error) {
-        console.error("Error adding marker:", error);
+        console.error("Error adding marker:", error, marker);
       }
     });
-  }, [markers, t]);
+  }, [markers, mapInitialized, t]);
 
-  // Update current mode effect
-  useEffect(() => {
-    if (currentMode === 'search' && tempMarker) {
-      tempMarker.remove();
-      setTempMarker(null);
+  // Cleanup function for map resources
+  const cleanupMap = () => {
+    console.log("Cleaning up map resources");
+    
+    // Abort any pending searches
+    if (searchControllerRef.current) {
+      searchControllerRef.current.abort();
+      searchControllerRef.current = null;
     }
-  }, [currentMode, tempMarker]);
+    
+    // Remove map
+    if (mapRef.current) {
+      mapRef.current.off('click', handleMapClick);
+      mapRef.current.remove();
+      mapRef.current = null;
+    }
+    
+    // Reset markers layer
+    markersLayerRef.current = null;
+    
+    // Reset state
+    setMapInitialized(false);
+  };
 
+  // Handle map click for adding markers
+  const handleMapClick = (e: L.LeafletMouseEvent) => {
+    if (currentMode !== 'addMarker' || !mapRef.current) return;
+    
+    // Remove any existing temporary marker
+    if (tempMarker) {
+      tempMarker.remove();
+    }
+    
+    // Create new temporary marker
+    const newTempMarker = L.marker(e.latlng).addTo(mapRef.current);
+    setTempMarker(newTempMarker);
+    
+    // Notify user
+    toast.info(t('map.markerPositionSet'));
+    
+    // Focus on name input (if possible)
+    const nameInput = document.getElementById('marker-name-input');
+    if (nameInput) {
+      nameInput.focus();
+    }
+  };
+
+  // Address search function
   const handleSearch = async () => {
     if (!searchAddress.trim() || !mapRef.current) {
       toast.error(t('map.enterAddress'));
@@ -164,21 +223,25 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
     }
     
     // Abort any ongoing search
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
+    if (searchControllerRef.current) {
+      searchControllerRef.current.abort();
     }
     
-    abortControllerRef.current = new AbortController();
+    // Create new abort controller
+    searchControllerRef.current = new AbortController();
+    
+    // Start searching
     setIsSearching(true);
+    toast.info(`${t('map.searchingFor')} "${searchAddress}"`);
     
     try {
-      toast.info(`${t('map.searchingFor')} "${searchAddress}"`);
-      
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchAddress)}`,
         { 
-          signal: abortControllerRef.current.signal,
-          headers: { 'Accept-Language': 'fr' }
+          signal: searchControllerRef.current.signal,
+          headers: {
+            'Accept-Language': navigator.language || 'fr'
+          }
         }
       );
       
@@ -196,7 +259,7 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
         toast.error(`${t('map.noResults')} "${searchAddress}". ${t('map.tryMorePrecise')}`);
       }
     } catch (error) {
-      if (abortControllerRef.current?.signal.aborted) {
+      if (searchControllerRef.current?.signal.aborted) {
         console.log("Search aborted");
       } else {
         console.error("Search error:", error);
@@ -207,28 +270,17 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
     }
   };
 
-  const handleMapClick = (e: L.LeafletMouseEvent) => {
-    if (currentMode !== 'addMarker' || !mapRef.current) return;
-    
-    // Remove any temporary marker
-    if (tempMarker) {
-      tempMarker.remove();
+  // Add marker from temporary marker
+  const addMarker = () => {
+    if (!tempMarker || !newMarkerName.trim()) {
+      toast.error(t('map.enterMarkerName'));
+      return;
     }
     
-    // Add a temporary marker
-    const newTempMarker = L.marker(e.latlng).addTo(mapRef.current);
-    setTempMarker(newTempMarker);
-    
-    // Show toast and focus on marker name input
-    toast.info(t('map.markerPositionSet'));
-  };
-
-  const addMarker = () => {
-    if (!tempMarker || !newMarkerName.trim()) return;
-    
+    // Get position from temporary marker
     const latlng = tempMarker.getLatLng();
     
-    // Add new marker to state
+    // Create new marker
     const newMarker: MapMarker = {
       id: Date.now().toString(),
       latlng,
@@ -236,40 +288,49 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
       color: markerColor
     };
     
+    // Add to markers list
     setMarkers(prev => [...prev, newMarker]);
     
-    // Reset temp marker and input
+    // Clean up temporary marker
     tempMarker.remove();
     setTempMarker(null);
     setNewMarkerName("");
     
+    // Notify user
     toast.success(`${t('map.markerAdded')} "${newMarkerName}" ${t('map.added')}`);
   };
 
+  // Delete marker by ID
   const deleteMarker = (id: string) => {
     setMarkers(prev => prev.filter(marker => marker.id !== id));
     toast.success(t('map.markerDeleted'));
   };
 
+  // Generate embed code
   const generateEmbedCode = () => {
     if (!markers.length) return '';
     
+    // Calculate center point from all markers
     const centerLat = markers.reduce((sum, marker) => sum + marker.latlng.lat, 0) / markers.length;
     const centerLng = markers.reduce((sum, marker) => sum + marker.latlng.lng, 0) / markers.length;
     
+    // Generate marker parameters for each marker
     const markerParams = markers.map(marker => 
       `&amp;marker=${marker.latlng.lat},${marker.latlng.lng},${encodeURIComponent(marker.name)}`
     ).join('');
     
+    // Create iframe code
     return `<iframe width="600" height="450" style="border:0" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade" src="https://www.openstreetmap.org/export/embed.html?bbox=${centerLng-0.1},${centerLat-0.1},${centerLng+0.1},${centerLat+0.1}&amp;layer=mapnik${markerParams}"></iframe>`;
   };
 
+  // Copy embed code to clipboard
   const copyEmbedCode = () => {
     const code = generateEmbedCode();
     navigator.clipboard.writeText(code);
     toast.success(t('map.codeCopied'));
   };
 
+  // Available marker colors
   const colors = [
     { name: t('map.color.red'), value: 'red' },
     { name: t('map.color.blue'), value: 'blue' },
@@ -278,9 +339,10 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
     { name: t('map.color.purple'), value: 'purple' }
   ];
 
+  // Handle dialog close
   const handleDialogChange = (isOpen: boolean) => {
-    if (!isOpen && abortControllerRef.current) {
-      abortControllerRef.current.abort();
+    if (!isOpen) {
+      cleanupMap();
     }
     onOpenChange(isOpen);
   };
@@ -354,10 +416,17 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
                   
                   <div className="space-y-2">
                     <Input
+                      id="marker-name-input"
                       placeholder={t('map.markerName')}
                       value={newMarkerName}
                       onChange={(e) => setNewMarkerName(e.target.value)}
                       disabled={!tempMarker}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && tempMarker && newMarkerName.trim()) {
+                          e.preventDefault();
+                          addMarker();
+                        }
+                      }}
                     />
                     
                     <div>
@@ -502,10 +571,13 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
               <div className="absolute bottom-4 right-4 bg-white bg-opacity-90 p-3 rounded shadow-md z-[1000]">
                 <h4 className="font-semibold text-sm mb-2">{t('map.legendTitle')}</h4>
                 <div className="space-y-1">
-                  {Object.entries(t('map.legendItems', { returnObjects: true })).map(([key, value]) => (
-                    <div key={key} className="flex items-center text-xs">
-                      <div className="w-3 h-3 rounded-full mr-2 bg-red-500"></div>
-                      <span>{value}</span>
+                  {colors.map(color => (
+                    <div key={color.value} className="flex items-center text-xs">
+                      <div 
+                        className="w-3 h-3 rounded-full mr-2"
+                        style={{ backgroundColor: color.value }}
+                      ></div>
+                      <span>{color.name}</span>
                     </div>
                   ))}
                 </div>
