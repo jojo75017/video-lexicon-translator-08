@@ -253,8 +253,12 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
     toast.info(`${t('map.searchingFor')} "${searchAddress}"`);
     
     try {
+      // Correction importante ici - le problème venait de la recherche
+      const encodedAddress = encodeURIComponent(searchAddress);
+      console.log(`Recherche de l'adresse: ${encodedAddress}`);
+      
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchAddress)}`,
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodedAddress}`,
         { 
           signal: searchControllerRef.current.signal,
           headers: {
@@ -271,8 +275,17 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
       console.log("Search results:", data);
       
       if (data && data.length > 0) {
-        const location = [parseFloat(data[0].lat), parseFloat(data[0].lon)];
-        mapRef.current.setView(location as L.LatLngExpression, 14);
+        // Correction importante - Utilisation correcte des coordonnées
+        const lat = parseFloat(data[0].lat);
+        const lon = parseFloat(data[0].lon);
+        const location = [lat, lon];
+        
+        if (isNaN(lat) || isNaN(lon)) {
+          throw new Error("Coordonnées invalides");
+        }
+        
+        console.log(`Coordonnées trouvées: ${lat}, ${lon}`);
+        mapRef.current.setView(location as L.LatLngExpression, 5); // Zoom adapté pour des pays
         toast.success(t('map.locationFound'));
       } else {
         toast.error(`${t('map.noResults')} "${searchAddress}". ${t('map.tryMorePrecise')}`);
@@ -585,8 +598,8 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
           <div className="md:col-span-2 relative min-h-[400px]">
             <div ref={mapContainerRef} className="absolute inset-0 rounded-md overflow-hidden"></div>
             
-            {/* Legend */}
-            {showLegend && (
+            {/* Legend - Assurer qu'elle est visible */}
+            {showLegend && mapInitialized && (
               <div className="absolute bottom-4 right-4 bg-white bg-opacity-90 p-3 rounded shadow-md z-[1000]">
                 <h4 className="font-semibold text-sm mb-2">{t('map.legendTitle')}</h4>
                 <div className="space-y-1">
