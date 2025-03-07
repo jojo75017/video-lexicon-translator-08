@@ -9,8 +9,14 @@ import { useTranslation } from "react-i18next";
 const MapButton = () => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(false);
 
   const handleOpenMap = () => {
+    if (isDisabled) {
+      toast.error("Cette fonctionnalité est temporairement désactivée.");
+      return;
+    }
+    
     console.log("Opening interactive map");
     setIsOpen(true);
     toast.info(t("map.openSuccess"));
@@ -22,6 +28,7 @@ const MapButton = () => {
         variant="outline"
         className="p-6 h-auto flex flex-col items-center gap-4 text-center"
         onClick={handleOpenMap}
+        disabled={isDisabled}
       >
         <MapIcon className="h-8 w-8" />
         <div>
@@ -30,10 +37,12 @@ const MapButton = () => {
         </div>
       </Button>
 
-      <MapModal 
-        open={isOpen} 
-        onOpenChange={setIsOpen}
-      />
+      {!isDisabled && (
+        <MapModal 
+          open={isOpen} 
+          onOpenChange={setIsOpen}
+        />
+      )}
     </>
   );
 };
