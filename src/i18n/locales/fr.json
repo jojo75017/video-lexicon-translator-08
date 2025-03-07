@@ -31,8 +31,9 @@
   },
   "map": {
     "title": "Carte Interactive SEO",
-    "description": "Recherchez une adresse et ajoutez des marqueurs pour créer une carte personnalisée",
+    "subtitle": "Recherchez une adresse et ajoutez des marqueurs pour créer une carte personnalisée",
     "interactiveMap": "Carte interactive",
+    "description": "Visualisez vos emplacements stratégiques sur une carte",
     "addMarker": "Ajouter un marqueur",
     "moveMap": "Déplacer la carte",
     "view": "Visualiser",
@@ -48,6 +49,7 @@
     "markerPositionSet": "Position du marqueur définie. Veuillez entrer un libellé",
     "marker": "Marqueur",
     "markerName": "Nom du marqueur...",
+    "enterMarkerName": "Veuillez entrer un nom pour le marqueur",
     "markerAdded": "Marqueur",
     "added": "ajouté",
     "markerDeleted": "Marqueur supprimé !",
@@ -93,7 +95,9 @@
     "locationDetails": "Détails de l'emplacement",
     "latitude": "Latitude",
     "longitude": "Longitude",
-    "zoomLevel": "Niveau de zoom"
+    "zoomLevel": "Niveau de zoom",
+    "embedUsage": "Comment utiliser ce code d'intégration",
+    "embedInstructions": "Copiez ce code HTML et collez-le dans votre site web pour afficher cette carte avec vos marqueurs personnalisés."
   },
   "common": {
     "loading": "Chargement...",

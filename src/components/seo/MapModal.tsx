@@ -352,7 +352,7 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
     toast.success(t('map.markerDeleted'));
   };
 
-  // Generate embed code
+  // Generate embed code - CORRECTED VERSION
   const generateEmbedCode = () => {
     if (!markers.length) return '';
     
@@ -360,14 +360,19 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
     const centerLat = markers.reduce((sum, marker) => sum + marker.latlng.lat, 0) / markers.length;
     const centerLng = markers.reduce((sum, marker) => sum + marker.latlng.lng, 0) / markers.length;
     
-    // Generate marker parameters for each marker - utilisation d'URI.encode pour éviter les problèmes d'encodage
-    const markerParams = markers.map(marker => 
-      `&marker=${marker.latlng.lat},${marker.latlng.lng},${encodeURIComponent(marker.name)}`
-    ).join('');
+    // Calculate bounding box with padding
+    const padding = 0.1; // degrees
+    const bbox = `${(centerLng-padding).toFixed(6)},${(centerLat-padding).toFixed(6)},${(centerLng+padding).toFixed(6)},${(centerLat+padding).toFixed(6)}`;
     
-    // Code d'intégration corrigé avec un encodage approprié
+    // Format marker parameters correctly for OpenStreetMap embed
+    let markerParams = '';
+    markers.forEach(marker => {
+      markerParams += `&marker=${marker.latlng.lat.toFixed(6)},${marker.latlng.lng.toFixed(6)},${encodeURIComponent(marker.name)}`;
+    });
+    
+    // Create iframe code with correct HTML entities
     return `<iframe width="600" height="450" frameborder="0" style="border:0" 
-      src="https://www.openstreetmap.org/export/embed.html?bbox=${centerLng-0.1}%2C${centerLat-0.1}%2C${centerLng+0.1}%2C${centerLat+0.1}&amp;layer=mapnik${markerParams.replace(/&/g, '&amp;')}"></iframe>`;
+      src="https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik${markerParams.replace(/&/g, '&amp;')}"></iframe>`;
   };
 
   // Copy embed code to clipboard
