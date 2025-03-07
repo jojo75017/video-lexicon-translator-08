@@ -253,16 +253,17 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
     toast.info(`${t('map.searchingFor')} "${searchAddress}"`);
     
     try {
-      // Correction importante ici - le problème venait de la recherche
-      const encodedAddress = encodeURIComponent(searchAddress);
+      // Encodage propre de l'adresse pour éviter les problèmes d'encodage
+      const encodedAddress = encodeURIComponent(searchAddress.trim());
       console.log(`Recherche de l'adresse: ${encodedAddress}`);
       
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodedAddress}`,
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodedAddress}&accept-language=fr`,
         { 
           signal: searchControllerRef.current.signal,
           headers: {
-            'Accept-Language': 'fr' // Force French results
+            'Accept-Language': 'fr', // Force des résultats en français
+            'Content-Type': 'application/json; charset=UTF-8'
           }
         }
       );
@@ -275,17 +276,30 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
       console.log("Search results:", data);
       
       if (data && data.length > 0) {
-        // Correction importante - Utilisation correcte des coordonnées
+        // Extraction correcte des coordonnées
         const lat = parseFloat(data[0].lat);
         const lon = parseFloat(data[0].lon);
-        const location = [lat, lon];
         
         if (isNaN(lat) || isNaN(lon)) {
           throw new Error("Coordonnées invalides");
         }
         
         console.log(`Coordonnées trouvées: ${lat}, ${lon}`);
-        mapRef.current.setView(location as L.LatLngExpression, 5); // Zoom adapté pour des pays
+        
+        // Détermination du niveau de zoom approprié en fonction du type de résultat
+        let zoomLevel = 5; // Par défaut pour les pays
+        
+        if (data[0].type === 'city' || data[0].type === 'administrative') {
+          if (data[0].place_rank >= 16) { // Ville
+            zoomLevel = 12;
+          } else if (data[0].place_rank >= 12) { // Région
+            zoomLevel = 8;
+          } else if (data[0].place_rank >= 4) { // Pays
+            zoomLevel = 5;
+          }
+        }
+        
+        mapRef.current.setView([lat, lon] as L.LatLngExpression, zoomLevel);
         toast.success(t('map.locationFound'));
       } else {
         toast.error(`${t('map.noResults')} "${searchAddress}". ${t('map.tryMorePrecise')}`);
@@ -346,13 +360,14 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
     const centerLat = markers.reduce((sum, marker) => sum + marker.latlng.lat, 0) / markers.length;
     const centerLng = markers.reduce((sum, marker) => sum + marker.latlng.lng, 0) / markers.length;
     
-    // Generate marker parameters for each marker
+    // Generate marker parameters for each marker - utilisation d'URI.encode pour éviter les problèmes d'encodage
     const markerParams = markers.map(marker => 
-      `&amp;marker=${marker.latlng.lat},${marker.latlng.lng},${encodeURIComponent(marker.name)}`
+      `&marker=${marker.latlng.lat},${marker.latlng.lng},${encodeURIComponent(marker.name)}`
     ).join('');
     
-    // Create iframe code
-    return `<iframe width="600" height="450" style="border:0" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade" src="https://www.openstreetmap.org/export/embed.html?bbox=${centerLng-0.1},${centerLat-0.1},${centerLng+0.1},${centerLat+0.1}&amp;layer=mapnik${markerParams}"></iframe>`;
+    // Code d'intégration corrigé avec un encodage approprié
+    return `<iframe width="600" height="450" frameborder="0" style="border:0" 
+      src="https://www.openstreetmap.org/export/embed.html?bbox=${centerLng-0.1}%2C${centerLat-0.1}%2C${centerLng+0.1}%2C${centerLat+0.1}&amp;layer=mapnik${markerParams.replace(/&/g, '&amp;')}"></iframe>`;
   };
 
   // Copy embed code to clipboard
@@ -589,6 +604,10 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
                       {t('map.copy')}
                     </Button>
                   </div>
+                  <div className="mt-2 p-2 bg-yellow-50 text-xs rounded">
+                    <p className="font-medium">{t('map.embedUsage')}</p>
+                    <p>{t('map.embedInstructions')}</p>
+                  </div>
                 </div>
               )}
             </div>
@@ -598,7 +617,7 @@ const MapModal = ({ open, onOpenChange }: MapModalProps) => {
           <div className="md:col-span-2 relative min-h-[400px]">
             <div ref={mapContainerRef} className="absolute inset-0 rounded-md overflow-hidden"></div>
             
-            {/* Legend - Assurer qu'elle est visible */}
+            {/* Legend - Toujours visible quand la carte est initialisée */}
             {showLegend && mapInitialized && (
               <div className="absolute bottom-4 right-4 bg-white bg-opacity-90 p-3 rounded shadow-md z-[1000]">
                 <h4 className="font-semibold text-sm mb-2">{t('map.legendTitle')}</h4>
