@@ -164,6 +164,7 @@ export interface SeoAnalysis {
   imgWithoutAlt: number;
   imagesDetails: ImageAnalysis[];
   metaTagsCount: number;
+  metaTagsAnalysis: Record<string, string>;
   canonicalUrl: string | null;
   robotsMeta: string | null;
   brokenLinks: BrokenLink[];
@@ -236,7 +237,6 @@ export interface SeoAnalysis {
     usabilityScore?: number;
     viewportScore?: number;
   };
-  metaTagsAnalysis: Record<string, string>;
   contentQuality?: {
     uniqueness: number;
     grammar: number;
@@ -295,4 +295,17 @@ export interface SeoAnalysis {
     viewportScore?: number;
   };
   technicalSuggestions: string[];
+}
+
+export type SeoAnalysisResult = SeoAnalysis;
+
+export interface SiteStructure {
+  name: string;
+  children: SiteNode[];
+}
+
+export interface SiteNode {
+  name: string;
+  path: string;
+  children: SiteNode[];
 }
