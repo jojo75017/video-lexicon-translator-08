@@ -16,7 +16,7 @@ const TabNavigation = () => {
   ];
 
   return (
-    <TabsList className="w-full flex overflow-x-auto justify-between bg-white shadow-md rounded-lg p-2 mb-6">
+    <TabsList className="w-full flex overflow-x-auto justify-between bg-white shadow-md rounded-lg p-2 mb-6 border border-gray-100">
       {tabs.map(({ id, icon: Icon, label, color }) => (
         <TabsTrigger 
           key={id}

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
@@ -12,6 +13,13 @@ import { KeywordSuggestion } from '@/types/seo';
 import { toast } from "sonner";
 import PageHeader from '@/components/dashboard/PageHeader';
 import InfoCards from '@/components/seo/InfoCards';
+import AnalysisSections from '@/components/seo/AnalysisSections';
+import StructureSection from '@/components/seo/StructureSection';
+import HierarchySection from '@/components/seo/HierarchySection';
+import BacklinkSection from '@/components/seo/BacklinkSection';
+import MetricsSection from '@/components/seo/MetricsSection';
+import AdvancedSection from '@/components/seo/AdvancedSection';
+import IntegrationsSection from '@/components/seo/IntegrationsSection';
 
 const Index = () => {
   const {
@@ -140,7 +148,7 @@ const Index = () => {
           <SeoActionButtons />
           <InfoCards />
           
-          <div className="bg-white rounded-lg shadow-md p-4">
+          <div className="bg-white rounded-lg shadow-md p-4 border border-gray-100">
             <Tabs defaultValue="seo" className="space-y-6">
               <TabNavigation />
     

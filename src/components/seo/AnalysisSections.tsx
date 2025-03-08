@@ -1,30 +1,14 @@
-
 import React from 'react';
-import { Card } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
-import { AlertCircle } from "lucide-react";
-import { SeoAnalysis, KeywordSuggestion } from '@/types/seo';
-import { toast } from "sonner";
-import UrlInput from '@/components/UrlInput';
-import SeoResults from '@/components/SeoResults';
-import BacklinksAnalysis from '@/components/seo/BacklinksAnalysis';
-import KeywordSuggestions from '@/components/seo/KeywordSuggestions';
-import MobileAnalysis from '@/components/seo/MobileAnalysis';
-import SeoSuggestions from '@/components/seo/SeoSuggestions';
-import KeywordGenerator from '@/components/seo/KeywordGenerator';
-import AiWriter from '@/components/seo/AiWriter';
-import SiteComparison from '@/components/seo/SiteComparison';
-import ContentIdeas from '@/components/seo/ContentIdeas';
+import { SeoAnalysisResult, KeywordSuggestion } from '@/types/seo';
+import { Card } from '@/components/ui/card';
 
 interface AnalysisSectionsProps {
   url: string;
   setUrl: (url: string) => void;
   isLoading: boolean;
   showCorsWarning: boolean;
-  seoAnalysis: SeoAnalysis | null;
-  setSeoAnalysis: (analysis: SeoAnalysis) => void;
+  seoAnalysis: SeoAnalysisResult | null;
+  setSeoAnalysis: (analysis: SeoAnalysisResult) => void;
   comparisonSite: string;
   setComparisonSite: (site: string) => void;
   generatedKeywords: KeywordSuggestion[];
@@ -34,33 +18,15 @@ interface AnalysisSectionsProps {
     intro: string;
     sections: Array<{ heading: string; content: string; }>;
   } | null;
-  setGeneratedContent: (content: {
-    title: string;
-    intro: string;
-    sections: Array<{ heading: string; content: string; }>;
-  } | null) => void;
+  setGeneratedContent: (content: any) => void;
   contentKeyword: string;
-  mockContentIdeas: Array<{
-    title: string;
-    url: string;
-    visits: number;
-    backlinks: number;
-    socialShares: {
-      facebook: number;
-      pinterest: number;
-      reddit: number;
-    }
-  }>;
+  mockContentIdeas: any[];
   analyzeSite: () => void;
   error: string | null;
   handleActivateProxy: () => void;
   handleContentKeywordChange: (keyword: string) => void;
   handleGeneratedKeywords: (keywords: KeywordSuggestion[]) => void;
-  handleContentGenerated: (content: { 
-    title: string; 
-    intro: string; 
-    sections: Array<{ heading: string; content: string; }> 
-  }) => void;
+  handleContentGenerated: (content: any) => void;
 }
 
 const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
@@ -69,7 +35,6 @@ const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
   isLoading,
   showCorsWarning,
   seoAnalysis,
-  setSeoAnalysis,
   comparisonSite,
   setComparisonSite,
   generatedKeywords,
@@ -84,114 +49,219 @@ const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
   handleContentGenerated
 }) => {
   return (
-    <>
-      <Card className="p-8 shadow-xl bg-gradient-to-br from-purple-50 to-blue-50 border-0">
-        <UrlInput 
-          url={url}
-          setUrl={setUrl}
-          onAnalyze={analyzeSite}
-          isLoading={isLoading}
-        />
-        {showCorsWarning && (
-          <div className="mt-6">
-            <Alert className="bg-yellow-50 border-yellow-200 mb-4">
-              <AlertCircle className="h-5 w-5 text-yellow-600" />
-              <AlertDescription className="text-yellow-800">
-                Pour accéder aux sites web, vous devez d'abord activer le proxy CORS. Cliquez sur le bouton ci-dessous, puis sur "Request temporary access".
-              </AlertDescription>
-            </Alert>
-            <Button 
-              onClick={handleActivateProxy}
-              variant="outline"
-              className="w-full bg-yellow-50 hover:bg-yellow-100 border-2 border-yellow-400 text-yellow-700 font-medium h-auto py-4"
+    <Card className="p-6">
+      <h2 className="text-xl font-bold mb-4">Analyse SEO</h2>
+      <p className="text-gray-600 mb-4">
+        Cette section contient les analyses SEO pour votre site. 
+        Veuillez utiliser le formulaire d'analyse pour commencer.
+      </p>
+      
+      <div className="space-y-6">
+        <div className="bg-blue-50 p-4 rounded-lg">
+          <h3 className="font-semibold text-blue-800 mb-2">Analyser un site web</h3>
+          <div className="flex flex-col md:flex-row gap-3">
+            <input
+              type="text"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder="Entrez l'URL du site à analyser"
+              className="flex-1 p-2 border border-gray-300 rounded-md"
+            />
+            <button
+              onClick={analyzeSite}
+              disabled={isLoading || !url}
+              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors disabled:bg-blue-300"
             >
-              <div className="flex flex-col items-center w-full">
-                <span className="flex items-center mb-1">
-                  Étape 1: Activer le Proxy CORS
-                  <AlertCircle className="ml-2 h-4 w-4" />
-                </span>
-                <span className="text-sm text-yellow-600">
-                  Une fois activé, revenez ici pour analyser votre site
-                </span>
+              {isLoading ? 'Analyse en cours...' : 'Analyser'}
+            </button>
+          </div>
+          
+          {showCorsWarning && (
+            <div className="mt-3 text-amber-700 bg-amber-50 p-3 rounded-md border border-amber-200">
+              <p className="text-sm">
+                Pour analyser des sites externes, vous devez activer le proxy CORS.
+                <button
+                  onClick={handleActivateProxy}
+                  className="ml-2 text-blue-600 underline"
+                >
+                  Activer le proxy
+                </button>
+              </p>
+            </div>
+          )}
+          
+          {error && (
+            <div className="mt-3 text-red-700 bg-red-50 p-3 rounded-md border border-red-200">
+              <p className="text-sm">{error}</p>
+            </div>
+          )}
+        </div>
+        
+        {seoAnalysis && (
+          <div className="bg-white border border-gray-200 rounded-lg p-4">
+            <h3 className="font-semibold text-lg mb-3">Résultats de l'analyse</h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div className="bg-gray-50 p-3 rounded-md">
+                <h4 className="font-medium text-gray-700">Score SEO global</h4>
+                <div className="flex items-center mt-2">
+                  <div className="w-full bg-gray-200 rounded-full h-2.5">
+                    <div 
+                      className="bg-blue-600 h-2.5 rounded-full" 
+                      style={{ width: `${seoAnalysis.overallScore || 0}%` }}
+                    ></div>
+                  </div>
+                  <span className="ml-2 text-sm font-medium text-gray-700">
+                    {seoAnalysis.overallScore || 0}%
+                  </span>
+                </div>
               </div>
-            </Button>
-          </div>
-        )}
-      </Card>
-
-      {error && (
-        <Alert className="mt-4 bg-red-50 border-red-200">
-          <AlertCircle className="h-4 w-4 text-red-500" />
-          <AlertDescription className="text-red-800">
-            {error}
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {isLoading ? (
-        <Card className="p-6 mt-6">
-          <div className="space-y-3">
-            <Skeleton className="h-8 w-2/3" />
-            <Skeleton className="h-4 w-1/2" />
-            <Skeleton className="h-4 w-3/4" />
-          </div>
-        </Card>
-      ) : seoAnalysis ? (
-        <div className="space-y-6 mt-6">
-          <Card className="p-6">
-            <KeywordGenerator onKeywordsGenerated={handleGeneratedKeywords} />
-          </Card>
-          {generatedKeywords.length > 0 && (
-            <Card className="p-6">
-              <AiWriter 
-                keywords={generatedKeywords}
-                onContentGenerated={handleContentGenerated}
-              />
-              {generatedContent && (
-                <div className="mt-8 space-y-6">
-                  <h2 className="text-2xl font-bold">{generatedContent.title}</h2>
-                  <p className="text-gray-700">{generatedContent.intro}</p>
-                  {generatedContent.sections.map((section, index) => (
-                    <div key={index} className="mt-6">
-                      <h3 className="text-xl font-semibold mb-4">{section.heading}</h3>
-                      <p className="text-gray-600">{section.content}</p>
-                    </div>
+              
+              <div className="bg-gray-50 p-3 rounded-md">
+                <h4 className="font-medium text-gray-700">Temps de chargement</h4>
+                <p className="text-lg font-semibold mt-1">
+                  {seoAnalysis.performance?.loadTime || 'N/A'} s
+                </p>
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-medium text-gray-700 mb-2">Mots-clés détectés</h4>
+                <div className="flex flex-wrap gap-2">
+                  {seoAnalysis.keywords?.map((keyword, index) => (
+                    <span 
+                      key={index} 
+                      className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full"
+                    >
+                      {keyword}
+                    </span>
                   ))}
                 </div>
-              )}
-            </Card>
-          )}
-          <SeoResults seoAnalysis={seoAnalysis} />
-          <SiteComparison 
-            site1={{ url, analysis: seoAnalysis }}
-            site2={comparisonSite ? { url: comparisonSite, analysis: seoAnalysis } : undefined}
-            onCompare={setComparisonSite}
-          />
-          <KeywordSuggestions suggestions={seoAnalysis.keywordSuggestions || []} />
-          <MobileAnalysis 
-            viewportMeta={seoAnalysis.mobileAnalysis?.viewportMeta || false}
-            responsiveImages={seoAnalysis.mobileAnalysis?.responsiveImages || false}
-            touchTargetSize={seoAnalysis.mobileAnalysis?.touchTargetSize || false}
-            fontScale={seoAnalysis.mobileAnalysis?.fontScale || false}
-            score={seoAnalysis.mobileAnalysis?.score || 0}
-          />
-          <SeoSuggestions suggestions={seoAnalysis.technicalSuggestions || []} />
-          <ContentIdeas 
-            keyword={contentKeyword}
-            ideas={mockContentIdeas}
-            onKeywordChange={handleContentKeywordChange}
-          />
+              </div>
+              
+              <div>
+                <h4 className="font-medium text-gray-700 mb-2">Problèmes détectés</h4>
+                <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
+                  {seoAnalysis.issues?.map((issue, index) => (
+                    <li key={index}>{issue}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <h3 className="font-semibold text-lg mb-3">Analyse comparative</h3>
+          <div className="flex flex-col md:flex-row gap-3 mb-4">
+            <input
+              type="text"
+              value={comparisonSite}
+              onChange={(e) => setComparisonSite(e.target.value)}
+              placeholder="URL du site concurrent à comparer"
+              className="flex-1 p-2 border border-gray-300 rounded-md"
+            />
+            <button
+              disabled={isLoading || !comparisonSite}
+              className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors disabled:bg-purple-300"
+            >
+              Comparer
+            </button>
+          </div>
+          
+          <p className="text-sm text-gray-600">
+            Comparez votre site avec vos concurrents pour identifier les opportunités d'amélioration.
+          </p>
         </div>
-      ) : (
-        <Card className="p-6 mt-6">
-          <ContentIdeas 
-            keyword={contentKeyword}
-            ideas={mockContentIdeas}
-            onKeywordChange={handleContentKeywordChange}
-          />
-        </Card>
-      )}
-    </>
+        
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <h3 className="font-semibold text-lg mb-3">Suggestions de mots-clés</h3>
+          
+          <div className="mb-4">
+            <p className="text-sm text-gray-600 mb-2">
+              Obtenez des suggestions de mots-clés pertinents pour votre site.
+            </p>
+            
+            <button
+              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
+            >
+              Générer des suggestions
+            </button>
+          </div>
+          
+          {generatedKeywords.length > 0 && (
+            <div className="mt-4">
+              <h4 className="font-medium text-gray-700 mb-2">Mots-clés suggérés</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {generatedKeywords.map((keyword, index) => (
+                  <div key={index} className="flex justify-between bg-gray-50 p-2 rounded-md">
+                    <span>{keyword.keyword}</span>
+                    <span className="text-gray-500 text-sm">
+                      {keyword.volume} recherches/mois
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+        
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <h3 className="font-semibold text-lg mb-3">Générateur de contenu</h3>
+          
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Mot-clé principal
+            </label>
+            <div className="flex gap-3">
+              <input
+                type="text"
+                value={contentKeyword}
+                onChange={(e) => handleContentKeywordChange(e.target.value)}
+                placeholder="Entrez un mot-clé"
+                className="flex-1 p-2 border border-gray-300 rounded-md"
+              />
+              <button
+                className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors"
+              >
+                Générer du contenu
+              </button>
+            </div>
+          </div>
+          
+          {generatedContent && (
+            <div className="mt-4 bg-gray-50 p-3 rounded-md">
+              <h4 className="font-medium text-gray-700 mb-2">{generatedContent.title}</h4>
+              <p className="text-sm text-gray-600 mb-3">{generatedContent.intro}</p>
+              
+              {generatedContent.sections.map((section, index) => (
+                <div key={index} className="mb-3">
+                  <h5 className="font-medium text-gray-700">{section.heading}</h5>
+                  <p className="text-sm text-gray-600">{section.content}</p>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          <div className="mt-4">
+            <h4 className="font-medium text-gray-700 mb-2">Idées de contenu populaires</h4>
+            <div className="space-y-2">
+              {mockContentIdeas.map((idea, index) => (
+                <div key={index} className="bg-gray-50 p-3 rounded-md">
+                  <h5 className="font-medium text-gray-700">{idea.title}</h5>
+                  <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
+                    <span>{idea.visits} visites</span>
+                    <span>{idea.backlinks} backlinks</span>
+                    <span>{idea.socialShares.facebook + idea.socialShares.pinterest + idea.socialShares.reddit} partages</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </Card>
   );
 };
 
