@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
@@ -13,13 +12,6 @@ import { KeywordSuggestion } from '@/types/seo';
 import { toast } from "sonner";
 import PageHeader from '@/components/dashboard/PageHeader';
 import InfoCards from '@/components/seo/InfoCards';
-import AnalysisSections from '@/components/seo/AnalysisSections';
-import StructureSection from '@/components/seo/StructureSection';
-import HierarchySection from '@/components/seo/HierarchySection';
-import BacklinkSection from '@/components/seo/BacklinkSection';
-import MetricsSection from '@/components/seo/MetricsSection';
-import AdvancedSection from '@/components/seo/AdvancedSection';
-import IntegrationsSection from '@/components/seo/IntegrationsSection';
 
 const Index = () => {
   const {
@@ -138,90 +130,93 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
-      <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
         <PageHeader />
-        <LocalBusinessSection />
-        <DashboardHeader />
-        <SeoActionButtons />
-
-        <div className="mb-12">
+        
+        <div className="space-y-8">
+          <DashboardHeader />
           <FeatureGrid />
+          <SeoActionButtons />
           <InfoCards />
+          
+          <div className="bg-white rounded-lg shadow-md p-4">
+            <Tabs defaultValue="seo" className="space-y-6">
+              <TabNavigation />
+    
+              <TabsContent value="seo" className="space-y-6">
+                <AnalysisSections 
+                  url={url}
+                  setUrl={setUrl}
+                  isLoading={isLoading}
+                  showCorsWarning={showCorsWarning}
+                  seoAnalysis={seoAnalysis}
+                  setSeoAnalysis={setSeoAnalysis}
+                  comparisonSite={comparisonSite}
+                  setComparisonSite={setComparisonSite}
+                  generatedKeywords={generatedKeywords}
+                  setGeneratedKeywords={setGeneratedKeywords}
+                  generatedContent={generatedContent}
+                  setGeneratedContent={setGeneratedContent}
+                  contentKeyword={contentKeyword}
+                  mockContentIdeas={mockContentIdeas}
+                  analyzeSite={analyzeSite}
+                  error={error}
+                  handleActivateProxy={handleActivateProxy}
+                  handleContentKeywordChange={handleContentKeywordChange}
+                  handleGeneratedKeywords={handleGeneratedKeywords}
+                  handleContentGenerated={handleContentGenerated}
+                />
+              </TabsContent>
+    
+              <TabsContent value="structure">
+                <StructureSection 
+                  isLoading={isLoading}
+                  siteStructure={siteStructure}
+                />
+              </TabsContent>
+    
+              <TabsContent value="hierarchy">
+                <HierarchySection 
+                  isLoading={isLoading}
+                  seoAnalysis={seoAnalysis}
+                />
+              </TabsContent>
+    
+              <TabsContent value="backlinks">
+                <BacklinkSection 
+                  isLoading={isLoading}
+                  seoAnalysis={seoAnalysis}
+                />
+              </TabsContent>
+    
+              <TabsContent value="metrics">
+                <MetricsSection 
+                  isLoading={isLoading}
+                />
+              </TabsContent>
+    
+              <TabsContent value="advanced">
+                <AdvancedSection 
+                  isLoading={isLoading}
+                  seoAnalysis={seoAnalysis}
+                />
+              </TabsContent>
+    
+              <TabsContent value="integrations">
+                <IntegrationsSection />
+              </TabsContent>
+    
+              <TabsContent value="signature">
+                <Card className="p-6">
+                  <SignatureGenerator />
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </div>
+          
+          <LocalBusinessSection />
         </div>
-
-        <Tabs defaultValue="seo" className="space-y-6">
-          <TabNavigation />
-
-          <TabsContent value="seo" className="space-y-6">
-            <AnalysisSections 
-              url={url}
-              setUrl={setUrl}
-              isLoading={isLoading}
-              showCorsWarning={showCorsWarning}
-              seoAnalysis={seoAnalysis}
-              setSeoAnalysis={setSeoAnalysis}
-              comparisonSite={comparisonSite}
-              setComparisonSite={setComparisonSite}
-              generatedKeywords={generatedKeywords}
-              setGeneratedKeywords={setGeneratedKeywords}
-              generatedContent={generatedContent}
-              setGeneratedContent={setGeneratedContent}
-              contentKeyword={contentKeyword}
-              mockContentIdeas={mockContentIdeas}
-              analyzeSite={analyzeSite}
-              error={error}
-              handleActivateProxy={handleActivateProxy}
-              handleContentKeywordChange={handleContentKeywordChange}
-              handleGeneratedKeywords={handleGeneratedKeywords}
-              handleContentGenerated={handleContentGenerated}
-            />
-          </TabsContent>
-
-          <TabsContent value="structure">
-            <StructureSection 
-              isLoading={isLoading}
-              siteStructure={siteStructure}
-            />
-          </TabsContent>
-
-          <TabsContent value="hierarchy">
-            <HierarchySection 
-              isLoading={isLoading}
-              seoAnalysis={seoAnalysis}
-            />
-          </TabsContent>
-
-          <TabsContent value="backlinks">
-            <BacklinkSection 
-              isLoading={isLoading}
-              seoAnalysis={seoAnalysis}
-            />
-          </TabsContent>
-
-          <TabsContent value="metrics">
-            <MetricsSection 
-              isLoading={isLoading}
-            />
-          </TabsContent>
-
-          <TabsContent value="advanced">
-            <AdvancedSection 
-              isLoading={isLoading}
-              seoAnalysis={seoAnalysis}
-            />
-          </TabsContent>
-
-          <TabsContent value="integrations">
-            <IntegrationsSection />
-          </TabsContent>
-
-          <TabsContent value="signature">
-            <Card className="p-6">
-              <SignatureGenerator />
-            </Card>
-          </TabsContent>
-        </Tabs>
       </div>
     </div>
   );

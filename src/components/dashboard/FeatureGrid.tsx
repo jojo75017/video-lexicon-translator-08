@@ -6,13 +6,6 @@ import { Search, Globe, Database, Link2, ChartBar, Settings, Hash, Pen } from 'l
 const FeatureGrid = () => {
   const features = [
     {
-      icon: Pen,
-      title: "Signature",
-      description: "Créez votre signature professionnelle",
-      color: "border-purple-500",
-      id: "signature"
-    },
-    {
       icon: Search,
       title: "SEO",
       description: "Analyse complète des facteurs SEO",
@@ -60,6 +53,13 @@ const FeatureGrid = () => {
       description: "Outils externes",
       color: "border-purple-500",
       id: "integrations"
+    },
+    {
+      icon: Pen,
+      title: "Signature",
+      description: "Signature professionnelle",
+      color: "border-blue-500",
+      id: "signature"
     }
   ];
 
@@ -72,17 +72,21 @@ const FeatureGrid = () => {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      {features.map((feature) => (
-        <FeatureCard
-          key={feature.id}
-          icon={feature.icon}
-          title={feature.title}
-          description={feature.description}
-          color={feature.color}
-          onClick={() => handleFeatureClick(feature.id)}
-        />
-      ))}
+    <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">Fonctionnalités</h2>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {features.map((feature) => (
+          <FeatureCard
+            key={feature.id}
+            icon={feature.icon}
+            title={feature.title}
+            description={feature.description}
+            color={feature.color}
+            onClick={() => handleFeatureClick(feature.id)}
+          />
+        ))}
+      </div>
     </div>
   );
 };

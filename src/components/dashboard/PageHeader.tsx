@@ -3,13 +3,15 @@ import React from 'react';
 
 const PageHeader = () => {
   return (
-    <div className="text-center mb-8">
-      <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-blue-600">
-        Optimisation SEO Avancée
-      </h1>
-      <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-        Découvrez comment améliorer votre visibilité en ligne grâce à nos outils d'analyse SEO et nos stratégies d'optimisation sur mesure.
-      </p>
+    <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-8 shadow-md mb-8">
+      <div className="max-w-3xl mx-auto text-center">
+        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+          Optimisation SEO Professionnelle
+        </h1>
+        <p className="text-lg text-gray-700">
+          Améliorez votre visibilité en ligne avec nos outils d'analyse et d'optimisation SEO
+        </p>
+      </div>
     </div>
   );
 };

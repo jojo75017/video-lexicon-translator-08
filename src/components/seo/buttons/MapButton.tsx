@@ -26,15 +26,12 @@ const MapButton = () => {
     <>
       <Button
         variant="outline"
-        className="p-6 h-auto flex flex-col items-center gap-4 text-center"
+        className="flex flex-col items-center gap-2 h-auto py-2 px-2 text-center hover:bg-blue-50"
         onClick={handleOpenMap}
         disabled={isDisabled}
       >
-        <MapIcon className="h-8 w-8" />
-        <div>
-          <h3 className="font-semibold mb-2">{t("map.interactiveMap")}</h3>
-          <p className="text-sm text-gray-600">{t("map.description")}</p>
-        </div>
+        <MapIcon className="h-5 w-5 text-blue-600" />
+        <span className="text-xs">{t("map.interactiveMap")}</span>
       </Button>
 
       {!isDisabled && (

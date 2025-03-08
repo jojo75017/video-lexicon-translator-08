@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Card } from "@/components/ui/card";
 import { LucideIcon } from 'lucide-react';
 
 interface FeatureCardProps {
@@ -16,20 +15,22 @@ const FeatureCard = ({ icon: Icon, title, description, onClick, className = '' }
   return (
     <div 
       onClick={onClick}
-      className={`group bg-white/80 backdrop-blur-lg rounded-2xl p-6 cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-2xl border border-gray-100 hover:border-blue-200 ${className}`}
+      className={`bg-white rounded-lg p-4 border border-gray-200 transition-all duration-300 hover:shadow-md hover:border-blue-300 cursor-pointer ${className}`}
     >
-      <div className="flex flex-col items-center text-center space-y-4">
-        <div className="p-4 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transform transition-transform duration-500 group-hover:scale-110 shadow-lg">
-          <Icon className="h-8 w-8 text-white" />
+      <div className="flex items-start gap-4">
+        <div className="p-2 rounded-md bg-blue-50">
+          <Icon className="h-5 w-5 text-blue-600" />
         </div>
         
-        <h3 className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
-          {title}
-        </h3>
-        
-        <p className="text-gray-600 leading-relaxed">
-          {description}
-        </p>
+        <div className="flex-1">
+          <h3 className="font-semibold text-gray-800">
+            {title}
+          </h3>
+          
+          <p className="text-sm text-gray-600 mt-1">
+            {description}
+          </p>
+        </div>
       </div>
     </div>
   );
