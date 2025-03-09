@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { MessageSquareText, MessageCircle } from 'lucide-react';
+import { MessageSquareText, Bold, Italic, Underline, Link as LinkIcon } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -29,7 +29,10 @@ type QuoraAnswerData = z.infer<typeof quoraAnswerSchema>;
 
 export const QuoraButton = () => {
   const [activeTab, setActiveTab] = useState("ask");
-
+  const [textDetails, setTextDetails] = useState("");
+  const [textAnswer, setTextAnswer] = useState("");
+  const [textSources, setTextSources] = useState("");
+  
   const askForm = useForm<QuoraFormData>({
     resolver: zodResolver(quoraFormSchema),
     defaultValues: {
@@ -58,16 +61,93 @@ export const QuoraButton = () => {
   ];
 
   const handleQuoraSubmit = (data: QuoraFormData) => {
+    // Mise à jour de la valeur des détails depuis l'état local
+    data.details = textDetails;
     console.log("Question Quora:", data);
     toast.success("Question préparée pour Quora !");
     askForm.reset();
+    setTextDetails("");
   };
 
   const handleQuoraAnswerSubmit = (data: QuoraAnswerData) => {
+    // Mise à jour des valeurs depuis les états locaux
+    data.answer = textAnswer;
+    data.sources = textSources;
     console.log("Réponse Quora:", data);
     toast.success("Réponse préparée pour Quora !");
     answerForm.reset();
+    setTextAnswer("");
+    setTextSources("");
   };
+
+  const applyFormatting = (fieldType: 'details' | 'answer' | 'sources', format: 'bold' | 'italic' | 'underline' | 'link') => {
+    let textState = '';
+    let setText: React.Dispatch<React.SetStateAction<string>> = () => {};
+
+    // Sélection du bon état et setter selon le champ
+    if (fieldType === 'details') {
+      textState = textDetails;
+      setText = setTextDetails;
+    } else if (fieldType === 'answer') {
+      textState = textAnswer;
+      setText = setTextAnswer;
+    } else if (fieldType === 'sources') {
+      textState = textSources;
+      setText = setTextSources;
+    }
+    
+    // Application du formatage selon le type
+    if (format === 'bold') {
+      setText(textState + " **texte en gras** ");
+    } else if (format === 'italic') {
+      setText(textState + " *texte en italique* ");
+    } else if (format === 'underline') {
+      setText(textState + " __texte souligné__ ");
+    } else if (format === 'link') {
+      setText(textState + " [texte du lien](https://example.com) ");
+    }
+  };
+  
+  // Composant pour les boutons de mise en forme
+  const FormatButtons = ({ fieldType }: { fieldType: 'details' | 'answer' | 'sources' }) => (
+    <div className="flex space-x-2 mb-2">
+      <Button 
+        type="button" 
+        variant="outline" 
+        size="sm" 
+        onClick={() => applyFormatting(fieldType, 'bold')}
+      >
+        <Bold className="h-4 w-4" />
+      </Button>
+      <Button 
+        type="button" 
+        variant="outline" 
+        size="sm" 
+        onClick={() => applyFormatting(fieldType, 'italic')}
+      >
+        <Italic className="h-4 w-4" />
+      </Button>
+      <Button 
+        type="button" 
+        variant="outline" 
+        size="sm" 
+        onClick={() => applyFormatting(fieldType, 'underline')}
+      >
+        <Underline className="h-4 w-4" />
+      </Button>
+      <Button 
+        type="button" 
+        variant="outline" 
+        size="sm" 
+        onClick={() => applyFormatting(fieldType, 'link')}
+      >
+        <LinkIcon className="h-4 w-4" />
+      </Button>
+      <div className="text-xs text-gray-500 flex items-center ml-2">
+        Formatage: **gras**, *italique*, __souligné__, [lien](url)
+      </div>
+    </div>
+  );
 
   return (
     <Dialog>
@@ -107,23 +187,18 @@ export const QuoraButton = () => {
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={askForm.control}
-                  name="details"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Détails (optionnel)</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Ajoutez des détails pour contextualiser votre question..."
-                          className="min-h-[100px]"
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                
+                <FormItem>
+                  <FormLabel>Détails (optionnel)</FormLabel>
+                  <FormatButtons fieldType="details" />
+                  <Textarea 
+                    placeholder="Ajoutez des détails pour contextualiser votre question..."
+                    className="min-h-[100px]"
+                    value={textDetails}
+                    onChange={(e) => setTextDetails(e.target.value)}
+                  />
+                </FormItem>
+                
                 <FormField
                   control={askForm.control}
                   name="topics"
@@ -138,7 +213,16 @@ export const QuoraButton = () => {
                   )}
                 />
                 <div className="flex justify-between mt-6">
-                  <Button type="button" variant="outline" onClick={() => askForm.reset()}>Annuler</Button>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => {
+                      askForm.reset();
+                      setTextDetails("");
+                    }}
+                  >
+                    Annuler
+                  </Button>
                   <Button type="submit" variant="quora">Publier sur Quora</Button>
                 </div>
               </form>
@@ -171,42 +255,41 @@ export const QuoraButton = () => {
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={answerForm.control}
-                  name="answer"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Votre réponse</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Rédigez une réponse détaillée et informative..."
-                          className="min-h-[200px]"
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={answerForm.control}
-                  name="sources"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Sources (optionnel)</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Ajoutez des liens ou références pour appuyer votre réponse..."
-                          className="min-h-[80px]"
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                
+                <FormItem>
+                  <FormLabel>Votre réponse</FormLabel>
+                  <FormatButtons fieldType="answer" />
+                  <Textarea 
+                    placeholder="Rédigez une réponse détaillée et informative..."
+                    className="min-h-[200px]" 
+                    value={textAnswer}
+                    onChange={(e) => setTextAnswer(e.target.value)}
+                  />
+                </FormItem>
+                
+                <FormItem>
+                  <FormLabel>Sources (optionnel)</FormLabel>
+                  <FormatButtons fieldType="sources" />
+                  <Textarea 
+                    placeholder="Ajoutez des liens ou références pour appuyer votre réponse..."
+                    className="min-h-[80px]"
+                    value={textSources}
+                    onChange={(e) => setTextSources(e.target.value)}
+                  />
+                </FormItem>
+                
                 <div className="flex justify-between mt-6">
-                  <Button type="button" variant="outline" onClick={() => answerForm.reset()}>Annuler</Button>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => {
+                      answerForm.reset();
+                      setTextAnswer("");
+                      setTextSources("");
+                    }}
+                  >
+                    Annuler
+                  </Button>
                   <Button type="submit" variant="quora">Publier la réponse</Button>
                 </div>
               </form>
