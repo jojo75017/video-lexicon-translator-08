@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
@@ -201,6 +200,7 @@ const Index = () => {
               <TabsContent value="metrics">
                 <MetricsSection 
                   isLoading={isLoading}
+                  seoAnalysis={seoAnalysis}
                 />
               </TabsContent>
     

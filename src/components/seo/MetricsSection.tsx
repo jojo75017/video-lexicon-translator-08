@@ -2,11 +2,11 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { BarChart2, PieChart, TrendingUp } from 'lucide-react';
-import { SeoAnalysisResult } from '@/types/seo';
+import { SeoAnalysis } from '@/types/seo';
 
 interface MetricsSectionProps {
   isLoading: boolean;
-  seoAnalysis: SeoAnalysisResult | null;
+  seoAnalysis?: SeoAnalysis | null;
 }
 
 const MetricsSection: React.FC<MetricsSectionProps> = ({ isLoading, seoAnalysis }) => {

@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { SeoAnalysisResult, KeywordSuggestion } from '@/types/seo';
+import { SeoAnalysis, KeywordSuggestion } from '@/types/seo';
 import { Card } from '@/components/ui/card';
 
 interface AnalysisSectionsProps {
@@ -7,8 +8,8 @@ interface AnalysisSectionsProps {
   setUrl: (url: string) => void;
   isLoading: boolean;
   showCorsWarning: boolean;
-  seoAnalysis: SeoAnalysisResult | null;
-  setSeoAnalysis: (analysis: SeoAnalysisResult) => void;
+  seoAnalysis: SeoAnalysis | null;
+  setSeoAnalysis: (analysis: SeoAnalysis) => void;
   comparisonSite: string;
   setComparisonSite: (site: string) => void;
   generatedKeywords: KeywordSuggestion[];
@@ -48,6 +49,66 @@ const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
   handleGeneratedKeywords,
   handleContentGenerated
 }) => {
+  // Calculate an overall score based on available metrics
+  const calculateOverallScore = (analysis: SeoAnalysis | null): number => {
+    if (!analysis) return 0;
+    
+    let scoreSum = 0;
+    let scoreCount = 0;
+    
+    if (analysis.performance?.score) {
+      scoreSum += analysis.performance.score;
+      scoreCount++;
+    }
+    
+    if (analysis.mobileAnalysis?.score) {
+      scoreSum += analysis.mobileAnalysis.score;
+      scoreCount++;
+    }
+    
+    if (analysis.readabilityScore) {
+      scoreSum += analysis.readabilityScore;
+      scoreCount++;
+    }
+    
+    return scoreCount > 0 ? Math.round(scoreSum / scoreCount) : 0;
+  };
+
+  // Generate some sample issues based on seoAnalysis
+  const generateIssues = (analysis: SeoAnalysis | null): string[] => {
+    if (!analysis) return [];
+    
+    const issues: string[] = [];
+    
+    if (analysis.h1Count !== 1) {
+      issues.push(analysis.h1Count === 0 
+        ? "Aucune balise H1 trouvée - ajoutez une balise H1 principale"
+        : "Plusieurs balises H1 détectées - utilisez une seule balise H1");
+    }
+    
+    if (analysis.imgWithoutAlt > 0) {
+      issues.push(`${analysis.imgWithoutAlt} image(s) sans attribut alt - ajoutez des descriptions alternatives`);
+    }
+    
+    if (analysis.metaTagsAnalysis && !analysis.metaTagsAnalysis.hasDescriptionTag) {
+      issues.push("Meta description manquante - ajoutez une description concise");
+    }
+    
+    if (analysis.metaTagsAnalysis && !analysis.metaTagsAnalysis.hasOpenGraphTags) {
+      issues.push("Balises Open Graph manquantes - améliorez le partage sur les réseaux sociaux");
+    }
+    
+    if (analysis.performance && analysis.performance.loadTime > 3000) {
+      issues.push("Temps de chargement lent - optimisez la vitesse du site");
+    }
+    
+    if (analysis.technicalSuggestions && analysis.technicalSuggestions.length > 0) {
+      issues.push(...analysis.technicalSuggestions.slice(0, 3));
+    }
+    
+    return issues;
+  };
+
   return (
     <Card className="p-6">
       <h2 className="text-xl font-bold mb-4">Analyse SEO</h2>
@@ -108,11 +169,11 @@ const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
                   <div className="w-full bg-gray-200 rounded-full h-2.5">
                     <div 
                       className="bg-blue-600 h-2.5 rounded-full" 
-                      style={{ width: `${seoAnalysis.overallScore || 0}%` }}
+                      style={{ width: `${calculateOverallScore(seoAnalysis)}%` }}
                     ></div>
                   </div>
                   <span className="ml-2 text-sm font-medium text-gray-700">
-                    {seoAnalysis.overallScore || 0}%
+                    {calculateOverallScore(seoAnalysis)}%
                   </span>
                 </div>
               </div>
@@ -120,7 +181,9 @@ const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
               <div className="bg-gray-50 p-3 rounded-md">
                 <h4 className="font-medium text-gray-700">Temps de chargement</h4>
                 <p className="text-lg font-semibold mt-1">
-                  {seoAnalysis.performance?.loadTime || 'N/A'} s
+                  {seoAnalysis.performance?.loadTime 
+                    ? (seoAnalysis.performance.loadTime / 1000).toFixed(2) 
+                    : 'N/A'} s
                 </p>
               </div>
             </div>
@@ -129,7 +192,7 @@ const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
               <div>
                 <h4 className="font-medium text-gray-700 mb-2">Mots-clés détectés</h4>
                 <div className="flex flex-wrap gap-2">
-                  {seoAnalysis.keywords?.map((keyword, index) => (
+                  {seoAnalysis.topKeywords?.map((keyword, index) => (
                     <span 
                       key={index} 
                       className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full"
@@ -143,7 +206,7 @@ const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
               <div>
                 <h4 className="font-medium text-gray-700 mb-2">Problèmes détectés</h4>
                 <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
-                  {seoAnalysis.issues?.map((issue, index) => (
+                  {generateIssues(seoAnalysis).map((issue, index) => (
                     <li key={index}>{issue}</li>
                   ))}
                 </ul>
