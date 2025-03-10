@@ -1,7 +1,7 @@
 
 import React, { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
-import { MessageSquareText, Bold, Italic, Underline, Link as LinkIcon } from 'lucide-react';
+import { MessageSquareText, Bold, Italic, Underline, Link as LinkIcon, ImageIcon, ListOrdered, ListIcon, Quote } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -32,8 +32,9 @@ export const QuoraButton = () => {
   const [textDetails, setTextDetails] = useState("");
   const [textAnswer, setTextAnswer] = useState("");
   const [textSources, setTextSources] = useState("");
+  const [selectedText, setSelectedText] = useState({ start: 0, end: 0, text: "" });
   
-  // Refs to track textarea elements
+  // Refs pour suivre les éléments textarea
   const detailsRef = useRef<HTMLTextAreaElement>(null);
   const answerRef = useRef<HTMLTextAreaElement>(null);
   const sourcesRef = useRef<HTMLTextAreaElement>(null);
@@ -85,7 +86,7 @@ export const QuoraButton = () => {
     setTextSources("");
   };
 
-  // Function to get the current textarea and selection
+  // Fonction pour obtenir les informations de textarea et de sélection
   const getTextAreaInfo = (fieldType: 'details' | 'answer' | 'sources') => {
     let textareaRef: React.RefObject<HTMLTextAreaElement>;
     let text = '';
@@ -109,7 +110,11 @@ export const QuoraButton = () => {
     return { textarea, text, setText };
   };
 
-  const applyFormatting = (fieldType: 'details' | 'answer' | 'sources', format: 'bold' | 'italic' | 'underline' | 'link') => {
+  const handleTextSelection = (fieldType: 'details' | 'answer' | 'sources', start: number, end: number, selectedText: string) => {
+    setSelectedText({ start, end, text: selectedText });
+  };
+
+  const applyFormatting = (fieldType: 'details' | 'answer' | 'sources', format: 'bold' | 'italic' | 'underline' | 'link' | 'image' | 'list' | 'numbered-list' | 'quote') => {
     const { textarea, text, setText } = getTextAreaInfo(fieldType);
     
     if (!textarea) return;
@@ -119,23 +124,27 @@ export const QuoraButton = () => {
     const selectedText = text.substring(start, end);
     
     if (start === end) {
-      // No text selected, insert template
+      // Aucun texte sélectionné, insérer un modèle
       let formattedTemplate = '';
       if (format === 'bold') formattedTemplate = '**texte en gras**';
       else if (format === 'italic') formattedTemplate = '*texte en italique*';
       else if (format === 'underline') formattedTemplate = '__texte souligné__';
       else if (format === 'link') formattedTemplate = '[texte du lien](https://example.com)';
+      else if (format === 'image') formattedTemplate = '![description de l\'image](https://exemple.com/image.jpg)';
+      else if (format === 'list') formattedTemplate = '\n- Élément de liste\n- Élément de liste\n- Élément de liste\n';
+      else if (format === 'numbered-list') formattedTemplate = '\n1. Premier élément\n2. Deuxième élément\n3. Troisième élément\n';
+      else if (format === 'quote') formattedTemplate = '\n> Votre citation ici\n';
       
       const newText = text.substring(0, start) + formattedTemplate + text.substring(end);
       setText(newText);
       
-      // Set cursor position after inserted template
+      // Définir la position du curseur après le modèle inséré
       setTimeout(() => {
         textarea.focus();
         textarea.setSelectionRange(start + formattedTemplate.length, start + formattedTemplate.length);
       }, 0);
     } else {
-      // Text selected, apply formatting to selection
+      // Texte sélectionné, appliquer le formatage à la sélection
       let before = text.substring(0, start);
       let after = text.substring(end);
       let formattedText = '';
@@ -144,19 +153,33 @@ export const QuoraButton = () => {
       else if (format === 'italic') formattedText = `*${selectedText}*`;
       else if (format === 'underline') formattedText = `__${selectedText}__`;
       else if (format === 'link') formattedText = `[${selectedText}](https://example.com)`;
+      else if (format === 'image') formattedText = `![${selectedText}](https://exemple.com/image.jpg)`;
+      else if (format === 'quote') formattedText = `\n> ${selectedText}\n`;
+      else if (format === 'list') {
+        const lines = selectedText.split('\n');
+        formattedText = '\n' + lines.map(line => `- ${line}`).join('\n') + '\n';
+      }
+      else if (format === 'numbered-list') {
+        const lines = selectedText.split('\n');
+        formattedText = '\n' + lines.map((line, index) => `${index + 1}. ${line}`).join('\n') + '\n';
+      }
       
       const newText = before + formattedText + after;
       setText(newText);
       
-      // Reset selection to include formatting
+      // Réinitialiser la sélection pour inclure le formatage
       setTimeout(() => {
         textarea.focus();
         if (format === 'link') {
-          // For links, place cursor at URL position for easy editing
+          // Pour les liens, placer le curseur à la position de l'URL pour une édition facile
           const cursorPos = before.length + selectedText.length + 3;
-          textarea.setSelectionRange(cursorPos, cursorPos + 19); // Length of https://example.com
+          textarea.setSelectionRange(cursorPos, cursorPos + 19); // Longueur de https://example.com
+        } else if (format === 'image') {
+          // Pour les images, placer le curseur à la position de l'URL pour une édition facile
+          const cursorPos = before.length + selectedText.length + 4;
+          textarea.setSelectionRange(cursorPos, cursorPos + 28); // Longueur de https://exemple.com/image.jpg
         } else {
-          // For other formats, select the formatted text
+          // Pour les autres formats, sélectionner le texte formaté
           textarea.setSelectionRange(start, start + formattedText.length);
         }
       }, 0);
@@ -165,12 +188,13 @@ export const QuoraButton = () => {
   
   // Composant pour les boutons de mise en forme
   const FormatButtons = ({ fieldType }: { fieldType: 'details' | 'answer' | 'sources' }) => (
-    <div className="flex space-x-2 mb-2">
+    <div className="flex flex-wrap gap-2 mb-2">
       <Button 
         type="button" 
         variant="outline" 
         size="sm" 
         onClick={() => applyFormatting(fieldType, 'bold')}
+        title="Gras"
       >
         <Bold className="h-4 w-4" />
       </Button>
@@ -179,6 +203,7 @@ export const QuoraButton = () => {
         variant="outline" 
         size="sm" 
         onClick={() => applyFormatting(fieldType, 'italic')}
+        title="Italique"
       >
         <Italic className="h-4 w-4" />
       </Button>
@@ -187,6 +212,7 @@ export const QuoraButton = () => {
         variant="outline" 
         size="sm" 
         onClick={() => applyFormatting(fieldType, 'underline')}
+        title="Souligné"
       >
         <Underline className="h-4 w-4" />
       </Button>
@@ -195,8 +221,45 @@ export const QuoraButton = () => {
         variant="outline" 
         size="sm" 
         onClick={() => applyFormatting(fieldType, 'link')}
+        title="Lien"
       >
         <LinkIcon className="h-4 w-4" />
+      </Button>
+      <Button 
+        type="button" 
+        variant="outline" 
+        size="sm" 
+        onClick={() => applyFormatting(fieldType, 'image')}
+        title="Image"
+      >
+        <ImageIcon className="h-4 w-4" />
+      </Button>
+      <Button 
+        type="button" 
+        variant="outline" 
+        size="sm" 
+        onClick={() => applyFormatting(fieldType, 'list')}
+        title="Liste à puces"
+      >
+        <ListIcon className="h-4 w-4" />
+      </Button>
+      <Button 
+        type="button" 
+        variant="outline" 
+        size="sm" 
+        onClick={() => applyFormatting(fieldType, 'numbered-list')}
+        title="Liste numérotée"
+      >
+        <ListOrdered className="h-4 w-4" />
+      </Button>
+      <Button 
+        type="button" 
+        variant="outline" 
+        size="sm" 
+        onClick={() => applyFormatting(fieldType, 'quote')}
+        title="Citation"
+      >
+        <Quote className="h-4 w-4" />
       </Button>
       <div className="text-xs text-gray-500 flex items-center ml-2">
         Formatage: **gras**, *italique*, __souligné__, [lien](url)
@@ -251,6 +314,7 @@ export const QuoraButton = () => {
                     className="min-h-[100px]"
                     value={textDetails}
                     onChange={(e) => setTextDetails(e.target.value)}
+                    onSelect={(start, end, text) => handleTextSelection('details', start, end, text)}
                     ref={detailsRef}
                   />
                 </FormItem>
@@ -320,8 +384,12 @@ export const QuoraButton = () => {
                     className="min-h-[200px]" 
                     value={textAnswer}
                     onChange={(e) => setTextAnswer(e.target.value)}
+                    onSelect={(start, end, text) => handleTextSelection('answer', start, end, text)}
                     ref={answerRef}
                   />
+                  <div className="text-xs text-[#6E59A5] mt-1">
+                    Astuce: Sélectionnez du texte et utilisez les boutons ci-dessus pour le mettre en forme.
+                  </div>
                 </FormItem>
                 
                 <FormItem>
@@ -332,6 +400,7 @@ export const QuoraButton = () => {
                     className="min-h-[80px]"
                     value={textSources}
                     onChange={(e) => setTextSources(e.target.value)}
+                    onSelect={(start, end, text) => handleTextSelection('sources', start, end, text)}
                     ref={sourcesRef}
                   />
                 </FormItem>
