@@ -35,14 +35,14 @@ export const QuoraButton = () => {
   const [selectedText, setSelectedText] = useState({ start: 0, end: 0, text: "" });
   const [showLinkPopover, setShowLinkPopover] = useState(false);
   const [linkUrl, setLinkUrl] = useState("https://");
-  
-  // Refs pour suivre les éléments textarea
+  const [quoraProfile, setQuoraProfile] = useState<string>("");
+
   const detailsRef = useRef<HTMLTextAreaElement>(null);
   const answerRef = useRef<HTMLTextAreaElement>(null);
   const sourcesRef = useRef<HTMLTextAreaElement>(null);
   const linkButtonRef = useRef<HTMLButtonElement>(null);
   const activeTextarea = useRef<'details' | 'answer' | 'sources'>('details');
-  
+
   const askForm = useForm<QuoraFormData>({
     resolver: zodResolver(quoraFormSchema),
     defaultValues: {
@@ -61,7 +61,6 @@ export const QuoraButton = () => {
     }
   });
 
-  // Liste exemple de questions populaires sur Quora liées au SEO
   const popularQuestions = [
     "Comment améliorer le référencement de mon site e-commerce en 2024?",
     "Quelles sont les meilleures stratégies de backlinks pour un nouveau site web?",
@@ -71,26 +70,67 @@ export const QuoraButton = () => {
   ];
 
   const handleQuoraSubmit = (data: QuoraFormData) => {
-    // Mise à jour de la valeur des détails depuis l'état local
     data.details = textDetails;
+    
+    const quoraPostUrl = "https://fr.quora.com/";
+    
     console.log("Question Quora:", data);
-    toast.success("Question préparée pour Quora !");
+    toast.success(
+      <div className="space-y-2">
+        <p>Question préparée pour Quora !</p>
+        <p className="text-sm">Pour publier votre question :</p>
+        <ol className="text-sm list-decimal pl-4">
+          <li>Copiez votre question</li>
+          <li>
+            <a 
+              href={quoraPostUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 hover:underline"
+            >
+              Cliquez ici pour aller sur Quora
+            </a>
+          </li>
+          <li>Collez et publiez votre question sur Quora</li>
+        </ol>
+      </div>
+    );
+    
     askForm.reset();
     setTextDetails("");
   };
 
   const handleQuoraAnswerSubmit = (data: QuoraAnswerData) => {
-    // Mise à jour des valeurs depuis les états locaux
     data.answer = textAnswer;
     data.sources = textSources;
+    
     console.log("Réponse Quora:", data);
-    toast.success("Réponse préparée pour Quora !");
+    toast.success(
+      <div className="space-y-2">
+        <p>Réponse préparée pour Quora !</p>
+        <p className="text-sm">Pour publier votre réponse :</p>
+        <ol className="text-sm list-decimal pl-4">
+          <li>Copiez votre réponse</li>
+          <li>
+            <a 
+              href={`https://fr.quora.com/answer`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 hover:underline"
+            >
+              Cliquez ici pour aller sur Quora
+            </a>
+          </li>
+          <li>Trouvez la question et collez votre réponse</li>
+        </ol>
+      </div>
+    );
+    
     answerForm.reset();
     setTextAnswer("");
     setTextSources("");
   };
 
-  // Fonction pour obtenir les informations de textarea et de sélection
   const getTextAreaInfo = (fieldType: 'details' | 'answer' | 'sources') => {
     let textareaRef: React.RefObject<HTMLTextAreaElement>;
     let text = '';
@@ -129,7 +169,6 @@ export const QuoraButton = () => {
     const selectedText = text.substring(start, end);
     
     if (format === 'link') {
-      // Si c'est un lien et qu'il y a du texte sélectionné, afficher le popover
       if (start !== end) {
         setShowLinkPopover(true);
         return;
@@ -137,7 +176,6 @@ export const QuoraButton = () => {
     }
     
     if (start === end) {
-      // Aucun texte sélectionné, insérer un modèle
       let formattedTemplate = '';
       if (format === 'bold') formattedTemplate = '**texte en gras**';
       else if (format === 'italic') formattedTemplate = '*texte en italique*';
@@ -151,22 +189,19 @@ export const QuoraButton = () => {
       const newText = text.substring(0, start) + formattedTemplate + text.substring(end);
       setText(newText);
       
-      // Définir la position du curseur après le modèle inséré
       setTimeout(() => {
         textarea.focus();
         textarea.setSelectionRange(start + formattedTemplate.length, start + formattedTemplate.length);
       }, 0);
     } else {
-      // Texte sélectionné, appliquer le formatage à la sélection
       let before = text.substring(0, start);
       let after = text.substring(end);
       let formattedText = '';
       
-      if (format === 'bold') formattedText = `**${selectedText}**`;
+      if (format === 'bold') formattedText = `**${selectedText}**';
       else if (format === 'italic') formattedText = `*${selectedText}*`;
       else if (format === 'underline') formattedText = `__${selectedText}__`;
       else if (format === 'link') {
-        // Le lien est traité par le popover dans handleApplyLink
         return;
       }
       else if (format === 'image') formattedText = `![${selectedText}](https://exemple.com/image.jpg)`;
@@ -183,15 +218,12 @@ export const QuoraButton = () => {
       const newText = before + formattedText + after;
       setText(newText);
       
-      // Réinitialiser la sélection pour inclure le formatage
       setTimeout(() => {
         textarea.focus();
         if (format === 'image') {
-          // Pour les images, placer le curseur à la position de l'URL pour une édition facile
           const cursorPos = before.length + selectedText.length + 4;
-          textarea.setSelectionRange(cursorPos, cursorPos + 28); // Longueur de https://exemple.com/image.jpg
+          textarea.setSelectionRange(cursorPos, cursorPos + 28);
         } else {
-          // Pour les autres formats, sélectionner le texte formaté
           textarea.setSelectionRange(start, start + formattedText.length);
         }
       }, 0);
@@ -216,17 +248,14 @@ export const QuoraButton = () => {
     const newText = before + linkMarkdown + after;
     setText(newText);
     
-    // Fermer le popover et réinitialiser l'URL
     setShowLinkPopover(false);
     setLinkUrl("https://");
     
-    // Remettre le focus sur le textarea
     setTimeout(() => {
       textarea.focus();
     }, 0);
   };
-  
-  // Composant pour les boutons de mise en forme
+
   const FormatButtons = ({ fieldType }: { fieldType: 'details' | 'answer' | 'sources' }) => (
     <div className="flex flex-wrap gap-2 mb-2">
       <Button 
@@ -381,19 +410,13 @@ export const QuoraButton = () => {
                   </div>
                 </FormItem>
                 
-                <FormField
-                  control={askForm.control}
-                  name="topics"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Sujets (séparés par des virgules)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="SEO, Marketing, Référencement" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <FormItem>
+                  <FormLabel>Sujets (séparés par des virgules)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="SEO, Marketing, Référencement" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
                 <div className="flex justify-between mt-6">
                   <Button 
                     type="button" 
