@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { MessageSquareText, Bold, Italic, Underline, Link as LinkIcon, ImageIcon, ListOrdered, ListIcon, Quote } from 'lucide-react';
@@ -11,6 +10,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const quoraFormSchema = z.object({
   question: z.string().min(10, "La question doit contenir au moins 10 caractères"),
@@ -33,11 +33,15 @@ export const QuoraButton = () => {
   const [textAnswer, setTextAnswer] = useState("");
   const [textSources, setTextSources] = useState("");
   const [selectedText, setSelectedText] = useState({ start: 0, end: 0, text: "" });
+  const [showLinkPopover, setShowLinkPopover] = useState(false);
+  const [linkUrl, setLinkUrl] = useState("https://");
   
   // Refs pour suivre les éléments textarea
   const detailsRef = useRef<HTMLTextAreaElement>(null);
   const answerRef = useRef<HTMLTextAreaElement>(null);
   const sourcesRef = useRef<HTMLTextAreaElement>(null);
+  const linkButtonRef = useRef<HTMLButtonElement>(null);
+  const activeTextarea = useRef<'details' | 'answer' | 'sources'>('details');
   
   const askForm = useForm<QuoraFormData>({
     resolver: zodResolver(quoraFormSchema),
@@ -112,6 +116,7 @@ export const QuoraButton = () => {
 
   const handleTextSelection = (fieldType: 'details' | 'answer' | 'sources', start: number, end: number, selectedText: string) => {
     setSelectedText({ start, end, text: selectedText });
+    activeTextarea.current = fieldType;
   };
 
   const applyFormatting = (fieldType: 'details' | 'answer' | 'sources', format: 'bold' | 'italic' | 'underline' | 'link' | 'image' | 'list' | 'numbered-list' | 'quote') => {
@@ -123,13 +128,21 @@ export const QuoraButton = () => {
     const end = textarea.selectionEnd;
     const selectedText = text.substring(start, end);
     
+    if (format === 'link') {
+      // Si c'est un lien et qu'il y a du texte sélectionné, afficher le popover
+      if (start !== end) {
+        setShowLinkPopover(true);
+        return;
+      }
+    }
+    
     if (start === end) {
       // Aucun texte sélectionné, insérer un modèle
       let formattedTemplate = '';
       if (format === 'bold') formattedTemplate = '**texte en gras**';
       else if (format === 'italic') formattedTemplate = '*texte en italique*';
       else if (format === 'underline') formattedTemplate = '__texte souligné__';
-      else if (format === 'link') formattedTemplate = '[texte du lien](https://example.com)';
+      else if (format === 'link') formattedTemplate = '[texte du lien](https://exemple.com)';
       else if (format === 'image') formattedTemplate = '![description de l\'image](https://exemple.com/image.jpg)';
       else if (format === 'list') formattedTemplate = '\n- Élément de liste\n- Élément de liste\n- Élément de liste\n';
       else if (format === 'numbered-list') formattedTemplate = '\n1. Premier élément\n2. Deuxième élément\n3. Troisième élément\n';
@@ -152,7 +165,10 @@ export const QuoraButton = () => {
       if (format === 'bold') formattedText = `**${selectedText}**`;
       else if (format === 'italic') formattedText = `*${selectedText}*`;
       else if (format === 'underline') formattedText = `__${selectedText}__`;
-      else if (format === 'link') formattedText = `[${selectedText}](https://example.com)`;
+      else if (format === 'link') {
+        // Le lien est traité par le popover dans handleApplyLink
+        return;
+      }
       else if (format === 'image') formattedText = `![${selectedText}](https://exemple.com/image.jpg)`;
       else if (format === 'quote') formattedText = `\n> ${selectedText}\n`;
       else if (format === 'list') {
@@ -170,11 +186,7 @@ export const QuoraButton = () => {
       // Réinitialiser la sélection pour inclure le formatage
       setTimeout(() => {
         textarea.focus();
-        if (format === 'link') {
-          // Pour les liens, placer le curseur à la position de l'URL pour une édition facile
-          const cursorPos = before.length + selectedText.length + 3;
-          textarea.setSelectionRange(cursorPos, cursorPos + 19); // Longueur de https://example.com
-        } else if (format === 'image') {
+        if (format === 'image') {
           // Pour les images, placer le curseur à la position de l'URL pour une édition facile
           const cursorPos = before.length + selectedText.length + 4;
           textarea.setSelectionRange(cursorPos, cursorPos + 28); // Longueur de https://exemple.com/image.jpg
@@ -184,6 +196,34 @@ export const QuoraButton = () => {
         }
       }, 0);
     }
+  };
+
+  const handleApplyLink = () => {
+    const fieldType = activeTextarea.current;
+    const { textarea, text, setText } = getTextAreaInfo(fieldType);
+    
+    if (!textarea) return;
+    
+    const start = selectedText.start;
+    const end = selectedText.end;
+    
+    if (start === end) return;
+    
+    const before = text.substring(0, start);
+    const after = text.substring(end);
+    const linkMarkdown = `[${selectedText.text}](${linkUrl})`;
+    
+    const newText = before + linkMarkdown + after;
+    setText(newText);
+    
+    // Fermer le popover et réinitialiser l'URL
+    setShowLinkPopover(false);
+    setLinkUrl("https://");
+    
+    // Remettre le focus sur le textarea
+    setTimeout(() => {
+      textarea.focus();
+    }, 0);
   };
   
   // Composant pour les boutons de mise en forme
@@ -216,15 +256,34 @@ export const QuoraButton = () => {
       >
         <Underline className="h-4 w-4" />
       </Button>
-      <Button 
-        type="button" 
-        variant="outline" 
-        size="sm" 
-        onClick={() => applyFormatting(fieldType, 'link')}
-        title="Lien"
-      >
-        <LinkIcon className="h-4 w-4" />
-      </Button>
+      <Popover open={showLinkPopover} onOpenChange={setShowLinkPopover}>
+        <PopoverTrigger asChild>
+          <Button 
+            type="button" 
+            variant="outline" 
+            size="sm" 
+            onClick={() => applyFormatting(fieldType, 'link')}
+            title="Lien"
+            ref={linkButtonRef}
+          >
+            <LinkIcon className="h-4 w-4" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-80 p-0" side="top">
+          <div className="p-4 space-y-2">
+            <h4 className="font-medium">Ajouter un lien</h4>
+            <p className="text-sm text-gray-500">Texte sélectionné: {selectedText.text}</p>
+            <div className="flex gap-2">
+              <Input 
+                placeholder="https://exemple.com" 
+                value={linkUrl}
+                onChange={(e) => setLinkUrl(e.target.value)}
+              />
+              <Button onClick={handleApplyLink}>Appliquer</Button>
+            </div>
+          </div>
+        </PopoverContent>
+      </Popover>
       <Button 
         type="button" 
         variant="outline" 
@@ -317,6 +376,9 @@ export const QuoraButton = () => {
                     onSelect={(start, end, text) => handleTextSelection('details', start, end, text)}
                     ref={detailsRef}
                   />
+                  <div className="text-xs text-[#6E59A5] mt-1">
+                    Astuce: Sélectionnez du texte et utilisez le bouton de lien pour créer un lien hypertexte.
+                  </div>
                 </FormItem>
                 
                 <FormField
@@ -388,7 +450,7 @@ export const QuoraButton = () => {
                     ref={answerRef}
                   />
                   <div className="text-xs text-[#6E59A5] mt-1">
-                    Astuce: Sélectionnez du texte et utilisez les boutons ci-dessus pour le mettre en forme.
+                    Astuce: Sélectionnez du texte et cliquez sur l'icône de lien pour ajouter un lien hypertexte.
                   </div>
                 </FormItem>
                 
