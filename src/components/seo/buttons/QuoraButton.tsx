@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { MessageSquareText, Bold, Italic, Underline, Link as LinkIcon, ImageIcon, ListOrdered, ListIcon, Quote } from 'lucide-react';
@@ -35,7 +36,7 @@ export const QuoraButton = () => {
   const [selectedText, setSelectedText] = useState({ start: 0, end: 0, text: "" });
   const [showLinkPopover, setShowLinkPopover] = useState(false);
   const [linkUrl, setLinkUrl] = useState("https://");
-  const [quoraProfile, setQuoraProfile] = useState<string>("");
+  const [quoraProfile, setQuoraProfile] = useState<string>("https://fr.quora.com/profile/Georges-Boubet");
 
   const detailsRef = useRef<HTMLTextAreaElement>(null);
   const answerRef = useRef<HTMLTextAreaElement>(null);
@@ -72,27 +73,14 @@ export const QuoraButton = () => {
   const handleQuoraSubmit = (data: QuoraFormData) => {
     data.details = textDetails;
     
-    const quoraPostUrl = "https://fr.quora.com/";
+    // Rediriger l'utilisateur vers sa page Quora pour publier
+    window.open(quoraProfile, '_blank');
     
     console.log("Question Quora:", data);
     toast.success(
       <div className="space-y-2">
         <p>Question préparée pour Quora !</p>
-        <p className="text-sm">Pour publier votre question :</p>
-        <ol className="text-sm list-decimal pl-4">
-          <li>Copiez votre question</li>
-          <li>
-            <a 
-              href={quoraPostUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-500 hover:underline"
-            >
-              Cliquez ici pour aller sur Quora
-            </a>
-          </li>
-          <li>Collez et publiez votre question sur Quora</li>
-        </ol>
+        <p className="text-sm">Vous êtes redirigé vers votre profil Quora. Copiez votre question et collez-la pour publication.</p>
       </div>
     );
     
@@ -104,25 +92,14 @@ export const QuoraButton = () => {
     data.answer = textAnswer;
     data.sources = textSources;
     
+    // Rediriger l'utilisateur vers sa page Quora pour publier
+    window.open(quoraProfile, '_blank');
+    
     console.log("Réponse Quora:", data);
     toast.success(
       <div className="space-y-2">
         <p>Réponse préparée pour Quora !</p>
-        <p className="text-sm">Pour publier votre réponse :</p>
-        <ol className="text-sm list-decimal pl-4">
-          <li>Copiez votre réponse</li>
-          <li>
-            <a 
-              href={`https://fr.quora.com/answer`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-500 hover:underline"
-            >
-              Cliquez ici pour aller sur Quora
-            </a>
-          </li>
-          <li>Trouvez la question et collez votre réponse</li>
-        </ol>
+        <p className="text-sm">Vous êtes redirigé vers votre profil Quora. Copiez votre réponse et collez-la pour publication.</p>
       </div>
     );
     
@@ -198,7 +175,7 @@ export const QuoraButton = () => {
       let after = text.substring(end);
       let formattedText = '';
       
-      if (format === 'bold') formattedText = `**${selectedText}**';
+      if (format === 'bold') formattedText = `**${selectedText}**`;
       else if (format === 'italic') formattedText = `*${selectedText}*`;
       else if (format === 'underline') formattedText = `__${selectedText}__`;
       else if (format === 'link') {
@@ -410,13 +387,19 @@ export const QuoraButton = () => {
                   </div>
                 </FormItem>
                 
-                <FormItem>
-                  <FormLabel>Sujets (séparés par des virgules)</FormLabel>
-                  <FormControl>
-                    <Input placeholder="SEO, Marketing, Référencement" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                <FormField
+                  control={askForm.control}
+                  name="topics"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Sujets (séparés par des virgules)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="SEO, Marketing, Référencement" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <div className="flex justify-between mt-6">
                   <Button 
                     type="button" 
