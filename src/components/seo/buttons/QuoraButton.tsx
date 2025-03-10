@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { MessageSquareText, Bold, Italic, Underline, Link as LinkIcon } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -32,6 +32,11 @@ export const QuoraButton = () => {
   const [textDetails, setTextDetails] = useState("");
   const [textAnswer, setTextAnswer] = useState("");
   const [textSources, setTextSources] = useState("");
+  
+  // Refs to track textarea elements
+  const detailsRef = useRef<HTMLTextAreaElement>(null);
+  const answerRef = useRef<HTMLTextAreaElement>(null);
+  const sourcesRef = useRef<HTMLTextAreaElement>(null);
   
   const askForm = useForm<QuoraFormData>({
     resolver: zodResolver(quoraFormSchema),
@@ -80,31 +85,81 @@ export const QuoraButton = () => {
     setTextSources("");
   };
 
-  const applyFormatting = (fieldType: 'details' | 'answer' | 'sources', format: 'bold' | 'italic' | 'underline' | 'link') => {
-    let textState = '';
+  // Function to get the current textarea and selection
+  const getTextAreaInfo = (fieldType: 'details' | 'answer' | 'sources') => {
+    let textareaRef: React.RefObject<HTMLTextAreaElement>;
+    let text = '';
     let setText: React.Dispatch<React.SetStateAction<string>> = () => {};
 
-    // Sélection du bon état et setter selon le champ
     if (fieldType === 'details') {
-      textState = textDetails;
+      textareaRef = detailsRef;
+      text = textDetails;
       setText = setTextDetails;
     } else if (fieldType === 'answer') {
-      textState = textAnswer;
+      textareaRef = answerRef;
+      text = textAnswer;
       setText = setTextAnswer;
-    } else if (fieldType === 'sources') {
-      textState = textSources;
+    } else {
+      textareaRef = sourcesRef;
+      text = textSources;
       setText = setTextSources;
     }
+
+    const textarea = textareaRef.current;
+    return { textarea, text, setText };
+  };
+
+  const applyFormatting = (fieldType: 'details' | 'answer' | 'sources', format: 'bold' | 'italic' | 'underline' | 'link') => {
+    const { textarea, text, setText } = getTextAreaInfo(fieldType);
     
-    // Application du formatage selon le type
-    if (format === 'bold') {
-      setText(textState + " **texte en gras** ");
-    } else if (format === 'italic') {
-      setText(textState + " *texte en italique* ");
-    } else if (format === 'underline') {
-      setText(textState + " __texte souligné__ ");
-    } else if (format === 'link') {
-      setText(textState + " [texte du lien](https://example.com) ");
+    if (!textarea) return;
+    
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = text.substring(start, end);
+    
+    if (start === end) {
+      // No text selected, insert template
+      let formattedTemplate = '';
+      if (format === 'bold') formattedTemplate = '**texte en gras**';
+      else if (format === 'italic') formattedTemplate = '*texte en italique*';
+      else if (format === 'underline') formattedTemplate = '__texte souligné__';
+      else if (format === 'link') formattedTemplate = '[texte du lien](https://example.com)';
+      
+      const newText = text.substring(0, start) + formattedTemplate + text.substring(end);
+      setText(newText);
+      
+      // Set cursor position after inserted template
+      setTimeout(() => {
+        textarea.focus();
+        textarea.setSelectionRange(start + formattedTemplate.length, start + formattedTemplate.length);
+      }, 0);
+    } else {
+      // Text selected, apply formatting to selection
+      let before = text.substring(0, start);
+      let after = text.substring(end);
+      let formattedText = '';
+      
+      if (format === 'bold') formattedText = `**${selectedText}**`;
+      else if (format === 'italic') formattedText = `*${selectedText}*`;
+      else if (format === 'underline') formattedText = `__${selectedText}__`;
+      else if (format === 'link') formattedText = `[${selectedText}](https://example.com)`;
+      
+      const newText = before + formattedText + after;
+      setText(newText);
+      
+      // Reset selection to include formatting
+      setTimeout(() => {
+        textarea.focus();
+        if (format === 'link') {
+          // For links, place cursor at URL position for easy editing
+          const cursorPos = before.length + selectedText.length + 3;
+          textarea.setSelectionRange(cursorPos, cursorPos + 19); // Length of https://example.com
+        } else {
+          // For other formats, select the formatted text
+          textarea.setSelectionRange(start, start + formattedText.length);
+        }
+      }, 0);
     }
   };
   
@@ -196,6 +251,7 @@ export const QuoraButton = () => {
                     className="min-h-[100px]"
                     value={textDetails}
                     onChange={(e) => setTextDetails(e.target.value)}
+                    ref={detailsRef}
                   />
                 </FormItem>
                 
@@ -264,6 +320,7 @@ export const QuoraButton = () => {
                     className="min-h-[200px]" 
                     value={textAnswer}
                     onChange={(e) => setTextAnswer(e.target.value)}
+                    ref={answerRef}
                   />
                 </FormItem>
                 
@@ -275,6 +332,7 @@ export const QuoraButton = () => {
                     className="min-h-[80px]"
                     value={textSources}
                     onChange={(e) => setTextSources(e.target.value)}
+                    ref={sourcesRef}
                   />
                 </FormItem>
                 
