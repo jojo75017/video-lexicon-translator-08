@@ -8,9 +8,11 @@ import { toast } from "sonner";
 import html2canvas from 'html2canvas';
 import SignaturePreview from './SignaturePreview';
 import StyleSelector from './StyleSelector';
+import AiAssistant from './AiAssistant';
 import type { StyleTemplate } from './StyleSelector';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const SignatureGenerator = () => {
   const [formData, setFormData] = useState({
@@ -22,6 +24,7 @@ const SignatureGenerator = () => {
     website: ''
   });
   
+  const [activeTab, setActiveTab] = useState("editeur");
   const [isItalic, setIsItalic] = useState(false);
   const [useStyleFont, setUseStyleFont] = useState(false);
   const [nameIcon, setNameIcon] = useState<'none' | 'user' | 'userRound' | 'emoji'>('none');
@@ -123,13 +126,6 @@ const SignatureGenerator = () => {
     return style;
   };
 
-  const emojiOptions = {
-    title: ['💼', '👔', '🎯', '⭐️', '📊', '🎩', '🚀'],
-    email: ['📧', '✉️', '📨', '📬', '📫', '📪'],
-    phone: ['📱', '☎️', '📞', '📲', '💻', '🤙'],
-    website: ['🌐', '💻', '🔗', '🎯', '🌍', '💡']
-  };
-
   const handleTextSelection = (
     field: 'name' | 'title' | 'company' | 'email' | 'phone' | 'website',
     e: React.MouseEvent<HTMLInputElement>
@@ -196,6 +192,14 @@ const SignatureGenerator = () => {
     setLinkUrl("https://");
   };
 
+  const handleUseAiResponse = (response: string) => {
+    // Ajoute la réponse de l'IA comme texte dans le champ titre
+    setFormData(prev => ({
+      ...prev,
+      title: response
+    }));
+  };
+
   return (
     <Card className="p-6">
       <div className="space-y-6">
@@ -204,438 +208,481 @@ const SignatureGenerator = () => {
           <h2>Générateur de Signature Email</h2>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          <div className="space-y-6">
-            <div className="space-y-4">
-              <Label>Logo de l'entreprise</Label>
-              <div className="flex gap-4 items-center">
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  accept="image/*"
-                  onChange={handleLogoUpload}
-                  className="hidden"
-                  id="logo-upload"
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid grid-cols-2 mb-4">
+            <TabsTrigger value="editeur">Éditeur de signature</TabsTrigger>
+            <TabsTrigger value="assistant">Assistant IA</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="editeur" className="space-y-6">
+            <div className="grid gap-6 md:grid-cols-2">
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <Label>Logo de l'entreprise</Label>
+                  <div className="flex gap-4 items-center">
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      accept="image/*"
+                      onChange={handleLogoUpload}
+                      className="hidden"
+                      id="logo-upload"
+                    />
+                    <Button
+                      variant="outline"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="gap-2"
+                    >
+                      <Upload className="h-4 w-4" />
+                      {logo ? "Changer le logo" : "Ajouter un logo"}
+                    </Button>
+                    {logo && (
+                      <Button
+                        variant="destructive"
+                        onClick={removeLogo}
+                      >
+                        Supprimer
+                      </Button>
+                    )}
+                  </div>
+                  {logo && (
+                    <div className="mt-2">
+                      <img 
+                        src={logo} 
+                        alt="Logo entreprise" 
+                        className="max-h-16 object-contain"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="name">Nom complet</Label>
+                    <div className="flex items-center space-x-2">
+                      <Input
+                        id="name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        placeholder="Jean Dupont"
+                        ref={nameInputRef}
+                        onMouseUp={(e) => handleTextSelection('name', e)}
+                        className="flex-1"
+                      />
+                      <Popover open={activeField === 'name' && showLinkPopover} onOpenChange={setShowLinkPopover}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => {
+                              if (nameInputRef.current) {
+                                const start = nameInputRef.current.selectionStart || 0;
+                                const end = nameInputRef.current.selectionEnd || 0;
+                                const text = formData.name.substring(start, end);
+                                if (start !== end) {
+                                  setSelectedText({ start, end, text });
+                                  setActiveField('name');
+                                  setShowLinkPopover(true);
+                                } else {
+                                  toast.error("Veuillez sélectionner du texte d'abord");
+                                }
+                              }
+                            }}
+                          >
+                            <LinkIcon className="h-4 w-4" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80" side="right">
+                          <div className="space-y-2">
+                            <h4 className="font-medium">Ajouter un lien</h4>
+                            <p className="text-sm text-gray-500">Texte sélectionné: {selectedText.text}</p>
+                            <div className="flex space-x-2">
+                              <Input 
+                                placeholder="https://exemple.com" 
+                                value={linkUrl}
+                                onChange={(e) => setLinkUrl(e.target.value)}
+                              />
+                              <Button size="sm" onClick={handleApplyLink}>Appliquer</Button>
+                            </div>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="title">Titre / Poste</Label>
+                    <div className="flex items-center space-x-2">
+                      <Input
+                        id="title"
+                        name="title"
+                        value={formData.title}
+                        onChange={handleInputChange}
+                        placeholder="Directeur Marketing"
+                        ref={titleInputRef}
+                        onMouseUp={(e) => handleTextSelection('title', e)}
+                        className="flex-1"
+                      />
+                      <Popover open={activeField === 'title' && showLinkPopover} onOpenChange={setShowLinkPopover}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => {
+                              if (titleInputRef.current) {
+                                const start = titleInputRef.current.selectionStart || 0;
+                                const end = titleInputRef.current.selectionEnd || 0;
+                                const text = formData.title.substring(start, end);
+                                if (start !== end) {
+                                  setSelectedText({ start, end, text });
+                                  setActiveField('title');
+                                  setShowLinkPopover(true);
+                                } else {
+                                  toast.error("Veuillez sélectionner du texte d'abord");
+                                }
+                              }
+                            }}
+                          >
+                            <LinkIcon className="h-4 w-4" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80" side="right">
+                          <div className="space-y-2">
+                            <h4 className="font-medium">Ajouter un lien</h4>
+                            <p className="text-sm text-gray-500">Texte sélectionné: {selectedText.text}</p>
+                            <div className="flex space-x-2">
+                              <Input 
+                                placeholder="https://exemple.com" 
+                                value={linkUrl}
+                                onChange={(e) => setLinkUrl(e.target.value)}
+                              />
+                              <Button size="sm" onClick={handleApplyLink}>Appliquer</Button>
+                            </div>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="company">Entreprise</Label>
+                    <div className="flex items-center space-x-2">
+                      <Input
+                        id="company"
+                        name="company"
+                        value={formData.company}
+                        onChange={handleInputChange}
+                        placeholder="Ma Société"
+                        ref={companyInputRef}
+                        onMouseUp={(e) => handleTextSelection('company', e)}
+                        className="flex-1"
+                      />
+                      <Popover open={activeField === 'company' && showLinkPopover} onOpenChange={setShowLinkPopover}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => {
+                              if (companyInputRef.current) {
+                                const start = companyInputRef.current.selectionStart || 0;
+                                const end = companyInputRef.current.selectionEnd || 0;
+                                const text = formData.company.substring(start, end);
+                                if (start !== end) {
+                                  setSelectedText({ start, end, text });
+                                  setActiveField('company');
+                                  setShowLinkPopover(true);
+                                } else {
+                                  toast.error("Veuillez sélectionner du texte d'abord");
+                                }
+                              }
+                            }}
+                          >
+                            <LinkIcon className="h-4 w-4" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80" side="right">
+                          <div className="space-y-2">
+                            <h4 className="font-medium">Ajouter un lien</h4>
+                            <p className="text-sm text-gray-500">Texte sélectionné: {selectedText.text}</p>
+                            <div className="flex space-x-2">
+                              <Input 
+                                placeholder="https://exemple.com" 
+                                value={linkUrl}
+                                onChange={(e) => setLinkUrl(e.target.value)}
+                              />
+                              <Button size="sm" onClick={handleApplyLink}>Appliquer</Button>
+                            </div>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="email">Email</Label>
+                    <div className="flex items-center space-x-2">
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        placeholder="jean.dupont@entreprise.com"
+                        ref={emailInputRef}
+                        onMouseUp={(e) => handleTextSelection('email', e)}
+                        className="flex-1"
+                      />
+                      <Popover open={activeField === 'email' && showLinkPopover} onOpenChange={setShowLinkPopover}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => {
+                              if (emailInputRef.current) {
+                                const start = emailInputRef.current.selectionStart || 0;
+                                const end = emailInputRef.current.selectionEnd || 0;
+                                const text = formData.email.substring(start, end);
+                                if (start !== end) {
+                                  setSelectedText({ start, end, text });
+                                  setActiveField('email');
+                                  setShowLinkPopover(true);
+                                } else {
+                                  toast.error("Veuillez sélectionner du texte d'abord");
+                                }
+                              }
+                            }}
+                          >
+                            <LinkIcon className="h-4 w-4" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80" side="right">
+                          <div className="space-y-2">
+                            <h4 className="font-medium">Ajouter un lien</h4>
+                            <p className="text-sm text-gray-500">Texte sélectionné: {selectedText.text}</p>
+                            <div className="flex space-x-2">
+                              <Input 
+                                placeholder="https://exemple.com" 
+                                value={linkUrl}
+                                onChange={(e) => setLinkUrl(e.target.value)}
+                              />
+                              <Button size="sm" onClick={handleApplyLink}>Appliquer</Button>
+                            </div>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="phone">Téléphone</Label>
+                    <div className="flex items-center space-x-2">
+                      <Input
+                        id="phone"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleInputChange}
+                        placeholder="+33 6 12 34 56 78"
+                        ref={phoneInputRef}
+                        onMouseUp={(e) => handleTextSelection('phone', e)}
+                        className="flex-1"
+                      />
+                      <Popover open={activeField === 'phone' && showLinkPopover} onOpenChange={setShowLinkPopover}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => {
+                              if (phoneInputRef.current) {
+                                const start = phoneInputRef.current.selectionStart || 0;
+                                const end = phoneInputRef.current.selectionEnd || 0;
+                                const text = formData.phone.substring(start, end);
+                                if (start !== end) {
+                                  setSelectedText({ start, end, text });
+                                  setActiveField('phone');
+                                  setShowLinkPopover(true);
+                                } else {
+                                  toast.error("Veuillez sélectionner du texte d'abord");
+                                }
+                              }
+                            }}
+                          >
+                            <LinkIcon className="h-4 w-4" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80" side="right">
+                          <div className="space-y-2">
+                            <h4 className="font-medium">Ajouter un lien</h4>
+                            <p className="text-sm text-gray-500">Texte sélectionné: {selectedText.text}</p>
+                            <div className="flex space-x-2">
+                              <Input 
+                                placeholder="https://exemple.com" 
+                                value={linkUrl}
+                                onChange={(e) => setLinkUrl(e.target.value)}
+                              />
+                              <Button size="sm" onClick={handleApplyLink}>Appliquer</Button>
+                            </div>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="website">Site web</Label>
+                    <div className="flex items-center space-x-2">
+                      <Input
+                        id="website"
+                        name="website"
+                        value={formData.website}
+                        onChange={handleInputChange}
+                        placeholder="www.monentreprise.com"
+                        ref={websiteInputRef}
+                        onMouseUp={(e) => handleTextSelection('website', e)}
+                        className="flex-1"
+                      />
+                      <Popover open={activeField === 'website' && showLinkPopover} onOpenChange={setShowLinkPopover}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => {
+                              if (websiteInputRef.current) {
+                                const start = websiteInputRef.current.selectionStart || 0;
+                                const end = websiteInputRef.current.selectionEnd || 0;
+                                const text = formData.website.substring(start, end);
+                                if (start !== end) {
+                                  setSelectedText({ start, end, text });
+                                  setActiveField('website');
+                                  setShowLinkPopover(true);
+                                } else {
+                                  toast.error("Veuillez sélectionner du texte d'abord");
+                                }
+                              }
+                            }}
+                          >
+                            <LinkIcon className="h-4 w-4" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80" side="right">
+                          <div className="space-y-2">
+                            <h4 className="font-medium">Ajouter un lien</h4>
+                            <p className="text-sm text-gray-500">Texte sélectionné: {selectedText.text}</p>
+                            <div className="flex space-x-2">
+                              <Input 
+                                placeholder="https://exemple.com" 
+                                value={linkUrl}
+                                onChange={(e) => setLinkUrl(e.target.value)}
+                              />
+                              <Button size="sm" onClick={handleApplyLink}>Appliquer</Button>
+                            </div>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={isItalic}
+                        onChange={(e) => setIsItalic(e.target.checked)}
+                        className="rounded border-gray-300"
+                      />
+                      <span>Italique</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={useStyleFont}
+                        onChange={(e) => setUseStyleFont(e.target.checked)}
+                        className="rounded border-gray-300"
+                      />
+                      <span>Police stylée</span>
+                    </label>
+                  </div>
+                </div>
+
+                <StyleSelector
+                  textColor={textColor}
+                  setTextColor={setTextColor}
+                  iconColor={iconColor}
+                  setIconColor={setIconColor}
+                  separatorColor={separatorColor}
+                  setSeparatorColor={setSeparatorColor}
+                  onSelectTemplate={handleTemplateSelect}
                 />
-                <Button
-                  variant="outline"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="gap-2"
+              </div>
+
+              <div className="space-y-4">
+                <Label>Aperçu de la signature</Label>
+                <div 
+                  ref={signatureRef}
+                  className="p-6 bg-white rounded-lg border"
                 >
-                  <Upload className="h-4 w-4" />
-                  {logo ? "Changer le logo" : "Ajouter un logo"}
+                  <SignaturePreview 
+                    formData={formData}
+                    style={getSignatureStyle()}
+                    nameIcon={nameIcon}
+                    companyIcon={companyIcon}
+                    titleEmoji={titleEmoji}
+                    emailEmoji={emailEmoji}
+                    phoneEmoji={phoneEmoji}
+                    websiteEmoji={websiteEmoji}
+                    textColor={textColor}
+                    iconColor={iconColor}
+                    separatorColor={separatorColor}
+                    logo={logo}
+                  />
+                </div>
+
+                <Button
+                  className="w-full gap-2"
+                  onClick={downloadSignature}
+                >
+                  <Download className="h-4 w-4" />
+                  Télécharger la signature
                 </Button>
-                {logo && (
-                  <Button
-                    variant="destructive"
-                    onClick={removeLogo}
-                  >
-                    Supprimer
-                  </Button>
-                )}
-              </div>
-              {logo && (
-                <div className="mt-2">
-                  <img 
-                    src={logo} 
-                    alt="Logo entreprise" 
-                    className="max-h-16 object-contain"
-                  />
-                </div>
-              )}
-            </div>
-
-            <div className="space-y-4">
-              <Popover open={showLinkPopover} onOpenChange={setShowLinkPopover}>
-                <PopoverContent className="w-80" side="right">
-                  <div className="space-y-2">
-                    <h4 className="font-medium">Ajouter un lien</h4>
-                    <p className="text-sm text-gray-500">Texte sélectionné: {selectedText.text}</p>
-                    <div className="flex space-x-2">
-                      <Input 
-                        placeholder="https://exemple.com" 
-                        value={linkUrl}
-                        onChange={(e) => setLinkUrl(e.target.value)}
-                      />
-                      <Button size="sm" onClick={handleApplyLink}>Appliquer</Button>
-                    </div>
-                  </div>
-                </PopoverContent>
-
-                <div>
-                  <Label htmlFor="name">Nom complet</Label>
-                  <div className="flex items-center space-x-2">
-                    <Input
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      placeholder="Jean Dupont"
-                      ref={nameInputRef}
-                      onMouseUp={(e) => handleTextSelection('name', e)}
-                      className="flex-1"
-                    />
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => {
-                          if (nameInputRef.current) {
-                            const start = nameInputRef.current.selectionStart || 0;
-                            const end = nameInputRef.current.selectionEnd || 0;
-                            const text = formData.name.substring(start, end);
-                            if (start !== end) {
-                              setSelectedText({ start, end, text });
-                              setActiveField('name');
-                              setShowLinkPopover(true);
-                            } else {
-                              toast.error("Veuillez sélectionner du texte d'abord");
-                            }
-                          }
-                        }}
-                      >
-                        <LinkIcon className="h-4 w-4" />
-                      </Button>
-                    </PopoverTrigger>
-                  </div>
-                </div>
-              </Popover>
-
-              <Popover>
-                <div>
-                  <Label htmlFor="title">Titre / Poste</Label>
-                  <div className="flex items-center space-x-2">
-                    <Input
-                      id="title"
-                      name="title"
-                      value={formData.title}
-                      onChange={handleInputChange}
-                      placeholder="Directeur Marketing"
-                      ref={titleInputRef}
-                      onMouseUp={(e) => handleTextSelection('title', e)}
-                      className="flex-1"
-                    />
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => {
-                          if (titleInputRef.current) {
-                            const start = titleInputRef.current.selectionStart || 0;
-                            const end = titleInputRef.current.selectionEnd || 0;
-                            const text = formData.title.substring(start, end);
-                            if (start !== end) {
-                              setSelectedText({ start, end, text });
-                              setActiveField('title');
-                              setShowLinkPopover(true);
-                            } else {
-                              toast.error("Veuillez sélectionner du texte d'abord");
-                            }
-                          }
-                        }}
-                      >
-                        <LinkIcon className="h-4 w-4" />
-                      </Button>
-                    </PopoverTrigger>
-                  </div>
-                </div>
-                <PopoverContent className="w-80" side="right">
-                  <div className="space-y-2">
-                    <h4 className="font-medium">Ajouter un lien</h4>
-                    <p className="text-sm text-gray-500">Texte sélectionné: {selectedText.text}</p>
-                    <div className="flex space-x-2">
-                      <Input 
-                        placeholder="https://exemple.com" 
-                        value={linkUrl}
-                        onChange={(e) => setLinkUrl(e.target.value)}
-                      />
-                      <Button size="sm" onClick={handleApplyLink}>Appliquer</Button>
-                    </div>
-                  </div>
-                </PopoverContent>
-              </Popover>
-
-              <Popover>
-                <div>
-                  <Label htmlFor="company">Entreprise</Label>
-                  <div className="flex items-center space-x-2">
-                    <Input
-                      id="company"
-                      name="company"
-                      value={formData.company}
-                      onChange={handleInputChange}
-                      placeholder="Ma Société"
-                      ref={companyInputRef}
-                      onMouseUp={(e) => handleTextSelection('company', e)}
-                      className="flex-1"
-                    />
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => {
-                          if (companyInputRef.current) {
-                            const start = companyInputRef.current.selectionStart || 0;
-                            const end = companyInputRef.current.selectionEnd || 0;
-                            const text = formData.company.substring(start, end);
-                            if (start !== end) {
-                              setSelectedText({ start, end, text });
-                              setActiveField('company');
-                              setShowLinkPopover(true);
-                            } else {
-                              toast.error("Veuillez sélectionner du texte d'abord");
-                            }
-                          }
-                        }}
-                      >
-                        <LinkIcon className="h-4 w-4" />
-                      </Button>
-                    </PopoverTrigger>
-                  </div>
-                </div>
-                <PopoverContent className="w-80" side="right">
-                  <div className="space-y-2">
-                    <h4 className="font-medium">Ajouter un lien</h4>
-                    <p className="text-sm text-gray-500">Texte sélectionné: {selectedText.text}</p>
-                    <div className="flex space-x-2">
-                      <Input 
-                        placeholder="https://exemple.com" 
-                        value={linkUrl}
-                        onChange={(e) => setLinkUrl(e.target.value)}
-                      />
-                      <Button size="sm" onClick={handleApplyLink}>Appliquer</Button>
-                    </div>
-                  </div>
-                </PopoverContent>
-              </Popover>
-
-              <Popover>
-                <div>
-                  <Label htmlFor="email">Email</Label>
-                  <div className="flex items-center space-x-2">
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      placeholder="jean.dupont@entreprise.com"
-                      ref={emailInputRef}
-                      onMouseUp={(e) => handleTextSelection('email', e)}
-                      className="flex-1"
-                    />
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => {
-                          if (emailInputRef.current) {
-                            const start = emailInputRef.current.selectionStart || 0;
-                            const end = emailInputRef.current.selectionEnd || 0;
-                            const text = formData.email.substring(start, end);
-                            if (start !== end) {
-                              setSelectedText({ start, end, text });
-                              setActiveField('email');
-                              setShowLinkPopover(true);
-                            } else {
-                              toast.error("Veuillez sélectionner du texte d'abord");
-                            }
-                          }
-                        }}
-                      >
-                        <LinkIcon className="h-4 w-4" />
-                      </Button>
-                    </PopoverTrigger>
-                  </div>
-                </div>
-                <PopoverContent className="w-80" side="right">
-                  <div className="space-y-2">
-                    <h4 className="font-medium">Ajouter un lien</h4>
-                    <p className="text-sm text-gray-500">Texte sélectionné: {selectedText.text}</p>
-                    <div className="flex space-x-2">
-                      <Input 
-                        placeholder="https://exemple.com" 
-                        value={linkUrl}
-                        onChange={(e) => setLinkUrl(e.target.value)}
-                      />
-                      <Button size="sm" onClick={handleApplyLink}>Appliquer</Button>
-                    </div>
-                  </div>
-                </PopoverContent>
-              </Popover>
-
-              <Popover>
-                <div>
-                  <Label htmlFor="phone">Téléphone</Label>
-                  <div className="flex items-center space-x-2">
-                    <Input
-                      id="phone"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      placeholder="+33 6 12 34 56 78"
-                      ref={phoneInputRef}
-                      onMouseUp={(e) => handleTextSelection('phone', e)}
-                      className="flex-1"
-                    />
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => {
-                          if (phoneInputRef.current) {
-                            const start = phoneInputRef.current.selectionStart || 0;
-                            const end = phoneInputRef.current.selectionEnd || 0;
-                            const text = formData.phone.substring(start, end);
-                            if (start !== end) {
-                              setSelectedText({ start, end, text });
-                              setActiveField('phone');
-                              setShowLinkPopover(true);
-                            } else {
-                              toast.error("Veuillez sélectionner du texte d'abord");
-                            }
-                          }
-                        }}
-                      >
-                        <LinkIcon className="h-4 w-4" />
-                      </Button>
-                    </PopoverTrigger>
-                  </div>
-                </div>
-                <PopoverContent className="w-80" side="right">
-                  <div className="space-y-2">
-                    <h4 className="font-medium">Ajouter un lien</h4>
-                    <p className="text-sm text-gray-500">Texte sélectionné: {selectedText.text}</p>
-                    <div className="flex space-x-2">
-                      <Input 
-                        placeholder="https://exemple.com" 
-                        value={linkUrl}
-                        onChange={(e) => setLinkUrl(e.target.value)}
-                      />
-                      <Button size="sm" onClick={handleApplyLink}>Appliquer</Button>
-                    </div>
-                  </div>
-                </PopoverContent>
-              </Popover>
-
-              <Popover>
-                <div>
-                  <Label htmlFor="website">Site web</Label>
-                  <div className="flex items-center space-x-2">
-                    <Input
-                      id="website"
-                      name="website"
-                      value={formData.website}
-                      onChange={handleInputChange}
-                      placeholder="www.monentreprise.com"
-                      ref={websiteInputRef}
-                      onMouseUp={(e) => handleTextSelection('website', e)}
-                      className="flex-1"
-                    />
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => {
-                          if (websiteInputRef.current) {
-                            const start = websiteInputRef.current.selectionStart || 0;
-                            const end = websiteInputRef.current.selectionEnd || 0;
-                            const text = formData.website.substring(start, end);
-                            if (start !== end) {
-                              setSelectedText({ start, end, text });
-                              setActiveField('website');
-                              setShowLinkPopover(true);
-                            } else {
-                              toast.error("Veuillez sélectionner du texte d'abord");
-                            }
-                          }
-                        }}
-                      >
-                        <LinkIcon className="h-4 w-4" />
-                      </Button>
-                    </PopoverTrigger>
-                  </div>
-                </div>
-                <PopoverContent className="w-80" side="right">
-                  <div className="space-y-2">
-                    <h4 className="font-medium">Ajouter un lien</h4>
-                    <p className="text-sm text-gray-500">Texte sélectionné: {selectedText.text}</p>
-                    <div className="flex space-x-2">
-                      <Input 
-                        placeholder="https://exemple.com" 
-                        value={linkUrl}
-                        onChange={(e) => setLinkUrl(e.target.value)}
-                      />
-                      <Button size="sm" onClick={handleApplyLink}>Appliquer</Button>
-                    </div>
-                  </div>
-                </PopoverContent>
-              </Popover>
-
-              <div className="flex items-center gap-4">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={isItalic}
-                    onChange={(e) => setIsItalic(e.target.checked)}
-                    className="rounded border-gray-300"
-                  />
-                  <span>Italique</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={useStyleFont}
-                    onChange={(e) => setUseStyleFont(e.target.checked)}
-                    className="rounded border-gray-300"
-                  />
-                  <span>Police stylée</span>
-                </label>
               </div>
             </div>
+          </TabsContent>
+          
+          <TabsContent value="assistant" className="space-y-6">
+            <div className="grid gap-6 md:grid-cols-2">
+              <div>
+                <AiAssistant onUseResponse={handleUseAiResponse} />
+              </div>
+              
+              <div className="space-y-4">
+                <Label>Aperçu de la signature</Label>
+                <div className="p-6 bg-white rounded-lg border">
+                  <SignaturePreview 
+                    formData={formData}
+                    style={getSignatureStyle()}
+                    nameIcon={nameIcon}
+                    companyIcon={companyIcon}
+                    titleEmoji={titleEmoji}
+                    emailEmoji={emailEmoji}
+                    phoneEmoji={phoneEmoji}
+                    websiteEmoji={websiteEmoji}
+                    textColor={textColor}
+                    iconColor={iconColor}
+                    separatorColor={separatorColor}
+                    logo={logo}
+                  />
+                </div>
 
-            <StyleSelector
-              textColor={textColor}
-              setTextColor={setTextColor}
-              iconColor={iconColor}
-              setIconColor={setIconColor}
-              separatorColor={separatorColor}
-              setSeparatorColor={setSeparatorColor}
-              onSelectTemplate={handleTemplateSelect}
-            />
-          </div>
-
-          <div className="space-y-4">
-            <Label>Aperçu de la signature</Label>
-            <div 
-              ref={signatureRef}
-              className="p-6 bg-white rounded-lg border"
-            >
-              <SignaturePreview 
-                formData={formData}
-                style={getSignatureStyle()}
-                nameIcon={nameIcon}
-                companyIcon={companyIcon}
-                titleEmoji={titleEmoji}
-                emailEmoji={emailEmoji}
-                phoneEmoji={phoneEmoji}
-                websiteEmoji={websiteEmoji}
-                textColor={textColor}
-                iconColor={iconColor}
-                separatorColor={separatorColor}
-                logo={logo}
-              />
+                <Button
+                  className="w-full gap-2"
+                  onClick={() => setActiveTab("editeur")}
+                >
+                  Retourner à l'éditeur
+                </Button>
+              </div>
             </div>
-
-            <Button
-              className="w-full gap-2"
-              onClick={downloadSignature}
-            >
-              <Download className="h-4 w-4" />
-              Télécharger la signature
-            </Button>
-          </div>
-        </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </Card>
   );
