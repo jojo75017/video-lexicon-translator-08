@@ -6,10 +6,12 @@ import { cn } from "@/lib/utils"
 export interface TextareaProps
   extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onSelect'> {
   onSelect?: (start: number, end: number, text: string) => void;
+  onPaste?: (e: React.ClipboardEvent<HTMLTextAreaElement>) => void;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
 }
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ className, onSelect, ...props }, ref) => {
+  ({ className, onSelect, onPaste, onKeyDown, ...props }, ref) => {
     const handleSelect = (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
       if (onSelect) {
         const target = e.target as HTMLTextAreaElement;
@@ -17,6 +19,18 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         const end = target.selectionEnd || 0;
         const text = target.value.substring(start, end);
         onSelect(start, end, text);
+      }
+    };
+
+    const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+      if (onPaste) {
+        onPaste(e);
+      }
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (onKeyDown) {
+        onKeyDown(e);
       }
     };
 
@@ -28,6 +42,8 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         )}
         ref={ref}
         onSelect={handleSelect}
+        onPaste={handlePaste}
+        onKeyDown={handleKeyDown}
         {...props}
       />
     )

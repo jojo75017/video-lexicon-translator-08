@@ -65,6 +65,10 @@ const SignaturePreview = ({
     }
   };
 
+  const renderWithLinks = (content: string) => {
+    return <span dangerouslySetInnerHTML={{ __html: content }} />;
+  };
+
   return (
     <div className="flex gap-4">
       {logo && (
@@ -79,20 +83,20 @@ const SignaturePreview = ({
       <div className={`space-y-2 ${style}`} style={{ color: textColor }}>
         <p className="text-xl font-bold flex items-center">
           {renderNamePrefix()}
-          {formData.name || "Votre Nom"}
+          {renderWithLinks(formData.name || "Votre Nom")}
         </p>
         <p>
-          {titleEmoji} {formData.title || "Votre Titre"}
+          {titleEmoji} {renderWithLinks(formData.title || "Votre Titre")}
         </p>
         <p className="font-semibold flex items-center">
           {renderCompanyPrefix()}
-          {formData.company || "Votre Entreprise"}
+          {renderWithLinks(formData.company || "Votre Entreprise")}
         </p>
         <Separator className="my-2" style={{ backgroundColor: separatorColor }} />
         <div className="space-y-1 text-sm">
-          {formData.email && <p>{emailEmoji} {formData.email}</p>}
-          {formData.phone && <p>{phoneEmoji} {formData.phone}</p>}
-          {formData.website && <p>{websiteEmoji} {formData.website}</p>}
+          {formData.email && <p>{emailEmoji} {renderWithLinks(formData.email)}</p>}
+          {formData.phone && <p>{phoneEmoji} {renderWithLinks(formData.phone)}</p>}
+          {formData.website && <p>{websiteEmoji} {renderWithLinks(formData.website)}</p>}
         </div>
       </div>
     </div>
