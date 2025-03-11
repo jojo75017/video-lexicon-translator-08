@@ -1,32 +1,15 @@
 
 import React, { useState, useRef } from 'react';
 import { Button } from "@/components/ui/button";
-import { MessageSquareText, Bold, Italic, Underline, Link as LinkIcon, ImageIcon, ListOrdered, ListIcon, Quote } from 'lucide-react';
+import { MessageSquareText } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-
-const quoraFormSchema = z.object({
-  question: z.string().min(10, "La question doit contenir au moins 10 caractères"),
-  details: z.string().optional(),
-  topics: z.string().min(2, "Ajoutez au moins un sujet"),
-});
-
-const quoraAnswerSchema = z.object({
-  questionToAnswer: z.string().min(10, "Sélectionnez une question à répondre"),
-  answer: z.string().min(50, "La réponse doit contenir au moins 50 caractères"),
-  sources: z.string().optional(),
-});
-
-type QuoraFormData = z.infer<typeof quoraFormSchema>;
-type QuoraAnswerData = z.infer<typeof quoraAnswerSchema>;
+import QuoraLinkPopover from './QuoraLinkPopover';
+import QuoraQuestionForm, { QuoraFormData, quoraFormSchema } from './QuoraQuestionForm';
+import QuoraAnswerForm, { QuoraAnswerData, quoraAnswerSchema } from './QuoraAnswerForm';
 
 export const QuoraButton = () => {
   const [activeTab, setActiveTab] = useState("ask");
@@ -38,9 +21,6 @@ export const QuoraButton = () => {
   const [linkUrl, setLinkUrl] = useState("https://");
   const [quoraProfile, setQuoraProfile] = useState<string>("https://fr.quora.com/profile/Georges-Boubet");
 
-  const detailsRef = useRef<HTMLTextAreaElement>(null);
-  const answerRef = useRef<HTMLTextAreaElement>(null);
-  const sourcesRef = useRef<HTMLTextAreaElement>(null);
   const linkButtonRef = useRef<HTMLButtonElement>(null);
   const activeTextarea = useRef<'details' | 'answer' | 'sources'>('details');
 
@@ -109,26 +89,21 @@ export const QuoraButton = () => {
   };
 
   const getTextAreaInfo = (fieldType: 'details' | 'answer' | 'sources') => {
-    let textareaRef: React.RefObject<HTMLTextAreaElement>;
     let text = '';
     let setText: React.Dispatch<React.SetStateAction<string>> = () => {};
 
     if (fieldType === 'details') {
-      textareaRef = detailsRef;
       text = textDetails;
       setText = setTextDetails;
     } else if (fieldType === 'answer') {
-      textareaRef = answerRef;
       text = textAnswer;
       setText = setTextAnswer;
     } else {
-      textareaRef = sourcesRef;
       text = textSources;
       setText = setTextSources;
     }
 
-    const textarea = textareaRef.current;
-    return { textarea, text, setText };
+    return { text, setText };
   };
 
   const handleTextSelection = (fieldType: 'details' | 'answer' | 'sources', start: number, end: number, selectedText: string) => {
@@ -137,22 +112,16 @@ export const QuoraButton = () => {
   };
 
   const applyFormatting = (fieldType: 'details' | 'answer' | 'sources', format: 'bold' | 'italic' | 'underline' | 'link' | 'image' | 'list' | 'numbered-list' | 'quote') => {
-    const { textarea, text, setText } = getTextAreaInfo(fieldType);
-    
-    if (!textarea) return;
-    
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = text.substring(start, end);
+    const { text, setText } = getTextAreaInfo(fieldType);
     
     if (format === 'link') {
-      if (start !== end) {
+      if (selectedText.start !== selectedText.end) {
         setShowLinkPopover(true);
         return;
       }
     }
     
-    if (start === end) {
+    if (selectedText.start === selectedText.end) {
       let formattedTemplate = '';
       if (format === 'bold') formattedTemplate = '**texte en gras**';
       else if (format === 'italic') formattedTemplate = '*texte en italique*';
@@ -163,63 +132,43 @@ export const QuoraButton = () => {
       else if (format === 'numbered-list') formattedTemplate = '\n1. Premier élément\n2. Deuxième élément\n3. Troisième élément\n';
       else if (format === 'quote') formattedTemplate = '\n> Votre citation ici\n';
       
-      const newText = text.substring(0, start) + formattedTemplate + text.substring(end);
+      const newText = text.substring(0, selectedText.start) + formattedTemplate + text.substring(selectedText.end);
       setText(newText);
-      
-      setTimeout(() => {
-        textarea.focus();
-        textarea.setSelectionRange(start + formattedTemplate.length, start + formattedTemplate.length);
-      }, 0);
     } else {
-      let before = text.substring(0, start);
-      let after = text.substring(end);
+      let before = text.substring(0, selectedText.start);
+      let after = text.substring(selectedText.end);
       let formattedText = '';
       
-      if (format === 'bold') formattedText = `**${selectedText}**`;
-      else if (format === 'italic') formattedText = `*${selectedText}*`;
-      else if (format === 'underline') formattedText = `__${selectedText}__`;
+      if (format === 'bold') formattedText = `**${selectedText.text}**`;
+      else if (format === 'italic') formattedText = `*${selectedText.text}*`;
+      else if (format === 'underline') formattedText = `__${selectedText.text}__`;
       else if (format === 'link') {
         return;
       }
-      else if (format === 'image') formattedText = `![${selectedText}](https://exemple.com/image.jpg)`;
-      else if (format === 'quote') formattedText = `\n> ${selectedText}\n`;
+      else if (format === 'image') formattedText = `![${selectedText.text}](https://exemple.com/image.jpg)`;
+      else if (format === 'quote') formattedText = `\n> ${selectedText.text}\n`;
       else if (format === 'list') {
-        const lines = selectedText.split('\n');
+        const lines = selectedText.text.split('\n');
         formattedText = '\n' + lines.map(line => `- ${line}`).join('\n') + '\n';
       }
       else if (format === 'numbered-list') {
-        const lines = selectedText.split('\n');
+        const lines = selectedText.text.split('\n');
         formattedText = '\n' + lines.map((line, index) => `${index + 1}. ${line}`).join('\n') + '\n';
       }
       
       const newText = before + formattedText + after;
       setText(newText);
-      
-      setTimeout(() => {
-        textarea.focus();
-        if (format === 'image') {
-          const cursorPos = before.length + selectedText.length + 4;
-          textarea.setSelectionRange(cursorPos, cursorPos + 28);
-        } else {
-          textarea.setSelectionRange(start, start + formattedText.length);
-        }
-      }, 0);
     }
   };
 
   const handleApplyLink = () => {
     const fieldType = activeTextarea.current;
-    const { textarea, text, setText } = getTextAreaInfo(fieldType);
+    const { text, setText } = getTextAreaInfo(fieldType);
     
-    if (!textarea) return;
+    if (selectedText.start === selectedText.end) return;
     
-    const start = selectedText.start;
-    const end = selectedText.end;
-    
-    if (start === end) return;
-    
-    const before = text.substring(0, start);
-    const after = text.substring(end);
+    const before = text.substring(0, selectedText.start);
+    const after = text.substring(selectedText.end);
     const linkMarkdown = `[${selectedText.text}](${linkUrl})`;
     
     const newText = before + linkMarkdown + after;
@@ -227,110 +176,7 @@ export const QuoraButton = () => {
     
     setShowLinkPopover(false);
     setLinkUrl("https://");
-    
-    setTimeout(() => {
-      textarea.focus();
-    }, 0);
   };
-
-  const FormatButtons = ({ fieldType }: { fieldType: 'details' | 'answer' | 'sources' }) => (
-    <div className="flex flex-wrap gap-2 mb-2">
-      <Button 
-        type="button" 
-        variant="outline" 
-        size="sm" 
-        onClick={() => applyFormatting(fieldType, 'bold')}
-        title="Gras"
-      >
-        <Bold className="h-4 w-4" />
-      </Button>
-      <Button 
-        type="button" 
-        variant="outline" 
-        size="sm" 
-        onClick={() => applyFormatting(fieldType, 'italic')}
-        title="Italique"
-      >
-        <Italic className="h-4 w-4" />
-      </Button>
-      <Button 
-        type="button" 
-        variant="outline" 
-        size="sm" 
-        onClick={() => applyFormatting(fieldType, 'underline')}
-        title="Souligné"
-      >
-        <Underline className="h-4 w-4" />
-      </Button>
-      <Popover open={showLinkPopover} onOpenChange={setShowLinkPopover}>
-        <PopoverTrigger asChild>
-          <Button 
-            type="button" 
-            variant="outline" 
-            size="sm" 
-            onClick={() => applyFormatting(fieldType, 'link')}
-            title="Lien"
-            ref={linkButtonRef}
-          >
-            <LinkIcon className="h-4 w-4" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-80 p-0" side="top">
-          <div className="p-4 space-y-2">
-            <h4 className="font-medium">Ajouter un lien</h4>
-            <p className="text-sm text-gray-500">Texte sélectionné: {selectedText.text}</p>
-            <div className="flex gap-2">
-              <Input 
-                placeholder="https://exemple.com" 
-                value={linkUrl}
-                onChange={(e) => setLinkUrl(e.target.value)}
-              />
-              <Button onClick={handleApplyLink}>Appliquer</Button>
-            </div>
-          </div>
-        </PopoverContent>
-      </Popover>
-      <Button 
-        type="button" 
-        variant="outline" 
-        size="sm" 
-        onClick={() => applyFormatting(fieldType, 'image')}
-        title="Image"
-      >
-        <ImageIcon className="h-4 w-4" />
-      </Button>
-      <Button 
-        type="button" 
-        variant="outline" 
-        size="sm" 
-        onClick={() => applyFormatting(fieldType, 'list')}
-        title="Liste à puces"
-      >
-        <ListIcon className="h-4 w-4" />
-      </Button>
-      <Button 
-        type="button" 
-        variant="outline" 
-        size="sm" 
-        onClick={() => applyFormatting(fieldType, 'numbered-list')}
-        title="Liste numérotée"
-      >
-        <ListOrdered className="h-4 w-4" />
-      </Button>
-      <Button 
-        type="button" 
-        variant="outline" 
-        size="sm" 
-        onClick={() => applyFormatting(fieldType, 'quote')}
-        title="Citation"
-      >
-        <Quote className="h-4 w-4" />
-      </Button>
-      <div className="text-xs text-gray-500 flex items-center ml-2">
-        Formatage: **gras**, *italique*, __souligné__, [lien](url)
-      </div>
-    </div>
-  );
 
   return (
     <Dialog>
@@ -355,142 +201,43 @@ export const QuoraButton = () => {
           </TabsList>
           
           <TabsContent value="ask" className="space-y-4">
-            <Form {...askForm}>
-              <form onSubmit={askForm.handleSubmit(handleQuoraSubmit)} className="space-y-4">
-                <FormField
-                  control={askForm.control}
-                  name="question"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Votre question</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Comment améliorer mon référencement SEO ?" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormItem>
-                  <FormLabel>Détails (optionnel)</FormLabel>
-                  <FormatButtons fieldType="details" />
-                  <Textarea 
-                    placeholder="Ajoutez des détails pour contextualiser votre question..."
-                    className="min-h-[100px]"
-                    value={textDetails}
-                    onChange={(e) => setTextDetails(e.target.value)}
-                    onSelect={(start, end, text) => handleTextSelection('details', start, end, text)}
-                    ref={detailsRef}
-                  />
-                  <div className="text-xs text-[#6E59A5] mt-1">
-                    Astuce: Sélectionnez du texte et utilisez le bouton de lien pour créer un lien hypertexte.
-                  </div>
-                </FormItem>
-                
-                <FormField
-                  control={askForm.control}
-                  name="topics"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Sujets (séparés par des virgules)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="SEO, Marketing, Référencement" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className="flex justify-between mt-6">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={() => {
-                      askForm.reset();
-                      setTextDetails("");
-                    }}
-                  >
-                    Annuler
-                  </Button>
-                  <Button type="submit" variant="quora">Publier sur Quora</Button>
-                </div>
-              </form>
-            </Form>
+            <QuoraQuestionForm
+              form={askForm}
+              textDetails={textDetails}
+              setTextDetails={setTextDetails}
+              handleTextSelection={handleTextSelection}
+              applyFormatting={applyFormatting}
+              onSubmit={handleQuoraSubmit}
+            />
           </TabsContent>
           
           <TabsContent value="answer" className="space-y-4">
-            <Form {...answerForm}>
-              <form onSubmit={answerForm.handleSubmit(handleQuoraAnswerSubmit)} className="space-y-4">
-                <FormField
-                  control={answerForm.control}
-                  name="questionToAnswer"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Question à répondre</FormLabel>
-                      <FormControl>
-                        <select
-                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                          {...field}
-                        >
-                          <option value="">Sélectionnez une question</option>
-                          {popularQuestions.map((question, index) => (
-                            <option key={index} value={question}>
-                              {question}
-                            </option>
-                          ))}
-                        </select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormItem>
-                  <FormLabel>Votre réponse</FormLabel>
-                  <FormatButtons fieldType="answer" />
-                  <Textarea 
-                    placeholder="Rédigez une réponse détaillée et informative..."
-                    className="min-h-[200px]" 
-                    value={textAnswer}
-                    onChange={(e) => setTextAnswer(e.target.value)}
-                    onSelect={(start, end, text) => handleTextSelection('answer', start, end, text)}
-                    ref={answerRef}
-                  />
-                  <div className="text-xs text-[#6E59A5] mt-1">
-                    Astuce: Sélectionnez du texte et cliquez sur l'icône de lien pour ajouter un lien hypertexte.
-                  </div>
-                </FormItem>
-                
-                <FormItem>
-                  <FormLabel>Sources (optionnel)</FormLabel>
-                  <FormatButtons fieldType="sources" />
-                  <Textarea 
-                    placeholder="Ajoutez des liens ou références pour appuyer votre réponse..."
-                    className="min-h-[80px]"
-                    value={textSources}
-                    onChange={(e) => setTextSources(e.target.value)}
-                    onSelect={(start, end, text) => handleTextSelection('sources', start, end, text)}
-                    ref={sourcesRef}
-                  />
-                </FormItem>
-                
-                <div className="flex justify-between mt-6">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={() => {
-                      answerForm.reset();
-                      setTextAnswer("");
-                      setTextSources("");
-                    }}
-                  >
-                    Annuler
-                  </Button>
-                  <Button type="submit" variant="quora">Publier la réponse</Button>
-                </div>
-              </form>
-            </Form>
+            <QuoraAnswerForm
+              form={answerForm}
+              popularQuestions={popularQuestions}
+              textAnswer={textAnswer}
+              setTextAnswer={setTextAnswer}
+              textSources={textSources}
+              setTextSources={setTextSources}
+              handleTextSelection={handleTextSelection}
+              applyFormatting={applyFormatting}
+              onSubmit={handleQuoraAnswerSubmit}
+            />
           </TabsContent>
         </Tabs>
+        
+        {/* This is a shared popover that appears when needed */}
+        {showLinkPopover && (
+          <QuoraLinkPopover
+            open={showLinkPopover}
+            onOpenChange={setShowLinkPopover}
+            linkUrl={linkUrl}
+            setLinkUrl={setLinkUrl}
+            selectedText={selectedText}
+            onApplyLink={handleApplyLink}
+            triggerRef={linkButtonRef}
+          />
+        )}
       </DialogContent>
     </Dialog>
   );
