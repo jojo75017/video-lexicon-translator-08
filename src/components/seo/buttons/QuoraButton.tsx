@@ -19,7 +19,8 @@ export const QuoraButton = () => {
   const [selectedText, setSelectedText] = useState({ start: 0, end: 0, text: "" });
   const [showLinkPopover, setShowLinkPopover] = useState(false);
   const [linkUrl, setLinkUrl] = useState("https://");
-  const [quoraProfile, setQuoraProfile] = useState<string>("https://fr.quora.com/profile/Georges-Boubet");
+  const [quoraProfile, setQuoraProfile] = useState<string>("https://quora.com");
+  const [open, setOpen] = useState(false);
 
   const linkButtonRef = useRef<HTMLButtonElement>(null);
   const activeTextarea = useRef<'details' | 'answer' | 'sources'>('details');
@@ -60,18 +61,20 @@ export const QuoraButton = () => {
     data.details = textDetails;
     
     // Rediriger l'utilisateur vers sa page Quora pour publier
-    window.open(quoraProfile, '_blank');
+    const quoraUrl = "https://quora.com";
+    window.open(quoraUrl, '_blank');
     
     console.log("Question Quora:", data);
     toast.success(
       <div className="space-y-2">
         <p>Question préparée pour Quora !</p>
-        <p className="text-sm">Vous êtes redirigé vers votre profil Quora. Copiez votre question et collez-la pour publication.</p>
+        <p className="text-sm">Vous êtes redirigé vers Quora. Copiez votre question et collez-la pour publication.</p>
       </div>
     );
     
     askForm.reset();
     setTextDetails("");
+    setOpen(false);
   };
 
   const handleQuoraAnswerSubmit = (data: QuoraAnswerData) => {
@@ -79,19 +82,21 @@ export const QuoraButton = () => {
     data.sources = textSources;
     
     // Rediriger l'utilisateur vers sa page Quora pour publier
-    window.open(quoraProfile, '_blank');
+    const quoraUrl = "https://quora.com";
+    window.open(quoraUrl, '_blank');
     
     console.log("Réponse Quora:", data);
     toast.success(
       <div className="space-y-2">
         <p>Réponse préparée pour Quora !</p>
-        <p className="text-sm">Vous êtes redirigé vers votre profil Quora. Copiez votre réponse et collez-la pour publication.</p>
+        <p className="text-sm">Vous êtes redirigé vers Quora. Copiez votre réponse et collez-la pour publication.</p>
       </div>
     );
     
     answerForm.reset();
     setTextAnswer("");
     setTextSources("");
+    setOpen(false);
   };
 
   const getTextAreaInfo = (fieldType: 'details' | 'answer' | 'sources') => {
@@ -185,7 +190,7 @@ export const QuoraButton = () => {
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
           variant="quora"
