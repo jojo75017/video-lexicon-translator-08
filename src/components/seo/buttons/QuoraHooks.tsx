@@ -18,7 +18,8 @@ export const useQuoraHooks = () => {
   const [open, setOpen] = useState(false);
 
   const linkButtonRef = useRef<HTMLButtonElement>(null);
-  const activeTextarea = useRef<'details' | 'answer' | 'sources'>('details');
+  // Utiliser une référence React pour stocker la valeur active, pas une référence DOM
+  const [activeTextareaType, setActiveTextareaType] = useState<'details' | 'answer' | 'sources'>('details');
 
   const askForm = useForm<QuoraFormData>({
     resolver: zodResolver(quoraFormSchema),
@@ -98,7 +99,8 @@ export const useQuoraHooks = () => {
     open,
     setOpen,
     linkButtonRef,
-    activeTextarea,
+    activeTextareaType,
+    setActiveTextareaType,
     askForm,
     answerForm,
     handleQuoraSubmit,
@@ -107,7 +109,8 @@ export const useQuoraHooks = () => {
 };
 
 export const useFormatting = (
-  activeTextarea: React.RefObject<'details' | 'answer' | 'sources'>,
+  activeTextareaType: 'details' | 'answer' | 'sources',
+  setActiveTextareaType: React.Dispatch<React.SetStateAction<'details' | 'answer' | 'sources'>>,
   selectedText: { start: number; end: number; text: string },
   setSelectedText: React.Dispatch<React.SetStateAction<{ start: number; end: number; text: string }>>,
   textDetails: string,
@@ -115,7 +118,8 @@ export const useFormatting = (
   textAnswer: string,
   setTextAnswer: React.Dispatch<React.SetStateAction<string>>,
   textSources: string,
-  setTextSources: React.Dispatch<React.SetStateAction<string>>
+  setTextSources: React.Dispatch<React.SetStateAction<string>>,
+  linkUrl: string
 ) => {
 
   const getTextAreaInfo = (fieldType: 'details' | 'answer' | 'sources') => {
@@ -138,7 +142,7 @@ export const useFormatting = (
 
   const handleTextSelection = (fieldType: 'details' | 'answer' | 'sources', start: number, end: number, selectedText: string) => {
     setSelectedText({ start, end, text: selectedText });
-    activeTextarea.current = fieldType;
+    setActiveTextareaType(fieldType);
   };
 
   const applyFormatting = (fieldType: 'details' | 'answer' | 'sources', format: 'bold' | 'italic' | 'underline' | 'link' | 'image' | 'list' | 'numbered-list' | 'quote') => {
@@ -188,9 +192,8 @@ export const useFormatting = (
     return false; // No need to show link popover
   };
 
-  const handleApplyLink = () => {
-    const fieldType = activeTextarea.current;
-    if (!fieldType) return;
+  const handleApplyLink = (currentLinkUrl: string) => {
+    const fieldType = activeTextareaType;
     
     const { text, setText } = getTextAreaInfo(fieldType);
     
@@ -198,7 +201,7 @@ export const useFormatting = (
     
     const before = text.substring(0, selectedText.start);
     const after = text.substring(selectedText.end);
-    const linkMarkdown = `[${selectedText.text}](${linkUrl})`;
+    const linkMarkdown = `[${selectedText.text}](${currentLinkUrl})`;
     
     const newText = before + linkMarkdown + after;
     setText(newText);

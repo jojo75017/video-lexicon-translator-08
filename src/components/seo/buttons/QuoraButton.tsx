@@ -29,7 +29,8 @@ export const QuoraButton = () => {
     open,
     setOpen,
     linkButtonRef,
-    activeTextarea,
+    activeTextareaType,
+    setActiveTextareaType,
     askForm,
     answerForm,
     handleQuoraSubmit,
@@ -41,7 +42,8 @@ export const QuoraButton = () => {
     applyFormatting: applyFormattingBase,
     handleApplyLink
   } = useFormatting(
-    activeTextarea,
+    activeTextareaType,
+    setActiveTextareaType,
     selectedText,
     setSelectedText,
     textDetails,
@@ -49,7 +51,8 @@ export const QuoraButton = () => {
     textAnswer,
     setTextAnswer,
     textSources,
-    setTextSources
+    setTextSources,
+    linkUrl
   );
 
   const applyFormatting = (fieldType: 'details' | 'answer' | 'sources', format: 'bold' | 'italic' | 'underline' | 'link' | 'image' | 'list' | 'numbered-list' | 'quote') => {
@@ -115,7 +118,7 @@ export const QuoraButton = () => {
             linkUrl={linkUrl}
             setLinkUrl={setLinkUrl}
             selectedText={selectedText}
-            onApplyLink={handleApplyLink}
+            onApplyLink={() => handleApplyLink(linkUrl)}
             triggerRef={linkButtonRef}
           />
         )}
