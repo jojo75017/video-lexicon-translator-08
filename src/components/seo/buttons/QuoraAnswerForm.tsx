@@ -1,3 +1,4 @@
+
 import React, { useRef, useState } from 'react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,7 +10,7 @@ import { Bot, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export const quoraAnswerSchema = z.object({
-  questionToAnswer: z.string().min(10, "Sélectionnez une question à répondre"),
+  questionToAnswer: z.string().min(5, "La question doit contenir au moins 5 caractères"),
   answer: z.string().min(50, "La réponse doit contenir au moins 50 caractères"),
   sources: z.string().optional(),
 });

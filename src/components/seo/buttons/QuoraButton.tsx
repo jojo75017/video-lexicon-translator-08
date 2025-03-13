@@ -1,8 +1,8 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { MessageSquareText } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -68,29 +68,36 @@ export const QuoraButton = () => {
     }
   };
 
+  // Update the form when questionSource or selected/custom question changes
+  useEffect(() => {
+    let currentQuestion = "";
+    
+    if (questionSource === "popular") {
+      currentQuestion = selectedQuestion;
+    } else {
+      currentQuestion = customQuestion;
+    }
+    
+    if (currentQuestion) {
+      if (activeTab === "answer") {
+        answerForm.setValue("questionToAnswer", currentQuestion);
+      } else {
+        askForm.setValue("question", currentQuestion);
+      }
+    }
+  }, [questionSource, selectedQuestion, customQuestion, activeTab, answerForm, askForm]);
+
   const handleQuestionSelect = (value: string) => {
     setSelectedQuestion(value);
     setQuestionSource("popular");
-    
-    if (activeTab === "answer") {
-      // Si on est dans l'onglet "répondre", on met à jour le formulaire avec la question sélectionnée
-      answerForm.setValue("questionToAnswer", value);
-    } else {
-      // Si on est dans l'onglet "poser une question", on adapte ce champ
-      askForm.setValue("question", value);
-    }
+    setCustomQuestion(""); // Clear custom question when selecting from dropdown
   };
 
   const handleCustomQuestionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setCustomQuestion(value);
     setQuestionSource("custom");
-    
-    if (activeTab === "answer") {
-      answerForm.setValue("questionToAnswer", value);
-    } else {
-      askForm.setValue("question", value);
-    }
+    setSelectedQuestion(""); // Clear dropdown selection when typing custom question
   };
 
   return (
@@ -107,12 +114,18 @@ export const QuoraButton = () => {
       <DialogContent className="sm:max-w-[650px]">
         <DialogHeader>
           <DialogTitle>Quora - Questions & Réponses</DialogTitle>
+          <DialogDescription>
+            Sélectionnez une question populaire ou saisissez votre propre question
+          </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-4 mb-4">
           <div>
             <label className="text-sm font-medium mb-1 block">Questions populaires</label>
-            <Select onValueChange={handleQuestionSelect} value={questionSource === "popular" ? selectedQuestion : ""}>
+            <Select 
+              onValueChange={handleQuestionSelect} 
+              value={questionSource === "popular" ? selectedQuestion : ""}
+            >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Sélectionnez une question populaire..." />
               </SelectTrigger>
@@ -129,7 +142,7 @@ export const QuoraButton = () => {
           <div>
             <label className="text-sm font-medium mb-1 block">Ou entrez votre propre question</label>
             <Input
-              value={questionSource === "custom" ? customQuestion : ""}
+              value={customQuestion}
               onChange={handleCustomQuestionChange}
               placeholder="Saisissez une question personnalisée..."
               className="w-full"
