@@ -1,9 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { MessageSquareText } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import QuoraLinkPopover from './QuoraLinkPopover';
 import QuoraQuestionForm from './QuoraQuestionForm';
 import QuoraAnswerForm from './QuoraAnswerForm';
@@ -11,6 +12,8 @@ import { useQuoraHooks, useFormatting } from './QuoraHooks';
 import { popularQuestions } from './QuoraConstants';
 
 export const QuoraButton = () => {
+  const [selectedQuestion, setSelectedQuestion] = useState("");
+
   const {
     activeTab,
     setActiveTab,
@@ -62,6 +65,17 @@ export const QuoraButton = () => {
     }
   };
 
+  const handleQuestionSelect = (value: string) => {
+    setSelectedQuestion(value);
+    if (activeTab === "answer") {
+      // Si on est dans l'onglet "répondre", on met à jour le formulaire avec la question sélectionnée
+      answerForm.setValue("questionToAnswer", value);
+    } else {
+      // Si on est dans l'onglet "poser une question", on adapte ce champ
+      askForm.setValue("question", value);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -77,6 +91,22 @@ export const QuoraButton = () => {
         <DialogHeader>
           <DialogTitle>Quora - Questions & Réponses</DialogTitle>
         </DialogHeader>
+        
+        <div className="mb-4">
+          <label className="text-sm font-medium mb-1 block">Questions populaires</label>
+          <Select onValueChange={handleQuestionSelect} value={selectedQuestion}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Sélectionnez une question populaire..." />
+            </SelectTrigger>
+            <SelectContent>
+              {popularQuestions.map((question, index) => (
+                <SelectItem key={index} value={question}>
+                  {question}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid grid-cols-2 mb-4">
