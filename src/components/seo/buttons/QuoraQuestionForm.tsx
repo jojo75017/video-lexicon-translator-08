@@ -35,6 +35,17 @@ const QuoraQuestionForm = ({
 }: QuoraQuestionFormProps) => {
   const detailsRef = useRef<HTMLTextAreaElement>(null);
 
+  const handleSelectChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const target = e.target;
+    const start = target.selectionStart || 0;
+    const end = target.selectionEnd || 0;
+    const selectedText = target.value.substring(start, end);
+    
+    if (start !== end) {
+      handleTextSelection('details', start, end, selectedText);
+    }
+  };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -55,12 +66,12 @@ const QuoraQuestionForm = ({
         <FormItem>
           <FormLabel>Détails (optionnel)</FormLabel>
           <QuoraFormatToolbar fieldType="details" onFormat={applyFormatting} />
-          <Textarea 
+          <textarea 
             placeholder="Ajoutez des détails pour contextualiser votre question..."
-            className="min-h-[100px]"
+            className="min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             value={textDetails}
             onChange={(e) => setTextDetails(e.target.value)}
-            onSelect={(start, end, text) => handleTextSelection('details', start, end, text)}
+            onSelect={handleSelectChange}
             ref={detailsRef}
           />
           <div className="text-xs text-[#6E59A5] mt-1">

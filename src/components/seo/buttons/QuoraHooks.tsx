@@ -148,8 +148,18 @@ export const useFormatting = (
   const applyFormatting = (fieldType: 'details' | 'answer' | 'sources', format: 'bold' | 'italic' | 'underline' | 'link' | 'image' | 'list' | 'numbered-list' | 'quote') => {
     const { text, setText } = getTextAreaInfo(fieldType);
     
-    if (format === 'link' && selectedText.start !== selectedText.end) {
-      return true; // Signal to show link popover
+    // Check if we should show link popover
+    if (format === 'link') {
+      // Only show link popover if text is selected
+      if (selectedText.start !== selectedText.end) {
+        return true; // Signal to show link popover
+      } else {
+        // No text selected, insert template
+        const formattedTemplate = '[texte du lien](https://exemple.com)';
+        const newText = text.substring(0, selectedText.start) + formattedTemplate + text.substring(selectedText.end);
+        setText(newText);
+        return false;
+      }
     }
     
     if (selectedText.start === selectedText.end) {
@@ -157,7 +167,6 @@ export const useFormatting = (
       if (format === 'bold') formattedTemplate = '**texte en gras**';
       else if (format === 'italic') formattedTemplate = '*texte en italique*';
       else if (format === 'underline') formattedTemplate = '__texte souligné__';
-      else if (format === 'link') formattedTemplate = '[texte du lien](https://exemple.com)';
       else if (format === 'image') formattedTemplate = '![description de l\'image](https://exemple.com/image.jpg)';
       else if (format === 'list') formattedTemplate = '\n- Élément de liste\n- Élément de liste\n- Élément de liste\n';
       else if (format === 'numbered-list') formattedTemplate = '\n1. Premier élément\n2. Deuxième élément\n3. Troisième élément\n';
@@ -173,7 +182,6 @@ export const useFormatting = (
       if (format === 'bold') formattedText = `**${selectedText.text}**`;
       else if (format === 'italic') formattedText = `*${selectedText.text}*`;
       else if (format === 'underline') formattedText = `__${selectedText.text}__`;
-      else if (format === 'link') return true; // Signal to show link popover
       else if (format === 'image') formattedText = `![${selectedText.text}](https://exemple.com/image.jpg)`;
       else if (format === 'quote') formattedText = `\n> ${selectedText.text}\n`;
       else if (format === 'list') {
@@ -193,14 +201,18 @@ export const useFormatting = (
   };
 
   const handleApplyLink = (currentLinkUrl: string) => {
+    if (!selectedText.text || selectedText.start === selectedText.end) {
+      console.log("No text selected for link");
+      return;
+    }
+    
     const fieldType = activeTextareaType;
-    
     const { text, setText } = getTextAreaInfo(fieldType);
-    
-    if (selectedText.start === selectedText.end) return;
     
     const before = text.substring(0, selectedText.start);
     const after = text.substring(selectedText.end);
+    
+    // Create markdown link format
     const linkMarkdown = `[${selectedText.text}](${currentLinkUrl})`;
     
     const newText = before + linkMarkdown + after;

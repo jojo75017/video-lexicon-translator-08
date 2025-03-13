@@ -1,9 +1,10 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link as LinkIcon } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface QuoraLinkPopoverProps {
   open: boolean;
@@ -24,6 +25,30 @@ const QuoraLinkPopover = ({
   onApplyLink,
   triggerRef
 }: QuoraLinkPopoverProps) => {
+  const [localLinkUrl, setLocalLinkUrl] = useState(linkUrl);
+
+  // Update local state when prop changes
+  useEffect(() => {
+    setLocalLinkUrl(linkUrl);
+  }, [linkUrl]);
+
+  const handleApplyLink = () => {
+    if (!localLinkUrl || !localLinkUrl.trim()) {
+      toast.error("Veuillez saisir une URL valide");
+      return;
+    }
+
+    // Apply protocol if missing
+    let finalUrl = localLinkUrl;
+    if (!finalUrl.startsWith('http://') && !finalUrl.startsWith('https://')) {
+      finalUrl = 'https://' + finalUrl;
+    }
+
+    setLinkUrl(finalUrl);
+    onApplyLink();
+    onOpenChange(false);
+  };
+
   return (
     <Popover open={open} onOpenChange={onOpenChange}>
       <PopoverTrigger asChild>
@@ -40,14 +65,24 @@ const QuoraLinkPopover = ({
       <PopoverContent className="w-80 p-0" side="top">
         <div className="p-4 space-y-2">
           <h4 className="font-medium">Ajouter un lien</h4>
-          <p className="text-sm text-gray-500">Texte sélectionné: {selectedText.text}</p>
+          <p className="text-sm text-gray-500">
+            Texte sélectionné: {selectedText.text.length > 30 
+              ? `${selectedText.text.substring(0, 30)}...` 
+              : selectedText.text}
+          </p>
           <div className="flex gap-2">
             <Input 
               placeholder="https://exemple.com" 
-              value={linkUrl}
-              onChange={(e) => setLinkUrl(e.target.value)}
+              value={localLinkUrl}
+              onChange={(e) => setLocalLinkUrl(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleApplyLink();
+                }
+              }}
             />
-            <Button onClick={onApplyLink}>Appliquer</Button>
+            <Button onClick={handleApplyLink}>Appliquer</Button>
           </div>
         </div>
       </PopoverContent>

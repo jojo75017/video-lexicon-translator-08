@@ -44,6 +44,28 @@ const QuoraAnswerForm = ({
   const sourcesRef = useRef<HTMLTextAreaElement>(null);
   const [isGeneratingAnswer, setIsGeneratingAnswer] = useState(false);
 
+  const handleAnswerSelect = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const target = e.target;
+    const start = target.selectionStart || 0;
+    const end = target.selectionEnd || 0;
+    const selectedText = target.value.substring(start, end);
+    
+    if (start !== end) {
+      handleTextSelection('answer', start, end, selectedText);
+    }
+  };
+
+  const handleSourcesSelect = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const target = e.target;
+    const start = target.selectionStart || 0;
+    const end = target.selectionEnd || 0;
+    const selectedText = target.value.substring(start, end);
+    
+    if (start !== end) {
+      handleTextSelection('sources', start, end, selectedText);
+    }
+  };
+
   const generateAIAnswer = async () => {
     const question = form.getValues("questionToAnswer");
     
@@ -137,12 +159,12 @@ const QuoraAnswerForm = ({
         <FormItem>
           <FormLabel>Votre réponse</FormLabel>
           <QuoraFormatToolbar fieldType="answer" onFormat={applyFormatting} />
-          <Textarea 
+          <textarea 
             placeholder="Rédigez une réponse détaillée et informative..."
-            className="min-h-[200px]" 
+            className="min-h-[200px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             value={textAnswer}
             onChange={(e) => setTextAnswer(e.target.value)}
-            onSelect={(start, end, text) => handleTextSelection('answer', start, end, text)}
+            onSelect={handleAnswerSelect}
             ref={answerRef}
           />
           <div className="text-xs text-[#6E59A5] mt-1">
@@ -153,12 +175,12 @@ const QuoraAnswerForm = ({
         <FormItem>
           <FormLabel>Sources (optionnel)</FormLabel>
           <QuoraFormatToolbar fieldType="sources" onFormat={applyFormatting} />
-          <Textarea 
+          <textarea 
             placeholder="Ajoutez des liens ou références pour appuyer votre réponse..."
-            className="min-h-[80px]"
+            className="min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             value={textSources}
             onChange={(e) => setTextSources(e.target.value)}
-            onSelect={(start, end, text) => handleTextSelection('sources', start, end, text)}
+            onSelect={handleSourcesSelect}
             ref={sourcesRef}
           />
         </FormItem>
