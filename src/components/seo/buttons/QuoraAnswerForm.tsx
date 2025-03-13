@@ -1,4 +1,3 @@
-
 import React, { useRef, useState } from 'react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
@@ -48,7 +47,7 @@ const QuoraAnswerForm = ({
     const question = form.getValues("questionToAnswer");
     
     if (!question || question === "") {
-      toast.error("Veuillez d'abord sélectionner une question");
+      toast.error("Veuillez d'abord saisir ou sélectionner une question");
       return;
     }
 
@@ -105,17 +104,12 @@ const QuoraAnswerForm = ({
             <FormItem>
               <FormLabel>Question à répondre</FormLabel>
               <FormControl>
-                <select
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                <Textarea
+                  className="min-h-[60px]"
+                  placeholder="La question sélectionnée ou personnalisée apparaîtra ici"
                   {...field}
-                >
-                  <option value="">Sélectionnez une question</option>
-                  {popularQuestions.map((question, index) => (
-                    <option key={index} value={question}>
-                      {question}
-                    </option>
-                  ))}
-                </select>
+                  readOnly
+                />
               </FormControl>
               <div className="flex justify-end mt-1">
                 <Button 
