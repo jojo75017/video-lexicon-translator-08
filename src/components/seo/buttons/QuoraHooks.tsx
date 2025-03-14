@@ -1,4 +1,3 @@
-
 import { useState, useRef } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -151,13 +150,11 @@ export const useFormatting = (
     // Check if we should show link popover
     if (format === 'link') {
       // Only show link popover if text is selected
-      if (selectedText.start !== selectedText.end) {
+      if (selectedText.start !== selectedText.end && selectedText.text.trim().length > 0) {
         return true; // Signal to show link popover
       } else {
-        // No text selected, insert template
-        const formattedTemplate = '[texte du lien](https://exemple.com)';
-        const newText = text.substring(0, selectedText.start) + formattedTemplate + text.substring(selectedText.end);
-        setText(newText);
+        // No text selected, show a toast message
+        toast.warning("Veuillez d'abord sélectionner le texte à transformer en lien.");
         return false;
       }
     }
@@ -202,21 +199,27 @@ export const useFormatting = (
 
   const handleApplyLink = (currentLinkUrl: string) => {
     if (!selectedText.text || selectedText.start === selectedText.end) {
-      console.log("No text selected for link");
+      toast.error("Aucun texte sélectionné pour le lien");
       return;
     }
     
     const fieldType = activeTextareaType;
     const { text, setText } = getTextAreaInfo(fieldType);
     
-    const before = text.substring(0, selectedText.start);
-    const after = text.substring(selectedText.end);
-    
-    // Create markdown link format
-    const linkMarkdown = `[${selectedText.text}](${currentLinkUrl})`;
-    
-    const newText = before + linkMarkdown + after;
-    setText(newText);
+    if (text.length > 0) {
+      const before = text.substring(0, selectedText.start);
+      const after = text.substring(selectedText.end);
+      
+      // Create markdown link format
+      const linkMarkdown = `[${selectedText.text}](${currentLinkUrl})`;
+      
+      const newText = before + linkMarkdown + after;
+      setText(newText);
+      
+      toast.success("Lien ajouté avec succès !");
+    } else {
+      toast.error("Impossible d'ajouter un lien à un texte vide");
+    }
   };
 
   return {

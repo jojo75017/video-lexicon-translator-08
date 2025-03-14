@@ -68,7 +68,7 @@ const QuoraLinkPopover = ({
           <p className="text-sm text-gray-500">
             Texte sélectionné: {selectedText.text.length > 30 
               ? `${selectedText.text.substring(0, 30)}...` 
-              : selectedText.text}
+              : selectedText.text || "Aucun texte sélectionné"}
           </p>
           <div className="flex gap-2">
             <Input 
@@ -82,8 +82,18 @@ const QuoraLinkPopover = ({
                 }
               }}
             />
-            <Button onClick={handleApplyLink}>Appliquer</Button>
+            <Button 
+              onClick={handleApplyLink}
+              disabled={!selectedText.text || selectedText.text.length === 0}
+            >
+              Appliquer
+            </Button>
           </div>
+          {(!selectedText.text || selectedText.text.length === 0) && (
+            <p className="text-xs text-amber-500">
+              Veuillez d'abord sélectionner du texte avant d'ajouter un lien.
+            </p>
+          )}
         </div>
       </PopoverContent>
     </Popover>

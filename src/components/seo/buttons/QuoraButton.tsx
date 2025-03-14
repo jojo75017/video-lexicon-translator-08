@@ -197,7 +197,7 @@ export const QuoraButton = () => {
             </TabsContent>
           </Tabs>
           
-          {/* This is a shared popover that appears when needed */}
+          {/* Use a conditional render for the link popover */}
           {showLinkPopover && (
             <QuoraLinkPopover
               open={showLinkPopover}

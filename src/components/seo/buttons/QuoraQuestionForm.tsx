@@ -9,7 +9,7 @@ import * as z from "zod";
 import QuoraFormatToolbar from './QuoraFormatToolbar';
 
 export const quoraFormSchema = z.object({
-  question: z.string().min(10, "La question doit contenir au moins 10 caractères"),
+  question: z.string().min(5, "La question doit contenir au moins 5 caractères"),
   details: z.string().optional(),
   topics: z.string().min(2, "Ajoutez au moins un sujet"),
 });
