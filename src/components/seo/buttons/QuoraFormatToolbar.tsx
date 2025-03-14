@@ -43,7 +43,7 @@ const QuoraFormatToolbar = ({ fieldType, onFormat }: FormatToolbarProps) => {
         variant="outline" 
         size="sm" 
         onClick={() => onFormat(fieldType, 'link')}
-        title="Lien"
+        title="Lien affilié"
         className="bg-[#f0f8ff] border-[#b92b27]/30 hover:bg-[#b92b27]/10"
       >
         <LinkIcon className="h-4 w-4 text-[#b92b27]" />

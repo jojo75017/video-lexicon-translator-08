@@ -58,14 +58,14 @@ const QuoraLinkPopover = ({
           size="sm" 
           title="Lien"
           ref={triggerRef}
-          className="bg-white"
+          className="bg-white border-[#b92b27]/30 hover:bg-[#b92b27]/10"
         >
-          <LinkIcon className="h-4 w-4" />
+          <LinkIcon className="h-4 w-4 text-[#b92b27]" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80 p-0" side="top">
         <div className="p-4 space-y-2">
-          <h4 className="font-medium">Ajouter un lien</h4>
+          <h4 className="font-medium">Ajouter un lien affilié</h4>
           <p className="text-sm text-gray-500">
             Texte sélectionné: {selectedText.text.length > 30 
               ? `${selectedText.text.substring(0, 30)}...` 
@@ -86,6 +86,7 @@ const QuoraLinkPopover = ({
             <Button 
               onClick={handleApplyLink}
               disabled={!selectedText.text || selectedText.text.length === 0}
+              className="bg-[#b92b27] hover:bg-[#b92b27]/90 text-white"
             >
               Appliquer
             </Button>

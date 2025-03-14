@@ -34,13 +34,25 @@ const QuoraQuestionForm = ({
 }: QuoraQuestionFormProps) => {
   const detailsRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleSelectChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const target = e.target;
+  const handleSelectChange = (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
+    const target = e.currentTarget;
     const start = target.selectionStart || 0;
     const end = target.selectionEnd || 0;
     const selectedText = target.value.substring(start, end);
     
-    if (start !== end) {
+    if (start !== end && selectedText.trim() !== '') {
+      handleTextSelection('details', start, end, selectedText);
+    }
+  };
+
+  const handleMouseUp = (e: React.MouseEvent<HTMLTextAreaElement>) => {
+    const target = e.currentTarget;
+    const start = target.selectionStart || 0;
+    const end = target.selectionEnd || 0;
+    const selectedText = target.value.substring(start, end);
+    
+    if (start !== end && selectedText.trim() !== '') {
+      console.log("Texte sélectionné avec mouseUp:", selectedText);
       handleTextSelection('details', start, end, selectedText);
     }
   };
@@ -71,11 +83,11 @@ const QuoraQuestionForm = ({
             value={textDetails}
             onChange={(e) => setTextDetails(e.target.value)}
             onSelect={handleSelectChange}
-            onMouseUp={handleSelectChange}
+            onMouseUp={handleMouseUp}
             ref={detailsRef}
           />
           <div className="text-xs text-[#6E59A5] mt-1">
-            Astuce: Sélectionnez du texte et utilisez le bouton de lien pour créer un lien hypertexte.
+            Astuce: Sélectionnez du texte et utilisez le bouton de lien pour créer un lien affilié.
           </div>
         </FormItem>
         

@@ -157,7 +157,7 @@ export const useFormatting = (
         return true; // Signal to show link popover
       } else {
         // No text selected, show a toast message
-        toast.warning("Veuillez d'abord sélectionner le texte à transformer en lien.");
+        toast.warning("Veuillez d'abord sélectionner le texte à transformer en lien affilié.");
         return false;
       }
     }
@@ -202,7 +202,7 @@ export const useFormatting = (
 
   const handleApplyLink = (currentLinkUrl: string) => {
     if (!selectedText.text || selectedText.start === selectedText.end) {
-      toast.error("Aucun texte sélectionné pour le lien");
+      toast.error("Aucun texte sélectionné pour le lien affilié");
       return;
     }
     
@@ -219,7 +219,7 @@ export const useFormatting = (
       const newText = before + linkMarkdown + after;
       setText(newText);
       
-      toast.success("Lien ajouté avec succès !");
+      toast.success("Lien affilié ajouté avec succès !");
     } else {
       toast.error("Impossible d'ajouter un lien à un texte vide");
     }

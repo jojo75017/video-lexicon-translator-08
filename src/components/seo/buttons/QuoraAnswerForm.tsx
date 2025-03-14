@@ -44,24 +44,48 @@ const QuoraAnswerForm = ({
   const sourcesRef = useRef<HTMLTextAreaElement>(null);
   const [isGeneratingAnswer, setIsGeneratingAnswer] = useState(false);
 
-  const handleAnswerSelect = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const target = e.target;
+  const handleAnswerSelect = (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
+    const target = e.currentTarget;
     const start = target.selectionStart || 0;
     const end = target.selectionEnd || 0;
     const selectedText = target.value.substring(start, end);
     
-    if (start !== end) {
+    if (start !== end && selectedText.trim() !== '') {
+      console.log(`Text selected in answer: "${selectedText}" (${start}:${end})`);
       handleTextSelection('answer', start, end, selectedText);
     }
   };
 
-  const handleSourcesSelect = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const target = e.target;
+  const handleAnswerMouseUp = (e: React.MouseEvent<HTMLTextAreaElement>) => {
+    const target = e.currentTarget;
     const start = target.selectionStart || 0;
     const end = target.selectionEnd || 0;
     const selectedText = target.value.substring(start, end);
     
-    if (start !== end) {
+    if (start !== end && selectedText.trim() !== '') {
+      console.log(`Text selected in answer: "${selectedText}" (${start}:${end})`);
+      handleTextSelection('answer', start, end, selectedText);
+    }
+  };
+
+  const handleSourcesSelect = (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
+    const target = e.currentTarget;
+    const start = target.selectionStart || 0;
+    const end = target.selectionEnd || 0;
+    const selectedText = target.value.substring(start, end);
+    
+    if (start !== end && selectedText.trim() !== '') {
+      handleTextSelection('sources', start, end, selectedText);
+    }
+  };
+
+  const handleSourcesMouseUp = (e: React.MouseEvent<HTMLTextAreaElement>) => {
+    const target = e.currentTarget;
+    const start = target.selectionStart || 0;
+    const end = target.selectionEnd || 0;
+    const selectedText = target.value.substring(start, end);
+    
+    if (start !== end && selectedText.trim() !== '') {
       handleTextSelection('sources', start, end, selectedText);
     }
   };
@@ -165,11 +189,11 @@ const QuoraAnswerForm = ({
             value={textAnswer}
             onChange={(e) => setTextAnswer(e.target.value)}
             onSelect={handleAnswerSelect}
-            onMouseUp={handleAnswerSelect}
+            onMouseUp={handleAnswerMouseUp}
             ref={answerRef}
           />
           <div className="text-xs text-[#6E59A5] mt-1">
-            Astuce: Sélectionnez du texte et cliquez sur l'icône de lien pour ajouter un lien hypertexte.
+            Astuce: Sélectionnez du texte et cliquez sur l'icône de lien pour ajouter un lien affilié.
           </div>
         </FormItem>
         
@@ -182,7 +206,7 @@ const QuoraAnswerForm = ({
             value={textSources}
             onChange={(e) => setTextSources(e.target.value)}
             onSelect={handleSourcesSelect}
-            onMouseUp={handleSourcesSelect}
+            onMouseUp={handleSourcesMouseUp}
             ref={sourcesRef}
           />
         </FormItem>
