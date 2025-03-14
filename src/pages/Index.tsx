@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
@@ -21,6 +20,7 @@ import MetricsSection from '@/components/seo/MetricsSection';
 import AdvancedSection from '@/components/seo/AdvancedSection';
 import IntegrationsSection from '@/components/seo/IntegrationsSection';
 import QuoraButton from '@/components/seo/buttons/QuoraButton';
+import ContentOptimizationButton from '@/components/seo/buttons/ContentOptimizationButton';
 
 const Index = () => {
   const {
@@ -146,7 +146,10 @@ const Index = () => {
         <div className="space-y-8">
           <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
             <DashboardHeader />
-            <QuoraButton />
+            <div className="flex flex-wrap gap-2">
+              <ContentOptimizationButton />
+              <QuoraButton />
+            </div>
           </div>
           
           <FeatureGrid />
@@ -231,11 +234,14 @@ const Index = () => {
           
           <div className="glass-card-v2 p-6 mb-8">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
-              <h2 className="text-2xl font-bold text-gradient-to-r from-indigo-600 to-purple-600">Nouvelle fonctionnalité</h2>
-              <QuoraButton />
+              <h2 className="text-2xl font-bold text-gradient-to-r from-indigo-600 to-purple-600">Nouvelles fonctionnalités</h2>
+              <div className="flex gap-2">
+                <ContentOptimizationButton />
+                <QuoraButton />
+              </div>
             </div>
             <p className="text-gray-700 mb-4">
-              Notre nouvelle intégration Quora vous permet de préparer rapidement des questions à poser sur la plateforme pour améliorer votre visibilité et votre autorité dans votre domaine.
+              Nos nouvelles intégrations vous permettent d'optimiser votre contenu et de préparer rapidement des questions pour Quora afin d'améliorer votre visibilité et votre autorité dans votre domaine.
             </p>
           </div>
           
