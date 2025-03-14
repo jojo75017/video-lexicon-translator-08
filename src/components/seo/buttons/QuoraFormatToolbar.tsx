@@ -44,8 +44,9 @@ const QuoraFormatToolbar = ({ fieldType, onFormat }: FormatToolbarProps) => {
         size="sm" 
         onClick={() => onFormat(fieldType, 'link')}
         title="Lien"
+        className="bg-[#f0f8ff] border-[#b92b27]/30 hover:bg-[#b92b27]/10"
       >
-        <LinkIcon className="h-4 w-4" />
+        <LinkIcon className="h-4 w-4 text-[#b92b27]" />
       </Button>
       <Button 
         type="button" 
@@ -84,7 +85,7 @@ const QuoraFormatToolbar = ({ fieldType, onFormat }: FormatToolbarProps) => {
         <Quote className="h-4 w-4" />
       </Button>
       <div className="text-xs text-gray-500 flex items-center ml-2">
-        Formatage: **gras**, *italique*, __souligné__, [lien](url)
+        <span className="hidden sm:inline">Formatage:</span> **gras**, *italique*, [lien](url)
       </div>
     </div>
   );

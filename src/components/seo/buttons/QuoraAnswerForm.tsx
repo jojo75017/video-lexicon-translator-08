@@ -165,6 +165,7 @@ const QuoraAnswerForm = ({
             value={textAnswer}
             onChange={(e) => setTextAnswer(e.target.value)}
             onSelect={handleAnswerSelect}
+            onMouseUp={handleAnswerSelect}
             ref={answerRef}
           />
           <div className="text-xs text-[#6E59A5] mt-1">
@@ -181,6 +182,7 @@ const QuoraAnswerForm = ({
             value={textSources}
             onChange={(e) => setTextSources(e.target.value)}
             onSelect={handleSourcesSelect}
+            onMouseUp={handleSourcesSelect}
             ref={sourcesRef}
           />
         </FormItem>

@@ -2,7 +2,6 @@
 import React, { useRef } from 'react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { UseFormReturn } from 'react-hook-form';
 import * as z from "zod";
@@ -72,6 +71,7 @@ const QuoraQuestionForm = ({
             value={textDetails}
             onChange={(e) => setTextDetails(e.target.value)}
             onSelect={handleSelectChange}
+            onMouseUp={handleSelectChange}
             ref={detailsRef}
           />
           <div className="text-xs text-[#6E59A5] mt-1">

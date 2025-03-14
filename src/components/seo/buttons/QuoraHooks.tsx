@@ -13,11 +13,10 @@ export const useQuoraHooks = () => {
   const [selectedText, setSelectedText] = useState({ start: 0, end: 0, text: "" });
   const [showLinkPopover, setShowLinkPopover] = useState(false);
   const [linkUrl, setLinkUrl] = useState("https://");
-  const [quoraProfile] = useState<string>("https://quora.com");
+  const [quoraProfile] = useState<string>("https://fr.quora.com/profile/Georges-Boubet");
   const [open, setOpen] = useState(false);
 
   const linkButtonRef = useRef<HTMLButtonElement>(null);
-  // Utiliser une référence React pour stocker la valeur active, pas une référence DOM
   const [activeTextareaType, setActiveTextareaType] = useState<'details' | 'answer' | 'sources'>('details');
 
   const askForm = useForm<QuoraFormData>({
@@ -42,7 +41,7 @@ export const useQuoraHooks = () => {
     data.details = textDetails;
     
     // Rediriger l'utilisateur vers sa page Quora pour publier
-    const quoraUrl = "https://quora.com";
+    const quoraUrl = "https://fr.quora.com/profile/Georges-Boubet";
     window.open(quoraUrl, '_blank');
     
     console.log("Question Quora:", data);
@@ -63,7 +62,7 @@ export const useQuoraHooks = () => {
     data.sources = textSources;
     
     // Rediriger l'utilisateur vers sa page Quora pour publier
-    const quoraUrl = "https://quora.com";
+    const quoraUrl = "https://fr.quora.com/profile/Georges-Boubet";
     window.open(quoraUrl, '_blank');
     
     console.log("Réponse Quora:", data);
@@ -140,8 +139,11 @@ export const useFormatting = (
   };
 
   const handleTextSelection = (fieldType: 'details' | 'answer' | 'sources', start: number, end: number, selectedText: string) => {
-    setSelectedText({ start, end, text: selectedText });
-    setActiveTextareaType(fieldType);
+    if (start !== end && selectedText.trim() !== '') {
+      console.log(`Text selected in ${fieldType}: "${selectedText}" (${start}:${end})`);
+      setSelectedText({ start, end, text: selectedText });
+      setActiveTextareaType(fieldType);
+    }
   };
 
   const applyFormatting = (fieldType: 'details' | 'answer' | 'sources', format: 'bold' | 'italic' | 'underline' | 'link' | 'image' | 'list' | 'numbered-list' | 'quote') => {
@@ -151,6 +153,7 @@ export const useFormatting = (
     if (format === 'link') {
       // Only show link popover if text is selected
       if (selectedText.start !== selectedText.end && selectedText.text.trim().length > 0) {
+        console.log("Opening link popover for text:", selectedText.text);
         return true; // Signal to show link popover
       } else {
         // No text selected, show a toast message

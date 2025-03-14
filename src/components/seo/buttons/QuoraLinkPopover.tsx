@@ -58,6 +58,7 @@ const QuoraLinkPopover = ({
           size="sm" 
           title="Lien"
           ref={triggerRef}
+          className="bg-white"
         >
           <LinkIcon className="h-4 w-4" />
         </Button>
