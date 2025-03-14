@@ -155,7 +155,7 @@ const QuoraAnswerForm = ({
                   className="min-h-[60px]"
                   placeholder="La question sélectionnée ou personnalisée apparaîtra ici"
                   {...field}
-                  readOnly
+                  readOnly={false}
                 />
               </FormControl>
               <div className="flex justify-end mt-1">
