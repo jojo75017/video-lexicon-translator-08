@@ -54,6 +54,35 @@ export const analyzeContentWithAI = async (content: string): Promise<ContentSugg
     });
   }
 
+  // Analyse des titres et structure
+  const h1Count = (content.match(/<h1>/g) || []).length;
+  const h2Count = (content.match(/<h2>/g) || []).length;
+  const h3Count = (content.match(/<h3>/g) || []).length;
+  
+  if (h1Count > 1) {
+    suggestions.push({
+      type: 'erreur',
+      message: 'Vous avez utilisé plusieurs balises H1. Une seule balise H1 est recommandée par page.',
+      priorité: 'haute'
+    });
+  }
+  
+  if (h1Count === 0 && content.length > 300) {
+    suggestions.push({
+      type: 'erreur',
+      message: 'Aucune balise H1 détectée. Ajoutez un titre principal pour améliorer la structure de votre contenu.',
+      priorité: 'haute'
+    });
+  }
+  
+  if (h2Count === 0 && content.length > 500) {
+    suggestions.push({
+      type: 'optimisation',
+      message: 'Aucune balise H2 détectée. Ajoutez des sous-titres pour améliorer la structure et la lisibilité.',
+      priorité: 'moyenne'
+    });
+  }
+
   // Analyse des paragraphes
   const paragraphs = content.split(/\n\s*\n/).filter(p => p.trim().length > 0);
   if (paragraphs.length < 3) {
@@ -64,14 +93,15 @@ export const analyzeContentWithAI = async (content: string): Promise<ContentSugg
     });
   }
 
-  // Vérification des balises HTML (si présentes)
-  if (content.includes('<h1>') || content.includes('<h2>') || content.includes('<h3>')) {
-    // C'est bien, le contenu utilise des balises de titre
-  } else if (content.length > 500) {
+  // Analyse des listes
+  const hasUnorderedList = content.includes('<ul>') || content.includes('<li>');
+  const hasOrderedList = content.includes('<ol>');
+  
+  if (!hasUnorderedList && !hasOrderedList && content.length > 700) {
     suggestions.push({
-      type: 'optimisation',
-      message: 'Utilisez des sous-titres (H2, H3) pour structurer votre contenu et améliorer sa lisibilité.',
-      priorité: 'moyenne'
+      type: 'amélioration',
+      message: 'Utilisez des listes à puces ou numérotées pour présenter des informations de manière plus claire.',
+      priorité: 'basse'
     });
   }
 

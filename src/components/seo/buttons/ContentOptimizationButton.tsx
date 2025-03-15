@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { analyzeContentWithAI } from '@/utils/seo/aiContentAnalyzer';
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import GutenbergEditor from '@/components/seo/content/GutenbergEditor';
 
 const contentOptimizationSchema = z.object({
   title: z.string().min(5, "Le titre doit contenir au moins 5 caractères"),
@@ -68,8 +69,15 @@ const ContentOptimizationButton = () => {
       const lengthScore = Math.min(100, (wordCount / 300) * 100); // Optimal around 300+ words
       const keywordScore = keywordsTotal ? (keywordsPresent / keywordsTotal) * 100 : 70;
       const titleScore = data.title.length > 10 && data.title.length < 70 ? 90 : 60;
-      const paragraphCount = data.content.split(/\n\s*\n/).length;
-      const structureScore = paragraphCount > 2 ? 85 : 50;
+      
+      // Analyse des titres H1, H2, H3
+      const h1Count = (data.content.match(/<h1>/g) || []).length;
+      const h2Count = (data.content.match(/<h2>/g) || []).length;
+      const h3Count = (data.content.match(/<h3>/g) || []).length;
+      const headingsScore = h1Count === 1 ? 100 : 
+                            h1Count > 1 ? 60 : 
+                            h1Count === 0 ? 70 : 80;
+      const structureScore = (h2Count > 0 || h3Count > 0) ? 90 : 60;
       
       // Pénalités basées sur l'analyse IA
       let aiPenalty = 0;
@@ -81,14 +89,11 @@ const ContentOptimizationButton = () => {
       
       // Score final
       const finalScore = Math.max(0, Math.min(100, Math.round(
-        (lengthScore * 0.25) + (keywordScore * 0.3) + (titleScore * 0.2) + (structureScore * 0.25) - aiPenalty
+        (lengthScore * 0.2) + (keywordScore * 0.25) + (titleScore * 0.15) + (headingsScore * 0.2) + (structureScore * 0.2) - aiPenalty
       )));
       
-      // Simulation de métriques pour l'affichage visuel
-      const mockScore = finalScore;
-      
       setOptimizationResults({
-        score: mockScore,
+        score: finalScore,
         suggestions: [
           {
             category: 'Titre',
@@ -113,7 +118,7 @@ const ContentOptimizationButton = () => {
         ],
         metrics: {
           title: Math.round(titleScore),
-          headings: Math.round(structureScore),
+          headings: Math.round(headingsScore),
           terms: Math.round(keywordScore),
           words: wordCount
         },
@@ -220,11 +225,12 @@ const ContentOptimizationButton = () => {
                     <FormItem>
                       <FormLabel>Contenu</FormLabel>
                       <FormControl>
-                        <Textarea 
-                          placeholder="Collez votre contenu ici pour l'analyser..." 
-                          className="min-h-[200px]"
-                          {...field} 
-                        />
+                        <div className="min-h-[300px] border rounded-md overflow-hidden">
+                          <GutenbergEditor
+                            value={field.value}
+                            onChange={field.onChange}
+                          />
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
