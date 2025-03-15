@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Plus, Heading1, Heading2, Heading3, Heading4, ListOrdered, List, Image, Quote, Paragraph, AlignLeft } from 'lucide-react';
+import { Plus, Heading1, Heading2, Heading3, Heading4, ListOrdered, List, Image, Quote, AlignJustify, AlignLeft } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Block {
@@ -23,7 +23,20 @@ const GutenbergEditor: React.FC<GutenbergEditorProps> = ({ value, onChange }) =>
     
     try {
       // Tenter de parser si c'est du JSON
-      return JSON.parse(value);
+      const parsedBlocks = JSON.parse(value);
+      // Vérifier que les types sont valides
+      if (Array.isArray(parsedBlocks)) {
+        const validBlocks = parsedBlocks.filter(block => 
+          isValidBlockType(block.type)
+        ).map(block => ({
+          id: block.id || generateId(),
+          type: block.type as Block['type'],
+          content: block.content || ''
+        }));
+        
+        return validBlocks.length > 0 ? validBlocks : [{ id: generateId(), type: 'paragraph', content: '' }];
+      }
+      return [{ id: generateId(), type: 'paragraph', content: '' }];
     } catch {
       // Sinon, considérer comme du texte simple et convertir en bloc paragraphe
       return [{ id: generateId(), type: 'paragraph', content: value }];
@@ -32,6 +45,12 @@ const GutenbergEditor: React.FC<GutenbergEditorProps> = ({ value, onChange }) =>
   
   const [activeBlock, setActiveBlock] = useState<string | null>(blocks[0]?.id || null);
   const [showBlockSelector, setShowBlockSelector] = useState<string | null>(null);
+
+  // Valider les types de blocs
+  function isValidBlockType(type: string): boolean {
+    return ['paragraph', 'heading1', 'heading2', 'heading3', 'heading4', 
+            'unordered-list', 'ordered-list', 'image', 'quote'].includes(type);
+  }
 
   function generateId() {
     return Date.now().toString(36) + Math.random().toString(36).substring(2);
@@ -165,7 +184,7 @@ const GutenbergEditor: React.FC<GutenbergEditorProps> = ({ value, onChange }) =>
                   <TabsTrigger value="media" className="flex-1">Média</TabsTrigger>
                 </TabsList>
                 <TabsContent value="text" className="flex flex-wrap gap-2 mt-2">
-                  <BlockButton icon={<Paragraph className="h-4 w-4" />} label="Paragraphe" onClick={() => addBlock('paragraph', block.id)} />
+                  <BlockButton icon={<AlignJustify className="h-4 w-4" />} label="Paragraphe" onClick={() => addBlock('paragraph', block.id)} />
                   <BlockButton icon={<Heading1 className="h-4 w-4" />} label="Titre H1" onClick={() => addBlock('heading1', block.id)} />
                   <BlockButton icon={<Heading2 className="h-4 w-4" />} label="Titre H2" onClick={() => addBlock('heading2', block.id)} />
                   <BlockButton icon={<Heading3 className="h-4 w-4" />} label="Titre H3" onClick={() => addBlock('heading3', block.id)} />
