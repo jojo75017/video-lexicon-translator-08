@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Sparkles, Target, XCircle } from 'lucide-react';
+import { Sparkles, Target, XCircle, CheckCircle, AlertCircle, Info } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
@@ -10,6 +10,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { toast } from 'sonner';
+import { analyzeContentWithAI } from '@/utils/seo/aiContentAnalyzer';
+import { Progress } from "@/components/ui/progress";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const contentOptimizationSchema = z.object({
   title: z.string().min(5, "Le titre doit contenir au moins 5 caractères"),
@@ -31,6 +34,11 @@ const ContentOptimizationButton = () => {
       terms: number;
       words: number;
     };
+    aiSuggestions: Array<{
+      type: 'amélioration' | 'erreur' | 'optimisation';
+      message: string;
+      priorité: 'haute' | 'moyenne' | 'basse';
+    }>;
   } | null>(null);
 
   const form = useForm<ContentOptimizationData>({
@@ -46,10 +54,38 @@ const ContentOptimizationButton = () => {
     setIsAnalyzing(true);
     
     try {
-      // Simulation d'une analyse de contenu (à remplacer par une API réelle)
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Analyse du contenu via l'IA
+      const aiSuggestions = await analyzeContentWithAI(data.content);
       
-      const mockScore = Math.floor(70 + Math.random() * 30);
+      // Calcul du score basé sur différents critères
+      const wordCount = data.content.split(/\s+/).length;
+      const keywordsPresent = data.targetKeywords ? 
+        data.targetKeywords.split(',').map(k => k.trim().toLowerCase())
+          .filter(k => data.content.toLowerCase().includes(k)).length : 0;
+      const keywordsTotal = data.targetKeywords ? data.targetKeywords.split(',').length : 0;
+      
+      // Facteurs de score
+      const lengthScore = Math.min(100, (wordCount / 300) * 100); // Optimal around 300+ words
+      const keywordScore = keywordsTotal ? (keywordsPresent / keywordsTotal) * 100 : 70;
+      const titleScore = data.title.length > 10 && data.title.length < 70 ? 90 : 60;
+      const paragraphCount = data.content.split(/\n\s*\n/).length;
+      const structureScore = paragraphCount > 2 ? 85 : 50;
+      
+      // Pénalités basées sur l'analyse IA
+      let aiPenalty = 0;
+      aiSuggestions.forEach(s => {
+        if (s.type === 'erreur') aiPenalty += s.priorité === 'haute' ? 15 : s.priorité === 'moyenne' ? 10 : 5;
+        if (s.type === 'optimisation') aiPenalty += s.priorité === 'haute' ? 8 : s.priorité === 'moyenne' ? 5 : 2;
+        if (s.type === 'amélioration') aiPenalty += s.priorité === 'haute' ? 5 : s.priorité === 'moyenne' ? 3 : 1;
+      });
+      
+      // Score final
+      const finalScore = Math.max(0, Math.min(100, Math.round(
+        (lengthScore * 0.25) + (keywordScore * 0.3) + (titleScore * 0.2) + (structureScore * 0.25) - aiPenalty
+      )));
+      
+      // Simulation de métriques pour l'affichage visuel
+      const mockScore = finalScore;
       
       setOptimizationResults({
         score: mockScore,
@@ -57,30 +93,31 @@ const ContentOptimizationButton = () => {
           {
             category: 'Titre',
             suggestion: 'Ajoutez des mots-clés ciblés dans votre titre pour améliorer son efficacité SEO.',
-            score: Math.floor(70 + Math.random() * 30)
+            score: titleScore
           },
           {
             category: 'Structure',
             suggestion: 'Utilisez plus de sous-titres (H2, H3) pour mieux structurer votre contenu.',
-            score: Math.floor(60 + Math.random() * 40)
+            score: structureScore
           },
           {
             category: 'Mots-clés',
-            suggestion: 'Intégrez vos mots-clés principaux dans les premiers 100 mots du contenu.',
-            score: Math.floor(50 + Math.random() * 50)
+            suggestion: `Intégrez vos mots-clés principaux dans les premiers 100 mots du contenu.`,
+            score: keywordScore
           },
           {
             category: 'Lisibilité',
             suggestion: 'Raccourcissez vos phrases pour améliorer la lisibilité du contenu.',
-            score: Math.floor(70 + Math.random() * 30)
+            score: lengthScore
           }
         ],
         metrics: {
-          title: Math.floor(80 + Math.random() * 20),
-          headings: Math.floor(60 + Math.random() * 40),
-          terms: Math.floor(80 + Math.random() * 20),
-          words: Math.floor(data.content.split(/\s+/).length / 10)
-        }
+          title: Math.round(titleScore),
+          headings: Math.round(structureScore),
+          terms: Math.round(keywordScore),
+          words: wordCount
+        },
+        aiSuggestions
       });
       
       toast.success("Analyse de contenu terminée avec succès!");
@@ -96,6 +133,30 @@ const ContentOptimizationButton = () => {
     setIsOpen(false);
     setOptimizationResults(null);
     form.reset();
+  };
+
+  // Fonction pour obtenir l'icône selon le type de suggestion
+  const getSuggestionIcon = (type: 'amélioration' | 'erreur' | 'optimisation') => {
+    switch (type) {
+      case 'erreur':
+        return <AlertCircle className="h-4 w-4 text-red-500" />;
+      case 'optimisation':
+        return <Info className="h-4 w-4 text-blue-500" />;
+      case 'amélioration':
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
+    }
+  };
+
+  // Fonction pour obtenir la couleur de la suggestion selon la priorité
+  const getSuggestionColor = (priorité: 'haute' | 'moyenne' | 'basse') => {
+    switch (priorité) {
+      case 'haute':
+        return 'bg-red-50 border-red-200 text-red-800';
+      case 'moyenne':
+        return 'bg-yellow-50 border-yellow-200 text-yellow-800';
+      case 'basse':
+        return 'bg-blue-50 border-blue-200 text-blue-800';
+    }
   };
 
   return (
@@ -199,7 +260,7 @@ const ContentOptimizationButton = () => {
                       }}
                     ></div>
                     <div className="relative bg-white rounded-full w-24 h-24 flex items-center justify-center">
-                      <span className="text-3xl font-bold">{optimizationResults.score}</span>
+                      <span className="text-3xl font-bold">{optimizationResults.score}%</span>
                     </div>
                   </div>
                 </div>
@@ -214,6 +275,37 @@ const ContentOptimizationButton = () => {
               </div>
 
               <div className="space-y-4 mt-6">
+                <h3 className="text-lg font-medium mb-2">Recommandations IA</h3>
+                
+                <div className="space-y-2">
+                  {optimizationResults.aiSuggestions.map((suggestion, index) => (
+                    <div 
+                      key={index} 
+                      className={`p-3 border rounded-md ${getSuggestionColor(suggestion.priorité)}`}
+                    >
+                      <div className="flex gap-2 items-start">
+                        {getSuggestionIcon(suggestion.type)}
+                        <div>
+                          <p className="text-sm">{suggestion.message}</p>
+                          <span className="text-xs mt-1 opacity-70">
+                            {suggestion.priorité === 'haute' ? 'Priorité haute' : 
+                             suggestion.priorité === 'moyenne' ? 'Priorité moyenne' : 
+                             'Priorité basse'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  {optimizationResults.aiSuggestions.length === 0 && (
+                    <Alert>
+                      <AlertDescription>
+                        Aucune suggestion d'amélioration n'a été détectée par notre IA. Votre contenu semble bien optimisé !
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </div>
+
                 <h3 className="text-lg font-medium mb-2">Checklist d'optimisation</h3>
 
                 {optimizationResults.suggestions.map((suggestion, index) => (
