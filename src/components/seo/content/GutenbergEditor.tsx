@@ -1,8 +1,18 @@
 
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Plus, Heading1, Heading2, Heading3, Heading4, ListOrdered, List, Image, Quote, AlignJustify, AlignLeft } from 'lucide-react';
+import { 
+  Plus, Heading1, Heading2, Heading3, Heading4, ListOrdered, List, 
+  Image as ImageIcon, Quote, AlignJustify, AlignLeft, Bold, Italic, Underline, 
+  Link as LinkIcon, Palette, AlignCenter, AlignRight 
+} from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuItem
+} from "@/components/ui/dropdown-menu";
 
 interface Block {
   id: string;
@@ -14,6 +24,29 @@ interface GutenbergEditorProps {
   value: string;
   onChange: (content: string) => void;
 }
+
+const TEXT_COLORS = {
+  default: { name: "Défaut", class: "" },
+  black: { name: "Noir", class: "text-black" },
+  gray: { name: "Gris", class: "text-gray-500" },
+  red: { name: "Rouge", class: "text-red-500" },
+  orange: { name: "Orange", class: "text-orange-500" },
+  yellow: { name: "Jaune", class: "text-yellow-500" },
+  green: { name: "Vert", class: "text-green-500" },
+  blue: { name: "Bleu", class: "text-blue-500" },
+  purple: { name: "Violet", class: "text-purple-500" },
+  pink: { name: "Rose", class: "text-pink-500" },
+};
+
+const HIGHLIGHT_COLORS = {
+  default: { name: "Aucun", class: "" },
+  yellow: { name: "Jaune", class: "bg-yellow-100" },
+  green: { name: "Vert", class: "bg-green-100" },
+  blue: { name: "Bleu", class: "bg-blue-100" },
+  purple: { name: "Violet", class: "bg-purple-100" },
+  pink: { name: "Rose", class: "bg-pink-100" },
+  gray: { name: "Gris", class: "bg-gray-100" },
+};
 
 const GutenbergEditor: React.FC<GutenbergEditorProps> = ({ value, onChange }) => {
   const [blocks, setBlocks] = useState<Block[]>(() => {
@@ -98,6 +131,14 @@ const GutenbergEditor: React.FC<GutenbergEditorProps> = ({ value, onChange }) =>
     updateParentContent(updatedBlocks);
   };
 
+  const updateBlockType = (id: string, newType: Block['type']) => {
+    const updatedBlocks = blocks.map(block => 
+      block.id === id ? { ...block, type: newType } : block
+    );
+    setBlocks(updatedBlocks);
+    updateParentContent(updatedBlocks);
+  };
+
   const updateParentContent = (currentBlocks: Block[]) => {
     // Convertir les blocs en HTML
     const htmlContent = currentBlocks.map(block => {
@@ -133,6 +174,95 @@ const GutenbergEditor: React.FC<GutenbergEditorProps> = ({ value, onChange }) =>
       e.preventDefault();
       addBlock('paragraph', id);
     }
+  };
+
+  // Fonctions pour le formatage du texte
+  const applyFormat = (format: string, blockId: string) => {
+    const block = blocks.find(b => b.id === blockId);
+    if (!block) return;
+
+    const textarea = document.querySelector(`#block-${blockId}`) as HTMLTextAreaElement;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = textarea.value.substring(start, end);
+    
+    let newContent = '';
+    let newCursorPos = 0;
+
+    switch (format) {
+      case 'bold':
+        newContent = textarea.value.substring(0, start) + `**${selectedText}**` + textarea.value.substring(end);
+        newCursorPos = end + 4;
+        break;
+      case 'italic':
+        newContent = textarea.value.substring(0, start) + `*${selectedText}*` + textarea.value.substring(end);
+        newCursorPos = end + 2;
+        break;
+      case 'underline':
+        newContent = textarea.value.substring(0, start) + `<u>${selectedText}</u>` + textarea.value.substring(end);
+        newCursorPos = end + 7;
+        break;
+      case 'link':
+        newContent = textarea.value.substring(0, start) + `[${selectedText}](url)` + textarea.value.substring(end);
+        newCursorPos = end + 7;
+        break;
+      default:
+        return;
+    }
+
+    updateBlockContent(blockId, newContent);
+    
+    // Remettre le focus et la sélection après l'update du contenu
+    setTimeout(() => {
+      textarea.focus();
+      if (selectedText) {
+        textarea.setSelectionRange(start, newCursorPos);
+      } else {
+        textarea.setSelectionRange(newCursorPos, newCursorPos);
+      }
+    }, 0);
+  };
+
+  const applyTextColor = (blockId: string, colorClass: string) => {
+    const block = blocks.find(b => b.id === blockId);
+    if (!block) return;
+
+    const textarea = document.querySelector(`#block-${blockId}`) as HTMLTextAreaElement;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = textarea.value.substring(start, end);
+    
+    if (!selectedText) return;
+    
+    const newContent = textarea.value.substring(0, start) + 
+      `<span class="${colorClass}">${selectedText}</span>` + 
+      textarea.value.substring(end);
+    
+    updateBlockContent(blockId, newContent);
+  };
+
+  const applyHighlightColor = (blockId: string, colorClass: string) => {
+    const block = blocks.find(b => b.id === blockId);
+    if (!block) return;
+
+    const textarea = document.querySelector(`#block-${blockId}`) as HTMLTextAreaElement;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = textarea.value.substring(start, end);
+    
+    if (!selectedText) return;
+    
+    const newContent = textarea.value.substring(0, start) + 
+      `<span class="${colorClass}">${selectedText}</span>` + 
+      textarea.value.substring(end);
+    
+    updateBlockContent(blockId, newContent);
   };
 
   return (
@@ -175,6 +305,184 @@ const GutenbergEditor: React.FC<GutenbergEditorProps> = ({ value, onChange }) =>
             </div>
           </div>
 
+          {activeBlock === block.id && (
+            <div className="formatting-toolbar flex flex-wrap gap-1 mb-2 p-1 bg-gray-100 rounded-md">
+              <Button 
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0"
+                onClick={() => applyFormat('bold', block.id)}
+                title="Gras"
+              >
+                <Bold className="h-4 w-4" />
+              </Button>
+              <Button 
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0"
+                onClick={() => applyFormat('italic', block.id)}
+                title="Italique"
+              >
+                <Italic className="h-4 w-4" />
+              </Button>
+              <Button 
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0"
+                onClick={() => applyFormat('underline', block.id)}
+                title="Souligné"
+              >
+                <Underline className="h-4 w-4" />
+              </Button>
+              <Button 
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0"
+                onClick={() => applyFormat('link', block.id)}
+                title="Lien"
+              >
+                <LinkIcon className="h-4 w-4" />
+              </Button>
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0"
+                    title="Couleur du texte"
+                  >
+                    <Palette className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-40">
+                  {Object.entries(TEXT_COLORS).map(([key, value]) => (
+                    <DropdownMenuItem
+                      key={`text-${key}`}
+                      onClick={() => applyTextColor(block.id, value.class)}
+                      className="flex items-center gap-2"
+                    >
+                      <div className={`w-4 h-4 rounded-full ${value.class || 'bg-black'}`} />
+                      <span>{value.name}</span>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm" 
+                    className="h-8 w-8 p-0"
+                    title="Surlignage"
+                  >
+                    <span className="flex items-center justify-center w-4 h-4 bg-yellow-200">A</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-40">
+                  {Object.entries(HIGHLIGHT_COLORS).map(([key, value]) => (
+                    <DropdownMenuItem
+                      key={`highlight-${key}`}
+                      onClick={() => applyHighlightColor(block.id, value.class)}
+                      className="flex items-center gap-2"
+                    >
+                      <div className={`w-4 h-4 rounded-full ${value.class || 'bg-transparent border border-gray-300'}`} />
+                      <span>{value.name}</span>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <div className="border-l border-gray-300 mx-1"></div>
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 px-2"
+                    title="Type de bloc"
+                  >
+                    <BlockTypeIcon type={block.type} />
+                    <span className="text-xs ml-1">{getBlockTypeShortName(block.type)}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-40">
+                  <DropdownMenuItem onClick={() => updateBlockType(block.id, 'paragraph')}>
+                    <AlignJustify className="h-4 w-4 mr-2" />
+                    <span>Paragraphe</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => updateBlockType(block.id, 'heading1')}>
+                    <Heading1 className="h-4 w-4 mr-2" />
+                    <span>Titre H1</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => updateBlockType(block.id, 'heading2')}>
+                    <Heading2 className="h-4 w-4 mr-2" />
+                    <span>Titre H2</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => updateBlockType(block.id, 'heading3')}>
+                    <Heading3 className="h-4 w-4 mr-2" />
+                    <span>Titre H3</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => updateBlockType(block.id, 'heading4')}>
+                    <Heading4 className="h-4 w-4 mr-2" />
+                    <span>Titre H4</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => updateBlockType(block.id, 'unordered-list')}>
+                    <List className="h-4 w-4 mr-2" />
+                    <span>Liste à puces</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => updateBlockType(block.id, 'ordered-list')}>
+                    <ListOrdered className="h-4 w-4 mr-2" />
+                    <span>Liste numérotée</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => updateBlockType(block.id, 'quote')}>
+                    <Quote className="h-4 w-4 mr-2" />
+                    <span>Citation</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              
+              <div className="border-l border-gray-300 mx-1"></div>
+              
+              <Button 
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0"
+                title="Aligner à gauche"
+              >
+                <AlignLeft className="h-4 w-4" />
+              </Button>
+              <Button 
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0"
+                title="Centrer"
+              >
+                <AlignCenter className="h-4 w-4" />
+              </Button>
+              <Button 
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0"
+                title="Aligner à droite"
+              >
+                <AlignRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+
           {showBlockSelector === block.id && (
             <div className="block-selector bg-white shadow-lg border rounded-md p-2 mb-3">
               <Tabs defaultValue="text">
@@ -196,7 +504,7 @@ const GutenbergEditor: React.FC<GutenbergEditorProps> = ({ value, onChange }) =>
                   <BlockButton icon={<ListOrdered className="h-4 w-4" />} label="Liste numérotée" onClick={() => addBlock('ordered-list', block.id)} />
                 </TabsContent>
                 <TabsContent value="media" className="flex flex-wrap gap-2 mt-2">
-                  <BlockButton icon={<Image className="h-4 w-4" />} label="Image" onClick={() => addBlock('image', block.id)} />
+                  <BlockButton icon={<ImageIcon className="h-4 w-4" />} label="Image" onClick={() => addBlock('image', block.id)} />
                 </TabsContent>
               </Tabs>
             </div>
@@ -247,7 +555,7 @@ const BlockTypeIcon: React.FC<{ type: Block['type'] }> = ({ type }) => {
     case 'heading4': return <Heading4 className="h-4 w-4" />;
     case 'unordered-list': return <List className="h-4 w-4" />;
     case 'ordered-list': return <ListOrdered className="h-4 w-4" />;
-    case 'image': return <Image className="h-4 w-4" />;
+    case 'image': return <ImageIcon className="h-4 w-4" />;
     case 'quote': return <Quote className="h-4 w-4" />;
     case 'paragraph':
     default: return <AlignLeft className="h-4 w-4" />;
@@ -263,6 +571,22 @@ const getBlockTypeName = (type: Block['type']): string => {
     case 'heading4': return 'Titre H4';
     case 'unordered-list': return 'Liste à puces';
     case 'ordered-list': return 'Liste numérotée';
+    case 'image': return 'Image';
+    case 'quote': return 'Citation';
+    case 'paragraph':
+    default: return 'Paragraphe';
+  }
+};
+
+// Fonction pour obtenir le nom court du type de bloc (pour l'affichage dans le menu déroulant)
+const getBlockTypeShortName = (type: Block['type']): string => {
+  switch (type) {
+    case 'heading1': return 'H1';
+    case 'heading2': return 'H2';
+    case 'heading3': return 'H3';
+    case 'heading4': return 'H4';
+    case 'unordered-list': return 'Liste';
+    case 'ordered-list': return 'Liste num.';
     case 'image': return 'Image';
     case 'quote': return 'Citation';
     case 'paragraph':
@@ -298,6 +622,7 @@ const BlockEditor: React.FC<{
 
   return (
     <textarea
+      id={`block-${block.id}`}
       className={`w-full border-0 bg-transparent outline-none resize-none ${
         block.type.startsWith('heading') 
           ? block.type === 'heading1' 
