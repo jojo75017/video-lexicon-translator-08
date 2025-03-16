@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { 
   Plus, Heading1, Heading2, Heading3, Heading4, ListOrdered, List, 
@@ -7,16 +6,13 @@ import {
   Link as LinkIcon, Palette, AlignCenter, AlignRight 
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-  DropdownMenuItem
-} from "@/components/ui/dropdown-menu";
+
+// Define the valid block types
+type BlockType = 'paragraph' | 'heading1' | 'heading2' | 'heading3' | 'heading4' | 'unordered-list' | 'ordered-list' | 'image' | 'quote';
 
 interface Block {
   id: string;
-  type: 'paragraph' | 'heading1' | 'heading2' | 'heading3' | 'heading4' | 'unordered-list' | 'ordered-list' | 'image' | 'quote';
+  type: BlockType;
   content: string;
 }
 
@@ -25,6 +21,7 @@ interface GutenbergEditorProps {
   onChange: (content: string) => void;
 }
 
+// Color palettes for styling
 const TEXT_COLORS = {
   default: { name: "Défaut", class: "" },
   black: { name: "Noir", class: "text-black" },
@@ -55,17 +52,20 @@ const GutenbergEditor: React.FC<GutenbergEditorProps> = ({ value, onChange }) =>
     }
     
     try {
-      // Tenter de parser si c'est du JSON
+      // Try to parse if it's JSON
       const parsedBlocks = JSON.parse(value);
-      // Vérifier que les types sont valides
+      
+      // Check that the types are valid
       if (Array.isArray(parsedBlocks)) {
         const validBlocks = parsedBlocks
           .filter(block => 
-            block && typeof block === 'object' && isValidBlockType(block.type)
+            block && typeof block === 'object' && 
+            typeof block.type === 'string' && 
+            isValidBlockType(block.type)
           )
           .map(block => ({
             id: block.id || generateId(),
-            type: block.type as Block['type'],
+            type: block.type as BlockType,
             content: block.content || ''
           }));
         
@@ -73,16 +73,17 @@ const GutenbergEditor: React.FC<GutenbergEditorProps> = ({ value, onChange }) =>
       }
       return [{ id: generateId(), type: 'paragraph', content: '' }];
     } catch {
-      // Sinon, considérer comme du texte simple et convertir en bloc paragraphe
+      // If it's not valid JSON, consider it as plain text and convert to paragraph block
       return [{ id: generateId(), type: 'paragraph', content: value }];
     }
   });
   
   const [activeBlock, setActiveBlock] = useState<string | null>(blocks[0]?.id || null);
   const [showBlockSelector, setShowBlockSelector] = useState<string | null>(null);
+  const editorRef = useRef<HTMLDivElement>(null);
 
-  // Valider les types de blocs
-  function isValidBlockType(type: any): type is Block['type'] {
+  // Function to validate block types
+  function isValidBlockType(type: string): type is BlockType {
     return ['paragraph', 'heading1', 'heading2', 'heading3', 'heading4', 
             'unordered-list', 'ordered-list', 'image', 'quote'].includes(type);
   }
@@ -99,7 +100,7 @@ const GutenbergEditor: React.FC<GutenbergEditorProps> = ({ value, onChange }) =>
     updateParentContent(updatedBlocks);
   };
 
-  const addBlock = (type: Block['type'], afterId: string) => {
+  const addBlock = (type: BlockType, afterId: string) => {
     const index = blocks.findIndex(block => block.id === afterId);
     const newBlock = { id: generateId(), type, content: '' };
     const updatedBlocks = [
@@ -115,8 +116,8 @@ const GutenbergEditor: React.FC<GutenbergEditorProps> = ({ value, onChange }) =>
 
   const removeBlock = (id: string) => {
     if (blocks.length <= 1) {
-      // Toujours garder au moins un bloc
-      const resetBlocks = [{ id: generateId(), type: 'paragraph', content: '' }];
+      // Always keep at least one block
+      const resetBlocks = [{ id: generateId(), type: 'paragraph' as BlockType, content: '' }];
       setBlocks(resetBlocks);
       setActiveBlock(resetBlocks[0].id);
       updateParentContent(resetBlocks);
@@ -127,13 +128,13 @@ const GutenbergEditor: React.FC<GutenbergEditorProps> = ({ value, onChange }) =>
     const updatedBlocks = blocks.filter(block => block.id !== id);
     setBlocks(updatedBlocks);
     
-    // Sélectionner le bloc précédent ou suivant
+    // Select the previous or next block
     const newActiveIndex = Math.min(index, updatedBlocks.length - 1);
     setActiveBlock(updatedBlocks[newActiveIndex]?.id || null);
     updateParentContent(updatedBlocks);
   };
 
-  const updateBlockType = (id: string, newType: Block['type']) => {
+  const updateBlockType = (id: string, newType: BlockType) => {
     const updatedBlocks = blocks.map(block => 
       block.id === id ? { ...block, type: newType } : block
     );
@@ -143,7 +144,7 @@ const GutenbergEditor: React.FC<GutenbergEditorProps> = ({ value, onChange }) =>
 
   const updateParentContent = (currentBlocks: Block[]) => {
     try {
-      // Convertir les blocs en HTML
+      // Convert blocks to HTML
       const htmlContent = currentBlocks.map(block => {
         switch (block.type) {
           case 'heading1':
@@ -170,19 +171,19 @@ const GutenbergEditor: React.FC<GutenbergEditorProps> = ({ value, onChange }) =>
       
       onChange(htmlContent);
     } catch (error) {
-      console.error("Erreur lors de la mise à jour du contenu:", error);
+      console.error("Error updating content:", error);
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>, id: string) => {
-    // Ajouter un nouveau paragraphe sur Entrée
+    // Add a new paragraph on Enter
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       addBlock('paragraph', id);
     }
   };
 
-  // Fonctions pour le formatage du texte
+  // Functions for text formatting
   const applyFormat = (format: string, blockId: string) => {
     const block = blocks.find(b => b.id === blockId);
     if (!block) return;
@@ -220,7 +221,7 @@ const GutenbergEditor: React.FC<GutenbergEditorProps> = ({ value, onChange }) =>
 
     updateBlockContent(blockId, newContent);
     
-    // Remettre le focus et la sélection après l'update du contenu
+    // Reset focus and selection after content update
     setTimeout(() => {
       textarea.focus();
       if (selectedText) {
@@ -271,148 +272,18 @@ const GutenbergEditor: React.FC<GutenbergEditorProps> = ({ value, onChange }) =>
     updateBlockContent(blockId, newContent);
   };
 
-  // Créons des composants séparés pour le menu déroulant
-  const TypeSelector = ({ blockId, currentType }: { blockId: string, currentType: Block['type'] }) => (
-    <div className="relative z-10">
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        className="h-8 px-2"
-        title="Type de bloc"
-        onClick={() => {
-          const menu = document.getElementById(`type-menu-${blockId}`);
-          if (menu) {
-            menu.classList.toggle('hidden');
-          }
-        }}
-      >
-        <BlockTypeIcon type={currentType} />
-        <span className="text-xs ml-1">{getBlockTypeShortName(currentType)}</span>
-      </Button>
-      
-      <div id={`type-menu-${blockId}`} className="absolute left-0 top-full mt-1 bg-white shadow-lg border rounded-md p-2 hidden w-40 z-50">
-        <div className="space-y-1">
-          <TypeOption icon={<AlignJustify className="h-4 w-4" />} label="Paragraphe" onClick={() => updateBlockType(blockId, 'paragraph')} />
-          <TypeOption icon={<Heading1 className="h-4 w-4" />} label="Titre H1" onClick={() => updateBlockType(blockId, 'heading1')} />
-          <TypeOption icon={<Heading2 className="h-4 w-4" />} label="Titre H2" onClick={() => updateBlockType(blockId, 'heading2')} />
-          <TypeOption icon={<Heading3 className="h-4 w-4" />} label="Titre H3" onClick={() => updateBlockType(blockId, 'heading3')} />
-          <TypeOption icon={<Heading4 className="h-4 w-4" />} label="Titre H4" onClick={() => updateBlockType(blockId, 'heading4')} />
-          <TypeOption icon={<List className="h-4 w-4" />} label="Liste à puces" onClick={() => updateBlockType(blockId, 'unordered-list')} />
-          <TypeOption icon={<ListOrdered className="h-4 w-4" />} label="Liste numérotée" onClick={() => updateBlockType(blockId, 'ordered-list')} />
-          <TypeOption icon={<Quote className="h-4 w-4" />} label="Citation" onClick={() => updateBlockType(blockId, 'quote')} />
-        </div>
-      </div>
-    </div>
-  );
-
-  const TypeOption = ({ icon, label, onClick }: { icon: React.ReactNode, label: string, onClick: () => void }) => (
-    <button
-      type="button"
-      className="flex items-center gap-2 w-full px-2 py-1 text-sm hover:bg-gray-100 rounded-md"
-      onClick={(e) => {
-        e.stopPropagation();
-        onClick();
-        // Fermer le menu après la sélection
-        document.querySelectorAll('[id^="type-menu-"]').forEach(el => {
-          if (el instanceof HTMLElement) el.classList.add('hidden');
-        });
-      }}
-    >
-      {icon}
-      <span>{label}</span>
-    </button>
-  );
-
-  const TextColorSelector = ({ blockId }: { blockId: string }) => (
-    <div className="relative z-10">
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        className="h-8 w-8 p-0"
-        title="Couleur du texte"
-        onClick={() => {
-          const menu = document.getElementById(`color-menu-${blockId}`);
-          if (menu) {
-            menu.classList.toggle('hidden');
-          }
-        }}
-      >
-        <Palette className="h-4 w-4" />
-      </Button>
-      
-      <div id={`color-menu-${blockId}`} className="absolute left-0 top-full mt-1 bg-white shadow-lg border rounded-md p-2 hidden w-40 z-50">
-        <div className="space-y-1">
-          {Object.entries(TEXT_COLORS).map(([key, value]) => (
-            <button
-              key={`text-${key}`}
-              className="flex items-center gap-2 w-full px-2 py-1 text-sm hover:bg-gray-100 rounded-md"
-              onClick={(e) => {
-                e.stopPropagation();
-                applyTextColor(blockId, value.class);
-                document.getElementById(`color-menu-${blockId}`)?.classList.add('hidden');
-              }}
-            >
-              <div className={`w-4 h-4 rounded-full ${value.class || 'bg-black'}`} />
-              <span>{value.name}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-
-  const HighlightColorSelector = ({ blockId }: { blockId: string }) => (
-    <div className="relative z-10">
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm" 
-        className="h-8 w-8 p-0"
-        title="Surlignage"
-        onClick={() => {
-          const menu = document.getElementById(`highlight-menu-${blockId}`);
-          if (menu) {
-            menu.classList.toggle('hidden');
-          }
-        }}
-      >
-        <span className="flex items-center justify-center w-4 h-4 bg-yellow-200">A</span>
-      </Button>
-      
-      <div id={`highlight-menu-${blockId}`} className="absolute left-0 top-full mt-1 bg-white shadow-lg border rounded-md p-2 hidden w-40 z-50">
-        <div className="space-y-1">
-          {Object.entries(HIGHLIGHT_COLORS).map(([key, value]) => (
-            <button
-              key={`highlight-${key}`}
-              className="flex items-center gap-2 w-full px-2 py-1 text-sm hover:bg-gray-100 rounded-md"
-              onClick={(e) => {
-                e.stopPropagation();
-                applyHighlightColor(blockId, value.class);
-                document.getElementById(`highlight-menu-${blockId}`)?.classList.add('hidden');
-              }}
-            >
-              <div className={`w-4 h-4 rounded-full ${value.class || 'bg-transparent border border-gray-300'}`} />
-              <span>{value.name}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-
-  // Fermer les menus quand on clique ailleurs
-  React.useEffect(() => {
+  // Close menus when clicking outside
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      // Si le clic n'est pas dans un menu ou un bouton qui contrôle un menu
+      // If the click is not in a menu or a button that controls a menu
       if (!target.closest('[id^="type-menu-"]') && 
           !target.closest('[id^="color-menu-"]') && 
           !target.closest('[id^="highlight-menu-"]')) {
-        document.querySelectorAll('[id^="type-menu-"],[id^="color-menu-"],[id^="highlight-menu-"]').forEach(el => {
-          if (el instanceof HTMLElement) el.classList.add('hidden');
-        });
+        document.querySelectorAll('[id^="type-menu-"],[id^="color-menu-"],[id^="highlight-menu-"]')
+          .forEach(el => {
+            if (el instanceof HTMLElement) el.classList.add('hidden');
+          });
       }
     };
 
@@ -423,8 +294,8 @@ const GutenbergEditor: React.FC<GutenbergEditorProps> = ({ value, onChange }) =>
   }, []);
 
   return (
-    <div className="gutenberg-editor border rounded-md">
-      {blocks.map((block, index) => (
+    <div className="gutenberg-editor rounded-md" ref={editorRef}>
+      {blocks.map((block) => (
         <div 
           key={block.id}
           className={`block-wrapper p-3 border-b ${activeBlock === block.id ? 'bg-gray-50' : ''}`}
@@ -463,7 +334,7 @@ const GutenbergEditor: React.FC<GutenbergEditorProps> = ({ value, onChange }) =>
           </div>
 
           {activeBlock === block.id && (
-            <div className="formatting-toolbar flex flex-wrap gap-1 mb-2 p-1 bg-gray-100 rounded-md">
+            <div className="formatting-toolbar flex flex-wrap gap-1 mb-2 p-2 bg-gray-100 rounded-md">
               <Button 
                 type="button"
                 variant="ghost"
@@ -505,15 +376,152 @@ const GutenbergEditor: React.FC<GutenbergEditorProps> = ({ value, onChange }) =>
                 <LinkIcon className="h-4 w-4" />
               </Button>
               
-              <TextColorSelector blockId={block.id} />
-              <HighlightColorSelector blockId={block.id} />
+              {/* Text Color Selector */}
+              <div className="relative z-10">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0"
+                  title="Couleur du texte"
+                  onClick={() => {
+                    const menu = document.getElementById(`color-menu-${block.id}`);
+                    if (menu) {
+                      menu.classList.toggle('hidden');
+                    }
+                  }}
+                >
+                  <Palette className="h-4 w-4" />
+                </Button>
+                
+                <div id={`color-menu-${block.id}`} className="absolute left-0 top-full mt-1 bg-white shadow-lg border rounded-md p-2 hidden w-40 z-50">
+                  <div className="space-y-1">
+                    {Object.entries(TEXT_COLORS).map(([key, value]) => (
+                      <button
+                        key={`text-${key}`}
+                        className="flex items-center gap-2 w-full px-2 py-1 text-sm hover:bg-gray-100 rounded-md"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          applyTextColor(block.id, value.class);
+                          document.getElementById(`color-menu-${block.id}`)?.classList.add('hidden');
+                        }}
+                      >
+                        <div className={`w-4 h-4 rounded-full ${value.class || 'bg-black'}`} />
+                        <span>{value.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Highlight Color Selector */}
+              <div className="relative z-10">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm" 
+                  className="h-8 w-8 p-0"
+                  title="Surlignage"
+                  onClick={() => {
+                    const menu = document.getElementById(`highlight-menu-${block.id}`);
+                    if (menu) {
+                      menu.classList.toggle('hidden');
+                    }
+                  }}
+                >
+                  <span className="flex items-center justify-center w-4 h-4 bg-yellow-200">A</span>
+                </Button>
+                
+                <div id={`highlight-menu-${block.id}`} className="absolute left-0 top-full mt-1 bg-white shadow-lg border rounded-md p-2 hidden w-40 z-50">
+                  <div className="space-y-1">
+                    {Object.entries(HIGHLIGHT_COLORS).map(([key, value]) => (
+                      <button
+                        key={`highlight-${key}`}
+                        className="flex items-center gap-2 w-full px-2 py-1 text-sm hover:bg-gray-100 rounded-md"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          applyHighlightColor(block.id, value.class);
+                          document.getElementById(`highlight-menu-${block.id}`)?.classList.add('hidden');
+                        }}
+                      >
+                        <div className={`w-4 h-4 rounded-full ${value.class || 'bg-transparent border border-gray-300'}`} />
+                        <span>{value.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
 
               <div className="border-l border-gray-300 mx-1"></div>
               
-              <TypeSelector blockId={block.id} currentType={block.type} />
+              {/* Block Type Selector */}
+              <div className="relative z-10">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 px-2"
+                  title="Type de bloc"
+                  onClick={() => {
+                    const menu = document.getElementById(`type-menu-${block.id}`);
+                    if (menu) {
+                      menu.classList.toggle('hidden');
+                    }
+                  }}
+                >
+                  <BlockTypeIcon type={block.type} />
+                  <span className="text-xs ml-1">{getBlockTypeShortName(block.type)}</span>
+                </Button>
+                
+                <div id={`type-menu-${block.id}`} className="absolute left-0 top-full mt-1 bg-white shadow-lg border rounded-md p-2 hidden w-40 z-50">
+                  <div className="space-y-1">
+                    <TypeOption 
+                      icon={<AlignJustify className="h-4 w-4" />} 
+                      label="Paragraphe" 
+                      onClick={() => updateBlockType(block.id, 'paragraph')} 
+                    />
+                    <TypeOption 
+                      icon={<Heading1 className="h-4 w-4" />} 
+                      label="Titre H1" 
+                      onClick={() => updateBlockType(block.id, 'heading1')} 
+                    />
+                    <TypeOption 
+                      icon={<Heading2 className="h-4 w-4" />} 
+                      label="Titre H2" 
+                      onClick={() => updateBlockType(block.id, 'heading2')} 
+                    />
+                    <TypeOption 
+                      icon={<Heading3 className="h-4 w-4" />} 
+                      label="Titre H3" 
+                      onClick={() => updateBlockType(block.id, 'heading3')} 
+                    />
+                    <TypeOption 
+                      icon={<Heading4 className="h-4 w-4" />} 
+                      label="Titre H4" 
+                      onClick={() => updateBlockType(block.id, 'heading4')} 
+                    />
+                    <TypeOption 
+                      icon={<List className="h-4 w-4" />} 
+                      label="Liste à puces" 
+                      onClick={() => updateBlockType(block.id, 'unordered-list')} 
+                    />
+                    <TypeOption 
+                      icon={<ListOrdered className="h-4 w-4" />} 
+                      label="Liste numérotée" 
+                      onClick={() => updateBlockType(block.id, 'ordered-list')} 
+                    />
+                    <TypeOption 
+                      icon={<Quote className="h-4 w-4" />} 
+                      label="Citation" 
+                      onClick={() => updateBlockType(block.id, 'quote')} 
+                    />
+                  </div>
+                </div>
+              </div>
               
               <div className="border-l border-gray-300 mx-1"></div>
               
+              {/* Text Alignment */}
               <Button 
                 type="button"
                 variant="ghost"
@@ -553,19 +561,55 @@ const GutenbergEditor: React.FC<GutenbergEditorProps> = ({ value, onChange }) =>
                   <TabsTrigger value="media" className="flex-1">Média</TabsTrigger>
                 </TabsList>
                 <TabsContent value="text" className="flex flex-wrap gap-2 mt-2">
-                  <BlockButton icon={<AlignJustify className="h-4 w-4" />} label="Paragraphe" onClick={() => addBlock('paragraph', block.id)} />
-                  <BlockButton icon={<Heading1 className="h-4 w-4" />} label="Titre H1" onClick={() => addBlock('heading1', block.id)} />
-                  <BlockButton icon={<Heading2 className="h-4 w-4" />} label="Titre H2" onClick={() => addBlock('heading2', block.id)} />
-                  <BlockButton icon={<Heading3 className="h-4 w-4" />} label="Titre H3" onClick={() => addBlock('heading3', block.id)} />
-                  <BlockButton icon={<Heading4 className="h-4 w-4" />} label="Titre H4" onClick={() => addBlock('heading4', block.id)} />
-                  <BlockButton icon={<Quote className="h-4 w-4" />} label="Citation" onClick={() => addBlock('quote', block.id)} />
+                  <BlockButton 
+                    icon={<AlignJustify className="h-4 w-4" />} 
+                    label="Paragraphe" 
+                    onClick={() => addBlock('paragraph', block.id)} 
+                  />
+                  <BlockButton 
+                    icon={<Heading1 className="h-4 w-4" />} 
+                    label="Titre H1" 
+                    onClick={() => addBlock('heading1', block.id)} 
+                  />
+                  <BlockButton 
+                    icon={<Heading2 className="h-4 w-4" />} 
+                    label="Titre H2" 
+                    onClick={() => addBlock('heading2', block.id)} 
+                  />
+                  <BlockButton 
+                    icon={<Heading3 className="h-4 w-4" />} 
+                    label="Titre H3" 
+                    onClick={() => addBlock('heading3', block.id)} 
+                  />
+                  <BlockButton 
+                    icon={<Heading4 className="h-4 w-4" />} 
+                    label="Titre H4" 
+                    onClick={() => addBlock('heading4', block.id)} 
+                  />
+                  <BlockButton 
+                    icon={<Quote className="h-4 w-4" />} 
+                    label="Citation" 
+                    onClick={() => addBlock('quote', block.id)} 
+                  />
                 </TabsContent>
                 <TabsContent value="list" className="flex flex-wrap gap-2 mt-2">
-                  <BlockButton icon={<List className="h-4 w-4" />} label="Liste à puces" onClick={() => addBlock('unordered-list', block.id)} />
-                  <BlockButton icon={<ListOrdered className="h-4 w-4" />} label="Liste numérotée" onClick={() => addBlock('ordered-list', block.id)} />
+                  <BlockButton 
+                    icon={<List className="h-4 w-4" />} 
+                    label="Liste à puces" 
+                    onClick={() => addBlock('unordered-list', block.id)} 
+                  />
+                  <BlockButton 
+                    icon={<ListOrdered className="h-4 w-4" />} 
+                    label="Liste numérotée" 
+                    onClick={() => addBlock('ordered-list', block.id)} 
+                  />
                 </TabsContent>
                 <TabsContent value="media" className="flex flex-wrap gap-2 mt-2">
-                  <BlockButton icon={<ImageIcon className="h-4 w-4" />} label="Image" onClick={() => addBlock('image', block.id)} />
+                  <BlockButton 
+                    icon={<ImageIcon className="h-4 w-4" />} 
+                    label="Image" 
+                    onClick={() => addBlock('image', block.id)} 
+                  />
                 </TabsContent>
               </Tabs>
             </div>
@@ -599,16 +643,30 @@ const GutenbergEditor: React.FC<GutenbergEditorProps> = ({ value, onChange }) =>
   );
 };
 
-// Composant pour chaque bouton de type de bloc
-const BlockButton = ({ icon, label, onClick }: { icon: React.ReactNode, label: string, onClick: () => void }) => (
-  <Button type="button" variant="outline" size="sm" className="flex items-center gap-1" onClick={onClick}>
+// Component for each block type button
+const BlockButton = ({ 
+  icon, 
+  label, 
+  onClick 
+}: { 
+  icon: React.ReactNode, 
+  label: string, 
+  onClick: () => void 
+}) => (
+  <Button 
+    type="button" 
+    variant="outline" 
+    size="sm" 
+    className="flex items-center gap-1" 
+    onClick={onClick}
+  >
     {icon}
     <span className="text-xs">{label}</span>
   </Button>
 );
 
-// Composant pour l'icône du type de bloc
-const BlockTypeIcon: React.FC<{ type: Block['type'] }> = ({ type }) => {
+// Component for the block type icon
+const BlockTypeIcon: React.FC<{ type: BlockType }> = ({ type }) => {
   switch (type) {
     case 'heading1': return <Heading1 className="h-4 w-4" />;
     case 'heading2': return <Heading2 className="h-4 w-4" />;
@@ -623,8 +681,35 @@ const BlockTypeIcon: React.FC<{ type: Block['type'] }> = ({ type }) => {
   }
 };
 
-// Fonction pour obtenir le nom du type de bloc
-const getBlockTypeName = (type: Block['type']): string => {
+// Component for type option in dropdown
+const TypeOption = ({ 
+  icon, 
+  label, 
+  onClick 
+}: { 
+  icon: React.ReactNode, 
+  label: string, 
+  onClick: () => void 
+}) => (
+  <button
+    type="button"
+    className="flex items-center gap-2 w-full px-2 py-1 text-sm hover:bg-gray-100 rounded-md"
+    onClick={(e) => {
+      e.stopPropagation();
+      onClick();
+      // Close menu after selection
+      document.querySelectorAll('[id^="type-menu-"]').forEach(el => {
+        if (el instanceof HTMLElement) el.classList.add('hidden');
+      });
+    }}
+  >
+    {icon}
+    <span>{label}</span>
+  </button>
+);
+
+// Function to get the block type name
+const getBlockTypeName = (type: BlockType): string => {
   switch (type) {
     case 'heading1': return 'Titre H1';
     case 'heading2': return 'Titre H2';
@@ -639,8 +724,8 @@ const getBlockTypeName = (type: Block['type']): string => {
   }
 };
 
-// Fonction pour obtenir le nom court du type de bloc (pour l'affichage dans le menu déroulant)
-const getBlockTypeShortName = (type: Block['type']): string => {
+// Function to get the short block type name (for display in dropdown)
+const getBlockTypeShortName = (type: BlockType): string => {
   switch (type) {
     case 'heading1': return 'H1';
     case 'heading2': return 'H2';
@@ -651,32 +736,40 @@ const getBlockTypeShortName = (type: Block['type']): string => {
     case 'image': return 'Image';
     case 'quote': return 'Citation';
     case 'paragraph':
-    default: return 'Paragraphe';
+    default: return 'Para';
   }
 };
 
-// Composant pour l'éditeur de bloc
+// Block Editor component
 const BlockEditor: React.FC<{ 
   block: Block, 
   updateContent: (content: string) => void,
   onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void
 }> = ({ block, updateContent, onKeyDown }) => {
   const [content, setContent] = useState(block.content);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setContent(e.target.value);
     updateContent(e.target.value);
+    adjustHeight(e);
   };
 
-  // Ajuster dynamiquement la hauteur du textarea
+  // Dynamically adjust textarea height
   const adjustHeight = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     e.target.style.height = 'auto';
     e.target.style.height = e.target.scrollHeight + 'px';
   };
 
-  React.useEffect(() => {
-    // Mettre à jour le contenu local si le bloc change
+  // Update local content if block changes
+  useEffect(() => {
     setContent(block.content);
+    
+    // Adjust height on load
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px';
+    }
   }, [block.content]);
 
   let placeholder = 'Saisissez votre texte ici...';
@@ -689,7 +782,8 @@ const BlockEditor: React.FC<{
   return (
     <textarea
       id={`block-${block.id}`}
-      className={`w-full border-0 bg-transparent outline-none resize-none ${
+      ref={textareaRef}
+      className={`w-full border-0 bg-transparent outline-none resize-none transition-all ${
         block.type.startsWith('heading') 
           ? block.type === 'heading1' 
             ? 'text-2xl font-bold' 
@@ -703,10 +797,7 @@ const BlockEditor: React.FC<{
             : 'text-base'
       }`}
       value={content}
-      onChange={(e) => {
-        handleChange(e);
-        adjustHeight(e);
-      }}
+      onChange={handleChange}
       onKeyDown={onKeyDown}
       placeholder={placeholder}
       rows={1}

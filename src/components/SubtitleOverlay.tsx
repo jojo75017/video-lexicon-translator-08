@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Subtitle {
   startTime: number;
@@ -27,26 +28,35 @@ const SubtitleOverlay: React.FC<SubtitleOverlayProps> = ({ subtitles, currentTim
 
   return (
     <div className="absolute bottom-16 left-0 right-0 flex flex-col items-center space-y-2 p-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -20 }}
-        className="bg-black/75 px-6 py-3 rounded-lg shadow-lg"
-      >
-        <p className="text-[#FEC6A1] text-xl font-semibold">
-          {currentSubtitle.text}
-        </p>
-      </motion.div>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -20 }}
-        className="bg-primary/75 px-6 py-3 rounded-lg shadow-lg"
-      >
-        <p className="text-[#E5DEFF] text-xl font-semibold">
-          {currentSubtitle.translation}
-        </p>
-      </motion.div>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={`original-${currentTime}`}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.3 }}
+          className="bg-black/75 px-6 py-3 rounded-lg shadow-lg max-w-2xl"
+        >
+          <p className="text-[#FEC6A1] text-xl font-semibold text-center">
+            {currentSubtitle.text}
+          </p>
+        </motion.div>
+      </AnimatePresence>
+      
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={`translation-${currentTime}`}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+          className="bg-primary/75 px-6 py-3 rounded-lg shadow-lg backdrop-blur-sm max-w-2xl"
+        >
+          <p className="text-[#E5DEFF] text-xl font-semibold text-center">
+            {currentSubtitle.translation}
+          </p>
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 };
