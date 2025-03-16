@@ -1,19 +1,16 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Sparkles, Target, XCircle, CheckCircle, AlertCircle, Info } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { toast } from 'sonner';
 import { analyzeContentWithAI } from '@/utils/seo/aiContentAnalyzer';
-import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import GutenbergEditor from '@/components/seo/content/GutenbergEditor';
+import ProfessionalEditor from '@/components/seo/content/ProfessionalEditor';
 
 const contentOptimizationSchema = z.object({
   title: z.string().min(5, "Le titre doit contenir au moins 5 caractères"),
@@ -176,7 +173,7 @@ const ContentOptimizationButton = () => {
       </Button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-purple-500" />
@@ -226,9 +223,10 @@ const ContentOptimizationButton = () => {
                       <FormLabel>Contenu</FormLabel>
                       <FormControl>
                         <div className="min-h-[300px] border rounded-md overflow-hidden">
-                          <GutenbergEditor
+                          <ProfessionalEditor
                             value={field.value}
                             onChange={field.onChange}
+                            height="400px"
                           />
                         </div>
                       </FormControl>

@@ -12,14 +12,14 @@ export const generateContentWithWordCount = (keyword: string, targetWordCount: n
   ];
 
   const bodyPhrases = [
-    `Les statistiques démontrent une croissance significative liée à ${boldKeyword}.`,
-    `Les professionnels reconnaissent l'importance stratégique de ${boldKeyword}.`,
-    `L'investissement dans ${boldKeyword} génère des résultats mesurables.`,
+    `Les statistiques démontrent une <em>croissance significative</em> liée à ${boldKeyword}.`,
+    `Les professionnels reconnaissent l'<em>importance stratégique</em> de ${boldKeyword}.`,
+    `L'investissement dans ${boldKeyword} génère des <strong>résultats mesurables</strong>.`,
     `Les organisations leaders misent sur ${boldKeyword} pour se démarquer.`,
     `La recherche et développement autour de ${boldKeyword} s'intensifie.`,
-    `L'adoption de ${boldKeyword} s'accompagne d'avantages concurrentiels.`,
+    `L'adoption de ${boldKeyword} s'accompagne d'<strong>avantages concurrentiels</strong>.`,
     `Les retours d'expérience positifs sur ${boldKeyword} se multiplient.`,
-    `Les innovations liées à ${boldKeyword} ouvrent de nouvelles perspectives.`,
+    `Les innovations liées à ${boldKeyword} ouvrent de <em>nouvelles perspectives</em>.`,
     `L'intégration de ${boldKeyword} nécessite une approche méthodique.`,
     `Le développement de ${boldKeyword} suit une progression constante.`
   ];
@@ -33,8 +33,8 @@ export const generateContentWithWordCount = (keyword: string, targetWordCount: n
   ];
 
   const transitionPhrases = [
-    `Par ailleurs,`,
-    `En outre,`,
+    `<strong>Par ailleurs</strong>,`,
+    `<em>En outre</em>,`,
     `De plus,`,
     `Il est important de noter que`,
     `À cela s'ajoute que`
@@ -65,7 +65,9 @@ export const generateContentWithWordCount = (keyword: string, targetWordCount: n
     const shuffledTransitions = [...transitionPhrases].sort(() => 0.5 - Math.random());
     
     if (useContext && shuffledContext.length > 0) {
-      content = shuffledContext[0] + ' ';
+      content = `<p>${shuffledContext[0]} `;
+    } else {
+      content = '<p>';
     }
     
     let phraseIndex = 0;
@@ -77,7 +79,7 @@ export const generateContentWithWordCount = (keyword: string, targetWordCount: n
       phraseIndex++;
     }
     
-    return content;
+    return content + '</p>';
   };
 
   const introWords = Math.max(Math.floor(targetWordCount * 0.2), 30);
@@ -88,18 +90,17 @@ export const generateContentWithWordCount = (keyword: string, targetWordCount: n
     intro: generateParagraph(introductoryPhrases, introWords),
     sections: [
       {
-        heading: `Les Fondamentaux de ${boldKeyword}`,
+        heading: `<h2>Les Fondamentaux de ${boldKeyword}</h2>`,
         content: `${generateParagraph(bodyPhrases, sectionWords)}\n\n<ul class="list-disc pl-6 my-4">\n${generateBulletPoints(3)}\n</ul>`
       },
       {
-        heading: `Optimisation et Mise en Œuvre de ${boldKeyword}`,
+        heading: `<h2>Optimisation et Mise en Œuvre de ${boldKeyword}</h2>`,
         content: `${generateParagraph(bodyPhrases, sectionWords)}\n\n<ul class="list-disc pl-6 my-4">\n${generateBulletPoints(3)}\n</ul>`
       },
       {
-        heading: `Tendances et Innovations pour ${boldKeyword}`,
-        content: `${generateParagraph(bodyPhrases, sectionWords)}\n\n<ul class="list-disc pl-6 my-4">\n${generateBulletPoints(3)}\n</ul>`
+        heading: `<h2>Tendances et Innovations pour ${boldKeyword}</h2>`,
+        content: `${generateParagraph(bodyPhrases, sectionWords)}\n\n<blockquote class="border-l-4 border-primary pl-4 py-2 my-4 italic bg-primary/5">\nL'innovation continue dans le domaine de ${boldKeyword} est un facteur clé pour maintenir un avantage compétitif sur le long terme.\n</blockquote>\n\n<ul class="list-disc pl-6 my-4">\n${generateBulletPoints(3)}\n</ul>`
       }
     ]
   };
 };
-

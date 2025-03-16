@@ -27,7 +27,7 @@ const SubtitleOverlay: React.FC<SubtitleOverlayProps> = ({ subtitles, currentTim
   if (!currentSubtitle) return null;
 
   return (
-    <div className="absolute bottom-16 left-0 right-0 flex flex-col items-center space-y-2 p-4">
+    <div className="absolute bottom-16 left-0 right-0 flex flex-col items-center space-y-2 p-4 z-30">
       <AnimatePresence mode="wait">
         <motion.div
           key={`original-${currentTime}`}
@@ -35,9 +35,9 @@ const SubtitleOverlay: React.FC<SubtitleOverlayProps> = ({ subtitles, currentTim
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.3 }}
-          className="bg-black/75 px-6 py-3 rounded-lg shadow-lg max-w-2xl"
+          className="bg-black/75 px-6 py-3 rounded-lg shadow-lg max-w-2xl backdrop-blur-md"
         >
-          <p className="text-[#FEC6A1] text-xl font-semibold text-center">
+          <p className="text-[#FEC6A1] text-xl font-semibold text-center drop-shadow-sm">
             {currentSubtitle.text}
           </p>
         </motion.div>
@@ -50,9 +50,9 @@ const SubtitleOverlay: React.FC<SubtitleOverlayProps> = ({ subtitles, currentTim
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.3, delay: 0.1 }}
-          className="bg-primary/75 px-6 py-3 rounded-lg shadow-lg backdrop-blur-sm max-w-2xl"
+          className="bg-primary/75 px-6 py-3.5 rounded-lg shadow-lg backdrop-blur-md max-w-2xl border border-primary/20"
         >
-          <p className="text-[#E5DEFF] text-xl font-semibold text-center">
+          <p className="text-[#E5DEFF] text-xl font-semibold text-center drop-shadow-sm">
             {currentSubtitle.translation}
           </p>
         </motion.div>
