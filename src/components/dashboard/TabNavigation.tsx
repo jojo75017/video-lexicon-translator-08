@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Link } from "react-router-dom";
 import { 
   Search, Globe, Database, Link2, ChartBar, Settings, Hash, Pen, 
   FileText, Book, BarChart2, ExternalLink, Rocket, Zap, 
@@ -29,7 +30,7 @@ const TabNavigation = () => {
     { id: 'content', icon: Book, label: 'Contenu', color: 'text-orange-600', group: 'content' },
     { id: 'optimize', icon: Zap, label: 'Optimisation', color: 'text-blue-600', group: 'content' },
     { id: 'ideas', icon: Lightbulb, label: 'Idées', color: 'text-yellow-600', group: 'content' },
-    { id: 'quora', icon: MessageSquareText, label: 'Quora', color: 'text-[#b92b27]', group: 'content', isNew: true },
+    { id: 'quora', icon: MessageSquareText, label: 'Quora', color: 'text-[#b92b27]', group: 'content', isNew: true, link: '/quora' },
     
     // Technique
     { id: 'advanced', icon: Settings, label: 'Avancé', color: 'text-rose-600', group: 'tech' },
@@ -80,26 +81,48 @@ const TabNavigation = () => {
           {Object.entries(groupedTabs).map(([groupName, groupTabs], groupIndex) => (
             <div key={groupName} className="flex-1 flex flex-col items-center min-w-fit">
               <div className="flex flex-wrap gap-1 justify-center">
-                {groupTabs.map(({ id, icon: Icon, label, color, isNew }) => (
+                {groupTabs.map(({ id, icon: Icon, label, color, isNew, link }) => (
                   <Tooltip key={id}>
                     <TooltipTrigger asChild>
-                      <TabsTrigger 
-                        value={id}
-                        data-value={id}
-                        className={`flex items-center gap-1 px-3 py-1.5 rounded-md relative group transition-all duration-200 hover:bg-white`}
-                      >
-                        <span className="absolute -top-1 -right-1 transform translate-x-1/2 -translate-y-1/2 z-10">
-                          {isNew && (
-                            <Badge variant="default" className="text-[10px] py-0 px-1.5 h-auto bg-[#b92b27] text-white">
-                              Nouveau
-                            </Badge>
-                          )}
-                        </span>
-                        <Icon className={`w-4 h-4 ${color}`} />
-                        <span className="font-medium text-sm">{label}</span>
-                        
-                        <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 rounded-md transition-opacity"></span>
-                      </TabsTrigger>
+                      {link ? (
+                        <Link to={link} className="inline-block">
+                          <div 
+                            className={`flex items-center gap-1 px-3 py-1.5 rounded-md relative group transition-all duration-200 hover:bg-white cursor-pointer ${
+                              id === 'quora' ? 'bg-[#b92b27]/10' : ''
+                            }`}
+                          >
+                            <span className="absolute -top-1 -right-1 transform translate-x-1/2 -translate-y-1/2 z-10">
+                              {isNew && (
+                                <Badge variant="default" className="text-[10px] py-0 px-1.5 h-auto bg-[#b92b27] text-white animate-pulse">
+                                  Nouveau
+                                </Badge>
+                              )}
+                            </span>
+                            <Icon className={`w-4 h-4 ${color}`} />
+                            <span className="font-medium text-sm">{label}</span>
+                            
+                            <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 rounded-md transition-opacity"></span>
+                          </div>
+                        </Link>
+                      ) : (
+                        <TabsTrigger 
+                          value={id}
+                          data-value={id}
+                          className={`flex items-center gap-1 px-3 py-1.5 rounded-md relative group transition-all duration-200 hover:bg-white`}
+                        >
+                          <span className="absolute -top-1 -right-1 transform translate-x-1/2 -translate-y-1/2 z-10">
+                            {isNew && (
+                              <Badge variant="default" className="text-[10px] py-0 px-1.5 h-auto bg-[#b92b27] text-white">
+                                Nouveau
+                              </Badge>
+                            )}
+                          </span>
+                          <Icon className={`w-4 h-4 ${color}`} />
+                          <span className="font-medium text-sm">{label}</span>
+                          
+                          <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 rounded-md transition-opacity"></span>
+                        </TabsTrigger>
+                      )}
                     </TooltipTrigger>
                     <TooltipContent>
                       <p className="text-xs">Accéder à {label}</p>

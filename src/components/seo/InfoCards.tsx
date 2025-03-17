@@ -5,7 +5,9 @@ import LinkBuilding from '@/components/seo/LinkBuilding';
 import OrganicSearch from '@/components/seo/OrganicSearch';
 import DomainOverview from '@/components/seo/DomainOverview';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Globe, Search, Link2 } from 'lucide-react';
+import { Globe, Search, Link2, MessageSquareText } from 'lucide-react';
+import { Badge } from "@/components/ui/badge";
+import { Link } from "react-router-dom";
 
 const InfoCards = () => {
   return (
@@ -29,6 +31,13 @@ const InfoCards = () => {
             <Link2 className="h-4 w-4 text-blue-600" /> 
             <span>Backlinks</span>
           </TabsTrigger>
+          <Link to="/quora" className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#b92b27]/10 hover:bg-[#b92b27]/20 transition-colors">
+            <MessageSquareText className="h-4 w-4 text-[#b92b27]" />
+            <span className="text-sm font-medium text-[#b92b27]">Quora</span>
+            <Badge variant="default" className="text-[10px] py-0 px-1.5 h-auto bg-[#b92b27] text-white animate-pulse">
+              Nouveau
+            </Badge>
+          </Link>
         </TabsList>
         
         <TabsContent value="domain" className="p-4 bg-white rounded-lg border border-gray-100">
