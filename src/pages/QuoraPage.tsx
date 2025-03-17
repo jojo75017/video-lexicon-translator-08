@@ -15,6 +15,7 @@ const QuoraPage = () => {
   const [response, setResponse] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [generatedResponse, setGeneratedResponse] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,15 +38,24 @@ const QuoraPage = () => {
       return;
     }
 
-    const content = generateQuoraContent(
-      question,
-      500,
-      undefined,
-      'expert'
-    );
+    setIsGenerating(true);
+    
+    try {
+      const content = generateQuoraContent(
+        question,
+        800,
+        undefined,
+        'expert'
+      );
 
-    setGeneratedResponse(content.answer);
-    toast.success("Réponse générée avec succès");
+      setGeneratedResponse(content.answer);
+      toast.success("Réponse générée avec succès");
+    } catch (error) {
+      console.error("Erreur lors de la génération de la réponse:", error);
+      toast.error("Une erreur est survenue lors de la génération de la réponse");
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const useGeneratedResponse = () => {
@@ -120,8 +130,9 @@ const QuoraPage = () => {
                   variant="outline" 
                   size="sm"
                   className="text-xs border-[#b92b27] text-[#b92b27] hover:bg-[#b92b27]/10"
+                  disabled={isGenerating}
                 >
-                  Générer une réponse professionnelle
+                  {isGenerating ? "Génération en cours..." : "Générer une réponse professionnelle"}
                 </Button>
               </div>
             </div>
@@ -159,6 +170,7 @@ const QuoraPage = () => {
             <Button 
               type="submit" 
               className="w-full bg-[#b92b27] hover:bg-[#a02622] text-white"
+              disabled={isGenerating}
             >
               Publier ma réponse
             </Button>

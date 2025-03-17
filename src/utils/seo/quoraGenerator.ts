@@ -25,20 +25,25 @@ export const generateQuoraContent = (
     quoraTitle = `Comment ${keyword} a transformé mon entreprise - Un témoignage concret`;
   }
   
-  // Générer une question basée sur le style et le mot-clé
+  // Utiliser la question directement si elle est fournie, sinon générer une question
   let quoraQuestion = '';
   
-  if (style === 'professional') {
-    quoraQuestion = `Quelles sont les meilleures stratégies pour optimiser ${keyword} en 2024 pour des résultats concrets ?`;
-  } else if (style === 'conversational') {
-    quoraQuestion = `Comment puis-je utiliser ${keyword} efficacement pour mon business en 2024 ?`;
-  } else if (style === 'expert') {
-    quoraQuestion = `En tant qu'expert, quelles innovations voyez-vous dans le domaine de ${keyword} pour 2024 ?`;
-  } else if (style === 'storytelling') {
-    quoraQuestion = `Comment avez-vous réussi à transformer votre entreprise grâce à ${keyword} ?`;
+  if (keyword.includes('?')) {
+    // Si le mot-clé contient un point d'interrogation, c'est probablement déjà une question
+    quoraQuestion = keyword;
   } else {
-    // Utiliser la question directement comme mot-clé si c'est une phrase complète
-    quoraQuestion = keyword.length > 30 ? keyword : `Quelles sont les meilleures pratiques concernant ${keyword} ?`;
+    // Sinon, générer une question basée sur le style et le mot-clé
+    if (style === 'professional') {
+      quoraQuestion = `Quelles sont les meilleures stratégies pour optimiser ${keyword} en 2024 pour des résultats concrets ?`;
+    } else if (style === 'conversational') {
+      quoraQuestion = `Comment puis-je utiliser ${keyword} efficacement pour mon business en 2024 ?`;
+    } else if (style === 'expert') {
+      quoraQuestion = `En tant qu'expert, quelles innovations voyez-vous dans le domaine de ${keyword} pour 2024 ?`;
+    } else if (style === 'storytelling') {
+      quoraQuestion = `Comment avez-vous réussi à transformer votre entreprise grâce à ${keyword} ?`;
+    } else {
+      quoraQuestion = keyword.length > 30 ? keyword : `Quelles sont les meilleures pratiques concernant ${keyword} ?`;
+    }
   }
   
   // Générer une base de réponse selon le style
