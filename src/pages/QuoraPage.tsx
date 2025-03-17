@@ -41,6 +41,7 @@ const QuoraPage = () => {
     setIsGenerating(true);
     
     try {
+      // Generate AI response based on the question
       const content = generateQuoraContent(
         question,
         800,
