@@ -8,11 +8,13 @@ import { MessageSquareText } from 'lucide-react';
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { generateQuoraContent } from "@/utils/seo/quoraGenerator";
 
 const QuoraPage = () => {
   const [question, setQuestion] = useState("");
   const [response, setResponse] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [generatedResponse, setGeneratedResponse] = useState("");
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,17 +23,46 @@ const QuoraPage = () => {
       return;
     }
     
-    setIsSubmitted(true);
-    toast.success("Votre réponse a été enregistrée !");
+    if (response.trim()) {
+      setIsSubmitted(true);
+      toast.success("Votre réponse a été enregistrée !");
+    } else {
+      toast.error("Veuillez saisir une réponse");
+    }
+  };
+
+  const handleGenerateResponse = () => {
+    if (!question.trim()) {
+      toast.error("Veuillez d'abord saisir une question");
+      return;
+    }
+
+    const content = generateQuoraContent(
+      question,
+      500,
+      undefined,
+      'expert'
+    );
+
+    setGeneratedResponse(content.answer);
+    toast.success("Réponse générée avec succès");
+  };
+
+  const useGeneratedResponse = () => {
+    setResponse(generatedResponse);
+    setGeneratedResponse("");
+    toast.success("Réponse ajoutée au formulaire");
   };
   
   return (
     <div className="container mx-auto py-6 space-y-6">
-      <PageHeader
-        title="Quora - Questions et Réponses"
-        description="Gérez et optimisez votre présence sur Quora pour améliorer votre visibilité"
-        icon={<MessageSquareText className="h-6 w-6 text-[#b92b27]" />}
-      />
+      <div>
+        <PageHeader 
+          title="Quora - Questions et Réponses"
+          description="Gérez et optimisez votre présence sur Quora pour améliorer votre visibilité"
+          icon={<MessageSquareText className="h-6 w-6 text-[#b92b27]" />}
+        />
+      </div>
       
       <TabNavigation />
       
@@ -82,7 +113,35 @@ const QuoraPage = () => {
                 placeholder="Quelle est votre question ?"
                 className="min-h-[80px]"
               />
+              <div className="flex justify-end">
+                <Button 
+                  type="button" 
+                  onClick={handleGenerateResponse}
+                  variant="outline" 
+                  size="sm"
+                  className="text-xs border-[#b92b27] text-[#b92b27] hover:bg-[#b92b27]/10"
+                >
+                  Générer une réponse professionnelle
+                </Button>
+              </div>
             </div>
+            
+            {generatedResponse && (
+              <div className="space-y-2 bg-[#b92b27]/5 p-4 rounded-lg border border-[#b92b27]/20">
+                <div className="flex justify-between items-center">
+                  <h3 className="font-semibold text-[#b92b27]">Réponse générée</h3>
+                  <Button 
+                    type="button" 
+                    onClick={useGeneratedResponse}
+                    size="sm" 
+                    className="bg-[#b92b27] hover:bg-[#a02622] text-white text-xs"
+                  >
+                    Utiliser cette réponse
+                  </Button>
+                </div>
+                <p className="text-sm whitespace-pre-wrap">{generatedResponse}</p>
+              </div>
+            )}
             
             <div className="space-y-2">
               <label htmlFor="response" className="block text-sm font-medium">
