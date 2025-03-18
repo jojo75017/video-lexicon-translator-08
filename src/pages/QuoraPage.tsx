@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import PageHeader from "@/components/dashboard/PageHeader";
 import TabNavigation from "@/components/dashboard/TabNavigation";
@@ -39,6 +39,7 @@ const QuoraPage = () => {
     }
 
     setIsGenerating(true);
+    setGeneratedResponse(""); // Réinitialiser la réponse générée précédente
     
     try {
       // Generate AI response based on the question
@@ -50,8 +51,15 @@ const QuoraPage = () => {
       );
 
       console.log("Generated content:", content); // Debug log
-      setGeneratedResponse(content.answer);
-      toast.success("Réponse générée avec succès");
+      
+      // On vérifie si content.answer existe et n'est pas vide
+      if (content && content.answer) {
+        setGeneratedResponse(content.answer);
+        toast.success("Réponse générée avec succès");
+      } else {
+        console.error("La réponse générée est vide");
+        toast.error("Erreur: La réponse générée est vide");
+      }
     } catch (error) {
       console.error("Erreur lors de la génération de la réponse:", error);
       toast.error("Une erreur est survenue lors de la génération de la réponse");
@@ -60,10 +68,18 @@ const QuoraPage = () => {
     }
   };
 
+  useEffect(() => {
+    // Afficher le state génératedResponse dans la console pour débogage
+    console.log("État de generatedResponse:", generatedResponse);
+  }, [generatedResponse]);
+
   const useGeneratedResponse = () => {
-    setResponse(generatedResponse);
-    setGeneratedResponse("");
-    toast.success("Réponse ajoutée au formulaire");
+    if (generatedResponse) {
+      setResponse(generatedResponse);
+      toast.success("Réponse ajoutée au formulaire");
+    } else {
+      toast.error("Aucune réponse générée à utiliser");
+    }
   };
   
   return (
