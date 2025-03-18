@@ -171,7 +171,7 @@ J'espère que ces insights vous aideront à aborder cette question avec une pers
     quoraAnswer += `\n\nPour une analyse plus détaillée et des ressources pratiques sur ${keyword}, je vous invite à consulter ce guide complet: [Ressources et stratégies avancées](${includeLink})`;
   }
   
-  // Ajouter des topics pertinents
+  // Fonction pour générer des topics pertinents
   const generateTopics = (keyword: string) => {
     const keywordLower = keyword.toLowerCase();
     let baseTopics = ["Business", "Stratégie", "Innovation", "Management"];
