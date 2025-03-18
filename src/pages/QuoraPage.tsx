@@ -49,6 +49,7 @@ const QuoraPage = () => {
         'expert'
       );
 
+      console.log("Generated content:", content); // Debug log
       setGeneratedResponse(content.answer);
       toast.success("Réponse générée avec succès");
     } catch (error) {
@@ -151,7 +152,7 @@ const QuoraPage = () => {
                     Utiliser cette réponse
                   </Button>
                 </div>
-                <p className="text-sm whitespace-pre-wrap">{generatedResponse}</p>
+                <div className="text-sm whitespace-pre-wrap mt-2">{generatedResponse}</div>
               </div>
             )}
             
