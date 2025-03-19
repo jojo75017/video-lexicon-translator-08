@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
@@ -21,6 +22,7 @@ import AdvancedSection from '@/components/seo/AdvancedSection';
 import IntegrationsSection from '@/components/seo/IntegrationsSection';
 import QuoraButton from '@/components/seo/buttons/QuoraButton';
 import ContentOptimizationButton from '@/components/seo/buttons/ContentOptimizationButton';
+import AiSearchButton from '@/components/seo/buttons/AiSearchButton';
 import EnhancedAnalytics from '@/components/seo/EnhancedAnalytics';
 import ContentOptimizationTabs from '@/components/seo/ContentOptimizationTabs';
 import AiSearchTab from '@/components/seo/AiSearchTab';
@@ -156,6 +158,7 @@ const Index = () => {
             <DashboardHeader />
             <div className="flex flex-wrap gap-2">
               <ContentOptimizationButton />
+              <AiSearchButton />
               <QuoraButton />
             </div>
           </div>
@@ -257,11 +260,12 @@ const Index = () => {
               <h2 className="text-2xl font-bold text-gradient-to-r from-indigo-600 to-purple-600">Nouvelles fonctionnalités</h2>
               <div className="flex gap-2">
                 <ContentOptimizationButton />
+                <AiSearchButton />
                 <QuoraButton />
               </div>
             </div>
             <p className="text-gray-700 mb-4">
-              Nos nouvelles intégrations vous permettent d'optimiser votre contenu et de préparer rapidement des questions pour Quora afin d'améliorer votre visibilité et votre autorité dans votre domaine.
+              Nos nouvelles intégrations vous permettent d'optimiser votre contenu, de faire des recherches IA, et de préparer rapidement des questions pour Quora afin d'améliorer votre visibilité et votre autorité dans votre domaine.
             </p>
           </div>
           
