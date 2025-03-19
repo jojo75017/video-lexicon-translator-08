@@ -33,11 +33,7 @@ export interface SeoAnalysis {
   h1Count: number;
   h2Count: number;
   h3Count: number;
-  headings: {
-    text: string;
-    level: number;
-    position: number;
-  }[];
+  headings: HeadingStructure[];
   paragraphs: {
     text: string;
     position: number;
@@ -146,11 +142,13 @@ export interface BacklinkInfo {
   followType: 'follow' | 'nofollow';
   authority: number;
   date: string;
+  // Add properties that were causing errors
+  isDoFollow?: boolean;
+  firstSeen?: string;
 }
 
 export interface ImageAnalysis {
   url: string;
-  alt: string | null;
   dimensions: {
     width: number;
     height: number;
@@ -159,6 +157,9 @@ export interface ImageAnalysis {
   format: string;
   lazyLoaded: boolean;
   compressed: boolean;
+  // Add properties that were causing errors
+  hasAlt?: boolean;
+  alt?: string;
 }
 
 export interface ImageDetails {
@@ -184,6 +185,9 @@ export interface KeywordSuggestion {
   competition: number;
   cpc: number;
   relevance: number;
+  // Add properties that were causing errors
+  difficulty?: number;
+  volume?: number;
 }
 
 export interface Performance {
@@ -206,6 +210,12 @@ export interface Performance {
     fonts: number;
     other: number;
   };
+  // Add properties that were causing errors
+  totalSize?: number;
+  styleCount?: number;
+  responseTime?: number;
+  impressions?: number;
+  clickThroughRate?: number;
 }
 
 export interface SocialMetrics {
@@ -217,9 +227,13 @@ export interface SocialMetrics {
   twitter: {
     shares: number;
     likes: number;
+    // Add missing property
+    replies?: number;
   };
   linkedin: {
     shares: number;
+    // Add missing property
+    engagements?: number;
   };
   pinterest: {
     pins: number;
@@ -249,6 +263,9 @@ export interface SearchConsoleData {
     clicks: number;
     impressions: number;
   }[];
+  // Add missing property
+  topQueries?: any[];
+  topPages?: any[];
 }
 
 export interface SecurityHeaders {
@@ -272,4 +289,11 @@ export interface SiteStructure {
       children: any[];
     }[];
   }[];
+}
+
+// Additional interface for broken links
+export interface BrokenLink {
+  url: string;
+  statusCode: number;
+  message: string;
 }
