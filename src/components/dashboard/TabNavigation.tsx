@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link } from "react-router-dom";
 import { 
   Search, Globe, Database, Link2, ChartBar, Settings, Hash, Pen, 
@@ -30,7 +30,7 @@ const TabNavigation = () => {
     { id: 'content', icon: Book, label: 'Contenu', color: 'text-orange-600', group: 'content' },
     { id: 'optimize', icon: Zap, label: 'Optimisation', color: 'text-blue-600', group: 'content', isNew: true },
     { id: 'ideas', icon: Lightbulb, label: 'Idées', color: 'text-yellow-600', group: 'content' },
-    { id: 'quora', icon: MessageSquareText, label: 'Quora', color: 'text-[#b92b27]', group: 'content', isNew: true, link: '/quora' },
+    { id: 'quora', icon: MessageSquareText, label: 'Quora', color: 'text-[#b92b27]', group: 'content', isNew: true, link: '/QuoraPage' },
     { id: 'airesearch', icon: BrainCircuit, label: 'Recherche IA', color: 'text-purple-700', group: 'content', isNew: true, highlighted: true },
     
     // Technique
@@ -69,33 +69,55 @@ const TabNavigation = () => {
 
   return (
     <TooltipProvider>
-      <TabsList className="w-full flex flex-col overflow-hidden justify-between bg-white shadow-md rounded-lg p-3 mb-6 border border-gray-100">
-        <div className="grid grid-cols-6 gap-2 text-xs font-medium text-gray-500 mb-2 px-2">
-          {Object.entries(groupLabels).map(([key, label]) => (
-            <div key={key} className="flex items-center justify-center">
-              {label}
-            </div>
-          ))}
-        </div>
-        
-        <div className="flex overflow-x-auto justify-between bg-gray-50 rounded-md p-2">
-          {Object.entries(groupedTabs).map(([groupName, groupTabs], groupIndex) => (
-            <div key={groupName} className="flex-1 flex flex-col items-center min-w-fit">
-              <div className="flex flex-wrap gap-1 justify-center">
-                {groupTabs.map(({ id, icon: Icon, label, color, isNew, link, highlighted }) => (
-                  <Tooltip key={id}>
-                    <TooltipTrigger asChild>
-                      {link ? (
-                        <Link to={link} className="inline-block">
-                          <div 
-                            className={`flex items-center gap-1 px-3 py-1.5 rounded-md relative group transition-all duration-200 hover:bg-white cursor-pointer ${
-                              id === 'quora' ? 'bg-[#b92b27]/10' : 
+      <Tabs defaultValue="seo" className="w-full">
+        <div className="w-full flex flex-col overflow-hidden justify-between bg-white shadow-md rounded-lg p-3 mb-6 border border-gray-100">
+          <div className="grid grid-cols-6 gap-2 text-xs font-medium text-gray-500 mb-2 px-2">
+            {Object.entries(groupLabels).map(([key, label]) => (
+              <div key={key} className="flex items-center justify-center">
+                {label}
+              </div>
+            ))}
+          </div>
+          
+          <TabsList className="flex overflow-x-auto justify-between bg-gray-50 rounded-md p-2">
+            {Object.entries(groupedTabs).map(([groupName, groupTabs], groupIndex) => (
+              <div key={groupName} className="flex-1 flex flex-col items-center min-w-fit">
+                <div className="flex flex-wrap gap-1 justify-center">
+                  {groupTabs.map(({ id, icon: Icon, label, color, isNew, link, highlighted }) => (
+                    <Tooltip key={id}>
+                      <TooltipTrigger asChild>
+                        {link ? (
+                          <Link to={link} className="inline-block">
+                            <div 
+                              className={`flex items-center gap-1 px-3 py-1.5 rounded-md relative group transition-all duration-200 hover:bg-white cursor-pointer ${
+                                id === 'quora' ? 'bg-[#b92b27]/10' : 
+                                highlighted ? 'bg-purple-100' : ''
+                              }`}
+                            >
+                              <span className="absolute -top-1 -right-1 transform translate-x-1/2 -translate-y-1/2 z-10">
+                                {isNew && (
+                                  <Badge variant="default" className="text-[10px] py-0 px-1.5 h-auto bg-[#b92b27] text-white animate-pulse">
+                                    Nouveau
+                                  </Badge>
+                                )}
+                              </span>
+                              <Icon className={`w-4 h-4 ${color}`} />
+                              <span className="font-medium text-sm">{label}</span>
+                              
+                              <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 rounded-md transition-opacity"></span>
+                            </div>
+                          </Link>
+                        ) : (
+                          <TabsTrigger 
+                            value={id}
+                            data-value={id}
+                            className={`flex items-center gap-1 px-3 py-1.5 rounded-md relative group transition-all duration-200 hover:bg-white ${
                               highlighted ? 'bg-purple-100' : ''
                             }`}
                           >
                             <span className="absolute -top-1 -right-1 transform translate-x-1/2 -translate-y-1/2 z-10">
                               {isNew && (
-                                <Badge variant="default" className="text-[10px] py-0 px-1.5 h-auto bg-[#b92b27] text-white animate-pulse">
+                                <Badge variant="default" className="text-[10px] py-0 px-1.5 h-auto bg-[#b92b27] text-white">
                                   Nouveau
                                 </Badge>
                               )}
@@ -104,40 +126,20 @@ const TabNavigation = () => {
                             <span className="font-medium text-sm">{label}</span>
                             
                             <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 rounded-md transition-opacity"></span>
-                          </div>
-                        </Link>
-                      ) : (
-                        <TabsTrigger 
-                          value={id}
-                          data-value={id}
-                          className={`flex items-center gap-1 px-3 py-1.5 rounded-md relative group transition-all duration-200 hover:bg-white ${
-                            highlighted ? 'bg-purple-100' : ''
-                          }`}
-                        >
-                          <span className="absolute -top-1 -right-1 transform translate-x-1/2 -translate-y-1/2 z-10">
-                            {isNew && (
-                              <Badge variant="default" className="text-[10px] py-0 px-1.5 h-auto bg-[#b92b27] text-white">
-                                Nouveau
-                              </Badge>
-                            )}
-                          </span>
-                          <Icon className={`w-4 h-4 ${color}`} />
-                          <span className="font-medium text-sm">{label}</span>
-                          
-                          <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 rounded-md transition-opacity"></span>
-                        </TabsTrigger>
-                      )}
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p className="text-xs">Accéder à {label}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                ))}
+                          </TabsTrigger>
+                        )}
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="text-xs">Accéder à {label}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </TabsList>
         </div>
-      </TabsList>
+      </Tabs>
     </TooltipProvider>
   );
 };
