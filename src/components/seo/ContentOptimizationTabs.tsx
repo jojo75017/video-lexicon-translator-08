@@ -1,331 +1,356 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { FileText, Search, BarChart, FileCheck, Award, Edit, Check, AlertTriangle, Clock } from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import PerformanceMetrics from '@/components/PerformanceMetrics';
+import {
+  BarChart,
+  BookOpen,
+  FileText,
+  Layers,
+  Search,
+  Wand2
+} from 'lucide-react';
+import MetaContentGenerator from './MetaContentGenerator';
 
-const ContentOptimizationTabs = () => {
-  const [readabilityScore, setReadabilityScore] = useState(78);
-  const [keywordScore, setKeywordScore] = useState(65);
-  const [seoScore, setSeoScore] = useState(82);
-  
-  // Exemples de suggestions d'optimisation
-  const seoSuggestions = [
-    { 
-      type: 'success', 
-      message: 'Votre balise titre est bien optimisée', 
-      icon: <Check className="h-4 w-4 text-green-500" /> 
-    },
-    { 
-      type: 'warning', 
-      message: 'Ajoutez plus de liens internes vers vos pages importantes', 
-      icon: <AlertTriangle className="h-4 w-4 text-yellow-500" /> 
-    },
-    { 
-      type: 'error', 
-      message: 'Vos images n\'ont pas toutes un attribut ALT', 
-      icon: <AlertTriangle className="h-4 w-4 text-red-500" /> 
-    },
-  ];
-  
-  const readabilitySuggestions = [
-    { 
-      type: 'warning', 
-      message: 'Vos phrases sont parfois trop longues (plus de 20 mots)', 
-      icon: <AlertTriangle className="h-4 w-4 text-yellow-500" /> 
-    },
-    { 
-      type: 'success', 
-      message: 'Bonne utilisation des paragraphes courts', 
-      icon: <Check className="h-4 w-4 text-green-500" /> 
-    },
-  ];
-  
-  const contentStructure = [
-    { type: 'h1', content: 'Comment optimiser son contenu pour le SEO en 2023', score: 95 },
-    { type: 'h2', content: 'Les fondamentaux du SEO on-page', score: 90 },
-    { type: 'p', content: 'Paragraphe d\'introduction sur les bases du SEO...', score: 85 },
-    { type: 'h3', content: 'Optimisation des balises meta', score: 80 },
-    { type: 'p', content: 'Paragraphe sur l\'importance des balises meta...', score: 75 },
-    { type: 'h2', content: 'La recherche de mots-clés', score: 90 },
-    { type: 'p', content: 'Paragraphe sur les techniques de recherche de mots-clés...', score: 80 },
-  ];
-  
-  const keywordAnalysis = [
-    { keyword: 'optimisation contenu', density: 1.2, positions: [1, 45, 120, 350], score: 85 },
-    { keyword: 'seo', density: 0.8, positions: [10, 80, 200], score: 80 },
-    { keyword: 'mots-clés', density: 0.6, positions: [150, 320], score: 70 },
-  ];
-  
-  // Calcul du score d'un élément en fonction de sa couleur
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return 'bg-green-500';
-    if (score >= 60) return 'bg-yellow-500';
-    return 'bg-red-500';
+interface Performance {
+  score: number;
+  metrics: {
+    textLength: number;
+    readingTime: number;
+    density: number;
+    // Remove mediaCount since it doesn't exist in the type
   };
-  
+}
+
+interface Content {
+  title: string;
+  meta: string;
+  headings: string[];
+  body: string;
+  performance: Performance;
+}
+
+interface ContentOptimizationTabsProps {
+  content?: Content;
+}
+
+const ContentOptimizationTabs: React.FC<ContentOptimizationTabsProps> = ({ content }) => {
+  // Sample Content if none is provided
+  const sampleContent: Content = content || {
+    title: "Guide complet sur l'optimisation SEO pour les débutants",
+    meta: "Découvrez les meilleures pratiques SEO pour améliorer votre classement dans les moteurs de recherche. Guide pas à pas pour débutants.",
+    headings: [
+      "Les fondamentaux du SEO",
+      "Optimisation on-page",
+      "Optimisation off-page",
+      "Analyse technique",
+      "Mesurer vos résultats"
+    ],
+    body: "Le SEO (Search Engine Optimization) est un ensemble de techniques visant à améliorer la visibilité d'un site web dans les résultats des moteurs de recherche. Une bonne stratégie SEO combine des éléments techniques, du contenu de qualité et une stratégie de liens externes...",
+    performance: {
+      score: 78,
+      metrics: {
+        textLength: 1250,
+        readingTime: 5,
+        density: 2.3,
+      }
+    }
+  };
+
+  const activeContent = content || sampleContent;
+
   return (
-    <Card className="p-6">
-      <h3 className="text-xl font-semibold mb-6">Optimisation de contenu avancée</h3>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="p-4 bg-green-50 rounded-lg">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <FileCheck className="h-5 w-5 text-green-600" />
-              <span className="font-medium">Score SEO</span>
-            </div>
-            <span className="text-lg font-bold">{seoScore}/100</span>
-          </div>
-          <Progress value={seoScore} className="h-2 mb-1" />
-          <p className="text-sm text-green-700">Bon score, quelques optimisations possibles</p>
-        </div>
-        
-        <div className="p-4 bg-yellow-50 rounded-lg">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-yellow-600" />
-              <span className="font-medium">Lisibilité</span>
-            </div>
-            <span className="text-lg font-bold">{readabilityScore}/100</span>
-          </div>
-          <Progress value={readabilityScore} className="h-2 mb-1" />
-          <p className="text-sm text-yellow-700">Niveau intermédiaire, accessible au grand public</p>
-        </div>
-        
-        <div className="p-4 bg-blue-50 rounded-lg">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <Search className="h-5 w-5 text-blue-600" />
-              <span className="font-medium">Mots-clés</span>
-            </div>
-            <span className="text-lg font-bold">{keywordScore}/100</span>
-          </div>
-          <Progress value={keywordScore} className="h-2 mb-1" />
-          <p className="text-sm text-blue-700">Optimisez davantage vos mots-clés secondaires</p>
-        </div>
-      </div>
-      
-      <Tabs defaultValue="seo">
-        <TabsList className="mb-4">
-          <TabsTrigger value="seo" className="flex items-center gap-2">
-            <Award className="h-4 w-4" />
-            <span>Optimisation SEO</span>
-          </TabsTrigger>
-          <TabsTrigger value="readability" className="flex items-center gap-2">
-            <Edit className="h-4 w-4" />
-            <span>Lisibilité</span>
-          </TabsTrigger>
-          <TabsTrigger value="structure" className="flex items-center gap-2">
-            <FileText className="h-4 w-4" />
-            <span>Structure</span>
-          </TabsTrigger>
-          <TabsTrigger value="keywords" className="flex items-center gap-2">
-            <Search className="h-4 w-4" />
-            <span>Mots-clés</span>
-          </TabsTrigger>
-          <TabsTrigger value="performance" className="flex items-center gap-2">
-            <Clock className="h-4 w-4" />
-            <span>Performance</span>
-          </TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="seo" className="space-y-4">
-          <div className="bg-gray-50 p-4 rounded-lg mb-4">
-            <h4 className="text-lg font-medium mb-2">Suggestions d'optimisation SEO</h4>
-            <div className="space-y-3">
-              {seoSuggestions.map((suggestion, index) => (
-                <div 
-                  key={index} 
-                  className={`p-3 rounded-md flex items-start gap-3 ${
-                    suggestion.type === 'success' ? 'bg-green-50 border border-green-200' : 
-                    suggestion.type === 'warning' ? 'bg-yellow-50 border border-yellow-200' : 
-                    'bg-red-50 border border-red-200'
-                  }`}
-                >
-                  {suggestion.icon}
-                  <p className="text-sm">{suggestion.message}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <Tabs defaultValue="generator" className="space-y-4">
+      <TabsList className="grid grid-cols-6 h-auto p-1">
+        <TabsTrigger value="generator" className="flex items-center gap-2 py-2">
+          <Wand2 className="h-4 w-4" />
+          <span className="hidden sm:inline">Générateur IA</span>
+        </TabsTrigger>
+        <TabsTrigger value="structure" className="flex items-center gap-2 py-2">
+          <Layers className="h-4 w-4" />
+          <span className="hidden sm:inline">Structure</span>
+        </TabsTrigger>
+        <TabsTrigger value="keywords" className="flex items-center gap-2 py-2">
+          <Search className="h-4 w-4" />
+          <span className="hidden sm:inline">Mots-clés</span>
+        </TabsTrigger>
+        <TabsTrigger value="readability" className="flex items-center gap-2 py-2">
+          <BookOpen className="h-4 w-4" />
+          <span className="hidden sm:inline">Lisibilité</span>
+        </TabsTrigger>
+        <TabsTrigger value="seo" className="flex items-center gap-2 py-2">
+          <FileText className="h-4 w-4" />
+          <span className="hidden sm:inline">SEO</span>
+        </TabsTrigger>
+        <TabsTrigger value="performance" className="flex items-center gap-2 py-2">
+          <BarChart className="h-4 w-4" />
+          <span className="hidden sm:inline">Performance</span>
+        </TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="generator" className="space-y-4">
+        <MetaContentGenerator />
+      </TabsContent>
+
+      <TabsContent value="structure" className="space-y-4">
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Structure du Contenu</h3>
+          <div className="space-y-4">
             <div>
-              <h4 className="font-medium mb-2">Checklist SEO</h4>
+              <h4 className="font-medium text-sm text-gray-500 mb-2">TITRE</h4>
+              <p className="text-lg font-medium">{activeContent.title}</p>
+              <div className="flex items-center gap-2 mt-1">
+                <div className="h-2 w-full max-w-md bg-gray-200 rounded-full overflow-hidden">
+                  <div className="h-full bg-blue-600 rounded-full" style={{ width: `${Math.min(100, (activeContent.title.length / 60) * 100)}%` }}></div>
+                </div>
+                <span className="text-xs font-medium">{activeContent.title.length} / 60</span>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="font-medium text-sm text-gray-500 mb-2">META DESCRIPTION</h4>
+              <p className="text-sm">{activeContent.meta}</p>
+              <div className="flex items-center gap-2 mt-1">
+                <div className="h-2 w-full max-w-md bg-gray-200 rounded-full overflow-hidden">
+                  <div className="h-full bg-green-600 rounded-full" style={{ width: `${Math.min(100, (activeContent.meta.length / 160) * 100)}%` }}></div>
+                </div>
+                <span className="text-xs font-medium">{activeContent.meta.length} / 160</span>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="font-medium text-sm text-gray-500 mb-2">STRUCTURE DES TITRES</h4>
               <div className="space-y-2">
-                <div className="flex items-center justify-between p-2 bg-green-50 rounded">
-                  <span className="text-sm flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    Balise titre optimisée
-                  </span>
-                  <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Fait</span>
+                {activeContent.headings.map((heading, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <div className="bg-gray-100 text-gray-700 text-xs font-medium px-2 py-1 rounded-md">H{index + 2}</div>
+                    <p className="text-sm">{heading}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </Card>
+      </TabsContent>
+
+      <TabsContent value="keywords" className="space-y-4">
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Analyse des Mots-clés</h3>
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm text-gray-500 mb-2">MOTS-CLÉS PRINCIPAUX</h4>
+              <div className="flex flex-wrap gap-2">
+                <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">SEO</div>
+                <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">optimisation</div>
+                <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">moteurs de recherche</div>
+                <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">débutants</div>
+                <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">classement</div>
+              </div>
+            </div>
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm text-gray-500 mb-2">DENSITÉ DE MOTS-CLÉS</h4>
+              <div className="space-y-2">
+                <div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">SEO</span>
+                    <span className="text-sm font-medium">3.2%</span>
+                  </div>
+                  <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                    <div className="h-full bg-green-600 rounded-full" style={{ width: '80%' }}></div>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between p-2 bg-green-50 rounded">
-                  <span className="text-sm flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    Meta description
-                  </span>
-                  <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Fait</span>
+                <div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">optimisation</span>
+                    <span className="text-sm font-medium">2.1%</span>
+                  </div>
+                  <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                    <div className="h-full bg-green-600 rounded-full" style={{ width: '60%' }}></div>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between p-2 bg-yellow-50 rounded">
-                  <span className="text-sm flex items-center gap-2">
-                    <AlertTriangle className="h-4 w-4 text-yellow-500" />
-                    Liens internes
-                  </span>
-                  <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">À améliorer</span>
-                </div>
-                <div className="flex items-center justify-between p-2 bg-red-50 rounded">
-                  <span className="text-sm flex items-center gap-2">
-                    <AlertTriangle className="h-4 w-4 text-red-500" />
-                    Attributs ALT des images
-                  </span>
-                  <span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">À faire</span>
+                <div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">débutants</span>
+                    <span className="text-sm font-medium">1.4%</span>
+                  </div>
+                  <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                    <div className="h-full bg-yellow-500 rounded-full" style={{ width: '40%' }}></div>
+                  </div>
                 </div>
               </div>
             </div>
-            
-            <div>
-              <h4 className="font-medium mb-2">Actions recommandées</h4>
+          </div>
+        </Card>
+      </TabsContent>
+
+      <TabsContent value="readability" className="space-y-4">
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Analyse de Lisibilité</h3>
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
+            <div className="bg-gray-50 p-4 rounded-lg text-center">
+              <h4 className="font-medium text-sm text-gray-500 mb-2">SCORE FLESCH</h4>
+              <div className="text-2xl font-bold">72</div>
+              <p className="text-sm text-green-600">Relativement facile à lire</p>
+            </div>
+            <div className="bg-gray-50 p-4 rounded-lg text-center">
+              <h4 className="font-medium text-sm text-gray-500 mb-2">TEMPS DE LECTURE</h4>
+              <div className="text-2xl font-bold">{activeContent.performance.metrics.readingTime} min</div>
+              <p className="text-sm text-gray-600">Environ {activeContent.performance.metrics.textLength} mots</p>
+            </div>
+            <div className="bg-gray-50 p-4 rounded-lg text-center">
+              <h4 className="font-medium text-sm text-gray-500 mb-2">PHRASES COMPLEXES</h4>
+              <div className="text-2xl font-bold">14%</div>
+              <p className="text-sm text-yellow-600">Acceptable</p>
+            </div>
+          </div>
+          <div className="mt-4 bg-gray-50 p-4 rounded-lg">
+            <h4 className="font-medium text-sm text-gray-500 mb-2">SUGGESTIONS D'AMÉLIORATION</h4>
+            <ul className="space-y-2 text-sm">
+              <li className="flex items-start gap-2">
+                <span className="text-yellow-500 text-lg">•</span>
+                <span>Certaines phrases sont trop longues. Essayez de les diviser en phrases plus courtes.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-yellow-500 text-lg">•</span>
+                <span>Ajoutez plus de sous-titres pour améliorer la scannabilité du contenu.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-green-500 text-lg">•</span>
+                <span>Bon usage des listes à puces pour présenter les informations.</span>
+              </li>
+            </ul>
+          </div>
+        </Card>
+      </TabsContent>
+
+      <TabsContent value="seo" className="space-y-4">
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Analyse SEO</h3>
+          <div className="flex items-center gap-4 mb-6">
+            <div className="relative w-24 h-24 flex items-center justify-center">
+              <svg className="w-24 h-24" viewBox="0 0 36 36">
+                <path
+                  d="M18 2.0845
+                    a 15.9155 15.9155 0 0 1 0 31.831
+                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="#eaeaea"
+                  strokeWidth="2"
+                />
+                <path
+                  d="M18 2.0845
+                    a 15.9155 15.9155 0 0 1 0 31.831
+                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="#4ade80"
+                  strokeWidth="2"
+                  strokeDasharray={`${activeContent.performance.score}, 100`}
+                  strokeLinecap="round"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-2xl font-bold">{activeContent.performance.score}</span>
+              </div>
+            </div>
+            <div className="flex-1">
+              <h4 className="font-medium mb-1">Score SEO</h4>
+              <p className="text-sm text-gray-600 mb-2">Votre contenu est bien optimisé pour les moteurs de recherche.</p>
+              <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                <div 
+                  className={`h-full rounded-full ${
+                    activeContent.performance.score >= 80 ? 'bg-green-500' : 
+                    activeContent.performance.score >= 60 ? 'bg-yellow-500' : 'bg-red-500'
+                  }`} 
+                  style={{ width: `${activeContent.performance.score}%` }}
+                ></div>
+              </div>
+            </div>
+          </div>
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm text-gray-500 mb-2">POINTS FORTS</h4>
               <ul className="space-y-2 text-sm">
-                <li className="p-2 bg-blue-50 rounded flex items-center gap-2">
-                  <Check className="h-4 w-4 text-blue-500 flex-shrink-0" />
-                  <span>Ajouter 2-3 liens internes vers vos pages principales</span>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-500 text-lg">✓</span>
+                  <span>Le titre contient le mot-clé principal</span>
                 </li>
-                <li className="p-2 bg-blue-50 rounded flex items-center gap-2">
-                  <Check className="h-4 w-4 text-blue-500 flex-shrink-0" />
-                  <span>Compléter les attributs ALT manquants sur les images</span>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-500 text-lg">✓</span>
+                  <span>Bonne structure avec des sous-titres hiérarchiques</span>
                 </li>
-                <li className="p-2 bg-blue-50 rounded flex items-center gap-2">
-                  <Check className="h-4 w-4 text-blue-500 flex-shrink-0" />
-                  <span>Ajouter un sous-titre H2 pour la section conclusion</span>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-500 text-lg">✓</span>
+                  <span>Longueur de contenu adéquate pour le sujet</span>
                 </li>
-                <li className="p-2 bg-blue-50 rounded flex items-center gap-2">
-                  <Check className="h-4 w-4 text-blue-500 flex-shrink-0" />
-                  <span>Renforcer la présence du mot-clé principal en début de texte</span>
+              </ul>
+            </div>
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h4 className="font-medium text-sm text-gray-500 mb-2">AMÉLIORATIONS POSSIBLES</h4>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-start gap-2">
+                  <span className="text-yellow-500 text-lg">•</span>
+                  <span>Ajoutez plus de liens internes vers d'autres contenus</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-yellow-500 text-lg">•</span>
+                  <span>Optimisez les attributs ALT des images</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-yellow-500 text-lg">•</span>
+                  <span>Augmentez la densité du mot-clé principal à 2-3%</span>
                 </li>
               </ul>
             </div>
           </div>
-        </TabsContent>
-        
-        <TabsContent value="readability" className="space-y-4">
-          <div className="bg-gray-50 p-4 rounded-lg mb-4">
-            <h4 className="text-lg font-medium mb-2">Analyse de lisibilité</h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-3 bg-white rounded-md shadow-sm">
-                <div className="text-sm text-gray-600">Score Flesch</div>
-                <div className="text-xl font-bold">64.5</div>
-                <div className="text-xs text-gray-500">Standard, facile à comprendre</div>
-              </div>
-              <div className="p-3 bg-white rounded-md shadow-sm">
-                <div className="text-sm text-gray-600">Longueur moyenne des phrases</div>
-                <div className="text-xl font-bold">18.2</div>
-                <div className="text-xs text-gray-500">mots par phrase</div>
-              </div>
-              <div className="p-3 bg-white rounded-md shadow-sm">
-                <div className="text-sm text-gray-600">Mots complexes</div>
-                <div className="text-xl font-bold">12%</div>
-                <div className="text-xs text-gray-500">du texte total</div>
+        </Card>
+      </TabsContent>
+
+      <TabsContent value="performance" className="space-y-4">
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Performance du Contenu</h3>
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
+            <div className="bg-gray-50 p-4 rounded-lg text-center">
+              <h4 className="font-medium text-sm text-gray-500 mb-2">LONGUEUR</h4>
+              <div className="text-2xl font-bold">{activeContent.performance.metrics.textLength}</div>
+              <p className="text-sm text-green-600">Mots au total</p>
+            </div>
+            <div className="bg-gray-50 p-4 rounded-lg text-center">
+              <h4 className="font-medium text-sm text-gray-500 mb-2">DENSITÉ</h4>
+              <div className="text-2xl font-bold">{activeContent.performance.metrics.density}%</div>
+              <p className="text-sm text-yellow-600">Mots-clés principaux</p>
+            </div>
+            <div className="bg-gray-50 p-4 rounded-lg text-center">
+              <h4 className="font-medium text-sm text-gray-500 mb-2">MÉDIAS</h4>
+              <div className="text-2xl font-bold">3</div>
+              <p className="text-sm text-green-600">Images et vidéos</p>
+            </div>
+          </div>
+          <div className="mt-4">
+            <h4 className="font-medium text-sm text-gray-500 mb-2">ENGAGEMENT PRÉVU</h4>
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
+                <div className="text-center">
+                  <h5 className="text-xs text-gray-500">TEMPS SUR PAGE</h5>
+                  <p className="text-lg font-bold">3:42</p>
+                </div>
+                <div className="text-center">
+                  <h5 className="text-xs text-gray-500">TX. REBOND</h5>
+                  <p className="text-lg font-bold">45%</p>
+                </div>
+                <div className="text-center">
+                  <h5 className="text-xs text-gray-500">PARTAGES SOC.</h5>
+                  <p className="text-lg font-bold">32</p>
+                </div>
+                <div className="text-center">
+                  <h5 className="text-xs text-gray-500">CTR ESTIMÉ</h5>
+                  <p className="text-lg font-bold">3.8%</p>
+                </div>
               </div>
             </div>
           </div>
-          
-          <div className="space-y-3">
-            <h4 className="font-medium">Suggestions d'amélioration</h4>
-            {readabilitySuggestions.map((suggestion, index) => (
-              <div 
-                key={index} 
-                className={`p-3 rounded-md flex items-start gap-3 ${
-                  suggestion.type === 'success' ? 'bg-green-50 border border-green-200' : 
-                  suggestion.type === 'warning' ? 'bg-yellow-50 border border-yellow-200' : 
-                  'bg-red-50 border border-red-200'
-                }`}
-              >
-                {suggestion.icon}
-                <p className="text-sm">{suggestion.message}</p>
-              </div>
-            ))}
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="structure" className="space-y-4">
-          <h4 className="font-medium mb-2">Structure du contenu</h4>
-          <div className="space-y-3">
-            {contentStructure.map((item, index) => (
-              <div key={index} className="flex items-center gap-3">
-                <div 
-                  className={`w-12 text-center py-1 text-xs font-bold rounded text-white ${
-                    item.type === 'h1' ? 'bg-blue-600' : 
-                    item.type === 'h2' ? 'bg-blue-500' : 
-                    item.type === 'h3' ? 'bg-blue-400' : 'bg-gray-400'
-                  }`}
-                >
-                  {item.type.toUpperCase()}
-                </div>
-                <div className="flex-1 text-sm">{item.content}</div>
-                <div className="flex items-center gap-2">
-                  <div className={`w-2 h-2 rounded-full ${getScoreColor(item.score)}`}></div>
-                  <span className="text-xs">{item.score}/100</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="keywords" className="space-y-4">
-          <h4 className="font-medium mb-4">Analyse des mots-clés</h4>
-          <div className="space-y-4">
-            {keywordAnalysis.map((keyword, index) => (
-              <div key={index} className="bg-gray-50 p-3 rounded-lg">
-                <div className="flex justify-between items-center mb-2">
-                  <div className="font-medium">{keyword.keyword}</div>
-                  <div className="text-sm text-gray-600">Densité: {keyword.density}%</div>
-                </div>
-                <div className="relative h-8 bg-gray-200 rounded overflow-hidden mb-2">
-                  {keyword.positions.map((pos, i) => (
-                    <div 
-                      key={i} 
-                      className="absolute top-0 bottom-0 w-1 bg-blue-500"
-                      style={{ left: `${Math.min((pos / 4), 100)}%` }}
-                    ></div>
-                  ))}
-                </div>
-                <div className="flex justify-between items-center text-sm">
-                  <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full ${getScoreColor(keyword.score)}`}></div>
-                    <span>Score: {keyword.score}/100</span>
-                  </div>
-                  <div>
-                    <Button variant="outline" size="sm">Optimiser</Button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="performance">
-          <PerformanceMetrics 
-            performance={{
-              responseTime: 780,
-              loadTime: 2.4,
-              firstContentfulPaint: 1.2,
-              domLoadTime: 1.8,
-              scriptCount: 8,
-              styleCount: 4,
-              totalSize: 1205430,
-              mediaCount: 6,
-              impressions: 3450,
-              clickThroughRate: 0.042
-            }}
-          />
-        </TabsContent>
-      </Tabs>
-    </Card>
+        </Card>
+      </TabsContent>
+    </Tabs>
   );
 };
 
