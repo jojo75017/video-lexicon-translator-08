@@ -32,7 +32,7 @@ const QuoraPage = () => {
     }
   };
 
-  const handleGenerateResponse = () => {
+  const handleGenerateResponse = async () => {
     if (!question.trim()) {
       toast.error("Veuillez d'abord saisir une question");
       return;
@@ -43,7 +43,7 @@ const QuoraPage = () => {
     
     try {
       // Generate AI response based on the question
-      const content = generateQuoraContent(
+      const content = await generateQuoraContent(
         question,
         800,
         undefined,
@@ -69,7 +69,7 @@ const QuoraPage = () => {
   };
 
   useEffect(() => {
-    // Afficher le state génératedResponse dans la console pour débogage
+    // Afficher le state generatedResponse dans la console pour débogage
     console.log("État de generatedResponse:", generatedResponse);
   }, [generatedResponse]);
 
@@ -156,7 +156,7 @@ const QuoraPage = () => {
             </div>
             
             {generatedResponse && (
-              <div className="space-y-2 bg-[#b92b27]/5 p-4 rounded-lg border border-[#b92b27]/20">
+              <div className="space-y-2 bg-[#b92b27]/5 p-4 rounded-lg border border-[#b92b27]/20 mt-4">
                 <div className="flex justify-between items-center">
                   <h3 className="font-semibold text-[#b92b27]">Réponse générée</h3>
                   <Button 
@@ -172,7 +172,7 @@ const QuoraPage = () => {
               </div>
             )}
             
-            <div className="space-y-2">
+            <div className="space-y-2 mt-4">
               <label htmlFor="response" className="block text-sm font-medium">
                 Votre réponse
               </label>

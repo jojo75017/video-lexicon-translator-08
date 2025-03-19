@@ -22,13 +22,13 @@ const TabNavigation = () => {
     
     // Métriques et données
     { id: 'metrics', icon: ChartBar, label: 'Métriques', color: 'text-fuchsia-600', group: 'metrics' },
-    { id: 'analytics', icon: BarChart2, label: 'Analytics', color: 'text-green-600', group: 'metrics' },
+    { id: 'analytics', icon: BarChart2, label: 'Analytics', color: 'text-green-600', group: 'metrics', isNew: true },
     { id: 'keywords', icon: FileText, label: 'Mots-clés', color: 'text-amber-600', group: 'metrics' },
     { id: 'performance', icon: Gauge, label: 'Performance', color: 'text-indigo-500', group: 'metrics' },
     
     // Contenu
     { id: 'content', icon: Book, label: 'Contenu', color: 'text-orange-600', group: 'content' },
-    { id: 'optimize', icon: Zap, label: 'Optimisation', color: 'text-blue-600', group: 'content' },
+    { id: 'optimize', icon: Zap, label: 'Optimisation', color: 'text-blue-600', group: 'content', isNew: true },
     { id: 'ideas', icon: Lightbulb, label: 'Idées', color: 'text-yellow-600', group: 'content' },
     { id: 'quora', icon: MessageSquareText, label: 'Quora', color: 'text-[#b92b27]', group: 'content', isNew: true, link: '/quora' },
     

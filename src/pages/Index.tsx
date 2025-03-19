@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
@@ -21,6 +22,9 @@ import AdvancedSection from '@/components/seo/AdvancedSection';
 import IntegrationsSection from '@/components/seo/IntegrationsSection';
 import QuoraButton from '@/components/seo/buttons/QuoraButton';
 import ContentOptimizationButton from '@/components/seo/buttons/ContentOptimizationButton';
+import EnhancedAnalytics from '@/components/seo/EnhancedAnalytics';
+import ContentOptimizationTabs from '@/components/seo/ContentOptimizationTabs';
+import { Search } from 'lucide-react';
 
 const Index = () => {
   const {
@@ -141,7 +145,11 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <PageHeader />
+        <PageHeader 
+          title="Tableau de bord SEO"
+          description="Analysez et optimisez votre présence en ligne avec nos outils avancés"
+          icon={<Search className="h-6 w-6 text-blue-600" />}
+        />
         
         <div className="space-y-8">
           <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
@@ -213,6 +221,10 @@ const Index = () => {
                 />
               </TabsContent>
     
+              <TabsContent value="analytics">
+                <EnhancedAnalytics />
+              </TabsContent>
+    
               <TabsContent value="advanced">
                 <AdvancedSection 
                   isLoading={isLoading}
@@ -228,6 +240,10 @@ const Index = () => {
                 <Card className="p-6">
                   <SignatureGenerator />
                 </Card>
+              </TabsContent>
+
+              <TabsContent value="optimize">
+                <ContentOptimizationTabs />
               </TabsContent>
             </Tabs>
           </div>
