@@ -3,7 +3,8 @@ import { useState } from 'react';
 import { useToast } from "@/components/ui/use-toast"; 
 import { FirecrawlService } from '@/utils/FirecrawlService';
 import { Card } from "@/components/ui/card";
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, ExternalLink } from 'lucide-react';
+import { Button } from "@/components/ui/button";
 import { CrawlInput } from './crawl/CrawlInput';
 import { ResultTabs } from './crawl/ResultTabs';
 import '@/styles/scrollbar.css';
@@ -25,6 +26,7 @@ export const CrawlForm = () => {
   const [crawlResult, setCrawlResult] = useState<CrawlResult | null>(null);
   const [hasPerformedAnalysis, setHasPerformedAnalysis] = useState(false);
   const [showCorsWarning, setShowCorsWarning] = useState(false);
+  const [isForbiddenError, setIsForbiddenError] = useState(false);
 
   const handleActivateProxy = () => {
     FirecrawlService.enableProxy();
@@ -32,6 +34,14 @@ export const CrawlForm = () => {
     toast({
       title: "Proxy CORS activé",
       description: "Vous pouvez maintenant analyser des sites externes",
+    });
+  };
+
+  const handleProxyDemoClick = () => {
+    window.open('https://cors-anywhere.herokuapp.com/corsdemo', '_blank');
+    toast({
+      title: "Redirection vers le service de démo CORS",
+      description: "Activez le service de démo, puis revenez ici pour continuer votre analyse",
     });
   };
 
@@ -63,6 +73,7 @@ export const CrawlForm = () => {
     setCrawlResult(null);
     setHasPerformedAnalysis(true);
     setShowCorsWarning(false);
+    setIsForbiddenError(false);
 
     try {
       const progressInterval = setInterval(() => {
@@ -82,8 +93,12 @@ export const CrawlForm = () => {
         });
         setCrawlResult(result);
       } else {
+        // Check if this is a 403 CORS error
+        if (result.error && result.error.includes('403')) {
+          setIsForbiddenError(true);
+        }
         // Check if this is a CORS error
-        if (result.error && (result.error.includes('CORS') || result.error.includes('proxy'))) {
+        else if (result.error && (result.error.includes('CORS') || result.error.includes('proxy'))) {
           setShowCorsWarning(true);
         }
         
@@ -125,12 +140,33 @@ export const CrawlForm = () => {
               <p className="text-amber-700 text-sm mb-2">
                 Pour analyser des sites externes, vous devez activer le proxy CORS.
               </p>
-              <button 
-                onClick={handleActivateProxy}
-                className="text-sm bg-amber-600 hover:bg-amber-700 text-white px-3 py-1 rounded-md"
+              <div className="flex flex-wrap gap-2">
+                <Button 
+                  onClick={handleActivateProxy}
+                  className="text-sm bg-amber-600 hover:bg-amber-700 text-white px-3 py-1 rounded-md"
+                >
+                  Activer le proxy CORS
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {isForbiddenError && (
+          <div className="mt-4 p-4 bg-red-50 rounded-lg border border-red-200 flex items-start">
+            <AlertTriangle className="h-5 w-5 text-red-500 mr-2 mt-0.5" />
+            <div>
+              <h3 className="font-medium text-red-800">Erreur 403 Forbidden</h3>
+              <p className="text-red-700 text-sm mb-2">
+                Le service de proxy CORS a retourné une erreur 403 Forbidden. Vous devez d'abord activer le service de démo CORS.
+              </p>
+              <Button 
+                onClick={handleProxyDemoClick}
+                className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md flex items-center"
               >
-                Activer le proxy CORS
-              </button>
+                <ExternalLink className="mr-1.5 h-4 w-4" />
+                Activer le service de démo CORS
+              </Button>
             </div>
           </div>
         )}
@@ -141,7 +177,7 @@ export const CrawlForm = () => {
           </div>
         )}
         
-        {hasPerformedAnalysis && (!crawlResult || !crawlResult.data || !crawlResult.data[0]) && !showCorsWarning && (
+        {hasPerformedAnalysis && (!crawlResult || !crawlResult.data || !crawlResult.data[0]) && !showCorsWarning && !isForbiddenError && (
           <div className="mt-6 p-4 bg-amber-50 rounded-lg border border-amber-200 flex items-start">
             <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5" />
             <div>

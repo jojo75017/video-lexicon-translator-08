@@ -60,6 +60,10 @@ const SeoAnalysisForm: React.FC<SeoAnalysisFormProps> = ({
     setUrl(example);
   };
 
+  const handleProxyDemoClick = () => {
+    window.open('https://cors-anywhere.herokuapp.com/corsdemo', '_blank');
+  };
+
   return (
     <Card className="bg-gradient-to-br from-white to-indigo-50 p-6 rounded-lg shadow-md border border-indigo-100 mb-6">
       <div className="flex items-center mb-4">
@@ -153,15 +157,26 @@ const SeoAnalysisForm: React.FC<SeoAnalysisFormProps> = ({
             <p className="text-sm mb-2">
               {t('seo.corsDescription')}
             </p>
-            <Button
-              onClick={handleActivateProxy}
-              variant="outline"
-              size="sm"
-              className="text-amber-700 border-amber-300 bg-amber-100 hover:bg-amber-200"
-            >
-              <Shield className="mr-1.5 h-4 w-4" />
-              {t('seo.activateProxy')}
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                onClick={handleActivateProxy}
+                variant="outline"
+                size="sm"
+                className="text-amber-700 border-amber-300 bg-amber-100 hover:bg-amber-200"
+              >
+                <Shield className="mr-1.5 h-4 w-4" />
+                {t('seo.activateProxy')}
+              </Button>
+              <Button
+                onClick={handleProxyDemoClick}
+                variant="outline"
+                size="sm"
+                className="text-blue-700 border-blue-300 bg-blue-100 hover:bg-blue-200"
+              >
+                <ExternalLink className="mr-1.5 h-4 w-4" />
+                Activer le service de démo CORS
+              </Button>
+            </div>
           </div>
         </div>
       )}
@@ -172,7 +187,27 @@ const SeoAnalysisForm: React.FC<SeoAnalysisFormProps> = ({
           <div>
             <p className="text-sm font-medium mb-1">{t('seo.analysisError')}</p>
             <p className="text-sm">{error}</p>
-            {error.includes('Failed to fetch') && (
+            {error.includes('HTTP: 403') && (
+              <>
+                <p className="text-sm mt-2 font-medium">Erreur 403 Forbidden. Cette erreur peut être due à :</p>
+                <ul className="text-sm list-disc pl-5 mt-1">
+                  <li>Le service de démo CORS n'est pas activé</li>
+                  <li>Le site refuse les requêtes du proxy</li>
+                </ul>
+                <div className="flex flex-wrap gap-2 mt-3">
+                  <Button
+                    onClick={handleProxyDemoClick}
+                    variant="outline"
+                    size="sm"
+                    className="mt-1 text-blue-700 border-blue-300 bg-blue-100 hover:bg-blue-200"
+                  >
+                    <ExternalLink className="mr-1.5 h-4 w-4" />
+                    Activer le service de démo CORS
+                  </Button>
+                </div>
+              </>
+            )}
+            {(error.includes('Failed to fetch') || error.includes('NetworkError')) && (
               <>
                 <p className="text-sm mt-2 font-medium">Impossible de se connecter au site. Cela peut être dû à plusieurs raisons :</p>
                 <ul className="text-sm list-disc pl-5 mt-1">

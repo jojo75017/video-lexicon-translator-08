@@ -60,6 +60,16 @@ export class FirecrawlService {
           )
         ]) as Response;
 
+        // Check for 403 errors specifically from the CORS proxy
+        if (response.status === 403 && this.isProxyEnabled) {
+          return {
+            success: false,
+            error: "Le proxy CORS a retourné une erreur 403. Vous devez d'abord visiter https://cors-anywhere.herokuapp.com/corsdemo pour activer le service de démonstration.",
+            completed: 0,
+            total: 0
+          };
+        }
+
         if (!response.ok) {
           throw new Error(`Impossible d'accéder au site (Statut: ${response.status})`);
         }

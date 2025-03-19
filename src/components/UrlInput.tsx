@@ -2,7 +2,7 @@
 import React from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Loader2, Globe, Search, AlertTriangle } from "lucide-react";
+import { Loader2, Globe, Search, AlertTriangle, ExternalLink } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
@@ -51,6 +51,13 @@ const UrlInput = ({
     }
   };
 
+  const handleProxyDemoClick = () => {
+    window.open('https://cors-anywhere.herokuapp.com/corsdemo', '_blank');
+    toast.info("Redirection vers le service de démo CORS", {
+      description: "Activez le service de démo, puis revenez ici pour continuer votre analyse"
+    });
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4 bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-100 shadow-sm">
       <div className="mb-4">
@@ -94,19 +101,30 @@ const UrlInput = ({
       </div>
       
       {showCorsWarning && handleActivateProxy && (
-        <div className="text-sm text-amber-700 bg-amber-50 p-3 rounded-md border border-amber-100 flex items-center">
-          <AlertTriangle className="h-4 w-4 mr-2 text-amber-600" />
+        <div className="text-sm text-amber-700 bg-amber-50 p-3 rounded-md border border-amber-100 flex items-start">
+          <AlertTriangle className="h-4 w-4 mr-2 text-amber-600 flex-shrink-0 mt-0.5" />
           <div>
             <p className="font-medium">Erreur CORS détectée</p>
             <p className="mb-2">Pour analyser des sites externes, vous devez activer le proxy CORS.</p>
-            <Button
-              onClick={handleActivateProxy}
-              size="sm"
-              variant="outline"
-              className="border-amber-200 text-amber-800 hover:bg-amber-100"
-            >
-              Activer le proxy
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                onClick={handleActivateProxy}
+                size="sm"
+                variant="outline"
+                className="border-amber-200 text-amber-800 hover:bg-amber-100"
+              >
+                Activer le proxy
+              </Button>
+              <Button
+                onClick={handleProxyDemoClick}
+                size="sm"
+                variant="outline"
+                className="border-blue-200 text-blue-800 hover:bg-blue-100"
+              >
+                <ExternalLink className="mr-1.5 h-3 w-3" />
+                Activer démo CORS
+              </Button>
+            </div>
           </div>
         </div>
       )}

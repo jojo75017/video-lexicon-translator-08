@@ -28,10 +28,10 @@ export const analyzeSearchConsole = async (url: string): Promise<SearchConsoleDa
     
     // Generate demonstration data if actual data is unavailable
     return {
-      clicks: data.clicks || Math.floor(Math.random() * 5000),
-      impressions: data.impressions || Math.floor(Math.random() * 100000),
-      ctr: data.ctr || (Math.random() * 5).toFixed(2),
-      position: data.position || Math.floor(Math.random() * 10) + 1,
+      clicks: typeof data.clicks === 'number' ? data.clicks : Math.floor(Math.random() * 5000),
+      impressions: typeof data.impressions === 'number' ? data.impressions : Math.floor(Math.random() * 100000),
+      ctr: typeof data.ctr === 'number' ? data.ctr : Number((Math.random() * 5).toFixed(2)),
+      position: typeof data.position === 'number' ? data.position : Math.floor(Math.random() * 10) + 1,
       keywords: [
         { keyword: "marketing digital", position: 5, clicks: 450, impressions: 2800 },
         { keyword: "seo optimisation", position: 8, clicks: 380, impressions: 2400 },
@@ -69,7 +69,7 @@ export const analyzeSearchConsole = async (url: string): Promise<SearchConsoleDa
     return {
       clicks: Math.floor(Math.random() * 5000),
       impressions: Math.floor(Math.random() * 100000),
-      ctr: (Math.random() * 5).toFixed(2),
+      ctr: Number((Math.random() * 5).toFixed(2)),
       position: Math.floor(Math.random() * 10) + 1,
       keywords: [
         { keyword: "marketing digital", position: 5, clicks: 450, impressions: 2800 },

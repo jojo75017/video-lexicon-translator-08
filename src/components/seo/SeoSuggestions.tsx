@@ -118,7 +118,7 @@ const SeoSuggestions = ({ suggestions }: SeoSuggestionsProps) => {
           {categorizedSuggestions.suggestions.map((suggestion, index) => (
             <div key={`suggestion-${index}`} className="group flex">
               <div className="mr-3 mt-0.5 text-blue-500">
-                <Info className="w-5 h-5" />
+                <Info className="w-5 w-5" />
               </div>
               <div className="flex-1">
                 <div className="bg-blue-50 border border-blue-100 p-4 rounded-md group-hover:border-blue-200 transition-colors">
