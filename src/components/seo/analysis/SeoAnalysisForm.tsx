@@ -141,36 +141,58 @@ const SeoAnalysisForm = ({
             Les restrictions de sécurité du navigateur empêchent l'accès au site. 
             Activez notre proxy CORS pour contourner cette limitation et continuer l'analyse.
           </p>
-          <Button 
-            variant="outline" 
-            onClick={handleProxyClick}
-            type="button"
-            className="bg-yellow-100 text-yellow-800 border-yellow-300 hover:bg-yellow-200"
-          >
-            <Shield className="mr-2 h-4 w-4" />
-            Activer le proxy CORS
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button 
+              variant="outline" 
+              onClick={handleProxyClick}
+              type="button"
+              className="bg-yellow-100 text-yellow-800 border-yellow-300 hover:bg-yellow-200"
+            >
+              <Shield className="mr-2 h-4 w-4" />
+              Activer le proxy CORS
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => window.open('https://cors-anywhere.herokuapp.com/corsdemo', '_blank')}
+              type="button"
+              className="text-blue-700 hover:bg-blue-50"
+            >
+              Activer service CORS externe
+            </Button>
+          </div>
         </div>
       )}
       
       {error && error.includes("Failed to fetch") && !showCorsWarning && (
-        <div className="mt-4 bg-red-50 p-4 rounded-md border border-red-200">
-          <h3 className="font-medium text-red-800 mb-2 flex items-center">
-            <AlertCircle className="h-4 w-4 mr-2" />
-            Erreur de connexion
-          </h3>
-          <p className="text-red-700 mb-3">
-            Impossible de se connecter au site demandé. Vérifiez que l'URL est correcte et que le site est accessible.
-          </p>
-          <Button 
-            variant="outline" 
-            onClick={handleProxyClick}
-            type="button"
-            className="bg-blue-100 text-blue-800 border-blue-300 hover:bg-blue-200"
-          >
-            <Shield className="mr-2 h-4 w-4" />
-            Essayer avec le proxy CORS
-          </Button>
+        <div className="mt-4 bg-red-50 p-4 rounded-md border border-red-200 flex items-start">
+          <AlertCircle className="h-5 w-5 text-red-500 mr-2 mt-0.5" />
+          <div>
+            <h3 className="font-medium text-red-800 mb-2 flex items-center">
+              Erreur de connexion
+            </h3>
+            <p className="text-red-700 mb-3">
+              Impossible de se connecter au site demandé. Vérifiez que l'URL est correcte et que le site est accessible.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <Button 
+                variant="outline" 
+                onClick={handleProxyClick}
+                type="button"
+                className="bg-blue-100 text-blue-800 border-blue-300 hover:bg-blue-200"
+              >
+                <Shield className="mr-2 h-4 w-4" />
+                Essayer avec le proxy CORS
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => window.open('https://cors-anywhere.herokuapp.com/corsdemo', '_blank')}
+                type="button"
+                className="text-blue-700 hover:bg-blue-50"
+              >
+                Activer service CORS externe
+              </Button>
+            </div>
+          </div>
         </div>
       )}
       

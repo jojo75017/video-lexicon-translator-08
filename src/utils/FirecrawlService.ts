@@ -18,17 +18,17 @@ export class FirecrawlService {
     'https://api.codetabs.com/v1/proxy?quest='
   ];
 
-  static enableProxy() {
+  static enableProxy(): boolean {
     this.isProxyEnabled = true;
     console.log('Proxy CORS activé');
     return this.isProxyEnabled;
   }
 
-  static isProxyActive() {
+  static isProxyActive(): boolean {
     return this.isProxyEnabled;
   }
 
-  static useAlternativeProxy() {
+  static useAlternativeProxy(): boolean {
     this.useAlternativeCorsProxy = true;
     console.log('Utilisation du proxy alternatif activée');
     return this.useAlternativeCorsProxy;
@@ -58,11 +58,13 @@ export class FirecrawlService {
       
       console.log('Démarrage de l\'analyse du site:', url);
       
-      // Try different CORS proxies
+      // Liste des proxies CORS à essayer
       const corsProxies = [
         'https://corsproxy.io/?',
         'https://api.allorigins.win/raw?url=',
-        'https://api.codetabs.com/v1/proxy?quest='
+        'https://api.codetabs.com/v1/proxy?quest=',
+        'https://cors-anywhere.herokuapp.com/',
+        'https://crossorigin.me/'
       ];
       
       let fetchResult = null;
@@ -175,6 +177,13 @@ export class FirecrawlService {
         alt: img.alt || "Sans description"
       }));
 
+    // Extraire les titres
+    const headings = Array.from(doc.querySelectorAll('h1, h2, h3'))
+      .map(h => ({
+        level: h.tagName.toLowerCase(),
+        text: h.textContent?.trim() || "Sans texte"
+      }));
+
     // Ajouter le code source formaté
     const formattedHtml = html
       .replace(/</g, '&lt;')
@@ -193,12 +202,14 @@ export class FirecrawlService {
         meta,
         links: links.slice(0, 20), // Limite à 20 liens
         images: images.slice(0, 20), // Limite à 20 images
-        headings: Array.from(doc.querySelectorAll('h1, h2, h3'))
-          .map(h => ({
-            level: h.tagName.toLowerCase(),
-            text: h.textContent?.trim() || "Sans texte"
-          })),
-        sourceCode: formattedHtml // Ajout du code source
+        headings,
+        sourceCode: formattedHtml, // Ajout du code source
+        recommendations: [
+          "Utilisez des titres H1, H2, H3 de façon hiérarchique",
+          "Incluez des meta-descriptions pertinentes",
+          "Optimisez vos images avec des attributs alt",
+          "Structurez votre contenu pour une meilleure lisibilité"
+        ]
       }]
     };
   }
@@ -213,20 +224,33 @@ export class FirecrawlService {
         url,
         title: "Démonstration - Site simulé",
         meta: [
-          { name: "description", content: "Données de démonstration pour le site demandé" }
+          { name: "description", content: "Données de démonstration pour le site demandé" },
+          { name: "keywords", content: "seo, analyse, démonstration" }
         ],
         links: [
           { href: url + "/page1", text: "Page d'exemple 1" },
-          { href: url + "/page2", text: "Page d'exemple 2" }
+          { href: url + "/page2", text: "Page d'exemple 2" },
+          { href: url + "/contact", text: "Page Contact" },
+          { href: url + "/about", text: "À propos" }
         ],
         images: [
-          { src: "https://via.placeholder.com/150", alt: "Image d'exemple" }
+          { src: "https://via.placeholder.com/150", alt: "Image d'exemple" },
+          { src: "https://via.placeholder.com/200", alt: "Autre image" }
         ],
         headings: [
           { level: "h1", text: "Titre principal de démonstration" },
-          { level: "h2", text: "Sous-titre de démonstration" }
+          { level: "h2", text: "Sous-titre de démonstration" },
+          { level: "h2", text: "Nos services" },
+          { level: "h3", text: "Service premium" },
+          { level: "h3", text: "Service standard" }
         ],
-        sourceCode: "&lt;html&gt;&lt;body&gt;Démonstration&lt;/body&gt;&lt;/html&gt;"
+        sourceCode: "&lt;html&gt;\n  &lt;head&gt;\n    &lt;title&gt;Démonstration&lt;/title&gt;\n  &lt;/head&gt;\n  &lt;body&gt;\n    &lt;h1&gt;Titre principal de démonstration&lt;/h1&gt;\n    &lt;p&gt;Contenu de démonstration&lt;/p&gt;\n  &lt;/body&gt;\n&lt;/html&gt;",
+        recommendations: [
+          "Ajoutez un titre H1 unique et pertinent",
+          "Utilisez des sous-titres H2 et H3 pour structurer votre contenu",
+          "Optimisez vos balises meta pour améliorer le référencement",
+          "Ajoutez des descriptions alt à toutes vos images"
+        ]
       }]
     };
   }

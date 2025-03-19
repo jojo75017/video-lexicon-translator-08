@@ -31,8 +31,10 @@ export const CrawlForm = () => {
 
   useEffect(() => {
     console.log("CrawlForm rendering with crawlResult:", !!crawlResult);
+    
     if (crawlResult) {
       console.log("CrawlResult data exists:", !!crawlResult.data);
+      
       if (crawlResult.data) {
         console.log("First data item exists:", !!crawlResult.data[0]);
       }
@@ -91,9 +93,10 @@ export const CrawlForm = () => {
     setHasPerformedAnalysis(true);
 
     try {
+      // Simuler une progression pour une meilleure expérience utilisateur
       const progressInterval = setInterval(() => {
-        setProgress(prev => Math.min(prev + 20, 90));
-      }, 500);
+        setProgress(prev => Math.min(prev + 10, 90));
+      }, 300);
 
       console.log('Starting analysis for URL:', url);
       const result = await FirecrawlService.crawlWebsite(url);
@@ -102,26 +105,25 @@ export const CrawlForm = () => {
       
       if (result.success) {
         setProgress(100);
-        toast("Succès", {
+        toast.success("Succès", {
           description: "Site web analysé avec succès",
         });
         console.log("Setting crawl result:", result);
         setCrawlResult(result);
       } else {
-        // Check if this is a 403 CORS error
+        // Vérifier le type d'erreur
         if (result.error && result.error.includes('403')) {
           setIsForbiddenError(true);
           toast.warning("Erreur d'accès 403");
         }
-        // Check if this is a CORS error
-        else if (result.error && (result.error.includes('CORS') || result.error.includes('proxy'))) {
+        else if (result.error && (result.error.includes('CORS') || result.error.includes('Failed to fetch'))) {
           setShowCorsWarning(true);
           toast.warning("Erreur CORS détectée");
         } else {
           toast.error(result.error || "Échec de l'analyse du site");
         }
         
-        // Even on error, we set a demo result so the UI can show something
+        // Même en cas d'erreur, générer des données de démonstration
         console.log("Setting demo crawl result due to error");
         setCrawlResult({
           success: true,
@@ -132,7 +134,8 @@ export const CrawlForm = () => {
             url,
             title: "Démonstration - Site simulé",
             meta: [
-              { name: "description", content: "Données de démonstration pour le site demandé" }
+              { name: "description", content: "Données de démonstration pour le site demandé" },
+              { name: "keywords", content: "seo, analyse, démonstration" }
             ],
             links: [
               { href: url + "/page1", text: "Page d'exemple 1" },
@@ -143,9 +146,14 @@ export const CrawlForm = () => {
             ],
             headings: [
               { level: "h1", text: "Titre principal de démonstration" },
-              { level: "h2", text: "Sous-titre de démonstration" }
+              { level: "h2", text: "Sous-titre de démonstration" },
+              { level: "h3", text: "Section importante" }
             ],
-            sourceCode: "&lt;html&gt;&lt;body&gt;Démonstration&lt;/body&gt;&lt;/html&gt;"
+            sourceCode: "&lt;html&gt;&lt;head&gt;&lt;title&gt;Démonstration&lt;/title&gt;&lt;/head&gt;&lt;body&gt;Démonstration&lt;/body&gt;&lt;/html&gt;",
+            recommendations: [
+              "Ajoutez un titre H1 unique et pertinent",
+              "Utilisez des sous-titres H2 et H3 pour structurer votre contenu"
+            ]
           }]
         });
       }
@@ -177,7 +185,11 @@ export const CrawlForm = () => {
             { level: "h1", text: "Titre principal de démonstration" },
             { level: "h2", text: "Sous-titre de démonstration" }
           ],
-          sourceCode: "&lt;html&gt;&lt;body&gt;Démonstration après erreur&lt;/body&gt;&lt;/html&gt;"
+          sourceCode: "&lt;html&gt;&lt;head&gt;&lt;title&gt;Démonstration&lt;/title&gt;&lt;/head&gt;&lt;body&gt;Démonstration après erreur&lt;/body&gt;&lt;/html&gt;",
+          recommendations: [
+            "Assurez-vous que l'URL est correcte et accessible",
+            "Vérifiez votre connexion internet"
+          ]
         }]
       });
     } finally {
@@ -201,7 +213,7 @@ export const CrawlForm = () => {
           <div className="mt-4 p-4 bg-amber-50 rounded-lg border border-amber-200 flex items-start">
             <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5" />
             <div>
-              <h3 className="font-medium text-amber-800">Erreur d'accès CORS</h3>
+              <h3 className="font-medium text-amber-800">Erreur d'accès CORS détectée</h3>
               <p className="text-amber-700 text-sm mb-2">
                 Pour analyser des sites externes, vous devez activer le proxy CORS.
               </p>
@@ -214,6 +226,15 @@ export const CrawlForm = () => {
                   className="text-sm bg-amber-600 hover:bg-amber-700 text-white px-3 py-1 rounded-md"
                 >
                   Activer le proxy CORS
+                </Button>
+                <Button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleProxyDemoClick();
+                  }}
+                  className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md"
+                >
+                  Activer service CORS externe
                 </Button>
               </div>
             </div>

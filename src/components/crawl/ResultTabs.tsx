@@ -40,10 +40,12 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
     });
   };
 
-  // Obtenez les données de structure, soit depuis les données transmises, soit en générant des données de secours
-  const structureData = data?.headings ? data : getStructureData();
+  // Vérification des données et préparation des données de secours
+  const hasValidHeadings = data?.headings && Array.isArray(data.headings) && data.headings.length > 0;
+  const structureData = hasValidHeadings ? data : getStructureData();
   console.log("Using structure data:", structureData);
 
+  // Si aucune donnée n'est fournie, ne rien afficher
   if (!data) {
     return null;
   }
@@ -79,7 +81,7 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
       </TabsContent>
 
       <TabsContent value="source" className="mt-6">
-        <SourceCode sourceCode={data?.sourceCode} />
+        <SourceCode sourceCode={data?.sourceCode || "<p>Aucun code source disponible</p>"} />
       </TabsContent>
       
       <TabsContent value="structure" className="mt-6">
