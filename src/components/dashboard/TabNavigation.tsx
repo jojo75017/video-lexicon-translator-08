@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Link } from "react-router-dom";
 import { 
   Search, Globe, Database, Link2, ChartBar, Settings, Hash, Pen, 
@@ -11,6 +11,8 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import HierarchySection from '@/components/seo/HierarchySection';
+import ContentHierarchy from '@/components/ContentHierarchy';
 
 const TabNavigation = () => {
   const tabs = [
@@ -66,6 +68,32 @@ const TabNavigation = () => {
     marketing: "Marketing",
     other: "Outils"
   };
+  
+  // Sample data for hierarchy demonstration
+  const sampleHeadings = [
+    { text: "Introduction au SEO", level: 1, position: 1 },
+    { text: "Importance des mots-clés", level: 2, position: 2 },
+    { text: "Optimisation on-page", level: 2, position: 3 },
+    { text: "Meta descriptions", level: 3, position: 4 },
+    { text: "Structure des URLs", level: 3, position: 5 },
+    { text: "Stratégies de backlinks", level: 2, position: 6 },
+  ];
+  
+  const sampleParagraphs = [
+    { text: "Le SEO est essentiel pour améliorer la visibilité de votre site web...", position: 1.5 },
+    { text: "Les mots-clés sont la base de toute stratégie SEO efficace...", position: 2.5 },
+    { text: "L'optimisation on-page comprend tous les éléments que vous pouvez contrôler directement...", position: 3.5 },
+    { text: "Les meta descriptions doivent être concises et inclure vos mots-clés principaux...", position: 4.5 },
+    { text: "Une structure d'URL claire et descriptive aide les moteurs de recherche...", position: 5.5 },
+    { text: "Les backlinks de qualité restent un facteur déterminant pour le classement...", position: 6.5 },
+  ];
+  
+  const recommendations = [
+    "Assurez-vous d'avoir un seul titre H1 par page pour une meilleure structure",
+    "Utilisez des H2 et H3 de manière hiérarchique pour organiser votre contenu",
+    "Incluez des mots-clés importants dans vos titres et sous-titres",
+    "Gardez une structure cohérente sur l'ensemble de votre site"
+  ];
 
   return (
     <TooltipProvider>
@@ -140,6 +168,62 @@ const TabNavigation = () => {
             ))}
           </TabsList>
         </div>
+        
+        {/* Tab content sections */}
+        <TabsContent value="hierarchy" className="mt-2">
+          <div className="grid grid-cols-1 gap-6">
+            <HierarchySection isLoading={false} seoAnalysis={{
+              h1Count: 1,
+              h2Count: 3,
+              h3Count: 2,
+              wordCount: 450,
+              readabilityScore: 75
+            }} />
+            <ContentHierarchy 
+              headings={sampleHeadings}
+              paragraphs={sampleParagraphs}
+              recommendations={recommendations}
+            />
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="seo" className="mt-2">
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-bold mb-4">Analyse SEO</h2>
+            <p className="text-gray-600">Contenu de l'analyse SEO</p>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="structure" className="mt-2">
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-bold mb-4">Structure du Site</h2>
+            <p className="text-gray-600">Contenu de l'analyse de structure</p>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="backlinks" className="mt-2">
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-bold mb-4">Analyse des Backlinks</h2>
+            <p className="text-gray-600">Contenu de l'analyse des backlinks</p>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="metrics" className="mt-2">
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-bold mb-4">Métriques</h2>
+            <p className="text-gray-600">Contenu des métriques</p>
+          </div>
+        </TabsContent>
+        
+        {/* Add default content for other tabs */}
+        {tabs.filter(tab => !['seo', 'structure', 'hierarchy', 'backlinks', 'metrics'].includes(tab.id) && !tab.link).map(tab => (
+          <TabsContent key={tab.id} value={tab.id} className="mt-2">
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <h2 className="text-xl font-bold mb-4">{tab.label}</h2>
+              <p className="text-gray-600">Contenu de {tab.label} (à venir)</p>
+            </div>
+          </TabsContent>
+        ))}
       </Tabs>
     </TooltipProvider>
   );
