@@ -12,7 +12,21 @@ interface SeoSuggestionsProps {
 const SeoSuggestions = ({ suggestions }: SeoSuggestionsProps) => {
   const { t } = useTranslation();
   
-  if (suggestions.length === 0) return null;
+  if (!suggestions || suggestions.length === 0) {
+    return (
+      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+        <div className="flex items-center mb-4">
+          <Info className="h-5 w-5 text-blue-500 mr-2" />
+          <h3 className="text-xl font-bold text-gray-800">
+            {t('seo.noSuggestions')}
+          </h3>
+        </div>
+        <p className="text-gray-600">
+          {t('seo.allGood')}
+        </p>
+      </div>
+    );
+  }
   
   // Categorize suggestions by severity
   const categorizedSuggestions = {

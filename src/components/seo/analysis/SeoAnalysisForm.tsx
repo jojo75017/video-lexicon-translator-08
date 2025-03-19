@@ -6,6 +6,7 @@ import { AlertTriangle, Globe, Shield, Rocket, ExternalLink, Search } from "luci
 import { Card } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useTranslation } from 'react-i18next';
+import { toast } from "sonner";
 
 interface SeoAnalysisFormProps {
   url: string;
@@ -35,7 +36,24 @@ const SeoAnalysisForm: React.FC<SeoAnalysisFormProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    analyzeSite();
+    
+    if (!url) {
+      toast.error("Veuillez entrer une URL à analyser");
+      return;
+    }
+    
+    try {
+      // Validate URL format
+      new URL(url);
+      toast.info("Début de l'analyse...", {
+        description: "Cette opération peut prendre quelques instants"
+      });
+      analyzeSite();
+    } catch (error) {
+      toast.error("URL invalide", {
+        description: "Veuillez entrer une URL valide (ex: https://exemple.com)"
+      });
+    }
   };
 
   const handleExampleClick = (example: string) => {
@@ -154,6 +172,25 @@ const SeoAnalysisForm: React.FC<SeoAnalysisFormProps> = ({
           <div>
             <p className="text-sm font-medium mb-1">{t('seo.analysisError')}</p>
             <p className="text-sm">{error}</p>
+            {error.includes('Failed to fetch') && (
+              <>
+                <p className="text-sm mt-2 font-medium">Impossible de se connecter au site. Cela peut être dû à plusieurs raisons :</p>
+                <ul className="text-sm list-disc pl-5 mt-1">
+                  <li>Restrictions CORS du site</li>
+                  <li>Le site n'est pas accessible actuellement</li>
+                  <li>L'URL entrée est incorrecte</li>
+                </ul>
+                <Button
+                  onClick={handleActivateProxy}
+                  variant="outline"
+                  size="sm"
+                  className="mt-3 text-amber-700 border-amber-300 bg-amber-100 hover:bg-amber-200"
+                >
+                  <Shield className="mr-1.5 h-4 w-4" />
+                  Activer le proxy CORS
+                </Button>
+              </>
+            )}
           </div>
         </div>
       )}
