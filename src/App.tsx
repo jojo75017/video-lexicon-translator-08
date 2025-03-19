@@ -17,7 +17,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/quora" element={<QuoraPage />} />
+          <Route path="/QuoraPage" element={<QuoraPage />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
