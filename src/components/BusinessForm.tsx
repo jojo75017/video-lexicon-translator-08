@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Flag from 'react-world-flags';
@@ -40,10 +40,27 @@ export const BusinessForm = ({ onSubmit }: BusinessFormProps) => {
     },
   });
 
+  // Debug props
+  useEffect(() => {
+    console.log("BusinessForm props:", { onSubmit: !!onSubmit });
+  }, [onSubmit]);
+
   const handleFormSubmit = (data: FormValues) => {
-    console.log("Business form submitted:", data);
+    console.log("Business form submitted with data:", data);
     toast.success("Formulaire soumis avec succès");
-    onSubmit(data);
+    
+    try {
+      onSubmit(data);
+    } catch (error) {
+      console.error("Error in form submission:", error);
+      toast.error("Erreur lors de la soumission du formulaire");
+    }
+  };
+
+  const handleButtonClick = () => {
+    console.log("Business form button clicked manually");
+    // This will trigger the form validation and submission
+    form.handleSubmit(handleFormSubmit)();
   };
 
   return (
@@ -165,9 +182,10 @@ export const BusinessForm = ({ onSubmit }: BusinessFormProps) => {
 
         <div className="text-center pt-4">
           <Button 
-            type="submit"
+            type="button" // Changed from submit to button
             size="lg"
             className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
+            onClick={handleButtonClick} // Add explicit click handler
           >
             Vérifiez vos répertoires locaux gratuitement
           </Button>

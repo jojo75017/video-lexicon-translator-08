@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2, Copy } from "lucide-react";
@@ -13,8 +13,13 @@ const UrlShortener = ({ longUrl }: UrlShortenerProps) => {
   const [shortUrl, setShortUrl] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
 
+  // Debug props
+  useEffect(() => {
+    console.log("UrlShortener props:", { longUrl });
+  }, [longUrl]);
+
   const shortenUrl = async () => {
-    console.log("Shortening URL:", longUrl);
+    console.log("Shortening URL button clicked:", longUrl);
     
     if (!longUrl) {
       toast.error("Veuillez d'abord entrer une URL à analyser");
@@ -23,15 +28,20 @@ const UrlShortener = ({ longUrl }: UrlShortenerProps) => {
 
     setIsLoading(true);
     try {
+      console.log("Fetching shortened URL from tinyurl");
       const response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(longUrl)}`);
-      if (!response.ok) throw new Error('Erreur lors du raccourcissement de l\'URL');
+      console.log("Fetch response status:", response.status);
+      
+      if (!response.ok) {
+        throw new Error('Erreur lors du raccourcissement de l\'URL');
+      }
       
       const shortened = await response.text();
+      console.log("Shortened URL received:", shortened);
       setShortUrl(shortened);
       toast.success("URL raccourcie avec succès !");
-      console.log("Shortened URL:", shortened);
     } catch (error) {
-      console.error('Erreur:', error);
+      console.error('Erreur lors du raccourcissement:', error);
       toast.error("Impossible de raccourcir l'URL");
     } finally {
       setIsLoading(false);
@@ -39,7 +49,12 @@ const UrlShortener = ({ longUrl }: UrlShortenerProps) => {
   };
 
   const copyToClipboard = async () => {
-    console.log("Copying to clipboard:", shortUrl);
+    console.log("Copy button clicked for URL:", shortUrl);
+    
+    if (!shortUrl) {
+      toast.error("Aucune URL à copier");
+      return;
+    }
     
     try {
       await navigator.clipboard.writeText(shortUrl);

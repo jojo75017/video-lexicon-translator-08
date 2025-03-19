@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -11,19 +11,49 @@ interface VideoInputProps {
 const VideoInput: React.FC<VideoInputProps> = ({ onVideoSubmit }) => {
   const [videoUrl, setVideoUrl] = useState('');
 
+  // Debug props
+  useEffect(() => {
+    console.log("VideoInput props:", { onVideoSubmit: !!onVideoSubmit });
+  }, [onVideoSubmit]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("VideoInput submit:", videoUrl);
+    console.log("VideoInput form submitted:", videoUrl);
     
     if (!videoUrl) {
       toast.error("Please enter a video URL");
       return;
     }
     
-    // Appeler directement la fonction de soumission
-    onVideoSubmit(videoUrl);
+    // Call the callback explicitly
+    try {
+      console.log("Calling onVideoSubmit with:", videoUrl);
+      onVideoSubmit(videoUrl);
+      toast.success("Video URL submitted successfully");
+    } catch (error) {
+      console.error("Error submitting video URL:", error);
+      toast.error("Failed to submit video URL");
+    }
+  };
+
+  const handleButtonClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    console.log("Video submit button clicked with:", videoUrl);
     
-    toast.success("Video URL submitted successfully");
+    if (!videoUrl) {
+      toast.error("Please enter a video URL");
+      return;
+    }
+    
+    // Call the callback explicitly
+    try {
+      console.log("Calling onVideoSubmit with:", videoUrl);
+      onVideoSubmit(videoUrl);
+      toast.success("Video URL submitted successfully");
+    } catch (error) {
+      console.error("Error submitting video URL:", error);
+      toast.error("Failed to submit video URL");
+    }
   };
 
   return (
@@ -38,9 +68,10 @@ const VideoInput: React.FC<VideoInputProps> = ({ onVideoSubmit }) => {
         />
       </div>
       <Button 
-        type="submit" 
+        type="button" 
         className="w-full bg-primary hover:bg-primary-600"
         disabled={!videoUrl}
+        onClick={handleButtonClick}
       >
         Load Video
       </Button>
