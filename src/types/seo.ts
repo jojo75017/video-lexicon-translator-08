@@ -191,6 +191,7 @@ export interface KeywordSuggestion {
   difficulty?: number;
   volume?: number;
   trend?: string;
+  seasonality?: string;
 }
 
 export interface Performance {
@@ -270,6 +271,7 @@ export interface SearchConsoleData {
   topQueries?: any[];
   topPages?: any[];
   devices?: any;
+  countries?: any;
 }
 
 export interface SecurityHeaders {
@@ -300,6 +302,7 @@ export interface BrokenLink {
   url: string;
   statusCode: number;
   message: string;
+  location?: string;
 }
 
 // Create a KeywordAnalysis interface that matches what's expected

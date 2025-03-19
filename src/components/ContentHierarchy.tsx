@@ -3,10 +3,11 @@ import React from 'react';
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useTranslation } from 'react-i18next';
-import { ChevronRight, Heading1, Heading2, Heading3, Type, AlertCircle, CheckCircle2, BarChart2, Lightbulb } from 'lucide-react';
+import { ChevronRight, Heading1, Heading2, Heading3, Type, AlertCircle, CheckCircle2, BarChart2, Lightbulb, FileQuestion } from 'lucide-react';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 
 interface ContentItem {
   type: 'h1' | 'h2' | 'h3' | 'text';
@@ -27,10 +28,15 @@ interface ContentHierarchyProps {
   recommendations?: string[];
 }
 
-const ContentHierarchy = ({ headings, paragraphs, recommendations = [] }: ContentHierarchyProps) => {
+const ContentHierarchy = ({ headings = [], paragraphs = [], recommendations = [] }: ContentHierarchyProps) => {
   const { t } = useTranslation();
+  
+  // Check if we have actual content to analyze
+  const hasContent = headings.length > 0 || paragraphs.length > 0;
 
   const getAllContent = (): ContentItem[] => {
+    if (!hasContent) return [];
+    
     const content: ContentItem[] = [
       ...headings.map(h => ({
         type: `h${h.level}` as 'h1' | 'h2' | 'h3',
@@ -74,6 +80,8 @@ const ContentHierarchy = ({ headings, paragraphs, recommendations = [] }: Conten
   };
 
   const analyzeHierarchy = () => {
+    if (!hasContent) return ["Aucun contenu à analyser. Analysez d'abord un site web."];
+    
     const h1Count = headings.filter(h => h.level === 1).length;
     const issues = [];
 
@@ -101,10 +109,12 @@ const ContentHierarchy = ({ headings, paragraphs, recommendations = [] }: Conten
       issues.push("⚠️ Des titres H3 apparaissent avant le premier H2");
     }
 
-    return issues;
+    return issues.length > 0 ? issues : ["La structure hiérarchique est bien organisée"];
   };
 
   const extractKeywords = () => {
+    if (!hasContent) return [];
+    
     const allText = getAllContent().map(item => item.content).join(' ').toLowerCase();
     const words = allText.split(/\s+/);
     const wordCount: { [key: string]: number } = {};
@@ -126,6 +136,34 @@ const ContentHierarchy = ({ headings, paragraphs, recommendations = [] }: Conten
   const content = getAllContent();
   const hierarchyIssues = analyzeHierarchy();
   const keywords = extractKeywords();
+
+  // Empty state rendering
+  if (!hasContent) {
+    return (
+      <Card className="p-6 bg-white/50 backdrop-blur-sm">
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-semibold mb-2 flex items-center gap-2">
+              <BarChart2 className="h-5 w-5 text-blue-600" />
+              Analyse de la Structure
+            </h2>
+            <p className="text-gray-600 text-sm">
+              Analysez un site web pour voir sa structure hiérarchique
+            </p>
+          </div>
+          
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <FileQuestion className="h-16 w-16 text-gray-300 mb-4" />
+            <h3 className="text-xl font-medium text-gray-500 mb-2">Aucun site web analysé</h3>
+            <p className="text-gray-400 max-w-md mb-6">
+              Pour voir l'analyse de la structure hiérarchique, commencez par analyser un site web en utilisant l'outil d'analyse SEO.
+            </p>
+            <Button variant="outline">Analyser un site web</Button>
+          </div>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card className="p-6 bg-white/50 backdrop-blur-sm">
@@ -198,25 +236,26 @@ const ContentHierarchy = ({ headings, paragraphs, recommendations = [] }: Conten
           </div>
 
           <div className="space-y-4">
-            {hierarchyIssues.length > 0 ? (
-              <Alert className="bg-amber-50 border-amber-200">
-                <AlertCircle className="h-4 w-4 text-amber-500" />
-                <AlertDescription className="text-amber-800">
-                  <ul className="list-none space-y-2">
-                    {hierarchyIssues.map((issue, index) => (
-                      <li key={index}>{issue}</li>
-                    ))}
-                  </ul>
-                </AlertDescription>
-              </Alert>
-            ) : (
-              <Alert className="bg-green-50 border-green-200">
+            <Alert className={hierarchyIssues.length === 1 && hierarchyIssues[0] === "La structure hiérarchique est bien organisée" 
+              ? "bg-green-50 border-green-200" 
+              : "bg-amber-50 border-amber-200"}>
+              {hierarchyIssues.length === 1 && hierarchyIssues[0] === "La structure hiérarchique est bien organisée" ? (
                 <CheckCircle2 className="h-4 w-4 text-green-500" />
-                <AlertDescription className="text-green-800">
-                  La hiérarchie de votre contenu est bien structurée !
-                </AlertDescription>
-              </Alert>
-            )}
+              ) : (
+                <AlertCircle className="h-4 w-4 text-amber-500" />
+              )}
+              <AlertDescription className={
+                hierarchyIssues.length === 1 && hierarchyIssues[0] === "La structure hiérarchique est bien organisée"
+                  ? "text-green-800"
+                  : "text-amber-800"
+              }>
+                <ul className="list-none space-y-2">
+                  {hierarchyIssues.map((issue, index) => (
+                    <li key={index}>{issue}</li>
+                  ))}
+                </ul>
+              </AlertDescription>
+            </Alert>
 
             {recommendations && recommendations.length > 0 && (
               <div className="bg-blue-50 rounded-lg p-4">
@@ -242,18 +281,24 @@ const ContentHierarchy = ({ headings, paragraphs, recommendations = [] }: Conten
         <div>
           <h3 className="text-lg font-semibold mb-3">Aperçu de la Structure</h3>
           <ScrollArea className="h-[400px] rounded-md border p-4">
-            {content.map((item, index) => (
-              <div
-                key={index}
-                className={`flex items-start gap-2 py-2 ${getIndentation(item.type)} group hover:bg-gray-50 rounded px-2 transition-colors`}
-              >
-                {getIcon(item.type)}
-                <ChevronRight className="h-4 w-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <span className={`text-sm ${item.type === 'text' ? 'text-gray-600' : 'font-medium'}`}>
-                  {item.content}
-                </span>
+            {content.length > 0 ? (
+              content.map((item, index) => (
+                <div
+                  key={index}
+                  className={`flex items-start gap-2 py-2 ${getIndentation(item.type)} group hover:bg-gray-50 rounded px-2 transition-colors`}
+                >
+                  {getIcon(item.type)}
+                  <ChevronRight className="h-4 w-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <span className={`text-sm ${item.type === 'text' ? 'text-gray-600' : 'font-medium'}`}>
+                    {item.content}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <div className="flex justify-center items-center h-full text-gray-400">
+                Aucun contenu structuré à afficher
               </div>
-            ))}
+            )}
           </ScrollArea>
         </div>
       </div>
@@ -262,4 +307,3 @@ const ContentHierarchy = ({ headings, paragraphs, recommendations = [] }: Conten
 };
 
 export default ContentHierarchy;
-
