@@ -2,7 +2,8 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { SeoAnalysisResult } from '@/types/seo';
-import { ListTree, Type, Heading, Quote } from 'lucide-react';
+import { ListTree, Type, Heading, Quote, FileQuestion } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface HierarchySectionProps {
   isLoading: boolean;
@@ -10,6 +11,14 @@ interface HierarchySectionProps {
 }
 
 const HierarchySection: React.FC<HierarchySectionProps> = ({ isLoading, seoAnalysis }) => {
+  // Check if we have content to analyze
+  const hasContent = seoAnalysis && (
+    seoAnalysis.h1Count !== undefined || 
+    seoAnalysis.h2Count !== undefined || 
+    seoAnalysis.h3Count !== undefined ||
+    seoAnalysis.wordCount !== undefined
+  );
+
   return (
     <Card className="p-6 border-0 shadow-md bg-gradient-to-br from-white to-slate-50">
       <div className="flex items-center mb-4">
@@ -29,7 +38,7 @@ const HierarchySection: React.FC<HierarchySectionProps> = ({ isLoading, seoAnaly
         </div>
       ) : (
         <div>
-          {seoAnalysis ? (
+          {hasContent ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm">
                 <div className="flex items-center mb-3">
@@ -42,21 +51,21 @@ const HierarchySection: React.FC<HierarchySectionProps> = ({ isLoading, seoAnaly
                       <div className="w-6 h-6 flex items-center justify-center bg-amber-100 text-amber-700 rounded-full text-xs font-medium">H1</div>
                       <span className="ml-2 text-gray-700">Titres principaux</span>
                     </div>
-                    <span className="font-semibold text-gray-800">{seoAnalysis.h1Count || 0}</span>
+                    <span className="font-semibold text-gray-800">{seoAnalysis?.h1Count || 0}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <div className="flex items-center">
                       <div className="w-6 h-6 flex items-center justify-center bg-amber-50 text-amber-600 rounded-full text-xs font-medium">H2</div>
                       <span className="ml-2 text-gray-700">Sous-titres</span>
                     </div>
-                    <span className="font-semibold text-gray-800">{seoAnalysis.h2Count || 0}</span>
+                    <span className="font-semibold text-gray-800">{seoAnalysis?.h2Count || 0}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <div className="flex items-center">
                       <div className="w-6 h-6 flex items-center justify-center bg-amber-50 text-amber-500 rounded-full text-xs font-medium">H3</div>
                       <span className="ml-2 text-gray-700">Sections</span>
                     </div>
-                    <span className="font-semibold text-gray-800">{seoAnalysis.h3Count || 0}</span>
+                    <span className="font-semibold text-gray-800">{seoAnalysis?.h3Count || 0}</span>
                   </div>
                 </div>
               </div>
@@ -70,12 +79,12 @@ const HierarchySection: React.FC<HierarchySectionProps> = ({ isLoading, seoAnaly
                   <div>
                     <div className="flex justify-between mb-1">
                       <span className="text-sm text-gray-500">Nombre de mots</span>
-                      <span className="text-sm font-medium text-gray-700">{seoAnalysis.wordCount || 0}</span>
+                      <span className="text-sm font-medium text-gray-700">{seoAnalysis?.wordCount || 0}</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-1.5">
                       <div 
                         className="bg-blue-600 h-1.5 rounded-full" 
-                        style={{ width: `${Math.min(Math.max((seoAnalysis.wordCount || 0) / 10, 10), 100)}%` }}
+                        style={{ width: `${Math.min(Math.max((seoAnalysis?.wordCount || 0) / 10, 10), 100)}%` }}
                       ></div>
                     </div>
                     <div className="flex justify-between text-xs text-gray-400 mt-1">
@@ -88,18 +97,18 @@ const HierarchySection: React.FC<HierarchySectionProps> = ({ isLoading, seoAnaly
                   <div>
                     <div className="flex justify-between mb-1">
                       <span className="text-sm text-gray-500">Lisibilité</span>
-                      <span className="text-sm font-medium text-gray-700">{seoAnalysis.readabilityScore || 0}/100</span>
+                      <span className="text-sm font-medium text-gray-700">{seoAnalysis?.readabilityScore || 0}/100</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-1.5">
                       <div 
                         className={`h-1.5 rounded-full ${
-                          (seoAnalysis.readabilityScore || 0) > 70 
+                          (seoAnalysis?.readabilityScore || 0) > 70 
                             ? 'bg-green-500' 
-                            : (seoAnalysis.readabilityScore || 0) > 40 
+                            : (seoAnalysis?.readabilityScore || 0) > 40 
                               ? 'bg-amber-500' 
                               : 'bg-red-500'
                         }`}
-                        style={{ width: `${seoAnalysis.readabilityScore || 0}%` }}
+                        style={{ width: `${seoAnalysis?.readabilityScore || 0}%` }}
                       ></div>
                     </div>
                   </div>
@@ -107,13 +116,17 @@ const HierarchySection: React.FC<HierarchySectionProps> = ({ isLoading, seoAnaly
               </div>
             </div>
           ) : (
-            <div className="bg-gray-50 p-6 rounded-lg text-center">
-              <p className="text-gray-500 font-medium">
-                Analysez un site pour voir la structure de son contenu
-              </p>
-              <p className="text-gray-400 text-sm mt-2">
-                La hiérarchie des titres et l'analyse du texte s'afficheront ici
-              </p>
+            <div className="bg-gray-50 p-8 rounded-lg text-center">
+              <div className="flex flex-col items-center justify-center">
+                <FileQuestion className="h-12 w-12 text-gray-300 mb-4" />
+                <p className="text-gray-600 font-medium mb-2">
+                  Aucun site web analysé
+                </p>
+                <p className="text-gray-400 text-sm max-w-md mb-6">
+                  Pour voir la structure du contenu, commencez par analyser un site web avec l'outil d'analyse SEO
+                </p>
+                <Button variant="outline">Analyser un site</Button>
+              </div>
             </div>
           )}
         </div>

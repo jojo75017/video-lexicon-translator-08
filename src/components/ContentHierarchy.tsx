@@ -31,8 +31,10 @@ interface ContentHierarchyProps {
 const ContentHierarchy = ({ headings = [], paragraphs = [], recommendations = [] }: ContentHierarchyProps) => {
   const { t } = useTranslation();
   
-  // Check if we have actual content to analyze
-  const hasContent = headings.length > 0 || paragraphs.length > 0;
+  // Check if we have actual content to analyze - ensure arrays have elements with content
+  const hasHeadings = headings && headings.length > 0 && headings.some(h => h.text && h.text.trim() !== '');
+  const hasParagraphs = paragraphs && paragraphs.length > 0 && paragraphs.some(p => p.text && p.text.trim() !== '');
+  const hasContent = hasHeadings || hasParagraphs;
 
   const getAllContent = (): ContentItem[] => {
     if (!hasContent) return [];
