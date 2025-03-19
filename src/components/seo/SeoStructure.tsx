@@ -26,7 +26,7 @@ const SeoStructure = ({
   hierarchy = []
 }: SeoStructureProps) => {
   const { t } = useTranslation();
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true); // Auto-expand by default to show structure
   
   const getHeadingIcon = (level: number) => {
     switch(level) {
@@ -49,7 +49,7 @@ const SeoStructure = ({
 
   const renderHierarchyItem = (item: HierarchyItem, index: number, depth: number = 0) => {
     return (
-      <div key={`${item.tagName}-${index}-${depth}`} className="ml-2">
+      <div key={`${item.tagName}-${index}-${depth}`} className="ml-2 mb-2">
         <div className={`
           flex items-start gap-2 p-2 rounded-md
           ${item.tagName === 'h1' ? 'bg-blue-50 border border-blue-100' : ''}
@@ -67,12 +67,18 @@ const SeoStructure = ({
             {item.text}
           </span>
         </div>
-        {item.children && item.children.map((child, childIndex) => 
-          renderHierarchyItem(child, childIndex, depth + 1)
+        {item.children && item.children.length > 0 && (
+          <div className="ml-4">
+            {item.children.map((child, childIndex) => 
+              renderHierarchyItem(child, childIndex, depth + 1)
+            )}
+          </div>
         )}
       </div>
     );
   };
+
+  console.log("Rendering SeoStructure:", { h1Count, h2Count, h3Count, headingsCount: headings?.length || 0, hierarchyCount: hierarchy?.length || 0 });
   
   return (
     <div>
@@ -124,25 +130,25 @@ const SeoStructure = ({
         </div>
       </div>
       
-      {showHeadingsList && (
-        <div className="mt-4">
-          <button 
-            onClick={() => setExpanded(!expanded)}
-            className="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors mb-2"
-          >
-            {expanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-            {expanded ? "Masquer" : "Afficher"} la structure des titres
-          </button>
-          
-          {expanded && (
-            <Card className="p-4 bg-gray-50 border border-gray-200 overflow-auto max-h-96">
-              <div className="space-y-2">
-                {hierarchy && hierarchy.length > 0 ? (
-                  <div className="space-y-1">
-                    {hierarchy.map((item, index) => renderHierarchyItem(item, index))}
-                  </div>
-                ) : headings && headings.length > 0 ? (
-                  headings.map((heading, idx) => (
+      <div className="mt-4">
+        <button 
+          onClick={() => setExpanded(!expanded)}
+          className="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors mb-2"
+        >
+          {expanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+          {expanded ? "Masquer" : "Afficher"} la structure des titres
+        </button>
+        
+        {expanded && (
+          <Card className="p-4 bg-gray-50 border border-gray-200 overflow-auto max-h-96">
+            <div className="space-y-2">
+              {hierarchy && hierarchy.length > 0 ? (
+                <div className="space-y-1">
+                  {hierarchy.map((item, index) => renderHierarchyItem(item, index))}
+                </div>
+              ) : headings && headings.length > 0 ? (
+                <div className="space-y-2">
+                  {headings.map((heading, idx) => (
                     <div 
                       key={idx} 
                       className={`
@@ -158,17 +164,17 @@ const SeoStructure = ({
                         {heading.text}
                       </span>
                     </div>
-                  ))
-                ) : (
-                  <div className="text-center text-gray-500 py-4">
-                    Aucune structure de titres détectée
-                  </div>
-                )}
-              </div>
-            </Card>
-          )}
-        </div>
-      )}
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center text-gray-500 py-4">
+                  Aucune structure de titres détectée. Veuillez analyser un site pour voir sa structure.
+                </div>
+              )}
+            </div>
+          </Card>
+        )}
+      </div>
     </div>
   );
 };

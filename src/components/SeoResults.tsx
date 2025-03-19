@@ -30,7 +30,7 @@ interface SeoResultsProps {
 const calculateSeoScore = (analysis: SeoAnalysis) => {
   let score = 100;
 
-  // Pénalités pour les problèmes de structure
+  // Penalties for structure issues
   if (analysis.h1Count !== 1) score -= 10;
   if (analysis.h1Count === 0) score -= 20;
   if (analysis.imgCount === 0) score -= 5;
@@ -38,9 +38,9 @@ const calculateSeoScore = (analysis: SeoAnalysis) => {
   if (!analysis.description) score -= 10;
   if (!analysis.title) score -= 15;
 
-  // Pénalités pour les performances
+  // Penalties for performance
   if (analysis.performance.firstContentfulPaint > 2.5) score -= 10;
-  if (analysis.performance.timeToInteractive > 3.8) score -= 10;
+  if (analysis.performance.timeToInteractive && analysis.performance.timeToInteractive > 3.8) score -= 10;
 
   return Math.max(0, Math.min(100, score));
 };
@@ -107,6 +107,14 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
 
   // Extract hierarchy from the seoAnalysis if available
   const hierarchy = seoAnalysis.headingStructure?.hierarchy || [];
+
+  console.log("SEO STRUCTURE RENDERING:", { 
+    h1Count: seoAnalysis.h1Count,
+    h2Count: seoAnalysis.h2Count,
+    h3Count: seoAnalysis.h3Count,
+    headings: seoAnalysis.headings?.length || 0,
+    hierarchy: hierarchy?.length || 0
+  });
 
   return (
     <ScrollArea className="h-[calc(100vh-200px)] pr-4">

@@ -15,7 +15,7 @@ interface MetaTagsResult {
 export const analyzeMetaTags = (doc: Document): Record<string, string> => {
   const metaTags = Array.from(doc.getElementsByTagName('meta'));
   
-  // Analyse détaillée des meta tags
+  // Detailed analysis of meta tags
   const analysis = metaTags.reduce((acc, meta) => {
     const name = meta.getAttribute('name') || meta.getAttribute('property');
     const content = meta.getAttribute('content');
@@ -25,24 +25,48 @@ export const analyzeMetaTags = (doc: Document): Record<string, string> => {
     return acc;
   }, {} as Record<string, string>);
 
-  // Vérification des balises essentielles
-  const hasSeoTitleTag = doc.querySelector('title') !== null;
-  const hasDescriptionTag = metaTags.some(tag => tag.getAttribute('name') === 'description');
-  const hasRobotsTag = metaTags.some(tag => tag.getAttribute('name') === 'robots');
-  const hasCanonicalTag = doc.querySelector('link[rel="canonical"]') !== null;
-  const hasOpenGraphTags = metaTags.some(tag => tag.getAttribute('property')?.startsWith('og:'));
-  const hasTwitterTags = metaTags.some(tag => tag.getAttribute('name')?.startsWith('twitter:'));
-  const hasViewportTag = metaTags.some(tag => tag.getAttribute('name') === 'viewport');
+  // Add title if it exists
+  if (doc.querySelector('title')) {
+    analysis['title'] = doc.querySelector('title')?.textContent || '';
+  }
 
-  // Ajout des statuts dans l'analyse
-  analysis['hasSeoTitleTag'] = String(hasSeoTitleTag);
-  analysis['hasDescriptionTag'] = String(hasDescriptionTag);
-  analysis['hasRobotsTag'] = String(hasRobotsTag);
-  analysis['hasCanonicalTag'] = String(hasCanonicalTag);
-  analysis['hasOpenGraphTags'] = String(hasOpenGraphTags);
-  analysis['hasTwitterTags'] = String(hasTwitterTags);
-  analysis['hasViewportTag'] = String(hasViewportTag);
+  // Group meta tags by category
+  if (metaTags.some(tag => tag.getAttribute('property')?.startsWith('og:'))) {
+    analysis['og'] = 'present';
+  }
+  
+  if (metaTags.some(tag => tag.getAttribute('name')?.startsWith('twitter:'))) {
+    analysis['twitter'] = 'present';
+  }
+  
+  if (doc.querySelector('link[rel="canonical"]')) {
+    analysis['canonical'] = doc.querySelector('link[rel="canonical"]')?.getAttribute('href') || '';
+  }
+  
+  if (metaTags.some(tag => tag.getAttribute('name') === 'robots')) {
+    analysis['robots'] = metaTags.find(tag => tag.getAttribute('name') === 'robots')?.getAttribute('content') || '';
+  }
+  
+  if (metaTags.some(tag => tag.getAttribute('name') === 'viewport')) {
+    analysis['viewport'] = metaTags.find(tag => tag.getAttribute('name') === 'viewport')?.getAttribute('content') || '';
+  }
+  
+  if (doc.querySelector('link[rel="alternate"][hreflang]')) {
+    analysis['hreflang'] = 'present';
+  }
+  
+  if (doc.querySelector('script[type="application/ld+json"]')) {
+    analysis['structuredData'] = 'present';
+  }
+
+  // Check essential tags
+  analysis['hasSeoTitleTag'] = String(doc.querySelector('title') !== null);
+  analysis['hasDescriptionTag'] = String(metaTags.some(tag => tag.getAttribute('name') === 'description'));
+  analysis['hasRobotsTag'] = String(metaTags.some(tag => tag.getAttribute('name') === 'robots'));
+  analysis['hasCanonicalTag'] = String(doc.querySelector('link[rel="canonical"]') !== null);
+  analysis['hasOpenGraphTags'] = String(metaTags.some(tag => tag.getAttribute('property')?.startsWith('og:')));
+  analysis['hasTwitterTags'] = String(metaTags.some(tag => tag.getAttribute('name')?.startsWith('twitter:')));
+  analysis['hasViewportTag'] = String(metaTags.some(tag => tag.getAttribute('name') === 'viewport'));
 
   return analysis;
 };
-
