@@ -2,6 +2,7 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Search, Loader2 } from "lucide-react";
 
 interface CrawlInputProps {
   url: string;
@@ -12,8 +13,14 @@ interface CrawlInputProps {
 }
 
 export const CrawlInput = ({ url, isLoading, progress, onUrlChange, onSubmit }: CrawlInputProps) => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("CrawlInput submit with URL:", url);
+    onSubmit(e);
+  };
+
   return (
-    <form onSubmit={onSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <div>
         <label htmlFor="url" className="block text-sm font-medium mb-1">
           URL du site
@@ -42,8 +49,19 @@ export const CrawlInput = ({ url, isLoading, progress, onUrlChange, onSubmit }: 
         type="submit"
         disabled={isLoading}
         className="w-full"
+        onClick={handleSubmit}
       >
-        {isLoading ? "Analyse en cours..." : "Analyser le site"}
+        {isLoading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Analyse en cours...
+          </>
+        ) : (
+          <>
+            <Search className="mr-2 h-4 w-4" />
+            Analyser le site
+          </>
+        )}
       </Button>
     </form>
   );

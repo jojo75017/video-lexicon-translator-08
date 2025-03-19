@@ -63,9 +63,13 @@ const SeoAnalysisForm: React.FC<SeoAnalysisFormProps> = ({
     setUrl(example);
   };
 
-  const handleProxyDemoClick = () => {
+  const handleProxyDemoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
     console.log("OPENING CORS DEMO PAGE");
     window.open('https://cors-anywhere.herokuapp.com/corsdemo', '_blank');
+    toast.info("Ouverture de la page de démo CORS", {
+      description: "Activez le service, puis revenez sur cette page"
+    });
   };
 
   return (
@@ -93,6 +97,10 @@ const SeoAnalysisForm: React.FC<SeoAnalysisFormProps> = ({
               type="submit"
               disabled={isLoading || !url}
               className="h-12 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white transition-colors disabled:bg-indigo-300 shadow-md"
+              onClick={(e) => {
+                e.preventDefault();
+                handleSubmit(e);
+              }}
             >
               {isLoading ? (
                 <>
@@ -163,7 +171,10 @@ const SeoAnalysisForm: React.FC<SeoAnalysisFormProps> = ({
             </p>
             <div className="flex flex-wrap gap-2">
               <Button
-                onClick={handleActivateProxy}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleActivateProxy();
+                }}
                 variant="outline"
                 size="sm"
                 className="text-amber-700 border-amber-300 bg-amber-100 hover:bg-amber-200"
@@ -220,7 +231,10 @@ const SeoAnalysisForm: React.FC<SeoAnalysisFormProps> = ({
                   <li>L'URL entrée est incorrecte</li>
                 </ul>
                 <Button
-                  onClick={handleActivateProxy}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleActivateProxy();
+                  }}
                   variant="outline"
                   size="sm"
                   className="mt-3 text-amber-700 border-amber-300 bg-amber-100 hover:bg-amber-200"

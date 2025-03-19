@@ -4,7 +4,7 @@ import { Code, Search, ListTree } from "lucide-react";
 import { SiteInfo } from "./SiteInfo";
 import { SourceCode } from "./SourceCode";
 import { toast } from "sonner";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { getStructureData } from "@/utils/seo/updateUtils";
 
 interface ResultTabsProps {
@@ -12,6 +12,8 @@ interface ResultTabsProps {
 }
 
 export const ResultTabs = ({ data }: ResultTabsProps) => {
+  const [activeTab, setActiveTab] = useState("info");
+  
   // Notification lorsque les données sont chargées
   useEffect(() => {
     if (data) {
@@ -27,6 +29,8 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
   // Gestionnaire pour le changement d'onglet
   const handleTabChange = (value: string) => {
     console.log("Tab changed to:", value);
+    setActiveTab(value);
+    
     toast.info(`Affichage de l'onglet ${value}`, {
       description: value === "info" 
         ? "Informations générales sur le site"

@@ -25,14 +25,7 @@ const UrlInput = ({
 }: UrlInputProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    handleAnalyze();
-  };
-
-  const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUrl(e.target.value);
-  };
-
-  const handleAnalyze = () => {
+    
     if (!url) {
       toast.error("Veuillez entrer une URL");
       return;
@@ -41,35 +34,29 @@ const UrlInput = ({
     try {
       // Vérifie si l'URL est valide
       new URL(url);
-      console.log("ANALYZING URL FROM URLINPUT:", url);
+      console.log("URL is valid, triggering analysis:", url);
+      
+      // Notification de démarrage
       toast.success("Analyse démarrée", {
         description: "Patientez pendant l'analyse..."
       });
       
-      // Notification supplémentaire pour guider l'utilisateur
-      toast.info("Conseils d'utilisation", {
-        description: "Une fois l'analyse terminée, utilisez les onglets pour explorer les résultats"
-      });
-      
       // On s'assure d'appeler la fonction onAnalyze du parent
-      if (typeof onAnalyze === 'function') {
-        onAnalyze();
-      } else {
-        console.error("onAnalyze n'est pas une fonction", onAnalyze);
-        toast.error("Erreur lors de l'analyse", {
-          description: "Une erreur technique est survenue, veuillez réessayer"
-        });
-      }
+      onAnalyze();
     } catch (error) {
-      console.error("INVALID URL FROM URLINPUT:", url, error);
+      console.error("Invalid URL:", url, error);
       toast.error("URL invalide", {
         description: "Veuillez entrer une URL valide (ex: https://exemple.com)"
       });
     }
   };
 
+  const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUrl(e.target.value);
+  };
+
   const handleProxyDemoClick = () => {
-    console.log("OPENING CORS DEMO PAGE FROM URLINPUT");
+    console.log("Opening CORS demo page");
     window.open('https://cors-anywhere.herokuapp.com/corsdemo', '_blank');
     toast.info("Redirection vers le service de démo CORS", {
       description: "Activez le service de démo, puis revenez ici pour continuer votre analyse"
@@ -102,7 +89,6 @@ const UrlInput = ({
             disabled={isLoading}
             className="min-w-[140px] relative bg-blue-600 hover:bg-blue-700"
             variant="default"
-            onClick={handleAnalyze} // Ajout d'un gestionnaire d'événement onClick explicite
           >
             {isLoading ? (
               <>
@@ -127,20 +113,26 @@ const UrlInput = ({
             <p className="mb-2">Pour analyser des sites externes, vous devez activer le proxy CORS.</p>
             <div className="flex flex-wrap gap-2">
               <Button
-                onClick={handleActivateProxy}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleActivateProxy();
+                }}
                 size="sm"
                 variant="outline"
                 className="border-amber-200 text-amber-800 hover:bg-amber-100"
-                type="button" // Spécifier le type pour éviter la soumission du formulaire
+                type="button"
               >
                 Activer le proxy
               </Button>
               <Button
-                onClick={handleProxyDemoClick}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleProxyDemoClick();
+                }}
                 size="sm"
                 variant="outline"
                 className="border-blue-200 text-blue-800 hover:bg-blue-100"
-                type="button" // Spécifier le type pour éviter la soumission du formulaire
+                type="button"
               >
                 <ExternalLink className="mr-1.5 h-3 w-3" />
                 Activer démo CORS

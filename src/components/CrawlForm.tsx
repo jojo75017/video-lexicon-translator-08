@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { CrawlInput } from './crawl/CrawlInput';
 import { ResultTabs } from './crawl/ResultTabs';
 import '@/styles/scrollbar.css';
+import { toast } from "sonner";
 
 interface CrawlResult {
   success: boolean;
@@ -19,7 +20,7 @@ interface CrawlResult {
 }
 
 export const CrawlForm = () => {
-  const { toast } = useToast();
+  const { toast: uiToast } = useToast();
   const [url, setUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -29,29 +30,29 @@ export const CrawlForm = () => {
   const [isForbiddenError, setIsForbiddenError] = useState(false);
 
   const handleActivateProxy = () => {
+    console.log("Activating proxy in CrawlForm");
     FirecrawlService.enableProxy();
     setShowCorsWarning(false);
-    toast({
-      title: "Proxy CORS activé",
+    toast("Proxy CORS activé", {
       description: "Vous pouvez maintenant analyser des sites externes",
     });
   };
 
   const handleProxyDemoClick = () => {
+    console.log("Opening CORS demo in CrawlForm");
     window.open('https://cors-anywhere.herokuapp.com/corsdemo', '_blank');
-    toast({
-      title: "Redirection vers le service de démo CORS",
-      description: "Activez le service de démo, puis revenez ici pour continuer votre analyse",
+    toast("Redirection vers CORS demo", {
+      description: "Activez le service de démo, puis revenez ici",
     });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Form submitted with URL:", url);
+    
     if (!url) {
-      toast({
-        title: "URL requise",
+      toast("URL requise", {
         description: "Veuillez entrer une URL à analyser",
-        variant: "destructive",
       });
       return;
     }
@@ -60,10 +61,8 @@ export const CrawlForm = () => {
     try {
       new URL(url);
     } catch {
-      toast({
-        title: "URL invalide",
+      toast("URL invalide", {
         description: "Veuillez entrer une URL valide (ex: https://exemple.com)",
-        variant: "destructive",
       });
       return;
     }
@@ -87,8 +86,7 @@ export const CrawlForm = () => {
       
       if (result.success) {
         setProgress(100);
-        toast({
-          title: "Succès",
+        toast("Succès", {
           description: "Site web analysé avec succès",
         });
         setCrawlResult(result);
@@ -102,18 +100,14 @@ export const CrawlForm = () => {
           setShowCorsWarning(true);
         }
         
-        toast({
-          title: "Erreur",
+        toast("Erreur", {
           description: result.error || "Échec de l'analyse du site",
-          variant: "destructive",
         });
       }
     } catch (error) {
       console.error('Error analyzing website:', error);
-      toast({
-        title: "Erreur",
+      toast("Erreur", {
         description: "Échec de l'analyse du site",
-        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -142,7 +136,10 @@ export const CrawlForm = () => {
               </p>
               <div className="flex flex-wrap gap-2">
                 <Button 
-                  onClick={handleActivateProxy}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleActivateProxy();
+                  }}
                   className="text-sm bg-amber-600 hover:bg-amber-700 text-white px-3 py-1 rounded-md"
                 >
                   Activer le proxy CORS
@@ -161,7 +158,10 @@ export const CrawlForm = () => {
                 Le service de proxy CORS a retourné une erreur 403 Forbidden. Vous devez d'abord activer le service de démo CORS.
               </p>
               <Button 
-                onClick={handleProxyDemoClick}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleProxyDemoClick();
+                }}
                 className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md flex items-center"
               >
                 <ExternalLink className="mr-1.5 h-4 w-4" />
