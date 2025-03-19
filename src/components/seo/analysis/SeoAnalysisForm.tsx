@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, AlertCircle, Loader2 } from "lucide-react";
+import { Search, AlertCircle, Loader2, Shield } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 
@@ -40,6 +40,7 @@ const SeoAnalysisForm = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     console.log("SeoAnalysisForm submit");
     analyzeSite();
   };
@@ -112,17 +113,30 @@ const SeoAnalysisForm = ({
 
       {showCorsWarning && (
         <div className="mt-4 bg-yellow-50 p-4 rounded-md border border-yellow-200">
-          <h3 className="font-medium text-yellow-800 mb-2">Erreur d'accès CORS détectée</h3>
+          <h3 className="font-medium text-yellow-800 mb-2 flex items-center">
+            <Shield className="h-4 w-4 mr-2" />
+            Erreur d'accès CORS détectée
+          </h3>
           <p className="text-yellow-700 mb-3">
-            Les restrictions de sécurité du navigateur empêchent l'accès au site. Activez notre proxy CORS pour continuer l'analyse.
+            Les restrictions de sécurité du navigateur empêchent l'accès au site. 
+            Activez notre proxy CORS pour contourner cette limitation et continuer l'analyse.
           </p>
           <Button 
             variant="outline" 
             onClick={handleProxyClick}
             type="button"
+            className="bg-yellow-100 text-yellow-800 border-yellow-300 hover:bg-yellow-200"
           >
+            <Shield className="mr-2 h-4 w-4" />
             Activer le proxy CORS
           </Button>
+        </div>
+      )}
+      
+      {isLoading && (
+        <div className="mt-4 p-3 bg-blue-50 rounded-md border border-blue-100 flex items-center">
+          <Loader2 className="mr-2 h-4 w-4 animate-spin text-blue-500" />
+          <span className="text-blue-700">Analyse en cours, veuillez patienter...</span>
         </div>
       )}
     </form>

@@ -11,6 +11,12 @@ interface CrawlResponse {
 export class FirecrawlService {
   private static readonly TIMEOUT = 15000; // 15 secondes de timeout
   private static isProxyEnabled = false;
+  private static useAlternativeCorsProxy = false;
+  private static alternativeCorsProxies = [
+    'https://corsproxy.io/?',
+    'https://cors-anywhere.herokuapp.com/',
+    'https://api.allorigins.win/raw?url='
+  ];
 
   static enableProxy() {
     this.isProxyEnabled = true;
@@ -20,6 +26,12 @@ export class FirecrawlService {
 
   static isProxyActive() {
     return this.isProxyEnabled;
+  }
+
+  static useAlternativeProxy() {
+    this.useAlternativeCorsProxy = true;
+    console.log('Utilisation du proxy alternatif activée');
+    return this.useAlternativeCorsProxy;
   }
 
   static async crawlWebsite(url: string): Promise<CrawlResponse> {
@@ -51,116 +63,40 @@ export class FirecrawlService {
       console.log('Utilisation du proxy CORS:', corsProxy + encodeURIComponent(url));
       
       try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), this.TIMEOUT);
+        // Première tentative avec le proxy principal
+        const fetchResult = await this.fetchWithTimeout(corsProxy + encodeURIComponent(url));
         
-        const response = await fetch(`${corsProxy}${encodeURIComponent(url)}`, {
-          headers: {
-            'Accept': 'text/html',
-            'X-Requested-With': 'XMLHttpRequest',
-          },
-          signal: controller.signal
-        });
-
-        clearTimeout(timeoutId);
-
-        if (!response.ok) {
-          console.error(`Erreur HTTP: ${response.status}`);
-          throw new Error(`Impossible d'accéder au site (Statut: ${response.status})`);
-        }
-
-        const html = await response.text();
-        if (!html || html.trim().length === 0) {
-          console.error("Le site a retourné un contenu vide");
-          return {
-            success: false,
-            error: "Le site a retourné un contenu vide",
-            completed: 0,
-            total: 0
-          };
+        if (fetchResult.success) {
+          return this.processHtmlResult(fetchResult.data, url);
+        } else if (this.useAlternativeCorsProxy) {
+          // Essayer avec un proxy alternatif si la première tentative a échoué
+          console.log('Tentative avec un proxy alternatif...');
+          for (const alternativeProxy of this.alternativeCorsProxies) {
+            if (alternativeProxy === corsProxy) continue; // Skip the one we already tried
+            
+            console.log('Essai avec proxy:', alternativeProxy);
+            const altFetchResult = await this.fetchWithTimeout(alternativeProxy + encodeURIComponent(url));
+            
+            if (altFetchResult.success) {
+              return this.processHtmlResult(altFetchResult.data, url);
+            }
+          }
         }
         
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-
-        // Analyse basique du site
-        const title = doc.title || "Sans titre";
-        const meta = Array.from(doc.getElementsByTagName('meta'))
-          .map(meta => ({
-            name: meta.getAttribute('name') || meta.getAttribute('property'),
-            content: meta.getAttribute('content')
-          }))
-          .filter(meta => meta.name && meta.content);
-
-        const links = Array.from(doc.getElementsByTagName('a'))
-          .map(a => ({
-            href: a.href,
-            text: a.textContent?.trim() || "Sans texte"
-          }))
-          .filter(link => link.href.startsWith('http'));
-
-        const images = Array.from(doc.getElementsByTagName('img'))
-          .map(img => ({
-            src: img.src,
-            alt: img.alt || "Sans description"
-          }));
-
-        // Ajouter le code source formaté
-        const formattedHtml = html
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/\n/g, '<br>')
-          .replace(/\s{2}/g, '&nbsp;&nbsp;');
-
+        // Si toutes les tentatives échouent, retourner une erreur
+        console.error('Toutes les tentatives ont échoué');
         return {
-          success: true,
-          status: 'completed',
-          completed: 1,
-          total: 1,
-          data: [{
-            url,
-            title,
-            meta,
-            links: links.slice(0, 20), // Limite à 20 liens
-            images: images.slice(0, 20), // Limite à 20 images
-            headings: Array.from(doc.querySelectorAll('h1, h2, h3'))
-              .map(h => ({
-                level: h.tagName.toLowerCase(),
-                text: h.textContent?.trim() || "Sans texte"
-              })),
-            sourceCode: formattedHtml // Ajout du code source
-          }]
+          success: false,
+          error: fetchResult.error || "Impossible d'accéder au site avec aucun proxy",
+          completed: 0,
+          total: 0
         };
       } catch (error) {
         console.error('Erreur lors de la requête fetch:', error);
         console.log('Génération de données de démonstration...');
         
         // Générer des données de démonstration en cas d'erreur
-        return {
-          success: true,
-          status: 'demo',
-          completed: 1,
-          total: 1,
-          data: [{
-            url,
-            title: "Démonstration - Site simulé",
-            meta: [
-              { name: "description", content: "Données de démonstration pour le site demandé" }
-            ],
-            links: [
-              { href: url + "/page1", text: "Page d'exemple 1" },
-              { href: url + "/page2", text: "Page d'exemple 2" }
-            ],
-            images: [
-              { src: "https://via.placeholder.com/150", alt: "Image d'exemple" }
-            ],
-            headings: [
-              { level: "h1", text: "Titre principal de démonstration" },
-              { level: "h2", text: "Sous-titre de démonstration" }
-            ],
-            sourceCode: "&lt;html&gt;&lt;body&gt;Démonstration&lt;/body&gt;&lt;/html&gt;"
-          }]
-        };
+        return this.generateDemoData(url);
       }
     } catch (error) {
       console.error('Erreur lors de l\'analyse:', error);
@@ -169,31 +105,135 @@ export class FirecrawlService {
       console.log('Génération de données de démonstration après erreur:', errorMessage);
       
       // Generate simulated data instead of failing completely
+      return this.generateDemoData(url);
+    }
+  }
+
+  private static async fetchWithTimeout(url: string): Promise<{ success: boolean, data?: string, error?: string }> {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), this.TIMEOUT);
+      
+      const response = await fetch(url, {
+        headers: {
+          'Accept': 'text/html',
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        console.error(`Erreur HTTP: ${response.status}`);
+        return {
+          success: false,
+          error: `Impossible d'accéder au site (Statut: ${response.status})`
+        };
+      }
+
+      const html = await response.text();
+      
+      if (!html || html.trim().length === 0) {
+        console.error("Le site a retourné un contenu vide");
+        return {
+          success: false,
+          error: "Le site a retourné un contenu vide"
+        };
+      }
+      
       return {
         success: true,
-        status: 'demo',
-        completed: 1,
-        total: 1,
-        data: [{
-          url,
-          title: "Démonstration - Site non accessible",
-          meta: [
-            { name: "description", content: "Données de démonstration pour le site demandé" }
-          ],
-          links: [
-            { href: url + "/page1", text: "Page d'exemple 1" },
-            { href: url + "/page2", text: "Page d'exemple 2" }
-          ],
-          images: [
-            { src: "https://via.placeholder.com/150", alt: "Image d'exemple" }
-          ],
-          headings: [
-            { level: "h1", text: "Titre principal de démonstration" },
-            { level: "h2", text: "Sous-titre de démonstration" }
-          ],
-          sourceCode: "&lt;html&gt;&lt;body&gt;Démonstration&lt;/body&gt;&lt;/html&gt;"
-        }]
+        data: html
+      };
+    } catch (error) {
+      console.error('Erreur de fetch avec timeout:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Erreur de connexion'
       };
     }
+  }
+
+  private static processHtmlResult(html: string, url: string): CrawlResponse {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    // Analyse basique du site
+    const title = doc.title || "Sans titre";
+    const meta = Array.from(doc.getElementsByTagName('meta'))
+      .map(meta => ({
+        name: meta.getAttribute('name') || meta.getAttribute('property'),
+        content: meta.getAttribute('content')
+      }))
+      .filter(meta => meta.name && meta.content);
+
+    const links = Array.from(doc.getElementsByTagName('a'))
+      .map(a => ({
+        href: a.href,
+        text: a.textContent?.trim() || "Sans texte"
+      }))
+      .filter(link => link.href.startsWith('http'));
+
+    const images = Array.from(doc.getElementsByTagName('img'))
+      .map(img => ({
+        src: img.src,
+        alt: img.alt || "Sans description"
+      }));
+
+    // Ajouter le code source formaté
+    const formattedHtml = html
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/\n/g, '<br>')
+      .replace(/\s{2}/g, '&nbsp;&nbsp;');
+
+    return {
+      success: true,
+      status: 'completed',
+      completed: 1,
+      total: 1,
+      data: [{
+        url,
+        title,
+        meta,
+        links: links.slice(0, 20), // Limite à 20 liens
+        images: images.slice(0, 20), // Limite à 20 images
+        headings: Array.from(doc.querySelectorAll('h1, h2, h3'))
+          .map(h => ({
+            level: h.tagName.toLowerCase(),
+            text: h.textContent?.trim() || "Sans texte"
+          })),
+        sourceCode: formattedHtml // Ajout du code source
+      }]
+    };
+  }
+
+  private static generateDemoData(url: string): CrawlResponse {
+    return {
+      success: true,
+      status: 'demo',
+      completed: 1,
+      total: 1,
+      data: [{
+        url,
+        title: "Démonstration - Site simulé",
+        meta: [
+          { name: "description", content: "Données de démonstration pour le site demandé" }
+        ],
+        links: [
+          { href: url + "/page1", text: "Page d'exemple 1" },
+          { href: url + "/page2", text: "Page d'exemple 2" }
+        ],
+        images: [
+          { src: "https://via.placeholder.com/150", alt: "Image d'exemple" }
+        ],
+        headings: [
+          { level: "h1", text: "Titre principal de démonstration" },
+          { level: "h2", text: "Sous-titre de démonstration" }
+        ],
+        sourceCode: "&lt;html&gt;&lt;body&gt;Démonstration&lt;/body&gt;&lt;/html&gt;"
+      }]
+    };
   }
 }
