@@ -41,10 +41,17 @@ const UrlInput = ({
     try {
       new URL(url);
       console.log("ANALYZING URL FROM URLINPUT:", url);
-      toast.info("Début de l'analyse...", {
-        description: "Cette opération peut prendre quelques instants"
+      toast.success("Analyse démarrée", {
+        description: "Cliquez sur les onglets pour voir les différentes analyses"
       });
       onAnalyze();
+      
+      // Notification supplémentaire pour guider l'utilisateur
+      setTimeout(() => {
+        toast.info("Conseils d'utilisation", {
+          description: "Utilisez les onglets en haut pour explorer les différentes analyses SEO"
+        });
+      }, 2000);
     } catch {
       console.error("INVALID URL FROM URLINPUT:", url);
       toast.error("URL invalide", {
@@ -142,6 +149,12 @@ const UrlInput = ({
       {!isLoading && !url && (
         <div className="bg-amber-50 p-3 rounded-md border border-amber-100 text-sm text-amber-700">
           Entrez l'URL d'un site web pour commencer l'analyse SEO et voir les résultats détaillés
+        </div>
+      )}
+      
+      {!isLoading && url && (
+        <div className="bg-green-50 p-3 rounded-md border border-green-100 text-sm text-green-700">
+          Une fois l'analyse lancée, utilisez les onglets en haut pour explorer les différentes analyses SEO
         </div>
       )}
     </form>

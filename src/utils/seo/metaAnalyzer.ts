@@ -1,148 +1,144 @@
+import { toast } from "sonner";
 
-interface MetaTagsResult {
-  tags: Record<string, string>;
-  metaStatus: {
-    hasSeoTitleTag: boolean;
-    hasDescriptionTag: boolean;
-    hasRobotsTag: boolean;
-    hasCanonicalTag: boolean;
-    hasOpenGraphTags: boolean;
-    hasTwitterTags: boolean;
-    hasViewportTag: boolean;
-  };
+interface MetaTag {
+  name: string;
+  content: string;
 }
 
-export const analyzeMetaTags = (doc: Document): Record<string, string> => {
-  console.log("ANALYZING META TAGS...");
-  
-  try {
-    // Si le document est null ou invalid, retourne des données fictives
-    if (!doc || !doc.getElementsByTagName) {
-      console.log("WARNING: Invalid document for meta analysis, returning mock data");
-      return generateMockMetaTags();
-    }
-    
-    const metaTags = Array.from(doc.getElementsByTagName('meta'));
-    console.log("META TAGS FOUND:", metaTags.length);
-    
-    // Detailed analysis of meta tags
-    const analysis = metaTags.reduce((acc, meta) => {
-      try {
-        const name = meta.getAttribute('name') || meta.getAttribute('property');
-        const content = meta.getAttribute('content');
-        if (name && content) {
-          acc[name] = content;
-          console.log(`META TAG: ${name} = ${content.substring(0, 50)}${content.length > 50 ? '...' : ''}`);
-        }
-      } catch (e) {
-        console.error("Error analyzing meta tag:", e);
-      }
-      return acc;
-    }, {} as Record<string, string>);
+interface OpenGraphTags {
+  title?: string;
+  description?: string;
+  image?: string;
+  url?: string;
+  type?: string;
+  siteName?: string;
+}
 
-    // Add title if it exists
-    try {
-      if (doc.querySelector('title')) {
-        analysis['title'] = doc.querySelector('title')?.textContent || '';
-        console.log(`TITLE: ${analysis['title']}`);
-      } else {
-        console.log("NO TITLE TAG FOUND");
-        analysis['title'] = "Titre non défini";
-      }
-    } catch (e) {
-      console.error("Error getting title:", e);
-      analysis['title'] = "Titre non défini";
-    }
+interface TwitterTags {
+  card?: string;
+  title?: string;
+  description?: string;
+  image?: string;
+  site?: string;
+}
 
-    // Group meta tags by category
-    try {
-      const hasOgTags = metaTags.some(tag => tag.getAttribute('property')?.startsWith('og:'));
-      if (hasOgTags) {
-        analysis['og'] = 'present';
-        console.log("OG TAGS: present");
-      }
-      
-      const hasTwitterTags = metaTags.some(tag => tag.getAttribute('name')?.startsWith('twitter:'));
-      if (hasTwitterTags) {
-        analysis['twitter'] = 'present';
-        console.log("TWITTER TAGS: present");
-      }
-      
-      const canonicalLink = doc.querySelector('link[rel="canonical"]');
-      if (canonicalLink) {
-        analysis['canonical'] = canonicalLink.getAttribute('href') || '';
-        console.log(`CANONICAL: ${analysis['canonical']}`);
-      }
-      
-      const robotsTag = metaTags.find(tag => tag.getAttribute('name') === 'robots');
-      if (robotsTag) {
-        analysis['robots'] = robotsTag.getAttribute('content') || '';
-        console.log(`ROBOTS: ${analysis['robots']}`);
-      }
-      
-      const viewportTag = metaTags.find(tag => tag.getAttribute('name') === 'viewport');
-      if (viewportTag) {
-        analysis['viewport'] = viewportTag.getAttribute('content') || '';
-        console.log(`VIEWPORT: ${analysis['viewport']}`);
-      }
-      
-      const hreflangLinks = doc.querySelectorAll('link[rel="alternate"][hreflang]');
-      if (hreflangLinks.length > 0) {
-        analysis['hreflang'] = 'present';
-        console.log("HREFLANG: present");
-      }
-      
-      const structuredData = doc.querySelectorAll('script[type="application/ld+json"]');
-      if (structuredData.length > 0) {
-        analysis['structuredData'] = 'present';
-        console.log("STRUCTURED DATA: present");
-      }
-    } catch (e) {
-      console.error("Error analyzing meta categories:", e);
-    }
+interface MetaAnalysis {
+  title: string;
+  description: string;
+  keywords: string[];
+  canonical: string;
+  ogTags: OpenGraphTags;
+  twitterTags: TwitterTags;
+  robots: string;
+  otherTags: MetaTag[];
+  hasOgTags: boolean;
+  hasTwitterTags: boolean;
+}
 
-    // Check essential tags
-    analysis['hasSeoTitleTag'] = String(doc.querySelector('title') !== null);
-    analysis['hasDescriptionTag'] = String(metaTags.some(tag => tag.getAttribute('name') === 'description'));
-    analysis['hasRobotsTag'] = String(metaTags.some(tag => tag.getAttribute('name') === 'robots'));
-    analysis['hasCanonicalTag'] = String(doc.querySelector('link[rel="canonical"]') !== null);
-    analysis['hasOpenGraphTags'] = String(hasOgTags);
-    analysis['hasTwitterTags'] = String(hasTwitterTags);
-    analysis['hasViewportTag'] = String(metaTags.some(tag => tag.getAttribute('name') === 'viewport'));
-
-    console.log("META ANALYSIS COMPLETE");
-    
-    if (Object.keys(analysis).length === 0) {
-      console.log("WARNING: No meta tags found, returning mock data");
-      return generateMockMetaTags();
-    }
-    
-    return analysis;
-  } catch (error) {
-    console.error("ERROR in meta tag analysis:", error);
-    return generateMockMetaTags();
-  }
+// Crée un modèle d'analyse méta par défaut
+const createDefaultMetaAnalysis = (): MetaAnalysis => {
+  return {
+    title: "Titre de la page non trouvé",
+    description: "Description non trouvée",
+    keywords: [],
+    canonical: "",
+    ogTags: {},
+    twitterTags: {},
+    robots: "",
+    otherTags: [],
+    hasOgTags: false,
+    hasTwitterTags: false
+  };
 };
 
-const generateMockMetaTags = (): Record<string, string> => {
-  console.log("GENERATING MOCK META TAGS");
-  return {
-    'title': 'AquariosLands: Votre guide en aquariophilie d\'eau douce',
-    'description': 'Découvrez toutes nos ressources et conseils pour réussir votre aquarium d\'eau douce. Guide pour débutants et passionnés.',
-    'viewport': 'width=device-width, initial-scale=1',
-    'robots': 'index, follow',
-    'og:title': 'AquariosLands - Experts en aquariophilie',
-    'og:description': 'Tout savoir sur l\'aquariophilie d\'eau douce',
-    'og:type': 'website',
-    'twitter:card': 'summary_large_image',
-    'twitter:title': 'AquariosLands - Experts en aquariophilie',
-    'canonical': 'https://aquarioslands.com/',
-    'hasSeoTitleTag': 'true',
-    'hasDescriptionTag': 'true',
-    'hasRobotsTag': 'true',
-    'hasCanonicalTag': 'true',
-    'hasOpenGraphTags': 'true',
-    'hasTwitterTags': 'true',
-    'hasViewportTag': 'true'
-  };
+export const analyzeMetaTags = (document: Document): MetaAnalysis => {
+  console.log("ANALYZING META TAGS");
+  
+  if (!document) {
+    console.warn("Document is null in analyzeMetaTags");
+    return createDefaultMetaAnalysis();
+  }
+  
+  try {
+    const metaAnalysis: MetaAnalysis = createDefaultMetaAnalysis();
+    
+    // Extraction du titre
+    const titleElement = document.querySelector('title');
+    if (titleElement && titleElement.textContent) {
+      metaAnalysis.title = titleElement.textContent.trim();
+      console.log("META: Found title:", metaAnalysis.title);
+    }
+    
+    // Extraction des balises meta
+    const metaTags = document.querySelectorAll('meta');
+    console.log("META: Found", metaTags.length, "meta tags");
+    
+    metaTags.forEach((tag) => {
+      const name = tag.getAttribute('name') || tag.getAttribute('property');
+      const content = tag.getAttribute('content');
+      
+      if (name && content) {
+        // Meta description
+        if (name.toLowerCase() === 'description') {
+          metaAnalysis.description = content;
+          console.log("META: Found description:", content.substring(0, 50) + "...");
+        }
+        // Meta keywords
+        else if (name.toLowerCase() === 'keywords') {
+          metaAnalysis.keywords = content.split(',').map(k => k.trim());
+          console.log("META: Found keywords:", metaAnalysis.keywords.join(', '));
+        }
+        // Meta robots
+        else if (name.toLowerCase() === 'robots') {
+          metaAnalysis.robots = content;
+          console.log("META: Found robots:", content);
+        }
+        // Open Graph tags
+        else if (name.startsWith('og:')) {
+          metaAnalysis.hasOgTags = true;
+          const ogProperty = name.substring(3);
+          metaAnalysis.ogTags[ogProperty as keyof OpenGraphTags] = content;
+          console.log("META: Found OG tag:", name, "=", content.substring(0, 30) + "...");
+        }
+        // Twitter tags
+        else if (name.startsWith('twitter:')) {
+          metaAnalysis.hasTwitterTags = true;
+          const twitterProperty = name.substring(8);
+          metaAnalysis.twitterTags[twitterProperty as keyof TwitterTags] = content;
+          console.log("META: Found Twitter tag:", name, "=", content.substring(0, 30) + "...");
+        }
+        // Other meta tags
+        else {
+          metaAnalysis.otherTags.push({ name, content });
+          console.log("META: Found other tag:", name, "=", content.substring(0, 30) + "...");
+        }
+      }
+    });
+    
+    // Extraction de l'URL canonique
+    const canonicalTag = document.querySelector('link[rel="canonical"]');
+    if (canonicalTag) {
+      const href = canonicalTag.getAttribute('href');
+      if (href) {
+        metaAnalysis.canonical = href;
+        console.log("META: Found canonical:", href);
+      }
+    }
+    
+    console.log("META ANALYSIS COMPLETE:", {
+      title: metaAnalysis.title,
+      description: metaAnalysis.description?.substring(0, 50) + "...",
+      keywordsCount: metaAnalysis.keywords.length,
+      hasOgTags: metaAnalysis.hasOgTags,
+      hasTwitterTags: metaAnalysis.hasTwitterTags
+    });
+    
+    return metaAnalysis;
+  } catch (error) {
+    console.error("ERROR in analyzeMetaTags:", error);
+    toast.error("Erreur lors de l'analyse des balises méta", {
+      description: "Une erreur est survenue pendant l'analyse des métadonnées"
+    });
+    return createDefaultMetaAnalysis();
+  }
 };
