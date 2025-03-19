@@ -16,7 +16,7 @@ export const analyzeTrafficData = (searchConsoleData: SearchConsoleData) => {
   const topKeywords = searchConsoleData.topQueries.map(query => ({
     keyword: query.query,
     volume: Math.floor(query.impressions),
-    position: Math.floor(Math.random() * 10) + 1
+    count: Math.floor(Math.random() * 10) + 1
   }));
 
   // Pages les plus populaires basées sur les données de Search Console

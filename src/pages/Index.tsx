@@ -1,9 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Rocket, Search, Signature } from "lucide-react";
+import { Rocket, Search, Signature, BarChart } from "lucide-react";
 import { Github } from 'lucide-react';
 import { Sparkles } from 'lucide-react';
 import { MessageSquareText } from 'lucide-react';
@@ -12,6 +12,12 @@ import PageHeader from '@/components/dashboard/PageHeader';
 import TabNavigation from '@/components/dashboard/TabNavigation';
 import FeatureGrid from '@/components/dashboard/FeatureGrid';
 import InfoCards from '@/components/seo/InfoCards';
+import SeoAnalysisForm from '@/components/seo/analysis/SeoAnalysisForm';
+import ResultsDisplay from '@/components/seo/analysis/ResultsDisplay';
+import { SeoAnalysis } from '@/types/seo';
+import { analyzeSeo } from '@/utils/seoAnalyzer';
+import { useTranslation } from 'react-i18next';
+import { useToast } from '@/components/ui/use-toast';
 
 const ModeToggle = () => {
   return (
@@ -23,13 +29,86 @@ const ModeToggle = () => {
 };
 
 const IndexPage = () => {
+  const { t } = useTranslation();
+  const { toast } = useToast();
+  const [url, setUrl] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [showCorsWarning, setShowCorsWarning] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [seoAnalysis, setSeoAnalysis] = useState<SeoAnalysis | null>(null);
+  const [proxyEnabled, setProxyEnabled] = useState(false);
+
+  const analyzeSite = async () => {
+    if (!url) {
+      toast({
+        title: "URL requise",
+        description: "Veuillez saisir une URL à analyser",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const urlWithProtocol = url.startsWith('http') ? url : `https://${url}`;
+      
+      // Utilisez un proxy CORS si activé
+      const fetchUrl = proxyEnabled 
+        ? `https://cors-anywhere.herokuapp.com/${urlWithProtocol}` 
+        : urlWithProtocol;
+      
+      const response = await fetch(fetchUrl);
+      
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+
+      const html = await response.text();
+      
+      // Analysez le HTML
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      
+      // Effectuez l'analyse SEO
+      const analysis = await analyzeSeo(doc, urlWithProtocol);
+      setSeoAnalysis(analysis);
+      
+      toast({
+        title: "Analyse terminée",
+        description: "L'analyse SEO de votre site est terminée avec succès"
+      });
+    } catch (err: any) {
+      console.error('Erreur lors de l\'analyse:', err);
+      
+      if (err.message.includes('NetworkError') || err.message.includes('CORS')) {
+        setShowCorsWarning(true);
+        setError("Problème d'accès CORS détecté. Veuillez activer le proxy pour analyser ce site.");
+      } else {
+        setError(`Erreur lors de l'analyse: ${err.message}`);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleActivateProxy = () => {
+    setProxyEnabled(true);
+    setShowCorsWarning(false);
+    toast({
+      title: "Proxy CORS activé",
+      description: "Vous pouvez maintenant analyser des sites externes"
+    });
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
-      <header className="px-4 py-3 bg-white border-b">
+      <header className="px-4 py-3 bg-white border-b border-gray-200 shadow-sm">
         <div className="container flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2">
-            <Rocket className="h-6 w-6 text-primary" />
-            <span className="font-bold">SEO-GPT</span>
+            <Rocket className="h-6 w-6 text-indigo-600" />
+            <span className="font-bold text-xl">SEO-GPT</span>
           </Link>
           <nav className="flex items-center space-x-4">
             <ModeToggle />
@@ -43,16 +122,46 @@ const IndexPage = () => {
       
       <main className="container py-8 flex-grow">
         {/* Dashboard header with overview info */}
-        <PageHeader />
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">Tableau de bord SEO</h1>
+          <p className="text-gray-600">Analysez et optimisez vos sites web pour les moteurs de recherche</p>
+        </div>
         
-        {/* Navigation tabs */}
-        <TabNavigation />
+        {/* Analyze Form */}
+        <SeoAnalysisForm 
+          url={url}
+          setUrl={setUrl}
+          isLoading={isLoading}
+          showCorsWarning={showCorsWarning}
+          analyzeSite={analyzeSite}
+          error={error}
+          handleActivateProxy={handleActivateProxy}
+        />
+        
+        {/* Results Display */}
+        {seoAnalysis && (
+          <div className="mb-8">
+            <ResultsDisplay seoAnalysis={seoAnalysis} />
+          </div>
+        )}
         
         {/* Feature grid showing main tool options */}
-        <FeatureGrid />
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold mb-6 flex items-center">
+            <BarChart className="mr-2 h-6 w-6 text-indigo-600" />
+            Outils d'analyse SEO
+          </h2>
+          <FeatureGrid />
+        </div>
         
         {/* Info cards with SEO performance metrics */}
-        <InfoCards />
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold mb-6 flex items-center">
+            <Sparkles className="mr-2 h-6 w-6 text-indigo-600" />
+            Dernières statistiques
+          </h2>
+          <InfoCards />
+        </div>
         
         {/* Quora Button Section */}
         <div className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100">
@@ -92,10 +201,24 @@ const IndexPage = () => {
       </main>
       
       <footer className="px-4 py-8 border-t bg-white">
-        <div className="container text-center text-gray-500">
-          <p className="text-sm">
-            © {new Date().getFullYear()} SEO-GPT. Tous droits réservés.
-          </p>
+        <div className="container">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="flex items-center mb-4 md:mb-0">
+              <Rocket className="h-6 w-6 text-indigo-600 mr-2" />
+              <span className="font-bold text-xl">SEO-GPT</span>
+            </div>
+            <div className="flex flex-wrap gap-6 text-sm">
+              <a href="#" className="text-gray-600 hover:text-indigo-600">À propos</a>
+              <a href="#" className="text-gray-600 hover:text-indigo-600">Confidentialité</a>
+              <a href="#" className="text-gray-600 hover:text-indigo-600">Conditions</a>
+              <a href="#" className="text-gray-600 hover:text-indigo-600">Contact</a>
+            </div>
+          </div>
+          <div className="mt-6 text-center text-gray-500 text-sm">
+            <p>
+              © {new Date().getFullYear()} SEO-GPT. Tous droits réservés.
+            </p>
+          </div>
         </div>
       </footer>
     </div>

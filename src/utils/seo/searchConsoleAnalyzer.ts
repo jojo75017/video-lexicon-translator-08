@@ -32,9 +32,9 @@ export const analyzeSearchConsole = async (url: string): Promise<SearchConsoleDa
       ctr: data.ctr || 0,
       position: data.position || 0,
       keywords: [
-        { keyword: "marketing digital", position: 5, clicks: 450, impressions: 2800 },
-        { keyword: "seo optimisation", position: 8, clicks: 380, impressions: 2400 },
-        { keyword: "référencement naturel", position: 4, clicks: 320, impressions: 1900 }
+        { keyword: "marketing digital", count: 5, clicks: 450, impressions: 2800 },
+        { keyword: "seo optimisation", count: 8, clicks: 380, impressions: 2400 },
+        { keyword: "référencement naturel", count: 4, clicks: 320, impressions: 1900 }
       ],
       topQueries: data.queries || [
         { query: "marketing digital", clicks: 450, impressions: 2800 },

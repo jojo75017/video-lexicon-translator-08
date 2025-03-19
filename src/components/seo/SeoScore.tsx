@@ -26,41 +26,43 @@ const SeoScore = ({ score }: SeoScoreProps) => {
   
   // Détermine le message en fonction du score
   const getScoreMessage = (score: number) => {
-    if (score >= 80) return "Excellent";
-    if (score >= 60) return "Bon";
-    if (score >= 40) return "Amélioration nécessaire";
-    return "Critique";
+    if (score >= 80) return t('seo.excellent');
+    if (score >= 60) return t('seo.good');
+    if (score >= 40) return t('seo.needsImprovement');
+    return t('seo.critical');
   };
   
   return (
-    <div className="mb-6">
-      <div className="flex justify-between mb-1">
-        <h2 className="text-lg font-semibold text-gray-800">{t('seo.score')}</h2>
+    <div className="mb-6 bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+      <div className="flex justify-between mb-3">
+        <h2 className="text-xl font-bold text-gray-800">{t('seo.score')}</h2>
         <span className={`text-sm font-medium ${getScoreColor(score)}`}>
           {getScoreMessage(score)}
         </span>
       </div>
       
-      <div className="flex items-center gap-4 mb-1">
-        <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
-          <div 
-            className={`h-full ${getProgressColor(score)} transition-all duration-500 ease-out`}
-            style={{ width: `${score}%` }}
-          ></div>
+      <div className="flex items-center gap-4 mb-3">
+        <div className="w-full">
+          <Progress 
+            value={score} 
+            className={`h-3 ${getProgressColor(score)}`} 
+          />
         </div>
-        <div className="shrink-0 w-12 h-12 rounded-full flex items-center justify-center border-4 border-white shadow-sm" style={{
-          background: score >= 80 ? "#10b981" : score >= 60 ? "#f59e0b" : "#ef4444"
+        <div className="shrink-0 w-16 h-16 rounded-full flex items-center justify-center border-4 border-white shadow-md" style={{
+          background: score >= 80 ? "linear-gradient(135deg, #10b981, #059669)" : 
+                    score >= 60 ? "linear-gradient(135deg, #f59e0b, #d97706)" : 
+                    "linear-gradient(135deg, #ef4444, #dc2626)"
         }}>
-          <span className="text-white text-lg font-bold">{score}</span>
+          <span className="text-white text-xl font-bold">{score}</span>
         </div>
       </div>
       
-      <p className="text-xs text-gray-500 mt-1">
+      <p className="text-sm text-gray-600 mt-2 bg-gray-50 p-3 rounded-md border border-gray-100">
         {score >= 80 
-          ? "Votre site est bien optimisé pour les moteurs de recherche." 
+          ? t('seo.excellentDescription') 
           : score >= 60 
-          ? "Votre site a un bon potentiel, mais peut être amélioré." 
-          : "Votre site nécessite des améliorations significatives."}
+          ? t('seo.goodDescription') 
+          : t('seo.needsImprovementDescription')}
       </p>
     </div>
   );
