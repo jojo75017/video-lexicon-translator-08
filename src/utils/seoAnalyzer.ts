@@ -16,16 +16,18 @@ import { analyzeSecurityHeaders } from './seo/securityAnalyzer';
 import { analyzeIndexability } from './seo/indexabilityAnalyzer';
 import { analyzeImages } from './seo/imageAnalyzer';
 import { analyzeHeadings } from './seo/headingAnalyzer';
+import { analyzeBacklinks } from './seo/backlinkAnalyzer';
 
 export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysis> => {
   const startTime = window.performance.now();
   const textContent = doc.body.textContent?.toLowerCase() || '';
 
+  // Run all analysis functions
   const topKeywords = analyzeKeywords(textContent);
   const performanceMetrics = analyzePerformance(doc, startTime);
   const linkAnalysis = analyzeLinkStructure(doc, url);
   const mobileAnalysis = analyzeMobilePerformance(doc);
-  const metaTagsAnalysis = analyzeMetaTags(doc);
+  const metaTagsAnalysisResult = analyzeMetaTags(doc);
   const semanticStructure = analyzeSemanticStructure(doc);
   const readabilityScore = analyzeReadability(textContent);
   const technologies = ['React', 'JavaScript', 'HTML5', 'CSS3'];
@@ -34,8 +36,22 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
   const headingStructure = analyzeHeadings(doc);
   const contentAnalysis = analyzeContent(doc, textContent);
   const socialMetricsResult = analyzeSocialMetrics();
+  const backlinkResults = analyzeBacklinks(url);
   
-  // Fixing type issues
+  // Create properly typed meta tags analysis
+  const metaTagsAnalysis = {
+    hasTitleTag: metaTagsAnalysisResult.title !== undefined,
+    hasDescriptionTag: metaTagsAnalysisResult.description !== undefined,
+    hasOpenGraphTags: metaTagsAnalysisResult.og !== undefined,
+    hasTwitterTags: metaTagsAnalysisResult.twitter !== undefined,
+    hasCanonicalTag: metaTagsAnalysisResult.canonical !== undefined,
+    hasRobotsTag: metaTagsAnalysisResult.robots !== undefined,
+    hasViewportTag: metaTagsAnalysisResult.viewport !== undefined,
+    hasHreflangTags: metaTagsAnalysisResult.hreflang !== undefined,
+    hasStructuredData: metaTagsAnalysisResult.structuredData !== undefined
+  };
+  
+  // Fix accessibility results structure
   const accessibilityResults = analyzeAccessibility(doc);
   const accessibility = {
     contrast: { issues: 0, score: accessibilityResults.contrast.pass ? 100 : 70 },
@@ -45,6 +61,8 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
   };
   
   const schemaMarkupResult = analyzeSchema(doc);
+  
+  // Fix security headers type
   const securityHeaders = {
     https: true,
     hsts: false,
@@ -52,12 +70,7 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     contentSecurityPolicy: false,
     xContentTypeOptions: false,
     referrerPolicy: false,
-    permissions: [],
-    cookies: {
-      secure: true,
-      httpOnly: true,
-      sameSite: 'Lax'
-    }
+    permissions: false
   };
   
   const indexability = analyzeIndexability(doc);
@@ -132,29 +145,28 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     searchVolume: Math.floor(Math.random() * 10000),
     competition: Math.random(),
     cpc: Math.random() * 5,
-    relevance: Math.random() * 100
+    relevance: Math.random() * 100,
+    difficulty: Math.floor(Math.random() * 100),
+    volume: Math.floor(Math.random() * 5000)
   }));
 
-  const socialMetrics = {
-    facebook: { shares: 0, comments: 0, likes: 0 },
-    twitter: { shares: 0, likes: 0, replies: 0 },
-    linkedin: { shares: 0, engagements: 0 },
-    pinterest: { pins: 0 }
-  };
-
-  const processedImagesDetails = imagesDetails.map(img => ({
-    url: img.url,
-    alt: img.alt || '',
-    dimensions: {
-      width: 0,
-      height: 0
+  // Create sample broken links for testing
+  const brokenLinks = [
+    {
+      url: 'https://example.com/broken-page',
+      statusCode: 404,
+      message: 'Page not found',
+      location: 'body > div > a'
     },
-    size: 0,
-    format: 'unknown',
-    lazyLoaded: false,
-    compressed: false
-  }));
+    {
+      url: 'https://example.com/another-broken',
+      statusCode: 500,
+      message: 'Server error',
+      location: 'footer > a'
+    }
+  ];
 
+  // Return the finalized SEO analysis object
   return {
     title: doc.title || "Pas de titre",
     description: doc.querySelector('meta[name="description"]')?.getAttribute('content') || '',
@@ -166,31 +178,31 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     headingStructure: headingStructure,
     imgCount,
     imgWithoutAlt,
-    imagesDetails: processedImagesDetails,
+    imagesDetails,
     metaTagsCount: doc.getElementsByTagName('meta').length,
     metaTagsAnalysis,
     canonicalUrl: doc.querySelector('link[rel="canonical"]')?.getAttribute('href') || null,
     robotsMeta: doc.querySelector('meta[name="robots"]')?.getAttribute('content') || null,
-    brokenLinks: [],
+    brokenLinks,
     keywords: Array.from(doc.querySelectorAll('meta[name="keywords"]'))
       .map(meta => meta.getAttribute('content') || '')
       .filter(content => content !== '')
       .flatMap(content => content.split(',').map(keyword => keyword.trim())),
     googlePosition: null,
-    authorityScore: 0,
-    organicTraffic: 0,
-    backlinks: 0,
-    backlinkDetails: [],
-    topBacklinkDomains: [],
-    doFollowBacklinks: 0,
-    noFollowBacklinks: 0,
+    authorityScore: backlinkResults.backlinkDetails.reduce((acc, bl) => acc + bl.authority, 0) / Math.max(1, backlinkResults.backlinkDetails.length),
+    organicTraffic: Math.floor(Math.random() * 10000),
+    backlinks: backlinkResults.backlinks,
+    backlinkDetails: backlinkResults.backlinkDetails,
+    topBacklinkDomains: backlinkResults.topBacklinkDomains,
+    doFollowBacklinks: backlinkResults.doFollowBacklinks,
+    noFollowBacklinks: backlinkResults.noFollowBacklinks,
     wordCount: contentAnalysis.wordCount,
     textToHtmlRatio: contentAnalysis.textToHtmlRatio,
     internalLinks: linkAnalysis.internal,
     externalLinks: linkAnalysis.external,
     analytics,
     searchConsole: searchConsoleData,
-    socialMetrics,
+    socialMetrics: socialMetricsResult,
     performance: performanceMetrics,
     securityHeaders,
     semanticStructure,

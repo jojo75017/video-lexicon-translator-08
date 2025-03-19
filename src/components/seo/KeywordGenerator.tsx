@@ -2,207 +2,179 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Progress } from "@/components/ui/progress";
-import { Label } from "@/components/ui/label";
-import { StepBack, StepForward, Check, ArrowRight } from 'lucide-react';
+import { Card } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { KeywordSuggestion } from "@/types/seo";
+import { SeasonalityData } from '@/types/seo';
 
 interface KeywordGeneratorProps {
-  onKeywordsGenerated: (keywords: KeywordSuggestion[]) => void;
+  onGenerate?: (keywords: string[]) => void;
 }
 
-const KeywordGenerator = ({ onKeywordsGenerated }: KeywordGeneratorProps) => {
-  const [step, setStep] = useState(1);
-  const [domain, setDomain] = useState('');
-  const [location, setLocation] = useState('');
-  const [competitor, setCompetitor] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
+const KeywordGenerator: React.FC<KeywordGeneratorProps> = ({ onGenerate }) => {
+  const [topic, setTopic] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [generatedKeywords, setGeneratedKeywords] = useState<string[]>([]);
+  const [selectedTab, setSelectedTab] = useState('general');
 
-  const handleNext = () => {
-    if (step === 1 && !domain) {
-      toast.error("Veuillez entrer un domaine");
-      return;
-    }
-    if (step === 2 && !location) {
-      toast.error("Veuillez entrer une localisation");
-      return;
-    }
-    if (step < 4) {
-      setStep(step + 1);
-    }
-  };
-
-  const handleBack = () => {
-    if (step > 1) {
-      setStep(step - 1);
+  // Sample seasonality data
+  const seasonalityData: Record<string, SeasonalityData> = {
+    'marketing': {
+      peak: ['January', 'September', 'November'],
+      low: ['July', 'August']
+    },
+    'seo': {
+      peak: ['February', 'October'],
+      low: ['December', 'August']
+    },
+    'ecommerce': {
+      peak: ['November', 'December'],
+      low: ['January', 'February']
     }
   };
 
-  const handleGenerate = async () => {
-    setIsGenerating(true);
-    toast.info("Génération des suggestions de mots-clés...");
-
-    try {
-      // Simulation de la génération de mots-clés
-      const simulatedKeywords: KeywordSuggestion[] = [
-        { 
-          keyword: `${domain} ${location}`, 
-          relevance: 85,
-          searchVolume: Math.floor(Math.random() * 1000), 
-          difficulty: Math.floor(Math.random() * 100),
-          volume: Math.floor(Math.random() * 1000),
-          trend: 'up',
-          competition: Math.random(),
-          cpc: Math.random() * 5,
-          seasonality: {
-            peak: ['Jun', 'Jul', 'Aug'],
-            low: ['Jan', 'Feb']
-          }
-        },
-        { 
-          keyword: `services ${domain}`,
-          relevance: 75,
-          searchVolume: Math.floor(Math.random() * 1000),
-          volume: Math.floor(Math.random() * 1000),
-          difficulty: Math.floor(Math.random() * 100),
-          trend: 'stable',
-          competition: Math.random(),
-          cpc: Math.random() * 5,
-          seasonality: {
-            peak: ['Mar', 'Apr', 'May'],
-            low: ['Nov', 'Dec']
-          }
-        },
-        { 
-          keyword: `${domain} près de ${location}`,
-          relevance: 90,
-          searchVolume: Math.floor(Math.random() * 1000),
-          volume: Math.floor(Math.random() * 1000),
-          difficulty: Math.floor(Math.random() * 100),
-          trend: 'up',
-          competition: Math.random(),
-          cpc: Math.random() * 5,
-          seasonality: {
-            peak: ['Sep', 'Oct'],
-            low: ['Jul', 'Aug']
-          }
-        }
-      ];
-
-      toast.success("Suggestions générées avec succès!");
-      onKeywordsGenerated(simulatedKeywords);
-    } catch (error) {
-      toast.error("Erreur lors de la génération des suggestions");
-    } finally {
-      setIsGenerating(false);
+  const handleGenerate = () => {
+    if (!topic.trim()) {
+      toast.error("Veuillez entrer un sujet pour générer des mots-clés");
+      return;
     }
+
+    setLoading(true);
+    setTimeout(() => {
+      // Simulate API call with mock data
+      const mockKeywords = getMockKeywords(topic);
+      setGeneratedKeywords(mockKeywords);
+      setLoading(false);
+      if (onGenerate) onGenerate(mockKeywords);
+    }, 1500);
+  };
+
+  const getMockKeywords = (topic: string): string[] => {
+    const baseKeywords = [
+      `${topic} guide`, 
+      `meilleur ${topic}`, 
+      `${topic} pour débutants`, 
+      `comment trouver ${topic}`, 
+      `${topic} comparatif`, 
+      `${topic} pas cher`, 
+      `${topic} professionnel`, 
+      `${topic} en ligne`, 
+      `${topic} gratuit`, 
+      `${topic} 2023`
+    ];
+    
+    return baseKeywords;
+  };
+
+  const getSeasonality = (keyword: string): SeasonalityData | null => {
+    // Check if any key in seasonalityData is in the keyword
+    for (const key in seasonalityData) {
+      if (keyword.toLowerCase().includes(key.toLowerCase())) {
+        return seasonalityData[key];
+      }
+    }
+    return null;
   };
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-2">
-        <h3 className="text-lg font-semibold">Générateur de Mots-clés</h3>
-        <Progress value={step * 25} className="h-2" />
+    <Card className="p-6">
+      <h2 className="text-xl font-bold mb-4">Générateur de mots-clés</h2>
+      <p className="text-gray-600 mb-4">
+        Générez des idées de mots-clés pertinents pour votre contenu SEO.
+      </p>
+      
+      <div className="mb-6 flex gap-2">
+        <Input
+          placeholder="Entrez un sujet (ex: marketing digital)"
+          value={topic}
+          onChange={(e) => setTopic(e.target.value)}
+          className="flex-1"
+        />
+        <Button 
+          onClick={handleGenerate}
+          disabled={loading}
+        >
+          {loading ? "Génération..." : "Générer"}
+        </Button>
       </div>
-
-      <div className="space-y-4">
-        {step === 1 && (
-          <div className="space-y-4">
-            <Label htmlFor="domain">Entrez votre domaine</Label>
-            <Input
-              id="domain"
-              placeholder="ex: marketing-digital"
-              value={domain}
-              onChange={(e) => setDomain(e.target.value)}
-            />
-          </div>
-        )}
-
-        {step === 2 && (
-          <div className="space-y-4">
-            <Label htmlFor="location">Localisation de votre entreprise</Label>
-            <Input
-              id="location"
-              placeholder="ex: Paris"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-            />
-          </div>
-        )}
-
-        {step === 3 && (
-          <div className="space-y-4">
-            <Label htmlFor="competitor">URL d'un concurrent (optionnel)</Label>
-            <Input
-              id="competitor"
-              placeholder="ex: concurrent.com"
-              value={competitor}
-              onChange={(e) => setCompetitor(e.target.value)}
-            />
-          </div>
-        )}
-
-        {step === 4 && (
-          <div className="space-y-4">
-            <div className="p-4 bg-blue-50 rounded-lg">
-              <h4 className="font-medium text-blue-800 mb-2">Récapitulatif</h4>
-              <ul className="space-y-2 text-sm text-blue-700">
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4" />
-                  Domaine : {domain}
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4" />
-                  Localisation : {location}
-                </li>
-                {competitor && (
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4" />
-                    Concurrent : {competitor}
-                  </li>
-                )}
-              </ul>
-            </div>
-          </div>
-        )}
-
-        <div className="flex justify-between pt-4">
-          <Button
-            variant="outline"
-            onClick={handleBack}
-            disabled={step === 1}
-          >
-            <StepBack className="mr-2 h-4 w-4" />
-            Retour
-          </Button>
-
-          {step < 4 ? (
-            <Button onClick={handleNext}>
-              Suivant
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          ) : (
-            <Button 
-              onClick={handleGenerate}
-              disabled={isGenerating}
-            >
-              {isGenerating ? (
-                <>
-                  <StepForward className="mr-2 h-4 w-4 animate-spin" />
-                  Génération...
-                </>
-              ) : (
-                <>
-                  <StepForward className="mr-2 h-4 w-4" />
-                  Générer les suggestions
-                </>
-              )}
-            </Button>
-          )}
+      
+      {generatedKeywords.length > 0 && (
+        <div>
+          <Tabs defaultValue="general" onValueChange={setSelectedTab}>
+            <TabsList className="mb-4">
+              <TabsTrigger value="general">Général</TabsTrigger>
+              <TabsTrigger value="seasonal">Saisonnalité</TabsTrigger>
+              <TabsTrigger value="questions">Questions</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="general">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {generatedKeywords.map((keyword, index) => (
+                  <div key={index} className="p-2 bg-gray-50 rounded-md hover:bg-gray-100 flex justify-between items-center">
+                    <span>{keyword}</span>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => {
+                        navigator.clipboard.writeText(keyword);
+                        toast.success("Mot-clé copié");
+                      }}
+                    >
+                      Copier
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="seasonal">
+              <div className="space-y-4">
+                {generatedKeywords.map((keyword, index) => {
+                  const seasonality = getSeasonality(keyword);
+                  return (
+                    <div key={index} className="p-3 bg-gray-50 rounded-md">
+                      <p className="font-medium mb-2">{keyword}</p>
+                      {seasonality ? (
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                          <div>
+                            <span className="text-green-600 font-medium">Pics de recherche:</span>
+                            <ul className="mt-1 list-disc list-inside">
+                              {seasonality.peak.map((month, i) => (
+                                <li key={i}>{month}</li>
+                              ))}
+                            </ul>
+                          </div>
+                          <div>
+                            <span className="text-amber-600 font-medium">Basse saison:</span>
+                            <ul className="mt-1 list-disc list-inside">
+                              {seasonality.low.map((month, i) => (
+                                <li key={i}>{month}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-gray-500 italic">Pas de données saisonnières disponibles</p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="questions">
+              <div className="space-y-2">
+                {generatedKeywords.map((keyword, index) => (
+                  <div key={index} className="p-2 bg-gray-50 rounded-md">
+                    {["Comment", "Pourquoi", "Quels sont", "Quelle est", "Où"][Math.floor(Math.random() * 5)]} {keyword} ?
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
-      </div>
-    </div>
+      )}
+    </Card>
   );
 };
 

@@ -311,9 +311,17 @@ export interface BrokenLink {
   url: string;
   statusCode: number;
   message: string;
-  location?: string;
+  location: string;
 }
 
 export interface KeywordAnalysis extends KeywordData {
-  // Ensure it has all KeywordData properties
+  keyword: string;
+  count: number;
+  density: number;
+  position?: number;
+}
+
+export interface SeasonalityData {
+  peak: string[];
+  low: string[];
 }
