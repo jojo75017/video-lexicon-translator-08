@@ -39,6 +39,7 @@ const UrlInput = ({
     }
     
     try {
+      // Vérifie si l'URL est valide
       new URL(url);
       console.log("ANALYZING URL FROM URLINPUT:", url);
       toast.success("Analyse démarrée", {
@@ -50,9 +51,17 @@ const UrlInput = ({
         description: "Une fois l'analyse terminée, utilisez les onglets pour explorer les résultats"
       });
       
-      onAnalyze();
-    } catch {
-      console.error("INVALID URL FROM URLINPUT:", url);
+      // On s'assure d'appeler la fonction onAnalyze du parent
+      if (typeof onAnalyze === 'function') {
+        onAnalyze();
+      } else {
+        console.error("onAnalyze n'est pas une fonction", onAnalyze);
+        toast.error("Erreur lors de l'analyse", {
+          description: "Une erreur technique est survenue, veuillez réessayer"
+        });
+      }
+    } catch (error) {
+      console.error("INVALID URL FROM URLINPUT:", url, error);
       toast.error("URL invalide", {
         description: "Veuillez entrer une URL valide (ex: https://exemple.com)"
       });
@@ -93,6 +102,7 @@ const UrlInput = ({
             disabled={isLoading}
             className="min-w-[140px] relative bg-blue-600 hover:bg-blue-700"
             variant="default"
+            onClick={handleAnalyze} // Ajout d'un gestionnaire d'événement onClick explicite
           >
             {isLoading ? (
               <>
@@ -121,6 +131,7 @@ const UrlInput = ({
                 size="sm"
                 variant="outline"
                 className="border-amber-200 text-amber-800 hover:bg-amber-100"
+                type="button" // Spécifier le type pour éviter la soumission du formulaire
               >
                 Activer le proxy
               </Button>
@@ -129,6 +140,7 @@ const UrlInput = ({
                 size="sm"
                 variant="outline"
                 className="border-blue-200 text-blue-800 hover:bg-blue-100"
+                type="button" // Spécifier le type pour éviter la soumission du formulaire
               >
                 <ExternalLink className="mr-1.5 h-3 w-3" />
                 Activer démo CORS

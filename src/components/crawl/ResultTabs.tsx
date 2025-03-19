@@ -15,9 +15,12 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
   // Notification lorsque les données sont chargées
   useEffect(() => {
     if (data) {
+      console.log("ResultTabs received data:", data);
       toast.success("Données chargées avec succès", {
         description: "Explorez les différents onglets pour voir les résultats"
       });
+    } else {
+      console.log("ResultTabs: No data received");
     }
   }, [data]);
 
@@ -35,6 +38,7 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
 
   // Obtenez les données de structure, soit depuis les données transmises, soit en générant des données de secours
   const structureData = data?.headings ? data : getStructureData();
+  console.log("Using structure data:", structureData);
 
   return (
     <Tabs defaultValue="info" className="w-full" onValueChange={handleTabChange}>
@@ -78,7 +82,7 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
             <div>
               <h4 className="font-medium text-gray-700 mb-2">Hiérarchie des titres</h4>
               <div className="pl-4 border-l-2 border-blue-200 space-y-2">
-                {structureData.headings ? (
+                {structureData && structureData.headings && structureData.headings.length > 0 ? (
                   structureData.headings.map((heading: any, index: number) => (
                     <div 
                       key={index} 
@@ -108,7 +112,7 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
               </ul>
             </div>
             
-            {structureData.recommendations && (
+            {structureData && structureData.recommendations && (
               <div className="mt-4">
                 <h4 className="font-medium text-gray-700 mb-2">Recommandations spécifiques</h4>
                 <ul className="list-disc pl-5 space-y-1 text-gray-600">
