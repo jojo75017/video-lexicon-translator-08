@@ -19,6 +19,10 @@ const UrlInput = ({ url, setUrl, onAnalyze, isLoading }: UrlInputProps) => {
     handleAnalyze();
   };
 
+  const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUrl(e.target.value);
+  };
+
   const handleAnalyze = () => {
     if (!url) {
       toast.error("Veuillez entrer une URL");
@@ -53,7 +57,7 @@ const UrlInput = ({ url, setUrl, onAnalyze, isLoading }: UrlInputProps) => {
               id="url"
               placeholder="https://exemple.com"
               value={url}
-              onChange={(e) => setUrl(e.target.value)}
+              onChange={handleUrlChange}
               disabled={isLoading}
               className="pl-10"
             />

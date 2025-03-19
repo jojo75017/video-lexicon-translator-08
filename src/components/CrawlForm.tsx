@@ -14,6 +14,7 @@ interface CrawlResult {
   completed?: number;
   total?: number;
   data?: any[];
+  error?: string;
 }
 
 export const CrawlForm = () => {
@@ -22,12 +23,23 @@ export const CrawlForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [crawlResult, setCrawlResult] = useState<CrawlResult | null>(null);
+  const [hasPerformedAnalysis, setHasPerformedAnalysis] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!url) {
+      toast({
+        title: "URL requise",
+        description: "Veuillez entrer une URL à analyser",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsLoading(true);
     setProgress(0);
     setCrawlResult(null);
+    setHasPerformedAnalysis(true);
 
     try {
       const progressInterval = setInterval(() => {
@@ -77,9 +89,29 @@ export const CrawlForm = () => {
           onSubmit={handleSubmit}
         />
 
-        {crawlResult && crawlResult.data && crawlResult.data[0] && (
+        {hasPerformedAnalysis && crawlResult && crawlResult.data && crawlResult.data[0] && (
           <div className="mt-6">
             <ResultTabs data={crawlResult.data[0]} />
+          </div>
+        )}
+        
+        {hasPerformedAnalysis && (!crawlResult || !crawlResult.data || !crawlResult.data[0]) && (
+          <div className="mt-6 p-4 bg-amber-50 rounded-lg border border-amber-200 flex items-start">
+            <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5" />
+            <div>
+              <h3 className="font-medium text-amber-800">Aucun résultat disponible</h3>
+              <p className="text-amber-700 text-sm">
+                L'analyse n'a pas pu être complétée ou n'a pas retourné de données valides. Veuillez vérifier l'URL et réessayer.
+              </p>
+            </div>
+          </div>
+        )}
+        
+        {!hasPerformedAnalysis && !isLoading && (
+          <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200 text-center">
+            <p className="text-blue-700">
+              Entrez l'URL d'un site web et cliquez sur "Analyser" pour commencer l'analyse.
+            </p>
           </div>
         )}
       </Card>

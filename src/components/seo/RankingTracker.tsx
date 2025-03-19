@@ -5,6 +5,7 @@ import SearchTrends from "@/components/seo/SearchTrends";
 import { motion } from "framer-motion";
 import { analyzeSearchConsole } from '@/utils/seo/searchConsoleAnalyzer';
 import { useQuery } from '@tanstack/react-query';
+import { AlertTriangle } from 'lucide-react';
 
 interface RankingTrackerProps {
   url: string;
@@ -14,13 +15,28 @@ const RankingTracker: React.FC<RankingTrackerProps> = ({ url }) => {
   const { data: searchData, isLoading } = useQuery({
     queryKey: ['searchConsole', url],
     queryFn: () => analyzeSearchConsole(url),
-    enabled: !!url,
+    enabled: !!url && url.length > 0,
   });
+
+  // Show empty state if no URL is provided
+  if (!url) {
+    return (
+      <Card className="p-6">
+        <div className="flex flex-col items-center justify-center py-10 text-center">
+          <AlertTriangle className="h-12 w-12 text-amber-500 mb-4" />
+          <h3 className="text-lg font-medium text-gray-700 mb-2">Aucun site web à analyser</h3>
+          <p className="text-gray-500 max-w-md">
+            Veuillez entrer l'URL d'un site web dans le formulaire d'analyse pour voir les données de classement.
+          </p>
+        </div>
+      </Card>
+    );
+  }
 
   if (isLoading) {
     return (
       <Card className="p-6">
-        <div className="flex items-center justify-center">
+        <div className="flex items-center justify-center py-10">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
         </div>
       </Card>
@@ -30,7 +46,7 @@ const RankingTracker: React.FC<RankingTrackerProps> = ({ url }) => {
   if (!searchData) {
     return (
       <Card className="p-6">
-        <p className="text-center text-gray-500">Aucune donnée disponible</p>
+        <p className="text-center text-gray-500 py-10">Aucune donnée disponible</p>
       </Card>
     );
   }

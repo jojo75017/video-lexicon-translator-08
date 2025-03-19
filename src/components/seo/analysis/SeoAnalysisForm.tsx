@@ -40,6 +40,12 @@ const SeoAnalysisForm: React.FC<SeoAnalysisFormProps> = ({
         </button>
       </div>
       
+      {!url && !isLoading && (
+        <div className="mt-3 text-gray-700 bg-white p-3 rounded-md border border-gray-200">
+          <p className="text-sm">Veuillez entrer l'URL d'un site web pour commencer l'analyse.</p>
+        </div>
+      )}
+      
       {showCorsWarning && (
         <div className="mt-3 text-amber-700 bg-amber-50 p-3 rounded-md border border-amber-200">
           <p className="text-sm">

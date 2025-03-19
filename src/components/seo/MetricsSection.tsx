@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card } from '@/components/ui/card';
-import { BarChart2, PieChart, TrendingUp } from 'lucide-react';
+import { BarChart2, PieChart, TrendingUp, AlertTriangle } from 'lucide-react';
 import { SeoAnalysis } from '@/types/seo';
 
 interface MetricsSectionProps {
@@ -10,6 +10,8 @@ interface MetricsSectionProps {
 }
 
 const MetricsSection: React.FC<MetricsSectionProps> = ({ isLoading, seoAnalysis }) => {
+  const hasData = seoAnalysis && Object.keys(seoAnalysis).length > 0;
+  
   return (
     <Card className="p-6 border-0 shadow-md bg-gradient-to-br from-white to-slate-50">
       <div className="flex items-center mb-4">
@@ -26,7 +28,7 @@ const MetricsSection: React.FC<MetricsSectionProps> = ({ isLoading, seoAnalysis 
         </div>
       ) : (
         <div>
-          {seoAnalysis ? (
+          {hasData ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <MetricCard 
                 icon={<BarChart2 className="h-5 w-5 text-indigo-600" />}
@@ -48,12 +50,13 @@ const MetricsSection: React.FC<MetricsSectionProps> = ({ isLoading, seoAnalysis 
               />
             </div>
           ) : (
-            <div className="bg-gray-50 p-6 rounded-lg text-center">
-              <p className="text-gray-500 font-medium">
-                Analysez un site pour voir ses métriques détaillées
+            <div className="bg-gray-50 p-6 rounded-lg text-center flex flex-col items-center">
+              <AlertTriangle className="h-8 w-8 text-amber-500 mb-2" />
+              <p className="text-gray-700 font-medium">
+                Aucun site web analysé
               </p>
-              <p className="text-gray-400 text-sm mt-2">
-                Les données seront affichées ici après l'analyse
+              <p className="text-gray-500 text-sm mt-2">
+                Entrez l'URL d'un site web dans le formulaire ci-dessus pour commencer l'analyse
               </p>
             </div>
           )}

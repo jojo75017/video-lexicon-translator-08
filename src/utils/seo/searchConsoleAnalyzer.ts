@@ -12,7 +12,7 @@ export const analyzeSearchConsole = async (url: string): Promise<SearchConsoleDa
       impressions: data.impressions || Math.floor(Math.random() * 100000), // Simulation
       ctr: data.ctr || 0,
       position: data.position || 0,
-      keywords: data.keywords || [
+      keywords: [
         { keyword: "marketing digital", position: 5, clicks: 450, impressions: 2800 },
         { keyword: "seo optimisation", position: 8, clicks: 380, impressions: 2400 },
         { keyword: "référencement naturel", position: 4, clicks: 320, impressions: 1900 }
@@ -47,32 +47,18 @@ export const analyzeSearchConsole = async (url: string): Promise<SearchConsoleDa
     console.error('Erreur lors de la récupération des données Search Console:', error);
     return {
       clicks: 0,
-      impressions: Math.floor(Math.random() * 50000), // Données simulées en cas d'erreur
+      impressions: 0,
       ctr: 0,
       position: 0,
-      keywords: [
-        { keyword: "exemple mot-clé 1", position: 7, clicks: 150, impressions: 1200 },
-        { keyword: "exemple mot-clé 2", position: 12, clicks: 120, impressions: 900 },
-        { keyword: "exemple mot-clé 3", position: 5, clicks: 90, impressions: 700 }
-      ],
-      topQueries: [
-        { query: "exemple mot-clé 1", clicks: 150, impressions: 1200 },
-        { query: "exemple mot-clé 2", clicks: 120, impressions: 900 },
-        { query: "exemple mot-clé 3", clicks: 90, impressions: 700 }
-      ],
-      topPages: [
-        { url: url, clicks: 400, impressions: 2500 },
-        { url: `${url}/page1`, clicks: 300, impressions: 2000 },
-        { url: `${url}/page2`, clicks: 200, impressions: 1500 }
-      ],
+      keywords: [],
+      topQueries: [],
+      topPages: [],
       devices: {
-        mobile: 55,
-        desktop: 35,
-        tablet: 10
+        mobile: 0,
+        desktop: 0,
+        tablet: 0
       },
-      countries: [
-        { country: "France", clicks: 500 }
-      ]
+      countries: []
     };
   }
 };

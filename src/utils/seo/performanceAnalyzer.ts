@@ -2,6 +2,7 @@
 import { Performance } from '@/types/seo';
 
 export const analyzePerformance = (doc: Document, startTime: number): Performance => {
+  // Check if we have performance entries available
   const performanceEntries = window.performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
   const loadTime = performanceEntries ? performanceEntries.loadEventEnd - performanceEntries.startTime : 0;
   const firstContentfulPaint = performanceEntries ? performanceEntries.domContentLoadedEventEnd - performanceEntries.startTime : 0;
