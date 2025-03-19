@@ -1,5 +1,5 @@
 
-import { HeadingStructure } from '@/types/seo';
+import { HeadingStructure, HierarchyItem } from '@/types/seo';
 
 export const analyzeHeadings = (doc: Document): HeadingStructure => {
   // Get all headings
@@ -17,10 +17,10 @@ export const analyzeHeadings = (doc: Document): HeadingStructure => {
   });
   
   // Build a hierarchical structure
-  const hierarchy = [];
-  let currentH1 = null;
-  let currentH2 = null;
-  let currentH3 = null;
+  const hierarchy: HierarchyItem[] = [];
+  let currentH1: HierarchyItem | null = null;
+  let currentH2: HierarchyItem | null = null;
+  let currentH3: HierarchyItem | null = null;
   
   for (const element of contentElements) {
     const tagName = element.tagName.toLowerCase();
@@ -40,7 +40,7 @@ export const analyzeHeadings = (doc: Document): HeadingStructure => {
       currentH3 = { text: content, children: [], tagName, position };
       currentH2.children.push(currentH3);
     } else if (tagName === 'p') {
-      const paragraph = { text: content, tagName, position };
+      const paragraph = { text: content, tagName, position, children: [] };
       if (currentH3) {
         currentH3.children.push(paragraph);
       } else if (currentH2) {

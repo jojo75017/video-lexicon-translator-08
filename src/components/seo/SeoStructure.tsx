@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { useTranslation } from 'react-i18next';
 import { List, Heading1, Heading2, Heading3, Image, ChevronDown, ChevronRight, Type } from 'lucide-react';
 import { Card } from '@/components/ui/card';
-import { HeadingStructure } from '@/types/seo';
+import { HeadingStructure, HierarchyItem } from '@/types/seo';
 
 interface SeoStructureProps {
   h1Count: number;
@@ -13,6 +13,7 @@ interface SeoStructureProps {
   imgCount: number;
   headings?: HeadingStructure['headings'];
   showHeadingsList?: boolean;
+  hierarchy?: HierarchyItem[];
 }
 
 const SeoStructure = ({ 
@@ -21,7 +22,8 @@ const SeoStructure = ({
   h3Count, 
   imgCount, 
   headings = [],
-  showHeadingsList = false
+  showHeadingsList = false,
+  hierarchy = []
 }: SeoStructureProps) => {
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
@@ -33,6 +35,43 @@ const SeoStructure = ({
       case 3: return <Heading3 className="h-4 w-4 text-purple-600" />;
       default: return <Heading3 className="h-4 w-4 text-gray-600" />;
     }
+  };
+
+  const getIconByTagName = (tagName: string) => {
+    switch(tagName) {
+      case 'h1': return <Heading1 className="h-4 w-4 text-blue-600" />;
+      case 'h2': return <Heading2 className="h-4 w-4 text-green-600" />;
+      case 'h3': return <Heading3 className="h-4 w-4 text-purple-600" />;
+      case 'p': return <Type className="h-4 w-4 text-gray-600" />;
+      default: return <Type className="h-4 w-4 text-gray-600" />;
+    }
+  };
+
+  const renderHierarchyItem = (item: HierarchyItem, index: number, depth: number = 0) => {
+    return (
+      <div key={`${item.tagName}-${index}-${depth}`} className="ml-2">
+        <div className={`
+          flex items-start gap-2 p-2 rounded-md
+          ${item.tagName === 'h1' ? 'bg-blue-50 border border-blue-100' : ''}
+          ${item.tagName === 'h2' ? 'bg-green-50 border border-green-100' : ''}
+          ${item.tagName === 'h3' ? 'bg-purple-50 border border-purple-100' : ''}
+          ${item.tagName === 'p' ? 'border-l-2 border-gray-200 pl-3' : ''}
+        `} style={{ marginLeft: `${depth * 12}px` }}>
+          {getIconByTagName(item.tagName)}
+          <span className={
+            item.tagName === 'h1' ? 'font-bold' : 
+            item.tagName === 'h2' ? 'font-medium' : 
+            item.tagName === 'h3' ? 'font-medium text-purple-700' : 
+            'text-sm text-gray-700'
+          }>
+            {item.text}
+          </span>
+        </div>
+        {item.children && item.children.map((child, childIndex) => 
+          renderHierarchyItem(child, childIndex, depth + 1)
+        )}
+      </div>
+    );
   };
   
   return (
@@ -85,7 +124,7 @@ const SeoStructure = ({
         </div>
       </div>
       
-      {showHeadingsList && headings.length > 0 && (
+      {showHeadingsList && (
         <div className="mt-4">
           <button 
             onClick={() => setExpanded(!expanded)}
@@ -98,24 +137,29 @@ const SeoStructure = ({
           {expanded && (
             <Card className="p-4 bg-gray-50 border border-gray-200 overflow-auto max-h-96">
               <div className="space-y-2">
-                {headings.map((heading, idx) => (
-                  <div 
-                    key={idx} 
-                    className={`
-                      flex items-start gap-2 p-2 rounded-md
-                      ${heading.level === 1 ? 'bg-blue-50 border border-blue-100' : ''}
-                      ${heading.level === 2 ? 'ml-6' : ''}
-                      ${heading.level === 3 ? 'ml-12' : ''}
-                      ${heading.level > 3 ? 'ml-16' : ''}
-                    `}
-                  >
-                    {getHeadingIcon(heading.level)}
-                    <span className={heading.level === 1 ? 'font-bold' : heading.level === 2 ? 'font-medium' : ''}>
-                      {heading.text}
-                    </span>
+                {hierarchy && hierarchy.length > 0 ? (
+                  <div className="space-y-1">
+                    {hierarchy.map((item, index) => renderHierarchyItem(item, index))}
                   </div>
-                ))}
-                {headings.length === 0 && (
+                ) : headings && headings.length > 0 ? (
+                  headings.map((heading, idx) => (
+                    <div 
+                      key={idx} 
+                      className={`
+                        flex items-start gap-2 p-2 rounded-md
+                        ${heading.level === 1 ? 'bg-blue-50 border border-blue-100' : ''}
+                        ${heading.level === 2 ? 'ml-6' : ''}
+                        ${heading.level === 3 ? 'ml-12' : ''}
+                        ${heading.level > 3 ? 'ml-16' : ''}
+                      `}
+                    >
+                      {getHeadingIcon(heading.level)}
+                      <span className={heading.level === 1 ? 'font-bold' : heading.level === 2 ? 'font-medium' : ''}>
+                        {heading.text}
+                      </span>
+                    </div>
+                  ))
+                ) : (
                   <div className="text-center text-gray-500 py-4">
                     Aucune structure de titres détectée
                   </div>

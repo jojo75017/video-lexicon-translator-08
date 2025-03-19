@@ -31,9 +31,9 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
   const technologies = ['React', 'JavaScript', 'HTML5', 'CSS3'];
   
   const { imgCount, imgWithoutAlt, imagesDetails } = analyzeImages(doc, url);
-  const { h1Count, h2Count, h3Count, headings } = analyzeHeadings(doc);
+  const headingStructure = analyzeHeadings(doc);
   const contentAnalysis = analyzeContent(doc, textContent);
-  const socialMetrics = analyzeSocialMetrics();
+  const socialMetricsResult = analyzeSocialMetrics();
   
   // Fixing type issues
   const accessibilityResults = analyzeAccessibility(doc);
@@ -44,14 +44,14 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     score: accessibilityResults.score
   };
   
-  const schemaMarkup = analyzeSchema(doc);
+  const schemaMarkupResult = analyzeSchema(doc);
   const securityHeaders = {
     https: true,
     hsts: false,
     xFrameOptions: false,
     contentSecurityPolicy: false,
     xContentTypeOptions: false,
-    referrerPolicy: '',
+    referrerPolicy: false,
     permissions: [],
     cookies: {
       secure: true,
@@ -88,7 +88,7 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
       "Développez la structure interne du site avec plus de pages pertinentes",
       "Créez une hiérarchie claire avec des sections thématiques"
     ] : []),
-    ...(h1Count !== 1 ? [
+    ...(headingStructure.h1Count !== 1 ? [
       "Assurez-vous d'avoir exactement une balise H1 par page pour une structure claire"
     ] : []),
     ...(performanceMetrics.loadTime > 3000 ? [
@@ -117,7 +117,7 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     ...(imgWithoutAlt > 0 ? [
       `Ajoutez des attributs alt descriptifs aux ${imgWithoutAlt} images qui en manquent`
     ] : []),
-    ...(!schemaMarkup ? [
+    ...(!schemaMarkupResult ? [
       "Ajoutez des données structurées Schema.org appropriées",
       "Implémentez le balisage JSON-LD pour les informations clés"
     ] : []),
@@ -129,32 +129,44 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
   // Create keyword suggestions
   const keywordSuggestions = topKeywords.map(kw => ({
     keyword: kw.keyword,
-    volume: Math.floor(Math.random() * 10000),
-    difficulty: Math.floor(Math.random() * 100),
-    cpc: (Math.random() * 5).toFixed(2),
-    competition: Math.random().toFixed(2)
+    searchVolume: Math.floor(Math.random() * 10000),
+    competition: Math.random(),
+    cpc: Math.random() * 5,
+    relevance: Math.random() * 100
+  }));
+
+  const socialMetrics = {
+    facebook: { shares: 0, comments: 0, likes: 0 },
+    twitter: { shares: 0, likes: 0, replies: 0 },
+    linkedin: { shares: 0, engagements: 0 },
+    pinterest: { pins: 0 }
+  };
+
+  const processedImagesDetails = imagesDetails.map(img => ({
+    url: img.url,
+    alt: img.alt || '',
+    dimensions: {
+      width: 0,
+      height: 0
+    },
+    size: 0,
+    format: 'unknown',
+    lazyLoaded: false,
+    compressed: false
   }));
 
   return {
     title: doc.title || "Pas de titre",
     description: doc.querySelector('meta[name="description"]')?.getAttribute('content') || '',
-    h1Count,
-    h2Count,
-    h3Count,
-    headings,
-    paragraphs: Array.from(doc.getElementsByTagName('p')).map((p, index) => ({
-      text: p.textContent || '',
-      position: index
-    })),
+    h1Count: headingStructure.h1Count,
+    h2Count: headingStructure.h2Count,
+    h3Count: headingStructure.h3Count,
+    headings: headingStructure.headings,
+    paragraphs: headingStructure.paragraphs,
+    headingStructure: headingStructure,
     imgCount,
     imgWithoutAlt,
-    imagesDetails: imagesDetails.map(img => ({
-      url: img.url,
-      alt: img.alt || '',
-      width: 0,
-      height: 0,
-      size: 0
-    })),
+    imagesDetails: processedImagesDetails,
     metaTagsCount: doc.getElementsByTagName('meta').length,
     metaTagsAnalysis,
     canonicalUrl: doc.querySelector('link[rel="canonical"]')?.getAttribute('href') || null,
@@ -178,12 +190,7 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     externalLinks: linkAnalysis.external,
     analytics,
     searchConsole: searchConsoleData,
-    socialMetrics: {
-      facebook: { shares: 0, likes: 0, comments: 0 },
-      twitter: { shares: 0, likes: 0, replies: 0 },
-      linkedin: { shares: 0, engagements: 0 },
-      pinterest: { pins: 0, saves: 0 }
-    },
+    socialMetrics,
     performance: performanceMetrics,
     securityHeaders,
     semanticStructure,
@@ -209,7 +216,7 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
       twitterImage: doc.querySelector('meta[name="twitter:image"]')?.getAttribute('content') || null,
     },
     contentQuality: contentAnalysis.contentQuality,
-    schemaMarkup,
+    schemaMarkup: !!schemaMarkupResult,
     accessibility,
     indexability,
     keywordSuggestions,

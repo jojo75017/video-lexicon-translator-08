@@ -1,4 +1,3 @@
-
 export interface SeoAnalysisResult {
   title?: string;
   description?: string;
@@ -32,11 +31,12 @@ export interface SeoAnalysis {
   h1Count: number;
   h2Count: number;
   h3Count: number;
-  headings: HeadingStructure[];
+  headings: HeadingStructure['headings'];
   paragraphs: {
     text: string;
     position: number;
   }[];
+  headingStructure?: HeadingStructure;
   imgCount: number;
   imgWithoutAlt: number;
   imagesDetails: ImageDetails[];
@@ -129,9 +129,26 @@ export interface SeoAnalysis {
 }
 
 export interface HeadingStructure {
+  h1Count: number;
+  h2Count: number;
+  h3Count: number;
+  headings: {
+    text: string;
+    level: number;
+    position: number;
+  }[];
+  paragraphs: {
+    text: string;
+    position: number;
+  }[];
+  hierarchy: HierarchyItem[];
+}
+
+export interface HierarchyItem {
   text: string;
-  level: number;
+  tagName: string;
   position: number;
+  children: HierarchyItem[];
 }
 
 export interface BacklinkInfo {
@@ -141,7 +158,6 @@ export interface BacklinkInfo {
   followType: 'follow' | 'nofollow';
   authority: number;
   date: string;
-  // Add properties that were causing errors
   isDoFollow?: boolean;
   firstSeen?: string;
 }
@@ -169,14 +185,15 @@ export interface ImageDetails {
   };
   size: number;
   format: string;
-  lazyLoaded?: boolean;
-  compressed?: boolean;
+  lazyLoaded: boolean;
+  compressed: boolean;
 }
 
 export interface KeywordData {
   keyword: string;
   count: number;
   density: number;
+  position?: number;
 }
 
 export interface KeywordSuggestion {

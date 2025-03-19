@@ -105,6 +105,9 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
     ]
   };
 
+  // Extract hierarchy from the seoAnalysis if available
+  const hierarchy = seoAnalysis.headingStructure?.hierarchy || [];
+
   return (
     <ScrollArea className="h-[calc(100vh-200px)] pr-4">
       <div className="space-y-6 p-4">
@@ -122,13 +125,14 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
             imgCount={seoAnalysis.imgCount}
             headings={seoAnalysis.headings}
             showHeadingsList={true}
+            hierarchy={hierarchy}
           />
         </Card>
 
         <ContentHierarchy 
           headings={seoAnalysis.headings} 
           paragraphs={seoAnalysis.paragraphs}
-          hierarchy={seoAnalysis.headingStructure?.hierarchy}
+          hierarchy={hierarchy}
           recommendations={seoAnalysis.technicalSuggestions} 
         />
 
