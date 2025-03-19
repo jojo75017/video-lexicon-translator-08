@@ -6,7 +6,7 @@ interface SiteInfoProps {
 }
 
 export const SiteInfo = ({ data }: SiteInfoProps) => {
-  // Vérifications de sécurité pour éviter les erreurs si les données sont manquantes
+  // Safety checks to avoid errors if data is missing
   const hasMeta = data?.meta && Array.isArray(data.meta) && data.meta.length > 0;
   const hasHeadings = data?.headings && Array.isArray(data.headings) && data.headings.length > 0;
   const hasLinks = data?.links && Array.isArray(data.links) && data.links.length > 0;
@@ -22,7 +22,7 @@ export const SiteInfo = ({ data }: SiteInfoProps) => {
   
   return (
     <>
-      <div className="bg-muted/10 p-4 rounded-lg shadow-sm border border-gray-100">
+      <div className="bg-muted/10 p-4 rounded-lg shadow-sm border border-gray-100" id="seo-title" data-section="seo">
         <h4 className="font-medium mb-2 flex items-center">
           <Globe className="w-4 h-4 mr-2 text-blue-600" />
           Titre du site
@@ -30,7 +30,7 @@ export const SiteInfo = ({ data }: SiteInfoProps) => {
         <p className="text-sm">{data?.title || "Titre non disponible"}</p>
       </div>
       
-      <div className="bg-muted/10 p-4 rounded-lg shadow-sm border border-gray-100 mt-4">
+      <div className="bg-muted/10 p-4 rounded-lg shadow-sm border border-gray-100 mt-4" id="meta-data" data-section="seo">
         <h4 className="font-medium mb-2 flex items-center">
           <Tag className="w-4 h-4 mr-2 text-purple-600" />
           Méta-données
@@ -49,7 +49,7 @@ export const SiteInfo = ({ data }: SiteInfoProps) => {
         </div>
       </div>
 
-      <div className="bg-muted/10 p-4 rounded-lg shadow-sm border border-gray-100 mt-4" id="hierarchy">
+      <div className="bg-muted/10 p-4 rounded-lg shadow-sm border border-gray-100 mt-4" id="hierarchy" data-section="hierarchy">
         <h4 className="font-medium mb-2 flex items-center">
           <Info className="w-4 h-4 mr-2 text-green-600" />
           Structure
@@ -76,7 +76,7 @@ export const SiteInfo = ({ data }: SiteInfoProps) => {
         </div>
       </div>
 
-      <div className="bg-muted/10 p-4 rounded-lg shadow-sm border border-gray-100 mt-4" id="backlinks">
+      <div className="bg-muted/10 p-4 rounded-lg shadow-sm border border-gray-100 mt-4" id="backlinks" data-section="backlinks">
         <h4 className="font-medium mb-2 flex items-center">
           <Link2 className="w-4 h-4 mr-2 text-blue-600" />
           Liens trouvés ({hasLinks ? data.links.length : 0})
@@ -100,7 +100,7 @@ export const SiteInfo = ({ data }: SiteInfoProps) => {
         </div>
       </div>
 
-      <div className="bg-muted/10 p-4 rounded-lg shadow-sm border border-gray-100 mt-4">
+      <div className="bg-muted/10 p-4 rounded-lg shadow-sm border border-gray-100 mt-4" id="images-section" data-section="images">
         <h4 className="font-medium mb-2 flex items-center">
           <Image className="w-4 h-4 mr-2 text-blue-600" />
           Images ({hasImages ? data.images.length : 0})

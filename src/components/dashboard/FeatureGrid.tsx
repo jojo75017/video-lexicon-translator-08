@@ -4,7 +4,7 @@ import FeatureCard from './FeatureCard';
 import { Search, Globe, Database, Link2, ChartBar, Settings, Hash, Pen, Signature } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from "sonner";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { navigateToSection } from '@/utils/navigationHelpers';
 
 const FeatureGrid = () => {
   const features = [
@@ -14,7 +14,7 @@ const FeatureGrid = () => {
       description: "Analyse complète des facteurs SEO",
       color: "blue",
       id: "seo",
-      tabValue: "seo"
+      tabValue: "info"
     },
     {
       icon: Globe,
@@ -30,7 +30,7 @@ const FeatureGrid = () => {
       description: "Organisation du contenu",
       color: "violet",
       id: "hierarchy",
-      tabValue: "hierarchy"
+      tabValue: "structure"
     },
     {
       icon: Link2,
@@ -38,7 +38,7 @@ const FeatureGrid = () => {
       description: "Analyse des liens",
       color: "pink",
       id: "backlinks",
-      tabValue: "backlinks"
+      tabValue: "info"
     },
     {
       icon: ChartBar,
@@ -46,7 +46,7 @@ const FeatureGrid = () => {
       description: "Statistiques détaillées",
       color: "fuchsia",
       id: "metrics",
-      tabValue: "metrics"
+      tabValue: "info"
     },
     {
       icon: Settings,
@@ -54,7 +54,7 @@ const FeatureGrid = () => {
       description: "Options avancées",
       color: "rose",
       id: "advanced",
-      tabValue: "advanced"
+      tabValue: "info"
     },
     {
       icon: Hash,
@@ -62,7 +62,7 @@ const FeatureGrid = () => {
       description: "Outils externes",
       color: "purple",
       id: "integrations",
-      tabValue: "integrations"
+      tabValue: "info"
     },
     {
       icon: Signature,
@@ -74,57 +74,25 @@ const FeatureGrid = () => {
     }
   ];
 
-  // Fonction améliorée pour gérer le clic sur les fonctionnalités
+  // Improved function to handle feature clicks
   const handleFeatureClick = (id: string, tabValue?: string, link?: string) => {
     if (link) {
-      // Aucune action nécessaire, le routage se fait via le Link
+      // No action needed, routing is handled by the Link component
       return;
     }
     
-    // Recherche d'un élément DOM correspondant à l'onglet visé
-    const mainTabTrigger = document.querySelector(`[data-state="active"][role="tab"]`) as HTMLElement;
-    if (mainTabTrigger) {
-      // Notifie l'utilisateur de la navigation
-      toast.info(`Accès à la section ${id}`, {
-        description: `Affichage des données de ${id}`,
-        duration: 2000
-      });
-      
-      // Essayons de trouver un onglet plus spécifique correspondant à la fonctionnalité
-      if (tabValue) {
-        setTimeout(() => {
-          const specificTabTrigger = document.querySelector(`[data-value="${tabValue}"]`) as HTMLElement;
-          if (specificTabTrigger) {
-            specificTabTrigger.click();
-            specificTabTrigger.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          } else {
-            console.log(`Onglet spécifique non trouvé: ${tabValue}`);
-            
-            // Si nous n'avons pas trouvé l'onglet spécifique, cherchons une section par ID
-            const sectionElement = document.getElementById(id);
-            if (sectionElement) {
-              sectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            } else {
-              console.log(`Section non trouvée: ${id}`);
-            }
-          }
-        }, 100);
-      }
+    // Using improved navigation helper
+    if (tabValue) {
+      navigateToSection(id, tabValue);
     } else {
-      console.log("Aucun onglet actif trouvé");
-      
-      // Comme solution de secours, afficher un message à l'utilisateur
-      toast.info(`Fonctionnalité ${id}`, {
-        description: "Cette fonctionnalité sera disponible après avoir analysé un site.",
-        duration: 3000
-      });
-      
-      // Essayer de faire défiler jusqu'au formulaire d'analyse
-      const analysisForm = document.querySelector('form') as HTMLElement;
-      if (analysisForm) {
-        analysisForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+      navigateToSection(id);
     }
+    
+    // Notify user about the navigation
+    toast.info(`Navigation vers ${id}`, {
+      description: `Affichage des données de ${id}`,
+      duration: 2000
+    });
   };
 
   return (
@@ -152,6 +120,8 @@ const FeatureGrid = () => {
               className="cursor-pointer" 
               onClick={() => handleFeatureClick(feature.id, feature.tabValue)}
               id={`feature-card-${feature.id}`}
+              data-feature-id={feature.id}
+              data-tab-value={feature.tabValue}
             >
               <FeatureCard
                 icon={feature.icon}

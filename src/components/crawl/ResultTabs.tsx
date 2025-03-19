@@ -14,7 +14,7 @@ interface ResultTabsProps {
 export const ResultTabs = ({ data }: ResultTabsProps) => {
   const [activeTab, setActiveTab] = useState("info");
   
-  // Notification lorsque les données sont chargées
+  // Notification when data is loaded
   useEffect(() => {
     if (data) {
       console.log("ResultTabs received data:", data);
@@ -26,40 +26,66 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
     }
   }, [data]);
 
-  // Effet pour gérer les changements d'URL et les interactions externes
+  // Effect to handle URL changes and external interactions
   useEffect(() => {
-    // Écouteur pour les clics sur les cartes de fonctionnalités
+    // Function to check if a feature card was clicked and update the active tab
+    const checkForFeatureCardClick = () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const targetSection = urlParams.get('section');
+      const targetTab = urlParams.get('tab');
+      
+      if (targetSection) {
+        // Try to find the corresponding tab for this section
+        let tabToActivate = targetTab || "info";
+        
+        if (targetSection === "structure" || targetSection === "hierarchy") {
+          tabToActivate = "structure";
+        } else if (targetSection === "source") {
+          tabToActivate = "source";
+        }
+        
+        setActiveTab(tabToActivate);
+        
+        // Remove the parameters after handling them
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    };
+    
+    // Call once on mount
+    checkForFeatureCardClick();
+    
+    // Listen for clicks on feature cards
     const handleFeatureClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      const featureCard = target.closest('[id^="feature-card-"]');
+      const featureCard = target.closest('[data-feature-id]');
       
       if (featureCard) {
-        const cardId = featureCard.id;
-        console.log("Feature card clicked:", cardId);
+        const featureId = featureCard.getAttribute('data-feature-id') || '';
+        const tabValue = featureCard.getAttribute('data-tab-value') || '';
         
-        // Déterminer quel onglet activer en fonction de l'ID de la carte
-        if (cardId.includes("structure")) {
+        console.log("Feature card clicked:", featureId, "Tab value:", tabValue);
+        
+        // Determine which tab to activate based on the feature ID
+        if (featureId === "structure" || featureId === "hierarchy") {
           setActiveTab("structure");
-        } else if (cardId.includes("backlinks")) {
-          setActiveTab("info");
-        } else if (cardId.includes("seo")) {
-          setActiveTab("info");
-        } else if (cardId.includes("hierarchy")) {
-          setActiveTab("structure");
+        } else if (featureId === "source") {
+          setActiveTab("source");
+        } else {
+          setActiveTab(tabValue || "info");
         }
       }
     };
 
-    // Ajouter l'écouteur d'événement
+    // Add event listener
     document.addEventListener("click", handleFeatureClick);
 
-    // Nettoyage
+    // Cleanup
     return () => {
       document.removeEventListener("click", handleFeatureClick);
     };
   }, []);
 
-  // Gestionnaire pour le changement d'onglet
+  // Tab change handler
   const handleTabChange = (value: string) => {
     console.log("Tab changed to:", value);
     setActiveTab(value);
@@ -73,14 +99,19 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
     });
   };
 
-  // Vérification des données et préparation des données de secours
+  // Check data and prepare fallback data
   const hasValidHeadings = data?.headings && Array.isArray(data.headings) && data.headings.length > 0;
   const structureData = hasValidHeadings ? data : getStructureData();
-  console.log("Using structure data:", structureData);
-
-  // Si aucune donnée n'est fournie, ne rien afficher
+  
+  // If no data is provided, show a placeholder
   if (!data) {
-    return null;
+    return (
+      <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 text-center">
+        <Search className="h-8 w-8 mx-auto text-gray-400 mb-2" />
+        <h3 className="text-lg font-medium text-gray-500">Aucune donnée disponible</h3>
+        <p className="text-sm text-gray-400">Analysez un site web pour voir les résultats</p>
+      </div>
+    );
   }
 
   return (
@@ -115,19 +146,21 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
         </TabsTrigger>
       </TabsList>
 
-      <TabsContent value="info" className="mt-6 space-y-6" id="seo">
-        <SiteInfo data={data} />
+      <TabsContent value="info" className="mt-6 space-y-6" id="seo" data-section="seo">
+        <div id="backlinks" data-section="backlinks" className="section-backlinks">
+          <SiteInfo data={data} />
+        </div>
       </TabsContent>
 
-      <TabsContent value="source" className="mt-6" id="source">
+      <TabsContent value="source" className="mt-6" id="source" data-section="source">
         <SourceCode sourceCode={data?.sourceCode || "<p>Aucun code source disponible</p>"} />
       </TabsContent>
       
-      <TabsContent value="structure" className="mt-6" id="hierarchy">
+      <TabsContent value="structure" className="mt-6" id="structure" data-section="structure">
         <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
           <h3 className="text-lg font-bold mb-4">Structure du site</h3>
           
-          <div className="space-y-4">
+          <div id="hierarchy" data-section="hierarchy" className="section-hierarchy space-y-4">
             <div>
               <h4 className="font-medium text-gray-700 mb-2">Hiérarchie des titres</h4>
               <div className="pl-4 border-l-2 border-blue-200 space-y-2">
