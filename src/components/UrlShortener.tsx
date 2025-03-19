@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +14,8 @@ const UrlShortener = ({ longUrl }: UrlShortenerProps) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const shortenUrl = async () => {
+    console.log("Shortening URL:", longUrl);
+    
     if (!longUrl) {
       toast.error("Veuillez d'abord entrer une URL à analyser");
       return;
@@ -26,6 +29,7 @@ const UrlShortener = ({ longUrl }: UrlShortenerProps) => {
       const shortened = await response.text();
       setShortUrl(shortened);
       toast.success("URL raccourcie avec succès !");
+      console.log("Shortened URL:", shortened);
     } catch (error) {
       console.error('Erreur:', error);
       toast.error("Impossible de raccourcir l'URL");
@@ -35,10 +39,13 @@ const UrlShortener = ({ longUrl }: UrlShortenerProps) => {
   };
 
   const copyToClipboard = async () => {
+    console.log("Copying to clipboard:", shortUrl);
+    
     try {
       await navigator.clipboard.writeText(shortUrl);
       toast.success("URL copiée dans le presse-papier !");
     } catch (err) {
+      console.error("Copy error:", err);
       toast.error("Impossible de copier l'URL");
     }
   };
@@ -56,6 +63,7 @@ const UrlShortener = ({ longUrl }: UrlShortenerProps) => {
           onClick={shortenUrl}
           disabled={isLoading || !longUrl}
           className="min-w-[120px]"
+          type="button"
         >
           {isLoading ? (
             <>
@@ -72,6 +80,7 @@ const UrlShortener = ({ longUrl }: UrlShortenerProps) => {
             variant="outline"
             size="icon"
             className="px-3"
+            type="button"
           >
             <Copy className="h-4 w-4" />
           </Button>

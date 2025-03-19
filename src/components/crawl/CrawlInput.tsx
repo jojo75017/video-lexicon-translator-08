@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Search, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface CrawlInputProps {
   url: string;
@@ -16,6 +17,13 @@ export const CrawlInput = ({ url, isLoading, progress, onUrlChange, onSubmit }: 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("CrawlInput submit with URL:", url);
+    
+    if (!url) {
+      toast.error("Veuillez saisir une URL");
+      return;
+    }
+    
+    // Appel direct de la fonction de soumission sans l'événement
     onSubmit(e);
   };
 
@@ -47,9 +55,8 @@ export const CrawlInput = ({ url, isLoading, progress, onUrlChange, onSubmit }: 
 
       <Button
         type="submit"
-        disabled={isLoading}
+        disabled={isLoading || !url}
         className="w-full"
-        onClick={handleSubmit}
       >
         {isLoading ? (
           <>

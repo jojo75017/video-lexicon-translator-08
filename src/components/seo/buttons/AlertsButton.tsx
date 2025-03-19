@@ -5,15 +5,24 @@ import { BellRing } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { getAlerts } from '@/utils/seo/alertUtils';
 import { toast } from 'sonner';
+import { useState } from 'react';
 
 export const AlertsButton = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  
   const handleOpenDialog = () => {
     console.log("Opening alerts dialog");
     toast.info("Affichage des alertes SEO critiques");
+    setIsOpen(true);
+  };
+  
+  const handleCloseDialog = () => {
+    console.log("Closing alerts dialog");
+    setIsOpen(false);
   };
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button
           variant="outline"
@@ -24,7 +33,7 @@ export const AlertsButton = () => {
           <span className="text-xs">Alertes critiques</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md" onInteractOutside={handleCloseDialog}>
         <DialogHeader>
           <DialogTitle>Alertes SEO Critiques</DialogTitle>
         </DialogHeader>

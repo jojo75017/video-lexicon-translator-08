@@ -33,7 +33,7 @@ const UrlInput = ({
     
     try {
       // Vérifie si l'URL est valide
-      new URL(url);
+      new URL(url.startsWith('http') ? url : `https://${url}`);
       console.log("URL is valid, triggering analysis:", url);
       
       // Notification de démarrage
@@ -41,7 +41,7 @@ const UrlInput = ({
         description: "Patientez pendant l'analyse..."
       });
       
-      // On s'assure d'appeler la fonction onAnalyze du parent
+      // Appel explicite de la fonction onAnalyze
       onAnalyze();
     } catch (error) {
       console.error("Invalid URL:", url, error);
@@ -61,6 +61,15 @@ const UrlInput = ({
     toast.info("Redirection vers le service de démo CORS", {
       description: "Activez le service de démo, puis revenez ici pour continuer votre analyse"
     });
+  };
+
+  const handleActivateProxyClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("Activating proxy");
+    if (handleActivateProxy) {
+      handleActivateProxy();
+    }
   };
 
   return (
@@ -86,7 +95,7 @@ const UrlInput = ({
           </div>
           <Button 
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || !url}
             className="min-w-[140px] relative bg-blue-600 hover:bg-blue-700"
             variant="default"
           >
@@ -113,10 +122,7 @@ const UrlInput = ({
             <p className="mb-2">Pour analyser des sites externes, vous devez activer le proxy CORS.</p>
             <div className="flex flex-wrap gap-2">
               <Button
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleActivateProxy();
-                }}
+                onClick={handleActivateProxyClick}
                 size="sm"
                 variant="outline"
                 className="border-amber-200 text-amber-800 hover:bg-amber-100"
@@ -127,6 +133,7 @@ const UrlInput = ({
               <Button
                 onClick={(e) => {
                   e.preventDefault();
+                  e.stopPropagation();
                   handleProxyDemoClick();
                 }}
                 size="sm"

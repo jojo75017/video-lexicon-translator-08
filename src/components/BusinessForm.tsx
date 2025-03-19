@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from '@/components/ui/button';
 import { FormValues, formSchema, countries } from '@/types/localBusiness';
+import { toast } from "sonner";
 
 interface BusinessFormProps {
   onSubmit: (data: FormValues) => void;
@@ -39,9 +40,15 @@ export const BusinessForm = ({ onSubmit }: BusinessFormProps) => {
     },
   });
 
+  const handleFormSubmit = (data: FormValues) => {
+    console.log("Business form submitted:", data);
+    toast.success("Formulaire soumis avec succès");
+    onSubmit(data);
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-2xl mx-auto">
+      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6 max-w-2xl mx-auto">
         <div className="grid md:grid-cols-2 gap-6">
           <FormField
             control={form.control}

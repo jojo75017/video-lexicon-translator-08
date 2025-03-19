@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,11 +13,17 @@ const VideoInput: React.FC<VideoInputProps> = ({ onVideoSubmit }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("VideoInput submit:", videoUrl);
+    
     if (!videoUrl) {
       toast.error("Please enter a video URL");
       return;
     }
+    
+    // Appeler directement la fonction de soumission
     onVideoSubmit(videoUrl);
+    
+    toast.success("Video URL submitted successfully");
   };
 
   return (
@@ -30,7 +37,11 @@ const VideoInput: React.FC<VideoInputProps> = ({ onVideoSubmit }) => {
           className="w-full"
         />
       </div>
-      <Button type="submit" className="w-full bg-primary hover:bg-primary-600">
+      <Button 
+        type="submit" 
+        className="w-full bg-primary hover:bg-primary-600"
+        disabled={!videoUrl}
+      >
         Load Video
       </Button>
     </form>

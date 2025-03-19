@@ -44,12 +44,28 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
   const structureData = data?.headings ? data : getStructureData();
   console.log("Using structure data:", structureData);
 
+  const handleInfoClick = () => {
+    console.log("Info tab clicked");
+    setActiveTab("info");
+  };
+
+  const handleSourceClick = () => {
+    console.log("Source tab clicked");
+    setActiveTab("source");
+  };
+
+  const handleStructureClick = () => {
+    console.log("Structure tab clicked");
+    setActiveTab("structure");
+  };
+
   return (
-    <Tabs defaultValue="info" className="w-full" onValueChange={handleTabChange}>
+    <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
       <TabsList className="w-full grid grid-cols-3 bg-muted/50 p-1 rounded-lg">
         <TabsTrigger 
           value="info"
           className="flex-1 py-2.5 font-medium rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800"
+          onClick={handleInfoClick}
         >
           <Search className="w-4 h-4 mr-2" />
           Informations
@@ -57,6 +73,7 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
         <TabsTrigger 
           value="source"
           className="flex-1 py-2.5 font-medium rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800"
+          onClick={handleSourceClick}
         >
           <Code className="w-4 h-4 mr-2" />
           Code Source
@@ -64,6 +81,7 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
         <TabsTrigger 
           value="structure"
           className="flex-1 py-2.5 font-medium rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800"
+          onClick={handleStructureClick}
         >
           <ListTree className="w-4 h-4 mr-2" />
           Structure
