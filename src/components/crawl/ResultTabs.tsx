@@ -1,6 +1,6 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Code, Search, ListTree } from "lucide-react";
+import { Code, Search, ListTree, BarChart, Link2, Globe, Database } from "lucide-react";
 import { SiteInfo } from "./SiteInfo";
 import { SourceCode } from "./SourceCode";
 import { toast } from "sonner";
@@ -25,6 +25,39 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
       console.log("ResultTabs: No data received");
     }
   }, [data]);
+
+  // Effet pour gérer les changements d'URL et les interactions externes
+  useEffect(() => {
+    // Écouteur pour les clics sur les cartes de fonctionnalités
+    const handleFeatureClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      const featureCard = target.closest('[id^="feature-card-"]');
+      
+      if (featureCard) {
+        const cardId = featureCard.id;
+        console.log("Feature card clicked:", cardId);
+        
+        // Déterminer quel onglet activer en fonction de l'ID de la carte
+        if (cardId.includes("structure")) {
+          setActiveTab("structure");
+        } else if (cardId.includes("backlinks")) {
+          setActiveTab("info");
+        } else if (cardId.includes("seo")) {
+          setActiveTab("info");
+        } else if (cardId.includes("hierarchy")) {
+          setActiveTab("structure");
+        }
+      }
+    };
+
+    // Ajouter l'écouteur d'événement
+    document.addEventListener("click", handleFeatureClick);
+
+    // Nettoyage
+    return () => {
+      document.removeEventListener("click", handleFeatureClick);
+    };
+  }, []);
 
   // Gestionnaire pour le changement d'onglet
   const handleTabChange = (value: string) => {
@@ -55,6 +88,8 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
       <TabsList className="w-full grid grid-cols-3 bg-muted/50 p-1 rounded-lg">
         <TabsTrigger 
           value="info"
+          data-value="info"
+          id="tab-info"
           className="flex-1 py-2.5 font-medium rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800"
         >
           <Search className="w-4 h-4 mr-2" />
@@ -62,6 +97,8 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
         </TabsTrigger>
         <TabsTrigger 
           value="source"
+          data-value="source"
+          id="tab-source"
           className="flex-1 py-2.5 font-medium rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800"
         >
           <Code className="w-4 h-4 mr-2" />
@@ -69,6 +106,8 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
         </TabsTrigger>
         <TabsTrigger 
           value="structure"
+          data-value="structure"
+          id="tab-structure"
           className="flex-1 py-2.5 font-medium rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800"
         >
           <ListTree className="w-4 h-4 mr-2" />
@@ -76,15 +115,15 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
         </TabsTrigger>
       </TabsList>
 
-      <TabsContent value="info" className="mt-6 space-y-6">
+      <TabsContent value="info" className="mt-6 space-y-6" id="seo">
         <SiteInfo data={data} />
       </TabsContent>
 
-      <TabsContent value="source" className="mt-6">
+      <TabsContent value="source" className="mt-6" id="source">
         <SourceCode sourceCode={data?.sourceCode || "<p>Aucun code source disponible</p>"} />
       </TabsContent>
       
-      <TabsContent value="structure" className="mt-6">
+      <TabsContent value="structure" className="mt-6" id="hierarchy">
         <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
           <h3 className="text-lg font-bold mb-4">Structure du site</h3>
           

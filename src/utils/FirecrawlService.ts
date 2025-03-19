@@ -1,257 +1,237 @@
 
-interface CrawlResponse {
-  success: boolean;
-  status?: string;
-  completed?: number;
-  total?: number;
-  data?: any[];
-  error?: string;
+import FirecrawlApp from '@mendable/firecrawl-js';
+import axios from 'axios';
+
+interface ErrorResponse {
+  success: false;
+  error: string;
 }
 
+interface CrawlStatusResponse {
+  success: true;
+  status: string;
+  completed: number;
+  total: number;
+  creditsUsed: number;
+  expiresAt: string;
+  data: any[];
+}
+
+type CrawlResponse = CrawlStatusResponse | ErrorResponse;
+
 export class FirecrawlService {
-  private static readonly TIMEOUT = 15000; // 15 secondes de timeout
-  private static isProxyEnabled = false;
-  private static useAlternativeCorsProxy = false;
-  private static alternativeCorsProxies = [
-    'https://corsproxy.io/?',
+  private static API_KEY_STORAGE_KEY = 'firecrawl_api_key';
+  private static PROXY_ENABLED_KEY = 'cors_proxy_enabled';
+  private static firecrawlApp: any = null;
+  private static proxyEnabled = false;
+  
+  // Liste des proxies CORS disponibles
+  private static corsProxies = [
     'https://api.allorigins.win/raw?url=',
-    'https://api.codetabs.com/v1/proxy?quest='
+    'https://corsproxy.io/?',
+    'https://cors-anywhere.herokuapp.com/',
+    'https://cors.eu.org/',
   ];
+  
+  // Index du proxy CORS actuel
+  private static currentProxyIndex = 0;
 
-  static enableProxy(): boolean {
-    this.isProxyEnabled = true;
-    console.log('Proxy CORS activé');
-    return this.isProxyEnabled;
+  static enableProxy(): void {
+    this.proxyEnabled = true;
+    localStorage.setItem(this.PROXY_ENABLED_KEY, 'true');
+    console.log('CORS proxy enabled');
   }
 
-  static isProxyActive(): boolean {
-    return this.isProxyEnabled;
+  static isProxyEnabled(): boolean {
+    return this.proxyEnabled || localStorage.getItem(this.PROXY_ENABLED_KEY) === 'true';
   }
 
-  static useAlternativeProxy(): boolean {
-    this.useAlternativeCorsProxy = true;
-    console.log('Utilisation du proxy alternatif activée');
-    return this.useAlternativeCorsProxy;
+  static getCurrentProxy(): string {
+    return this.corsProxies[this.currentProxyIndex];
   }
 
-  static async crawlWebsite(url: string): Promise<CrawlResponse> {
-    if (!url) {
-      return {
-        success: false,
-        error: "URL non fournie",
-        completed: 0,
-        total: 0
-      };
+  static rotateProxy(): string {
+    this.currentProxyIndex = (this.currentProxyIndex + 1) % this.corsProxies.length;
+    return this.getCurrentProxy();
+  }
+
+  static saveApiKey(apiKey: string): void {
+    localStorage.setItem(this.API_KEY_STORAGE_KEY, apiKey);
+    try {
+      this.firecrawlApp = new FirecrawlApp({ apiKey });
+      console.log('API key saved successfully');
+    } catch (error) {
+      console.error('Error initializing FirecrawlApp:', error);
+    }
+  }
+
+  static getApiKey(): string | null {
+    return localStorage.getItem(this.API_KEY_STORAGE_KEY);
+  }
+
+  static async testApiKey(apiKey: string): Promise<boolean> {
+    try {
+      console.log('Testing API key with Firecrawl API');
+      this.firecrawlApp = new FirecrawlApp({ apiKey });
+      // A simple test crawl to verify the API key
+      const testResponse = await this.firecrawlApp.crawlUrl('https://example.com', {
+        limit: 1
+      });
+      return testResponse.success;
+    } catch (error) {
+      console.error('Error testing API key:', error);
+      return false;
+    }
+  }
+
+  static async crawlWebsite(url: string): Promise<{ success: boolean; error?: string; data?: any }> {
+    console.log('Crawling website:', url);
+    
+    // Essayons d'abord d'utiliser l'API Firecrawl
+    if (this.getApiKey() && this.firecrawlApp) {
+      try {
+        console.log('Using Firecrawl API...');
+        const crawlResponse = await this.firecrawlApp.crawlUrl(url, {
+          limit: 100,
+          scrapeOptions: {
+            formats: ['markdown', 'html'],
+          }
+        }) as CrawlResponse;
+
+        if (!crawlResponse.success) {
+          console.error('Firecrawl API crawl failed:', crawlResponse);
+          // Essayons de passer au CORS proxy si l'API a échoué
+        } else {
+          console.log('Firecrawl API crawl successful');
+          return { 
+            success: true,
+            data: crawlResponse.data 
+          };
+        }
+      } catch (error) {
+        console.error('Error using Firecrawl API:', error);
+        // Continuons avec le CORS proxy en cas d'échec
+      }
     }
     
+    // Si nous n'avons pas de clé API ou si l'appel à l'API a échoué, utilisons le CORS proxy
+    console.log('Using CORS proxy...');
+    
     try {
-      // Validate URL format
-      const urlObj = new URL(url);
-      if (!urlObj.protocol.startsWith('http')) {
-        return {
-          success: false,
-          error: "L'URL doit commencer par http:// ou https://",
-          completed: 0,
-          total: 0
-        };
-      }
+      let proxyUrl = '';
+      let htmlContent = '';
+      let success = false;
+      let proxyAttempts = 0;
+      const maxProxyAttempts = this.corsProxies.length;
       
-      console.log('Démarrage de l\'analyse du site:', url);
-      
-      // Liste des proxies CORS à essayer
-      const corsProxies = [
-        'https://corsproxy.io/?',
-        'https://api.allorigins.win/raw?url=',
-        'https://api.codetabs.com/v1/proxy?quest=',
-        'https://cors-anywhere.herokuapp.com/',
-        'https://crossorigin.me/'
-      ];
-      
-      let fetchResult = null;
-      let errorMessage = '';
-      
-      // Try each proxy until one works
-      for (const corsProxy of corsProxies) {
-        const proxyUrl = corsProxy + encodeURIComponent(url);
-        console.log('Tentative avec proxy:', proxyUrl);
+      while (!success && proxyAttempts < maxProxyAttempts) {
+        proxyUrl = this.getCurrentProxy();
+        console.log(`Trying CORS proxy (${proxyAttempts + 1}/${maxProxyAttempts}):`, proxyUrl);
         
         try {
-          fetchResult = await this.fetchWithTimeout(proxyUrl);
+          const response = await axios.get(proxyUrl + encodeURIComponent(url), {
+            headers: { 
+              'X-Requested-With': 'XMLHttpRequest',
+              'Accept': 'text/html'
+            },
+            timeout: 10000
+          });
           
-          if (fetchResult.success) {
-            console.log('Succès avec le proxy:', corsProxy);
-            return this.processHtmlResult(fetchResult.data, url);
+          if (response.status === 200 && response.data) {
+            htmlContent = response.data;
+            success = true;
+            console.log('CORS proxy request successful');
+            break;
           } else {
-            errorMessage = fetchResult.error || 'Erreur inconnue';
-            console.log(`Échec avec le proxy ${corsProxy}: ${errorMessage}`);
+            console.warn('CORS proxy returned empty or invalid response:', response.status);
           }
         } catch (error) {
-          console.error(`Erreur avec le proxy ${corsProxy}:`, error);
+          console.error(`Error with CORS proxy ${proxyUrl}:`, error);
+          this.rotateProxy();  // Essayons le prochain proxy
         }
+        
+        proxyAttempts++;
       }
       
-      // If all proxies fail, generate demo data
-      console.log('Tous les proxies ont échoué, génération de données de démonstration...');
-      return this.generateDemoData(url);
-
-    } catch (error) {
-      console.error('Erreur lors de l\'analyse:', error);
+      if (!success) {
+        console.error('All CORS proxies failed');
+        return { 
+          success: false, 
+          error: 'Tous les proxies CORS ont échoué. Veuillez réessayer plus tard.' 
+        };
+      }
       
-      const errorMessage = error instanceof Error ? error.message : 'Erreur lors de l\'analyse du site';
-      console.log('Génération de données de démonstration après erreur:', errorMessage);
+      // Créer un objet DOM à partir du HTML récupéré
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(htmlContent, 'text/html');
       
-      // Generate simulated data instead of failing completely
-      return this.generateDemoData(url);
-    }
-  }
-
-  private static async fetchWithTimeout(url: string): Promise<{ success: boolean, data?: string, error?: string }> {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), this.TIMEOUT);
-      
-      const response = await fetch(url, {
-        headers: {
-          'Accept': 'text/html',
-          'X-Requested-With': 'XMLHttpRequest',
-        },
-        signal: controller.signal
+      // Extraire les informations du DOM
+      const title = doc.title;
+      const meta = Array.from(doc.querySelectorAll('meta')).map(metaEl => {
+        return {
+          name: metaEl.getAttribute('name') || metaEl.getAttribute('property') || '',
+          content: metaEl.getAttribute('content') || ''
+        };
       });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        console.error(`Erreur HTTP: ${response.status}`);
-        return {
-          success: false,
-          error: `Impossible d'accéder au site (Statut: ${response.status})`
-        };
-      }
-
-      const html = await response.text();
       
-      if (!html || html.trim().length === 0) {
-        console.error("Le site a retourné un contenu vide");
+      const headings = Array.from(doc.querySelectorAll('h1, h2, h3, h4, h5, h6')).map(el => {
         return {
-          success: false,
-          error: "Le site a retourné un contenu vide"
+          level: el.tagName.toLowerCase(),
+          text: el.textContent?.trim() || ''
         };
-      }
+      });
       
-      return {
-        success: true,
-        data: html
-      };
-    } catch (error) {
-      console.error('Erreur de fetch avec timeout:', error);
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Erreur de connexion'
-      };
-    }
-  }
-
-  private static processHtmlResult(html: string, url: string): CrawlResponse {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-
-    // Analyse basique du site
-    const title = doc.title || "Sans titre";
-    const meta = Array.from(doc.getElementsByTagName('meta'))
-      .map(meta => ({
-        name: meta.getAttribute('name') || meta.getAttribute('property'),
-        content: meta.getAttribute('content')
-      }))
-      .filter(meta => meta.name && meta.content);
-
-    const links = Array.from(doc.getElementsByTagName('a'))
-      .map(a => ({
-        href: a.href,
-        text: a.textContent?.trim() || "Sans texte"
-      }))
-      .filter(link => link.href.startsWith('http'));
-
-    const images = Array.from(doc.getElementsByTagName('img'))
-      .map(img => ({
-        src: img.src,
-        alt: img.alt || "Sans description"
-      }));
-
-    // Extraire les titres
-    const headings = Array.from(doc.querySelectorAll('h1, h2, h3'))
-      .map(h => ({
-        level: h.tagName.toLowerCase(),
-        text: h.textContent?.trim() || "Sans texte"
-      }));
-
-    // Ajouter le code source formaté
-    const formattedHtml = html
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/\n/g, '<br>')
-      .replace(/\s{2}/g, '&nbsp;&nbsp;');
-
-    return {
-      success: true,
-      status: 'completed',
-      completed: 1,
-      total: 1,
-      data: [{
+      const links = Array.from(doc.querySelectorAll('a')).map(link => {
+        return {
+          href: link.href || link.getAttribute('href') || '',
+          text: link.textContent?.trim() || '',
+          rel: link.getAttribute('rel') || ''
+        };
+      });
+      
+      const images = Array.from(doc.querySelectorAll('img')).map(img => {
+        return {
+          src: img.src || img.getAttribute('src') || '',
+          alt: img.alt || img.getAttribute('alt') || '',
+          width: img.width || 0,
+          height: img.height || 0
+        };
+      });
+      
+      // Créer un objet de résultat
+      const crawlResult = [{
         url,
         title,
         meta,
-        links: links.slice(0, 20), // Limite à 20 liens
-        images: images.slice(0, 20), // Limite à 20 images
         headings,
-        sourceCode: formattedHtml, // Ajout du code source
-        recommendations: [
-          "Utilisez des titres H1, H2, H3 de façon hiérarchique",
-          "Incluez des meta-descriptions pertinentes",
-          "Optimisez vos images avec des attributs alt",
-          "Structurez votre contenu pour une meilleure lisibilité"
-        ]
-      }]
-    };
-  }
-
-  private static generateDemoData(url: string): CrawlResponse {
-    return {
-      success: true,
-      status: 'demo',
-      completed: 1,
-      total: 1,
-      data: [{
-        url,
-        title: "Démonstration - Site simulé",
-        meta: [
-          { name: "description", content: "Données de démonstration pour le site demandé" },
-          { name: "keywords", content: "seo, analyse, démonstration" }
-        ],
-        links: [
-          { href: url + "/page1", text: "Page d'exemple 1" },
-          { href: url + "/page2", text: "Page d'exemple 2" },
-          { href: url + "/contact", text: "Page Contact" },
-          { href: url + "/about", text: "À propos" }
-        ],
-        images: [
-          { src: "https://via.placeholder.com/150", alt: "Image d'exemple" },
-          { src: "https://via.placeholder.com/200", alt: "Autre image" }
-        ],
-        headings: [
-          { level: "h1", text: "Titre principal de démonstration" },
-          { level: "h2", text: "Sous-titre de démonstration" },
-          { level: "h2", text: "Nos services" },
-          { level: "h3", text: "Service premium" },
-          { level: "h3", text: "Service standard" }
-        ],
-        sourceCode: "&lt;html&gt;\n  &lt;head&gt;\n    &lt;title&gt;Démonstration&lt;/title&gt;\n  &lt;/head&gt;\n  &lt;body&gt;\n    &lt;h1&gt;Titre principal de démonstration&lt;/h1&gt;\n    &lt;p&gt;Contenu de démonstration&lt;/p&gt;\n  &lt;/body&gt;\n&lt;/html&gt;",
-        recommendations: [
-          "Ajoutez un titre H1 unique et pertinent",
-          "Utilisez des sous-titres H2 et H3 pour structurer votre contenu",
-          "Optimisez vos balises meta pour améliorer le référencement",
-          "Ajoutez des descriptions alt à toutes vos images"
-        ]
-      }]
-    };
+        links,
+        images,
+        sourceCode: htmlContent
+      }];
+      
+      console.log('CORS proxy extraction successful');
+      console.log('Extracted data:', {
+        title,
+        metaCount: meta.length,
+        headingsCount: headings.length,
+        linksCount: links.length,
+        imagesCount: images.length
+      });
+      
+      return {
+        success: true,
+        data: crawlResult
+      };
+      
+    } catch (error) {
+      console.error('Error during CORS proxy extraction:', error);
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Échec de récupération des données via proxy CORS' 
+      };
+    }
   }
 }
+
+// Initialize proxy status from localStorage
+FirecrawlService.isProxyEnabled();

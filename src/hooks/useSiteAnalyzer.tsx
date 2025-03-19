@@ -630,3 +630,4 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
     handleActivateProxy
   };
 };
+
