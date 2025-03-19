@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,50 +38,102 @@ const AiSearchTab = () => {
     
     // Simulation d'une recherche IA
     setTimeout(() => {
-      const mockResults: SearchResults = {
-        summary: `Le mot-clé "${keyword}" est un sujet important dans le domaine du marketing digital et du SEO. D'après notre analyse, ce terme est recherché environ 5 400 fois par mois en France, avec un CPC moyen de 1,20€. Les utilisateurs qui recherchent ce terme sont généralement intéressés par des guides pratiques, des tutoriels et des études de cas. Le contenu qui fonctionne le mieux pour ce mot-clé combine des explications techniques avec des exemples concrets et des visualisations. La concurrence pour ce terme est modérée (difficulté de 62/100), ce qui signifie qu'il y a une opportunité réelle de se positionner avec du contenu de qualité. Les recherches associées à ce terme indiquent une intention d'information plutôt que d'achat, suggerant qu'un contenu éducatif serait plus approprié qu'un contenu commercial.`,
-        keyPoints: [
-          `"${keyword}" génère environ 5 400 recherches mensuelles en France`,
-          `La concurrence est modérée avec un score de difficulté de 62/100`,
-          `L'intention de recherche est principalement informative`,
-          `Le contenu mixant théorie et pratique obtient les meilleurs résultats`,
-          `Les articles de plus de 1 800 mots sont mieux classés pour ce mot-clé`,
-          `Les utilisateurs passent en moyenne 4 minutes 30 sur les pages bien positionnées`,
-          `73% des recherches proviennent d'appareils mobiles`
-        ],
-        relatedKeywords: [
-          `${keyword} guide`,
-          `${keyword} exemple`,
-          `comment utiliser ${keyword}`,
-          `${keyword} vs ${keyword.split(' ')[0]} traditionnel`,
-          `meilleures pratiques ${keyword}`,
-          `${keyword} pour débutants`,
-          `${keyword} avancé`,
-          `outils pour ${keyword}`
-        ],
-        sources: [
-          {
-            title: `Guide complet sur ${keyword}`,
-            url: "https://example.com/guide",
-            relevance: 92
-          },
-          {
-            title: `Les tendances ${keyword} en 2024`,
-            url: "https://example.com/trends",
-            relevance: 88
-          },
-          {
-            title: `Étude de cas: Comment Entreprise X a réussi avec ${keyword}`,
-            url: "https://example.com/case-study",
-            relevance: 84
-          },
-          {
-            title: `${keyword}: Statistiques et chiffres clés`,
-            url: "https://example.com/stats",
-            relevance: 78
-          }
-        ]
-      };
+      let mockResults: SearchResults;
+      
+      // Generate content based on the keyword category
+      if (keyword.toLowerCase().includes('voyage') || keyword.toLowerCase().includes('trip')) {
+        // Travel-related content
+        mockResults = {
+          summary: `Le mot-clé "${keyword}" fait référence au domaine du tourisme et des voyages. Notre analyse montre que ce terme génère environ 8 200 recherches mensuelles en France, avec un CPC moyen de 0,95€. Les utilisateurs recherchant ce terme sont principalement intéressés par des comparatifs d'offres, des avis sur les destinations, et des conseils pratiques pour organiser leur voyage. Le contenu qui performe le mieux combine des informations détaillées sur les destinations avec des conseils pratiques et des témoignages de voyageurs. La concurrence est relativement élevée (difficulté de 75/100), mais il existe des opportunités de positionnement sur des niches spécifiques ou des destinations moins couvertes. L'intention de recherche est mixte, avec à la fois une volonté d'information et d'achat/réservation.`,
+          keyPoints: [
+            `"${keyword}" génère environ 8 200 recherches mensuelles en France`,
+            `La concurrence est élevée avec un score de difficulté de 75/100`,
+            `Les recherches sont plus nombreuses entre janvier et mars (période de planification)`,
+            `Le contenu visuel et les témoignages personnels obtiennent les meilleurs résultats`,
+            `Les comparatifs d'offres et les guides pratiques sont très recherchés`,
+            `67% des recherches sont effectuées sur mobile`,
+            `Les utilisateurs passent en moyenne 5 minutes 20 sur les pages bien positionnées`
+          ],
+          relatedKeywords: [
+            `${keyword} pas cher`,
+            `${keyword} tout inclus`,
+            `avis ${keyword}`,
+            `${keyword} dernière minute`,
+            `comparatif ${keyword}`,
+            `${keyword} famille`,
+            `conseils ${keyword}`,
+            `${keyword} destinations populaires`
+          ],
+          sources: [
+            {
+              title: `Guide complet ${keyword} 2024`,
+              url: "https://example.com/guide-voyage",
+              relevance: 95
+            },
+            {
+              title: `Les meilleures offres pour ${keyword}`,
+              url: "https://example.com/offres-voyage",
+              relevance: 90
+            },
+            {
+              title: `Témoignages: Expériences avec ${keyword}`,
+              url: "https://example.com/temoignages",
+              relevance: 87
+            },
+            {
+              title: `${keyword}: Comparatif des plateformes de réservation`,
+              url: "https://example.com/comparatif",
+              relevance: 82
+            }
+          ]
+        };
+      } else {
+        // Default content for other keywords
+        mockResults = {
+          summary: `Le mot-clé "${keyword}" est un sujet important dans son domaine. D'après notre analyse, ce terme est recherché environ 5 400 fois par mois en France, avec un CPC moyen de 1,20€. Les utilisateurs qui recherchent ce terme sont généralement intéressés par des guides pratiques, des tutoriels et des études de cas. Le contenu qui fonctionne le mieux pour ce mot-clé combine des explications techniques avec des exemples concrets et des visualisations. La concurrence pour ce terme est modérée (difficulté de 62/100), ce qui signifie qu'il y a une opportunité réelle de se positionner avec du contenu de qualité. Les recherches associées à ce terme indiquent une intention d'information plutôt que d'achat, suggerant qu'un contenu éducatif serait plus approprié qu'un contenu commercial.`,
+          keyPoints: [
+            `"${keyword}" génère environ 5 400 recherches mensuelles en France`,
+            `La concurrence est modérée avec un score de difficulté de 62/100`,
+            `L'intention de recherche est principalement informative`,
+            `Le contenu mixant théorie et pratique obtient les meilleurs résultats`,
+            `Les articles de plus de 1 800 mots sont mieux classés pour ce mot-clé`,
+            `Les utilisateurs passent en moyenne 4 minutes 30 sur les pages bien positionnées`,
+            `73% des recherches proviennent d'appareils mobiles`
+          ],
+          relatedKeywords: [
+            `${keyword} guide`,
+            `${keyword} exemple`,
+            `comment utiliser ${keyword}`,
+            `${keyword} vs alternatives`,
+            `meilleures pratiques ${keyword}`,
+            `${keyword} pour débutants`,
+            `${keyword} avancé`,
+            `outils pour ${keyword}`
+          ],
+          sources: [
+            {
+              title: `Guide complet sur ${keyword}`,
+              url: "https://example.com/guide",
+              relevance: 92
+            },
+            {
+              title: `Les tendances ${keyword} en 2024`,
+              url: "https://example.com/trends",
+              relevance: 88
+            },
+            {
+              title: `Étude de cas: Comment Entreprise X a réussi avec ${keyword}`,
+              url: "https://example.com/case-study",
+              relevance: 84
+            },
+            {
+              title: `${keyword}: Statistiques et chiffres clés`,
+              url: "https://example.com/stats",
+              relevance: 78
+            }
+          ]
+        };
+      }
       
       setSearchResults(mockResults);
       setIsLoading(false);
@@ -107,7 +158,7 @@ const AiSearchTab = () => {
             <Input
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
-              placeholder="Entrez un mot-clé à analyser..."
+              placeholder="Entrez un mot-clé à analyser... (ex: voyage, trip.com)"
               className="flex-1 border-purple-200 focus-visible:ring-purple-500"
             />
             <Button 
@@ -279,7 +330,7 @@ const AiSearchTab = () => {
               Entrez un mot-clé ci-dessus pour obtenir une analyse détaillée générée par notre IA. Vous recevrez un résumé, des points clés, des mots-clés associés et des sources pertinentes.
             </p>
             <div className="flex flex-wrap justify-center gap-2">
-              {["marketing digital", "SEO", "stratégie de contenu", "réseaux sociaux", "e-commerce"].map((suggestion, i) => (
+              {["voyage", "trip.com", "SEO", "stratégie de contenu", "e-commerce"].map((suggestion, i) => (
                 <Badge 
                   key={i}
                   variant="outline"

@@ -31,18 +31,46 @@ const AiSearchButton = () => {
 
     setIsSearching(true);
     
-    // Simulation of AI search results
+    // Generate results based on the actual user query, not hardcoded to marketing digital
     setTimeout(() => {
-      setSearchResult({
-        summary: `${searchQuery} est un domaine en pleine expansion qui gagne en popularité notamment grâce à ses applications diverses dans le marketing digital et l'optimisation SEO. Les experts recommandent une approche stratégique intégrée pour maximiser les résultats. Les dernières tendances montrent une évolution vers des techniques plus personnalisées et axées sur l'expérience utilisateur.`,
-        keyPoints: [
-          `L'importance de ${searchQuery} dans une stratégie marketing globale`,
+      // Create tailored content based on search query topics
+      let summary = '';
+      let keyPoints: string[] = [];
+      let relatedKeywords: string[] = [];
+      
+      if (searchQuery.toLowerCase().includes('voyage') || searchQuery.toLowerCase().includes('trip')) {
+        summary = `${searchQuery} est un domaine passionnant du tourisme qui offre de nombreuses opportunités pour découvrir de nouvelles cultures et destinations. Les experts recommandent de bien planifier son voyage, de comparer les offres, et de rester flexible sur les dates pour obtenir les meilleurs tarifs. Les dernières tendances montrent une préférence pour les expériences authentiques et les voyages responsables.`;
+        
+        keyPoints = [
+          `Planifier à l'avance permet d'économiser jusqu'à 30% sur les tarifs`,
+          `Les applications mobiles dédiées au voyage facilitent l'organisation`,
+          `La flexibilité des dates peut réduire considérablement les coûts`,
+          `L'assurance voyage est essentielle pour voyager l'esprit tranquille`,
+          `Les avis en ligne sont précieux pour choisir les bonnes destinations`
+        ];
+        
+        relatedKeywords = [
+          `${searchQuery} économique`,
+          `${searchQuery} dernière minute`,
+          `${searchQuery} tout inclus`,
+          `conseils ${searchQuery}`,
+          `destinations populaires ${searchQuery}`,
+          `${searchQuery} en famille`,
+          `${searchQuery} hors saison`
+        ];
+      } else {
+        // Fallback for other topics - this should be customized for various domains
+        summary = `${searchQuery} est un domaine en pleine expansion qui gagne en popularité notamment grâce à ses applications diverses. Les experts recommandent une approche stratégique intégrée pour maximiser les résultats. Les dernières tendances montrent une évolution vers des techniques plus personnalisées et axées sur l'expérience utilisateur.`;
+        
+        keyPoints = [
+          `L'importance de ${searchQuery} dans une stratégie globale`,
           `Les principales méthodes d'optimisation de ${searchQuery} en 2024`,
           `Comment mesurer l'efficacité de vos actions liées à ${searchQuery}`,
           `Les erreurs courantes à éviter dans l'implémentation de ${searchQuery}`,
-          `Les tendances futures de ${searchQuery} pour les 2-3 prochaines années`
-        ],
-        relatedKeywords: [
+          `Les tendances futures de ${searchQuery} pour les prochaines années`
+        ];
+        
+        relatedKeywords = [
           `${searchQuery} optimisation`,
           `${searchQuery} stratégie`,
           `${searchQuery} analyse`,
@@ -50,10 +78,16 @@ const AiSearchButton = () => {
           `outils ${searchQuery}`,
           `mesurer ${searchQuery}`,
           `${searchQuery} efficacité`
-        ],
+        ];
+      }
+      
+      setSearchResult({
+        summary,
+        keyPoints,
+        relatedKeywords,
         sources: [
-          { title: `Guide complet sur ${searchQuery} - Marketing Digital`, url: "https://example.com/guide" },
-          { title: `Étude de cas: Comment ${searchQuery} a transformé notre stratégie`, url: "https://example.com/case-study" },
+          { title: `Guide complet sur ${searchQuery}`, url: "https://example.com/guide" },
+          { title: `Étude de cas: Comment ${searchQuery} a transformé notre approche`, url: "https://example.com/case-study" },
           { title: `Les 10 meilleures pratiques pour ${searchQuery} en 2024`, url: "https://example.com/best-practices" }
         ]
       });
@@ -102,7 +136,7 @@ const AiSearchButton = () => {
                   id="search-query"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Ex: SEO, marketing d'influence, e-commerce..."
+                  placeholder="Ex: voyage, trip.com, SEO, e-commerce..."
                   className="flex-1"
                 />
                 <Button 

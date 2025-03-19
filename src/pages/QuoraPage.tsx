@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -16,6 +15,7 @@ import QuoraAnswerForm, { QuoraAnswerFormProps } from '@/components/seo/buttons/
 import { toast } from 'sonner';
 import PageHeader from '@/components/dashboard/PageHeader';
 import { useForm } from 'react-hook-form';
+import { PageHeaderProps } from '@/components/dashboard/PageHeader.d';
 
 const QuoraPage = () => {
   const [activeTab, setActiveTab] = useState('questions');
