@@ -45,3 +45,25 @@ export const getMetricsData = () => {
     }
   };
 };
+
+// Ajout de la fonction getDailyUpdates qui était manquante
+export const getDailyUpdates = () => {
+  return [
+    {
+      type: "success",
+      message: "Position améliorée pour 'seo optimisation' +2 places"
+    },
+    {
+      type: "warning",
+      message: "Baisse de trafic organique de 5% cette semaine"
+    },
+    {
+      type: "info",
+      message: "Nouveau backlink détecté depuis domain.com"
+    },
+    {
+      type: "success",
+      message: "Performance mobile améliorée +7 points"
+    }
+  ];
+};

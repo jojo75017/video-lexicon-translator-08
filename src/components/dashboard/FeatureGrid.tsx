@@ -75,11 +75,16 @@ const FeatureGrid = () => {
   ];
 
   // Improved function to handle feature clicks
-  const handleFeatureClick = (id: string, tabValue?: string, link?: string) => {
+  const handleFeatureClick = (e: React.MouseEvent, id: string, tabValue?: string, link?: string) => {
+    // Prevent default behavior to avoid scrolling to top
+    e.preventDefault();
+    
     if (link) {
       // No action needed, routing is handled by the Link component
       return;
     }
+    
+    console.log(`Feature clicked: ${id}, tab: ${tabValue}`);
     
     // Using improved navigation helper
     if (tabValue) {
@@ -118,7 +123,7 @@ const FeatureGrid = () => {
             <div 
               key={feature.id} 
               className="cursor-pointer" 
-              onClick={() => handleFeatureClick(feature.id, feature.tabValue)}
+              onClick={(e) => handleFeatureClick(e, feature.id, feature.tabValue)}
               id={`feature-card-${feature.id}`}
               data-feature-id={feature.id}
               data-tab-value={feature.tabValue}
