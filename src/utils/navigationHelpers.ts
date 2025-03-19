@@ -4,9 +4,6 @@ import { toast } from "sonner";
 export const navigateToSection = (sectionId: string, tabId?: string): void => {
   console.log(`Navigating to section: ${sectionId}, tab: ${tabId}`);
   
-  // Empêcher le comportement par défaut qui fait remonter la page
-  // en utilisant preventDefault sur l'événement
-  
   // First step: Activate the tab if needed
   if (tabId) {
     const tabElement = document.querySelector(`[data-value="${tabId}"]`) as HTMLElement;
@@ -32,10 +29,13 @@ export const scrollToSection = (sectionId: string): void => {
   
   if (sectionElement) {
     console.log(`Section element found: ${sectionId}`);
-    // Empêcher le scrolling automatique vers le haut
-    event?.preventDefault?.();
     
-    // Faire défiler vers la section avec un comportement fluide
+    // Prevent default page navigation/scrolling behavior
+    if (typeof window !== 'undefined' && window.event) {
+      window.event.preventDefault();
+    }
+    
+    // Scroll to the section with smooth behavior
     sectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
     
     // Add temporary highlight effect
@@ -50,7 +50,9 @@ export const scrollToSection = (sectionId: string): void => {
     const dataAttributeSection = document.querySelector(`[data-section="${sectionId}"]`);
     if (dataAttributeSection) {
       console.log(`Found section by data attribute: ${sectionId}`);
-      event?.preventDefault?.();
+      if (typeof window !== 'undefined' && window.event) {
+        window.event.preventDefault();
+      }
       dataAttributeSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
       return;
     }
@@ -59,7 +61,9 @@ export const scrollToSection = (sectionId: string): void => {
     const classSection = document.querySelector(`.section-${sectionId}`);
     if (classSection) {
       console.log(`Found section by class: ${sectionId}`);
-      event?.preventDefault?.();
+      if (typeof window !== 'undefined' && window.event) {
+        window.event.preventDefault();
+      }
       classSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
       return;
     }

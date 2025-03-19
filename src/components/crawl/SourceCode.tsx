@@ -10,6 +10,8 @@ export const SourceCode = ({ sourceCode }: SourceCodeProps) => {
   const [formattedCode, setFormattedCode] = useState<string>("");
   
   useEffect(() => {
+    console.log("SourceCode component received code:", !!sourceCode);
+    
     if (sourceCode) {
       // Format HTML for better display
       try {
@@ -29,7 +31,7 @@ export const SourceCode = ({ sourceCode }: SourceCodeProps) => {
   }, [sourceCode]);
 
   return (
-    <div className="border rounded-lg overflow-hidden shadow-sm" id="source-code" data-section="source">
+    <div className="border rounded-lg overflow-hidden shadow-sm" id="source" data-section="source">
       <div className="bg-gray-100 dark:bg-gray-800 p-3 border-b flex items-center gap-2">
         <Code className="w-4 h-4" />
         <h4 className="font-medium text-sm">Code Source HTML</h4>

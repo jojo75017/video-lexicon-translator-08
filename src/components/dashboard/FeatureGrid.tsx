@@ -74,10 +74,11 @@ const FeatureGrid = () => {
     }
   ];
 
-  // Improved function to handle feature clicks
+  // Fixed function to handle feature clicks
   const handleFeatureClick = (e: React.MouseEvent, id: string, tabValue?: string, link?: string) => {
-    // Prevent default behavior to avoid scrolling to top
+    // Important: Prevent default behavior to avoid scrolling to top
     e.preventDefault();
+    e.stopPropagation(); // Also stop propagation to avoid bubbling
     
     if (link) {
       // No action needed, routing is handled by the Link component
@@ -86,7 +87,7 @@ const FeatureGrid = () => {
     
     console.log(`Feature clicked: ${id}, tab: ${tabValue}`);
     
-    // Using improved navigation helper
+    // Using improved navigation helper and showing feedback to user
     if (tabValue) {
       navigateToSection(id, tabValue);
     } else {
@@ -94,7 +95,7 @@ const FeatureGrid = () => {
     }
     
     // Notify user about the navigation
-    toast.info(`Navigation vers ${id}`, {
+    toast.success(`Navigation vers ${id}`, {
       description: `Affichage des données de ${id}`,
       duration: 2000
     });
@@ -133,7 +134,11 @@ const FeatureGrid = () => {
                 title={feature.title}
                 description={feature.description}
                 color={feature.color}
-                onClick={() => {}}
+                onClick={(e) => {
+                  // Stop propagation here too to ensure the click doesn't bubble
+                  e.stopPropagation();
+                  handleFeatureClick(e, feature.id, feature.tabValue);
+                }}
               />
             </div>
           )

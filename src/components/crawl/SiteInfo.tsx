@@ -1,5 +1,5 @@
 
-import { AlertCircle, Globe, Link2, Image, Search, Tag, Info } from "lucide-react";
+import { AlertCircle, Globe, Link2, Image, Search, Tag, Info, ChartBar, Settings, Hash } from "lucide-react";
 
 interface SiteInfoProps {
   data: any;
@@ -18,11 +18,12 @@ export const SiteInfo = ({ data }: SiteInfoProps) => {
     hasLinks,
     hasImages,
     title: data?.title,
+    dataObject: data
   });
   
   return (
     <>
-      <div className="bg-muted/10 p-4 rounded-lg shadow-sm border border-gray-100" id="seo-title" data-section="seo">
+      <div className="bg-muted/10 p-4 rounded-lg shadow-sm border border-gray-100" id="seo" data-section="seo">
         <h4 className="font-medium mb-2 flex items-center">
           <Globe className="w-4 h-4 mr-2 text-blue-600" />
           Titre du site
@@ -128,6 +129,36 @@ export const SiteInfo = ({ data }: SiteInfoProps) => {
           ) : (
             <p className="text-gray-500 italic">Aucune image trouvée</p>
           )}
+        </div>
+      </div>
+      
+      <div className="bg-muted/10 p-4 rounded-lg shadow-sm border border-gray-100 mt-4" id="metrics" data-section="metrics">
+        <h4 className="font-medium mb-2 flex items-center">
+          <ChartBar className="w-4 h-4 mr-2 text-blue-600" />
+          Métriques
+        </h4>
+        <div className="text-sm space-y-1">
+          <p>Ces données seront disponibles après l'analyse d'un site.</p>
+        </div>
+      </div>
+      
+      <div className="bg-muted/10 p-4 rounded-lg shadow-sm border border-gray-100 mt-4" id="advanced" data-section="advanced">
+        <h4 className="font-medium mb-2 flex items-center">
+          <Settings className="w-4 h-4 mr-2 text-blue-600" />
+          Options avancées
+        </h4>
+        <div className="text-sm space-y-1">
+          <p>Fonctionnalités avancées disponibles après l'analyse complète.</p>
+        </div>
+      </div>
+      
+      <div className="bg-muted/10 p-4 rounded-lg shadow-sm border border-gray-100 mt-4" id="integrations" data-section="integrations">
+        <h4 className="font-medium mb-2 flex items-center">
+          <Hash className="w-4 h-4 mr-2 text-blue-600" />
+          Intégrations
+        </h4>
+        <div className="text-sm space-y-1">
+          <p>Connectez-vous à des outils externes pour des analyses plus approfondies.</p>
         </div>
       </div>
     </>

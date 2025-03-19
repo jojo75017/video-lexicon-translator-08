@@ -22,6 +22,7 @@ type CrawlResponse = CrawlStatusResponse | ErrorResponse;
 export class FirecrawlService {
   private static API_KEY_STORAGE_KEY = 'firecrawl_api_key';
   private static firecrawlApp: FirecrawlApp | null = null;
+  private static proxyEnabled = false;
   
   // List of available CORS proxies
   private static corsProxies = [
@@ -38,6 +39,15 @@ export class FirecrawlService {
 
   static getApiKey(): string | null {
     return localStorage.getItem(this.API_KEY_STORAGE_KEY) || 'demo-key'; // Provide a demo key for testing
+  }
+
+  static enableProxy(): void {
+    this.proxyEnabled = true;
+    console.log('CORS proxy enabled');
+  }
+  
+  static isProxyEnabled(): boolean {
+    return this.proxyEnabled;
   }
 
   static async testApiKey(apiKey: string): Promise<boolean> {
@@ -166,7 +176,7 @@ export class FirecrawlService {
 
   static async crawlWebsite(url: string, useProxy = false): Promise<{ success: boolean; error?: string; data?: any }> {
     try {
-      if (useProxy) {
+      if (useProxy || this.proxyEnabled) {
         console.log('Using CORS proxy for:', url);
         return await this.fetchWithCorsProxy(url);
       }
