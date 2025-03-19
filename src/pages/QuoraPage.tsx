@@ -1,304 +1,313 @@
-import React, { useState } from 'react';
-import { Card } from "@/components/ui/card";
+
+import React from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Switch } from "@/components/ui/switch";
-import { PenLine, Search, RefreshCw, ArrowLeft, MessageSquareText, HelpCircle } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import QuoraQuestionForm, { QuoraQuestionFormProps } from '@/components/seo/buttons/QuoraQuestionForm';
-import QuoraAnswerForm, { QuoraAnswerFormProps } from '@/components/seo/buttons/QuoraAnswerForm';
-import { toast } from 'sonner';
-import PageHeader from '@/components/dashboard/PageHeader';
-import { useForm } from 'react-hook-form';
-import { PageHeaderProps } from '@/components/dashboard/PageHeader.d';
+import QuoraButton from "@/components/seo/buttons/QuoraButton";
+import { PageHeader } from "@/components/dashboard/PageHeader";
+import { Separator } from "@/components/ui/separator";
+import { Rocket, MessageSquareText, Sparkles, Users, TrendingUp, Award } from "lucide-react";
 
 const QuoraPage = () => {
-  const [activeTab, setActiveTab] = useState('questions');
-  const [isLoading, setIsLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [questionDraft, setQuestionDraft] = useState('');
-  const [questionTags, setQuestionTags] = useState('');
-  const [questionCategory, setQuestionCategory] = useState('');
-  const [answerTarget, setAnswerTarget] = useState('');
-  const [answerDraft, setAnswerDraft] = useState('');
-  const [answerApproach, setAnswerApproach] = useState('authority');
-  const [includeLinks, setIncludeLinks] = useState(true);
-  const [includeStatistics, setIncludeStatistics] = useState(true);
-  
-  // Add state and handlers for QuoraQuestionForm and QuoraAnswerForm
-  const [textDetails, setTextDetails] = useState('');
-  const [textAnswer, setTextAnswer] = useState('');
-  const [textSources, setTextSources] = useState('');
-  
-  const popularQuestions = [
-    "Comment améliorer mon référencement SEO en 2024 ?",
-    "Quelles sont les meilleures stratégies de marketing digital ?",
-    "Comment optimiser ma présence sur les réseaux sociaux ?"
-  ];
-  
-  const askForm = useForm();
-  const answerForm = useForm();
-  
-  const handleSaveDraft = () => {
-    if (activeTab === 'questions' && questionDraft) {
-      toast.success('Brouillon de question sauvegardé');
-    } else if (activeTab === 'answers' && answerDraft) {
-      toast.success('Brouillon de réponse sauvegardé');
-    } else {
-      toast.error('Veuillez d\'abord écrire du contenu');
-    }
-  };
-  
-  const handleGenerateContent = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      if (activeTab === 'questions') {
-        setQuestionDraft("Comment puis-je améliorer efficacement le référencement de mon site e-commerce en 2024 avec un budget limité ?");
-      } else {
-        setAnswerDraft(`Pour améliorer le référencement de votre site e-commerce avec un budget limité en 2024, concentrez-vous sur ces stratégies éprouvées:
-
-1. **Optimisez votre contenu** - Créez des descriptions de produits uniques et détaillées qui répondent aux intentions de recherche des utilisateurs.
-
-2. **Améliorez la vitesse de votre site** - Utilisez Google PageSpeed Insights pour identifier et corriger les problèmes de performance.
-
-3. **Structurez vos données avec Schema.org** - Implémentez le balisage de schéma pour aider les moteurs de recherche à mieux comprendre votre contenu.
-
-4. **Optimisez pour mobile** - Assurez-vous que votre site offre une expérience parfaite sur tous les appareils.
-
-5. **Créez un blog** - Publiez régulièrement du contenu informatif lié à vos produits pour attirer du trafic organique.
-
-Selon une étude récente de SEMrush, les sites e-commerce qui publient régulièrement du contenu voient une augmentation moyenne de 68% du trafic organique en 6 mois.
-
-N'hésitez pas à me contacter pour des conseils plus personnalisés adaptés à votre niche spécifique.`);
-      }
-      setIsLoading(false);
-      toast.success('Contenu généré avec succès');
-    }, 1500);
-  };
-  
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchTerm) {
-      toast.success(`Recherche de "${searchTerm}" en cours...`);
-    } else {
-      toast.error('Veuillez entrer un terme de recherche');
-    }
-  };
-  
-  const handleTextSelection = (e: React.MouseEvent<HTMLTextAreaElement>) => {
-    // Placeholder for text selection handler
-  };
-  
-  const applyFormatting = (fieldType: 'details' | 'answer' | 'sources', format: 'bold' | 'italic' | 'underline' | 'link' | 'image' | 'list' | 'numbered-list' | 'quote') => {
-    // Placeholder for formatting handler
-  };
-  
-  const handleQuoraSubmit = (data: any) => {
-    // Placeholder for form submission
-    toast.success('Question Quora soumise');
-  };
-  
-  const handleQuoraAnswerSubmit = (data: any) => {
-    // Placeholder for form submission
-    toast.success('Réponse Quora soumise');
-  };
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <PageHeader 
-          title="Assistant Quora"
-          description="Générez des questions et réponses optimisées pour Quora"
-          icon={<MessageSquareText className="h-6 w-6 text-[#b92b27]" />}
-        />
-        
-        <div className="mb-6">
-          <Link to="/" className="text-gray-600 hover:text-gray-900 inline-flex items-center">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Retour au tableau de bord
-          </Link>
-        </div>
-        
-        <Card className="p-6 space-y-6">
-          <Tabs defaultValue="questions" className="space-y-4">
-            <TabsList className="bg-gray-100 rounded-md p-1">
-              <TabsTrigger value="questions" onClick={() => setActiveTab('questions')} className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md px-4 py-2 font-medium">
-                Questions
-              </TabsTrigger>
-              <TabsTrigger value="answers" onClick={() => setActiveTab('answers')} className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md px-4 py-2 font-medium">
-                Réponses
-              </TabsTrigger>
+    <div className="flex flex-col min-h-screen bg-background">
+      <div className="flex-1">
+        <div className="container py-6">
+          <PageHeader 
+            heading="Assistant Quora" 
+            subheading="Créez du contenu optimisé pour Quora et augmentez votre autorité en ligne"
+            icon={<MessageSquareText className="h-6 w-6 text-[#b92b27]" />}
+          />
+          
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold">Créer du contenu pour Quora</h2>
+            <div className="flex gap-2">
+              <QuoraButton />
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-yellow-500" />
+                  <span>Visibilité</span>
+                </CardTitle>
+                <CardDescription>Augmentez votre exposition</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm">Quora reçoit plus de 300 millions de visiteurs uniques par mois, offrant une opportunité unique d'exposition et de génération de trafic.</p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Users className="h-5 w-5 text-blue-500" />
+                  <span>Autorité</span>
+                </CardTitle>
+                <CardDescription>Établissez votre expertise</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm">Positionnez-vous comme un expert dans votre domaine en fournissant des réponses détaillées et informatives à des questions pertinentes.</p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-green-500" />
+                  <span>Trafic Qualifié</span>
+                </CardTitle>
+                <CardDescription>Attirez des visiteurs ciblés</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm">Générez du trafic qualifié vers votre site en incluant stratégiquement des liens pertinents dans vos réponses Quora.</p>
+              </CardContent>
+            </Card>
+          </div>
+          
+          <Tabs defaultValue="strategies" className="w-full">
+            <TabsList className="grid grid-cols-3 mb-6">
+              <TabsTrigger value="strategies">Stratégies Quora</TabsTrigger>
+              <TabsTrigger value="examples">Exemples Réussis</TabsTrigger>
+              <TabsTrigger value="tips">Conseils Avancés</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="questions" className="space-y-4">
-              <form onSubmit={handleSearch} className="flex items-center space-x-2">
-                <Input
-                  type="search"
-                  placeholder="Rechercher des questions..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="flex-1"
-                />
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? (
-                    <>
-                      <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                      Recherche...
-                    </>
-                  ) : (
-                    <>
-                      <Search className="mr-2 h-4 w-4" />
-                      Rechercher
-                    </>
-                  )}
-                </Button>
-              </form>
-              
-              <Textarea
-                placeholder="Rédigez votre question ici..."
-                value={questionDraft}
-                onChange={(e) => setQuestionDraft(e.target.value)}
-                className="min-h-[100px]"
-              />
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="tags">Tags (séparés par des virgules)</Label>
-                  <Input
-                    type="text"
-                    id="tags"
-                    placeholder="ex: référencement, SEO, marketing digital"
-                    value={questionTags}
-                    onChange={(e) => setQuestionTags(e.target.value)}
-                  />
-                </div>
+            <TabsContent value="strategies" className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Cibler les questions pertinentes</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <p>Recherchez des questions qui correspondent à votre domaine d'expertise et qui sont susceptibles d'attirer votre audience cible.</p>
+                    <ul className="list-disc pl-6 space-y-1 text-sm">
+                      <li>Utilisez les filtres de recherche pour trouver des questions récentes</li>
+                      <li>Concentrez-vous sur les questions avec peu de réponses pour maximiser la visibilité</li>
+                      <li>Abonnez-vous à des sujets pertinents pour être notifié des nouvelles questions</li>
+                    </ul>
+                  </CardContent>
+                </Card>
                 
-                <div>
-                  <Label htmlFor="category">Catégorie</Label>
-                  <Select onValueChange={setQuestionCategory}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Sélectionnez une catégorie" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="marketing">Marketing</SelectItem>
-                      <SelectItem value="business">Business</SelectItem>
-                      <SelectItem value="technology">Technologie</SelectItem>
-                      <SelectItem value="education">Éducation</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Créer des réponses de qualité</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <p>Les réponses détaillées, informatives et bien structurées obtiennent plus de vues et d'upvotes.</p>
+                    <ul className="list-disc pl-6 space-y-1 text-sm">
+                      <li>Commencez par un paragraphe d'introduction accrocheur</li>
+                      <li>Structurez votre réponse avec des sous-titres et des listes</li>
+                      <li>Incluez des données, statistiques et exemples concrets</li>
+                      <li>Ajoutez une conclusion avec un appel à l'action subtil</li>
+                    </ul>
+                  </CardContent>
+                </Card>
               </div>
               
-              <div className="flex justify-between">
-                <Button variant="secondary" onClick={handleSaveDraft}>
-                  <PenLine className="mr-2 h-4 w-4" />
-                  Enregistrer le brouillon
-                </Button>
-                <Button onClick={handleGenerateContent} disabled={isLoading}>
-                  {isLoading ? (
-                    <>
-                      <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                      Génération...
-                    </>
-                  ) : (
-                    <>
-                      <HelpCircle className="mr-2 h-4 w-4" />
-                      Générer une question
-                    </>
-                  )}
-                </Button>
-              </div>
-              
-              <QuoraQuestionForm 
-                form={askForm} 
-                textDetails={textDetails}
-                setTextDetails={setTextDetails}
-                handleTextSelection={handleTextSelection}
-                applyFormatting={applyFormatting}
-                onSubmit={handleQuoraSubmit}
-              />
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Calendrier de publication optimal</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left py-2 px-4">Fréquence</th>
+                          <th className="text-left py-2 px-4">Meilleur moment</th>
+                          <th className="text-left py-2 px-4">Avantages</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr className="border-b">
+                          <td className="py-2 px-4">Quotidien</td>
+                          <td className="py-2 px-4">8h-10h ou 19h-21h</td>
+                          <td className="py-2 px-4">Visibilité maximale, croissance rapide</td>
+                        </tr>
+                        <tr className="border-b">
+                          <td className="py-2 px-4">3-4 fois/semaine</td>
+                          <td className="py-2 px-4">Mardi et jeudi matin</td>
+                          <td className="py-2 px-4">Équilibre entre qualité et quantité</td>
+                        </tr>
+                        <tr>
+                          <td className="py-2 px-4">1 fois/semaine</td>
+                          <td className="py-2 px-4">Dimanche soir</td>
+                          <td className="py-2 px-4">Réponses très détaillées et recherchées</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
             
-            <TabsContent value="answers" className="space-y-4">
-              <Input
-                type="search"
-                placeholder="Question cible..."
-                value={answerTarget}
-                onChange={(e) => setAnswerTarget(e.target.value)}
-              />
-              
-              <Textarea
-                placeholder="Rédigez votre réponse ici..."
-                value={answerDraft}
-                onChange={(e) => setAnswerDraft(e.target.value)}
-                className="min-h-[150px]"
-              />
-              
-              <div className="space-y-2">
-                <Label>Approche de la réponse</Label>
-                <RadioGroup defaultValue={answerApproach} className="flex space-x-2" onValueChange={setAnswerApproach}>
-                  <RadioGroupItem value="authority" id="approach1" />
-                  <Label htmlFor="approach1">Expert (autorité)</Label>
-                  <RadioGroupItem value="friendly" id="approach2" />
-                  <Label htmlFor="approach2">Amical (conseils)</Label>
-                  <RadioGroupItem value="humorous" id="approach3" />
-                  <Label htmlFor="approach3">Humoristique</Label>
-                </RadioGroup>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div className="space-x-4 flex items-center">
-                  <div className="flex items-center space-x-2">
-                    <Switch id="links" checked={includeLinks} onCheckedChange={(checked) => setIncludeLinks(checked)} />
-                    <Label htmlFor="links">Inclure des liens</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Switch id="statistics" checked={includeStatistics} onCheckedChange={(checked) => setIncludeStatistics(checked)} />
-                    <Label htmlFor="statistics">Inclure des statistiques</Label>
-                  </div>
-                </div>
+            <TabsContent value="examples" className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader className="pb-2 flex flex-row items-start gap-2">
+                    <Award className="h-5 w-5 text-[#b92b27] mt-1" />
+                    <div>
+                      <CardTitle className="text-lg">Exemple 1: Réponse virale</CardTitle>
+                      <CardDescription>42K vues, 837 upvotes</CardDescription>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <p className="font-medium">Q: Quelles sont les stratégies SEO les plus efficaces pour un nouveau site web en 2023?</p>
+                    <div className="bg-gray-50 p-3 rounded-md text-sm">
+                      <p>Après avoir lancé plus de 50 sites web et analysé leur performance SEO, voici ce qui fonctionne réellement en 2023:</p>
+                      <p className="mt-2">1. <strong>Contenu E-E-A-T optimisé</strong> - Google met désormais l'accent sur l'Expertise, l'Expérience, l'Autorité et la Fiabilité...</p>
+                      <p className="italic text-xs mt-2">[Réponse tronquée pour l'exemple]</p>
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      Pourquoi ça fonctionne: Approche basée sur l'expérience, données concrètes, structure claire
+                    </div>
+                  </CardContent>
+                </Card>
                 
-                <div className="flex justify-between">
-                  <Button variant="secondary" onClick={handleSaveDraft}>
-                    <PenLine className="mr-2 h-4 w-4" />
-                    Enregistrer le brouillon
-                  </Button>
-                  <Button onClick={handleGenerateContent} disabled={isLoading}>
-                    {isLoading ? (
-                      <>
-                        <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                        Génération...
-                      </>
-                    ) : (
-                      <>
-                        <HelpCircle className="mr-2 h-4 w-4" />
-                        Générer une réponse
-                      </>
-                    )}
-                  </Button>
-                </div>
+                <Card>
+                  <CardHeader className="pb-2 flex flex-row items-start gap-2">
+                    <Award className="h-5 w-5 text-[#b92b27] mt-1" />
+                    <div>
+                      <CardTitle className="text-lg">Exemple 2: Génération de trafic</CardTitle>
+                      <CardDescription>18K vues, 412 upvotes, 280 clics</CardDescription>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <p className="font-medium">Q: Comment créer un plan marketing digital efficace avec un budget limité?</p>
+                    <div className="bg-gray-50 p-3 rounded-md text-sm">
+                      <p>Un plan marketing digital efficace ne nécessite pas forcément un budget conséquent. Voici comment j'ai aidé une startup à générer plus de 100K€ avec seulement 5K€ de budget marketing:</p>
+                      <p className="mt-2">Étape 1: <strong>Audit et analyse</strong> - Avant tout investissement, comprendre précisément où se trouve votre audience...</p>
+                      <p className="italic text-xs mt-2">[Réponse tronquée pour l'exemple]</p>
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      Pourquoi ça fonctionne: Histoire concrète, plan étape par étape, lien naturel vers une ressource
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
               
-              <QuoraAnswerForm 
-                form={answerForm}
-                popularQuestions={popularQuestions}
-                textAnswer={textAnswer}
-                setTextAnswer={setTextAnswer}
-                textSources={textSources}
-                setTextSources={setTextSources}
-                handleTextSelection={handleTextSelection}
-                applyFormatting={applyFormatting}
-                onSubmit={handleQuoraAnswerSubmit}
-              />
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Éléments communs des réponses performantes</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="bg-blue-50 p-4 rounded-md">
+                      <h3 className="font-medium text-blue-700 mb-2">Structure</h3>
+                      <ul className="space-y-1 text-sm">
+                        <li>Introduction accrocheuse</li>
+                        <li>Points principaux clairement identifiés</li>
+                        <li>Sous-titres pour faciliter la lecture</li>
+                        <li>Conclusion mémorable</li>
+                      </ul>
+                    </div>
+                    
+                    <div className="bg-green-50 p-4 rounded-md">
+                      <h3 className="font-medium text-green-700 mb-2">Contenu</h3>
+                      <ul className="space-y-1 text-sm">
+                        <li>Informations originales</li>
+                        <li>Exemples concrets et chiffres</li>
+                        <li>Expertise personnelle partagée</li>
+                        <li>Réponse complète à la question</li>
+                      </ul>
+                    </div>
+                    
+                    <div className="bg-purple-50 p-4 rounded-md">
+                      <h3 className="font-medium text-purple-700 mb-2">Engagement</h3>
+                      <ul className="space-y-1 text-sm">
+                        <li>Style conversationnel</li>
+                        <li>Utilisation judicieuse du formatage</li>
+                        <li>Citations et références</li>
+                        <li>Questions rhétoriques</li>
+                      </ul>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="tips" className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Optimisation du profil</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <p>Un profil optimisé augmente considérablement la crédibilité de vos réponses.</p>
+                    <ul className="list-disc pl-6 space-y-2 text-sm">
+                      <li><strong>Bio professionnelle</strong> - Mettez en avant votre expertise et vos réalisations</li>
+                      <li><strong>Photo de qualité</strong> - Utilisez une photo professionnelle avec un bon éclairage</li>
+                      <li><strong>Créneaux d'expertise</strong> - Définissez clairement vos domaines de compétence</li>
+                      <li><strong>Liens pertinents</strong> - Ajoutez des liens vers votre site, blog ou réseaux sociaux</li>
+                    </ul>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Analyse des performances</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <p>Suivez et analysez régulièrement les performances de vos réponses pour optimiser votre stratégie.</p>
+                    <ul className="list-disc pl-6 space-y-2 text-sm">
+                      <li><strong>Vues et upvotes</strong> - Identifiez les sujets et formats qui génèrent le plus d'engagement</li>
+                      <li><strong>Taux de clics</strong> - Mesurez l'efficacité de vos liens avec Google Analytics</li>
+                      <li><strong>Questions connexes</strong> - Repérez les opportunités de répondre à des questions similaires</li>
+                      <li><strong>Commentaires</strong> - Utilisez les feedbacks pour améliorer vos futures réponses</li>
+                    </ul>
+                  </CardContent>
+                </Card>
+              </div>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Techniques avancées</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                    <div>
+                      <h3 className="font-medium mb-2">Storytelling stratégique</h3>
+                      <p className="text-sm">Intégrez des histoires personnelles et des études de cas dans vos réponses pour créer une connexion émotionnelle avec les lecteurs et renforcer votre crédibilité.</p>
+                    </div>
+                    
+                    <div>
+                      <h3 className="font-medium mb-2">Réutilisation de contenu</h3>
+                      <p className="text-sm">Adaptez le contenu existant de votre blog ou site web pour créer des réponses Quora détaillées, maximisant ainsi l'impact de votre contenu.</p>
+                    </div>
+                    
+                    <div>
+                      <h3 className="font-medium mb-2">Réseautage stratégique</h3>
+                      <p className="text-sm">Suivez et interagissez avec des influenceurs de votre niche sur Quora pour augmenter votre visibilité et construire des relations professionnelles.</p>
+                    </div>
+                    
+                    <div>
+                      <h3 className="font-medium mb-2">Questions et réponses</h3>
+                      <p className="text-sm">Posez des questions pertinentes à votre expertise puis répondez-y de manière détaillée pour créer un contenu contrôlé qui met en valeur votre expertise.</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
-        </Card>
+        </div>
       </div>
+      
+      <footer className="border-t py-6">
+        <div className="container">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-sm text-gray-500">
+              © {new Date().getFullYear()} SEO-GPT. Tous droits réservés.
+            </p>
+            <div className="flex items-center gap-6">
+              <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Confidentialité</a>
+              <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Conditions d'utilisation</a>
+              <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Contact</a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
