@@ -45,7 +45,7 @@ export interface SeoAnalysis {
   metaTagsAnalysis: MetaTagsAnalysis;
   canonicalUrl: string | null;
   robotsMeta: string | null;
-  brokenLinks: string[];
+  brokenLinks: BrokenLink[];
   keywords: string[];
   googlePosition: number | null;
   authorityScore: number;
@@ -171,6 +171,8 @@ export interface ImageDetails {
   };
   size: number;
   format: string;
+  lazyLoaded?: boolean;
+  compressed?: boolean;
 }
 
 export interface KeywordData {
@@ -188,6 +190,7 @@ export interface KeywordSuggestion {
   // Add properties that were causing errors
   difficulty?: number;
   volume?: number;
+  trend?: string;
 }
 
 export interface Performance {
@@ -266,6 +269,7 @@ export interface SearchConsoleData {
   // Add missing property
   topQueries?: any[];
   topPages?: any[];
+  devices?: any;
 }
 
 export interface SecurityHeaders {
@@ -296,4 +300,9 @@ export interface BrokenLink {
   url: string;
   statusCode: number;
   message: string;
+}
+
+// Create a KeywordAnalysis interface that matches what's expected
+export interface KeywordAnalysis extends KeywordData {
+  // Make sure it has all properties needed
 }

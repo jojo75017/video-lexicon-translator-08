@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Link } from "react-router-dom";
@@ -100,7 +99,7 @@ const TabNavigation = () => {
 
   return (
     <TooltipProvider>
-      <Tabs defaultValue="hierarchy" className="w-full">
+      <Tabs defaultValue="wordcount" className="w-full">
         <div className="w-full flex flex-col overflow-hidden justify-between bg-white shadow-md rounded-lg p-3 mb-6 border border-gray-100">
           <div className="grid grid-cols-6 gap-2 text-xs font-medium text-gray-500 mb-2 px-2">
             {Object.entries(groupLabels).map(([key, label]) => (
