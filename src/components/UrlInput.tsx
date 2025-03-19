@@ -40,11 +40,13 @@ const UrlInput = ({
     
     try {
       new URL(url);
+      console.log("ANALYZING URL FROM URLINPUT:", url);
       toast.info("Début de l'analyse...", {
         description: "Cette opération peut prendre quelques instants"
       });
       onAnalyze();
     } catch {
+      console.error("INVALID URL FROM URLINPUT:", url);
       toast.error("URL invalide", {
         description: "Veuillez entrer une URL valide (ex: https://exemple.com)"
       });
@@ -52,6 +54,7 @@ const UrlInput = ({
   };
 
   const handleProxyDemoClick = () => {
+    console.log("OPENING CORS DEMO PAGE FROM URLINPUT");
     window.open('https://cors-anywhere.herokuapp.com/corsdemo', '_blank');
     toast.info("Redirection vers le service de démo CORS", {
       description: "Activez le service de démo, puis revenez ici pour continuer votre analyse"

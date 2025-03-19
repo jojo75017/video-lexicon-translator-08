@@ -45,11 +45,13 @@ const SeoAnalysisForm: React.FC<SeoAnalysisFormProps> = ({
     try {
       // Validate URL format
       new URL(url);
+      console.log("ANALYZING URL:", url);
       toast.info("Début de l'analyse...", {
         description: "Cette opération peut prendre quelques instants"
       });
       analyzeSite();
     } catch (error) {
+      console.error("INVALID URL:", url, error);
       toast.error("URL invalide", {
         description: "Veuillez entrer une URL valide (ex: https://exemple.com)"
       });
@@ -57,10 +59,12 @@ const SeoAnalysisForm: React.FC<SeoAnalysisFormProps> = ({
   };
 
   const handleExampleClick = (example: string) => {
+    console.log("EXAMPLE CLICKED:", example);
     setUrl(example);
   };
 
   const handleProxyDemoClick = () => {
+    console.log("OPENING CORS DEMO PAGE");
     window.open('https://cors-anywhere.herokuapp.com/corsdemo', '_blank');
   };
 
