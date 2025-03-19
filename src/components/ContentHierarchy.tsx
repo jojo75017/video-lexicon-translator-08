@@ -1,9 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useTranslation } from 'react-i18next';
-import { ChevronRight, Heading1, Heading2, Heading3, Type, AlertCircle, CheckCircle2, BarChart2, Lightbulb, FileQuestion, Search } from 'lucide-react';
+import { ChevronRight, ChevronDown, Heading1, Heading2, Heading3, Type, AlertCircle, CheckCircle2, BarChart2, Lightbulb, FileQuestion, Search } from 'lucide-react';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -26,6 +26,7 @@ interface ContentHierarchyProps {
     text: string;
     position: number;
   }[];
+  hierarchy?: any[];
   recommendations?: string[];
   onAnalyze?: () => void;
 }
@@ -33,10 +34,12 @@ interface ContentHierarchyProps {
 const ContentHierarchy = ({ 
   headings = [], 
   paragraphs = [], 
+  hierarchy = [],
   recommendations = [],
   onAnalyze
 }: ContentHierarchyProps) => {
   const { t } = useTranslation();
+  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
   
   // Check if we have actual content to analyze - ensure arrays have elements with content
   const hasHeadings = headings && headings.length > 0 && headings.some(h => h.text && h.text.trim() !== '');
@@ -49,6 +52,13 @@ const ContentHierarchy = ({
     } else {
       toast.info("Pour analyser un site, utilisez l'outil principal d'analyse SEO");
     }
+  };
+
+  const toggleItem = (key: string) => {
+    setExpandedItems(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
   };
 
   const getAllContent = (): ContentItem[] => {
@@ -162,10 +172,10 @@ const ContentHierarchy = ({
           <div>
             <h2 className="text-2xl font-semibold mb-2 flex items-center gap-2">
               <BarChart2 className="h-5 w-5 text-blue-600" />
-              Analyse de la Structure
+              Aperçu de la SERP et Structure
             </h2>
             <p className="text-gray-600 text-sm">
-              Analysez un site web pour voir sa structure hiérarchique
+              Analysez un site web pour voir sa structure SERP et hiérarchique
             </p>
           </div>
           
@@ -173,7 +183,7 @@ const ContentHierarchy = ({
             <FileQuestion className="h-16 w-16 text-gray-300 mb-4" />
             <h3 className="text-xl font-medium text-gray-500 mb-2">Aucun site web analysé</h3>
             <p className="text-gray-400 max-w-md mb-6">
-              Pour voir l'analyse de la structure hiérarchique, commencez par analyser un site web en utilisant l'outil d'analyse SEO.
+              Pour voir l'analyse de la structure SERP, commencez par analyser un site web en utilisant l'outil d'analyse SEO.
             </p>
             <Button 
               variant="outline"
@@ -189,16 +199,73 @@ const ContentHierarchy = ({
     );
   }
 
+  // Render hierarchical content with expand/collapse functionality
+  const renderHierarchicalItem = (item: any, index: number, level: number = 0, path: string = '') => {
+    const currentPath = `${path}-${index}`;
+    const hasChildren = item.children && item.children.length > 0;
+    const isExpanded = expandedItems[currentPath] !== false; // Default to expanded
+    
+    const getTagIcon = () => {
+      if (item.tagName === 'h1') return <Heading1 className="h-5 w-5 text-blue-600 flex-shrink-0" />;
+      if (item.tagName === 'h2') return <Heading2 className="h-5 w-5 text-green-600 flex-shrink-0" />;
+      if (item.tagName === 'h3') return <Heading3 className="h-5 w-5 text-purple-600 flex-shrink-0" />;
+      if (item.tagName === 'p') return <Type className="h-5 w-5 text-gray-500 flex-shrink-0" />;
+      return <div className="w-5 h-5 flex-shrink-0" />;
+    };
+    
+    return (
+      <div key={currentPath} className={`ml-${level * 6}`}>
+        <div 
+          className={`
+            flex items-start rounded-md p-2 mb-1 group transition-colors
+            ${item.tagName === 'h1' ? 'bg-blue-50 border border-blue-100' : ''}
+            ${item.tagName === 'h2' ? 'bg-green-50 border border-green-100' : ''}
+            ${item.tagName === 'h3' ? 'bg-purple-50 border border-purple-100' : ''}
+            ${item.tagName === 'p' ? 'pl-3 text-sm text-gray-600' : 'font-medium'}
+          `}
+        >
+          {hasChildren ? (
+            <button 
+              onClick={() => toggleItem(currentPath)} 
+              className="mr-1 text-gray-400 hover:text-gray-600 mt-0.5"
+            >
+              {isExpanded ? 
+                <ChevronDown className="h-4 w-4" /> : 
+                <ChevronRight className="h-4 w-4" />
+              }
+            </button>
+          ) : (
+            <div className="w-5 mr-1" />
+          )}
+          
+          {getTagIcon()}
+          
+          <span className="ml-2 overflow-hidden text-ellipsis">
+            {item.text}
+          </span>
+        </div>
+        
+        {hasChildren && isExpanded && (
+          <div className="pl-4 border-l border-gray-200 ml-2.5 mt-1 mb-2">
+            {item.children.map((child: any, childIndex: number) => 
+              renderHierarchicalItem(child, childIndex, level + 1, currentPath)
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <Card className="p-6 bg-white/50 backdrop-blur-sm">
       <div className="space-y-6">
         <div>
           <h2 className="text-2xl font-semibold mb-2 flex items-center gap-2">
             <BarChart2 className="h-5 w-5 text-blue-600" />
-            Analyse de la Structure
+            Aperçu de la SERP et Structure
           </h2>
           <p className="text-gray-600 text-sm">
-            Analyse détaillée de la hiérarchie et du contenu de votre page
+            Analyse détaillée de la hiérarchie SERP et du contenu de votre page
           </p>
         </div>
 
@@ -285,15 +352,20 @@ const ContentHierarchy = ({
               <div className="bg-blue-50 rounded-lg p-4">
                 <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
                   <Lightbulb className="h-4 w-4 text-blue-600" />
-                  Recommandations
+                  Recommandations SERP
                 </h3>
                 <ul className="space-y-2">
-                  {recommendations.map((recommendation, index) => (
+                  {recommendations.slice(0, 5).map((recommendation, index) => (
                     <li key={index} className="flex items-start gap-2 text-sm text-blue-700">
                       <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0" />
                       {recommendation}
                     </li>
                   ))}
+                  {recommendations.length > 5 && (
+                    <li className="text-sm text-blue-700 italic">
+                      + {recommendations.length - 5} autres recommandations
+                    </li>
+                  )}
                 </ul>
               </div>
             )}
@@ -303,27 +375,36 @@ const ContentHierarchy = ({
         <Separator />
 
         <div>
-          <h3 className="text-lg font-semibold mb-3">Aperçu de la Structure</h3>
-          <ScrollArea className="h-[400px] rounded-md border p-4">
-            {content.length > 0 ? (
-              content.map((item, index) => (
-                <div
-                  key={index}
-                  className={`flex items-start gap-2 py-2 ${getIndentation(item.type)} group hover:bg-gray-50 rounded px-2 transition-colors`}
-                >
-                  {getIcon(item.type)}
-                  <ChevronRight className="h-4 w-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <span className={`text-sm ${item.type === 'text' ? 'text-gray-600' : 'font-medium'}`}>
-                    {item.content}
-                  </span>
-                </div>
-              ))
-            ) : (
-              <div className="flex justify-center items-center h-full text-gray-400">
-                Aucun contenu structuré à afficher
+          <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+            <BarChart2 className="h-4 w-4 text-blue-600" />
+            Structure SERP Détaillée
+          </h3>
+          <Card className="bg-white border border-gray-200 p-2">
+            <ScrollArea className="h-[400px] rounded-md pr-4">
+              <div className="space-y-1 p-2">
+                {hierarchy && hierarchy.length > 0 ? (
+                  hierarchy.map((item, index) => renderHierarchicalItem(item, index))
+                ) : content.length > 0 ? (
+                  content.map((item, index) => (
+                    <div
+                      key={index}
+                      className={`flex items-start gap-2 py-2 ${getIndentation(item.type)} group hover:bg-gray-50 rounded px-2 transition-colors`}
+                    >
+                      {getIcon(item.type)}
+                      <ChevronRight className="h-4 w-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <span className={`text-sm ${item.type === 'text' ? 'text-gray-600' : 'font-medium'}`}>
+                        {item.content}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="flex justify-center items-center h-full text-gray-400 py-16">
+                    Aucun contenu structuré à afficher
+                  </div>
+                )}
               </div>
-            )}
-          </ScrollArea>
+            </ScrollArea>
+          </Card>
         </div>
       </div>
     </Card>

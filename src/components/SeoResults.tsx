@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SeoAnalysis } from '@/types/seo';
@@ -113,24 +114,27 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
           performance={seoAnalysis.performance}
         />
 
-        <SeoIntegrations />
-
         <Card className="p-6">
           <SeoStructure 
             h1Count={seoAnalysis.h1Count}
             h2Count={seoAnalysis.h2Count}
             h3Count={seoAnalysis.h3Count}
             imgCount={seoAnalysis.imgCount}
+            headings={seoAnalysis.headings}
+            showHeadingsList={true}
           />
         </Card>
-
-        <SiteStructureVisualizer structure={siteStructure} />
 
         <ContentHierarchy 
           headings={seoAnalysis.headings} 
           paragraphs={seoAnalysis.paragraphs}
+          hierarchy={seoAnalysis.headingStructure?.hierarchy}
           recommendations={seoAnalysis.technicalSuggestions} 
         />
+
+        <SiteStructureVisualizer structure={siteStructure} />
+
+        <SeoIntegrations />
 
         <ReadabilityAnalysis 
           score={readabilityScore}
