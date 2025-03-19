@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -10,10 +11,11 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
 import { PenLine, Search, RefreshCw, ArrowLeft, MessageSquareText, HelpCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import QuoraQuestionForm from '@/components/seo/buttons/QuoraQuestionForm';
-import QuoraAnswerForm from '@/components/seo/buttons/QuoraAnswerForm';
+import QuoraQuestionForm, { QuoraQuestionFormProps } from '@/components/seo/buttons/QuoraQuestionForm';
+import QuoraAnswerForm, { QuoraAnswerFormProps } from '@/components/seo/buttons/QuoraAnswerForm';
 import { toast } from 'sonner';
 import PageHeader from '@/components/dashboard/PageHeader';
+import { useForm } from 'react-hook-form';
 
 const QuoraPage = () => {
   const [activeTab, setActiveTab] = useState('questions');
@@ -27,6 +29,20 @@ const QuoraPage = () => {
   const [answerApproach, setAnswerApproach] = useState('authority');
   const [includeLinks, setIncludeLinks] = useState(true);
   const [includeStatistics, setIncludeStatistics] = useState(true);
+  
+  // Add state and handlers for QuoraQuestionForm and QuoraAnswerForm
+  const [textDetails, setTextDetails] = useState('');
+  const [textAnswer, setTextAnswer] = useState('');
+  const [textSources, setTextSources] = useState('');
+  
+  const popularQuestions = [
+    "Comment améliorer mon référencement SEO en 2024 ?",
+    "Quelles sont les meilleures stratégies de marketing digital ?",
+    "Comment optimiser ma présence sur les réseaux sociaux ?"
+  ];
+  
+  const askForm = useForm();
+  const answerForm = useForm();
   
   const handleSaveDraft = () => {
     if (activeTab === 'questions' && questionDraft) {
@@ -72,6 +88,24 @@ N'hésitez pas à me contacter pour des conseils plus personnalisés adaptés à
     } else {
       toast.error('Veuillez entrer un terme de recherche');
     }
+  };
+  
+  const handleTextSelection = (e: React.MouseEvent<HTMLTextAreaElement>) => {
+    // Placeholder for text selection handler
+  };
+  
+  const applyFormatting = (fieldType: 'details' | 'answer' | 'sources', format: 'bold' | 'italic' | 'underline' | 'link' | 'image' | 'list' | 'numbered-list' | 'quote') => {
+    // Placeholder for formatting handler
+  };
+  
+  const handleQuoraSubmit = (data: any) => {
+    // Placeholder for form submission
+    toast.success('Question Quora soumise');
+  };
+  
+  const handleQuoraAnswerSubmit = (data: any) => {
+    // Placeholder for form submission
+    toast.success('Réponse Quora soumise');
   };
 
   return (
@@ -180,7 +214,14 @@ N'hésitez pas à me contacter pour des conseils plus personnalisés adaptés à
                 </Button>
               </div>
               
-              <QuoraQuestionForm />
+              <QuoraQuestionForm 
+                form={askForm} 
+                textDetails={textDetails}
+                setTextDetails={setTextDetails}
+                handleTextSelection={handleTextSelection}
+                applyFormatting={applyFormatting}
+                onSubmit={handleQuoraSubmit}
+              />
             </TabsContent>
             
             <TabsContent value="answers" className="space-y-4">
@@ -243,7 +284,17 @@ N'hésitez pas à me contacter pour des conseils plus personnalisés adaptés à
                 </div>
               </div>
               
-              <QuoraAnswerForm />
+              <QuoraAnswerForm 
+                form={answerForm}
+                popularQuestions={popularQuestions}
+                textAnswer={textAnswer}
+                setTextAnswer={setTextAnswer}
+                textSources={textSources}
+                setTextSources={setTextSources}
+                handleTextSelection={handleTextSelection}
+                applyFormatting={applyFormatting}
+                onSubmit={handleQuoraAnswerSubmit}
+              />
             </TabsContent>
           </Tabs>
         </Card>

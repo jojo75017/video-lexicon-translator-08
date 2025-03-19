@@ -31,7 +31,7 @@ const TabNavigation = () => {
     { id: 'optimize', icon: Zap, label: 'Optimisation', color: 'text-blue-600', group: 'content', isNew: true },
     { id: 'ideas', icon: Lightbulb, label: 'Idées', color: 'text-yellow-600', group: 'content' },
     { id: 'quora', icon: MessageSquareText, label: 'Quora', color: 'text-[#b92b27]', group: 'content', isNew: true, link: '/quora' },
-    { id: 'airesearch', icon: BrainCircuit, label: 'Recherche IA', color: 'text-purple-700', group: 'content', isNew: true },
+    { id: 'airesearch', icon: BrainCircuit, label: 'Recherche IA', color: 'text-purple-700', group: 'content', isNew: true, highlighted: true },
     
     // Technique
     { id: 'advanced', icon: Settings, label: 'Avancé', color: 'text-rose-600', group: 'tech' },
@@ -82,14 +82,15 @@ const TabNavigation = () => {
           {Object.entries(groupedTabs).map(([groupName, groupTabs], groupIndex) => (
             <div key={groupName} className="flex-1 flex flex-col items-center min-w-fit">
               <div className="flex flex-wrap gap-1 justify-center">
-                {groupTabs.map(({ id, icon: Icon, label, color, isNew, link }) => (
+                {groupTabs.map(({ id, icon: Icon, label, color, isNew, link, highlighted }) => (
                   <Tooltip key={id}>
                     <TooltipTrigger asChild>
                       {link ? (
                         <Link to={link} className="inline-block">
                           <div 
                             className={`flex items-center gap-1 px-3 py-1.5 rounded-md relative group transition-all duration-200 hover:bg-white cursor-pointer ${
-                              id === 'quora' ? 'bg-[#b92b27]/10' : ''
+                              id === 'quora' ? 'bg-[#b92b27]/10' : 
+                              highlighted ? 'bg-purple-100' : ''
                             }`}
                           >
                             <span className="absolute -top-1 -right-1 transform translate-x-1/2 -translate-y-1/2 z-10">
@@ -109,7 +110,9 @@ const TabNavigation = () => {
                         <TabsTrigger 
                           value={id}
                           data-value={id}
-                          className={`flex items-center gap-1 px-3 py-1.5 rounded-md relative group transition-all duration-200 hover:bg-white`}
+                          className={`flex items-center gap-1 px-3 py-1.5 rounded-md relative group transition-all duration-200 hover:bg-white ${
+                            highlighted ? 'bg-purple-100' : ''
+                          }`}
                         >
                           <span className="absolute -top-1 -right-1 transform translate-x-1/2 -translate-y-1/2 z-10">
                             {isNew && (

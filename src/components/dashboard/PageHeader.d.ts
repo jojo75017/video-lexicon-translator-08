@@ -7,6 +7,6 @@ export interface PageHeaderProps {
   icon: ReactNode;
 }
 
-const PageHeader: React.FC<PageHeaderProps> = ({ title, description, icon }) => null;
+const PageHeader: React.FC<PageHeaderProps>;
 
 export default PageHeader;

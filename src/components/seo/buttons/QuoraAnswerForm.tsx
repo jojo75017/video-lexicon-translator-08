@@ -1,35 +1,26 @@
-
-import React, { useRef, useState } from 'react';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
+import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
-import * as z from "zod";
-import QuoraFormatToolbar from './QuoraFormatToolbar';
-import { Bot, Loader2 } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Bold, Italic, Underline, Link, Image, List, ListOrdered, Quote, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 
-export const quoraAnswerSchema = z.object({
-  questionToAnswer: z.string().min(5, "La question doit contenir au moins 5 caractères"),
-  answer: z.string().min(50, "La réponse doit contenir au moins 50 caractères"),
-  sources: z.string().optional(),
-});
-
-export type QuoraAnswerData = z.infer<typeof quoraAnswerSchema>;
-
-interface QuoraAnswerFormProps {
-  form: UseFormReturn<QuoraAnswerData>;
+export interface QuoraAnswerFormProps {
+  form: UseFormReturn<any, any, undefined>;
   popularQuestions: string[];
   textAnswer: string;
-  setTextAnswer: (text: string) => void;
+  setTextAnswer: React.Dispatch<React.SetStateAction<string>>;
   textSources: string;
-  setTextSources: (text: string) => void;
-  handleTextSelection: (fieldType: 'details' | 'answer' | 'sources', start: number, end: number, text: string) => void;
+  setTextSources: React.Dispatch<React.SetStateAction<string>>;
+  handleTextSelection: (e: React.MouseEvent<HTMLTextAreaElement>) => void;
   applyFormatting: (fieldType: 'details' | 'answer' | 'sources', format: 'bold' | 'italic' | 'underline' | 'link' | 'image' | 'list' | 'numbered-list' | 'quote') => void;
-  onSubmit: (data: QuoraAnswerData) => void;
+  onSubmit: (data: any) => void;
 }
 
-const QuoraAnswerForm = ({
+const QuoraAnswerForm: React.FC<QuoraAnswerFormProps> = ({
   form,
   popularQuestions,
   textAnswer,
@@ -39,194 +30,205 @@ const QuoraAnswerForm = ({
   handleTextSelection,
   applyFormatting,
   onSubmit
-}: QuoraAnswerFormProps) => {
-  const answerRef = useRef<HTMLTextAreaElement>(null);
-  const sourcesRef = useRef<HTMLTextAreaElement>(null);
-  const [isGeneratingAnswer, setIsGeneratingAnswer] = useState(false);
-
-  const handleAnswerSelect = (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
-    const target = e.currentTarget;
-    const start = target.selectionStart || 0;
-    const end = target.selectionEnd || 0;
-    const selectedText = target.value.substring(start, end);
-    
-    if (start !== end && selectedText.trim() !== '') {
-      console.log(`Text selected in answer: "${selectedText}" (${start}:${end})`);
-      handleTextSelection('answer', start, end, selectedText);
-    }
-  };
-
-  const handleAnswerMouseUp = (e: React.MouseEvent<HTMLTextAreaElement>) => {
-    const target = e.currentTarget;
-    const start = target.selectionStart || 0;
-    const end = target.selectionEnd || 0;
-    const selectedText = target.value.substring(start, end);
-    
-    if (start !== end && selectedText.trim() !== '') {
-      console.log(`Text selected in answer: "${selectedText}" (${start}:${end})`);
-      handleTextSelection('answer', start, end, selectedText);
-    }
-  };
-
-  const handleSourcesSelect = (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
-    const target = e.currentTarget;
-    const start = target.selectionStart || 0;
-    const end = target.selectionEnd || 0;
-    const selectedText = target.value.substring(start, end);
-    
-    if (start !== end && selectedText.trim() !== '') {
-      handleTextSelection('sources', start, end, selectedText);
-    }
-  };
-
-  const handleSourcesMouseUp = (e: React.MouseEvent<HTMLTextAreaElement>) => {
-    const target = e.currentTarget;
-    const start = target.selectionStart || 0;
-    const end = target.selectionEnd || 0;
-    const selectedText = target.value.substring(start, end);
-    
-    if (start !== end && selectedText.trim() !== '') {
-      handleTextSelection('sources', start, end, selectedText);
-    }
-  };
-
-  const generateAIAnswer = async () => {
-    const question = form.getValues("questionToAnswer");
-    
-    if (!question || question === "") {
-      toast.error("Veuillez d'abord saisir ou sélectionner une question");
+}) => {
+  const { register, handleSubmit, setValue, watch } = form;
+  const questionToAnswer = watch('questionToAnswer');
+  
+  const handleGenerateAnswer = () => {
+    if (!questionToAnswer) {
+      toast.error("Veuillez d'abord sélectionner une question");
       return;
     }
-
-    setIsGeneratingAnswer(true);
     
-    try {
-      // Simulons une réponse IA 
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Générer une réponse selon le type de question
-      let aiResponse = "";
-      const lowerQuestion = question.toLowerCase();
-      
-      if (lowerQuestion.includes("référencement") || lowerQuestion.includes("seo") || lowerQuestion.includes("e-commerce")) {
-        aiResponse = "Le référencement d'un site e-commerce en 2024 nécessite une approche multidimensionnelle :\n\n**1. Optimisation technique**\n- Améliorez la vitesse de chargement des pages (utilisez Google PageSpeed Insights)\n- Assurez-vous que votre site est responsive et optimisé pour mobile\n- Implémentez une structure de données schema.org pour les produits\n\n**2. Optimisation du contenu**\n- Créez des descriptions de produits uniques et détaillées\n- Développez un blog avec du contenu informatif lié à vos produits\n- Intégrez naturellement des mots-clés pertinents\n\n**3. Amélioration de l'expérience utilisateur**\n- Simplifiez la navigation et la recherche sur votre site\n- Réduisez les taux de rebond avec un design attrayant\n- Optimisez le parcours d'achat pour réduire les abandons de panier\n\n**4. Stratégie de backlinks**\n- Obtenez des liens depuis des sites d'autorité dans votre secteur\n- Collaborez avec des influenceurs pertinents\n\nUne analyse régulière de vos performances avec Google Analytics et Search Console vous permettra d'ajuster votre stratégie en fonction des résultats.";
-      } 
-      else if (lowerQuestion.includes("backlinks") || lowerQuestion.includes("liens")) {
-        aiResponse = "Pour développer une stratégie de backlinks efficace pour un nouveau site web, voici les meilleures approches :\n\n**1. Créez du contenu de qualité**\n- Développez des articles approfondis, des guides et des infographies que les autres voudront naturellement référencer\n- Utilisez la méthode du \"skyscraper\" : trouvez du contenu populaire, améliorez-le, puis contactez ceux qui y font référence\n\n**2. Guest blogging stratégique**\n- Identifiez des blogs pertinents dans votre secteur avec une bonne autorité\n- Proposez du contenu de valeur avec des liens contextuels vers votre site\n\n**3. Relations publiques digitales**\n- Contactez des journalistes et blogueurs via HARO (Help A Reporter Out)\n- Partagez des études de cas ou des données originales dignes d'intérêt\n\n**4. Réparez les liens brisés**\n- Trouvez des liens cassés sur des sites d'autorité dans votre niche\n- Proposez votre contenu comme alternative\n\n**5. Utilisez les annuaires et plateformes spécialisées**\n- Inscrivez-vous sur des annuaires de qualité spécifiques à votre secteur\n- Créez des profils sur des plateformes comme Google Business Profile\n\nÉvitez à tout prix les services de liens en masse ou de mauvaise qualité qui peuvent entraîner des pénalités Google.";
-      }
-      else if (lowerQuestion.includes("featured snippet") || lowerQuestion.includes("position zéro")) {
-        aiResponse = "Pour optimiser votre contenu pour le featured snippet (ou \"position zéro\") de Google, suivez ces étapes stratégiques :\n\n**1. Identifiez les bonnes opportunités**\n- Recherchez des requêtes pertinentes dans votre domaine qui déclenchent déjà des featured snippets\n- Utilisez des outils comme Ahrefs ou SEMrush pour trouver ces opportunités\n\n**2. Structurez votre contenu efficacement**\n- Répondez directement à la question dans les 40-60 premiers mots\n- Utilisez le format approprié selon le type de snippet visé :\n  - *Paragraphes* : fournissez une réponse concise (40-60 mots)\n  - *Listes* : utilisez des balises <ul>, <ol> et <li> avec des sous-titres clairs\n  - *Tableaux* : créez des tableaux bien structurés avec HTML\n  - *Étapes* : numérotez clairement les processus\n\n**3. Améliorez la lisibilité et la clarté**\n- Utilisez un langage simple et direct\n- Employez des mots-clés pertinents dans vos sous-titres (H2, H3)\n- Structurez votre contenu avec des balises HTML appropriées\n\n**4. Utilisez le balisage schema.org**\n- Implémentez les données structurées pertinentes (FAQ, HowTo, etc.)\n- Validez votre balisage avec l'outil de test des données structurées de Google\n\nSuivez régulièrement vos performances dans Search Console et ajustez votre stratégie en fonction des résultats obtenus.";
-      }
-      else if (lowerQuestion.includes("outils") || lowerQuestion.includes("analyse") || lowerQuestion.includes("concurrence")) {
-        aiResponse = "Pour analyser efficacement votre concurrence SEO, ces outils indispensables vous aideront à obtenir des insights précieux :\n\n**1. Outils d'analyse de mots-clés et de positionnement**\n- *SEMrush* : Analysez les mots-clés que vos concurrents ciblent et leur trafic organique\n- *Ahrefs* : Étudiez le profil de backlinks et le contenu performant des concurrents\n- *Moz Pro* : Obtenez des données sur l'autorité de domaine et identifiez les opportunités manquées\n\n**2. Outils d'analyse de contenu**\n- *Surfer SEO* : Analysez le contenu on-page des concurrents performants\n- *Clearscope* : Identifiez les mots-clés et sujets connexes à intégrer dans votre contenu\n- *MarketMuse* : Comparez la profondeur et la pertinence de votre contenu avec la concurrence\n\n**3. Outils d'audit technique**\n- *Screaming Frog* : Analysez la structure du site et identifiez les problèmes techniques\n- *Sitebulb* : Obtenez des insights visuels sur l'architecture du site concurrent\n\n**4. Outils de suivi et de reporting**\n- *Google Search Console* : Surveillez vos performances par rapport aux requêtes ciblées\n- *Google Analytics* : Comprenez les comportements des utilisateurs sur votre site\n- *Databox* : Créez des tableaux de bord personnalisés pour suivre les KPIs importants\n\nL'utilisation combinée de ces outils vous permettra d'élaborer une stratégie SEO complète basée sur des données concrètes plutôt que sur des suppositions.";
-      }
-      else if (lowerQuestion.includes("contenu") || lowerQuestion.includes("rédiger") || lowerQuestion.includes("conversion")) {
-        aiResponse = "Pour rédiger du contenu qui performe à la fois pour le SEO et la conversion, suivez cette méthode en 6 étapes :\n\n**1. Recherche approfondie de mots-clés**\n- Identifiez des mots-clés à intention commerciale ET informationnelle\n- Analysez l'intention de recherche derrière chaque requête\n- Utilisez des outils comme KeywordTool.io ou Ubersuggest pour trouver des questions réelles\n\n**2. Structure optimisée pour le scan visuel**\n- Créez des titres et sous-titres accrocheurs contenant vos mots-clés\n- Utilisez des listes à puces et des paragraphes courts (3-4 lignes maximum)\n- Intégrez des éléments visuels pertinents tous les 300 mots environ\n\n**3. Contenu orienté solution**\n- Commencez par identifier clairement le problème de votre audience\n- Proposez des solutions concrètes et actionnables\n- Incluez des exemples réels et des études de cas\n\n**4. Éléments persuasifs stratégiques**\n- Intégrez des preuves sociales (témoignages, avis, études)\n- Utilisez des données chiffrées pour renforcer vos arguments\n- Anticipez et répondez aux objections potentielles\n\n**5. Appels à l'action contextuels**\n- Placez des CTA pertinents en fonction du parcours de lecture\n- Variez les formulations selon le niveau d'engagement\n- Créez un sentiment d'urgence ou d'exclusivité quand c'est pertinent\n\n**6. Optimisation technique**\n- Utilisez votre mot-clé principal dans les premiers 100 mots\n- Optimisez vos balises title, meta descriptions et alt des images\n- Créez des URLs courtes et descriptives\n\nN'oubliez pas de mettre à jour régulièrement votre contenu pour maintenir sa pertinence et son classement.";
-      }
-      else {
-        aiResponse = "Pour répondre à cette question spécifique sur " + question + ", je vous suggère d'aborder les points suivants dans votre réponse:\n\n1. **Contextualisez le sujet** - Commencez par expliquer pourquoi cette question est importante dans le domaine du SEO et du marketing digital\n\n2. **Présentez des solutions concrètes** - Offrez 3-5 tactiques spécifiques que vous avez personnellement testées ou que des experts recommandent\n\n3. **Appuyez avec des données** - Intégrez quelques statistiques ou études de cas qui renforcent vos arguments\n\n4. **Anticipez les objections** - Abordez les défis potentiels et comment les surmonter\n\n5. **Concluez avec des actions précises** - Terminez par 2-3 étapes concrètes que le lecteur peut entreprendre immédiatement\n\nN'hésitez pas à partager votre expérience personnelle sur ce sujet pour rendre votre réponse plus authentique et engageante.";
-      }
-      
-      setTextAnswer(aiResponse);
-      
-      // Générer automatiquement des sources
-      setTextSources("1. [Google Search Central](https://developers.google.com/search)\n2. [Moz Blog](https://moz.com/blog)\n3. [Search Engine Journal](https://www.searchenginejournal.com)\n4. [Backlinko](https://backlinko.com)");
-      
-      toast.success("Réponse IA générée avec succès!");
-    } catch (error) {
-      console.error("Erreur lors de la génération de la réponse:", error);
-      toast.error("Erreur lors de la génération de la réponse");
-    } finally {
-      setIsGeneratingAnswer(false);
-    }
-  };
+    toast.loading("Génération d'une réponse...");
+    
+    // Simulate API call
+    setTimeout(() => {
+      const generatedAnswer = `Merci pour cette excellente question sur ${questionToAnswer.split(' ').slice(0, 3).join(' ')}...
 
+Après plusieurs années d'expérience dans ce domaine, je peux vous partager quelques points essentiels:
+
+1. **Commencez par une analyse approfondie** - Avant de vous lancer, prenez le temps d'étudier votre situation spécifique et vos objectifs.
+
+2. **Adoptez une approche systématique** - Les meilleurs résultats viennent d'une méthode structurée plutôt que d'actions isolées.
+
+3. **Mesurez vos résultats** - Ce qui ne peut être mesuré ne peut être amélioré. Définissez des KPIs clairs.
+
+4. **Restez flexible** - Soyez prêt à ajuster votre stratégie en fonction des résultats et des changements du marché.
+
+Selon une étude récente de McKinsey, les entreprises qui suivent ces principes voient une amélioration de 37% de leurs performances dans ce domaine.
+
+N'hésitez pas à me demander des précisions sur l'un de ces points!`;
+      
+      setTextAnswer(generatedAnswer);
+      
+      const generatedSources = `1. "Guide stratégique 2024", Harvard Business Review, https://example.com/hbr
+2. "Étude sectorielle sur les performances", McKinsey & Company, https://example.com/mckinsey
+3. "Analyse comparative des meilleures pratiques", Journal of Business Strategy, https://example.com/jbs`;
+      
+      setTextSources(generatedSources);
+      
+      toast.dismiss();
+      toast.success("Réponse générée avec succès!");
+    }, 2000);
+  };
+  
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="questionToAnswer"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Question à répondre</FormLabel>
-              <FormControl>
-                <Textarea
-                  className="min-h-[60px]"
-                  placeholder="La question sélectionnée ou personnalisée apparaîtra ici"
-                  {...field}
-                  readOnly={false}
-                />
-              </FormControl>
-              <div className="flex justify-end mt-1">
-                <Button 
-                  type="button" 
-                  size="sm" 
-                  variant="outline" 
-                  className="flex items-center gap-2 text-primary"
-                  onClick={generateAIAnswer}
-                  disabled={isGeneratingAnswer}
-                >
-                  {isGeneratingAnswer ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Bot className="h-4 w-4" />
-                  )}
-                  {isGeneratingAnswer ? "Génération en cours..." : "Générer une réponse IA"}
-                </Button>
-              </div>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <FormItem>
-          <FormLabel>Votre réponse</FormLabel>
-          <QuoraFormatToolbar fieldType="answer" onFormat={applyFormatting} />
-          <textarea 
-            placeholder="Rédigez une réponse détaillée et informative..."
-            className="min-h-[200px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-            value={textAnswer}
-            onChange={(e) => setTextAnswer(e.target.value)}
-            onSelect={handleAnswerSelect}
-            onMouseUp={handleAnswerMouseUp}
-            ref={answerRef}
-          />
-          <div className="text-xs text-[#6E59A5] mt-1">
-            Astuce: Sélectionnez du texte et cliquez sur l'icône de lien pour ajouter un lien affilié.
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <div>
+        <Label htmlFor="questionToAnswer">Question à répondre</Label>
+        <Select 
+          onValueChange={(value) => setValue('questionToAnswer', value)}
+          value={questionToAnswer}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Sélectionnez une question..." />
+          </SelectTrigger>
+          <SelectContent>
+            {popularQuestions.map((question, index) => (
+              <SelectItem key={index} value={question}>
+                {question}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      
+      <div>
+        <div className="flex justify-between items-center mb-2">
+          <Label htmlFor="answer">Votre réponse</Label>
+          <div className="flex items-center space-x-1">
+            <Button 
+              type="button" 
+              variant="ghost" 
+              size="sm" 
+              className="h-8 w-8 p-0" 
+              onClick={() => applyFormatting('answer', 'bold')}
+            >
+              <Bold className="h-4 w-4" />
+            </Button>
+            <Button 
+              type="button" 
+              variant="ghost" 
+              size="sm" 
+              className="h-8 w-8 p-0" 
+              onClick={() => applyFormatting('answer', 'italic')}
+            >
+              <Italic className="h-4 w-4" />
+            </Button>
+            <Button 
+              type="button" 
+              variant="ghost" 
+              size="sm" 
+              className="h-8 w-8 p-0" 
+              onClick={() => applyFormatting('answer', 'underline')}
+            >
+              <Underline className="h-4 w-4" />
+            </Button>
+            <Button 
+              type="button" 
+              variant="ghost" 
+              size="sm" 
+              className="h-8 w-8 p-0" 
+              onClick={() => applyFormatting('answer', 'link')}
+            >
+              <Link className="h-4 w-4" />
+            </Button>
+            <Button 
+              type="button" 
+              variant="ghost" 
+              size="sm" 
+              className="h-8 w-8 p-0" 
+              onClick={() => applyFormatting('answer', 'list')}
+            >
+              <List className="h-4 w-4" />
+            </Button>
+            <Button 
+              type="button" 
+              variant="ghost" 
+              size="sm" 
+              className="h-8 w-8 p-0" 
+              onClick={() => applyFormatting('answer', 'numbered-list')}
+            >
+              <ListOrdered className="h-4 w-4" />
+            </Button>
+            <Button 
+              type="button" 
+              variant="ghost" 
+              size="sm" 
+              className="h-8 w-8 p-0" 
+              onClick={() => applyFormatting('answer', 'quote')}
+            >
+              <Quote className="h-4 w-4" />
+            </Button>
           </div>
-        </FormItem>
-        
-        <FormItem>
-          <FormLabel>Sources (optionnel)</FormLabel>
-          <QuoraFormatToolbar fieldType="sources" onFormat={applyFormatting} />
-          <textarea 
-            placeholder="Ajoutez des liens ou références pour appuyer votre réponse..."
-            className="min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-            value={textSources}
-            onChange={(e) => setTextSources(e.target.value)}
-            onSelect={handleSourcesSelect}
-            onMouseUp={handleSourcesMouseUp}
-            ref={sourcesRef}
-          />
-        </FormItem>
-        
-        <div className="flex justify-between mt-6">
-          <Button 
-            type="button" 
-            variant="outline" 
-            onClick={() => {
-              form.reset();
-              setTextAnswer("");
-              setTextSources("");
-            }}
-          >
-            Annuler
-          </Button>
-          <Button type="submit" variant="quora">Publier la réponse</Button>
         </div>
-      </form>
-    </Form>
+        <Textarea
+          id="answer"
+          value={textAnswer}
+          onChange={(e) => setTextAnswer(e.target.value)}
+          onMouseUp={(e) => handleTextSelection(e)}
+          placeholder="Rédigez votre réponse ici..."
+          className="min-h-[200px] font-sans"
+          {...register('answer')}
+        />
+      </div>
+      
+      <div>
+        <div className="flex justify-between items-center mb-2">
+          <Label htmlFor="sources">Sources et références</Label>
+          <div className="flex items-center space-x-1">
+            <Button 
+              type="button" 
+              variant="ghost" 
+              size="sm" 
+              className="h-8 w-8 p-0" 
+              onClick={() => applyFormatting('sources', 'link')}
+            >
+              <Link className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+        <Textarea
+          id="sources"
+          value={textSources}
+          onChange={(e) => setTextSources(e.target.value)}
+          onMouseUp={(e) => handleTextSelection(e)}
+          placeholder="Ajoutez vos sources et références ici..."
+          className="min-h-[100px] font-sans"
+          {...register('sources')}
+        />
+      </div>
+      
+      <div className="flex justify-between">
+        <Button 
+          type="button" 
+          variant="outline" 
+          onClick={handleGenerateAnswer}
+          className="gap-2"
+        >
+          <RefreshCw className="h-4 w-4" />
+          Générer une réponse
+        </Button>
+        
+        <Button type="submit" className="bg-[#b92b27] hover:bg-[#a42520]">
+          Publier sur Quora
+        </Button>
+      </div>
+      
+      <Card className="bg-gray-50 border-gray-200">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium text-gray-500">Conseils pour une réponse efficace</CardTitle>
+        </CardHeader>
+        <CardContent className="text-xs text-gray-500 space-y-1">
+          <p>• Commencez par une introduction qui montre votre expertise</p>
+          <p>• Structurez votre réponse avec des points numérotés ou des listes</p>
+          <p>• Incluez des données et statistiques pour renforcer vos arguments</p>
+          <p>• Terminez par une conclusion qui résume vos points principaux</p>
+          <p>• Ajoutez des sources crédibles pour augmenter votre autorité</p>
+        </CardContent>
+      </Card>
+    </form>
   );
 };
 
