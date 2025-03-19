@@ -23,6 +23,7 @@ interface UseSiteAnalyzerReturn {
   siteStructure: { name: string; children: SiteNode[] } | null;
   analyzeSite: () => Promise<void>;
   error: string | null;
+  handleActivateProxy: () => void; // Ajout de la fonction manquante
 }
 
 export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
@@ -33,6 +34,15 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
   const [resources, setResources] = useState<Resource[]>([]);
   const [siteStructure, setSiteStructure] = useState<{ name: string; children: SiteNode[] } | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isProxyEnabled, setIsProxyEnabled] = useState(false);
+
+  // Fonction pour activer le proxy CORS
+  const handleActivateProxy = useCallback(() => {
+    setIsProxyEnabled(true);
+    setShowCorsWarning(false);
+    toast.success("Proxy CORS activé");
+    console.log("Proxy CORS activé dans useSiteAnalyzer");
+  }, []);
 
   const analyzeSite = useCallback(async () => {
     if (!url) {
@@ -63,7 +73,7 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
     }, 15000); // Réduit à 15 secondes
 
     try {
-      // Utiliser un proxy CORS plus fiable
+      // Toujours utiliser un proxy CORS
       const corsProxy = 'https://corsproxy.io/?';
       console.log("FETCHING WITH CORS PROXY:", corsProxy + encodeURIComponent(url));
       
@@ -201,7 +211,7 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
       setIsLoading(false);
       console.log("ANALYSIS PROCESS COMPLETE");
     }
-  }, [url]);
+  }, [url, siteStructure]);
 
   // Fonction pour créer des données d'analyse SEO de démonstration
   const createDemoAnalysis = (siteUrl: string): SeoAnalysis => {
@@ -434,6 +444,7 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
     resources,
     siteStructure,
     analyzeSite,
-    error
+    error,
+    handleActivateProxy
   };
 };

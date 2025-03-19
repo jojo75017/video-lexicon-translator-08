@@ -1,23 +1,21 @@
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Rocket, Search, Signature, BarChart } from "lucide-react";
 import { Github } from 'lucide-react';
 import { Sparkles } from 'lucide-react';
 import { MessageSquareText } from 'lucide-react';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
-import PageHeader from '@/components/dashboard/PageHeader';
 import TabNavigation from '@/components/dashboard/TabNavigation';
 import FeatureGrid from '@/components/dashboard/FeatureGrid';
 import InfoCards from '@/components/seo/InfoCards';
 import SeoAnalysisForm from '@/components/seo/analysis/SeoAnalysisForm';
 import ResultsDisplay from '@/components/seo/analysis/ResultsDisplay';
-import { SeoAnalysis } from '@/types/seo';
-import { analyzeSeo } from '@/utils/seoAnalyzer';
-import { useTranslation } from 'react-i18next';
-import { useToast } from '@/components/ui/use-toast';
+import { toast } from "sonner";
+import { useSiteAnalyzer } from '@/hooks/useSiteAnalyzer';
+import { FirecrawlService } from '@/utils/FirecrawlService';
 
 const ModeToggle = () => {
   return (
@@ -29,78 +27,19 @@ const ModeToggle = () => {
 };
 
 const IndexPage = () => {
-  const { t } = useTranslation();
-  const { toast } = useToast();
-  const [url, setUrl] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [showCorsWarning, setShowCorsWarning] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [seoAnalysis, setSeoAnalysis] = useState<SeoAnalysis | null>(null);
-  const [proxyEnabled, setProxyEnabled] = useState(false);
-
-  const analyzeSite = async () => {
-    if (!url) {
-      toast({
-        title: "URL requise",
-        description: "Veuillez saisir une URL à analyser",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const urlWithProtocol = url.startsWith('http') ? url : `https://${url}`;
-      
-      // Utilisez un proxy CORS si activé
-      const fetchUrl = proxyEnabled 
-        ? `https://cors-anywhere.herokuapp.com/${urlWithProtocol}` 
-        : urlWithProtocol;
-      
-      const response = await fetch(fetchUrl);
-      
-      if (!response.ok) {
-        throw new Error(`Erreur HTTP: ${response.status}`);
-      }
-
-      const html = await response.text();
-      
-      // Analysez le HTML
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
-      
-      // Effectuez l'analyse SEO
-      const analysis = await analyzeSeo(doc, urlWithProtocol);
-      setSeoAnalysis(analysis);
-      
-      toast({
-        title: "Analyse terminée",
-        description: "L'analyse SEO de votre site est terminée avec succès"
-      });
-    } catch (err: any) {
-      console.error('Erreur lors de l\'analyse:', err);
-      
-      if (err.message.includes('NetworkError') || err.message.includes('CORS')) {
-        setShowCorsWarning(true);
-        setError("Problème d'accès CORS détecté. Veuillez activer le proxy pour analyser ce site.");
-      } else {
-        setError(`Erreur lors de l'analyse: ${err.message}`);
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleActivateProxy = () => {
-    setProxyEnabled(true);
-    setShowCorsWarning(false);
-    toast({
-      title: "Proxy CORS activé",
-      description: "Vous pouvez maintenant analyser des sites externes"
-    });
-  };
+  // Utiliser le hook useSiteAnalyzer pour gérer l'analyse
+  const {
+    url,
+    setUrl,
+    isLoading,
+    showCorsWarning,
+    seoAnalysis,
+    resources,
+    siteStructure,
+    analyzeSite,
+    error,
+    handleActivateProxy
+  } = useSiteAnalyzer();
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">

@@ -46,7 +46,7 @@ export class FirecrawlService {
       
       console.log('Démarrage de l\'analyse du site:', url);
       
-      // Utiliser le proxy CORS
+      // Toujours utiliser le proxy CORS pour éviter les erreurs
       const corsProxy = 'https://corsproxy.io/?';
       console.log('Utilisation du proxy CORS:', corsProxy + encodeURIComponent(url));
       

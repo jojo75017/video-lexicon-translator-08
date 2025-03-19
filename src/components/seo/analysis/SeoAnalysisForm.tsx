@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, AlertCircle, Loader2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { toast } from "sonner";
 
 interface SeoAnalysisFormProps {
   url: string;
@@ -55,6 +56,9 @@ const SeoAnalysisForm = ({
     e.stopPropagation();
     console.log("Proxy button clicked manually");
     handleActivateProxy();
+    toast.success("Proxy CORS activé", {
+      description: "Vous pouvez maintenant analyser des sites externes"
+    });
   };
 
   return (
