@@ -3,6 +3,8 @@ interface KeywordAnalysis {
   keyword: string;
   frequency: number;
   density: number;
+  count?: number;
+  position?: number;
 }
 
 interface KeywordSuggestion {
@@ -56,10 +58,12 @@ export const analyzeKeywords = (textContent: string): KeywordAnalysis[] => {
   return Array.from(keywordDensity.entries())
     .sort((a, b) => b[1] - a[1])
     .slice(0, 15)
-    .map(([keyword, count]) => ({
+    .map(([keyword, frequency], index) => ({
       keyword,
-      frequency: count,
-      density: (count / words.length) * 100
+      frequency,
+      density: (frequency / words.length) * 100,
+      count: frequency,
+      position: index + 1
     }));
 };
 

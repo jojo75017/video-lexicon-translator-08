@@ -2,11 +2,18 @@
 import { HeadingStructure, HierarchyItem } from '@/types/seo';
 
 export const analyzeHeadings = (doc: Document): HeadingStructure => {
+  console.log("ANALYZING HEADINGS...");
+  
   // Get all headings
   const headings = Array.from(doc.querySelectorAll('h1, h2, h3, h4, h5, h6'));
+  console.log(`HEADINGS FOUND: ${headings.length}`);
+  headings.forEach((h, i) => {
+    console.log(`HEADING ${i+1}: ${h.tagName} - ${h.textContent?.substring(0, 50)}`);
+  });
   
   // Get all paragraphs
   const paragraphs = Array.from(doc.querySelectorAll('p'));
+  console.log(`PARAGRAPHS FOUND: ${paragraphs.length}`);
   
   // Create a combined array of headings and paragraphs to maintain document flow
   const contentElements = [...headings, ...paragraphs].sort((a, b) => {
@@ -23,7 +30,8 @@ export const analyzeHeadings = (doc: Document): HeadingStructure => {
   let currentH3: HierarchyItem | null = null;
   
   // If there are no content elements, create mock data for testing
-  if (contentElements.length === 0) {
+  if (contentElements.length === 0 || headings.length === 0) {
+    console.log("NO HEADINGS FOUND: Creating sample data");
     // Create sample hierarchy data
     hierarchy.push({
       text: "Page d'exemple SEO",
@@ -65,41 +73,7 @@ export const analyzeHeadings = (doc: Document): HeadingStructure => {
         }
       ]
     });
-  } else {
-    for (const element of contentElements) {
-      const tagName = element.tagName.toLowerCase();
-      const content = element.textContent?.trim() || '';
-      const position = Array.from(doc.body.querySelectorAll('*')).indexOf(element);
-      
-      if (tagName === 'h1') {
-        currentH1 = { text: content, children: [], tagName, position };
-        currentH2 = null;
-        currentH3 = null;
-        hierarchy.push(currentH1);
-      } else if (tagName === 'h2' && currentH1) {
-        currentH2 = { text: content, children: [], tagName, position };
-        currentH3 = null;
-        currentH1.children.push(currentH2);
-      } else if (tagName === 'h3' && currentH2) {
-        currentH3 = { text: content, children: [], tagName, position };
-        currentH2.children.push(currentH3);
-      } else if (tagName === 'p') {
-        const paragraph = { text: content, tagName, position, children: [] };
-        if (currentH3) {
-          currentH3.children.push(paragraph);
-        } else if (currentH2) {
-          currentH2.children.push(paragraph);
-        } else if (currentH1) {
-          currentH1.children.push(paragraph);
-        } else {
-          hierarchy.push(paragraph);
-        }
-      }
-    }
-  }
-
-  // If no real headings were found, create sample data for demonstration
-  if (headings.length === 0) {
+    
     return {
       h1Count: 1,
       h2Count: 2,
@@ -117,6 +91,43 @@ export const analyzeHeadings = (doc: Document): HeadingStructure => {
       hierarchy
     };
   }
+  
+  console.log("BUILDING HIERARCHY...");
+  for (const element of contentElements) {
+    const tagName = element.tagName.toLowerCase();
+    const content = element.textContent?.trim() || '';
+    const position = Array.from(doc.body.querySelectorAll('*')).indexOf(element);
+    
+    if (tagName === 'h1') {
+      console.log(`ADDING H1: ${content}`);
+      currentH1 = { text: content, children: [], tagName, position };
+      currentH2 = null;
+      currentH3 = null;
+      hierarchy.push(currentH1);
+    } else if (tagName === 'h2' && currentH1) {
+      console.log(`ADDING H2: ${content}`);
+      currentH2 = { text: content, children: [], tagName, position };
+      currentH3 = null;
+      currentH1.children.push(currentH2);
+    } else if (tagName === 'h3' && currentH2) {
+      console.log(`ADDING H3: ${content}`);
+      currentH3 = { text: content, children: [], tagName, position };
+      currentH2.children.push(currentH3);
+    } else if (tagName === 'p') {
+      const paragraph = { text: content, tagName, position, children: [] };
+      if (currentH3) {
+        currentH3.children.push(paragraph);
+      } else if (currentH2) {
+        currentH2.children.push(paragraph);
+      } else if (currentH1) {
+        currentH1.children.push(paragraph);
+      } else {
+        hierarchy.push(paragraph);
+      }
+    }
+  }
+
+  console.log(`HIERARCHY BUILT: ${JSON.stringify(hierarchy.length)} top-level items`);
   
   return {
     h1Count: doc.getElementsByTagName('h1').length,

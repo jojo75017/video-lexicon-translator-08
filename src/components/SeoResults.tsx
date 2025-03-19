@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SeoAnalysis } from '@/types/seo';
 import SeoOverview from './seo/SeoOverview';
@@ -81,6 +81,17 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
       analysis: seoAnalysis
     });
   };
+
+  useEffect(() => {
+    console.log("SeoResults rendering with data:", {
+      title: seoAnalysis.title,
+      headings: seoAnalysis.headings?.length || 0,
+      h1Count: seoAnalysis.h1Count,
+      h2Count: seoAnalysis.h2Count,
+      h3Count: seoAnalysis.h3Count,
+      hierarchy: seoAnalysis.headingStructure?.hierarchy?.length || 0
+    });
+  }, [seoAnalysis]);
 
   const seoScore = calculateSeoScore(seoAnalysis);
   const suggestions = getSeoSuggestions(seoAnalysis);

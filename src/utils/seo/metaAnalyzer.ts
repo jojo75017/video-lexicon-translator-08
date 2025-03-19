@@ -14,6 +14,7 @@ interface MetaTagsResult {
 
 export const analyzeMetaTags = (doc: Document): Record<string, string> => {
   const metaTags = Array.from(doc.getElementsByTagName('meta'));
+  console.log("META TAGS FOUND:", metaTags.length);
   
   // Detailed analysis of meta tags
   const analysis = metaTags.reduce((acc, meta) => {
@@ -21,6 +22,7 @@ export const analyzeMetaTags = (doc: Document): Record<string, string> => {
     const content = meta.getAttribute('content');
     if (name && content) {
       acc[name] = content;
+      console.log(`META TAG: ${name} = ${content.substring(0, 50)}${content.length > 50 ? '...' : ''}`);
     }
     return acc;
   }, {} as Record<string, string>);
@@ -28,35 +30,50 @@ export const analyzeMetaTags = (doc: Document): Record<string, string> => {
   // Add title if it exists
   if (doc.querySelector('title')) {
     analysis['title'] = doc.querySelector('title')?.textContent || '';
+    console.log(`TITLE: ${analysis['title']}`);
   }
 
   // Group meta tags by category
-  if (metaTags.some(tag => tag.getAttribute('property')?.startsWith('og:'))) {
+  const hasOgTags = metaTags.some(tag => tag.getAttribute('property')?.startsWith('og:'));
+  if (hasOgTags) {
     analysis['og'] = 'present';
+    console.log("OG TAGS: present");
   }
   
-  if (metaTags.some(tag => tag.getAttribute('name')?.startsWith('twitter:'))) {
+  const hasTwitterTags = metaTags.some(tag => tag.getAttribute('name')?.startsWith('twitter:'));
+  if (hasTwitterTags) {
     analysis['twitter'] = 'present';
+    console.log("TWITTER TAGS: present");
   }
   
-  if (doc.querySelector('link[rel="canonical"]')) {
-    analysis['canonical'] = doc.querySelector('link[rel="canonical"]')?.getAttribute('href') || '';
+  const canonicalLink = doc.querySelector('link[rel="canonical"]');
+  if (canonicalLink) {
+    analysis['canonical'] = canonicalLink.getAttribute('href') || '';
+    console.log(`CANONICAL: ${analysis['canonical']}`);
   }
   
-  if (metaTags.some(tag => tag.getAttribute('name') === 'robots')) {
-    analysis['robots'] = metaTags.find(tag => tag.getAttribute('name') === 'robots')?.getAttribute('content') || '';
+  const robotsTag = metaTags.find(tag => tag.getAttribute('name') === 'robots');
+  if (robotsTag) {
+    analysis['robots'] = robotsTag.getAttribute('content') || '';
+    console.log(`ROBOTS: ${analysis['robots']}`);
   }
   
-  if (metaTags.some(tag => tag.getAttribute('name') === 'viewport')) {
-    analysis['viewport'] = metaTags.find(tag => tag.getAttribute('name') === 'viewport')?.getAttribute('content') || '';
+  const viewportTag = metaTags.find(tag => tag.getAttribute('name') === 'viewport');
+  if (viewportTag) {
+    analysis['viewport'] = viewportTag.getAttribute('content') || '';
+    console.log(`VIEWPORT: ${analysis['viewport']}`);
   }
   
-  if (doc.querySelector('link[rel="alternate"][hreflang]')) {
+  const hreflangLinks = doc.querySelectorAll('link[rel="alternate"][hreflang]');
+  if (hreflangLinks.length > 0) {
     analysis['hreflang'] = 'present';
+    console.log("HREFLANG: present");
   }
   
-  if (doc.querySelector('script[type="application/ld+json"]')) {
+  const structuredData = doc.querySelectorAll('script[type="application/ld+json"]');
+  if (structuredData.length > 0) {
     analysis['structuredData'] = 'present';
+    console.log("STRUCTURED DATA: present");
   }
 
   // Check essential tags
@@ -64,9 +81,10 @@ export const analyzeMetaTags = (doc: Document): Record<string, string> => {
   analysis['hasDescriptionTag'] = String(metaTags.some(tag => tag.getAttribute('name') === 'description'));
   analysis['hasRobotsTag'] = String(metaTags.some(tag => tag.getAttribute('name') === 'robots'));
   analysis['hasCanonicalTag'] = String(doc.querySelector('link[rel="canonical"]') !== null);
-  analysis['hasOpenGraphTags'] = String(metaTags.some(tag => tag.getAttribute('property')?.startsWith('og:')));
-  analysis['hasTwitterTags'] = String(metaTags.some(tag => tag.getAttribute('name')?.startsWith('twitter:')));
+  analysis['hasOpenGraphTags'] = String(hasOgTags);
+  analysis['hasTwitterTags'] = String(hasTwitterTags);
   analysis['hasViewportTag'] = String(metaTags.some(tag => tag.getAttribute('name') === 'viewport'));
 
+  console.log("META ANALYSIS COMPLETE:", analysis);
   return analysis;
 };
