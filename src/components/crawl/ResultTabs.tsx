@@ -5,6 +5,7 @@ import { SiteInfo } from "./SiteInfo";
 import { SourceCode } from "./SourceCode";
 import { toast } from "sonner";
 import { useEffect } from "react";
+import { getStructureData } from "@/utils/seo/updateUtils";
 
 interface ResultTabsProps {
   data: any;
@@ -31,6 +32,9 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
           : "Structure du site et hiérarchie"
     });
   };
+
+  // Obtenez les données de structure, soit depuis les données transmises, soit en générant des données de secours
+  const structureData = data?.headings ? data : getStructureData();
 
   return (
     <Tabs defaultValue="info" className="w-full" onValueChange={handleTabChange}>
@@ -63,7 +67,7 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
       </TabsContent>
 
       <TabsContent value="source" className="mt-6">
-        <SourceCode sourceCode={data.sourceCode} />
+        <SourceCode sourceCode={data?.sourceCode} />
       </TabsContent>
       
       <TabsContent value="structure" className="mt-6">
@@ -74,8 +78,8 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
             <div>
               <h4 className="font-medium text-gray-700 mb-2">Hiérarchie des titres</h4>
               <div className="pl-4 border-l-2 border-blue-200 space-y-2">
-                {data.headings ? (
-                  data.headings.map((heading: any, index: number) => (
+                {structureData.headings ? (
+                  structureData.headings.map((heading: any, index: number) => (
                     <div 
                       key={index} 
                       className={`py-1.5 px-3 rounded-md ${
@@ -103,6 +107,17 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
                 <li>Gardez une structure cohérente sur l'ensemble du site</li>
               </ul>
             </div>
+            
+            {structureData.recommendations && (
+              <div className="mt-4">
+                <h4 className="font-medium text-gray-700 mb-2">Recommandations spécifiques</h4>
+                <ul className="list-disc pl-5 space-y-1 text-gray-600">
+                  {structureData.recommendations.map((recommendation: string, index: number) => (
+                    <li key={index}>{recommendation}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         </div>
       </TabsContent>

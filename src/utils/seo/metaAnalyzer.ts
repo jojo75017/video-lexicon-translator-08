@@ -1,3 +1,4 @@
+
 import { toast } from "sonner";
 
 interface MetaTag {
@@ -22,7 +23,7 @@ interface TwitterTags {
   site?: string;
 }
 
-interface MetaAnalysis {
+export interface MetaAnalysis {
   title: string;
   description: string;
   keywords: string[];
@@ -97,14 +98,16 @@ export const analyzeMetaTags = (document: Document): MetaAnalysis => {
         else if (name.startsWith('og:')) {
           metaAnalysis.hasOgTags = true;
           const ogProperty = name.substring(3);
-          metaAnalysis.ogTags[ogProperty as keyof OpenGraphTags] = content;
+          // Using type assertion to safely set property
+          (metaAnalysis.ogTags as any)[ogProperty] = content;
           console.log("META: Found OG tag:", name, "=", content.substring(0, 30) + "...");
         }
         // Twitter tags
         else if (name.startsWith('twitter:')) {
           metaAnalysis.hasTwitterTags = true;
           const twitterProperty = name.substring(8);
-          metaAnalysis.twitterTags[twitterProperty as keyof TwitterTags] = content;
+          // Using type assertion to safely set property
+          (metaAnalysis.twitterTags as any)[twitterProperty] = content;
           console.log("META: Found Twitter tag:", name, "=", content.substring(0, 30) + "...");
         }
         // Other meta tags

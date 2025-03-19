@@ -38,17 +38,17 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
   const socialMetricsResult = analyzeSocialMetrics();
   const backlinkResults = analyzeBacklinks(url);
   
-  // Create properly typed meta tags analysis
+  // Create properly typed meta tags analysis based on the properties that are actually available in metaTagsAnalysisResult
   const metaTagsAnalysis = {
-    hasTitleTag: metaTagsAnalysisResult.title !== undefined,
-    hasDescriptionTag: metaTagsAnalysisResult.description !== undefined,
-    hasOpenGraphTags: metaTagsAnalysisResult.og !== undefined,
-    hasTwitterTags: metaTagsAnalysisResult.twitter !== undefined,
-    hasCanonicalTag: metaTagsAnalysisResult.canonical !== undefined,
-    hasRobotsTag: metaTagsAnalysisResult.robots !== undefined,
-    hasViewportTag: metaTagsAnalysisResult.viewport !== undefined,
-    hasHreflangTags: metaTagsAnalysisResult.hreflang !== undefined,
-    hasStructuredData: metaTagsAnalysisResult.structuredData !== undefined
+    hasTitleTag: metaTagsAnalysisResult.title !== "Titre de la page non trouvé",
+    hasDescriptionTag: metaTagsAnalysisResult.description !== "Description non trouvée",
+    hasOpenGraphTags: metaTagsAnalysisResult.hasOgTags,
+    hasTwitterTags: metaTagsAnalysisResult.hasTwitterTags,
+    hasCanonicalTag: metaTagsAnalysisResult.canonical !== "",
+    hasRobotsTag: metaTagsAnalysisResult.robots !== "",
+    hasViewportTag: false, // This information is not provided by metaTagsAnalysisResult
+    hasHreflangTags: false, // This information is not provided by metaTagsAnalysisResult
+    hasStructuredData: false // This information is not provided by metaTagsAnalysisResult
   };
   
   // Fix accessibility results structure

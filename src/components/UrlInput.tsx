@@ -42,16 +42,15 @@ const UrlInput = ({
       new URL(url);
       console.log("ANALYZING URL FROM URLINPUT:", url);
       toast.success("Analyse démarrée", {
-        description: "Cliquez sur les onglets pour voir les différentes analyses"
+        description: "Patientez pendant l'analyse..."
       });
-      onAnalyze();
       
       // Notification supplémentaire pour guider l'utilisateur
-      setTimeout(() => {
-        toast.info("Conseils d'utilisation", {
-          description: "Utilisez les onglets en haut pour explorer les différentes analyses SEO"
-        });
-      }, 2000);
+      toast.info("Conseils d'utilisation", {
+        description: "Une fois l'analyse terminée, utilisez les onglets pour explorer les résultats"
+      });
+      
+      onAnalyze();
     } catch {
       console.error("INVALID URL FROM URLINPUT:", url);
       toast.error("URL invalide", {
