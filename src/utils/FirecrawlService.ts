@@ -48,27 +48,30 @@ export class FirecrawlService {
       
       // Toujours utiliser le proxy CORS pour éviter les erreurs CORS
       const corsProxy = 'https://corsproxy.io/?';
-      console.log('Utilisation du proxy CORS:', corsProxy + url);
+      console.log('Utilisation du proxy CORS:', corsProxy + encodeURIComponent(url));
       
       try {
-        const response = await Promise.race([
-          fetch(`${corsProxy}${encodeURIComponent(url)}`, {
-            headers: {
-              'Accept': 'text/html',
-              'X-Requested-With': 'XMLHttpRequest',
-            }
-          }),
-          new Promise<Response>((_, reject) => 
-            setTimeout(() => reject(new Error('L\'analyse a pris trop de temps')), this.TIMEOUT)
-          )
-        ]) as Response;
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), this.TIMEOUT);
+        
+        const response = await fetch(`${corsProxy}${encodeURIComponent(url)}`, {
+          headers: {
+            'Accept': 'text/html',
+            'X-Requested-With': 'XMLHttpRequest',
+          },
+          signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
 
         if (!response.ok) {
+          console.error(`Erreur HTTP: ${response.status}`);
           throw new Error(`Impossible d'accéder au site (Statut: ${response.status})`);
         }
 
         const html = await response.text();
         if (!html || html.trim().length === 0) {
+          console.error("Le site a retourné un contenu vide");
           return {
             success: false,
             error: "Le site a retourné un contenu vide",
@@ -130,6 +133,7 @@ export class FirecrawlService {
         };
       } catch (error) {
         console.error('Erreur lors de la requête fetch:', error);
+        console.log('Génération de données de démonstration...');
         
         // Générer des données de démonstration en cas d'erreur
         return {
@@ -162,6 +166,7 @@ export class FirecrawlService {
       console.error('Erreur lors de l\'analyse:', error);
       
       const errorMessage = error instanceof Error ? error.message : 'Erreur lors de l\'analyse du site';
+      console.log('Génération de données de démonstration après erreur:', errorMessage);
       
       // Generate simulated data instead of failing completely
       return {

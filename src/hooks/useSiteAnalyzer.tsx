@@ -254,10 +254,13 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
       organicTraffic: 1500,
       backlinks: 120,
       backlinkDetails: [
-        { domain: "exemple1.com", url: "https://exemple1.com/page", text: "Texte d'ancrage", authority: 45, dofollow: true },
-        { domain: "exemple2.com", url: "https://exemple2.com/page", text: "Autre texte", authority: 30, dofollow: false }
+        { domain: "exemple1.com", url: "https://exemple1.com/page", authority: 45, dofollow: true },
+        { domain: "exemple2.com", url: "https://exemple2.com/page", authority: 30, dofollow: false }
       ],
-      topBacklinkDomains: ["exemple1.com", "exemple2.com"],
+      topBacklinkDomains: [
+        { domain: "exemple1.com", count: 45 },
+        { domain: "exemple2.com", count: 30 }
+      ],
       doFollowBacklinks: 85,
       noFollowBacklinks: 35,
       wordCount: 2500,
@@ -283,9 +286,9 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
         countries: []
       },
       socialMetrics: {
-        facebook: { shares: 120, comments: 45, likes: 230 },
-        twitter: { tweets: 85, retweets: 35, likes: 150 },
-        linkedin: { shares: 55, comments: 20 },
+        facebook: { shares: 120, likes: 230 },
+        twitter: { shares: 85, likes: 150 },
+        linkedin: { shares: 55, engagements: 20 },
         pinterest: { pins: 25 }
       },
       performance: {
@@ -295,21 +298,21 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
         styleCount: 8,
         resourceSize: 1250000,
         resourceBreakdown: {
-          js: 750000,
-          css: 120000,
-          images: 350000,
+          images: 750000,
+          scripts: 120000,
+          styles: 350000,
           fonts: 80000,
           other: 25000
         }
       },
       securityHeaders: {
-        https: true,
-        hsts: false,
-        xFrameOptions: true,
-        contentSecurityPolicy: false,
-        xContentTypeOptions: true,
-        referrerPolicy: true,
-        permissions: false
+        https: 1,
+        hsts: 0,
+        xFrameOptions: 1,
+        contentSecurityPolicy: 0,
+        xContentTypeOptions: 1,
+        referrerPolicy: 1,
+        permissions: 0
       },
       semanticStructure: {
         header: true,
@@ -331,7 +334,7 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
           { url: "https://example.com", text: "Exemple externe", isExternal: true, isNofollow: true }
         ]
       },
-      readabilityScore: 68,
+      readabilityScore: { readingTime: 68, complexity: 45 },
       topKeywords: [
         { keyword: "exemple", count: 25, density: 1.2, position: 15 },
         { keyword: "démonstration", count: 18, density: 0.8, position: 22 },
@@ -339,18 +342,17 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
       ],
       technologies: ["WordPress", "jQuery", "Bootstrap", "Google Analytics"],
       mobileAnalysis: {
-        isMobileFriendly: true,
-        viewport: true,
-        textSize: 90,
-        tapTargets: 85,
-        flashUsage: false,
+        viewportMeta: true,
+        responsiveImages: true,
+        touchTargetSize: true,
+        fontScale: true,
         score: 85
       },
       mobilePerformance: {
         viewportMeta: true,
         responsiveImages: true,
-        touchTargetSize: 90,
-        fontScale: 85,
+        touchTargetSize: true,
+        fontScale: true,
         score: 85
       },
       socialTags: {
@@ -362,7 +364,7 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
         twitterDescription: null,
         twitterImage: null
       },
-      contentQuality: 78,
+      contentQuality: { readingTime: 78, complexity: 65, uniqueness: 80 },
       schemaMarkup: false,
       accessibility: {
         contrast: { issues: 2, score: 85 },
@@ -371,11 +373,8 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
         score: 75
       },
       indexability: {
-        isIndexable: true,
-        blockedByRobotsTxt: false,
-        hasNoindexTag: false,
-        hasCanonicalIssues: false,
-        issues: []
+        canIndex: true,
+        reasons: []
       },
       keywordSuggestions: [
         { keyword: "exemple analyse seo", searchVolume: 1200, competition: 0.65, relevance: 95, difficulty: 45, volume: 1200, cpc: 1.25 },
