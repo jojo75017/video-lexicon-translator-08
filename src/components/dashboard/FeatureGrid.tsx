@@ -1,7 +1,8 @@
 
 import React from 'react';
 import FeatureCard from './FeatureCard';
-import { Search, Globe, Database, Link2, ChartBar, Settings, Hash, Pen } from 'lucide-react';
+import { Search, Globe, Database, Link2, ChartBar, Settings, Hash, Pen, Signature } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const FeatureGrid = () => {
   const features = [
@@ -55,15 +56,18 @@ const FeatureGrid = () => {
       id: "integrations"
     },
     {
-      icon: Pen,
+      icon: Signature,
       title: "Signature",
       description: "Signature professionnelle",
       color: "blue",
-      id: "signature"
+      id: "signature",
+      link: "/SignaturePage"
     }
   ];
 
-  const handleFeatureClick = (id: string) => {
+  const handleFeatureClick = (id: string, link?: string) => {
+    if (link) return; // Si un lien est fourni, on utilise le routage normal
+    
     const element = document.querySelector(`[data-value="${id}"]`) as HTMLElement;
     if (element) {
       element.click();
@@ -80,14 +84,26 @@ const FeatureGrid = () => {
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {features.map((feature) => (
-          <FeatureCard
-            key={feature.id}
-            icon={feature.icon}
-            title={feature.title}
-            description={feature.description}
-            color={feature.color}
-            onClick={() => handleFeatureClick(feature.id)}
-          />
+          feature.link ? (
+            <Link key={feature.id} to={feature.link} className="block">
+              <FeatureCard
+                icon={feature.icon}
+                title={feature.title}
+                description={feature.description}
+                color={feature.color}
+                onClick={() => {}}
+              />
+            </Link>
+          ) : (
+            <FeatureCard
+              key={feature.id}
+              icon={feature.icon}
+              title={feature.title}
+              description={feature.description}
+              color={feature.color}
+              onClick={() => handleFeatureClick(feature.id, feature.link)}
+            />
+          )
         ))}
       </div>
     </div>

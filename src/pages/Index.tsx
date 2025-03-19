@@ -3,7 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Rocket, Search } from "lucide-react";
+import { Rocket, Search, Signature } from "lucide-react";
 import { Github } from 'lucide-react';
 import { Sparkles } from 'lucide-react';
 import { MessageSquareText } from 'lucide-react';
@@ -67,6 +67,24 @@ const IndexPage = () => {
               >
                 <MessageSquareText className="mr-2 h-5 w-5" />
                 Créer du Contenu Quora (500+ mots)
+              </Button>
+            </Link>
+          </div>
+        </div>
+        
+        {/* Signature Button Section */}
+        <div className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold mb-4">Signature Email Professionnelle</h2>
+            <p className="text-gray-600 mb-6 max-w-3xl mx-auto">
+              Créez une signature email professionnelle personnalisée avec notre générateur interactif. Ajoutez votre logo, choisissez vos couleurs et téléchargez votre signature.
+            </p>
+            <Link to="/SignaturePage">
+              <Button 
+                className="bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white"
+              >
+                <Signature className="mr-2 h-5 w-5" />
+                Créer ma Signature Email
               </Button>
             </Link>
           </div>

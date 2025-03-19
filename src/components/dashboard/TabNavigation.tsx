@@ -6,7 +6,7 @@ import {
   Search, Globe, Database, Link2, ChartBar, Settings, Hash, Pen, 
   FileText, Book, BarChart2, ExternalLink, Rocket, Zap, 
   Layers, Lightbulb, FileCode, Bell, UserPlus, MessageSquareText,
-  Gauge, BarChart, Newspaper, Award, Target, Boxes, BrainCircuit
+  Gauge, BarChart, Newspaper, Award, Target, Boxes, BrainCircuit, Signature
 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Separator } from "@/components/ui/separator";
@@ -45,7 +45,7 @@ const TabNavigation = () => {
     { id: 'trends', icon: Target, label: 'Tendances', color: 'text-cyan-600', group: 'marketing' },
     
     // Autres outils
-    { id: 'signature', icon: Pen, label: 'Signature', color: 'text-blue-600', group: 'other' },
+    { id: 'signature', icon: Signature, label: 'Signature', color: 'text-blue-600', group: 'other', link: '/SignaturePage' },
     { id: 'external', icon: ExternalLink, label: 'Externe', color: 'text-teal-600', group: 'other' },
   ];
 
@@ -91,6 +91,7 @@ const TabNavigation = () => {
                             <div 
                               className={`flex items-center gap-1 px-3 py-1.5 rounded-md relative group transition-all duration-200 hover:bg-white cursor-pointer ${
                                 id === 'quora' ? 'bg-[#b92b27]/10' : 
+                                id === 'signature' ? 'bg-blue-100' :
                                 highlighted ? 'bg-purple-100' : ''
                               }`}
                             >
