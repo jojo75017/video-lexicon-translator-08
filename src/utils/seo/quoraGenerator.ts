@@ -31,7 +31,7 @@ export const generateQuoraContent = (
     storytelling: {
       intro: `Je me souviens de ma première expérience avec ${keyword}. C'était en 2018...`,
       tone: 'narratif et personnel',
-      conclusion: 'Cette expérience m'a appris que:'
+      conclusion: 'Cette expérience m\'a appris que:'
     }
   };
 
