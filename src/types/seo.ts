@@ -1,3 +1,4 @@
+
 export interface SeoAnalysisResult {
   title?: string;
   description?: string;
