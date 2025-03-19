@@ -6,7 +6,7 @@ import {
   Search, Globe, Database, Link2, ChartBar, Settings, Hash, Pen, 
   FileText, Book, BarChart2, ExternalLink, Rocket, Zap, 
   Layers, Lightbulb, FileCode, Bell, UserPlus, MessageSquareText,
-  Gauge, BarChart, Newspaper, Award, Target, Boxes
+  Gauge, BarChart, Newspaper, Award, Target, Boxes, BrainCircuit
 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Separator } from "@/components/ui/separator";
@@ -31,6 +31,7 @@ const TabNavigation = () => {
     { id: 'optimize', icon: Zap, label: 'Optimisation', color: 'text-blue-600', group: 'content', isNew: true },
     { id: 'ideas', icon: Lightbulb, label: 'Idées', color: 'text-yellow-600', group: 'content' },
     { id: 'quora', icon: MessageSquareText, label: 'Quora', color: 'text-[#b92b27]', group: 'content', isNew: true, link: '/quora' },
+    { id: 'airesearch', icon: BrainCircuit, label: 'Recherche IA', color: 'text-purple-700', group: 'content', isNew: true },
     
     // Technique
     { id: 'advanced', icon: Settings, label: 'Avancé', color: 'text-rose-600', group: 'tech' },

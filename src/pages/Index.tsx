@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
@@ -24,6 +23,7 @@ import QuoraButton from '@/components/seo/buttons/QuoraButton';
 import ContentOptimizationButton from '@/components/seo/buttons/ContentOptimizationButton';
 import EnhancedAnalytics from '@/components/seo/EnhancedAnalytics';
 import ContentOptimizationTabs from '@/components/seo/ContentOptimizationTabs';
+import AiSearchTab from '@/components/seo/AiSearchTab';
 import { Search } from 'lucide-react';
 
 const Index = () => {
@@ -242,6 +242,10 @@ const Index = () => {
                 </Card>
               </TabsContent>
 
+              <TabsContent value="airesearch">
+                <AiSearchTab />
+              </TabsContent>
+              
               <TabsContent value="optimize">
                 <ContentOptimizationTabs />
               </TabsContent>
