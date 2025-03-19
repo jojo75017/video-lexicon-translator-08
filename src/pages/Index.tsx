@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Rocket, Search } from "lucide-react";
 import { Github } from 'lucide-react';
 import { Sparkles } from 'lucide-react';
+import { MessageSquareText } from 'lucide-react';
 
 const ModeToggle = () => {
   return (
@@ -44,6 +45,16 @@ const IndexPage = () => {
               Bienvenue sur SEO-GPT, votre assistant SEO alimenté par l'intelligence artificielle.
               Optimisez votre contenu, analysez vos performances et surpassez vos concurrents.
             </p>
+            <div className="mt-6">
+              <Link to="/QuoraPage">
+                <Button 
+                  className="bg-gradient-to-r from-[#b92b27] to-[#8B5CF6] hover:from-[#a72724] hover:to-[#7849e0] text-white"
+                >
+                  <MessageSquareText className="mr-2 h-5 w-5" />
+                  Créer du Contenu Quora (500+ mots)
+                </Button>
+              </Link>
+            </div>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <Card className="bg-white dark:bg-neutral-950 shadow-md transition-shadow hover:shadow-lg">

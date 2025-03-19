@@ -6,809 +6,50 @@ interface QuoraContent {
   topics?: string[];
 }
 
+/**
+ * Génère du contenu pour Quora basé sur un mot-clé spécifique
+ * @param keyword Le mot-clé principal
+ * @param minWordCount Nombre minimum de mots pour la réponse (par défaut 500)
+ * @param topics Sujets associés (optionnel)
+ * @param style Style de réponse (professionnel, conversationnel, expert, storytelling)
+ * @returns Objet contenant titre, question, réponse et sujets
+ */
 export const generateQuoraContent = (
   keyword: string,
-  wordCount: number = 500,
+  minWordCount: number = 500,
   topics?: string[],
-  style: 'professional' | 'conversational' | 'expert' | 'storytelling' = 'expert'
+  style: 'professional' | 'conversational' | 'expert' | 'storytelling' = 'professional'
 ): QuoraContent => {
-  const styleFormats = {
-    professional: {
-      intro: `En tant que professionnel dans ce domaine, je peux vous fournir une analyse détaillée sur ${keyword}.`,
-      tone: 'factuel et concis',
-      conclusion: 'Pour conclure, voici les points essentiels à retenir:'
-    },
-    conversational: {
-      intro: `Ah, ${keyword}! C'est un sujet fascinant que j'adore explorer.`,
-      tone: 'amical et accessible',
-      conclusion: 'En résumé, voici ce que je vous conseille:'
-    },
-    expert: {
-      intro: `Après plus de 10 ans d'expérience sur le sujet de ${keyword}, voici mon analyse approfondie.`,
-      tone: 'autoritaire et approfondi',
-      conclusion: 'Sur la base de mon expertise, voici les recommandations clés:'
-    },
-    storytelling: {
-      intro: `Je me souviens de ma première expérience avec ${keyword}. C'était en 2018...`,
-      tone: 'narratif et personnel',
-      conclusion: 'Cette expérience m\'a appris que:'
-    }
+  // Fonction pour compter approximativement le nombre de mots
+  const countWords = (text: string): number => {
+    return text.split(/\s+/).length;
   };
 
-  const format = styleFormats[style];
+  // Identifier la catégorie du mot-clé
+  const category = identifyCategory(keyword);
   
-  // Déterminer la catégorie du mot-clé
-  const keywordLower = keyword.toLowerCase();
-  let category = '';
+  // Générer une question pertinente basée sur le mot-clé
+  const question = generateQuestion(keyword, category);
   
-  if (keywordLower.includes('voyage') || keywordLower.includes('trip') || keywordLower.includes('tourisme') || keywordLower.includes('destination')) {
-    category = 'voyage';
-  } else if (keywordLower.includes('seo') || keywordLower.includes('référencement')) {
-    category = 'seo';
-  } else if (keywordLower.includes('marketing') || keywordLower.includes('digital')) {
-    category = 'marketing';
-  } else if (keywordLower.includes('santé') || keywordLower.includes('bien-être') || keywordLower.includes('fitness')) {
-    category = 'santé';
-  } else if (keywordLower.includes('finance') || keywordLower.includes('investissement') || keywordLower.includes('argent')) {
-    category = 'finance';
-  } else if (keywordLower.includes('technologie') || keywordLower.includes('tech') || keywordLower.includes('informatique')) {
-    category = 'technologie';
-  } else {
-    category = 'général';
+  // Générer un titre accrocheur
+  const title = generateTitle(keyword, category);
+  
+  // Générer une réponse détaillée
+  let answer = generateDetailedAnswer(keyword, category, style);
+  
+  // S'assurer que la réponse contient au moins le nombre minimum de mots
+  let attempts = 0;
+  const maxAttempts = 3;
+  
+  while (countWords(answer) < minWordCount && attempts < maxAttempts) {
+    // Ajouter du contenu supplémentaire si nécessaire
+    answer += "\n\n" + generateAdditionalContent(keyword, category, style);
+    attempts++;
   }
   
-  // Generate content specifically about the keyword
-  const title = `${keyword.charAt(0).toUpperCase() + keyword.slice(1)}: Guide complet et conseils pratiques`;
+  // Générer des sujets si non fournis
+  const generatedTopics = topics || generateTopics(keyword, category);
   
-  // Génération de la question en fonction de la catégorie
-  let question = '';
-  
-  switch (category) {
-    case 'voyage':
-      question = `Quelles sont les meilleures astuces pour optimiser mon voyage à/avec ${keyword} ? Je recherche des conseils d'experts sur la planification, les coûts et les expériences incontournables.`;
-      break;
-    case 'seo':
-      question = `Comment puis-je améliorer ma stratégie de ${keyword} pour augmenter mon trafic organique ? Je cherche des techniques avancées et des outils recommandés par des experts.`;
-      break;
-    case 'marketing':
-      question = `Quelles sont les stratégies de ${keyword} les plus efficaces en 2024 ? Je souhaite savoir comment optimiser mon ROI et atteindre ma cible avec précision.`;
-      break;
-    case 'santé':
-      question = `Comment intégrer ${keyword} dans ma routine quotidienne pour maximiser les bénéfices ? Je cherche des conseils scientifiquement prouvés et des recommandations d'experts.`;
-      break;
-    case 'finance':
-      question = `Quelles sont les meilleures approches pour optimiser mes investissements dans ${keyword} ? Je cherche des stratégies éprouvées et des analyses d'experts sur les tendances actuelles.`;
-      break;
-    case 'technologie':
-      question = `Comment puis-je tirer le meilleur parti de ${keyword} dans mon entreprise ? Je recherche des conseils techniques, des cas d'usage innovants et des bonnes pratiques.`;
-      break;
-    default:
-      question = `Quelles sont les meilleures pratiques concernant ${keyword} ? Je cherche des conseils d'experts et des recommandations basées sur l'expérience.`;
-      break;
-  }
-  
-  // Introduction basée sur la catégorie et le style
-  let answer = `${format.intro}\n\n`;
-  
-  // Corps de la réponse en fonction de la catégorie
-  switch (category) {
-    case 'voyage':
-      answer += `# Planifier votre voyage ${keyword} : l'approche optimale
-
-Lorsqu'on parle de voyager à/avec ${keyword}, il est crucial d'adopter une approche méthodique pour tirer le meilleur parti de votre expérience tout en optimisant votre budget et votre temps.
-
-## 1. Planification stratégique et timing optimal
-
-La première règle d'or pour tout voyage impliquant ${keyword} est la planification anticipée. Mes recherches et mon expérience personnelle ont démontré qu'une réservation effectuée 3 à 6 mois à l'avance peut vous faire économiser entre 20% et 40% sur les tarifs aériens et l'hébergement.
-
-**Périodes optimales pour ${keyword}:**
-* Haute saison: Expérience complète mais prix élevés et affluence importante
-* Saison intermédiaire: Excellent compromis entre prix, climat et affluence
-* Basse saison: Tarifs attractifs mais certaines attractions peuvent être fermées ou le climat moins favorable
-
-La flexibilité des dates reste votre meilleur atout. Un décalage de quelques jours peut parfois faire une différence considérable sur les tarifs, particulièrement si vous pouvez éviter les week-ends et les périodes de vacances scolaires.
-
-## 2. Recherche approfondie et préparation culturelle
-
-Avant votre départ pour ${keyword}, immergez-vous dans la culture locale à travers:
-
-* Des livres et documentaires sur la région
-* Des blogs de voyageurs expérimentés
-* Des forums spécialisés comme Lonely Planet ou TripAdvisor
-* Des applications comme Culture Trip pour découvrir les aspects peu connus
-
-Cette préparation culturelle vous permettra non seulement d'enrichir votre expérience, mais aussi d'éviter les faux pas culturels et d'interagir plus authentiquement avec les habitants.
-
-J'ai personnellement consacré environ 15 heures à la recherche avant mon voyage à ${keyword}, ce qui m'a permis de découvrir des restaurants locaux exceptionnels et des activités hors des sentiers battus que je n'aurais jamais trouvés autrement.
-
-## 3. Optimisation budgétaire sans compromettre l'expérience
-
-Voyager à/avec ${keyword} peut représenter un investissement conséquent, mais de nombreuses stratégies permettent d'optimiser votre budget:
-
-* Utilisez des comparateurs de vols comme Skyscanner ou Kayak, en activant les alertes de prix
-* Considérez les hébergements alternatifs: appartements locaux, auberges de jeunesse de qualité, ou échanges de maisons
-* Procurez-vous une carte de transport locale pour la durée de votre séjour
-* Mangez où les locaux mangent: les prix sont généralement inférieurs de 30-50% par rapport aux restaurants touristiques
-* Recherchez les jours de gratuité des musées et attractions
-
-Mon expérience avec ${keyword} m'a appris que ce n'est pas nécessairement le montant dépensé qui détermine la qualité de l'expérience, mais plutôt la manière dont vous allouez votre budget.
-
-## 4. Équipement essentiel et applications indispensables
-
-Pour tirer le meilleur parti de votre expérience ${keyword}, certains équipements et applications sont incontournables:
-
-**Équipement:**
-* Adaptateur électrique universel avec ports USB
-* Batterie externe de haute capacité (minimum 20 000 mAh)
-* Chaussures de marche confortables, testées avant le départ
-* Vêtements adaptés au climat local, privilégiant les couches superposables
-
-**Applications:**
-* Maps.me ou Google Maps (avec cartes téléchargées hors-ligne)
-* XE pour les conversions de devises en temps réel
-* Google Translate avec packs de langues téléchargés
-* TripIt pour centraliser tous vos documents de voyage
-
-Ces outils ont transformé ma propre expérience à ${keyword}, me permettant de naviguer avec confiance même dans les zones sans connexion internet.
-
-## 5. Immersion authentique et expériences locales
-
-La véritable essence de ${keyword} se révèle lorsque vous sortez des sentiers battus pour découvrir des expériences authentiques:
-
-* Participez à un cours de cuisine locale
-* Visitez les marchés matinaux où s'approvisionnent les habitants
-* Utilisez les transports en commun plutôt que les navettes touristiques
-* Apprenez quelques phrases dans la langue locale - même des efforts modestes sont généralement très appréciés
-
-Une technique que j'ai trouvée particulièrement efficace à ${keyword} était de demander aux hôteliers et restaurateurs locaux: "Où iriez-vous si vous aviez une journée libre?" - leurs recommandations m'ont systématiquement conduit vers des expériences mémorables que peu de touristes découvrent.
-
-## 6. Gestion des imprévus et sécurité
-
-Même avec la planification la plus minutieuse, les voyages comportent toujours une part d'imprévu, particulièrement à ${keyword}:
-
-* Souscrivez à une assurance voyage complète couvrant les frais médicaux, annulations et bagages
-* Conservez des copies numériques de tous vos documents importants
-* Gardez une réserve d'urgence d'environ 200-300€ en devise locale
-* Renseignez-vous sur les numéros d'urgence locaux et l'emplacement des ambassades ou consulats
-
-J'ai personnellement vécu une situation où mon vol a été annulé à ${keyword}, et grâce à mon assurance voyage et ma préparation, ce qui aurait pu être un désastre s'est transformé en simple contretemps.`;
-      break;
-
-    case 'seo':
-      answer += `# Maîtriser ${keyword} : Stratégies avancées pour des résultats mesurables
-
-Dans le paysage numérique actuel, ${keyword} représente un pilier fondamental pour toute présence en ligne performante. Au fil de mes années d'expérience, j'ai pu identifier les approches les plus efficaces pour générer des résultats significatifs et durables.
-
-## 1. Analyse stratégique des mots-clés : au-delà des bases
-
-La recherche de mots-clés pour ${keyword} ne se limite plus à l'utilisation d'outils comme Google Keyword Planner. Une approche véritablement efficace combine:
-
-* **Analyse sémantique** : Identifiez les champs lexicaux complets autour de vos thématiques principales
-* **Intention de recherche** : Catégorisez vos mots-clés selon l'intention (informationnelle, transactionnelle, navigationnelle)
-* **Difficulté et opportunité** : Évaluez le rapport entre le volume de recherche, la concurrence et le potentiel de conversion
-
-Dans mon expérience avec ${keyword}, les mots-clés à queue longue avec une intention transactionnelle claire génèrent souvent un ROI supérieur de 30-40% par rapport aux termes génériques à volume élevé.
-
-J'utilise systématiquement une matrice de priorisation qui croise ces dimensions pour identifier les opportunités à fort potentiel:
-
-**Exemple de matrice pour ${keyword}:**
-* Haute priorité: Intention transactionnelle + Volume moyen + Faible concurrence
-* Priorité moyenne: Intention informationnelle + Volume élevé + Concurrence moyenne
-* Basse priorité: Intention navigationnelle + Faible volume + Forte concurrence
-
-## 2. Contenu optimisé pour les signaux E-E-A-T
-
-Google accorde une importance croissante aux signaux E-E-A-T (Expérience, Expertise, Autorité, Fiabilité) dans son évaluation de ${keyword}. Pour renforcer ces signaux:
-
-* **Expérience démontrée**: Partagez des études de cas, témoignages et récits d'expérience personnelle
-* **Expertise validée**: Incluez des références à vos certifications, formations et accomplissements professionnels
-* **Autorité sectorielle**: Obtenez des backlinks de sources faisant autorité dans votre domaine
-* **Fiabilité factuelle**: Citez vos sources, incluez des données récentes et actualisez régulièrement votre contenu
-
-J'ai constaté qu'un contenu intégrant ces dimensions pour ${keyword} obtient typiquement un taux de rebond inférieur de 25% et un temps de session supérieur de 40% par rapport au contenu standard.
-
-La structuration de votre contenu joue également un rôle crucial:
-* Introduction claire établissant votre expertise sur ${keyword}
-* Hiérarchie logique de titres et sous-titres (H1, H2, H3)
-* Paragraphes courts et scanables (60-80 mots maximum)
-* Éléments visuels explicatifs (graphiques, schémas, infographies)
-* Conclusion avec synthèse des points clés et prochaines étapes
-
-## 3. Optimisation technique pour une indexation optimale
-
-L'architecture technique de votre site influence considérablement l'efficacité de votre stratégie ${keyword}:
-
-* **Vitesse de chargement**: Optimisez-la pour rester sous les 2,5 secondes, idéalement sous 1,5 seconde
-* **Architecture de l'information**: Structurez votre site avec une profondeur de navigation maximale de 3 clics
-* **Balisage sémantique**: Implémentez les données structurées Schema.org pertinentes
-* **Mobile-first**: Assurez une expérience fluide et complète sur appareils mobiles
-* **Core Web Vitals**: Surveillez et optimisez ces métriques de performance essentielles
-
-Lors d'un audit récent pour un client spécialisé en ${keyword}, l'amélioration des Core Web Vitals a entraîné une augmentation de 28% du trafic organique en seulement six semaines.
-
-## 4. Stratégie de backlinks qualitative et diversifiée
-
-Dans l'écosystème actuel de ${keyword}, la qualité et la pertinence des backlinks surpassent largement la quantité:
-
-* **Sources d'autorité**: Privilégiez les sites avec un Domain Rating élevé et pertinents pour votre secteur
-* **Ancres diversifiées**: Variez les textes d'ancrage entre mots-clés exacts, variations et ancres de marque
-* **Contextualisation**: Recherchez des liens entourés de contenu thématiquement cohérent avec ${keyword}
-* **Acquisition naturelle**: Créez du contenu digne de liens plutôt que de vous focaliser sur l'acquisition directe
-
-Ma stratégie personnelle pour ${keyword} repose sur la règle des "40-40-20":
-* 40% des efforts sur la création de contenu remarquable qui attire naturellement des liens
-* 40% sur les relations publiques numériques et le networking sectoriel
-* 20% sur les tactiques d'outreach directes et ciblées
-
-## 5. Analyse de données et optimisation continue
-
-L'amélioration de ${keyword} nécessite une approche basée sur les données:
-
-* **KPIs pertinents**: Définissez des indicateurs alignés sur vos objectifs business, au-delà du simple positionnement
-* **Segmentation avancée**: Analysez les performances par intention de recherche, type de page et parcours utilisateur
-* **Tests A/B**: Expérimentez systématiquement avec différentes approches de contenu et techniques
-* **Analyse concurrentielle**: Surveillez les évolutions stratégiques de vos principaux concurrents
-
-Dans ma pratique de ${keyword}, j'utilise un tableau de bord personnalisé qui intègre des données de Google Analytics, Search Console, SEMrush et Ahrefs pour obtenir une vision holistique des performances.
-
-Un client spécialisé en ${keyword} a vu son trafic organique augmenter de 156% en 12 mois grâce à cette approche d'amélioration itérative guidée par les données.`;
-      break;
-
-    case 'marketing':
-      answer += `# Maximiser l'impact de votre stratégie ${keyword} : L'approche complète
-
-Dans l'écosystème numérique actuel, ${keyword} représente un levier stratégique fondamental pour les organisations cherchant à développer leur présence et leur impact. Après avoir conseillé plus de 50 entreprises sur ce sujet, je partage ici les stratégies les plus efficaces et les enseignements clés.
-
-## 1. Fondements d'une stratégie omnicanale cohérente
-
-L'approche la plus performante en ${keyword} repose sur une stratégie omnicanale parfaitement intégrée:
-
-* **Cartographie des points de contact**: Identifiez systématiquement tous les canaux où votre audience interagit avec votre marque
-* **Messagerie unifiée**: Assurez-vous que votre communication reste cohérente sur tous les canaux tout en adaptant le format aux spécificités de chaque plateforme
-* **Orchestration des données**: Implémentez un système centralisé pour collecter et analyser les données de tous vos points de contact
-
-Dans mon expérience avec des clients en ${keyword}, les entreprises adoptant une approche véritablement omnicanale observent un taux de conversion supérieur de 35% par rapport à celles utilisant des canaux isolés.
-
-**Structure recommandée pour votre stratégie ${keyword}:**
-1. Vision stratégique et objectifs mesurables
-2. Profils d'audience détaillés (personas)
-3. Parcours client complet pour chaque persona
-4. Mix de canaux optimisé avec rôle spécifique pour chacun
-5. Calendrier éditorial intégré
-6. Système de mesure cross-canal
-
-## 2. Personnalisation avancée : le nouvel impératif
-
-La personnalisation représente aujourd'hui l'élément différenciateur majeur en ${keyword}:
-
-* **Micro-segmentation comportementale**: Allez au-delà des données démographiques pour segmenter selon les comportements et intentions
-* **Contenu dynamique**: Adaptez automatiquement votre contenu en fonction du profil, de l'historique et du contexte de chaque utilisateur
-* **Parcours adaptatifs**: Créez des séquences de communication qui évoluent en fonction des actions et réponses de l'utilisateur
-
-J'ai implémenté une stratégie de personnalisation avancée pour un client en ${keyword} qui a généré une augmentation de 28% du taux d'engagement et de 41% du panier moyen.
-
-Les technologies de personnalisation les plus efficaces que j'ai testées incluent:
-* Plateformes CDP (Customer Data Platform) pour l'unification des données client
-* Outils de marketing automation avec logique conditionnelle avancée
-* Solutions de personnalisation web en temps réel
-* Systèmes de recommandation basés sur le machine learning
-
-## 3. Contenu stratégique à haute valeur ajoutée
-
-En matière de ${keyword}, la qualité du contenu surpasse désormais largement la quantité:
-
-* **Contenu cornerstone**: Développez des ressources exhaustives qui établissent votre autorité dans des domaines spécifiques
-* **Formats immersifs**: Intégrez des éléments interactifs, visuels et multimédias pour maximiser l'engagement
-* **Storytelling de marque**: Articulez votre communication autour d'une narration cohérente qui résonne avec vos valeurs et celles de votre audience
-* **User-generated content**: Encouragez et mettez en valeur le contenu créé par votre communauté
-
-Dans ma pratique du ${keyword}, j'observe que le contenu interactif génère typiquement un taux d'engagement 2 à 3 fois supérieur au contenu statique.
-
-**Matrice d'efficacité du contenu pour ${keyword}:**
-* Impact maximal: Contenu éducatif approfondi + Études de cas détaillées + Témoignages authentiques
-* Impact moyen: Actualités sectorielles + Tutoriels basiques + Infographies générales
-* Impact minimal: Contenu promotionnel direct + Annonces de produits sans contexte
-
-## 4. Analyse de données et attribution multi-touch
-
-Une stratégie ${keyword} performante repose sur une compréhension approfondie de vos données:
-
-* **Modèles d'attribution avancés**: Dépassez l'attribution "last click" pour comprendre l'impact réel de chaque canal dans le parcours client
-* **Cohortes comportementales**: Analysez les performances par segments d'utilisateurs partageant des comportements similaires
-* **Tests multivariés**: Testez simultanément plusieurs variables pour identifier les combinaisons optimales
-* **Prédiction et anticipation**: Utilisez l'analyse prédictive pour anticiper les tendances et besoins émergents
-
-L'une des transformations les plus significatives que j'ai dirigées en ${keyword} concernait l'implémentation d'un modèle d'attribution basé sur les chaînes de Markov, qui a permis de réallouer le budget marketing et d'augmenter le ROI global de 47%.
-
-Les métriques essentielles à surveiller incluent:
-* Coût d'acquisition client (CAC) par canal et segment
-* Valeur vie client (LTV) et ratio LTV/CAC
-* Taux de conversion aux différentes étapes du funnel
-* Taux d'engagement et de rétention
-* Vitesse de progression dans le parcours client
-
-## 5. Automatisation intelligente et scaling efficace
-
-L'automatisation représente désormais un levier indispensable pour optimiser l'efficacité de votre ${keyword}:
-
-* **Workflows automatisés**: Définissez des séquences de communication déclenchées par des comportements spécifiques
-* **Personnalisation à l'échelle**: Utilisez l'IA pour personnaliser les interactions sans augmenter proportionnellement les ressources
-* **Tests automatisés**: Implémentez des systèmes qui testent continuellement différentes variantes et optimisent automatiquement
-* **Maintenance prédictive**: Anticipez les problèmes potentiels avant qu'ils n'affectent vos performances
-
-Dans le cadre d'une stratégie ${keyword} que j'ai supervisée, l'automatisation des campagnes email a permis de réduire le temps de gestion de 68% tout en améliorant les performances de 23%.
-
-**Domaines prioritaires pour l'automatisation en ${keyword}:**
-1. Nurturing des leads et séquences d'onboarding
-2. Récupération de paniers abandonnés et réengagement
-3. Modération et curation de contenu utilisateur
-4. Distribution cross-canal et adaptation de format
-5. Analyse et reporting de performance`;
-      break;
-
-    case 'santé':
-      answer += `# Intégrer ${keyword} dans votre quotidien : Approche scientifique et pratique
-
-Après avoir étudié et expérimenté personnellement les bénéfices de ${keyword} pendant plus d'une décennie, je souhaite partager une approche structurée pour maximiser ses effets positifs sur votre santé et bien-être quotidien.
-
-## 1. Fondements scientifiques et mécanismes d'action
-
-${keyword} agit sur plusieurs systèmes physiologiques simultanément, ce qui explique son large spectre de bénéfices:
-
-* **Impact sur les marqueurs inflammatoires**: Des études publiées dans le Journal of Physiological Research ont démontré une réduction de 18-25% des marqueurs d'inflammation systémique après 8 semaines de pratique régulière
-* **Régulation hormonale**: Modulation des niveaux de cortisol et amélioration du ratio cortisol/DHEA, indiquant une meilleure gestion du stress
-* **Optimisation mitochondriale**: Augmentation de la biogenèse mitochondriale et amélioration de l'efficacité énergétique cellulaire
-* **Neuroplasticité améliorée**: Stimulation de la production de BDNF (Brain-Derived Neurotrophic Factor), protéine cruciale pour la santé cognitive
-
-Une méta-analyse récente publiée dans le British Medical Journal a examiné 47 études contrôlées randomisées incluant plus de 3,800 participants, confirmant les bénéfices significatifs de ${keyword} sur plusieurs paramètres de santé mesurables.
-
-## 2. Protocole d'intégration progressive et personnalisée
-
-L'intégration optimale de ${keyword} dans votre routine suit idéalement ces étapes:
-
-### Phase 1: Initiation (2-3 semaines)
-* Commencez par des sessions courtes de 5-10 minutes
-* Fréquence: 3 fois par semaine
-* Attention à la forme et à la technique correcte
-* Objectif: Établir l'habitude et adapter le corps progressivement
-
-### Phase 2: Consolidation (1-2 mois)
-* Augmentez la durée à 15-20 minutes
-* Fréquence: 4-5 fois par semaine
-* Introduisez des variations de base
-* Objectif: Renforcer l'habitude et améliorer les fondamentaux
-
-### Phase 3: Optimisation (après 2-3 mois)
-* Sessions de 20-45 minutes selon vos objectifs
-* Fréquence: 5-6 fois par semaine, avec variation d'intensité
-* Introduction de techniques avancées
-* Objectif: Maximiser les bénéfices et personnaliser selon vos besoins spécifiques
-
-Cette approche progressive est essentielle pour ${keyword}. Dans ma pratique personnelle et professionnelle, j'ai constaté que les abandons surviennent principalement lorsque les personnes commencent trop intensément, provoquant inconfort, découragement ou même blessures.
-
-## 3. Adaptations spécifiques selon vos objectifs de santé
-
-${keyword} peut être personnalisé selon vos priorités de santé:
-
-**Pour l'amélioration de la santé cardiovasculaire:**
-* Accentuez les aspects rythmiques et continus
-* Intégrez des variations d'intensité (principe HIIT adapté)
-* Surveillez votre zone de fréquence cardiaque cible (65-80% de votre FCM)
-* Progression mesurable: réduction de la fréquence cardiaque au repos, amélioration de la VFC (variabilité de la fréquence cardiaque)
-
-**Pour la gestion du stress chronique:**
-* Privilégiez les mouvements fluides et contrôlés
-* Intégrez des techniques de respiration consciente
-* Pratiquez de préférence en milieu de journée ou en soirée
-* Progression mesurable: diminution du cortisol salivaire, amélioration de la qualité du sommeil
-
-**Pour l'optimisation cognitive:**
-* Incluez des séquences complexes qui stimulent la coordination
-* Alternez entre concentration intense et périodes de récupération active
-* Pratiquez idéalement le matin
-* Progression mesurable: tests d'attention soutenue, réduction du "brain fog"
-
-Dans mon expérience avec ${keyword}, l'adaptation aux objectifs spécifiques peut amplifier les résultats de 30-40% comparé à une approche générique.
-
-## 4. Synergies avec d'autres pratiques de santé
-
-${keyword} fonctionne de manière optimale lorsqu'il est intégré dans un cadre holistique:
-
-* **Nutrition complémentaire**: Certains nutriments potentialisent les effets de ${keyword}, notamment les antioxydants, les acides gras oméga-3 et les composés anti-inflammatoires naturels
-* **Hydratation optimisée**: La performance et les bénéfices sont significativement améliorés avec une hydratation adéquate (environ 30-35ml/kg de poids corporel)
-* **Cycle sommeil-éveil**: Alignez votre pratique avec votre chronotype naturel pour maximiser l'adhérence et les bénéfices
-* **Mindfulness intégrée**: L'attention consciente pendant la pratique amplifie considérablement les bénéfices neurophysiologiques
-
-J'ai personnellement documenté un effet multiplicateur de ces synergies: lorsque ${keyword} est pratiqué en conjonction avec ces autres aspects de santé, les résultats observés dépassent la simple addition des bénéfices individuels.
-
-## 5. Suivi des progrès et ajustements basés sur les données
-
-Pour maximiser les bénéfices de ${keyword}, un suivi systématique est crucial:
-
-* **Biomarqueurs pertinents**: HbA1c, profil lipidique, CRP-us, cortisol, et hormones spécifiques selon vos objectifs
-* **Métriques fonctionnelles**: VO2max, force relative, amplitude de mouvement, équilibre statique et dynamique
-* **Indicateurs subjectifs**: Échelles validées pour la qualité du sommeil (PSQI), niveau d'énergie, et bien-être général (WEMWBS)
-* **Suivi technologique**: Utilisez des applications et wearables pour objectiver les paramètres pertinents
-
-Dans ma propre expérience avec ${keyword}, l'approche basée sur les données a transformé ma pratique en révélant des corrélations inattendues entre certains aspects de l'implémentation et les résultats obtenus.
-
-Je recommande un bilan complet tous les 3 mois, avec des micro-évaluations hebdomadaires pour les ajustements fins.`;
-      break;
-      
-    case 'finance':
-      answer += `# Optimiser vos investissements dans ${keyword} : Guide stratégique complet
-
-Après avoir conseillé des centaines de clients et géré personnellement des portefeuilles diversifiés incluant ${keyword}, je partage ici une analyse approfondie pour maximiser votre ROI tout en maîtrisant les risques inhérents à ce segment.
-
-## 1. Principes fondamentaux et positionnement stratégique
-
-Pour aborder ${keyword} efficacement, il faut d'abord comprendre sa place dans l'écosystème financier global:
-
-* **Corrélation avec les classes d'actifs traditionnelles**: ${keyword} présente historiquement une corrélation de seulement 0.21 avec le S&P 500 et 0.15 avec les obligations d'État, offrant un véritable potentiel de diversification
-* **Cycles spécifiques**: Contrairement aux marchés traditionnels, ${keyword} suit des cycles distincts qu'il faut savoir identifier et anticiper
-* **Dynamique risque/rendement**: Le ratio de Sharpe historique de 1.7 sur 5 ans indique un profil risque/rendement attractif malgré la volatilité
-
-L'allocation optimale à ${keyword} varie selon votre profil:
-* Investisseur conservateur: 5-10% maximum
-* Investisseur modéré: 10-15%
-* Investisseur agressif: 15-25%
-* Investisseur spécialisé: jusqu'à 40% avec stratégies de couverture appropriées
-
-Lors de mes consultations en gestion de patrimoine, j'observe systématiquement que les portefeuilles incluant une allocation bien dimensionnée à ${keyword} surperforment de 2.8% à 4.3% annuellement les portefeuilles comparables sans cette exposition.
-
-## 2. Due diligence approfondie et critères de sélection
-
-L'univers de ${keyword} étant vaste et hétérogène, une méthodologie rigoureuse de sélection s'impose:
-
-### Analyse fondamentale multi-dimensionnelle
-* **Avantage concurrentiel durable**: Évaluez la proposition de valeur unique et les barrières à l'entrée
-* **Équipe dirigeante**: Background, track record et alignement des intérêts
-* **Modèle économique**: Scalabilité, récurrence des revenus et marges structurelles
-* **Gouvernance**: Transparence, processus décisionnels et gestion des risques
-
-### Analyse quantitative et valorisation
-* **Multiples comparatifs**: EV/EBITDA, P/E, P/S ajustés au secteur et à la croissance
-* **DCF ajusté au risque**: Utilisation de taux d'actualisation différenciés selon la maturité du projet
-* **Valorisation des actifs intangibles**: Méthodologie propriétaire pour évaluer la propriété intellectuelle et l'avantage technologique
-
-J'ai développé un framework de scoring qui agrège ces dimensions en un indice composite. Les opportunités dans ${keyword} obtenant un score supérieur à 75/100 ont généré un alpha annualisé de 11.2% sur 3 ans dans mon portefeuille.
-
-## 3. Stratégies d'allocation et de timing adaptées à ${keyword}
-
-La réussite avec ${keyword} repose largement sur l'exécution tactique:
-
-### Stratégies d'entrée optimisées
-* **Cost Averaging stratégique**: Contrairement au DCA classique, utilisez un modèle pondéré par la volatilité
-* **Investissement contra-cyclique**: Allocations accrues lors des phases de correction substantielles (-30% ou plus)
-* **Stratification temporelle**: Divisez votre allocation cible en tranches d'investissement sur 6-18 mois
-
-### Construction de position prudente
-* Débutez avec 25-30% de votre allocation cible
-* Augmentez progressivement pendant les phases de consolidation
-* Atteignez 100% de votre allocation seulement après validation des hypothèses fondamentales
-
-Mon expérience avec ${keyword} m'a appris que la patience et la discipline dans la construction des positions peuvent améliorer le rendement ajusté au risque de 20-35% par rapport aux stratégies d'allocation linéaires.
-
-## 4. Gestion active des risques et couverture
-
-La volatilité inhérente à ${keyword} nécessite un dispositif robuste de gestion des risques:
-
-### Outils de limitation des pertes
-* **Stop-loss dynamiques**: Ajustés selon la volatilité historique (typiquement 2-2.5x l'ATR)
-* **Options de protection**: Puts stratégiques sur les indices sectoriels pertinents
-* **Couvertures croisées**: Positions compensatoires sur des actifs négativement corrélés
-
-### Diversification intra-classe d'actifs
-* Allocation entre différentes sous-catégories de ${keyword}
-* Équilibre entre actifs établis et opportunités émergentes
-* Répartition géographique tenant compte des environnements réglementaires
-
-Une gestion des risques bien exécutée dans ${keyword} ne vise pas seulement à limiter les pertes, mais aussi à préserver le capital psychologique. Dans ma pratique, j'observe que les investisseurs ayant implémenté ces stratégies maintiennent leur exposition pendant les périodes de turbulence, évitant ainsi le piège comportemental classique de vendre au plus bas.
-
-## 5. Optimisation fiscale et structuration patrimoniale
-
-L'efficience fiscale peut considérablement amplifier le rendement net de ${keyword}:
-
-### Véhicules d'investissement optimisés
-* **Comptes fiscalement avantageux**: PEA, Assurance-vie, PER selon votre juridiction
-* **Structures corporate**: Holdings, SCIs ou SPVs pour les allocations substantielles
-* **Dispositifs de défiscalisation**: Réduction d'impôt pour certaines catégories de ${keyword}
-
-### Planification successorale
-* Anticipation de la transmission avec minimisation des droits
-* Structuration pour la protection des actifs
-* Documentation complète pour faciliter la gestion par les héritiers
-
-Dans mon expérience de conseil en gestion de patrimoine, une structuration optimisée peut générer un gain d'efficience fiscale de 15-28% sur le long terme pour les investissements dans ${keyword}.`;
-      break;
-      
-    case 'technologie':
-      answer += `# Exploiter pleinement le potentiel de ${keyword} dans votre entreprise : Guide d'implémentation stratégique
-
-Après avoir accompagné plus de 75 entreprises dans leur transformation numérique et l'adoption de ${keyword}, je partage ici une méthodologie éprouvée pour maximiser le ROI de cette technologie tout en minimisant les risques d'implémentation.
-
-## 1. Fondements stratégiques et analyse préliminaire
-
-Avant toute implémentation de ${keyword}, une phase d'analyse approfondie est indispensable:
-
-* **Audit technologique complet**: Cartographiez votre infrastructure existante, identifiez les dépendances et les potentiels points de friction
-* **Analyse des processus métier**: Documentez les workflows actuels que ${keyword} pourrait optimiser ou transformer
-* **Évaluation de maturité numérique**: Mesurez objectivement la préparation de votre organisation à l'adoption de ${keyword}
-* **Benchmark sectoriel**: Analysez comment vos concurrents et leaders du secteur utilisent cette technologie
-
-J'ai développé une matrice d'évaluation qui quantifie le potentiel de ${keyword} selon cinq dimensions: efficience opérationnelle, expérience client, avantage concurrentiel, réduction des risques et scalabilité. Cette analyse préliminaire permet d'identifier précisément où ${keyword} générera le plus de valeur.
-
-Pour un client du secteur manufacturier, cette approche a permis d'isoler trois processus clés où ${keyword} pouvait générer un ROI de 457% sur trois ans, concentrant ainsi les efforts sur les domaines à plus fort impact.
-
-## 2. Architecture d'implémentation et feuille de route
-
-Une implémentation réussie de ${keyword} repose sur une architecture cohérente et une séquence optimisée:
-
-### Architecture technique recommandée
-* **Infrastructure modulaire**: Privilégiez une approche par microservices pour faciliter les évolutions futures
-* **Interfaces ouvertes**: Assurez l'interopérabilité via des APIs standardisées
-* **Sécurité by design**: Intégrez les considérations de cybersécurité dès la conception
-* **Scalabilité horizontale**: Dimensionnez l'architecture pour absorber la croissance sans refonte majeure
-
-### Méthodologie de déploiement progressif
-1. **Prototype fonctionnel** (4-6 semaines): Version minimale démontrant la valeur principale
-2. **Pilote ciblé** (2-3 mois): Déploiement limité à un département ou processus spécifique
-3. **Expansion contrôlée** (3-6 mois): Extension progressive à d'autres unités avec ajustements continus
-4. **Déploiement complet** (6-12 mois): Généralisation avec optimisation continue
-
-Cette approche séquentielle réduit considérablement les risques. Dans mon expérience, 72% des échecs d'implémentation de ${keyword} résultent d'un déploiement trop rapide sans validation progressive.
-
-## 3. Intégration aux écosystèmes existants et optimisation des workflows
-
-L'un des plus grands défis de ${keyword} est son intégration harmonieuse à votre environnement technologique actuel:
-
-### Stratégies d'intégration éprouvées
-* **Cartographie des flux de données**: Identifiez tous les points d'échange entre ${keyword} et vos systèmes existants
-* **Middleware adaptatif**: Implémentez une couche d'intégration flexible plutôt que des connexions point-à-point
-* **Automatisation des processus**: Utilisez des outils RPA ou d'orchestration pour fluidifier les transitions entre systèmes
-* **Monitoring end-to-end**: Établissez une visibilité complète sur les chaînes de traitement intégrées
-
-### Refonte intelligente des processus métier
-* Évitez de simplement numériser des processus inefficients
-* Repensez les workflows en exploitant pleinement les capacités de ${keyword}
-* Supprimez les étapes redondantes et les validations non essentielles
-* Automatisez les décisions routinières tout en préservant l'intervention humaine sur les cas complexes
-
-Lors d'un projet d'implémentation de ${keyword} pour une institution financière, cette approche d'intégration a permis de réduire les temps de traitement de 78% et d'améliorer l'exactitude des données de 94%.
-
-## 4. Gestion du changement et adoption utilisateur
-
-La technologie la plus puissante échoue sans une adoption effective par les utilisateurs:
-
-### Programme structuré d'adoption
-* **Communication multicanale**: Articulez clairement la vision et les bénéfices de ${keyword} pour chaque groupe d'utilisateurs
-* **Formation différenciée**: Adaptez le contenu et le format selon les profils et niveaux de compétence
-* **Champions internes**: Identifiez et formez des promoteurs dans chaque département
-* **Mécanismes de feedback**: Instaurez des canaux pour recueillir et adresser rapidement les difficultés rencontrées
-
-### Indicateurs d'adoption à surveiller
-* Taux d'utilisation active (quotidienne/hebdomadaire)
-* Temps passé sur les nouvelles fonctionnalités
-* Réduction des demandes d'assistance après la période initiale
-* Satisfaction utilisateur mesurée régulièrement
-
-D'après mon expérience avec plus de 50 déploiements de ${keyword}, les organisations investissant au moins 15% du budget total dans la gestion du changement obtiennent un taux d'adoption supérieur de 62% et un ROI amélioré de 43%.
-
-## 5. Mesure d'impact et optimisation continue
-
-Le succès à long terme de ${keyword} repose sur un cycle d'amélioration continue:
-
-### Framework de mesure d'impact
-* **KPIs stratégiques**: Alignés sur les objectifs business initiaux (réduction des coûts, amélioration qualité, croissance)
-* **Métriques opérationnelles**: Indicateurs de performance des processus optimisés
-* **Indicateurs techniques**: Disponibilité, performance, sécurité et conformité
-* **ROI multidimensionnel**: Valeur tangible et intangible, directe et indirecte
-
-### Processus d'optimisation continue
-* Audits réguliers d'utilisation et de performance
-* Collecte structurée des retours utilisateurs
-* Veille technologique sur les évolutions de ${keyword}
-* Cycles d'amélioration trimestriels avec feuille de route évolutive
-
-Pour un groupe de distribution ayant implémenté ${keyword}, ce cadre d'optimisation continue a permis d'augmenter la valeur générée de 27% supplémentaires après la phase initiale de déploiement.`;
-      break;
-      
-    // Cas par défaut
-    default:
-      answer += `# Optimisation de votre expérience avec ${keyword} : Guide complet et stratégies avancées
-
-Après plus d'une décennie d'expérience avec ${keyword} et l'accompagnement de nombreux professionnels dans ce domaine, je souhaite partager une approche structurée pour maximiser votre efficacité et vos résultats.
-
-## 1. Fondamentaux et principes directeurs
-
-Pour tirer pleinement parti de ${keyword}, il est essentiel de comprendre les principes qui sous-tendent son fonctionnement optimal:
-
-* **Approche systémique**: ${keyword} doit être considéré comme un écosystème interconnecté plutôt qu'un outil isolé
-* **Cohérence stratégique**: Alignez votre utilisation de ${keyword} avec vos objectifs globaux à court, moyen et long terme
-* **Amélioration itérative**: Adoptez une méthodologie d'optimisation continue plutôt qu'une approche "set and forget"
-* **Mesurabilité intégrée**: Établissez dès le départ des indicateurs clairs pour évaluer l'efficacité de vos actions
-
-Dans ma pratique professionnelle, j'ai constaté que les organisations qui formalisent ces principes avant de se lancer pleinement dans ${keyword} obtiennent en moyenne un ROI supérieur de 37% par rapport à celles qui adoptent une approche plus improvisée.
-
-## 2. Méthodologie d'implémentation structurée
-
-Une implémentation réussie de ${keyword} suit généralement ces étapes clés:
-
-### Phase 1: Analyse et préparation (4-6 semaines)
-* Audit complet de la situation actuelle
-* Définition précise des objectifs et KPIs
-* Identification des ressources nécessaires
-* Cartographie des parties prenantes et de leurs attentes
-
-### Phase 2: Déploiement pilote (6-8 semaines)
-* Mise en œuvre à échelle réduite
-* Collection et analyse des données initiales
-* Ajustements basés sur les premiers retours
-* Documentation des apprentissages clés
-
-### Phase 3: Déploiement complet (2-3 mois)
-* Extension progressive à l'ensemble du périmètre cible
-* Formation approfondie des utilisateurs
-* Intégration aux processus existants
-* Établissement de mécanismes de support
-
-### Phase 4: Optimisation continue (cyclique)
-* Analyse régulière des performances
-* Benchmarking avec les meilleures pratiques sectorielles
-* Exploration des fonctionnalités avancées
-* Innovation et expérimentation contrôlée
-
-Cette méthodologie séquentielle réduit significativement les risques d'échec. Lors de mes interventions en tant que consultant, j'ai observé que 68% des problèmes rencontrés avec ${keyword} découlent d'une mise en œuvre précipitée sans respecter ces phases essentielles.
-
-## 3. Stratégies avancées d'optimisation
-
-Au-delà des pratiques standard, voici des stratégies différenciantes pour ${keyword}:
-
-### Personnalisation contextuelle
-* Adaptez l'utilisation de ${keyword} à votre contexte spécifique plutôt que d'appliquer des modèles génériques
-* Développez des configurations sur mesure en fonction de vos processus uniques
-* Construisez progressivement un écosystème personnalisé autour de ${keyword}
-
-### Intégration stratégique
-* Connectez ${keyword} à vos autres outils et flux de travail
-* Automatisez les transitions et échanges de données entre systèmes
-* Créez des tableaux de bord unifiés pour une vision holistique
-
-### Approche data-driven
-* Instrumentez votre utilisation de ${keyword} pour collecter des données pertinentes
-* Analysez régulièrement ces données pour identifier des patterns et opportunités
-* Prenez des décisions d'optimisation basées sur ces insights plutôt que sur des impressions
-
-Un client dans le secteur des services professionnels a vu sa productivité augmenter de 41% en six mois après avoir implémenté ces stratégies avancées pour ${keyword}.
-
-## 4. Formation et adoption utilisateur
-
-Le facteur humain représente souvent le déterminant principal du succès de ${keyword}:
-
-### Programme de formation multi-niveaux
-* **Niveau fondamental**: Principes de base et fonctionnalités essentielles
-* **Niveau intermédiaire**: Workflows optimisés et configurations avancées
-* **Niveau expert**: Personnalisation poussée et résolution de problèmes complexes
-
-### Stratégies d'adoption éprouvées
-* Identifiez et formez des "champions" internes qui serviront d'ambassadeurs
-* Créez une bibliothèque de ressources facilement accessibles (tutoriels, FAQ, guides)
-* Instaurez des sessions régulières de partage de bonnes pratiques
-* Reconnaissez et récompensez les utilisateurs exemplaires
-
-### Gestion de la résistance au changement
-* Anticipez les objections et préparez des réponses adaptées
-* Démontrez rapidement des "quick wins" pour construire l'adhésion
-* Impliquez les utilisateurs dans le processus d'amélioration continue
-* Communiquez régulièrement sur les succès et progrès réalisés
-
-D'après mon expérience, les organisations qui investissent au moins 15% du budget total de ${keyword} dans la formation et l'accompagnement au changement obtiennent un taux d'adoption supérieur de 73% et un ROI global amélioré de 58%.
-
-## 5. Mesure d'impact et amélioration continue
-
-La pérennité des bénéfices de ${keyword} repose sur un cycle vertueux d'évaluation et d'amélioration:
-
-### Framework d'évaluation complet
-* **Métriques d'utilisation**: Adoption, fréquence d'utilisation, profondeur d'engagement
-* **Indicateurs d'efficacité**: Gain de temps, réduction des erreurs, amélioration qualitative
-* **Impact business**: Conversion en valeur financière, ROI, contribution aux objectifs stratégiques
-* **Benchmark évolutif**: Comparaison avec l'état initial et les standards du secteur
-
-### Processus d'amélioration structuré
-* Revues trimestrielles approfondies basées sur les données collectées
-* Sessions d'idéation impliquant utilisateurs et parties prenantes
-* Priorisation des améliorations selon leur impact potentiel et leur facilité d'implémentation
-* Cycles d'implémentation courts avec validation rapide des bénéfices
-
-Cette approche systématique a permis à une entreprise du secteur technologique d'augmenter progressivement la valeur générée par ${keyword} de 23% par an sur trois années consécutives.`;
-      break;
-  }
-
-  answer += `
-
-${format.conclusion}
-• Prenez le temps de bien vous informer avant de prendre des décisions concernant ${keyword}
-• Testez différentes approches et documentez vos résultats pour optimiser votre stratégie
-• N'hésitez pas à demander conseil à des experts spécialisés dans ${keyword}
-• Restez à jour avec les dernières évolutions et tendances dans le domaine de ${keyword}
-
-J'espère que ces conseils vous aideront à tirer le meilleur parti de ${keyword}. N'hésitez pas à me poser des questions spécifiques pour approfondir certains points.`;
-
-  // Générer des topics basés sur le mot-clé et la catégorie
-  const topicsByCategory = {
-    voyage: [
-      keyword,
-      `Conseils voyage ${keyword}`,
-      `Guide ${keyword}`,
-      `Astuces ${keyword}`,
-      `Planification ${keyword}`,
-      `Budget ${keyword}`,
-      `Expérience ${keyword}`
-    ],
-    seo: [
-      keyword,
-      `Stratégie ${keyword}`,
-      `Optimisation ${keyword}`,
-      `Techniques ${keyword}`,
-      `Analyse ${keyword}`,
-      `Outils ${keyword}`,
-      `ROI ${keyword}`
-    ],
-    marketing: [
-      keyword,
-      `Stratégie ${keyword}`,
-      `ROI ${keyword}`,
-      `Analyse ${keyword}`,
-      `Tendances ${keyword}`,
-      `Outils ${keyword}`,
-      `Case studies ${keyword}`
-    ],
-    santé: [
-      keyword,
-      `Bienfaits ${keyword}`,
-      `Protocole ${keyword}`,
-      `Recherche ${keyword}`,
-      `Applications ${keyword}`,
-      `Méthodes ${keyword}`,
-      `Prévention santé`
-    ],
-    finance: [
-      keyword,
-      `Investissement ${keyword}`,
-      `Stratégie ${keyword}`,
-      `Optimisation ${keyword}`,
-      `Analyse ${keyword}`,
-      `Rendement ${keyword}`,
-      `Risques ${keyword}`
-    ],
-    technologie: [
-      keyword,
-      `Implémentation ${keyword}`,
-      `Solutions ${keyword}`,
-      `Innovation ${keyword}`,
-      `Intégration ${keyword}`,
-      `Adoption ${keyword}`,
-      `ROI technologique`
-    ],
-    général: [
-      keyword,
-      `Guide ${keyword}`,
-      `Méthodes ${keyword}`,
-      `Optimisation ${keyword}`,
-      `Stratégie ${keyword}`,
-      `Analyse ${keyword}`,
-      `Applications ${keyword}`
-    ]
-  };
-
-  const generatedTopics = topics || topicsByCategory[category] || [
-    keyword,
-    `Guide ${keyword}`,
-    `Conseils ${keyword}`,
-    `Stratégie ${keyword}`,
-    `Optimisation ${keyword}`
-  ];
-
   return {
     title,
     question,
@@ -816,3 +57,315 @@ J'espère que ces conseils vous aideront à tirer le meilleur parti de ${keyword
     topics: generatedTopics
   };
 };
+
+/**
+ * Identifie la catégorie principale du mot-clé
+ */
+const identifyCategory = (keyword: string): string => {
+  keyword = keyword.toLowerCase();
+  
+  // Catégories principales et mots-clés associés
+  const categories = {
+    voyage: ['voyage', 'voyager', 'destination', 'hotel', 'trip', 'tourisme', 'vacances', 'séjour', 'avion', 'visiter'],
+    marketing: ['seo', 'marketing', 'digital', 'référencement', 'publicité', 'ads', 'contenu', 'stratégie', 'marque', 'audience'],
+    sante: ['santé', 'médecine', 'bien-être', 'nutrition', 'exercice', 'régime', 'maladie', 'symptômes', 'médecin', 'médical'],
+    finance: ['finance', 'investissement', 'bourse', 'argent', 'épargne', 'banque', 'crédit', 'budget', 'immobilier', 'impôts'],
+    tech: ['technologie', 'informatique', 'logiciel', 'application', 'développement', 'programmation', 'intelligence artificielle', 'ia', 'web', 'mobile'],
+    education: ['éducation', 'apprentissage', 'école', 'université', 'formation', 'cours', 'diplôme', 'étudiant', 'enseignement', 'professeur']
+  };
+  
+  // Vérifier à quelle catégorie le mot-clé appartient
+  for (const [category, keywords] of Object.entries(categories)) {
+    if (keywords.some(k => keyword.includes(k))) {
+      return category;
+    }
+  }
+  
+  // Par défaut, retourner marketing si aucune correspondance
+  return 'marketing';
+};
+
+/**
+ * Génère une question pertinente basée sur le mot-clé et sa catégorie
+ */
+const generateQuestion = (keyword: string, category: string): string => {
+  const templates = {
+    voyage: [
+      `Quelles sont les meilleures façons de ${keyword} en 2024 ?`,
+      `Comment optimiser son expérience de ${keyword} avec un budget limité ?`,
+      `Quels sont les secrets que les professionnels du ${keyword} ne vous révèlent pas ?`,
+      `Quelles destinations recommandez-vous pour ${keyword} en famille ?`,
+      `Comment préparer efficacement un ${keyword} de longue durée ?`
+    ],
+    marketing: [
+      `Quelles sont les stratégies les plus efficaces pour ${keyword} en 2024 ?`,
+      `Comment mesurer précisément le ROI de mes actions de ${keyword} ?`,
+      `Quels outils recommandez-vous pour optimiser le ${keyword} ?`,
+      `Comment se démarquer de la concurrence grâce au ${keyword} ?`,
+      `Quelles erreurs éviter absolument en ${keyword} ?`
+    ],
+    sante: [
+      `Quels sont les derniers avancements scientifiques concernant ${keyword} ?`,
+      `Comment améliorer son ${keyword} naturellement ?`,
+      `Quels aliments recommandez-vous pour optimiser ${keyword} ?`,
+      `Quels sont les mythes les plus répandus sur ${keyword} ?`,
+      `Comment intégrer ${keyword} dans sa routine quotidienne ?`
+    ],
+    finance: [
+      `Quelles stratégies d'investissement recommandez-vous pour ${keyword} en 2024 ?`,
+      `Comment optimiser fiscalement ses ${keyword} ?`,
+      `Quels sont les risques à considérer avant de ${keyword} ?`,
+      `Comment constituer un portefeuille diversifié pour ${keyword} ?`,
+      `Quelles sont les erreurs à éviter absolument en matière de ${keyword} ?`
+    ],
+    tech: [
+      `Quelles sont les innovations récentes en matière de ${keyword} ?`,
+      `Comment intégrer ${keyword} dans sa stratégie d'entreprise ?`,
+      `Quels outils recommandez-vous pour optimiser ${keyword} ?`,
+      `Comment se former efficacement au ${keyword} en 2024 ?`,
+      `Quels sont les défis éthiques posés par ${keyword} ?`
+    ],
+    education: [
+      `Quelles méthodes sont les plus efficaces pour ${keyword} ?`,
+      `Comment optimiser son ${keyword} à distance ?`,
+      `Quels outils recommandez-vous pour améliorer ${keyword} ?`,
+      `Comment personnaliser ${keyword} selon les besoins individuels ?`,
+      `Quels sont les avantages du ${keyword} par rapport aux méthodes traditionnelles ?`
+    ]
+  };
+  
+  // Sélectionner aléatoirement une question dans la catégorie appropriée
+  const categoryTemplates = templates[category as keyof typeof templates] || templates.marketing;
+  const randomIndex = Math.floor(Math.random() * categoryTemplates.length);
+  return categoryTemplates[randomIndex];
+};
+
+/**
+ * Génère un titre accrocheur pour la réponse Quora
+ */
+const generateTitle = (keyword: string, category: string): string => {
+  const templates = {
+    voyage: [
+      `${keyword} : Guide Complet par un Expert du Voyage`,
+      `Les 5 Secrets d'un ${keyword} Réussi que Personne ne Vous Dit`,
+      `Comment J'ai Transformé Mon Approche du ${keyword} (et Comment Vous Pouvez le Faire Aussi)`,
+      `${keyword} : Conseils d'un Voyageur Ayant Visité Plus de 50 Pays`,
+      `Le Guide Définitif pour ${keyword} en 2024`
+    ],
+    marketing: [
+      `${keyword} : Stratégies Éprouvées par un Expert en Marketing Digital`,
+      `Comment J'ai Multiplié par 3 les Résultats de ${keyword} de Mes Clients`,
+      `${keyword} : Les Techniques Avancées que 90% des Marketers Ignorent`,
+      `Guide Scientifique pour Optimiser Votre ${keyword} en 2024`,
+      `Analyse de 100+ Campagnes de ${keyword} : Voici Ce Qui Fonctionne Vraiment`
+    ],
+    sante: [
+      `${keyword} : Ce que 20 Ans de Pratique Médicale M'ont Appris`,
+      `La Vérité Scientifique sur ${keyword} que Votre Médecin Ne Vous Dit Pas`,
+      `Comment J'ai Transformé Ma Santé Grâce à ${keyword} : Guide Complet`,
+      `${keyword} : Approche Holistique Basée sur les Dernières Recherches`,
+      `Les 7 Principes Fondamentaux de ${keyword} pour une Santé Optimale`
+    ],
+    finance: [
+      `${keyword} : Stratégies d'un Conseiller Financier avec 15+ Ans d'Expérience`,
+      `Comment J'ai Construit un Patrimoine Grâce à ${keyword} (et Comment Vous Pouvez le Faire)`,
+      `${keyword} : Les Principes que les Institutions Financières Ne Veulent Pas que Vous Connaissiez`,
+      `Guide Pratique pour Optimiser Vos ${keyword} en Période d'Incertitude`,
+      `Analyse de 200+ Portefeuilles : Les Meilleures Pratiques pour ${keyword}`
+    ],
+    tech: [
+      `${keyword} : Perspectives d'un Développeur Senior avec 12+ Ans d'Expérience`,
+      `Comment ${keyword} Transforme l'Industrie en 2024 : Analyse Approfondie`,
+      `Guide Technique Complet sur ${keyword} pour les Professionnels`,
+      `Comment J'ai Implémenté ${keyword} dans 30+ Entreprises avec Succès`,
+      `Les Avancées Révolutionnaires en ${keyword} que Vous Devez Connaître`
+    ],
+    education: [
+      `${keyword} : Perspectives d'un Éducateur avec 20+ Ans d'Expérience`,
+      `Comment J'ai Révolutionné ${keyword} dans Mon Établissement`,
+      `${keyword} : Approche Basée sur les Neurosciences et l'Apprentissage Efficace`,
+      `Guide Complet pour Optimiser ${keyword} à Tout Âge`,
+      `Les Méthodes Innovantes de ${keyword} qui Transforment l'Éducation`
+    ]
+  };
+  
+  // Sélectionner aléatoirement un titre dans la catégorie appropriée
+  const categoryTemplates = templates[category as keyof typeof templates] || templates.marketing;
+  const randomIndex = Math.floor(Math.random() * categoryTemplates.length);
+  return categoryTemplates[randomIndex];
+};
+
+/**
+ * Génère une réponse détaillée basée sur le mot-clé, la catégorie et le style
+ */
+const generateDetailedAnswer = (keyword: string, category: string, style: string): string => {
+  // Structure de base pour toutes les réponses
+  let answer = "";
+  
+  // Introduction personnalisée selon le style
+  if (style === 'professional') {
+    answer += `En tant que professionnel spécialisé dans le domaine de ${keyword} depuis plus de 10 ans, je souhaite partager une analyse détaillée basée sur des données concrètes et mon expertise dans le secteur.\n\n`;
+  } else if (style === 'conversational') {
+    answer += `Ah, ${keyword}! C'est un sujet qui me passionne depuis longtemps. Laissez-moi vous partager mon expérience et quelques conseils utiles que j'ai appris au fil des années.\n\n`;
+  } else if (style === 'expert') {
+    answer += `Après avoir consacré plus de 15 ans à l'étude et à la pratique de ${keyword}, et publié plusieurs articles de recherche sur le sujet, permettez-moi de vous offrir une analyse approfondie basée sur les données les plus récentes.\n\n`;
+  } else if (style === 'storytelling') {
+    answer += `Je me souviens encore du jour où j'ai découvert l'importance cruciale de ${keyword}. C'était en 2018, alors que je travaillais sur un projet qui semblait impossible à réaliser. Cette expérience a complètement transformé ma vision et aujourd'hui, je souhaite vous partager ce parcours et les leçons précieuses que j'en ai tirées.\n\n`;
+  }
+  
+  // Ajouter du contenu spécifique à la catégorie
+  answer += getCategorySpecificContent(keyword, category);
+  
+  // Ajouter une section sur les erreurs courantes
+  answer += `\n\n## Les erreurs courantes à éviter concernant ${keyword}\n\n`;
+  answer += getCommonMistakesContent(keyword, category);
+  
+  // Ajouter une section sur les tendances actuelles
+  answer += `\n\n## Tendances actuelles et évolutions futures de ${keyword}\n\n`;
+  answer += getCurrentTrendsContent(keyword, category);
+  
+  // Conclusion adaptée au style
+  if (style === 'professional') {
+    answer += `\n\n## Conclusion\n\nEn définitive, ${keyword} représente un aspect fondamental qui nécessite une approche stratégique et méthodique. Les données montrent clairement que les organisations qui investissent judicieusement dans ce domaine obtiennent des résultats significativement supérieurs à leurs concurrents. Je vous encourage à appliquer ces principes et à suivre attentivement l'évolution des tendances mentionnées précédemment.\n\nN'hésitez pas à me contacter si vous avez des questions plus spécifiques sur certains aspects abordés dans cette réponse.`;
+  } else if (style === 'conversational') {
+    answer += `\n\n## Pour finir\n\nVoilà, j'espère que ces informations vous aideront dans votre parcours avec ${keyword}! J'ai partagé ce qui a fonctionné pour moi et pour beaucoup d'autres, mais n'oubliez pas que chaque situation est unique. Adaptez ces conseils à votre contexte spécifique et n'hésitez pas à expérimenter. On apprend souvent plus de nos erreurs que de nos succès, alors lancez-vous!\n\nSi vous avez d'autres questions, je suis là pour y répondre. Bonne chance dans votre aventure!`;
+  } else if (style === 'expert') {
+    answer += `\n\n## Conclusion et perspectives\n\nAu terme de cette analyse approfondie de ${keyword}, il apparaît évident que nous sommes à un moment charnière dans l'évolution de ce domaine. Les données empiriques et les études de cas convergent vers la nécessité d'une approche holistique intégrant les multiples dimensions évoquées précédemment. Les organisations qui sauront implémenter ces principes avec rigueur et adaptabilité bénéficieront d'un avantage concurrentiel significatif.\n\nJe reste à disposition pour approfondir tout aspect spécifique qui retiendrait particulièrement votre attention.`;
+  } else if (style === 'storytelling') {
+    answer += `\n\n## Ce que j'ai appris\n\nMon parcours avec ${keyword} m'a enseigné que derrière chaque défi se cache une opportunité de croissance. Les obstacles que j'ai rencontrés se sont transformés en tremplins vers de nouvelles perspectives et solutions innovantes. Aujourd'hui, je regarde en arrière avec gratitude pour ces difficultés qui ont forgé ma compréhension actuelle.\n\nJe vous encourage à voir votre propre voyage avec ${keyword} comme une histoire en construction, où chaque chapitre, même les plus difficiles, contribue à enrichir votre expérience. N'hésitez pas à partager votre propre parcours dans les commentaires – les échanges d'expériences sont souvent sources des plus grands apprentissages.`;
+  }
+  
+  return answer;
+};
+
+/**
+ * Génère du contenu spécifique à la catégorie
+ */
+const getCategorySpecificContent = (keyword: string, category: string): string => {
+  switch (category) {
+    case 'voyage':
+      return `## Les fondamentaux de ${keyword}\n\nLorsqu'on aborde le sujet de ${keyword}, il est essentiel de comprendre que la planification est la clé du succès. Mes années d'expérience en tant que consultant en voyages m'ont appris que 78% des problèmes rencontrés pendant un séjour auraient pu être évités avec une préparation adéquate.\n\n1. **Recherche approfondie** - Consacrez au moins 10-15 heures à rechercher votre destination avant de finaliser votre itinéraire. Explorez non seulement les attractions principales, mais aussi les quartiers moins touristiques qui offrent souvent des expériences plus authentiques.\n\n2. **Budget réaliste** - Selon une étude récente du Travel Institute, les voyageurs sous-estiment généralement leurs dépenses de 23%. Je recommande d'ajouter une marge de 30% à votre budget initial pour couvrir les imprévus et les opportunités spontanées.\n\n3. **Documentation et assurances** - Assurez-vous d'avoir tous les documents nécessaires (passeport, visas, permis internationaux) et une assurance voyage complète. Une bonne assurance doit couvrir les frais médicaux, les annulations et les perturbations de voyage.\n\n## Optimisation de l'expérience de ${keyword}\n\nAprès avoir accompagné plus de 500 clients dans leurs voyages à travers le monde, j'ai identifié plusieurs facteurs qui transforment un simple séjour en une expérience mémorable:\n\n1. **Immersion culturelle** - Participez à des ateliers locaux, apprenez quelques phrases dans la langue locale, et privilégiez les restaurants fréquentés par les habitants plutôt que les chaînes internationales.\n\n2. **Équilibre entre planification et spontanéité** - Structurez environ 60% de votre itinéraire et laissez 40% à la découverte spontanée. Cette approche permet de profiter des attractions principales tout en restant ouvert aux découvertes inattendues.\n\n3. **Technologie au service du voyage** - Utilisez des applications comme Maps.me pour la navigation hors ligne, XE pour les conversions de devises en temps réel, et Google Lens pour la traduction instantanée des menus et panneaux.\n\n4. **Connexion avec les locaux** - Envisagez des plateformes comme Couchsurfing ou Meetup pour rencontrer des habitants qui peuvent vous offrir une perspective unique sur leur ville ou région.`;
+
+    case 'marketing':
+      return `## Les principes fondamentaux de ${keyword}\n\nAprès avoir analysé plus de 200 campagnes de marketing digital et travaillé avec des entreprises de toutes tailles, je peux affirmer que le succès en ${keyword} repose sur quelques principes fondamentaux:\n\n1. **Connaissance approfondie de l'audience** - Les données montrent que les campagnes basées sur une segmentation précise de l'audience génèrent un ROI supérieur de 38% à celles qui utilisent une approche généraliste. Investissez dans la création de personas détaillés et dans l'analyse comportementale.\n\n2. **Contenu de valeur** - Selon Content Marketing Institute, les entreprises qui privilégient la qualité du contenu sur la quantité voient un engagement 2,5 fois supérieur. Chaque contenu doit répondre à une question précise ou résoudre un problème spécifique de votre audience.\n\n3. **Approche data-driven** - L'intuition est importante, mais les décisions basées sur des données solides sont 5 fois plus susceptibles d'aboutir à des résultats positifs. Mettez en place un système d'analyse robuste et prenez l'habitude d'évaluer régulièrement vos KPIs.\n\n## Stratégies avancées pour optimiser ${keyword}\n\nVoici les techniques qui distinguent les experts des amateurs dans le domaine de ${keyword}:\n\n1. **Attribution multi-touch** - Abandonnez les modèles d'attribution simplistes et adoptez une approche qui reconnaît l'ensemble du parcours client. Les modèles algorithmiques comme l'attribution basée sur les chaînes de Markov offrent une vision plus précise de l'impact de chaque point de contact.\n\n2. **Personnalisation dynamique** - Les études démontrent que la personnalisation peut augmenter les taux de conversion de 20% et le revenu par utilisateur de 15%. Implémentez des systèmes qui adaptent automatiquement le contenu en fonction du comportement et des préférences de l'utilisateur.\n\n3. **Intégration des canaux** - La cohérence entre les différents canaux de communication n'est plus optionnelle. Une stratégie omnicanale bien exécutée peut augmenter la valeur vie client de 30% selon une étude de McKinsey.\n\n4. **Tests A/B systématiques** - Les entreprises qui testent régulièrement leurs hypothèses marketing obtiennent un ROI 2x supérieur sur leurs campagnes. Développez une culture d'expérimentation continue au sein de votre équipe.`;
+
+    case 'sante':
+      return `## Les fondements scientifiques de ${keyword}\n\nEn tant que professionnel de la santé spécialisé dans ${keyword}, j'ai constaté que de nombreuses idées reçues circulent sur ce sujet. Permettez-moi de clarifier les aspects scientifiques essentiels:\n\n1. **Base physiologique** - Les recherches publiées dans le Journal of Medical Sciences démontrent que ${keyword} implique des mécanismes biologiques complexes, notamment les voies métaboliques et les systèmes endocriniens. Une compréhension de ces mécanismes est fondamentale pour une approche efficace.\n\n2. **Facteurs génétiques et environnementaux** - Selon une méta-analyse de 2023 portant sur 84 études, les facteurs génétiques influencent ${keyword} à hauteur de 30-40%, tandis que les facteurs environnementaux et comportementaux représentent 60-70% de l'équation.\n\n3. **Approche holistique nécessaire** - Les données cliniques montrent que les interventions ciblant uniquement un aspect de ${keyword} ont un taux de réussite limité à 35%, alors que les approches holistiques atteignent des taux de 70-85%.\n\n## Stratégies basées sur les preuves pour optimiser ${keyword}\n\nVoici les interventions qui ont démontré leur efficacité dans des études contrôlées randomisées:\n\n1. **Nutrition personnalisée** - Une alimentation adaptée aux besoins individuels peut améliorer les marqueurs de ${keyword} de 42% en moyenne. Privilégiez les aliments non transformés, riches en nutriments essentiels comme les acides gras oméga-3, les antioxydants et les phytonutriments.\n\n2. **Activité physique structurée** - L'exercice régulier, adapté à votre condition, améliore ${keyword} de manière significative. Les études montrent qu'un minimum de 150 minutes d'activité modérée par semaine est nécessaire, mais les bénéfices augmentent jusqu'à 300 minutes hebdomadaires.\n\n3. **Gestion du stress chronique** - Le stress chronique peut compromettre ${keyword} via plusieurs mécanismes inflammatoires et hormonaux. Les techniques de réduction du stress comme la méditation, la cohérence cardiaque et la thérapie cognitivo-comportementale ont démontré des améliorations mesurables sur les biomarqueurs liés à ${keyword}.\n\n4. **Sommeil réparateur** - Les perturbations du sommeil sont fortement corrélées à une détérioration de ${keyword}. Optimisez votre environnement de sommeil, maintenez des horaires réguliers et limitez l'exposition aux écrans avant le coucher.`;
+
+    case 'finance':
+      return `## Principes fondamentaux de ${keyword}\n\nAprès avoir conseillé plus de 300 clients et géré des portefeuilles totalisant plus de 50 millions d'euros, j'ai identifié les principes intemporels qui gouvernent le succès en matière de ${keyword}:\n\n1. **Allocation d'actifs stratégique** - Les études démontrent que l'allocation d'actifs détermine plus de 90% de la performance à long terme d'un portefeuille. La diversification entre les classes d'actifs (actions, obligations, immobilier, alternatifs) reste le moyen le plus efficace de gérer le risque.\n\n2. **Discipline et perspective à long terme** - Les investisseurs qui conservent leurs positions pendant les périodes de volatilité obtiennent des rendements supérieurs de 4 à 5% par an par rapport à ceux qui tentent de "timer" le marché. Le temps passé sur le marché est plus important que le timing d'entrée et de sortie.\n\n3. **Minimisation des coûts** - Chaque point de pourcentage payé en frais réduit significativement les rendements composés sur le long terme. Une différence de 1% en frais peut représenter une réduction de patrimoine de plus de 25% sur 30 ans.\n\n## Stratégies avancées pour optimiser ${keyword}\n\nVoici les approches qui distinguent les investisseurs avertis dans le domaine de ${keyword}:\n\n1. **Diversification internationale intelligente** - Ne vous limitez pas à votre marché domestique. Les données montrent qu'une exposition globale réduit la volatilité du portefeuille tout en offrant des opportunités de croissance additionnelles. Cependant, soyez attentif aux corrélations qui augmentent en période de crise.\n\n2. **Stratégies fiscales optimisées** - L'optimisation fiscale légale peut augmenter le rendement net de 1-2% annuellement. Utilisez pleinement les enveloppes fiscales disponibles (PEA, Assurance-vie, etc.) et structurez vos investissements pour minimiser l'impact fiscal.\n\n3. **Facteurs de style et investissement systématique** - Les recherches académiques ont identifié plusieurs "facteurs" qui génèrent des rendements ajustés au risque supérieurs sur le long terme: valeur, taille, momentum, qualité et volatilité faible. Intégrez ces facteurs dans votre stratégie d'investissement.\n\n4. **Rééquilibrage discipliné** - Le rééquilibrage régulier de votre portefeuille vers votre allocation cible peut générer un rendement supplémentaire de 0,5% par an tout en contrôlant le risque. Établissez un calendrier fixe ou des seuils de déviation pour déclencher le rééquilibrage.`;
+
+    case 'tech':
+      return `## Fondamentaux de ${keyword} pour les professionnels\n\nAprès avoir dirigé des équipes techniques et implémenté ${keyword} dans plus de 20 entreprises, je peux affirmer que la compréhension des principes fondamentaux est essentielle:\n\n1. **Architecture et conception systémique** - La qualité d'un système repose davantage sur son architecture que sur ses composants individuels. Une architecture bien conçue pour ${keyword} doit privilégier la scalabilité, la maintenabilité et la résilience dès le départ.\n\n2. **Approche DevOps intégrée** - Les organisations qui ont adopté une culture DevOps mature pour ${keyword} déploient 200 fois plus fréquemment, avec des temps de récupération 24 fois plus rapides et des taux d'échec 3 fois inférieurs, selon le rapport DORA.\n\n3. **Sécurité by design** - Intégrer la sécurité dès les premières phases de conception coûte 6 fois moins cher que de l'ajouter après le développement. Implémentez des pratiques comme le threat modeling et les tests de sécurité automatisés dans votre pipeline.\n\n## Stratégies avancées pour ${keyword}\n\nVoici les approches qui distinguent les implémentations exceptionnelles de ${keyword}:\n\n1. **Architecture en microservices bien pensée** - Les microservices offrent une agilité inégalée, mais introduisent une complexité opérationnelle. Définissez clairement les limites de vos domaines métier et assurez-vous que chaque service respecte le principe de responsabilité unique.\n\n2. **Infrastructure as Code (IaC)** - L'automatisation de l'infrastructure via des outils comme Terraform ou CloudFormation réduit les erreurs de 50 à 70% et accélère les déploiements de 97%. Traitez votre infrastructure comme du code, avec versionnement, tests et revues.\n\n3. **Observabilité multi-dimensionnelle** - Au-delà de la simple surveillance, l'observabilité combine logs, métriques et traces pour fournir une compréhension complète du système. Implémentez des outils comme OpenTelemetry pour standardiser la collecte de données d'observabilité.\n\n4. **Continuous Experimentation** - Les plateformes technologiques les plus innovantes utilisent des techniques comme les feature flags et les tests A/B pour valider les hypothèses en production avec un risque minimal. Cette approche permet d'itérer rapidement et de prendre des décisions basées sur des données réelles.`;
+
+    case 'education':
+      return `## Principes pédagogiques fondamentaux pour ${keyword}\n\nAprès plus de deux décennies d'expérience dans le domaine éducatif et l'analyse de centaines de méthodes d'apprentissage, j'ai identifié les principes qui sous-tendent l'efficacité de ${keyword}:\n\n1. **Apprentissage actif** - Les recherches en neurosciences cognitives démontrent que l'engagement actif dans le processus d'apprentissage améliore la rétention de 50 à 90% par rapport à l'apprentissage passif. Privilégiez les méthodologies qui placent l'apprenant au centre du processus.\n\n2. **Feedback immédiat et formatif** - Le feedback rapide et constructif accélère l'apprentissage de 20 à 30% selon les études. Implémentez des systèmes d'évaluation formative qui permettent aux apprenants d'identifier rapidement leurs erreurs et de s'adapter.\n\n3. **Espacement et récupération active** - La pratique espacée (distributed practice) et la récupération active (retrieval practice) sont deux des techniques d'apprentissage les plus efficaces selon la recherche cognitive. Intégrez des révisions systématiques espacées dans le temps plutôt que du "bourrage de crâne".\n\n## Méthodologies innovantes pour optimiser ${keyword}\n\nVoici les approches qui transforment l'efficacité de ${keyword} dans les contextes éducatifs modernes:\n\n1. **Personnalisation adaptative** - Les plateformes d'apprentissage qui utilisent l'IA pour adapter le contenu aux besoins individuels montrent des gains d'apprentissage de 30% par rapport aux approches standardisées. Utilisez des outils qui permettent différents parcours d'apprentissage selon les profils.\n\n2. **Apprentissage par projet et par problème** - Ces approches augmentent la motivation intrinsèque et développent des compétences transversales essentielles comme la pensée critique et la collaboration. Les données montrent que les étudiants formés avec ces méthodes sont 2,5 fois plus susceptibles de transférer leurs connaissances à de nouveaux contextes.\n\n3. **Intégration des neurosciences** - Les méthodes qui s'appuient sur notre compréhension du fonctionnement cérébral optimisent l'apprentissage. Par exemple, l'intégration d'activités physiques brèves entre les sessions d'étude peut améliorer la concentration et la mémorisation de 15-20%.\n\n4. **Communautés d'apprentissage** - L'apprentissage social et collaboratif renforce la motivation et la persévérance. Créez des espaces d'échange et de co-construction des savoirs, qu'ils soient physiques ou virtuels.`;
+
+    default:
+      return `## Les principes fondamentaux de ${keyword}\n\nAprès avoir travaillé dans ce domaine pendant plus d'une décennie, j'ai identifié les éléments clés qui font la différence:\n\n1. **Approche stratégique** - Une vision claire et des objectifs précis sont essentiels pour réussir dans le domaine de ${keyword}. Les organisations qui définissent des indicateurs de performance spécifiques obtiennent des résultats 37% supérieurs à celles qui travaillent sans métriques claires.\n\n2. **Adaptation continue** - Le marché évolue rapidement, et la capacité à pivoter en fonction des nouvelles données est cruciale. Les entreprises agiles qui réévaluent leur stratégie de ${keyword} trimestriellement surpassent leurs concurrents de 25% en termes de croissance.\n\n3. **Investissement dans la formation** - Les équipes qui bénéficient d'une formation continue sur les dernières tendances et techniques de ${keyword} génèrent un ROI 3 fois supérieur à celles qui n'investissent pas dans le développement des compétences.\n\n## Stratégies avancées pour optimiser ${keyword}\n\nVoici les approches qui distinguent les leaders dans le domaine de ${keyword}:\n\n1. **Analyse prédictive** - L'utilisation d'algorithmes avancés pour anticiper les tendances du marché permet de prendre des décisions proactives plutôt que réactives. Les organisations qui exploitent efficacement les données prédictives augmentent leur efficacité de ${keyword} de 42%.\n\n2. **Personnalisation à grande échelle** - Les technologies actuelles permettent une personnalisation sans précédent. Les campagnes hautement personnalisées génèrent des taux d'engagement 5 à 8 fois supérieurs aux approches génériques.\n\n3. **Intégration omnicanale** - Une stratégie cohérente à travers tous les points de contact crée une expérience fluide qui renforce l'efficacité de ${keyword}. Les entreprises avec une intégration omnicanale solide retiennent en moyenne 89% de leurs clients, contre seulement 33% pour celles avec une présence fragmentée.\n\n4. **Éthique et transparence** - Dans un monde où la confiance est une monnaie précieuse, les pratiques éthiques en matière de ${keyword} ne sont plus optionnelles. Les organisations perçues comme transparentes et éthiques bénéficient d'une fidélité client 3,5 fois supérieure.`;
+  }
+};
+
+/**
+ * Génère du contenu sur les erreurs courantes
+ */
+const getCommonMistakesContent = (keyword: string, category: string): string => {
+  switch (category) {
+    case 'voyage':
+      return `1. **Surplanification** - Trop structurer chaque journée empêche de profiter des découvertes spontanées qui font souvent les meilleurs souvenirs de voyage. Laissez de l'espace pour l'imprévu.\n\n2. **Négliger l'assurance voyage** - Économiser sur l'assurance peut coûter extrêmement cher en cas de problème. Un rapatriement médical depuis l'Asie peut coûter jusqu'à 100 000€ sans assurance adéquate.\n\n3. **Sous-estimer les différences culturelles** - Se renseigner sur les coutumes locales n'est pas seulement une question de respect, c'est aussi une protection contre les malentendus potentiellement problématiques.\n\n4. **Dépendance excessive à la technologie** - Prévoyez toujours des plans alternatifs en cas de panne de batterie ou d'absence de connexion. Avoir une carte physique et quelques phrases essentielles dans la langue locale peut faire toute la différence.`;
+      
+    case 'marketing':
+      return `1. **Négliger la stratégie au profit des tactiques** - Trop d'organisations se précipitent sur les dernières tendances sans s'assurer qu'elles s'alignent avec leurs objectifs globaux. Une tactique brillante sans alignement stratégique est vouée à l'échec.\n\n2. **Ignorer l'importance des tests** - Fonder ses décisions uniquement sur l'intuition ou les "meilleures pratiques" sans tester leur efficacité dans votre contexte spécifique peut mener à des investissements inefficaces.\n\n3. **Obsession des métriques vaniteuses** - Se concentrer sur des indicateurs comme le nombre de followers ou de likes au détriment des métriques d'impact business (conversion, rétention, LTV) détourne l'attention des véritables objectifs.\n\n4. **Négliger l'expérience utilisateur** - Un contenu brillant perdra tout son impact s'il est présenté dans une expérience utilisateur médiocre. La vitesse de chargement, la navigation et l'accessibilité sont des fondamentaux non négociables.`;
+      
+    case 'sante':
+      return `1. **Suivre les tendances plutôt que la science** - Les modes en matière de santé vont et viennent, mais la science évolue par accumulation de preuves. Privilégiez les approches validées par des études rigoureuses plutôt que les dernières tendances médiatisées.\n\n2. **Adopter une approche "taille unique"** - Chaque organisme est unique, et ce qui fonctionne parfaitement pour une personne peut être inefficace pour une autre. La personnalisation est essentielle.\n\n3. **Chercher des solutions rapides** - Les transformations durables en matière de santé nécessitent du temps et de la constance. Les approches promettant des résultats rapides conduisent généralement à des cycles d'échec et de frustration.\n\n4. **Négliger la santé mentale** - Le lien entre santé physique et mentale est bidirectionnel et puissant. Une approche holistique intégrant le bien-être psychologique est indispensable pour des résultats optimaux.`;
+      
+    case 'finance':
+      return `1. **Suivre l'actualité financière quotidienne** - La surexposition aux nouvelles financières conduit souvent à des décisions émotionnelles préjudiciables. Les investisseurs qui consultent leurs portefeuilles quotidiennement obtiennent des rendements inférieurs de 3% en moyenne.\n\n2. **Timing du marché** - Tenter de prédire les mouvements à court terme du marché est statistiquement voué à l'échec. Même les professionnels échouent systématiquement à battre les indices sur le long terme avec cette approche.\n\n3. **Négliger l'inflation et les frais** - Ces deux facteurs peuvent éroder silencieusement la valeur réelle de votre patrimoine. Un investissement qui génère 7% brut avec 2% de frais et 3% d'inflation ne produit que 2% de rendement réel.\n\n4. **Concentration excessive** - Trop concentrer ses investissements expose à un risque non rémunéré. Diversifiez non seulement entre les classes d'actifs, mais aussi géographiquement et sectoriellement.`;
+      
+    case 'tech':
+      return `1. **Adoption de technologies sans analyse des besoins** - Intégrer une technologie parce qu'elle est tendance plutôt que parce qu'elle répond à un besoin spécifique est une erreur coûteuse. Commencez toujours par comprendre le problème à résoudre.\n\n2. **Négliger la dette technique** - Ignorer la dette technique pour gagner du temps à court terme peut multiplier par 4 à 5 le coût de maintenance à long terme. Établissez une stratégie délibérée de gestion de la dette technique.\n\n3. **Surcomplexité architecturale** - Adopter des architectures complexes (comme les microservices) sans en maîtriser les implications opérationnelles peut paralyser le développement. La simplicité reste une vertu fondamentale en ingénierie.\n\n4. **Ignorer l'expérience utilisateur** - La technologie la plus avancée échouera si elle n'est pas utilisable. Intégrez les principes d'UX et d'accessibilité dès les premières phases de conception.`;
+      
+    case 'education':
+      return `1. **Privilégier le contenu sur la pédagogie** - L'expertise dans un domaine ne garantit pas la capacité à transmettre efficacement ces connaissances. Les méthodes pédagogiques sont aussi importantes que le contenu lui-même.\n\n2. **Ignorer les différences individuelles** - Les apprenants ont des profils cognitifs, des intérêts et des contextes variés. Une approche standardisée limite significativement l'efficacité de l'apprentissage.\n\n3. **Négliger la motivation intrinsèque** - Les systèmes éducatifs qui reposent exclusivement sur la motivation extrinsèque (notes, récompenses, punitions) limitent le développement d'un amour durable pour l'apprentissage.\n\n4. **Sous-estimer l'importance de l'application pratique** - La capacité à appliquer des connaissances dans des contextes réels est l'objectif ultime de l'éducation. Sans opportunités d'application concrète, même les connaissances bien mémorisées restent inertes.`;
+      
+    default:
+      return `1. **Se concentrer sur les tendances plutôt que sur les fondamentaux** - Les principes fondamentaux de ${keyword} restent relativement stables, alors que les tendances sont éphémères. Maîtrisez d'abord les bases avant de suivre les dernières modes.\n\n2. **Négliger l'analyse des données** - Prendre des décisions basées uniquement sur l'intuition plutôt que sur les données disponibles peut mener à des erreurs coûteuses. Investissez dans des outils d'analyse adaptés à votre contexte.\n\n3. **Imiter la concurrence sans adaptation** - Ce qui fonctionne pour une organisation peut être totalement inadapté pour une autre. Analysez les stratégies concurrentes, mais adaptez-les à votre situation spécifique.\n\n4. **Ignorer le feedback des utilisateurs/clients** - Les données quantitatives doivent être complétées par des insights qualitatifs provenant directement de votre audience. Mettez en place des mécanismes systématiques de collecte et d'analyse du feedback.`;
+  }
+};
+
+/**
+ * Génère du contenu sur les tendances actuelles
+ */
+const getCurrentTrendsContent = (keyword: string, category: string): string => {
+  switch (category) {
+    case 'voyage':
+      return `1. **Tourisme régénératif** - Au-delà du tourisme durable, le tourisme régénératif vise à laisser les destinations dans un meilleur état qu'avant la visite. Cette tendance gagne du terrain avec 76% des voyageurs se déclarant prêts à payer plus pour des expériences qui contribuent positivement aux communautés locales.\n\n2. **Nomadisme digital** - Accéléré par la pandémie, ce mode de vie continue de se développer avec l'apparition de visas spécifiques dans plus de 40 pays. Les infrastructures s'adaptent rapidement avec une augmentation de 200% des espaces de coworking dans les destinations touristiques.\n\n3. **Technologies immersives** - La réalité augmentée et virtuelle transforme l'expérience avant, pendant et après le voyage. Des applications permettent désormais d'explorer virtuellement des destinations avant de réserver, ou d'enrichir l'expérience sur place avec des informations contextuelles.\n\n4. **Voyages transformationnels** - De plus en plus de voyageurs cherchent des expériences qui les transforment personnellement. Les retraites de bien-être, les voyages d'apprentissage et les séjours immersifs dans des communautés locales connaissent une croissance annuelle de 20%.`;
+      
+    case 'marketing':
+      return `1. **Marketing conversationnel et IA générative** - L'intégration de chatbots avancés et d'IA générative transforme l'engagement client. Les entreprises utilisant ces technologies voient une augmentation de 35% du taux de conversion et une réduction de 40% des coûts de service client.\n\n2. **Zero-party data** - Face aux restrictions croissantes sur les cookies tiers, les stratégies de collecte de données fournies volontairement par les utilisateurs (zero-party data) deviennent essentielles. Les marques développent des expériences interactives qui incitent les utilisateurs à partager leurs préférences.\n\n3. **Commerce social intégré** - L'achat directement via les plateformes sociales connaît une croissance exponentielle, avec une augmentation de 35% par an. L'intégration du shopping en direct (livestream shopping) ajoute une dimension d'engagement et d'urgence qui stimule les conversions.\n\n4. **Durabilité et valeurs de marque** - 83% des millennials privilégient les marques alignées avec leurs valeurs. La transparence sur l'impact environnemental et social devient un différenciateur majeur, au-delà d'un simple argument marketing.`;
+      
+    case 'sante':
+      return `1. **Médecine de précision** - L'intégration des données génomiques, du microbiome et des biomarqueurs permet une personnalisation sans précédent des approches thérapeutiques et préventives. Cette tendance révolutionne particulièrement l'oncologie et la nutrition personnalisée.\n\n2. **Télémédecine avancée** - Au-delà des simples consultations vidéo, nous voyons émerger des plateformes intégrant des dispositifs connectés, de l'IA diagnostique et des interventions à distance. La croissance annuelle de ce secteur est estimée à 38% jusqu'en 2025.\n\n3. **Santé numérique préventive** - Les wearables et applications évoluent vers des systèmes capables de détecter les signaux précoces de problèmes de santé. Des études montrent que ces technologies peuvent identifier certaines conditions jusqu'à 14 jours avant l'apparition des symptômes cliniques.\n\n4. **Approches intégratives basées sur les données** - L'intégration des médecines traditionnelles et complémentaires avec la médecine conventionnelle, guidée par des données probantes, gagne en légitimité. Les hôpitaux universitaires de renom développent de plus en plus de départements dédiés à ces approches.`;
+      
+    case 'finance':
+      return `1. **Finance décentralisée et tokenisation** - Au-delà des cryptomonnaies, la blockchain transforme l'infrastructure financière traditionnelle. La tokenisation des actifs réels (immobilier, art, infrastructures) devrait représenter un marché de 16 trillions de dollars d'ici 2030.\n\n2. **Investissement à impact** - Le marché de l'investissement ESG et à impact atteint désormais 30 trillions de dollars et continue de croître. Les données montrent que ces investissements peuvent générer des rendements comparables ou supérieurs aux approches traditionnelles.\n\n3. **Intelligence artificielle et finance comportementale** - Les institutions financières déploient des solutions d'IA qui identifient les biais comportementaux des investisseurs et proposent des interventions correctrices. Ces systèmes améliorent les performances des portefeuilles de 1,5 à 3% annuellement.\n\n4. **Banking as a Service (BaaS) et super-apps** - Les infrastructures financières deviennent des plateformes ouvertes sur lesquelles se construisent des expériences intégrées. Les entreprises non-financières intègrent désormais des services financiers directement dans leurs écosystèmes.`;
+      
+    case 'tech':
+      return `1. **IA générative industrialisée** - Après la phase d'expérimentation, nous entrons dans l'ère de l'industrialisation de l'IA générative. Les entreprises développent des architectures robustes pour intégrer ces capacités dans leurs produits et processus, avec des applications dans la création de contenu, le développement logiciel et l'automatisation avancée.\n\n2. **Edge computing et IA embarquée** - Le traitement des données à la périphérie du réseau, au plus près des capteurs et appareils, transforme les possibilités d'applications en temps réel. Cette tendance est particulièrement importante pour l'IoT industriel, la mobilité autonome et les wearables avancés.\n\n3. **Informatique quantique accessible** - Les services d'informatique quantique dans le cloud démocratisent l'accès à cette technologie révolutionnaire. Des cas d'usage pratiques émergent dans l'optimisation logistique, la découverte de médicaments et la cryptographie post-quantique.\n\n4. **Développement piloté par l'IA** - Les outils d'assistance au développement basés sur l'IA transforment la productivité des équipes techniques. Les premiers adoptants rapportent des gains de productivité de 30 à 50%, permettant aux développeurs de se concentrer sur des tâches à plus haute valeur ajoutée.`;
+      
+    case 'education':
+      return `1. **Micro-credentials et apprentissage modulaire** - Face à l'évolution rapide des compétences requises, les formations courtes et ciblées gagnent en popularité. Les entreprises reconnaissent de plus en plus ces certifications comme complémentaires aux diplômes traditionnels.\n\n2. **Apprentissage hybride optimisé** - Après les expérimentations forcées pendant la pandémie, nous voyons émerger des modèles hybrides sophistiqués qui combinent le meilleur du présentiel et du distanciel. Ces approches augmentent l'engagement de 40% par rapport aux formats traditionnels.\n\n3. **Éducation basée sur les compétences** - Le passage d'un système basé sur le temps (crédits, heures) à un système basé sur la maîtrise des compétences transforme l'éducation supérieure et professionnelle. Cette approche réduit le temps nécessaire à l'obtention des qualifications de 30 à 50%.\n\n4. **Technologies immersives pour l'apprentissage expérientiel** - La réalité virtuelle et augmentée permet des expériences d'apprentissage impossibles ou coûteuses dans le monde réel. Ces technologies montrent des améliorations de 28% dans la rétention des connaissances et de 20% dans les performances de compétences pratiques.`;
+      
+    default:
+      return `1. **Intégration de l'intelligence artificielle** - L'IA transforme rapidement le paysage de ${keyword}, offrant des capacités d'analyse, de personnalisation et d'automatisation sans précédent. Les organisations qui intègrent efficacement l'IA constatent une amélioration de 35% des indicateurs de performance clés.\n\n2. **Approches centrées sur l'humain** - Paradoxalement, à mesure que la technologie progresse, l'importance de l'élément humain dans ${keyword} s'accentue. Les stratégies qui placent l'expérience utilisateur et les besoins humains au centre de leur développement surpassent les approches purement techniques.\n\n3. **Durabilité et responsabilité** - Les considérations environnementales et éthiques ne sont plus optionnelles dans ${keyword}. 76% des consommateurs privilégient désormais les organisations qui démontrent un engagement concret en matière de durabilité.\n\n4. **Écosystèmes collaboratifs** - Les modèles traditionnels cèdent la place à des approches écosystémiques où différentes organisations, parfois concurrentes, collaborent pour créer plus de valeur. Ces partenariats stratégiques permettent d'accéder à de nouvelles ressources et marchés.`;
+  }
+};
+
+/**
+ * Génère du contenu supplémentaire pour atteindre le nombre de mots minimum
+ */
+const generateAdditionalContent = (keyword: string, category: string, style: string): string => {
+  let additionalContent = `\n\n## Questions fréquemment posées sur ${keyword}\n\n`;
+  
+  // Ajouter quelques questions/réponses selon la catégorie
+  switch (category) {
+    case 'voyage':
+      additionalContent += `### Comment optimiser son budget pour ${keyword}?\n\nOptimiser son budget pour ${keyword} nécessite une planification stratégique. Voici mes conseils basés sur l'accompagnement de centaines de voyageurs:\n\n1. **Réservation anticipée vs dernière minute** - Réservez les vols 2-3 mois à l'avance pour les meilleures offres, mais attendez parfois la dernière semaine pour les hôtels, surtout en basse saison.\n\n2. **Cartes et applications spécialisées** - Utilisez des cartes bancaires sans frais à l'étranger et des applications comme Trail Wallet pour suivre vos dépenses en temps réel.\n\n3. **Transport local** - Privilégiez les transports en commun et envisagez des passes touristiques multi-jours qui incluent transport et attractions.\n\n4. **Alimentation flexible** - Alternez entre restaurants locaux authentiques, marchés alimentaires et quelques repas préparés par vous-même pour une expérience variée sans exploser votre budget.\n\n### Comment gérer les imprévus pendant ${keyword}?\n\nLes imprévus font partie intégrante de l'expérience de voyage. Voici comment les transformer en opportunités:\n\n1. **Assurance complète** - Souscrivez une assurance qui couvre l'annulation, les soins médicaux, les évacuations et les perturbations de voyage.\n\n2. **Fonds d'urgence** - Conservez environ 20% de votre budget total comme coussin de sécurité pour les imprévus.\n\n3. **Documentation numérique et physique** - Gardez des copies numériques et physiques de vos documents essentiels stockées séparément.\n\n4. **Flexibilité mentale** - Cultivez une attitude adaptative qui vous permet de voir les changements d'itinéraire comme des aventures plutôt que des contrariétés.`;
+      break;
+      
+    case 'marketing':
+      additionalContent += `### Comment mesurer précisément le ROI de ${keyword}?\n\nLa mesure du ROI de ${keyword} reste un défi pour de nombreuses organisations. Voici une approche structurée basée sur mon travail avec plus de 50 entreprises:\n\n1. **Définition claire des conversions** - Établissez une hiérarchie de conversions, des micro-conversions (inscription à une newsletter) aux macro-conversions (achat). Attribuez une valeur économique à chaque type de conversion.\n\n2. **Modèles d'attribution avancés** - Dépassez l'attribution au dernier clic en implémentant des modèles plus sophistiqués comme l'attribution basée sur les données ou les modèles algorithmiques.\n\n3. **Coûts totaux vs directs** - Intégrez non seulement les coûts directs mais aussi les coûts indirects comme le temps des équipes internes, les outils et technologies, et les coûts d'opportunité.\n\n4. **Valeur vie client (LTV)** - Pour une vision complète, considérez la valeur à long terme générée par vos efforts de ${keyword}, pas uniquement les conversions immédiates.\n\n### Comment adapter sa stratégie de ${keyword} à l'ère post-cookie?\n\nLa disparition progressive des cookies tiers transforme radicalement l'écosystème du marketing digital. Voici comment s'adapter efficacement:\n\n1. **Construction d'actifs propriétaires** - Développez activement votre base de données propriétaire via l'email marketing, les programmes de fidélité et les communautés engagées.\n\n2. **Stratégies contextuelle et sémantique** - Réorientez une partie de vos investissements vers le ciblage contextuel et sémantique, qui cible les environnements pertinents plutôt que les individus spécifiques.\n\n3. **Identifiants universels et clean rooms** - Explorez les solutions émergentes comme les identifiants universels (UID 2.0) et les data clean rooms qui permettent des collaborations sécurisées autour des données.\n\n4. **Tests et mesure multicanale** - Développez des méthodologies de test robustes pour évaluer l'efficacité de vos canaux marketing sans dépendre des cookies tiers pour l'attribution.`;
+      break;
+      
+    default:
+      additionalContent += `### Question 1: Quels sont les outils les plus efficaces pour optimiser ${keyword}?\n\nLe choix des outils pour ${keyword} dépend de vos objectifs spécifiques et de votre contexte, mais voici une sélection des solutions les plus performantes selon mon expérience:\n\n1. **Outils d'analyse et de reporting** - Des plateformes comme X, Y et Z offrent des capacités d'analyse avancées qui permettent de transformer les données brutes en insights actionnables. Ces outils sont particulièrement efficaces pour identifier les tendances et optimiser les performances.\n\n2. **Solutions d'automatisation** - L'automatisation des processus répétitifs peut augmenter l'efficacité de vos initiatives de ${keyword} de 40 à 60%. Les plateformes A et B se distinguent par leur facilité d'intégration et leur flexibilité.\n\n3. **Plateformes collaboratives** - Dans un environnement de plus en plus distribué, des outils comme C et D facilitent la collaboration entre équipes et permettent un partage efficace des connaissances et des ressources.\n\n4. **Technologies émergentes** - L'intelligence artificielle et l'apprentissage automatique transforment rapidement le domaine de ${keyword}. Les solutions E et F offrent des capacités prédictives qui peuvent donner un avantage concurrentiel significatif.\n\n### Question 2: Comment développer une stratégie de ${keyword} sur le long terme?\n\nDévelopper une stratégie durable pour ${keyword} nécessite une approche systématique:\n\n1. **Analyse de la situation actuelle** - Commencez par un audit complet de votre position actuelle, incluant une analyse SWOT, une évaluation de la concurrence et une revue des performances passées.\n\n2. **Définition d'objectifs SMART** - Établissez des objectifs Spécifiques, Mesurables, Atteignables, Pertinents et Temporellement définis qui s'alignent avec votre vision organisationnelle globale.\n\n3. **Développement de scénarios** - Préparez différents scénarios (optimiste, réaliste, pessimiste) pour anticiper les évolutions potentielles du marché et adapter votre stratégie en conséquence.\n\n4. **Cycles d'itération planifiés** - Intégrez des revues stratégiques régulières (trimestrielles et annuelles) pour ajuster votre approche en fonction des résultats et des changements dans l'environnement externe.\n\n5. **Gestion du changement** - N'oubliez pas que l'implémentation d'une stratégie de ${keyword} implique souvent des changements organisationnels. Développez un plan de gestion du changement pour faciliter l'adoption et minimiser la résistance.`;
+  }
+  
+  return additionalContent;
+};
+
+/**
+ * Génère des sujets pertinents pour la question Quora
+ */
+const generateTopics = (keyword: string, category: string): string[] => {
+  const commonTopics = ["Conseils d'Experts", "Guide Pratique", "Astuces Professionnelles"];
+  
+  const categoryTopics: {[key: string]: string[]} = {
+    voyage: ["Voyage", "Tourisme", "Conseils de Voyage", "Destinations", "Voyage International"],
+    marketing: ["Marketing Digital", "SEO", "Stratégie Marketing", "Content Marketing", "Publicité En Ligne"],
+    sante: ["Santé", "Bien-être", "Nutrition", "Médecine", "Fitness"],
+    finance: ["Finance Personnelle", "Investissement", "Épargne", "Planification Financière", "Économie"],
+    tech: ["Technologie", "Développement Logiciel", "Intelligence Artificielle", "Informatique", "Innovation"],
+    education: ["Éducation", "Apprentissage", "Pédagogie", "Formation", "Développement Personnel"]
+  };
+  
+  // Combiner les sujets communs avec les sujets spécifiques à la catégorie
+  const specificTopics = categoryTopics[category] || categoryTopics.marketing;
+  const allTopics = [...commonTopics, ...specificTopics, keyword];
+  
+  // Sélectionner aléatoirement 5 sujets
+  const shuffledTopics = allTopics.sort(() => 0.5 - Math.random());
+  return shuffledTopics.slice(0, 5);
+};
+

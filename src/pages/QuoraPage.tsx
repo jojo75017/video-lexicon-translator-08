@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import QuoraButton from "@/components/seo/buttons/QuoraButton";
-import { PageHeader } from "@/components/dashboard/PageHeader";
 import { Separator } from "@/components/ui/separator";
 import { Rocket, MessageSquareText, Sparkles, Users, TrendingUp, Award } from "lucide-react";
 
@@ -13,16 +12,30 @@ const QuoraPage = () => {
     <div className="flex flex-col min-h-screen bg-background">
       <div className="flex-1">
         <div className="container py-6">
-          <PageHeader 
-            heading="Assistant Quora" 
-            subheading="Créez du contenu optimisé pour Quora et augmentez votre autorité en ligne"
-            icon={<MessageSquareText className="h-6 w-6 text-[#b92b27]" />}
-          />
+          <div className="mb-8">
+            <div className="flex items-center gap-2">
+              <MessageSquareText className="h-6 w-6 text-[#b92b27]" />
+              <h1 className="text-2xl font-bold tracking-tight">Assistant Quora</h1>
+            </div>
+            <p className="text-muted-foreground mt-1">
+              Créez du contenu optimisé pour Quora et augmentez votre autorité en ligne
+            </p>
+          </div>
           
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold">Créer du contenu pour Quora</h2>
             <div className="flex gap-2">
               <QuoraButton />
+            </div>
+          </div>
+          
+          <div className="bg-[#b92b27]/10 p-4 rounded-lg border border-[#b92b27]/20 mb-6">
+            <div className="flex items-start gap-3">
+              <Sparkles className="h-5 w-5 text-[#b92b27] mt-1" />
+              <div>
+                <h3 className="font-semibold">Nouveau : Contenu de 500+ mots</h3>
+                <p className="text-sm">Notre générateur produit maintenant des réponses Quora détaillées de plus de 500 mots, avec des références, des exemples concrets et une structure optimisée pour maximiser l'engagement.</p>
+              </div>
             </div>
           </div>
           
