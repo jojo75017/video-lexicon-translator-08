@@ -44,28 +44,16 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
   const structureData = data?.headings ? data : getStructureData();
   console.log("Using structure data:", structureData);
 
-  const handleInfoClick = () => {
-    console.log("Info tab clicked");
-    setActiveTab("info");
-  };
-
-  const handleSourceClick = () => {
-    console.log("Source tab clicked");
-    setActiveTab("source");
-  };
-
-  const handleStructureClick = () => {
-    console.log("Structure tab clicked");
-    setActiveTab("structure");
-  };
+  if (!data) {
+    return null;
+  }
 
   return (
-    <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+    <Tabs defaultValue="info" value={activeTab} onValueChange={handleTabChange} className="w-full">
       <TabsList className="w-full grid grid-cols-3 bg-muted/50 p-1 rounded-lg">
         <TabsTrigger 
           value="info"
           className="flex-1 py-2.5 font-medium rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800"
-          onClick={handleInfoClick}
         >
           <Search className="w-4 h-4 mr-2" />
           Informations
@@ -73,7 +61,6 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
         <TabsTrigger 
           value="source"
           className="flex-1 py-2.5 font-medium rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800"
-          onClick={handleSourceClick}
         >
           <Code className="w-4 h-4 mr-2" />
           Code Source
@@ -81,7 +68,6 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
         <TabsTrigger 
           value="structure"
           className="flex-1 py-2.5 font-medium rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800"
-          onClick={handleStructureClick}
         >
           <ListTree className="w-4 h-4 mr-2" />
           Structure
@@ -109,13 +95,13 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
                     <div 
                       key={index} 
                       className={`py-1.5 px-3 rounded-md ${
-                        heading.level === 1 ? 'bg-blue-50 font-bold ml-0' : 
-                        heading.level === 2 ? 'bg-blue-50/60 font-semibold ml-4' : 
-                        heading.level === 3 ? 'bg-blue-50/30 ml-8' : 
+                        heading.level === "h1" ? 'bg-blue-50 font-bold ml-0' : 
+                        heading.level === "h2" ? 'bg-blue-50/60 font-semibold ml-4' : 
+                        heading.level === "h3" ? 'bg-blue-50/30 ml-8' : 
                         'bg-gray-50 ml-12'
                       }`}
                     >
-                      {`H${heading.level}: ${heading.text}`}
+                      {`${heading.level.toUpperCase()}: ${heading.text}`}
                     </div>
                   ))
                 ) : (

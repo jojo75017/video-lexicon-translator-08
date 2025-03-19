@@ -249,7 +249,7 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
             twitterImage: null
           },
           contentQuality: {
-            readingTime: 78,
+            readingTime: 10,
             complexity: 65,
             uniqueness: 80
           },
@@ -588,7 +588,7 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
         twitterImage: null
       },
       contentQuality: {
-        readingTime: 78,
+        readingTime: 10,
         complexity: 65,
         uniqueness: 80
       },

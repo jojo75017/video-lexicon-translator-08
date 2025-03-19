@@ -42,6 +42,10 @@ const SeoAnalysisForm = ({
     e.preventDefault();
     e.stopPropagation();
     console.log("SeoAnalysisForm submit");
+    if (!url) {
+      toast.error("Veuillez entrer une URL valide");
+      return;
+    }
     analyzeSite();
   };
 
@@ -49,6 +53,10 @@ const SeoAnalysisForm = ({
     e.preventDefault();
     e.stopPropagation();
     console.log("Analyze button clicked manually");
+    if (!url) {
+      toast.error("Veuillez entrer une URL valide");
+      return;
+    }
     analyzeSite();
   };
 
@@ -60,6 +68,17 @@ const SeoAnalysisForm = ({
     toast.success("Proxy CORS activé", {
       description: "Vous pouvez maintenant analyser des sites externes"
     });
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (!url) {
+        toast.error("Veuillez entrer une URL valide");
+        return;
+      }
+      analyzeSite();
+    }
   };
 
   return (
@@ -81,6 +100,7 @@ const SeoAnalysisForm = ({
             placeholder="https://exemple.com"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
+            onKeyPress={handleKeyPress}
             className="w-full"
           />
         </div>
@@ -129,6 +149,27 @@ const SeoAnalysisForm = ({
           >
             <Shield className="mr-2 h-4 w-4" />
             Activer le proxy CORS
+          </Button>
+        </div>
+      )}
+      
+      {error && error.includes("Failed to fetch") && !showCorsWarning && (
+        <div className="mt-4 bg-red-50 p-4 rounded-md border border-red-200">
+          <h3 className="font-medium text-red-800 mb-2 flex items-center">
+            <AlertCircle className="h-4 w-4 mr-2" />
+            Erreur de connexion
+          </h3>
+          <p className="text-red-700 mb-3">
+            Impossible de se connecter au site demandé. Vérifiez que l'URL est correcte et que le site est accessible.
+          </p>
+          <Button 
+            variant="outline" 
+            onClick={handleProxyClick}
+            type="button"
+            className="bg-blue-100 text-blue-800 border-blue-300 hover:bg-blue-200"
+          >
+            <Shield className="mr-2 h-4 w-4" />
+            Essayer avec le proxy CORS
           </Button>
         </div>
       )}

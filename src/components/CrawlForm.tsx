@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useToast } from "@/components/ui/use-toast"; 
 import { FirecrawlService } from '@/utils/FirecrawlService';
 import { Card } from "@/components/ui/card";
@@ -29,6 +29,16 @@ export const CrawlForm = () => {
   const [showCorsWarning, setShowCorsWarning] = useState(false);
   const [isForbiddenError, setIsForbiddenError] = useState(false);
 
+  useEffect(() => {
+    console.log("CrawlForm rendering with crawlResult:", !!crawlResult);
+    if (crawlResult) {
+      console.log("CrawlResult data exists:", !!crawlResult.data);
+      if (crawlResult.data) {
+        console.log("First data item exists:", !!crawlResult.data[0]);
+      }
+    }
+  }, [crawlResult]);
+
   const handleActivateProxy = () => {
     console.log("Activating proxy in CrawlForm");
     FirecrawlService.enableProxy();
@@ -44,6 +54,14 @@ export const CrawlForm = () => {
     toast("Redirection vers CORS demo", {
       description: "Activez le service de démo, puis revenez ici",
     });
+  };
+
+  const reset = () => {
+    setCrawlResult(null);
+    setHasPerformedAnalysis(false);
+    setShowCorsWarning(false);
+    setIsForbiddenError(false);
+    setProgress(0);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -69,10 +87,8 @@ export const CrawlForm = () => {
     
     setIsLoading(true);
     setProgress(0);
-    setCrawlResult(null);
+    reset();
     setHasPerformedAnalysis(true);
-    setShowCorsWarning(false);
-    setIsForbiddenError(false);
 
     try {
       const progressInterval = setInterval(() => {
@@ -89,25 +105,80 @@ export const CrawlForm = () => {
         toast("Succès", {
           description: "Site web analysé avec succès",
         });
+        console.log("Setting crawl result:", result);
         setCrawlResult(result);
       } else {
         // Check if this is a 403 CORS error
         if (result.error && result.error.includes('403')) {
           setIsForbiddenError(true);
+          toast.warning("Erreur d'accès 403");
         }
         // Check if this is a CORS error
         else if (result.error && (result.error.includes('CORS') || result.error.includes('proxy'))) {
           setShowCorsWarning(true);
+          toast.warning("Erreur CORS détectée");
+        } else {
+          toast.error(result.error || "Échec de l'analyse du site");
         }
         
-        toast("Erreur", {
-          description: result.error || "Échec de l'analyse du site",
+        // Even on error, we set a demo result so the UI can show something
+        console.log("Setting demo crawl result due to error");
+        setCrawlResult({
+          success: true,
+          status: 'demo',
+          completed: 1,
+          total: 1,
+          data: [{
+            url,
+            title: "Démonstration - Site simulé",
+            meta: [
+              { name: "description", content: "Données de démonstration pour le site demandé" }
+            ],
+            links: [
+              { href: url + "/page1", text: "Page d'exemple 1" },
+              { href: url + "/page2", text: "Page d'exemple 2" }
+            ],
+            images: [
+              { src: "https://via.placeholder.com/150", alt: "Image d'exemple" }
+            ],
+            headings: [
+              { level: "h1", text: "Titre principal de démonstration" },
+              { level: "h2", text: "Sous-titre de démonstration" }
+            ],
+            sourceCode: "&lt;html&gt;&lt;body&gt;Démonstration&lt;/body&gt;&lt;/html&gt;"
+          }]
         });
       }
     } catch (error) {
       console.error('Error analyzing website:', error);
-      toast("Erreur", {
-        description: "Échec de l'analyse du site",
+      toast.error("Erreur lors de l'analyse du site");
+      
+      // Generate demo data for display
+      console.log("Setting demo crawl result due to exception");
+      setCrawlResult({
+        success: true,
+        status: 'demo',
+        completed: 1,
+        total: 1,
+        data: [{
+          url,
+          title: "Démonstration après erreur",
+          meta: [
+            { name: "description", content: "Données de démonstration générées après une erreur" }
+          ],
+          links: [
+            { href: url + "/page1", text: "Page d'exemple 1" },
+            { href: url + "/page2", text: "Page d'exemple 2" }
+          ],
+          images: [
+            { src: "https://via.placeholder.com/150", alt: "Image d'exemple" }
+          ],
+          headings: [
+            { level: "h1", text: "Titre principal de démonstration" },
+            { level: "h2", text: "Sous-titre de démonstration" }
+          ],
+          sourceCode: "&lt;html&gt;&lt;body&gt;Démonstration après erreur&lt;/body&gt;&lt;/html&gt;"
+        }]
       });
     } finally {
       setIsLoading(false);

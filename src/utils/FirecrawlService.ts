@@ -14,8 +14,8 @@ export class FirecrawlService {
   private static useAlternativeCorsProxy = false;
   private static alternativeCorsProxies = [
     'https://corsproxy.io/?',
-    'https://cors-anywhere.herokuapp.com/',
-    'https://api.allorigins.win/raw?url='
+    'https://api.allorigins.win/raw?url=',
+    'https://api.codetabs.com/v1/proxy?quest='
   ];
 
   static enableProxy() {
@@ -58,46 +58,40 @@ export class FirecrawlService {
       
       console.log('Démarrage de l\'analyse du site:', url);
       
-      // Toujours utiliser le proxy CORS pour éviter les erreurs
-      const corsProxy = 'https://corsproxy.io/?';
-      console.log('Utilisation du proxy CORS:', corsProxy + encodeURIComponent(url));
+      // Try different CORS proxies
+      const corsProxies = [
+        'https://corsproxy.io/?',
+        'https://api.allorigins.win/raw?url=',
+        'https://api.codetabs.com/v1/proxy?quest='
+      ];
       
-      try {
-        // Première tentative avec le proxy principal
-        const fetchResult = await this.fetchWithTimeout(corsProxy + encodeURIComponent(url));
+      let fetchResult = null;
+      let errorMessage = '';
+      
+      // Try each proxy until one works
+      for (const corsProxy of corsProxies) {
+        const proxyUrl = corsProxy + encodeURIComponent(url);
+        console.log('Tentative avec proxy:', proxyUrl);
         
-        if (fetchResult.success) {
-          return this.processHtmlResult(fetchResult.data, url);
-        } else if (this.useAlternativeCorsProxy) {
-          // Essayer avec un proxy alternatif si la première tentative a échoué
-          console.log('Tentative avec un proxy alternatif...');
-          for (const alternativeProxy of this.alternativeCorsProxies) {
-            if (alternativeProxy === corsProxy) continue; // Skip the one we already tried
-            
-            console.log('Essai avec proxy:', alternativeProxy);
-            const altFetchResult = await this.fetchWithTimeout(alternativeProxy + encodeURIComponent(url));
-            
-            if (altFetchResult.success) {
-              return this.processHtmlResult(altFetchResult.data, url);
-            }
+        try {
+          fetchResult = await this.fetchWithTimeout(proxyUrl);
+          
+          if (fetchResult.success) {
+            console.log('Succès avec le proxy:', corsProxy);
+            return this.processHtmlResult(fetchResult.data, url);
+          } else {
+            errorMessage = fetchResult.error || 'Erreur inconnue';
+            console.log(`Échec avec le proxy ${corsProxy}: ${errorMessage}`);
           }
+        } catch (error) {
+          console.error(`Erreur avec le proxy ${corsProxy}:`, error);
         }
-        
-        // Si toutes les tentatives échouent, retourner une erreur
-        console.error('Toutes les tentatives ont échoué');
-        return {
-          success: false,
-          error: fetchResult.error || "Impossible d'accéder au site avec aucun proxy",
-          completed: 0,
-          total: 0
-        };
-      } catch (error) {
-        console.error('Erreur lors de la requête fetch:', error);
-        console.log('Génération de données de démonstration...');
-        
-        // Générer des données de démonstration en cas d'erreur
-        return this.generateDemoData(url);
       }
+      
+      // If all proxies fail, generate demo data
+      console.log('Tous les proxies ont échoué, génération de données de démonstration...');
+      return this.generateDemoData(url);
+
     } catch (error) {
       console.error('Erreur lors de l\'analyse:', error);
       
