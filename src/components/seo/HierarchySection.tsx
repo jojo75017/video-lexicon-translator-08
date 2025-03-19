@@ -2,15 +2,21 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { SeoAnalysisResult } from '@/types/seo';
-import { ListTree, Type, Heading, Quote, FileQuestion } from 'lucide-react';
+import { ListTree, Type, Heading, Quote, FileQuestion, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 interface HierarchySectionProps {
   isLoading: boolean;
   seoAnalysis: SeoAnalysisResult | null;
+  onAnalyze?: () => void;
 }
 
-const HierarchySection: React.FC<HierarchySectionProps> = ({ isLoading, seoAnalysis }) => {
+const HierarchySection: React.FC<HierarchySectionProps> = ({ 
+  isLoading, 
+  seoAnalysis,
+  onAnalyze 
+}) => {
   // Check if we have content to analyze
   const hasContent = seoAnalysis && (
     seoAnalysis.h1Count !== undefined || 
@@ -18,6 +24,14 @@ const HierarchySection: React.FC<HierarchySectionProps> = ({ isLoading, seoAnaly
     seoAnalysis.h3Count !== undefined ||
     seoAnalysis.wordCount !== undefined
   );
+
+  const handleAnalyzeClick = () => {
+    if (onAnalyze) {
+      onAnalyze();
+    } else {
+      toast.info("Pour analyser un site, utilisez l'outil d'analyse SEO");
+    }
+  };
 
   return (
     <Card className="p-6 border-0 shadow-md bg-gradient-to-br from-white to-slate-50">
@@ -125,7 +139,14 @@ const HierarchySection: React.FC<HierarchySectionProps> = ({ isLoading, seoAnaly
                 <p className="text-gray-400 text-sm max-w-md mb-6">
                   Pour voir la structure du contenu, commencez par analyser un site web avec l'outil d'analyse SEO
                 </p>
-                <Button variant="outline">Analyser un site</Button>
+                <Button 
+                  variant="outline" 
+                  onClick={handleAnalyzeClick}
+                  className="flex items-center gap-2"
+                >
+                  <Search className="h-4 w-4" />
+                  Analyser un site
+                </Button>
               </div>
             </div>
           )}

@@ -26,7 +26,6 @@ export interface SeoAnalysisResult {
   noFollowBacklinks?: number;
 }
 
-// Add all the missing interface definitions
 export interface SeoAnalysis {
   title: string;
   description: string;
@@ -157,7 +156,6 @@ export interface ImageAnalysis {
   format: string;
   lazyLoaded: boolean;
   compressed: boolean;
-  // Add properties that were causing errors
   hasAlt?: boolean;
   alt?: string;
 }
@@ -187,7 +185,6 @@ export interface KeywordSuggestion {
   competition: number;
   cpc: number;
   relevance: number;
-  // Add properties that were causing errors
   difficulty?: number;
   volume?: number;
   trend?: string;
@@ -214,7 +211,6 @@ export interface Performance {
     fonts: number;
     other: number;
   };
-  // Add properties that were causing errors
   totalSize?: number;
   styleCount?: number;
   responseTime?: number;
@@ -231,12 +227,10 @@ export interface SocialMetrics {
   twitter: {
     shares: number;
     likes: number;
-    // Add missing property
     replies?: number;
   };
   linkedin: {
     shares: number;
-    // Add missing property
     engagements?: number;
   };
   pinterest: {
@@ -267,7 +261,6 @@ export interface SearchConsoleData {
     clicks: number;
     impressions: number;
   }[];
-  // Add missing property
   topQueries?: any[];
   topPages?: any[];
   devices?: any;
@@ -297,7 +290,6 @@ export interface SiteStructure {
   }[];
 }
 
-// Additional interface for broken links
 export interface BrokenLink {
   url: string;
   statusCode: number;
@@ -305,7 +297,6 @@ export interface BrokenLink {
   location?: string;
 }
 
-// Create a KeywordAnalysis interface that matches what's expected
 export interface KeywordAnalysis extends KeywordData {
-  // Make sure it has all properties needed
+  // Ensure it has all KeywordData properties
 }

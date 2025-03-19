@@ -2,7 +2,7 @@
 import React from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Loader2, Globe } from "lucide-react";
+import { Loader2, Globe, Search } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
@@ -39,42 +39,57 @@ const UrlInput = ({ url, setUrl, onAnalyze, isLoading }: UrlInputProps) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <Label htmlFor="url" className="text-lg font-medium">URL du site</Label>
-      <div className="flex gap-2">
-        <div className="relative flex-1">
-          <Input
-            id="url"
-            placeholder="https://exemple.com"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            disabled={isLoading}
-            className="pl-10"
-          />
-          <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-        </div>
-        <Button 
-          type="submit"
-          disabled={isLoading}
-          className="min-w-[120px] relative"
-          variant="default"
-        >
-          {isLoading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Analyse en cours...
-            </>
-          ) : (
-            <>
-              <Globe className="mr-2 h-4 w-4" />
-              Analyser
-            </>
-          )}
-        </Button>
+    <form onSubmit={handleSubmit} className="space-y-4 bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-100 shadow-sm">
+      <div className="mb-4">
+        <h2 className="text-xl font-bold text-gray-800 mb-2">Analyse SEO</h2>
+        <p className="text-gray-600">Entrez l'URL d'un site web pour commencer l'analyse SEO complète</p>
       </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="url" className="text-lg font-medium">URL du site</Label>
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Input
+              id="url"
+              placeholder="https://exemple.com"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              disabled={isLoading}
+              className="pl-10"
+            />
+            <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+          </div>
+          <Button 
+            type="submit"
+            disabled={isLoading}
+            className="min-w-[140px] relative bg-blue-600 hover:bg-blue-700"
+            variant="default"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Analyse en cours...
+              </>
+            ) : (
+              <>
+                <Search className="mr-2 h-4 w-4" />
+                Analyser le site
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
+      
       {isLoading && (
-        <div className="text-sm text-muted-foreground animate-pulse">
+        <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-md border border-blue-100 animate-pulse flex items-center">
+          <Loader2 className="h-4 w-4 animate-spin mr-2 text-blue-500" />
           Analyse en cours, veuillez patienter...
+        </div>
+      )}
+      
+      {!isLoading && !url && (
+        <div className="bg-amber-50 p-3 rounded-md border border-amber-100 text-sm text-amber-700">
+          Entrez l'URL d'un site web pour commencer l'analyse SEO et voir les résultats détaillés
         </div>
       )}
     </form>

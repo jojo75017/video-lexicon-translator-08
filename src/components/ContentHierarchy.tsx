@@ -3,11 +3,12 @@ import React from 'react';
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useTranslation } from 'react-i18next';
-import { ChevronRight, Heading1, Heading2, Heading3, Type, AlertCircle, CheckCircle2, BarChart2, Lightbulb, FileQuestion } from 'lucide-react';
+import { ChevronRight, Heading1, Heading2, Heading3, Type, AlertCircle, CheckCircle2, BarChart2, Lightbulb, FileQuestion, Search } from 'lucide-react';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface ContentItem {
   type: 'h1' | 'h2' | 'h3' | 'text';
@@ -26,15 +27,29 @@ interface ContentHierarchyProps {
     position: number;
   }[];
   recommendations?: string[];
+  onAnalyze?: () => void;
 }
 
-const ContentHierarchy = ({ headings = [], paragraphs = [], recommendations = [] }: ContentHierarchyProps) => {
+const ContentHierarchy = ({ 
+  headings = [], 
+  paragraphs = [], 
+  recommendations = [],
+  onAnalyze
+}: ContentHierarchyProps) => {
   const { t } = useTranslation();
   
   // Check if we have actual content to analyze - ensure arrays have elements with content
   const hasHeadings = headings && headings.length > 0 && headings.some(h => h.text && h.text.trim() !== '');
   const hasParagraphs = paragraphs && paragraphs.length > 0 && paragraphs.some(p => p.text && p.text.trim() !== '');
   const hasContent = hasHeadings || hasParagraphs;
+
+  const handleAnalyzeClick = () => {
+    if (onAnalyze) {
+      onAnalyze();
+    } else {
+      toast.info("Pour analyser un site, utilisez l'outil principal d'analyse SEO");
+    }
+  };
 
   const getAllContent = (): ContentItem[] => {
     if (!hasContent) return [];
@@ -160,7 +175,14 @@ const ContentHierarchy = ({ headings = [], paragraphs = [], recommendations = []
             <p className="text-gray-400 max-w-md mb-6">
               Pour voir l'analyse de la structure hiérarchique, commencez par analyser un site web en utilisant l'outil d'analyse SEO.
             </p>
-            <Button variant="outline">Analyser un site web</Button>
+            <Button 
+              variant="outline"
+              onClick={handleAnalyzeClick}
+              className="flex items-center gap-2"
+            >
+              <Search className="h-4 w-4" />
+              Analyser un site web
+            </Button>
           </div>
         </div>
       </Card>

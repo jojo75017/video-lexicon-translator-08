@@ -36,6 +36,10 @@ export const analyzePerformance = (doc: Document, startTime: number): Performanc
   const speedIndex = window.performance.now() - startTime;
   const timeToInteractive = performanceEntries ? performanceEntries.domInteractive - performanceEntries.startTime : 0;
   const largestContentfulPaint = firstContentfulPaint * 1.2;
+  const resourceCount = resources.length;
+  const scriptCount = doc.getElementsByTagName('script').length;
+  const cssCount = doc.getElementsByTagName('link').length + doc.getElementsByTagName('style').length;
+  const imageCount = doc.getElementsByTagName('img').length;
 
   // Calcul du score de performance
   let score = 100;
@@ -46,20 +50,23 @@ export const analyzePerformance = (doc: Document, startTime: number): Performanc
   if (resources.length > 50) score -= 10; // Pénalité si trop de ressources
 
   return {
-    totalSize,
-    scriptCount: doc.getElementsByTagName('script').length,
-    styleCount: doc.getElementsByTagName('link').length + doc.getElementsByTagName('style').length,
-    responseTime: window.performance.now() - startTime,
-    impressions: 0,
-    clickThroughRate: 0,
     loadTime,
     firstContentfulPaint,
-    domLoadTime,
-    speedIndex,
-    score: Math.max(0, score),
     largestContentfulPaint,
+    speedIndex,
     timeToInteractive,
-    resourceBreakdown: resourceSizes
+    domLoadTime,
+    resourceCount,
+    scriptCount,
+    cssCount,
+    imageCount,
+    cacheLifetime: 3600, // 1 heure par défaut
+    score: Math.max(0, score),
+    resourceBreakdown: resourceSizes,
+    totalSize,
+    styleCount: cssCount,
+    responseTime: window.performance.now() - startTime,
+    impressions: 0,
+    clickThroughRate: 0
   };
 };
-
