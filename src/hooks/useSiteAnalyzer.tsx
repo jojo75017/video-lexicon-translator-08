@@ -216,22 +216,29 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
         { level: "h2", text: "Premier sous-titre" },
         { level: "h2", text: "Deuxième sous-titre" }
       ],
-      paragraphs: 12,
+      paragraphs: [
+        { text: "Paragraphe d'exemple 1", position: 1 },
+        { text: "Paragraphe d'exemple 2", position: 2 }
+      ],
       headingStructure: {
         h1Count: 1,
         h2Count: 3,
         h3Count: 5,
         headings: [
-          { level: "h1", text: "Titre principal" },
-          { level: "h2", text: "Premier sous-titre" }
+          { level: "h1", text: "Titre principal", position: 1 },
+          { level: "h2", text: "Premier sous-titre", position: 2 }
         ],
-        paragraphs: 12
+        paragraphs: [
+          { text: "Paragraphe d'exemple 1", position: 1 },
+          { text: "Paragraphe d'exemple 2", position: 2 }
+        ],
+        hierarchy: []
       },
       imgCount: 8,
       imgWithoutAlt: 2,
       imagesDetails: [
-        { src: "https://via.placeholder.com/800x400", alt: "Image de bannière", hasAlt: true, size: "800x400" },
-        { src: "https://via.placeholder.com/400x300", alt: "", hasAlt: false, size: "400x300" }
+        { src: "https://via.placeholder.com/800x400", alt: "Image de bannière", hasAlt: true, size: "800x400", url: "https://via.placeholder.com/800x400", dimensions: { width: 800, height: 400 }, format: "jpg", lazyLoaded: false, compressed: true },
+        { src: "https://via.placeholder.com/400x300", alt: "", hasAlt: false, size: "400x300", url: "https://via.placeholder.com/400x300", dimensions: { width: 400, height: 300 }, format: "jpg", lazyLoaded: false, compressed: true }
       ],
       metaTagsCount: 7,
       metaTagsAnalysis: {
@@ -247,15 +254,18 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
       },
       canonicalUrl: siteUrl,
       robotsMeta: "index, follow",
-      brokenLinks: [],
+      brokenLinks: [
+        { url: "https://exemple.com/broken", statusCode: 404, message: "Page non trouvée", location: "footer" },
+        { url: "https://exemple.com/error", statusCode: 500, message: "Erreur serveur", location: "menu" }
+      ],
       keywords: ["exemple", "démonstration", "seo", "analyse"],
       googlePosition: null,
       authorityScore: 35,
       organicTraffic: 1500,
       backlinks: 120,
       backlinkDetails: [
-        { domain: "exemple1.com", url: "https://exemple1.com/page", authority: 45, dofollow: true },
-        { domain: "exemple2.com", url: "https://exemple2.com/page", authority: 30, dofollow: false }
+        { domain: "exemple1.com", url: "https://exemple1.com/page", anchorText: "Exemple 1", followType: "follow", authority: 45, date: "2023-05-15", isDoFollow: true, firstSeen: "2023-05-15" },
+        { domain: "exemple2.com", url: "https://exemple2.com/page", anchorText: "Exemple 2", followType: "nofollow", authority: 30, date: "2023-06-20", isDoFollow: false, firstSeen: "2023-06-20" }
       ],
       topBacklinkDomains: [
         { domain: "exemple1.com", count: 45 },
@@ -286,17 +296,38 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
         countries: []
       },
       socialMetrics: {
-        facebook: { shares: 120, likes: 230 },
-        twitter: { shares: 85, likes: 150 },
-        linkedin: { shares: 55, engagements: 20 },
-        pinterest: { pins: 25 }
+        facebook: {
+          shares: 120,
+          comments: 230,
+          likes: 230
+        },
+        twitter: {
+          shares: 85,
+          likes: 150
+        },
+        linkedin: {
+          shares: 55,
+          engagements: 20
+        },
+        pinterest: {
+          pins: 25
+        }
       },
       performance: {
         loadTime: 2500,
+        firstContentfulPaint: 1200,
+        domLoadTime: 2000,
         resourceCount: 45,
         scriptCount: 12,
+        cssCount: 8,
+        imageCount: 15,
+        cacheLifetime: 86400,
+        score: 75,
+        totalSize: 1250000,
         styleCount: 8,
-        resourceSize: 1250000,
+        responseTime: 350,
+        impressions: 12000,
+        clickThroughRate: 5.2,
         resourceBreakdown: {
           images: 750000,
           scripts: 120000,
@@ -306,22 +337,22 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
         }
       },
       securityHeaders: {
-        https: 1,
-        hsts: 0,
-        xFrameOptions: 1,
-        contentSecurityPolicy: 0,
-        xContentTypeOptions: 1,
-        referrerPolicy: 1,
-        permissions: 0
+        https: true,
+        hsts: false,
+        xFrameOptions: true,
+        contentSecurityPolicy: false,
+        xContentTypeOptions: true,
+        referrerPolicy: true,
+        permissions: false
       },
       semanticStructure: {
-        header: true,
-        footer: true,
-        nav: true,
-        main: true,
-        article: false,
-        section: true,
-        aside: false,
+        header: 1,
+        footer: 1,
+        nav: 1,
+        main: 1,
+        article: 0,
+        section: 1,
+        aside: 0,
         score: 75
       },
       linkAnalysis: {
@@ -334,7 +365,7 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
           { url: "https://example.com", text: "Exemple externe", isExternal: true, isNofollow: true }
         ]
       },
-      readabilityScore: { readingTime: 68, complexity: 45 },
+      readabilityScore: 68,
       topKeywords: [
         { keyword: "exemple", count: 25, density: 1.2, position: 15 },
         { keyword: "démonstration", count: 18, density: 0.8, position: 22 },
@@ -364,7 +395,11 @@ export const useSiteAnalyzer = (): UseSiteAnalyzerReturn => {
         twitterDescription: null,
         twitterImage: null
       },
-      contentQuality: { readingTime: 78, complexity: 65, uniqueness: 80 },
+      contentQuality: {
+        readingTime: 78,
+        complexity: 65,
+        uniqueness: 80
+      },
       schemaMarkup: false,
       accessibility: {
         contrast: { issues: 2, score: 85 },

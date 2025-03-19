@@ -45,12 +45,14 @@ const SeoAnalysisForm = ({
 
   const handleAnalyzeClick = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     console.log("Analyze button clicked manually");
     analyzeSite();
   };
 
   const handleProxyClick = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     console.log("Proxy button clicked manually");
     handleActivateProxy();
   };
