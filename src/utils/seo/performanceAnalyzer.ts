@@ -1,7 +1,37 @@
 
 import { Performance } from '@/types/seo';
 
-export const analyzePerformance = (doc: Document, startTime: number): Performance => {
+export const analyzePerformance = (doc: Document | null, startTime: number): Performance => {
+  // Return empty performance data if no document is provided
+  if (!doc) {
+    return {
+      loadTime: 0,
+      firstContentfulPaint: 0,
+      largestContentfulPaint: 0,
+      speedIndex: 0,
+      timeToInteractive: 0,
+      domLoadTime: 0,
+      resourceCount: 0,
+      scriptCount: 0,
+      cssCount: 0,
+      imageCount: 0,
+      cacheLifetime: 0,
+      score: 0,
+      resourceBreakdown: {
+        images: 0,
+        scripts: 0,
+        styles: 0,
+        fonts: 0,
+        other: 0
+      },
+      totalSize: 0,
+      styleCount: 0,
+      responseTime: 0,
+      impressions: 0,
+      clickThroughRate: 0
+    };
+  }
+
   // Check if we have performance entries available
   const performanceEntries = window.performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
   const loadTime = performanceEntries ? performanceEntries.loadEventEnd - performanceEntries.startTime : 0;

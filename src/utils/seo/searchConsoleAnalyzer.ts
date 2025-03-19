@@ -3,6 +3,25 @@ import { SearchConsoleData } from '@/types/seo';
 import { GoogleSearchConsole } from '@/utils/googleSearchConsole';
 
 export const analyzeSearchConsole = async (url: string): Promise<SearchConsoleData> => {
+  // Return empty data if no URL is provided
+  if (!url) {
+    return {
+      clicks: 0,
+      impressions: 0,
+      ctr: 0,
+      position: 0,
+      keywords: [],
+      topQueries: [],
+      topPages: [],
+      devices: {
+        mobile: 0,
+        desktop: 0,
+        tablet: 0
+      },
+      countries: []
+    };
+  }
+
   try {
     const searchConsole = new GoogleSearchConsole();
     const data = await searchConsole.getSearchAnalytics(url);

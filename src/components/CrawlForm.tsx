@@ -24,6 +24,16 @@ export const CrawlForm = () => {
   const [progress, setProgress] = useState(0);
   const [crawlResult, setCrawlResult] = useState<CrawlResult | null>(null);
   const [hasPerformedAnalysis, setHasPerformedAnalysis] = useState(false);
+  const [showCorsWarning, setShowCorsWarning] = useState(false);
+
+  const handleActivateProxy = () => {
+    FirecrawlService.enableProxy();
+    setShowCorsWarning(false);
+    toast({
+      title: "Proxy CORS activé",
+      description: "Vous pouvez maintenant analyser des sites externes",
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,10 +46,23 @@ export const CrawlForm = () => {
       return;
     }
     
+    // Validate URL format
+    try {
+      new URL(url);
+    } catch {
+      toast({
+        title: "URL invalide",
+        description: "Veuillez entrer une URL valide (ex: https://exemple.com)",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsLoading(true);
     setProgress(0);
     setCrawlResult(null);
     setHasPerformedAnalysis(true);
+    setShowCorsWarning(false);
 
     try {
       const progressInterval = setInterval(() => {
@@ -59,6 +82,11 @@ export const CrawlForm = () => {
         });
         setCrawlResult(result);
       } else {
+        // Check if this is a CORS error
+        if (result.error && (result.error.includes('CORS') || result.error.includes('proxy'))) {
+          setShowCorsWarning(true);
+        }
+        
         toast({
           title: "Erreur",
           description: result.error || "Échec de l'analyse du site",
@@ -89,13 +117,31 @@ export const CrawlForm = () => {
           onSubmit={handleSubmit}
         />
 
+        {showCorsWarning && (
+          <div className="mt-4 p-4 bg-amber-50 rounded-lg border border-amber-200 flex items-start">
+            <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5" />
+            <div>
+              <h3 className="font-medium text-amber-800">Erreur d'accès CORS</h3>
+              <p className="text-amber-700 text-sm mb-2">
+                Pour analyser des sites externes, vous devez activer le proxy CORS.
+              </p>
+              <button 
+                onClick={handleActivateProxy}
+                className="text-sm bg-amber-600 hover:bg-amber-700 text-white px-3 py-1 rounded-md"
+              >
+                Activer le proxy CORS
+              </button>
+            </div>
+          </div>
+        )}
+
         {hasPerformedAnalysis && crawlResult && crawlResult.data && crawlResult.data[0] && (
           <div className="mt-6">
             <ResultTabs data={crawlResult.data[0]} />
           </div>
         )}
         
-        {hasPerformedAnalysis && (!crawlResult || !crawlResult.data || !crawlResult.data[0]) && (
+        {hasPerformedAnalysis && (!crawlResult || !crawlResult.data || !crawlResult.data[0]) && !showCorsWarning && (
           <div className="mt-6 p-4 bg-amber-50 rounded-lg border border-amber-200 flex items-start">
             <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5" />
             <div>
@@ -117,7 +163,7 @@ export const CrawlForm = () => {
       </Card>
 
       <div className="flex items-start gap-2 text-sm text-amber-600 dark:text-amber-500">
-        <AlertTriangle className="h-4 h-4 mt-0.5" />
+        <AlertTriangle className="h-4 w-4 mt-0.5" />
         <p>
           Note : Cette analyse est basique et gratuite. Pour une analyse plus approfondie, 
           vous pouvez utiliser des services spécialisés.

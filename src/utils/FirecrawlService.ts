@@ -10,6 +10,17 @@ interface CrawlResponse {
 
 export class FirecrawlService {
   private static readonly TIMEOUT = 15000; // 15 secondes de timeout
+  private static isProxyEnabled = false;
+
+  static enableProxy() {
+    this.isProxyEnabled = true;
+    console.log('Proxy CORS activé');
+    return this.isProxyEnabled;
+  }
+
+  static isProxyActive() {
+    return this.isProxyEnabled;
+  }
 
   static async crawlWebsite(url: string): Promise<CrawlResponse> {
     if (!url) {
@@ -34,7 +45,7 @@ export class FirecrawlService {
       }
       
       console.log('Démarrage de l\'analyse du site:', url);
-      const corsProxy = 'https://cors-anywhere.herokuapp.com/';
+      const corsProxy = this.isProxyEnabled ? 'https://cors-anywhere.herokuapp.com/' : '';
       
       const response = await Promise.race([
         fetch(`${corsProxy}${url}`, {
@@ -116,9 +127,22 @@ export class FirecrawlService {
 
     } catch (error) {
       console.error('Erreur lors de l\'analyse:', error);
+      // Vérifier si c'est une erreur CORS
+      const errorMessage = error instanceof Error ? error.message : 'Erreur lors de l\'analyse du site';
+      
+      if (!this.isProxyEnabled && (errorMessage.includes('CORS') || errorMessage.includes('cross-origin'))) {
+        return {
+          success: false,
+          error: "Erreur CORS détectée. Activez le proxy pour analyser ce site.",
+          completed: 0,
+          total: 1,
+          data: []
+        };
+      }
+      
       return { 
         success: false, 
-        error: error instanceof Error ? error.message : 'Erreur lors de l\'analyse du site',
+        error: errorMessage,
         completed: 0,
         total: 1
       };

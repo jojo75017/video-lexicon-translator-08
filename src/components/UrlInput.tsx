@@ -2,7 +2,7 @@
 import React from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Loader2, Globe, Search } from "lucide-react";
+import { Loader2, Globe, Search, AlertTriangle } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 
@@ -11,9 +11,18 @@ interface UrlInputProps {
   setUrl: (url: string) => void;
   onAnalyze: () => void;
   isLoading: boolean;
+  showCorsWarning?: boolean;
+  handleActivateProxy?: () => void;
 }
 
-const UrlInput = ({ url, setUrl, onAnalyze, isLoading }: UrlInputProps) => {
+const UrlInput = ({ 
+  url, 
+  setUrl, 
+  onAnalyze, 
+  isLoading, 
+  showCorsWarning = false, 
+  handleActivateProxy 
+}: UrlInputProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     handleAnalyze();
@@ -83,6 +92,24 @@ const UrlInput = ({ url, setUrl, onAnalyze, isLoading }: UrlInputProps) => {
           </Button>
         </div>
       </div>
+      
+      {showCorsWarning && handleActivateProxy && (
+        <div className="text-sm text-amber-700 bg-amber-50 p-3 rounded-md border border-amber-100 flex items-center">
+          <AlertTriangle className="h-4 w-4 mr-2 text-amber-600" />
+          <div>
+            <p className="font-medium">Erreur CORS détectée</p>
+            <p className="mb-2">Pour analyser des sites externes, vous devez activer le proxy CORS.</p>
+            <Button
+              onClick={handleActivateProxy}
+              size="sm"
+              variant="outline"
+              className="border-amber-200 text-amber-800 hover:bg-amber-100"
+            >
+              Activer le proxy
+            </Button>
+          </div>
+        </div>
+      )}
       
       {isLoading && (
         <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-md border border-blue-100 animate-pulse flex items-center">
