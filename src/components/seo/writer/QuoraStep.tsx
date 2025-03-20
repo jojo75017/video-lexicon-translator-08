@@ -6,10 +6,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { Sparkles, RefreshCw, MessageSquareText, Reply, Lightbulb, Send } from 'lucide-react';
+import { Sparkles, RefreshCw, MessageSquareText, Reply, Lightbulb, Send, AlertCircle } from 'lucide-react';
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { createPerplexityService } from "@/services/perplexityService";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 interface QuoraStepProps {
   quoraTitle: string;
@@ -40,6 +41,7 @@ const QuoraStep = ({
   const [questionMode, setQuestionMode] = useState("ask"); // "ask" or "answer"
   const [apiKey, setApiKey] = useState<string>("");
   const [showApiKeyInput, setShowApiKeyInput] = useState(false);
+  const [previewVisible, setPreviewVisible] = useState(false);
 
   const popularQuestions = [
     "Comment voyager pas cher en Europe ?",
@@ -60,6 +62,7 @@ const QuoraStep = ({
     }
 
     setIsGenerating(true);
+    setPreviewVisible(false); // Reset preview state
     toast.loading("Génération de contenu en cours...");
 
     try {
@@ -109,6 +112,7 @@ const QuoraStep = ({
 
       toast.dismiss();
       toast.success("Contenu généré avec succès !");
+      setPreviewVisible(true); // Show preview after successful generation
     } catch (error) {
       toast.error("Erreur lors de la génération du contenu");
       console.error("Erreur IA:", error);
@@ -474,26 +478,55 @@ Ces trois principes vous permettront d'obtenir des résultats optimaux et durabl
               </>
             )}
           </Button>
+          
+          {!quoraQuestion && !quoraAnswer && !isGenerating && (
+            <Alert className="bg-blue-50 border-blue-200 text-blue-800">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Aucun contenu généré</AlertTitle>
+              <AlertDescription>
+                Cliquez sur le bouton "Générer" ci-dessus pour créer du contenu avec l'IA
+              </AlertDescription>
+            </Alert>
+          )}
         </TabsContent>
       </Tabs>
 
-      {quoraQuestion && quoraAnswer && (
+      {/* Preview section - shown after generation or when content exists */}
+      {(quoraQuestion && quoraAnswer) && (
         <Card className="mt-4 p-4 bg-gray-50 border-[#b92b27]/20">
           <CardContent className="p-0">
-            <h4 className="font-medium mb-2">{quoraQuestion}</h4>
-            <div className="bg-white p-3 rounded-md">
-              <p className="whitespace-pre-wrap text-sm">{quoraAnswer}</p>
-              {quoraLink && (
-                <a 
-                  href={quoraLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline text-sm mt-2 block"
+            <div className="flex justify-between items-center mb-2">
+              <h4 className="font-medium">Aperçu de votre contenu</h4>
+              {!previewVisible && activeTab === "ai" && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => setPreviewVisible(true)}
+                  className="text-xs"
                 >
-                  En savoir plus
-                </a>
+                  Afficher l'aperçu
+                </Button>
               )}
             </div>
+            
+            {(previewVisible || activeTab === "manual") && (
+              <div className="space-y-3">
+                <h4 className="font-medium mb-2">{quoraQuestion}</h4>
+                <div className="bg-white p-3 rounded-md shadow-sm">
+                  <p className="whitespace-pre-wrap text-sm">{quoraAnswer}</p>
+                  {quoraLink && (
+                    <a 
+                      href={quoraLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline text-sm mt-2 block"
+                    >
+                      En savoir plus
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
