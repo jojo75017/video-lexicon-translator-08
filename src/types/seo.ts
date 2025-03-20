@@ -1,4 +1,3 @@
-
 export interface SeoAnalysisResult {
   title?: string;
   description?: string;
@@ -207,6 +206,8 @@ export interface KeywordSuggestion {
   volume?: number;
   trend?: string;
   seasonality?: string;
+  suggestedTitle?: string;
+  suggestedDescription?: string;
 }
 
 export interface Performance {
@@ -290,7 +291,6 @@ export interface SecurityHeaders {
   hsts: boolean;
   xFrameOptions: boolean;
   xContentTypeOptions: boolean;
-  contentSecurityPolicy: boolean;
   referrerPolicy: boolean;
   permissions: boolean;
 }

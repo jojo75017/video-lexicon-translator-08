@@ -1,4 +1,3 @@
-
 interface KeywordAnalysis {
   keyword: string;
   frequency: number;
@@ -13,6 +12,8 @@ interface KeywordSuggestion {
   relevance: number;
   searchVolume: number;
   difficulty: number;
+  suggestedTitle?: string;
+  suggestedDescription?: string;
 }
 
 const stopWords = new Set([
@@ -86,23 +87,6 @@ export const analyzeKeywords = (textContent: string): KeywordAnalysis[] => {
   return results.length > 0 ? results : generateMockKeywordAnalysis();
 };
 
-// Génère des mots-clés fictifs pour les tests
-const generateMockKeywordAnalysis = (): KeywordAnalysis[] => {
-  console.log("GENERATING MOCK KEYWORD ANALYSIS");
-  return [
-    { keyword: "aquarium", frequency: 15, density: 2.5, count: 15, position: 1 },
-    { keyword: "poisson", frequency: 12, density: 2.0, count: 12, position: 2 },
-    { keyword: "eau douce", frequency: 10, density: 1.7, count: 10, position: 3 },
-    { keyword: "plante aquatique", frequency: 8, density: 1.3, count: 8, position: 4 },
-    { keyword: "entretien", frequency: 7, density: 1.2, count: 7, position: 5 },
-    { keyword: "filtre", frequency: 6, density: 1.0, count: 6, position: 6 },
-    { keyword: "température", frequency: 5, density: 0.8, count: 5, position: 7 },
-    { keyword: "aquariophilie", frequency: 5, density: 0.8, count: 5, position: 8 },
-    { keyword: "débutant", frequency: 4, density: 0.7, count: 4, position: 9 },
-    { keyword: "éclairage", frequency: 4, density: 0.7, count: 4, position: 10 }
-  ];
-};
-
 const calculateRelevanceScore = (frequency: number, length: number): number => {
   // Les mots-clés plus longs sont généralement plus pertinents
   const lengthBonus = Math.min(length / 10, 1) * 20;
@@ -110,6 +94,60 @@ const calculateRelevanceScore = (frequency: number, length: number): number => {
   const frequencyScore = Math.min(frequency * 10, 50);
   
   return Math.min(lengthBonus + frequencyScore, 100);
+};
+
+// Génère un titre SEO optimisé basé sur un mot-clé (max 60 caractères)
+const generateSeoTitle = (keyword: string): string => {
+  const prefixes = [
+    "Guide Ultime : ",
+    "Comment ",
+    "Les Meilleurs ",
+    "Tout Savoir sur ",
+    "Optimisez vos ",
+    "Découvrez ",
+    "Améliorez votre "
+  ];
+  
+  const suffixes = [
+    " - Guide Complet",
+    " - Conseils d'Experts",
+    " en 2024",
+    " pour Débutants",
+    " | Techniques Avancées",
+    " pour de Meilleurs Résultats"
+  ];
+  
+  const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+  const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+  
+  let title = prefix + keyword.charAt(0).toUpperCase() + keyword.slice(1) + suffix;
+  
+  // Tronquer à 60 caractères si nécessaire
+  if (title.length > 60) {
+    title = title.substring(0, 57) + "...";
+  }
+  
+  return title;
+};
+
+// Génère une meta description SEO optimisée basée sur un mot-clé (max 155 caractères)
+const generateSeoDescription = (keyword: string): string => {
+  const templates = [
+    `Découvrez les meilleures stratégies pour ${keyword}. Nos conseils d'experts vous aideront à maximiser vos résultats et améliorer votre visibilité en ligne.`,
+    `Vous cherchez à optimiser ${keyword}? Notre guide complet présente les techniques éprouvées et les dernières tendances pour des résultats garantis.`,
+    `Améliorez vos performances avec nos astuces spécialisées sur ${keyword}. Conseils pratiques, études de cas et stratégies recommandées par les experts.`,
+    `Tout ce que vous devez savoir sur ${keyword} en un seul endroit. Guide pratique avec exemples concrets et méthodes efficaces pour progresser rapidement.`,
+    `${keyword.charAt(0).toUpperCase() + keyword.slice(1)} : stratégies avancées et conseils d'experts pour maximiser votre ROI. Techniques testées et approuvées par les professionnels.`
+  ];
+  
+  let description = templates[Math.floor(Math.random() * templates.length)];
+  
+  // Tronquer à 155 caractères si nécessaire
+  if (description.length > 155) {
+    description = description.substring(0, 152) + "...";
+  }
+  
+  return description;
 };
 
 export const generateKeywordSuggestions = (keywords: KeywordAnalysis[]): KeywordSuggestion[] => {
@@ -128,7 +166,26 @@ export const generateKeywordSuggestions = (keywords: KeywordAnalysis[]): Keyword
       volume: frequency,
       relevance,
       searchVolume,
-      difficulty: Math.floor(Math.random() * 100)
+      difficulty: Math.floor(Math.random() * 100),
+      suggestedTitle: generateSeoTitle(keyword),
+      suggestedDescription: generateSeoDescription(keyword)
     };
   });
+};
+
+// Génère des mots-clés fictifs pour les tests
+const generateMockKeywordAnalysis = (): KeywordAnalysis[] => {
+  console.log("GENERATING MOCK KEYWORD ANALYSIS");
+  return [
+    { keyword: "aquarium", frequency: 15, density: 2.5, count: 15, position: 1 },
+    { keyword: "poisson", frequency: 12, density: 2.0, count: 12, position: 2 },
+    { keyword: "eau douce", frequency: 10, density: 1.7, count: 10, position: 3 },
+    { keyword: "plante aquatique", frequency: 8, density: 1.3, count: 8, position: 4 },
+    { keyword: "entretien", frequency: 7, density: 1.2, count: 7, position: 5 },
+    { keyword: "filtre", frequency: 6, density: 1.0, count: 6, position: 6 },
+    { keyword: "température", frequency: 5, density: 0.8, count: 5, position: 7 },
+    { keyword: "aquariophilie", frequency: 5, density: 0.8, count: 5, position: 8 },
+    { keyword: "débutant", frequency: 4, density: 0.7, count: 4, position: 9 },
+    { keyword: "éclairage", frequency: 4, density: 0.7, count: 4, position: 10 }
+  ];
 };
