@@ -1,11 +1,12 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import QuoraButton from "@/components/seo/buttons/QuoraButton";
 import { Separator } from "@/components/ui/separator";
-import { Rocket, MessageSquareText, Sparkles, Users, TrendingUp, Award } from "lucide-react";
+import { Rocket, MessageSquareText, Sparkles, Users, TrendingUp, Award, ArrowLeft } from "lucide-react";
 
 const QuoraPage = () => {
   return (
@@ -13,9 +14,17 @@ const QuoraPage = () => {
       <div className="flex-1">
         <div className="container py-6">
           <div className="mb-8">
-            <div className="flex items-center gap-2">
-              <MessageSquareText className="h-6 w-6 text-[#b92b27]" />
-              <h1 className="text-2xl font-bold tracking-tight">Assistant Quora</h1>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <MessageSquareText className="h-6 w-6 text-[#b92b27]" />
+                <h1 className="text-2xl font-bold tracking-tight">Assistant Quora</h1>
+              </div>
+              <Link to="/">
+                <Button variant="outline" className="gap-2">
+                  <ArrowLeft className="h-4 w-4" />
+                  Retour au tableau de bord
+                </Button>
+              </Link>
             </div>
             <p className="text-muted-foreground mt-1">
               Créez du contenu optimisé pour Quora et augmentez votre autorité en ligne
@@ -314,6 +323,7 @@ const QuoraPage = () => {
               © {new Date().getFullYear()} SEO-GPT. Tous droits réservés.
             </p>
             <div className="flex items-center gap-6">
+              <Link to="/" className="text-sm text-gray-500 hover:text-gray-900">Tableau de bord</Link>
               <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Confidentialité</a>
               <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Conditions d'utilisation</a>
               <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Contact</a>
