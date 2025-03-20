@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
@@ -20,42 +20,47 @@ import { navigateToSection } from '@/utils/navigationHelpers';
 import { toast } from "sonner";
 
 const TabNavigation = () => {
-  const [activeTab, setActiveTab] = useState("wordcount");
+  const [activeTab, setActiveTab] = useState<string | null>(null);
   const groupedTabs = getGroupedTabs();
   
   // Filter tabs to only include those without external links
   const contentTabs = tabs.filter(tab => !tab.link);
   
-  // When active tab changes, ensure the tab content is visible
-  useEffect(() => {
-    if (activeTab) {
-      console.log(`Active tab changed to: ${activeTab}`);
-      const tabElement = document.getElementById(activeTab);
-      if (tabElement) {
-        console.log(`Found tab element with id: ${activeTab}`);
-        tabElement.style.display = 'block';
-        
-        // Show toast for better user feedback
-        toast.success(`Onglet ${activeTab} activé`, {
-          description: "Le contenu est maintenant visible",
-          duration: 1500
-        });
-      } else {
-        console.log(`Tab element with id ${activeTab} not found, using navigateToSection`);
-        navigateToSection(activeTab);
+  // Handle tab value change
+  const handleTabChange = (value: string) => {
+    console.log(`Tab changed to: ${value}`);
+    setActiveTab(value);
+    
+    // Find and show the relevant tab content
+    const tabElements = document.querySelectorAll('[data-tab-content]');
+    tabElements.forEach((element) => {
+      const el = element as HTMLElement;
+      el.style.display = 'none'; // Hide all
+    });
+    
+    // Show the selected tab content
+    const selectedTab = document.querySelector(`[data-tab-content="${value}"]`);
+    if (selectedTab) {
+      (selectedTab as HTMLElement).style.display = 'block';
+      toast.success(`Onglet ${value} activé`, {
+        description: "Contenu affiché",
+        duration: 1500
+      });
+    } else {
+      // Try alternate selectors
+      const alternateContent = document.getElementById(value) || 
+                               document.querySelector(`[data-section="${value}"]`);
+      if (alternateContent) {
+        (alternateContent as HTMLElement).style.display = 'block';
       }
     }
-  }, [activeTab]);
+  };
 
   return (
     <TooltipProvider>
       <Tabs 
-        defaultValue="wordcount" 
-        value={activeTab} 
-        onValueChange={(value) => {
-          console.log(`Tab selected: ${value}`);
-          setActiveTab(value);
-        }} 
+        value={activeTab || undefined} 
+        onValueChange={handleTabChange} 
         className="w-full"
       >
         <div className="w-full flex flex-col overflow-hidden justify-between bg-white shadow-md rounded-lg p-3 mb-6 border border-gray-100">

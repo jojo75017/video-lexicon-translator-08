@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 
 interface DefaultTabContentProps {
   id: string;
@@ -9,14 +9,6 @@ interface DefaultTabContentProps {
 const DefaultTabContent: React.FC<DefaultTabContentProps> = ({ id, label }) => {
   const contentRef = useRef<HTMLDivElement>(null);
   
-  // Make sure content is visible when the component mounts
-  useEffect(() => {
-    if (contentRef.current) {
-      contentRef.current.style.display = 'block';
-      console.log(`DefaultTabContent for ${id} is now visible`);
-    }
-  }, [id]);
-  
   return (
     <div 
       className="bg-white p-6 rounded-lg shadow-md" 
@@ -24,6 +16,7 @@ const DefaultTabContent: React.FC<DefaultTabContentProps> = ({ id, label }) => {
       data-section={id}
       data-tab-content={id}
       ref={contentRef}
+      style={{ display: 'none' }} // Initially hidden
     >
       <h2 className="text-xl font-bold mb-4">{label}</h2>
       <p className="text-gray-600">Contenu de {label}</p>

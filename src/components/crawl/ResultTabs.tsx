@@ -1,10 +1,9 @@
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Code, Search, ListTree, BarChart, Link2, Globe, Database } from "lucide-react";
 import { SiteInfo } from "./SiteInfo";
 import { SourceCode } from "./SourceCode";
 import { toast } from "sonner";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { getStructureData } from "@/utils/seo/updateUtils";
 
 interface ResultTabsProps {
@@ -14,81 +13,22 @@ interface ResultTabsProps {
 export const ResultTabs = ({ data }: ResultTabsProps) => {
   const [activeTab, setActiveTab] = useState("info");
   
-  // Notification when data is loaded
-  useEffect(() => {
-    if (data) {
-      console.log("ResultTabs received data:", data);
-      toast.success("Données chargées avec succès", {
-        description: "Explorez les différents onglets pour voir les résultats"
-      });
-    } else {
-      console.log("ResultTabs: No data received");
-    }
-  }, [data]);
-
-  // Effect to handle URL changes and external interactions
-  useEffect(() => {
-    // Function to check if a feature card was clicked and update the active tab
-    const checkForFeatureCardClick = () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const targetSection = urlParams.get('section');
-      const targetTab = urlParams.get('tab');
-      
-      if (targetSection) {
-        // Try to find the corresponding tab for this section
-        let tabToActivate = targetTab || "info";
-        
-        if (targetSection === "structure" || targetSection === "hierarchy") {
-          tabToActivate = "structure";
-        } else if (targetSection === "source") {
-          tabToActivate = "source";
-        }
-        
-        setActiveTab(tabToActivate);
-        
-        // Remove the parameters after handling them
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
-    };
-    
-    // Call once on mount
-    checkForFeatureCardClick();
-    
-    // Listen for clicks on feature cards
-    const handleFeatureClick = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      const featureCard = target.closest('[data-feature-id]');
-      
-      if (featureCard) {
-        const featureId = featureCard.getAttribute('data-feature-id') || '';
-        const tabValue = featureCard.getAttribute('data-tab-value') || '';
-        
-        console.log("Feature card clicked:", featureId, "Tab value:", tabValue);
-        
-        // Determine which tab to activate based on the feature ID
-        if (featureId === "structure" || featureId === "hierarchy") {
-          setActiveTab("structure");
-        } else if (featureId === "source") {
-          setActiveTab("source");
-        } else {
-          setActiveTab(tabValue || "info");
-        }
-      }
-    };
-
-    // Add event listener
-    document.addEventListener("click", handleFeatureClick);
-
-    // Cleanup
-    return () => {
-      document.removeEventListener("click", handleFeatureClick);
-    };
-  }, []);
-
   // Tab change handler
   const handleTabChange = (value: string) => {
     console.log("Tab changed to:", value);
     setActiveTab(value);
+    
+    // Hide all content first
+    const allContent = document.querySelectorAll('[data-section]');
+    allContent.forEach((el) => {
+      (el as HTMLElement).style.display = 'none';
+    });
+    
+    // Show only selected content
+    const selectedContent = document.querySelector(`[data-section="${value}"]`);
+    if (selectedContent) {
+      (selectedContent as HTMLElement).style.display = 'block';
+    }
     
     toast.info(`Affichage de l'onglet ${value}`, {
       description: value === "info" 
@@ -115,7 +55,7 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
   }
 
   return (
-    <Tabs defaultValue="info" value={activeTab} onValueChange={handleTabChange} className="w-full">
+    <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
       <TabsList className="w-full grid grid-cols-3 bg-muted/50 p-1 rounded-lg">
         <TabsTrigger 
           value="info"
@@ -146,17 +86,17 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
         </TabsTrigger>
       </TabsList>
 
-      <TabsContent value="info" className="mt-6 space-y-6" id="seo" data-section="seo">
+      <TabsContent value="info" className="mt-6 space-y-6" id="seo" data-section="info" style={{ display: activeTab === "info" ? "block" : "none" }}>
         <div id="backlinks" data-section="backlinks" className="section-backlinks">
           <SiteInfo data={data} />
         </div>
       </TabsContent>
 
-      <TabsContent value="source" className="mt-6" id="source" data-section="source">
+      <TabsContent value="source" className="mt-6" id="source" data-section="source" style={{ display: activeTab === "source" ? "block" : "none" }}>
         <SourceCode sourceCode={data?.sourceCode || "<p>Aucun code source disponible</p>"} />
       </TabsContent>
       
-      <TabsContent value="structure" className="mt-6" id="structure" data-section="structure">
+      <TabsContent value="structure" className="mt-6" id="structure" data-section="structure" style={{ display: activeTab === "structure" ? "block" : "none" }}>
         <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
           <h3 className="text-lg font-bold mb-4">Structure du site</h3>
           

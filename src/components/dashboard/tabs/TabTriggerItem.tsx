@@ -29,18 +29,17 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
   const handleTabClick = () => {
     console.log(`Tab clicked: ${id}`);
     
-    // Force display of tab content immediately
-    const tabContent = document.querySelector(`[data-state="content"][value="${id}"]`);
+    // Hide all tab content first
+    const allTabContent = document.querySelectorAll('[data-tab-content]');
+    allTabContent.forEach((el) => {
+      (el as HTMLElement).style.display = 'none';
+    });
+    
+    // Show the selected tab content
+    const tabContent = document.querySelector(`[data-tab-content="${id}"]`);
     if (tabContent) {
-      console.log(`Found tab content with value: ${id}`);
+      console.log(`Found tab content with data-tab-content: ${id}`);
       (tabContent as HTMLElement).style.display = 'block';
-      
-      // Also try by ID as fallback
-      const idElement = document.getElementById(id);
-      if (idElement) {
-        console.log(`Also found element by ID: ${id}`);
-        idElement.style.display = 'block';
-      }
       
       toast.success(`Onglet ${label} activé`, {
         description: "Contenu affiché",
