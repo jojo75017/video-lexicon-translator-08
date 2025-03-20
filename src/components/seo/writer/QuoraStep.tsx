@@ -80,7 +80,7 @@ const QuoraStep = ({
             return;
           }
           
-          prompt = `En tant que ${tone === "expert" ? "expert" : tone === "conversational" ? "personne amicale et conversationnelle" : "narrateur partageant une histoire personnelle"}, écrivez une réponse détaillée à la question Quora suivante: "${quoraQuestion}". La réponse doit être approfondie, bien structurée et porter sur le sujet "${quoraTitle}".`;
+          prompt = `En tant que ${tone === "expert" ? "expert" : tone === "conversational" ? "personne amicale et conversationnelle" : "narrateur partageant une histoire personnelle"}, écrivez une réponse concise (max 200 mots) à la question Quora suivante: "${quoraQuestion}". La réponse doit être pertinente et porter sur le sujet "${quoraTitle}".`;
         }
         
         try {
@@ -89,7 +89,7 @@ const QuoraStep = ({
           console.log("Génération avec prompt:", prompt);
           
           // Simuler un délai pour la génération d'IA
-          await new Promise(resolve => setTimeout(resolve, 2000));
+          await new Promise(resolve => setTimeout(resolve, 1000));
           
           // Générer du contenu selon le mode et le ton choisis
           if (questionMode === "ask") {
@@ -130,39 +130,39 @@ const QuoraStep = ({
       setQuoraQuestion(`Quelles sont les meilleures astuces pour ${title} tout en optimisant son budget ?`);
       
       // Générer également une réponse pour avoir un aperçu
-      const sampleAnswer = `Le ${title} est parfaitement possible si l'on suit quelques principes clés. D'après mon expérience, voici les meilleures stratégies :
+      const sampleAnswer = `Pour ${title} efficacement, voici 3 astuces essentielles :
 
-1. **Planifier en avance** - Les réservations précoces permettent souvent d'économiser 30 à 40% sur les billets d'avion et les hébergements.
+1. **Planifier en avance** - Les réservations précoces permettent souvent d'économiser 30-40% sur les billets d'avion et hébergements.
 
-2. **Voyager hors saison** - Les prix peuvent être divisés par deux pendant les périodes creuses, avec l'avantage supplémentaire de sites moins bondés.
+2. **Voyager hors saison** - Les prix peuvent être divisés par deux pendant les périodes creuses, avec moins de touristes.
 
-3. **Utiliser les bonnes applications** - Des outils comme Skyscanner, Hopper ou Google Flights pour surveiller les prix des vols, et Booking.com ou Airbnb pour comparer les hébergements.`;
+3. **Utiliser les bonnes applications** - Skyscanner pour surveiller les prix des vols, Booking.com ou Airbnb pour comparer les hébergements.`;
       
       setQuoraAnswer(sampleAnswer);
     } else if (keywords.includes('marketing') || keywords.includes('digital') || keywords.includes('business')) {
       setQuoraQuestion(`Comment optimiser sa stratégie de ${title} pour obtenir les meilleurs résultats en 2024 ?`);
       
       // Générer une réponse business
-      const sampleAnswer = `Pour optimiser votre stratégie de ${title}, il est essentiel d'adopter une approche méthodique et basée sur les données. Voici les points clés à considérer :
+      const sampleAnswer = `Pour optimiser votre stratégie de ${title}, 3 approches sont essentielles :
 
 1. **Analyse concurrentielle** - Étudiez ce que font vos concurrents et identifiez les opportunités qu'ils négligent.
 
-2. **Segmentation précise** - Divisez votre audience en segments spécifiques pour des communications plus ciblées et pertinentes.
+2. **Segmentation précise** - Divisez votre audience en segments spécifiques pour des communications plus ciblées.
 
-3. **Contenu de qualité** - Privilégiez la qualité à la quantité, avec un contenu qui apporte une réelle valeur ajoutée à votre audience.`;
+3. **Contenu de qualité** - Privilégiez la qualité à la quantité, apportez une valeur ajoutée à votre audience.`;
       
       setQuoraAnswer(sampleAnswer);
     } else {
       // Générique pour tout autre sujet
-      setQuoraQuestion(`Quelles sont les meilleures pratiques concernant ${title} que les experts recommandent en 2024 ?`);
+      setQuoraQuestion(`Quelles sont les meilleures pratiques concernant ${title} en 2024 ?`);
       
-      const sampleAnswer = `En ce qui concerne ${title}, les experts s'accordent sur plusieurs points essentiels pour 2024 :
+      const sampleAnswer = `Concernant ${title}, voici les pratiques essentielles pour 2024 :
 
 1. **Se former continuellement** - Le domaine évolue rapidement, une veille régulière est indispensable.
 
 2. **Adopter une approche holistique** - Ne pas se concentrer sur un seul aspect mais considérer l'ensemble des facteurs.
 
-3. **Mesurer les résultats** - Définir des KPIs clairs et les suivre régulièrement pour ajuster sa stratégie.`;
+3. **Mesurer les résultats** - Définir des KPIs clairs et les suivre régulièrement pour ajuster votre stratégie.`;
       
       setQuoraAnswer(sampleAnswer);
     }
@@ -183,66 +183,55 @@ const QuoraStep = ({
     
     switch (toneStyle) {
       case "expert":
-        generatedAnswer = `En tant qu'expert avec plus de 10 ans d'expérience dans le domaine du ${topic}, je peux vous affirmer que ${title} requiert une approche méthodique et stratégique.
+        generatedAnswer = `En tant qu'expert dans le domaine du ${topic}, voici 3 points essentiels à considérer pour ${title} :
 
-Voici les 3 points essentiels à considérer pour ${isTravelTopic ? "voyager pas cher" : title} :
+1. **Planification stratégique** - ${isTravelTopic ? "Réserver 3-4 mois à l'avance peut réduire vos coûts de transport de 30-40%" : "Une analyse préalable de votre situation actuelle est essentielle"}. 
 
-1. **Planification intelligente** - ${isTravelTopic ? "Réserver 3-4 mois à l'avance peut réduire vos coûts de transport de 30-40%" : "Une analyse préalable complète de votre situation actuelle est essentielle"}. Selon une étude récente ${isTravelTopic ? "de Skyscanner" : "de McKinsey"}, les personnes qui commencent par cette étape ont 64% plus de chances de réussir.
+2. **${isTravelTopic ? "Flexibilité" : "Mise en œuvre progressive"}** - ${isTravelTopic ? "Être flexible sur les dates et destinations peut faire économiser jusqu'à 60%" : "Priorisez vos actions selon leur impact potentiel"}.
 
-2. **${isTravelTopic ? "Flexibilité" : "Mise en œuvre progressive"}** - ${isTravelTopic ? "Être flexible sur les dates et les destinations peut faire économiser jusqu'à 60% sur un voyage" : "Priorisez vos actions selon leur impact potentiel"}. Un ${isTravelTopic ? "voyage" : "déploiement"} par phases permet de mesurer les résultats et d'ajuster votre stratégie.
-
-3. **${isTravelTopic ? "Ressources alternatives" : "Mesure et optimisation"}** - ${isTravelTopic ? "Considérez les auberges de jeunesse, le couchsurfing ou les échanges de maisons" : "Définissez des KPIs clairs et suivez-les régulièrement"}. ${isTravelTopic ? "Ces options peuvent réduire vos frais d'hébergement de 70-80%" : "Ce qui ne peut être mesuré ne peut être amélioré"}.
-
-Dans mon livre "${isTravelTopic ? "Voyager malin, dépenser moins" : "Stratégies d'excellence"}", j'explique comment j'ai aidé plus de 200 ${isTravelTopic ? "voyageurs" : "clients"} à obtenir des résultats exceptionnels en suivant ces principes. La clé est la constance et l'adaptation continue.
+3. **${isTravelTopic ? "Ressources alternatives" : "Mesure et optimisation"}** - ${isTravelTopic ? "Considérez les auberges de jeunesse ou les échanges de maisons" : "Définissez des KPIs clairs et suivez-les régulièrement"}.
 
 N'hésitez pas à me poser des questions plus spécifiques sur l'un de ces aspects.`;
         break;
         
       case "conversational":
-        generatedAnswer = `Ah, ${title} ! C'est une super question que beaucoup de gens se posent.
+        generatedAnswer = `${title} ? C'est une super question !
 
 Je me souviens quand j'ai commencé à m'intéresser à ${isTravelTopic ? "voyager sans me ruiner" : title}, j'étais complètement perdu 😅
 
-Mais avec le temps, j'ai découvert quelques astuces qui marchent vraiment bien :
+Voici mes conseils :
 
-• D'abord, ${isTravelTopic ? "soyez flexible sur vos dates" : "prenez le temps de bien comprendre votre situation"}. C'est comme quand on part en voyage - on vérifie la météo et on prépare sa valise en conséquence, non ?
+• ${isTravelTopic ? "Soyez flexible sur vos dates" : "Prenez le temps de bien comprendre votre situation"}
 
-• Ensuite, ${isTravelTopic ? "utilisez les bons outils comme Skyscanner ou Hopper" : "avancez étape par étape"}. ${isTravelTopic ? "Ces applis peuvent vous trouver des vols à moitié prix !" : "Rome ne s'est pas construite en un jour !"} J'ai fait l'erreur de vouloir tout faire en même temps et... catastrophe !
+• ${isTravelTopic ? "Utilisez des outils comme Skyscanner" : "Avancez étape par étape"}
 
-• Finalement, ${isTravelTopic ? "pensez comme un local, pas comme un touriste" : "gardez un œil sur vos progrès"}. ${isTravelTopic ? "Les restaurants où vont les habitants locaux sont souvent 3 fois moins chers que ceux pour touristes" : "Comme quand on suit un régime, il faut se peser régulièrement pour voir si ça fonctionne"}.
+• ${isTravelTopic ? "Pensez comme un local, pas comme un touriste" : "Suivez vos progrès"}
 
-J'ai partagé mon expérience sur mon blog si ça vous intéresse d'en savoir plus. Le plus important c'est de rester motivé et de ne pas abandonner au premier obstacle.
-
-Qu'est-ce qui vous intéresse le plus dans tout ça ? Je serais ravi d'approfondir un aspect particulier !`;
+Qu'est-ce qui vous intéresse le plus dans tout ça ?`;
         break;
         
       case "storytelling":
-        generatedAnswer = `Il y a trois ans, ${isTravelTopic ? "Sophie" : "Marc"}, ${isTravelTopic ? "une passionnée de voyages" : "un entrepreneur passionné"}, s'est retrouvé face au même défi que vous concernant ${title.toLowerCase()}.
+        generatedAnswer = `Il y a trois ans, ${isTravelTopic ? "Sophie" : "Marc"} s'est retrouvé face au même défi concernant ${title}.
 
-${isTravelTopic ? "Son budget était serré mais son envie de découvrir le monde était immense" : "Son entreprise stagnait, malgré tous ses efforts"}. Un soir, épuisé, ${isTravelTopic ? "elle a rencontré un voyageur expérimenté" : "il a rencontré un mentor"} qui lui a partagé une approche qui allait tout changer.
+**Première révélation :** ${isTravelTopic ? "la planification stratégique" : "l'importance de l'analyse"}
+${isTravelTopic ? "Sophie a commencé par identifier les destinations abordables selon les saisons" : "Marc a commencé par cartographier sa situation"}.
 
-**Première révélation : ${isTravelTopic ? "la planification stratégique" : "l'importance de l'analyse"}**
-${isTravelTopic ? "Sophie a commencé par identifier les destinations abordables selon les saisons" : "Marc a commencé par cartographier précisément sa situation"}. "C'était comme allumer la lumière dans une pièce sombre", ${isTravelTopic ? "m'a-t-elle" : "m'a-t-il"} confié. Cette clarté lui a permis d'identifier des opportunités invisibles jusque-là.
+**Deuxième étape :** ${isTravelTopic ? "les ressources alternatives" : "la méthode des petits pas"}
+${isTravelTopic ? "Au lieu de séjourner dans des hôtels, Sophie a découvert le couchsurfing" : "Marc a adopté une approche progressive"}.
 
-**Deuxième tournant : ${isTravelTopic ? "les ressources alternatives" : "la méthode des petits pas"}**
-${isTravelTopic ? "Au lieu de séjourner dans des hôtels, Sophie a découvert le couchsurfing et les auberges locales" : "Au lieu de tout bouleverser, Marc a adopté une approche progressive"}. Chaque ${isTravelTopic ? "voyage" : "semaine"}, une nouvelle ${isTravelTopic ? "astuce" : "amélioration"}. "C'était comme construire un mur, brique par brique", explique-t-${isTravelTopic ? "elle" : "il"}. En six mois, la transformation était spectaculaire.
+**Résultat final :** ${isTravelTopic ? "Sophie a visité 5 pays avec un budget limité" : "l'entreprise de Marc a doublé son chiffre d'affaires"}.
 
-**Moment décisif : ${isTravelTopic ? "l'immersion locale" : "le pouvoir des données"}**
-${isTravelTopic ? "Sophie a appris à voyager comme une locale, mangeant où les habitants mangent" : "Marc a mis en place un tableau de bord simple pour suivre ses progrès"}. "${isTravelTopic ? "Les expériences les plus authentiques étaient aussi les moins chères" : "Les chiffres m'ont raconté une histoire que mon intuition ne pouvait pas voir"}", dit-${isTravelTopic ? "elle" : "il"}. Cette ${isTravelTopic ? "approche" : "visibilité"} l'a guidé vers des ${isTravelTopic ? "découvertes inoubliables" : "ajustements cruciaux"}.
-
-Aujourd'hui, ${isTravelTopic ? "Sophie a visité 15 pays avec un budget que beaucoup dépenseraient pour un seul voyage" : "l'entreprise de Marc a triplé son chiffre d'affaires"}. ${isTravelTopic ? "Son" : "Cette"} histoire n'est pas unique - j'ai accompagné des dizaines de ${isTravelTopic ? "voyageurs" : "entrepreneurs"} vers des réussites similaires en suivant ces principes.
-
-Quelle est votre plus grande difficulté actuellement avec ${title.toLowerCase()} ?`;
+Quelle est votre plus grande difficulté avec ${title} ?`;
         break;
         
       default:
-        generatedAnswer = `Concernant ${title}, voici les points essentiels à considérer :
+        generatedAnswer = `Concernant ${title}, voici les points essentiels :
 
 1. ${isTravelTopic ? "Planifiez à l'avance pour obtenir les meilleurs tarifs" : "Commencez par une analyse approfondie"}
 2. ${isTravelTopic ? "Soyez flexible sur les dates et destinations" : "Procédez par étapes progressives"}
 3. ${isTravelTopic ? "Utilisez les bons outils de comparaison" : "Mesurez régulièrement vos résultats"}
 
-Ces trois principes vous permettront d'obtenir des résultats optimaux et durables.`;
+Ces trois principes vous permettront d'obtenir des résultats optimaux.`;
     }
 
     setQuoraAnswer(generatedAnswer);
@@ -436,21 +425,21 @@ Ces trois principes vous permettront d'obtenir des résultats optimaux et durabl
               <div className="flex items-start gap-2">
                 <Lightbulb className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-medium mb-2">Conseils pour un contenu efficace :</p>
+                  <p className="font-medium mb-2">Conseils pour un contenu Quora efficace :</p>
                   <ul className="space-y-1 text-gray-600">
                     {questionMode === "ask" ? (
                       <>
                         <li>• Formulez une question claire et précise</li>
                         <li>• Incluez des mots-clés pertinents pour votre niche</li>
-                        <li>• Évitez les questions trop générales ou trop techniques</li>
-                        <li>• Ajoutez du contexte pour obtenir des réponses plus pertinentes</li>
+                        <li>• Évitez les questions trop générales</li>
+                        <li>• Ajoutez du contexte pour obtenir des réponses pertinentes</li>
                       </>
                     ) : (
                       <>
-                        <li>• Montrez votre expertise dès le début de votre réponse</li>
-                        <li>• Structurez votre réponse avec des points clairs</li>
-                        <li>• Incluez des exemples concrets et des données</li>
-                        <li>• Terminez par une conclusion et une invitation à l'engagement</li>
+                        <li>• Restez concis (200-250 mots maximum)</li>
+                        <li>• Montrez votre expertise dès le début</li>
+                        <li>• Structurez votre réponse avec 2-3 points clairs</li>
+                        <li>• Incluez un exemple concret si possible</li>
                       </>
                     )}
                   </ul>
@@ -491,7 +480,7 @@ Ces trois principes vous permettront d'obtenir des résultats optimaux et durabl
         </TabsContent>
       </Tabs>
 
-      {/* Preview section - shown after generation or when content exists */}
+      {/* Preview section - always visible when content exists */}
       {(quoraQuestion && quoraAnswer) && (
         <Card className="mt-4 p-4 bg-gray-50 border-[#b92b27]/20">
           <CardContent className="p-0">
