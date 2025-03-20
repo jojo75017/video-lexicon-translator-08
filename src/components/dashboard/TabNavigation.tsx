@@ -20,6 +20,9 @@ import {
 const TabNavigation = () => {
   const [activeTab, setActiveTab] = useState("wordcount");
   const groupedTabs = getGroupedTabs();
+  
+  // Filtrer les onglets pour n'avoir que ceux sans lien externe
+  const contentTabs = tabs.filter(tab => !tab.link);
 
   return (
     <TooltipProvider>
@@ -38,19 +41,28 @@ const TabNavigation = () => {
           </TabsList>
         </div>
         
-        {/* Tab content sections - ensure visibility */}
+        {/* Tab content sections */}
         <div className="p-2 bg-gray-50 rounded-lg border border-gray-200">
-          <HierarchyTabContent />
-          <WordCountTabContent />
-          <SeoTabContent />
-          <StructureTabContent />
-          <BacklinksTabContent />
-          <MetricsTabContent />
-          
-          {/* Add default content for other tabs */}
-          {tabs.filter(tab => !['seo', 'structure', 'hierarchy', 'backlinks', 'metrics', 'wordcount'].includes(tab.id) && !tab.link).map(tab => (
-            <DefaultTabContent key={tab.id} id={tab.id} label={tab.label} />
-          ))}
+          {/* Render all tab contents for better visibility */}
+          {contentTabs.map(tab => {
+            // Utiliser des composants spécifiques pour certains onglets
+            switch(tab.id) {
+              case 'hierarchy':
+                return <HierarchyTabContent key={tab.id} />;
+              case 'wordcount':
+                return <WordCountTabContent key={tab.id} />;
+              case 'seo':
+                return <SeoTabContent key={tab.id} />;
+              case 'structure':
+                return <StructureTabContent key={tab.id} />;
+              case 'backlinks':
+                return <BacklinksTabContent key={tab.id} />;
+              case 'metrics':
+                return <MetricsTabContent key={tab.id} />;
+              default:
+                return <DefaultTabContent key={tab.id} id={tab.id} label={tab.label} />;
+            }
+          })}
         </div>
       </Tabs>
     </TooltipProvider>
