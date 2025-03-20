@@ -19,15 +19,15 @@ const MainTabList: React.FC<MainTabListProps> = ({
   onTabChange
 }) => {
   return (
-    <div className="grid grid-cols-4 gap-2 p-1 bg-gray-50 mb-4 rounded-lg">
+    <div className="flex rounded-lg bg-white shadow-sm mb-4 overflow-hidden">
       {mainTabs.map(tab => (
         <div 
           key={tab.id}
           onClick={() => onTabChange(tab.id)}
-          className={`rounded-md py-2 px-4 text-center cursor-pointer transition-all ${
+          className={`flex-1 py-3 px-4 text-center cursor-pointer transition-all border-b-2 ${
             activeTab === tab.id 
-              ? tab.color
-              : 'hover:bg-gray-100'
+              ? `border-b-2 ${tab.color} font-medium`
+              : 'border-transparent hover:bg-gray-50'
           }`}
         >
           {tab.label}

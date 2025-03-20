@@ -12,12 +12,12 @@ export interface MainTab {
 export const useTabNavigation = () => {
   const [activeTab, setActiveTab] = useState<string>('');
   
-  // Define main categories
+  // Define main categories with more SEMrush/UberSuggest-like styling
   const mainTabs: MainTab[] = [
-    {id: 'seo', label: 'SEO', color: 'bg-purple-100 text-purple-800'},
-    {id: 'content', label: 'Contenu', color: 'bg-blue-100 text-blue-800'},
-    {id: 'performance', label: 'Performance', color: 'bg-amber-100 text-amber-800'},
-    {id: 'analytics', label: 'Analytics', color: 'bg-emerald-100 text-emerald-800'}
+    {id: 'seo', label: 'SEO', color: 'text-purple-800 border-purple-600'},
+    {id: 'content', label: 'Contenu', color: 'text-blue-800 border-blue-600'},
+    {id: 'performance', label: 'Performance', color: 'text-amber-800 border-amber-600'},
+    {id: 'analytics', label: 'Analytics', color: 'text-emerald-800 border-emerald-600'}
   ];
   
   // Filter tabs without external links
@@ -64,16 +64,7 @@ export const useTabNavigation = () => {
     setActiveTab(value);
     
     // Make the section visible by using its ID
-    const section = document.getElementById(value);
-    if (section) {
-      console.log(`Section "${value}" found, making visible`);
-      document.querySelectorAll('[data-tab-content]').forEach(el => {
-        (el as HTMLElement).style.display = 'none';
-      });
-      section.style.display = 'block';
-    } else {
-      console.error(`Section "${value}" not found`);
-    }
+    activateSection(value);
     
     // Update URL
     window.location.hash = value;
@@ -81,13 +72,13 @@ export const useTabNavigation = () => {
 
   // Get sub-tabs based on active main tab
   const getSubTabs = () => {
-    if (activeTab === 'seo') {
+    if (activeTab === 'seo' || mainTabs.some(t => t.id === 'seo' && t.id === activeTab)) {
       return tabs.filter(tab => ['seo', 'structure', 'backlinks'].includes(tab.id));
-    } else if (activeTab === 'content') {
+    } else if (activeTab === 'content' || mainTabs.some(t => t.id === 'content' && t.id === activeTab)) {
       return tabs.filter(tab => ['wordcount', 'hierarchy', 'suggestions'].includes(tab.id));
-    } else if (activeTab === 'performance') {
+    } else if (activeTab === 'performance' || mainTabs.some(t => t.id === 'performance' && t.id === activeTab)) {
       return tabs.filter(tab => ['performance', 'metrics'].includes(tab.id));
-    } else if (activeTab === 'analytics') {
+    } else if (activeTab === 'analytics' || mainTabs.some(t => t.id === 'analytics' && t.id === activeTab)) {
       return tabs.filter(tab => ['analytics'].includes(tab.id));
     }
     return [];

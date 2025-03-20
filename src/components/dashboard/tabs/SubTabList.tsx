@@ -16,15 +16,15 @@ const SubTabList: React.FC<SubTabListProps> = ({
   if (subTabs.length === 0) return null;
   
   return (
-    <div className="flex flex-wrap gap-2 mb-4 pl-2">
+    <div className="flex overflow-x-auto mb-4 bg-white p-2 rounded-lg shadow-sm">
       {subTabs.map(tab => (
         <div 
           key={tab.id}
           onClick={() => onTabChange(tab.id)}
-          className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm cursor-pointer ${
+          className={`flex items-center gap-1 px-4 py-2 mx-1 rounded-md text-sm cursor-pointer whitespace-nowrap ${
             activeTab === tab.id 
-              ? 'bg-blue-600 text-white'
-              : 'bg-gray-100 hover:bg-gray-200'
+              ? 'bg-blue-100 text-blue-800 font-medium'
+              : 'hover:bg-gray-100'
           }`}
         >
           {tab.icon}

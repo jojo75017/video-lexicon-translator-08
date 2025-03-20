@@ -28,14 +28,12 @@ const TabNavigation = () => {
             onValueChange={handleTabChange} 
             className="w-full"
           >
-            {/* Main Tab Navigation */}
-            <TabsList className="w-full">
-              <MainTabList 
-                mainTabs={mainTabs}
-                activeTab={activeTab}
-                onTabChange={handleTabChange}
-              />
-            </TabsList>
+            {/* Main Tab Navigation - Now styled more like SEMrush/UberSuggest */}
+            <MainTabList 
+              mainTabs={mainTabs}
+              activeTab={activeTab}
+              onTabChange={handleTabChange}
+            />
             
             {/* Subtabs based on active main tab */}
             <SubTabList 
@@ -45,7 +43,7 @@ const TabNavigation = () => {
             />
             
             {/* Tab Contents */}
-            <div className="bg-gray-50 rounded-lg border border-gray-200 p-0">
+            <div className="bg-white rounded-lg border border-gray-200 p-4">
               <TabContentsRenderer contentTabs={contentTabs} />
             </div>
           </Tabs>

@@ -32,12 +32,12 @@ const TabContentsRenderer: React.FC<TabContentsRendererProps> = ({ contentTabs }
   return (
     <>
       {/* Specialized tab contents */}
-      <TabsContent value="wordcount" id="wordcount" data-tab-content>
-        <WordCountTabContent />
-      </TabsContent>
-      
       <TabsContent value="hierarchy" id="hierarchy" data-tab-content>
         <HierarchyTabContent />
+      </TabsContent>
+      
+      <TabsContent value="wordcount" id="wordcount" data-tab-content>
+        <WordCountTabContent />
       </TabsContent>
       
       <TabsContent value="suggestions" id="suggestions" data-tab-content>
