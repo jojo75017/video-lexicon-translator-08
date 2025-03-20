@@ -1,4 +1,3 @@
-
 import { Tab } from './types';
 import { 
   BarChart2, 
@@ -14,7 +13,9 @@ import {
   PieChart, 
   Settings, 
   SlidersHorizontal, 
-  Zap
+  Zap,
+  Tag,
+  Edit3
 } from 'lucide-react';
 
 export const groupLabels: Record<string, string> = {
@@ -33,7 +34,7 @@ export const tabs: Tab[] = [
     description: 'Analyse de la densité des mots-clés',
     icon: <List />,
     group: 'content',
-    color: 'text-blue-600' // Added color property
+    color: 'text-blue-600'
   },
   {
     id: 'hierarchy',
@@ -41,7 +42,18 @@ export const tabs: Tab[] = [
     description: 'Structure des titres et contenu',
     icon: <Layout />,
     group: 'content',
-    color: 'text-green-600' // Added color property
+    color: 'text-green-600'
+  },
+  // Nouvel onglet pour les suggestions de titre/meta description
+  {
+    id: 'suggestions',
+    label: 'Suggestions',
+    description: 'Suggestions de titres et meta descriptions',
+    icon: <Edit3 />,
+    group: 'content',
+    color: 'text-amber-600',
+    isNew: true,
+    highlighted: true
   },
   {
     id: 'seo',
@@ -49,7 +61,7 @@ export const tabs: Tab[] = [
     description: 'Analyse du référencement',
     icon: <Maximize2 />,
     group: 'seo',
-    color: 'text-purple-600' // Added color property
+    color: 'text-purple-600'
   },
   {
     id: 'structure',
@@ -57,7 +69,7 @@ export const tabs: Tab[] = [
     description: 'Structure du site et navigation',
     icon: <HardDrive />,
     group: 'seo',
-    color: 'text-yellow-600' // Added color property
+    color: 'text-yellow-600'
   },
   {
     id: 'backlinks',
@@ -65,7 +77,7 @@ export const tabs: Tab[] = [
     description: 'Analyse des liens entrants',
     icon: <Link2 />,
     group: 'backlinks',
-    color: 'text-indigo-600' // Added color property
+    color: 'text-indigo-600'
   },
   {
     id: 'analytics',
@@ -73,7 +85,7 @@ export const tabs: Tab[] = [
     description: 'Données statistiques et analytiques',
     icon: <BarChart2 />,
     group: 'seo',
-    color: 'text-orange-600' // Added color property
+    color: 'text-orange-600'
   },
   {
     id: 'performance',
@@ -81,7 +93,7 @@ export const tabs: Tab[] = [
     description: 'Vitesse et optimisations',
     icon: <Zap />,
     group: 'performance',
-    color: 'text-amber-600' // Added color property
+    color: 'text-amber-600'
   },
   {
     id: 'metrics',
@@ -89,7 +101,7 @@ export const tabs: Tab[] = [
     description: 'KPIs et statistiques',
     icon: <PieChart />,
     group: 'performance',
-    color: 'text-emerald-600' // Added color property
+    color: 'text-emerald-600'
   },
   {
     id: 'advanced',
@@ -97,7 +109,7 @@ export const tabs: Tab[] = [
     description: 'Options et analyses avancées',
     icon: <SlidersHorizontal />,
     group: 'advanced',
-    color: 'text-gray-600' // Added color property
+    color: 'text-gray-600'
   },
   {
     id: 'code',
@@ -105,7 +117,7 @@ export const tabs: Tab[] = [
     description: 'Analyse technique du code',
     icon: <Code />,
     group: 'advanced',
-    color: 'text-rose-600' // Added color property
+    color: 'text-rose-600'
   },
   {
     id: 'integrations',
@@ -113,7 +125,7 @@ export const tabs: Tab[] = [
     description: 'Connexion avec d\'autres outils',
     icon: <Settings />,
     group: 'advanced',
-    color: 'text-cyan-600' // Added color property
+    color: 'text-cyan-600'
   },
   {
     id: 'gsc',
@@ -122,7 +134,7 @@ export const tabs: Tab[] = [
     icon: <FileText />,
     link: 'https://search.google.com/search-console',
     group: 'external',
-    color: 'text-red-600' // Added color property
+    color: 'text-red-600'
   },
   {
     id: 'ga',
@@ -131,7 +143,7 @@ export const tabs: Tab[] = [
     icon: <BarChart2 />,
     link: 'https://analytics.google.com/',
     group: 'external',
-    color: 'text-blue-600' // Added color property
+    color: 'text-blue-600'
   },
   {
     id: 'lighthouse',
@@ -140,7 +152,7 @@ export const tabs: Tab[] = [
     icon: <Clock />,
     link: 'https://developers.google.com/web/tools/lighthouse',
     group: 'external',
-    color: 'text-yellow-600' // Added color property
+    color: 'text-yellow-600'
   },
   {
     id: 'pagespeed',
@@ -149,7 +161,7 @@ export const tabs: Tab[] = [
     icon: <ExternalLink />,
     link: 'https://developers.google.com/speed/pagespeed/insights/',
     group: 'external',
-    color: 'text-green-600' // Added color property
+    color: 'text-green-600'
   }
 ];
 

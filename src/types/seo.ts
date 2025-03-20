@@ -1,4 +1,3 @@
-
 export interface SeoAnalysisResult {
   title?: string;
   description?: string;
@@ -220,7 +219,6 @@ export interface Performance {
   domLoadTime: number;
   resourceCount: number;
   scriptCount: number;
-  cssCount: number;
   imageCount: number;
   cacheLifetime: number;
   score: number;
@@ -316,4 +314,7 @@ export interface SeasonalityData {
   spring: number;
   summer: number;
   fall: number;
+  // Ajout des propriétés manquantes qui causent des erreurs
+  peak?: number;
+  low?: number;
 }
