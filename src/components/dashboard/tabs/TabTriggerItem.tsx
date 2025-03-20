@@ -5,6 +5,7 @@ import { LucideIcon } from 'lucide-react';
 import { TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { toast } from "sonner";
 
 interface TabTriggerItemProps {
   id: string;
@@ -27,14 +28,48 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
 }) => {
   const handleTabClick = () => {
     console.log(`Tab clicked: ${id}`);
-    // Find the corresponding tab content and make sure it's visible
-    setTimeout(() => {
-      const tabContent = document.getElementById(id);
-      if (tabContent) {
-        console.log(`Making tab content visible for: ${id}`);
-        tabContent.style.display = 'block';
+    
+    // Force display of tab content immediately
+    const tabContent = document.querySelector(`[data-state="content"][value="${id}"]`);
+    if (tabContent) {
+      console.log(`Found tab content with value: ${id}`);
+      (tabContent as HTMLElement).style.display = 'block';
+      
+      // Also try by ID as fallback
+      const idElement = document.getElementById(id);
+      if (idElement) {
+        console.log(`Also found element by ID: ${id}`);
+        idElement.style.display = 'block';
       }
-    }, 50);
+      
+      toast.success(`Onglet ${label} activé`, {
+        description: "Contenu affiché",
+        duration: 1500
+      });
+    } else {
+      console.log(`Tab content not found for: ${id}, trying other selectors`);
+      
+      // Try other selectors
+      const alternateContent = document.getElementById(id) || 
+                               document.querySelector(`[data-section="${id}"]`) ||
+                               document.querySelector(`.section-${id}`);
+      
+      if (alternateContent) {
+        console.log(`Found alternate content element for: ${id}`);
+        (alternateContent as HTMLElement).style.display = 'block';
+        
+        toast.success(`Onglet ${label} activé`, {
+          description: "Contenu affiché via sélecteur alternatif",
+          duration: 1500
+        });
+      } else {
+        console.log(`No content element found for: ${id}`);
+        toast.error(`Impossible d'afficher le contenu pour ${label}`, {
+          description: "Élément introuvable",
+          duration: 2000
+        });
+      }
+    }
   };
 
   return (
