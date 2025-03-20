@@ -16,7 +16,8 @@ import {
   BacklinksTabContent, 
   MetricsTabContent,
   AdvancedTabContent,
-  IntegrationsTabContent 
+  IntegrationsTabContent,
+  AnalyticsTabContent
 } from './tabs/StandardTabContents';
 import { activateSection } from '@/utils/navigationHelpers';
 
@@ -125,9 +126,13 @@ const TabNavigation = () => {
             <IntegrationsTabContent />
           </TabsContent>
           
+          <TabsContent value="analytics">
+            <AnalyticsTabContent />
+          </TabsContent>
+          
           {/* Generate TabsContent for remaining tabs */}
           {contentTabs
-            .filter(tab => !['hierarchy', 'wordcount', 'seo', 'structure', 'backlinks', 'metrics', 'advanced', 'integrations'].includes(tab.id))
+            .filter(tab => !['hierarchy', 'wordcount', 'seo', 'structure', 'backlinks', 'metrics', 'advanced', 'integrations', 'analytics'].includes(tab.id))
             .map(tab => (
               <TabsContent key={tab.id} value={tab.id}>
                 <DefaultTabContent id={tab.id} label={tab.label} />

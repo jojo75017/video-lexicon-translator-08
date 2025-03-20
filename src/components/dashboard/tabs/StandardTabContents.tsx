@@ -120,6 +120,10 @@ export const StructureTabContent: React.FC = () => {
 import HierarchyTabContent from './HierarchyTabContent';
 export { HierarchyTabContent };
 
+// Import the new AnalyticsTabContent
+import AnalyticsTabContent from './AnalyticsTabContent';
+export { AnalyticsTabContent };
+
 export const BacklinksTabContent: React.FC = () => (
   <div className="bg-white p-6 rounded-lg shadow-md" id="backlinks" data-section="backlinks" data-tab-content="backlinks">
     <h2 className="text-xl font-bold mb-4">Analyse des Backlinks</h2>
