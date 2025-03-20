@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { FileText, AlignLeft, Tag, Copy, Check, PenTool, Sparkles, Search } from 'lucide-react';
 import { toast } from "sonner";
 import { KeywordSuggestion } from '@/types/seo';
-import { analyzeKeywords, generateKeywordSuggestions } from '@/utils/seo/keywordAnalyzer';
 
 const SuggestionsTabContent = () => {
   const [keyword, setKeyword] = useState<string>("");
@@ -18,16 +17,22 @@ const SuggestionsTabContent = () => {
   const handleGenerateSuggestions = () => {
     setIsLoading(true);
     
-    // Simulation d'une analyse pour générer des suggestions
+    // Vérifier que le mot-clé n'est pas vide
+    if (!keyword || keyword.trim() === "") {
+      toast.error("Veuillez entrer un mot-clé pour générer des suggestions");
+      setIsLoading(false);
+      return;
+    }
+    
+    // Simulation d'une analyse pour générer des suggestions basées sur le mot-clé saisi
     setTimeout(() => {
       try {
-        const mockContent = "Le référencement naturel (SEO) est l'ensemble des techniques qui permettent d'améliorer la position d'un site web dans les résultats des moteurs de recherche. L'objectif est d'optimiser le site pour qu'il apparaisse dans les premiers résultats pour des mots-clés pertinents. Cela comprend l'optimisation technique, l'optimisation du contenu et la création de liens.";
-        const keywords = analyzeKeywords(mockContent + (keyword ? ` ${keyword}` : ''));
-        const generatedSuggestions = generateKeywordSuggestions(keywords);
+        // Générer des suggestions fictives basées sur le mot-clé
+        const generatedSuggestions = generateSuggestionsByKeyword(keyword);
         
         setSuggestions(generatedSuggestions);
         toast.success("Suggestions générées avec succès", {
-          description: `${generatedSuggestions.length} suggestions ont été créées`
+          description: `${generatedSuggestions.length} suggestions pour "${keyword}"`
         });
       } catch (error) {
         console.error("Erreur lors de la génération des suggestions:", error);
@@ -36,6 +41,68 @@ const SuggestionsTabContent = () => {
         setIsLoading(false);
       }
     }, 1000);
+  };
+
+  // Fonction pour générer des suggestions basées sur un mot-clé
+  const generateSuggestionsByKeyword = (baseKeyword: string): KeywordSuggestion[] => {
+    const cleanKeyword = baseKeyword.trim().toLowerCase();
+    
+    // Variation de mots-clés basés sur le mot-clé principal
+    const keywordVariations = [
+      cleanKeyword,
+      `${cleanKeyword} optimisation`,
+      `meilleur ${cleanKeyword}`,
+      `${cleanKeyword} guide`,
+      `${cleanKeyword} stratégies`,
+      `comment améliorer ${cleanKeyword}`,
+      `${cleanKeyword} techniques`,
+      `${cleanKeyword} conseils`
+    ];
+    
+    return keywordVariations.map((kw, index) => {
+      // Générer des valeurs aléatoires pour les propriétés de suggestion
+      const volume = Math.floor(Math.random() * 9000) + 1000;
+      const relevance = Math.floor(Math.random() * 30) + 70; // Pertinence entre 70 et 100
+      const competition = Math.random() * 0.8;
+      const difficulty = Math.floor(Math.random() * 70) + 30;
+      const cpc = (Math.random() * 4) + 1;
+      
+      // Génération de titre optimisé pour le SEO (60 caractères max)
+      const titleTemplates = [
+        `${kw.charAt(0).toUpperCase() + kw.slice(1)} : Guide Complet ${new Date().getFullYear()}`,
+        `Comment Optimiser ${kw.charAt(0).toUpperCase() + kw.slice(1)} | Conseils d'Experts`,
+        `Les Meilleures Stratégies pour ${kw.charAt(0).toUpperCase() + kw.slice(1)}`,
+        `${kw.charAt(0).toUpperCase() + kw.slice(1)} : Techniques Avancées et Astuces`,
+        `Guide Ultime : ${kw.charAt(0).toUpperCase() + kw.slice(1)} Expliqué Simplement`
+      ];
+      
+      let title = titleTemplates[index % titleTemplates.length];
+      if (title.length > 60) title = title.substring(0, 57) + "...";
+      
+      // Génération de description optimisée pour le SEO (155 caractères max)
+      const descTemplates = [
+        `Découvrez nos conseils experts pour ${kw}. Apprenez à optimiser vos performances et obtenez des résultats concrets rapidement avec nos techniques éprouvées.`,
+        `${kw.charAt(0).toUpperCase() + kw.slice(1)} : nos stratégies exclusives pour maximiser votre ROI. Suivez notre guide étape par étape pour des résultats garantis.`,
+        `Améliorez votre ${kw} grâce à nos astuces professionnelles. Méthodes testées et approuvées par les experts du domaine pour des résultats rapides.`,
+        `Guide complet sur ${kw} avec exemples concrets et méthodes efficaces. Optimisez votre approche et dépassez vos concurrents facilement.`,
+        `Tout ce que vous devez savoir sur ${kw} en un seul endroit. Stratégies, conseils pratiques et analyses détaillées pour réussir votre optimisation.`
+      ];
+      
+      let description = descTemplates[index % descTemplates.length];
+      if (description.length > 155) description = description.substring(0, 152) + "...";
+      
+      return {
+        keyword: kw,
+        searchVolume: volume,
+        relevance: relevance,
+        competition: competition,
+        difficulty: difficulty,
+        cpc: cpc,
+        suggestedTitle: title,
+        suggestedDescription: description,
+        volume: volume
+      };
+    });
   };
 
   const copyToClipboard = (text: string, index: number) => {
@@ -52,8 +119,8 @@ const SuggestionsTabContent = () => {
     <div className="space-y-6 p-4">
       <h2 className="text-2xl font-bold">Suggestions de contenu SEO</h2>
       <p className="text-muted-foreground">
-        Obtenez des suggestions pour optimiser vos titres (balises title) et descriptions (meta descriptions) 
-        pour améliorer votre référencement.
+        Obtenez des suggestions de titres (balises title) et descriptions (meta descriptions) 
+        optimisées pour votre mot-clé principal.
       </p>
       
       <Card className="border border-gray-200 rounded-lg">
@@ -69,7 +136,7 @@ const SuggestionsTabContent = () => {
             <div className="flex gap-4 mb-4">
               <div className="flex-1">
                 <label htmlFor="keyword" className="block text-sm font-medium text-gray-700 mb-1">
-                  Mot-clé principal (optionnel)
+                  Mot-clé principal <span className="text-red-500">*</span>
                 </label>
                 <div className="relative rounded-md shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -114,7 +181,7 @@ const SuggestionsTabContent = () => {
                 </TabsTrigger>
                 <TabsTrigger value="keywords" className="flex items-center gap-2">
                   <Tag className="h-4 w-4" />
-                  Mots-clés
+                  Mots-clés associés
                 </TabsTrigger>
               </TabsList>
               
@@ -190,10 +257,10 @@ const SuggestionsTabContent = () => {
           {suggestions.length === 0 && (
             <div className="text-center p-6 bg-gray-50 rounded-lg border border-dashed border-gray-300">
               <Sparkles className="h-12 w-12 mx-auto text-amber-500 mb-4" />
-              <h3 className="text-lg font-medium mb-2">Aucune suggestion générée</h3>
+              <h3 className="text-lg font-medium mb-2">Entrez un mot-clé pour commencer</h3>
               <p className="text-gray-500 mb-4">
-                Cliquez sur le bouton "Générer des suggestions" pour créer des suggestions
-                de titres et de descriptions optimisées pour le SEO.
+                Saisissez un mot-clé principal ci-dessus et cliquez sur "Générer des suggestions" 
+                pour créer des titres et descriptions SEO pertinents.
               </p>
             </div>
           )}
