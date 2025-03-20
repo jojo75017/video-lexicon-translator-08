@@ -17,7 +17,7 @@ const TabGroup: React.FC<TabGroupProps> = ({ groupTabs }) => {
             id={tab.id}
             icon={tab.icon}
             label={tab.label}
-            color={tab.color || 'text-gray-600'} // Default color if not provided
+            color={tab.color}
             isNew={tab.isNew}
             link={tab.link}
             highlighted={tab.highlighted}
