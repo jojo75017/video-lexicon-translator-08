@@ -7,11 +7,19 @@ interface FeatureCardProps {
   title: string;
   description: string;
   color?: string;
-  onClick: (e: React.MouseEvent<HTMLDivElement>) => void;
+  onClick: () => void;
   className?: string;
 }
 
-const FeatureCard = ({ icon: Icon, title, description, onClick, className = '', color = 'blue' }: FeatureCardProps) => {
+const FeatureCard = ({ 
+  icon: Icon, 
+  title, 
+  description, 
+  onClick, 
+  className = '', 
+  color = 'blue' 
+}: FeatureCardProps) => {
+  
   const colorClasses: Record<string, string> = {
     blue: 'text-blue-600 bg-blue-50 border-blue-200 hover:border-blue-300',
     indigo: 'text-indigo-600 bg-indigo-50 border-indigo-200 hover:border-indigo-300',
@@ -24,13 +32,18 @@ const FeatureCard = ({ icon: Icon, title, description, onClick, className = '', 
   
   const colorClass = colorClasses[color] || colorClasses.blue;
   
+  const handleClick = () => {
+    console.log('FeatureCard clicked');
+    onClick();
+  };
+  
   return (
     <div 
-      onClick={onClick}
+      onClick={handleClick}
       className={`bg-white rounded-lg p-5 border transition-all duration-300 hover:shadow-md cursor-pointer ${colorClass} ${className}`}
     >
       <div className="flex items-start gap-4">
-        <div className={`p-2.5 rounded-md ${color === 'blue' ? 'bg-blue-50' : `bg-${color}-50`}`}>
+        <div className={`p-2.5 rounded-md bg-${color}-50`}>
           <Icon className="h-5 w-5" />
         </div>
         

@@ -36,21 +36,23 @@ export const scrollToSection = (sectionId: string): void => {
     sectionElement.style.display = 'block';
     
     // Scroll to section with smooth behavior
-    sectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    
-    // Apply more visible highlight effect
-    sectionElement.classList.add('transition-all');
-    sectionElement.classList.add('duration-1000');
-    sectionElement.style.backgroundColor = 'rgba(59, 130, 246, 0.2)';
-    sectionElement.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.5)';
-    
-    // Remove effect after longer delay
     setTimeout(() => {
-      sectionElement.style.backgroundColor = '';
-      sectionElement.style.boxShadow = 'none';
-      sectionElement.classList.remove('transition-all');
-      sectionElement.classList.remove('duration-1000');
-    }, 3000);
+      sectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      
+      // Apply more visible highlight effect
+      sectionElement.classList.add('transition-all');
+      sectionElement.classList.add('duration-1000');
+      sectionElement.style.backgroundColor = 'rgba(59, 130, 246, 0.2)';
+      sectionElement.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.5)';
+      
+      // Remove effect after longer delay
+      setTimeout(() => {
+        sectionElement.style.backgroundColor = '';
+        sectionElement.style.boxShadow = 'none';
+        sectionElement.classList.remove('transition-all');
+        sectionElement.classList.remove('duration-1000');
+      }, 3000);
+    }, 100);
   } else {
     console.log(`Section element not found: ${sectionId}`);
     
@@ -62,21 +64,23 @@ export const scrollToSection = (sectionId: string): void => {
       // Ensure the element is visible
       (dataAttributeSection as HTMLElement).style.display = 'block';
       
-      dataAttributeSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      
-      // Apply highlight effect
-      dataAttributeSection.classList.add('transition-all');
-      dataAttributeSection.classList.add('duration-1000');
-      (dataAttributeSection as HTMLElement).style.backgroundColor = 'rgba(59, 130, 246, 0.2)';
-      (dataAttributeSection as HTMLElement).style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.5)';
-      
-      // Remove effect after delay
       setTimeout(() => {
-        (dataAttributeSection as HTMLElement).style.backgroundColor = '';
-        (dataAttributeSection as HTMLElement).style.boxShadow = 'none';
-        dataAttributeSection.classList.remove('transition-all');
-        dataAttributeSection.classList.remove('duration-1000');
-      }, 3000);
+        dataAttributeSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        
+        // Apply highlight effect
+        dataAttributeSection.classList.add('transition-all');
+        dataAttributeSection.classList.add('duration-1000');
+        (dataAttributeSection as HTMLElement).style.backgroundColor = 'rgba(59, 130, 246, 0.2)';
+        (dataAttributeSection as HTMLElement).style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.5)';
+        
+        // Remove effect after delay
+        setTimeout(() => {
+          (dataAttributeSection as HTMLElement).style.backgroundColor = '';
+          (dataAttributeSection as HTMLElement).style.boxShadow = 'none';
+          dataAttributeSection.classList.remove('transition-all');
+          dataAttributeSection.classList.remove('duration-1000');
+        }, 3000);
+      }, 100);
       return;
     }
     
@@ -88,21 +92,23 @@ export const scrollToSection = (sectionId: string): void => {
       // Ensure the element is visible
       (classSection as HTMLElement).style.display = 'block';
       
-      classSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      
-      // Apply highlight effect
-      (classSection as HTMLElement).classList.add('transition-all');
-      (classSection as HTMLElement).classList.add('duration-1000');
-      (classSection as HTMLElement).style.backgroundColor = 'rgba(59, 130, 246, 0.2)';
-      (classSection as HTMLElement).style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.5)';
-      
-      // Remove effect after delay
       setTimeout(() => {
-        (classSection as HTMLElement).style.backgroundColor = '';
-        (classSection as HTMLElement).style.boxShadow = 'none';
-        (classSection as HTMLElement).classList.remove('transition-all');
-        (classSection as HTMLElement).classList.remove('duration-1000');
-      }, 3000);
+        classSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        
+        // Apply highlight effect
+        (classSection as HTMLElement).classList.add('transition-all');
+        (classSection as HTMLElement).classList.add('duration-1000');
+        (classSection as HTMLElement).style.backgroundColor = 'rgba(59, 130, 246, 0.2)';
+        (classSection as HTMLElement).style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.5)';
+        
+        // Remove effect after delay
+        setTimeout(() => {
+          (classSection as HTMLElement).style.backgroundColor = '';
+          (classSection as HTMLElement).style.boxShadow = 'none';
+          (classSection as HTMLElement).classList.remove('transition-all');
+          (classSection as HTMLElement).classList.remove('duration-1000');
+        }, 3000);
+      }, 100);
       return;
     }
     
