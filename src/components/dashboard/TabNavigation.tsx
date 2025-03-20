@@ -16,11 +16,11 @@ import {
   BacklinksTabContent, 
   MetricsTabContent,
   AdvancedTabContent,
-  IntegrationsTabContent,
-  AnalyticsTabContent
+  IntegrationsTabContent
 } from './tabs/StandardTabContents';
 import PerformanceTabContent from './tabs/PerformanceTabContent';
 import SuggestionsTabContent from './tabs/SuggestionsTabContent';
+import AnalyticsTabContent from './tabs/AnalyticsTabContent';
 import { activateSection } from '@/utils/navigationHelpers';
 
 const TabNavigation = () => {
@@ -76,7 +76,21 @@ const TabNavigation = () => {
   const handleTabChange = (value: string) => {
     console.log(`Tab changed to: ${value}`);
     setActiveTab(value);
-    activateSection(value);
+    
+    // Make the section visible by using its ID
+    const section = document.getElementById(value);
+    if (section) {
+      console.log(`Section "${value}" found, making visible`);
+      document.querySelectorAll('[data-tab-content]').forEach(el => {
+        (el as HTMLElement).style.display = 'none';
+      });
+      section.style.display = 'block';
+    } else {
+      console.error(`Section "${value}" not found`);
+    }
+    
+    // Update URL
+    window.location.hash = value;
   };
 
   // Get sub-tabs based on active main tab
@@ -143,47 +157,47 @@ const TabNavigation = () => {
             
             {/* Tab Contents */}
             <div className="bg-gray-50 rounded-lg border border-gray-200 p-0">
-              <TabsContent value="wordcount">
+              <TabsContent value="wordcount" id="wordcount" data-tab-content>
                 <WordCountTabContent />
               </TabsContent>
               
-              <TabsContent value="hierarchy">
+              <TabsContent value="hierarchy" id="hierarchy" data-tab-content>
                 <HierarchyTabContent />
               </TabsContent>
               
-              <TabsContent value="suggestions">
+              <TabsContent value="suggestions" id="suggestions" data-tab-content>
                 <SuggestionsTabContent />
               </TabsContent>
               
-              <TabsContent value="seo">
+              <TabsContent value="seo" id="seo" data-tab-content>
                 <SeoTabContent />
               </TabsContent>
               
-              <TabsContent value="structure">
+              <TabsContent value="structure" id="structure" data-tab-content>
                 <StructureTabContent />
               </TabsContent>
               
-              <TabsContent value="backlinks">
+              <TabsContent value="backlinks" id="backlinks" data-tab-content>
                 <BacklinksTabContent />
               </TabsContent>
               
-              <TabsContent value="metrics">
+              <TabsContent value="metrics" id="metrics" data-tab-content>
                 <MetricsTabContent />
               </TabsContent>
               
-              <TabsContent value="advanced">
+              <TabsContent value="advanced" id="advanced" data-tab-content>
                 <AdvancedTabContent />
               </TabsContent>
               
-              <TabsContent value="integrations">
+              <TabsContent value="integrations" id="integrations" data-tab-content>
                 <IntegrationsTabContent />
               </TabsContent>
               
-              <TabsContent value="analytics">
+              <TabsContent value="analytics" id="analytics" data-tab-content>
                 <AnalyticsTabContent />
               </TabsContent>
               
-              <TabsContent value="performance">
+              <TabsContent value="performance" id="performance" data-tab-content>
                 <PerformanceTabContent />
               </TabsContent>
               
@@ -191,7 +205,7 @@ const TabNavigation = () => {
               {contentTabs
                 .filter(tab => !['hierarchy', 'wordcount', 'seo', 'structure', 'backlinks', 'metrics', 'advanced', 'integrations', 'analytics', 'performance', 'suggestions'].includes(tab.id))
                 .map(tab => (
-                  <TabsContent key={tab.id} value={tab.id}>
+                  <TabsContent key={tab.id} value={tab.id} id={tab.id} data-tab-content>
                     <DefaultTabContent id={tab.id} label={tab.label} />
                   </TabsContent>
                 ))

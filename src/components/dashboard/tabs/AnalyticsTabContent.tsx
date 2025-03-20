@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -17,9 +17,10 @@ import {
   ArrowDownRight,
   Zap,
   Search,
-  ExternalLink
+  ExternalLink,
+  Clock
 } from 'lucide-react';
-import SeoOverview from '@/components/seo/SeoOverview';
+
 import {
   LineChart,
   Line,
@@ -33,85 +34,113 @@ import {
   PieChart as RechartsPieChart,
   Pie,
   Cell,
-  Legend
+  Legend,
+  Area,
+  AreaChart
 } from 'recharts';
-
-const visitData = [
-  { day: 'Lun', visits: 2400, pageviews: 4800 },
-  { day: 'Mar', visits: 1398, pageviews: 3200 },
-  { day: 'Mer', visits: 9800, pageviews: 15000 },
-  { day: 'Jeu', visits: 3908, pageviews: 7800 },
-  { day: 'Ven', visits: 4800, pageviews: 9600 },
-  { day: 'Sam', visits: 3800, pageviews: 6400 },
-  { day: 'Dim', visits: 4300, pageviews: 8000 },
-];
-
-const deviceData = [
-  { device: 'Mobile', visits: 4000, percentage: 50 },
-  { device: 'Desktop', visits: 3000, percentage: 37.5 },
-  { device: 'Tablet', visits: 1000, percentage: 12.5 },
-];
-
-const sourceData = [
-  { source: 'Google', visits: 3500, percentage: 42 },
-  { source: 'Direct', visits: 2000, percentage: 24 },
-  { source: 'Referral', visits: 1500, percentage: 18 },
-  { source: 'Social', visits: 1000, percentage: 12 },
-  { source: 'Email', visits: 500, percentage: 6 },
-];
-
-const pageData = [
-  { page: '/accueil', views: 2800, avgTime: '1:45' },
-  { page: '/services', views: 1900, avgTime: '2:30' },
-  { page: '/blog/seo-guide', views: 1550, avgTime: '4:10' },
-  { page: '/contact', views: 950, avgTime: '1:05' },
-  { page: '/a-propos', views: 800, avgTime: '1:35' },
-];
-
-const conversionData = [
-  { name: 'Contact', value: 65 },
-  { name: 'Inscription', value: 25 },
-  { name: 'Achat', value: 10 },
-];
-
-const conversionColors = ['#8884d8', '#83a6ed', '#8dd1e1'];
+import { analyzeAnalytics } from '@/utils/seo/analyticsAnalyzer';
+import { toast } from "sonner";
 
 const AnalyticsTabContent = () => {
   const [timeRange, setTimeRange] = useState('7d');
-  
-  // Données fictives pour l'aperçu SEO
-  const seoOverviewData = {
-    score: 78,
-    suggestions: [
-      "Améliorer le temps de chargement",
-      "Optimiser les images pour les appareils mobiles",
-      "Ajouter des balises alt à toutes les images"
-    ],
-    performance: {
-      score: 78,
-      loadTime: 2500,
-      firstContentfulPaint: 1800,
-      domLoadTime: 2200,
-      timeToInteractive: 3000,
-      scriptCount: 12,
-      resourceCount: 45,
-      imageCount: 15,
-      cacheLifetime: 3600,
-      totalSize: 2500000,
-      resourceBreakdown: {
-        images: 1500000,
-        scripts: 500000,
-        styles: 300000,
-        fonts: 150000,
-        other: 50000
-      },
-      largestContentfulPaint: 2100,
-      speedIndex: 2800,
-      responseTime: 180,
-      impressions: 5800,
-      clickThroughRate: 3.2
+  const [analyticsData, setAnalyticsData] = useState({
+    pageViews: 0,
+    uniqueVisitors: 0,
+    bounceRate: 0,
+    averageTimeOnPage: 0,
+    topCountries: [{ country: "France", visits: 0 }],
+    deviceBreakdown: {
+      desktop: 0,
+      mobile: 0,
+      tablet: 0,
+    },
+    timeOnSite: {
+      '0-30s': 0,
+      '30s-2m': 0,
+      '2m-5m': 0,
+      '5m+': 0,
+    },
+    trafficSources: {
+      organic: 0,
+      direct: 0,
+      referral: 0,
+      social: 0
     }
+  });
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const data = await analyzeAnalytics();
+        setAnalyticsData(data);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des données Analytics:', error);
+        toast.error("Erreur lors du chargement des données Analytics");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const visitData = [
+    { day: 'Lun', visits: Math.floor(analyticsData.pageViews / 7), pageviews: Math.floor(analyticsData.pageViews / 3.5) },
+    { day: 'Mar', visits: Math.floor(analyticsData.pageViews / 6), pageviews: Math.floor(analyticsData.pageViews / 3.2) },
+    { day: 'Mer', visits: Math.floor(analyticsData.pageViews / 5), pageviews: Math.floor(analyticsData.pageViews / 1.5) },
+    { day: 'Jeu', visits: Math.floor(analyticsData.pageViews / 4), pageviews: Math.floor(analyticsData.pageViews / 2.5) },
+    { day: 'Ven', visits: Math.floor(analyticsData.pageViews / 3), pageviews: Math.floor(analyticsData.pageViews / 2.1) },
+    { day: 'Sam', visits: Math.floor(analyticsData.pageViews / 2), pageviews: Math.floor(analyticsData.pageViews / 3.2) },
+    { day: 'Dim', visits: Math.floor(analyticsData.pageViews), pageviews: Math.floor(analyticsData.pageViews / 2.2) }
+  ];
+
+  const deviceData = [
+    { device: 'Mobile', value: analyticsData.deviceBreakdown.mobile },
+    { device: 'Desktop', value: analyticsData.deviceBreakdown.desktop },
+    { device: 'Tablet', value: analyticsData.deviceBreakdown.tablet }
+  ];
+
+  const deviceColors = ['#4F46E5', '#10B981', '#F59E0B'];
+
+  const sourceData = [
+    { source: 'Google', visits: analyticsData.trafficSources?.organic || 0 },
+    { source: 'Direct', visits: analyticsData.trafficSources?.direct || 0 },
+    { source: 'Referral', visits: analyticsData.trafficSources?.referral || 0 },
+    { source: 'Social', visits: analyticsData.trafficSources?.social || 0 }
+  ];
+
+  const pageData = [
+    { page: '/accueil', views: Math.floor(analyticsData.pageViews * 0.4), avgTime: '1:45' },
+    { page: '/services', views: Math.floor(analyticsData.pageViews * 0.2), avgTime: '2:30' },
+    { page: '/blog/seo-guide', views: Math.floor(analyticsData.pageViews * 0.15), avgTime: '4:10' },
+    { page: '/contact', views: Math.floor(analyticsData.pageViews * 0.1), avgTime: '1:05' },
+    { page: '/a-propos', views: Math.floor(analyticsData.pageViews * 0.08), avgTime: '1:35' }
+  ];
+
+  const conversionData = [
+    { name: 'Contact', value: 65 },
+    { name: 'Inscription', value: 25 },
+    { name: 'Achat', value: 10 }
+  ];
+
+  const conversionColors = ['#8884d8', '#83a6ed', '#8dd1e1'];
+
+  const formatTime = (seconds) => {
+    if (seconds < 60) return `${seconds}s`;
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}m ${remainingSeconds}s`;
   };
+
+  if (isLoading) {
+    return (
+      <div className="p-8 text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <p className="text-gray-600">Chargement des données d'analytique...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 p-4">
@@ -147,37 +176,144 @@ const AnalyticsTabContent = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <MetricCard 
           title="Visiteurs"
-          value="15,842"
+          value={analyticsData.uniqueVisitors.toLocaleString()}
           change={12.5}
           icon={<Users className="h-5 w-5 text-blue-600" />}
         />
         <MetricCard 
           title="Pages Vues"
-          value="42,928"
+          value={analyticsData.pageViews.toLocaleString()}
           change={8.3}
           icon={<Globe className="h-5 w-5 text-indigo-600" />}
         />
         <MetricCard 
           title="Taux de Rebond"
-          value="38.2%"
+          value={`${analyticsData.bounceRate.toFixed(1)}%`}
           change={-5.1}
           isGoodWhenNegative={true}
           icon={<Activity className="h-5 w-5 text-emerald-600" />}
         />
         <MetricCard 
           title="Durée Moyenne"
-          value="2:18"
+          value={formatTime(analyticsData.averageTimeOnPage)}
           change={15.7}
           icon={<Clock className="h-5 w-5 text-purple-600" />}
         />
       </div>
       
-      <SeoOverview 
-        score={seoOverviewData.score}
-        suggestions={seoOverviewData.suggestions}
-        performance={seoOverviewData.performance}
-      />
-      
+      {/* Analytics Overview Card */}
+      <Card className="p-6">
+        <h3 className="text-lg font-semibold mb-4">Aperçu Analytics</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <Users className="h-5 w-5 text-blue-600" />
+              <span className="text-blue-600 font-medium">Visiteurs uniques</span>
+            </div>
+            <p className="text-2xl font-bold">{analyticsData.uniqueVisitors.toLocaleString()}</p>
+            <p className="text-sm text-blue-600">Visiteurs actuels</p>
+          </div>
+          
+          <div className="bg-green-50 p-4 rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <Clock className="h-5 w-5 text-green-600" />
+              <span className="text-green-600 font-medium">Temps moyen</span>
+            </div>
+            <p className="text-2xl font-bold">{formatTime(analyticsData.averageTimeOnPage)}</p>
+            <p className="text-sm text-green-600">Durée moyenne de visite</p>
+          </div>
+          
+          <div className="bg-purple-50 p-4 rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <ArrowRight className="h-5 w-5 text-purple-600" />
+              <span className="text-purple-600 font-medium">Taux de rebond</span>
+            </div>
+            <p className="text-2xl font-bold">{analyticsData.bounceRate.toFixed(1)}%</p>
+            <p className="text-sm text-purple-600">Taux de rebond actuel</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <h4 className="text-sm font-medium text-gray-600 mb-3">Trafic sur 7 jours</h4>
+            <div className="h-[200px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart
+                  data={visitData}
+                  margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="day" />
+                  <YAxis />
+                  <Tooltip />
+                  <Area 
+                    type="monotone" 
+                    dataKey="visits" 
+                    name="Visites"
+                    stroke="#4F46E5" 
+                    fill="#4F46E5" 
+                    fillOpacity={0.1} 
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="pageviews" 
+                    name="Pages vues"
+                    stroke="#10B981" 
+                    fill="#10B981" 
+                    fillOpacity={0.1} 
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div>
+            <h4 className="text-sm font-medium text-gray-600 mb-3">Répartition par appareil</h4>
+            <div className="h-[200px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={deviceData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    paddingAngle={5}
+                    dataKey="value"
+                    nameKey="device"
+                  >
+                    {deviceData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={deviceColors[index]} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value, name) => [value, name]} />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <h4 className="text-sm font-medium text-gray-600">Principaux pays</h4>
+          <div className="space-y-2">
+            {analyticsData.topCountries.map((country, index) => (
+              <div 
+                key={country.country}
+                className="flex items-center justify-between p-2 bg-gray-50 rounded"
+              >
+                <div className="flex items-center gap-2">
+                  <Globe className="h-4 w-4 text-gray-500" />
+                  <span>{country.country}</span>
+                </div>
+                <span className="font-medium">{country.visits.toLocaleString()} visites</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Card>
+    
       <Tabs defaultValue="traffic" className="mt-8">
         <div className="bg-white p-4 rounded-lg shadow-sm mb-4 border border-gray-100">
           <h3 className="text-lg font-semibold mb-3">Données Détaillées</h3>
@@ -255,15 +391,9 @@ const AnalyticsTabContent = () => {
                     <CartesianGrid strokeDasharray="3 3" stroke="#eaeaea" />
                     <XAxis dataKey="device" />
                     <YAxis />
-                    <Tooltip 
-                      formatter={(value, name) => {
-                        if (name === 'percentage') return [`${value}%`, 'Pourcentage'];
-                        return [value, 'Visites'];
-                      }}
-                    />
+                    <Tooltip />
                     <Legend />
-                    <Bar dataKey="visits" name="Visites" fill="#8884d8" />
-                    <Bar dataKey="percentage" name="Pourcentage" fill="#82ca9d" />
+                    <Bar dataKey="value" name="Visites" fill="#8884d8" />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -292,7 +422,7 @@ const AnalyticsTabContent = () => {
                     </thead>
                     <tbody>
                       {pageData.map((page, index) => (
-                        <tr key={index} className="border-t border-gray-100 dark:border-gray-800">
+                        <tr key={index} className="border-t border-gray-100">
                           <td className="py-3 text-sm text-blue-600 hover:underline cursor-pointer">{page.page}</td>
                           <td className="py-3 text-sm text-right font-medium">{page.views.toLocaleString()}</td>
                           <td className="py-3 text-sm text-right">{page.avgTime}</td>
@@ -317,21 +447,21 @@ const AnalyticsTabContent = () => {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-4 mb-6">
-                  <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg text-center">
+                  <div className="bg-blue-50 p-4 rounded-lg text-center">
                     <div className="text-sm text-gray-500 mb-1">Pages par session</div>
-                    <div className="text-2xl font-bold text-blue-700 dark:text-blue-300">3.2</div>
+                    <div className="text-2xl font-bold text-blue-700">3.2</div>
                   </div>
-                  <div className="bg-emerald-50 dark:bg-emerald-900/20 p-4 rounded-lg text-center">
+                  <div className="bg-emerald-50 p-4 rounded-lg text-center">
                     <div className="text-sm text-gray-500 mb-1">Taux de rebond</div>
-                    <div className="text-2xl font-bold text-emerald-700 dark:text-emerald-300">38.2%</div>
+                    <div className="text-2xl font-bold text-emerald-700">{analyticsData.bounceRate.toFixed(1)}%</div>
                   </div>
-                  <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg text-center">
+                  <div className="bg-purple-50 p-4 rounded-lg text-center">
                     <div className="text-sm text-gray-500 mb-1">Durée session</div>
-                    <div className="text-2xl font-bold text-purple-700 dark:text-purple-300">2:18</div>
+                    <div className="text-2xl font-bold text-purple-700">{formatTime(analyticsData.averageTimeOnPage)}</div>
                   </div>
-                  <div className="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-lg text-center">
+                  <div className="bg-amber-50 p-4 rounded-lg text-center">
                     <div className="text-sm text-gray-500 mb-1">Nouveaux visiteurs</div>
-                    <div className="text-2xl font-bold text-amber-700 dark:text-amber-300">68%</div>
+                    <div className="text-2xl font-bold text-amber-700">68%</div>
                   </div>
                 </div>
                 <Button className="w-full">
@@ -473,7 +603,7 @@ const AnalyticsTabContent = () => {
                     { keyword: "améliorer seo", clicks: 189, impressions: 2950, position: 6.3 },
                     { keyword: "outils seo", clicks: 124, impressions: 2340, position: 7.5 }
                   ].map((item, index) => (
-                    <div key={index} className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+                    <div key={index} className="bg-gray-50 p-3 rounded-lg">
                       <div className="flex justify-between mb-1">
                         <span className="font-medium text-blue-600">{item.keyword}</span>
                         <span className="text-sm bg-blue-100 text-blue-800 py-0.5 px-2 rounded-full">{item.position}</span>
@@ -502,14 +632,14 @@ const MetricCard = ({ title, value, change, icon, isGoodWhenNegative = false }) 
   const isPositiveChange = isGoodWhenNegative ? change < 0 : change > 0;
   
   return (
-    <Card className="bg-white dark:bg-gray-800 shadow-sm">
+    <Card className="bg-white shadow-sm">
       <CardContent className="p-4">
         <div className="flex justify-between items-start">
           <div>
-            <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">{title}</div>
+            <div className="text-sm text-gray-500 mb-1">{title}</div>
             <div className="text-2xl font-bold">{value}</div>
           </div>
-          <div className="rounded-full p-2 bg-blue-50 dark:bg-blue-900/20">
+          <div className="rounded-full p-2 bg-blue-50">
             {icon}
           </div>
         </div>
@@ -519,30 +649,12 @@ const MetricCard = ({ title, value, change, icon, isGoodWhenNegative = false }) 
           ) : (
             <ArrowDownRight className="h-4 w-4 text-red-500 mr-1" />
           )}
-          <span className={`text-sm font-medium ${isPositiveChange ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+          <span className={`text-sm font-medium ${isPositiveChange ? 'text-green-600' : 'text-red-600'}`}>
             {Math.abs(change)}% {isPositiveChange ? 'hausse' : 'baisse'}
           </span>
         </div>
       </CardContent>
     </Card>
-  );
-};
-
-const Clock = ({ className }) => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <circle cx="12" cy="12" r="10" />
-      <polyline points="12 6 12 12 16 14" />
-    </svg>
   );
 };
 
