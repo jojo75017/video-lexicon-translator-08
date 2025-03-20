@@ -21,13 +21,13 @@ const FeatureCard = ({
 }: FeatureCardProps) => {
   
   const colorClasses: Record<string, string> = {
-    blue: 'text-blue-600 bg-blue-50 border-blue-200 hover:border-blue-300',
-    indigo: 'text-indigo-600 bg-indigo-50 border-indigo-200 hover:border-indigo-300',
-    violet: 'text-violet-600 bg-violet-50 border-violet-200 hover:border-violet-300',
-    purple: 'text-purple-600 bg-purple-50 border-purple-200 hover:border-purple-300',
-    pink: 'text-pink-600 bg-pink-50 border-pink-200 hover:border-pink-300',
-    fuchsia: 'text-fuchsia-600 bg-fuchsia-50 border-fuchsia-200 hover:border-fuchsia-300',
-    rose: 'text-rose-600 bg-rose-50 border-rose-200 hover:border-rose-300',
+    blue: 'text-blue-600 bg-blue-50 border-blue-200 hover:border-blue-300 hover:bg-blue-100',
+    indigo: 'text-indigo-600 bg-indigo-50 border-indigo-200 hover:border-indigo-300 hover:bg-indigo-100',
+    violet: 'text-violet-600 bg-violet-50 border-violet-200 hover:border-violet-300 hover:bg-violet-100',
+    purple: 'text-purple-600 bg-purple-50 border-purple-200 hover:border-purple-300 hover:bg-purple-100',
+    pink: 'text-pink-600 bg-pink-50 border-pink-200 hover:border-pink-300 hover:bg-pink-100',
+    fuchsia: 'text-fuchsia-600 bg-fuchsia-50 border-fuchsia-200 hover:border-fuchsia-300 hover:bg-fuchsia-100',
+    rose: 'text-rose-600 bg-rose-50 border-rose-200 hover:border-rose-300 hover:bg-rose-100',
   };
   
   const colorClass = colorClasses[color] || colorClasses.blue;
@@ -35,6 +35,7 @@ const FeatureCard = ({
   return (
     <div 
       className={`bg-white rounded-lg p-5 border transition-all duration-300 hover:shadow-md cursor-pointer ${colorClass} ${className}`}
+      onClick={onClick}
     >
       <div className="flex items-start gap-4">
         <div className={`p-2.5 rounded-md bg-${color}-50`}>

@@ -39,11 +39,11 @@ const PageHeader = () => {
             </p>
             
             <div className="flex gap-3">
-              <Button variant="outline" className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20">
+              <Button variant="outline" className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20 hover:text-white">
                 <Search className="mr-2 h-4 w-4" /> 
                 Analyser mon site
               </Button>
-              <Button variant="outline" className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20">
+              <Button variant="outline" className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20 hover:text-white">
                 <ExternalLink className="mr-2 h-4 w-4" /> 
                 Voir le guide SEO
               </Button>
@@ -78,7 +78,7 @@ const PageHeader = () => {
               {/* Onglet SEO */}
               <TabsTrigger 
                 value="seo" 
-                className="data-[state=active]:bg-white/20 text-white data-[state=active]:text-white flex gap-2 items-center"
+                className="data-[state=active]:bg-white/20 text-white data-[state=active]:text-white hover:bg-white/20 hover:text-white flex gap-2 items-center"
                 onClick={() => handleTabClick('seo')}
               >
                 <Search className="h-4 w-4" />
@@ -88,7 +88,7 @@ const PageHeader = () => {
               {/* Onglet Structure */}
               <TabsTrigger 
                 value="structure" 
-                className="data-[state=active]:bg-white/20 text-white data-[state=active]:text-white flex gap-2 items-center"
+                className="data-[state=active]:bg-white/20 text-white data-[state=active]:text-white hover:bg-white/20 hover:text-white flex gap-2 items-center"
                 onClick={() => handleTabClick('structure')}
               >
                 <FileSearch className="h-4 w-4" />
@@ -98,7 +98,7 @@ const PageHeader = () => {
               {/* Onglet Hiérarchie */}
               <TabsTrigger 
                 value="hierarchy" 
-                className="data-[state=active]:bg-white/20 text-white data-[state=active]:text-white flex gap-2 items-center"
+                className="data-[state=active]:bg-white/20 text-white data-[state=active]:text-white hover:bg-white/20 hover:text-white flex gap-2 items-center"
                 onClick={() => handleTabClick('hierarchy')}
               >
                 <PenTool className="h-4 w-4" />
@@ -108,7 +108,7 @@ const PageHeader = () => {
               {/* Onglet Backlinks */}
               <TabsTrigger 
                 value="backlinks" 
-                className="data-[state=active]:bg-white/20 text-white data-[state=active]:text-white flex gap-2 items-center"
+                className="data-[state=active]:bg-white/20 text-white data-[state=active]:text-white hover:bg-white/20 hover:text-white flex gap-2 items-center"
                 onClick={() => handleTabClick('backlinks')}
               >
                 <CheckCircle className="h-4 w-4" />

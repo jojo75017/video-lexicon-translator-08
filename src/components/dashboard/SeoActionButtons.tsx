@@ -76,7 +76,7 @@ const ToolButton: React.FC<ToolButtonProps> = ({ icon, label, component }) => {
       <div className="absolute inset-0 z-10 opacity-0">
         {component}
       </div>
-      <div className="flex flex-col items-center p-4 bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group-hover:border-gray-200">
+      <div className="flex flex-col items-center p-4 bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group-hover:border-gray-200 group-hover:bg-gray-50">
         <div className="mb-2 p-2 bg-gray-50 rounded-full">{icon}</div>
         <span className="text-sm font-medium text-gray-700">{label}</span>
       </div>
