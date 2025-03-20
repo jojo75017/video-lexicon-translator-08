@@ -25,6 +25,18 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
   link, 
   highlighted 
 }) => {
+  const handleTabClick = () => {
+    console.log(`Tab clicked: ${id}`);
+    // Find the corresponding tab content and make sure it's visible
+    setTimeout(() => {
+      const tabContent = document.getElementById(id);
+      if (tabContent) {
+        console.log(`Making tab content visible for: ${id}`);
+        tabContent.style.display = 'block';
+      }
+    }, 50);
+  };
+
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -58,7 +70,7 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
             }`}
             data-value={id}
             data-tab-id={id}
-            onClick={() => console.log(`Tab clicked: ${id}`)}
+            onClick={handleTabClick}
           >
             <span className="absolute -top-1 -right-1 transform translate-x-1/2 -translate-y-1/2 z-10">
               {isNew && (

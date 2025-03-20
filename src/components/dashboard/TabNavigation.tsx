@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Tabs, TabsList, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 // Import refactored components
@@ -17,6 +17,7 @@ import {
   MetricsTabContent 
 } from './tabs/StandardTabContents';
 import { navigateToSection } from '@/utils/navigationHelpers';
+import { toast } from "sonner";
 
 const TabNavigation = () => {
   const [activeTab, setActiveTab] = useState("wordcount");
@@ -29,7 +30,20 @@ const TabNavigation = () => {
   useEffect(() => {
     if (activeTab) {
       console.log(`Active tab changed to: ${activeTab}`);
-      navigateToSection(activeTab);
+      const tabElement = document.getElementById(activeTab);
+      if (tabElement) {
+        console.log(`Found tab element with id: ${activeTab}`);
+        tabElement.style.display = 'block';
+        
+        // Show toast for better user feedback
+        toast.success(`Onglet ${activeTab} activé`, {
+          description: "Le contenu est maintenant visible",
+          duration: 1500
+        });
+      } else {
+        console.log(`Tab element with id ${activeTab} not found, using navigateToSection`);
+        navigateToSection(activeTab);
+      }
     }
   }, [activeTab]);
 
