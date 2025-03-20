@@ -9,8 +9,8 @@ interface TabGroupProps {
 
 const TabGroup: React.FC<TabGroupProps> = ({ groupTabs }) => {
   return (
-    <div className="flex-1 flex flex-col items-center min-w-fit">
-      <div className="flex flex-wrap gap-1 justify-center">
+    <div className="flex-1 flex flex-col items-center min-w-fit px-1">
+      <div className="flex flex-wrap gap-2 justify-center py-1">
         {groupTabs.map((tab) => (
           <TabTriggerItem
             key={tab.id}

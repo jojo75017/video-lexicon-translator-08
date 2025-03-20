@@ -10,9 +10,12 @@ interface DefaultTabContentProps {
 const DefaultTabContent: React.FC<DefaultTabContentProps> = ({ id, label }) => {
   return (
     <TabsContent key={id} value={id} className="mt-2">
-      <div className="bg-white p-6 rounded-lg shadow-md">
+      <div className="bg-white p-6 rounded-lg shadow-md" id={id} data-section={id}>
         <h2 className="text-xl font-bold mb-4">{label}</h2>
-        <p className="text-gray-600">Contenu de {label} (à venir)</p>
+        <p className="text-gray-600">Contenu de {label}</p>
+        <div className="mt-4 p-4 bg-gray-50 rounded-md">
+          <p className="text-sm text-gray-500">Le contenu détaillé de cette section sera disponible prochainement.</p>
+        </div>
       </div>
     </TabsContent>
   );
