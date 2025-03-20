@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   BarChart2, 
@@ -12,7 +13,6 @@ import {
   Globe, 
   Activity, 
   Calendar,
-
   ArrowUpRight,
   ArrowDownRight,
   Zap,
@@ -178,17 +178,20 @@ const AnalyticsTabContent = () => {
         performance={seoOverviewData.performance}
       />
       
-      <Tabs defaultValue="traffic">
-        <TabsList className="mb-4 w-full">
-          <TabsTrigger value="traffic" className="flex-1">Trafic</TabsTrigger>
-          <TabsTrigger value="behavior" className="flex-1">Comportement</TabsTrigger>
-          <TabsTrigger value="conversion" className="flex-1">Conversion</TabsTrigger>
-          <TabsTrigger value="sources" className="flex-1">Sources</TabsTrigger>
-        </TabsList>
+      <Tabs defaultValue="traffic" className="mt-8">
+        <div className="bg-white p-4 rounded-lg shadow-sm mb-4 border border-gray-100">
+          <h3 className="text-lg font-semibold mb-3">Données Détaillées</h3>
+          <TabsList className="w-full grid grid-cols-4 mb-4">
+            <TabsTrigger value="traffic">Trafic</TabsTrigger>
+            <TabsTrigger value="behavior">Comportement</TabsTrigger>
+            <TabsTrigger value="conversion">Conversion</TabsTrigger>
+            <TabsTrigger value="sources">Sources</TabsTrigger>
+          </TabsList>
+        </div>
         
         <TabsContent value="traffic">
           <div className="grid gap-6 md:grid-cols-2">
-            <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 shadow-md">
+            <Card className="bg-white shadow-md border border-gray-100">
               <CardHeader className="pb-0">
                 <CardTitle className="text-lg font-semibold flex items-center gap-2">
                   <TrendingUp className="h-4 w-4 text-blue-600" />
@@ -231,7 +234,7 @@ const AnalyticsTabContent = () => {
               </CardContent>
             </Card>
             
-            <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 shadow-md">
+            <Card className="bg-white shadow-md border border-gray-100">
               <CardHeader className="pb-0">
                 <CardTitle className="text-lg font-semibold flex items-center gap-2">
                   <Users className="h-4 w-4 text-blue-600" />
@@ -270,7 +273,7 @@ const AnalyticsTabContent = () => {
         
         <TabsContent value="behavior">
           <div className="grid gap-6 md:grid-cols-2">
-            <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 shadow-md">
+            <Card className="bg-white shadow-md border border-gray-100">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold flex items-center gap-2">
                   <Activity className="h-4 w-4 text-blue-600" />
@@ -305,7 +308,7 @@ const AnalyticsTabContent = () => {
               </CardContent>
             </Card>
             
-            <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 shadow-md">
+            <Card className="bg-white shadow-md border border-gray-100">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold flex items-center gap-2">
                   <Zap className="h-4 w-4 text-blue-600" />
@@ -342,7 +345,7 @@ const AnalyticsTabContent = () => {
         
         <TabsContent value="conversion">
           <div className="grid gap-6 md:grid-cols-2">
-            <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 shadow-md">
+            <Card className="bg-white shadow-md border border-gray-100">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold flex items-center gap-2">
                   <PieChart className="h-4 w-4 text-blue-600" />
@@ -373,7 +376,7 @@ const AnalyticsTabContent = () => {
               </CardContent>
             </Card>
             
-            <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 shadow-md">
+            <Card className="bg-white shadow-md border border-gray-100">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold flex items-center gap-2">
                   <TrendingUp className="h-4 w-4 text-blue-600" />
@@ -424,7 +427,7 @@ const AnalyticsTabContent = () => {
         
         <TabsContent value="sources">
           <div className="grid gap-6 md:grid-cols-2">
-            <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 shadow-md">
+            <Card className="bg-white shadow-md border border-gray-100">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold flex items-center gap-2">
                   <Globe className="h-4 w-4 text-blue-600" />
@@ -454,7 +457,7 @@ const AnalyticsTabContent = () => {
               </CardContent>
             </Card>
             
-            <Card className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 shadow-md">
+            <Card className="bg-white shadow-md border border-gray-100">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold flex items-center gap-2">
                   <Search className="h-4 w-4 text-blue-600" />
