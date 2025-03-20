@@ -94,12 +94,43 @@ const IndexPage = () => {
         </div>
         
         {/* Info cards with SEO performance metrics */}
-        <div className="mb-8">
+        <div className="mb-8" id="metrics" data-section="metrics">
           <h2 className="text-2xl font-bold mb-6 flex items-center">
             <Sparkles className="mr-2 h-6 w-6 text-indigo-600" />
             Dernières statistiques
           </h2>
           <InfoCards />
+        </div>
+        
+        {/* Sections pour les différentes fonctionnalités */}
+        <div id="seo" data-section="seo" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100">
+          <h2 className="text-2xl font-bold mb-4">Analyse SEO</h2>
+          <p className="text-gray-600">Consultez l'analyse détaillée des performances SEO de votre site.</p>
+        </div>
+        
+        <div id="structure" data-section="structure" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100">
+          <h2 className="text-2xl font-bold mb-4">Structure du Site</h2>
+          <p className="text-gray-600">Visualisez l'architecture de votre site web et identifiez les améliorations possibles.</p>
+        </div>
+        
+        <div id="hierarchy" data-section="hierarchy" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100">
+          <h2 className="text-2xl font-bold mb-4">Hiérarchie des Contenus</h2>
+          <p className="text-gray-600">Optimisez la structure de vos contenus pour une meilleure indexation.</p>
+        </div>
+        
+        <div id="backlinks" data-section="backlinks" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100">
+          <h2 className="text-2xl font-bold mb-4">Analyse des Backlinks</h2>
+          <p className="text-gray-600">Évaluez la qualité et la quantité des liens pointant vers votre site.</p>
+        </div>
+        
+        <div id="advanced" data-section="advanced" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100">
+          <h2 className="text-2xl font-bold mb-4">Options Avancées</h2>
+          <p className="text-gray-600">Accédez aux paramètres et outils avancés d'optimisation SEO.</p>
+        </div>
+        
+        <div id="integrations" data-section="integrations" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100">
+          <h2 className="text-2xl font-bold mb-4">Intégrations</h2>
+          <p className="text-gray-600">Connectez-vous à d'autres outils et services pour améliorer votre SEO.</p>
         </div>
         
         {/* Quora Button Section */}

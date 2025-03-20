@@ -30,14 +30,6 @@ export const scrollToSection = (sectionId: string): void => {
   if (sectionElement) {
     console.log(`Section element found: ${sectionId}`);
     
-    // Empêcher le comportement de navigation/défilement par défaut de la page
-    if (typeof window !== 'undefined' && window.event) {
-      const event = window.event as Event;
-      if (event.preventDefault) {
-        event.preventDefault();
-      }
-    }
-    
     // Faire défiler jusqu'à la section avec un comportement fluide
     sectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
     
@@ -53,12 +45,6 @@ export const scrollToSection = (sectionId: string): void => {
     const dataAttributeSection = document.querySelector(`[data-section="${sectionId}"]`);
     if (dataAttributeSection) {
       console.log(`Found section by data attribute: ${sectionId}`);
-      if (typeof window !== 'undefined' && window.event) {
-        const event = window.event as Event;
-        if (event.preventDefault) {
-          event.preventDefault();
-        }
-      }
       dataAttributeSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
       // Ajouter un effet de surbrillance temporaire
       dataAttributeSection.classList.add('bg-blue-50');
@@ -72,12 +58,6 @@ export const scrollToSection = (sectionId: string): void => {
     const classSection = document.querySelector(`.section-${sectionId}`);
     if (classSection) {
       console.log(`Found section by class: ${sectionId}`);
-      if (typeof window !== 'undefined' && window.event) {
-        const event = window.event as Event;
-        if (event.preventDefault) {
-          event.preventDefault();
-        }
-      }
       classSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
       // Ajouter un effet de surbrillance temporaire
       (classSection as HTMLElement).classList.add('bg-blue-50');
