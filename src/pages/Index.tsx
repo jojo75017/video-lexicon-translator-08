@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card } from "@/components/ui/card";
@@ -17,6 +16,7 @@ import { useSiteAnalyzer } from '@/hooks/useSiteAnalyzer';
 import { activateSection } from '@/utils/navigationHelpers';
 import PageHeader from '@/components/dashboard/PageHeader';
 import LocalBusinessSection from '@/components/LocalBusinessSection';
+import KeywordSuggestions from '@/components/seo/analysis/KeywordSuggestions';
 
 const ModeToggle = () => {
   return (
@@ -28,7 +28,6 @@ const ModeToggle = () => {
 };
 
 const IndexPage = () => {
-  // Utiliser le hook useSiteAnalyzer pour gérer l'analyse
   const {
     url,
     setUrl,
@@ -42,9 +41,7 @@ const IndexPage = () => {
     handleActivateProxy
   } = useSiteAnalyzer();
 
-  // Hide all sections initially
   useEffect(() => {
-    // Hide all tab content initially
     document.querySelectorAll('[data-tab-content]').forEach(el => {
       (el as HTMLElement).style.display = 'none';
     });
@@ -52,14 +49,12 @@ const IndexPage = () => {
     console.log('IndexPage initialized - hiding all sections initially');
   }, []);
 
-  // Show results when analysis is complete
   useEffect(() => {
     if (seoAnalysis) {
       console.log('SEO analysis complete, showing SEO section');
+      console.log('Keyword suggestions available:', seoAnalysis.keywordSuggestions?.length || 0);
       
-      // Show the results section
       setTimeout(() => {
-        // Activate the SEO tab
         window.location.hash = 'seo';
         activateSection('seo');
         
@@ -68,7 +63,6 @@ const IndexPage = () => {
           duration: 3000
         });
         
-        // Also make the specific results display visible
         const resultsDisplay = document.querySelector('.results-display');
         if (resultsDisplay) {
           (resultsDisplay as HTMLElement).style.display = 'block';
@@ -96,10 +90,8 @@ const IndexPage = () => {
       </header>
       
       <main className="container py-8 flex-grow">
-        {/* Hero Section with Advanced Header */}
         <PageHeader />
         
-        {/* Welcome Section */}
         <div className="mb-8 bg-white p-8 rounded-xl shadow-md border border-gray-100">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl font-bold text-gray-800 mb-4">
@@ -140,7 +132,6 @@ const IndexPage = () => {
           </div>
         </div>
         
-        {/* Analyze Form */}
         <Card className="mb-8">
           <div className="p-6">
             <h2 className="text-2xl font-bold mb-6 flex items-center">
@@ -159,19 +150,28 @@ const IndexPage = () => {
           </div>
         </Card>
         
-        {/* Results Display - Initially hidden */}
+        {seoAnalysis && seoAnalysis.keywordSuggestions && seoAnalysis.keywordSuggestions.length > 0 && (
+          <div className="mb-8">
+            <KeywordSuggestions 
+              generatedKeywords={seoAnalysis.keywordSuggestions} 
+              onGenerateClick={() => {
+                toast.info("Génération de nouvelles suggestions...");
+                analyzeSite();
+              }}
+            />
+          </div>
+        )}
+        
         {seoAnalysis && (
           <div className="mb-8 results-display" style={{ display: 'none' }}>
             <ResultsDisplay seoAnalysis={seoAnalysis} />
           </div>
         )}
         
-        {/* Tab Navigation */}
         <div className="mb-8">
           <TabNavigation />
         </div>
         
-        {/* Feature grid showing main tool options */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold mb-6 flex items-center">
             <BarChart className="mr-2 h-6 w-6 text-indigo-600" />
@@ -180,10 +180,8 @@ const IndexPage = () => {
           <FeatureGrid />
         </div>
         
-        {/* Local Business Section */}
         <LocalBusinessSection />
         
-        {/* Content Sections - These are now managed by TabNavigation */}
         <div id="seo" data-section="seo" data-tab-content="seo" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100" style={{ display: 'none' }}>
           <h2 className="text-2xl font-bold mb-4 flex items-center">
             <span className="w-1 h-6 bg-indigo-600 rounded-full mr-3"></span>
@@ -191,7 +189,6 @@ const IndexPage = () => {
           </h2>
           <p className="text-gray-600">Consultez l'analyse détaillée des performances SEO de votre site.</p>
           
-          {/* Add additional content specifically for SEO results */}
           {seoAnalysis && (
             <div className="mt-4 p-4 bg-gray-50 rounded-md">
               <h3 className="font-medium mb-2">Résultats de l'analyse pour {url}</h3>
@@ -213,7 +210,6 @@ const IndexPage = () => {
           </h2>
           <p className="text-gray-600">Visualisez l'architecture de votre site web et identifiez les améliorations possibles.</p>
           
-          {/* Add structure visualization if data exists */}
           {siteStructure && siteStructure.headings && (
             <div className="mt-4 p-4 bg-gray-50 rounded-md">
               <h3 className="font-medium mb-2">Hiérarchie des titres</h3>
@@ -236,7 +232,6 @@ const IndexPage = () => {
           )}
         </div>
         
-        {/* Quora Button Section */}
         <div className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100">
           <div className="text-center">
             <div className="inline-block p-1.5 px-3 bg-[#b92b27]/10 text-[#b92b27] text-sm font-medium rounded-full mb-3">
@@ -259,7 +254,6 @@ const IndexPage = () => {
           </div>
         </div>
         
-        {/* Signature Button Section */}
         <div className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100">
           <div className="text-center">
             <div className="inline-block p-1.5 px-3 bg-blue-100 text-blue-700 text-sm font-medium rounded-full mb-3">

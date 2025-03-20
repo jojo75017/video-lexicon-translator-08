@@ -15,6 +15,8 @@ interface KeywordSuggestion {
   difficulty: number;
   suggestedTitle: string;
   suggestedDescription: string;
+  competition: number;
+  cpc: number;
 }
 
 const stopWords = new Set([
@@ -159,19 +161,29 @@ export const generateKeywordSuggestions = (keywords: KeywordAnalysis[]): Keyword
     return [];
   }
   
-  return keywords.map(({ keyword, frequency }) => {
+  const suggestions = keywords.map(({ keyword, frequency }) => {
     const relevance = calculateRelevanceScore(frequency, keyword.length);
     const searchVolume = Math.floor(Math.random() * 10000); // Simulation
+    const title = generateSeoTitle(keyword);
+    const description = generateSeoDescription(keyword);
+    
+    console.log(`Generated suggestion for "${keyword}": Title (${title.length} chars), Description (${description.length} chars)`);
+    
     return {
       keyword,
       volume: frequency,
       relevance,
       searchVolume,
       difficulty: Math.floor(Math.random() * 100),
-      suggestedTitle: generateSeoTitle(keyword),
-      suggestedDescription: generateSeoDescription(keyword)
+      suggestedTitle: title,
+      suggestedDescription: description,
+      competition: Math.random(),
+      cpc: Math.random() * 5
     };
   });
+  
+  console.log(`Generated ${suggestions.length} keyword suggestions with titles and descriptions`);
+  return suggestions;
 };
 
 // Génère des mots-clés fictifs pour les tests

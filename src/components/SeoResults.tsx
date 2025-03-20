@@ -22,6 +22,7 @@ import { analyzeMobilePerformance } from '@/utils/seo/mobileAnalyzer';
 import AnalyticsOverview from './seo/AnalyticsOverview';
 import ContentHierarchy from './ContentHierarchy';
 import SeoIntegrations from './seo/SeoIntegrations';
+import KeywordSuggestions from './seo/analysis/KeywordSuggestions';
 
 interface SeoResultsProps {
   seoAnalysis: SeoAnalysis;
@@ -34,8 +35,11 @@ const calculateSeoScore = (analysis: SeoAnalysis) => {
   if (analysis.h1Count !== 1) score -= 10;
   if (analysis.h1Count === 0) score -= 20;
   if (analysis.imgCount === 0) score -= 5;
-  if (analysis.metaTagsCount === 0) score -= 15;
-  if (!analysis.description) score -= 10;
+  
+  // Fix error: comparing MetaTagsAnalysis with number
+  // Check if metaTagsAnalysis exists and has properties instead
+  if (!analysis.metaTagsAnalysis.hasTitleTag) score -= 15;
+  if (!analysis.metaTagsAnalysis.hasDescriptionTag) score -= 10;
   if (!analysis.title) score -= 15;
 
   // Penalties for performance
@@ -89,7 +93,8 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
       h1Count: seoAnalysis.h1Count,
       h2Count: seoAnalysis.h2Count,
       h3Count: seoAnalysis.h3Count,
-      hierarchy: seoAnalysis.headingStructure?.hierarchy?.length || 0
+      hierarchy: seoAnalysis.headingStructure?.hierarchy?.length || 0,
+      keywordSuggestions: seoAnalysis.keywordSuggestions?.length || 0
     });
   }, [seoAnalysis]);
 
@@ -124,7 +129,8 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
     h2Count: seoAnalysis.h2Count,
     h3Count: seoAnalysis.h3Count,
     headings: seoAnalysis.headings?.length || 0,
-    hierarchy: hierarchy?.length || 0
+    hierarchy: hierarchy?.length || 0,
+    keywordSuggestions: seoAnalysis.keywordSuggestions?.length || 0
   });
 
   return (
@@ -135,6 +141,14 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
           suggestions={suggestions}
           performance={seoAnalysis.performance}
         />
+
+        {/* Add KeywordSuggestions component to display SEO suggestions */}
+        {seoAnalysis.keywordSuggestions && seoAnalysis.keywordSuggestions.length > 0 && (
+          <KeywordSuggestions 
+            generatedKeywords={seoAnalysis.keywordSuggestions}
+            onGenerateClick={() => console.log("Generate new suggestions")}
+          />
+        )}
 
         <Card className="p-6">
           <SeoStructure 

@@ -1,3 +1,4 @@
+
 export interface SeoAnalysisResult {
   title?: string;
   description?: string;
@@ -44,7 +45,7 @@ export interface SeoAnalysis {
   metaTagsAnalysis: MetaTagsAnalysis;
   canonicalUrl: string | null;
   robotsMeta: string | null;
-  brokenLinks: BrokenLink[];
+  brokenLinks: BrokenLinkInfo[];
   keywords: string[];
   googlePosition: number | null;
   authorityScore: number;
@@ -62,7 +63,7 @@ export interface SeoAnalysis {
   searchConsole: SearchConsoleData;
   socialMetrics: SocialMetrics;
   performance: Performance;
-  securityHeaders: SecurityHeaders;
+  securityHeaders: SecurityHeadersInfo;
   semanticStructure: Record<string, number>;
   linkAnalysis: {
     internal: number;
@@ -284,4 +285,35 @@ export interface SearchConsoleData {
   topPages?: any[];
   devices?: any;
   countries?: any;
+}
+
+// Add missing interfaces
+export interface BrokenLinkInfo {
+  url: string;
+  statusCode: number;
+  message: string;
+  location: string;
+}
+
+export interface SecurityHeadersInfo {
+  https: boolean;
+  hsts: boolean;
+  xFrameOptions: boolean;
+  contentSecurityPolicy: boolean;
+  xContentTypeOptions: boolean;
+  referrerPolicy: boolean;
+  permissions: boolean;
+}
+
+export interface SiteStructure {
+  name: string;
+  path: string;
+  children: SiteStructure[];
+}
+
+export interface SeasonalityData {
+  winter: number;
+  spring: number;
+  summer: number;
+  fall: number;
 }

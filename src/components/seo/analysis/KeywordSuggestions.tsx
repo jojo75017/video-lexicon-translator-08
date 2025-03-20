@@ -29,6 +29,9 @@ const KeywordSuggestions: React.FC<KeywordSuggestionsProps> = ({
     }, 2000);
   };
 
+  console.log("KeywordSuggestions component rendering with", generatedKeywords.length, "keywords");
+  console.log("Sample data:", generatedKeywords.slice(0, 2));
+
   return (
     <Card className="border border-gray-200 rounded-lg">
       <CardHeader className="pb-2">

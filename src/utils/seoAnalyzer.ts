@@ -1,6 +1,6 @@
 
-import { SeoAnalysis, KeywordData } from '@/types/seo';
-import { analyzeKeywords } from './seo/keywordAnalyzer';
+import { SeoAnalysis, KeywordData, MetaTagsAnalysis } from '@/types/seo';
+import { analyzeKeywords, generateKeywordSuggestions } from './seo/keywordAnalyzer';
 import { analyzePerformance } from './seo/performanceAnalyzer';
 import { analyzeLinkStructure } from './seo/linkAnalyzer';
 import { analyzeMobilePerformance } from './seo/mobileAnalyzer';
@@ -39,7 +39,7 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
   const backlinkResults = analyzeBacklinks(url);
   
   // Create properly typed meta tags analysis based on the properties that are actually available in metaTagsAnalysisResult
-  const metaTagsAnalysis = {
+  const metaTagsAnalysis: MetaTagsAnalysis = {
     hasTitleTag: metaTagsAnalysisResult.title !== "Titre de la page non trouvé",
     hasDescriptionTag: metaTagsAnalysisResult.description !== "Description non trouvée",
     hasOpenGraphTags: metaTagsAnalysisResult.hasOgTags,
@@ -147,16 +147,9 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     position: kw.position
   }));
 
-  // Create keyword suggestions
-  const keywordSuggestions = topKeywords.map(kw => ({
-    keyword: kw.keyword,
-    searchVolume: Math.floor(Math.random() * 10000),
-    competition: Math.random(),
-    cpc: Math.random() * 5,
-    relevance: Math.random() * 100,
-    difficulty: Math.floor(Math.random() * 100),
-    volume: Math.floor(Math.random() * 5000)
-  }));
+  // Create keyword suggestions with titles and descriptions
+  const keywordSuggestions = generateKeywordSuggestions(topKeywords);
+  console.log("Generated keyword suggestions:", keywordSuggestions);
 
   // Create sample broken links for testing
   const brokenLinks = [
@@ -197,7 +190,7 @@ export const analyzeSeo = async (doc: Document, url: string): Promise<SeoAnalysi
     imgCount,
     imgWithoutAlt,
     imagesDetails,
-    metaTagsCount: doc.getElementsByTagName('meta').length,
+    metaTagsCount: metaTagsAnalysis, // Replace with the correct type
     metaTagsAnalysis,
     canonicalUrl: doc.querySelector('link[rel="canonical"]')?.getAttribute('href') || null,
     robotsMeta: doc.querySelector('meta[name="robots"]')?.getAttribute('content') || null,
