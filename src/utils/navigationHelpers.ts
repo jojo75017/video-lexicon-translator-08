@@ -24,6 +24,8 @@ export const navigateToSection = (sectionId: string, tabId?: string): void => {
 };
 
 export const scrollToSection = (sectionId: string): void => {
+  console.log(`Scrolling to section: ${sectionId}`);
+  
   // Chercher l'élément par ID
   const sectionElement = document.getElementById(sectionId);
   
@@ -33,16 +35,21 @@ export const scrollToSection = (sectionId: string): void => {
     // Faire défiler jusqu'à la section avec un comportement fluide
     sectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
     
-    // Ajouter un effet de surbrillance temporaire plus visible
-    sectionElement.classList.add('bg-blue-100');
+    // Effet de surbrillance plus visible et plus durable
     sectionElement.classList.add('transition-all');
     sectionElement.classList.add('duration-1000');
+    
+    // Appliquer un effet plus visible
+    sectionElement.style.backgroundColor = 'rgba(59, 130, 246, 0.2)';
     sectionElement.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.5)';
     
+    // Retirer l'effet après un délai plus long
     setTimeout(() => {
-      sectionElement.classList.remove('bg-blue-100');
+      sectionElement.style.backgroundColor = '';
       sectionElement.style.boxShadow = 'none';
-    }, 2000);
+      sectionElement.classList.remove('transition-all');
+      sectionElement.classList.remove('duration-1000');
+    }, 3000);
   } else {
     console.log(`Section element not found: ${sectionId}`);
     
@@ -52,16 +59,21 @@ export const scrollToSection = (sectionId: string): void => {
       console.log(`Found section by data attribute: ${sectionId}`);
       dataAttributeSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
       
-      // Ajouter un effet de surbrillance temporaire plus visible
-      dataAttributeSection.classList.add('bg-blue-100');
+      // Effet de surbrillance plus visible et plus durable
       dataAttributeSection.classList.add('transition-all');
       dataAttributeSection.classList.add('duration-1000');
+      
+      // Appliquer un effet plus visible
+      (dataAttributeSection as HTMLElement).style.backgroundColor = 'rgba(59, 130, 246, 0.2)';
       (dataAttributeSection as HTMLElement).style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.5)';
       
+      // Retirer l'effet après un délai plus long
       setTimeout(() => {
-        dataAttributeSection.classList.remove('bg-blue-100');
+        (dataAttributeSection as HTMLElement).style.backgroundColor = '';
         (dataAttributeSection as HTMLElement).style.boxShadow = 'none';
-      }, 2000);
+        dataAttributeSection.classList.remove('transition-all');
+        dataAttributeSection.classList.remove('duration-1000');
+      }, 3000);
       return;
     }
     
@@ -71,16 +83,21 @@ export const scrollToSection = (sectionId: string): void => {
       console.log(`Found section by class: ${sectionId}`);
       classSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
       
-      // Ajouter un effet de surbrillance temporaire plus visible
-      (classSection as HTMLElement).classList.add('bg-blue-100');
+      // Effet de surbrillance plus visible et plus durable
       (classSection as HTMLElement).classList.add('transition-all');
       (classSection as HTMLElement).classList.add('duration-1000');
+      
+      // Appliquer un effet plus visible
+      (classSection as HTMLElement).style.backgroundColor = 'rgba(59, 130, 246, 0.2)';
       (classSection as HTMLElement).style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.5)';
       
+      // Retirer l'effet après un délai plus long
       setTimeout(() => {
-        (classSection as HTMLElement).classList.remove('bg-blue-100');
+        (classSection as HTMLElement).style.backgroundColor = '';
         (classSection as HTMLElement).style.boxShadow = 'none';
-      }, 2000);
+        (classSection as HTMLElement).classList.remove('transition-all');
+        (classSection as HTMLElement).classList.remove('duration-1000');
+      }, 3000);
       return;
     }
     

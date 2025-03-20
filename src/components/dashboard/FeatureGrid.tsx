@@ -2,11 +2,13 @@
 import React from 'react';
 import FeatureCard from './FeatureCard';
 import { Search, Globe, Database, Link2, ChartBar, Settings, Hash, Pen, Signature } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
 import { navigateToSection } from '@/utils/navigationHelpers';
 
 const FeatureGrid = () => {
+  const navigate = useNavigate();
+  
   const features = [
     {
       icon: Search,
@@ -75,19 +77,17 @@ const FeatureGrid = () => {
   ];
 
   // Fonction pour gérer les clics sur les fonctionnalités
-  const handleFeatureClick = (e: React.MouseEvent, id: string, tabValue?: string, link?: string) => {
-    // Empêcher le comportement par défaut et la propagation
+  const handleFeatureClick = (e: React.MouseEvent<HTMLDivElement>, id: string, tabValue?: string, link?: string) => {
     e.preventDefault();
     e.stopPropagation();
     
+    console.log(`Feature clicked: ${id}, tab: ${tabValue}, link: ${link}`);
+    
     if (link) {
-      // Si on a un lien, ne rien faire - le routage est géré par le composant Link
+      navigate(link);
       return;
     }
     
-    console.log(`Feature clicked: ${id}, tab: ${tabValue}`);
-    
-    // Navigation avec toast de confirmation
     if (tabValue) {
       navigateToSection(id, tabValue);
     } else {
@@ -111,7 +111,11 @@ const FeatureGrid = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {features.map((feature) => (
           feature.link ? (
-            <Link key={feature.id} to={feature.link} className="block">
+            <div 
+              key={feature.id}
+              onClick={(e) => handleFeatureClick(e, feature.id, feature.tabValue, feature.link)}
+              className="cursor-pointer"
+            >
               <FeatureCard
                 icon={feature.icon}
                 title={feature.title}
@@ -119,15 +123,15 @@ const FeatureGrid = () => {
                 color={feature.color}
                 onClick={(e) => handleFeatureClick(e, feature.id, feature.tabValue, feature.link)}
               />
-            </Link>
+            </div>
           ) : (
             <div 
               key={feature.id} 
               className="cursor-pointer" 
-              onClick={(e) => handleFeatureClick(e, feature.id, feature.tabValue)}
               id={`feature-card-${feature.id}`}
               data-feature-id={feature.id}
               data-tab-value={feature.tabValue}
+              onClick={(e) => handleFeatureClick(e, feature.id, feature.tabValue)}
             >
               <FeatureCard
                 icon={feature.icon}
