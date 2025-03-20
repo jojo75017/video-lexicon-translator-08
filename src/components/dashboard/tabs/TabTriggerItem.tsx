@@ -56,6 +56,7 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
             className={`flex items-center gap-1 px-3 py-1.5 rounded-md relative group transition-all duration-200 hover:bg-white ${
               highlighted ? 'bg-purple-100' : ''
             }`}
+            data-value={id}
           >
             <span className="absolute -top-1 -right-1 transform translate-x-1/2 -translate-y-1/2 z-10">
               {isNew && (

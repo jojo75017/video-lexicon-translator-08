@@ -21,12 +21,17 @@ const TabNavigation = () => {
   const [activeTab, setActiveTab] = useState("wordcount");
   const groupedTabs = getGroupedTabs();
   
-  // Filtrer les onglets pour n'avoir que ceux sans lien externe
+  // Filter tabs to only include those without external links
   const contentTabs = tabs.filter(tab => !tab.link);
 
   return (
     <TooltipProvider>
-      <Tabs defaultValue="wordcount" value={activeTab} onValueChange={setActiveTab} className="w-full">
+      <Tabs 
+        defaultValue="wordcount" 
+        value={activeTab} 
+        onValueChange={setActiveTab} 
+        className="w-full"
+      >
         <div className="w-full flex flex-col overflow-hidden justify-between bg-white shadow-md rounded-lg p-3 mb-6 border border-gray-100">
           <div className="grid grid-cols-6 gap-2 text-xs font-medium text-gray-500 mb-2 px-2">
             {Object.entries(groupLabels).map(([key, label]) => (
@@ -41,17 +46,33 @@ const TabNavigation = () => {
           </TabsList>
         </div>
         
-        {/* Tab content section */}
+        {/* Tab content section - Make sure each tab has a corresponding TabsContent */}
         <div className="p-2 bg-gray-50 rounded-lg border border-gray-200">
-          {/* Render specific tab contents */}
-          <TabsContent value="hierarchy"><HierarchyTabContent /></TabsContent>
-          <TabsContent value="wordcount"><WordCountTabContent /></TabsContent>
-          <TabsContent value="seo"><SeoTabContent /></TabsContent>
-          <TabsContent value="structure"><StructureTabContent /></TabsContent>
-          <TabsContent value="backlinks"><BacklinksTabContent /></TabsContent>
-          <TabsContent value="metrics"><MetricsTabContent /></TabsContent>
+          <TabsContent value="wordcount">
+            <WordCountTabContent />
+          </TabsContent>
           
-          {/* Render default tab contents for other tabs */}
+          <TabsContent value="hierarchy">
+            <HierarchyTabContent />
+          </TabsContent>
+          
+          <TabsContent value="seo">
+            <SeoTabContent />
+          </TabsContent>
+          
+          <TabsContent value="structure">
+            <StructureTabContent />
+          </TabsContent>
+          
+          <TabsContent value="backlinks">
+            <BacklinksTabContent />
+          </TabsContent>
+          
+          <TabsContent value="metrics">
+            <MetricsTabContent />
+          </TabsContent>
+          
+          {/* Generate TabsContent components for all remaining tabs */}
           {contentTabs
             .filter(tab => !['hierarchy', 'wordcount', 'seo', 'structure', 'backlinks', 'metrics'].includes(tab.id))
             .map(tab => (
