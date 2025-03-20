@@ -34,11 +34,11 @@ export const showSection = (sectionId: string): void => {
     (section as HTMLElement).style.display = 'none';
   });
   
-  // Look for element by ID
+  // Look for element by ID first (most specific)
   const sectionElement = document.getElementById(sectionId);
   
   if (sectionElement) {
-    console.log(`Section element found: ${sectionId}`);
+    console.log(`Section element found by ID: ${sectionId}`);
     
     // Ensure the element is visible
     sectionElement.style.display = 'block';
@@ -48,46 +48,62 @@ export const showSection = (sectionId: string): void => {
       description: "La section est maintenant visible",
       duration: 2000
     });
-  } else {
-    console.log(`Section element not found: ${sectionId}`);
-    
-    // Try to find element with data-section attribute
-    const dataAttributeSection = document.querySelector(`[data-section="${sectionId}"]`);
-    if (dataAttributeSection) {
-      console.log(`Found section by data attribute: ${sectionId}`);
-      
-      // Ensure the element is visible
-      (dataAttributeSection as HTMLElement).style.display = 'block';
-      
-      // Notify user
-      toast.success(`Section ${sectionId} affichée`, {
-        description: "La section est maintenant visible",
-        duration: 2000
-      });
-      return;
-    }
-    
-    // Try to find element with class name
-    const classSection = document.querySelector(`.section-${sectionId}`);
-    if (classSection) {
-      console.log(`Found section by class: ${sectionId}`);
-      
-      // Ensure the element is visible
-      (classSection as HTMLElement).style.display = 'block';
-      
-      // Notify user
-      toast.success(`Section ${sectionId} affichée`, {
-        description: "La section est maintenant visible",
-        duration: 2000
-      });
-      return;
-    }
-    
-    // If no specific section is found, inform the user
-    toast.info("Section non trouvée", {
-      description: "Veuillez d'abord analyser un site web pour accéder à cette section",
-    });
+    return;
   }
+  
+  // Try to find element with data-section attribute
+  const dataAttributeSection = document.querySelector(`[data-section="${sectionId}"]`);
+  if (dataAttributeSection) {
+    console.log(`Found section by data attribute: ${sectionId}`);
+    
+    // Ensure the element is visible
+    (dataAttributeSection as HTMLElement).style.display = 'block';
+    
+    // Notify user
+    toast.success(`Section ${sectionId} affichée`, {
+      description: "La section est maintenant visible",
+      duration: 2000
+    });
+    return;
+  }
+  
+  // Try to find element with class name
+  const classSection = document.querySelector(`.section-${sectionId}`);
+  if (classSection) {
+    console.log(`Found section by class: ${sectionId}`);
+    
+    // Ensure the element is visible
+    (classSection as HTMLElement).style.display = 'block';
+    
+    // Notify user
+    toast.success(`Section ${sectionId} affichée`, {
+      description: "La section est maintenant visible",
+      duration: 2000
+    });
+    return;
+  }
+  
+  // If no specific section is found, try find by tab-content attribute
+  const tabContentSection = document.querySelector(`[data-tab-content="${sectionId}"]`);
+  if (tabContentSection) {
+    console.log(`Found section by tab-content: ${sectionId}`);
+    
+    // Ensure the element is visible
+    (tabContentSection as HTMLElement).style.display = 'block';
+    
+    // Notify user
+    toast.success(`Section ${sectionId} affichée`, {
+      description: "La section est maintenant visible",
+      duration: 2000
+    });
+    return;
+  }
+  
+  // If no specific section is found, inform the user
+  console.log(`No section found for: ${sectionId}`);
+  toast.info("Section non trouvée", {
+    description: "Veuillez d'abord analyser un site web pour accéder à cette section",
+  });
 };
 
 // Additional scroll function kept but simplified
@@ -100,7 +116,8 @@ export const scrollToSection = (sectionId: string): void => {
   // Then scroll to it
   const sectionElement = document.getElementById(sectionId) || 
                        document.querySelector(`[data-section="${sectionId}"]`) || 
-                       document.querySelector(`.section-${sectionId}`);
+                       document.querySelector(`.section-${sectionId}`) ||
+                       document.querySelector(`[data-tab-content="${sectionId}"]`);
   
   if (sectionElement) {
     // Scroll to section with smooth behavior

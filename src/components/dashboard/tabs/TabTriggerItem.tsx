@@ -6,6 +6,7 @@ import { TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
+import { showSection } from '@/utils/navigationHelpers';
 
 interface TabTriggerItemProps {
   id: string;
@@ -29,46 +30,10 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
   const handleTabClick = () => {
     console.log(`Tab clicked: ${id}`);
     
-    // Hide all tab content first
-    const allTabContent = document.querySelectorAll('[data-tab-content]');
-    allTabContent.forEach((el) => {
-      (el as HTMLElement).style.display = 'none';
-    });
-    
-    // Show the selected tab content
-    const tabContent = document.querySelector(`[data-tab-content="${id}"]`);
-    if (tabContent) {
-      console.log(`Found tab content with data-tab-content: ${id}`);
-      (tabContent as HTMLElement).style.display = 'block';
-      
-      toast.success(`Onglet ${label} activé`, {
-        description: "Contenu affiché",
-        duration: 1500
-      });
-    } else {
-      console.log(`Tab content not found for: ${id}, trying other selectors`);
-      
-      // Try other selectors
-      const alternateContent = document.getElementById(id) || 
-                               document.querySelector(`[data-section="${id}"]`) ||
-                               document.querySelector(`.section-${id}`);
-      
-      if (alternateContent) {
-        console.log(`Found alternate content element for: ${id}`);
-        (alternateContent as HTMLElement).style.display = 'block';
-        
-        toast.success(`Onglet ${label} activé`, {
-          description: "Contenu affiché via sélecteur alternatif",
-          duration: 1500
-        });
-      } else {
-        console.log(`No content element found for: ${id}`);
-        toast.error(`Impossible d'afficher le contenu pour ${label}`, {
-          description: "Élément introuvable",
-          duration: 2000
-        });
-      }
-    }
+    // Use the helper function to show the section
+    setTimeout(() => {
+      showSection(id);
+    }, 0);
   };
 
   return (

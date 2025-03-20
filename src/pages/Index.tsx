@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card } from "@/components/ui/card";
@@ -15,6 +16,7 @@ import ResultsDisplay from '@/components/seo/analysis/ResultsDisplay';
 import { toast } from "sonner";
 import { useSiteAnalyzer } from '@/hooks/useSiteAnalyzer';
 import { FirecrawlService } from '@/utils/FirecrawlService';
+import { showSection } from '@/utils/navigationHelpers';
 
 const ModeToggle = () => {
   return (
@@ -42,6 +44,7 @@ const IndexPage = () => {
   
   // Hide all sections initially
   useEffect(() => {
+    // Hide all sections on first render
     const sections = document.querySelectorAll('[data-section]');
     sections.forEach((section) => {
       (section as HTMLElement).style.display = 'none';
@@ -53,22 +56,32 @@ const IndexPage = () => {
   // Show results when analysis is complete
   useEffect(() => {
     if (seoAnalysis) {
-      // Show the results section automatically
-      const resultsSection = document.querySelector('#seo');
-      if (resultsSection) {
-        (resultsSection as HTMLElement).style.display = 'block';
-        
-        toast.success("Analyse SEO terminée", {
-          description: "Consultez les résultats ci-dessous",
-          duration: 3000
-        });
-      }
+      console.log('SEO analysis complete - showing results');
       
-      // Also make the specific results display visible
-      const resultsDisplay = document.querySelector('.results-display');
-      if (resultsDisplay) {
-        (resultsDisplay as HTMLElement).style.display = 'block';
-      }
+      // Show the results section "seo" automatically
+      setTimeout(() => {
+        const seoSection = document.getElementById('seo') || document.querySelector('[data-section="seo"]');
+        if (seoSection) {
+          console.log('Found SEO section, making it visible');
+          (seoSection as HTMLElement).style.display = 'block';
+          
+          toast.success("Analyse SEO terminée", {
+            description: "Consultez les résultats ci-dessous",
+            duration: 3000
+          });
+        } else {
+          console.log('SEO section not found!');
+        }
+        
+        // Also make the specific results display visible
+        const resultsDisplay = document.querySelector('.results-display');
+        if (resultsDisplay) {
+          console.log('Found results display, making it visible');
+          (resultsDisplay as HTMLElement).style.display = 'block';
+        } else {
+          console.log('Results display not found!');
+        }
+      }, 100);
     }
   }, [seoAnalysis]);
 
@@ -137,11 +150,47 @@ const IndexPage = () => {
         <div id="seo" data-section="seo" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100" style={{ display: 'none' }}>
           <h2 className="text-2xl font-bold mb-4">Analyse SEO</h2>
           <p className="text-gray-600">Consultez l'analyse détaillée des performances SEO de votre site.</p>
+          
+          {/* Add additional content specifically for SEO results */}
+          {seoAnalysis && (
+            <div className="mt-4 p-4 bg-gray-50 rounded-md">
+              <h3 className="font-medium mb-2">Résultats de l'analyse pour {url}</h3>
+              <ul className="list-disc pl-5 space-y-1 text-gray-600">
+                <li>Titre: {seoAnalysis.title}</li>
+                <li>Balises Meta: {seoAnalysis.metaTagsAnalysis.hasDescriptionTag ? 'Description présente' : 'Description manquante'}</li>
+                <li>Titres H1: {seoAnalysis.h1Count}</li>
+                <li>Titres H2: {seoAnalysis.h2Count}</li>
+                <li>Images: {seoAnalysis.imgCount} (dont {seoAnalysis.imgWithoutAlt} sans attribut alt)</li>
+              </ul>
+            </div>
+          )}
         </div>
         
         <div id="structure" data-section="structure" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100" style={{ display: 'none' }}>
           <h2 className="text-2xl font-bold mb-4">Structure du Site</h2>
           <p className="text-gray-600">Visualisez l'architecture de votre site web et identifiez les améliorations possibles.</p>
+          
+          {/* Add structure visualization if data exists */}
+          {siteStructure && siteStructure.headings && (
+            <div className="mt-4 p-4 bg-gray-50 rounded-md">
+              <h3 className="font-medium mb-2">Hiérarchie des titres</h3>
+              <div className="pl-4 border-l-2 border-blue-200 space-y-2">
+                {siteStructure.headings.map((heading: any, index: number) => (
+                  <div 
+                    key={index} 
+                    className={`py-1.5 px-3 rounded-md ${
+                      heading.level === "h1" ? 'bg-blue-50 font-bold ml-0' : 
+                      heading.level === "h2" ? 'bg-blue-50/60 font-semibold ml-4' : 
+                      heading.level === "h3" ? 'bg-blue-50/30 ml-8' : 
+                      'bg-gray-50 ml-12'
+                    }`}
+                  >
+                    {`${heading.level.toUpperCase()}: ${heading.text}`}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
         
         <div id="hierarchy" data-section="hierarchy" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100" style={{ display: 'none' }}>
@@ -152,6 +201,23 @@ const IndexPage = () => {
         <div id="backlinks" data-section="backlinks" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100" style={{ display: 'none' }}>
           <h2 className="text-2xl font-bold mb-4">Analyse des Backlinks</h2>
           <p className="text-gray-600">Évaluez la qualité et la quantité des liens pointant vers votre site.</p>
+          
+          {/* Add backlinks info if resources exist */}
+          {resources && (
+            <div className="mt-4 p-4 bg-gray-50 rounded-md">
+              <h3 className="font-medium mb-2">Aperçu des liens</h3>
+              <div className="grid grid-cols-2 gap-4 mt-3">
+                <div className="bg-white p-3 rounded-md shadow-sm">
+                  <span className="text-lg font-bold text-blue-600">{resources.externalLinks}</span>
+                  <p className="text-sm text-gray-500">Liens externes</p>
+                </div>
+                <div className="bg-white p-3 rounded-md shadow-sm">
+                  <span className="text-lg font-bold text-green-600">{resources.internalLinks}</span>
+                  <p className="text-sm text-gray-500">Liens internes</p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
         
         <div id="advanced" data-section="advanced" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100" style={{ display: 'none' }}>

@@ -9,12 +9,16 @@ interface DefaultTabContentProps {
 const DefaultTabContent: React.FC<DefaultTabContentProps> = ({ id, label }) => {
   const contentRef = useRef<HTMLDivElement>(null);
   
-  // This effect ensures the content is visible when the component is rendered
+  // This effect ensures the content has the right visibility status
   useEffect(() => {
     if (contentRef.current) {
-      // Make sure we're visible when initially mounted
-      contentRef.current.style.display = 'block';
-      console.log(`DefaultTabContent ${id} mounted and made visible`);
+      // Make sure visibility is properly set initially
+      // Check if this tab should be visible (depends on if it's the active tab)
+      const isActiveTab = window.location.hash === `#${id}` || 
+                          document.querySelector(`[data-value="${id}"][data-state="active"]`);
+      
+      contentRef.current.style.display = isActiveTab ? 'block' : 'none';
+      console.log(`DefaultTabContent ${id} mounted with display: ${contentRef.current.style.display}`);
     }
     
     return () => {
