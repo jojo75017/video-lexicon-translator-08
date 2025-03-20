@@ -25,7 +25,7 @@ const MainTabList: React.FC<MainTabListProps> = ({
           key={tab.id}
           onClick={() => onTabChange(tab.id)}
           className={`flex-1 py-3 px-4 text-center cursor-pointer transition-all border-b-2 ${
-            activeTab === tab.id 
+            activeTab === tab.id || activeTab.startsWith(tab.id) 
               ? `border-b-2 ${tab.color} font-medium`
               : 'border-transparent hover:bg-gray-50'
           }`}

@@ -29,6 +29,7 @@ const TabContentsRenderer: React.FC<TabContentsRendererProps> = ({ contentTabs }
     'performance', 'suggestions'
   ];
   
+  // Make sure all content elements are properly rendered
   return (
     <>
       {/* Specialized tab contents */}

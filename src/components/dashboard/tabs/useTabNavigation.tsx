@@ -38,8 +38,8 @@ export const useTabNavigation = () => {
       setTimeout(() => activateSection(hash), 100);
     } else {
       // Default to first tab if no hash
-      const defaultTab = 'seo';
-      console.log(`No hash in URL, defaulting to first tab: ${defaultTab}`);
+      const defaultTab = 'hierarchy';
+      console.log(`No hash in URL, defaulting to: ${defaultTab}`);
       setActiveTab(defaultTab);
       setTimeout(() => activateSection(defaultTab), 100);
     }
@@ -72,15 +72,32 @@ export const useTabNavigation = () => {
 
   // Get sub-tabs based on active main tab
   const getSubTabs = () => {
-    if (activeTab === 'seo' || mainTabs.some(t => t.id === 'seo' && t.id === activeTab)) {
+    if (activeTab === 'seo' || activeTab.startsWith('seo') || 
+        tabs.some(t => t.group === 'seo' && t.id === activeTab)) {
       return tabs.filter(tab => ['seo', 'structure', 'backlinks'].includes(tab.id));
-    } else if (activeTab === 'content' || mainTabs.some(t => t.id === 'content' && t.id === activeTab)) {
+    } 
+    else if (activeTab === 'content' || activeTab.startsWith('content') || 
+             tabs.some(t => t.group === 'content' && t.id === activeTab)) {
       return tabs.filter(tab => ['wordcount', 'hierarchy', 'suggestions'].includes(tab.id));
-    } else if (activeTab === 'performance' || mainTabs.some(t => t.id === 'performance' && t.id === activeTab)) {
+    } 
+    else if (activeTab === 'performance' || activeTab.startsWith('performance') || 
+             tabs.some(t => t.group === 'performance' && t.id === activeTab)) {
       return tabs.filter(tab => ['performance', 'metrics'].includes(tab.id));
-    } else if (activeTab === 'analytics' || mainTabs.some(t => t.id === 'analytics' && t.id === activeTab)) {
+    } 
+    else if (activeTab === 'analytics' || activeTab.startsWith('analytics') || 
+             tabs.some(t => t.group === 'analytics' && t.id === activeTab)) {
       return tabs.filter(tab => ['analytics'].includes(tab.id));
     }
+    
+    // If none of the above, try to find the main tab by group
+    const tabItem = tabs.find(t => t.id === activeTab);
+    if (tabItem) {
+      const matchingTabs = tabs.filter(t => t.group === tabItem.group && !t.link);
+      if (matchingTabs.length > 0) {
+        return matchingTabs;
+      }
+    }
+    
     return [];
   };
   
