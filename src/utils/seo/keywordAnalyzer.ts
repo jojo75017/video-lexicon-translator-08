@@ -1,3 +1,4 @@
+
 interface KeywordAnalysis {
   keyword: string;
   frequency: number;
@@ -12,8 +13,8 @@ interface KeywordSuggestion {
   relevance: number;
   searchVolume: number;
   difficulty: number;
-  suggestedTitle?: string;
-  suggestedDescription?: string;
+  suggestedTitle: string;
+  suggestedDescription: string;
 }
 
 const stopWords = new Set([

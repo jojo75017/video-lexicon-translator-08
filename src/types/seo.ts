@@ -30,6 +30,7 @@ export interface SeoAnalysis {
   description: string;
   h1Count: number;
   h2Count: number;
+  h2Count: number;
   h3Count: number;
   headings: HeadingStructure['headings'];
   paragraphs: {

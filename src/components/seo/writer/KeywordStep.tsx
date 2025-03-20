@@ -126,9 +126,9 @@ const KeywordStep: React.FC<KeywordStepProps> = ({
 
         <Card className="p-4">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="mb-4">
-              <TabsTrigger value="trends">Évolution du volume</TabsTrigger>
-              <TabsTrigger value="suggestions">Suggestions SEO</TabsTrigger>
+            <TabsList className="mb-4 w-full">
+              <TabsTrigger value="trends" className="flex-1">Évolution du volume</TabsTrigger>
+              <TabsTrigger value="suggestions" className="flex-1">Suggestions SEO</TabsTrigger>
             </TabsList>
             
             <TabsContent value="trends">
@@ -195,6 +195,31 @@ const KeywordStep: React.FC<KeywordStepProps> = ({
           </Tabs>
         </Card>
       </div>
+      
+      {/* Section de débogage - Affichons toutes les suggestions */}
+      <Card className="p-4 mt-4 bg-gray-50">
+        <h3 className="font-medium mb-3">Toutes les suggestions disponibles</h3>
+        <div className="grid gap-3 max-h-60 overflow-y-auto">
+          {keywords.map((kw, index) => (
+            <div key={index} className="p-3 bg-white rounded border border-gray-200">
+              <div className="flex justify-between mb-1">
+                <span className="font-semibold">{kw.keyword}</span>
+                <Badge variant="outline">{kw.relevance}%</Badge>
+              </div>
+              <div className="text-sm space-y-1 mt-2">
+                <div>
+                  <span className="font-medium text-blue-600">Title: </span>
+                  <span>{kw.suggestedTitle || "Non disponible"}</span>
+                </div>
+                <div>
+                  <span className="font-medium text-green-600">Description: </span>
+                  <span>{kw.suggestedDescription || "Non disponible"}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Card>
     </div>
   );
 };
