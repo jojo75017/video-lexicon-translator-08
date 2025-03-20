@@ -32,14 +32,8 @@ const FeatureCard = ({
   
   const colorClass = colorClasses[color] || colorClasses.blue;
   
-  const handleClick = () => {
-    console.log('FeatureCard clicked');
-    onClick();
-  };
-  
   return (
     <div 
-      onClick={handleClick}
       className={`bg-white rounded-lg p-5 border transition-all duration-300 hover:shadow-md cursor-pointer ${colorClass} ${className}`}
     >
       <div className="flex items-start gap-4">
