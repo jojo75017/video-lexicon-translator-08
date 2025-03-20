@@ -56,7 +56,15 @@ const SuggestionsTabContent = () => {
       `${cleanKeyword} stratégies`,
       `comment améliorer ${cleanKeyword}`,
       `${cleanKeyword} techniques`,
-      `${cleanKeyword} conseils`
+      `${cleanKeyword} conseils`,
+      `top ${cleanKeyword}`,
+      `${cleanKeyword} en ligne`,
+      `${cleanKeyword} gratuit`,
+      `${cleanKeyword} professionnel`,
+      `${cleanKeyword} pas cher`,
+      `${cleanKeyword} comparatif`,
+      `acheter ${cleanKeyword}`,
+      `${cleanKeyword} prix`
     ];
     
     return keywordVariations.map((kw, index) => {
@@ -118,9 +126,9 @@ const SuggestionsTabContent = () => {
   return (
     <div className="space-y-6 p-4">
       <h2 className="text-2xl font-bold">Suggestions de contenu SEO</h2>
-      <p className="text-muted-foreground">
-        Obtenez des suggestions de titres (balises title) et descriptions (meta descriptions) 
-        optimisées pour votre mot-clé principal.
+      <p className="text-muted-foreground mb-6">
+        Obtenez des suggestions de titres (balises title), descriptions (meta descriptions) 
+        et mots-clés associés pour optimiser votre référencement.
       </p>
       
       <Card className="border border-gray-200 rounded-lg">
@@ -169,8 +177,12 @@ const SuggestionsTabContent = () => {
           </div>
           
           {suggestions.length > 0 && (
-            <Tabs defaultValue="titles" className="mt-6">
+            <Tabs defaultValue="keywords" className="mt-6">
               <TabsList className="mb-4 grid grid-cols-3 w-full">
+                <TabsTrigger value="keywords" className="flex items-center gap-2">
+                  <Tag className="h-4 w-4" />
+                  Mots-clés associés
+                </TabsTrigger>
                 <TabsTrigger value="titles" className="flex items-center gap-2">
                   <FileText className="h-4 w-4" />
                   Balises Title (60 car.)
@@ -179,11 +191,30 @@ const SuggestionsTabContent = () => {
                   <AlignLeft className="h-4 w-4" />
                   Meta Descriptions (155 car.)
                 </TabsTrigger>
-                <TabsTrigger value="keywords" className="flex items-center gap-2">
-                  <Tag className="h-4 w-4" />
-                  Mots-clés associés
-                </TabsTrigger>
               </TabsList>
+              
+              <TabsContent value="keywords">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  {suggestions.map((suggestion, index) => (
+                    <div key={index} className="flex justify-between items-center bg-blue-50 p-3 rounded-md border border-blue-100">
+                      <span className="font-medium">{suggestion.keyword}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-gray-500 text-sm bg-white px-2 py-1 rounded-full border border-gray-200">
+                          {suggestion.searchVolume} recherches
+                        </span>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8"
+                          onClick={() => copyToClipboard(suggestion.keyword, index + 200)}
+                        >
+                          {copiedIndex === index + 200 ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </TabsContent>
               
               <TabsContent value="titles">
                 <div className="space-y-3">
@@ -238,19 +269,6 @@ const SuggestionsTabContent = () => {
                   ))}
                 </div>
               </TabsContent>
-              
-              <TabsContent value="keywords">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {suggestions.map((suggestion, index) => (
-                    <div key={index} className="flex justify-between bg-blue-50 p-3 rounded-md border border-blue-100">
-                      <span className="font-medium">{suggestion.keyword}</span>
-                      <span className="text-gray-500 text-sm bg-white px-2 py-1 rounded-full border border-gray-200">
-                        {suggestion.searchVolume} recherches/mois
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </TabsContent>
             </Tabs>
           )}
           
@@ -260,7 +278,7 @@ const SuggestionsTabContent = () => {
               <h3 className="text-lg font-medium mb-2">Entrez un mot-clé pour commencer</h3>
               <p className="text-gray-500 mb-4">
                 Saisissez un mot-clé principal ci-dessus et cliquez sur "Générer des suggestions" 
-                pour créer des titres et descriptions SEO pertinents.
+                pour créer des titres, descriptions SEO et mots-clés associés pertinents.
               </p>
             </div>
           )}
