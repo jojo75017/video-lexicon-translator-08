@@ -4,6 +4,7 @@ import FeatureCard from './FeatureCard';
 import { Search, Globe, Database, Link2, ChartBar, Settings, Hash, Signature } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
+import { navigateToSection } from '@/utils/navigationHelpers';
 
 const FeatureGrid = () => {
   const navigate = useNavigate();
@@ -84,33 +85,8 @@ const FeatureGrid = () => {
       return;
     }
     
-    // Activation directe des onglets sans défilement
-    const tabElement = document.querySelector(`#tab-${tabValue}`) as HTMLElement;
-    if (tabElement) {
-      console.log(`Activating tab: ${tabValue}`);
-      tabElement.click();
-      
-      // Notification
-      toast.success(`Navigation vers ${id}`, {
-        description: `Affichage des données de ${id}`,
-        duration: 2000
-      });
-    } else {
-      console.log(`Tab element not found: #tab-${tabValue}`);
-      
-      // Fallback - essayer de trouver la section
-      const sectionElement = document.getElementById(id);
-      if (sectionElement) {
-        console.log(`Showing section: ${id}`);
-        // Rendre la section visible sans défilement
-        sectionElement.style.display = 'block';
-      } else {
-        console.log(`Section element not found: ${id}`);
-        toast.info(`Section ${id} non trouvée`, {
-          description: "Veuillez d'abord analyser un site web pour accéder à cette section"
-        });
-      }
-    }
+    // Utiliser notre fonction de navigation de manière cohérente avec les logs
+    navigateToSection(id, tabValue);
   };
 
   return (
@@ -135,7 +111,7 @@ const FeatureGrid = () => {
               title={feature.title}
               description={feature.description}
               color={feature.color}
-              onClick={() => {}} // Géré par le div parent maintenant
+              onClick={() => {}} // Handled by parent div now
             />
           </div>
         ))}

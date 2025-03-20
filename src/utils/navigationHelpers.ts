@@ -6,12 +6,18 @@ export const navigateToSection = (sectionId: string, tabId?: string): void => {
   
   // First activate tab if needed
   if (tabId) {
+    // Use the correct tab selector that matches ResultTabs.tsx
     const tabElement = document.querySelector(`[data-value="${tabId}"]`) as HTMLElement;
     if (tabElement) {
-      console.log(`Tab element found: ${tabId}`);
+      console.log(`Tab element found with data-value: ${tabId}`);
       tabElement.click();
+      
+      // Also ensure the section is visible after clicking the tab
+      setTimeout(() => {
+        showSection(sectionId);
+      }, 100);
     } else {
-      console.log(`Tab element not found: ${tabId}`);
+      console.log(`Tab element not found with data-value: ${tabId}`);
       showSection(sectionId);
     }
   } else {
@@ -19,7 +25,6 @@ export const navigateToSection = (sectionId: string, tabId?: string): void => {
   }
 };
 
-// Nouvelle fonction simplifiée qui montre la section sans défilement
 export const showSection = (sectionId: string): void => {
   console.log(`Showing section: ${sectionId}`);
   
