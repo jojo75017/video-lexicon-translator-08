@@ -23,10 +23,11 @@ const PageHeader = () => {
   const availableTabs = ['seo', 'structure', 'hierarchy', 'backlinks'];
 
   return (
-    <div className="bg-gradient-to-r from-indigo-600 to-blue-700 rounded-xl p-8 shadow-lg mb-8 relative overflow-hidden">
-      {/* Blobs décoratifs en arrière-plan */}
+    <div className="bg-gradient-to-r from-indigo-700 to-blue-600 rounded-xl p-8 shadow-lg mb-8 relative overflow-hidden">
+      {/* Blobs décoratifs en arrière-plan améliorés */}
       <div className="absolute top-0 left-0 w-72 h-72 bg-indigo-500 opacity-20 rounded-full filter blur-3xl animate-blob"></div>
       <div className="absolute bottom-0 right-0 w-72 h-72 bg-blue-500 opacity-20 rounded-full filter blur-3xl animate-blob animation-delay-2000"></div>
+      <div className="absolute bottom-20 left-1/4 w-48 h-48 bg-purple-500 opacity-10 rounded-full filter blur-3xl animate-blob animation-delay-4000"></div>
       
       <div className="relative z-10 max-w-4xl mx-auto">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-6">
@@ -34,7 +35,7 @@ const PageHeader = () => {
             <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4 drop-shadow-md">
               Tableau de bord SEO
             </h1>
-            <p className="text-lg text-blue-50 max-w-xl mb-6">
+            <p className="text-lg text-blue-50 max-w-xl mb-6 leading-relaxed">
               Optimisez votre visibilité en ligne avec nos outils d'analyse et d'optimisation professionnels
             </p>
             
@@ -50,17 +51,17 @@ const PageHeader = () => {
             </div>
           </div>
           
-          <div className="flex flex-col gap-3 bg-white/10 backdrop-blur-md p-4 rounded-lg border border-white/20">
+          <div className="flex flex-col gap-3 bg-white/15 backdrop-blur-md p-4 rounded-lg border border-white/20 shadow-xl">
             <div className="text-white font-semibold text-center mb-2">Statistiques du mois</div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white/10 p-3 rounded-lg">
+              <div className="bg-white/15 p-3 rounded-lg shadow-inner border border-white/10">
                 <div className="flex items-center justify-center gap-2 text-white mb-1">
                   <BarChart className="h-4 w-4" />
                   <span className="text-sm">Trafic organique</span>
                 </div>
                 <div className="text-center text-white font-bold text-xl">+12.5%</div>
               </div>
-              <div className="bg-white/10 p-3 rounded-lg">
+              <div className="bg-white/15 p-3 rounded-lg shadow-inner border border-white/10">
                 <div className="flex items-center justify-center gap-2 text-white mb-1">
                   <Search className="h-4 w-4" />
                   <span className="text-sm">Mots-clés</span>
@@ -72,7 +73,7 @@ const PageHeader = () => {
         </div>
         
         {/* Navigation Tabs - uniquement pour les onglets disponibles */}
-        <div className="mt-8 bg-white/10 backdrop-blur-sm rounded-lg p-1 border border-white/20">
+        <div className="mt-8 bg-white/15 backdrop-blur-sm rounded-lg p-1 border border-white/20 shadow-lg">
           <Tabs defaultValue="seo" className="w-full">
             <TabsList className="w-full bg-transparent flex gap-1 justify-center">
               {/* Onglet SEO */}

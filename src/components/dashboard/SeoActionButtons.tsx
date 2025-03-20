@@ -12,7 +12,7 @@ import { FileText, Eye, PieChart, Map, Bell, BarChart2, FolderTree } from 'lucid
 
 const SeoActionButtons = () => {
   return (
-    <Card className="p-6 shadow-md mb-8 border-0 bg-gradient-to-br from-white to-gray-50">
+    <Card className="p-6 shadow-lg mb-8 border-0 bg-gradient-to-br from-white to-gray-50">
       <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center">
           <div className="w-1 h-6 bg-indigo-600 rounded-full mr-3"></div>
@@ -69,15 +69,14 @@ interface ToolButtonProps {
 }
 
 const ToolButton: React.FC<ToolButtonProps> = ({ icon, label, component }) => {
-  // This wrapper preserves the functionality of the original button components
-  // while giving them a consistent visual appearance
+  // Enhanced professional styling
   return (
     <div className="group relative">
       <div className="absolute inset-0 z-10 opacity-0">
         {component}
       </div>
-      <div className="flex flex-col items-center p-4 bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer group-hover:border-gray-200 group-hover:bg-gray-50">
-        <div className="mb-2 p-2 bg-gray-50 rounded-full">{icon}</div>
+      <div className="flex flex-col items-center p-4 bg-white rounded-lg border border-gray-100 shadow-sm transition-all duration-200 cursor-pointer group-hover:border-gray-200 group-hover:shadow-md group-hover:translate-y-[-2px]">
+        <div className="mb-2 p-2.5 bg-gray-50 rounded-full shadow-inner">{icon}</div>
         <span className="text-sm font-medium text-gray-700">{label}</span>
       </div>
     </div>
