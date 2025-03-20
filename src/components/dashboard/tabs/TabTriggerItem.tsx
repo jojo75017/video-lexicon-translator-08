@@ -57,6 +57,8 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
               highlighted ? 'bg-purple-100' : ''
             }`}
             data-value={id}
+            data-tab-id={id}
+            onClick={() => console.log(`Tab clicked: ${id}`)}
           >
             <span className="absolute -top-1 -right-1 transform translate-x-1/2 -translate-y-1/2 z-10">
               {isNew && (

@@ -44,7 +44,8 @@ const TabsContent = React.forwardRef<
     ref={ref}
     className={cn(
       "mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-      "block w-full rounded-md border border-gray-100 bg-white p-4 shadow-sm", 
+      "rounded-md border border-gray-100 bg-white p-4 shadow-sm",
+      "data-[state=active]:block data-[state=inactive]:hidden", // Crucial: hide inactive tabs, show active ones
       className
     )}
     {...props}

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Tabs, TabsList, TabsContent } from "@/components/ui/tabs";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
@@ -16,6 +16,7 @@ import {
   BacklinksTabContent, 
   MetricsTabContent 
 } from './tabs/StandardTabContents';
+import { navigateToSection } from '@/utils/navigationHelpers';
 
 const TabNavigation = () => {
   const [activeTab, setActiveTab] = useState("wordcount");
@@ -23,13 +24,24 @@ const TabNavigation = () => {
   
   // Filter tabs to only include those without external links
   const contentTabs = tabs.filter(tab => !tab.link);
+  
+  // When active tab changes, ensure the tab content is visible
+  useEffect(() => {
+    if (activeTab) {
+      console.log(`Active tab changed to: ${activeTab}`);
+      navigateToSection(activeTab);
+    }
+  }, [activeTab]);
 
   return (
     <TooltipProvider>
       <Tabs 
         defaultValue="wordcount" 
         value={activeTab} 
-        onValueChange={setActiveTab} 
+        onValueChange={(value) => {
+          console.log(`Tab selected: ${value}`);
+          setActiveTab(value);
+        }} 
         className="w-full"
       >
         <div className="w-full flex flex-col overflow-hidden justify-between bg-white shadow-md rounded-lg p-3 mb-6 border border-gray-100">
@@ -46,7 +58,7 @@ const TabNavigation = () => {
           </TabsList>
         </div>
         
-        {/* Tab content section - Make sure each tab has a corresponding TabsContent */}
+        {/* Tab content section */}
         <div className="p-2 bg-gray-50 rounded-lg border border-gray-200">
           <TabsContent value="wordcount">
             <WordCountTabContent />
