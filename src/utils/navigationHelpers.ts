@@ -12,9 +12,35 @@ export const navigateToSection = (sectionId: string, tabId?: string): void => {
       console.log(`Tab element found with data-value: ${tabId}`);
       tabElement.click();
       
-      // Also ensure the section is visible after clicking the tab
+      // Allow some time for the tab content to render
       setTimeout(() => {
-        showSection(sectionId);
+        const sectionElement = document.getElementById(sectionId);
+        if (sectionElement) {
+          console.log(`Section element found: ${sectionId}`);
+          // Make sure section is visible
+          sectionElement.style.display = 'block';
+          
+          toast.success(`Section ${sectionId} affichée`, {
+            description: "La section est maintenant visible",
+            duration: 2000
+          });
+        } else {
+          // Try alternate selectors
+          const dataSection = document.querySelector(`[data-section="${sectionId}"]`);
+          if (dataSection) {
+            console.log(`Found section by data attribute: ${sectionId}`);
+            (dataSection as HTMLElement).style.display = 'block';
+            
+            toast.success(`Section ${sectionId} affichée`, {
+              description: "La section est maintenant visible",
+              duration: 2000
+            });
+          } else {
+            toast.info("Section non trouvée", {
+              description: "Veuillez d'abord analyser un site web pour accéder à cette section",
+            });
+          }
+        }
       }, 100);
     } else {
       console.log(`Tab element not found with data-value: ${tabId}`);

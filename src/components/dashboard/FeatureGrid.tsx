@@ -85,8 +85,37 @@ const FeatureGrid = () => {
       return;
     }
     
-    // Utiliser notre fonction de navigation de manière cohérente avec les logs
-    navigateToSection(id, tabValue);
+    // Force tab selection and section visibility
+    if (tabValue) {
+      const tabEl = document.querySelector(`[data-value="${tabValue}"]`) as HTMLElement;
+      if (tabEl) {
+        console.log(`Directly clicking tab with data-value: ${tabValue}`);
+        tabEl.click();
+        
+        // Set a short timeout to ensure the section is visible after tab content is rendered
+        setTimeout(() => {
+          // Try to find and show the section by ID first
+          const sectionEl = document.getElementById(id);
+          if (sectionEl) {
+            console.log(`Making section visible: ${id}`);
+            sectionEl.style.display = 'block';
+          } else {
+            // Try data-section attribute as fallback
+            const dataSectionEl = document.querySelector(`[data-section="${id}"]`);
+            if (dataSectionEl) {
+              console.log(`Making data-section visible: ${id}`);
+              (dataSectionEl as HTMLElement).style.display = 'block';
+            }
+          }
+        }, 150);
+      } else {
+        // Fallback to using the navigation helper
+        navigateToSection(id, tabValue);
+      }
+    } else {
+      // If no tab specified, just try to show the section
+      navigateToSection(id);
+    }
   };
 
   return (
