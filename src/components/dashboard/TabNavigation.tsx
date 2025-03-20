@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsContent } from "@/components/ui/tabs";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 // Import refactored components
@@ -16,8 +16,7 @@ import {
   BacklinksTabContent, 
   MetricsTabContent 
 } from './tabs/StandardTabContents';
-import { navigateToSection, showSection } from '@/utils/navigationHelpers';
-import { toast } from "sonner";
+import { activateSection } from '@/utils/navigationHelpers';
 
 const TabNavigation = () => {
   const [activeTab, setActiveTab] = useState<string>('');
@@ -26,66 +25,54 @@ const TabNavigation = () => {
   // Filter tabs to only include those without external links
   const contentTabs = tabs.filter(tab => !tab.link);
   
-  // Initialize component by hiding all content except the active one
+  // Initialize from URL hash if present
   useEffect(() => {
-    // Hide all tab content on first render
-    const tabElements = document.querySelectorAll('[data-tab-content]');
-    tabElements.forEach((element) => {
-      const el = element as HTMLElement;
-      el.style.display = 'none';
+    // Hide all tab content initially
+    document.querySelectorAll('[data-tab-content]').forEach(el => {
+      (el as HTMLElement).style.display = 'none';
     });
     
-    // Check URL hash to see if a specific tab should be active
-    const hashTab = window.location.hash.replace('#', '');
-    if (hashTab && document.getElementById(hashTab)) {
-      setActiveTab(hashTab);
-      showSection(hashTab);
+    // Check for hash in URL
+    const hash = window.location.hash.replace('#', '');
+    if (hash && tabs.some(tab => tab.id === hash)) {
+      console.log(`Found hash in URL: ${hash}, activating this tab`);
+      setActiveTab(hash);
+      setTimeout(() => activateSection(hash), 100);
+    } else {
+      // Default to first tab if no hash
+      const defaultTab = tabs[0].id;
+      console.log(`No hash in URL, defaulting to first tab: ${defaultTab}`);
+      setActiveTab(defaultTab);
+      setTimeout(() => activateSection(defaultTab), 100);
     }
     
-    console.log('TabNavigation initialized - all tab content hidden');
+    // Listen for hash changes
+    const handleHashChange = () => {
+      const newHash = window.location.hash.replace('#', '');
+      if (newHash && tabs.some(tab => tab.id === newHash)) {
+        console.log(`Hash changed to ${newHash}, updating active tab`);
+        setActiveTab(newHash);
+        activateSection(newHash);
+      }
+    };
+    
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
   
-  // Handle tab value change
+  // Handle tab selection
   const handleTabChange = (value: string) => {
     console.log(`Tab changed to: ${value}`);
     setActiveTab(value);
-    
-    // Hide all tab content first
-    const tabElements = document.querySelectorAll('[data-tab-content]');
-    tabElements.forEach((element) => {
-      const el = element as HTMLElement;
-      el.style.display = 'none';
-    });
-    
-    // Find and show the relevant tab content
-    const selectedContent = document.getElementById(value) || 
-                            document.querySelector(`[data-section="${value}"]`) ||
-                            document.querySelector(`[data-tab-content="${value}"]`);
-    
-    if (selectedContent) {
-      console.log(`Found content element for tab: ${value}`);
-      (selectedContent as HTMLElement).style.display = 'block';
-      
-      toast.success(`Onglet ${value} activé`, {
-        description: "Contenu affiché",
-        duration: 1500
-      });
-    } else {
-      console.log(`No content element found for tab: ${value}`);
-      toast.error(`Contenu introuvable pour ${value}`, {
-        description: "L'onglet existe mais le contenu n'a pas été trouvé",
-        duration: 2000
-      });
-    }
+    activateSection(value);
   };
 
   return (
     <TooltipProvider>
       <Tabs 
-        value={activeTab || undefined} 
+        value={activeTab} 
         onValueChange={handleTabChange} 
         className="w-full"
-        defaultValue=""
       >
         <div className="w-full flex flex-col overflow-hidden justify-between bg-white shadow-md rounded-lg p-3 mb-6 border border-gray-100">
           <div className="grid grid-cols-6 gap-2 text-xs font-medium text-gray-500 mb-2 px-2">
@@ -101,9 +88,9 @@ const TabNavigation = () => {
           </TabsList>
         </div>
         
-        {/* Tab content section */}
+        {/* Tab Content Container - Always visible */}
         <div className="p-2 bg-gray-50 rounded-lg border border-gray-200">
-          {/* Define TabsContent for each tab to handle active state */}
+          {/* Static Tab Contents */}
           <TabsContent value="wordcount">
             <WordCountTabContent />
           </TabsContent>
@@ -128,7 +115,7 @@ const TabNavigation = () => {
             <MetricsTabContent />
           </TabsContent>
           
-          {/* Generate TabsContent components for all remaining tabs */}
+          {/* Generate TabsContent for remaining tabs */}
           {contentTabs
             .filter(tab => !['hierarchy', 'wordcount', 'seo', 'structure', 'backlinks', 'metrics'].includes(tab.id))
             .map(tab => (

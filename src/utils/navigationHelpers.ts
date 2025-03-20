@@ -4,85 +4,81 @@ import { toast } from "sonner";
 export const navigateToSection = (sectionId: string, tabId?: string): void => {
   console.log(`Navigating to section: ${sectionId}, tab: ${tabId}`);
   
-  // First activate tab if needed
+  // Ensure all tabs are properly reset first
+  resetAllTabs();
+  
+  // First select the tab if provided
   if (tabId) {
-    // Find and click the tab
-    const tabElement = document.querySelector(`[data-value="${tabId}"]`) as HTMLElement;
-    if (tabElement) {
-      console.log(`Tab element found with data-value: ${tabId}`);
-      tabElement.click();
-      
-      // Allow some time for the tab content to render
-      setTimeout(() => {
-        showSection(sectionId);
-      }, 100);
+    const tabTrigger = document.querySelector(`[data-value="${tabId}"]`) as HTMLElement;
+    if (tabTrigger) {
+      console.log(`Clicking tab with data-value: ${tabId}`);
+      tabTrigger.click();
+      setTimeout(() => activateSection(sectionId), 50);
     } else {
-      console.log(`Tab element not found with data-value: ${tabId}`);
-      showSection(sectionId);
+      console.log(`Tab with data-value "${tabId}" not found, directly activating section`);
+      activateSection(sectionId);
     }
   } else {
-    showSection(sectionId);
+    activateSection(sectionId);
   }
 };
 
-export const showSection = (sectionId: string): void => {
-  console.log(`Showing section: ${sectionId}`);
+// Reset all tabs to inactive state
+const resetAllTabs = () => {
+  document.querySelectorAll('[data-tab-id]').forEach(tab => {
+    tab.setAttribute('data-state', 'inactive');
+  });
+};
+
+// Show specific section and hide others
+export const activateSection = (sectionId: string): void => {
+  console.log(`Activating section: ${sectionId}`);
   
-  // Hide all tab content sections first
-  const allSections = document.querySelectorAll('[data-tab-content]');
-  allSections.forEach((section) => {
+  // First reset all content sections to hidden
+  document.querySelectorAll('[data-tab-content]').forEach(section => {
     (section as HTMLElement).style.display = 'none';
   });
   
-  // Deactivate all tabs first
-  const allTabs = document.querySelectorAll('[data-tab-id]');
-  allTabs.forEach((tab) => {
-    tab.setAttribute('data-state', 'inactive');
-  });
-  
-  // Activate the tab for this section
-  const tabTrigger = document.querySelector(`[data-tab-id="${sectionId}"]`) as HTMLElement;
-  if (tabTrigger) {
-    console.log(`Activating tab for: ${sectionId}`);
-    tabTrigger.setAttribute('data-state', 'active');
-  }
-  
-  // Find the section to show (try all possible selectors)
-  const sectionElement = document.getElementById(sectionId) || 
-                         document.querySelector(`[data-section="${sectionId}"]`) ||
-                         document.querySelector(`[data-tab-content="${sectionId}"]`);
+  // Find the target section (try multiple selector formats)
+  const sectionElement = 
+    document.getElementById(sectionId) || 
+    document.querySelector(`[data-section="${sectionId}"]`) || 
+    document.querySelector(`[data-tab-content="${sectionId}"]`);
   
   if (sectionElement) {
-    console.log(`Section found for: ${sectionId}, making it visible`);
+    console.log(`Section "${sectionId}" found, making visible`);
     (sectionElement as HTMLElement).style.display = 'block';
+    
+    // Also make sure the corresponding tab is activated
+    const tabTrigger = document.querySelector(`[data-tab-id="${sectionId}"]`);
+    if (tabTrigger) {
+      console.log(`Setting tab for "${sectionId}" to active state`);
+      tabTrigger.setAttribute('data-state', 'active');
+    }
     
     toast.success(`Section ${sectionId} affichée`, {
       description: "La section est maintenant visible",
       duration: 2000
     });
-    return;
+  } else {
+    console.error(`Section "${sectionId}" not found`);
+    toast.error(`Section non trouvée: ${sectionId}`, {
+      description: "La section demandée n'existe pas",
+      duration: 2000
+    });
   }
-  
-  // If no section is found
-  console.log(`No section found for: ${sectionId}`);
-  toast.error(`Section non trouvée: ${sectionId}`, {
-    description: "La section demandée n'existe pas",
-    duration: 2000
-  });
 };
 
-// Additional scroll function
+// Scroll to section with highlight effect
 export const scrollToSection = (sectionId: string): void => {
-  // First make sure section is visible
-  showSection(sectionId);
+  activateSection(sectionId);
   
-  // Then scroll to it
-  const sectionElement = document.getElementById(sectionId) || 
-                       document.querySelector(`[data-section="${sectionId}"]`) || 
-                       document.querySelector(`[data-tab-content="${sectionId}"]`);
+  const sectionElement = 
+    document.getElementById(sectionId) || 
+    document.querySelector(`[data-section="${sectionId}"]`) || 
+    document.querySelector(`[data-tab-content="${sectionId}"]`);
   
   if (sectionElement) {
-    // Scroll to section with smooth behavior
     setTimeout(() => {
       sectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
       

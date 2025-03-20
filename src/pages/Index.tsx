@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,6 @@ import { Rocket, Search, Signature, BarChart } from "lucide-react";
 import { Github } from 'lucide-react';
 import { Sparkles } from 'lucide-react';
 import { MessageSquareText } from 'lucide-react';
-import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import TabNavigation from '@/components/dashboard/TabNavigation';
 import FeatureGrid from '@/components/dashboard/FeatureGrid';
 import InfoCards from '@/components/seo/InfoCards';
@@ -15,8 +14,7 @@ import SeoAnalysisForm from '@/components/seo/analysis/SeoAnalysisForm';
 import ResultsDisplay from '@/components/seo/analysis/ResultsDisplay';
 import { toast } from "sonner";
 import { useSiteAnalyzer } from '@/hooks/useSiteAnalyzer';
-import { FirecrawlService } from '@/utils/FirecrawlService';
-import { showSection } from '@/utils/navigationHelpers';
+import { activateSection } from '@/utils/navigationHelpers';
 
 const ModeToggle = () => {
   return (
@@ -41,45 +39,37 @@ const IndexPage = () => {
     error,
     handleActivateProxy
   } = useSiteAnalyzer();
-  
+
   // Hide all sections initially
   useEffect(() => {
-    // Hide all sections on first render
-    const sections = document.querySelectorAll('[data-section]');
-    sections.forEach((section) => {
-      (section as HTMLElement).style.display = 'none';
+    // Hide all tab content initially
+    document.querySelectorAll('[data-tab-content]').forEach(el => {
+      (el as HTMLElement).style.display = 'none';
     });
     
-    console.log('Index page initialized - all sections hidden by default');
+    console.log('IndexPage initialized - hiding all sections initially');
   }, []);
 
   // Show results when analysis is complete
   useEffect(() => {
     if (seoAnalysis) {
-      console.log('SEO analysis complete - showing results');
+      console.log('SEO analysis complete, showing SEO section');
       
-      // Show the results section "seo" automatically
+      // Show the results section
       setTimeout(() => {
-        const seoSection = document.getElementById('seo') || document.querySelector('[data-section="seo"]');
-        if (seoSection) {
-          console.log('Found SEO section, making it visible');
-          (seoSection as HTMLElement).style.display = 'block';
-          
-          toast.success("Analyse SEO terminée", {
-            description: "Consultez les résultats ci-dessous",
-            duration: 3000
-          });
-        } else {
-          console.log('SEO section not found!');
-        }
+        // Activate the SEO tab
+        window.location.hash = 'seo';
+        activateSection('seo');
+        
+        toast.success("Analyse SEO terminée", {
+          description: "Consultez les résultats ci-dessous",
+          duration: 3000
+        });
         
         // Also make the specific results display visible
         const resultsDisplay = document.querySelector('.results-display');
         if (resultsDisplay) {
-          console.log('Found results display, making it visible');
           (resultsDisplay as HTMLElement).style.display = 'block';
-        } else {
-          console.log('Results display not found!');
         }
       }, 100);
     }
@@ -121,12 +111,17 @@ const IndexPage = () => {
           handleActivateProxy={handleActivateProxy}
         />
         
-        {/* Results Display - make sure this is visible when there are results */}
+        {/* Results Display - Initially hidden */}
         {seoAnalysis && (
-          <div className="mb-8 results-display" style={{ display: 'block' }}>
+          <div className="mb-8 results-display" style={{ display: 'none' }}>
             <ResultsDisplay seoAnalysis={seoAnalysis} />
           </div>
         )}
+        
+        {/* Tab Navigation */}
+        <div className="mb-8">
+          <TabNavigation />
+        </div>
         
         {/* Feature grid showing main tool options */}
         <div className="mb-8">
@@ -137,17 +132,8 @@ const IndexPage = () => {
           <FeatureGrid />
         </div>
         
-        {/* Info cards with SEO performance metrics */}
-        <div className="mb-8" id="metrics" data-section="metrics">
-          <h2 className="text-2xl font-bold mb-6 flex items-center">
-            <Sparkles className="mr-2 h-6 w-6 text-indigo-600" />
-            Dernières statistiques
-          </h2>
-          <InfoCards />
-        </div>
-        
-        {/* Sections pour les différentes fonctionnalités - hidden by default */}
-        <div id="seo" data-section="seo" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100" style={{ display: 'none' }}>
+        {/* Content Sections - These are now managed by TabNavigation */}
+        <div id="seo" data-section="seo" data-tab-content="seo" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100" style={{ display: 'none' }}>
           <h2 className="text-2xl font-bold mb-4">Analyse SEO</h2>
           <p className="text-gray-600">Consultez l'analyse détaillée des performances SEO de votre site.</p>
           
@@ -166,7 +152,7 @@ const IndexPage = () => {
           )}
         </div>
         
-        <div id="structure" data-section="structure" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100" style={{ display: 'none' }}>
+        <div id="structure" data-section="structure" data-tab-content="structure" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100" style={{ display: 'none' }}>
           <h2 className="text-2xl font-bold mb-4">Structure du Site</h2>
           <p className="text-gray-600">Visualisez l'architecture de votre site web et identifiez les améliorations possibles.</p>
           
@@ -191,43 +177,6 @@ const IndexPage = () => {
               </div>
             </div>
           )}
-        </div>
-        
-        <div id="hierarchy" data-section="hierarchy" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100" style={{ display: 'none' }}>
-          <h2 className="text-2xl font-bold mb-4">Hiérarchie des Contenus</h2>
-          <p className="text-gray-600">Optimisez la structure de vos contenus pour une meilleure indexation.</p>
-        </div>
-        
-        <div id="backlinks" data-section="backlinks" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100" style={{ display: 'none' }}>
-          <h2 className="text-2xl font-bold mb-4">Analyse des Backlinks</h2>
-          <p className="text-gray-600">Évaluez la qualité et la quantité des liens pointant vers votre site.</p>
-          
-          {/* Add backlinks info if resources exist */}
-          {resources && (
-            <div className="mt-4 p-4 bg-gray-50 rounded-md">
-              <h3 className="font-medium mb-2">Aperçu des liens</h3>
-              <div className="grid grid-cols-2 gap-4 mt-3">
-                <div className="bg-white p-3 rounded-md shadow-sm">
-                  <span className="text-lg font-bold text-blue-600">{resources.externalLinks}</span>
-                  <p className="text-sm text-gray-500">Liens externes</p>
-                </div>
-                <div className="bg-white p-3 rounded-md shadow-sm">
-                  <span className="text-lg font-bold text-green-600">{resources.internalLinks}</span>
-                  <p className="text-sm text-gray-500">Liens internes</p>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-        
-        <div id="advanced" data-section="advanced" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100" style={{ display: 'none' }}>
-          <h2 className="text-2xl font-bold mb-4">Options Avancées</h2>
-          <p className="text-gray-600">Accédez aux paramètres et outils avancés d'optimisation SEO.</p>
-        </div>
-        
-        <div id="integrations" data-section="integrations" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100" style={{ display: 'none' }}>
-          <h2 className="text-2xl font-bold mb-4">Intégrations</h2>
-          <p className="text-gray-600">Connectez-vous à d'autres outils et services pour améliorer votre SEO.</p>
         </div>
         
         {/* Quora Button Section */}

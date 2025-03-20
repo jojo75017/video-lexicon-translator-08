@@ -3,8 +3,7 @@ import React from 'react';
 import FeatureCard from './FeatureCard';
 import { Search, Globe, Database, Link2, ChartBar, Settings, Hash, Signature } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from "sonner";
-import { navigateToSection } from '@/utils/navigationHelpers';
+import { activateSection } from '@/utils/navigationHelpers';
 
 const FeatureGrid = () => {
   const navigate = useNavigate();
@@ -15,56 +14,49 @@ const FeatureGrid = () => {
       title: "SEO",
       description: "Analyse complète des facteurs SEO",
       color: "blue",
-      id: "seo",
-      tabValue: "info"
+      id: "seo"
     },
     {
       icon: Globe,
       title: "Structure",
       description: "Architecture du site",
       color: "indigo",
-      id: "structure",
-      tabValue: "structure" 
+      id: "structure"
     },
     {
       icon: Database,
       title: "Hiérarchie",
       description: "Organisation du contenu",
       color: "violet",
-      id: "hierarchy",
-      tabValue: "structure"
+      id: "hierarchy"
     },
     {
       icon: Link2,
       title: "Backlinks",
       description: "Analyse des liens",
       color: "pink",
-      id: "backlinks",
-      tabValue: "info"
+      id: "backlinks"
     },
     {
       icon: ChartBar,
       title: "Métriques",
       description: "Statistiques détaillées",
       color: "fuchsia",
-      id: "metrics",
-      tabValue: "info"
+      id: "metrics"
     },
     {
       icon: Settings,
       title: "Avancé",
       description: "Options avancées",
       color: "rose",
-      id: "advanced",
-      tabValue: "info"
+      id: "advanced"
     },
     {
       icon: Hash,
       title: "Intégrations",
       description: "Outils externes",
       color: "purple",
-      id: "integrations",
-      tabValue: "info"
+      id: "integrations"
     },
     {
       icon: Signature,
@@ -77,45 +69,17 @@ const FeatureGrid = () => {
   ];
 
   // Fonction pour gérer les clics sur les fonctionnalités
-  const handleFeatureClick = (id: string, tabValue?: string, link?: string) => {
-    console.log(`Feature clicked: ${id}, tab: ${tabValue}, link: ${link}`);
+  const handleFeatureClick = (id: string, link?: string) => {
+    console.log(`Feature clicked: ${id}, link: ${link}`);
     
     if (link) {
       navigate(link);
       return;
     }
     
-    // Force tab selection and section visibility
-    if (tabValue) {
-      const tabEl = document.querySelector(`[data-value="${tabValue}"]`) as HTMLElement;
-      if (tabEl) {
-        console.log(`Directly clicking tab with data-value: ${tabValue}`);
-        tabEl.click();
-        
-        // Set a short timeout to ensure the section is visible after tab content is rendered
-        setTimeout(() => {
-          // Try to find and show the section by ID first
-          const sectionEl = document.getElementById(id);
-          if (sectionEl) {
-            console.log(`Making section visible: ${id}`);
-            sectionEl.style.display = 'block';
-          } else {
-            // Try data-section attribute as fallback
-            const dataSectionEl = document.querySelector(`[data-section="${id}"]`);
-            if (dataSectionEl) {
-              console.log(`Making data-section visible: ${id}`);
-              (dataSectionEl as HTMLElement).style.display = 'block';
-            }
-          }
-        }, 150);
-      } else {
-        // Fallback to using the navigation helper
-        navigateToSection(id, tabValue);
-      }
-    } else {
-      // If no tab specified, just try to show the section
-      navigateToSection(id);
-    }
+    // Update URL hash and activate section
+    window.location.hash = id;
+    activateSection(id);
   };
 
   return (
@@ -132,8 +96,7 @@ const FeatureGrid = () => {
             className="cursor-pointer" 
             id={`feature-card-${feature.id}`}
             data-feature-id={feature.id}
-            data-tab-value={feature.tabValue}
-            onClick={() => handleFeatureClick(feature.id, feature.tabValue, feature.link)}
+            onClick={() => handleFeatureClick(feature.id, feature.link)}
           >
             <FeatureCard
               icon={feature.icon}

@@ -1,62 +1,9 @@
 
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import HierarchySection from '@/components/seo/HierarchySection';
 import ContentHierarchy from '@/components/ContentHierarchy';
 
 const HierarchyTabContent: React.FC = () => {
-  const contentRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!contentRef.current) return;
-    
-    // Set initial visibility
-    const isActive = window.location.hash === '#hierarchy' || 
-                    document.querySelector('[data-tab-id="hierarchy"][data-state="active"]');
-                    
-    contentRef.current.style.display = isActive ? 'block' : 'none';
-    console.log(`HierarchyTabContent initialized with display: ${contentRef.current.style.display}`);
-    
-    // Watch for tab clicks to ensure our content is visible
-    const handleTabClick = (event: MouseEvent) => {
-      const clickedElement = event.target as HTMLElement;
-      const hierarchyTab = clickedElement.closest('[data-tab-id="hierarchy"]');
-      const isActive = hierarchyTab && hierarchyTab.getAttribute('data-state') === 'active';
-      
-      if (contentRef.current) {
-        contentRef.current.style.display = isActive ? 'block' : 'none';
-        console.log(`HierarchyTabContent display set to ${contentRef.current.style.display} by click handler`);
-      }
-    };
-    
-    document.addEventListener('click', handleTabClick);
-    
-    // Also watch for hash changes
-    const handleHashChange = () => {
-      if (window.location.hash === '#hierarchy' && contentRef.current) {
-        contentRef.current.style.display = 'block';
-        console.log(`HierarchyTabContent made visible by hash change`);
-      }
-    };
-    
-    window.addEventListener('hashchange', handleHashChange);
-    
-    // Check visibility periodically as a fallback
-    const checkVisibilityInterval = setInterval(() => {
-      const activeTab = document.querySelector('[data-tab-id="hierarchy"][data-state="active"]');
-      if (activeTab && contentRef.current && contentRef.current.style.display === 'none') {
-        contentRef.current.style.display = 'block';
-        console.log(`HierarchyTabContent made visible by interval check`);
-      }
-    }, 500);
-    
-    return () => {
-      document.removeEventListener('click', handleTabClick);
-      window.removeEventListener('hashchange', handleHashChange);
-      clearInterval(checkVisibilityInterval);
-      console.log('HierarchyTabContent unmounted');
-    };
-  }, []);
-  
   // Sample data for hierarchy demonstration
   const sampleHeadings = [
     { text: "Introduction au SEO", level: 1, position: 1 },
@@ -89,7 +36,6 @@ const HierarchyTabContent: React.FC = () => {
       id="hierarchy" 
       data-section="hierarchy" 
       data-tab-content="hierarchy"
-      ref={contentRef}
     >
       <HierarchySection isLoading={false} seoAnalysis={{
         h1Count: 1,
