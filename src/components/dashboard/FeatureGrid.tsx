@@ -74,27 +74,27 @@ const FeatureGrid = () => {
     }
   ];
 
-  // Fixed function to handle feature clicks
+  // Fonction corrigée pour gérer les clics sur les fonctionnalités
   const handleFeatureClick = (e: React.MouseEvent, id: string, tabValue?: string, link?: string) => {
-    // Important: Prevent default behavior to avoid scrolling to top
+    // Important: Empêcher le comportement par défaut pour éviter le défilement vers le haut
     e.preventDefault();
-    e.stopPropagation(); // Also stop propagation to avoid bubbling
+    e.stopPropagation(); // Arrêter également la propagation pour éviter la remontée
     
     if (link) {
-      // No action needed, routing is handled by the Link component
+      // Aucune action nécessaire, le routage est géré par le composant Link
       return;
     }
     
     console.log(`Feature clicked: ${id}, tab: ${tabValue}`);
     
-    // Using improved navigation helper and showing feedback to user
+    // Utilisation de l'assistant de navigation amélioré et affichage d'un retour à l'utilisateur
     if (tabValue) {
       navigateToSection(id, tabValue);
     } else {
       navigateToSection(id);
     }
     
-    // Notify user about the navigation
+    // Notifier l'utilisateur de la navigation
     toast.success(`Navigation vers ${id}`, {
       description: `Affichage des données de ${id}`,
       duration: 2000
@@ -117,7 +117,7 @@ const FeatureGrid = () => {
                 title={feature.title}
                 description={feature.description}
                 color={feature.color}
-                onClick={() => {}}
+                onClick={(e) => e.preventDefault()}
               />
             </Link>
           ) : (
@@ -135,7 +135,7 @@ const FeatureGrid = () => {
                 description={feature.description}
                 color={feature.color}
                 onClick={(e) => {
-                  // Stop propagation here too to ensure the click doesn't bubble
+                  // Arrêter la propagation ici aussi pour s'assurer que le clic ne remonte pas
                   e.stopPropagation();
                   handleFeatureClick(e, feature.id, feature.tabValue);
                 }}

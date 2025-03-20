@@ -4,13 +4,13 @@ import { toast } from "sonner";
 export const navigateToSection = (sectionId: string, tabId?: string): void => {
   console.log(`Navigating to section: ${sectionId}, tab: ${tabId}`);
   
-  // First step: Activate the tab if needed
+  // Première étape : Activer l'onglet si nécessaire
   if (tabId) {
     const tabElement = document.querySelector(`[data-value="${tabId}"]`) as HTMLElement;
     if (tabElement) {
       console.log(`Tab element found: ${tabId}`);
       tabElement.click();
-      // Wait for the tab to be activated
+      // Attendre que l'onglet soit activé
       setTimeout(() => {
         scrollToSection(sectionId);
       }, 200);
@@ -24,21 +24,24 @@ export const navigateToSection = (sectionId: string, tabId?: string): void => {
 };
 
 export const scrollToSection = (sectionId: string): void => {
-  // Look for element by ID
+  // Chercher l'élément par ID
   const sectionElement = document.getElementById(sectionId);
   
   if (sectionElement) {
     console.log(`Section element found: ${sectionId}`);
     
-    // Prevent default page navigation/scrolling behavior
+    // Empêcher le comportement de navigation/défilement par défaut de la page
     if (typeof window !== 'undefined' && window.event) {
-      window.event.preventDefault();
+      const event = window.event as Event;
+      if (event.preventDefault) {
+        event.preventDefault();
+      }
     }
     
-    // Scroll to the section with smooth behavior
+    // Faire défiler jusqu'à la section avec un comportement fluide
     sectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
     
-    // Add temporary highlight effect
+    // Ajouter un effet de surbrillance temporaire
     sectionElement.classList.add('bg-blue-50');
     setTimeout(() => {
       sectionElement.classList.remove('bg-blue-50');
@@ -46,29 +49,45 @@ export const scrollToSection = (sectionId: string): void => {
   } else {
     console.log(`Section element not found: ${sectionId}`);
     
-    // Try to find an element with a data-section attribute
+    // Essayer de trouver un élément avec un attribut data-section
     const dataAttributeSection = document.querySelector(`[data-section="${sectionId}"]`);
     if (dataAttributeSection) {
       console.log(`Found section by data attribute: ${sectionId}`);
       if (typeof window !== 'undefined' && window.event) {
-        window.event.preventDefault();
+        const event = window.event as Event;
+        if (event.preventDefault) {
+          event.preventDefault();
+        }
       }
       dataAttributeSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Ajouter un effet de surbrillance temporaire
+      dataAttributeSection.classList.add('bg-blue-50');
+      setTimeout(() => {
+        dataAttributeSection.classList.remove('bg-blue-50');
+      }, 2000);
       return;
     }
     
-    // Try to find an element with the class name
+    // Essayer de trouver un élément avec le nom de classe
     const classSection = document.querySelector(`.section-${sectionId}`);
     if (classSection) {
       console.log(`Found section by class: ${sectionId}`);
       if (typeof window !== 'undefined' && window.event) {
-        window.event.preventDefault();
+        const event = window.event as Event;
+        if (event.preventDefault) {
+          event.preventDefault();
+        }
       }
       classSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Ajouter un effet de surbrillance temporaire
+      (classSection as HTMLElement).classList.add('bg-blue-50');
+      setTimeout(() => {
+        (classSection as HTMLElement).classList.remove('bg-blue-50');
+      }, 2000);
       return;
     }
     
-    // If no specific section is found, inform the user
+    // Si aucune section spécifique n'est trouvée, informer l'utilisateur
     toast.info("Section non trouvée", {
       description: "Veuillez d'abord analyser un site web pour accéder à cette section",
     });
