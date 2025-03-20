@@ -33,10 +33,15 @@ export const scrollToSection = (sectionId: string): void => {
     // Faire défiler jusqu'à la section avec un comportement fluide
     sectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
     
-    // Ajouter un effet de surbrillance temporaire
-    sectionElement.classList.add('bg-blue-50');
+    // Ajouter un effet de surbrillance temporaire plus visible
+    sectionElement.classList.add('bg-blue-100');
+    sectionElement.classList.add('transition-all');
+    sectionElement.classList.add('duration-1000');
+    sectionElement.style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.5)';
+    
     setTimeout(() => {
-      sectionElement.classList.remove('bg-blue-50');
+      sectionElement.classList.remove('bg-blue-100');
+      sectionElement.style.boxShadow = 'none';
     }, 2000);
   } else {
     console.log(`Section element not found: ${sectionId}`);
@@ -46,10 +51,16 @@ export const scrollToSection = (sectionId: string): void => {
     if (dataAttributeSection) {
       console.log(`Found section by data attribute: ${sectionId}`);
       dataAttributeSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      // Ajouter un effet de surbrillance temporaire
-      dataAttributeSection.classList.add('bg-blue-50');
+      
+      // Ajouter un effet de surbrillance temporaire plus visible
+      dataAttributeSection.classList.add('bg-blue-100');
+      dataAttributeSection.classList.add('transition-all');
+      dataAttributeSection.classList.add('duration-1000');
+      (dataAttributeSection as HTMLElement).style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.5)';
+      
       setTimeout(() => {
-        dataAttributeSection.classList.remove('bg-blue-50');
+        dataAttributeSection.classList.remove('bg-blue-100');
+        (dataAttributeSection as HTMLElement).style.boxShadow = 'none';
       }, 2000);
       return;
     }
@@ -59,10 +70,16 @@ export const scrollToSection = (sectionId: string): void => {
     if (classSection) {
       console.log(`Found section by class: ${sectionId}`);
       classSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      // Ajouter un effet de surbrillance temporaire
-      (classSection as HTMLElement).classList.add('bg-blue-50');
+      
+      // Ajouter un effet de surbrillance temporaire plus visible
+      (classSection as HTMLElement).classList.add('bg-blue-100');
+      (classSection as HTMLElement).classList.add('transition-all');
+      (classSection as HTMLElement).classList.add('duration-1000');
+      (classSection as HTMLElement).style.boxShadow = '0 0 0 4px rgba(59, 130, 246, 0.5)';
+      
       setTimeout(() => {
-        (classSection as HTMLElement).classList.remove('bg-blue-50');
+        (classSection as HTMLElement).classList.remove('bg-blue-100');
+        (classSection as HTMLElement).style.boxShadow = 'none';
       }, 2000);
       return;
     }

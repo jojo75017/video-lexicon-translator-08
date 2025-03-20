@@ -7,7 +7,7 @@ interface FeatureCardProps {
   title: string;
   description: string;
   color?: string;
-  onClick: () => void;
+  onClick: (e: React.MouseEvent) => void;
   className?: string;
 }
 
