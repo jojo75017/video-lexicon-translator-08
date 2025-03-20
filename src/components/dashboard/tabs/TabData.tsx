@@ -1,5 +1,5 @@
 
-import { Tab, TabGroup } from './types';
+import { Tab } from './types';
 import { 
   BarChart2, 
   Clock, 

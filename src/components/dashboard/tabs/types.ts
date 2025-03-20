@@ -1,9 +1,20 @@
 
-import { LucideIcon } from 'lucide-react';
+import { ReactNode } from 'react';
+
+export interface Tab {
+  id: string;
+  label: string;
+  description: string;
+  icon: ReactNode;
+  group: string;
+  link?: string;
+  isNew?: boolean;
+  highlighted?: boolean;
+}
 
 export interface TabItemType {
   id: string;
-  icon: LucideIcon;
+  icon: ReactNode;
   label: string;
   color: string;
   group: string;
