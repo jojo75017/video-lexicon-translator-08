@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from "react-router-dom";
 import { LucideIcon } from 'lucide-react';
@@ -26,7 +27,8 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
   link, 
   highlighted 
 }) => {
-  const handleTabClick = () => {
+  const handleTabClick = (e: React.MouseEvent) => {
+    e.preventDefault();
     console.log(`Tab clicked: ${id}`);
     
     // Show the section immediately
@@ -34,6 +36,17 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
     
     // Update URL hash for better navigation
     window.location.hash = id;
+    
+    // Explicitly set active class on the clicked tab
+    const allTabs = document.querySelectorAll('[data-tab-id]');
+    allTabs.forEach(tab => {
+      tab.setAttribute('data-state', 'inactive');
+    });
+    
+    const clickedTab = document.querySelector(`[data-tab-id="${id}"]`);
+    if (clickedTab) {
+      clickedTab.setAttribute('data-state', 'active');
+    }
   };
 
   return (
