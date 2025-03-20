@@ -1,64 +1,152 @@
 
+import { Tab, TabGroup } from './types';
 import { 
-  Search, Globe, Database, Link2, ChartBar, Settings, Hash, Pen, 
-  FileText, Book, BarChart2, ExternalLink, Rocket, Zap, 
-  Layers, Lightbulb, FileCode, Bell, UserPlus, MessageSquareText,
-  Gauge, BarChart, Newspaper, Award, Target, Boxes, BrainCircuit, Signature
+  BarChart2, 
+  Clock, 
+  Code, 
+  ExternalLink, 
+  FileText, 
+  HardDrive, 
+  Layout, 
+  Link2, 
+  List, 
+  Maximize2, 
+  PieChart, 
+  Settings, 
+  SlidersHorizontal, 
+  Zap
 } from 'lucide-react';
-import { TabItemType, GroupedTabsType, GroupLabelsType } from './types';
 
-export const tabs: TabItemType[] = [
-  // Analyses principales
-  { id: 'seo', icon: Search, label: 'SEO', color: 'text-blue-600', group: 'main' },
-  { id: 'structure', icon: Globe, label: 'Structure', color: 'text-indigo-600', group: 'main' },
-  { id: 'hierarchy', icon: Database, label: 'Hiérarchie', color: 'text-violet-600', group: 'main' },
-  { id: 'backlinks', icon: Link2, label: 'Backlinks', color: 'text-pink-600', group: 'main' },
-  
-  // Métriques et données
-  { id: 'metrics', icon: ChartBar, label: 'Métriques', color: 'text-fuchsia-600', group: 'metrics' },
-  { id: 'analytics', icon: BarChart2, label: 'Analytics', color: 'text-green-600', group: 'metrics', isNew: true },
-  { id: 'keywords', icon: FileText, label: 'Mots-clés', color: 'text-amber-600', group: 'metrics' },
-  { id: 'performance', icon: Gauge, label: 'Performance', color: 'text-indigo-500', group: 'metrics' },
-  
-  // Contenu
-  { id: 'content', icon: Book, label: 'Contenu', color: 'text-orange-600', group: 'content' },
-  { id: 'optimize', icon: Zap, label: 'Optimisation', color: 'text-blue-600', group: 'content', isNew: true },
-  { id: 'ideas', icon: Lightbulb, label: 'Idées', color: 'text-yellow-600', group: 'content' },
-  { id: 'quora', icon: MessageSquareText, label: 'Quora', color: 'text-[#b92b27]', group: 'content', isNew: true, link: '/QuoraPage' },
-  { id: 'airesearch', icon: BrainCircuit, label: 'Recherche IA', color: 'text-purple-700', group: 'content', isNew: true, highlighted: true },
-  
-  // Technique
-  { id: 'advanced', icon: Settings, label: 'Avancé', color: 'text-rose-600', group: 'tech' },
-  { id: 'code', icon: FileCode, label: 'Code', color: 'text-slate-600', group: 'tech' },
-  { id: 'integrations', icon: Hash, label: 'Intégrations', color: 'text-purple-600', group: 'tech' },
-  
-  // Marketing
-  { id: 'alerts', icon: Bell, label: 'Alertes', color: 'text-red-600', group: 'marketing' },
-  { id: 'social', icon: UserPlus, label: 'Social', color: 'text-blue-500', group: 'marketing' },
-  { id: 'reports', icon: BarChart, label: 'Rapports', color: 'text-emerald-600', group: 'marketing' },
-  { id: 'trends', icon: Target, label: 'Tendances', color: 'text-cyan-600', group: 'marketing' },
-  
-  // Autres outils
-  { id: 'signature', icon: Signature, label: 'Signature', color: 'text-blue-600', group: 'other', link: '/SignaturePage' },
-  { id: 'external', icon: ExternalLink, label: 'Externe', color: 'text-teal-600', group: 'other' },
-];
-
-export const getGroupedTabs = (): GroupedTabsType => {
-  return {
-    main: tabs.filter(tab => tab.group === 'main'),
-    metrics: tabs.filter(tab => tab.group === 'metrics'),
-    content: tabs.filter(tab => tab.group === 'content'),
-    tech: tabs.filter(tab => tab.group === 'tech'),
-    marketing: tabs.filter(tab => tab.group === 'marketing'),
-    other: tabs.filter(tab => tab.group === 'other'),
-  };
+export const groupLabels: Record<string, string> = {
+  'content': 'Contenu',
+  'seo': 'SEO',
+  'backlinks': 'Backlinks',
+  'performance': 'Performance',
+  'advanced': 'Avancé',
+  'external': 'Liens',
 };
 
-export const groupLabels: GroupLabelsType = {
-  main: "Analyses",
-  metrics: "Données",
-  content: "Contenu",
-  tech: "Technique",
-  marketing: "Marketing",
-  other: "Outils"
+export const tabs: Tab[] = [
+  {
+    id: 'wordcount',
+    label: 'Mots-clés',
+    description: 'Analyse de la densité des mots-clés',
+    icon: <List />,
+    group: 'content'
+  },
+  {
+    id: 'hierarchy',
+    label: 'Hiérarchie',
+    description: 'Structure des titres et contenu',
+    icon: <Layout />,
+    group: 'content'
+  },
+  {
+    id: 'seo',
+    label: 'SEO',
+    description: 'Analyse du référencement',
+    icon: <Maximize2 />,
+    group: 'seo'
+  },
+  {
+    id: 'structure',
+    label: 'Structure',
+    description: 'Structure du site et navigation',
+    icon: <HardDrive />,
+    group: 'seo'
+  },
+  {
+    id: 'backlinks',
+    label: 'Backlinks',
+    description: 'Analyse des liens entrants',
+    icon: <Link2 />,
+    group: 'backlinks'
+  },
+  {
+    id: 'analytics',
+    label: 'Analytics',
+    description: 'Données statistiques et analytiques',
+    icon: <BarChart2 />,
+    group: 'seo'
+  },
+  {
+    id: 'performance',
+    label: 'Performance',
+    description: 'Vitesse et optimisations',
+    icon: <Zap />,
+    group: 'performance'
+  },
+  {
+    id: 'metrics',
+    label: 'Métriques',
+    description: 'KPIs et statistiques',
+    icon: <PieChart />,
+    group: 'performance'
+  },
+  {
+    id: 'advanced',
+    label: 'Avancé',
+    description: 'Options et analyses avancées',
+    icon: <SlidersHorizontal />,
+    group: 'advanced'
+  },
+  {
+    id: 'code',
+    label: 'Code',
+    description: 'Analyse technique du code',
+    icon: <Code />,
+    group: 'advanced'
+  },
+  {
+    id: 'integrations',
+    label: 'Intégrations',
+    description: 'Connexion avec d\'autres outils',
+    icon: <Settings />,
+    group: 'advanced'
+  },
+  {
+    id: 'gsc',
+    label: 'Search Console',
+    description: 'Données de Google Search Console',
+    icon: <FileText />,
+    link: 'https://search.google.com/search-console',
+    group: 'external'
+  },
+  {
+    id: 'ga',
+    label: 'Google Analytics',
+    description: 'Données de Google Analytics',
+    icon: <BarChart2 />,
+    link: 'https://analytics.google.com/',
+    group: 'external'
+  },
+  {
+    id: 'lighthouse',
+    label: 'Lighthouse',
+    description: 'Audit de performance',
+    icon: <Clock />,
+    link: 'https://developers.google.com/web/tools/lighthouse',
+    group: 'external'
+  },
+  {
+    id: 'pagespeed',
+    label: 'PageSpeed',
+    description: 'Analyse de vitesse Google',
+    icon: <ExternalLink />,
+    link: 'https://developers.google.com/speed/pagespeed/insights/',
+    group: 'external'
+  }
+];
+
+export const getGroupedTabs = (): Record<string, Tab[]> => {
+  const grouped: Record<string, Tab[]> = {};
+  
+  tabs.forEach(tab => {
+    if (!grouped[tab.group]) {
+      grouped[tab.group] = [];
+    }
+    grouped[tab.group].push(tab);
+  });
+  
+  return grouped;
 };
