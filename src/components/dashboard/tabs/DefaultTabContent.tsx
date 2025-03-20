@@ -9,25 +9,47 @@ interface DefaultTabContentProps {
 const DefaultTabContent: React.FC<DefaultTabContentProps> = ({ id, label }) => {
   const contentRef = useRef<HTMLDivElement>(null);
   
-  // This effect ensures the content has the right visibility status
   useEffect(() => {
     if (contentRef.current) {
-      // Initially hide all tab content
+      // Set initial visibility - hidden by default
       contentRef.current.style.display = 'none';
       
-      // Check if this tab should be visible (depends on if it's the active tab)
+      // Check if this tab should be visible
       const isActiveTab = window.location.hash === `#${id}` || 
                           document.querySelector(`[data-value="${id}"][data-state="active"]`);
       
       if (isActiveTab) {
         contentRef.current.style.display = 'block';
-        console.log(`DefaultTabContent ${id} is active and visible`);
+        console.log(`DefaultTabContent ${id} is initially active`);
       }
+      
+      // Create an observer to watch for tab state changes
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'data-state') {
+            const tab = document.querySelector(`[data-value="${id}"]`);
+            if (tab && tab.getAttribute('data-state') === 'active' && contentRef.current) {
+              contentRef.current.style.display = 'block';
+              console.log(`DefaultTabContent ${id} made visible by observer`);
+            } else if (tab && tab.getAttribute('data-state') !== 'active' && contentRef.current) {
+              contentRef.current.style.display = 'none';
+            }
+          }
+        });
+      });
+      
+      // Start observing the tab element
+      const tabElement = document.querySelector(`[data-value="${id}"]`);
+      if (tabElement) {
+        observer.observe(tabElement, { attributes: true });
+      }
+      
+      return () => {
+        // Clean up observer
+        observer.disconnect();
+        console.log(`DefaultTabContent ${id} unmounted`);
+      };
     }
-    
-    return () => {
-      console.log(`DefaultTabContent ${id} unmounted`);
-    };
   }, [id]);
   
   return (

@@ -30,10 +30,27 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
   const handleTabClick = () => {
     console.log(`Tab clicked: ${id}`);
     
-    // Use the helper function to show the section with a small delay to ensure DOM is ready
+    // Give the DOM time to update after the click and then show the section
     setTimeout(() => {
-      showSection(id);
-    }, 50);
+      // Hide all sections first
+      const allSections = document.querySelectorAll('[data-section], [data-tab-content]');
+      allSections.forEach((section) => {
+        (section as HTMLElement).style.display = 'none';
+      });
+      
+      // Show the clicked section
+      const sectionToShow = document.getElementById(id) || 
+                            document.querySelector(`[data-section="${id}"]`) ||
+                            document.querySelector(`[data-tab-content="${id}"]`);
+      
+      if (sectionToShow) {
+        (sectionToShow as HTMLElement).style.display = 'block';
+        console.log(`Section ${id} displayed by direct tab click`);
+      } else {
+        // If section not found, fall back to the helper
+        showSection(id);
+      }
+    }, 100);
   };
 
   return (

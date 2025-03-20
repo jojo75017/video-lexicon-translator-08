@@ -7,16 +7,39 @@ const HierarchyTabContent: React.FC = () => {
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Ensure this component is visible if it's the active tab
+    // When component mounts, check if it should be visible
     if (contentRef.current) {
+      // Check if this tab should be visible 
       const isActive = window.location.hash === '#hierarchy' || 
                       document.querySelector('[data-value="hierarchy"][data-state="active"]');
       
+      // Set initial visibility
       contentRef.current.style.display = isActive ? 'block' : 'none';
-      console.log(`HierarchyTabContent mounted with display: ${contentRef.current.style.display}`);
+      console.log(`HierarchyTabContent initialized with display: ${contentRef.current.style.display}`);
+    }
+    
+    // Create a mutation observer to watch for changes to the active tab
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'data-state') {
+          const hierarchyTab = document.querySelector('[data-value="hierarchy"]');
+          if (hierarchyTab && hierarchyTab.getAttribute('data-state') === 'active' && contentRef.current) {
+            contentRef.current.style.display = 'block';
+            console.log('HierarchyTabContent made visible by observer');
+          }
+        }
+      });
+    });
+    
+    // Start observing the hierarchy tab element
+    const hierarchyTab = document.querySelector('[data-value="hierarchy"]');
+    if (hierarchyTab) {
+      observer.observe(hierarchyTab, { attributes: true });
     }
     
     return () => {
+      // Clean up observer
+      observer.disconnect();
       console.log('HierarchyTabContent unmounted');
     };
   }, []);
