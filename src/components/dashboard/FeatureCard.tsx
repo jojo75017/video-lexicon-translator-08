@@ -24,18 +24,13 @@ const FeatureCard = ({ icon: Icon, title, description, onClick, className = '', 
   
   const colorClass = colorClasses[color] || colorClasses.blue;
   
-  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    console.log('FeatureCard clicked', title);
-    onClick(e);
-  };
-  
   return (
     <div 
-      onClick={handleClick}
+      onClick={onClick}
       className={`bg-white rounded-lg p-5 border transition-all duration-300 hover:shadow-md cursor-pointer ${colorClass} ${className}`}
     >
       <div className="flex items-start gap-4">
-        <div className={`p-2.5 rounded-md bg-${color}-50`}>
+        <div className={`p-2.5 rounded-md ${color === 'blue' ? 'bg-blue-50' : `bg-${color}-50`}`}>
           <Icon className="h-5 w-5" />
         </div>
         
