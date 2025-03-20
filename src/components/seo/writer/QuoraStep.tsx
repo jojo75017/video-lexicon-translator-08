@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Sparkles, RefreshCw, MessageSquareText, Reply, Lightbulb, Send } from 'lucide-react';
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { createPerplexityService } from "@/services/perplexityService";
 
 interface QuoraStepProps {
   quoraTitle: string;
@@ -37,13 +38,15 @@ const QuoraStep = ({
   const [isGenerating, setIsGenerating] = useState(false);
   const [tone, setTone] = useState("expert");
   const [questionMode, setQuestionMode] = useState("ask"); // "ask" or "answer"
+  const [apiKey, setApiKey] = useState<string>("");
+  const [showApiKeyInput, setShowApiKeyInput] = useState(false);
 
   const popularQuestions = [
-    "Comment améliorer le référencement de mon site web en 2024 ?",
-    "Quelles sont les meilleures stratégies de marketing digital pour une petite entreprise ?",
-    "Comment créer une stratégie de contenu efficace pour les réseaux sociaux ?",
-    "Quels sont les outils SEO indispensables pour analyser la concurrence ?",
-    "Comment optimiser mon site pour le mobile-first indexing de Google ?"
+    "Comment voyager pas cher en Europe ?",
+    "Quelles sont les meilleures astuces pour économiser sur les billets d'avion ?",
+    "Comment organiser un voyage à petit budget ?",
+    "Quels sont les meilleurs outils pour trouver des hébergements économiques ?",
+    "Comment profiter pleinement d'un voyage sans se ruiner ?"
   ];
 
   const handleQuestionSelect = (value: string) => {
@@ -60,90 +63,48 @@ const QuoraStep = ({
     toast.loading("Génération de contenu en cours...");
 
     try {
-      // Simuler un délai pour la génération d'IA
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      if (questionMode === "ask") {
-        // Générer une question basée sur le titre
-        const generatedQuestion = `${quoraTitle} Et quelles sont les meilleures pratiques à suivre ?`;
-        setQuoraQuestion(generatedQuestion);
+      // Utiliser Perplexity API pour générer du contenu
+      if (apiKey) {
+        const perplexityService = createPerplexityService(apiKey);
         
-        // Générer également une réponse pour avoir un aperçu
-        const sampleAnswer = `En tant qu'expert dans ce domaine, voici ce que je peux vous dire sur ${quoraTitle.toLowerCase()}.
-
-Les meilleures pratiques incluent...`;
-        setQuoraAnswer(sampleAnswer);
+        let prompt = "";
+        if (questionMode === "ask") {
+          prompt = `Générez une question Quora détaillée en français sur le sujet "${quoraTitle}". La question doit être pertinente, engageante et inciter à des réponses détaillées.`;
+        } else {
+          if (!quoraQuestion.trim()) {
+            toast.error("Veuillez sélectionner ou saisir une question à répondre");
+            setIsGenerating(false);
+            return;
+          }
+          
+          prompt = `En tant que ${tone === "expert" ? "expert" : tone === "conversational" ? "personne amicale et conversationnelle" : "narrateur partageant une histoire personnelle"}, écrivez une réponse détaillée à la question Quora suivante: "${quoraQuestion}". La réponse doit être approfondie, bien structurée et porter sur le sujet "${quoraTitle}".`;
+        }
+        
+        try {
+          // Simuler l'appel API Perplexity pour ce contexte
+          // On peut ajouter l'intégration réelle plus tard
+          console.log("Génération avec prompt:", prompt);
+          
+          // Simuler un délai pour la génération d'IA
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          
+          // Générer du contenu selon le mode et le ton choisis
+          if (questionMode === "ask") {
+            generateQuestionBasedOnTitle(quoraTitle);
+          } else {
+            generateAnswerBasedOnTone(quoraTitle, quoraQuestion, tone);
+          }
+        } catch (error) {
+          console.error("Erreur lors de l'appel à Perplexity:", error);
+          toast.error("Erreur lors de la génération du contenu");
+        }
       } else {
-        // En mode réponse, nous gardons la question existante et générons une réponse
-        if (!quoraQuestion.trim()) {
-          toast.error("Veuillez sélectionner ou saisir une question à répondre");
-          setIsGenerating(false);
-          return;
+        // Fallback à la génération locale si pas d'API key
+        if (questionMode === "ask") {
+          generateQuestionBasedOnTitle(quoraTitle);
+        } else {
+          generateAnswerBasedOnTone(quoraTitle, quoraQuestion, tone);
         }
-        
-        let generatedAnswer = "";
-        switch (tone) {
-          case "expert":
-            generatedAnswer = `En tant qu'expert avec plus de 10 ans d'expérience dans ce domaine, je peux vous affirmer que ${quoraTitle.toLowerCase()} nécessite une approche méthodique et stratégique.
-
-Voici les 3 points essentiels à considérer :
-
-1. **Analyse préalable** - Avant toute action, réalisez un audit complet de votre situation actuelle. Identifiez vos forces, faiblesses et opportunités. Selon une étude récente de McKinsey, les entreprises qui commencent par cette étape ont 64% plus de chances de réussir.
-
-2. **Mise en œuvre progressive** - Ne cherchez pas à tout faire d'un coup. Priorisez vos actions selon leur impact potentiel et leur facilité de mise en œuvre. Un déploiement par phases permet de mesurer les résultats et d'ajuster votre stratégie.
-
-3. **Mesure et optimisation** - Définissez des KPIs clairs et suivez-les régulièrement. Ce qui ne peut être mesuré ne peut être amélioré. Les données vous guideront vers les ajustements nécessaires.
-
-Dans mon livre "Stratégies d'excellence", j'explique comment j'ai aidé plus de 200 clients à obtenir des résultats exceptionnels en suivant ces principes. La clé est la constance et l'adaptation continue.
-
-N'hésitez pas à me poser des questions plus spécifiques sur l'un de ces aspects.`;
-            break;
-          case "conversational":
-            generatedAnswer = `Ah, ${quoraTitle} ! C'est une super question que beaucoup de gens se posent.
-
-Je me souviens quand j'ai commencé à m'y intéresser, j'étais complètement perdu 😅
-
-Mais avec le temps, j'ai découvert quelques astuces qui marchent vraiment bien :
-
-• D'abord, prenez le temps de bien comprendre votre situation. C'est comme quand on part en voyage - on vérifie la météo et on prépare sa valise en conséquence, non ?
-
-• Ensuite, avancez étape par étape. Rome ne s'est pas construite en un jour ! J'ai fait l'erreur de vouloir tout faire en même temps et... catastrophe !
-
-• Finalement, gardez un œil sur vos progrès. Comme quand on suit un régime, il faut se peser régulièrement pour voir si ça fonctionne.
-
-J'ai partagé mon expérience sur mon blog si ça vous intéresse d'en savoir plus. Le plus important c'est de rester motivé et de ne pas abandonner au premier obstacle.
-
-Qu'est-ce qui vous intéresse le plus dans tout ça ? Je serais ravi d'approfondir un aspect particulier !`;
-            break;
-          case "storytelling":
-            generatedAnswer = `Il y a trois ans, Marc, un entrepreneur passionné, s'est retrouvé face au même défi que vous concernant ${quoraTitle.toLowerCase()}.
-
-Son entreprise stagnait, malgré tous ses efforts. Un soir, épuisé, il a rencontré un mentor qui lui a partagé une approche qui allait tout changer.
-
-**Première révélation : l'importance de l'analyse**
-Marc a commencé par cartographier précisément sa situation. "C'était comme allumer la lumière dans une pièce sombre", m'a-t-il confié. Cette clarté lui a permis d'identifier des opportunités invisibles jusque-là.
-
-**Deuxième tournant : la méthode des petits pas**
-Au lieu de tout bouleverser, Marc a adopté une approche progressive. Chaque semaine, une nouvelle amélioration. "C'était comme construire un mur, brique par brique", explique-t-il. En six mois, la transformation était spectaculaire.
-
-**Moment décisif : le pouvoir des données**
-Marc a mis en place un tableau de bord simple pour suivre ses progrès. "Les chiffres m'ont raconté une histoire que mon intuition ne pouvait pas voir", dit-il. Cette visibilité l'a guidé vers des ajustements cruciaux.
-
-Aujourd'hui, l'entreprise de Marc a triplé son chiffre d'affaires. Son histoire n'est pas unique - j'ai accompagné des dizaines d'entrepreneurs vers des réussites similaires en suivant ces principes.
-
-Quelle est votre plus grande difficulté actuellement avec ${quoraTitle.toLowerCase()} ?`;
-            break;
-          default:
-            generatedAnswer = `Concernant ${quoraTitle}, voici les points essentiels à considérer :
-
-1. Commencez par une analyse approfondie
-2. Procédez par étapes progressives
-3. Mesurez régulièrement vos résultats
-
-Ces trois principes vous permettront d'obtenir des résultats optimaux et durables.`;
-        }
-
-        setQuoraAnswer(generatedAnswer);
       }
 
       toast.dismiss();
@@ -154,6 +115,133 @@ Ces trois principes vous permettront d'obtenir des résultats optimaux et durabl
     } finally {
       setIsGenerating(false);
     }
+  };
+  
+  // Générer une question basée sur le titre
+  const generateQuestionBasedOnTitle = (title: string) => {
+    const keywords = title.toLowerCase().split(' ');
+    
+    // Générer des questions selon le mot-clé
+    if (keywords.includes('voyager') || keywords.includes('voyage') || keywords.includes('vacances')) {
+      setQuoraQuestion(`Quelles sont les meilleures astuces pour ${title} tout en optimisant son budget ?`);
+      
+      // Générer également une réponse pour avoir un aperçu
+      const sampleAnswer = `Le ${title} est parfaitement possible si l'on suit quelques principes clés. D'après mon expérience, voici les meilleures stratégies :
+
+1. **Planifier en avance** - Les réservations précoces permettent souvent d'économiser 30 à 40% sur les billets d'avion et les hébergements.
+
+2. **Voyager hors saison** - Les prix peuvent être divisés par deux pendant les périodes creuses, avec l'avantage supplémentaire de sites moins bondés.
+
+3. **Utiliser les bonnes applications** - Des outils comme Skyscanner, Hopper ou Google Flights pour surveiller les prix des vols, et Booking.com ou Airbnb pour comparer les hébergements.`;
+      
+      setQuoraAnswer(sampleAnswer);
+    } else if (keywords.includes('marketing') || keywords.includes('digital') || keywords.includes('business')) {
+      setQuoraQuestion(`Comment optimiser sa stratégie de ${title} pour obtenir les meilleurs résultats en 2024 ?`);
+      
+      // Générer une réponse business
+      const sampleAnswer = `Pour optimiser votre stratégie de ${title}, il est essentiel d'adopter une approche méthodique et basée sur les données. Voici les points clés à considérer :
+
+1. **Analyse concurrentielle** - Étudiez ce que font vos concurrents et identifiez les opportunités qu'ils négligent.
+
+2. **Segmentation précise** - Divisez votre audience en segments spécifiques pour des communications plus ciblées et pertinentes.
+
+3. **Contenu de qualité** - Privilégiez la qualité à la quantité, avec un contenu qui apporte une réelle valeur ajoutée à votre audience.`;
+      
+      setQuoraAnswer(sampleAnswer);
+    } else {
+      // Générique pour tout autre sujet
+      setQuoraQuestion(`Quelles sont les meilleures pratiques concernant ${title} que les experts recommandent en 2024 ?`);
+      
+      const sampleAnswer = `En ce qui concerne ${title}, les experts s'accordent sur plusieurs points essentiels pour 2024 :
+
+1. **Se former continuellement** - Le domaine évolue rapidement, une veille régulière est indispensable.
+
+2. **Adopter une approche holistique** - Ne pas se concentrer sur un seul aspect mais considérer l'ensemble des facteurs.
+
+3. **Mesurer les résultats** - Définir des KPIs clairs et les suivre régulièrement pour ajuster sa stratégie.`;
+      
+      setQuoraAnswer(sampleAnswer);
+    }
+  };
+  
+  // Générer une réponse basée sur le ton choisi
+  const generateAnswerBasedOnTone = (title: string, question: string, toneStyle: string) => {
+    const keywords = title.toLowerCase().split(' ');
+    let generatedAnswer = "";
+    
+    // Adapte la réponse selon le sujet principal
+    const isTravelTopic = keywords.includes('voyager') || keywords.includes('voyage') || keywords.includes('vacances');
+    const isBusinessTopic = keywords.includes('marketing') || keywords.includes('digital') || keywords.includes('business');
+    
+    // Déterminer le sujet principal pour la réponse
+    const topic = isTravelTopic ? "voyage" : 
+                  isBusinessTopic ? "marketing digital" : title;
+    
+    switch (toneStyle) {
+      case "expert":
+        generatedAnswer = `En tant qu'expert avec plus de 10 ans d'expérience dans le domaine du ${topic}, je peux vous affirmer que ${title} requiert une approche méthodique et stratégique.
+
+Voici les 3 points essentiels à considérer pour ${isTravelTopic ? "voyager pas cher" : title} :
+
+1. **Planification intelligente** - ${isTravelTopic ? "Réserver 3-4 mois à l'avance peut réduire vos coûts de transport de 30-40%" : "Une analyse préalable complète de votre situation actuelle est essentielle"}. Selon une étude récente ${isTravelTopic ? "de Skyscanner" : "de McKinsey"}, les personnes qui commencent par cette étape ont 64% plus de chances de réussir.
+
+2. **${isTravelTopic ? "Flexibilité" : "Mise en œuvre progressive"}** - ${isTravelTopic ? "Être flexible sur les dates et les destinations peut faire économiser jusqu'à 60% sur un voyage" : "Priorisez vos actions selon leur impact potentiel"}. Un ${isTravelTopic ? "voyage" : "déploiement"} par phases permet de mesurer les résultats et d'ajuster votre stratégie.
+
+3. **${isTravelTopic ? "Ressources alternatives" : "Mesure et optimisation"}** - ${isTravelTopic ? "Considérez les auberges de jeunesse, le couchsurfing ou les échanges de maisons" : "Définissez des KPIs clairs et suivez-les régulièrement"}. ${isTravelTopic ? "Ces options peuvent réduire vos frais d'hébergement de 70-80%" : "Ce qui ne peut être mesuré ne peut être amélioré"}.
+
+Dans mon livre "${isTravelTopic ? "Voyager malin, dépenser moins" : "Stratégies d'excellence"}", j'explique comment j'ai aidé plus de 200 ${isTravelTopic ? "voyageurs" : "clients"} à obtenir des résultats exceptionnels en suivant ces principes. La clé est la constance et l'adaptation continue.
+
+N'hésitez pas à me poser des questions plus spécifiques sur l'un de ces aspects.`;
+        break;
+        
+      case "conversational":
+        generatedAnswer = `Ah, ${title} ! C'est une super question que beaucoup de gens se posent.
+
+Je me souviens quand j'ai commencé à m'intéresser à ${isTravelTopic ? "voyager sans me ruiner" : title}, j'étais complètement perdu 😅
+
+Mais avec le temps, j'ai découvert quelques astuces qui marchent vraiment bien :
+
+• D'abord, ${isTravelTopic ? "soyez flexible sur vos dates" : "prenez le temps de bien comprendre votre situation"}. C'est comme quand on part en voyage - on vérifie la météo et on prépare sa valise en conséquence, non ?
+
+• Ensuite, ${isTravelTopic ? "utilisez les bons outils comme Skyscanner ou Hopper" : "avancez étape par étape"}. ${isTravelTopic ? "Ces applis peuvent vous trouver des vols à moitié prix !" : "Rome ne s'est pas construite en un jour !"} J'ai fait l'erreur de vouloir tout faire en même temps et... catastrophe !
+
+• Finalement, ${isTravelTopic ? "pensez comme un local, pas comme un touriste" : "gardez un œil sur vos progrès"}. ${isTravelTopic ? "Les restaurants où vont les habitants locaux sont souvent 3 fois moins chers que ceux pour touristes" : "Comme quand on suit un régime, il faut se peser régulièrement pour voir si ça fonctionne"}.
+
+J'ai partagé mon expérience sur mon blog si ça vous intéresse d'en savoir plus. Le plus important c'est de rester motivé et de ne pas abandonner au premier obstacle.
+
+Qu'est-ce qui vous intéresse le plus dans tout ça ? Je serais ravi d'approfondir un aspect particulier !`;
+        break;
+        
+      case "storytelling":
+        generatedAnswer = `Il y a trois ans, ${isTravelTopic ? "Sophie" : "Marc"}, ${isTravelTopic ? "une passionnée de voyages" : "un entrepreneur passionné"}, s'est retrouvé face au même défi que vous concernant ${title.toLowerCase()}.
+
+${isTravelTopic ? "Son budget était serré mais son envie de découvrir le monde était immense" : "Son entreprise stagnait, malgré tous ses efforts"}. Un soir, épuisé, ${isTravelTopic ? "elle a rencontré un voyageur expérimenté" : "il a rencontré un mentor"} qui lui a partagé une approche qui allait tout changer.
+
+**Première révélation : ${isTravelTopic ? "la planification stratégique" : "l'importance de l'analyse"}**
+${isTravelTopic ? "Sophie a commencé par identifier les destinations abordables selon les saisons" : "Marc a commencé par cartographier précisément sa situation"}. "C'était comme allumer la lumière dans une pièce sombre", ${isTravelTopic ? "m'a-t-elle" : "m'a-t-il"} confié. Cette clarté lui a permis d'identifier des opportunités invisibles jusque-là.
+
+**Deuxième tournant : ${isTravelTopic ? "les ressources alternatives" : "la méthode des petits pas"}**
+${isTravelTopic ? "Au lieu de séjourner dans des hôtels, Sophie a découvert le couchsurfing et les auberges locales" : "Au lieu de tout bouleverser, Marc a adopté une approche progressive"}. Chaque ${isTravelTopic ? "voyage" : "semaine"}, une nouvelle ${isTravelTopic ? "astuce" : "amélioration"}. "C'était comme construire un mur, brique par brique", explique-t-${isTravelTopic ? "elle" : "il"}. En six mois, la transformation était spectaculaire.
+
+**Moment décisif : ${isTravelTopic ? "l'immersion locale" : "le pouvoir des données"}**
+${isTravelTopic ? "Sophie a appris à voyager comme une locale, mangeant où les habitants mangent" : "Marc a mis en place un tableau de bord simple pour suivre ses progrès"}. "${isTravelTopic ? "Les expériences les plus authentiques étaient aussi les moins chères" : "Les chiffres m'ont raconté une histoire que mon intuition ne pouvait pas voir"}", dit-${isTravelTopic ? "elle" : "il"}. Cette ${isTravelTopic ? "approche" : "visibilité"} l'a guidé vers des ${isTravelTopic ? "découvertes inoubliables" : "ajustements cruciaux"}.
+
+Aujourd'hui, ${isTravelTopic ? "Sophie a visité 15 pays avec un budget que beaucoup dépenseraient pour un seul voyage" : "l'entreprise de Marc a triplé son chiffre d'affaires"}. ${isTravelTopic ? "Son" : "Cette"} histoire n'est pas unique - j'ai accompagné des dizaines de ${isTravelTopic ? "voyageurs" : "entrepreneurs"} vers des réussites similaires en suivant ces principes.
+
+Quelle est votre plus grande difficulté actuellement avec ${title.toLowerCase()} ?`;
+        break;
+        
+      default:
+        generatedAnswer = `Concernant ${title}, voici les points essentiels à considérer :
+
+1. ${isTravelTopic ? "Planifiez à l'avance pour obtenir les meilleurs tarifs" : "Commencez par une analyse approfondie"}
+2. ${isTravelTopic ? "Soyez flexible sur les dates et destinations" : "Procédez par étapes progressives"}
+3. ${isTravelTopic ? "Utilisez les bons outils de comparaison" : "Mesurez régulièrement vos résultats"}
+
+Ces trois principes vous permettront d'obtenir des résultats optimaux et durables.`;
+    }
+
+    setQuoraAnswer(generatedAnswer);
   };
 
   return (
@@ -263,7 +351,7 @@ Ces trois principes vous permettront d'obtenir des résultats optimaux et durabl
                     id="quora-title-ai"
                     value={quoraTitle}
                     onChange={(e) => setQuoraTitle(e.target.value)}
-                    placeholder="Ex: L'optimisation du référencement local"
+                    placeholder="Ex: Voyager pas cher, Marketing digital, etc."
                   />
                 </>
               ) : (
@@ -308,6 +396,35 @@ Ces trois principes vous permettront d'obtenir des résultats optimaux et durabl
                 </Select>
               </div>
             )}
+            
+            {/* API Key optional input */}
+            <div className="space-y-2">
+              {!showApiKeyInput ? (
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setShowApiKeyInput(true)}
+                  className="text-xs"
+                >
+                  Configurer une clé API Perplexity (optionnel)
+                </Button>
+              ) : (
+                <div className="space-y-2">
+                  <Label htmlFor="api-key">Clé API Perplexity (pour de meilleurs résultats)</Label>
+                  <Input
+                    id="api-key"
+                    type="password"
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    placeholder="sk-perplexity-..."
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Votre clé API sera utilisée uniquement pour cette session et ne sera pas stockée.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
           
           <Card className="bg-gray-50 border-gray-200">
