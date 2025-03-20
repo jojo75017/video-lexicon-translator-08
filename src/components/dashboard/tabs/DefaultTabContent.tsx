@@ -44,8 +44,23 @@ const DefaultTabContent: React.FC<DefaultTabContentProps> = ({ id, label }) => {
         observer.observe(tabElement, { attributes: true });
       }
       
+      // Now also observe DOM changes for when the tab is clicked directly
+      document.addEventListener('click', function(event) {
+        const clickedElement = event.target as HTMLElement;
+        const closestTab = clickedElement.closest(`[data-value="${id}"]`);
+        
+        if (closestTab) {
+          setTimeout(() => {
+            if (contentRef.current) {
+              contentRef.current.style.display = 'block';
+              console.log(`DefaultTabContent ${id} made visible by direct click`);
+            }
+          }, 50);
+        }
+      });
+      
       return () => {
-        // Clean up observer
+        // Clean up observer and event listener
         observer.disconnect();
         console.log(`DefaultTabContent ${id} unmounted`);
       };

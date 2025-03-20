@@ -9,6 +9,9 @@ const HierarchyTabContent: React.FC = () => {
   useEffect(() => {
     // When component mounts, check if it should be visible
     if (contentRef.current) {
+      // Set initial visibility - hidden by default
+      contentRef.current.style.display = 'none';
+      
       // Check if this tab should be visible 
       const isActive = window.location.hash === '#hierarchy' || 
                       document.querySelector('[data-value="hierarchy"][data-state="active"]');
@@ -22,16 +25,35 @@ const HierarchyTabContent: React.FC = () => {
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.type === 'attributes' && mutation.attributeName === 'data-state') {
-          const hierarchyTab = document.querySelector('[data-value="hierarchy"]');
-          if (hierarchyTab && hierarchyTab.getAttribute('data-state') === 'active' && contentRef.current) {
+          const target = mutation.target as HTMLElement;
+          if (target.getAttribute('data-value') === 'hierarchy' && 
+              target.getAttribute('data-state') === 'active' && 
+              contentRef.current) {
             contentRef.current.style.display = 'block';
-            console.log('HierarchyTabContent made visible by observer');
+            console.log('HierarchyTabContent made visible by tab observer');
+          } else if (target.getAttribute('data-value') === 'hierarchy' && 
+                     target.getAttribute('data-state') !== 'active' && 
+                     contentRef.current) {
+            contentRef.current.style.display = 'none';
           }
         }
       });
     });
     
-    // Start observing the hierarchy tab element
+    // Also listen for direct clicks on the hierarchy tab
+    document.addEventListener('click', function(event) {
+      const clickedElement = event.target as HTMLElement;
+      const hierarchyTab = clickedElement.closest('[data-value="hierarchy"]');
+      
+      if (hierarchyTab && contentRef.current) {
+        setTimeout(() => {
+          contentRef.current.style.display = 'block';
+          console.log('HierarchyTabContent made visible by direct click');
+        }, 50);
+      }
+    });
+    
+    // Start observing all potential tab elements
     const hierarchyTab = document.querySelector('[data-value="hierarchy"]');
     if (hierarchyTab) {
       observer.observe(hierarchyTab, { attributes: true });

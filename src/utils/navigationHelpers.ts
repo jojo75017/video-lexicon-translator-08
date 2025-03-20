@@ -37,7 +37,6 @@ export const showSection = (sectionId: string): void => {
   // Special case for hierarchy tab
   if (sectionId === 'hierarchy') {
     const hierarchyElement = document.getElementById('hierarchy') || 
-                             document.querySelector('.section-hierarchy') ||
                              document.querySelector('[data-section="hierarchy"]') ||
                              document.querySelector('[data-tab-content="hierarchy"]');
     
@@ -68,6 +67,12 @@ export const showSection = (sectionId: string): void => {
     // Ensure the element is visible
     sectionElement.style.display = 'block';
     
+    // Update the tab state if needed
+    const tabTrigger = document.querySelector(`[data-value="${sectionId}"]`);
+    if (tabTrigger && tabTrigger.getAttribute('data-state') !== 'active') {
+      (tabTrigger as HTMLElement).click();
+    }
+    
     // Notify user
     toast.success(`Section ${sectionId} affichée`, {
       description: "La section est maintenant visible",
@@ -84,21 +89,11 @@ export const showSection = (sectionId: string): void => {
     // Ensure the element is visible
     (dataAttributeSection as HTMLElement).style.display = 'block';
     
-    // Notify user
-    toast.success(`Section ${sectionId} affichée`, {
-      description: "La section est maintenant visible",
-      duration: 2000
-    });
-    return;
-  }
-  
-  // Try to find element with class name
-  const classSection = document.querySelector(`.section-${sectionId}`);
-  if (classSection) {
-    console.log(`Found section by class: ${sectionId}`);
-    
-    // Ensure the element is visible
-    (classSection as HTMLElement).style.display = 'block';
+    // Update the tab state if needed
+    const tabTrigger = document.querySelector(`[data-value="${sectionId}"]`);
+    if (tabTrigger && tabTrigger.getAttribute('data-state') !== 'active') {
+      (tabTrigger as HTMLElement).click();
+    }
     
     // Notify user
     toast.success(`Section ${sectionId} affichée`, {
@@ -108,13 +103,19 @@ export const showSection = (sectionId: string): void => {
     return;
   }
   
-  // If no specific section is found, try find by tab-content attribute
+  // Try to find element with data-tab-content attribute
   const tabContentSection = document.querySelector(`[data-tab-content="${sectionId}"]`);
   if (tabContentSection) {
     console.log(`Found section by tab-content: ${sectionId}`);
     
     // Ensure the element is visible
     (tabContentSection as HTMLElement).style.display = 'block';
+    
+    // Update the tab state if needed
+    const tabTrigger = document.querySelector(`[data-value="${sectionId}"]`);
+    if (tabTrigger && tabTrigger.getAttribute('data-state') !== 'active') {
+      (tabTrigger as HTMLElement).click();
+    }
     
     // Notify user
     toast.success(`Section ${sectionId} affichée`, {
@@ -141,7 +142,6 @@ export const scrollToSection = (sectionId: string): void => {
   // Then scroll to it
   const sectionElement = document.getElementById(sectionId) || 
                        document.querySelector(`[data-section="${sectionId}"]`) || 
-                       document.querySelector(`.section-${sectionId}`) ||
                        document.querySelector(`[data-tab-content="${sectionId}"]`);
   
   if (sectionElement) {
