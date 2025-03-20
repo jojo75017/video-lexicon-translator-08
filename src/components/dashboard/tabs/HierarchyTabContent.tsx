@@ -1,9 +1,26 @@
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import HierarchySection from '@/components/seo/HierarchySection';
 import ContentHierarchy from '@/components/ContentHierarchy';
 
 const HierarchyTabContent: React.FC = () => {
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Ensure this component is visible if it's the active tab
+    if (contentRef.current) {
+      const isActive = window.location.hash === '#hierarchy' || 
+                      document.querySelector('[data-value="hierarchy"][data-state="active"]');
+      
+      contentRef.current.style.display = isActive ? 'block' : 'none';
+      console.log(`HierarchyTabContent mounted with display: ${contentRef.current.style.display}`);
+    }
+    
+    return () => {
+      console.log('HierarchyTabContent unmounted');
+    };
+  }, []);
+  
   // Sample data for hierarchy demonstration
   const sampleHeadings = [
     { text: "Introduction au SEO", level: 1, position: 1 },
@@ -31,7 +48,13 @@ const HierarchyTabContent: React.FC = () => {
   ];
 
   return (
-    <div className="grid grid-cols-1 gap-6">
+    <div 
+      className="grid grid-cols-1 gap-6" 
+      id="hierarchy" 
+      data-section="hierarchy" 
+      data-tab-content="hierarchy"
+      ref={contentRef}
+    >
       <HierarchySection isLoading={false} seoAnalysis={{
         h1Count: 1,
         h2Count: 3,

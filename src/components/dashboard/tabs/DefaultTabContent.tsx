@@ -12,13 +12,17 @@ const DefaultTabContent: React.FC<DefaultTabContentProps> = ({ id, label }) => {
   // This effect ensures the content has the right visibility status
   useEffect(() => {
     if (contentRef.current) {
-      // Make sure visibility is properly set initially
+      // Initially hide all tab content
+      contentRef.current.style.display = 'none';
+      
       // Check if this tab should be visible (depends on if it's the active tab)
       const isActiveTab = window.location.hash === `#${id}` || 
                           document.querySelector(`[data-value="${id}"][data-state="active"]`);
       
-      contentRef.current.style.display = isActiveTab ? 'block' : 'none';
-      console.log(`DefaultTabContent ${id} mounted with display: ${contentRef.current.style.display}`);
+      if (isActiveTab) {
+        contentRef.current.style.display = 'block';
+        console.log(`DefaultTabContent ${id} is active and visible`);
+      }
     }
     
     return () => {

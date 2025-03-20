@@ -29,10 +29,35 @@ export const showSection = (sectionId: string): void => {
   console.log(`Showing section: ${sectionId}`);
   
   // Hide all sections first
-  const allSections = document.querySelectorAll('[data-section]');
+  const allSections = document.querySelectorAll('[data-section], [data-tab-content]');
   allSections.forEach((section) => {
     (section as HTMLElement).style.display = 'none';
   });
+  
+  // Special case for hierarchy tab
+  if (sectionId === 'hierarchy') {
+    const hierarchyElement = document.getElementById('hierarchy') || 
+                             document.querySelector('.section-hierarchy') ||
+                             document.querySelector('[data-section="hierarchy"]') ||
+                             document.querySelector('[data-tab-content="hierarchy"]');
+    
+    if (hierarchyElement) {
+      console.log('Hierarchy section found, making it visible');
+      (hierarchyElement as HTMLElement).style.display = 'block';
+      
+      // Ensure the hierarchy tab is active
+      const hierarchyTab = document.querySelector('[data-value="hierarchy"]') as HTMLElement;
+      if (hierarchyTab && hierarchyTab.getAttribute('data-state') !== 'active') {
+        hierarchyTab.click();
+      }
+      
+      toast.success(`Section hiérarchie affichée`, {
+        description: "La section est maintenant visible",
+        duration: 2000
+      });
+      return;
+    }
+  }
   
   // Look for element by ID first (most specific)
   const sectionElement = document.getElementById(sectionId);

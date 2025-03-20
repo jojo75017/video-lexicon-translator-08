@@ -30,10 +30,10 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
   const handleTabClick = () => {
     console.log(`Tab clicked: ${id}`);
     
-    // Use the helper function to show the section
+    // Use the helper function to show the section with a small delay to ensure DOM is ready
     setTimeout(() => {
       showSection(id);
-    }, 0);
+    }, 50);
   };
 
   return (
