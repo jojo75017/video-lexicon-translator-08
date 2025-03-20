@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { Sparkles, RefreshCw, MessageSquareText } from 'lucide-react';
+import { Sparkles, RefreshCw, MessageSquareText, Reply, Lightbulb, Send } from 'lucide-react';
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -36,6 +36,7 @@ const QuoraStep = ({
   const [activeTab, setActiveTab] = useState("manual");
   const [isGenerating, setIsGenerating] = useState(false);
   const [tone, setTone] = useState("expert");
+  const [questionMode, setQuestionMode] = useState("ask"); // "ask" or "answer"
 
   const popularQuestions = [
     "Comment améliorer le référencement de mon site web en 2024 ?",
@@ -62,13 +63,28 @@ const QuoraStep = ({
       // Simuler un délai pour la génération d'IA
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      // Générer un contenu basé sur le titre
-      const generatedQuestion = `${quoraTitle} Et quelles sont les meilleures pratiques à suivre ?`;
-      
-      let generatedAnswer = "";
-      switch (tone) {
-        case "expert":
-          generatedAnswer = `En tant qu'expert avec plus de 10 ans d'expérience dans ce domaine, je peux vous affirmer que ${quoraTitle.toLowerCase()} nécessite une approche méthodique et stratégique.
+      if (questionMode === "ask") {
+        // Générer une question basée sur le titre
+        const generatedQuestion = `${quoraTitle} Et quelles sont les meilleures pratiques à suivre ?`;
+        setQuoraQuestion(generatedQuestion);
+        
+        // Générer également une réponse pour avoir un aperçu
+        const sampleAnswer = `En tant qu'expert dans ce domaine, voici ce que je peux vous dire sur ${quoraTitle.toLowerCase()}.
+
+Les meilleures pratiques incluent...`;
+        setQuoraAnswer(sampleAnswer);
+      } else {
+        // En mode réponse, nous gardons la question existante et générons une réponse
+        if (!quoraQuestion.trim()) {
+          toast.error("Veuillez sélectionner ou saisir une question à répondre");
+          setIsGenerating(false);
+          return;
+        }
+        
+        let generatedAnswer = "";
+        switch (tone) {
+          case "expert":
+            generatedAnswer = `En tant qu'expert avec plus de 10 ans d'expérience dans ce domaine, je peux vous affirmer que ${quoraTitle.toLowerCase()} nécessite une approche méthodique et stratégique.
 
 Voici les 3 points essentiels à considérer :
 
@@ -81,9 +97,9 @@ Voici les 3 points essentiels à considérer :
 Dans mon livre "Stratégies d'excellence", j'explique comment j'ai aidé plus de 200 clients à obtenir des résultats exceptionnels en suivant ces principes. La clé est la constance et l'adaptation continue.
 
 N'hésitez pas à me poser des questions plus spécifiques sur l'un de ces aspects.`;
-          break;
-        case "conversational":
-          generatedAnswer = `Ah, ${quoraTitle} ! C'est une super question que beaucoup de gens se posent.
+            break;
+          case "conversational":
+            generatedAnswer = `Ah, ${quoraTitle} ! C'est une super question que beaucoup de gens se posent.
 
 Je me souviens quand j'ai commencé à m'y intéresser, j'étais complètement perdu 😅
 
@@ -98,9 +114,9 @@ Mais avec le temps, j'ai découvert quelques astuces qui marchent vraiment bien 
 J'ai partagé mon expérience sur mon blog si ça vous intéresse d'en savoir plus. Le plus important c'est de rester motivé et de ne pas abandonner au premier obstacle.
 
 Qu'est-ce qui vous intéresse le plus dans tout ça ? Je serais ravi d'approfondir un aspect particulier !`;
-          break;
-        case "storytelling":
-          generatedAnswer = `Il y a trois ans, Marc, un entrepreneur passionné, s'est retrouvé face au même défi que vous concernant ${quoraTitle.toLowerCase()}.
+            break;
+          case "storytelling":
+            generatedAnswer = `Il y a trois ans, Marc, un entrepreneur passionné, s'est retrouvé face au même défi que vous concernant ${quoraTitle.toLowerCase()}.
 
 Son entreprise stagnait, malgré tous ses efforts. Un soir, épuisé, il a rencontré un mentor qui lui a partagé une approche qui allait tout changer.
 
@@ -116,19 +132,19 @@ Marc a mis en place un tableau de bord simple pour suivre ses progrès. "Les chi
 Aujourd'hui, l'entreprise de Marc a triplé son chiffre d'affaires. Son histoire n'est pas unique - j'ai accompagné des dizaines d'entrepreneurs vers des réussites similaires en suivant ces principes.
 
 Quelle est votre plus grande difficulté actuellement avec ${quoraTitle.toLowerCase()} ?`;
-          break;
-        default:
-          generatedAnswer = `Concernant ${quoraTitle}, voici les points essentiels à considérer :
+            break;
+          default:
+            generatedAnswer = `Concernant ${quoraTitle}, voici les points essentiels à considérer :
 
 1. Commencez par une analyse approfondie
 2. Procédez par étapes progressives
 3. Mesurez régulièrement vos résultats
 
 Ces trois principes vous permettront d'obtenir des résultats optimaux et durables.`;
-      }
+        }
 
-      setQuoraQuestion(generatedQuestion);
-      setQuoraAnswer(generatedAnswer);
+        setQuoraAnswer(generatedAnswer);
+      }
 
       toast.dismiss();
       toast.success("Contenu généré avec succès !");
@@ -214,39 +230,111 @@ Ces trois principes vous permettront d'obtenir des résultats optimaux et durabl
         </TabsContent>
         
         <TabsContent value="ai" className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="quora-title-ai">Sujet de votre question</Label>
-            <Input
-              id="quora-title-ai"
-              value={quoraTitle}
-              onChange={(e) => setQuoraTitle(e.target.value)}
-              placeholder="Ex: L'optimisation du référencement local"
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="tone-selector">Style de réponse</Label>
-            <Select value={tone} onValueChange={setTone}>
-              <SelectTrigger>
-                <SelectValue placeholder="Choisir un style" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="expert">Expert et autoritaire</SelectItem>
-                <SelectItem value="conversational">Conversationnel et amical</SelectItem>
-                <SelectItem value="storytelling">Narratif (storytelling)</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="question-mode">Mode</Label>
+              <div className="grid grid-cols-2 gap-2 mt-2">
+                <Button 
+                  type="button" 
+                  variant={questionMode === "ask" ? "default" : "outline"}
+                  onClick={() => setQuestionMode("ask")}
+                  className={questionMode === "ask" ? "bg-[#b92b27] hover:bg-[#a62520]" : ""}
+                >
+                  <MessageSquareText className="mr-2 h-4 w-4" />
+                  Poser une question
+                </Button>
+                <Button 
+                  type="button" 
+                  variant={questionMode === "answer" ? "default" : "outline"}
+                  onClick={() => setQuestionMode("answer")}
+                  className={questionMode === "answer" ? "bg-[#b92b27] hover:bg-[#a62520]" : ""}
+                >
+                  <Reply className="mr-2 h-4 w-4" />
+                  Répondre à une question
+                </Button>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              {questionMode === "ask" ? (
+                <>
+                  <Label htmlFor="quora-title-ai">Sujet de votre question</Label>
+                  <Input
+                    id="quora-title-ai"
+                    value={quoraTitle}
+                    onChange={(e) => setQuoraTitle(e.target.value)}
+                    placeholder="Ex: L'optimisation du référencement local"
+                  />
+                </>
+              ) : (
+                <>
+                  <Label htmlFor="quora-question-ai">Question à répondre</Label>
+                  <div className="flex gap-2 mb-2">
+                    <Select onValueChange={handleQuestionSelect} value={quoraQuestion}>
+                      <SelectTrigger className="flex-grow">
+                        <SelectValue placeholder="Sélectionnez une question..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {popularQuestions.map((question, index) => (
+                          <SelectItem key={index} value={question}>
+                            {question.length > 40 ? `${question.substring(0, 40)}...` : question}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Input
+                    value={quoraTitle}
+                    onChange={(e) => setQuoraTitle(e.target.value)}
+                    placeholder="Sujet principal de votre réponse"
+                    className="mb-2"
+                  />
+                </>
+              )}
+            </div>
+            
+            {questionMode === "answer" && (
+              <div className="space-y-2">
+                <Label htmlFor="tone-selector">Style de réponse</Label>
+                <Select value={tone} onValueChange={setTone}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choisir un style" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="expert">Expert et autoritaire</SelectItem>
+                    <SelectItem value="conversational">Conversationnel et amical</SelectItem>
+                    <SelectItem value="storytelling">Narratif (storytelling)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
           
           <Card className="bg-gray-50 border-gray-200">
             <CardContent className="p-4 text-sm">
-              <p className="font-medium mb-2">Conseils pour un sujet efficace :</p>
-              <ul className="space-y-1 text-gray-600">
-                <li>• Soyez précis sur votre domaine d'expertise</li>
-                <li>• Formulez un sujet qui intéresse votre audience cible</li>
-                <li>• Évitez les sujets trop généraux ou trop techniques</li>
-                <li>• Incluez des mots-clés pertinents pour votre niche</li>
-              </ul>
+              <div className="flex items-start gap-2">
+                <Lightbulb className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium mb-2">Conseils pour un contenu efficace :</p>
+                  <ul className="space-y-1 text-gray-600">
+                    {questionMode === "ask" ? (
+                      <>
+                        <li>• Formulez une question claire et précise</li>
+                        <li>• Incluez des mots-clés pertinents pour votre niche</li>
+                        <li>• Évitez les questions trop générales ou trop techniques</li>
+                        <li>• Ajoutez du contexte pour obtenir des réponses plus pertinentes</li>
+                      </>
+                    ) : (
+                      <>
+                        <li>• Montrez votre expertise dès le début de votre réponse</li>
+                        <li>• Structurez votre réponse avec des points clairs</li>
+                        <li>• Incluez des exemples concrets et des données</li>
+                        <li>• Terminez par une conclusion et une invitation à l'engagement</li>
+                      </>
+                    )}
+                  </ul>
+                </div>
+              </div>
             </CardContent>
           </Card>
           
@@ -263,7 +351,9 @@ Ces trois principes vous permettront d'obtenir des résultats optimaux et durabl
             ) : (
               <>
                 <Sparkles className="mr-2 h-4 w-4" />
-                Générer question et réponse
+                {questionMode === "ask" 
+                  ? "Générer une question" 
+                  : "Générer une réponse"}
               </>
             )}
           </Button>
@@ -295,6 +385,7 @@ Ces trois principes vous permettront d'obtenir des résultats optimaux et durabl
         onClick={onSubmit}
         className="w-full bg-[#ea384c] hover:bg-[#ea384c]/90 text-white"
       >
+        <Send className="mr-2 h-4 w-4" />
         Publier sur Quora
       </Button>
     </div>
