@@ -30,7 +30,6 @@ export interface SeoAnalysis {
   description: string;
   h1Count: number;
   h2Count: number;
-  h2Count: number;
   h3Count: number;
   headings: HeadingStructure['headings'];
   paragraphs: {
@@ -41,7 +40,7 @@ export interface SeoAnalysis {
   imgCount: number;
   imgWithoutAlt: number;
   imagesDetails: ImageDetails[];
-  metaTagsCount: number;
+  metaTagsCount: MetaTagsAnalysis;
   metaTagsAnalysis: MetaTagsAnalysis;
   canonicalUrl: string | null;
   robotsMeta: string | null;
@@ -285,45 +284,4 @@ export interface SearchConsoleData {
   topPages?: any[];
   devices?: any;
   countries?: any;
-}
-
-export interface SecurityHeaders {
-  https: boolean;
-  hsts: boolean;
-  xFrameOptions: boolean;
-  xContentTypeOptions: boolean;
-  referrerPolicy: boolean;
-  permissions: boolean;
-}
-
-export interface SiteStructure {
-  name: string;
-  children: {
-    name: string;
-    path: string;
-    children: {
-      name: string;
-      path: string;
-      children: any[];
-    }[];
-  }[];
-}
-
-export interface BrokenLink {
-  url: string;
-  statusCode: number;
-  message: string;
-  location: string;
-}
-
-export interface KeywordAnalysis extends KeywordData {
-  keyword: string;
-  count: number;
-  density: number;
-  position?: number;
-}
-
-export interface SeasonalityData {
-  peak: string[];
-  low: string[];
 }

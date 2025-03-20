@@ -5,7 +5,8 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, AlignLeft, Tag, TrendingUp, BarChart2 } from 'lucide-react';
+import { FileText, AlignLeft, Tag, TrendingUp, BarChart2, Copy, Check } from 'lucide-react';
+import { toast } from "sonner";
 
 interface KeywordSuggestionsProps {
   generatedKeywords: KeywordSuggestion[];
@@ -16,19 +17,31 @@ const KeywordSuggestions: React.FC<KeywordSuggestionsProps> = ({
   generatedKeywords,
   onGenerateClick
 }) => {
+  const [copiedIndex, setCopiedIndex] = React.useState<number | null>(null);
+
+  const copyToClipboard = (text: string, index: number) => {
+    navigator.clipboard.writeText(text);
+    setCopiedIndex(index);
+    toast.success("Copié dans le presse-papiers!");
+    
+    setTimeout(() => {
+      setCopiedIndex(null);
+    }, 2000);
+  };
+
   return (
     <Card className="border border-gray-200 rounded-lg">
       <CardHeader className="pb-2">
         <CardTitle className="text-lg font-semibold flex items-center gap-2">
           <Tag className="h-4 w-4 text-blue-600" />
-          Suggestions de mots-clés
+          Suggestions SEO
         </CardTitle>
       </CardHeader>
       
       <CardContent>
         <div className="mb-4">
           <p className="text-sm text-gray-600 mb-2">
-            Obtenez des suggestions de mots-clés pertinents pour votre site.
+            Obtenez des suggestions de mots-clés, titres et descriptions pour améliorer votre référencement.
           </p>
           
           <Button
@@ -41,10 +54,10 @@ const KeywordSuggestions: React.FC<KeywordSuggestionsProps> = ({
         
         {generatedKeywords.length > 0 && (
           <Tabs defaultValue="keywords" className="mt-4">
-            <TabsList className="mb-4">
+            <TabsList className="mb-4 grid grid-cols-3 w-full">
               <TabsTrigger value="keywords">Mots-clés</TabsTrigger>
-              <TabsTrigger value="titles">Suggestions de titres</TabsTrigger>
-              <TabsTrigger value="descriptions">Meta descriptions</TabsTrigger>
+              <TabsTrigger value="titles">Balises Title (60 car.)</TabsTrigger>
+              <TabsTrigger value="descriptions">Meta Descriptions (155 car.)</TabsTrigger>
             </TabsList>
             
             <TabsContent value="keywords">
@@ -70,8 +83,16 @@ const KeywordSuggestions: React.FC<KeywordSuggestionsProps> = ({
                       <Badge variant="outline" className="ml-auto text-xs">
                         {keyword.suggestedTitle?.length || 0}/60
                       </Badge>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8"
+                        onClick={() => copyToClipboard(keyword.suggestedTitle || "", index)}
+                      >
+                        {copiedIndex === index ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                      </Button>
                     </div>
-                    <div className="p-2 bg-blue-50 rounded text-sm mt-1">
+                    <div className="p-3 bg-blue-50 rounded text-sm mt-1 whitespace-pre-wrap">
                       {keyword.suggestedTitle || "Non disponible"}
                     </div>
                   </div>
@@ -89,8 +110,16 @@ const KeywordSuggestions: React.FC<KeywordSuggestionsProps> = ({
                       <Badge variant="outline" className="ml-auto text-xs">
                         {keyword.suggestedDescription?.length || 0}/155
                       </Badge>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8"
+                        onClick={() => copyToClipboard(keyword.suggestedDescription || "", index)}
+                      >
+                        {copiedIndex === index ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                      </Button>
                     </div>
-                    <div className="p-2 bg-green-50 rounded text-sm mt-1">
+                    <div className="p-3 bg-green-50 rounded text-sm mt-1 whitespace-pre-wrap">
                       {keyword.suggestedDescription || "Non disponible"}
                     </div>
                   </div>
