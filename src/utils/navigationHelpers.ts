@@ -6,7 +6,7 @@ export const navigateToSection = (sectionId: string, tabId?: string): void => {
   
   // First activate tab if needed
   if (tabId) {
-    // Use the correct tab selector that matches ResultTabs.tsx
+    // Find and click the tab
     const tabElement = document.querySelector(`[data-value="${tabId}"]`) as HTMLElement;
     if (tabElement) {
       console.log(`Tab element found with data-value: ${tabId}`);
@@ -28,52 +28,50 @@ export const navigateToSection = (sectionId: string, tabId?: string): void => {
 export const showSection = (sectionId: string): void => {
   console.log(`Showing section: ${sectionId}`);
   
-  // Hide all sections first
-  const allSections = document.querySelectorAll('[data-section], [data-tab-content]');
+  // Hide all tab content sections first
+  const allSections = document.querySelectorAll('[data-tab-content]');
   allSections.forEach((section) => {
     (section as HTMLElement).style.display = 'none';
   });
   
-  // Special case for hierarchy tab
+  // Activate the correct tab if not already active
+  const tabTrigger = document.querySelector(`[data-value="${sectionId}"]`) as HTMLElement;
+  if (tabTrigger && tabTrigger.getAttribute('data-state') !== 'active') {
+    console.log(`Activating tab for: ${sectionId}`);
+    tabTrigger.click();
+  }
+  
+  // Handle special case for hierarchy tab
   if (sectionId === 'hierarchy') {
     const hierarchyElement = document.getElementById('hierarchy') || 
-                             document.querySelector('[data-section="hierarchy"]') ||
-                             document.querySelector('[data-tab-content="hierarchy"]');
+                            document.querySelector('[data-section="hierarchy"]') ||
+                            document.querySelector('[data-tab-content="hierarchy"]');
     
     if (hierarchyElement) {
       console.log('Hierarchy section found, making it visible');
       (hierarchyElement as HTMLElement).style.display = 'block';
       
-      // Ensure the hierarchy tab is active
-      const hierarchyTab = document.querySelector('[data-value="hierarchy"]') as HTMLElement;
-      if (hierarchyTab && hierarchyTab.getAttribute('data-state') !== 'active') {
-        hierarchyTab.click();
-      }
-      
       toast.success(`Section hiérarchie affichée`, {
         description: "La section est maintenant visible",
         duration: 2000
       });
+      
+      // Also ensure the tab is active
+      const hierarchyTab = document.querySelector('[data-value="hierarchy"]') as HTMLElement;
+      if (hierarchyTab) {
+        hierarchyTab.click();
+      }
+      
       return;
     }
   }
   
-  // Look for element by ID first (most specific)
+  // First try to find by ID (most specific)
   const sectionElement = document.getElementById(sectionId);
-  
   if (sectionElement) {
-    console.log(`Section element found by ID: ${sectionId}`);
-    
-    // Ensure the element is visible
+    console.log(`Section found by ID: ${sectionId}`);
     sectionElement.style.display = 'block';
     
-    // Update the tab state if needed
-    const tabTrigger = document.querySelector(`[data-value="${sectionId}"]`);
-    if (tabTrigger && tabTrigger.getAttribute('data-state') !== 'active') {
-      (tabTrigger as HTMLElement).click();
-    }
-    
-    // Notify user
     toast.success(`Section ${sectionId} affichée`, {
       description: "La section est maintenant visible",
       duration: 2000
@@ -81,21 +79,12 @@ export const showSection = (sectionId: string): void => {
     return;
   }
   
-  // Try to find element with data-section attribute
-  const dataAttributeSection = document.querySelector(`[data-section="${sectionId}"]`);
-  if (dataAttributeSection) {
-    console.log(`Found section by data attribute: ${sectionId}`);
+  // Try to find by data-section attribute
+  const dataSection = document.querySelector(`[data-section="${sectionId}"]`);
+  if (dataSection) {
+    console.log(`Section found by data-section: ${sectionId}`);
+    (dataSection as HTMLElement).style.display = 'block';
     
-    // Ensure the element is visible
-    (dataAttributeSection as HTMLElement).style.display = 'block';
-    
-    // Update the tab state if needed
-    const tabTrigger = document.querySelector(`[data-value="${sectionId}"]`);
-    if (tabTrigger && tabTrigger.getAttribute('data-state') !== 'active') {
-      (tabTrigger as HTMLElement).click();
-    }
-    
-    // Notify user
     toast.success(`Section ${sectionId} affichée`, {
       description: "La section est maintenant visible",
       duration: 2000
@@ -103,21 +92,12 @@ export const showSection = (sectionId: string): void => {
     return;
   }
   
-  // Try to find element with data-tab-content attribute
-  const tabContentSection = document.querySelector(`[data-tab-content="${sectionId}"]`);
-  if (tabContentSection) {
-    console.log(`Found section by tab-content: ${sectionId}`);
+  // Try to find by data-tab-content attribute
+  const tabContent = document.querySelector(`[data-tab-content="${sectionId}"]`);
+  if (tabContent) {
+    console.log(`Section found by data-tab-content: ${sectionId}`);
+    (tabContent as HTMLElement).style.display = 'block';
     
-    // Ensure the element is visible
-    (tabContentSection as HTMLElement).style.display = 'block';
-    
-    // Update the tab state if needed
-    const tabTrigger = document.querySelector(`[data-value="${sectionId}"]`);
-    if (tabTrigger && tabTrigger.getAttribute('data-state') !== 'active') {
-      (tabTrigger as HTMLElement).click();
-    }
-    
-    // Notify user
     toast.success(`Section ${sectionId} affichée`, {
       description: "La section est maintenant visible",
       duration: 2000
@@ -125,17 +105,16 @@ export const showSection = (sectionId: string): void => {
     return;
   }
   
-  // If no specific section is found, inform the user
+  // If no section is found
   console.log(`No section found for: ${sectionId}`);
-  toast.info("Section non trouvée", {
-    description: "Veuillez d'abord analyser un site web pour accéder à cette section",
+  toast.error(`Section non trouvée: ${sectionId}`, {
+    description: "La section demandée n'existe pas",
+    duration: 2000
   });
 };
 
-// Additional scroll function kept but simplified
+// Additional scroll function
 export const scrollToSection = (sectionId: string): void => {
-  console.log(`Scrolling to section: ${sectionId}`);
-  
   // First make sure section is visible
   showSection(sectionId);
   

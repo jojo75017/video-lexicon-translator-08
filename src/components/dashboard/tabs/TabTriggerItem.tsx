@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from "react-router-dom";
 import { LucideIcon } from 'lucide-react';
@@ -30,11 +29,11 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
   const handleTabClick = () => {
     console.log(`Tab clicked: ${id}`);
     
-    // Give the DOM time to update after the click and then show the section
-    setTimeout(() => {
-      // Show the clicked section
-      showSection(id);
-    }, 50);
+    // Show the section immediately
+    showSection(id);
+    
+    // Update URL hash for better navigation
+    window.location.hash = id;
   };
 
   return (

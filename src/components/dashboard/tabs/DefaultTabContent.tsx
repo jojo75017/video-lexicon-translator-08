@@ -10,61 +10,71 @@ const DefaultTabContent: React.FC<DefaultTabContentProps> = ({ id, label }) => {
   const contentRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
-    if (contentRef.current) {
-      // Set initial visibility - hidden by default
-      contentRef.current.style.display = 'none';
+    if (!contentRef.current) return;
       
-      // Check if this tab should be visible
-      const isActiveTab = window.location.hash === `#${id}` || 
-                          document.querySelector(`[data-value="${id}"][data-state="active"]`);
-      
-      if (isActiveTab) {
-        contentRef.current.style.display = 'block';
-        console.log(`DefaultTabContent ${id} is initially active`);
-      }
-      
-      // Create an observer to watch for tab state changes
-      const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-          if (mutation.type === 'attributes' && mutation.attributeName === 'data-state') {
-            const tab = document.querySelector(`[data-value="${id}"]`);
-            if (tab && tab.getAttribute('data-state') === 'active' && contentRef.current) {
-              contentRef.current.style.display = 'block';
-              console.log(`DefaultTabContent ${id} made visible by observer`);
-            } else if (tab && tab.getAttribute('data-state') !== 'active' && contentRef.current) {
-              contentRef.current.style.display = 'none';
-            }
+    // Set initial visibility based on hash or active tab state
+    const isActiveTab = window.location.hash === `#${id}` || 
+                      document.querySelector(`[data-value="${id}"][data-state="active"]`);
+    
+    contentRef.current.style.display = isActiveTab ? 'block' : 'none';
+    console.log(`DefaultTabContent ${id} initialized with display: ${contentRef.current.style.display}`);
+    
+    // Create a mutation observer to watch for tab state changes on all tabs
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'data-state') {
+          const target = mutation.target as HTMLElement;
+          const isThisTab = target.getAttribute('data-value') === id;
+          const isActive = target.getAttribute('data-state') === 'active';
+          
+          if (isThisTab && isActive && contentRef.current) {
+            contentRef.current.style.display = 'block';
+            console.log(`DefaultTabContent ${id} made visible by observer`);
+          } else if (isThisTab && !isActive && contentRef.current) {
+            contentRef.current.style.display = 'none';
           }
-        });
-      });
-      
-      // Start observing the tab element
-      const tabElement = document.querySelector(`[data-value="${id}"]`);
-      if (tabElement) {
-        observer.observe(tabElement, { attributes: true });
-      }
-      
-      // Now also observe DOM changes for when the tab is clicked directly
-      document.addEventListener('click', function(event) {
-        const clickedElement = event.target as HTMLElement;
-        const closestTab = clickedElement.closest(`[data-value="${id}"]`);
-        
-        if (closestTab) {
-          setTimeout(() => {
-            if (contentRef.current) {
-              contentRef.current.style.display = 'block';
-              console.log(`DefaultTabContent ${id} made visible by direct click`);
-            }
-          }, 50);
         }
       });
+    });
+    
+    // Watch for direct clicks on tabs
+    const handleTabClick = (event: MouseEvent) => {
+      const clickedElement = event.target as HTMLElement;
+      const thisTab = clickedElement.closest(`[data-value="${id}"]`);
       
-      return () => {
-        // Clean up observer and event listener
-        observer.disconnect();
-        console.log(`DefaultTabContent ${id} unmounted`);
-      };
-    }
+      if (thisTab && contentRef.current) {
+        // Short delay to allow the tab state to update
+        setTimeout(() => {
+          contentRef.current.style.display = 'block';
+          console.log(`DefaultTabContent ${id} made visible by click handler`);
+        }, 50);
+      }
+    };
+    
+    document.addEventListener('click', handleTabClick);
+    
+    // Start observing all tab triggers
+    const allTabTriggers = document.querySelectorAll('[data-value]');
+    allTabTriggers.forEach(trigger => {
+      observer.observe(trigger, { attributes: true });
+    });
+    
+    // Watch for hash changes
+    const handleHashChange = () => {
+      if (window.location.hash === `#${id}` && contentRef.current) {
+        contentRef.current.style.display = 'block';
+        console.log(`DefaultTabContent ${id} made visible by hash change`);
+      }
+    };
+    
+    window.addEventListener('hashchange', handleHashChange);
+    
+    return () => {
+      observer.disconnect();
+      document.removeEventListener('click', handleTabClick);
+      window.removeEventListener('hashchange', handleHashChange);
+      console.log(`DefaultTabContent ${id} unmounted`);
+    };
   }, [id]);
   
   return (

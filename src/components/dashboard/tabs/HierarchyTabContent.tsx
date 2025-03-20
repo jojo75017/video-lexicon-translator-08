@@ -7,61 +7,68 @@ const HierarchyTabContent: React.FC = () => {
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // When component mounts, check if it should be visible
-    if (contentRef.current) {
-      // Set initial visibility - hidden by default
-      contentRef.current.style.display = 'none';
-      
-      // Check if this tab should be visible 
-      const isActive = window.location.hash === '#hierarchy' || 
-                      document.querySelector('[data-value="hierarchy"][data-state="active"]');
-      
-      // Set initial visibility
-      contentRef.current.style.display = isActive ? 'block' : 'none';
-      console.log(`HierarchyTabContent initialized with display: ${contentRef.current.style.display}`);
-    }
+    if (!contentRef.current) return;
     
-    // Create a mutation observer to watch for changes to the active tab
+    // Set initial visibility
+    const isActive = window.location.hash === '#hierarchy' || 
+                    document.querySelector('[data-value="hierarchy"][data-state="active"]');
+                    
+    contentRef.current.style.display = isActive ? 'block' : 'none';
+    console.log(`HierarchyTabContent initialized with display: ${contentRef.current.style.display}`);
+    
+    // Create a mutation observer to watch for changes to all potential tab triggers
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.type === 'attributes' && mutation.attributeName === 'data-state') {
           const target = mutation.target as HTMLElement;
-          if (target.getAttribute('data-value') === 'hierarchy' && 
-              target.getAttribute('data-state') === 'active' && 
-              contentRef.current) {
+          const isHierarchyTab = target.getAttribute('data-value') === 'hierarchy';
+          const isActive = target.getAttribute('data-state') === 'active';
+          
+          if (isHierarchyTab && isActive && contentRef.current) {
             contentRef.current.style.display = 'block';
-            console.log('HierarchyTabContent made visible by tab observer');
-          } else if (target.getAttribute('data-value') === 'hierarchy' && 
-                     target.getAttribute('data-state') !== 'active' && 
-                     contentRef.current) {
+            console.log('HierarchyTabContent made visible by observer');
+          } else if (isHierarchyTab && !isActive && contentRef.current) {
             contentRef.current.style.display = 'none';
           }
         }
       });
     });
     
-    // Also listen for direct clicks on the hierarchy tab
-    document.addEventListener('click', function(event) {
+    // Watch for tab clicks to ensure our content is visible
+    const handleTabClick = (event: MouseEvent) => {
       const clickedElement = event.target as HTMLElement;
       const hierarchyTab = clickedElement.closest('[data-value="hierarchy"]');
       
       if (hierarchyTab && contentRef.current) {
         setTimeout(() => {
           contentRef.current.style.display = 'block';
-          console.log('HierarchyTabContent made visible by direct click');
+          console.log('HierarchyTabContent made visible by click handler');
         }, 50);
       }
+    };
+    
+    document.addEventListener('click', handleTabClick);
+    
+    // Start observing all tab triggers
+    const allTabTriggers = document.querySelectorAll('[data-value]');
+    allTabTriggers.forEach(trigger => {
+      observer.observe(trigger, { attributes: true });
     });
     
-    // Start observing all potential tab elements
-    const hierarchyTab = document.querySelector('[data-value="hierarchy"]');
-    if (hierarchyTab) {
-      observer.observe(hierarchyTab, { attributes: true });
-    }
+    // Also watch for hash changes
+    const handleHashChange = () => {
+      if (window.location.hash === '#hierarchy' && contentRef.current) {
+        contentRef.current.style.display = 'block';
+        console.log('HierarchyTabContent made visible by hash change');
+      }
+    };
+    
+    window.addEventListener('hashchange', handleHashChange);
     
     return () => {
-      // Clean up observer
       observer.disconnect();
+      document.removeEventListener('click', handleTabClick);
+      window.removeEventListener('hashchange', handleHashChange);
       console.log('HierarchyTabContent unmounted');
     };
   }, []);
