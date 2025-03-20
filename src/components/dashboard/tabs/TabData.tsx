@@ -3,7 +3,7 @@ import {
   Search, Globe, Database, Link2, ChartBar, Settings, Hash, Pen, 
   FileText, Book, BarChart2, ExternalLink, Rocket, Zap, 
   Layers, Lightbulb, FileCode, Bell, UserPlus, MessageSquareText,
-  Gauge, BarChart, Newspaper, Award, Target, Boxes, BrainCircuit, Signature, FileCheck
+  Gauge, BarChart, Newspaper, Award, Target, Boxes, BrainCircuit, Signature
 } from 'lucide-react';
 import { TabItemType, GroupedTabsType, GroupLabelsType } from './types';
 
@@ -26,9 +26,6 @@ export const tabs: TabItemType[] = [
   { id: 'ideas', icon: Lightbulb, label: 'Idées', color: 'text-yellow-600', group: 'content' },
   { id: 'quora', icon: MessageSquareText, label: 'Quora', color: 'text-[#b92b27]', group: 'content', isNew: true, link: '/QuoraPage' },
   { id: 'airesearch', icon: BrainCircuit, label: 'Recherche IA', color: 'text-purple-700', group: 'content', isNew: true, highlighted: true },
-  
-  // New Tab for Word Count Analysis
-  { id: 'wordcount', icon: FileCheck, label: '500 Mots', color: 'text-green-700', group: 'content', isNew: true, highlighted: true },
   
   // Technique
   { id: 'advanced', icon: Settings, label: 'Avancé', color: 'text-rose-600', group: 'tech' },
