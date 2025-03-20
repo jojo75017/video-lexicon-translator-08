@@ -249,13 +249,12 @@ const MetricCard: React.FC<MetricCardProps> = ({ icon, label, value, color, bgCo
         
         <Progress
           value={value}
-          className="h-1.5"
-          className={
+          className={`h-1.5 ${
             value >= 90 ? 'bg-green-500' : 
             value >= 70 ? 'bg-blue-500' : 
             value >= 50 ? 'bg-amber-500' : 
             'bg-red-500'
-          }
+          }`}
         />
       </div>
     </div>

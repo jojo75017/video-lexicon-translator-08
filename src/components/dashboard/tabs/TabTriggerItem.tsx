@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Link } from "react-router-dom";
-import { LucideIcon } from 'lucide-react';
 import { TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -9,7 +8,7 @@ import { activateSection } from '@/utils/navigationHelpers';
 
 interface TabTriggerItemProps {
   id: string;
-  icon: LucideIcon;
+  icon: React.ReactNode;
   label: string;
   color: string;
   isNew?: boolean;
@@ -19,7 +18,7 @@ interface TabTriggerItemProps {
 
 const TabTriggerItem: React.FC<TabTriggerItemProps> = ({ 
   id, 
-  icon: Icon, 
+  icon, 
   label, 
   color, 
   isNew, 
@@ -59,7 +58,7 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
           </Badge>
         )}
       </span>
-      <Icon className={`w-4 h-4 ${color}`} />
+      {icon}
       <span className="font-medium text-sm">{label}</span>
       
       <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 rounded-md transition-opacity"></span>

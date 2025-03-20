@@ -10,6 +10,7 @@ export interface Tab {
   link?: string;
   isNew?: boolean;
   highlighted?: boolean;
+  color?: string; // Added to make Tab compatible with TabItemType
 }
 
 export interface TabItemType {

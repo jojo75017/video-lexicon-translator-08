@@ -1,10 +1,10 @@
 
 import React from 'react';
 import TabTriggerItem from './TabTriggerItem';
-import { TabItemType } from './types';
+import { Tab } from './types';
 
 interface TabGroupProps {
-  groupTabs: TabItemType[];
+  groupTabs: Tab[];
 }
 
 const TabGroup: React.FC<TabGroupProps> = ({ groupTabs }) => {
@@ -17,7 +17,7 @@ const TabGroup: React.FC<TabGroupProps> = ({ groupTabs }) => {
             id={tab.id}
             icon={tab.icon}
             label={tab.label}
-            color={tab.color}
+            color={tab.color || 'text-gray-600'} // Default color if not provided
             isNew={tab.isNew}
             link={tab.link}
             highlighted={tab.highlighted}
