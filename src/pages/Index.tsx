@@ -1,5 +1,4 @@
-
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -40,6 +39,38 @@ const IndexPage = () => {
     error,
     handleActivateProxy
   } = useSiteAnalyzer();
+  
+  // Hide all sections initially
+  useEffect(() => {
+    const sections = document.querySelectorAll('[data-section]');
+    sections.forEach((section) => {
+      (section as HTMLElement).style.display = 'none';
+    });
+    
+    console.log('Index page initialized - all sections hidden by default');
+  }, []);
+
+  // Show results when analysis is complete
+  useEffect(() => {
+    if (seoAnalysis) {
+      // Show the results section automatically
+      const resultsSection = document.querySelector('#seo');
+      if (resultsSection) {
+        (resultsSection as HTMLElement).style.display = 'block';
+        
+        toast.success("Analyse SEO terminée", {
+          description: "Consultez les résultats ci-dessous",
+          duration: 3000
+        });
+      }
+      
+      // Also make the specific results display visible
+      const resultsDisplay = document.querySelector('.results-display');
+      if (resultsDisplay) {
+        (resultsDisplay as HTMLElement).style.display = 'block';
+      }
+    }
+  }, [seoAnalysis]);
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
@@ -77,9 +108,9 @@ const IndexPage = () => {
           handleActivateProxy={handleActivateProxy}
         />
         
-        {/* Results Display */}
+        {/* Results Display - make sure this is visible when there are results */}
         {seoAnalysis && (
-          <div className="mb-8">
+          <div className="mb-8 results-display" style={{ display: 'block' }}>
             <ResultsDisplay seoAnalysis={seoAnalysis} />
           </div>
         )}
@@ -102,33 +133,33 @@ const IndexPage = () => {
           <InfoCards />
         </div>
         
-        {/* Sections pour les différentes fonctionnalités */}
-        <div id="seo" data-section="seo" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100">
+        {/* Sections pour les différentes fonctionnalités - hidden by default */}
+        <div id="seo" data-section="seo" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100" style={{ display: 'none' }}>
           <h2 className="text-2xl font-bold mb-4">Analyse SEO</h2>
           <p className="text-gray-600">Consultez l'analyse détaillée des performances SEO de votre site.</p>
         </div>
         
-        <div id="structure" data-section="structure" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100">
+        <div id="structure" data-section="structure" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100" style={{ display: 'none' }}>
           <h2 className="text-2xl font-bold mb-4">Structure du Site</h2>
           <p className="text-gray-600">Visualisez l'architecture de votre site web et identifiez les améliorations possibles.</p>
         </div>
         
-        <div id="hierarchy" data-section="hierarchy" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100">
+        <div id="hierarchy" data-section="hierarchy" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100" style={{ display: 'none' }}>
           <h2 className="text-2xl font-bold mb-4">Hiérarchie des Contenus</h2>
           <p className="text-gray-600">Optimisez la structure de vos contenus pour une meilleure indexation.</p>
         </div>
         
-        <div id="backlinks" data-section="backlinks" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100">
+        <div id="backlinks" data-section="backlinks" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100" style={{ display: 'none' }}>
           <h2 className="text-2xl font-bold mb-4">Analyse des Backlinks</h2>
           <p className="text-gray-600">Évaluez la qualité et la quantité des liens pointant vers votre site.</p>
         </div>
         
-        <div id="advanced" data-section="advanced" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100">
+        <div id="advanced" data-section="advanced" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100" style={{ display: 'none' }}>
           <h2 className="text-2xl font-bold mb-4">Options Avancées</h2>
           <p className="text-gray-600">Accédez aux paramètres et outils avancés d'optimisation SEO.</p>
         </div>
         
-        <div id="integrations" data-section="integrations" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100">
+        <div id="integrations" data-section="integrations" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100" style={{ display: 'none' }}>
           <h2 className="text-2xl font-bold mb-4">Intégrations</h2>
           <p className="text-gray-600">Connectez-vous à d'autres outils et services pour améliorer votre SEO.</p>
         </div>

@@ -1,9 +1,10 @@
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Code, Search, ListTree, BarChart, Link2, Globe, Database } from "lucide-react";
 import { SiteInfo } from "./SiteInfo";
 import { SourceCode } from "./SourceCode";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getStructureData } from "@/utils/seo/updateUtils";
 
 interface ResultTabsProps {
@@ -12,6 +13,24 @@ interface ResultTabsProps {
 
 export const ResultTabs = ({ data }: ResultTabsProps) => {
   const [activeTab, setActiveTab] = useState("info");
+  
+  // Initialize component - show first tab, hide others
+  useEffect(() => {
+    // Set first tab content to be visible and hide the rest
+    const sections = document.querySelectorAll('[data-section]');
+    sections.forEach((section) => {
+      const sectionId = section.getAttribute('data-section');
+      (section as HTMLElement).style.display = sectionId === "info" ? "block" : "none";
+    });
+    
+    console.log("ResultTabs initialized - showing info tab");
+    
+    // Notify user that results are available
+    toast.success("Résultats d'analyse disponibles", {
+      description: "Consultez les différents onglets pour voir les détails",
+      duration: 3000
+    });
+  }, [data]);
   
   // Tab change handler
   const handleTabChange = (value: string) => {
@@ -28,15 +47,15 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
     const selectedContent = document.querySelector(`[data-section="${value}"]`);
     if (selectedContent) {
       (selectedContent as HTMLElement).style.display = 'block';
+      
+      toast.info(`Affichage de l'onglet ${value}`, {
+        description: value === "info" 
+          ? "Informations générales sur le site"
+          : value === "source" 
+            ? "Code source de la page" 
+            : "Structure du site et hiérarchie"
+      });
     }
-    
-    toast.info(`Affichage de l'onglet ${value}`, {
-      description: value === "info" 
-        ? "Informations générales sur le site"
-        : value === "source" 
-          ? "Code source de la page" 
-          : "Structure du site et hiérarchie"
-    });
   };
 
   // Check data and prepare fallback data
@@ -86,64 +105,68 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
         </TabsTrigger>
       </TabsList>
 
-      <TabsContent value="info" className="mt-6 space-y-6" id="seo" data-section="info" style={{ display: activeTab === "info" ? "block" : "none" }}>
-        <div id="backlinks" data-section="backlinks" className="section-backlinks">
+      <TabsContent value="info" className="mt-6 space-y-6">
+        <div id="info" data-section="info" className="section-info">
           <SiteInfo data={data} />
         </div>
       </TabsContent>
 
-      <TabsContent value="source" className="mt-6" id="source" data-section="source" style={{ display: activeTab === "source" ? "block" : "none" }}>
-        <SourceCode sourceCode={data?.sourceCode || "<p>Aucun code source disponible</p>"} />
+      <TabsContent value="source" className="mt-6">
+        <div id="source" data-section="source" className="section-source">
+          <SourceCode sourceCode={data?.sourceCode || "<p>Aucun code source disponible</p>"} />
+        </div>
       </TabsContent>
       
-      <TabsContent value="structure" className="mt-6" id="structure" data-section="structure" style={{ display: activeTab === "structure" ? "block" : "none" }}>
-        <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-          <h3 className="text-lg font-bold mb-4">Structure du site</h3>
-          
-          <div id="hierarchy" data-section="hierarchy" className="section-hierarchy space-y-4">
-            <div>
-              <h4 className="font-medium text-gray-700 mb-2">Hiérarchie des titres</h4>
-              <div className="pl-4 border-l-2 border-blue-200 space-y-2">
-                {structureData && structureData.headings && structureData.headings.length > 0 ? (
-                  structureData.headings.map((heading: any, index: number) => (
-                    <div 
-                      key={index} 
-                      className={`py-1.5 px-3 rounded-md ${
-                        heading.level === "h1" ? 'bg-blue-50 font-bold ml-0' : 
-                        heading.level === "h2" ? 'bg-blue-50/60 font-semibold ml-4' : 
-                        heading.level === "h3" ? 'bg-blue-50/30 ml-8' : 
-                        'bg-gray-50 ml-12'
-                      }`}
-                    >
-                      {`${heading.level.toUpperCase()}: ${heading.text}`}
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-gray-500">Aucune donnée de titres disponible</div>
-                )}
+      <TabsContent value="structure" className="mt-6">
+        <div id="structure" data-section="structure" className="section-structure">
+          <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+            <h3 className="text-lg font-bold mb-4">Structure du site</h3>
+            
+            <div id="hierarchy" className="section-hierarchy space-y-4">
+              <div>
+                <h4 className="font-medium text-gray-700 mb-2">Hiérarchie des titres</h4>
+                <div className="pl-4 border-l-2 border-blue-200 space-y-2">
+                  {structureData && structureData.headings && structureData.headings.length > 0 ? (
+                    structureData.headings.map((heading: any, index: number) => (
+                      <div 
+                        key={index} 
+                        className={`py-1.5 px-3 rounded-md ${
+                          heading.level === "h1" ? 'bg-blue-50 font-bold ml-0' : 
+                          heading.level === "h2" ? 'bg-blue-50/60 font-semibold ml-4' : 
+                          heading.level === "h3" ? 'bg-blue-50/30 ml-8' : 
+                          'bg-gray-50 ml-12'
+                        }`}
+                      >
+                        {`${heading.level.toUpperCase()}: ${heading.text}`}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-gray-500">Aucune donnée de titres disponible</div>
+                  )}
+                </div>
               </div>
-            </div>
-            
-            <div className="mt-4">
-              <h4 className="font-medium text-gray-700 mb-2">Recommandations</h4>
-              <ul className="list-disc pl-5 space-y-1 text-gray-600">
-                <li>Assurez-vous d'avoir un seul titre H1 par page</li>
-                <li>Utilisez des H2 et H3 de manière hiérarchique</li>
-                <li>Incluez des mots-clés importants dans vos titres</li>
-                <li>Gardez une structure cohérente sur l'ensemble du site</li>
-              </ul>
-            </div>
-            
-            {structureData && structureData.recommendations && (
+              
               <div className="mt-4">
-                <h4 className="font-medium text-gray-700 mb-2">Recommandations spécifiques</h4>
+                <h4 className="font-medium text-gray-700 mb-2">Recommandations</h4>
                 <ul className="list-disc pl-5 space-y-1 text-gray-600">
-                  {structureData.recommendations.map((recommendation: string, index: number) => (
-                    <li key={index}>{recommendation}</li>
-                  ))}
+                  <li>Assurez-vous d'avoir un seul titre H1 par page</li>
+                  <li>Utilisez des H2 et H3 de manière hiérarchique</li>
+                  <li>Incluez des mots-clés importants dans vos titres</li>
+                  <li>Gardez une structure cohérente sur l'ensemble du site</li>
                 </ul>
               </div>
-            )}
+              
+              {structureData && structureData.recommendations && (
+                <div className="mt-4">
+                  <h4 className="font-medium text-gray-700 mb-2">Recommandations spécifiques</h4>
+                  <ul className="list-disc pl-5 space-y-1 text-gray-600">
+                    {structureData.recommendations.map((recommendation: string, index: number) => (
+                      <li key={index}>{recommendation}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </TabsContent>

@@ -40,17 +40,15 @@ const TabsContent = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content>
 >(({ className, ...props }, ref) => {
+  // Use the controlled visibility approach from Radix
   return (
     <TabsPrimitive.Content
       ref={ref}
       className={cn(
         "mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         "rounded-md border border-gray-100 bg-white p-4 shadow-sm",
-        "data-[state=active]:block data-[state=inactive]:hidden", // Control visibility based on state
         className
       )}
-      style={{ display: 'none' }} // Initially hide all tab content
-      data-state="content"
       {...props}
     />
   )

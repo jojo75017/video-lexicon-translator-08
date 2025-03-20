@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
@@ -26,6 +26,18 @@ const TabNavigation = () => {
   // Filter tabs to only include those without external links
   const contentTabs = tabs.filter(tab => !tab.link);
   
+  // Initialize component by hiding all content
+  useEffect(() => {
+    // Hide all tab content on first render
+    const tabElements = document.querySelectorAll('[data-tab-content]');
+    tabElements.forEach((element) => {
+      const el = element as HTMLElement;
+      el.style.display = 'none';
+    });
+    
+    console.log('TabNavigation initialized - all tab content hidden');
+  }, []);
+  
   // Handle tab value change
   const handleTabChange = (value: string) => {
     console.log(`Tab changed to: ${value}`);
@@ -35,24 +47,20 @@ const TabNavigation = () => {
     const tabElements = document.querySelectorAll('[data-tab-content]');
     tabElements.forEach((element) => {
       const el = element as HTMLElement;
-      el.style.display = 'none'; // Hide all
+      const tabId = el.getAttribute('data-tab-content');
+      el.style.display = tabId === value ? 'block' : 'none';
     });
     
-    // Show the selected tab content
-    const selectedTab = document.querySelector(`[data-tab-content="${value}"]`);
-    if (selectedTab) {
-      (selectedTab as HTMLElement).style.display = 'block';
+    // Show the selected tab content via additional selectors if needed
+    const selectedContent = document.getElementById(value) || 
+                          document.querySelector(`[data-section="${value}"]`);
+    if (selectedContent) {
+      (selectedContent as HTMLElement).style.display = 'block';
+      
       toast.success(`Onglet ${value} activé`, {
         description: "Contenu affiché",
         duration: 1500
       });
-    } else {
-      // Try alternate selectors
-      const alternateContent = document.getElementById(value) || 
-                               document.querySelector(`[data-section="${value}"]`);
-      if (alternateContent) {
-        (alternateContent as HTMLElement).style.display = 'block';
-      }
     }
   };
 
@@ -79,6 +87,7 @@ const TabNavigation = () => {
         
         {/* Tab content section */}
         <div className="p-2 bg-gray-50 rounded-lg border border-gray-200">
+          {/* Use Radix's TabsContent for automatic state management */}
           <TabsContent value="wordcount">
             <WordCountTabContent />
           </TabsContent>
