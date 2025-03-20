@@ -53,7 +53,6 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
         ) : (
           <TabsTrigger 
             value={id}
-            data-value={id}
             className={`flex items-center gap-1 px-3 py-1.5 rounded-md relative group transition-all duration-200 hover:bg-white ${
               highlighted ? 'bg-purple-100' : ''
             }`}

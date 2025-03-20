@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { TabsContent } from "@/components/ui/tabs";
 import HierarchySection from '@/components/seo/HierarchySection';
 import ContentHierarchy from '@/components/ContentHierarchy';
 
@@ -32,22 +31,20 @@ const HierarchyTabContent: React.FC = () => {
   ];
 
   return (
-    <TabsContent value="hierarchy" className="mt-2">
-      <div className="grid grid-cols-1 gap-6">
-        <HierarchySection isLoading={false} seoAnalysis={{
-          h1Count: 1,
-          h2Count: 3,
-          h3Count: 2,
-          wordCount: 450,
-          readabilityScore: 75
-        }} />
-        <ContentHierarchy 
-          headings={sampleHeadings}
-          paragraphs={sampleParagraphs}
-          recommendations={recommendations}
-        />
-      </div>
-    </TabsContent>
+    <div className="grid grid-cols-1 gap-6">
+      <HierarchySection isLoading={false} seoAnalysis={{
+        h1Count: 1,
+        h2Count: 3,
+        h3Count: 2,
+        wordCount: 450,
+        readabilityScore: 75
+      }} />
+      <ContentHierarchy 
+        headings={sampleHeadings}
+        paragraphs={sampleParagraphs}
+        recommendations={recommendations}
+      />
+    </div>
   );
 };
 

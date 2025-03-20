@@ -41,28 +41,25 @@ const TabNavigation = () => {
           </TabsList>
         </div>
         
-        {/* Tab content sections */}
+        {/* Tab content section */}
         <div className="p-2 bg-gray-50 rounded-lg border border-gray-200">
-          {/* Render all tab contents for better visibility */}
-          {contentTabs.map(tab => {
-            // Utiliser des composants spécifiques pour certains onglets
-            switch(tab.id) {
-              case 'hierarchy':
-                return <HierarchyTabContent key={tab.id} />;
-              case 'wordcount':
-                return <WordCountTabContent key={tab.id} />;
-              case 'seo':
-                return <SeoTabContent key={tab.id} />;
-              case 'structure':
-                return <StructureTabContent key={tab.id} />;
-              case 'backlinks':
-                return <BacklinksTabContent key={tab.id} />;
-              case 'metrics':
-                return <MetricsTabContent key={tab.id} />;
-              default:
-                return <DefaultTabContent key={tab.id} id={tab.id} label={tab.label} />;
-            }
-          })}
+          {/* Render specific tab contents */}
+          <TabsContent value="hierarchy"><HierarchyTabContent /></TabsContent>
+          <TabsContent value="wordcount"><WordCountTabContent /></TabsContent>
+          <TabsContent value="seo"><SeoTabContent /></TabsContent>
+          <TabsContent value="structure"><StructureTabContent /></TabsContent>
+          <TabsContent value="backlinks"><BacklinksTabContent /></TabsContent>
+          <TabsContent value="metrics"><MetricsTabContent /></TabsContent>
+          
+          {/* Render default tab contents for other tabs */}
+          {contentTabs
+            .filter(tab => !['hierarchy', 'wordcount', 'seo', 'structure', 'backlinks', 'metrics'].includes(tab.id))
+            .map(tab => (
+              <TabsContent key={tab.id} value={tab.id}>
+                <DefaultTabContent id={tab.id} label={tab.label} />
+              </TabsContent>
+            ))
+          }
         </div>
       </Tabs>
     </TooltipProvider>
