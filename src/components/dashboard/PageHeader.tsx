@@ -8,9 +8,19 @@ import { activateSection } from '@/utils/navigationHelpers';
 const PageHeader = () => {
   const handleTabClick = (id: string) => {
     console.log(`Header tab clicked: ${id}`);
-    window.location.hash = id;
-    activateSection(id);
+    
+    // Vérifier que la section existe avant de tenter de l'activer
+    const section = document.querySelector(`[data-section="${id}"]`);
+    if (section) {
+      window.location.hash = id;
+      activateSection(id);
+    } else {
+      console.log(`Section "${id}" does not exist`);
+    }
   };
+
+  // Liste des onglets disponibles
+  const availableTabs = ['seo', 'structure', 'hierarchy', 'backlinks'];
 
   return (
     <div className="bg-gradient-to-r from-indigo-600 to-blue-700 rounded-xl p-8 shadow-lg mb-8 relative overflow-hidden">
@@ -61,10 +71,11 @@ const PageHeader = () => {
           </div>
         </div>
         
-        {/* Navigation Tabs */}
+        {/* Navigation Tabs - uniquement pour les onglets disponibles */}
         <div className="mt-8 bg-white/10 backdrop-blur-sm rounded-lg p-1 border border-white/20">
           <Tabs defaultValue="seo" className="w-full">
             <TabsList className="w-full bg-transparent flex gap-1 justify-center">
+              {/* Onglet SEO */}
               <TabsTrigger 
                 value="seo" 
                 className="data-[state=active]:bg-white/20 text-white data-[state=active]:text-white flex gap-2 items-center"
@@ -73,6 +84,8 @@ const PageHeader = () => {
                 <Search className="h-4 w-4" />
                 <span>Analyse SEO</span>
               </TabsTrigger>
+              
+              {/* Onglet Structure */}
               <TabsTrigger 
                 value="structure" 
                 className="data-[state=active]:bg-white/20 text-white data-[state=active]:text-white flex gap-2 items-center"
@@ -81,6 +94,8 @@ const PageHeader = () => {
                 <FileSearch className="h-4 w-4" />
                 <span>Structure</span>
               </TabsTrigger>
+              
+              {/* Onglet Hiérarchie */}
               <TabsTrigger 
                 value="hierarchy" 
                 className="data-[state=active]:bg-white/20 text-white data-[state=active]:text-white flex gap-2 items-center"
@@ -89,6 +104,8 @@ const PageHeader = () => {
                 <PenTool className="h-4 w-4" />
                 <span>Hiérarchie</span>
               </TabsTrigger>
+              
+              {/* Onglet Backlinks */}
               <TabsTrigger 
                 value="backlinks" 
                 className="data-[state=active]:bg-white/20 text-white data-[state=active]:text-white flex gap-2 items-center"
