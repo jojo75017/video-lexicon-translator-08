@@ -10,7 +10,7 @@ export interface MainTab {
 }
 
 export const useTabNavigation = () => {
-  const [activeTab, setActiveTab] = useState<string>('');
+  const [activeTab, setActiveTab] = useState<string>('hierarchy');
   
   // Define main categories with more SEMrush/UberSuggest-like styling
   const mainTabs: MainTab[] = [
@@ -23,7 +23,7 @@ export const useTabNavigation = () => {
   // Filter tabs without external links
   const contentTabs = tabs.filter(tab => !tab.link);
   
-  // Initialize from URL hash
+  // Initialize from URL hash or set default
   useEffect(() => {
     // Hide all tab content initially
     document.querySelectorAll('[data-tab-content]').forEach(el => {
@@ -35,13 +35,13 @@ export const useTabNavigation = () => {
     if (hash && tabs.some(tab => tab.id === hash)) {
       console.log(`Found hash in URL: ${hash}, activating this tab`);
       setActiveTab(hash);
-      setTimeout(() => activateSection(hash), 100);
+      setTimeout(() => activateSection(hash), 200);
     } else {
-      // Default to first tab if no hash
+      // Default to hierarchy tab if no hash
       const defaultTab = 'hierarchy';
       console.log(`No hash in URL, defaulting to: ${defaultTab}`);
       setActiveTab(defaultTab);
-      setTimeout(() => activateSection(defaultTab), 100);
+      setTimeout(() => activateSection(defaultTab), 200);
     }
     
     // Listen for hash changes
@@ -70,35 +70,49 @@ export const useTabNavigation = () => {
     window.location.hash = value;
   };
 
-  // Get sub-tabs based on active main tab
+  // Get sub-tabs based on active main tab or selected tab
   const getSubTabs = () => {
-    if (activeTab === 'seo' || activeTab.startsWith('seo') || 
-        tabs.some(t => t.group === 'seo' && t.id === activeTab)) {
-      return tabs.filter(tab => ['seo', 'structure', 'backlinks'].includes(tab.id));
-    } 
-    else if (activeTab === 'content' || activeTab.startsWith('content') || 
-             tabs.some(t => t.group === 'content' && t.id === activeTab)) {
-      return tabs.filter(tab => ['wordcount', 'hierarchy', 'suggestions'].includes(tab.id));
-    } 
-    else if (activeTab === 'performance' || activeTab.startsWith('performance') || 
-             tabs.some(t => t.group === 'performance' && t.id === activeTab)) {
-      return tabs.filter(tab => ['performance', 'metrics'].includes(tab.id));
-    } 
-    else if (activeTab === 'analytics' || activeTab.startsWith('analytics') || 
-             tabs.some(t => t.group === 'analytics' && t.id === activeTab)) {
-      return tabs.filter(tab => ['analytics'].includes(tab.id));
-    }
+    // Determine the tab group based on active tab
+    let tabGroup = '';
     
-    // If none of the above, try to find the main tab by group
-    const tabItem = tabs.find(t => t.id === activeTab);
-    if (tabItem) {
-      const matchingTabs = tabs.filter(t => t.group === tabItem.group && !t.link);
-      if (matchingTabs.length > 0) {
-        return matchingTabs;
+    // First, check if the active tab belongs to a main tab
+    if (activeTab.startsWith('seo') || tabs.some(t => t.id === activeTab && t.group === 'seo')) {
+      tabGroup = 'seo';
+    } else if (activeTab.startsWith('content') || activeTab === 'hierarchy' || activeTab === 'wordcount' || activeTab === 'suggestions' || 
+               tabs.some(t => t.id === activeTab && t.group === 'content')) {
+      tabGroup = 'content';
+    } else if (activeTab.startsWith('performance') || activeTab === 'metrics' || 
+               tabs.some(t => t.id === activeTab && t.group === 'performance')) {
+      tabGroup = 'performance';
+    } else if (activeTab.startsWith('analytics') || 
+               tabs.some(t => t.id === activeTab && t.group === 'analytics')) {
+      tabGroup = 'analytics';
+    } else {
+      // If none of the above, try to find the group directly
+      const tabItem = tabs.find(t => t.id === activeTab);
+      if (tabItem) {
+        tabGroup = tabItem.group;
       }
     }
     
-    return [];
+    // Return tabs based on determined group
+    switch (tabGroup) {
+      case 'seo':
+        return tabs.filter(tab => ['seo', 'structure', 'backlinks'].includes(tab.id));
+      case 'content':
+        return tabs.filter(tab => ['wordcount', 'hierarchy', 'suggestions'].includes(tab.id));
+      case 'performance':
+        return tabs.filter(tab => ['performance', 'metrics'].includes(tab.id));
+      case 'analytics':
+        return tabs.filter(tab => ['analytics'].includes(tab.id));
+      default:
+        // Find tabs of the same group as the active tab
+        const currentTabItem = tabs.find(t => t.id === activeTab);
+        if (currentTabItem) {
+          return tabs.filter(t => t.group === currentTabItem.group && !t.link);
+        }
+        return [];
+    }
   };
   
   return {

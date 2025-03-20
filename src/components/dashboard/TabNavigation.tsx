@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { Tabs, TabsList, TabsContent } from "@/components/ui/tabs";
+import { Tabs } from "@/components/ui/tabs";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Card, CardContent } from "@/components/ui/card";
 import MainTabList from './tabs/MainTabList';
@@ -18,10 +18,11 @@ const TabNavigation = () => {
     handleTabChange 
   } = useTabNavigation();
   
-  // Force-activate the section on every render to ensure visibility
+  // Force-activate the section on component mount and when activeTab changes
   useEffect(() => {
     if (activeTab) {
-      setTimeout(() => activateSection(activeTab), 150);
+      console.log(`TabNavigation: Activating section for tab ${activeTab}`);
+      setTimeout(() => activateSection(activeTab), 200);
     }
   }, [activeTab]);
   
@@ -35,6 +36,7 @@ const TabNavigation = () => {
             value={activeTab} 
             onValueChange={handleTabChange} 
             className="w-full"
+            defaultValue="hierarchy"
           >
             {/* Main Tab Navigation - Now styled more like SEMrush/UberSuggest */}
             <MainTabList 
@@ -51,8 +53,11 @@ const TabNavigation = () => {
             />
             
             {/* Tab Contents */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4">
-              <TabContentsRenderer contentTabs={contentTabs} />
+            <div className="bg-white rounded-lg border border-gray-200 p-4 mt-4">
+              <TabContentsRenderer 
+                contentTabs={contentTabs} 
+                activeTab={activeTab}
+              />
             </div>
           </Tabs>
         </CardContent>

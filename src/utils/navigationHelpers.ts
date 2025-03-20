@@ -13,7 +13,7 @@ export const navigateToSection = (sectionId: string, tabId?: string): void => {
     if (tabTrigger) {
       console.log(`Clicking tab with data-value: ${tabId}`);
       tabTrigger.click();
-      setTimeout(() => activateSection(sectionId), 50);
+      setTimeout(() => activateSection(sectionId), 100);
     } else {
       console.log(`Tab with data-value "${tabId}" not found, directly activating section`);
       activateSection(sectionId);
@@ -34,7 +34,7 @@ const resetAllTabs = () => {
 export const activateSection = (sectionId: string): void => {
   console.log(`Activating section: ${sectionId}`);
   
-  // First reset all content sections to hidden
+  // First hide all content sections
   document.querySelectorAll('[data-tab-content]').forEach(section => {
     (section as HTMLElement).style.display = 'none';
   });
@@ -54,6 +54,17 @@ export const activateSection = (sectionId: string): void => {
     if (tabTrigger) {
       console.log(`Setting tab for "${sectionId}" to active state`);
       tabTrigger.setAttribute('data-state', 'active');
+    }
+    
+    // Set main tab active state
+    if (['hierarchy', 'wordcount', 'suggestions'].includes(sectionId)) {
+      document.querySelector('[data-main-tab="content"]')?.classList.add('active-main-tab');
+    } else if (['seo', 'structure', 'backlinks'].includes(sectionId)) {
+      document.querySelector('[data-main-tab="seo"]')?.classList.add('active-main-tab');
+    } else if (['performance', 'metrics'].includes(sectionId)) {
+      document.querySelector('[data-main-tab="performance"]')?.classList.add('active-main-tab');
+    } else if (sectionId === 'analytics') {
+      document.querySelector('[data-main-tab="analytics"]')?.classList.add('active-main-tab');
     }
     
     toast.success(`Section ${sectionId} affichée`, {
