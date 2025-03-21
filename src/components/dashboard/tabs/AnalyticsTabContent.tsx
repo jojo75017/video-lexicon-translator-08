@@ -3,10 +3,14 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
-  BarChart2, PieChart, TrendingUp, Users, 
+  BarChart2, PieChart as PieChartIcon, TrendingUp, Users, 
   Globe, Clock, ArrowUpRight, ExternalLink, Calendar 
 } from 'lucide-react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell, Legend } from 'recharts';
+import { 
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, 
+  ResponsiveContainer, BarChart, Bar, Cell, Legend, 
+  PieChart, Pie
+} from 'recharts';
 import { toast } from "sonner";
 import { analyzeAnalytics } from '@/utils/seo/analyticsAnalyzer';
 import AnalyticsOverview from '@/components/seo/AnalyticsOverview';
