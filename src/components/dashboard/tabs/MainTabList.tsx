@@ -18,10 +18,11 @@ const MainTabList: React.FC<MainTabListProps> = ({
   activeTab,
   onTabChange
 }) => {
-  // Helper function to determine if a tab is active, including its children
+  // Helper function to determine if a tab is active
   const isTabActive = (tabId: string): boolean => {
     if (activeTab === tabId) return true;
     
+    // Check for subtabs
     if (tabId === 'content' && ['hierarchy', 'wordcount', 'suggestions'].includes(activeTab)) {
       return true;
     }

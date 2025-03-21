@@ -7,7 +7,6 @@ import MainTabList from './tabs/MainTabList';
 import SubTabList from './tabs/SubTabList';
 import TabContentsRenderer from './tabs/TabContentsRenderer';
 import { useTabNavigation } from './tabs/useTabNavigation';
-import { activateSection } from '@/utils/navigationHelpers';
 
 const TabNavigation = () => {
   const { 
@@ -18,12 +17,9 @@ const TabNavigation = () => {
     handleTabChange 
   } = useTabNavigation();
   
-  // Force-activate the section on component mount and when activeTab changes
+  // Log active tab for debugging
   useEffect(() => {
-    if (activeTab) {
-      console.log(`TabNavigation: Activating section for tab ${activeTab}`);
-      setTimeout(() => activateSection(activeTab), 200);
-    }
+    console.log(`TabNavigation: Active tab is ${activeTab}`);
   }, [activeTab]);
   
   return (
@@ -38,7 +34,7 @@ const TabNavigation = () => {
             className="w-full"
             defaultValue="hierarchy"
           >
-            {/* Main Tab Navigation - Now styled more like SEMrush/UberSuggest */}
+            {/* Main Tab Navigation */}
             <MainTabList 
               mainTabs={mainTabs}
               activeTab={activeTab}
