@@ -17,6 +17,8 @@ import { activateSection } from '@/utils/navigationHelpers';
 import PageHeader from '@/components/dashboard/PageHeader';
 import LocalBusinessSection from '@/components/LocalBusinessSection';
 import KeywordSuggestions from '@/components/seo/analysis/KeywordSuggestions';
+import PageExplorer from '@/components/explorer/PageExplorer';
+import '@/styles/explorer-scrollbar.css';
 
 const ModeToggle = () => {
   return (
@@ -132,35 +134,43 @@ const IndexPage = () => {
           </div>
         </div>
         
-        <Card className="mb-8">
-          <div className="p-6">
-            <h2 className="text-2xl font-bold mb-6 flex items-center">
-              <Search className="mr-2 h-6 w-6 text-indigo-600" />
-              Analysez votre site
-            </h2>
-            <SeoAnalysisForm 
-              url={url}
-              setUrl={setUrl}
-              isLoading={isLoading}
-              showCorsWarning={showCorsWarning}
-              analyzeSite={analyzeSite}
-              error={error}
-              handleActivateProxy={handleActivateProxy}
-            />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="md:col-span-2">
+            <Card className="mb-6">
+              <div className="p-6">
+                <h2 className="text-2xl font-bold mb-6 flex items-center">
+                  <Search className="mr-2 h-6 w-6 text-indigo-600" />
+                  Analysez votre site
+                </h2>
+                <SeoAnalysisForm 
+                  url={url}
+                  setUrl={setUrl}
+                  isLoading={isLoading}
+                  showCorsWarning={showCorsWarning}
+                  analyzeSite={analyzeSite}
+                  error={error}
+                  handleActivateProxy={handleActivateProxy}
+                />
+              </div>
+            </Card>
+            
+            {seoAnalysis && seoAnalysis.keywordSuggestions && seoAnalysis.keywordSuggestions.length > 0 && (
+              <div className="mb-6">
+                <KeywordSuggestions 
+                  generatedKeywords={seoAnalysis.keywordSuggestions} 
+                  onGenerateClick={() => {
+                    toast.info("Génération de nouvelles suggestions...");
+                    analyzeSite();
+                  }}
+                />
+              </div>
+            )}
           </div>
-        </Card>
-        
-        {seoAnalysis && seoAnalysis.keywordSuggestions && seoAnalysis.keywordSuggestions.length > 0 && (
-          <div className="mb-8">
-            <KeywordSuggestions 
-              generatedKeywords={seoAnalysis.keywordSuggestions} 
-              onGenerateClick={() => {
-                toast.info("Génération de nouvelles suggestions...");
-                analyzeSite();
-              }}
-            />
+          
+          <div className="md:col-span-1">
+            <PageExplorer />
           </div>
-        )}
+        </div>
         
         {seoAnalysis && (
           <div className="mb-8 results-display" style={{ display: 'none' }}>
@@ -232,47 +242,49 @@ const IndexPage = () => {
           )}
         </div>
         
-        <div className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100">
-          <div className="text-center">
-            <div className="inline-block p-1.5 px-3 bg-[#b92b27]/10 text-[#b92b27] text-sm font-medium rounded-full mb-3">
-              Nouveau
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+            <div className="text-center">
+              <div className="inline-block p-1.5 px-3 bg-[#b92b27]/10 text-[#b92b27] text-sm font-medium rounded-full mb-3">
+                Nouveau
+              </div>
+              <h2 className="text-2xl font-bold mb-4">Assistant Quora</h2>
+              <p className="text-gray-600 mb-6 max-w-3xl mx-auto">
+                Créez du contenu optimisé pour Quora avec notre générateur IA. Produisez des réponses détaillées de plus de 500 mots pour maximiser votre visibilité et votre autorité.
+              </p>
+              <Link to="/QuoraPage">
+                <Button 
+                  className="bg-gradient-to-r from-[#b92b27] to-[#8B5CF6] hover:from-[#a72724] hover:to-[#7849e0] text-white"
+                  size="lg"
+                >
+                  <MessageSquareText className="mr-2 h-5 w-5" />
+                  Créer du Contenu Quora (500+ mots)
+                  <ChevronRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
             </div>
-            <h2 className="text-2xl font-bold mb-4">Assistant Quora</h2>
-            <p className="text-gray-600 mb-6 max-w-3xl mx-auto">
-              Créez du contenu optimisé pour Quora avec notre générateur IA. Produisez des réponses détaillées de plus de 500 mots pour maximiser votre visibilité et votre autorité.
-            </p>
-            <Link to="/QuoraPage">
-              <Button 
-                className="bg-gradient-to-r from-[#b92b27] to-[#8B5CF6] hover:from-[#a72724] hover:to-[#7849e0] text-white"
-                size="lg"
-              >
-                <MessageSquareText className="mr-2 h-5 w-5" />
-                Créer du Contenu Quora (500+ mots)
-                <ChevronRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
           </div>
-        </div>
-        
-        <div className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100">
-          <div className="text-center">
-            <div className="inline-block p-1.5 px-3 bg-blue-100 text-blue-700 text-sm font-medium rounded-full mb-3">
-              Professionnel
+          
+          <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
+            <div className="text-center">
+              <div className="inline-block p-1.5 px-3 bg-blue-100 text-blue-700 text-sm font-medium rounded-full mb-3">
+                Professionnel
+              </div>
+              <h2 className="text-2xl font-bold mb-4">Signature Email Professionnelle</h2>
+              <p className="text-gray-600 mb-6 max-w-3xl mx-auto">
+                Créez une signature email professionnelle personnalisée avec notre générateur interactif. Ajoutez votre logo, choisissez vos couleurs et téléchargez votre signature.
+              </p>
+              <Link to="/SignaturePage">
+                <Button 
+                  className="bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white"
+                  size="lg"
+                >
+                  <Signature className="mr-2 h-5 w-5" />
+                  Créer ma Signature Email
+                  <ChevronRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
             </div>
-            <h2 className="text-2xl font-bold mb-4">Signature Email Professionnelle</h2>
-            <p className="text-gray-600 mb-6 max-w-3xl mx-auto">
-              Créez une signature email professionnelle personnalisée avec notre générateur interactif. Ajoutez votre logo, choisissez vos couleurs et téléchargez votre signature.
-            </p>
-            <Link to="/SignaturePage">
-              <Button 
-                className="bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white"
-                size="lg"
-              >
-                <Signature className="mr-2 h-5 w-5" />
-                Créer ma Signature Email
-                <ChevronRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
           </div>
         </div>
       </main>

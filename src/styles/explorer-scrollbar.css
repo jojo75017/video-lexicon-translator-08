@@ -1,0 +1,23 @@
+
+.explorer-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(155, 155, 155, 0.5) transparent;
+}
+
+.explorer-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.explorer-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.explorer-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(155, 155, 155, 0.5);
+  border-radius: 20px;
+  border: transparent;
+}
+
+.explorer-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(155, 155, 155, 0.7);
+}

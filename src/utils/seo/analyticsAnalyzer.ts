@@ -1,4 +1,3 @@
-
 interface AnalyticsData {
   pageViews: number;
   uniqueVisitors: number;
@@ -91,10 +90,24 @@ export const analyzeAnalytics = (period: string = '30days'): AnalyticsData => {
   
   const multiplier = periodMultiplier[period as keyof typeof periodMultiplier] || 1;
   
-  // Génération de données plus réalistes
+  // Génération de données plus réalistes avec saisonnalité
   const baseVisitors = Math.floor((Math.random() * 50000) + 20000);
   const visitors = Math.floor(baseVisitors * multiplier);
-  const pageViews = Math.floor(visitors * (Math.random() * 2.5 + 2.2));
+  
+  // Appliquer des variations saisonnières et hebdomadaires
+  const now = new Date();
+  const month = now.getMonth();
+  const dayOfWeek = now.getDay();
+  
+  // Facteur saisonnier: plus de trafic pendant les périodes fortes (novembre-décembre, mai-juin)
+  const seasonalFactor = [0.9, 0.85, 0.9, 1.0, 1.1, 1.05, 0.8, 0.75, 0.95, 1.05, 1.2, 1.15][month];
+  
+  // Facteur journalier: moins de trafic les week-ends
+  const dailyFactor = dayOfWeek === 0 || dayOfWeek === 6 ? 0.8 : 1.1;
+  
+  // Appliquer les facteurs
+  const adjustedVisitors = Math.floor(visitors * seasonalFactor * dailyFactor);
+  const pageViews = Math.floor(adjustedVisitors * (Math.random() * 2.5 + 2.2));
   const bounceRate = 35 + Math.random() * 15; // Entre 35% et 50%
   
   // Nombre de jours pour la tendance basé sur la période
@@ -129,8 +142,11 @@ export const analyzeAnalytics = (period: string = '30days'): AnalyticsData => {
       // Variation aléatoire
       const randomFactor = 1 + (Math.random() * 2 - 1) * variation;
       
-      // Valeur finale = base * progression * weekend * saison * aléatoire
-      const value = Math.floor(baseValue / days * progress * weekendFactor * seasonalFactor * randomFactor);
+      // Appliquer des événements spéciaux occasionnels (pics de trafic)
+      const specialEventFactor = Math.random() > 0.95 ? 1.5 + Math.random() : 1;
+      
+      // Valeur finale = base * progression * weekend * saison * aléatoire * événement spécial
+      const value = Math.floor(baseValue / days * progress * weekendFactor * seasonalFactor * randomFactor * specialEventFactor);
       
       return {
         date: date.toISOString().split('T')[0], // Format YYYY-MM-DD
@@ -140,11 +156,11 @@ export const analyzeAnalytics = (period: string = '30days'): AnalyticsData => {
   };
   
   // Générer des tendances pour les visiteurs, pages vues, taux de rebond et conversions
-  const baseDailyVisitors = visitors / trendDays;
+  const baseDailyVisitors = adjustedVisitors / trendDays;
   const baseDailyPageviews = pageViews / trendDays;
-  const baseDailyConversions = visitors * 0.02 / trendDays; // Taux de conversion moyen de 2%
+  const baseDailyConversions = adjustedVisitors * 0.02 / trendDays; // Taux de conversion moyen de 2%
   
-  const visitorsTrend = generateTrends(trendDays, visitors);
+  const visitorsTrend = generateTrends(trendDays, adjustedVisitors);
   const pageviewsTrend = visitorsTrend.map(item => ({
     date: item.date,
     count: Math.floor(item.count * (2.2 + Math.random() * 0.8)) // Pages vues = Visiteurs * facteur moyen de pages par visite
@@ -521,7 +537,7 @@ export const analyzeAnalytics = (period: string = '30days'): AnalyticsData => {
   
   return {
     pageViews: pageViews,
-    uniqueVisitors: visitors,
+    uniqueVisitors: adjustedVisitors,
     bounceRate: bounceRate,
     avgSessionDuration: Math.floor(120 + Math.random() * 180), // Entre 2 et 5 minutes
     averageTimeOnPage: Math.floor(60 + Math.random() * 120), // Entre 1 et 3 minutes
