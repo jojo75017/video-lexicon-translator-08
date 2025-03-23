@@ -8,10 +8,11 @@ import { Badge } from "@/components/ui/badge";
 import { 
   Folder, ChevronRight, ChevronDown, Search, Plus, FileText, 
   ExternalLink, Type, Heading1, Heading2, Heading3, AlignLeft, 
-  Image as ImageIcon, Eye, Code, Globe
+  Image as ImageIcon, Eye, Code, Globe, Sparkles
 } from 'lucide-react';
 import { toast } from "sonner";
 import SiteStructureVisualizer from '../SiteStructureVisualizer';
+import "../../styles/explorer-scrollbar.css";
 
 // Interfaces pour les données
 interface PageContent {
@@ -418,21 +419,31 @@ const PageExplorer: React.FC = () => {
           <div className="ml-6 space-y-1 mt-1">
             {folder.pages.map(page => (
               <div key={page.id}>
-                <div 
-                  className="flex items-center p-2 hover:bg-gray-100 rounded-md cursor-pointer"
-                  onClick={() => handleOpenPage(page)}
-                >
-                  <FileText className="h-4 w-4 mr-2 text-gray-500" />
-                  <span className="flex-1 truncate">{page.title}</span>
+                <div className="flex items-center justify-between p-2 hover:bg-gray-100 rounded-md">
+                  <div 
+                    className="flex items-center flex-1 cursor-pointer"
+                    onClick={() => handleOpenPage(page)}
+                  >
+                    <FileText className="h-4 w-4 mr-2 text-gray-500" />
+                    <span className="truncate">{page.title}</span>
+                  </div>
                   <div className="flex items-center gap-2">
                     {getStatusBadge(page.status)}
-                    <ExternalLink className="h-4 w-4 text-gray-400" />
+                    <Button 
+                      variant="purple"
+                      size="sm"
+                      className="h-7 px-2 flex items-center gap-1"
+                      onClick={() => handleOpenPage(page)}
+                    >
+                      <Sparkles className="h-3.5 w-3.5" />
+                      <span className="text-xs">Voir SERP</span>
+                    </Button>
                   </div>
                 </div>
                 
                 {/* Contenu SERP de la page */}
                 {showSerpPreview === page.id && page.content && (
-                  <div className="ml-4 mt-1 mb-3 p-3 bg-gray-50 rounded-md border border-gray-200">
+                  <div className="ml-4 mt-1 mb-3 p-3 bg-gray-50 rounded-md border border-gray-200 shadow-sm">
                     <div className="flex justify-between items-center mb-2">
                       <div className="text-sm font-medium text-gray-700 flex items-center">
                         <Globe className="h-4 w-4 mr-1 text-blue-500" />
@@ -440,18 +451,18 @@ const PageExplorer: React.FC = () => {
                       </div>
                       <div className="flex gap-1">
                         <Button 
-                          variant="outline" 
+                          variant={previewMode === 'content' ? "pastel" : "outline"}
                           size="sm"
-                          className={`text-xs py-1 px-2 h-7 ${previewMode === 'content' ? 'bg-blue-50 border-blue-200 text-blue-700' : ''}`}
+                          className="text-xs py-1 px-2 h-7"
                           onClick={() => setPreviewMode('content')}
                         >
                           <Eye className="h-3 w-3 mr-1" />
                           Contenu
                         </Button>
                         <Button 
-                          variant="outline" 
+                          variant={previewMode === 'html' ? "pastel" : "outline"}
                           size="sm"
-                          className={`text-xs py-1 px-2 h-7 ${previewMode === 'html' ? 'bg-blue-50 border-blue-200 text-blue-700' : ''}`}
+                          className="text-xs py-1 px-2 h-7"
                           onClick={() => setPreviewMode('html')}
                         >
                           <Code className="h-3 w-3 mr-1" />
@@ -461,13 +472,13 @@ const PageExplorer: React.FC = () => {
                     </div>
                     
                     {previewMode === 'content' ? (
-                      <div className="space-y-2">
+                      <div className="space-y-2 border border-gray-100 rounded-md p-2 bg-white">
                         {page.content.map((item, index) => (
                           <div key={index} className="flex items-start gap-2 p-2 hover:bg-gray-100 rounded">
                             {getContentTypeIcon(item.type)}
                             <div className="flex-1">
                               <div className="flex items-center">
-                                <span className="text-xs font-medium text-gray-500 mr-2">{item.type.toUpperCase()}</span>
+                                <Badge variant="outline" className="mr-2 text-[10px]">{item.type.toUpperCase()}</Badge>
                                 <span className="text-xs text-gray-400">Position: {item.position}</span>
                               </div>
                               <div className={`${
@@ -478,6 +489,16 @@ const PageExplorer: React.FC = () => {
                                 'text-xs text-gray-700'
                               }`}>
                                 {item.text}
+                                {item.type === 'image' && (
+                                  <div className="mt-1 border border-gray-200 rounded p-1 bg-gray-50">
+                                    <img 
+                                      src={item.text} 
+                                      alt="Aperçu" 
+                                      className="max-h-20 object-cover rounded"
+                                      onError={(e) => (e.target as HTMLImageElement).src = '/placeholder.svg'}
+                                    />
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </div>
@@ -488,7 +509,7 @@ const PageExplorer: React.FC = () => {
                         <div className="bg-gray-800 text-gray-200 p-2 rounded-t-md text-xs font-mono">
                           HTML - {page.title}
                         </div>
-                        <pre className="bg-gray-900 text-gray-200 p-3 rounded-b-md text-xs font-mono overflow-x-auto whitespace-pre-wrap">
+                        <pre className="bg-gray-900 text-gray-200 p-3 rounded-b-md text-xs font-mono overflow-x-auto whitespace-pre-wrap explorer-scrollbar max-h-48">
                           {generatePageHtml(page)}
                         </pre>
                       </div>
@@ -541,8 +562,8 @@ const PageExplorer: React.FC = () => {
   }).filter(folder => folder.pages.length > 0 || (folder.subfolders && folder.subfolders.length > 0));
 
   return (
-    <Card className="border shadow-sm bg-white">
-      <div className="p-4 border-b">
+    <Card className="border shadow-lg bg-white">
+      <div className="p-4 border-b bg-gradient-to-r from-gray-50 to-blue-50">
         <h2 className="text-xl font-bold">Explorateur de pages</h2>
         <p className="text-gray-500 text-sm">Gérez toutes vos pages web et visualisez leur contenu</p>
       </div>
@@ -561,7 +582,7 @@ const PageExplorer: React.FC = () => {
           </div>
           <Button 
             onClick={handleAddPage}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-purple-600 hover:bg-purple-700 text-white"
           >
             <Plus className="h-4 w-4 mr-1" />
             Ajouter
@@ -596,7 +617,7 @@ const PageExplorer: React.FC = () => {
         </TabsContent>
       </Tabs>
       
-      <div className="p-3 bg-gray-50 border-t flex justify-between items-center text-xs text-gray-500">
+      <div className="p-3 bg-gradient-to-r from-purple-50 to-indigo-50 border-t flex justify-between items-center text-xs text-gray-500">
         <div>Total: {folders.reduce((acc, folder) => acc + folder.pages.length + (folder.subfolders?.reduce((acc2, sf) => acc2 + sf.pages.length, 0) || 0), 0)} pages</div>
         <div>Dernière mise à jour: {formatDate(new Date())}</div>
       </div>

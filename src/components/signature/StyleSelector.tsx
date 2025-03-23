@@ -50,6 +50,13 @@ const templates: StyleTemplate[] = [
     iconColor: "#52525b",
     separatorColor: "#e4e4e7",
     font: "font-sans"
+  },
+  {
+    name: "Coloré",
+    textColor: "#f97316",
+    iconColor: "#f59e0b",
+    separatorColor: "#fef3c7",
+    font: "font-sans"
   }
 ];
 
@@ -70,8 +77,8 @@ const StyleSelector = ({
           {templates.map((template) => (
             <Button
               key={template.name}
-              variant="outline"
-              className="h-auto py-2"
+              variant={template.name === "Coloré" ? "purple" : "outline"}
+              className={`h-auto py-2 ${template.name === "Coloré" ? "text-white shadow-md" : ""}`}
               onClick={() => onSelectTemplate(template)}
             >
               {template.name}
