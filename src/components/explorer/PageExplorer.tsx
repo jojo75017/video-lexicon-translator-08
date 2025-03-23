@@ -5,9 +5,20 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Folder, ChevronRight, ChevronDown, Search, Plus, FileText, ExternalLink, Type, Heading1, Heading2, Heading3, AlignLeft, Image as ImageIcon } from 'lucide-react';
+import { 
+  Folder, ChevronRight, ChevronDown, Search, Plus, FileText, 
+  ExternalLink, Type, Heading1, Heading2, Heading3, AlignLeft, 
+  Image as ImageIcon, Eye, Code, Globe
+} from 'lucide-react';
 import { toast } from "sonner";
 import SiteStructureVisualizer from '../SiteStructureVisualizer';
+
+// Interfaces pour les données
+interface PageContent {
+  type: 'h1' | 'h2' | 'h3' | 'paragraph' | 'image';
+  text: string;
+  position: number;
+}
 
 interface Page {
   id: string;
@@ -17,12 +28,6 @@ interface Page {
   status: 'published' | 'draft';
   lastModified: Date;
   content?: PageContent[];
-}
-
-interface PageContent {
-  type: 'h1' | 'h2' | 'h3' | 'paragraph' | 'image';
-  text: string;
-  position: number;
 }
 
 interface PageFolder {
@@ -39,10 +44,12 @@ interface SiteNode {
   children: SiteNode[];
 }
 
+// Composant principal
 const PageExplorer: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('liste');
   const [showSerpPreview, setShowSerpPreview] = useState<string | null>(null);
+  const [previewMode, setPreviewMode] = useState<'content' | 'html'>('content');
   const [folders, setFolders] = useState<PageFolder[]>([
     {
       id: 'principal',
@@ -303,6 +310,7 @@ const PageExplorer: React.FC = () => {
     ]
   };
 
+  // Ouvrir/fermer un dossier
   const toggleFolder = (folderId: string) => {
     setFolders(prevFolders => 
       prevFolders.map(folder => {
@@ -319,6 +327,7 @@ const PageExplorer: React.FC = () => {
     );
   };
 
+  // Ouvrir une page et afficher son contenu SERP
   const handleOpenPage = (page: Page) => {
     toast.info(`Ouverture de la page : ${page.title}`, {
       description: `URL: ${page.url}`
@@ -328,18 +337,21 @@ const PageExplorer: React.FC = () => {
     setShowSerpPreview(showSerpPreview === page.id ? null : page.id);
   };
 
+  // Ajouter une nouvelle page
   const handleAddPage = () => {
     toast.info("Créer une nouvelle page", {
       description: "Fonctionnalité à implémenter"
     });
   };
 
+  // Générer le badge de statut
   const getStatusBadge = (status: string) => {
     return status === 'published' 
       ? <Badge className="bg-green-100 text-green-800 hover:bg-green-200">Publié</Badge>
       : <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-200">Brouillon</Badge>;
   };
 
+  // Formater la date
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('fr-FR', {
       day: '2-digit',
@@ -348,6 +360,7 @@ const PageExplorer: React.FC = () => {
     }).format(date);
   };
 
+  // Obtenir l'icône pour le type de contenu
   const getContentTypeIcon = (type: string) => {
     switch (type) {
       case 'h1': return <Heading1 className="h-4 w-4 text-red-600" />;
@@ -359,6 +372,35 @@ const PageExplorer: React.FC = () => {
     }
   };
 
+  // Générer un aperçu HTML de la page
+  const generatePageHtml = (page: Page): string => {
+    if (!page.content) return '<p>Pas de contenu disponible</p>';
+    
+    let html = '';
+    page.content.forEach(item => {
+      switch (item.type) {
+        case 'h1':
+          html += `<h1 style="font-size: 24px; font-weight: bold; margin-bottom: 16px; color: #111;">${item.text}</h1>`;
+          break;
+        case 'h2':
+          html += `<h2 style="font-size: 20px; font-weight: bold; margin-bottom: 12px; color: #333;">${item.text}</h2>`;
+          break;
+        case 'h3':
+          html += `<h3 style="font-size: 18px; font-weight: bold; margin-bottom: 10px; color: #444;">${item.text}</h3>`;
+          break;
+        case 'paragraph':
+          html += `<p style="margin-bottom: 16px; line-height: 1.5; color: #666;">${item.text}</p>`;
+          break;
+        case 'image':
+          html += `<div style="margin-bottom: 16px;"><img src="${item.text}" alt="Image" style="max-width: 100%; border-radius: 4px;" /></div>`;
+          break;
+      }
+    });
+    
+    return html;
+  };
+
+  // Rendu d'un dossier avec ses pages
   const renderFolder = (folder: PageFolder) => {
     return (
       <div key={folder.id} className="mb-2">
@@ -391,28 +433,74 @@ const PageExplorer: React.FC = () => {
                 {/* Contenu SERP de la page */}
                 {showSerpPreview === page.id && page.content && (
                   <div className="ml-4 mt-1 mb-3 p-3 bg-gray-50 rounded-md border border-gray-200">
-                    <div className="text-sm font-medium mb-2 text-gray-700">Contenu de la page</div>
-                    <div className="space-y-2">
-                      {page.content.map((item, index) => (
-                        <div key={index} className="flex items-start gap-2">
-                          {getContentTypeIcon(item.type)}
-                          <div className="flex-1">
-                            <div className="flex items-center">
-                              <span className="text-xs font-medium text-gray-500 mr-2">{item.type.toUpperCase()}</span>
-                              <span className="text-xs text-gray-400">Position: {item.position}</span>
-                            </div>
-                            <div className={`${
-                              item.type === 'h1' ? 'text-base font-bold' : 
-                              item.type === 'h2' ? 'text-sm font-semibold' : 
-                              item.type === 'h3' ? 'text-sm font-medium' :
-                              item.type === 'image' ? 'text-xs italic text-blue-600' : 
-                              'text-xs'
-                            }`}>
-                              {item.text}
+                    <div className="flex justify-between items-center mb-2">
+                      <div className="text-sm font-medium text-gray-700 flex items-center">
+                        <Globe className="h-4 w-4 mr-1 text-blue-500" />
+                        Aperçu SERP - {page.url}
+                      </div>
+                      <div className="flex gap-1">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className={`text-xs py-1 px-2 h-7 ${previewMode === 'content' ? 'bg-blue-50 border-blue-200 text-blue-700' : ''}`}
+                          onClick={() => setPreviewMode('content')}
+                        >
+                          <Eye className="h-3 w-3 mr-1" />
+                          Contenu
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className={`text-xs py-1 px-2 h-7 ${previewMode === 'html' ? 'bg-blue-50 border-blue-200 text-blue-700' : ''}`}
+                          onClick={() => setPreviewMode('html')}
+                        >
+                          <Code className="h-3 w-3 mr-1" />
+                          HTML
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    {previewMode === 'content' ? (
+                      <div className="space-y-2">
+                        {page.content.map((item, index) => (
+                          <div key={index} className="flex items-start gap-2 p-2 hover:bg-gray-100 rounded">
+                            {getContentTypeIcon(item.type)}
+                            <div className="flex-1">
+                              <div className="flex items-center">
+                                <span className="text-xs font-medium text-gray-500 mr-2">{item.type.toUpperCase()}</span>
+                                <span className="text-xs text-gray-400">Position: {item.position}</span>
+                              </div>
+                              <div className={`${
+                                item.type === 'h1' ? 'text-base font-bold text-red-700' : 
+                                item.type === 'h2' ? 'text-sm font-semibold text-orange-700' : 
+                                item.type === 'h3' ? 'text-sm font-medium text-yellow-700' :
+                                item.type === 'image' ? 'text-xs italic text-blue-600' : 
+                                'text-xs text-gray-700'
+                              }`}>
+                                {item.text}
+                              </div>
                             </div>
                           </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="mt-3">
+                        <div className="bg-gray-800 text-gray-200 p-2 rounded-t-md text-xs font-mono">
+                          HTML - {page.title}
                         </div>
-                      ))}
+                        <pre className="bg-gray-900 text-gray-200 p-3 rounded-b-md text-xs font-mono overflow-x-auto whitespace-pre-wrap">
+                          {generatePageHtml(page)}
+                        </pre>
+                      </div>
+                    )}
+                    
+                    <div className="mt-3 pt-2 border-t border-gray-200">
+                      <div className="flex justify-between items-center text-xs text-gray-500">
+                        <span>Dernière modification: {formatDate(page.lastModified)}</span>
+                        <Badge variant="outline" className="text-xs">
+                          {page.type === 'page' ? 'Page' : page.type === 'post' ? 'Article' : 'Landing'}
+                        </Badge>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -426,6 +514,7 @@ const PageExplorer: React.FC = () => {
     );
   };
 
+  // Filtrer les dossiers et les pages selon la recherche
   const filteredFolders = folders.map(folder => {
     // Filtrer les pages dans le dossier courant
     const filteredPages = folder.pages.filter(page => 
@@ -455,7 +544,7 @@ const PageExplorer: React.FC = () => {
     <Card className="border shadow-sm bg-white">
       <div className="p-4 border-b">
         <h2 className="text-xl font-bold">Explorateur de pages</h2>
-        <p className="text-gray-500 text-sm">Gérez toutes vos pages web</p>
+        <p className="text-gray-500 text-sm">Gérez toutes vos pages web et visualisez leur contenu</p>
       </div>
       
       <div className="p-4 border-b">
