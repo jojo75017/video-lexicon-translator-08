@@ -60,6 +60,15 @@ const templates: StyleTemplate[] = [
   }
 ];
 
+// Définition des couleurs de fond pour chaque template
+const templateColors: Record<string, string> = {
+  "Moderne": "bg-blue-500 hover:bg-blue-600 text-white",
+  "Classique": "bg-slate-700 hover:bg-slate-800 text-white",
+  "Créatif": "bg-purple-500 hover:bg-purple-600 text-white",
+  "Minimaliste": "bg-zinc-800 hover:bg-zinc-900 text-white",
+  "Coloré": "bg-orange-500 hover:bg-orange-600 text-white",
+};
+
 const StyleSelector = ({
   textColor,
   setTextColor,
@@ -72,23 +81,23 @@ const StyleSelector = ({
   return (
     <div className="space-y-4">
       <div>
-        <Label>Templates</Label>
+        <Label className="text-base font-semibold">Templates</Label>
         <div className="grid grid-cols-2 gap-2 mt-2">
           {templates.map((template) => (
             <Button
               key={template.name}
-              variant={template.name === "Coloré" ? "purple" : "outline"}
-              className={`h-auto py-2 ${template.name === "Coloré" ? "text-white shadow-md" : ""}`}
+              variant="default"
+              className={`h-auto py-3 shadow-md transition-all duration-200 ${templateColors[template.name]}`}
               onClick={() => onSelectTemplate(template)}
             >
-              {template.name}
+              <span className="font-medium">{template.name}</span>
             </Button>
           ))}
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label>Couleurs personnalisées</Label>
+        <Label className="text-base font-semibold">Couleurs personnalisées</Label>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label htmlFor="textColor" className="text-xs">Texte</Label>
