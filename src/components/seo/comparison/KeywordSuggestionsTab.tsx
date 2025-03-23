@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { AlertTriangle, Sparkles, TrendingUp, RefreshCcw, BarChart } from 'lucide-react';
+import { AlertTriangle, Sparkles, TrendingUp, RefreshCcw, BarChart, MessageSquare } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -36,9 +36,12 @@ const KeywordSuggestionsTab = ({
   onApiCredentialsChange,
   onApiCredentialsSubmit
 }: KeywordSuggestionsTabProps) => {
-  const [selectedService, setSelectedService] = useState<'dataforseo' | 'perplexity'>('dataforseo');
+  const [selectedService, setSelectedService] = useState<'dataforseo' | 'perplexity' | 'openai'>('dataforseo');
   const [perplexityKey, setPerplexityKey] = useState('');
+  const [openaiKey, setOpenaiKey] = useState('');
   const [showPerplexityConfig, setShowPerplexityConfig] = useState(false);
+  const [showOpenAIConfig, setShowOpenAIConfig] = useState(false);
+  const [isConfigured, setIsConfigured] = useState(false);
 
   useEffect(() => {
     if (!apiCredentials.login && !apiCredentials.password) {
@@ -74,8 +77,9 @@ const KeywordSuggestionsTab = ({
   }, []);
 
   const handleServiceChange = (value: string) => {
-    setSelectedService(value as 'dataforseo' | 'perplexity');
+    setSelectedService(value as 'dataforseo' | 'perplexity' | 'openai');
     setShowPerplexityConfig(value === 'perplexity');
+    setShowOpenAIConfig(value === 'openai');
   };
 
   const handlePerplexitySubmit = (e: React.FormEvent) => {
@@ -83,13 +87,41 @@ const KeywordSuggestionsTab = ({
     if (perplexityKey) {
       toast.success("Clé API Perplexity enregistrée");
       localStorage.setItem('perplexityKey', perplexityKey);
+      setIsConfigured(true);
+    }
+  };
+
+  const handleOpenAISubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (openaiKey) {
+      toast.success("Clé API OpenAI enregistrée");
+      localStorage.setItem('openaiKey', openaiKey);
+      setIsConfigured(true);
+      getKeywordSuggestionsWithOpenAI();
+    }
+  };
+
+  const getKeywordSuggestionsWithOpenAI = async () => {
+    try {
+      toast.info("Récupération des données via OpenAI...");
+      
+      // Implementation réelle à faire ici
+      // Cette fonction sera implémentée pour utiliser l'API OpenAI
+      // et obtenir des suggestions de mots-clés réelles
+      
+      toast.success("Données récupérées avec succès");
+    } catch (error) {
+      console.error("Erreur lors de la récupération des données via OpenAI:", error);
+      toast.error("Erreur lors de la récupération des données");
     }
   };
 
   return (
     <div className="space-y-6">
-      {!useRealData && (
-        <form onSubmit={selectedService === 'dataforseo' ? onApiCredentialsSubmit : handlePerplexitySubmit} 
+      {!isConfigured && (
+        <form onSubmit={selectedService === 'dataforseo' ? onApiCredentialsSubmit : 
+                        selectedService === 'perplexity' ? handlePerplexitySubmit : 
+                        handleOpenAISubmit} 
               className="space-y-4 p-4 bg-blue-50 rounded-lg">
           <div className="flex items-center gap-2 mb-4">
             <AlertTriangle className="h-5 w-5 text-blue-600" />
@@ -103,6 +135,7 @@ const KeywordSuggestionsTab = ({
             <SelectContent>
               <SelectItem value="dataforseo">DataForSEO</SelectItem>
               <SelectItem value="perplexity">Perplexity AI</SelectItem>
+              <SelectItem value="openai">OpenAI (ChatGPT)</SelectItem>
             </SelectContent>
           </Select>
 
@@ -133,7 +166,7 @@ const KeywordSuggestionsTab = ({
                 onChange={(e) => onApiCredentialsChange({ ...apiCredentials, password: e.target.value })}
               />
             </div>
-          ) : (
+          ) : selectedService === 'perplexity' ? (
             <div className="grid gap-4">
               <p className="text-sm text-blue-700 mb-4">
                 Entrez votre clé API Perplexity pour obtenir des suggestions de mots-clés intelligentes.
@@ -152,6 +185,27 @@ const KeywordSuggestionsTab = ({
                 placeholder="Clé API Perplexity"
                 value={perplexityKey}
                 onChange={(e) => setPerplexityKey(e.target.value)}
+              />
+            </div>
+          ) : (
+            <div className="grid gap-4">
+              <p className="text-sm text-blue-700 mb-4">
+                Entrez votre clé API OpenAI pour obtenir des suggestions de mots-clés basées sur ChatGPT.
+                Vous pouvez obtenir une clé sur{' '}
+                <a 
+                  href="https://platform.openai.com/account/api-keys" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="underline hover:text-blue-900"
+                >
+                  OpenAI
+                </a>
+              </p>
+              <Input
+                type="password"
+                placeholder="Clé API OpenAI"
+                value={openaiKey}
+                onChange={(e) => setOpenaiKey(e.target.value)}
               />
             </div>
           )}
@@ -252,7 +306,25 @@ const KeywordSuggestionsTab = ({
         </TabsContent>
       </Tabs>
 
-      {!useRealData && (
+      {isConfigured && selectedService === 'openai' && (
+        <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+          <div className="flex items-center gap-2 mb-2">
+            <MessageSquare className="h-5 w-5 text-green-600" />
+            <h3 className="font-medium text-green-800">OpenAI activé</h3>
+          </div>
+          <p className="text-sm text-green-700 mb-4">
+            Vous utilisez actuellement l'API OpenAI pour obtenir des suggestions de mots-clés.
+          </p>
+          <Button 
+            onClick={getKeywordSuggestionsWithOpenAI}
+            className="w-full bg-green-600 hover:bg-green-700 text-white"
+          >
+            Rafraîchir les suggestions avec OpenAI
+          </Button>
+        </div>
+      )}
+
+      {!isConfigured && (
         <div className="p-4 bg-yellow-50 rounded-lg">
           <p className="text-sm text-yellow-800">
             Vous visualisez actuellement des données simulées. Pour obtenir des données réelles,

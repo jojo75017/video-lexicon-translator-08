@@ -7,6 +7,7 @@ import { SeoAnalysis } from '@/types/seo';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { createDataForSEOService } from '@/services/dataForSeoService';
+import { OpenAIService } from '@/utils/seo/openaiService';
 import ComparisonChart from './comparison/ComparisonChart';
 import KeywordSuggestionsTab from './comparison/KeywordSuggestionsTab';
 import ComparisonHeader from './comparison/ComparisonHeader';
@@ -40,13 +41,33 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
     login: '',
     password: ''
   });
+  const [useOpenAI, setUseOpenAI] = useState(false);
 
   const fetchKeywordData = async (keyword: string): Promise<KeywordSuggestion> => {
     if (useRealData && apiCredentials.login && apiCredentials.password) {
       const service = createDataForSEOService(apiCredentials.login, apiCredentials.password);
       return service.getKeywordData(keyword);
     }
+    
+    // Utiliser OpenAI si activé
+    if (useOpenAI) {
+      const openaiKey = localStorage.getItem('openaiKey');
+      if (openaiKey) {
+        try {
+          const openaiService = new OpenAIService(openaiKey);
+          const suggestions = await openaiService.getKeywordSuggestions(keyword);
+          // Retourner la première suggestion (pour cette fonction spécifique)
+          if (suggestions.length > 0) {
+            return suggestions[0];
+          }
+        } catch (error) {
+          console.error("Erreur OpenAI:", error);
+          toast.error("Erreur lors de la récupération des données OpenAI");
+        }
+      }
+    }
 
+    // Fallback vers des données simulées
     await new Promise(resolve => setTimeout(resolve, 500));
     return {
       keyword,
@@ -63,6 +84,30 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
       const baseKeywords = site1.analysis.keywords || [];
       const keywords = baseKeywords.slice(0, 5);
       
+      // Vérifier si on utilise OpenAI
+      const openaiKey = localStorage.getItem('openaiKey');
+      if (openaiKey && keywords.length > 0) {
+        setUseOpenAI(true);
+        try {
+          const openaiService = new OpenAIService(openaiKey);
+          const mainKeyword = typeof keywords[0] === 'string' 
+            ? keywords[0] 
+            : (keywords[0] && typeof keywords[0] === 'object' && 'keyword' in keywords[0]) 
+              ? String((keywords[0] as { keyword: string }).keyword)
+              : String(keywords[0]);
+              
+          const openaiSuggestions = await openaiService.getKeywordSuggestions(mainKeyword);
+          setKeywordSuggestions(openaiSuggestions);
+          toast.success("Suggestions générées avec OpenAI");
+          setIsLoadingKeywords(false);
+          return;
+        } catch (error) {
+          console.error("Erreur OpenAI:", error);
+          toast.error("Erreur OpenAI, utilisation des données alternatives");
+        }
+      }
+      
+      // Fallback vers l'ancienne méthode
       const suggestions = await Promise.all(
         keywords.map(kw => {
           const keyword = typeof kw === 'string' 
@@ -168,7 +213,7 @@ const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
           <KeywordSuggestionsTab
             keywordSuggestions={keywordSuggestions}
             isLoadingKeywords={isLoadingKeywords}
-            useRealData={useRealData}
+            useRealData={useRealData || useOpenAI}
             apiCredentials={apiCredentials}
             onApiCredentialsChange={setApiCredentials}
             onApiCredentialsSubmit={handleApiCredentialsSubmit}
