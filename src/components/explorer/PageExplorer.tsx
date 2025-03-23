@@ -5,7 +5,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Folder, ChevronRight, ChevronDown, Search, Plus, FileText, ExternalLink } from 'lucide-react';
+import { Folder, ChevronRight, ChevronDown, Search, Plus, FileText, ExternalLink, Type, Heading1, Heading2, Heading3, AlignLeft, Image as ImageIcon } from 'lucide-react';
 import { toast } from "sonner";
 import SiteStructureVisualizer from '../SiteStructureVisualizer';
 
@@ -16,6 +16,13 @@ interface Page {
   type: 'page' | 'post' | 'landing';
   status: 'published' | 'draft';
   lastModified: Date;
+  content?: PageContent[];
+}
+
+interface PageContent {
+  type: 'h1' | 'h2' | 'h3' | 'paragraph' | 'image';
+  text: string;
+  position: number;
 }
 
 interface PageFolder {
@@ -35,6 +42,7 @@ interface SiteNode {
 const PageExplorer: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('liste');
+  const [showSerpPreview, setShowSerpPreview] = useState<string | null>(null);
   const [folders, setFolders] = useState<PageFolder[]>([
     {
       id: 'principal',
@@ -47,7 +55,16 @@ const PageExplorer: React.FC = () => {
           url: '/', 
           type: 'page', 
           status: 'published', 
-          lastModified: new Date('2023-10-15') 
+          lastModified: new Date('2023-10-15'),
+          content: [
+            { type: 'h1', text: 'Bienvenue sur notre site', position: 1 },
+            { type: 'paragraph', text: 'Notre entreprise vous propose des solutions innovantes.', position: 2 },
+            { type: 'h2', text: 'Nos services', position: 3 },
+            { type: 'paragraph', text: 'Découvrez notre gamme complète de services adaptés à vos besoins.', position: 4 },
+            { type: 'image', text: '/images/services.jpg', position: 5 },
+            { type: 'h3', text: 'Service Premium', position: 6 },
+            { type: 'paragraph', text: 'Notre offre haut de gamme pour les professionnels exigeants.', position: 7 }
+          ]
         },
         { 
           id: 'about', 
@@ -55,7 +72,15 @@ const PageExplorer: React.FC = () => {
           url: '/a-propos', 
           type: 'page', 
           status: 'published', 
-          lastModified: new Date('2023-09-20') 
+          lastModified: new Date('2023-09-20'),
+          content: [
+            { type: 'h1', text: 'À propos de notre entreprise', position: 1 },
+            { type: 'paragraph', text: 'Fondée en 2010, notre entreprise a connu une croissance constante.', position: 2 },
+            { type: 'h2', text: 'Notre mission', position: 3 },
+            { type: 'paragraph', text: 'Nous visons l\'excellence dans tous nos projets.', position: 4 },
+            { type: 'h2', text: 'Notre équipe', position: 5 },
+            { type: 'paragraph', text: 'Composée d\'experts passionnés par leur métier.', position: 6 }
+          ]
         },
         { 
           id: 'contact', 
@@ -63,7 +88,13 @@ const PageExplorer: React.FC = () => {
           url: '/contact', 
           type: 'page', 
           status: 'published', 
-          lastModified: new Date('2023-11-05') 
+          lastModified: new Date('2023-11-05'),
+          content: [
+            { type: 'h1', text: 'Contactez-nous', position: 1 },
+            { type: 'paragraph', text: 'Nous sommes à votre écoute pour toute demande.', position: 2 },
+            { type: 'h2', text: 'Formulaire de contact', position: 3 },
+            { type: 'paragraph', text: 'Remplissez le formulaire ci-dessous pour nous envoyer un message.', position: 4 }
+          ]
         }
       ],
       subfolders: [
@@ -78,7 +109,17 @@ const PageExplorer: React.FC = () => {
               url: '/services/seo', 
               type: 'page', 
               status: 'published', 
-              lastModified: new Date('2023-10-25') 
+              lastModified: new Date('2023-10-25'),
+              content: [
+                { type: 'h1', text: 'Services SEO', position: 1 },
+                { type: 'paragraph', text: 'Optimisez votre présence en ligne avec nos solutions SEO.', position: 2 },
+                { type: 'h2', text: 'Audit SEO', position: 3 },
+                { type: 'paragraph', text: 'Analyse complète de votre site web et de son positionnement.', position: 4 },
+                { type: 'h2', text: 'Optimisation technique', position: 5 },
+                { type: 'paragraph', text: 'Amélioration des aspects techniques de votre site pour les moteurs de recherche.', position: 6 },
+                { type: 'h3', text: 'Structure du site', position: 7 },
+                { type: 'paragraph', text: 'Organisation optimale de votre contenu pour le référencement.', position: 8 }
+              ]
             },
             { 
               id: 'sem', 
@@ -86,7 +127,13 @@ const PageExplorer: React.FC = () => {
               url: '/services/sem', 
               type: 'page', 
               status: 'draft', 
-              lastModified: new Date('2023-11-02') 
+              lastModified: new Date('2023-11-02'),
+              content: [
+                { type: 'h1', text: 'Marketing sur les moteurs de recherche', position: 1 },
+                { type: 'paragraph', text: 'Campagnes publicitaires ciblées sur les moteurs de recherche.', position: 2 },
+                { type: 'h2', text: 'Google Ads', position: 3 },
+                { type: 'paragraph', text: 'Gestion professionnelle de vos campagnes Google Ads.', position: 4 }
+              ]
             }
           ]
         }
@@ -103,7 +150,15 @@ const PageExplorer: React.FC = () => {
           url: '/blog/guide-seo-complet', 
           type: 'post', 
           status: 'published', 
-          lastModified: new Date('2023-11-10') 
+          lastModified: new Date('2023-11-10'),
+          content: [
+            { type: 'h1', text: 'Guide SEO complet pour débutants', position: 1 },
+            { type: 'paragraph', text: 'Tout ce que vous devez savoir pour débuter en SEO.', position: 2 },
+            { type: 'h2', text: 'Comprendre les bases du SEO', position: 3 },
+            { type: 'paragraph', text: 'Les fondamentaux du référencement naturel expliqués simplement.', position: 4 },
+            { type: 'h3', text: 'L\'importance des mots-clés', position: 5 },
+            { type: 'paragraph', text: 'Comment rechercher et utiliser les bons mots-clés.', position: 6 }
+          ]
         },
         { 
           id: 'analytics', 
@@ -111,7 +166,13 @@ const PageExplorer: React.FC = () => {
           url: '/blog/comprendre-google-analytics', 
           type: 'post', 
           status: 'published', 
-          lastModified: new Date('2023-10-28') 
+          lastModified: new Date('2023-10-28'),
+          content: [
+            { type: 'h1', text: 'Maîtriser Google Analytics', position: 1 },
+            { type: 'paragraph', text: 'Guide pour tirer le meilleur parti de cet outil d\'analyse.', position: 2 },
+            { type: 'h2', text: 'Installation et configuration', position: 3 },
+            { type: 'paragraph', text: 'Comment mettre en place Google Analytics sur votre site.', position: 4 }
+          ]
         },
         { 
           id: 'backlinks', 
@@ -119,7 +180,13 @@ const PageExplorer: React.FC = () => {
           url: '/blog/strategie-backlinks', 
           type: 'post', 
           status: 'draft', 
-          lastModified: new Date('2023-11-15') 
+          lastModified: new Date('2023-11-15'),
+          content: [
+            { type: 'h1', text: 'Développer une stratégie de backlinks efficace', position: 1 },
+            { type: 'paragraph', text: 'Les meilleures pratiques pour obtenir des backlinks de qualité.', position: 2 },
+            { type: 'h2', text: 'L\'importance des backlinks', position: 3 },
+            { type: 'paragraph', text: 'Pourquoi les backlinks sont essentiels pour le SEO.', position: 4 }
+          ]
         }
       ]
     },
@@ -134,7 +201,13 @@ const PageExplorer: React.FC = () => {
           url: '/landing/promo-ete', 
           type: 'landing', 
           status: 'published', 
-          lastModified: new Date('2023-06-15') 
+          lastModified: new Date('2023-06-15'),
+          content: [
+            { type: 'h1', text: 'Offres spéciales été', position: 1 },
+            { type: 'paragraph', text: 'Profitez de nos promotions exceptionnelles tout l\'été.', position: 2 },
+            { type: 'h2', text: 'Remises exclusives', position: 3 },
+            { type: 'paragraph', text: 'Jusqu\'à 30% de réduction sur une sélection de services.', position: 4 }
+          ]
         },
         { 
           id: 'webinar', 
@@ -142,7 +215,13 @@ const PageExplorer: React.FC = () => {
           url: '/landing/webinaire-seo', 
           type: 'landing', 
           status: 'draft', 
-          lastModified: new Date('2023-12-01') 
+          lastModified: new Date('2023-12-01'),
+          content: [
+            { type: 'h1', text: 'Webinaire: Les secrets du SEO en 2024', position: 1 },
+            { type: 'paragraph', text: 'Inscrivez-vous à notre webinaire gratuit et découvrez les dernières stratégies SEO.', position: 2 },
+            { type: 'h2', text: 'Au programme', position: 3 },
+            { type: 'paragraph', text: 'Les nouvelles tendances, les meilleures pratiques et des conseils d\'experts.', position: 4 }
+          ]
         }
       ]
     }
@@ -244,6 +323,9 @@ const PageExplorer: React.FC = () => {
     toast.info(`Ouverture de la page : ${page.title}`, {
       description: `URL: ${page.url}`
     });
+    
+    // Afficher/masquer le contenu SERP de la page
+    setShowSerpPreview(showSerpPreview === page.id ? null : page.id);
   };
 
   const handleAddPage = () => {
@@ -266,6 +348,17 @@ const PageExplorer: React.FC = () => {
     }).format(date);
   };
 
+  const getContentTypeIcon = (type: string) => {
+    switch (type) {
+      case 'h1': return <Heading1 className="h-4 w-4 text-red-600" />;
+      case 'h2': return <Heading2 className="h-4 w-4 text-orange-600" />;
+      case 'h3': return <Heading3 className="h-4 w-4 text-yellow-600" />;
+      case 'paragraph': return <AlignLeft className="h-4 w-4 text-gray-600" />;
+      case 'image': return <ImageIcon className="h-4 w-4 text-blue-600" />;
+      default: return <Type className="h-4 w-4 text-gray-600" />;
+    }
+  };
+
   const renderFolder = (folder: PageFolder) => {
     return (
       <div key={folder.id} className="mb-2">
@@ -282,17 +375,47 @@ const PageExplorer: React.FC = () => {
         {folder.isOpen && (
           <div className="ml-6 space-y-1 mt-1">
             {folder.pages.map(page => (
-              <div 
-                key={page.id}
-                className="flex items-center p-2 hover:bg-gray-100 rounded-md cursor-pointer"
-                onClick={() => handleOpenPage(page)}
-              >
-                <FileText className="h-4 w-4 mr-2 text-gray-500" />
-                <span className="flex-1 truncate">{page.title}</span>
-                <div className="flex items-center gap-2">
-                  {getStatusBadge(page.status)}
-                  <ExternalLink className="h-4 w-4 text-gray-400" />
+              <div key={page.id}>
+                <div 
+                  className="flex items-center p-2 hover:bg-gray-100 rounded-md cursor-pointer"
+                  onClick={() => handleOpenPage(page)}
+                >
+                  <FileText className="h-4 w-4 mr-2 text-gray-500" />
+                  <span className="flex-1 truncate">{page.title}</span>
+                  <div className="flex items-center gap-2">
+                    {getStatusBadge(page.status)}
+                    <ExternalLink className="h-4 w-4 text-gray-400" />
+                  </div>
                 </div>
+                
+                {/* Contenu SERP de la page */}
+                {showSerpPreview === page.id && page.content && (
+                  <div className="ml-4 mt-1 mb-3 p-3 bg-gray-50 rounded-md border border-gray-200">
+                    <div className="text-sm font-medium mb-2 text-gray-700">Contenu de la page</div>
+                    <div className="space-y-2">
+                      {page.content.map((item, index) => (
+                        <div key={index} className="flex items-start gap-2">
+                          {getContentTypeIcon(item.type)}
+                          <div className="flex-1">
+                            <div className="flex items-center">
+                              <span className="text-xs font-medium text-gray-500 mr-2">{item.type.toUpperCase()}</span>
+                              <span className="text-xs text-gray-400">Position: {item.position}</span>
+                            </div>
+                            <div className={`${
+                              item.type === 'h1' ? 'text-base font-bold' : 
+                              item.type === 'h2' ? 'text-sm font-semibold' : 
+                              item.type === 'h3' ? 'text-sm font-medium' :
+                              item.type === 'image' ? 'text-xs italic text-blue-600' : 
+                              'text-xs'
+                            }`}>
+                              {item.text}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
             
