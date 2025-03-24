@@ -242,74 +242,55 @@ const IndexPage = () => {
           )}
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
-            <div className="text-center">
-              <div className="inline-block p-1.5 px-3 bg-[#b92b27]/10 text-[#b92b27] text-sm font-medium rounded-full mb-3">
-                Nouveau
-              </div>
-              <h2 className="text-2xl font-bold mb-4">Assistant Quora</h2>
-              <p className="text-gray-600 mb-6 max-w-3xl mx-auto">
-                Créez du contenu optimisé pour Quora avec notre générateur IA. Produisez des réponses détaillées de plus de 500 mots pour maximiser votre visibilité et votre autorité.
-              </p>
-              <Link to="/QuoraPage">
-                <Button 
-                  className="bg-gradient-to-r from-[#b92b27] to-[#8B5CF6] hover:from-[#a72724] hover:to-[#7849e0] text-white"
-                  size="lg"
-                >
-                  <MessageSquareText className="mr-2 h-5 w-5" />
-                  Créer du Contenu Quora (500+ mots)
-                  <ChevronRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-            </div>
-          </div>
+        <div id="hierarchy" data-section="hierarchy" data-tab-content="hierarchy" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100" style={{ display: 'none' }}>
+          <h2 className="text-2xl font-bold mb-4 flex items-center">
+            <span className="w-1 h-6 bg-blue-600 rounded-full mr-3"></span>
+            Hiérarchie de contenu
+          </h2>
+          <p className="text-gray-600">Analysez la structure et la hiérarchie de votre contenu pour améliorer son SEO.</p>
           
-          <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
-            <div className="text-center">
-              <div className="inline-block p-1.5 px-3 bg-blue-100 text-blue-700 text-sm font-medium rounded-full mb-3">
-                Professionnel
-              </div>
-              <h2 className="text-2xl font-bold mb-4">Signature Email Professionnelle</h2>
-              <p className="text-gray-600 mb-6 max-w-3xl mx-auto">
-                Créez une signature email professionnelle personnalisée avec notre générateur interactif. Ajoutez votre logo, choisissez vos couleurs et téléchargez votre signature.
-              </p>
-              <Link to="/SignaturePage">
-                <Button 
-                  className="bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white"
-                  size="lg"
-                >
-                  <Signature className="mr-2 h-5 w-5" />
-                  Créer ma Signature Email
-                  <ChevronRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-            </div>
-          </div>
         </div>
+        
+        <div id="wordcount" data-section="wordcount" data-tab-content="wordcount" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100" style={{ display: 'none' }}>
+          <h2 className="text-2xl font-bold mb-4 flex items-center">
+            <span className="w-1 h-6 bg-green-600 rounded-full mr-3"></span>
+            Analyse des mots-clés
+          </h2>
+          <p className="text-gray-600">Examinez la densité et la pertinence des mots-clés dans votre contenu.</p>
+          
+        </div>
+        
+        <div id="suggestions" data-section="suggestions" data-tab-content="suggestions" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100" style={{ display: 'none' }}>
+          <h2 className="text-2xl font-bold mb-4 flex items-center">
+            <span className="w-1 h-6 bg-amber-600 rounded-full mr-3"></span>
+            Suggestions de contenu
+          </h2>
+          <p className="text-gray-600">Obtenez des suggestions personnalisées pour améliorer votre contenu et votre SEO.</p>
+          
+        </div>
+        
+        <div id="performance" data-section="performance" data-tab-content="performance" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100" style={{ display: 'none' }}>
+          <h2 className="text-2xl font-bold mb-4 flex items-center">
+            <span className="w-1 h-6 bg-amber-600 rounded-full mr-3"></span>
+            Performance du site
+          </h2>
+          <p className="text-gray-600">Analysez les performances techniques de votre site web.</p>
+          
+        </div>
+        
+        <div id="analytics" data-section="analytics" data-tab-content="analytics" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100" style={{ display: 'none' }}>
+          <h2 className="text-2xl font-bold mb-4 flex items-center">
+            <span className="w-1 h-6 bg-emerald-600 rounded-full mr-3"></span>
+            Analytics
+          </h2>
+          <p className="text-gray-600">Consultez les statistiques et analyses de trafic de votre site web.</p>
+          
+        </div>
+        
+        
       </main>
       
-      <footer className="px-4 py-8 border-t bg-white">
-        <div className="container">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center mb-4 md:mb-0">
-              <Rocket className="h-6 w-6 text-indigo-600 mr-2" />
-              <span className="font-bold text-xl">SEO-GPT</span>
-            </div>
-            <div className="flex flex-wrap gap-6 text-sm">
-              <a href="#" className="text-gray-600 hover:text-indigo-600">À propos</a>
-              <a href="#" className="text-gray-600 hover:text-indigo-600">Confidentialité</a>
-              <a href="#" className="text-gray-600 hover:text-indigo-600">Conditions</a>
-              <a href="#" className="text-gray-600 hover:text-indigo-600">Contact</a>
-            </div>
-          </div>
-          <div className="mt-6 text-center text-gray-500 text-sm">
-            <p>
-              © {new Date().getFullYear()} SEO-GPT. Tous droits réservés.
-            </p>
-          </div>
-        </div>
-      </footer>
+      
     </div>
   );
 };

@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { tabs } from './TabData';
 import { toast } from "sonner";
+import { activateSection } from '@/utils/navigationHelpers';
 
 export interface MainTab {
   id: string;
@@ -57,6 +58,20 @@ export const useTabNavigation = () => {
     
     // Update URL
     window.location.hash = value;
+    
+    // Make sure the tab content is visible
+    activateSection(value);
+    
+    // Special case for main category tabs
+    if (value === 'content') {
+      activateSection('hierarchy');
+    } else if (value === 'seo') {
+      activateSection('seo');
+    } else if (value === 'performance') {
+      activateSection('performance');
+    } else if (value === 'analytics') {
+      activateSection('analytics');
+    }
     
     // Show notification
     toast.success(`Onglet ${value} affiché`, {

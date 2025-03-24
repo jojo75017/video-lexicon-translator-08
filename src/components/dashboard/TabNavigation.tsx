@@ -7,6 +7,7 @@ import MainTabList from './tabs/MainTabList';
 import SubTabList from './tabs/SubTabList';
 import TabContentsRenderer from './tabs/TabContentsRenderer';
 import { useTabNavigation } from './tabs/useTabNavigation';
+import { activateSection } from '@/utils/navigationHelpers';
 
 const TabNavigation = () => {
   const { 
@@ -20,6 +21,11 @@ const TabNavigation = () => {
   // Log active tab for debugging
   useEffect(() => {
     console.log(`TabNavigation: Active tab is ${activeTab}`);
+    
+    // Ensure the active tab content is visible
+    setTimeout(() => {
+      activateSection(activeTab);
+    }, 100);
   }, [activeTab]);
   
   return (

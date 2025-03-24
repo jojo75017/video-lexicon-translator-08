@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { TabsContent } from "@/components/ui/tabs";
 import WordCountTabContent from './WordCountTabContent';
 import HierarchyTabContent from './HierarchyTabContent';
@@ -16,6 +16,7 @@ import PerformanceTabContent from './PerformanceTabContent';
 import SuggestionsTabContent from './SuggestionsTabContent';
 import AnalyticsTabContent from './AnalyticsTabContent';
 import { Tab } from './types';
+import { activateSection } from '@/utils/navigationHelpers';
 
 interface TabContentsRendererProps {
   contentTabs: Tab[];
@@ -35,50 +36,58 @@ const TabContentsRenderer: React.FC<TabContentsRendererProps> = ({
   
   console.log(`TabContentsRenderer: Rendering content for active tab: ${activeTab}`);
   
+  // Make sure content is visible when activeTab changes
+  useEffect(() => {
+    // Short delay to ensure DOM is updated
+    setTimeout(() => {
+      activateSection(activeTab);
+    }, 50);
+  }, [activeTab]);
+  
   return (
     <div className="tab-content-container">
       {/* Specialized tab contents */}
-      <TabsContent value="hierarchy" id="hierarchy">
+      <TabsContent value="hierarchy" id="hierarchy" data-tab-content="hierarchy">
         <HierarchyTabContent />
       </TabsContent>
       
-      <TabsContent value="wordcount" id="wordcount">
+      <TabsContent value="wordcount" id="wordcount" data-tab-content="wordcount">
         <WordCountTabContent />
       </TabsContent>
       
-      <TabsContent value="suggestions" id="suggestions">
+      <TabsContent value="suggestions" id="suggestions" data-tab-content="suggestions">
         <SuggestionsTabContent />
       </TabsContent>
       
-      <TabsContent value="seo" id="seo">
+      <TabsContent value="seo" id="seo" data-tab-content="seo">
         <SeoTabContent />
       </TabsContent>
       
-      <TabsContent value="structure" id="structure">
+      <TabsContent value="structure" id="structure" data-tab-content="structure">
         <StructureTabContent />
       </TabsContent>
       
-      <TabsContent value="backlinks" id="backlinks">
+      <TabsContent value="backlinks" id="backlinks" data-tab-content="backlinks">
         <BacklinksTabContent />
       </TabsContent>
       
-      <TabsContent value="metrics" id="metrics">
+      <TabsContent value="metrics" id="metrics" data-tab-content="metrics">
         <MetricsTabContent />
       </TabsContent>
       
-      <TabsContent value="advanced" id="advanced">
+      <TabsContent value="advanced" id="advanced" data-tab-content="advanced">
         <AdvancedTabContent />
       </TabsContent>
       
-      <TabsContent value="integrations" id="integrations">
+      <TabsContent value="integrations" id="integrations" data-tab-content="integrations">
         <IntegrationsTabContent />
       </TabsContent>
       
-      <TabsContent value="analytics" id="analytics">
+      <TabsContent value="analytics" id="analytics" data-tab-content="analytics">
         <AnalyticsTabContent />
       </TabsContent>
       
-      <TabsContent value="performance" id="performance">
+      <TabsContent value="performance" id="performance" data-tab-content="performance">
         <PerformanceTabContent />
       </TabsContent>
       
@@ -86,7 +95,7 @@ const TabContentsRenderer: React.FC<TabContentsRendererProps> = ({
       {contentTabs
         .filter(tab => !specializedTabs.includes(tab.id))
         .map(tab => (
-          <TabsContent key={tab.id} value={tab.id} id={tab.id}>
+          <TabsContent key={tab.id} value={tab.id} id={tab.id} data-tab-content={tab.id}>
             <DefaultTabContent id={tab.id} label={tab.label} />
           </TabsContent>
         ))
