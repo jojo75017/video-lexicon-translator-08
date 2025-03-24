@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -13,6 +12,16 @@ import {
 import { toast } from "sonner";
 import SiteStructureVisualizer from '../SiteStructureVisualizer';
 import "../../styles/explorer-scrollbar.css";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // Interfaces pour les données
 interface PageContent {
@@ -51,6 +60,18 @@ const PageExplorer: React.FC = () => {
   const [activeTab, setActiveTab] = useState('liste');
   const [showSerpPreview, setShowSerpPreview] = useState<string | null>(null);
   const [previewMode, setPreviewMode] = useState<'content' | 'html'>('content');
+  const [showAddPageDialog, setShowAddPageDialog] = useState(false);
+  const [newPage, setNewPage] = useState<{
+    title: string;
+    url: string;
+    type: 'page' | 'post' | 'landing';
+    folderId: string;
+  }>({
+    title: '',
+    url: '',
+    type: 'page',
+    folderId: 'principal'
+  });
   const [folders, setFolders] = useState<PageFolder[]>([
     {
       id: 'principal',
@@ -340,8 +361,72 @@ const PageExplorer: React.FC = () => {
 
   // Ajouter une nouvelle page
   const handleAddPage = () => {
-    toast.info("Créer une nouvelle page", {
-      description: "Fonctionnalité à implémenter"
+    setShowAddPageDialog(true);
+  };
+
+  // Gérer la soumission du formulaire d'ajout de page
+  const handleAddPageSubmit = () => {
+    if (!newPage.title || !newPage.url) {
+      toast.error("Le titre et l'URL sont requis");
+      return;
+    }
+
+    // Générer un ID unique pour la nouvelle page
+    const pageId = `page-${Date.now()}`;
+    
+    // Créer un objet pour la nouvelle page
+    const pageToAdd: Page = {
+      id: pageId,
+      title: newPage.title,
+      url: newPage.url.startsWith('/') ? newPage.url : `/${newPage.url}`,
+      type: newPage.type,
+      status: 'draft',
+      lastModified: new Date(),
+      content: [
+        { type: 'h1', text: newPage.title, position: 1 },
+        { type: 'paragraph', text: 'Contenu de la page à remplir.', position: 2 }
+      ]
+    };
+
+    // Ajouter la page au dossier sélectionné
+    setFolders(prevFolders => {
+      return prevFolders.map(folder => {
+        if (folder.id === newPage.folderId) {
+          return {
+            ...folder,
+            pages: [...folder.pages, pageToAdd],
+            isOpen: true // Ouvrir le dossier automatiquement
+          };
+        } else if (folder.subfolders) {
+          // Vérifier dans les sous-dossiers
+          const updatedSubfolders = folder.subfolders.map(subfolder => {
+            if (subfolder.id === newPage.folderId) {
+              return {
+                ...subfolder,
+                pages: [...subfolder.pages, pageToAdd],
+                isOpen: true
+              };
+            }
+            return subfolder;
+          });
+          return { ...folder, subfolders: updatedSubfolders };
+        }
+        return folder;
+      });
+    });
+
+    // Réinitialiser le formulaire et fermer la boîte de dialogue
+    setNewPage({
+      title: '',
+      url: '',
+      type: 'page',
+      folderId: 'principal'
+    });
+    setShowAddPageDialog(false);
+
+    // Notifier l'utilisateur
+    toast.success("Page ajoutée avec succès", {
+      description: `La page "${newPage.title}" a été ajoutée au dossier sélectionné.`
     });
   };
 
@@ -399,6 +484,23 @@ const PageExplorer: React.FC = () => {
     });
     
     return html;
+  };
+
+  // Obtenir tous les dossiers (plats) pour le sélecteur de dossier
+  const getAllFolders = () => {
+    const result: {id: string, name: string}[] = [];
+    
+    folders.forEach(folder => {
+      result.push({ id: folder.id, name: folder.name });
+      
+      if (folder.subfolders) {
+        folder.subfolders.forEach(subfolder => {
+          result.push({ id: subfolder.id, name: `${folder.name} > ${subfolder.name}` });
+        });
+      }
+    });
+    
+    return result;
   };
 
   // Rendu d'un dossier avec ses pages
@@ -621,8 +723,65 @@ const PageExplorer: React.FC = () => {
         <div>Total: {folders.reduce((acc, folder) => acc + folder.pages.length + (folder.subfolders?.reduce((acc2, sf) => acc2 + sf.pages.length, 0) || 0), 0)} pages</div>
         <div>Dernière mise à jour: {formatDate(new Date())}</div>
       </div>
-    </Card>
-  );
-};
 
-export default PageExplorer;
+      {/* Dialogue d'ajout de page */}
+      <Dialog open={showAddPageDialog} onOpenChange={setShowAddPageDialog}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Ajouter une nouvelle page</DialogTitle>
+            <DialogDescription>
+              Créez une nouvelle page pour votre site web.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="title" className="text-right">
+                Titre
+              </Label>
+              <Input
+                id="title"
+                value={newPage.title}
+                onChange={(e) => setNewPage({...newPage, title: e.target.value})}
+                className="col-span-3"
+                placeholder="Titre de la page"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="url" className="text-right">
+                URL
+              </Label>
+              <Input
+                id="url"
+                value={newPage.url}
+                onChange={(e) => setNewPage({...newPage, url: e.target.value})}
+                className="col-span-3"
+                placeholder="/mon-url"
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="type" className="text-right">
+                Type
+              </Label>
+              <Select
+                value={newPage.type}
+                onValueChange={(value: 'page' | 'post' | 'landing') => setNewPage({...newPage, type: value})}
+              >
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Type de page" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="page">Page</SelectItem>
+                  <SelectItem value="post">Article</SelectItem>
+                  <SelectItem value="landing">Landing page</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="folder" className="text-right">
+                Dossier
+              </Label>
+              <Select
+                value={newPage.folderId}
+                onValueChange={(value) => setNewPage({...newPage, folderId: value})}
+              >
+                <
