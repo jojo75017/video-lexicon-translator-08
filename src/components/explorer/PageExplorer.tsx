@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -784,4 +785,29 @@ const PageExplorer: React.FC = () => {
                 value={newPage.folderId}
                 onValueChange={(value) => setNewPage({...newPage, folderId: value})}
               >
-                <
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Sélectionner un dossier" />
+                </SelectTrigger>
+                <SelectContent>
+                  {getAllFolders().map(folder => (
+                    <SelectItem key={folder.id} value={folder.id}>{folder.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddPageDialog(false)}>
+              Annuler
+            </Button>
+            <Button onClick={handleAddPageSubmit}>
+              Ajouter la page
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </Card>
+  );
+};
+
+export default PageExplorer;
