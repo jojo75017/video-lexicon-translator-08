@@ -1,28 +1,34 @@
 
-/**
- * Activates a section by ID by making it visible and hiding others
- */
-export const activateSection = (sectionId: string): void => {
+// Helper functions for managing section navigation and activation
+
+export const activateSection = (sectionId: string) => {
   console.log(`Activating section: ${sectionId}`);
   
-  // First hide all sections with data-tab-content attribute
+  // Hide all sections first
   document.querySelectorAll('[data-tab-content]').forEach(el => {
     (el as HTMLElement).style.display = 'none';
   });
   
-  // Then show the requested section
-  const section = document.querySelector(`[data-tab-content="${sectionId}"]`);
-  if (section) {
-    (section as HTMLElement).style.display = 'block';
+  // Show the selected section
+  const element = document.getElementById(sectionId);
+  if (element) {
+    element.style.display = 'block';
     console.log(`Section ${sectionId} activated and displayed`);
-  } else {
-    console.warn(`Section with ID ${sectionId} not found`);
   }
   
-  // Also activate any section with matching data-section attribute
-  const sectionByAttr = document.querySelector(`[data-section="${sectionId}"]`);
-  if (sectionByAttr) {
-    (sectionByAttr as HTMLElement).style.display = 'block';
+  // Also check for elements with data-section attribute
+  const sectionElement = document.querySelector(`[data-section="${sectionId}"]`);
+  if (sectionElement) {
+    (sectionElement as HTMLElement).style.display = 'block';
     console.log(`Section with data-section=${sectionId} also activated`);
   }
+};
+
+// Add the missing navigateToSection function
+export const navigateToSection = (sectionId: string) => {
+  // First, set the hash to trigger any listeners
+  window.location.hash = sectionId;
+  
+  // Then explicitly activate the section
+  activateSection(sectionId);
 };

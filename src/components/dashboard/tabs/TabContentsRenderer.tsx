@@ -83,23 +83,22 @@ const TabContentsRenderer: React.FC<TabContentsRendererProps> = ({
         <IntegrationsTabContent />
       </TabsContent>
       
-      <TabsContent value="analytics" id="analytics" data-tab-content="analytics">
-        <AnalyticsTabContent />
-      </TabsContent>
-      
       <TabsContent value="performance" id="performance" data-tab-content="performance">
         <PerformanceTabContent />
       </TabsContent>
       
-      {/* Generate TabsContent for remaining tabs */}
+      <TabsContent value="analytics" id="analytics" data-tab-content="analytics">
+        <AnalyticsTabContent />
+      </TabsContent>
+      
+      {/* For any other tab that doesn't have a specialized component */}
       {contentTabs
         .filter(tab => !specializedTabs.includes(tab.id))
         .map(tab => (
           <TabsContent key={tab.id} value={tab.id} id={tab.id} data-tab-content={tab.id}>
-            <DefaultTabContent id={tab.id} label={tab.label} />
+            <DefaultTabContent label={tab.label} />
           </TabsContent>
-        ))
-      }
+        ))}
     </div>
   );
 };
