@@ -29,15 +29,15 @@ export class OpenAIService {
               role: 'system',
               content: `Vous êtes un expert en SEO qui fournit des suggestions de mots-clés. 
               Retournez toujours un JSON valide contenant un tableau d'objets avec ces propriétés:
-              keyword: string - le mot-clé suggéré
+              keyword: string - le mot-clé suggéré en français
               volume: number - volume de recherche mensuel estimé entre 100 et 10000
               difficulty: number - difficulté de classement entre 0-100
               cpc: number - coût par clic moyen entre 0.1 et 10
-              competition: number - niveau de concurrence entre a et 1`
+              competition: number - niveau de concurrence entre 0 et 1`
             },
             {
               role: 'user',
-              content: `Générez 5 suggestions de mots-clés pertinents relatifs à "${baseKeyword}" avec leurs métriques. Répondez uniquement au format JSON.`
+              content: `Générez 5 suggestions de mots-clés pertinents relatifs à "${baseKeyword}" en français avec leurs métriques. Répondez uniquement au format JSON.`
             }
           ],
           temperature: 0.3,
