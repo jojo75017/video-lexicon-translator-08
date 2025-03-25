@@ -117,7 +117,8 @@ const PerformanceTabContent = () => {
           <Card className="p-6">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-lg font-semibold">Vitesse de chargement</h3>
-              <Badge variant={performanceData && performanceData.loadTime < 1500 ? "success" : "warning"}>
+              <Badge variant={performanceData && performanceData.loadTime < 1500 ? "secondary" : "outline"} 
+                className={performanceData && performanceData.loadTime < 1500 ? "bg-green-100 text-green-800 hover:bg-green-200" : "bg-amber-100 text-amber-800 hover:bg-amber-200"}>
                 {performanceData ? (performanceData.loadTime / 1000).toFixed(2) + 's' : 'N/A'}
               </Badge>
             </div>
