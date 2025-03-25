@@ -5,16 +5,20 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Check, ExternalLink, AlertTriangle, Search, Gift, Link2, Globe } from 'lucide-react';
+import { Check, ExternalLink, AlertTriangle, Search, Gift, Link2, Globe, Info, ImageIcon } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { analyzeMetaTags, MetaAnalysis } from '@/utils/seo/metaAnalyzer';
 import { toast } from "sonner";
+import { Progress } from "@/components/ui/progress";
 
 const MetaContentGenerator = () => {
   const [url, setUrl] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [metaAnalysis, setMetaAnalysis] = useState<MetaAnalysis | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [htmlContent, setHtmlContent] = useState<string | null>(null);
+  const [headingCounts, setHeadingCounts] = useState<{h1: number; h2: number; h3: number}>({ h1: 0, h2: 0, h3: 0 });
+  const [imageStats, setImageStats] = useState<{total: number; withoutAlt: number}>({ total: 0, withoutAlt: 0 });
 
   const analyzeMeta = async () => {
     if (!url) {
@@ -48,13 +52,15 @@ const MetaContentGenerator = () => {
 
       for (const proxyUrl of proxyUrls) {
         try {
+          console.log(`Tentative d'accès via ${proxyUrl}`);
           response = await fetch(proxyUrl);
           if (response.ok) {
             html = await response.text();
+            console.log(`Succès avec ${proxyUrl}, taille de la réponse: ${html.length} caractères`);
             break;
           }
         } catch (err) {
-          console.error(`Error with proxy ${proxyUrl}:`, err);
+          console.error(`Erreur avec proxy ${proxyUrl}:`, err);
         }
       }
 
@@ -62,9 +68,23 @@ const MetaContentGenerator = () => {
         throw new Error("Impossible d'accéder au contenu via les proxies CORS disponibles");
       }
 
+      // Store the HTML content for debugging
+      setHtmlContent(html);
+
       // Parse the HTML
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
+      
+      // Count headings
+      const h1Count = doc.querySelectorAll('h1').length;
+      const h2Count = doc.querySelectorAll('h2').length;
+      const h3Count = doc.querySelectorAll('h3').length;
+      setHeadingCounts({ h1: h1Count, h2: h2Count, h3: h3Count });
+      
+      // Count images and those without alt
+      const images = doc.querySelectorAll('img');
+      const imagesWithoutAlt = Array.from(images).filter(img => !img.hasAttribute('alt') || img.getAttribute('alt') === '').length;
+      setImageStats({ total: images.length, withoutAlt: imagesWithoutAlt });
       
       // Analyze meta tags
       const analysis = analyzeMetaTags(doc);
@@ -72,7 +92,7 @@ const MetaContentGenerator = () => {
       
       setMetaAnalysis(analysis);
       toast.success("Analyse complétée", {
-        description: "Aperçu SERP généré"
+        description: "Résultats générés avec succès"
       });
     } catch (err) {
       console.error("Error analyzing meta tags:", err);
@@ -116,6 +136,13 @@ const MetaContentGenerator = () => {
             </Button>
           </div>
 
+          {isLoading && (
+            <div className="space-y-2 py-4">
+              <p className="text-sm text-center text-gray-500">Analyse en cours...</p>
+              <Progress value={45} className="h-2" />
+            </div>
+          )}
+
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-md p-4 flex items-start">
               <AlertTriangle className="h-5 w-5 text-red-500 mt-0.5 mr-3 flex-shrink-0" />
@@ -130,8 +157,12 @@ const MetaContentGenerator = () => {
           )}
 
           {metaAnalysis && (
-            <Tabs defaultValue="serp" className="w-full mt-6">
+            <Tabs defaultValue="summary" className="w-full mt-6">
               <TabsList className="mb-4">
+                <TabsTrigger value="summary" className="flex items-center gap-1.5">
+                  <Info className="h-4 w-4" />
+                  <span>Résumé</span>
+                </TabsTrigger>
                 <TabsTrigger value="serp" className="flex items-center gap-1.5">
                   <Search className="h-4 w-4" />
                   <span>Aperçu SERP</span>
@@ -149,6 +180,87 @@ const MetaContentGenerator = () => {
                   <span>Suggestions</span>
                 </TabsTrigger>
               </TabsList>
+
+              <TabsContent value="summary" className="space-y-4">
+                <div className="bg-white rounded-lg border border-gray-200 p-4">
+                  <h3 className="text-lg font-medium mb-4">Résultats de l'analyse pour {url}</h3>
+                  
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="font-medium">Titre:</span>
+                      <span>{metaAnalysis.title || "Titre non défini"}</span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="font-medium">Balises Meta:</span>
+                      <span>
+                        {metaAnalysis.description ? (
+                          <Badge className="bg-green-100 text-green-800">Description présente</Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-red-600">Description manquante</Badge>
+                        )}
+                      </span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="font-medium">Titres H1:</span>
+                      <span className={`${headingCounts.h1 === 1 ? 'text-green-600' : 'text-red-600'}`}>
+                        {headingCounts.h1}
+                      </span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="font-medium">Titres H2:</span>
+                      <span>{headingCounts.h2}</span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="font-medium">Titres H3:</span>
+                      <span>{headingCounts.h3}</span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="font-medium">Images:</span>
+                      <span>
+                        {imageStats.total} (dont {imageStats.withoutAlt} sans attribut alt)
+                      </span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="font-medium">URL Canonique:</span>
+                      <span>
+                        {metaAnalysis.canonical ? (
+                          <Badge className="bg-green-100 text-green-800">Présente</Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-amber-600">Manquante</Badge>
+                        )}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="font-medium">Open Graph:</span>
+                      <span>
+                        {metaAnalysis.hasOgTags ? (
+                          <Badge className="bg-green-100 text-green-800">Présent</Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-amber-600">Manquant</Badge>
+                        )}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="font-medium">Twitter Cards:</span>
+                      <span>
+                        {metaAnalysis.hasTwitterTags ? (
+                          <Badge className="bg-green-100 text-green-800">Présent</Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-amber-600">Manquant</Badge>
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
 
               <TabsContent value="serp" className="space-y-4">
                 <div className="bg-white rounded-lg border border-gray-200 p-4">
@@ -370,6 +482,20 @@ const MetaContentGenerator = () => {
                       </li>
                     )}
                     
+                    {headingCounts.h1 !== 1 && (
+                      <li className="flex items-start gap-2 text-sm">
+                        <AlertTriangle className="h-4 w-4 text-amber-500 mt-0.5 flex-shrink-0" />
+                        <span>Assurez-vous d'avoir exactement une balise H1 sur votre page</span>
+                      </li>
+                    )}
+                    
+                    {imageStats.withoutAlt > 0 && (
+                      <li className="flex items-start gap-2 text-sm">
+                        <AlertTriangle className="h-4 w-4 text-amber-500 mt-0.5 flex-shrink-0" />
+                        <span>Ajoutez des attributs alt descriptifs aux {imageStats.withoutAlt} images qui en manquent</span>
+                      </li>
+                    )}
+                    
                     {/* Afficher un message positif si tout est bien configuré */}
                     {metaAnalysis.title && 
                      metaAnalysis.title.length >= 30 && 
@@ -379,7 +505,9 @@ const MetaContentGenerator = () => {
                      metaAnalysis.description.length <= 160 &&
                      metaAnalysis.canonical &&
                      metaAnalysis.hasOgTags &&
-                     metaAnalysis.hasTwitterTags && (
+                     metaAnalysis.hasTwitterTags &&
+                     headingCounts.h1 === 1 &&
+                     imageStats.withoutAlt === 0 && (
                       <li className="flex items-start gap-2 text-sm bg-green-50 p-2 rounded-md">
                         <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
                         <span className="text-green-700">Vos balises méta sont bien optimisées pour le SEO !</span>
