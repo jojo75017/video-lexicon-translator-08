@@ -22,6 +22,15 @@ export const activateSection = (sectionId: string) => {
     (sectionElement as HTMLElement).style.display = 'block';
     console.log(`Section with data-section=${sectionId} also activated`);
   }
+  
+  // Make sure results-display is visible when showing seo section
+  if (sectionId === 'seo') {
+    const resultsDisplay = document.querySelector('.results-display');
+    if (resultsDisplay) {
+      (resultsDisplay as HTMLElement).style.display = 'block';
+      console.log('Results display for SEO is now visible');
+    }
+  }
 };
 
 // Add the missing navigateToSection function

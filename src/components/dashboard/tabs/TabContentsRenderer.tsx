@@ -96,7 +96,7 @@ const TabContentsRenderer: React.FC<TabContentsRendererProps> = ({
         .filter(tab => !specializedTabs.includes(tab.id))
         .map(tab => (
           <TabsContent key={tab.id} value={tab.id} id={tab.id} data-tab-content={tab.id}>
-            <DefaultTabContent label={tab.label} />
+            <DefaultTabContent id={tab.id} label={tab.label} />
           </TabsContent>
         ))}
     </div>
