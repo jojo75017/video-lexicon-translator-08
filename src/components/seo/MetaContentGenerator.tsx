@@ -1,15 +1,16 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Check, ExternalLink, AlertTriangle, Search, Gift, Link2, Globe, Info, ImageIcon } from 'lucide-react';
+import { Check, ExternalLink, AlertTriangle, Search, Gift, Link2, Globe, Info, ImageIcon, Loader2, Shield } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { analyzeMetaTags, MetaAnalysis } from '@/utils/seo/metaAnalyzer';
 import { toast } from "sonner";
 import { Progress } from "@/components/ui/progress";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const MetaContentGenerator = () => {
   const [url, setUrl] = useState<string>('');
@@ -19,6 +20,15 @@ const MetaContentGenerator = () => {
   const [htmlContent, setHtmlContent] = useState<string | null>(null);
   const [headingCounts, setHeadingCounts] = useState<{h1: number; h2: number; h3: number}>({ h1: 0, h2: 0, h3: 0 });
   const [imageStats, setImageStats] = useState<{total: number; withoutAlt: number}>({ total: 0, withoutAlt: 0 });
+  const [showCorsWarning, setShowCorsWarning] = useState<boolean>(false);
+  const [proxyEnabled, setProxyEnabled] = useState<boolean>(false);
+
+  const handleActivateProxy = () => {
+    setProxyEnabled(true);
+    toast.success("Proxy CORS activé", {
+      description: "Les requêtes utiliseront désormais un proxy pour contourner les restrictions CORS",
+    });
+  };
 
   const analyzeMeta = async () => {
     if (!url) {
@@ -26,9 +36,15 @@ const MetaContentGenerator = () => {
       return;
     }
 
+    let formattedUrl = url;
+    // Ensure URL has protocol
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      formattedUrl = 'https://' + url;
+    }
+
     try {
       // Validate URL format
-      new URL(url);
+      new URL(formattedUrl);
     } catch {
       toast.error("URL invalide", {
         description: "Veuillez entrer une URL valide (ex: https://exemple.com)",
@@ -38,17 +54,19 @@ const MetaContentGenerator = () => {
 
     setIsLoading(true);
     setError(null);
+    setShowCorsWarning(false);
 
     try {
       // Using multiple CORS proxies in case one fails
-      const proxyUrls = [
-        `https://corsproxy.io/?${encodeURIComponent(url)}`,
-        `https://cors-anywhere.herokuapp.com/${url}`,
-        `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
-      ];
+      const proxyUrls = proxyEnabled ? [
+        `https://corsproxy.io/?${encodeURIComponent(formattedUrl)}`,
+        `https://cors-anywhere.herokuapp.com/${formattedUrl}`,
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(formattedUrl)}`
+      ] : [formattedUrl]; // Try direct URL first if proxy not enabled
 
       let response = null;
       let html = '';
+      let corsError = false;
 
       for (const proxyUrl of proxyUrls) {
         try {
@@ -60,12 +78,25 @@ const MetaContentGenerator = () => {
             break;
           }
         } catch (err) {
-          console.error(`Erreur avec proxy ${proxyUrl}:`, err);
+          console.error(`Erreur avec ${proxyUrl}:`, err);
+          if (
+            err instanceof Error && 
+            (err.message.includes("CORS") || 
+             err.message.includes("cross-origin") ||
+             err.message.includes("network error"))
+          ) {
+            corsError = true;
+          }
         }
       }
 
       if (!html) {
-        throw new Error("Impossible d'accéder au contenu via les proxies CORS disponibles");
+        if (corsError) {
+          setShowCorsWarning(true);
+          throw new Error("Erreur CORS: Impossible d'accéder au contenu - activez le proxy CORS pour continuer");
+        } else {
+          throw new Error("Impossible d'accéder au contenu du site. Vérifiez que l'URL est correcte et accessible.");
+        }
       }
 
       // Store the HTML content for debugging
@@ -120,19 +151,30 @@ const MetaContentGenerator = () => {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <Input
-              placeholder="Entrez une URL (ex: https://example.com)"
+              placeholder="Entrez une URL (ex: exemple.com)"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               className="flex-1"
+              onKeyPress={(e) => e.key === 'Enter' && analyzeMeta()}
             />
             <Button 
               onClick={analyzeMeta} 
               disabled={isLoading}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-blue-600 hover:bg-blue-700 min-w-[120px]"
             >
-              {isLoading ? "Analyse..." : "Analyser"}
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Analyse...
+                </>
+              ) : (
+                <>
+                  <Search className="mr-2 h-4 w-4" />
+                  Analyser
+                </>
+              )}
             </Button>
           </div>
 
@@ -143,16 +185,31 @@ const MetaContentGenerator = () => {
             </div>
           )}
 
-          {error && (
-            <div className="bg-red-50 border border-red-200 rounded-md p-4 flex items-start">
-              <AlertTriangle className="h-5 w-5 text-red-500 mt-0.5 mr-3 flex-shrink-0" />
-              <div>
-                <h4 className="font-medium text-red-800">Erreur</h4>
-                <p className="text-red-700 text-sm mt-1">{error}</p>
-                <p className="text-sm text-red-600 mt-2">
-                  Si vous rencontrez des erreurs CORS, essayez d'activer un proxy CORS ou utilisez un site qui autorise les requêtes cross-origin.
-                </p>
-              </div>
+          {error && !showCorsWarning && (
+            <Alert variant="destructive" className="mt-4">
+              <AlertTriangle className="h-4 w-4 mr-2" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {showCorsWarning && (
+            <div className="mt-4 bg-yellow-50 p-4 rounded-md border border-yellow-200">
+              <h3 className="font-medium text-yellow-800 mb-2 flex items-center">
+                <Shield className="h-4 w-4 mr-2" />
+                Erreur d'accès CORS détectée
+              </h3>
+              <p className="text-yellow-700 mb-3">
+                Les restrictions de sécurité du navigateur empêchent l'accès au site. 
+                Activez notre proxy CORS pour contourner cette limitation et continuer l'analyse.
+              </p>
+              <Button 
+                variant="outline" 
+                onClick={handleActivateProxy}
+                className="bg-yellow-100 text-yellow-800 border-yellow-300 hover:bg-yellow-200"
+              >
+                <Shield className="mr-2 h-4 w-4" />
+                Activer le proxy CORS
+              </Button>
             </div>
           )}
 
