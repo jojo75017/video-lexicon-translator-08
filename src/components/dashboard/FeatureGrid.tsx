@@ -1,113 +1,91 @@
-
 import React from 'react';
-import FeatureCard from './FeatureCard';
-import { Search, Globe, Database, Link2, ChartBar, Settings, Hash, Signature } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { activateSection } from '@/utils/navigationHelpers';
+import { Link } from 'react-router-dom';
+import { 
+  Search, 
+  BarChart2, 
+  Globe, 
+  Smartphone, 
+  Compass, 
+  Zap,
+  ListTree,
+  MessageSquare
+} from 'lucide-react';
 
 const FeatureGrid = () => {
-  const navigate = useNavigate();
-  
   const features = [
     {
-      icon: Search,
-      title: "SEO",
-      description: "Analyse complète des facteurs SEO",
-      color: "blue",
-      id: "seo"
+      icon: <Search className="h-8 w-8 text-indigo-600" />,
+      title: "Analyse SEO",
+      description: "Analysez et améliorez le référencement de votre site web",
+      link: "/seo",
+      color: "bg-indigo-100"
     },
     {
-      icon: Globe,
+      icon: <BarChart2 className="h-8 w-8 text-green-600" />,
+      title: "Performance",
+      description: "Optimisez la vitesse et l'efficacité de votre site",
+      link: "#performance",
+      color: "bg-green-100"
+    },
+    {
+      icon: <Globe className="h-8 w-8 text-blue-600" />,
+      title: "Accessibilité",
+      description: "Assurez-vous que votre site est accessible à tous les utilisateurs",
+      link: "#accessibility",
+      color: "bg-blue-100"
+    },
+    {
+      icon: <Smartphone className="h-8 w-8 text-purple-600" />,
+      title: "Mobile",
+      description: "Optimisez votre site pour les appareils mobiles",
+      link: "#mobile",
+      color: "bg-purple-100"
+    },
+    {
+      icon: <Compass className="h-8 w-8 text-orange-600" />,
+      title: "Exploration",
+      description: "Découvrez des opportunités d'amélioration de votre site",
+      link: "#exploration",
+      color: "bg-orange-100"
+    },
+    {
+      icon: <Zap className="h-8 w-8 text-yellow-600" />,
+      title: "Vitesse",
+      description: "Améliorez la vitesse de chargement de votre site",
+      link: "#vitesse",
+      color: "bg-yellow-100"
+    },
+    {
+      icon: <ListTree className="h-8 w-8 text-teal-600" />,
       title: "Structure",
-      description: "Architecture du site",
-      color: "indigo",
-      id: "structure"
+      description: "Analysez la structure de votre site web",
+      link: "#structure",
+      color: "bg-teal-100"
     },
     {
-      icon: Database,
-      title: "Hiérarchie",
-      description: "Organisation du contenu",
-      color: "violet",
-      id: "hierarchy"
+      icon: <MessageSquare className="h-8 w-8 text-pink-600" />,
+      title: "Contenu",
+      description: "Optimisez votre contenu pour un meilleur référencement",
+      link: "#contenu",
+      color: "bg-pink-100"
     },
-    {
-      icon: Link2,
-      title: "Backlinks",
-      description: "Analyse des liens",
-      color: "pink",
-      id: "backlinks"
-    },
-    {
-      icon: ChartBar,
-      title: "Métriques",
-      description: "Statistiques détaillées",
-      color: "fuchsia",
-      id: "metrics"
-    },
-    {
-      icon: Settings,
-      title: "Avancé",
-      description: "Options avancées",
-      color: "rose",
-      id: "advanced"
-    },
-    {
-      icon: Hash,
-      title: "Intégrations",
-      description: "Outils externes",
-      color: "purple",
-      id: "integrations"
-    },
-    {
-      icon: Signature,
-      title: "Signature",
-      description: "Signature professionnelle",
-      color: "blue",
-      id: "signature",
-      link: "/SignaturePage"
-    }
   ];
 
-  // Fonction pour gérer les clics sur les fonctionnalités
-  const handleFeatureClick = (id: string, link?: string) => {
-    console.log(`Feature clicked: ${id}, link: ${link}`);
-    
-    if (link) {
-      navigate(link);
-      return;
-    }
-    
-    // Update URL hash and activate section
-    window.location.hash = id;
-    activateSection(id);
-  };
-
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-        <span className="w-1 h-6 bg-blue-600 rounded-full mr-3"></span>
-        Fonctionnalités
-      </h2>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {features.map((feature) => (
-          <div 
-            key={feature.id} 
-            className="cursor-pointer" 
-            id={`feature-card-${feature.id}`}
-            data-feature-id={feature.id}
-            onClick={() => handleFeatureClick(feature.id, feature.link)}
-          >
-            <FeatureCard
-              icon={feature.icon}
-              title={feature.title}
-              description={feature.description}
-              color={feature.color}
-              onClick={() => {}} // Handled by parent div now
-            />
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {features.map((feature, index) => (
+        <Link 
+          key={index} 
+          to={feature.link || "#"} 
+          className={`block p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow ${feature.color || 'bg-white'}`}
+        >
+          <div className="flex flex-col items-center text-center space-y-4">
+            {feature.icon}
+            <h3 className="text-lg font-semibold">{feature.title}</h3>
+            <p className="text-gray-600 text-sm">{feature.description}</p>
           </div>
-        ))}
-      </div>
+        </Link>
+      ))}
     </div>
   );
 };

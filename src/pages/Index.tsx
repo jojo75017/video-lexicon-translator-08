@@ -82,6 +82,9 @@ const IndexPage = () => {
             <span className="font-bold text-xl">SEO-GPT</span>
           </Link>
           <nav className="flex items-center space-x-4">
+            <Link to="/seo" className="text-indigo-600 hover:text-indigo-800 font-medium">
+              Outils SEO
+            </Link>
             <ModeToggle />
             <a href="https://github.com/your-github-repo" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-2 text-sm">
               <Github className="h-4 w-4" />
