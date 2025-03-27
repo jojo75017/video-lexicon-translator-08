@@ -26,26 +26,37 @@ export const useTabNavigation = () => {
   
   // Initialiser à partir du hash URL ou définir par défaut
   useEffect(() => {
-    // Vérifier le hash dans l'URL
-    const hash = window.location.hash.replace('#', '');
-    if (hash && tabs.some(tab => tab.id === hash)) {
-      console.log(`Hash trouvé dans l'URL: ${hash}, activation de cet onglet`);
-      setActiveTab(hash);
-      
-      // Activation immédiate de la section correspondante
-      setTimeout(() => {
-        activateSection(hash);
-      }, 300);
-    } else {
-      // Par défaut, aller au premier onglet si pas de hash
-      const defaultTab = 'hierarchy';
-      setActiveTab(defaultTab);
-      
-      // Activation immédiate de la section par défaut
-      setTimeout(() => {
-        activateSection(defaultTab);
-      }, 300);
-    }
+    const handleInitialTabActivation = () => {
+      // Vérifier le hash dans l'URL
+      const hash = window.location.hash.replace('#', '');
+      if (hash && tabs.some(tab => tab.id === hash)) {
+        console.log(`Hash trouvé dans l'URL: ${hash}, activation de cet onglet`);
+        setActiveTab(hash);
+        
+        // Activation immédiate de la section correspondante
+        setTimeout(() => {
+          activateSection(hash);
+          toast.info(`Onglet ${hash} activé depuis l'URL`, {
+            duration: 1500
+          });
+        }, 800); // Délai important pour s'assurer que tout est prêt
+      } else {
+        // Par défaut, aller au premier onglet si pas de hash
+        const defaultTab = 'hierarchy';
+        setActiveTab(defaultTab);
+        
+        // Activation immédiate de la section par défaut
+        setTimeout(() => {
+          activateSection(defaultTab);
+          toast.info(`Onglet par défaut activé: ${defaultTab}`, {
+            duration: 1500
+          });
+        }, 800);
+      }
+    };
+    
+    // Exécuter après un court délai pour laisser le DOM se mettre en place
+    setTimeout(handleInitialTabActivation, 300);
     
     // Écouter les changements de hash
     const handleHashChange = () => {
@@ -55,7 +66,11 @@ export const useTabNavigation = () => {
         setActiveTab(newHash);
         setTimeout(() => {
           activateSection(newHash);
-        }, 300);
+          toast.info(`Navigation vers l'onglet ${newHash}`, {
+            description: "URL mise à jour",
+            duration: 1500
+          });
+        }, 500);
       }
     };
     
@@ -88,7 +103,7 @@ export const useTabNavigation = () => {
         description: "Chargement du contenu en cours...",
         duration: 1500
       });
-    }, 300);
+    }, 500); // Délai augmenté significativement
   };
 
   // Obtenir les sous-onglets en fonction de l'onglet principal actif

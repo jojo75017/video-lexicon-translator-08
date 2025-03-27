@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { TabsContent } from "@/components/ui/tabs";
 import WordCountTabContent from './WordCountTabContent';
 import HierarchyTabContent from './HierarchyTabContent';
@@ -17,6 +17,7 @@ import SuggestionsTabContent from './SuggestionsTabContent';
 import AnalyticsTabContent from './AnalyticsTabContent';
 import { Tab } from './types';
 import { activateSection } from '@/utils/navigationHelpers';
+import { toast } from "sonner";
 
 interface TabContentsRendererProps {
   contentTabs: Tab[];
@@ -34,6 +35,8 @@ const TabContentsRenderer: React.FC<TabContentsRendererProps> = ({
     'performance', 'suggestions'
   ];
   
+  const initialRender = useRef(true);
+  
   console.log(`TabContentsRenderer: Rendu du contenu pour l'onglet actif: ${activeTab}`);
   
   // S'assurer que le contenu est visible lorsque activeTab change
@@ -43,20 +46,39 @@ const TabContentsRenderer: React.FC<TabContentsRendererProps> = ({
       // Activer la section spécifique
       activateSection(activeTab);
       console.log(`TabContentsRenderer: Activation de la section ${activeTab} après délai`);
-    }, 300);
+      
+      // Notification pour indiquer le changement d'onglet (seulement après le premier rendu)
+      if (!initialRender.current) {
+        toast.success(`Contenu de l'onglet ${activeTab} chargé`, {
+          description: "Le contenu a été mis à jour",
+          duration: 1500
+        });
+      }
+      initialRender.current = false;
+    }, 500); // Délai augmenté pour garantir que le DOM est complètement chargé
     
     return () => clearTimeout(timer);
   }, [activeTab]);
   
+  // Utilisation de styles inline plus agressifs pour contrôler la visibilité
+  const getTabStyle = (tabId: string) => ({
+    display: activeTab === tabId ? 'block' : 'none',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%'
+  });
+  
   return (
-    <div className="tab-content-container relative min-h-[400px]">
+    <div className="tab-content-container relative min-h-[500px]">
       {/* Contenu d'onglet spécialisé */}
       <TabsContent 
         value="hierarchy" 
         id="hierarchy" 
         data-tab-content="hierarchy" 
         className="absolute inset-0 w-full"
-        style={{ display: activeTab === 'hierarchy' ? 'block' : 'none' }}
+        style={getTabStyle('hierarchy')}
       >
         <HierarchyTabContent />
       </TabsContent>
@@ -66,7 +88,7 @@ const TabContentsRenderer: React.FC<TabContentsRendererProps> = ({
         id="wordcount" 
         data-tab-content="wordcount" 
         className="absolute inset-0 w-full"
-        style={{ display: activeTab === 'wordcount' ? 'block' : 'none' }}
+        style={getTabStyle('wordcount')}
       >
         <WordCountTabContent />
       </TabsContent>
@@ -76,7 +98,7 @@ const TabContentsRenderer: React.FC<TabContentsRendererProps> = ({
         id="suggestions" 
         data-tab-content="suggestions" 
         className="absolute inset-0 w-full"
-        style={{ display: activeTab === 'suggestions' ? 'block' : 'none' }}
+        style={getTabStyle('suggestions')}
       >
         <SuggestionsTabContent />
       </TabsContent>
@@ -86,7 +108,7 @@ const TabContentsRenderer: React.FC<TabContentsRendererProps> = ({
         id="seo" 
         data-tab-content="seo" 
         className="absolute inset-0 w-full"
-        style={{ display: activeTab === 'seo' ? 'block' : 'none' }}
+        style={getTabStyle('seo')}
       >
         <SeoTabContent />
       </TabsContent>
@@ -96,7 +118,7 @@ const TabContentsRenderer: React.FC<TabContentsRendererProps> = ({
         id="structure" 
         data-tab-content="structure" 
         className="absolute inset-0 w-full"
-        style={{ display: activeTab === 'structure' ? 'block' : 'none' }}
+        style={getTabStyle('structure')}
       >
         <StructureTabContent />
       </TabsContent>
@@ -106,7 +128,7 @@ const TabContentsRenderer: React.FC<TabContentsRendererProps> = ({
         id="backlinks" 
         data-tab-content="backlinks" 
         className="absolute inset-0 w-full"
-        style={{ display: activeTab === 'backlinks' ? 'block' : 'none' }}
+        style={getTabStyle('backlinks')}
       >
         <BacklinksTabContent />
       </TabsContent>
@@ -116,7 +138,7 @@ const TabContentsRenderer: React.FC<TabContentsRendererProps> = ({
         id="metrics" 
         data-tab-content="metrics" 
         className="absolute inset-0 w-full"
-        style={{ display: activeTab === 'metrics' ? 'block' : 'none' }}
+        style={getTabStyle('metrics')}
       >
         <MetricsTabContent />
       </TabsContent>
@@ -126,7 +148,7 @@ const TabContentsRenderer: React.FC<TabContentsRendererProps> = ({
         id="advanced" 
         data-tab-content="advanced" 
         className="absolute inset-0 w-full"
-        style={{ display: activeTab === 'advanced' ? 'block' : 'none' }}
+        style={getTabStyle('advanced')}
       >
         <AdvancedTabContent />
       </TabsContent>
@@ -136,7 +158,7 @@ const TabContentsRenderer: React.FC<TabContentsRendererProps> = ({
         id="integrations" 
         data-tab-content="integrations" 
         className="absolute inset-0 w-full"
-        style={{ display: activeTab === 'integrations' ? 'block' : 'none' }}
+        style={getTabStyle('integrations')}
       >
         <IntegrationsTabContent />
       </TabsContent>
@@ -146,7 +168,7 @@ const TabContentsRenderer: React.FC<TabContentsRendererProps> = ({
         id="performance" 
         data-tab-content="performance" 
         className="absolute inset-0 w-full"
-        style={{ display: activeTab === 'performance' ? 'block' : 'none' }}
+        style={getTabStyle('performance')}
       >
         <PerformanceTabContent />
       </TabsContent>
@@ -156,7 +178,7 @@ const TabContentsRenderer: React.FC<TabContentsRendererProps> = ({
         id="analytics" 
         data-tab-content="analytics" 
         className="absolute inset-0 w-full"
-        style={{ display: activeTab === 'analytics' ? 'block' : 'none' }}
+        style={getTabStyle('analytics')}
       >
         <AnalyticsTabContent />
       </TabsContent>
@@ -171,7 +193,7 @@ const TabContentsRenderer: React.FC<TabContentsRendererProps> = ({
             id={tab.id} 
             data-tab-content={tab.id}
             className="absolute inset-0 w-full"
-            style={{ display: activeTab === tab.id ? 'block' : 'none' }}
+            style={getTabStyle(tab.id)}
           >
             <DefaultTabContent id={tab.id} label={tab.label} />
           </TabsContent>

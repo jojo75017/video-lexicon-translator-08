@@ -4,12 +4,17 @@
 export const activateSection = (sectionId: string) => {
   console.log(`Activation de la section: ${sectionId}`);
   
-  // Masquer toutes les sections d'abord
+  // Masquer TOUTES les sections d'abord (solution plus radicale)
   document.querySelectorAll('[data-tab-content]').forEach(el => {
     (el as HTMLElement).style.display = 'none';
   });
   
   document.querySelectorAll('[data-section]').forEach(el => {
+    (el as HTMLElement).style.display = 'none';
+  });
+  
+  // Masquer toutes les TabsContent d'abord
+  document.querySelectorAll('[role="tabpanel"]').forEach(el => {
     (el as HTMLElement).style.display = 'none';
   });
   
@@ -41,6 +46,13 @@ export const activateSection = (sectionId: string) => {
     });
     console.log(`Éléments avec data-tab-content=${sectionId} affichés`);
   }
+  
+  // Activer également le TabsContent correspondant
+  const tabPanel = document.querySelector(`[role="tabpanel"][value="${sectionId}"]`);
+  if (tabPanel) {
+    (tabPanel as HTMLElement).style.display = 'block';
+    console.log(`Panneau d'onglet ${sectionId} activé`);
+  }
 };
 
 // Fonction pour naviguer vers une section
@@ -51,7 +63,7 @@ export const navigateToSection = (sectionId: string) => {
   // Puis activer explicitement la section
   setTimeout(() => {
     activateSection(sectionId);
-  }, 100);
+  }, 300); // Délai augmenté pour garantir que le DOM est prêt
 };
 
 // Fonction pour obtenir la catégorie principale d'un onglet
