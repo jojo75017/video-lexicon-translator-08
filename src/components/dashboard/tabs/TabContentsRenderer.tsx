@@ -40,21 +40,34 @@ const TabContentsRenderer: React.FC<TabContentsRendererProps> = ({
   useEffect(() => {
     // Short delay to ensure DOM is updated
     setTimeout(() => {
+      // First clear all displays
+      document.querySelectorAll('[data-tab-content]').forEach(el => {
+        (el as HTMLElement).style.display = 'none';
+      });
+      
+      // Then activate the specific tab
       activateSection(activeTab);
       
       // Force display of the active tab content
       const activeElement = document.getElementById(activeTab);
       if (activeElement) {
         activeElement.style.display = 'block';
-        console.log(`Forced display of tab content: ${activeTab}`);
+        console.log(`Forced display of tab content with ID: ${activeTab}`);
       }
       
       // Also force display of data-section
-      const sectionElement = document.querySelector(`[data-section="${activeTab}"]`);
-      if (sectionElement) {
-        (sectionElement as HTMLElement).style.display = 'block';
-        console.log(`Forced display of section: ${activeTab}`);
-      }
+      const sectionElements = document.querySelectorAll(`[data-section="${activeTab}"]`);
+      sectionElements.forEach(el => {
+        (el as HTMLElement).style.display = 'block';
+        console.log(`Forced display of section with data-section: ${activeTab}`);
+      });
+      
+      // Also check for data-tab-content
+      const tabContentElements = document.querySelectorAll(`[data-tab-content="${activeTab}"]`);
+      tabContentElements.forEach(el => {
+        (el as HTMLElement).style.display = 'block';
+        console.log(`Forced display of element with data-tab-content: ${activeTab}`);
+      });
     }, 50);
   }, [activeTab]);
   

@@ -65,24 +65,30 @@ export const useTabNavigation = () => {
     window.location.hash = value;
     
     // Make sure the tab content is visible
-    activateSection(value);
-    
-    // Special case for main category tabs
-    if (value === 'content') {
-      activateSection('hierarchy');
-    } else if (value === 'seo') {
-      activateSection('seo');
-    } else if (value === 'performance') {
-      activateSection('performance');
-    } else if (value === 'analytics') {
-      activateSection('analytics');
-    }
-    
-    // Show notification
-    toast.success(`Onglet ${value} affiché`, {
-      description: "Contenu mis à jour",
-      duration: 2000
-    });
+    setTimeout(() => {
+      // First hide all sections
+      document.querySelectorAll('[data-tab-content]').forEach(el => {
+        (el as HTMLElement).style.display = 'none';
+      });
+      
+      document.querySelectorAll('[data-section]').forEach(el => {
+        (el as HTMLElement).style.display = 'none';
+      });
+      
+      // Then activate the proper section
+      activateSection(value);
+      
+      // Special case for main category tabs
+      if (value === 'content') {
+        activateSection('hierarchy');
+      } else if (value === 'seo') {
+        activateSection('seo');
+      } else if (value === 'performance') {
+        activateSection('performance');
+      } else if (value === 'analytics') {
+        activateSection('analytics');
+      }
+    }, 50);
   };
 
   // Get sub-tabs based on active main tab

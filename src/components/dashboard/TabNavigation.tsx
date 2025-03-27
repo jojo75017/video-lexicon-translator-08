@@ -8,6 +8,7 @@ import SubTabList from './tabs/SubTabList';
 import TabContentsRenderer from './tabs/TabContentsRenderer';
 import { useTabNavigation } from './tabs/useTabNavigation';
 import { activateSection, getMainTabCategory } from '@/utils/navigationHelpers';
+import { toast } from "sonner";
 
 const TabNavigation = () => {
   const { 
@@ -24,6 +25,16 @@ const TabNavigation = () => {
     
     // Ensure the active tab content is visible
     setTimeout(() => {
+      // First hide all sections
+      document.querySelectorAll('[data-tab-content]').forEach(el => {
+        (el as HTMLElement).style.display = 'none';
+      });
+      
+      document.querySelectorAll('[data-section]').forEach(el => {
+        (el as HTMLElement).style.display = 'none';
+      });
+      
+      // Then activate the correct section
       activateSection(activeTab);
       
       // Also ensure main tab category is active
@@ -31,6 +42,13 @@ const TabNavigation = () => {
       if (mainCategory !== activeTab) {
         console.log(`Ensuring main category ${mainCategory} is also active`);
       }
+      
+      // Display a toast message for better UX
+      toast.success(`Tab ${activeTab} activé`, {
+        description: "Contenu mis à jour",
+        position: "bottom-right",
+        duration: 2000
+      });
     }, 100);
   }, [activeTab]);
   
