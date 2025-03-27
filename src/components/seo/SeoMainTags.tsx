@@ -87,10 +87,13 @@ const SeoMainTags = ({
         </h4>
         
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="bg-red-50 p-3 rounded-lg border border-red-100 flex flex-col items-center">
-            <Heading1 className="h-5 w-5 text-red-600 mb-1" />
-            <span className="text-2xl font-bold text-red-800">{h1Count}</span>
-            <span className="text-xs text-red-700">Balises H1</span>
+          <div className={`p-3 rounded-lg border flex flex-col items-center ${h1Count === 1 ? 'bg-green-50 border-green-100' : h1Count === 0 ? 'bg-gray-50 border-gray-100' : 'bg-red-50 border-red-100'}`}>
+            <Heading1 className={`h-5 w-5 mb-1 ${h1Count === 1 ? 'text-green-600' : h1Count === 0 ? 'text-gray-400' : 'text-red-600'}`} />
+            <span className={`text-2xl font-bold ${h1Count === 1 ? 'text-green-800' : h1Count === 0 ? 'text-gray-500' : 'text-red-800'}`}>{h1Count}</span>
+            <span className={`text-xs ${h1Count === 1 ? 'text-green-700' : h1Count === 0 ? 'text-gray-500' : 'text-red-700'}`}>Balises H1</span>
+            {h1Count !== 1 && (
+              <span className="text-xs text-red-600 mt-1">{h1Count === 0 ? 'Manquante !' : 'Trop nombreuses !'}</span>
+            )}
           </div>
           
           <div className="bg-orange-50 p-3 rounded-lg border border-orange-100 flex flex-col items-center">
@@ -105,10 +108,10 @@ const SeoMainTags = ({
             <span className="text-xs text-yellow-700">Balises H3</span>
           </div>
           
-          <div className="bg-blue-50 p-3 rounded-lg border border-blue-100 flex flex-col items-center">
-            <Image className="h-5 w-5 text-blue-600 mb-1" />
-            <span className="text-2xl font-bold text-blue-800">{imgCount}</span>
-            <span className="text-xs text-blue-700">Images</span>
+          <div className={`p-3 rounded-lg border flex flex-col items-center ${imgCount === 0 ? 'bg-red-50 border-red-100' : 'bg-blue-50 border-blue-100'}`}>
+            <Image className={`h-5 w-5 mb-1 ${imgCount === 0 ? 'text-red-600' : 'text-blue-600'}`} />
+            <span className={`text-2xl font-bold ${imgCount === 0 ? 'text-red-800' : 'text-blue-800'}`}>{imgCount}</span>
+            <span className={`text-xs ${imgCount === 0 ? 'text-red-700' : 'text-blue-700'}`}>Images</span>
           </div>
         </div>
       </div>

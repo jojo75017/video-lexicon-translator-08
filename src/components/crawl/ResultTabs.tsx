@@ -22,8 +22,7 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
       initialRenderRef.current = false;
       
       // Set first tab content to be visible and hide the rest
-      const sections = document.querySelectorAll('[data-section]');
-      sections.forEach((section) => {
+      document.querySelectorAll('[data-section]').forEach((section) => {
         const sectionId = section.getAttribute('data-section');
         (section as HTMLElement).style.display = sectionId === "info" ? "block" : "none";
       });
@@ -31,10 +30,12 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
       console.log("ResultTabs initialized - showing info tab");
       
       // Notify user that results are available
-      toast.success("Résultats d'analyse disponibles", {
-        description: "Consultez les différents onglets pour voir les détails",
-        duration: 3000
-      });
+      if (data) {
+        toast.success("Résultats d'analyse disponibles", {
+          description: "Consultez les différents onglets pour voir les détails",
+          duration: 3000
+        });
+      }
     }
   }, [data]);
   
@@ -44,8 +45,7 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
     setActiveTab(value);
     
     // Hide all content first
-    const allContent = document.querySelectorAll('[data-section]');
-    allContent.forEach((el) => {
+    document.querySelectorAll('[data-section]').forEach((el) => {
       (el as HTMLElement).style.display = 'none';
     });
     
@@ -59,7 +59,8 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
           ? "Informations générales sur le site"
           : value === "source" 
             ? "Code source de la page" 
-            : "Structure du site et hiérarchie"
+            : "Structure du site et hiérarchie",
+        duration: 1500
       });
     }
   };

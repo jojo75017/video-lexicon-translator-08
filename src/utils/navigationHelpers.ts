@@ -65,7 +65,21 @@ export const activateSection = (sectionId: string) => {
       });
       console.log(`Tab content with class ${sectionId} displayed (${tabContentByClass.length} found)`);
     }
-  }, 300);
+    
+    // 6. Try for TabsContent components
+    const radixTabsContent = document.querySelector(`[data-state="active"][role="tabpanel"][data-orientation="horizontal"]`);
+    if (radixTabsContent) {
+      (radixTabsContent as HTMLElement).style.display = 'block';
+      console.log(`Radix TabsContent activated for ${sectionId}`);
+    }
+    
+    // 7. Also look for specific tabs content with matching value
+    const valueTabsContent = document.querySelector(`[value="${sectionId}"][role="tabpanel"]`);
+    if (valueTabsContent) {
+      (valueTabsContent as HTMLElement).style.display = 'block';
+      console.log(`TabsContent with value=${sectionId} displayed`);
+    }
+  }, 100);
 };
 
 // Function to navigate to a section - updates URL hash and activates the section
@@ -76,7 +90,7 @@ export const navigateToSection = (sectionId: string) => {
   // Explicitly activate the section with delay
   setTimeout(() => {
     activateSection(sectionId);
-  }, 500);
+  }, 200);
 };
 
 // Function to get the main tab category of a tab
