@@ -15,12 +15,20 @@ export const SourceCode = ({ sourceCode }: SourceCodeProps) => {
     if (sourceCode) {
       // Format HTML for better display
       try {
+        // Enhanced formatting to better highlight HTML tags
         const formatted = sourceCode
           .replace(/</g, "&lt;")
           .replace(/>/g, "&gt;")
-          .replace(/&lt;([\/]?[a-zA-Z0-9]+)/g, "<span class='text-blue-600'>&lt;$1</span>")
+          .replace(/&lt;([\/]?[a-zA-Z0-9]+)/g, "<span class='text-blue-600 font-bold'>&lt;$1</span>")
           .replace(/([a-zA-Z0-9\-]+)=["']/g, "<span class='text-purple-600'>$1</span>=&quot;")
-          .replace(/["']>/g, "&quot;&gt;");
+          .replace(/["']>/g, "&quot;&gt;")
+          // Highlight headings with different colors
+          .replace(/&lt;h1/g, "<span class='text-red-600 font-bold'>&lt;h1</span>")
+          .replace(/&lt;\/h1/g, "<span class='text-red-600 font-bold'>&lt;/h1</span>")
+          .replace(/&lt;h2/g, "<span class='text-orange-600 font-bold'>&lt;h2</span>")
+          .replace(/&lt;\/h2/g, "<span class='text-orange-600 font-bold'>&lt;/h2</span>")
+          .replace(/&lt;h3/g, "<span class='text-yellow-600 font-bold'>&lt;h3</span>")
+          .replace(/&lt;\/h3/g, "<span class='text-yellow-600 font-bold'>&lt;/h3</span>");
         
         setFormattedCode(formatted);
       } catch (error) {

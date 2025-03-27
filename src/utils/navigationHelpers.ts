@@ -4,7 +4,7 @@
 export const activateSection = (sectionId: string) => {
   console.log(`Activation de la section: ${sectionId}`);
   
-  // Masquer TOUTES les sections d'abord (solution plus radicale)
+  // Hide ALL sections first
   document.querySelectorAll('[data-tab-content]').forEach(el => {
     (el as HTMLElement).style.display = 'none';
   });
@@ -13,62 +13,59 @@ export const activateSection = (sectionId: string) => {
     (el as HTMLElement).style.display = 'none';
   });
   
-  // Masquer toutes les TabsContent d'abord
+  // Hide all TabsContent first
   document.querySelectorAll('[role="tabpanel"]').forEach(el => {
     (el as HTMLElement).style.display = 'none';
   });
   
-  // Afficher la section sélectionnée par ID - augmenter le délai
+  // Show the selected section by ID with a delay
   setTimeout(() => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.style.display = 'block';
-      console.log(`Section ${sectionId} activée et affichée`);
-    } else {
-      console.log(`Section avec ID ${sectionId} non trouvée dans le DOM`);
+    // Show all elements that match the sectionId
+    const elementById = document.getElementById(sectionId);
+    if (elementById) {
+      elementById.style.display = 'block';
+      console.log(`Section ID ${sectionId} activated and displayed`);
     }
     
-    // Vérifier également les éléments avec l'attribut data-section
+    // Show all elements with the matching data-section attribute
     const sectionElements = document.querySelectorAll(`[data-section="${sectionId}"]`);
     if (sectionElements.length > 0) {
       sectionElements.forEach(el => {
         (el as HTMLElement).style.display = 'block';
       });
-      console.log(`Sections avec data-section=${sectionId} également activées`);
-    } else {
-      console.log(`Aucun élément avec data-section=${sectionId} trouvé`);
+      console.log(`Sections with data-section=${sectionId} activated (${sectionElements.length} found)`);
     }
     
-    // Vérifier les éléments avec l'attribut data-tab-content
+    // Show all elements with the matching data-tab-content attribute
     const tabContentElements = document.querySelectorAll(`[data-tab-content="${sectionId}"]`);
     if (tabContentElements.length > 0) {
       tabContentElements.forEach(el => {
         (el as HTMLElement).style.display = 'block';
       });
-      console.log(`Éléments avec data-tab-content=${sectionId} affichés`);
+      console.log(`Elements with data-tab-content=${sectionId} displayed (${tabContentElements.length} found)`);
     }
     
-    // Activer également le TabsContent correspondant
+    // Show the tab panel with the matching value attribute
     const tabPanel = document.querySelector(`[role="tabpanel"][value="${sectionId}"]`);
     if (tabPanel) {
       (tabPanel as HTMLElement).style.display = 'block';
-      console.log(`Panneau d'onglet ${sectionId} activé`);
+      console.log(`Tab panel ${sectionId} activated`);
     }
-  }, 100);
+  }, 300); // Increased delay to ensure DOM is ready
 };
 
-// Fonction pour naviguer vers une section
+// Function to navigate to a section
 export const navigateToSection = (sectionId: string) => {
-  // Mettre à jour le hash pour déclencher les écouteurs
+  // Update hash to trigger listeners
   window.location.hash = sectionId;
   
-  // Puis activer explicitement la section
+  // Explicitly activate the section after a delay
   setTimeout(() => {
     activateSection(sectionId);
-  }, 300); // Délai augmenté pour garantir que le DOM est prêt
+  }, 500); // Increased delay to ensure hash is updated
 };
 
-// Fonction pour obtenir la catégorie principale d'un onglet
+// Function to get the main tab category of a tab
 export const getMainTabCategory = (tabId: string): string => {
   if (['hierarchy', 'wordcount', 'suggestions'].includes(tabId)) {
     return 'content';
@@ -80,6 +77,6 @@ export const getMainTabCategory = (tabId: string): string => {
     return 'analytics';
   }
   
-  // Par défaut, retourner l'onglet lui-même s'il s'agit d'une catégorie principale
+  // Return the tab itself if it's a main category
   return tabId;
 };

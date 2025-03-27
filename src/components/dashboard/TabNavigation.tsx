@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Tabs } from "@/components/ui/tabs";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,22 +19,32 @@ const TabNavigation = () => {
     handleTabChange 
   } = useTabNavigation();
   
-  // Log active tab for debugging
+  const initialRenderRef = useRef(true);
+  
+  // Log active tab for debugging and ensure active tab content is visible
   useEffect(() => {
-    console.log(`TabNavigation: Active tab is ${activeTab}`);
+    console.log(`TabNavigation: Active tab changed to ${activeTab}`);
     
-    // Ensure the active tab content is visible
+    if (initialRenderRef.current) {
+      initialRenderRef.current = false;
+      console.log("Initial render, skipping toast notification");
+      // Still activate the section on initial render
+      setTimeout(() => activateSection(activeTab), 600);
+      return;
+    }
+    
+    // Ensure the active tab content is visible with increased timeout
     setTimeout(() => {
-      // Activation de la section avec l'ID actif
+      // Activate the section with the active ID
       activateSection(activeTab);
       
-      // Afficher une notification toast pour confirmer l'activation
+      // Show toast notification to confirm activation
       toast.success(`Onglet ${activeTab} activé`, {
         description: "Contenu mis à jour",
         position: "bottom-right",
         duration: 2000
       });
-    }, 800); // Augmenter le délai pour s'assurer que le DOM est mis à jour
+    }, 800); // Increased delay to ensure DOM is updated
   }, [activeTab]);
   
   return (
@@ -64,7 +74,7 @@ const TabNavigation = () => {
             />
             
             {/* Tab Contents */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4 mt-4 relative">
+            <div className="bg-white rounded-lg border border-gray-200 p-4 mt-4 relative min-h-[400px]">
               <TabContentsRenderer 
                 contentTabs={contentTabs} 
                 activeTab={activeTab}

@@ -4,7 +4,7 @@ import { Code, Search, ListTree, BarChart, Link2, Globe, Database } from "lucide
 import { SiteInfo } from "./SiteInfo";
 import { SourceCode } from "./SourceCode";
 import { toast } from "sonner";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { getStructureData } from "@/utils/seo/updateUtils";
 import ContentHierarchy from "../ContentHierarchy";
 
@@ -14,23 +14,28 @@ interface ResultTabsProps {
 
 export const ResultTabs = ({ data }: ResultTabsProps) => {
   const [activeTab, setActiveTab] = useState("info");
+  const initialRenderRef = useRef(true);
   
   // Initialize component - show first tab, hide others
   useEffect(() => {
-    // Set first tab content to be visible and hide the rest
-    const sections = document.querySelectorAll('[data-section]');
-    sections.forEach((section) => {
-      const sectionId = section.getAttribute('data-section');
-      (section as HTMLElement).style.display = sectionId === "info" ? "block" : "none";
-    });
-    
-    console.log("ResultTabs initialized - showing info tab");
-    
-    // Notify user that results are available
-    toast.success("Résultats d'analyse disponibles", {
-      description: "Consultez les différents onglets pour voir les détails",
-      duration: 3000
-    });
+    if (initialRenderRef.current) {
+      initialRenderRef.current = false;
+      
+      // Set first tab content to be visible and hide the rest
+      const sections = document.querySelectorAll('[data-section]');
+      sections.forEach((section) => {
+        const sectionId = section.getAttribute('data-section');
+        (section as HTMLElement).style.display = sectionId === "info" ? "block" : "none";
+      });
+      
+      console.log("ResultTabs initialized - showing info tab");
+      
+      // Notify user that results are available
+      toast.success("Résultats d'analyse disponibles", {
+        description: "Consultez les différents onglets pour voir les détails",
+        duration: 3000
+      });
+    }
   }, [data]);
   
   // Tab change handler
@@ -101,6 +106,8 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
     );
   }
 
+  console.log("RENDERING TABS with headings:", formattedHeadings.length, "paragraphs:", paragraphs.length);
+
   return (
     <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
       <TabsList className="w-full grid grid-cols-3 bg-muted/50 p-1 rounded-lg">
@@ -134,19 +141,19 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
       </TabsList>
 
       <TabsContent value="info" className="mt-6 space-y-6">
-        <div id="info" data-section="info" className="section-info">
+        <div id="info" data-section="info" className="section-info" style={{display: 'block'}}>
           <SiteInfo data={data} />
         </div>
       </TabsContent>
 
       <TabsContent value="source" className="mt-6">
-        <div id="source" data-section="source" className="section-source">
+        <div id="source" data-section="source" className="section-source" style={{display: 'none'}}>
           <SourceCode sourceCode={data?.sourceCode || "<p>Aucun code source disponible</p>"} />
         </div>
       </TabsContent>
       
       <TabsContent value="structure" className="mt-6">
-        <div id="structure" data-section="structure" className="section-structure">
+        <div id="structure" data-section="structure" className="section-structure" style={{display: 'none'}}>
           <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
             <ContentHierarchy 
               headings={formattedHeadings}
