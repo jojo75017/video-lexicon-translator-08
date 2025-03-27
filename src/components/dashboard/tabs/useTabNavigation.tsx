@@ -35,7 +35,7 @@ export const useTabNavigation = () => {
       // Activation immédiate de la section correspondante
       setTimeout(() => {
         activateSection(hash);
-      }, 50);
+      }, 300);
     } else {
       // Par défaut, aller au premier onglet si pas de hash
       const defaultTab = 'hierarchy';
@@ -44,7 +44,7 @@ export const useTabNavigation = () => {
       // Activation immédiate de la section par défaut
       setTimeout(() => {
         activateSection(defaultTab);
-      }, 50);
+      }, 300);
     }
     
     // Écouter les changements de hash
@@ -53,7 +53,9 @@ export const useTabNavigation = () => {
       if (newHash && tabs.some(tab => tab.id === newHash)) {
         console.log(`Hash changé en ${newHash}, mise à jour de l'onglet actif`);
         setActiveTab(newHash);
-        activateSection(newHash);
+        setTimeout(() => {
+          activateSection(newHash);
+        }, 300);
       }
     };
     
@@ -80,7 +82,13 @@ export const useTabNavigation = () => {
     setTimeout(() => {
       // Activer la section appropriée
       activateSection(value);
-    }, 50);
+      
+      // Notification visuelle du changement d'onglet
+      toast.info(`Navigation vers l'onglet ${value}`, {
+        description: "Chargement du contenu en cours...",
+        duration: 1500
+      });
+    }, 300);
   };
 
   // Obtenir les sous-onglets en fonction de l'onglet principal actif

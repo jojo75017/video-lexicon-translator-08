@@ -34,7 +34,7 @@ const TabNavigation = () => {
         position: "bottom-right",
         duration: 2000
       });
-    }, 100);
+    }, 300); // Augmenter le délai pour s'assurer que le DOM est mis à jour
   }, [activeTab]);
   
   return (
@@ -64,7 +64,7 @@ const TabNavigation = () => {
             />
             
             {/* Tab Contents */}
-            <div className="bg-white rounded-lg border border-gray-200 p-4 mt-4">
+            <div className="bg-white rounded-lg border border-gray-200 p-4 mt-4 relative">
               <TabContentsRenderer 
                 contentTabs={contentTabs} 
                 activeTab={activeTab}

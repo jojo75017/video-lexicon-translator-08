@@ -49,7 +49,9 @@ export const navigateToSection = (sectionId: string) => {
   window.location.hash = sectionId;
   
   // Puis activer explicitement la section
-  activateSection(sectionId);
+  setTimeout(() => {
+    activateSection(sectionId);
+  }, 100);
 };
 
 // Fonction pour obtenir la catégorie principale d'un onglet

@@ -39,14 +39,17 @@ const TabContentsRenderer: React.FC<TabContentsRendererProps> = ({
   // S'assurer que le contenu est visible lorsque activeTab change
   useEffect(() => {
     // Court délai pour s'assurer que le DOM est mis à jour
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       // Activer la section spécifique
       activateSection(activeTab);
-    }, 100);
+      console.log(`TabContentsRenderer: Activation de la section ${activeTab} après délai`);
+    }, 300);
+    
+    return () => clearTimeout(timer);
   }, [activeTab]);
   
   return (
-    <div className="tab-content-container relative">
+    <div className="tab-content-container relative min-h-[400px]">
       {/* Contenu d'onglet spécialisé */}
       <TabsContent 
         value="hierarchy" 
