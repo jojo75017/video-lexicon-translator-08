@@ -27,98 +27,138 @@ const TabContentsRenderer: React.FC<TabContentsRendererProps> = ({
   contentTabs,
   activeTab
 }) => {
-  // List of tab IDs that have specialized components
+  // Liste des identifiants d'onglets qui ont des composants spécialisés
   const specializedTabs = [
     'hierarchy', 'wordcount', 'seo', 'structure', 'backlinks', 
     'metrics', 'advanced', 'integrations', 'analytics', 
     'performance', 'suggestions'
   ];
   
-  console.log(`TabContentsRenderer: Rendering content for active tab: ${activeTab}`);
+  console.log(`TabContentsRenderer: Rendu du contenu pour l'onglet actif: ${activeTab}`);
   
-  // Make sure content is visible when activeTab changes
+  // S'assurer que le contenu est visible lorsque activeTab change
   useEffect(() => {
-    // Short delay to ensure DOM is updated
+    // Court délai pour s'assurer que le DOM est mis à jour
     setTimeout(() => {
-      // First clear all displays
-      document.querySelectorAll('[data-tab-content]').forEach(el => {
-        (el as HTMLElement).style.display = 'none';
-      });
-      
-      // Then activate the specific tab
+      // Activer la section spécifique
       activateSection(activeTab);
-      
-      // Force display of the active tab content
-      const activeElement = document.getElementById(activeTab);
-      if (activeElement) {
-        activeElement.style.display = 'block';
-        console.log(`Forced display of tab content with ID: ${activeTab}`);
-      }
-      
-      // Also force display of data-section
-      const sectionElements = document.querySelectorAll(`[data-section="${activeTab}"]`);
-      sectionElements.forEach(el => {
-        (el as HTMLElement).style.display = 'block';
-        console.log(`Forced display of section with data-section: ${activeTab}`);
-      });
-      
-      // Also check for data-tab-content
-      const tabContentElements = document.querySelectorAll(`[data-tab-content="${activeTab}"]`);
-      tabContentElements.forEach(el => {
-        (el as HTMLElement).style.display = 'block';
-        console.log(`Forced display of element with data-tab-content: ${activeTab}`);
-      });
-    }, 50);
+    }, 100);
   }, [activeTab]);
   
   return (
-    <div className="tab-content-container">
-      {/* Specialized tab contents */}
-      <TabsContent value="hierarchy" id="hierarchy" data-tab-content="hierarchy" className={activeTab === 'hierarchy' ? 'block' : 'hidden'}>
+    <div className="tab-content-container relative">
+      {/* Contenu d'onglet spécialisé */}
+      <TabsContent 
+        value="hierarchy" 
+        id="hierarchy" 
+        data-tab-content="hierarchy" 
+        className="absolute inset-0 w-full"
+        style={{ display: activeTab === 'hierarchy' ? 'block' : 'none' }}
+      >
         <HierarchyTabContent />
       </TabsContent>
       
-      <TabsContent value="wordcount" id="wordcount" data-tab-content="wordcount" className={activeTab === 'wordcount' ? 'block' : 'hidden'}>
+      <TabsContent 
+        value="wordcount" 
+        id="wordcount" 
+        data-tab-content="wordcount" 
+        className="absolute inset-0 w-full"
+        style={{ display: activeTab === 'wordcount' ? 'block' : 'none' }}
+      >
         <WordCountTabContent />
       </TabsContent>
       
-      <TabsContent value="suggestions" id="suggestions" data-tab-content="suggestions" className={activeTab === 'suggestions' ? 'block' : 'hidden'}>
+      <TabsContent 
+        value="suggestions" 
+        id="suggestions" 
+        data-tab-content="suggestions" 
+        className="absolute inset-0 w-full"
+        style={{ display: activeTab === 'suggestions' ? 'block' : 'none' }}
+      >
         <SuggestionsTabContent />
       </TabsContent>
       
-      <TabsContent value="seo" id="seo" data-tab-content="seo" className={activeTab === 'seo' ? 'block' : 'hidden'}>
+      <TabsContent 
+        value="seo" 
+        id="seo" 
+        data-tab-content="seo" 
+        className="absolute inset-0 w-full"
+        style={{ display: activeTab === 'seo' ? 'block' : 'none' }}
+      >
         <SeoTabContent />
       </TabsContent>
       
-      <TabsContent value="structure" id="structure" data-tab-content="structure" className={activeTab === 'structure' ? 'block' : 'hidden'}>
+      <TabsContent 
+        value="structure" 
+        id="structure" 
+        data-tab-content="structure" 
+        className="absolute inset-0 w-full"
+        style={{ display: activeTab === 'structure' ? 'block' : 'none' }}
+      >
         <StructureTabContent />
       </TabsContent>
       
-      <TabsContent value="backlinks" id="backlinks" data-tab-content="backlinks" className={activeTab === 'backlinks' ? 'block' : 'hidden'}>
+      <TabsContent 
+        value="backlinks" 
+        id="backlinks" 
+        data-tab-content="backlinks" 
+        className="absolute inset-0 w-full"
+        style={{ display: activeTab === 'backlinks' ? 'block' : 'none' }}
+      >
         <BacklinksTabContent />
       </TabsContent>
       
-      <TabsContent value="metrics" id="metrics" data-tab-content="metrics" className={activeTab === 'metrics' ? 'block' : 'hidden'}>
+      <TabsContent 
+        value="metrics" 
+        id="metrics" 
+        data-tab-content="metrics" 
+        className="absolute inset-0 w-full"
+        style={{ display: activeTab === 'metrics' ? 'block' : 'none' }}
+      >
         <MetricsTabContent />
       </TabsContent>
       
-      <TabsContent value="advanced" id="advanced" data-tab-content="advanced" className={activeTab === 'advanced' ? 'block' : 'hidden'}>
+      <TabsContent 
+        value="advanced" 
+        id="advanced" 
+        data-tab-content="advanced" 
+        className="absolute inset-0 w-full"
+        style={{ display: activeTab === 'advanced' ? 'block' : 'none' }}
+      >
         <AdvancedTabContent />
       </TabsContent>
       
-      <TabsContent value="integrations" id="integrations" data-tab-content="integrations" className={activeTab === 'integrations' ? 'block' : 'hidden'}>
+      <TabsContent 
+        value="integrations" 
+        id="integrations" 
+        data-tab-content="integrations" 
+        className="absolute inset-0 w-full"
+        style={{ display: activeTab === 'integrations' ? 'block' : 'none' }}
+      >
         <IntegrationsTabContent />
       </TabsContent>
       
-      <TabsContent value="performance" id="performance" data-tab-content="performance" className={activeTab === 'performance' ? 'block' : 'hidden'}>
+      <TabsContent 
+        value="performance" 
+        id="performance" 
+        data-tab-content="performance" 
+        className="absolute inset-0 w-full"
+        style={{ display: activeTab === 'performance' ? 'block' : 'none' }}
+      >
         <PerformanceTabContent />
       </TabsContent>
       
-      <TabsContent value="analytics" id="analytics" data-tab-content="analytics" className={activeTab === 'analytics' ? 'block' : 'hidden'}>
+      <TabsContent 
+        value="analytics" 
+        id="analytics" 
+        data-tab-content="analytics" 
+        className="absolute inset-0 w-full"
+        style={{ display: activeTab === 'analytics' ? 'block' : 'none' }}
+      >
         <AnalyticsTabContent />
       </TabsContent>
       
-      {/* For any other tab that doesn't have a specialized component */}
+      {/* Pour tout autre onglet qui n'a pas de composant spécialisé */}
       {contentTabs
         .filter(tab => !specializedTabs.includes(tab.id))
         .map(tab => (
@@ -127,7 +167,8 @@ const TabContentsRenderer: React.FC<TabContentsRendererProps> = ({
             value={tab.id} 
             id={tab.id} 
             data-tab-content={tab.id}
-            className={activeTab === tab.id ? 'block' : 'hidden'}
+            className="absolute inset-0 w-full"
+            style={{ display: activeTab === tab.id ? 'block' : 'none' }}
           >
             <DefaultTabContent id={tab.id} label={tab.label} />
           </TabsContent>

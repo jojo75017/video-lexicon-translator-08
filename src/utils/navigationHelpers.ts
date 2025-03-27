@@ -2,9 +2,9 @@
 // Helper functions for managing section navigation and activation
 
 export const activateSection = (sectionId: string) => {
-  console.log(`Activating section: ${sectionId}`);
+  console.log(`Activation de la section: ${sectionId}`);
   
-  // Hide all sections first
+  // Masquer toutes les sections d'abord
   document.querySelectorAll('[data-tab-content]').forEach(el => {
     (el as HTMLElement).style.display = 'none';
   });
@@ -13,69 +13,46 @@ export const activateSection = (sectionId: string) => {
     (el as HTMLElement).style.display = 'none';
   });
   
-  // Show the selected section
+  // Afficher la section sélectionnée par ID
   const element = document.getElementById(sectionId);
   if (element) {
     element.style.display = 'block';
-    console.log(`Section ${sectionId} activated and displayed`);
+    console.log(`Section ${sectionId} activée et affichée`);
   } else {
-    console.log(`Section with ID ${sectionId} not found in DOM`);
+    console.log(`Section avec ID ${sectionId} non trouvée dans le DOM`);
   }
   
-  // Also check for elements with data-section attribute
-  const sectionElement = document.querySelector(`[data-section="${sectionId}"]`);
-  if (sectionElement) {
-    (sectionElement as HTMLElement).style.display = 'block';
-    console.log(`Section with data-section=${sectionId} also activated`);
+  // Vérifier également les éléments avec l'attribut data-section
+  const sectionElements = document.querySelectorAll(`[data-section="${sectionId}"]`);
+  if (sectionElements.length > 0) {
+    sectionElements.forEach(el => {
+      (el as HTMLElement).style.display = 'block';
+    });
+    console.log(`Sections avec data-section=${sectionId} également activées`);
   } else {
-    console.log(`No element with data-section=${sectionId} found`);
+    console.log(`Aucun élément avec data-section=${sectionId} trouvé`);
   }
   
-  // Special case for main categories - activate their first sub-tab if needed
-  if (sectionId === 'content') {
-    const hierarchySection = document.getElementById('hierarchy') || document.querySelector('[data-section="hierarchy"]');
-    if (hierarchySection) {
-      (hierarchySection as HTMLElement).style.display = 'block';
-      console.log('Content category activated - showing hierarchy tab');
-    }
-  } else if (sectionId === 'seo') {
-    const seoSection = document.getElementById('seo') || document.querySelector('[data-section="seo"]');
-    if (seoSection) {
-      (seoSection as HTMLElement).style.display = 'block';
-      console.log('SEO category activated - showing seo tab');
-      
-      // Make sure results-display is visible when showing seo section
-      const resultsDisplay = document.querySelector('.results-display');
-      if (resultsDisplay) {
-        (resultsDisplay as HTMLElement).style.display = 'block';
-        console.log('Results display for SEO is now visible');
-      }
-    }
-  } else if (sectionId === 'performance') {
-    const performanceSection = document.getElementById('performance') || document.querySelector('[data-section="performance"]');
-    if (performanceSection) {
-      (performanceSection as HTMLElement).style.display = 'block';
-      console.log('Performance category activated - showing performance tab');
-    }
-  } else if (sectionId === 'analytics') {
-    const analyticsSection = document.getElementById('analytics') || document.querySelector('[data-section="analytics"]');
-    if (analyticsSection) {
-      (analyticsSection as HTMLElement).style.display = 'block';
-      console.log('Analytics category activated - showing analytics tab');
-    }
+  // Vérifier les éléments avec l'attribut data-tab-content
+  const tabContentElements = document.querySelectorAll(`[data-tab-content="${sectionId}"]`);
+  if (tabContentElements.length > 0) {
+    tabContentElements.forEach(el => {
+      (el as HTMLElement).style.display = 'block';
+    });
+    console.log(`Éléments avec data-tab-content=${sectionId} affichés`);
   }
 };
 
-// Add the missing navigateToSection function
+// Fonction pour naviguer vers une section
 export const navigateToSection = (sectionId: string) => {
-  // First, set the hash to trigger any listeners
+  // Mettre à jour le hash pour déclencher les écouteurs
   window.location.hash = sectionId;
   
-  // Then explicitly activate the section
+  // Puis activer explicitement la section
   activateSection(sectionId);
 };
 
-// Function to get main tab category for any tab
+// Fonction pour obtenir la catégorie principale d'un onglet
 export const getMainTabCategory = (tabId: string): string => {
   if (['hierarchy', 'wordcount', 'suggestions'].includes(tabId)) {
     return 'content';
@@ -87,6 +64,6 @@ export const getMainTabCategory = (tabId: string): string => {
     return 'analytics';
   }
   
-  // Default to the tab itself if it's a main category
+  // Par défaut, retourner l'onglet lui-même s'il s'agit d'une catégorie principale
   return tabId;
 };

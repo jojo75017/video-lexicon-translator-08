@@ -25,26 +25,11 @@ const TabNavigation = () => {
     
     // Ensure the active tab content is visible
     setTimeout(() => {
-      // First hide all sections
-      document.querySelectorAll('[data-tab-content]').forEach(el => {
-        (el as HTMLElement).style.display = 'none';
-      });
-      
-      document.querySelectorAll('[data-section]').forEach(el => {
-        (el as HTMLElement).style.display = 'none';
-      });
-      
-      // Then activate the correct section
+      // Activation de la section avec l'ID actif
       activateSection(activeTab);
       
-      // Also ensure main tab category is active
-      const mainCategory = getMainTabCategory(activeTab);
-      if (mainCategory !== activeTab) {
-        console.log(`Ensuring main category ${mainCategory} is also active`);
-      }
-      
-      // Display a toast message for better UX
-      toast.success(`Tab ${activeTab} activé`, {
+      // Afficher une notification toast pour confirmer l'activation
+      toast.success(`Onglet ${activeTab} activé`, {
         description: "Contenu mis à jour",
         position: "bottom-right",
         duration: 2000

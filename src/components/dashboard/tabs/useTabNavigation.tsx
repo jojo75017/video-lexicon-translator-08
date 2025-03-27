@@ -13,7 +13,7 @@ export interface MainTab {
 export const useTabNavigation = () => {
   const [activeTab, setActiveTab] = useState<string>('hierarchy');
   
-  // Define main categories 
+  // Définir les catégories principales
   const mainTabs: MainTab[] = [
     {id: 'content', label: 'Contenu', color: 'border-blue-600'},
     {id: 'seo', label: 'SEO', color: 'border-purple-600'},
@@ -21,32 +21,37 @@ export const useTabNavigation = () => {
     {id: 'analytics', label: 'Analytics', color: 'border-emerald-600'}
   ];
   
-  // Filter tabs without external links
+  // Filtrer les onglets sans liens externes
   const contentTabs = tabs.filter(tab => !tab.link);
   
-  // Initialize from URL hash or set default
+  // Initialiser à partir du hash URL ou définir par défaut
   useEffect(() => {
-    // Set default tab
-    const defaultTab = 'hierarchy';
-    console.log(`Setting default tab: ${defaultTab}`);
-    setActiveTab(defaultTab);
-    
-    // Check for hash in URL
+    // Vérifier le hash dans l'URL
     const hash = window.location.hash.replace('#', '');
     if (hash && tabs.some(tab => tab.id === hash)) {
-      console.log(`Found hash in URL: ${hash}, activating this tab`);
+      console.log(`Hash trouvé dans l'URL: ${hash}, activation de cet onglet`);
       setActiveTab(hash);
-      activateSection(hash);
+      
+      // Activation immédiate de la section correspondante
+      setTimeout(() => {
+        activateSection(hash);
+      }, 50);
     } else {
-      // Default to first tab if no hash
-      activateSection(defaultTab);
+      // Par défaut, aller au premier onglet si pas de hash
+      const defaultTab = 'hierarchy';
+      setActiveTab(defaultTab);
+      
+      // Activation immédiate de la section par défaut
+      setTimeout(() => {
+        activateSection(defaultTab);
+      }, 50);
     }
     
-    // Listen for hash changes
+    // Écouter les changements de hash
     const handleHashChange = () => {
       const newHash = window.location.hash.replace('#', '');
       if (newHash && tabs.some(tab => tab.id === newHash)) {
-        console.log(`Hash changed to ${newHash}, updating active tab`);
+        console.log(`Hash changé en ${newHash}, mise à jour de l'onglet actif`);
         setActiveTab(newHash);
         activateSection(newHash);
       }
@@ -56,44 +61,31 @@ export const useTabNavigation = () => {
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
   
-  // Handle tab selection
+  // Gérer la sélection d'onglet
   const handleTabChange = (value: string) => {
-    console.log(`Tab changed to: ${value}`);
+    console.log(`Changement d'onglet vers: ${value}`);
+    
+    // Ne pas continuer si c'est déjà l'onglet actif
+    if (value === activeTab) {
+      console.log('Onglet déjà actif, aucune action nécessaire');
+      return;
+    }
+    
     setActiveTab(value);
     
-    // Update URL
+    // Mise à jour de l'URL
     window.location.hash = value;
     
-    // Make sure the tab content is visible
+    // Assurer que le contenu de l'onglet est visible
     setTimeout(() => {
-      // First hide all sections
-      document.querySelectorAll('[data-tab-content]').forEach(el => {
-        (el as HTMLElement).style.display = 'none';
-      });
-      
-      document.querySelectorAll('[data-section]').forEach(el => {
-        (el as HTMLElement).style.display = 'none';
-      });
-      
-      // Then activate the proper section
+      // Activer la section appropriée
       activateSection(value);
-      
-      // Special case for main category tabs
-      if (value === 'content') {
-        activateSection('hierarchy');
-      } else if (value === 'seo') {
-        activateSection('seo');
-      } else if (value === 'performance') {
-        activateSection('performance');
-      } else if (value === 'analytics') {
-        activateSection('analytics');
-      }
     }, 50);
   };
 
-  // Get sub-tabs based on active main tab
+  // Obtenir les sous-onglets en fonction de l'onglet principal actif
   const getSubTabs = () => {
-    // Get main category of active tab
+    // Obtenir la catégorie principale de l'onglet actif
     const mainCategory = getMainTabCategory(activeTab);
     
     if (mainCategory === 'content') {
@@ -109,7 +101,7 @@ export const useTabNavigation = () => {
       return tabs.filter(tab => ['analytics'].includes(tab.id));
     }
     
-    // Default - show content tabs
+    // Par défaut - afficher les onglets de contenu
     return tabs.filter(tab => ['hierarchy', 'wordcount', 'suggestions'].includes(tab.id));
   };
   
