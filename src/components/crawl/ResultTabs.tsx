@@ -15,6 +15,7 @@ interface ResultTabsProps {
 export const ResultTabs = ({ data }: ResultTabsProps) => {
   const [activeTab, setActiveTab] = useState("info");
   const initialRenderRef = useRef(true);
+  const tabsInitializedRef = useRef(false);
   
   // Initialize component - show first tab, hide others
   useEffect(() => {
@@ -40,6 +41,26 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
           duration: 3000
         });
       }
+    }
+  }, [data, activeTab]);
+  
+  // Make sure tabs are properly set up when data changes
+  useEffect(() => {
+    if (data && !tabsInitializedRef.current) {
+      tabsInitializedRef.current = true;
+      
+      // Reset all tabs
+      document.querySelectorAll('[role="tabpanel"]').forEach((el) => {
+        (el as HTMLElement).style.display = 'none';
+      });
+      
+      // Show active tab
+      const activePanel = document.querySelector(`[role="tabpanel"][value="${activeTab}"]`);
+      if (activePanel) {
+        (activePanel as HTMLElement).style.display = 'block';
+      }
+      
+      console.log("Tabs initialized with new data, active tab:", activeTab);
     }
   }, [data, activeTab]);
   
@@ -168,7 +189,11 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
         </TabsTrigger>
       </TabsList>
 
-      <TabsContent value="info" className="mt-6 space-y-6">
+      <TabsContent 
+        value="info" 
+        data-value="info"
+        className="mt-6 space-y-6"
+      >
         <div className="bg-white p-4 rounded-lg border border-gray-200">
           <SiteInfo data={data} />
           <div className="mt-6 border-t pt-4">
@@ -185,14 +210,22 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
         </div>
       </TabsContent>
 
-      <TabsContent value="source" className="mt-6">
+      <TabsContent 
+        value="source" 
+        data-value="source"
+        className="mt-6"
+      >
         <div className="bg-white p-4 rounded-lg border border-gray-200">
           <h3 className="font-medium mb-4 text-lg border-b pb-2">Code source de la page</h3>
           <SourceCode sourceCode={data?.sourceCode || "<p>Aucun code source disponible</p>"} />
         </div>
       </TabsContent>
       
-      <TabsContent value="structure" className="mt-6">
+      <TabsContent 
+        value="structure" 
+        data-value="structure"
+        className="mt-6"
+      >
         <div className="bg-white p-4 rounded-lg border border-gray-200">
           <h3 className="font-medium mb-4 text-lg border-b pb-2">Structure et hiérarchie du contenu</h3>
           <ContentHierarchy 

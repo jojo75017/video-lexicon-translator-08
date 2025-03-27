@@ -26,11 +26,17 @@ const SeoMainTags = ({
   // Fallback if i18n is not available
   const t = (key: string, fallback: string) => {
     try {
-      return useTranslation().t(key) || fallback;
+      // Check if useTranslation is available and working
+      const { t: translate } = useTranslation();
+      return translate(key) || fallback;
     } catch (e) {
       return fallback;
     }
   };
+  
+  // Ensure keywords is always an array
+  const keywordsArray = Array.isArray(keywords) ? keywords : 
+    (typeof keywords === 'string' ? [keywords] : []);
   
   return (
     <div className="space-y-6">
@@ -70,8 +76,8 @@ const SeoMainTags = ({
             <span className="font-medium">Mots-clés :</span>
           </div>
           <div className="flex flex-wrap gap-2">
-            {Array.isArray(keywords) && keywords.length > 0 ? (
-              keywords.map((keyword, index) => (
+            {keywordsArray.length > 0 ? (
+              keywordsArray.map((keyword, index) => (
                 <Badge 
                   key={index} 
                   variant="secondary"

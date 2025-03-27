@@ -78,12 +78,15 @@ export const activateSection = (sectionId: string) => {
       });
     }
     
-    // 7. Specially handle ResultTabs content by looking for TabsContent with matching data-value
+    // 7. Specially handle for ResultTabs content by looking for TabsContent with matching data-value
     if (['info', 'source', 'structure'].includes(sectionId)) {
-      const resultsTabContent = document.querySelector(`[data-state="active"][role="tabpanel"][data-value="${sectionId}"]`);
-      if (resultsTabContent) {
-        (resultsTabContent as HTMLElement).style.display = 'block';
-        console.log(`ResultTabs content for ${sectionId} displayed`);
+      // Find all ResultTabs content elements
+      const resultsTabElements = document.querySelectorAll(`[role="tabpanel"][data-value="${sectionId}"], [role="tabpanel"][value="${sectionId}"]`);
+      if (resultsTabElements.length > 0) {
+        resultsTabElements.forEach(el => {
+          (el as HTMLElement).style.display = 'block';
+          console.log(`ResultTabs panel with value=${sectionId} displayed`);
+        });
       }
       
       // Also try with direct ID match for ResultTabs
@@ -93,7 +96,7 @@ export const activateSection = (sectionId: string) => {
         console.log(`ResultTabs section with ID ${sectionId} displayed`);
       }
     }
-  }, 100);
+  }, 150); // Increased delay for more reliability
 };
 
 // Function to navigate to a section - updates URL hash and activates the section
@@ -104,7 +107,7 @@ export const navigateToSection = (sectionId: string) => {
   // Explicitly activate the section with delay
   setTimeout(() => {
     activateSection(sectionId);
-  }, 200);
+  }, 250); // Increased delay for reliability
 };
 
 // Function to get the main tab category of a tab
