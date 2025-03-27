@@ -9,7 +9,8 @@ import {
   Compass, 
   Zap,
   ListTree,
-  MessageSquare
+  MessageSquare,
+  Signature
 } from 'lucide-react';
 
 const GrilleFonctionnalites = () => {
@@ -64,10 +65,10 @@ const GrilleFonctionnalites = () => {
       couleur: "bg-teal-100"
     },
     {
-      icon: <MessageSquare className="h-8 w-8 text-pink-600" />,
-      titre: "Contenu",
-      description: "Optimisez votre contenu pour un meilleur référencement",
-      lien: "/seo?tab=content",
+      icon: <Signature className="h-8 w-8 text-pink-600" />,
+      titre: "Signature Email",
+      description: "Créez une signature professionnelle pour vos emails",
+      lien: "/signature",
       couleur: "bg-pink-100"
     },
   ];
