@@ -18,41 +18,43 @@ export const activateSection = (sectionId: string) => {
     (el as HTMLElement).style.display = 'none';
   });
   
-  // Afficher la section sélectionnée par ID
-  const element = document.getElementById(sectionId);
-  if (element) {
-    element.style.display = 'block';
-    console.log(`Section ${sectionId} activée et affichée`);
-  } else {
-    console.log(`Section avec ID ${sectionId} non trouvée dans le DOM`);
-  }
-  
-  // Vérifier également les éléments avec l'attribut data-section
-  const sectionElements = document.querySelectorAll(`[data-section="${sectionId}"]`);
-  if (sectionElements.length > 0) {
-    sectionElements.forEach(el => {
-      (el as HTMLElement).style.display = 'block';
-    });
-    console.log(`Sections avec data-section=${sectionId} également activées`);
-  } else {
-    console.log(`Aucun élément avec data-section=${sectionId} trouvé`);
-  }
-  
-  // Vérifier les éléments avec l'attribut data-tab-content
-  const tabContentElements = document.querySelectorAll(`[data-tab-content="${sectionId}"]`);
-  if (tabContentElements.length > 0) {
-    tabContentElements.forEach(el => {
-      (el as HTMLElement).style.display = 'block';
-    });
-    console.log(`Éléments avec data-tab-content=${sectionId} affichés`);
-  }
-  
-  // Activer également le TabsContent correspondant
-  const tabPanel = document.querySelector(`[role="tabpanel"][value="${sectionId}"]`);
-  if (tabPanel) {
-    (tabPanel as HTMLElement).style.display = 'block';
-    console.log(`Panneau d'onglet ${sectionId} activé`);
-  }
+  // Afficher la section sélectionnée par ID - augmenter le délai
+  setTimeout(() => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.style.display = 'block';
+      console.log(`Section ${sectionId} activée et affichée`);
+    } else {
+      console.log(`Section avec ID ${sectionId} non trouvée dans le DOM`);
+    }
+    
+    // Vérifier également les éléments avec l'attribut data-section
+    const sectionElements = document.querySelectorAll(`[data-section="${sectionId}"]`);
+    if (sectionElements.length > 0) {
+      sectionElements.forEach(el => {
+        (el as HTMLElement).style.display = 'block';
+      });
+      console.log(`Sections avec data-section=${sectionId} également activées`);
+    } else {
+      console.log(`Aucun élément avec data-section=${sectionId} trouvé`);
+    }
+    
+    // Vérifier les éléments avec l'attribut data-tab-content
+    const tabContentElements = document.querySelectorAll(`[data-tab-content="${sectionId}"]`);
+    if (tabContentElements.length > 0) {
+      tabContentElements.forEach(el => {
+        (el as HTMLElement).style.display = 'block';
+      });
+      console.log(`Éléments avec data-tab-content=${sectionId} affichés`);
+    }
+    
+    // Activer également le TabsContent correspondant
+    const tabPanel = document.querySelector(`[role="tabpanel"][value="${sectionId}"]`);
+    if (tabPanel) {
+      (tabPanel as HTMLElement).style.display = 'block';
+      console.log(`Panneau d'onglet ${sectionId} activé`);
+    }
+  }, 100);
 };
 
 // Fonction pour naviguer vers une section

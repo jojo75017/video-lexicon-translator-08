@@ -6,6 +6,7 @@ import { SourceCode } from "./SourceCode";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { getStructureData } from "@/utils/seo/updateUtils";
+import ContentHierarchy from "../ContentHierarchy";
 
 interface ResultTabsProps {
   data: any;
@@ -58,9 +59,36 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
     }
   };
 
+  // Format headings data correctly
+  const formatHeadings = (data: any) => {
+    if (!data?.headings || !Array.isArray(data.headings)) return [];
+    
+    return data.headings.map(heading => ({
+      text: heading.text || "",
+      level: typeof heading.level === 'string' ? 
+        parseInt(heading.level.replace(/\D/g, '')) : 
+        heading.level || 0,
+      position: heading.position || 0
+    }));
+  };
+
   // Check data and prepare fallback data
   const hasValidHeadings = data?.headings && Array.isArray(data.headings) && data.headings.length > 0;
   const structureData = hasValidHeadings ? data : getStructureData();
+  const formattedHeadings = formatHeadings(structureData);
+  
+  // Extract paragraphs if available
+  const paragraphs = data?.paragraphs || [];
+  
+  // Create a simple hierarchy if none provided
+  const hierarchyData = data?.hierarchy || structureData?.hierarchy || [];
+
+  // Create recommendations
+  const recommendations = data?.recommendations || [
+    "Utilisez une seule balise H1 par page",
+    "Structurez votre contenu avec des H2 et H3",
+    "Ajoutez des alt-texts à toutes vos images"
+  ];
   
   // If no data is provided, show a placeholder
   if (!data) {
@@ -120,53 +148,12 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
       <TabsContent value="structure" className="mt-6">
         <div id="structure" data-section="structure" className="section-structure">
           <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-            <h3 className="text-lg font-bold mb-4">Structure du site</h3>
-            
-            <div id="hierarchy" className="section-hierarchy space-y-4">
-              <div>
-                <h4 className="font-medium text-gray-700 mb-2">Hiérarchie des titres</h4>
-                <div className="pl-4 border-l-2 border-blue-200 space-y-2">
-                  {structureData && structureData.headings && structureData.headings.length > 0 ? (
-                    structureData.headings.map((heading: any, index: number) => (
-                      <div 
-                        key={index} 
-                        className={`py-1.5 px-3 rounded-md ${
-                          heading.level === "h1" ? 'bg-blue-50 font-bold ml-0' : 
-                          heading.level === "h2" ? 'bg-blue-50/60 font-semibold ml-4' : 
-                          heading.level === "h3" ? 'bg-blue-50/30 ml-8' : 
-                          'bg-gray-50 ml-12'
-                        }`}
-                      >
-                        {`${heading.level.toUpperCase()}: ${heading.text}`}
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-gray-500">Aucune donnée de titres disponible</div>
-                  )}
-                </div>
-              </div>
-              
-              <div className="mt-4">
-                <h4 className="font-medium text-gray-700 mb-2">Recommandations</h4>
-                <ul className="list-disc pl-5 space-y-1 text-gray-600">
-                  <li>Assurez-vous d'avoir un seul titre H1 par page</li>
-                  <li>Utilisez des H2 et H3 de manière hiérarchique</li>
-                  <li>Incluez des mots-clés importants dans vos titres</li>
-                  <li>Gardez une structure cohérente sur l'ensemble du site</li>
-                </ul>
-              </div>
-              
-              {structureData && structureData.recommendations && (
-                <div className="mt-4">
-                  <h4 className="font-medium text-gray-700 mb-2">Recommandations spécifiques</h4>
-                  <ul className="list-disc pl-5 space-y-1 text-gray-600">
-                    {structureData.recommendations.map((recommendation: string, index: number) => (
-                      <li key={index}>{recommendation}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
+            <ContentHierarchy 
+              headings={formattedHeadings}
+              paragraphs={paragraphs}
+              hierarchy={hierarchyData}
+              recommendations={recommendations}
+            />
           </div>
         </div>
       </TabsContent>

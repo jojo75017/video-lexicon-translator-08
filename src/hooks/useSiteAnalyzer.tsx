@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { FirecrawlService } from '@/utils/FirecrawlService';
 import { navigateToSection } from '@/utils/navigationHelpers';
 import { getStructureData } from '@/utils/seo/updateUtils';
+import { analyzeHeadings } from '@/utils/seo/headingAnalyzer';
 
 export const useSiteAnalyzer = () => {
   const [url, setUrl] = useState<string>('');
@@ -33,10 +34,10 @@ export const useSiteAnalyzer = () => {
         { name: "keywords", content: "seo, demo, analyse" }
       ],
       headings: [
-        { level: "h1", text: "Titre principal" },
-        { level: "h2", text: "Sous-titre 1" },
-        { level: "h2", text: "Sous-titre 2" },
-        { level: "h3", text: "Section détaillée" }
+        { level: 1, text: "Titre principal" },
+        { level: 2, text: "Sous-titre 1" },
+        { level: 2, text: "Sous-titre 2" },
+        { level: 3, text: "Section détaillée" }
       ],
       links: [
         { href: "https://example.com", text: "Exemple de lien" },
@@ -117,6 +118,27 @@ export const useSiteAnalyzer = () => {
       // Parse the result and create analysis objects
       const crawlData = result.data;
       
+      // Analyse les titres avec une structure hiérarchique complète
+      let headingStructure = null;
+      let headings = [];
+      
+      // Création d'un document temporaire pour analyser le code HTML
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(crawlData.sourceCode || "<html><body></body></html>", "text/html");
+      
+      // Analyse avancée des titres
+      headingStructure = analyzeHeadings(doc);
+      console.log("Heading structure analysis:", headingStructure);
+      
+      // Format attendu pour les headings
+      if (crawlData.headings) {
+        headings = crawlData.headings.map(h => ({
+          level: typeof h.level === 'string' ? parseInt(h.level.replace('h', '')) : h.level,
+          text: h.text,
+          position: h.position || 0
+        }));
+      }
+      
       // Basic SEO analysis
       const seoData = {
         title: crawlData.title || url,
@@ -127,10 +149,13 @@ export const useSiteAnalyzer = () => {
           canonical: crawlData.meta && crawlData.meta.find(meta => meta.rel === "canonical")?.href || "",
           robots: crawlData.meta && crawlData.meta.find(meta => meta.name === "robots")?.content || "",
         },
-        h1Count: crawlData.headings ? crawlData.headings.filter(h => h.level === "h1").length : 0,
-        h2Count: crawlData.headings ? crawlData.headings.filter(h => h.level === "h2").length : 0,
-        h3Count: crawlData.headings ? crawlData.headings.filter(h => h.level === "h3").length : 0,
-        headings: crawlData.headings || [],
+        h1Count: headings ? headings.filter(h => h.level === 1).length : 0,
+        h2Count: headings ? headings.filter(h => h.level === 2).length : 0,
+        h3Count: headings ? headings.filter(h => h.level === 3).length : 0,
+        headings: headings,
+        paragraphs: headingStructure?.paragraphs || [],
+        headingStructure: headingStructure,
+        hierarchy: headingStructure?.hierarchy || [],
         imgCount: crawlData.images ? crawlData.images.length : 0,
         imgWithoutAlt: crawlData.images ? crawlData.images.filter(img => !img.alt).length : 0,
         performance: getPerformanceData(),
@@ -147,6 +172,12 @@ export const useSiteAnalyzer = () => {
           { keyword: "Example", count: 24, density: 2.1, position: 1 },
           { keyword: "Test", count: 18, density: 1.6, position: 2 },
           { keyword: "Demo", count: 15, density: 1.3, position: 3 }
+        ],
+        technicalSuggestions: [
+          "Assurez-vous d'avoir exactement une balise H1",
+          "Utilisez des titres H2 et H3 pour structurer votre contenu",
+          "Ajoutez des attributs alt à toutes vos images",
+          "Optimisez la longueur de vos titres et méta-descriptions"
         ]
       };
 
@@ -188,7 +219,11 @@ export const useSiteAnalyzer = () => {
       const demoData = generateDemoData();
       setSiteStructure(demoData);
       
-      // Generate synthetic SEO data
+      // Generate synthetic SEO data with hierarchical structure
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(demoData.sourceCode, "text/html");
+      const headingStructure = analyzeHeadings(doc);
+      
       const syntheticSeoData = {
         title: demoData.title || url,
         metaTagsAnalysis: {
@@ -201,7 +236,14 @@ export const useSiteAnalyzer = () => {
         h1Count: 1,
         h2Count: 2,
         h3Count: 1,
-        headings: demoData.headings || [],
+        headings: demoData.headings.map(h => ({
+          level: typeof h.level === 'string' ? parseInt(h.level.replace('h', '')) : h.level,
+          text: h.text,
+          position: 0
+        })),
+        paragraphs: headingStructure?.paragraphs || [],
+        headingStructure: headingStructure,
+        hierarchy: headingStructure?.hierarchy || [],
         imgCount: demoData.images ? demoData.images.length : 0,
         imgWithoutAlt: demoData.images ? demoData.images.filter(img => !img.alt).length : 0,
         performance: getPerformanceData(),
@@ -218,6 +260,12 @@ export const useSiteAnalyzer = () => {
           { keyword: "Example", count: 24, density: 2.1, position: 1 },
           { keyword: "Test", count: 18, density: 1.6, position: 2 },
           { keyword: "Demo", count: 15, density: 1.3, position: 3 }
+        ],
+        technicalSuggestions: [
+          "Assurez-vous d'avoir exactement une balise H1",
+          "Utilisez des titres H2 et H3 pour structurer votre contenu",
+          "Ajoutez des attributs alt à toutes vos images",
+          "Optimisez la longueur de vos titres et méta-descriptions"
         ]
       };
       
@@ -228,6 +276,35 @@ export const useSiteAnalyzer = () => {
       console.log("ANALYSIS PROCESS COMPLETE");
     }
   }, [url, proxyEnabled, generateDemoData, getExternalLinkAnalysis, getPerformanceData]);
+
+  const getExternalLinkAnalysis = useCallback(() => {
+    return {
+      externalLinks: 12,
+      internalLinks: 28,
+      noFollowLinks: 5,
+      brokenLinks: 2,
+      mostLinkedDomains: [
+        { domain: "facebook.com", count: 3 },
+        { domain: "twitter.com", count: 2 },
+        { domain: "linkedin.com", count: 2 }
+      ]
+    };
+  }, []);
+
+  const getPerformanceData = useCallback(() => {
+    return {
+      score: 85,
+      loadTime: 1.8,
+      resourceCount: 45,
+      resourceSize: 1.2, // MB
+      resourceBreakdown: {
+        js: 480000, // ~480KB
+        css: 120000, // ~120KB
+        images: 580000, // ~580KB
+        fonts: 60000 // ~60KB
+      }
+    };
+  }, []);
 
   return {
     url,

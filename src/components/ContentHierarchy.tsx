@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useTranslation } from 'react-i18next';
 import { ChevronRight, ChevronDown, Heading1, Heading2, Heading3, Type, AlertCircle, CheckCircle2, BarChart2, Lightbulb, FileQuestion, Search } from 'lucide-react';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -17,12 +16,12 @@ interface ContentItem {
 }
 
 interface ContentHierarchyProps {
-  headings: {
+  headings?: {
     text: string;
     level: number;
     position: number;
   }[];
-  paragraphs: {
+  paragraphs?: {
     text: string;
     position: number;
   }[];
@@ -38,7 +37,6 @@ const ContentHierarchy = ({
   recommendations = [],
   onAnalyze
 }: ContentHierarchyProps) => {
-  const { t } = useTranslation();
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
   
   // Check if we have actual content to analyze - ensure arrays have elements with content
@@ -349,23 +347,15 @@ const ContentHierarchy = ({
             </Alert>
 
             {recommendations && recommendations.length > 0 && (
-              <div className="bg-blue-50 rounded-lg p-4">
-                <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+              <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
+                <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
                   <Lightbulb className="h-4 w-4 text-blue-600" />
-                  Recommandations SERP
+                  Recommandations
                 </h3>
-                <ul className="space-y-2">
-                  {recommendations.slice(0, 5).map((recommendation, index) => (
-                    <li key={index} className="flex items-start gap-2 text-sm text-blue-700">
-                      <ChevronRight className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                      {recommendation}
-                    </li>
+                <ul className="list-disc pl-5 space-y-1.5 text-sm text-blue-800">
+                  {recommendations.map((rec, i) => (
+                    <li key={i}>{rec}</li>
                   ))}
-                  {recommendations.length > 5 && (
-                    <li className="text-sm text-blue-700 italic">
-                      + {recommendations.length - 5} autres recommandations
-                    </li>
-                  )}
                 </ul>
               </div>
             )}
@@ -377,34 +367,27 @@ const ContentHierarchy = ({
         <div>
           <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
             <BarChart2 className="h-4 w-4 text-blue-600" />
-            Structure SERP Détaillée
+            Hiérarchie du contenu
           </h3>
-          <Card className="bg-white border border-gray-200 p-2">
-            <ScrollArea className="h-[400px] rounded-md pr-4">
-              <div className="space-y-1 p-2">
-                {hierarchy && hierarchy.length > 0 ? (
-                  hierarchy.map((item, index) => renderHierarchicalItem(item, index))
-                ) : content.length > 0 ? (
-                  content.map((item, index) => (
-                    <div
-                      key={index}
-                      className={`flex items-start gap-2 py-2 ${getIndentation(item.type)} group hover:bg-gray-50 rounded px-2 transition-colors`}
-                    >
-                      {getIcon(item.type)}
-                      <ChevronRight className="h-4 w-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      <span className={`text-sm ${item.type === 'text' ? 'text-gray-600' : 'font-medium'}`}>
-                        {item.content}
-                      </span>
-                    </div>
-                  ))
-                ) : (
-                  <div className="flex justify-center items-center h-full text-gray-400 py-16">
-                    Aucun contenu structuré à afficher
+          
+          <ScrollArea className="h-[400px] rounded-md border p-4">
+            {hierarchy && hierarchy.length > 0 ? (
+              hierarchy.map((item, index) => renderHierarchicalItem(item, index))
+            ) : content.length > 0 ? (
+              <div className="space-y-2">
+                {content.map((item, i) => (
+                  <div key={i} className={`flex items-center p-2 ${getIndentation(item.type)}`}>
+                    {getIcon(item.type)}
+                    <span className="ml-2 text-sm">{item.content}</span>
                   </div>
-                )}
+                ))}
               </div>
-            </ScrollArea>
-          </Card>
+            ) : (
+              <div className="text-center p-6 text-gray-500">
+                La structure hiérarchique n'est pas disponible pour ce contenu.
+              </div>
+            )}
+          </ScrollArea>
         </div>
       </div>
     </Card>

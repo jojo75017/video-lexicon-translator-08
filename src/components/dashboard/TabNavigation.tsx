@@ -34,7 +34,7 @@ const TabNavigation = () => {
         position: "bottom-right",
         duration: 2000
       });
-    }, 500); // Augmenter le délai pour s'assurer que le DOM est mis à jour
+    }, 800); // Augmenter le délai pour s'assurer que le DOM est mis à jour
   }, [activeTab]);
   
   return (
