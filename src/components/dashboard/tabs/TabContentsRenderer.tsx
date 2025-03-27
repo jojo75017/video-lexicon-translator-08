@@ -41,53 +41,67 @@ const TabContentsRenderer: React.FC<TabContentsRendererProps> = ({
     // Short delay to ensure DOM is updated
     setTimeout(() => {
       activateSection(activeTab);
+      
+      // Force display of the active tab content
+      const activeElement = document.getElementById(activeTab);
+      if (activeElement) {
+        activeElement.style.display = 'block';
+        console.log(`Forced display of tab content: ${activeTab}`);
+      }
+      
+      // Also force display of data-section
+      const sectionElement = document.querySelector(`[data-section="${activeTab}"]`);
+      if (sectionElement) {
+        (sectionElement as HTMLElement).style.display = 'block';
+        console.log(`Forced display of section: ${activeTab}`);
+      }
     }, 50);
   }, [activeTab]);
   
   return (
     <div className="tab-content-container">
       {/* Specialized tab contents */}
-      <TabsContent value="hierarchy" id="hierarchy" data-tab-content="hierarchy">
+      <TabsContent value="hierarchy" id="hierarchy" data-tab-content="hierarchy" className={activeTab === 'hierarchy' ? 'block' : 'hidden'}>
         <HierarchyTabContent />
       </TabsContent>
       
-      <TabsContent value="wordcount" id="wordcount" data-tab-content="wordcount">
+      <TabsContent value="wordcount" id="wordcount" data-tab-content="wordcount" className={activeTab === 'wordcount' ? 'block' : 'hidden'}>
         <WordCountTabContent />
       </TabsContent>
       
-      <TabsContent value="suggestions" id="suggestions" data-tab-content="suggestions">
+      <TabsContent value="suggestions" id="suggestions" data-tab-content="suggestions" className={activeTab === 'suggestions' ? 'block' : 'hidden'}>
         <SuggestionsTabContent />
       </TabsContent>
       
-      <TabsContent value="seo" id="seo" data-tab-content="seo">
+      <TabsContent value="seo" id="seo" data-tab-content="seo" className={activeTab === 'seo' ? 'block' : 'hidden'}>
         <SeoTabContent />
       </TabsContent>
       
-      <TabsContent value="structure" id="structure" data-tab-content="structure">
+      <TabsContent value="structure" id="structure" data-tab-content="structure" className={activeTab === 'structure' ? 'block' : 'hidden'}>
         <StructureTabContent />
       </TabsContent>
       
-      <TabsContent value="backlinks" id="backlinks" data-tab-content="backlinks">
+      <TabsContent value="backlinks" id="backlinks" data-tab-content="backlinks" className={activeTab === 'backlinks' ? 'block' : 'hidden'}>
         <BacklinksTabContent />
       </TabsContent>
       
-      <TabsContent value="metrics" id="metrics" data-tab-content="metrics">
+      <TabsContent value="metrics" id="metrics" data-tab-content="metrics" className={activeTab === 'metrics' ? 'block' : 'hidden'}>
         <MetricsTabContent />
       </TabsContent>
       
-      <TabsContent value="advanced" id="advanced" data-tab-content="advanced">
+      <TabsContent value="advanced" id="advanced" data-tab-content="advanced" className={activeTab === 'advanced' ? 'block' : 'hidden'}>
         <AdvancedTabContent />
       </TabsContent>
       
-      <TabsContent value="integrations" id="integrations" data-tab-content="integrations">
+      <TabsContent value="integrations" id="integrations" data-tab-content="integrations" className={activeTab === 'integrations' ? 'block' : 'hidden'}>
         <IntegrationsTabContent />
       </TabsContent>
       
-      <TabsContent value="performance" id="performance" data-tab-content="performance">
+      <TabsContent value="performance" id="performance" data-tab-content="performance" className={activeTab === 'performance' ? 'block' : 'hidden'}>
         <PerformanceTabContent />
       </TabsContent>
       
-      <TabsContent value="analytics" id="analytics" data-tab-content="analytics">
+      <TabsContent value="analytics" id="analytics" data-tab-content="analytics" className={activeTab === 'analytics' ? 'block' : 'hidden'}>
         <AnalyticsTabContent />
       </TabsContent>
       
@@ -95,7 +109,13 @@ const TabContentsRenderer: React.FC<TabContentsRendererProps> = ({
       {contentTabs
         .filter(tab => !specializedTabs.includes(tab.id))
         .map(tab => (
-          <TabsContent key={tab.id} value={tab.id} id={tab.id} data-tab-content={tab.id}>
+          <TabsContent 
+            key={tab.id} 
+            value={tab.id} 
+            id={tab.id} 
+            data-tab-content={tab.id}
+            className={activeTab === tab.id ? 'block' : 'hidden'}
+          >
             <DefaultTabContent id={tab.id} label={tab.label} />
           </TabsContent>
         ))}

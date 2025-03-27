@@ -14,6 +14,8 @@ export const activateSection = (sectionId: string) => {
   if (element) {
     element.style.display = 'block';
     console.log(`Section ${sectionId} activated and displayed`);
+  } else {
+    console.log(`Section with ID ${sectionId} not found in DOM`);
   }
   
   // Also check for elements with data-section attribute
@@ -21,6 +23,8 @@ export const activateSection = (sectionId: string) => {
   if (sectionElement) {
     (sectionElement as HTMLElement).style.display = 'block';
     console.log(`Section with data-section=${sectionId} also activated`);
+  } else {
+    console.log(`No element with data-section=${sectionId} found`);
   }
   
   // Make sure results-display is visible when showing seo section
@@ -40,4 +44,20 @@ export const navigateToSection = (sectionId: string) => {
   
   // Then explicitly activate the section
   activateSection(sectionId);
+};
+
+// Function to get main tab category for any tab
+export const getMainTabCategory = (tabId: string): string => {
+  if (['hierarchy', 'wordcount', 'suggestions'].includes(tabId)) {
+    return 'content';
+  } else if (['seo', 'structure', 'backlinks'].includes(tabId)) {
+    return 'seo';
+  } else if (['performance', 'metrics'].includes(tabId)) {
+    return 'performance';
+  } else if (tabId === 'analytics') {
+    return 'analytics';
+  }
+  
+  // Default to the tab itself if it's a main category
+  return tabId;
 };

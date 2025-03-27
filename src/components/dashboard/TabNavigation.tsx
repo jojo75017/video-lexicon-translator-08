@@ -7,7 +7,7 @@ import MainTabList from './tabs/MainTabList';
 import SubTabList from './tabs/SubTabList';
 import TabContentsRenderer from './tabs/TabContentsRenderer';
 import { useTabNavigation } from './tabs/useTabNavigation';
-import { activateSection } from '@/utils/navigationHelpers';
+import { activateSection, getMainTabCategory } from '@/utils/navigationHelpers';
 
 const TabNavigation = () => {
   const { 
@@ -25,6 +25,12 @@ const TabNavigation = () => {
     // Ensure the active tab content is visible
     setTimeout(() => {
       activateSection(activeTab);
+      
+      // Also ensure main tab category is active
+      const mainCategory = getMainTabCategory(activeTab);
+      if (mainCategory !== activeTab) {
+        console.log(`Ensuring main category ${mainCategory} is also active`);
+      }
     }, 100);
   }, [activeTab]);
   

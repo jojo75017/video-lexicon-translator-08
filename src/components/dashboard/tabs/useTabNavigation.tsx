@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { tabs } from './TabData';
 import { toast } from "sonner";
-import { activateSection } from '@/utils/navigationHelpers';
+import { activateSection, getMainTabCategory } from '@/utils/navigationHelpers';
 
 export interface MainTab {
   id: string;
@@ -36,6 +36,10 @@ export const useTabNavigation = () => {
     if (hash && tabs.some(tab => tab.id === hash)) {
       console.log(`Found hash in URL: ${hash}, activating this tab`);
       setActiveTab(hash);
+      activateSection(hash);
+    } else {
+      // Default to first tab if no hash
+      activateSection(defaultTab);
     }
     
     // Listen for hash changes
@@ -44,6 +48,7 @@ export const useTabNavigation = () => {
       if (newHash && tabs.some(tab => tab.id === newHash)) {
         console.log(`Hash changed to ${newHash}, updating active tab`);
         setActiveTab(newHash);
+        activateSection(newHash);
       }
     };
     
@@ -82,17 +87,19 @@ export const useTabNavigation = () => {
 
   // Get sub-tabs based on active main tab
   const getSubTabs = () => {
-    if (['hierarchy', 'wordcount', 'suggestions'].includes(activeTab) || 
-        activeTab === 'content') {
+    // Get main category of active tab
+    const mainCategory = getMainTabCategory(activeTab);
+    
+    if (mainCategory === 'content') {
       return tabs.filter(tab => ['hierarchy', 'wordcount', 'suggestions'].includes(tab.id));
     } 
-    else if (['seo', 'structure', 'backlinks'].includes(activeTab)) {
+    else if (mainCategory === 'seo') {
       return tabs.filter(tab => ['seo', 'structure', 'backlinks'].includes(tab.id));
     } 
-    else if (['performance', 'metrics'].includes(activeTab)) {
+    else if (mainCategory === 'performance') {
       return tabs.filter(tab => ['performance', 'metrics'].includes(tab.id));
     } 
-    else if (activeTab === 'analytics') {
+    else if (mainCategory === 'analytics') {
       return tabs.filter(tab => ['analytics'].includes(tab.id));
     }
     
