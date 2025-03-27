@@ -206,7 +206,7 @@ const AnalyseAvancee = () => {
                         <span className="text-sm">concurrent-1.com</span>
                         <span className="text-sm">Score SEO: 82/100</span>
                       </div>
-                      <Progress value={82} className="h-2 bg-gray-100" indicatorClassName="bg-green-500" />
+                      <Progress value={82} className="h-2 bg-gray-100" />
                     </div>
                     
                     <div>
@@ -214,7 +214,7 @@ const AnalyseAvancee = () => {
                         <span className="text-sm">concurrent-2.com</span>
                         <span className="text-sm">Score SEO: 68/100</span>
                       </div>
-                      <Progress value={68} className="h-2 bg-gray-100" indicatorClassName="bg-amber-500" />
+                      <Progress value={68} className="h-2 bg-gray-100" />
                     </div>
                     
                     <div>
@@ -222,7 +222,7 @@ const AnalyseAvancee = () => {
                         <span className="text-sm">concurrent-3.com</span>
                         <span className="text-sm">Score SEO: 71/100</span>
                       </div>
-                      <Progress value={71} className="h-2 bg-gray-100" indicatorClassName="bg-orange-500" />
+                      <Progress value={71} className="h-2 bg-gray-100" />
                     </div>
                   </div>
                 </div>
