@@ -19,6 +19,7 @@ export const useSiteAnalyzer = () => {
   // Fonction pour activer le proxy CORS
   const handleActivateProxy = () => {
     setProxyEnabled(true);
+    FirecrawlService.enableProxy();
     toast.success("Proxy CORS activé", {
       description: "Les requêtes utiliseront désormais un proxy pour contourner les restrictions CORS",
     });
@@ -56,6 +57,7 @@ export const useSiteAnalyzer = () => {
     };
   }, [url]);
 
+  // Get external link analysis data
   const getExternalLinkAnalysis = useCallback(() => {
     return {
       externalLinks: 12,
@@ -70,6 +72,7 @@ export const useSiteAnalyzer = () => {
     };
   }, []);
 
+  // Get performance data
   const getPerformanceData = useCallback(() => {
     return {
       score: 85,
@@ -116,7 +119,7 @@ export const useSiteAnalyzer = () => {
       console.log("Analysis result:", result);
       
       // Parse the result and create analysis objects
-      const crawlData = result.data;
+      const crawlData = result.data[0];
       
       // Analyse les titres avec une structure hiérarchique complète
       let headingStructure = null;
@@ -133,7 +136,7 @@ export const useSiteAnalyzer = () => {
       // Format attendu pour les headings
       if (crawlData.headings) {
         headings = crawlData.headings.map(h => ({
-          level: typeof h.level === 'string' ? parseInt(h.level.replace('h', '')) : h.level,
+          level: typeof h.level === 'string' ? parseInt(h.level.replace(/h/,'')) : h.level,
           text: h.text,
           position: h.position || 0
         }));
@@ -237,7 +240,7 @@ export const useSiteAnalyzer = () => {
         h2Count: 2,
         h3Count: 1,
         headings: demoData.headings.map(h => ({
-          level: typeof h.level === 'string' ? parseInt(h.level.replace('h', '')) : h.level,
+          level: typeof h.level === 'string' ? parseInt(h.level.toString()) : h.level,
           text: h.text,
           position: 0
         })),
@@ -276,35 +279,6 @@ export const useSiteAnalyzer = () => {
       console.log("ANALYSIS PROCESS COMPLETE");
     }
   }, [url, proxyEnabled, generateDemoData, getExternalLinkAnalysis, getPerformanceData]);
-
-  const getExternalLinkAnalysis = useCallback(() => {
-    return {
-      externalLinks: 12,
-      internalLinks: 28,
-      noFollowLinks: 5,
-      brokenLinks: 2,
-      mostLinkedDomains: [
-        { domain: "facebook.com", count: 3 },
-        { domain: "twitter.com", count: 2 },
-        { domain: "linkedin.com", count: 2 }
-      ]
-    };
-  }, []);
-
-  const getPerformanceData = useCallback(() => {
-    return {
-      score: 85,
-      loadTime: 1.8,
-      resourceCount: 45,
-      resourceSize: 1.2, // MB
-      resourceBreakdown: {
-        js: 480000, // ~480KB
-        css: 120000, // ~120KB
-        images: 580000, // ~580KB
-        fonts: 60000 // ~60KB
-      }
-    };
-  }, []);
 
   return {
     url,

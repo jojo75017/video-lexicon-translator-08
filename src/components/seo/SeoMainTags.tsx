@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Badge } from "@/components/ui/badge";
-import { Tag, FileHeading, Heading1, Heading2, Heading3, Image } from 'lucide-react';
+import { Tag, FileText, Heading1, Heading2, Heading3, Image } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface SeoMainTagsProps {
@@ -82,7 +82,7 @@ const SeoMainTags = ({
       
       <div className="mt-8 pt-4 border-t">
         <h4 className="font-medium mb-4 flex items-center">
-          <FileHeading className="h-4 w-4 mr-2" />
+          <FileText className="h-4 w-4 mr-2" />
           Structure de balises
         </h4>
         

@@ -15,20 +15,38 @@ export const SourceCode = ({ sourceCode }: SourceCodeProps) => {
     if (sourceCode) {
       // Format HTML for better display
       try {
-        // Enhanced formatting to better highlight HTML tags
-        const formatted = sourceCode
+        // Enhanced formatting to better highlight HTML tags with distinct colors for different elements
+        let formatted = sourceCode
           .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/&lt;([\/]?[a-zA-Z0-9]+)/g, "<span class='text-blue-600 font-bold'>&lt;$1</span>")
-          .replace(/([a-zA-Z0-9\-]+)=["']/g, "<span class='text-purple-600'>$1</span>=&quot;")
-          .replace(/["']>/g, "&quot;&gt;")
-          // Highlight headings with different colors
-          .replace(/&lt;h1/g, "<span class='text-red-600 font-bold'>&lt;h1</span>")
-          .replace(/&lt;\/h1/g, "<span class='text-red-600 font-bold'>&lt;/h1</span>")
-          .replace(/&lt;h2/g, "<span class='text-orange-600 font-bold'>&lt;h2</span>")
-          .replace(/&lt;\/h2/g, "<span class='text-orange-600 font-bold'>&lt;/h2</span>")
-          .replace(/&lt;h3/g, "<span class='text-yellow-600 font-bold'>&lt;h3</span>")
-          .replace(/&lt;\/h3/g, "<span class='text-yellow-600 font-bold'>&lt;/h3</span>");
+          .replace(/>/g, "&gt;");
+        
+        // Highlight HTML structure elements  
+        formatted = formatted
+          // Replace opening tags with highlighted versions
+          .replace(/&lt;([\/]?[a-zA-Z0-9]+)([^&]*?)&gt;/g, (match, tag, attrs) => {
+            // Different colors for different tag types
+            let tagClass = 'text-blue-600';
+            
+            // Headings get special colors
+            if (tag === 'h1' || tag === '/h1') tagClass = 'text-red-600 font-bold text-lg';
+            else if (tag === 'h2' || tag === '/h2') tagClass = 'text-orange-600 font-bold';
+            else if (tag === 'h3' || tag === '/h3') tagClass = 'text-yellow-600 font-bold';
+            else if (tag === 'p' || tag === '/p') tagClass = 'text-green-600';
+            else if (tag === 'img' || tag === '/img') tagClass = 'text-purple-600';
+            else if (tag === 'a' || tag === '/a') tagClass = 'text-blue-500';
+            else if (tag === 'div' || tag === '/div') tagClass = 'text-gray-600';
+            else if (tag === 'span' || tag === '/span') tagClass = 'text-gray-500';
+            else if (tag === 'meta' || tag === 'title' || tag === '/title') tagClass = 'text-pink-600 font-semibold';
+            
+            // Format attributes within tags
+            let formattedAttrs = attrs;
+            if (attrs) {
+              formattedAttrs = attrs.replace(/([a-zA-Z0-9\-_]+)=["']([^"']*)["']/g, 
+                '<span class="text-purple-600">$1</span>=<span class="text-amber-500">"$2"</span>');
+            }
+            
+            return `&lt;<span class="${tagClass}">${tag}</span>${formattedAttrs}&gt;`;
+          });
         
         setFormattedCode(formatted);
       } catch (error) {
@@ -46,7 +64,7 @@ export const SourceCode = ({ sourceCode }: SourceCodeProps) => {
       </div>
       <div className="bg-white dark:bg-gray-900 p-4">
         {sourceCode ? (
-          <pre className="text-sm font-mono overflow-x-auto max-h-[500px] overflow-y-auto whitespace-pre-wrap rounded bg-gray-50 p-4 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
+          <pre className="text-sm font-mono overflow-x-auto max-h-[600px] overflow-y-auto whitespace-pre-wrap rounded bg-gray-50 p-4 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
             <div dangerouslySetInnerHTML={{ __html: formattedCode }} />
           </pre>
         ) : (
