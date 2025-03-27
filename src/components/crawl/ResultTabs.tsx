@@ -5,8 +5,8 @@ import { SiteInfo } from "./SiteInfo";
 import { SourceCode } from "./SourceCode";
 import { toast } from "sonner";
 import { useState, useEffect, useRef } from "react";
-import { getStructureData } from "@/utils/seo/updateUtils";
 import ContentHierarchy from "../ContentHierarchy";
+import SeoMainTags from "../seo/SeoMainTags";
 
 interface ResultTabsProps {
   data: any;
@@ -21,10 +21,14 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
     if (initialRenderRef.current) {
       initialRenderRef.current = false;
       
-      // Set first tab content to be visible and hide the rest
-      document.querySelectorAll('[data-section]').forEach((section) => {
-        const sectionId = section.getAttribute('data-section');
-        (section as HTMLElement).style.display = sectionId === "info" ? "block" : "none";
+      // Ensure all TabsContent are properly configured
+      document.querySelectorAll('[role="tabpanel"]').forEach((panel) => {
+        const value = panel.getAttribute('value');
+        if (value !== activeTab) {
+          (panel as HTMLElement).style.display = 'none';
+        } else {
+          (panel as HTMLElement).style.display = 'block';
+        }
       });
       
       console.log("ResultTabs initialized - showing info tab");
@@ -37,7 +41,7 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
         });
       }
     }
-  }, [data]);
+  }, [data, activeTab]);
   
   // Tab change handler
   const handleTabChange = (value: string) => {
@@ -45,24 +49,27 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
     setActiveTab(value);
     
     // Hide all content first
-    document.querySelectorAll('[data-section]').forEach((el) => {
+    document.querySelectorAll('[role="tabpanel"]').forEach((el) => {
       (el as HTMLElement).style.display = 'none';
     });
     
-    // Show only selected content
-    const selectedContent = document.querySelector(`[data-section="${value}"]`);
-    if (selectedContent) {
-      (selectedContent as HTMLElement).style.display = 'block';
-      
-      toast.info(`Affichage de l'onglet ${value}`, {
-        description: value === "info" 
-          ? "Informations générales sur le site"
-          : value === "source" 
-            ? "Code source de la page" 
-            : "Structure du site et hiérarchie",
-        duration: 1500
-      });
-    }
+    // Show only selected content with a slight delay
+    setTimeout(() => {
+      // Find TabsContent with the matching value
+      const selectedContent = document.querySelector(`[role="tabpanel"][value="${value}"]`);
+      if (selectedContent) {
+        (selectedContent as HTMLElement).style.display = 'block';
+        
+        toast.info(`Affichage de l'onglet ${value}`, {
+          description: value === "info" 
+            ? "Informations générales sur le site"
+            : value === "source" 
+              ? "Code source de la page" 
+              : "Structure du site et hiérarchie",
+          duration: 1500
+        });
+      }
+    }, 100);
   };
 
   // Format headings data correctly
@@ -80,14 +87,13 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
 
   // Check data and prepare fallback data
   const hasValidHeadings = data?.headings && Array.isArray(data.headings) && data.headings.length > 0;
-  const structureData = hasValidHeadings ? data : getStructureData();
-  const formattedHeadings = formatHeadings(structureData);
+  const formattedHeadings = formatHeadings(data);
   
   // Extract paragraphs if available
   const paragraphs = data?.paragraphs || [];
   
   // Create a simple hierarchy if none provided
-  const hierarchyData = data?.hierarchy || structureData?.hierarchy || [];
+  const hierarchyData = data?.hierarchy || [];
 
   // Create recommendations
   const recommendations = data?.recommendations || [
@@ -107,10 +113,31 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
     );
   }
 
-  console.log("RENDERING TABS with headings:", formattedHeadings.length, "paragraphs:", paragraphs.length);
+  // Extract metadata for SEO info
+  const metaTags = data.meta || [];
+  const title = data.title || "";
+  const description = metaTags.find((meta: any) => meta.name === "description")?.content || "";
+  const keywords = metaTags.find((meta: any) => meta.name === "keywords")?.content?.split(",").map((k: string) => k.trim()) || [];
+  
+  // Count headings by level
+  const h1Count = formattedHeadings.filter(h => h.level === 1).length;
+  const h2Count = formattedHeadings.filter(h => h.level === 2).length;
+  const h3Count = formattedHeadings.filter(h => h.level === 3).length;
+  const imgCount = data.images?.length || 0;
+
+  console.log("RENDERING TABS with data:", { 
+    title,
+    headings: formattedHeadings.length, 
+    h1Count, 
+    h2Count, 
+    h3Count,
+    imgCount,
+    hasSourceCode: !!data.sourceCode,
+    sourceLength: data.sourceCode?.length || 0
+  });
 
   return (
-    <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+    <Tabs defaultValue="info" value={activeTab} onValueChange={handleTabChange} className="w-full">
       <TabsList className="w-full grid grid-cols-3 bg-muted/50 p-1 rounded-lg">
         <TabsTrigger 
           value="info"
@@ -142,27 +169,38 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
       </TabsList>
 
       <TabsContent value="info" className="mt-6 space-y-6">
-        <div id="info" data-section="info" className="section-info" style={{display: 'block'}}>
+        <div className="bg-white p-4 rounded-lg border border-gray-200">
           <SiteInfo data={data} />
+          <div className="mt-6 border-t pt-4">
+            <SeoMainTags
+              title={title}
+              description={description}
+              keywords={keywords}
+              h1Count={h1Count}
+              h2Count={h2Count}
+              h3Count={h3Count}
+              imgCount={imgCount}
+            />
+          </div>
         </div>
       </TabsContent>
 
       <TabsContent value="source" className="mt-6">
-        <div id="source" data-section="source" className="section-source" style={{display: 'none'}}>
+        <div className="bg-white p-4 rounded-lg border border-gray-200">
+          <h3 className="font-medium mb-4 text-lg border-b pb-2">Code source de la page</h3>
           <SourceCode sourceCode={data?.sourceCode || "<p>Aucun code source disponible</p>"} />
         </div>
       </TabsContent>
       
       <TabsContent value="structure" className="mt-6">
-        <div id="structure" data-section="structure" className="section-structure" style={{display: 'none'}}>
-          <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-            <ContentHierarchy 
-              headings={formattedHeadings}
-              paragraphs={paragraphs}
-              hierarchy={hierarchyData}
-              recommendations={recommendations}
-            />
-          </div>
+        <div className="bg-white p-4 rounded-lg border border-gray-200">
+          <h3 className="font-medium mb-4 text-lg border-b pb-2">Structure et hiérarchie du contenu</h3>
+          <ContentHierarchy 
+            headings={formattedHeadings}
+            paragraphs={paragraphs}
+            hierarchy={hierarchyData}
+            recommendations={recommendations}
+          />
         </div>
       </TabsContent>
     </Tabs>

@@ -66,18 +66,32 @@ export const activateSection = (sectionId: string) => {
       console.log(`Tab content with class ${sectionId} displayed (${tabContentByClass.length} found)`);
     }
     
-    // 6. Try for TabsContent components
-    const radixTabsContent = document.querySelector(`[data-state="active"][role="tabpanel"][data-orientation="horizontal"]`);
-    if (radixTabsContent) {
-      (radixTabsContent as HTMLElement).style.display = 'block';
-      console.log(`Radix TabsContent activated for ${sectionId}`);
+    // 6. Try for TabsContent components from shadcn/ui
+    const tabsContent = document.querySelector(`[data-state][role="tabpanel"][value="${sectionId}"]`);
+    if (tabsContent) {
+      (tabsContent as HTMLElement).style.display = 'block';
+      console.log(`TabsContent with value=${sectionId} displayed`);
+      
+      // Make sure all active tabpanels with the same value are visible
+      document.querySelectorAll(`[data-state="active"][role="tabpanel"][value="${sectionId}"]`).forEach(el => {
+        (el as HTMLElement).style.display = 'block';
+      });
     }
     
-    // 7. Also look for specific tabs content with matching value
-    const valueTabsContent = document.querySelector(`[value="${sectionId}"][role="tabpanel"]`);
-    if (valueTabsContent) {
-      (valueTabsContent as HTMLElement).style.display = 'block';
-      console.log(`TabsContent with value=${sectionId} displayed`);
+    // 7. Specially handle ResultTabs content by looking for TabsContent with matching data-value
+    if (['info', 'source', 'structure'].includes(sectionId)) {
+      const resultsTabContent = document.querySelector(`[data-state="active"][role="tabpanel"][data-value="${sectionId}"]`);
+      if (resultsTabContent) {
+        (resultsTabContent as HTMLElement).style.display = 'block';
+        console.log(`ResultTabs content for ${sectionId} displayed`);
+      }
+      
+      // Also try with direct ID match for ResultTabs
+      const resultTabSection = document.getElementById(sectionId);
+      if (resultTabSection) {
+        resultTabSection.style.display = 'block';
+        console.log(`ResultTabs section with ID ${sectionId} displayed`);
+      }
     }
   }, 100);
 };
@@ -103,6 +117,8 @@ export const getMainTabCategory = (tabId: string): string => {
     return 'performance';
   } else if (tabId === 'analytics') {
     return 'analytics';
+  } else if (['info', 'source'].includes(tabId)) {
+    return 'results';
   }
   
   // Return the tab itself if it's a main category

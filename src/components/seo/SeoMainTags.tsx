@@ -23,15 +23,22 @@ const SeoMainTags = ({
   h3Count = 0,
   imgCount = 0
 }: SeoMainTagsProps) => {
-  const { t } = useTranslation();
+  // Fallback if i18n is not available
+  const t = (key: string, fallback: string) => {
+    try {
+      return useTranslation().t(key) || fallback;
+    } catch (e) {
+      return fallback;
+    }
+  };
   
   return (
     <div className="space-y-6">
-      <h3 className="font-medium mb-4 text-lg border-b pb-2">{t('seo.mainTags')}</h3>
+      <h3 className="font-medium mb-4 text-lg border-b pb-2">Balises SEO principales</h3>
       <ul className="space-y-4">
         <li>
           <div className="flex items-center gap-2">
-            <span className="font-medium">{t('seo.title')} :</span>
+            <span className="font-medium">Titre :</span>
             {title && (
               <Badge variant="outline" className="bg-green-50 text-green-700">
                 {title.length} caractères
@@ -39,13 +46,13 @@ const SeoMainTags = ({
             )}
           </div>
           <p className="mt-1 text-gray-600">
-            {title || t('seo.notDefined')}
+            {title || "Non défini"}
           </p>
         </li>
         
         <li>
           <div className="flex items-center gap-2">
-            <span className="font-medium">{t('seo.description')} :</span>
+            <span className="font-medium">Description :</span>
             {description && (
               <Badge variant="outline" className="bg-green-50 text-green-700">
                 {description.length} caractères
@@ -53,14 +60,14 @@ const SeoMainTags = ({
             )}
           </div>
           <p className="mt-1 text-gray-600">
-            {description || t('seo.notDefined_female')}
+            {description || "Non définie"}
           </p>
         </li>
         
         <li>
           <div className="flex items-center gap-2 mb-2">
             <Tag className="h-4 w-4" />
-            <span className="font-medium">{t('seo.keywords')} :</span>
+            <span className="font-medium">Mots-clés :</span>
           </div>
           <div className="flex flex-wrap gap-2">
             {Array.isArray(keywords) && keywords.length > 0 ? (
@@ -74,7 +81,7 @@ const SeoMainTags = ({
                 </Badge>
               ))
             ) : (
-              <span className="text-gray-500 italic">{t('seo.noKeywords')}</span>
+              <span className="text-gray-500 italic">Aucun mot-clé défini</span>
             )}
           </div>
         </li>

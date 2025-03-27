@@ -145,8 +145,11 @@ export const useSiteAnalyzer = () => {
       // Basic SEO analysis
       const seoData = {
         title: crawlData.title || url,
+        description: crawlData.meta?.find(m => m.name === "description")?.content || "",
+        keywords: crawlData.meta?.find(m => m.name === "keywords")?.content?.split(",").map(k => k.trim()) || [],
         metaTagsAnalysis: {
           hasDescriptionTag: crawlData.meta && crawlData.meta.some(meta => meta.name === "description"),
+          hasTitleTag: !!crawlData.title,
           hasOpenGraphTags: crawlData.meta && crawlData.meta.some(meta => meta.property && meta.property.startsWith("og:")),
           hasTwitterTags: crawlData.meta && crawlData.meta.some(meta => meta.name && meta.name.startsWith("twitter:")),
           canonical: crawlData.meta && crawlData.meta.find(meta => meta.rel === "canonical")?.href || "",
@@ -169,12 +172,27 @@ export const useSiteAnalyzer = () => {
           touchTargetSize: "Adequate",
           fontScale: "Good"
         },
+        searchConsole: {
+          clicks: [150, 160, 170, 155, 180, 190, 200],
+          impressions: [1500, 1600, 1700, 1550, 1800, 1900, 2000],
+        },
+        contentQuality: {
+          readingTime: 3.5,
+          complexity: 65
+        },
         wordCount: crawlData.textContent ? crawlData.textContent.split(/\s+/).length : 0,
         readabilityScore: 68,
         topKeywords: [
           { keyword: "Example", count: 24, density: 2.1, position: 1 },
           { keyword: "Test", count: 18, density: 1.6, position: 2 },
           { keyword: "Demo", count: 15, density: 1.3, position: 3 }
+        ],
+        keywordSuggestions: [
+          { keyword: "SEO optimization", volume: 8500, difficulty: 67 },
+          { keyword: "website analysis tools", volume: 4200, difficulty: 45 },
+          { keyword: "content structure SEO", volume: 2800, difficulty: 38 },
+          { keyword: "heading hierarchy", volume: 1200, difficulty: 25 },
+          { keyword: "meta tags optimization", volume: 3600, difficulty: 43 }
         ],
         technicalSuggestions: [
           "Assurez-vous d'avoir exactement une balise H1",
@@ -187,7 +205,7 @@ export const useSiteAnalyzer = () => {
       // Set the data in state
       setSeoAnalysis(seoData);
       setResources(getExternalLinkAnalysis());
-      setSiteStructure(crawlData);
+      setSiteStructure({...crawlData, sourceCode: crawlData.sourceCode || ""});
       
       console.log("ANALYSIS COMPLETE");
       
@@ -220,17 +238,20 @@ export const useSiteAnalyzer = () => {
       
       // Even with an error, provide demo data for testing the interface
       const demoData = generateDemoData();
-      setSiteStructure(demoData);
+      setSiteStructure({...demoData, sourceCode: demoData.sourceCode || ""});
       
       // Generate synthetic SEO data with hierarchical structure
       const parser = new DOMParser();
-      const doc = parser.parseFromString(demoData.sourceCode, "text/html");
+      const doc = parser.parseFromString(demoData.sourceCode || "", "text/html");
       const headingStructure = analyzeHeadings(doc);
       
       const syntheticSeoData = {
         title: demoData.title || url,
+        description: "Description exemple pour " + url,
+        keywords: ["seo", "analyse", "demo", "test"],
         metaTagsAnalysis: {
           hasDescriptionTag: true,
+          hasTitleTag: true,
           hasOpenGraphTags: false,
           hasTwitterTags: false,
           canonical: "",
@@ -257,12 +278,27 @@ export const useSiteAnalyzer = () => {
           touchTargetSize: "Adequate",
           fontScale: "Good"
         },
+        searchConsole: {
+          clicks: [100, 110, 120, 115, 130, 140, 150],
+          impressions: [1000, 1100, 1200, 1150, 1300, 1400, 1500],
+        },
+        contentQuality: {
+          readingTime: 2.5,
+          complexity: 55
+        },
         wordCount: 320,
         readabilityScore: 68,
         topKeywords: [
           { keyword: "Example", count: 24, density: 2.1, position: 1 },
           { keyword: "Test", count: 18, density: 1.6, position: 2 },
           { keyword: "Demo", count: 15, density: 1.3, position: 3 }
+        ],
+        keywordSuggestions: [
+          { keyword: "demo website analysis", volume: 5500, difficulty: 47 },
+          { keyword: "example site structure", volume: 3200, difficulty: 35 },
+          { keyword: "test website seo", volume: 1800, difficulty: 28 },
+          { keyword: "sample content optimization", volume: 1200, difficulty: 25 },
+          { keyword: "dummy website performance", volume: 2600, difficulty: 33 }
         ],
         technicalSuggestions: [
           "Assurez-vous d'avoir exactement une balise H1",
