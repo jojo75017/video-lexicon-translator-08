@@ -1,6 +1,6 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Code, Search, ListTree, BarChart, Globe, Database, Link2 } from "lucide-react";
+import { Code, Search, ListTree, BarChart, Globe } from "lucide-react";
 import { SiteInfo } from "./SiteInfo";
 import { SourceCode } from "./SourceCode";
 import { toast } from "sonner";
@@ -75,63 +75,64 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
   // Génération de données spécifiques pour chaque onglet
   // Cela garantit que chaque onglet a des données uniques
   const generateTabSpecificData = () => {
-    let performanceData = null;
-    let mobileData = null;
-    
-    // Pour l'onglet Performance, générons des données de performance réalistes
-    if (data) {
-      performanceData = data.performance || {
-        loadTime: Math.floor(Math.random() * 2000) + 1000, // Entre 1s et 3s
-        firstContentfulPaint: Math.floor(Math.random() * 800) + 500, // Entre 500ms et 1.3s
-        domLoadTime: Math.floor(Math.random() * 1500) + 800, // Entre 800ms et 2.3s
-        speedIndex: Math.floor(Math.random() * 1000) + 1000, // Entre 1s et 2s
-        largestContentfulPaint: Math.floor(Math.random() * 1000) + 1200, // Entre 1.2s et 2.2s
-        timeToInteractive: Math.floor(Math.random() * 1000) + 1500, // Entre 1.5s et 2.5s
-        score: Math.floor(Math.random() * 30) + 60, // Score entre 60 et 90
-        resourceBreakdown: {
-          images: Math.floor(Math.random() * 500000) + 100000, // Entre 100KB et 600KB
-          scripts: Math.floor(Math.random() * 400000) + 100000, // Entre 100KB et 500KB
-          styles: Math.floor(Math.random() * 100000) + 20000, // Entre 20KB et 120KB
-          fonts: Math.floor(Math.random() * 50000) + 10000, // Entre 10KB et 60KB
-          other: Math.floor(Math.random() * 20000) + 5000 // Entre 5KB et 25KB
-        },
-        resourceCount: Math.floor(Math.random() * 50) + 20, // Entre 20 et 70 ressources
-        totalSize: Math.floor(Math.random() * 2000000) + 500000 // Entre 500KB et 2.5MB
-      };
-    }
+    // Données pour l'onglet Performance
+    let performanceData = {
+      loadTime: Math.floor(Math.random() * 2000) + 1000, // Entre 1s et 3s
+      firstContentfulPaint: Math.floor(Math.random() * 800) + 500, // Entre 500ms et 1.3s
+      domLoadTime: Math.floor(Math.random() * 1500) + 800, // Entre 800ms et 2.3s
+      speedIndex: Math.floor(Math.random() * 1000) + 1000, // Entre 1s et 2s
+      largestContentfulPaint: Math.floor(Math.random() * 1000) + 1200, // Entre 1.2s et 2.2s
+      timeToInteractive: Math.floor(Math.random() * 1000) + 1500, // Entre 1.5s et 2.5s
+      score: Math.floor(Math.random() * 30) + 60, // Score entre 60 et 90
+      resourceBreakdown: {
+        images: Math.floor(Math.random() * 500000) + 100000, // Entre 100KB et 600KB
+        scripts: Math.floor(Math.random() * 400000) + 100000, // Entre 100KB et 500KB
+        styles: Math.floor(Math.random() * 100000) + 20000, // Entre 20KB et 120KB
+        fonts: Math.floor(Math.random() * 50000) + 10000, // Entre 10KB et 60KB
+        other: Math.floor(Math.random() * 20000) + 5000 // Entre 5KB et 25KB
+      },
+      resourceCount: Math.floor(Math.random() * 50) + 20, // Entre 20 et 70 ressources
+      totalSize: Math.floor(Math.random() * 2000000) + 500000 // Entre 500KB et 2.5MB
+    };
     
     // Pour l'onglet Mobile, générons des données d'accessibilité mobile réalistes
-    if (data) {
-      const viewportMetaPresent = Math.random() > 0.3; // 70% de chance d'avoir viewport meta
-      const responsiveImagesPresent = Math.random() > 0.4; // 60% de chance d'avoir des images responsives
-      const touchTargetSizeOk = Math.random() > 0.5; // 50% de chance d'avoir des cibles tactiles correctes
-      const fontScaleOk = Math.random() > 0.4; // 60% de chance d'avoir une échelle de police correcte
-      
-      const criteriaCount = 4;
-      const passedCriteria = [viewportMetaPresent, responsiveImagesPresent, touchTargetSizeOk, fontScaleOk]
-        .filter(Boolean).length;
-      const mobileScore = Math.round((passedCriteria / criteriaCount) * 100);
-      
-      mobileData = {
-        score: mobileScore,
-        viewportMeta: viewportMetaPresent,
-        responsiveImages: responsiveImagesPresent,
-        touchTargetSize: touchTargetSizeOk,
-        fontScale: fontScaleOk
-      };
-    }
+    const viewportMetaPresent = Math.random() > 0.3; // 70% de chance d'avoir viewport meta
+    const responsiveImagesPresent = Math.random() > 0.4; // 60% de chance d'avoir des images responsives
+    const touchTargetSizeOk = Math.random() > 0.5; // 50% de chance d'avoir des cibles tactiles correctes
+    const fontScaleOk = Math.random() > 0.4; // 60% de chance d'avoir une échelle de police correcte
+    
+    const criteriaCount = 4;
+    const passedCriteria = [viewportMetaPresent, responsiveImagesPresent, touchTargetSizeOk, fontScaleOk]
+      .filter(Boolean).length;
+    const mobileScore = Math.round((passedCriteria / criteriaCount) * 100);
+    
+    const mobileData = {
+      score: mobileScore,
+      viewportMeta: viewportMetaPresent,
+      responsiveImages: responsiveImagesPresent,
+      touchTargetSize: touchTargetSizeOk,
+      fontScale: fontScaleOk
+    };
     
     return { performanceData, mobileData };
   };
   
   const { performanceData, mobileData } = generateTabSpecificData();
 
-  // Création de recommandations
-  const recommendations = data?.recommendations || [
-    "Utilisez une seule balise H1 par page",
-    "Structurez votre contenu avec des H2 et H3",
-    "Ajoutez des alt-texts à toutes vos images"
-  ];
+  // Recommandations basées sur l'URL analysée
+  const generateRecommendations = () => {
+    const domain = data?.url ? new URL(data.url).hostname : "exemple.com";
+    
+    return [
+      `Optimisez le titre principal de ${domain} pour inclure des mots-clés pertinents`,
+      `Améliorez la structure des titres H2 et H3 sur ${domain}`,
+      `Ajoutez des alt-texts à toutes vos images sur ${domain}`,
+      `Optimisez la vitesse de chargement de ${domain} en compressant les images`,
+      `Améliorez le maillage interne de ${domain} pour renforcer votre SEO`
+    ];
+  };
+  
+  const recommendations = data?.recommendations || generateRecommendations();
   
   // Si aucune donnée n'est fournie, afficher un placeholder
   if (!data) {

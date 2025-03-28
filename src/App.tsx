@@ -8,6 +8,11 @@ import Accueil from "./pages/Accueil";
 import OutilsSeo from "./pages/OutilsSeo";
 import QuoraPage from "./pages/QuoraPage";
 import SignaturePage from "./pages/SignaturePage";
+import HierarchyPage from "./pages/HierarchyPage";
+import WordCountPage from "./pages/WordCountPage";
+import StructurePage from "./pages/StructurePage";
+import PerformancePage from "./pages/PerformancePage";
+import AnalyticsPage from "./pages/AnalyticsPage";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +27,11 @@ const App = () => (
           <Route path="/seo" element={<OutilsSeo />} />
           <Route path="/quora" element={<QuoraPage />} />
           <Route path="/signature" element={<SignaturePage />} />
+          <Route path="/hierarchy" element={<HierarchyPage />} />
+          <Route path="/wordcount" element={<WordCountPage />} />
+          <Route path="/structure" element={<StructurePage />} />
+          <Route path="/performance" element={<PerformancePage />} />
+          <Route path="/analytics" element={<AnalyticsPage />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

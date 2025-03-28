@@ -4,89 +4,68 @@
 export const activateSection = (sectionId: string) => {
   console.log(`Activation de la section: ${sectionId}`);
   
-  // Masquer tous les conteneurs possibles pour garantir un état propre
-  document.querySelectorAll('[data-tab-content]').forEach(el => {
-    (el as HTMLElement).style.display = 'none';
-  });
-  
+  // Masquer tous les conteneurs de sections
   document.querySelectorAll('[data-section]').forEach(el => {
     (el as HTMLElement).style.display = 'none';
   });
   
-  // Pour les composants TabsContent dans le cadre de Shadcn UI
-  document.querySelectorAll('[role="tabpanel"]').forEach(el => {
-    // Vérifier si ce panneau correspond à la section que nous voulons activer
-    const elValue = el.getAttribute('value');
-    const dataValue = el.getAttribute('data-value');
-    
-    // Si c'est le panneau que nous voulons afficher, ne pas le masquer
-    if (elValue === sectionId || dataValue === sectionId) {
-      console.log(`Activation du panneau pour ${sectionId}`);
-      (el as HTMLElement).style.display = 'block';
-      el.setAttribute('data-state', 'active');
-      return;
-    }
-    
-    // Sinon, le masquer
+  // Masquer tous les contenus d'onglets
+  document.querySelectorAll('[data-tab-content]').forEach(el => {
     (el as HTMLElement).style.display = 'none';
-    el.setAttribute('data-state', 'inactive');
   });
   
-  // Activation spécifique pour les onglets du composant ResultTabs
-  setTimeout(() => {
-    if (['info', 'source', 'structure', 'performance', 'accessibility'].includes(sectionId)) {
-      // Trouver et activer le déclencheur d'onglet (TabsTrigger) correspondant
-      const triggerSelector = `[role="tab"][value="${sectionId}"]`;
-      const trigger = document.querySelector(triggerSelector);
+  // Masquer tous les panneaux de contenu de Tabs
+  document.querySelectorAll('[role="tabpanel"]').forEach(el => {
+    el.setAttribute('data-state', 'inactive');
+    (el as HTMLElement).style.display = 'none';
+  });
+  
+  // Activation du panneau spécifique pour le composant ResultTabs
+  if (['info', 'source', 'structure', 'performance', 'accessibility'].includes(sectionId)) {
+    // Trouver et activer le déclencheur d'onglet correspondant
+    const triggerSelector = `[role="tab"][value="${sectionId}"]`;
+    const trigger = document.querySelector(triggerSelector);
+    
+    if (trigger) {
+      // Marquer tous les autres onglets comme inactifs
+      document.querySelectorAll('[role="tab"]').forEach(tab => {
+        tab.setAttribute('data-state', 'inactive');
+        tab.setAttribute('aria-selected', 'false');
+      });
       
-      if (trigger) {
-        // Marquer tous les autres onglets comme inactifs
-        document.querySelectorAll('[role="tab"]').forEach(tab => {
-          tab.setAttribute('data-state', 'inactive');
-          tab.setAttribute('aria-selected', 'false');
-        });
-        
-        // Marquer cet onglet comme actif
-        trigger.setAttribute('data-state', 'active');
-        trigger.setAttribute('aria-selected', 'true');
-        console.log(`Onglet ${sectionId} activé avec succès`);
-        
-        // Activer son contenu
-        const panelSelector = `[role="tabpanel"][value="${sectionId}"]`;
-        const panel = document.querySelector(panelSelector);
-        
-        if (panel) {
-          document.querySelectorAll('[role="tabpanel"]').forEach(p => {
-            p.setAttribute('data-state', 'inactive');
-            (p as HTMLElement).style.display = 'none';
-          });
-          
-          panel.setAttribute('data-state', 'active');
-          (panel as HTMLElement).style.display = 'block';
-          console.log(`Panneau ${sectionId} activé avec succès`);
-        }
+      // Marquer cet onglet comme actif
+      trigger.setAttribute('data-state', 'active');
+      trigger.setAttribute('aria-selected', 'true');
+      
+      // Activer son contenu
+      const panelSelector = `[role="tabpanel"][value="${sectionId}"]`;
+      const panel = document.querySelector(panelSelector);
+      
+      if (panel) {
+        panel.setAttribute('data-state', 'active');
+        (panel as HTMLElement).style.display = 'block';
       }
     }
-    
-    // Activer explicitement la section et le contenu de l'onglet
-    document.querySelectorAll(`[data-section="${sectionId}"]`).forEach(el => {
-      (el as HTMLElement).style.display = 'block';
-    });
-    
-    document.querySelectorAll(`[data-tab-content="${sectionId}"]`).forEach(el => {
-      (el as HTMLElement).style.display = 'block';
-    });
-  }, 10);
+  }
+  
+  // Activer explicitement la section demandée
+  document.querySelectorAll(`[data-section="${sectionId}"]`).forEach(el => {
+    (el as HTMLElement).style.display = 'block';
+  });
+  
+  document.querySelectorAll(`[data-tab-content="${sectionId}"]`).forEach(el => {
+    (el as HTMLElement).style.display = 'block';
+  });
 };
 
 // Fonction pour naviguer vers une section avec mise à jour de l'URL
 export const navigateToSection = (sectionId: string) => {
   console.log(`Navigation vers la section: ${sectionId}`);
   
-  // Mettre à jour le hash de l'URL sans créer d'entrée dans l'historique
+  // Mettre à jour le hash de l'URL
   window.location.hash = sectionId;
   
-  // Activer la section après un court délai pour s'assurer que le DOM est prêt
+  // Activer la section après un court délai
   setTimeout(() => {
     activateSection(sectionId);
   }, 50);

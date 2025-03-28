@@ -2,23 +2,26 @@
 import { useState, useEffect } from 'react';
 import { tabs } from './TabData';
 import { toast } from "sonner";
+import { useNavigate } from 'react-router-dom';
 import { activateSection, getMainTabCategory } from '@/utils/navigationHelpers';
 
 export interface MainTab {
   id: string;
   label: string;
   color: string;
+  path?: string;
 }
 
 export const useTabNavigation = () => {
   const [activeTab, setActiveTab] = useState<string>('hierarchy');
+  const navigate = useNavigate();
   
-  // Définir les catégories principales
+  // Définir les catégories principales avec les chemins de navigation
   const mainTabs: MainTab[] = [
-    {id: 'content', label: 'Contenu', color: 'border-blue-600'},
-    {id: 'seo', label: 'SEO', color: 'border-purple-600'},
-    {id: 'performance', label: 'Performance', color: 'border-amber-600'},
-    {id: 'analytics', label: 'Analytics', color: 'border-emerald-600'}
+    {id: 'content', label: 'Contenu', color: 'border-blue-600', path: '/hierarchy'},
+    {id: 'seo', label: 'SEO', color: 'border-purple-600', path: '/seo'},
+    {id: 'performance', label: 'Performance', color: 'border-amber-600', path: '/performance'},
+    {id: 'analytics', label: 'Analytics', color: 'border-emerald-600', path: '/analytics'}
   ];
   
   // Filtrer les onglets sans liens externes
@@ -39,7 +42,7 @@ export const useTabNavigation = () => {
           toast.info(`Onglet ${hash} activé depuis l'URL`, {
             duration: 1500
           });
-        }, 800); // Délai important pour s'assurer que tout est prêt
+        }, 800);
       } else {
         // Par défaut, aller au premier onglet si pas de hash
         const defaultTab = 'hierarchy';
@@ -78,7 +81,7 @@ export const useTabNavigation = () => {
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
   
-  // Gérer la sélection d'onglet
+  // Gérer la sélection d'onglet avec navigation vers les pages dédiées
   const handleTabChange = (value: string) => {
     console.log(`Changement d'onglet vers: ${value}`);
     
@@ -90,7 +93,25 @@ export const useTabNavigation = () => {
     
     setActiveTab(value);
     
-    // Mise à jour de l'URL
+    // Navigation vers les pages dédiées
+    const tabPaths: Record<string, string> = {
+      'hierarchy': '/hierarchy',
+      'wordcount': '/wordcount',
+      'suggestions': '/wordcount',
+      'seo': '/seo',
+      'structure': '/structure',
+      'backlinks': '/seo',
+      'performance': '/performance',
+      'metrics': '/performance',
+      'analytics': '/analytics',
+    };
+    
+    if (tabPaths[value]) {
+      navigate(tabPaths[value]);
+      return;
+    }
+    
+    // Si pas de page dédiée, mise à jour de l'URL avec le hash
     window.location.hash = value;
     
     // Assurer que le contenu de l'onglet est visible
@@ -103,7 +124,7 @@ export const useTabNavigation = () => {
         description: "Chargement du contenu en cours...",
         duration: 1500
       });
-    }, 500); // Délai augmenté significativement
+    }, 500);
   };
 
   // Obtenir les sous-onglets en fonction de l'onglet principal actif

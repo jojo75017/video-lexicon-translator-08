@@ -42,6 +42,22 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
     }
   };
 
+  // Map internal links to proper routes instead of hash navigation
+  const getInternalLink = (id: string): string => {
+    const routeMap: Record<string, string> = {
+      'hierarchy': '/hierarchy',
+      'wordcount': '/wordcount',
+      'seo': '/seo',
+      'structure': '/structure',
+      'performance': '/performance',
+      'analytics': '/analytics',
+      'signature': '/signature',
+      'quora': '/quora'
+    };
+    
+    return routeMap[id] || `#${id}`;
+  };
+
   // Content for badge and icon that's shared between link and tab versions
   const TabContent = () => (
     <div 
@@ -74,15 +90,16 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
               <TabContent />
             </Link>
           ) : (
-            <TabsTrigger 
-              value={id}
-              className="data-[state=active]:bg-white data-[state=active]:shadow-sm"
+            // Pour les onglets internes, utiliser des liens plutôt que des TabsTrigger
+            <Link 
+              to={getInternalLink(id)} 
+              className="inline-block" 
               data-value={id}
               data-tab-id={id}
               onClick={handleTabClick}
             >
               <TabContent />
-            </TabsTrigger>
+            </Link>
           )}
         </TooltipTrigger>
         <TooltipContent>
