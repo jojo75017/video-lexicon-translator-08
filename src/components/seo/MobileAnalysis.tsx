@@ -19,10 +19,10 @@ const MobileAnalysis: React.FC<MobileAnalysisProps> = ({
   score = 0
 }) => {
   // Vérifier que les propriétés booléennes sont correctement interprétées
-  const hasViewportMeta = viewportMeta === true || viewportMeta === "true";
-  const hasResponsiveImages = responsiveImages === true || responsiveImages === "true";
-  const hasTouchTargetSize = touchTargetSize === true || touchTargetSize === "true";
-  const hasFontScale = fontScale === true || fontScale === "true";
+  const hasViewportMeta = Boolean(viewportMeta);
+  const hasResponsiveImages = Boolean(responsiveImages);
+  const hasTouchTargetSize = Boolean(touchTargetSize);
+  const hasFontScale = Boolean(fontScale);
   
   // Calculer le score sur 4 critères
   const criteriaCount = 4;
