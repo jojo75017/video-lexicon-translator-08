@@ -1,10 +1,8 @@
 
 import React from 'react';
 import { Link } from "react-router-dom";
-import { TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { activateSection } from '@/utils/navigationHelpers';
 
 interface TabTriggerItemProps {
   id: string;
@@ -25,40 +23,7 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
   link, 
   highlighted 
 }) => {
-  const handleTabClick = (e: React.MouseEvent) => {
-    // Prevent default only if it's not a link
-    if (!link) {
-      e.preventDefault();
-    }
-    
-    console.log(`Tab clicked: ${id}`);
-    
-    // Set URL hash for better navigation
-    if (!link) {
-      window.location.hash = id;
-      
-      // Use our activation function directly
-      activateSection(id);
-    }
-  };
-
-  // Map internal links to proper routes instead of hash navigation
-  const getInternalLink = (id: string): string => {
-    const routeMap: Record<string, string> = {
-      'hierarchy': '/hierarchy',
-      'wordcount': '/wordcount',
-      'seo': '/seo',
-      'structure': '/structure',
-      'performance': '/performance',
-      'analytics': '/analytics',
-      'signature': '/signature',
-      'quora': '/quora'
-    };
-    
-    return routeMap[id] || `#${id}`;
-  };
-
-  // Content for badge and icon that's shared between link and tab versions
+  // Contenu pour badge et icône partagé entre les versions de lien et d'onglet
   const TabContent = () => (
     <div 
       className={`flex items-center gap-1 px-3 py-1.5 rounded-md relative group transition-all duration-200 hover:bg-white ${
@@ -81,26 +46,36 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
     </div>
   );
 
+  // Obtenir le chemin correct pour la navigation
+  const getPath = () => {
+    if (link) return link;
+    
+    const routeMap: Record<string, string> = {
+      'hierarchy': '/hierarchy',
+      'wordcount': '/wordcount',
+      'seo': '/seo',
+      'structure': '/structure',
+      'performance': '/performance',
+      'analytics': '/analytics',
+      'signature': '/signature',
+      'quora': '/quora'
+    };
+    
+    return routeMap[id] || '/';
+  };
+
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          {link ? (
-            <Link to={link} className="inline-block" onClick={handleTabClick}>
-              <TabContent />
-            </Link>
-          ) : (
-            // Pour les onglets internes, utiliser des liens plutôt que des TabsTrigger
-            <Link 
-              to={getInternalLink(id)} 
-              className="inline-block" 
-              data-value={id}
-              data-tab-id={id}
-              onClick={handleTabClick}
-            >
-              <TabContent />
-            </Link>
-          )}
+          <Link 
+            to={getPath()} 
+            className="inline-block" 
+            data-value={id}
+            data-tab-id={id}
+          >
+            <TabContent />
+          </Link>
         </TooltipTrigger>
         <TooltipContent>
           <p className="text-xs">Accéder à {label}</p>

@@ -2,8 +2,7 @@
 import { useState, useEffect } from 'react';
 import { tabs } from './TabData';
 import { toast } from "sonner";
-import { useNavigate } from 'react-router-dom';
-import { activateSection, getMainTabCategory } from '@/utils/navigationHelpers';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export interface MainTab {
   id: string;
@@ -13,8 +12,33 @@ export interface MainTab {
 }
 
 export const useTabNavigation = () => {
-  const [activeTab, setActiveTab] = useState<string>('hierarchy');
   const navigate = useNavigate();
+  const location = useLocation();
+  const currentPath = location.pathname;
+  
+  // Déterminer l'onglet actif basé sur le chemin actuel
+  const determineActiveTab = (): string => {
+    const pathToTabMap: Record<string, string> = {
+      '/': 'hierarchy',
+      '/hierarchy': 'hierarchy',
+      '/wordcount': 'wordcount',
+      '/seo': 'seo',
+      '/structure': 'structure',
+      '/performance': 'performance',
+      '/analytics': 'analytics',
+      '/quora': 'quora',
+      '/signature': 'signature'
+    };
+    
+    return pathToTabMap[currentPath] || 'hierarchy';
+  };
+  
+  const [activeTab, setActiveTab] = useState<string>(determineActiveTab());
+  
+  // Mettre à jour l'onglet actif lorsque le chemin change
+  useEffect(() => {
+    setActiveTab(determineActiveTab());
+  }, [currentPath]);
   
   // Définir les catégories principales avec les chemins de navigation
   const mainTabs: MainTab[] = [
@@ -26,60 +50,6 @@ export const useTabNavigation = () => {
   
   // Filtrer les onglets sans liens externes
   const contentTabs = tabs.filter(tab => !tab.link);
-  
-  // Initialiser à partir du hash URL ou définir par défaut
-  useEffect(() => {
-    const handleInitialTabActivation = () => {
-      // Vérifier le hash dans l'URL
-      const hash = window.location.hash.replace('#', '');
-      if (hash && tabs.some(tab => tab.id === hash)) {
-        console.log(`Hash trouvé dans l'URL: ${hash}, activation de cet onglet`);
-        setActiveTab(hash);
-        
-        // Activation immédiate de la section correspondante
-        setTimeout(() => {
-          activateSection(hash);
-          toast.info(`Onglet ${hash} activé depuis l'URL`, {
-            duration: 1500
-          });
-        }, 800);
-      } else {
-        // Par défaut, aller au premier onglet si pas de hash
-        const defaultTab = 'hierarchy';
-        setActiveTab(defaultTab);
-        
-        // Activation immédiate de la section par défaut
-        setTimeout(() => {
-          activateSection(defaultTab);
-          toast.info(`Onglet par défaut activé: ${defaultTab}`, {
-            duration: 1500
-          });
-        }, 800);
-      }
-    };
-    
-    // Exécuter après un court délai pour laisser le DOM se mettre en place
-    setTimeout(handleInitialTabActivation, 300);
-    
-    // Écouter les changements de hash
-    const handleHashChange = () => {
-      const newHash = window.location.hash.replace('#', '');
-      if (newHash && tabs.some(tab => tab.id === newHash)) {
-        console.log(`Hash changé en ${newHash}, mise à jour de l'onglet actif`);
-        setActiveTab(newHash);
-        setTimeout(() => {
-          activateSection(newHash);
-          toast.info(`Navigation vers l'onglet ${newHash}`, {
-            description: "URL mise à jour",
-            duration: 1500
-          });
-        }, 500);
-      }
-    };
-    
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
-  }, []);
   
   // Gérer la sélection d'onglet avec navigation vers les pages dédiées
   const handleTabChange = (value: string) => {
@@ -104,33 +74,41 @@ export const useTabNavigation = () => {
       'performance': '/performance',
       'metrics': '/performance',
       'analytics': '/analytics',
+      'quora': '/quora',
+      'signature': '/signature'
     };
     
     if (tabPaths[value]) {
       navigate(tabPaths[value]);
-      return;
-    }
-    
-    // Si pas de page dédiée, mise à jour de l'URL avec le hash
-    window.location.hash = value;
-    
-    // Assurer que le contenu de l'onglet est visible
-    setTimeout(() => {
-      // Activer la section appropriée
-      activateSection(value);
       
       // Notification visuelle du changement d'onglet
-      toast.info(`Navigation vers l'onglet ${value}`, {
-        description: "Chargement du contenu en cours...",
+      toast.info(`Navigation vers ${value}`, {
+        description: "Chargement de la page...",
         duration: 1500
       });
-    }, 500);
+      
+      return;
+    }
   };
 
   // Obtenir les sous-onglets en fonction de l'onglet principal actif
   const getSubTabs = () => {
     // Obtenir la catégorie principale de l'onglet actif
-    const mainCategory = getMainTabCategory(activeTab);
+    const getMainCategory = (tabId: string): string => {
+      if (['hierarchy', 'wordcount', 'suggestions'].includes(tabId)) {
+        return 'content';
+      } else if (['seo', 'structure', 'backlinks'].includes(tabId)) {
+        return 'seo';
+      } else if (['performance', 'metrics'].includes(tabId)) {
+        return 'performance';
+      } else if (tabId === 'analytics') {
+        return 'analytics';
+      }
+      
+      return tabId;
+    };
+    
+    const mainCategory = getMainCategory(activeTab);
     
     if (mainCategory === 'content') {
       return tabs.filter(tab => ['hierarchy', 'wordcount', 'suggestions'].includes(tab.id));
