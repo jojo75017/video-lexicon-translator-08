@@ -1,9 +1,10 @@
-// Helper functions for managing section navigation and activation
+
+// Fonctions d'aide pour gérer la navigation entre sections et leur activation
 
 export const activateSection = (sectionId: string) => {
   console.log(`Activation de la section: ${sectionId}`);
   
-  // First, hide ALL possible content containers to ensure clean state
+  // D'abord, masquer TOUS les conteneurs possibles pour garantir un état propre
   document.querySelectorAll('[data-tab-content]').forEach(el => {
     (el as HTMLElement).style.display = 'none';
   });
@@ -12,140 +13,81 @@ export const activateSection = (sectionId: string) => {
     (el as HTMLElement).style.display = 'none';
   });
   
-  // For TabsContent components, we need to set the CSS display property directly
-  // BUT we shouldn't disable the active ones
+  // Pour les composants TabsContent, nous devons définir directement la propriété CSS display
+  // MAIS nous ne devrions pas désactiver les actifs
   document.querySelectorAll('[role="tabpanel"]').forEach(el => {
-    // Check if this panel is for the currently activated section
+    // Vérifier si ce panneau est pour la section actuellement activée
     const elValue = el.getAttribute('value');
     const dataValue = el.getAttribute('data-value');
     
-    // Skip if this is the panel we want to show
+    // Ignorer si c'est le panneau que nous voulons afficher
     if (elValue === sectionId || dataValue === sectionId) {
-      console.log(`Keeping panel visible: ${sectionId}`);
+      console.log(`Garder le panneau visible: ${sectionId}`);
       (el as HTMLElement).style.display = 'block';
+      (el as HTMLElement).setAttribute('data-state', 'active');
       return;
     }
     
-    // Otherwise hide it
+    // Sinon le masquer
     (el as HTMLElement).style.display = 'none';
+    (el as HTMLElement).setAttribute('data-state', 'inactive');
   });
   
-  document.querySelectorAll('.tab-content').forEach(el => {
-    (el as HTMLElement).style.display = 'none';
-  });
-  
-  // Handle special case for ResultTabs
-  if (['info', 'source', 'structure', 'performance', 'accessibility'].includes(sectionId)) {
-    // Make sure the TabsTrigger for this section is marked as active
-    const trigger = document.querySelector(`[role="tab"][data-state="active"][value="${sectionId}"]`);
-    if (!trigger) {
-      // If the trigger isn't active yet, find and click it
-      const tabButton = document.querySelector(`[role="tab"][value="${sectionId}"]`);
-      if (tabButton) {
-        (tabButton as HTMLElement).click();
-        console.log(`Clicked tab trigger for ${sectionId}`);
-      }
-    }
-    
-    // Force the specific TabsContent to be visible
-    const content = document.querySelector(`[role="tabpanel"][value="${sectionId}"]`);
-    if (content) {
-      (content as HTMLElement).style.display = 'block';
-      (content as HTMLElement).setAttribute('data-state', 'active');
-      console.log(`Forced visibility of tab content: ${sectionId}`);
-    }
-    
-    // 7. Specially handle for ResultTabs content by looking for TabsContent with matching data-value
-    if (['info', 'source', 'structure'].includes(sectionId)) {
-      // Find all ResultTabs content elements
-      const resultsTabElements = document.querySelectorAll(`[role="tabpanel"][data-value="${sectionId}"], [role="tabpanel"][value="${sectionId}"]`);
-      if (resultsTabElements.length > 0) {
-        resultsTabElements.forEach(el => {
-          (el as HTMLElement).style.display = 'block';
-          console.log(`ResultTabs panel with value=${sectionId} displayed`);
-        });
-      }
-      
-      // Also try with direct ID match for ResultTabs
-      const resultTabSection = document.getElementById(sectionId);
-      if (resultTabSection) {
-        resultTabSection.style.display = 'block';
-        console.log(`ResultTabs section with ID ${sectionId} displayed`);
-      }
-    }
-  }
-  
-  // Show the selected section with a small delay to ensure DOM is ready
+  // Activer explicitement l'onglet cible
   setTimeout(() => {
-    // Try multiple selectors to ensure we find the right content
-    
-    // 1. Try by direct ID
-    const elementById = document.getElementById(sectionId);
-    if (elementById) {
-      elementById.style.display = 'block';
-      console.log(`Section ID ${sectionId} activated by ID`);
-    }
-    
-    // 2. Try by data-section attribute
-    const sectionElements = document.querySelectorAll(`[data-section="${sectionId}"]`);
-    if (sectionElements.length > 0) {
-      sectionElements.forEach(el => {
-        (el as HTMLElement).style.display = 'block';
-      });
-      console.log(`Sections with data-section=${sectionId} activated (${sectionElements.length} found)`);
-    }
-    
-    // 3. Try by data-tab-content attribute
-    const tabContentElements = document.querySelectorAll(`[data-tab-content="${sectionId}"]`);
-    if (tabContentElements.length > 0) {
-      tabContentElements.forEach(el => {
-        (el as HTMLElement).style.display = 'block';
-      });
-      console.log(`Elements with data-tab-content=${sectionId} displayed (${tabContentElements.length} found)`);
-    }
-    
-    // 4. Try by tab panel with matching value
-    const tabPanel = document.querySelector(`[role="tabpanel"][value="${sectionId}"]`);
-    if (tabPanel) {
-      (tabPanel as HTMLElement).style.display = 'block';
-      console.log(`Tab panel ${sectionId} activated by value attribute`);
-    }
-    
-    // 5. Try for elements with specific classes that match the sectionId
-    const tabContentByClass = document.querySelectorAll(`.tab-content.${sectionId}`);
-    if (tabContentByClass.length > 0) {
-      tabContentByClass.forEach(el => {
-        (el as HTMLElement).style.display = 'block';
-      });
-      console.log(`Tab content with class ${sectionId} displayed (${tabContentByClass.length} found)`);
-    }
-    
-    // 6. Try for TabsContent components from shadcn/ui
-    const tabsContent = document.querySelector(`[data-state][role="tabpanel"][value="${sectionId}"]`);
-    if (tabsContent) {
-      (tabsContent as HTMLElement).style.display = 'block';
-      console.log(`TabsContent with value=${sectionId} displayed`);
+    if (['info', 'source', 'structure', 'performance', 'accessibility'].includes(sectionId)) {
+      // S'assurer que le TabsTrigger pour cette section est marqué comme actif
+      const triggerSelector = `[role="tab"][value="${sectionId}"]`;
+      const trigger = document.querySelector(triggerSelector);
       
-      // Make sure all active tabpanels with the same value are visible
-      document.querySelectorAll(`[data-state="active"][role="tabpanel"][value="${sectionId}"]`).forEach(el => {
-        (el as HTMLElement).style.display = 'block';
-      });
+      if (trigger) {
+        // Marquer tous les autres onglets comme inactifs
+        document.querySelectorAll('[role="tab"]').forEach(tab => {
+          tab.setAttribute('data-state', 'inactive');
+          tab.setAttribute('aria-selected', 'false');
+        });
+        
+        // Marquer cet onglet comme actif
+        trigger.setAttribute('data-state', 'active');
+        trigger.setAttribute('aria-selected', 'true');
+        console.log(`Onglet ${sectionId} défini comme actif`);
+        
+        // Marquer tous les panneaux comme inactifs
+        document.querySelectorAll('[role="tabpanel"]').forEach(panel => {
+          panel.setAttribute('data-state', 'inactive');
+          (panel as HTMLElement).style.display = 'none';
+        });
+        
+        // Trouver et activer le contenu de l'onglet correspondant
+        const panelSelector = `[role="tabpanel"][value="${sectionId}"]`;
+        const panel = document.querySelector(panelSelector);
+        
+        if (panel) {
+          panel.setAttribute('data-state', 'active');
+          (panel as HTMLElement).style.display = 'block';
+          console.log(`Panneau ${sectionId} défini comme actif`);
+        } else {
+          console.warn(`Panneau non trouvé pour: ${sectionId}`);
+        }
+      } else {
+        console.warn(`Déclencheur non trouvé pour: ${sectionId}`);
+      }
     }
-  }, 150); // Increased delay for more reliability
+  }, 10);
 };
 
-// Function to navigate to a section - updates URL hash and activates the section
+// Fonction pour naviguer vers une section - met à jour le hash de l'URL et active la section
 export const navigateToSection = (sectionId: string) => {
-  // Update hash to trigger listeners (but don't create a history entry)
+  // Mettre à jour le hash pour déclencher les écouteurs (mais ne pas créer d'entrée dans l'historique)
   window.location.hash = sectionId;
   
-  // Explicitly activate the section with delay
+  // Activer explicitement la section avec un délai
   setTimeout(() => {
     activateSection(sectionId);
-  }, 250); // Increased delay for reliability
+  }, 50);
 };
 
-// Function to get the main tab category of a tab
+// Fonction pour obtenir la catégorie principale d'un onglet
 export const getMainTabCategory = (tabId: string): string => {
   if (['hierarchy', 'wordcount', 'suggestions'].includes(tabId)) {
     return 'content';
@@ -159,6 +101,6 @@ export const getMainTabCategory = (tabId: string): string => {
     return 'results';
   }
   
-  // Return the tab itself if it's a main category
+  // Retourner l'onglet lui-même s'il s'agit d'une catégorie principale
   return tabId;
 };

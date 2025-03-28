@@ -25,30 +25,83 @@ export const useSiteAnalyzer = () => {
     });
   };
 
-  // Helper function to generate demo/sample data when a real crawl fails
+  // Fonction pour générer des données de démonstration en cas d'échec d'analyse
   const generateDemoData = useCallback(() => {
+    const domainMatch = url.match(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n?]+)/);
+    const domain = domainMatch ? domainMatch[1] : url;
+    
     return {
-      title: "Site Web Demo",
+      title: `Site Web - ${domain}`,
       url: url,
       meta: [
-        { name: "description", content: "Description démo du site" },
-        { name: "keywords", content: "seo, demo, analyse" }
+        { name: "description", content: `Description démo pour ${domain}` },
+        { name: "keywords", content: `${domain}, seo, analyse, démonstration` }
       ],
       headings: [
-        { level: 1, text: "Titre principal" },
-        { level: 2, text: "Sous-titre 1" },
-        { level: 2, text: "Sous-titre 2" },
-        { level: 3, text: "Section détaillée" }
+        { level: 1, text: "Titre principal de démonstration" },
+        { level: 2, text: "À propos de nous" },
+        { level: 2, text: "Nos services" },
+        { level: 3, text: "Service premium" }
       ],
       links: [
-        { href: "https://example.com", text: "Exemple de lien" },
-        { href: "https://example.com/page", text: "Autre lien" }
+        { href: `https://${domain}/about`, text: "À propos", isInternal: true },
+        { href: `https://${domain}/services`, text: "Services", isInternal: true },
+        { href: "https://facebook.com", text: "Facebook", isInternal: false },
+        { href: "https://twitter.com", text: "Twitter", isInternal: false }
       ],
       images: [
-        { src: "https://placekitten.com/200/300", alt: "Image d'exemple", width: 200, height: 300 },
-        { src: "https://placekitten.com/300/200", alt: "", width: 300, height: 200 }
+        { src: "https://via.placeholder.com/600x400", alt: "Image d'exemple principale", width: 600, height: 400 },
+        { src: "https://via.placeholder.com/300x200", alt: "", width: 300, height: 200 }
       ],
-      sourceCode: "<html>\n<head>\n  <title>Site Web Demo</title>\n</head>\n<body>\n  <h1>Titre principal</h1>\n  <p>Contenu démonstratif</p>\n</body>\n</html>",
+      sourceCode: `<!DOCTYPE html>
+<html>
+<head>
+  <title>Site Web - ${domain}</title>
+  <meta name="description" content="Description démo pour ${domain}">
+  <meta name="keywords" content="${domain}, seo, analyse, démonstration">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Titre principal de démonstration</h1>
+    <nav>
+      <ul>
+        <li><a href="/about">À propos</a></li>
+        <li><a href="/services">Services</a></li>
+        <li><a href="/contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+  
+  <main>
+    <section>
+      <h2>À propos de nous</h2>
+      <p>Ceci est un exemple de contenu généré pour montrer la structure d'une page web typique.</p>
+      <img src="https://via.placeholder.com/600x400" alt="Image d'exemple principale" width="600" height="400">
+    </section>
+    
+    <section>
+      <h2>Nos services</h2>
+      <p>Découvrez nos services professionnels qui peuvent aider votre entreprise.</p>
+      
+      <div class="service">
+        <h3>Service premium</h3>
+        <p>Notre service haut de gamme avec toutes les fonctionnalités dont vous avez besoin.</p>
+        <img src="https://via.placeholder.com/300x200" width="300" height="200">
+      </div>
+    </section>
+  </main>
+  
+  <footer>
+    <p>Copyright © 2023 ${domain}</p>
+    <div class="social-links">
+      <a href="https://facebook.com">Facebook</a>
+      <a href="https://twitter.com">Twitter</a>
+    </div>
+  </footer>
+</body>
+</html>`,
       recommendations: [
         "Ajoutez une balise meta description",
         "Optimisez vos balises H1 et H2",
@@ -57,52 +110,68 @@ export const useSiteAnalyzer = () => {
     };
   }, [url]);
 
-  // Get external link analysis data
+  // Fonction pour obtenir des données d'analyse de liens externes
   const getExternalLinkAnalysis = useCallback(() => {
     return {
-      externalLinks: 12,
-      internalLinks: 28,
-      noFollowLinks: 5,
-      brokenLinks: 2,
+      externalLinks: Math.floor(Math.random() * 8) + 5,
+      internalLinks: Math.floor(Math.random() * 15) + 10,
+      noFollowLinks: Math.floor(Math.random() * 3) + 1,
+      brokenLinks: Math.floor(Math.random() * 2),
       mostLinkedDomains: [
-        { domain: "facebook.com", count: 3 },
-        { domain: "twitter.com", count: 2 },
-        { domain: "linkedin.com", count: 2 }
+        { domain: "facebook.com", count: Math.floor(Math.random() * 2) + 1 },
+        { domain: "twitter.com", count: Math.floor(Math.random() * 2) + 1 },
+        { domain: "linkedin.com", count: Math.floor(Math.random() * 2) + 1 }
       ]
     };
   }, []);
 
-  // Get performance data
+  // Fonction pour obtenir des données de performance
   const getPerformanceData = useCallback(() => {
+    // Générer des valeurs aléatoires mais réalistes pour la démo
+    const loadTime = Math.floor(Math.random() * 2000) + 1000; // 1-3s
+    const firstContentfulPaint = Math.floor(loadTime * 0.4); // 40% du temps de chargement
+    const domLoadTime = Math.floor(loadTime * 0.7); // 70% du temps de chargement
+    const speedIndex = Math.floor(loadTime * 0.8);
+    const largestContentfulPaint = Math.floor(loadTime * 0.9);
+    const timeToInteractive = Math.floor(loadTime * 1.2);
+    
+    // Générer des tailles de ressources réalistes
+    const totalSize = Math.floor(Math.random() * 1500000) + 500000; // 500KB - 2MB
+    const imagesSize = Math.floor(totalSize * (Math.random() * 0.3 + 0.4)); // 40-70% du total
+    const scriptsSize = Math.floor(totalSize * (Math.random() * 0.2 + 0.2)); // 20-40% du total
+    const stylesSize = Math.floor(totalSize * (Math.random() * 0.1 + 0.05)); // 5-15% du total
+    const fontsSize = Math.floor(totalSize * (Math.random() * 0.05 + 0.02)); // 2-7% du total
+    const otherSize = totalSize - imagesSize - scriptsSize - stylesSize - fontsSize;
+    
     return {
-      score: 85,
-      loadTime: 1800, // ms
-      firstContentfulPaint: 850,
-      domLoadTime: 1200,
-      speedIndex: 1500,
-      largestContentfulPaint: 1400,
-      timeToInteractive: 2000,
-      resourceCount: 45,
-      resourceSize: 1.2, // MB
-      scriptCount: 12,
-      styleCount: 8,
-      imageCount: 15,
+      score: Math.floor(90 - (loadTime / 100)), // Score sur 100
+      loadTime,
+      firstContentfulPaint,
+      domLoadTime,
+      speedIndex,
+      largestContentfulPaint,
+      timeToInteractive,
+      resourceCount: Math.floor(Math.random() * 30) + 20,
+      resourceSize: totalSize / 1024 / 1024, // En MB
+      scriptCount: Math.floor(Math.random() * 10) + 5,
+      styleCount: Math.floor(Math.random() * 5) + 2,
+      imageCount: Math.floor(Math.random() * 15) + 5,
       cacheLifetime: 3600,
-      totalSize: 1250000, // bytes
-      responseTime: 220, // ms
-      impressions: 5500,
-      clickThroughRate: 0.08,
+      totalSize,
+      responseTime: Math.floor(Math.random() * 150) + 100,
+      impressions: Math.floor(Math.random() * 5000) + 1000,
+      clickThroughRate: (Math.random() * 0.05 + 0.05).toFixed(2),
       resourceBreakdown: {
-        images: 580000, // ~580KB
-        scripts: 480000, // ~480KB
-        css: 120000, // ~120KB
-        styles: 120000, // ~120KB
-        fonts: 60000, // ~60KB
-        other: 10000 // ~10KB
+        images: imagesSize,
+        scripts: scriptsSize,
+        styles: stylesSize,
+        fonts: fontsSize,
+        other: otherSize
       }
     };
   }, []);
 
+  // Fonction principale d'analyse du site
   const analyzeSite = useCallback(async () => {
     if (!url) {
       toast.error("Veuillez entrer une URL valide");
@@ -115,28 +184,28 @@ export const useSiteAnalyzer = () => {
     setResources(null);
     setSiteStructure(null);
     
-    // Message d'information
+    // Message d'information pour l'utilisateur
     toast.info("Analyse en cours", {
       description: "Cette opération peut prendre quelques instants...",
       duration: 5000,
     });
     
     try {
-      console.log("Analyzing site:", url);
+      console.log("Analyse du site:", url);
       
-      // Use FirecrawlService to get data
+      // Utiliser le service FirecrawlService pour obtenir les données
       const result = await FirecrawlService.crawlWebsite(url, proxyEnabled);
       
       if (!result.success) {
         throw new Error(result.error || "Erreur inconnue lors de l'analyse");
       }
       
-      console.log("Analysis result:", result);
+      console.log("Résultat de l'analyse:", result);
       
-      // Parse the result and create analysis objects
+      // Analyser le résultat et créer des objets d'analyse
       const crawlData = result.data[0];
       
-      // Analyse les titres avec une structure hiérarchique complète
+      // Analyser les titres avec une structure hiérarchique complète
       let headingStructure = null;
       let headings = [];
       
@@ -146,7 +215,7 @@ export const useSiteAnalyzer = () => {
       
       // Analyse avancée des titres
       headingStructure = analyzeHeadings(doc);
-      console.log("Heading structure analysis:", headingStructure);
+      console.log("Analyse de la structure des titres:", headingStructure);
       
       // Format attendu pour les headings
       if (crawlData.headings) {
@@ -157,7 +226,10 @@ export const useSiteAnalyzer = () => {
         }));
       }
       
-      // Basic SEO analysis
+      // Générer les données de performance
+      const performanceData = getPerformanceData();
+      
+      // Analyse SEO de base
       const seoData = {
         title: crawlData.title || url,
         description: crawlData.meta?.find(m => m.name === "description")?.content || "",
@@ -179,35 +251,35 @@ export const useSiteAnalyzer = () => {
         hierarchy: headingStructure?.hierarchy || [],
         imgCount: crawlData.images ? crawlData.images.length : 0,
         imgWithoutAlt: crawlData.images ? crawlData.images.filter(img => !img.alt).length : 0,
-        performance: getPerformanceData(),
+        performance: performanceData,
         mobileAnalysis: {
-          score: 75,
-          viewportMeta: true,
-          responsiveImages: true,
-          touchTargetSize: true,
-          fontScale: true
+          score: Math.floor(Math.random() * 20) + 60, // Score entre 60 et 80
+          viewportMeta: !!doc.querySelector('meta[name="viewport"]'),
+          responsiveImages: Math.random() > 0.3, // 70% de chance d'être true
+          touchTargetSize: Math.random() > 0.4, // 60% de chance d'être true
+          fontScale: Math.random() > 0.2, // 80% de chance d'être true
         },
         searchConsole: {
           clicks: [150, 160, 170, 155, 180, 190, 200],
           impressions: [1500, 1600, 1700, 1550, 1800, 1900, 2000],
         },
         contentQuality: {
-          readingTime: 3.5,
-          complexity: 65
+          readingTime: (crawlData.textContent?.split(/\s+/).length || 0) / 200, // ~200 mots par minute
+          complexity: Math.floor(Math.random() * 30) + 50
         },
         wordCount: crawlData.textContent ? crawlData.textContent.split(/\s+/).length : 0,
-        readabilityScore: 68,
+        readabilityScore: Math.floor(Math.random() * 30) + 50,
         topKeywords: [
-          { keyword: "Example", count: 24, density: 2.1, position: 1 },
+          { keyword: "Exemple", count: 24, density: 2.1, position: 1 },
           { keyword: "Test", count: 18, density: 1.6, position: 2 },
-          { keyword: "Demo", count: 15, density: 1.3, position: 3 }
+          { keyword: "Démo", count: 15, density: 1.3, position: 3 }
         ],
         keywordSuggestions: [
-          { keyword: "SEO optimization", volume: 8500, difficulty: 67 },
-          { keyword: "website analysis tools", volume: 4200, difficulty: 45 },
-          { keyword: "content structure SEO", volume: 2800, difficulty: 38 },
-          { keyword: "heading hierarchy", volume: 1200, difficulty: 25 },
-          { keyword: "meta tags optimization", volume: 3600, difficulty: 43 }
+          { keyword: "optimisation SEO", volume: 8500, difficulty: 67 },
+          { keyword: "outils analyse site web", volume: 4200, difficulty: 45 },
+          { keyword: "structure contenu SEO", volume: 2800, difficulty: 38 },
+          { keyword: "hiérarchie titres", volume: 1200, difficulty: 25 },
+          { keyword: "optimisation balises meta", volume: 3600, difficulty: 43 }
         ],
         technicalSuggestions: [
           "Assurez-vous d'avoir exactement une balise H1",
@@ -217,26 +289,26 @@ export const useSiteAnalyzer = () => {
         ]
       };
 
-      // Set the data in state
+      // Mise à jour des états avec les données analysées
       setSeoAnalysis(seoData);
       setResources(getExternalLinkAnalysis());
       setSiteStructure({...crawlData, sourceCode: crawlData.sourceCode || ""});
       
-      console.log("ANALYSIS COMPLETE");
+      console.log("ANALYSE TERMINÉE");
       
-      // Success notification
+      // Notification de succès
       toast.success("Analyse terminée", {
         description: "Consultez les résultats ci-dessous",
       });
       
-      // Navigate to the results section
+      // Navigation vers la section des résultats
       navigateToSection('info');
       
     } catch (err) {
-      console.error("Error analyzing site:", err);
+      console.error("Erreur lors de l'analyse du site:", err);
       setError(err instanceof Error ? err.message : "Une erreur s'est produite");
       
-      // Check if it's a CORS error
+      // Vérifier s'il s'agit d'une erreur CORS
       if (err instanceof Error && 
           (err.message.includes("CORS") || 
            err.message.includes("cross-origin") ||
@@ -251,18 +323,21 @@ export const useSiteAnalyzer = () => {
         });
       }
       
-      // Even with an error, provide demo data for testing the interface
+      // Même en cas d'erreur, fournir des données de démonstration pour tester l'interface
       const demoData = generateDemoData();
       setSiteStructure({...demoData, sourceCode: demoData.sourceCode || ""});
       
-      // Generate synthetic SEO data with hierarchical structure
+      // Génération de données SEO synthétiques avec structure hiérarchique
       const parser = new DOMParser();
       const doc = parser.parseFromString(demoData.sourceCode || "", "text/html");
       const headingStructure = analyzeHeadings(doc);
       
+      // Générer des données de performance
+      const performanceData = getPerformanceData();
+      
       const syntheticSeoData = {
         title: demoData.title || url,
-        description: "Description exemple pour " + url,
+        description: `Description exemple pour ${url}`,
         keywords: ["seo", "analyse", "demo", "test"],
         metaTagsAnalysis: {
           hasDescriptionTag: true,
@@ -285,9 +360,9 @@ export const useSiteAnalyzer = () => {
         hierarchy: headingStructure?.hierarchy || [],
         imgCount: demoData.images ? demoData.images.length : 0,
         imgWithoutAlt: demoData.images ? demoData.images.filter(img => !img.alt).length : 0,
-        performance: getPerformanceData(),
+        performance: performanceData,
         mobileAnalysis: {
-          score: 75,
+          score: Math.floor(Math.random() * 20) + 60, // Score entre 60 et 80
           viewportMeta: true,
           responsiveImages: true,
           touchTargetSize: true,
@@ -304,16 +379,16 @@ export const useSiteAnalyzer = () => {
         wordCount: 320,
         readabilityScore: 68,
         topKeywords: [
-          { keyword: "Example", count: 24, density: 2.1, position: 1 },
+          { keyword: "Exemple", count: 24, density: 2.1, position: 1 },
           { keyword: "Test", count: 18, density: 1.6, position: 2 },
-          { keyword: "Demo", count: 15, density: 1.3, position: 3 }
+          { keyword: "Démo", count: 15, density: 1.3, position: 3 }
         ],
         keywordSuggestions: [
-          { keyword: "demo website analysis", volume: 5500, difficulty: 47 },
-          { keyword: "example site structure", volume: 3200, difficulty: 35 },
-          { keyword: "test website seo", volume: 1800, difficulty: 28 },
-          { keyword: "sample content optimization", volume: 1200, difficulty: 25 },
-          { keyword: "dummy website performance", volume: 2600, difficulty: 33 }
+          { keyword: "analyse site démo", volume: 5500, difficulty: 47 },
+          { keyword: "structure site exemple", volume: 3200, difficulty: 35 },
+          { keyword: "test seo site web", volume: 1800, difficulty: 28 },
+          { keyword: "optimisation contenu exemple", volume: 1200, difficulty: 25 },
+          { keyword: "performance site web factice", volume: 2600, difficulty: 33 }
         ],
         technicalSuggestions: [
           "Assurez-vous d'avoir exactement une balise H1",
@@ -327,7 +402,7 @@ export const useSiteAnalyzer = () => {
       setResources(getExternalLinkAnalysis());
     } finally {
       setIsLoading(false);
-      console.log("ANALYSIS PROCESS COMPLETE");
+      console.log("PROCESSUS D'ANALYSE TERMINÉ");
     }
   }, [url, proxyEnabled, generateDemoData, getExternalLinkAnalysis, getPerformanceData]);
 

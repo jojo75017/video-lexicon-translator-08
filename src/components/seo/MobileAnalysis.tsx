@@ -1,9 +1,7 @@
 
 import React from 'react';
-import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Smartphone, Check, XCircle } from 'lucide-react';
-import { Badge } from "@/components/ui/badge";
+import { Check, X, Smartphone, Lightbulb } from 'lucide-react';
 
 interface MobileAnalysisProps {
   viewportMeta: boolean;
@@ -13,66 +11,147 @@ interface MobileAnalysisProps {
   score: number;
 }
 
-const MobileAnalysis = ({ viewportMeta, responsiveImages, touchTargetSize, fontScale, score }: MobileAnalysisProps) => {
-  const items = [
-    {
-      label: "Meta viewport",
-      value: viewportMeta,
-      description: "Configuration de la vue mobile"
-    },
-    {
-      label: "Images responsives",
-      value: responsiveImages,
-      description: "Optimisation pour différentes tailles d'écran"
-    },
-    {
-      label: "Zones tactiles",
-      value: touchTargetSize,
-      description: "Taille minimum de 44px pour les éléments cliquables"
-    },
-    {
-      label: "Mise à l'échelle des polices",
-      value: fontScale,
-      description: "Texte lisible sur mobile"
-    }
-  ];
+const MobileAnalysis: React.FC<MobileAnalysisProps> = ({
+  viewportMeta,
+  responsiveImages,
+  touchTargetSize,
+  fontScale,
+  score = 0
+}) => {
+  // Vérifier que les propriétés booléennes sont correctement interprétées
+  const hasViewportMeta = viewportMeta === true || viewportMeta === "true";
+  const hasResponsiveImages = responsiveImages === true || responsiveImages === "true";
+  const hasTouchTargetSize = touchTargetSize === true || touchTargetSize === "true";
+  const hasFontScale = fontScale === true || fontScale === "true";
+  
+  // Calculer le score sur 4 critères
+  const criteriaCount = 4;
+  const passedCriteria = [hasViewportMeta, hasResponsiveImages, hasTouchTargetSize, hasFontScale].filter(Boolean).length;
+  const calculatedScore = score || Math.round((passedCriteria / criteriaCount) * 100);
+  
+  // Déterminer la classe de couleur pour le score
+  const getScoreColorClass = (scoreValue: number) => {
+    if (scoreValue >= 80) return "text-green-600";
+    if (scoreValue >= 60) return "text-yellow-600";
+    return "text-red-600";
+  };
+
+  // Obtenir le message de statut en fonction du score
+  const getStatusMessage = (scoreValue: number) => {
+    if (scoreValue >= 80) return "Très bon";
+    if (scoreValue >= 60) return "Acceptable";
+    return "À améliorer";
+  };
 
   return (
-    <Card className="p-6">
-      <div className="flex items-center gap-2 mb-6">
-        <Smartphone className="h-5 w-5 text-blue-600" />
-        <h3 className="text-lg font-semibold">Performance Mobile</h3>
-        <Badge variant={score >= 90 ? "default" : score >= 70 ? "secondary" : "destructive"}>
-          {score}/100
-        </Badge>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center">
+          <Smartphone className="w-5 h-5 mr-2 text-blue-600" />
+          <h3 className="text-lg font-medium">Analyse de compatibilité mobile</h3>
+        </div>
+        <div className={`text-2xl font-bold ${getScoreColorClass(calculatedScore)}`}>
+          {calculatedScore}/100
+          <span className="text-sm font-normal ml-2 text-gray-500">
+            ({getStatusMessage(calculatedScore)})
+          </span>
+        </div>
       </div>
-
-      <div className="space-y-6">
-        <div>
-          <div className="flex justify-between mb-2">
-            <span className="font-medium">Score mobile</span>
-            <span>{score}/100</span>
+      
+      <Progress value={calculatedScore} className="h-2" />
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className={`p-4 rounded-lg border ${hasViewportMeta ? 'border-green-100 bg-green-50' : 'border-red-100 bg-red-50'}`}>
+          <div className="flex items-center gap-2">
+            {hasViewportMeta ? (
+              <Check className="w-5 h-5 text-green-600" />
+            ) : (
+              <X className="w-5 h-5 text-red-600" />
+            )}
+            <h4 className="font-medium">Meta viewport</h4>
           </div>
-          <Progress value={score} className="h-2" />
+          <p className="text-sm mt-2 text-gray-600">
+            {hasViewportMeta 
+              ? "La balise meta viewport est présente, permettant un affichage adaptatif." 
+              : "La balise meta viewport est absente, ce qui peut causer des problèmes d'affichage sur mobile."}
+          </p>
         </div>
-
-        <div className="grid gap-4">
-          {items.map((item, index) => (
-            <div key={index} className="flex items-start gap-4 p-3 bg-gray-50 rounded-lg">
-              {item.value ? (
-                <Check className="h-5 w-5 text-green-600 mt-0.5" />
-              ) : (
-                <XCircle className="h-5 w-5 text-red-600 mt-0.5" />
-              )}
-              <div>
-                <div className="font-medium">{item.label}</div>
-                <div className="text-sm text-gray-600">{item.description}</div>
-              </div>
-            </div>
-          ))}
+        
+        <div className={`p-4 rounded-lg border ${hasResponsiveImages ? 'border-green-100 bg-green-50' : 'border-red-100 bg-red-50'}`}>
+          <div className="flex items-center gap-2">
+            {hasResponsiveImages ? (
+              <Check className="w-5 h-5 text-green-600" />
+            ) : (
+              <X className="w-5 h-5 text-red-600" />
+            )}
+            <h4 className="font-medium">Images responsives</h4>
+          </div>
+          <p className="text-sm mt-2 text-gray-600">
+            {hasResponsiveImages 
+              ? "Les images sont configurées pour s'adapter aux différentes tailles d'écran." 
+              : "Les images ne sont pas optimisées pour s'adapter aux écrans mobiles."}
+          </p>
+        </div>
+        
+        <div className={`p-4 rounded-lg border ${hasTouchTargetSize ? 'border-green-100 bg-green-50' : 'border-red-100 bg-red-50'}`}>
+          <div className="flex items-center gap-2">
+            {hasTouchTargetSize ? (
+              <Check className="w-5 h-5 text-green-600" />
+            ) : (
+              <X className="w-5 h-5 text-red-600" />
+            )}
+            <h4 className="font-medium">Taille des zones tactiles</h4>
+          </div>
+          <p className="text-sm mt-2 text-gray-600">
+            {hasTouchTargetSize 
+              ? "Les zones tactiles (boutons, liens) sont suffisamment grandes pour une utilisation mobile." 
+              : "Certaines zones tactiles sont trop petites, ce qui peut rendre difficile l'utilisation sur mobile."}
+          </p>
+        </div>
+        
+        <div className={`p-4 rounded-lg border ${hasFontScale ? 'border-green-100 bg-green-50' : 'border-red-100 bg-red-50'}`}>
+          <div className="flex items-center gap-2">
+            {hasFontScale ? (
+              <Check className="w-5 h-5 text-green-600" />
+            ) : (
+              <X className="w-5 h-5 text-red-600" />
+            )}
+            <h4 className="font-medium">Mise à l'échelle des polices</h4>
+          </div>
+          <p className="text-sm mt-2 text-gray-600">
+            {hasFontScale 
+              ? "Les textes peuvent être agrandis sans perte de fonctionnalité." 
+              : "Les textes ne s'adaptent pas correctement aux préférences d'accessibilité."}
+          </p>
         </div>
       </div>
-    </Card>
+      
+      <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 mt-4">
+        <div className="flex items-start gap-2">
+          <Lightbulb className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+          <div>
+            <h4 className="font-medium text-blue-800">Recommandations d'amélioration</h4>
+            <ul className="text-sm text-blue-700 mt-2 space-y-1 list-disc pl-5">
+              {!hasViewportMeta && (
+                <li>Ajoutez une balise meta viewport avec content="width=device-width, initial-scale=1"</li>
+              )}
+              {!hasResponsiveImages && (
+                <li>Utilisez des attributs srcset ou des images fluides avec max-width: 100%</li>
+              )}
+              {!hasTouchTargetSize && (
+                <li>Assurez-vous que les boutons et liens ont une taille minimum de 44x44px</li>
+              )}
+              {!hasFontScale && (
+                <li>Évitez d'utiliser des tailles de police fixées en pixels, préférez les unités relatives</li>
+              )}
+              {(hasViewportMeta && hasResponsiveImages && hasTouchTargetSize && hasFontScale) && (
+                <li>Votre site est bien optimisé pour les appareils mobiles!</li>
+              )}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

@@ -1,6 +1,6 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Code, Search, ListTree, BarChart, Link2, Globe, Database } from "lucide-react";
+import { Code, Search, ListTree, BarChart, Globe, Database, Link2 } from "lucide-react";
 import { SiteInfo } from "./SiteInfo";
 import { SourceCode } from "./SourceCode";
 import { toast } from "sonner";
@@ -18,7 +18,7 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
   const [activeTab, setActiveTab] = useState("info");
   
   useEffect(() => {
-    // Notify user that results are available
+    // Notification des résultats disponibles
     if (data) {
       toast.success("Résultats d'analyse disponibles", {
         description: "Consultez les différents onglets pour voir les détails",
@@ -27,26 +27,30 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
     }
   }, [data]);
   
-  // Tab change handler
+  // Gestionnaire de changement d'onglet
   const handleTabChange = (value: string) => {
-    console.log("Tab changed to:", value);
+    console.log("Changement d'onglet vers:", value);
     setActiveTab(value);
     
     toast.info(`Onglet ${value} activé`, {
-      description: value === "info" 
-        ? "Informations générales sur le site"
-        : value === "source" 
-          ? "Code source de la page" 
-          : value === "structure"
-            ? "Structure du site et hiérarchie"
-            : value === "performance"
-              ? "Analyse de la vitesse et performance"
-              : "Analyse de l'accessibilité",
+      description: getTabDescription(value),
       duration: 1500
     });
   };
 
-  // Format headings data correctly
+  // Fonction pour obtenir la description de l'onglet
+  const getTabDescription = (tab: string): string => {
+    switch(tab) {
+      case "info": return "Informations générales sur le site";
+      case "source": return "Code source de la page";
+      case "structure": return "Structure du site et hiérarchie";
+      case "performance": return "Analyse de la vitesse et performance";
+      case "accessibility": return "Analyse de l'accessibilité mobile";
+      default: return "Analyse détaillée";
+    }
+  };
+
+  // Formatage des données de titres
   const formatHeadings = (data: any) => {
     if (!data?.headings || !Array.isArray(data.headings)) return [];
     
@@ -59,24 +63,23 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
     }));
   };
 
-  // Check data and prepare fallback data
-  const hasValidHeadings = data?.headings && Array.isArray(data.headings) && data.headings.length > 0;
+  // Vérification des données et préparation des données de secours
   const formattedHeadings = formatHeadings(data);
   
-  // Extract paragraphs if available
+  // Extraction des paragraphes si disponibles
   const paragraphs = data?.paragraphs || [];
   
-  // Create a simple hierarchy if none provided
+  // Création d'une hiérarchie simple si aucune n'est fournie
   const hierarchyData = data?.hierarchy || [];
 
-  // Create recommendations
+  // Création de recommandations
   const recommendations = data?.recommendations || [
     "Utilisez une seule balise H1 par page",
     "Structurez votre contenu avec des H2 et H3",
     "Ajoutez des alt-texts à toutes vos images"
   ];
   
-  // If no data is provided, show a placeholder
+  // Si aucune donnée n'est fournie, afficher un placeholder
   if (!data) {
     return (
       <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 text-center">
@@ -87,19 +90,19 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
     );
   }
 
-  // Extract metadata for SEO info
+  // Extraction des métadonnées pour les informations SEO
   const metaTags = data.meta || [];
   const title = data.title || "";
   const description = metaTags.find((meta: any) => meta.name === "description")?.content || "";
   const keywords = metaTags.find((meta: any) => meta.name === "keywords")?.content?.split(",").map((k: string) => k.trim()) || [];
   
-  // Count headings by level
+  // Comptage des titres par niveau
   const h1Count = formattedHeadings.filter(h => h.level === 1).length;
   const h2Count = formattedHeadings.filter(h => h.level === 2).length;
   const h3Count = formattedHeadings.filter(h => h.level === 3).length;
   const imgCount = data.images?.length || 0;
 
-  // Create mock performance data if not available
+  // Données de performance si non disponibles
   const performanceData = data.performance || {
     loadTime: 2500,
     firstContentfulPaint: 850,
@@ -117,7 +120,7 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
     }
   };
 
-  // Create mock mobile data if not available
+  // Données mobiles si non disponibles
   const mobileData = data.mobileAnalysis || {
     score: 80,
     viewportMeta: true,
@@ -126,52 +129,40 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
     fontScale: true
   };
 
-  console.log("RENDERING TABS with data:", { 
-    title,
-    headings: formattedHeadings.length, 
-    h1Count, 
-    h2Count, 
-    h3Count,
-    imgCount,
-    hasSourceCode: !!data.sourceCode,
-    sourceLength: data.sourceCode?.length || 0,
-    activeTab
-  });
-
   return (
     <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
       <TabsList className="w-full grid grid-cols-5 bg-muted/50 p-1 rounded-lg">
         <TabsTrigger 
           value="info"
-          className="flex-1 py-2.5 font-medium rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800"
+          className="flex-1 py-2.5 font-medium rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 flex items-center justify-center"
         >
           <Search className="w-4 h-4 mr-2" />
           Informations
         </TabsTrigger>
         <TabsTrigger 
           value="source"
-          className="flex-1 py-2.5 font-medium rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800"
+          className="flex-1 py-2.5 font-medium rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 flex items-center justify-center"
         >
           <Code className="w-4 h-4 mr-2" />
           Code Source
         </TabsTrigger>
         <TabsTrigger 
           value="structure"
-          className="flex-1 py-2.5 font-medium rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800"
+          className="flex-1 py-2.5 font-medium rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 flex items-center justify-center"
         >
           <ListTree className="w-4 h-4 mr-2" />
           Structure
         </TabsTrigger>
         <TabsTrigger 
           value="performance"
-          className="flex-1 py-2.5 font-medium rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800"
+          className="flex-1 py-2.5 font-medium rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 flex items-center justify-center"
         >
           <BarChart className="w-4 h-4 mr-2" />
           Performance
         </TabsTrigger>
         <TabsTrigger 
           value="accessibility"
-          className="flex-1 py-2.5 font-medium rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800"
+          className="flex-1 py-2.5 font-medium rounded-md data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 flex items-center justify-center"
         >
           <Globe className="w-4 h-4 mr-2" />
           Mobile
