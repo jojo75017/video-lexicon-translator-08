@@ -1,4 +1,3 @@
-
 // Helper functions for managing section navigation and activation
 
 export const activateSection = (sectionId: string) => {
@@ -13,13 +12,68 @@ export const activateSection = (sectionId: string) => {
     (el as HTMLElement).style.display = 'none';
   });
   
+  // For TabsContent components, we need to set the CSS display property directly
+  // BUT we shouldn't disable the active ones
   document.querySelectorAll('[role="tabpanel"]').forEach(el => {
+    // Check if this panel is for the currently activated section
+    const elValue = el.getAttribute('value');
+    const dataValue = el.getAttribute('data-value');
+    
+    // Skip if this is the panel we want to show
+    if (elValue === sectionId || dataValue === sectionId) {
+      console.log(`Keeping panel visible: ${sectionId}`);
+      (el as HTMLElement).style.display = 'block';
+      return;
+    }
+    
+    // Otherwise hide it
     (el as HTMLElement).style.display = 'none';
   });
   
   document.querySelectorAll('.tab-content').forEach(el => {
     (el as HTMLElement).style.display = 'none';
   });
+  
+  // Handle special case for ResultTabs
+  if (['info', 'source', 'structure', 'performance', 'accessibility'].includes(sectionId)) {
+    // Make sure the TabsTrigger for this section is marked as active
+    const trigger = document.querySelector(`[role="tab"][data-state="active"][value="${sectionId}"]`);
+    if (!trigger) {
+      // If the trigger isn't active yet, find and click it
+      const tabButton = document.querySelector(`[role="tab"][value="${sectionId}"]`);
+      if (tabButton) {
+        (tabButton as HTMLElement).click();
+        console.log(`Clicked tab trigger for ${sectionId}`);
+      }
+    }
+    
+    // Force the specific TabsContent to be visible
+    const content = document.querySelector(`[role="tabpanel"][value="${sectionId}"]`);
+    if (content) {
+      (content as HTMLElement).style.display = 'block';
+      (content as HTMLElement).setAttribute('data-state', 'active');
+      console.log(`Forced visibility of tab content: ${sectionId}`);
+    }
+    
+    // 7. Specially handle for ResultTabs content by looking for TabsContent with matching data-value
+    if (['info', 'source', 'structure'].includes(sectionId)) {
+      // Find all ResultTabs content elements
+      const resultsTabElements = document.querySelectorAll(`[role="tabpanel"][data-value="${sectionId}"], [role="tabpanel"][value="${sectionId}"]`);
+      if (resultsTabElements.length > 0) {
+        resultsTabElements.forEach(el => {
+          (el as HTMLElement).style.display = 'block';
+          console.log(`ResultTabs panel with value=${sectionId} displayed`);
+        });
+      }
+      
+      // Also try with direct ID match for ResultTabs
+      const resultTabSection = document.getElementById(sectionId);
+      if (resultTabSection) {
+        resultTabSection.style.display = 'block';
+        console.log(`ResultTabs section with ID ${sectionId} displayed`);
+      }
+    }
+  }
   
   // Show the selected section with a small delay to ensure DOM is ready
   setTimeout(() => {
@@ -76,25 +130,6 @@ export const activateSection = (sectionId: string) => {
       document.querySelectorAll(`[data-state="active"][role="tabpanel"][value="${sectionId}"]`).forEach(el => {
         (el as HTMLElement).style.display = 'block';
       });
-    }
-    
-    // 7. Specially handle for ResultTabs content by looking for TabsContent with matching data-value
-    if (['info', 'source', 'structure'].includes(sectionId)) {
-      // Find all ResultTabs content elements
-      const resultsTabElements = document.querySelectorAll(`[role="tabpanel"][data-value="${sectionId}"], [role="tabpanel"][value="${sectionId}"]`);
-      if (resultsTabElements.length > 0) {
-        resultsTabElements.forEach(el => {
-          (el as HTMLElement).style.display = 'block';
-          console.log(`ResultTabs panel with value=${sectionId} displayed`);
-        });
-      }
-      
-      // Also try with direct ID match for ResultTabs
-      const resultTabSection = document.getElementById(sectionId);
-      if (resultTabSection) {
-        resultTabSection.style.display = 'block';
-        console.log(`ResultTabs section with ID ${sectionId} displayed`);
-      }
     }
   }, 150); // Increased delay for more reliability
 };

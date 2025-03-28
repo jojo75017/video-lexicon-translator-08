@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from "sonner";
 import { FirecrawlService } from '@/utils/FirecrawlService';
@@ -75,14 +76,29 @@ export const useSiteAnalyzer = () => {
   const getPerformanceData = useCallback(() => {
     return {
       score: 85,
-      loadTime: 1.8,
+      loadTime: 1800, // ms
+      firstContentfulPaint: 850,
+      domLoadTime: 1200,
+      speedIndex: 1500,
+      largestContentfulPaint: 1400,
+      timeToInteractive: 2000,
       resourceCount: 45,
       resourceSize: 1.2, // MB
+      scriptCount: 12,
+      styleCount: 8,
+      imageCount: 15,
+      cacheLifetime: 3600,
+      totalSize: 1250000, // bytes
+      responseTime: 220, // ms
+      impressions: 5500,
+      clickThroughRate: 0.08,
       resourceBreakdown: {
-        js: 480000, // ~480KB
-        css: 120000, // ~120KB
         images: 580000, // ~580KB
-        fonts: 60000 // ~60KB
+        scripts: 480000, // ~480KB
+        css: 120000, // ~120KB
+        styles: 120000, // ~120KB
+        fonts: 60000, // ~60KB
+        other: 10000 // ~10KB
       }
     };
   }, []);
@@ -168,8 +184,8 @@ export const useSiteAnalyzer = () => {
           score: 75,
           viewportMeta: true,
           responsiveImages: true,
-          touchTargetSize: "Adequate",
-          fontScale: "Good"
+          touchTargetSize: true,
+          fontScale: true
         },
         searchConsole: {
           clicks: [150, 160, 170, 155, 180, 190, 200],
@@ -214,7 +230,7 @@ export const useSiteAnalyzer = () => {
       });
       
       // Navigate to the results section
-      navigateToSection('seo');
+      navigateToSection('info');
       
     } catch (err) {
       console.error("Error analyzing site:", err);
@@ -260,7 +276,7 @@ export const useSiteAnalyzer = () => {
         h2Count: 2,
         h3Count: 1,
         headings: demoData.headings.map(h => ({
-          level: typeof h.level === 'string' ? parseInt(h.level.toString()) : h.level,
+          level: typeof h.level === 'number' ? h.level : parseInt(h.level as string),
           text: h.text,
           position: 0
         })),
@@ -274,8 +290,8 @@ export const useSiteAnalyzer = () => {
           score: 75,
           viewportMeta: true,
           responsiveImages: true,
-          touchTargetSize: "Adequate",
-          fontScale: "Good"
+          touchTargetSize: true,
+          fontScale: true
         },
         searchConsole: {
           clicks: [100, 110, 120, 115, 130, 140, 150],
