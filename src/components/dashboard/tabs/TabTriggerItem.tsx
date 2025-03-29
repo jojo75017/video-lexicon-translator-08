@@ -53,12 +53,16 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
     const routeMap: Record<string, string> = {
       'hierarchy': '/hierarchy',
       'wordcount': '/wordcount',
+      'suggestions': '/suggestions',
       'seo': '/seo',
       'structure': '/structure',
+      'backlinks': '/backlinks',
       'performance': '/performance',
+      'metrics': '/metrics',
       'analytics': '/analytics',
       'signature': '/signature',
-      'quora': '/quora'
+      'quora': '/quora',
+      'local-business': '/local-business'
     };
     
     return routeMap[id] || '/';

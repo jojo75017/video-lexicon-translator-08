@@ -1,36 +1,27 @@
 
 import React from 'react';
-import { Tab } from './types';
+import TabTriggerItem from './TabTriggerItem';
 
 interface SubTabListProps {
-  subTabs: Tab[];
+  tabs: any[];
   activeTab: string;
-  onTabChange: (tabId: string) => void;
+  onTabChange: (value: string) => void;
 }
 
-const SubTabList: React.FC<SubTabListProps> = ({ 
-  subTabs,
-  activeTab,
-  onTabChange
-}) => {
-  if (subTabs.length === 0) return null;
-  
+const SubTabList: React.FC<SubTabListProps> = ({ tabs, activeTab, onTabChange }) => {
   return (
-    <div className="flex overflow-x-auto mb-4 bg-white p-2 rounded-lg shadow-sm">
-      {subTabs.map(tab => (
-        <div 
+    <div className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar">
+      {tabs.map((tab) => (
+        <TabTriggerItem
           key={tab.id}
-          onClick={() => onTabChange(tab.id)}
-          className={`flex items-center gap-1 px-4 py-2 mx-1 rounded-md text-sm cursor-pointer whitespace-nowrap transition-colors ${
-            activeTab === tab.id 
-              ? 'bg-blue-100 text-blue-800 font-medium'
-              : 'hover:bg-gray-100'
-          }`}
-          data-sub-tab={tab.id}
-        >
-          {tab.icon && <span className="opacity-70">{tab.icon}</span>}
-          <span>{tab.label}</span>
-        </div>
+          id={tab.id}
+          icon={tab.icon}
+          label={tab.label}
+          color={tab.color}
+          isNew={tab.isNew}
+          link={tab.link}
+          highlighted={activeTab === tab.id}
+        />
       ))}
     </div>
   );

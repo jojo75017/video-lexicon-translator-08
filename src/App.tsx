@@ -13,6 +13,10 @@ import WordCountPage from "./pages/WordCountPage";
 import StructurePage from "./pages/StructurePage";
 import PerformancePage from "./pages/PerformancePage";
 import AnalyticsPage from "./pages/AnalyticsPage";
+import LocalBusinessPage from "./pages/LocalBusinessPage";
+import BacklinksPage from "./pages/BacklinksPage";
+import MetricsPage from "./pages/MetricsPage";
+import SuggestionsPage from "./pages/SuggestionsPage";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +37,10 @@ const App = () => (
           <Route path="/structure" element={<StructurePage />} />
           <Route path="/performance" element={<PerformancePage />} />
           <Route path="/analytics" element={<AnalyticsPage />} />
+          <Route path="/local-business" element={<LocalBusinessPage />} />
+          <Route path="/backlinks" element={<BacklinksPage />} />
+          <Route path="/metrics" element={<MetricsPage />} />
+          <Route path="/suggestions" element={<SuggestionsPage />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { getMainTabCategory } from '@/utils/navigationHelpers';
 
 interface MainTab {
   id: string;
@@ -28,7 +29,7 @@ const MainTabList: React.FC<MainTabListProps> = ({
     
     // Check current path against tab path
     const tabPaths: Record<string, string[]> = {
-      'content': ['/hierarchy', '/wordcount'],
+      'content': ['/hierarchy', '/wordcount', '/suggestions'],
       'seo': ['/seo', '/structure', '/backlinks'],
       'performance': ['/performance', '/metrics'],
       'analytics': ['/analytics'],
@@ -42,23 +43,8 @@ const MainTabList: React.FC<MainTabListProps> = ({
     if (activeTab === tabId) return true;
     
     // Check for subtabs
-    if (tabId === 'content' && ['hierarchy', 'wordcount', 'suggestions'].includes(activeTab)) {
-      return true;
-    }
-    
-    if (tabId === 'seo' && ['seo', 'structure', 'backlinks'].includes(activeTab)) {
-      return true;
-    }
-    
-    if (tabId === 'performance' && ['performance', 'metrics'].includes(activeTab)) {
-      return true;
-    }
-    
-    if (tabId === 'analytics' && activeTab === 'analytics') {
-      return true;
-    }
-    
-    return false;
+    const currentTabCategory = getMainTabCategory(activeTab);
+    return currentTabCategory === tabId;
   };
 
   // Obtenir le bon chemin pour un onglet principal

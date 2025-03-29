@@ -36,3 +36,17 @@ export const getMainTabCategory = (tabId: string): string => {
   // Retourner l'onglet lui-même s'il s'agit d'une catégorie principale
   return tabId;
 };
+
+// Fonction pour activer une section/onglet
+export const activateSection = (sectionId: string): void => {
+  console.log(`Activation de la section: ${sectionId}`);
+  // Cette fonction peut être utilisée pour activer un onglet spécifique
+  // Elle est appelée par d'autres composants
+};
+
+// Fonction pour naviguer vers une section
+export const navigateToSection = (sectionId: string): void => {
+  console.log(`Navigation vers la section: ${sectionId}`);
+  // Cette fonction peut être utilisée pour naviguer vers un onglet spécifique
+  // Elle est appelée par d'autres composants
+};
