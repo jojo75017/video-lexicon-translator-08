@@ -18,6 +18,7 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
   useEffect(() => {
     // Activer l'onglet courant si spécifié
     if (currentTab) {
+      console.log(`PageLayout activating section: ${currentTab}`);
       const section = document.querySelector(`[data-section="${currentTab}"]`);
       if (section) {
         (section as HTMLElement).style.display = 'block';
@@ -36,7 +37,11 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
       <main className="container mx-auto px-4">
         <div className="mb-6">
           <h1 className="text-3xl font-bold">{title}</h1>
-          {description && <p className="text-gray-600 mt-2">{description}</p>}
+          {description && (
+            <p className="text-gray-600 mt-2">
+              {description}
+            </p>
+          )}
         </div>
         
         {children}

@@ -12,6 +12,7 @@ interface TabTriggerItemProps {
   isNew?: boolean;
   link?: string;
   highlighted?: boolean;
+  onClick?: () => void;
 }
 
 const TabTriggerItem: React.FC<TabTriggerItemProps> = ({ 
@@ -21,7 +22,8 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
   color, 
   isNew, 
   link, 
-  highlighted 
+  highlighted,
+  onClick
 }) => {
   // Contenu pour badge et icône partagé entre les versions de lien et d'onglet
   const TabContent = () => (
@@ -77,6 +79,7 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
             className="inline-block" 
             data-value={id}
             data-tab-id={id}
+            onClick={onClick}
           >
             <TabContent />
           </Link>

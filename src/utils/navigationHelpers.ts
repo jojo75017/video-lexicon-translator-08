@@ -50,6 +50,8 @@ export const activateSection = (sectionId: string): void => {
   const section = document.querySelector(`[data-section="${sectionId}"]`);
   if (section) {
     (section as HTMLElement).style.display = 'block';
+  } else {
+    console.warn(`La section ${sectionId} n'existe pas dans le DOM.`);
   }
 };
 
@@ -58,4 +60,26 @@ export const navigateToSection = (sectionId: string): void => {
   console.log(`Navigation vers la section: ${sectionId}`);
   window.location.hash = sectionId;
   activateSection(sectionId);
+};
+
+// Mappage des chemins d'URL vers les ID d'onglets pour la navigation
+export const getTabIdFromPath = (path: string): string => {
+  const pathToTabMap: Record<string, string> = {
+    '/': 'hierarchy',
+    '/index': 'hierarchy',
+    '/hierarchy': 'hierarchy',
+    '/wordcount': 'wordcount',
+    '/suggestions': 'suggestions',
+    '/seo': 'seo',
+    '/structure': 'structure',
+    '/backlinks': 'backlinks',
+    '/performance': 'performance',
+    '/metrics': 'metrics',
+    '/analytics': 'analytics',
+    '/quora': 'quora',
+    '/signature': 'signature',
+    '/local-business': 'local-business'
+  };
+  
+  return pathToTabMap[path] || 'hierarchy';
 };

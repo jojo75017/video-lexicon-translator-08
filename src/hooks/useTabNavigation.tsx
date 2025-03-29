@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { tabs } from '@/components/dashboard/tabs/TabData';
 import { toast } from "sonner";
 import { useNavigate, useLocation } from 'react-router-dom';
-import { getMainTabCategory } from '@/utils/navigationHelpers';
+import { getMainTabCategory, getTabIdFromPath } from '@/utils/navigationHelpers';
 
 export interface MainTab {
   id: string;
@@ -19,31 +19,16 @@ export const useTabNavigation = () => {
   
   // Déterminer l'onglet actif basé sur le chemin actuel
   const determineActiveTab = (): string => {
-    const pathToTabMap: Record<string, string> = {
-      '/': 'hierarchy',
-      '/index': 'hierarchy',
-      '/hierarchy': 'hierarchy',
-      '/wordcount': 'wordcount',
-      '/suggestions': 'suggestions',
-      '/seo': 'seo',
-      '/structure': 'structure',
-      '/backlinks': 'backlinks',
-      '/performance': 'performance',
-      '/metrics': 'metrics',
-      '/analytics': 'analytics',
-      '/quora': 'quora',
-      '/signature': 'signature',
-      '/local-business': 'local-business'
-    };
-    
-    return pathToTabMap[currentPath] || 'hierarchy';
+    return getTabIdFromPath(currentPath);
   };
   
   const [activeTab, setActiveTab] = useState<string>(determineActiveTab());
   
   // Mettre à jour l'onglet actif lorsque le chemin change
   useEffect(() => {
-    setActiveTab(determineActiveTab());
+    const newActiveTab = determineActiveTab();
+    setActiveTab(newActiveTab);
+    console.log(`Path changed to ${currentPath}, active tab is now: ${newActiveTab}`);
   }, [currentPath]);
   
   // Définir les catégories principales avec les chemins de navigation
@@ -86,6 +71,10 @@ export const useTabNavigation = () => {
     };
     
     if (tabPaths[value]) {
+      // Mémoriser le dernier onglet utilisé pour cette catégorie
+      const mainCategory = getMainTabCategory(value);
+      localStorage.setItem(`last-tab-${mainCategory}`, value);
+      
       navigate(tabPaths[value]);
       
       // Notification visuelle du changement d'onglet
@@ -112,6 +101,10 @@ export const useTabNavigation = () => {
     } 
     else if (mainCategory === 'analytics') {
       return tabs.filter(tab => ['analytics'].includes(tab.id));
+    }
+    else if (['quora', 'signature', 'local-business'].includes(mainCategory)) {
+      // Pour ces catégories spéciales, afficher uniquement l'onglet correspondant
+      return tabs.filter(tab => tab.id === mainCategory);
     }
     
     // Par défaut - afficher les onglets de contenu
