@@ -29,8 +29,8 @@ export const getMainTabCategory = (tabId: string): string => {
     return 'performance';
   } else if (tabId === 'analytics') {
     return 'analytics';
-  } else if (['info', 'source'].includes(tabId)) {
-    return 'results';
+  } else if (['quora', 'signature', 'local-business'].includes(tabId)) {
+    return tabId;
   }
   
   // Retourner l'onglet lui-même s'il s'agit d'une catégorie principale
@@ -40,13 +40,22 @@ export const getMainTabCategory = (tabId: string): string => {
 // Fonction pour activer une section/onglet
 export const activateSection = (sectionId: string): void => {
   console.log(`Activation de la section: ${sectionId}`);
-  // Cette fonction peut être utilisée pour activer un onglet spécifique
-  // Elle est appelée par d'autres composants
+  
+  // Masquer toutes les sections
+  document.querySelectorAll('[data-section]').forEach(el => {
+    (el as HTMLElement).style.display = 'none';
+  });
+  
+  // Afficher la section demandée
+  const section = document.querySelector(`[data-section="${sectionId}"]`);
+  if (section) {
+    (section as HTMLElement).style.display = 'block';
+  }
 };
 
 // Fonction pour naviguer vers une section
 export const navigateToSection = (sectionId: string): void => {
   console.log(`Navigation vers la section: ${sectionId}`);
-  // Cette fonction peut être utilisée pour naviguer vers un onglet spécifique
-  // Elle est appelée par d'autres composants
+  window.location.hash = sectionId;
+  activateSection(sectionId);
 };

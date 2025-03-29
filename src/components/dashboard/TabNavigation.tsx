@@ -17,6 +17,7 @@ const TabNavigation = () => {
   React.useEffect(() => {
     if (activeTab) {
       activateSection(activeTab);
+      console.log('TabNavigation activated section:', activeTab);
     }
   }, [activeTab]);
 

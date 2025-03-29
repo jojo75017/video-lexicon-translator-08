@@ -21,6 +21,7 @@ export const useTabNavigation = () => {
   const determineActiveTab = (): string => {
     const pathToTabMap: Record<string, string> = {
       '/': 'hierarchy',
+      '/index': 'hierarchy',
       '/hierarchy': 'hierarchy',
       '/wordcount': 'wordcount',
       '/suggestions': 'suggestions',
@@ -92,8 +93,6 @@ export const useTabNavigation = () => {
         description: "Chargement de la page...",
         duration: 1500
       });
-      
-      return;
     }
   };
 
