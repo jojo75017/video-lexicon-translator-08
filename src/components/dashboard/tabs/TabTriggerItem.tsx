@@ -3,6 +3,7 @@ import React from 'react';
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { FileSignature } from 'lucide-react';
 
 interface TabTriggerItemProps {
   id: string;

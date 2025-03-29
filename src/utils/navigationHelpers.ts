@@ -29,8 +29,8 @@ export const getMainTabCategory = (tabId: string): string => {
     return 'performance';
   } else if (tabId === 'analytics') {
     return 'analytics';
-  } else if (['quora', 'signature', 'local-business'].includes(tabId)) {
-    return tabId;
+  } else if (['signature', 'quora', 'local-business'].includes(tabId)) {
+    return 'tools';
   }
   
   // Retourner l'onglet lui-même s'il s'agit d'une catégorie principale

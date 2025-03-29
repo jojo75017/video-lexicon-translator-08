@@ -36,7 +36,8 @@ export const useTabNavigation = () => {
     {id: 'content', label: 'Contenu', color: 'border-blue-600', path: '/hierarchy'},
     {id: 'seo', label: 'SEO', color: 'border-purple-600', path: '/seo'},
     {id: 'performance', label: 'Performance', color: 'border-amber-600', path: '/performance'},
-    {id: 'analytics', label: 'Analytics', color: 'border-emerald-600', path: '/analytics'}
+    {id: 'analytics', label: 'Analytics', color: 'border-emerald-600', path: '/analytics'},
+    {id: 'tools', label: 'Outils', color: 'border-blue-600', path: '/signature'}
   ];
   
   // Filtrer les onglets sans liens externes
@@ -67,7 +68,8 @@ export const useTabNavigation = () => {
       'analytics': '/analytics',
       'quora': '/quora',
       'signature': '/signature',
-      'local-business': '/local-business'
+      'local-business': '/local-business',
+      'tools': '/signature'
     };
     
     if (tabPaths[value]) {
@@ -101,6 +103,9 @@ export const useTabNavigation = () => {
     } 
     else if (mainCategory === 'analytics') {
       return tabs.filter(tab => ['analytics'].includes(tab.id));
+    }
+    else if (mainCategory === 'tools') {
+      return tabs.filter(tab => ['signature', 'quora', 'local-business'].includes(tab.id));
     }
     else if (['quora', 'signature', 'local-business'].includes(mainCategory)) {
       // Pour ces catégories spéciales, afficher uniquement l'onglet correspondant

@@ -1,7 +1,9 @@
 
 import React from 'react';
-import { RocketIcon, Sparkles, Zap, BarChart4, Gauge, Globe, Search } from 'lucide-react';
+import { RocketIcon, Sparkles, Zap, BarChart4, Gauge, Globe, Search, FileSignature } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 
 const DashboardHeader = () => {
   const stats = [
@@ -27,6 +29,11 @@ const DashboardHeader = () => {
             </div>
             
             <div className="flex flex-wrap gap-3">
+              <Link to="/signature" className="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 flex items-center shadow-sm hover:bg-white/20 transition-all duration-300 cursor-pointer">
+                <FileSignature className="h-5 w-5 mr-2" />
+                <span className="font-medium">Signature Email</span>
+              </Link>
+              
               <div className="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 flex items-center shadow-sm hover:bg-white/20 transition-all duration-300 cursor-pointer">
                 <RocketIcon className="h-5 w-5 mr-2" />
                 <span className="font-medium">Analyse avancée</span>
@@ -62,6 +69,15 @@ const DashboardHeader = () => {
             </div>
           </Card>
         ))}
+      </div>
+      
+      <div className="flex items-center justify-center gap-4 mb-8">
+        <Link to="/signature">
+          <Button className="px-6 py-6 bg-blue-600 hover:bg-blue-700 flex items-center gap-2">
+            <FileSignature className="h-6 w-6" />
+            <span className="text-lg font-medium">Créer votre signature email</span>
+          </Button>
+        </Link>
       </div>
     </>
   );

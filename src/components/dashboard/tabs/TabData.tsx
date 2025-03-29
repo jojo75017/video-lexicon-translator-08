@@ -1,3 +1,4 @@
+
 import { Tab } from './types';
 import { 
   BarChart2, 
@@ -15,7 +16,8 @@ import {
   SlidersHorizontal, 
   Zap,
   Tag,
-  Edit3
+  Edit3,
+  FileSignature
 } from 'lucide-react';
 
 export const groupLabels: Record<string, string> = {
@@ -25,6 +27,7 @@ export const groupLabels: Record<string, string> = {
   'performance': 'Performance',
   'advanced': 'Avancé',
   'external': 'Liens',
+  'tools': 'Outils',
 };
 
 export const tabs: Tab[] = [
@@ -126,6 +129,32 @@ export const tabs: Tab[] = [
     icon: <Settings />,
     group: 'advanced',
     color: 'text-cyan-600'
+  },
+  // Add Signature tab with higher visibility
+  {
+    id: 'signature',
+    label: 'Signature Email',
+    description: 'Créer une signature professionnelle',
+    icon: <FileSignature />,
+    group: 'tools',
+    color: 'text-blue-600',
+    highlighted: true
+  },
+  {
+    id: 'quora',
+    label: 'Questions Quora',
+    description: 'Trouver et répondre aux questions pertinentes',
+    icon: <Tag />,
+    group: 'tools',
+    color: 'text-[#b92b27]'
+  },
+  {
+    id: 'local-business',
+    label: 'Entreprise Locale',
+    description: 'Optimisation pour les recherches locales',
+    icon: <Tag />,
+    group: 'tools',
+    color: 'text-indigo-600'
   },
   {
     id: 'gsc',
