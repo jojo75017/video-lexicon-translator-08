@@ -28,9 +28,10 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
   // Contenu pour badge et icône partagé entre les versions de lien et d'onglet
   const TabContent = () => (
     <div 
-      className={`flex items-center gap-1 px-3 py-1.5 rounded-md relative group transition-all duration-200 hover:bg-white ${
+      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md relative group transition-all duration-200 hover:bg-white ${
         id === 'quora' ? 'bg-[#b92b27]/10' : 
         id === 'signature' ? 'bg-blue-100' :
+        id === 'local-business' ? 'bg-indigo-100' :
         highlighted ? 'bg-purple-100' : ''
       }`}
     >

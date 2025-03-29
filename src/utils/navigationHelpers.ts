@@ -49,9 +49,17 @@ export const activateSection = (sectionId: string): void => {
   // Afficher la section demandée
   const section = document.querySelector(`[data-section="${sectionId}"]`);
   if (section) {
+    console.log(`Section ${sectionId} trouvée, affichage en cours`);
     (section as HTMLElement).style.display = 'block';
   } else {
     console.warn(`La section ${sectionId} n'existe pas dans le DOM.`);
+    
+    // Afficher la première section disponible comme fallback
+    const firstSection = document.querySelector('[data-section]');
+    if (firstSection) {
+      console.log('Affichage de la première section disponible comme fallback');
+      (firstSection as HTMLElement).style.display = 'block';
+    }
   }
 };
 

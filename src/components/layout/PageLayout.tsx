@@ -19,9 +19,20 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
     // Activer l'onglet courant si spécifié
     if (currentTab) {
       console.log(`PageLayout activating section: ${currentTab}`);
+      
+      // Masquer toutes les sections d'abord
+      const allSections = document.querySelectorAll('[data-section]');
+      allSections.forEach((section) => {
+        (section as HTMLElement).style.display = 'none';
+      });
+      
+      // Puis afficher la section demandée
       const section = document.querySelector(`[data-section="${currentTab}"]`);
       if (section) {
+        console.log(`Found section ${currentTab}, displaying it`);
         (section as HTMLElement).style.display = 'block';
+      } else {
+        console.warn(`Section ${currentTab} not found in DOM`);
       }
     }
   }, [currentTab]);

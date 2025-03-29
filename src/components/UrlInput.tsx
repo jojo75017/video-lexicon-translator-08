@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, Globe, Search, AlertTriangle, ExternalLink } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import SiteAnalysisService from '@/utils/siteAnalysisUtils';
 
 interface UrlInputProps {
   url: string;
@@ -69,6 +70,11 @@ const UrlInput = ({
     console.log("Activating proxy");
     if (handleActivateProxy) {
       handleActivateProxy();
+      // Activez également dans le service SiteAnalysis
+      SiteAnalysisService.enableProxy();
+      toast.success("Proxy CORS activé", {
+        description: "Vous pouvez maintenant analyser des sites externes"
+      });
     }
   };
 
