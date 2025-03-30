@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, MessageSquarePlus, Lightbulb, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Search, MessageSquarePlus, Lightbulb, ArrowRight, CheckCircle2, ExternalLink } from 'lucide-react';
 import { toast } from "sonner";
 
 const SuggestionsPage = () => {
@@ -102,6 +102,53 @@ const SuggestionsPage = () => {
     }, 1500);
   };
   
+  const handleCreateContent = (title: string, description: string) => {
+    const prompt = encodeURIComponent(`Rédige un article détaillé sur le sujet suivant: "${title}". 
+Description: ${description}
+
+L'article doit être structuré avec une introduction, plusieurs parties détaillées, et une conclusion.`);
+    
+    // Ouvrir ChatGPT avec le prompt prérempli
+    window.open(`https://chat.openai.com/chat?model=text-davinci-002-render-sha&prompt=${prompt}`, '_blank');
+    
+    toast.success(`Redirection vers ChatGPT pour créer: "${title}"`, {
+      description: "Un nouvel onglet s'est ouvert avec votre prompt"
+    });
+  };
+  
+  const handleCreateFromQuestion = (question: string) => {
+    const prompt = encodeURIComponent(`Réponds de façon détaillée à la question suivante: "${question}"
+
+Ta réponse doit être:
+- Complète et informative
+- Structurée avec des sous-parties
+- Basée sur des informations factuelles`);
+    
+    // Ouvrir ChatGPT avec le prompt prérempli
+    window.open(`https://chat.openai.com/chat?model=text-davinci-002-render-sha&prompt=${prompt}`, '_blank');
+    
+    toast.success(`Redirection vers ChatGPT pour répondre à: "${question}"`, {
+      description: "Un nouvel onglet s'est ouvert avec votre prompt"
+    });
+  };
+  
+  const handleCreateFromTrend = (trend: string) => {
+    const prompt = encodeURIComponent(`Rédige un article complet sur la tendance suivante: "${trend}"
+
+L'article doit inclure:
+- Pourquoi cette tendance est en croissance
+- Comment en tirer profit
+- Des exemples concrets d'application
+- Des prédictions pour l'avenir`);
+    
+    // Ouvrir ChatGPT avec le prompt prérempli
+    window.open(`https://chat.openai.com/chat?model=text-davinci-002-render-sha&prompt=${prompt}`, '_blank');
+    
+    toast.success(`Redirection vers ChatGPT pour explorer: "${trend}"`, {
+      description: "Un nouvel onglet s'est ouvert avec votre prompt"
+    });
+  };
+
   return (
     <PageLayout title="Suggestions de Contenu" description="Générez des idées pour votre contenu web">
       <div className="container mx-auto px-4 py-8">
@@ -169,8 +216,13 @@ const SuggestionsPage = () => {
                           <span>•</span>
                           <span>Volume: {item.volume}</span>
                         </div>
-                        <Button variant="outline" size="sm" className="text-indigo-600 border-indigo-200 hover:bg-indigo-50">
-                          <MessageSquarePlus className="h-3.5 w-3.5 mr-1" />
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="text-indigo-600 border-indigo-200 hover:bg-indigo-50"
+                          onClick={() => handleCreateContent(item.title, item.description)}
+                        >
+                          <ExternalLink className="h-3.5 w-3.5 mr-1" />
                           Créer
                         </Button>
                       </div>
@@ -201,7 +253,12 @@ const SuggestionsPage = () => {
                             </p>
                           </div>
                         </div>
-                        <Button variant="ghost" size="sm" className="text-blue-600">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="text-blue-600"
+                          onClick={() => handleCreateFromQuestion(question)}
+                        >
                           <ArrowRight className="h-4 w-4" />
                         </Button>
                       </div>
@@ -251,7 +308,12 @@ const SuggestionsPage = () => {
                         ].map((topic, index) => (
                           <div key={index} className="flex items-center justify-between p-4 hover:bg-gray-50">
                             <div>{topic}</div>
-                            <Button variant="ghost" size="sm" className="text-green-600">
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="text-green-600"
+                              onClick={() => handleCreateFromTrend(topic)}
+                            >
                               <CheckCircle2 className="h-4 w-4 mr-1" />
                               Sélectionner
                             </Button>
