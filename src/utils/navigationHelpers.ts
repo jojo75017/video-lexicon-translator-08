@@ -72,6 +72,9 @@ export const navigateToSection = (sectionId: string): void => {
 
 // Mappage des chemins d'URL vers les ID d'onglets pour la navigation
 export const getTabIdFromPath = (path: string): string => {
+  // Nettoyer le chemin des paramètres ou du hash
+  const cleanPath = path.split('?')[0].split('#')[0];
+  
   const pathToTabMap: Record<string, string> = {
     '/': 'hierarchy',
     '/index': 'hierarchy',
@@ -89,5 +92,25 @@ export const getTabIdFromPath = (path: string): string => {
     '/local-business': 'local-business'
   };
   
-  return pathToTabMap[path] || 'hierarchy';
+  return pathToTabMap[cleanPath] || 'hierarchy';
+};
+
+// Fonction pour formater une URL avant l'analyse
+export const formatUrl = (url: string): string => {
+  // Ajouter le protocole si nécessaire
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    return 'https://' + url;
+  }
+  return url;
+};
+
+// Fonction pour extraire un nom de domaine lisible
+export const getReadableDomain = (url: string): string => {
+  try {
+    const urlObj = new URL(formatUrl(url));
+    // Supprimer le www si présent
+    return urlObj.hostname.replace(/^www\./, '');
+  } catch {
+    return url;
+  }
 };

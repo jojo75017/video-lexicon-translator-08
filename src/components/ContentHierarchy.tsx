@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronRight, ChevronDown, Heading1, Heading2, Heading3, Type, AlertCircle, CheckCircle2, BarChart2, Lightbulb, FileQuestion, Search } from 'lucide-react';
+import { ChevronRight, ChevronDown, Heading1, Heading2, Heading3, Type, AlertCircle, CheckCircle2, BarChart2, Lightbulb, FileQuestion, Search, ExternalLink } from 'lucide-react';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -28,6 +28,7 @@ interface ContentHierarchyProps {
   hierarchy?: any[];
   recommendations?: string[];
   onAnalyze?: () => void;
+  url?: string;
 }
 
 const ContentHierarchy = ({ 
@@ -35,9 +36,11 @@ const ContentHierarchy = ({
   paragraphs = [], 
   hierarchy = [],
   recommendations = [],
-  onAnalyze
+  onAnalyze,
+  url
 }: ContentHierarchyProps) => {
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
+  const [expandedView, setExpandedView] = useState(false);
   
   // Check if we have actual content to analyze - ensure arrays have elements with content
   const hasHeadings = headings && headings.length > 0 && headings.some(h => h.text && h.text.trim() !== '');
@@ -57,6 +60,10 @@ const ContentHierarchy = ({
       ...prev,
       [key]: !prev[key]
     }));
+  };
+
+  const toggleExpandedView = () => {
+    setExpandedView(!expandedView);
   };
 
   const getAllContent = (): ContentItem[] => {
@@ -256,18 +263,50 @@ const ContentHierarchy = ({
 
   return (
     <Card className="p-6 bg-white/50 backdrop-blur-sm">
+      {url && (
+        <div className="bg-blue-50 p-4 rounded-lg mb-6 flex items-center justify-between">
+          <div className="flex items-center">
+            <ExternalLink className="h-5 w-5 text-blue-500 mr-2" />
+            <h3 className="font-medium text-blue-700">{url}</h3>
+          </div>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="text-blue-700 border-blue-200"
+            onClick={() => window.open(url, '_blank')}
+          >
+            Visiter le site
+          </Button>
+        </div>
+      )}
+
       <div className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-semibold mb-2 flex items-center gap-2">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-semibold flex items-center gap-2">
             <BarChart2 className="h-5 w-5 text-blue-600" />
             Aperçu de la SERP et Structure
           </h2>
-          <p className="text-gray-600 text-sm">
-            Analyse détaillée de la hiérarchie SERP et du contenu de votre page
-          </p>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={toggleExpandedView}
+            className="flex items-center gap-1"
+          >
+            {expandedView ? (
+              <>
+                <ChevronDown className="h-4 w-4" />
+                Vue compacte
+              </>
+            ) : (
+              <>
+                <ChevronDown className="h-4 w-4" />
+                Vue détaillée
+              </>
+            )}
+          </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className={`grid grid-cols-1 ${expandedView ? 'md:grid-cols-1' : 'md:grid-cols-2'} gap-6`}>
           <div className="space-y-4">
             <div className="bg-gray-50 rounded-lg p-4">
               <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
@@ -370,7 +409,7 @@ const ContentHierarchy = ({
             Hiérarchie du contenu
           </h3>
           
-          <ScrollArea className="h-[400px] rounded-md border p-4">
+          <ScrollArea className="h-[600px] rounded-md border p-4">
             {hierarchy && hierarchy.length > 0 ? (
               hierarchy.map((item, index) => renderHierarchicalItem(item, index))
             ) : content.length > 0 ? (
