@@ -1,7 +1,6 @@
 
 import FirecrawlApp from '@mendable/firecrawl-js';
 
-// Interfaces for the response types
 interface ErrorResponse {
   success: false;
   error: string;
@@ -14,7 +13,7 @@ interface CrawlStatusResponse {
   total: number;
   creditsUsed: number;
   expiresAt: string;
-  data: any;
+  data: any[];
 }
 
 type CrawlResponse = CrawlStatusResponse | ErrorResponse;
@@ -23,13 +22,7 @@ export class FirecrawlService {
   private static API_KEY_STORAGE_KEY = 'firecrawl_api_key';
   private static firecrawlApp: FirecrawlApp | null = null;
   private static proxyEnabled = false;
-  
-  // List of available CORS proxies
-  private static corsProxies = [
-    'https://corsproxy.io/?',
-    'https://cors-anywhere.herokuapp.com/',
-    'https://api.allorigins.win/raw?url='
-  ];
+  private static proxyUrl = 'https://api.allorigins.win/raw?url=';
 
   static saveApiKey(apiKey: string): void {
     localStorage.setItem(this.API_KEY_STORAGE_KEY, apiKey);
@@ -38,16 +31,17 @@ export class FirecrawlService {
   }
 
   static getApiKey(): string | null {
-    return localStorage.getItem(this.API_KEY_STORAGE_KEY) || 'demo-key'; // Provide a demo key for testing
+    return localStorage.getItem(this.API_KEY_STORAGE_KEY);
   }
 
   static enableProxy(): void {
     this.proxyEnabled = true;
     console.log('CORS proxy enabled');
   }
-  
-  static isProxyEnabled(): boolean {
-    return this.proxyEnabled;
+
+  static disableProxy(): void {
+    this.proxyEnabled = false;
+    console.log('CORS proxy disabled');
   }
 
   static async testApiKey(apiKey: string): Promise<boolean> {
@@ -65,135 +59,18 @@ export class FirecrawlService {
     }
   }
 
-  // Method to fetch via a CORS proxy
-  private static async fetchWithCorsProxy(url: string): Promise<any> {
-    let response = null;
-    let error = null;
-    
-    // Try each proxy in order
-    for (const proxy of this.corsProxies) {
-      try {
-        const proxyUrl = `${proxy}${encodeURIComponent(url)}`;
-        console.log(`Trying CORS proxy: ${proxy}`);
-        
-        response = await fetch(proxyUrl);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const text = await response.text();
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(text, 'text/html');
-        
-        return {
-          success: true,
-          data: this.extractPageData(doc, url)
-        };
-      } catch (err) {
-        error = err;
-        console.warn(`CORS proxy ${proxy} failed:`, err);
-        // Continue to the next proxy
-      }
-    }
-    
-    // If all proxies fail, throw the last error
-    throw error || new Error('All CORS proxies failed');
-  }
-  
-  // Extract page data from HTML document
-  private static extractPageData(doc: Document, url: string): any {
-    try {
-      // Get the title
-      const title = doc.title || '';
-      
-      // Get meta tags
-      const metaTags = Array.from(doc.querySelectorAll('meta')).map(meta => {
-        const attributes: Record<string, string> = {};
-        Array.from(meta.attributes).forEach(attr => {
-          attributes[attr.name] = attr.value;
-        });
-        return attributes;
-      });
-      
-      // Get headings
-      const headings = Array.from(doc.querySelectorAll('h1, h2, h3, h4, h5, h6')).map(heading => ({
-        level: heading.tagName.toLowerCase(),
-        text: heading.textContent?.trim() || ''
-      }));
-      
-      // Get links
-      const links = Array.from(doc.querySelectorAll('a')).map(link => {
-        let href = link.getAttribute('href') || '';
-        
-        // Handle relative URLs
-        if (href && !href.startsWith('http') && !href.startsWith('#')) {
-          const baseUrl = new URL(url);
-          href = new URL(href, baseUrl.origin).href;
-        }
-        
-        return {
-          href,
-          text: link.textContent?.trim() || '',
-          rel: link.getAttribute('rel') || '',
-          isInternal: href.includes(new URL(url).hostname)
-        };
-      });
-      
-      // Get images
-      const images = Array.from(doc.querySelectorAll('img')).map(img => ({
-        src: img.getAttribute('src') || '',
-        alt: img.getAttribute('alt') || '',
-        width: img.getAttribute('width') || '0',
-        height: img.getAttribute('height') || '0'
-      }));
-      
-      // Get page source code
-      const sourceCode = new XMLSerializer().serializeToString(doc);
-      
-      return {
-        title,
-        url,
-        meta: metaTags,
-        headings,
-        links,
-        images,
-        sourceCode
-      };
-    } catch (error) {
-      console.error('Error extracting page data:', error);
-      return {
-        title: url,
-        url,
-        meta: [],
-        headings: [],
-        links: [],
-        images: [],
-        sourceCode: `<html><body>Error extracting data: ${error}</body></html>`
-      };
-    }
-  }
-
   static async crawlWebsite(url: string, useProxy = false): Promise<{ success: boolean; error?: string; data?: any }> {
-    try {
-      if (useProxy || this.proxyEnabled) {
-        console.log('Using CORS proxy for:', url);
-        return await this.fetchWithCorsProxy(url);
-      }
-      
-      const apiKey = this.getApiKey();
-      if (!apiKey) {
-        console.warn('No API key found, using demo mode');
-        // Instead of failing, try the CORS proxy as a fallback
-        return await this.fetchWithCorsProxy(url);
-      }
+    console.log(`Crawling website: ${url}, useProxy: ${useProxy || this.proxyEnabled}`);
 
-      console.log('Making crawl request to Firecrawl API');
-      if (!this.firecrawlApp) {
-        this.firecrawlApp = new FirecrawlApp({ apiKey });
-      }
-
+    // If we have a Firecrawl API key, use it
+    const apiKey = this.getApiKey();
+    if (apiKey) {
       try {
+        console.log('Using Firecrawl API with API key');
+        if (!this.firecrawlApp) {
+          this.firecrawlApp = new FirecrawlApp({ apiKey });
+        }
+
         const crawlResponse = await this.firecrawlApp.crawlUrl(url, {
           limit: 100,
           scrapeOptions: {
@@ -203,100 +80,113 @@ export class FirecrawlService {
 
         if (!crawlResponse.success) {
           console.error('Crawl failed:', (crawlResponse as ErrorResponse).error);
-          // If Firecrawl API fails, try the CORS proxy as a fallback
-          console.log('Falling back to CORS proxy');
-          return await this.fetchWithCorsProxy(url);
+          throw new Error((crawlResponse as ErrorResponse).error || 'Failed to crawl website');
         }
 
         console.log('Crawl successful:', crawlResponse);
         return { 
           success: true,
-          data: crawlResponse.data 
+          data: crawlResponse 
         };
       } catch (error) {
-        console.error('Error during crawl with Firecrawl API:', error);
-        // If Firecrawl API fails, try the CORS proxy as a fallback
-        console.log('Falling back to CORS proxy due to error');
-        return await this.fetchWithCorsProxy(url);
+        console.error('Error during crawl with API key:', error);
+        // Fall back to proxy method if API key method fails
+        console.log('Falling back to proxy method');
+        return this.fetchWithProxy(url);
       }
-    } catch (error) {
-      console.error('All crawl methods failed:', error);
-      
-      // Generate demo data as a last resort
-      console.log('Generating demo data as fallback');
-      return { 
-        success: true, 
-        data: this.generateDemoData(url)
-      };
+    } else {
+      // No API key, use proxy method
+      console.log('No API key found, using proxy method');
+      return this.fetchWithProxy(url);
     }
   }
-  
-  // Generate demo data for testing when all other methods fail
-  private static generateDemoData(url: string): any {
-    return {
-      title: "Site de démonstration",
-      url: url,
-      meta: [
-        { name: "description", content: "Description de démonstration pour ce site" },
-        { name: "keywords", content: "demo, test, exemple" }
-      ],
-      headings: [
-        { level: "h1", text: "Titre principal" },
-        { level: "h2", text: "À propos de nous" },
-        { level: "h2", text: "Nos services" },
-        { level: "h3", text: "Service Premium" },
-        { level: "h3", text: "Support client" }
-      ],
-      links: [
-        { href: "https://example.com/about", text: "À propos", rel: "", isInternal: true },
-        { href: "https://example.com/services", text: "Services", rel: "", isInternal: true },
-        { href: "https://facebook.com", text: "Facebook", rel: "nofollow", isInternal: false },
-        { href: "https://twitter.com", text: "Twitter", rel: "nofollow", isInternal: false }
-      ],
-      images: [
-        { src: "https://placekitten.com/200/300", alt: "Image d'un chat", width: "200", height: "300" },
-        { src: "https://placekitten.com/300/200", alt: "", width: "300", height: "200" },
-        { src: "https://placekitten.com/400/400", alt: "Logo", width: "400", height: "400" }
-      ],
-      sourceCode: `
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Site de démonstration</title>
-  <meta name="description" content="Description de démonstration pour ce site">
-  <meta name="keywords" content="demo, test, exemple">
-</head>
-<body>
-  <h1>Titre principal</h1>
-  <p>Contenu de démonstration pour tester l'analyseur SEO.</p>
-  
-  <h2>À propos de nous</h2>
-  <p>Nous sommes une entreprise fictive pour la démonstration.</p>
-  
-  <h2>Nos services</h2>
-  <p>Voici les services que nous proposons :</p>
-  
-  <h3>Service Premium</h3>
-  <p>Notre meilleur service avec toutes les fonctionnalités.</p>
-  
-  <h3>Support client</h3>
-  <p>Support disponible 24/7.</p>
-  
-  <div>
-    <a href="https://example.com/about">À propos</a>
-    <a href="https://example.com/services">Services</a>
-    <a href="https://facebook.com" rel="nofollow">Facebook</a>
-    <a href="https://twitter.com" rel="nofollow">Twitter</a>
-  </div>
-  
-  <div>
-    <img src="https://placekitten.com/200/300" alt="Image d'un chat" width="200" height="300">
-    <img src="https://placekitten.com/300/200" width="300" height="200">
-    <img src="https://placekitten.com/400/400" alt="Logo" width="400" height="400">
-  </div>
-</body>
-</html>
-      `
-    };
+
+  private static async fetchWithProxy(url: string): Promise<{ success: boolean; error?: string; data?: any }> {
+    try {
+      console.log('Fetching with proxy:', this.proxyUrl + encodeURIComponent(url));
+      
+      // Try multiple CORS proxies in order
+      const proxies = [
+        'https://api.allorigins.win/raw?url=',
+        'https://corsproxy.io/?',
+        'https://cors-anywhere.herokuapp.com/'
+      ];
+      
+      let response = null;
+      let sourceCode = null;
+      let error = null;
+      
+      // Try each proxy until one works
+      for (const proxy of proxies) {
+        try {
+          console.log(`Trying proxy: ${proxy}`);
+          response = await fetch(proxy + encodeURIComponent(url));
+          
+          if (response.ok) {
+            console.log(`Proxy ${proxy} worked!`);
+            sourceCode = await response.text();
+            break;
+          } else {
+            console.warn(`Proxy ${proxy} returned status: ${response.status}`);
+          }
+        } catch (err) {
+          console.warn(`Error with proxy ${proxy}:`, err);
+          continue;
+        }
+      }
+      
+      if (!sourceCode) {
+        throw new Error('Failed to fetch page content through any proxy');
+      }
+      
+      // Extract basic metadata from HTML
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(sourceCode, 'text/html');
+      
+      const title = doc.querySelector('title')?.textContent || '';
+      const h1s = Array.from(doc.querySelectorAll('h1')).map(el => ({ 
+        level: 1, 
+        text: el.textContent?.trim() || '', 
+        position: 0
+      }));
+      const h2s = Array.from(doc.querySelectorAll('h2')).map(el => ({ 
+        level: 2, 
+        text: el.textContent?.trim() || '', 
+        position: 0
+      }));
+      const h3s = Array.from(doc.querySelectorAll('h3')).map(el => ({ 
+        level: 3, 
+        text: el.textContent?.trim() || '', 
+        position: 0
+      }));
+      const headings = [...h1s, ...h2s, ...h3s].sort((a, b) => a.position - b.position);
+      
+      const meta = Array.from(doc.querySelectorAll('meta')).map(el => ({
+        name: el.getAttribute('name'),
+        property: el.getAttribute('property'),
+        content: el.getAttribute('content')
+      }));
+      
+      const result = {
+        url,
+        title,
+        headings,
+        meta,
+        sourceCode,
+        textContent: doc.body.textContent
+      };
+      
+      return {
+        success: true,
+        data: result
+      };
+    } catch (error) {
+      console.error('Error fetching with proxy:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to fetch website content',
+        data: null
+      };
+    }
   }
 }
