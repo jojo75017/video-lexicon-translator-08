@@ -41,6 +41,7 @@ const ContentHierarchy = ({
 }: ContentHierarchyProps) => {
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
   const [expandedView, setExpandedView] = useState(false);
+  const [visualMode, setVisualMode] = useState<'tree' | 'list'>('tree');
   
   // Check if we have actual content to analyze - ensure arrays have elements with content
   const hasHeadings = headings && headings.length > 0 && headings.some(h => h.text && h.text.trim() !== '');
@@ -64,6 +65,34 @@ const ContentHierarchy = ({
 
   const toggleExpandedView = () => {
     setExpandedView(!expandedView);
+  };
+
+  const toggleVisualMode = () => {
+    setVisualMode(visualMode === 'tree' ? 'list' : 'tree');
+  };
+
+  const expandAll = () => {
+    const newExpandedItems: Record<string, boolean> = {};
+    
+    const processItem = (items: any[], prefix = '') => {
+      items.forEach((item, index) => {
+        const key = `${prefix}-${index}`;
+        newExpandedItems[key] = true;
+        if (item.children && item.children.length > 0) {
+          processItem(item.children, key);
+        }
+      });
+    };
+    
+    if (hierarchy && hierarchy.length > 0) {
+      processItem(hierarchy);
+    }
+    
+    setExpandedItems(newExpandedItems);
+  };
+
+  const collapseAll = () => {
+    setExpandedItems({});
   };
 
   const getAllContent = (): ContentItem[] => {
@@ -172,7 +201,7 @@ const ContentHierarchy = ({
   // Empty state rendering
   if (!hasContent) {
     return (
-      <Card className="p-6 bg-white/50 backdrop-blur-sm">
+      <Card className="p-6 bg-white/50 backdrop-blur-sm shadow-lg border border-gray-100">
         <div className="space-y-6">
           <div>
             <h2 className="text-2xl font-semibold mb-2 flex items-center gap-2">
@@ -262,7 +291,7 @@ const ContentHierarchy = ({
   };
 
   return (
-    <Card className="p-6 bg-white/50 backdrop-blur-sm">
+    <Card className="p-6 bg-white/50 backdrop-blur-sm shadow-lg border border-gray-100">
       {url && (
         <div className="bg-blue-50 p-4 rounded-lg mb-6 flex items-center justify-between">
           <div className="flex items-center">
@@ -286,29 +315,29 @@ const ContentHierarchy = ({
             <BarChart2 className="h-5 w-5 text-blue-600" />
             Aperçu de la SERP et Structure
           </h2>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={toggleExpandedView}
-            className="flex items-center gap-1"
-          >
-            {expandedView ? (
-              <>
-                <ChevronDown className="h-4 w-4" />
-                Vue compacte
-              </>
-            ) : (
-              <>
-                <ChevronDown className="h-4 w-4" />
-                Vue détaillée
-              </>
-            )}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={toggleVisualMode}
+              className="flex items-center gap-1"
+            >
+              {visualMode === 'tree' ? 'Vue Liste' : 'Vue Arbre'}
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={toggleExpandedView}
+              className="flex items-center gap-1"
+            >
+              {expandedView ? 'Vue Compacte' : 'Vue Détaillée'}
+            </Button>
+          </div>
         </div>
 
         <div className={`grid grid-cols-1 ${expandedView ? 'md:grid-cols-1' : 'md:grid-cols-2'} gap-6`}>
           <div className="space-y-4">
-            <div className="bg-gray-50 rounded-lg p-4">
+            <div className="bg-gray-50 rounded-lg p-4 shadow-sm">
               <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
                 <Type className="h-4 w-4 text-blue-600" />
                 Mots-clés Principaux
@@ -322,7 +351,7 @@ const ContentHierarchy = ({
               </div>
             </div>
 
-            <div className="bg-gray-50 rounded-lg p-4">
+            <div className="bg-gray-50 rounded-lg p-4 shadow-sm">
               <h3 className="text-lg font-semibold mb-3">Structure du Document</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -386,7 +415,7 @@ const ContentHierarchy = ({
             </Alert>
 
             {recommendations && recommendations.length > 0 && (
-              <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
+              <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 shadow-sm">
                 <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
                   <Lightbulb className="h-4 w-4 text-blue-600" />
                   Recommandations
@@ -404,18 +433,38 @@ const ContentHierarchy = ({
         <Separator />
 
         <div>
-          <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-            <BarChart2 className="h-4 w-4 text-blue-600" />
-            Hiérarchie du contenu
-          </h3>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <BarChart2 className="h-4 w-4 text-blue-600" />
+              Hiérarchie du contenu
+            </h3>
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={expandAll}
+                className="text-xs"
+              >
+                Tout déplier
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={collapseAll}
+                className="text-xs"
+              >
+                Tout replier
+              </Button>
+            </div>
+          </div>
           
-          <ScrollArea className="h-[600px] rounded-md border p-4">
-            {hierarchy && hierarchy.length > 0 ? (
+          <ScrollArea className="h-[600px] rounded-md border p-4 shadow-inner bg-white">
+            {visualMode === 'tree' && hierarchy && hierarchy.length > 0 ? (
               hierarchy.map((item, index) => renderHierarchicalItem(item, index))
             ) : content.length > 0 ? (
               <div className="space-y-2">
                 {content.map((item, i) => (
-                  <div key={i} className={`flex items-center p-2 ${getIndentation(item.type)}`}>
+                  <div key={i} className={`flex items-center p-2 ${getIndentation(item.type)} ${i % 2 === 0 ? 'bg-gray-50' : ''} rounded`}>
                     {getIcon(item.type)}
                     <span className="ml-2 text-sm">{item.content}</span>
                   </div>
