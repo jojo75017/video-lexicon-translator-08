@@ -1,10 +1,10 @@
 
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Search, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { useEffect } from "react";
 
 interface CrawlInputProps {
   url: string;
@@ -15,24 +15,25 @@ interface CrawlInputProps {
 }
 
 export const CrawlInput = ({ url, isLoading, progress, onUrlChange, onSubmit }: CrawlInputProps) => {
-  // Handle the form submission properly
+  // Debug info
+  useEffect(() => {
+    console.log("CrawlInput props:", { url, isLoading, progress, onSubmit: !!onSubmit });
+  }, [url, isLoading, progress, onSubmit]);
+
+  // Gérer la soumission du formulaire
   const handleFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault(); // Prevent default form submission
-    console.log("CrawlInput form submit with URL:", url);
+    e.preventDefault(); // Empêcher la soumission par défaut du formulaire
     
-    if (!url) {
+    // Vérifier si l'URL est vide
+    if (!url || url.trim() === '') {
       toast.error("Veuillez saisir une URL");
       return;
     }
     
-    // Call the parent component's onSubmit function
+    // Si l'URL est valide, appeler la fonction onSubmit du parent
+    console.log("CrawlInput soumet l'URL:", url);
     onSubmit(e);
   };
-
-  // Debug props received
-  useEffect(() => {
-    console.log("CrawlInput props:", { url, isLoading, progress, onSubmit: !!onSubmit });
-  }, [url, isLoading, progress, onSubmit]);
 
   return (
     <form onSubmit={handleFormSubmit} className="space-y-6">
