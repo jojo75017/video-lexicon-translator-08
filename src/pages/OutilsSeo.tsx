@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import GenerateurContenuMeta from '@/components/seo/GenerateurContenuMeta';
 import AnalyseurStructureSERP from '@/components/seo/AnalyseurStructureSERP';
 import AnalyseAvancee from '@/components/seo/AnalyseAvancee';
+import GenerateurContenuSEO from '@/components/seo/GenerateurContenuSEO';
 
 const OutilsSeo = () => {
   return (
@@ -68,16 +69,7 @@ const OutilsSeo = () => {
             </TabsContent>
             
             <TabsContent value="content" className="space-y-6">
-              <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 text-center">
-                <FileText className="h-8 w-8 mx-auto text-gray-400 mb-2" />
-                <h3 className="text-lg font-medium text-gray-500">Générateur de contenu SEO</h3>
-                <p className="text-sm text-gray-400 mb-4">
-                  Module de génération de contenu en cours de développement. Bientôt disponible!
-                </p>
-                <Button variant="outline" size="sm" disabled>
-                  Être notifié lors du lancement
-                </Button>
-              </div>
+              <GenerateurContenuSEO />
             </TabsContent>
           </Tabs>
         </div>
