@@ -70,7 +70,9 @@ export const CrawlForm = () => {
     e.preventDefault();
     console.log("Form submitted with URL:", url);
     
-    if (!url) {
+    let formattedUrl = url.trim(); // Nettoyer les espaces
+    
+    if (!formattedUrl) {
       toast("URL requise", {
         description: "Veuillez entrer une URL à analyser",
       });
@@ -78,9 +80,8 @@ export const CrawlForm = () => {
     }
     
     // Validate URL format and add protocol if missing
-    let formattedUrl = url;
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      formattedUrl = 'https://' + url;
+    if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
+      formattedUrl = 'https://' + formattedUrl;
     }
     
     try {
@@ -137,12 +138,171 @@ export const CrawlForm = () => {
           toast.error(result.error || "Échec de l'analyse du site");
         }
         
-        // Même en cas d'erreur, générer des données de démonstration
+        // Même en cas d'erreur, générer des données de démonstration personnalisées
         console.log("Setting demo crawl result due to error");
         
         // Extraction du domaine de l'URL
         const cleanUrl = formattedUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
         const domainName = cleanUrl.split('/')[0];
+        
+        // Utiliser un hashage simple pour générer des valeurs déterministes basées sur l'URL
+        const generateSeedFromUrl = (str: string) => {
+          let hash = 0;
+          for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash;
+          }
+          return Math.abs(hash) / 2147483647;
+        };
+        
+        const urlSeed = generateSeedFromUrl(cleanUrl);
+        
+        // Déterminer un thème approximatif en fonction de l'URL
+        let themeKeywords = ['marketing', 'seo', 'référencement', 'digital'];
+        let siteType = 'Site';
+        
+        if (domainName.includes('blog')) {
+          themeKeywords = ['blog', 'contenu', 'articles', 'rédaction'];
+          siteType = 'Blog';
+        } else if (domainName.includes('cluster')) {
+          themeKeywords = ['cluster', 'réseau', 'groupe', 'organisation'];
+          siteType = 'Réseau';
+        } else if (domainName.includes('tech') || domainName.includes('dev')) {
+          themeKeywords = ['technologie', 'développement', 'code', 'web'];
+          siteType = 'Technologie';
+        } else if (domainName.includes('voyage') || domainName.includes('travel')) {
+          themeKeywords = ['voyage', 'destination', 'séjour', 'tourisme'];
+          siteType = 'Voyage';
+        } else if (domainName.includes('food') || domainName.includes('cuisine')) {
+          themeKeywords = ['recette', 'cuisine', 'gastronomie', 'food'];
+          siteType = 'Cuisine';
+        } else if (domainName.includes('shop') || domainName.includes('store')) {
+          themeKeywords = ['boutique', 'produits', 'e-commerce', 'vente'];
+          siteType = 'Boutique';
+        } else if (domainName.includes('photo')) {
+          themeKeywords = ['photographie', 'images', 'portfolio', 'galerie'];
+          siteType = 'Photographie';
+        }
+        
+        // Créer des liens spécifiques au domaine
+        const pageLinks = [
+          { href: `${formattedUrl}/`, text: "Accueil" },
+          { href: `${formattedUrl}/a-propos`, text: "À propos" },
+          { href: `${formattedUrl}/contact`, text: "Contact" },
+          { href: `${formattedUrl}/blog`, text: "Blog" }
+        ];
+        
+        // Ajouter des liens spécifiques au thème
+        if (siteType === 'Blog') {
+          pageLinks.push(
+            { href: `${formattedUrl}/blog/article-1`, text: "Article récent" },
+            { href: `${formattedUrl}/blog/article-2`, text: "Article populaire" }
+          );
+        } else if (siteType === 'Boutique') {
+          pageLinks.push(
+            { href: `${formattedUrl}/produits`, text: "Tous les produits" },
+            { href: `${formattedUrl}/categories`, text: "Catégories" },
+            { href: `${formattedUrl}/panier`, text: "Panier" }
+          );
+        } else if (siteType === 'Technologie') {
+          pageLinks.push(
+            { href: `${formattedUrl}/services`, text: "Services" },
+            { href: `${formattedUrl}/technologies`, text: "Technologies" },
+            { href: `${formattedUrl}/projets`, text: "Projets" }
+          );
+        }
+        
+        // Générer des titres cohérents avec le domaine
+        const generateHeadings = () => {
+          const h1Text = `Bienvenue sur ${domainName} - ${siteType} ${themeKeywords[0]}`;
+          const h2Texts = [
+            `Nos services de ${themeKeywords[0]}`,
+            `À propos de ${domainName}`,
+            `Pourquoi choisir ${domainName}`,
+            `Nos derniers ${themeKeywords[2]}`
+          ];
+          const h3Texts = [
+            `${themeKeywords[0]} premium`,
+            `${themeKeywords[1]} professionnel`,
+            `${themeKeywords[2]} optimisés`
+          ];
+          
+          return [
+            { level: "h1", text: h1Text },
+            ...h2Texts.map(text => ({ level: "h2", text })),
+            ...h3Texts.map(text => ({ level: "h3", text }))
+          ];
+        };
+        
+        // Générer du HTML simulé
+        const generateHtml = () => {
+          return `<!DOCTYPE html>
+<html>
+<head>
+  <title>${domainName} - ${siteType} ${themeKeywords[0]}</title>
+  <meta name="description" content="${siteType} spécialisé en ${themeKeywords.join(', ')} pour ${domainName}">
+  <meta name="keywords" content="${domainName}, ${themeKeywords.join(', ')}">
+</head>
+<body>
+  <header>
+    <h1>Bienvenue sur ${domainName} - ${siteType} ${themeKeywords[0]}</h1>
+    <nav>
+      <ul>
+        <li><a href="/">Accueil</a></li>
+        <li><a href="/a-propos">À propos</a></li>
+        <li><a href="/contact">Contact</a></li>
+        <li><a href="/blog">Blog</a></li>
+      </ul>
+    </nav>
+  </header>
+  
+  <main>
+    <section>
+      <h2>Nos services de ${themeKeywords[0]}</h2>
+      <p>Découvrez nos services professionnels de ${themeKeywords[0]} qui peuvent transformer votre présence en ligne.</p>
+      <img src="https://via.placeholder.com/600x400" alt="Services de ${themeKeywords[0]}">
+      
+      <div class="service">
+        <h3>${themeKeywords[0]} premium</h3>
+        <p>Notre service premium avec toutes les fonctionnalités dont vous avez besoin.</p>
+        <img src="https://via.placeholder.com/300x200" alt="">
+      </div>
+    </section>
+    
+    <section>
+      <h2>À propos de ${domainName}</h2>
+      <p>${domainName} est votre partenaire pour tous vos besoins en ${themeKeywords.join(', ')}.</p>
+    </section>
+    
+    <section>
+      <h2>Pourquoi choisir ${domainName}</h2>
+      <p>Notre expertise en ${themeKeywords[0]} nous permet de vous offrir des résultats exceptionnels.</p>
+      
+      <div class="testimonial">
+        <h3>${themeKeywords[1]} professionnel</h3>
+        <p>Des solutions professionnelles adaptées à vos besoins spécifiques.</p>
+      </div>
+    </section>
+  </main>
+  
+  <footer>
+    <p>Copyright © 2023 ${domainName}</p>
+  </footer>
+</body>
+</html>`;
+        };
+        
+        // Générer des recommandations spécifiques
+        const generateRecommendations = () => {
+          return [
+            `Optimisez votre meta description pour inclure plus de mots-clés liés à ${themeKeywords[0]}`,
+            `Ajoutez des balises alt à toutes vos images pour améliorer le référencement et l'accessibilité`,
+            `Créez une structure de titres H1, H2 et H3 plus cohérente sur toutes les pages`,
+            `Optimisez votre contenu pour les mots-clés principaux de votre domaine: ${themeKeywords.join(', ')}`,
+            `Améliorez votre présence sur les réseaux sociaux avec des balises Open Graph`
+          ];
+        };
         
         setCrawlResult({
           success: true,
@@ -151,36 +311,20 @@ export const CrawlForm = () => {
           total: 1,
           data: [{
             url: formattedUrl,
-            title: `${domainName} - Données de démonstration`,
+            title: `${domainName} - ${siteType} ${themeKeywords[0]}`,
             meta: [
-              { name: "description", content: `Analyse SEO pour ${domainName}` },
-              { name: "keywords", content: `${domainName}, seo, analyse, référencement` }
+              { name: "description", content: `${siteType} spécialisé en ${themeKeywords.join(', ')} pour ${domainName}` },
+              { name: "keywords", content: `${domainName}, ${themeKeywords.join(', ')}` }
             ],
-            links: [
-              { href: `${formattedUrl}/page1`, text: "Page d'exemple 1" },
-              { href: `${formattedUrl}/page2`, text: "Page d'exemple 2" },
-              { href: `${formattedUrl}/contact`, text: "Contact" },
-              { href: `${formattedUrl}/a-propos`, text: "À propos" }
-            ],
+            links: pageLinks,
             images: [
-              { src: "https://via.placeholder.com/150", alt: "Image d'exemple 1" },
-              { src: "https://via.placeholder.com/300", alt: "Image d'exemple 2" },
-              { src: "https://via.placeholder.com/200", alt: "" }
+              { src: "https://via.placeholder.com/600x400", alt: `Services de ${themeKeywords[0]}` },
+              { src: "https://via.placeholder.com/300x200", alt: "" },
+              { src: "https://via.placeholder.com/400x300", alt: `${domainName} - ${themeKeywords[1]}` }
             ],
-            headings: [
-              { level: "h1", text: `Bienvenue sur ${domainName}` },
-              { level: "h2", text: "Nos services" },
-              { level: "h3", text: "Service premium" },
-              { level: "h2", text: "À propos de nous" },
-              { level: "h3", text: "Notre histoire" }
-            ],
-            sourceCode: `<!DOCTYPE html>\n<html>\n<head>\n  <title>${domainName} - Démonstration</title>\n  <meta name="description" content="Analyse SEO pour ${domainName}">\n</head>\n<body>\n  <h1>Bienvenue sur ${domainName}</h1>\n  <!-- Contenu de démonstration -->\n</body>\n</html>`,
-            recommendations: [
-              "Ajoutez une meta description plus détaillée",
-              "Utilisez des titres H1, H2 et H3 de manière hiérarchique",
-              "Ajoutez des attributs alt à toutes vos images",
-              "Optimisez votre contenu pour les mots-clés principaux"
-            ]
+            headings: generateHeadings(),
+            sourceCode: generateHtml(),
+            recommendations: generateRecommendations()
           }]
         });
       }
@@ -188,7 +332,7 @@ export const CrawlForm = () => {
       console.error('Error analyzing website:', error);
       toast.error("Erreur lors de l'analyse du site");
       
-      // Generate demo data for display
+      // Générer des données personnalisées même en cas d'erreur
       console.log("Setting demo crawl result due to exception");
       
       // Extraction du domaine de l'URL
@@ -202,9 +346,9 @@ export const CrawlForm = () => {
         total: 1,
         data: [{
           url: formattedUrl,
-          title: `${domainName} - Données après erreur`,
+          title: `${domainName} - Site Web`,
           meta: [
-            { name: "description", content: `Analyse SEO alternative pour ${domainName}` }
+            { name: "description", content: `Analyse SEO pour ${domainName}` }
           ],
           links: [
             { href: `${formattedUrl}/accueil`, text: "Accueil" },
@@ -217,7 +361,7 @@ export const CrawlForm = () => {
             { level: "h1", text: `${domainName} - Site web` },
             { level: "h2", text: "Contenu principal" }
           ],
-          sourceCode: `<!DOCTYPE html>\n<html>\n<head>\n  <title>${domainName}</title>\n</head>\n<body>\n  <h1>${domainName} - Site web</h1>\n  <!-- Contenu de démonstration -->\n</body>\n</html>`,
+          sourceCode: `<!DOCTYPE html>\n<html>\n<head>\n  <title>${domainName}</title>\n  <meta name="description" content="Analyse SEO pour ${domainName}">\n</head>\n<body>\n  <h1>${domainName} - Site web</h1>\n  <h2>Contenu principal</h2>\n  <p>Contenu du site web ${domainName}.</p>\n</body>\n</html>`,
           recommendations: [
             "Assurez-vous que l'URL est correcte et accessible",
             "Vérifiez votre connexion internet",

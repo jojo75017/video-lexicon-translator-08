@@ -24,14 +24,17 @@ export const CrawlInput = ({ url, isLoading, progress, onUrlChange, onSubmit }: 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault(); // Empêcher la soumission par défaut du formulaire
     
+    // Nettoyer l'URL (supprimer les espaces)
+    const cleanUrl = url ? url.trim() : '';
+    
     // Vérifier si l'URL est vide
-    if (!url || url.trim() === '') {
+    if (!cleanUrl) {
       toast.error("Veuillez saisir une URL");
       return;
     }
     
     // Si l'URL est valide, appeler la fonction onSubmit du parent
-    console.log("CrawlInput soumet l'URL:", url);
+    console.log("CrawlInput soumet l'URL:", cleanUrl);
     onSubmit(e);
   };
 
