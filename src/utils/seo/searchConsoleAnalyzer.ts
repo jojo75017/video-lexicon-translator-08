@@ -34,8 +34,14 @@ export const analyzeSearchConsole = async (url: string): Promise<SearchConsoleDa
       data = {}; // Fall back to generating demo data
     }
     
+    // Format the URL properly, adding protocol if needed
+    let formattedUrl = url;
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      formattedUrl = 'https://' + url;
+    }
+    
     // Clean the URL to use in mock data
-    const cleanUrl = url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+    const cleanUrl = formattedUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
     
     // Extract domain name for more realistic data
     const domainName = cleanUrl.split('/')[0];
@@ -52,6 +58,10 @@ export const analyzeSearchConsole = async (url: string): Promise<SearchConsoleDa
       themeKeywords = ['voyage', 'destination', 'séjour', 'tourisme'];
     } else if (domainName.includes('food') || domainName.includes('cuisine')) {
       themeKeywords = ['recette', 'cuisine', 'gastronomie', 'food'];
+    } else if (domainName.includes('shop') || domainName.includes('store')) {
+      themeKeywords = ['boutique', 'produits', 'e-commerce', 'vente'];
+    } else if (domainName.includes('photo')) {
+      themeKeywords = ['photographie', 'images', 'portfolio', 'galerie'];
     }
     
     // Generate random but realistic data for the report
@@ -98,7 +108,7 @@ export const analyzeSearchConsole = async (url: string): Promise<SearchConsoleDa
     // Sort keywords by impressions
     allKeywords.sort((a, b) => b.impressions - a.impressions);
     
-    // Generate top pages
+    // Generate top pages using domain name for more realism
     const pagePaths = [
       '',
       '/blog',
@@ -171,6 +181,8 @@ export const analyzeSearchConsole = async (url: string): Promise<SearchConsoleDa
     const topFivePages = topPages.slice(0, 5);
     const topFiveQueries = queries.slice(0, 5);
     
+    console.log("Generated Search Console data for", cleanUrl);
+    
     // Return combined data (API data or generated demo data)
     return {
       clicks: typeof data.clicks === 'number' ? data.clicks : totalClicks,
@@ -191,6 +203,8 @@ export const analyzeSearchConsole = async (url: string): Promise<SearchConsoleDa
     console.error('Erreur lors de la récupération des données Search Console:', error);
     
     // Return minimal fallback demo data in case of error
+    const formattedUrl = url.startsWith('http') ? url : `https://${url}`;
+    
     return {
       clicks: Math.floor(Math.random() * 5000),
       impressions: Math.floor(Math.random() * 100000),
@@ -207,8 +221,8 @@ export const analyzeSearchConsole = async (url: string): Promise<SearchConsoleDa
         { query: "référencement naturel", clicks: 320, impressions: 1900 }
       ],
       topPages: [
-        { url: `${url || 'https://example.com'}/blog/seo-guide`, clicks: 800, impressions: 4500 },
-        { url: `${url || 'https://example.com'}/services`, clicks: 600, impressions: 3800 }
+        { url: `${formattedUrl}/blog/seo-guide`, clicks: 800, impressions: 4500 },
+        { url: `${formattedUrl}/services`, clicks: 600, impressions: 3800 }
       ],
       devices: {
         mobile: Math.floor(Math.random() * 60) + 40,

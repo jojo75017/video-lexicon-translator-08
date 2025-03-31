@@ -29,20 +29,6 @@ export const CrawlInput = ({ url, isLoading, progress, onUrlChange, onSubmit }: 
     onSubmit(e);
   };
 
-  // Handle button click separately
-  const handleButtonClick = () => {
-    console.log("Crawl button clicked with URL:", url);
-    
-    if (!url) {
-      toast.error("Veuillez saisir une URL");
-      return;
-    }
-    
-    // Manually trigger form submission
-    const formEvent = new Event("submit") as unknown as React.FormEvent;
-    onSubmit(formEvent);
-  };
-
   // Debug props received
   useEffect(() => {
     console.log("CrawlInput props:", { url, isLoading, progress, onSubmit: !!onSubmit });
@@ -54,15 +40,33 @@ export const CrawlInput = ({ url, isLoading, progress, onUrlChange, onSubmit }: 
         <label htmlFor="url" className="block text-sm font-medium mb-1">
           URL du site
         </label>
-        <Input
-          id="url"
-          type="url"
-          value={url}
-          onChange={onUrlChange}
-          className="w-full"
-          placeholder="https://exemple.com"
-          required
-        />
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Input
+            id="url"
+            value={url}
+            onChange={onUrlChange}
+            className="flex-1"
+            placeholder="exemple.com"
+            required
+          />
+          <Button 
+            type="submit"
+            disabled={isLoading}
+            className="sm:w-auto w-full bg-blue-600 hover:bg-blue-700"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Analyse en cours...
+              </>
+            ) : (
+              <>
+                <Search className="mr-2 h-4 w-4" />
+                Analyser le site
+              </>
+            )}
+          </Button>
+        </div>
       </div>
 
       {isLoading && (
@@ -73,25 +77,6 @@ export const CrawlInput = ({ url, isLoading, progress, onUrlChange, onSubmit }: 
           </p>
         </div>
       )}
-
-      <Button
-        type="button" // Changed from submit to button
-        disabled={isLoading || !url}
-        className="w-full"
-        onClick={handleButtonClick} // Add explicit click handler
-      >
-        {isLoading ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Analyse en cours...
-          </>
-        ) : (
-          <>
-            <Search className="mr-2 h-4 w-4" />
-            Analyser le site
-          </>
-        )}
-      </Button>
     </form>
   );
 };

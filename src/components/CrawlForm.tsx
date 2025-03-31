@@ -77,12 +77,17 @@ export const CrawlForm = () => {
       return;
     }
     
-    // Validate URL format
+    // Validate URL format and add protocol if missing
+    let formattedUrl = url;
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      formattedUrl = 'https://' + url;
+    }
+    
     try {
-      new URL(url);
+      new URL(formattedUrl);
     } catch {
       toast("URL invalide", {
-        description: "Veuillez entrer une URL valide (ex: https://exemple.com)",
+        description: "Veuillez entrer une URL valide (ex: exemple.com)",
       });
       return;
     }
@@ -98,10 +103,19 @@ export const CrawlForm = () => {
         setProgress(prev => Math.min(prev + 10, 90));
       }, 300);
 
-      console.log('Starting analysis for URL:', url);
-      const result = await FirecrawlService.crawlWebsite(url);
+      console.log('Starting analysis for URL:', formattedUrl);
+      
+      // Activation automatique du proxy pour les domaines externes
+      if (!formattedUrl.includes('localhost') && !formattedUrl.includes('127.0.0.1')) {
+        FirecrawlService.enableProxy();
+        console.log("Proxy automatically enabled for external domain");
+      }
+      
+      const result = await FirecrawlService.crawlWebsite(formattedUrl);
       
       clearInterval(progressInterval);
+      
+      console.log("Crawl result received:", result);
       
       if (result.success) {
         setProgress(100);
@@ -114,45 +128,58 @@ export const CrawlForm = () => {
         // Vérifier le type d'erreur
         if (result.error && result.error.includes('403')) {
           setIsForbiddenError(true);
-          toast.warning("Erreur d'accès 403");
+          toast.warning("Erreur d'accès 403 - Activez le service CORS");
         }
         else if (result.error && (result.error.includes('CORS') || result.error.includes('Failed to fetch'))) {
           setShowCorsWarning(true);
-          toast.warning("Erreur CORS détectée");
+          toast.warning("Erreur CORS détectée - Activation du proxy requise");
         } else {
           toast.error(result.error || "Échec de l'analyse du site");
         }
         
         // Même en cas d'erreur, générer des données de démonstration
         console.log("Setting demo crawl result due to error");
+        
+        // Extraction du domaine de l'URL
+        const cleanUrl = formattedUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
+        const domainName = cleanUrl.split('/')[0];
+        
         setCrawlResult({
           success: true,
           status: 'demo',
           completed: 1,
           total: 1,
           data: [{
-            url,
-            title: "Démonstration - Site simulé",
+            url: formattedUrl,
+            title: `${domainName} - Données de démonstration`,
             meta: [
-              { name: "description", content: "Données de démonstration pour le site demandé" },
-              { name: "keywords", content: "seo, analyse, démonstration" }
+              { name: "description", content: `Analyse SEO pour ${domainName}` },
+              { name: "keywords", content: `${domainName}, seo, analyse, référencement` }
             ],
             links: [
-              { href: url + "/page1", text: "Page d'exemple 1" },
-              { href: url + "/page2", text: "Page d'exemple 2" }
+              { href: `${formattedUrl}/page1`, text: "Page d'exemple 1" },
+              { href: `${formattedUrl}/page2`, text: "Page d'exemple 2" },
+              { href: `${formattedUrl}/contact`, text: "Contact" },
+              { href: `${formattedUrl}/a-propos`, text: "À propos" }
             ],
             images: [
-              { src: "https://via.placeholder.com/150", alt: "Image d'exemple" }
+              { src: "https://via.placeholder.com/150", alt: "Image d'exemple 1" },
+              { src: "https://via.placeholder.com/300", alt: "Image d'exemple 2" },
+              { src: "https://via.placeholder.com/200", alt: "" }
             ],
             headings: [
-              { level: "h1", text: "Titre principal de démonstration" },
-              { level: "h2", text: "Sous-titre de démonstration" },
-              { level: "h3", text: "Section importante" }
+              { level: "h1", text: `Bienvenue sur ${domainName}` },
+              { level: "h2", text: "Nos services" },
+              { level: "h3", text: "Service premium" },
+              { level: "h2", text: "À propos de nous" },
+              { level: "h3", text: "Notre histoire" }
             ],
-            sourceCode: "&lt;html&gt;&lt;head&gt;&lt;title&gt;Démonstration&lt;/title&gt;&lt;/head&gt;&lt;body&gt;Démonstration&lt;/body&gt;&lt;/html&gt;",
+            sourceCode: `<!DOCTYPE html>\n<html>\n<head>\n  <title>${domainName} - Démonstration</title>\n  <meta name="description" content="Analyse SEO pour ${domainName}">\n</head>\n<body>\n  <h1>Bienvenue sur ${domainName}</h1>\n  <!-- Contenu de démonstration -->\n</body>\n</html>`,
             recommendations: [
-              "Ajoutez un titre H1 unique et pertinent",
-              "Utilisez des sous-titres H2 et H3 pour structurer votre contenu"
+              "Ajoutez une meta description plus détaillée",
+              "Utilisez des titres H1, H2 et H3 de manière hiérarchique",
+              "Ajoutez des attributs alt à toutes vos images",
+              "Optimisez votre contenu pour les mots-clés principaux"
             ]
           }]
         });
@@ -163,32 +190,38 @@ export const CrawlForm = () => {
       
       // Generate demo data for display
       console.log("Setting demo crawl result due to exception");
+      
+      // Extraction du domaine de l'URL
+      const cleanUrl = formattedUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
+      const domainName = cleanUrl.split('/')[0];
+      
       setCrawlResult({
         success: true,
         status: 'demo',
         completed: 1,
         total: 1,
         data: [{
-          url,
-          title: "Démonstration après erreur",
+          url: formattedUrl,
+          title: `${domainName} - Données après erreur`,
           meta: [
-            { name: "description", content: "Données de démonstration générées après une erreur" }
+            { name: "description", content: `Analyse SEO alternative pour ${domainName}` }
           ],
           links: [
-            { href: url + "/page1", text: "Page d'exemple 1" },
-            { href: url + "/page2", text: "Page d'exemple 2" }
+            { href: `${formattedUrl}/accueil`, text: "Accueil" },
+            { href: `${formattedUrl}/blog`, text: "Blog" }
           ],
           images: [
             { src: "https://via.placeholder.com/150", alt: "Image d'exemple" }
           ],
           headings: [
-            { level: "h1", text: "Titre principal de démonstration" },
-            { level: "h2", text: "Sous-titre de démonstration" }
+            { level: "h1", text: `${domainName} - Site web` },
+            { level: "h2", text: "Contenu principal" }
           ],
-          sourceCode: "&lt;html&gt;&lt;head&gt;&lt;title&gt;Démonstration&lt;/title&gt;&lt;/head&gt;&lt;body&gt;Démonstration après erreur&lt;/body&gt;&lt;/html&gt;",
+          sourceCode: `<!DOCTYPE html>\n<html>\n<head>\n  <title>${domainName}</title>\n</head>\n<body>\n  <h1>${domainName} - Site web</h1>\n  <!-- Contenu de démonstration -->\n</body>\n</html>`,
           recommendations: [
             "Assurez-vous que l'URL est correcte et accessible",
-            "Vérifiez votre connexion internet"
+            "Vérifiez votre connexion internet",
+            "Essayez d'activer le proxy CORS"
           ]
         }]
       });
@@ -263,13 +296,13 @@ export const CrawlForm = () => {
           </div>
         )}
 
-        {hasPerformedAnalysis && crawlResult && crawlResult.data && crawlResult.data[0] && (
+        {hasPerformedAnalysis && crawlResult && crawlResult.data && crawlResult.data.length > 0 && (
           <div className="mt-6">
             <ResultTabs data={crawlResult.data[0]} />
           </div>
         )}
         
-        {hasPerformedAnalysis && (!crawlResult || !crawlResult.data || !crawlResult.data[0]) && !showCorsWarning && !isForbiddenError && (
+        {hasPerformedAnalysis && (!crawlResult || !crawlResult.data || crawlResult.data.length === 0) && !showCorsWarning && !isForbiddenError && (
           <div className="mt-6 p-4 bg-amber-50 rounded-lg border border-amber-200 flex items-start">
             <AlertTriangle className="h-5 w-5 text-amber-500 mr-2 mt-0.5" />
             <div>
