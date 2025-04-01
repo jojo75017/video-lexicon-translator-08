@@ -63,6 +63,12 @@ const GenerateurContenuSEO = () => {
       analyzeEditorContent(editorContent);
     }
   }, [editorContent]);
+
+  // Reset content when keyword changes
+  useEffect(() => {
+    setGeneratedContent('');
+    setMetaSuggestions(null);
+  }, [keyword]);
   
   const handleGenerateContent = async () => {
     if (!keyword.trim()) {
@@ -91,6 +97,7 @@ const GenerateurContenuSEO = () => {
       `;
       
       setGeneratedContent(simulatedContent);
+      setEditorContent(simulatedContent);
       setIsGenerating(false);
       toast.success("Contenu généré avec succès");
       
@@ -131,6 +138,9 @@ const GenerateurContenuSEO = () => {
       seoScore,
       imageUrl
     });
+    
+    // Automatiquement passer à l'onglet "Optimisations" après la génération
+    setCurrentTab('suggestions');
   };
   
   const handleAnalyzeContent = async () => {
@@ -512,4 +522,3 @@ const GenerateurContenuSEO = () => {
 };
 
 export default GenerateurContenuSEO;
-
