@@ -266,7 +266,7 @@ const SuggestionsTabContent = () => {
                         size="sm"
                         onClick={() => handleCopy(suggestion.content, index + 200)}
                       >
-                        {copiedField === index + 200 ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                        {copiedIndex === index + 200 ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                       </Button>
                     </div>
                     <div className="aspect-video mb-2 rounded-md overflow-hidden bg-gray-100">
