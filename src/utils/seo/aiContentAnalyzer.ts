@@ -15,6 +15,10 @@ export const analyzeContentWithAI = async (content: string): Promise<Array<{
     priorité: 'haute' | 'moyenne' | 'basse';
   }> = [];
   
+  // Identifie le sujet principal pour des suggestions adaptées
+  const topicMatch = content.match(/<h1[^>]*>(.*?)<\/h1>/i);
+  const mainTopic = topicMatch ? topicMatch[1].replace(/<[^>]*>/g, '') : '';
+  
   // Analyse de la longueur du contenu
   const wordCount = content.split(/\s+/).length;
   if (wordCount < 300) {
@@ -50,6 +54,30 @@ export const analyzeContentWithAI = async (content: string): Promise<Array<{
       message: 'Aucun sous-titre H2 détecté. Utilisez des H2 pour structurer votre contenu en sections principales.',
       priorité: 'moyenne'
     });
+  }
+  
+  // Suggestions spécifiques au thème
+  if (mainTopic.toLowerCase().includes('aquariophilie')) {
+    suggestions.push({
+      type: 'amélioration',
+      message: 'Envisagez d\'ajouter une section sur les équipements essentiels pour débutants en aquariophilie.',
+      priorité: 'moyenne'
+    });
+    
+    suggestions.push({
+      type: 'optimisation',
+      message: 'Intégrez des mots-clés spécifiques comme "poisson d\'eau douce", "entretien aquarium" ou "filtration" pour améliorer le référencement.',
+      priorité: 'haute'
+    });
+    
+    // Vérifie si ces termes sont présents
+    if (!content.toLowerCase().includes('ph de l\'eau') && !content.toLowerCase().includes('qualité de l\'eau')) {
+      suggestions.push({
+        type: 'amélioration',
+        message: 'Mentionnez l\'importance de la qualité de l\'eau et du pH pour la santé des poissons.',
+        priorité: 'moyenne'
+      });
+    }
   }
   
   // Analyse des paragraphes
