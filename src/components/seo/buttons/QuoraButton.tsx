@@ -26,8 +26,9 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { ClipboardCopy, HelpCircle, MessageSquare, Search, Copy, CheckIcon, RefreshCw } from 'lucide-react';
+import { ClipboardCopy, HelpCircle, MessageSquare, Search, Copy, CheckIcon, RefreshCw, Send, PencilLine } from 'lucide-react';
 import { toast } from "sonner";
+import QuoraQuestionForm from './QuoraQuestionForm';
 
 // Définition du schéma de validation pour la recherche
 const searchFormSchema = z.object({
@@ -64,6 +65,26 @@ const responseFormSchema = z.object({
     .max(500, {
       message: "La bio ne peut pas dépasser 500 caractères",
     })
+    .optional(),
+});
+
+// Définition du schéma de validation pour la création de question
+const questionFormSchema = z.object({
+  question: z
+    .string()
+    .min(10, {
+      message: "La question doit contenir au moins 10 caractères",
+    })
+    .max(200, {
+      message: "La question ne peut pas dépasser 200 caractères",
+    }),
+  category: z
+    .string()
+    .min(1, {
+      message: "Veuillez sélectionner une catégorie",
+    }),
+  tags: z
+    .string()
     .optional(),
 });
 
@@ -185,6 +206,8 @@ export function QuoraButton() {
   const [isGeneratingQuestion, setIsGeneratingQuestion] = useState(false);
   const [generatedAnswer, setGeneratedAnswer] = useState("");
   const [isGeneratingAnswer, setIsGeneratingAnswer] = useState(false);
+  const [textDetails, setTextDetails] = useState("");
+  const [selectedText, setSelectedText] = useState({ start: 0, end: 0 });
 
   // Configuration du formulaire de recherche
   const searchForm = useForm<z.infer<typeof searchFormSchema>>({
@@ -201,6 +224,16 @@ export function QuoraButton() {
       question: "",
       answer: "",
       authorBio: "",
+    },
+  });
+
+  // Configuration du formulaire de création de question
+  const questionForm = useForm<z.infer<typeof questionFormSchema>>({
+    resolver: zodResolver(questionFormSchema),
+    defaultValues: {
+      question: "",
+      category: "",
+      tags: "",
     },
   });
 
@@ -234,7 +267,13 @@ export function QuoraButton() {
       
       const randomIndex = Math.floor(Math.random() * generatedQuestions.length);
       setGeneratedQuestion(generatedQuestions[randomIndex]);
-      responseForm.setValue("question", generatedQuestions[randomIndex]);
+      
+      if (activeTab === "ask") {
+        questionForm.setValue("question", generatedQuestions[randomIndex]);
+      } else {
+        responseForm.setValue("question", generatedQuestions[randomIndex]);
+      }
+      
       setIsGeneratingQuestion(false);
       toast.success("Question générée avec succès");
     }, 1500);
@@ -296,6 +335,19 @@ N'hésitez pas à me demander des précisions sur n'importe lequel de ces points
     setOpen(false);
   };
 
+  // Gestion de la création de question
+  const onCreateQuestion = (data: z.infer<typeof questionFormSchema>) => {
+    console.log("Question Quora créée:", data, "Détails:", textDetails);
+    
+    // Afficher un message de succès
+    toast.success("Question Quora publiée", {
+      description: "Votre question a été publiée avec succès"
+    });
+    
+    // Fermer la modal
+    setOpen(false);
+  };
+
   // Appliquer un template
   const applyTemplate = (template: QuoraTemplate) => {
     responseForm.setValue("answer", template.content);
@@ -333,6 +385,80 @@ N'hésitez pas à me demander des précisions sur n'importe lequel de ces points
       });
   };
 
+  // Gérer la sélection de texte
+  const handleTextSelection = (e: React.MouseEvent<HTMLTextAreaElement>) => {
+    const target = e.target as HTMLTextAreaElement;
+    setSelectedText({
+      start: target.selectionStart,
+      end: target.selectionEnd
+    });
+  };
+
+  // Appliquer le formatage au texte
+  const applyFormatting = (fieldType: 'details' | 'answer' | 'sources', format: 'bold' | 'italic' | 'underline' | 'link' | 'image' | 'list' | 'numbered-list' | 'quote') => {
+    let text = '';
+    let start = 0;
+    let end = 0;
+    
+    // Déterminer le texte à formater en fonction du champ
+    if (fieldType === 'details') {
+      text = textDetails;
+      start = selectedText.start;
+      end = selectedText.end;
+    } else if (fieldType === 'answer') {
+      text = responseForm.getValues('answer');
+      // Pour simplifier, on utilise les mêmes indices de sélection
+      start = selectedText.start;
+      end = selectedText.end;
+    }
+    
+    // Si aucun texte n'est sélectionné, utiliser des placeholders
+    const selectedContent = start !== end ? text.substring(start, end) : '';
+    let formattedText = '';
+    
+    switch (format) {
+      case 'bold':
+        formattedText = `**${selectedContent || 'texte en gras'}**`;
+        break;
+      case 'italic':
+        formattedText = `*${selectedContent || 'texte en italique'}*`;
+        break;
+      case 'underline':
+        formattedText = `__${selectedContent || 'texte souligné'}__`;
+        break;
+      case 'link':
+        formattedText = `[${selectedContent || 'lien'}](https://exemple.com)`;
+        break;
+      case 'image':
+        formattedText = `![${selectedContent || 'description image'}](https://exemple.com/image.jpg)`;
+        break;
+      case 'list':
+        formattedText = selectedContent ? 
+          selectedContent.split('\n').map(line => `- ${line}`).join('\n') : 
+          "- élément de liste\n- élément de liste\n- élément de liste";
+        break;
+      case 'numbered-list':
+        formattedText = selectedContent ? 
+          selectedContent.split('\n').map((line, i) => `${i+1}. ${line}`).join('\n') : 
+          "1. premier élément\n2. deuxième élément\n3. troisième élément";
+        break;
+      case 'quote':
+        formattedText = selectedContent ? 
+          selectedContent.split('\n').map(line => `> ${line}`).join('\n') : 
+          "> citation ou bloc de texte";
+        break;
+    }
+    
+    // Appliquer le formatage au texte
+    if (fieldType === 'details') {
+      const newText = text.substring(0, start) + formattedText + text.substring(end);
+      setTextDetails(newText);
+    } else if (fieldType === 'answer') {
+      const newText = text.substring(0, start) + formattedText + text.substring(end);
+      responseForm.setValue('answer', newText);
+    }
+  };
+
   return (
     <>
       <Button onClick={() => setOpen(true)} className="w-full flex items-center gap-2">
@@ -345,7 +471,7 @@ N'hésitez pas à me demander des précisions sur n'importe lequel de ces points
           <DialogHeader>
             <DialogTitle>Assistant Quora</DialogTitle>
             <DialogDescription>
-              Recherchez des questions sur Quora ou créez des réponses optimisées pour la plateforme.
+              Recherchez des questions sur Quora, posez vos propres questions ou créez des réponses optimisées.
             </DialogDescription>
           </DialogHeader>
           
@@ -354,6 +480,10 @@ N'hésitez pas à me demander des précisions sur n'importe lequel de ces points
               <TabsTrigger value="search" className="flex-1">
                 <Search className="h-4 w-4 mr-2" />
                 Rechercher des questions
+              </TabsTrigger>
+              <TabsTrigger value="ask" className="flex-1">
+                <PencilLine className="h-4 w-4 mr-2" />
+                Poser une question
               </TabsTrigger>
               <TabsTrigger value="create" className="flex-1">
                 <MessageSquare className="h-4 w-4 mr-2" />
@@ -444,6 +574,17 @@ N'hésitez pas à me demander des précisions sur n'importe lequel de ces points
                   </div>
                 )}
               </div>
+            </TabsContent>
+            
+            <TabsContent value="ask" className="flex-1 overflow-hidden">
+              <QuoraQuestionForm 
+                form={questionForm}
+                textDetails={textDetails}
+                setTextDetails={setTextDetails}
+                handleTextSelection={handleTextSelection}
+                applyFormatting={applyFormatting}
+                onSubmit={onCreateQuestion}
+              />
             </TabsContent>
             
             <TabsContent value="create" className="flex-1 overflow-hidden">
@@ -571,12 +712,16 @@ N'hésitez pas à me demander des précisions sur n'importe lequel de ces points
                   <div>
                     <h3 className="font-medium text-lg mb-2">Comment utiliser l'assistant Quora ?</h3>
                     <p className="text-gray-600 mb-4">
-                      Cet outil vous permet de rechercher des questions existantes sur Quora ou de créer des réponses optimisées pour la plateforme.
+                      Cet outil vous permet de rechercher des questions existantes sur Quora, de poser vos propres questions ou de créer des réponses optimisées pour la plateforme.
                     </p>
                     <div className="space-y-2">
                       <div className="bg-gray-50 p-3 rounded-lg">
                         <h4 className="font-medium">Recherche de questions</h4>
                         <p className="text-sm text-gray-600">Utilisez l'onglet "Rechercher des questions" pour trouver des questions pertinentes sur Quora auxquelles vous pourriez répondre.</p>
+                      </div>
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <h4 className="font-medium">Poser une question</h4>
+                        <p className="text-sm text-gray-600">Utilisez l'onglet "Poser une question" pour créer une nouvelle question sur Quora. Ajoutez des détails pour obtenir des réponses de qualité.</p>
                       </div>
                       <div className="bg-gray-50 p-3 rounded-lg">
                         <h4 className="font-medium">Création de réponses</h4>
@@ -625,7 +770,7 @@ N'hésitez pas à me demander des précisions sur n'importe lequel de ces points
           
           <DialogFooter className="mt-4">
             <p className="text-xs text-gray-500">
-              Utilisez cet assistant pour trouver des questions pertinentes et créer des réponses optimisées pour Quora.
+              Utilisez cet assistant pour trouver des questions pertinentes, poser vos propres questions et créer des réponses optimisées pour Quora.
             </p>
           </DialogFooter>
         </DialogContent>
