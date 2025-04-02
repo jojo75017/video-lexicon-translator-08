@@ -19,13 +19,14 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  Form,
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { ClipboardCopy, HelpCircle, MessageSquare, Search, Copy, CheckIcon } from 'lucide-react';
+import { ClipboardCopy, HelpCircle, MessageSquare, Search, Copy, CheckIcon, RefreshCw } from 'lucide-react';
 import { toast } from "sonner";
 
 // Définition du schéma de validation pour la recherche
@@ -180,6 +181,10 @@ export function QuoraButton() {
   const [isSearching, setIsSearching] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<QuoraTemplate | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [generatedQuestion, setGeneratedQuestion] = useState("");
+  const [isGeneratingQuestion, setIsGeneratingQuestion] = useState(false);
+  const [generatedAnswer, setGeneratedAnswer] = useState("");
+  const [isGeneratingAnswer, setIsGeneratingAnswer] = useState(false);
 
   // Configuration du formulaire de recherche
   const searchForm = useForm<z.infer<typeof searchFormSchema>>({
@@ -213,6 +218,71 @@ export function QuoraButton() {
     }, 1000);
   };
 
+  // Générer une question avec l'IA
+  const generateQuestion = () => {
+    setIsGeneratingQuestion(true);
+    
+    // Simulation de génération par IA
+    setTimeout(() => {
+      const generatedQuestions = [
+        "Comment optimiser une stratégie de content marketing pour améliorer le SEO d'un site e-commerce ?",
+        "Quelles sont les meilleures pratiques pour améliorer le taux de conversion d'un site web en 2024 ?",
+        "Comment mesurer efficacement le ROI de ses campagnes SEO et content marketing ?",
+        "Quels sont les outils indispensables pour analyser la performance d'un site web ?",
+        "Comment structurer un blog d'entreprise pour maximiser son impact SEO ?"
+      ];
+      
+      const randomIndex = Math.floor(Math.random() * generatedQuestions.length);
+      setGeneratedQuestion(generatedQuestions[randomIndex]);
+      responseForm.setValue("question", generatedQuestions[randomIndex]);
+      setIsGeneratingQuestion(false);
+      toast.success("Question générée avec succès");
+    }, 1500);
+  };
+
+  // Générer une réponse avec l'IA
+  const generateAnswer = () => {
+    const question = responseForm.getValues("question");
+    
+    if (!question) {
+      toast.error("Veuillez d'abord saisir ou générer une question");
+      return;
+    }
+    
+    setIsGeneratingAnswer(true);
+    
+    // Simulation de génération par IA
+    setTimeout(() => {
+      const answer = `Voici ma réponse détaillée à la question "${question}":
+
+## Points essentiels à considérer
+
+1. **Analyse préliminaire**
+   * Identifiez vos objectifs précis et les indicateurs de performance associés
+   * Effectuez un audit complet de votre situation actuelle
+   * Étudiez vos concurrents directs et indirects
+
+2. **Stratégie optimale**
+   * Développez un plan d'action en 3 phases (court, moyen et long terme)
+   * Priorisez les actions à fort impact et faible investissement initial
+   * Intégrez des mécanismes de mesure et d'ajustement continus
+
+3. **Mise en œuvre pratique**
+   * Commencez par implémenter [détail spécifique lié à la question]
+   * Utilisez des outils comme [exemples pertinents]
+   * Mesurez régulièrement vos résultats avec [métriques appropriées]
+
+En conclusion, l'approche la plus efficace combine une vision stratégique claire et une exécution méthodique. D'après mon expérience avec plusieurs clients dans ce domaine, vous pouvez vous attendre à des résultats significatifs dans un délai de 3 à 6 mois en suivant ces recommandations.
+
+N'hésitez pas à me demander des précisions sur n'importe lequel de ces points.`;
+      
+      setGeneratedAnswer(answer);
+      responseForm.setValue("answer", answer);
+      setIsGeneratingAnswer(false);
+      toast.success("Réponse générée avec succès");
+    }, 2000);
+  };
+
   // Gestion de la création de réponse
   const onCreateResponse = (data: z.infer<typeof responseFormSchema>) => {
     console.log("Réponse Quora créée:", data);
@@ -230,6 +300,7 @@ export function QuoraButton() {
   const applyTemplate = (template: QuoraTemplate) => {
     responseForm.setValue("answer", template.content);
     setSelectedTemplate(template);
+    toast.success(`Template "${template.title}" appliqué`);
   };
 
   // Copier une question
@@ -294,8 +365,8 @@ export function QuoraButton() {
               </TabsTrigger>
             </TabsList>
             
-            <TabsContent value="search" className="flex-1">
-              <form onSubmit={searchForm.handleSubmit(onSearch as any)}>
+            <TabsContent value="search" className="flex-1 overflow-hidden">
+              <form onSubmit={searchForm.handleSubmit(onSearch)}>
                 <FormField
                   control={searchForm.control}
                   name="searchQuery"
@@ -304,13 +375,20 @@ export function QuoraButton() {
                       <FormLabel>Rechercher sur Quora</FormLabel>
                       <div className="flex gap-2">
                         <FormControl>
-                          <Input
-                            placeholder="Ex: référencement, seo, backlinks..."
-                            {...field}
-                          />
+                          <Input placeholder="Ex: référencement, marketing digital..." {...field} />
                         </FormControl>
                         <Button type="submit" disabled={isSearching}>
-                          {isSearching ? "Recherche..." : "Rechercher"}
+                          {isSearching ? (
+                            <>
+                              <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                              <span>Recherche...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Search className="mr-2 h-4 w-4" />
+                              <span>Rechercher</span>
+                            </>
+                          )}
                         </Button>
                       </div>
                       <FormMessage />
@@ -319,61 +397,92 @@ export function QuoraButton() {
                 />
               </form>
               
-              <ScrollArea className="h-[400px] mt-4">
+              <div className="mt-4 overflow-auto">
                 {searchResults.length > 0 ? (
-                  <div className="space-y-4">
-                    {searchResults.map((result) => (
-                      <Card key={result.id} className="relative">
-                        <CardContent className="p-4">
-                          <div className="flex justify-between items-start gap-2">
-                            <div>
-                              <h3 className="font-medium mb-2">{result.question}</h3>
-                              <div className="text-sm text-gray-500 flex flex-wrap gap-3">
+                  <ScrollArea className="h-[calc(100vh-300px)] pr-4">
+                    <div className="space-y-3">
+                      {searchResults.map((result) => (
+                        <Card key={result.id} className="overflow-hidden">
+                          <CardContent className="p-4">
+                            <div className="mb-2">
+                              <h3 className="font-medium text-blue-600">{result.question}</h3>
+                              <div className="flex items-center gap-4 text-xs text-gray-500 mt-1">
                                 <span>{result.answerCount} réponses</span>
                                 <span>{result.viewCount} vues</span>
                               </div>
                             </div>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => copyQuestion(result.question)}
-                              className="h-8"
-                            >
-                              <ClipboardCopy className="h-3.5 w-3.5 mr-1" />
-                              Copier
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
+                            <div className="flex justify-between items-center">
+                              <a 
+                                href={result.url} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-sm text-blue-500 hover:underline"
+                              >
+                                Voir sur Quora
+                              </a>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => copyQuestion(result.question)}
+                              >
+                                <Copy className="h-3 w-3 mr-1" />
+                                Répondre
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </ScrollArea>
                 ) : (
                   <div className="text-center py-8 text-gray-500">
-                    {isSearching ? (
-                      <p>Recherche en cours...</p>
-                    ) : (
-                      <p>Utilisez le champ de recherche ci-dessus pour trouver des questions</p>
-                    )}
+                    {searchForm.getValues("searchQuery")
+                      ? isSearching 
+                        ? "Recherche en cours..." 
+                        : "Aucun résultat trouvé. Essayez d'autres mots clés."
+                      : "Entrez des mots clés pour rechercher des questions sur Quora."}
                   </div>
                 )}
-              </ScrollArea>
+              </div>
             </TabsContent>
             
-            <TabsContent value="create" className="flex-1">
-              <form onSubmit={responseForm.handleSubmit(onCreateResponse as any)}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <div>
+            <TabsContent value="create" className="flex-1 overflow-hidden">
+              <Form {...responseForm}>
+                <form onSubmit={responseForm.handleSubmit(onCreateResponse)} className="space-y-4">
+                  <div className="flex flex-col space-y-2">
+                    <div className="flex justify-between items-center">
+                      <FormLabel>Question</FormLabel>
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        size="sm"
+                        onClick={generateQuestion}
+                        disabled={isGeneratingQuestion}
+                      >
+                        {isGeneratingQuestion ? (
+                          <>
+                            <RefreshCw className="mr-2 h-3 w-3 animate-spin" />
+                            <span>Génération...</span>
+                          </>
+                        ) : (
+                          <>
+                            <MessageSquare className="mr-2 h-3 w-3" />
+                            <span>Générer une question</span>
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                    
                     <FormField
                       control={responseForm.control}
                       name="question"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Question</FormLabel>
                           <FormControl>
-                            <Textarea
-                              placeholder="Saisissez ou collez ici la question Quora"
-                              className="h-20"
-                              {...field}
+                            <Textarea 
+                              placeholder="Posez une question ou utilisez la génération automatique..." 
+                              className="min-h-[80px]" 
+                              {...field} 
                             />
                           </FormControl>
                           <FormMessage />
@@ -382,163 +491,143 @@ export function QuoraButton() {
                     />
                   </div>
                   
-                  <div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <FormLabel>Réponse</FormLabel>
+                      <div className="flex gap-2">
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          size="sm"
+                          onClick={generateAnswer}
+                          disabled={isGeneratingAnswer}
+                        >
+                          {isGeneratingAnswer ? (
+                            <>
+                              <RefreshCw className="mr-2 h-3 w-3 animate-spin" />
+                              <span>Génération...</span>
+                            </>
+                          ) : (
+                            <>
+                              <MessageSquare className="mr-2 h-3 w-3" />
+                              <span>Générer une réponse</span>
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                    
                     <FormField
                       control={responseForm.control}
-                      name="authorBio"
+                      name="answer"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Biographie de l'auteur (optionnel)</FormLabel>
                           <FormControl>
-                            <Textarea
-                              placeholder="Votre expertise ou expérience dans ce domaine"
-                              className="h-20"
-                              {...field}
+                            <Textarea 
+                              placeholder="Rédigez votre réponse ou utilisez un modèle..." 
+                              className="min-h-[200px]" 
+                              {...field} 
                             />
                           </FormControl>
-                          <FormDescription>
-                            Utilisée pour personnaliser votre réponse
-                          </FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
                   </div>
-                </div>
-                
-                <h3 className="font-medium mb-2">Templates de réponse</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-4">
-                  {responseTemplates.map((template) => (
-                    <Button
-                      key={template.id}
-                      type="button"
-                      variant={selectedTemplate?.id === template.id ? "default" : "outline"}
-                      className="h-auto py-2 px-3 justify-start"
-                      onClick={() => applyTemplate(template)}
-                    >
-                      <span className="text-left text-sm font-normal">{template.title}</span>
+                  
+                  <div className="flex flex-col space-y-2">
+                    <FormLabel>Templates de réponses</FormLabel>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                      {responseTemplates.map((template) => (
+                        <Card 
+                          key={template.id} 
+                          className={`cursor-pointer ${selectedTemplate?.id === template.id ? 'border-primary' : ''}`}
+                          onClick={() => applyTemplate(template)}
+                        >
+                          <CardContent className="p-3">
+                            <h4 className="font-medium text-sm mb-1">{template.title}</h4>
+                            <p className="text-xs text-gray-500 line-clamp-2">{template.content.substring(0, 100)}...</p>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div className="pt-2 flex justify-end gap-2">
+                    <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+                      Annuler
                     </Button>
-                  ))}
-                </div>
-                
-                <FormField
-                  control={responseForm.control}
-                  name="answer"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Votre réponse</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Rédigez votre réponse ici..."
-                          className="min-h-[200px]"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <DialogFooter className="mt-4">
-                  <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-                    Annuler
-                  </Button>
-                  <Button type="submit">Générer la réponse</Button>
-                </DialogFooter>
-              </form>
+                    <Button type="submit" className="bg-[#b92b27] hover:bg-[#a42521]">
+                      Publier sur Quora
+                    </Button>
+                  </div>
+                </form>
+              </Form>
             </TabsContent>
             
             <TabsContent value="help" className="flex-1">
-              <ScrollArea className="h-[400px]">
-                <div className="space-y-4">
-                  <Card>
-                    <CardContent className="p-4">
-                      <h3 className="font-medium mb-2">Conseils pour les réponses Quora</h3>
-                      <ul className="list-disc pl-5 space-y-2">
-                        <li>Assurez-vous que votre réponse apporte réellement de la valeur</li>
-                        <li>Utilisez un format facile à lire avec des paragraphes courts</li>
-                        <li>Incluez des listes à puces ou numérotées quand c'est pertinent</li>
-                        <li>Utilisez votre expertise personnelle ou professionnelle</li>
-                        <li>Incluez des références et des sources fiables</li>
-                        <li>Évitez le jargon inutile et les termes trop techniques</li>
-                        <li>Concluez avec une invitation à l'interaction</li>
-                      </ul>
-                    </CardContent>
-                  </Card>
+              <ScrollArea className="h-[calc(100vh-300px)] pr-4">
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="font-medium text-lg mb-2">Comment utiliser l'assistant Quora ?</h3>
+                    <p className="text-gray-600 mb-4">
+                      Cet outil vous permet de rechercher des questions existantes sur Quora ou de créer des réponses optimisées pour la plateforme.
+                    </p>
+                    <div className="space-y-2">
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <h4 className="font-medium">Recherche de questions</h4>
+                        <p className="text-sm text-gray-600">Utilisez l'onglet "Rechercher des questions" pour trouver des questions pertinentes sur Quora auxquelles vous pourriez répondre.</p>
+                      </div>
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <h4 className="font-medium">Création de réponses</h4>
+                        <p className="text-sm text-gray-600">Utilisez l'onglet "Créer une réponse" pour rédiger des réponses optimisées. Vous pouvez utiliser des templates prédéfinis ou générer automatiquement des réponses.</p>
+                      </div>
+                    </div>
+                  </div>
                   
-                  <Card>
-                    <CardContent className="p-4">
-                      <h3 className="font-medium mb-2">Structure recommandée</h3>
-                      <div className="space-y-3">
-                        <div>
-                          <h4 className="text-sm font-medium">1. Introduction</h4>
-                          <p className="text-sm text-gray-600">
-                            Répondez directement à la question, établissez votre crédibilité.
-                          </p>
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-medium">2. Corps de la réponse</h4>
-                          <p className="text-sm text-gray-600">
-                            Développez votre argumentation point par point, utilisez des exemples.
-                          </p>
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-medium">3. Conclusion</h4>
-                          <p className="text-sm text-gray-600">
-                            Résumez votre réponse, ajoutez une touche personnelle.
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <div className="mt-4 p-3 bg-gray-50 rounded-md border border-gray-200">
-                        <h4 className="text-sm font-medium mb-2">Exemple de bonne réponse</h4>
-                        <div className="text-sm text-gray-700">
-                          <p className="mb-2">
-                            <strong>Question :</strong> Comment améliorer le SEO d'un site WordPress ?
-                          </p>
-                          <p className="mb-2">
-                            <strong>Réponse :</strong>
-                          </p>
-                          <div className="pl-4 border-l-2 border-gray-300 py-1">
-                            <p className="mb-2">
-                              Après avoir optimisé plus de 50 sites WordPress, je peux vous confirmer que ces 3 techniques sont essentielles :
-                            </p>
-                            <ol className="list-decimal pl-5 mb-2 space-y-1">
-                              <li>Installez un plugin SEO comme Yoast ou Rank Math qui vous guidera pour chaque page</li>
-                              <li>Optimisez la vitesse de chargement avec un bon hébergement et un plugin de cache</li>
-                              <li>Créez du contenu de qualité qui répond aux questions de votre audience</li>
-                            </ol>
-                            <p>
-                              La clé est de rester cohérent. J'ai vu des sites doubler leur trafic en 3 mois simplement en appliquant ces principes de base.
-                            </p>
-                          </div>
-                          <button 
-                            onClick={() => copyToClipboard(
-                              "Après avoir optimisé plus de 50 sites WordPress, je peux vous confirmer que ces 3 techniques sont essentielles :\n\n1. Installez un plugin SEO comme Yoast ou Rank Math qui vous guidera pour chaque page\n2. Optimisez la vitesse de chargement avec un bon hébergement et un plugin de cache\n3. Créez du contenu de qualité qui répond aux questions de votre audience\n\nLa clé est de rester cohérent. J'ai vu des sites doubler leur trafic en 3 mois simplement en appliquant ces principes de base.",
-                              "example"
-                            )}
-                            className="text-xs flex items-center mt-2 text-blue-600 hover:text-blue-800"
-                          >
-                            {copiedId === "example" ? (
-                              <>
-                                <CheckIcon className="h-3 w-3 mr-1" />
-                                Copié !
-                              </>
-                            ) : (
-                              <>
-                                <Copy className="h-3 w-3 mr-1" />
-                                Copier cet exemple
-                              </>
-                            )}
-                          </button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <div>
+                    <h3 className="font-medium text-lg mb-2">Bonnes pratiques sur Quora</h3>
+                    <ul className="list-disc pl-5 space-y-2 text-gray-600">
+                      <li>Répondez de manière objective et factuelle</li>
+                      <li>Incluez des exemples concrets et des sources fiables</li>
+                      <li>Structurez votre réponse avec des sous-titres et des listes</li>
+                      <li>Écrivez dans un style conversationnel et accessible</li>
+                      <li>Évitez la promotion excessive de vos produits ou services</li>
+                      <li>Restez concis tout en étant informatif (200-300 mots idéalement)</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                    <h3 className="font-medium text-blue-800 mb-2">Conseils pour maximiser la visibilité</h3>
+                    <ul className="space-y-2 text-sm text-blue-700">
+                      <li className="flex items-start gap-2">
+                        <span className="font-bold">•</span>
+                        <span>Répondez rapidement aux questions récentes pour avoir plus de chances d'être visible</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="font-bold">•</span>
+                        <span>Incluez des images ou des graphiques pertinents dans vos réponses</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="font-bold">•</span>
+                        <span>Répondez régulièrement pour construire votre réputation sur la plateforme</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="font-bold">•</span>
+                        <span>Utilisez un ton amical et conversationnel qui engage le lecteur</span>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </ScrollArea>
             </TabsContent>
           </Tabs>
+          
+          <DialogFooter className="mt-4">
+            <p className="text-xs text-gray-500">
+              Utilisez cet assistant pour trouver des questions pertinentes et créer des réponses optimisées pour Quora.
+            </p>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </>
