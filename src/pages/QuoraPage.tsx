@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -16,10 +16,52 @@ import {
   ArrowLeft, 
   FileText,
   CheckCircle2,
-  AlertTriangle
+  AlertTriangle,
+  PencilLine,
+  Send
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const QuoraPage = () => {
+  const [activeQuoraTab, setActiveQuoraTab] = useState("answer");
+  const [questionTitle, setQuestionTitle] = useState("");
+  const [questionDetails, setQuestionDetails] = useState("");
+  const [questionTopic, setQuestionTopic] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmitQuestion = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!questionTitle.trim()) {
+      toast.error("Veuillez saisir un titre pour votre question");
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    // Simuler l'envoi de la question
+    setTimeout(() => {
+      toast.success("Votre question a été publiée sur Quora avec succès !");
+      setIsSubmitting(false);
+      setQuestionTitle("");
+      setQuestionDetails("");
+      setQuestionTopic("");
+    }, 1500);
+  };
+
+  const popularTopics = [
+    "Voyage et tourisme",
+    "Marketing digital",
+    "Développement personnel",
+    "Technologie",
+    "Affaires et entrepreneuriat",
+    "Santé et bien-être"
+  ];
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       {/* === HEADER SECTION === */}
@@ -50,16 +92,6 @@ const QuoraPage = () => {
               Créez du contenu optimisé pour Quora et augmentez votre autorité en ligne
             </p>
             
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <FileText className="h-5 w-5 text-[#b92b27]" />
-                <span className="font-medium">Créez des réponses de 200-300 mots pour un impact optimal</span>
-              </div>
-              <div className="flex gap-2">
-                <QuoraButton />
-              </div>
-            </div>
-            
             <div className="bg-[#b92b27]/10 p-4 rounded-lg border border-[#b92b27]/20 mb-6">
               <div className="flex items-start gap-3">
                 <Sparkles className="h-5 w-5 text-[#b92b27] mt-1" />
@@ -69,6 +101,92 @@ const QuoraPage = () => {
                 </div>
               </div>
             </div>
+            
+            {/* Question or Answer Tab Selector */}
+            <Card className="border-[#b92b27]/20 mb-8">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg">Assistant Quora</CardTitle>
+                <CardDescription>Posez des questions ou répondez à des questions existantes sur Quora</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Tabs value={activeQuoraTab} onValueChange={setActiveQuoraTab} className="w-full">
+                  <TabsList className="grid grid-cols-2 mb-6">
+                    <TabsTrigger value="ask" className="flex items-center gap-2">
+                      <PencilLine className="h-4 w-4" />
+                      Poser une question
+                    </TabsTrigger>
+                    <TabsTrigger value="answer" className="flex items-center gap-2">
+                      <MessageSquareText className="h-4 w-4" />
+                      Répondre aux questions
+                    </TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="ask" className="space-y-6">
+                    <form onSubmit={handleSubmitQuestion} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="question-title">Titre de votre question</Label>
+                        <Input 
+                          id="question-title"
+                          value={questionTitle}
+                          onChange={(e) => setQuestionTitle(e.target.value)}
+                          placeholder="Ex: Comment voyager à petit budget en Europe ?"
+                          className="w-full"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="question-details">Détails (optionnel)</Label>
+                        <Textarea
+                          id="question-details"
+                          value={questionDetails}
+                          onChange={(e) => setQuestionDetails(e.target.value)}
+                          placeholder="Ajoutez des détails pour obtenir des réponses plus précises..."
+                          className="min-h-[100px]"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="question-topic">Sujet</Label>
+                        <Select 
+                          value={questionTopic} 
+                          onValueChange={setQuestionTopic}
+                        >
+                          <SelectTrigger id="question-topic">
+                            <SelectValue placeholder="Sélectionnez un sujet" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {popularTopics.map((topic) => (
+                              <SelectItem key={topic} value={topic}>
+                                {topic}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <Button 
+                        type="submit" 
+                        disabled={isSubmitting} 
+                        className="w-full bg-[#b92b27] hover:bg-[#a62520]"
+                      >
+                        {isSubmitting ? (
+                          <>Envoi en cours...</>
+                        ) : (
+                          <>
+                            <Send className="mr-2 h-4 w-4" />
+                            Publier sur Quora
+                          </>
+                        )}
+                      </Button>
+                    </form>
+                  </TabsContent>
+                  
+                  <TabsContent value="answer" className="space-y-4">
+                    <QuoraButton />
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
           </section>
           
           {/* Benefits Cards Section */}
