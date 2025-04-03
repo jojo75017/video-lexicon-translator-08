@@ -51,33 +51,145 @@ const AiAssistant = ({ onUseResponse }: AiAssistantProps) => {
       // Simule une réponse IA
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Système de réponse amélioré basé sur des mots-clés dans la question
+      // Amélioration du système de réponses pour une meilleure correspondance
       let aiResponse = "";
       const lowerQuestion = question.toLowerCase();
       
-      if (lowerQuestion.includes("youtube") || lowerQuestion.includes("abonnés") || lowerQuestion.includes("vues")) {
-        aiResponse = "Pour obtenir 1 000 abonnés rapidement sur YouTube, concentrez-vous sur des stratégies éthiques comme la collaboration avec d'autres créateurs, l'optimisation de vos titres/descriptions avec des mots-clés pertinents, et la promotion de votre contenu sur d'autres plateformes sociales. Créez un contenu de qualité qui répond à un besoin spécifique ou résout un problème pour votre audience cible. Attention cependant: la croissance organique prend généralement plus de temps, et les méthodes pour gagner 1 000 abonnés en une seule journée peuvent violer les conditions d'utilisation de YouTube et mettre votre chaîne en danger.";
-      } 
-      else if (lowerQuestion.includes("signature") && lowerQuestion.includes("professionnelle")) {
-        aiResponse = "Une signature professionnelle devrait inclure votre nom complet, titre, entreprise, numéro de téléphone, email et site web. Pensez à garder un design sobre et élégant qui reflète l'identité visuelle de votre entreprise. Limitez les polices à 1-2 maximum et assurez-vous que votre signature est adaptée aux mobiles.";
-      } 
-      else if (lowerQuestion.includes("couleur") || lowerQuestion.includes("design")) {
-        aiResponse = "Pour un design efficace, choisissez des couleurs qui correspondent à votre identité visuelle. Le bleu inspire confiance, le vert évoque la croissance, le rouge l'énergie. Évitez trop de couleurs vives dans une signature professionnelle et limitez-vous à 2-3 couleurs maximum pour maintenir une cohérence visuelle professionnelle.";
+      // Analyse des mots-clés principaux pour déterminer l'intention de la question
+      const hasYoutubeKeywords = lowerQuestion.includes("youtube") || lowerQuestion.includes("abonnés") || 
+                                 lowerQuestion.includes("vues") || lowerQuestion.includes("vidéo");
+      
+      const hasMarketingKeywords = lowerQuestion.includes("marketing") || lowerQuestion.includes("publicité") || 
+                                   lowerQuestion.includes("promotion") || lowerQuestion.includes("marque") || 
+                                   lowerQuestion.includes("stratégie");
+      
+      const hasSeoKeywords = lowerQuestion.includes("seo") || lowerQuestion.includes("référencement") || 
+                             lowerQuestion.includes("google") || lowerQuestion.includes("moteur de recherche") || 
+                             lowerQuestion.includes("classement");
+      
+      const hasSignatureKeywords = lowerQuestion.includes("signature") || lowerQuestion.includes("email") || 
+                                   lowerQuestion.includes("courriel") || lowerQuestion.includes("mail");
+      
+      const hasDesignKeywords = lowerQuestion.includes("couleur") || lowerQuestion.includes("design") || 
+                                lowerQuestion.includes("style") || lowerQuestion.includes("visuel") || 
+                                lowerQuestion.includes("apparence");
+      
+      const hasLogoKeywords = lowerQuestion.includes("logo") || lowerQuestion.includes("image") || 
+                              lowerQuestion.includes("icône") || lowerQuestion.includes("marque") || 
+                              lowerQuestion.includes("identité visuelle");
+      
+      const hasLinkKeywords = lowerQuestion.includes("lien") || lowerQuestion.includes("url") || 
+                              lowerQuestion.includes("hyperlien") || lowerQuestion.includes("cliquer") || 
+                              lowerQuestion.includes("redirection");
+      
+      // Question sur l'obtention rapide d'abonnés YouTube
+      if (hasYoutubeKeywords && (lowerQuestion.includes("rapide") || lowerQuestion.includes("vite") || 
+          lowerQuestion.includes("rapidement") || lowerQuestion.includes("journée") || lowerQuestion.includes("jour"))) {
+        if (lowerQuestion.includes("1000") || lowerQuestion.includes("mille")) {
+          aiResponse = "Pour obtenir 1000 abonnés rapidement sur YouTube, voici des méthodes éthiques et efficaces :\n\n" +
+          "1. **Créez un contenu ciblé et de qualité** - Identifiez une niche spécifique et créez du contenu qui répond à un besoin réel. La qualité prime sur la quantité.\n\n" +
+          "2. **Optimisez vos vidéos pour le SEO** - Utilisez des mots-clés pertinents dans vos titres, descriptions et tags. YouTube est le deuxième moteur de recherche mondial.\n\n" +
+          "3. **Collaborez avec d'autres créateurs** - Trouvez des YouTubeurs de taille similaire dans votre niche et proposez des collaborations mutuellement bénéfiques.\n\n" +
+          "4. **Partagez sur d'autres plateformes** - Diffusez vos vidéos sur vos réseaux sociaux, forums spécialisés, et communautés en ligne pertinentes.\n\n" +
+          "5. **Engagez votre audience** - Répondez aux commentaires et créez une communauté autour de votre contenu.\n\n" +
+          "⚠️ **Attention** : Les promesses d'obtenir 1000 abonnés en une seule journée sont généralement trompeuses. De telles méthodes (achat d'abonnés, échanges artificiels) peuvent entraîner la suppression de votre chaîne pour violation des conditions d'utilisation de YouTube. La croissance organique prend du temps mais construit une audience de qualité.";
+        } else {
+          aiResponse = "Pour développer rapidement votre chaîne YouTube, concentrez-vous sur ces stratégies éprouvées :\n\n" +
+          "1. **Publiez régulièrement** - Établissez un calendrier de publication cohérent que vous pouvez maintenir.\n\n" +
+          "2. **Analysez vos concurrents** - Identifiez ce qui fonctionne bien dans votre niche sans simplement copier.\n\n" +
+          "3. **Optimisez vos miniatures** - Créez des miniatures accrocheuses qui génèrent des clics sans être trompeuses.\n\n" +
+          "4. **Exploitez les tendances** - Adaptez les sujets populaires à votre style et niche.\n\n" +
+          "5. **Utilisez les shorts** - Les courts formats peuvent générer beaucoup de visibilité rapidement.\n\n" +
+          "Méfiez-vous des services promettant des milliers d'abonnés instantanés. Ces méthodes non organiques nuisent à l'engagement et peuvent entraîner des pénalités de la part de YouTube. La croissance authentique peut prendre du temps, mais attire une audience véritablement intéressée par votre contenu.";
+        }
       }
-      else if (lowerQuestion.includes("logo")) {
-        aiResponse = "Intégrer votre logo dans votre signature email renforce votre image de marque. Assurez-vous qu'il soit de petite taille (idéalement moins de 200px de large) et en format PNG avec un fond transparent. Le positionnement optimal est généralement en haut ou à gauche de votre signature pour une meilleure visibilité.";
+      // Question sur les signatures email professionnelles
+      else if (hasSignatureKeywords && (lowerQuestion.includes("professionnel") || lowerQuestion.includes("travail") || 
+               lowerQuestion.includes("entreprise") || lowerQuestion.includes("business"))) {
+        aiResponse = "Une signature email professionnelle efficace doit contenir ces éléments essentiels :\n\n" +
+        "1. **Informations de base** - Votre nom complet, titre professionnel, nom de l'entreprise et coordonnées (téléphone, email professionnel)\n\n" +
+        "2. **Design cohérent** - Respectez la charte graphique de votre entreprise avec un design sobre et élégant\n\n" +
+        "3. **Logo d'entreprise** - Intégrez-le en taille réduite (pas plus de 200px de large)\n\n" +
+        "4. **Liens pertinents** - Votre site web, profil LinkedIn, et éventuellement d'autres réseaux sociaux professionnels\n\n" +
+        "5. **Call-to-action** - Un lien vers votre calendrier de réservation ou votre dernier projet\n\n" +
+        "Évitez les erreurs courantes comme : trop d'informations, police illisible, taille excessive, et images trop lourdes qui peuvent déclencher les filtres anti-spam. Votre signature doit être responsive pour s'afficher correctement sur mobile, où plus de 60% des emails sont désormais consultés.";
       }
-      else if (lowerQuestion.includes("lien") || lowerQuestion.includes("url")) {
-        aiResponse = "Pour ajouter des liens cliquables, sélectionnez le texte et utilisez le bouton de lien. Vous pouvez inclure des liens vers votre site web, profils sociaux ou calendrier de réunion. Assurez-vous que tous les liens fonctionnent correctement et envisagez d'utiliser des icônes reconnaissables pour les réseaux sociaux plutôt que de longs URL.";
+      // Questions sur le design et les couleurs
+      else if (hasDesignKeywords) {
+        aiResponse = "Pour un design de signature email efficace, voici les principes essentiels à suivre :\n\n" +
+        "1. **Psychologie des couleurs** - Choisissez des couleurs alignées avec votre identité de marque :\n" +
+        "   • Bleu : confiance, professionnalisme, sérénité\n" +
+        "   • Vert : croissance, santé, éco-responsabilité\n" +
+        "   • Rouge : énergie, urgence, passion\n" +
+        "   • Noir : élégance, luxe, autorité\n\n" +
+        "2. **Hiérarchie visuelle** - Organisez les informations par ordre d'importance avec des variations subtiles de taille et de poids de police\n\n" +
+        "3. **Espacement et alignement** - Utilisez des marges cohérentes et alignez proprement les éléments\n\n" +
+        "4. **Sobriété et cohérence** - Limitez-vous à 2-3 couleurs maximum et 1-2 polices\n\n" +
+        "5. **Séparateurs visuels** - Utilisez des lignes fines ou des espaces pour délimiter les sections\n\n" +
+        "Le design de votre signature est souvent le dernier élément de votre email que vos contacts verront - assurez-vous qu'il reflète professionnellement votre marque tout en restant léger et fonctionnel.";
       }
-      else if (lowerQuestion.includes("seo") || lowerQuestion.includes("référencement")) {
-        aiResponse = "Pour améliorer le SEO de votre site, concentrez-vous sur la création de contenu de qualité qui répond aux besoins de vos utilisateurs. Optimisez vos balises title et meta descriptions, utilisez des mots-clés pertinents dans votre contenu, améliorez la vitesse de chargement de votre site et assurez-vous qu'il est mobile-friendly. Les backlinks de qualité restent également un facteur important pour le référencement naturel.";
+      // Questions sur les logos
+      else if (hasLogoKeywords) {
+        aiResponse = "Pour intégrer efficacement votre logo dans votre signature email :\n\n" +
+        "1. **Format optimal** - Utilisez un PNG avec fond transparent pour une meilleure intégration visuelle\n\n" +
+        "2. **Taille recommandée** - Maintenez une largeur de 150-200px maximum pour éviter de surcharger la signature\n\n" +
+        "3. **Résolution adaptée** - Optimisez l'image à 72dpi, suffisant pour l'affichage écran tout en limitant le poids du fichier\n\n" +
+        "4. **Positionnement stratégique** - Placez généralement le logo en haut ou à gauche de la signature pour une meilleure visibilité selon les habitudes de lecture occidentales\n\n" +
+        "5. **Version simplifiée** - Si votre logo est complexe, envisagez une version simplifiée spécifiquement pour les signatures\n\n" +
+        "6. **Test multi-plateforme** - Vérifiez l'apparence sur différents clients de messagerie et appareils\n\n" +
+        "Un logo bien intégré renforce considérablement la mémorabilité de votre marque dans chaque interaction email, mais assurez-vous qu'il reste léger (idéalement moins de 30Ko) pour ne pas ralentir le chargement de l'email.";
       }
-      else if (lowerQuestion.includes("marketing") || lowerQuestion.includes("publicité")) {
-        aiResponse = "Une stratégie de marketing digital efficace combine plusieurs canaux : SEO, publicité payante, marketing par email, réseaux sociaux et content marketing. L'important est d'identifier où se trouve votre audience cible et d'adapter votre message en fonction de chaque plateforme. Mesurez régulièrement vos résultats avec des outils d'analyse pour optimiser votre retour sur investissement.";
+      // Questions sur les liens et URL
+      else if (hasLinkKeywords) {
+        aiResponse = "Pour ajouter des liens efficaces dans votre signature email :\n\n" +
+        "1. **Types de liens essentiels** :\n" +
+        "   • Site web principal de l'entreprise\n" +
+        "   • Profils professionnels (LinkedIn, Twitter professionnel)\n" +
+        "   • Calendrier de réservation (Calendly, HubSpot)\n" +
+        "   • Portfolio ou études de cas récentes\n\n" +
+        "2. **Bonnes pratiques techniques** :\n" +
+        "   • Utilisez des attributs title pour améliorer l'accessibilité\n" +
+        "   • Testez tous les liens avant de finaliser la signature\n" +
+        "   • Préférez des textes d'ancrage descriptifs plutôt que des URLs brutes\n" +
+        "   • Assurez-vous que la couleur des liens offre un contraste suffisant\n\n" +
+        "3. **Approche visuelle** :\n" +
+        "   • Pour les réseaux sociaux, utilisez des icônes reconnaissables plutôt que du texte\n" +
+        "   • Maintenez une taille suffisante pour faciliter le clic sur mobile\n" +
+        "   • Espacez suffisamment les liens pour éviter les erreurs de clic\n\n" +
+        "4. **Suivi et analyse** :\n" +
+        "   • Envisagez d'utiliser des UTM parameters pour suivre le trafic généré\n" +
+        "   • Utilisez des services de raccourcissement d'URL avec analytics intégrés\n\n" +
+        "Les liens dans votre signature représentent des opportunités stratégiques de redirection - choisissez-les judicieusement pour maximiser leur impact commercial.";
       }
+      // Questions sur le SEO et le référencement
+      else if (hasSeoKeywords) {
+        aiResponse = "Pour optimiser le référencement naturel (SEO) de votre site web en 2024, concentrez-vous sur ces stratégies essentielles :\n\n" +
+        "1. **Contenu E-E-A-T de qualité** - Google accorde une importance croissante à l'Expertise, l'Expérience, l'Autorité et la Fiabilité. Créez du contenu approfondi qui démontre votre expertise réelle.\n\n" +
+        "2. **Optimisation pour l'intention de recherche** - Allez au-delà des mots-clés pour comprendre pourquoi les utilisateurs recherchent certains termes. Structurez votre contenu pour répondre précisément à leurs questions.\n\n" +
+        "3. **Expérience utilisateur optimale** - Les Core Web Vitals et l'expérience mobile sont des facteurs de classement directs. Assurez-vous que votre site se charge rapidement et offre une navigation fluide.\n\n" +
+        "4. **Stratégie de liens naturelle** - Privilégiez la qualité à la quantité pour vos backlinks. Un seul lien provenant d'un site autoritaire dans votre domaine vaut mieux que des dizaines de liens de faible qualité.\n\n" +
+        "5. **Optimisation technique** - Assurez-vous que votre site utilise HTTPS, possède un sitemap XML à jour, et implémente correctement les données structurées pour les rich snippets.\n\n" +
+        "Le SEO évolue constamment vers une approche plus holistique. Les techniques de manipulation qui fonctionnaient il y a quelques années peuvent désormais pénaliser votre site. Concentrez-vous sur la création de valeur réelle pour vos utilisateurs.";
+      }
+      // Questions sur le marketing et la publicité
+      else if (hasMarketingKeywords) {
+        aiResponse = "Pour développer une stratégie de marketing digital efficace en 2024, voici les éléments fondamentaux à intégrer :\n\n" +
+        "1. **Approche omnicanale cohérente** - Assurez une expérience fluide entre tous vos points de contact digitaux (site web, réseaux sociaux, email, etc.)\n\n" +
+        "2. **Personnalisation avancée** - Utilisez les données comportementales pour créer des parcours client hautement personnalisés. 80% des consommateurs sont plus susceptibles d'acheter auprès de marques offrant des expériences personnalisées.\n\n" +
+        "3. **Marketing de contenu stratégique** - Développez un mix de formats (articles, vidéos, podcasts, infographies) adaptés à chaque étape du parcours client.\n\n" +
+        "4. **Attribution multi-touch** - Implémentez des modèles d'attribution qui reconnaissent l'impact de chaque interaction dans le processus de conversion.\n\n" +
+        "5. **Automatisation intelligente** - Déployez des solutions de marketing automation qui s'adaptent au comportement des utilisateurs en temps réel.\n\n" +
+        "La clé d'une stratégie marketing efficace réside dans l'équilibre entre l'innovation technologique et l'authenticité humaine. Les marques qui réussissent ne se contentent pas de suivre les tendances - elles créent des connexions émotionnelles durables avec leur audience tout en exploitant les données pour améliorer continuellement leurs performances.";
+      }
+      // Réponse par défaut - plus générique mais toujours utile
       else {
-        aiResponse = "Je suis votre assistant pour répondre à vos questions. Votre question semble porter sur un sujet que je n'ai pas spécifiquement identifié. N'hésitez pas à me poser des questions sur les signatures email, le marketing digital, le SEO, YouTube, ou tout autre sujet lié au web et aux médias sociaux, et je ferai de mon mieux pour vous fournir une réponse détaillée et utile.";
+        aiResponse = "Votre question touche un sujet intéressant qui mérite une réponse détaillée. Bien que je n'aie pas identifié un thème spécifique comme YouTube, SEO, signatures email ou marketing dans votre question, je peux vous offrir quelques conseils généraux:\n\n" +
+        "1. **Recherche approfondie** - Commencez par explorer les ressources existantes sur ce sujet spécifique. Les études de cas, statistiques récentes et exemples concrets renforceront votre compréhension.\n\n" +
+        "2. **Application pratique** - La théorie est importante, mais l'expérimentation vous permettra de découvrir ce qui fonctionne spécifiquement dans votre contexte.\n\n" +
+        "3. **Mesure des résultats** - Définissez des indicateurs clés de performance pertinents pour évaluer l'efficacité de vos actions.\n\n" +
+        "4. **Adaptation continue** - Les meilleures pratiques évoluent constamment. Restez informé des dernières tendances dans ce domaine.\n\n" +
+        "5. **Apprentissage communautaire** - Rejoignez des groupes professionnels ou forums spécialisés pour échanger avec d'autres personnes intéressées par ce sujet.\n\n" +
+        "Si vous souhaitez une réponse plus ciblée, n'hésitez pas à reformuler votre question avec des détails supplémentaires sur le contexte spécifique qui vous intéresse (YouTube, SEO, marketing digital, signatures email, etc.).";
       }
       
       // S'assurer que la réponse fait au moins 500 caractères
