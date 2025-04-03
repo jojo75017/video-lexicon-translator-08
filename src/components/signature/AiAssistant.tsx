@@ -51,152 +51,8 @@ const AiAssistant = ({ onUseResponse }: AiAssistantProps) => {
       // Simule une réponse IA
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Amélioration du système de réponses pour une meilleure correspondance
-      let aiResponse = "";
-      const lowerQuestion = question.toLowerCase();
-      
-      // Analyse des mots-clés principaux pour déterminer l'intention de la question
-      const hasYoutubeKeywords = lowerQuestion.includes("youtube") || lowerQuestion.includes("abonnés") || 
-                                 lowerQuestion.includes("vues") || lowerQuestion.includes("vidéo");
-      
-      const hasMarketingKeywords = lowerQuestion.includes("marketing") || lowerQuestion.includes("publicité") || 
-                                   lowerQuestion.includes("promotion") || lowerQuestion.includes("marque") || 
-                                   lowerQuestion.includes("stratégie");
-      
-      const hasSeoKeywords = lowerQuestion.includes("seo") || lowerQuestion.includes("référencement") || 
-                             lowerQuestion.includes("google") || lowerQuestion.includes("moteur de recherche") || 
-                             lowerQuestion.includes("classement");
-      
-      const hasSignatureKeywords = lowerQuestion.includes("signature") || lowerQuestion.includes("email") || 
-                                   lowerQuestion.includes("courriel") || lowerQuestion.includes("mail");
-      
-      const hasDesignKeywords = lowerQuestion.includes("couleur") || lowerQuestion.includes("design") || 
-                                lowerQuestion.includes("style") || lowerQuestion.includes("visuel") || 
-                                lowerQuestion.includes("apparence");
-      
-      const hasLogoKeywords = lowerQuestion.includes("logo") || lowerQuestion.includes("image") || 
-                              lowerQuestion.includes("icône") || lowerQuestion.includes("marque") || 
-                              lowerQuestion.includes("identité visuelle");
-      
-      const hasLinkKeywords = lowerQuestion.includes("lien") || lowerQuestion.includes("url") || 
-                              lowerQuestion.includes("hyperlien") || lowerQuestion.includes("cliquer") || 
-                              lowerQuestion.includes("redirection");
-      
-      // Question sur l'obtention rapide d'abonnés YouTube
-      if (hasYoutubeKeywords && (lowerQuestion.includes("rapide") || lowerQuestion.includes("vite") || 
-          lowerQuestion.includes("rapidement") || lowerQuestion.includes("journée") || lowerQuestion.includes("jour"))) {
-        if (lowerQuestion.includes("1000") || lowerQuestion.includes("mille")) {
-          aiResponse = "Pour obtenir 1000 abonnés rapidement sur YouTube, voici des méthodes éthiques et efficaces :\n\n" +
-          "1. **Créez un contenu ciblé et de qualité** - Identifiez une niche spécifique et créez du contenu qui répond à un besoin réel. La qualité prime sur la quantité.\n\n" +
-          "2. **Optimisez vos vidéos pour le SEO** - Utilisez des mots-clés pertinents dans vos titres, descriptions et tags. YouTube est le deuxième moteur de recherche mondial.\n\n" +
-          "3. **Collaborez avec d'autres créateurs** - Trouvez des YouTubeurs de taille similaire dans votre niche et proposez des collaborations mutuellement bénéfiques.\n\n" +
-          "4. **Partagez sur d'autres plateformes** - Diffusez vos vidéos sur vos réseaux sociaux, forums spécialisés, et communautés en ligne pertinentes.\n\n" +
-          "5. **Engagez votre audience** - Répondez aux commentaires et créez une communauté autour de votre contenu.\n\n" +
-          "⚠️ **Attention** : Les promesses d'obtenir 1000 abonnés en une seule journée sont généralement trompeuses. De telles méthodes (achat d'abonnés, échanges artificiels) peuvent entraîner la suppression de votre chaîne pour violation des conditions d'utilisation de YouTube. La croissance organique prend du temps mais construit une audience de qualité.";
-        } else {
-          aiResponse = "Pour développer rapidement votre chaîne YouTube, concentrez-vous sur ces stratégies éprouvées :\n\n" +
-          "1. **Publiez régulièrement** - Établissez un calendrier de publication cohérent que vous pouvez maintenir.\n\n" +
-          "2. **Analysez vos concurrents** - Identifiez ce qui fonctionne bien dans votre niche sans simplement copier.\n\n" +
-          "3. **Optimisez vos miniatures** - Créez des miniatures accrocheuses qui génèrent des clics sans être trompeuses.\n\n" +
-          "4. **Exploitez les tendances** - Adaptez les sujets populaires à votre style et niche.\n\n" +
-          "5. **Utilisez les shorts** - Les courts formats peuvent générer beaucoup de visibilité rapidement.\n\n" +
-          "Méfiez-vous des services promettant des milliers d'abonnés instantanés. Ces méthodes non organiques nuisent à l'engagement et peuvent entraîner des pénalités de la part de YouTube. La croissance authentique peut prendre du temps, mais attire une audience véritablement intéressée par votre contenu.";
-        }
-      }
-      // Question sur les signatures email professionnelles
-      else if (hasSignatureKeywords && (lowerQuestion.includes("professionnel") || lowerQuestion.includes("travail") || 
-               lowerQuestion.includes("entreprise") || lowerQuestion.includes("business"))) {
-        aiResponse = "Une signature email professionnelle efficace doit contenir ces éléments essentiels :\n\n" +
-        "1. **Informations de base** - Votre nom complet, titre professionnel, nom de l'entreprise et coordonnées (téléphone, email professionnel)\n\n" +
-        "2. **Design cohérent** - Respectez la charte graphique de votre entreprise avec un design sobre et élégant\n\n" +
-        "3. **Logo d'entreprise** - Intégrez-le en taille réduite (pas plus de 200px de large)\n\n" +
-        "4. **Liens pertinents** - Votre site web, profil LinkedIn, et éventuellement d'autres réseaux sociaux professionnels\n\n" +
-        "5. **Call-to-action** - Un lien vers votre calendrier de réservation ou votre dernier projet\n\n" +
-        "Évitez les erreurs courantes comme : trop d'informations, police illisible, taille excessive, et images trop lourdes qui peuvent déclencher les filtres anti-spam. Votre signature doit être responsive pour s'afficher correctement sur mobile, où plus de 60% des emails sont désormais consultés.";
-      }
-      // Questions sur le design et les couleurs
-      else if (hasDesignKeywords) {
-        aiResponse = "Pour un design de signature email efficace, voici les principes essentiels à suivre :\n\n" +
-        "1. **Psychologie des couleurs** - Choisissez des couleurs alignées avec votre identité de marque :\n" +
-        "   • Bleu : confiance, professionnalisme, sérénité\n" +
-        "   • Vert : croissance, santé, éco-responsabilité\n" +
-        "   • Rouge : énergie, urgence, passion\n" +
-        "   • Noir : élégance, luxe, autorité\n\n" +
-        "2. **Hiérarchie visuelle** - Organisez les informations par ordre d'importance avec des variations subtiles de taille et de poids de police\n\n" +
-        "3. **Espacement et alignement** - Utilisez des marges cohérentes et alignez proprement les éléments\n\n" +
-        "4. **Sobriété et cohérence** - Limitez-vous à 2-3 couleurs maximum et 1-2 polices\n\n" +
-        "5. **Séparateurs visuels** - Utilisez des lignes fines ou des espaces pour délimiter les sections\n\n" +
-        "Le design de votre signature est souvent le dernier élément de votre email que vos contacts verront - assurez-vous qu'il reflète professionnellement votre marque tout en restant léger et fonctionnel.";
-      }
-      // Questions sur les logos
-      else if (hasLogoKeywords) {
-        aiResponse = "Pour intégrer efficacement votre logo dans votre signature email :\n\n" +
-        "1. **Format optimal** - Utilisez un PNG avec fond transparent pour une meilleure intégration visuelle\n\n" +
-        "2. **Taille recommandée** - Maintenez une largeur de 150-200px maximum pour éviter de surcharger la signature\n\n" +
-        "3. **Résolution adaptée** - Optimisez l'image à 72dpi, suffisant pour l'affichage écran tout en limitant le poids du fichier\n\n" +
-        "4. **Positionnement stratégique** - Placez généralement le logo en haut ou à gauche de la signature pour une meilleure visibilité selon les habitudes de lecture occidentales\n\n" +
-        "5. **Version simplifiée** - Si votre logo est complexe, envisagez une version simplifiée spécifiquement pour les signatures\n\n" +
-        "6. **Test multi-plateforme** - Vérifiez l'apparence sur différents clients de messagerie et appareils\n\n" +
-        "Un logo bien intégré renforce considérablement la mémorabilité de votre marque dans chaque interaction email, mais assurez-vous qu'il reste léger (idéalement moins de 30Ko) pour ne pas ralentir le chargement de l'email.";
-      }
-      // Questions sur les liens et URL
-      else if (hasLinkKeywords) {
-        aiResponse = "Pour ajouter des liens efficaces dans votre signature email :\n\n" +
-        "1. **Types de liens essentiels** :\n" +
-        "   • Site web principal de l'entreprise\n" +
-        "   • Profils professionnels (LinkedIn, Twitter professionnel)\n" +
-        "   • Calendrier de réservation (Calendly, HubSpot)\n" +
-        "   • Portfolio ou études de cas récentes\n\n" +
-        "2. **Bonnes pratiques techniques** :\n" +
-        "   • Utilisez des attributs title pour améliorer l'accessibilité\n" +
-        "   • Testez tous les liens avant de finaliser la signature\n" +
-        "   • Préférez des textes d'ancrage descriptifs plutôt que des URLs brutes\n" +
-        "   • Assurez-vous que la couleur des liens offre un contraste suffisant\n\n" +
-        "3. **Approche visuelle** :\n" +
-        "   • Pour les réseaux sociaux, utilisez des icônes reconnaissables plutôt que du texte\n" +
-        "   • Maintenez une taille suffisante pour faciliter le clic sur mobile\n" +
-        "   • Espacez suffisamment les liens pour éviter les erreurs de clic\n\n" +
-        "4. **Suivi et analyse** :\n" +
-        "   • Envisagez d'utiliser des UTM parameters pour suivre le trafic généré\n" +
-        "   • Utilisez des services de raccourcissement d'URL avec analytics intégrés\n\n" +
-        "Les liens dans votre signature représentent des opportunités stratégiques de redirection - choisissez-les judicieusement pour maximiser leur impact commercial.";
-      }
-      // Questions sur le SEO et le référencement
-      else if (hasSeoKeywords) {
-        aiResponse = "Pour optimiser le référencement naturel (SEO) de votre site web en 2024, concentrez-vous sur ces stratégies essentielles :\n\n" +
-        "1. **Contenu E-E-A-T de qualité** - Google accorde une importance croissante à l'Expertise, l'Expérience, l'Autorité et la Fiabilité. Créez du contenu approfondi qui démontre votre expertise réelle.\n\n" +
-        "2. **Optimisation pour l'intention de recherche** - Allez au-delà des mots-clés pour comprendre pourquoi les utilisateurs recherchent certains termes. Structurez votre contenu pour répondre précisément à leurs questions.\n\n" +
-        "3. **Expérience utilisateur optimale** - Les Core Web Vitals et l'expérience mobile sont des facteurs de classement directs. Assurez-vous que votre site se charge rapidement et offre une navigation fluide.\n\n" +
-        "4. **Stratégie de liens naturelle** - Privilégiez la qualité à la quantité pour vos backlinks. Un seul lien provenant d'un site autoritaire dans votre domaine vaut mieux que des dizaines de liens de faible qualité.\n\n" +
-        "5. **Optimisation technique** - Assurez-vous que votre site utilise HTTPS, possède un sitemap XML à jour, et implémente correctement les données structurées pour les rich snippets.\n\n" +
-        "Le SEO évolue constamment vers une approche plus holistique. Les techniques de manipulation qui fonctionnaient il y a quelques années peuvent désormais pénaliser votre site. Concentrez-vous sur la création de valeur réelle pour vos utilisateurs.";
-      }
-      // Questions sur le marketing et la publicité
-      else if (hasMarketingKeywords) {
-        aiResponse = "Pour développer une stratégie de marketing digital efficace en 2024, voici les éléments fondamentaux à intégrer :\n\n" +
-        "1. **Approche omnicanale cohérente** - Assurez une expérience fluide entre tous vos points de contact digitaux (site web, réseaux sociaux, email, etc.)\n\n" +
-        "2. **Personnalisation avancée** - Utilisez les données comportementales pour créer des parcours client hautement personnalisés. 80% des consommateurs sont plus susceptibles d'acheter auprès de marques offrant des expériences personnalisées.\n\n" +
-        "3. **Marketing de contenu stratégique** - Développez un mix de formats (articles, vidéos, podcasts, infographies) adaptés à chaque étape du parcours client.\n\n" +
-        "4. **Attribution multi-touch** - Implémentez des modèles d'attribution qui reconnaissent l'impact de chaque interaction dans le processus de conversion.\n\n" +
-        "5. **Automatisation intelligente** - Déployez des solutions de marketing automation qui s'adaptent au comportement des utilisateurs en temps réel.\n\n" +
-        "La clé d'une stratégie marketing efficace réside dans l'équilibre entre l'innovation technologique et l'authenticité humaine. Les marques qui réussissent ne se contentent pas de suivre les tendances - elles créent des connexions émotionnelles durables avec leur audience tout en exploitant les données pour améliorer continuellement leurs performances.";
-      }
-      // Réponse par défaut - plus générique mais toujours utile
-      else {
-        aiResponse = "Votre question touche un sujet intéressant qui mérite une réponse détaillée. Bien que je n'aie pas identifié un thème spécifique comme YouTube, SEO, signatures email ou marketing dans votre question, je peux vous offrir quelques conseils généraux:\n\n" +
-        "1. **Recherche approfondie** - Commencez par explorer les ressources existantes sur ce sujet spécifique. Les études de cas, statistiques récentes et exemples concrets renforceront votre compréhension.\n\n" +
-        "2. **Application pratique** - La théorie est importante, mais l'expérimentation vous permettra de découvrir ce qui fonctionne spécifiquement dans votre contexte.\n\n" +
-        "3. **Mesure des résultats** - Définissez des indicateurs clés de performance pertinents pour évaluer l'efficacité de vos actions.\n\n" +
-        "4. **Adaptation continue** - Les meilleures pratiques évoluent constamment. Restez informé des dernières tendances dans ce domaine.\n\n" +
-        "5. **Apprentissage communautaire** - Rejoignez des groupes professionnels ou forums spécialisés pour échanger avec d'autres personnes intéressées par ce sujet.\n\n" +
-        "Si vous souhaitez une réponse plus ciblée, n'hésitez pas à reformuler votre question avec des détails supplémentaires sur le contexte spécifique qui vous intéresse (YouTube, SEO, marketing digital, signatures email, etc.).";
-      }
-      
-      // S'assurer que la réponse fait au moins 500 caractères
-      if (aiResponse.length < 500) {
-        const additionalInfo = "Pour approfondir ce sujet, je vous recommande également d'explorer les dernières tendances et meilleures pratiques dans ce domaine. Les technologies et stratégies évoluent rapidement, et rester informé des développements récents vous donnera un avantage concurrentiel. N'hésitez pas à me poser des questions plus spécifiques sur certains aspects particuliers qui vous intéressent, et je pourrai vous donner des conseils plus ciblés adaptés à votre situation.";
-        aiResponse += " " + additionalInfo;
-      }
+      // Générer une réponse personnalisée en fonction de la question
+      let aiResponse = generateResponse(question);
       
       // Ajouter la réponse à la conversation
       if (isReplyMode && replyingToIndex !== null) {
@@ -219,6 +75,122 @@ const AiAssistant = ({ onUseResponse }: AiAssistantProps) => {
       setIsLoading(false);
       setQuestion("");
     }
+  };
+
+  // Générer une réponse différente pour chaque question
+  const generateResponse = (userQuestion: string): string => {
+    const lowerQuestion = userQuestion.toLowerCase();
+    
+    // Base de données de réponses par thèmes
+    const responses = {
+      youtube: [
+        "Pour développer votre chaîne YouTube, concentrez-vous sur la qualité plutôt que la quantité. Publiez régulièrement du contenu qui apporte une vraie valeur à votre audience. Analysez vos statistiques pour comprendre ce qui fonctionne et engagez-vous avec votre communauté dans les commentaires. Les algorithmes de YouTube favorisent l'engagement et le temps de visionnage.",
+        "L'achat d'abonnés sur YouTube est fortement déconseillé. Ces abonnés sont généralement des comptes inactifs qui n'interagiront jamais avec votre contenu, ce qui peut nuire à votre taux d'engagement et même conduire à des sanctions de la part de YouTube. Mieux vaut avoir 100 vrais fans qu'un million d'abonnés fantômes.",
+        "Pour optimiser vos vidéos YouTube, travaillez sur vos titres, descriptions et miniatures. Utilisez des mots-clés pertinents, créez des miniatures accrocheuses et structurez vos descriptions avec des timestamps et des liens utiles. N'oubliez pas d'inciter vos spectateurs à s'abonner et à laisser un commentaire.",
+        "Les Shorts YouTube sont un excellent moyen d'accroître votre visibilité. Ce format vertical court (moins de 60 secondes) est idéal pour captiver rapidement l'attention. Essayez de transformer vos meilleurs moments de vidéos longues en Shorts ou créez du contenu spécifique pour ce format."
+      ],
+      email: [
+        "Une signature email professionnelle doit être concise et contenir vos informations essentielles : nom, fonction, entreprise, coordonnées et éventuellement logo. Évitez les polices fantaisistes et limitez-vous à 2-3 couleurs maximum pour maintenir un aspect professionnel.",
+        "Pour améliorer le taux d'ouverture de vos emails, travaillez sur l'objet : il doit être court (moins de 50 caractères), personnalisé et créer une sensation d'urgence ou de curiosité. Évitez les termes spammy comme 'gratuit' ou 'promotion' qui peuvent déclencher les filtres anti-spam.",
+        "La meilleure heure pour envoyer des emails professionnels est généralement entre 10h et 11h ou entre 14h et 15h, du mardi au jeudi. Cependant, ces horaires peuvent varier selon votre secteur et votre audience - testez différents moments pour trouver ce qui fonctionne le mieux pour vous.",
+        "Pour une campagne d'emailing réussie, segmentez votre audience, personnalisez le contenu et incluez un call-to-action clair et unique. Mesurez systématiquement vos performances (taux d'ouverture, de clic, de conversion) et optimisez continuellement vos campagnes sur la base de ces données."
+      ],
+      marketing: [
+        "Le marketing de contenu reste l'une des stratégies les plus efficaces en 2024. Créez du contenu utile qui répond aux questions de votre audience à chaque étape de leur parcours d'achat. Un contenu de qualité construit votre autorité dans votre domaine et génère un trafic organique durable.",
+        "Pour augmenter votre taux de conversion, optimisez votre entonnoir de vente en éliminant les frictions. Simplifiez les formulaires, réduisez le nombre d'étapes jusqu'à l'achat, proposez plusieurs options de paiement et mettez en place un système de relance automatique pour les paniers abandonnés.",
+        "Les micro-influenceurs (1 000 à 50 000 abonnés) offrent souvent un meilleur ROI que les influenceurs à grande audience. Leur communauté est généralement plus engagée et leurs recommandations sont perçues comme plus authentiques, ce qui peut générer un taux de conversion plus élevé.",
+        "Pour mesurer l'efficacité de votre marketing digital, suivez ces KPIs essentiels : coût d'acquisition client (CAC), valeur vie client (LTV), taux de conversion, engagement sur les réseaux sociaux et positionnement SEO. L'important est de lier ces métriques à vos objectifs business globaux."
+      ],
+      seo: [
+        "Le référencement (SEO) est un processus de long terme. Concentrez-vous sur la création de contenu de qualité qui répond aux questions de vos utilisateurs. Optimisez vos mots-clés, vos balises titre et méta descriptions, et travaillez votre netlinking. Les résultats peuvent prendre 3 à 6 mois pour être visibles.",
+        "Pour améliorer votre référencement local, assurez-vous que votre fiche Google My Business est complète et à jour. Collectez des avis positifs, utilisez des mots-clés locaux dans votre contenu et créez des pages dédiées pour chaque zone géographique que vous servez.",
+        "La vitesse de chargement est un facteur de classement majeur. Optimisez vos images, utilisez la mise en cache, minifiez vos CSS et JavaScript, et envisagez d'utiliser un CDN. Visez un temps de chargement inférieur à 3 secondes pour un impact positif sur votre SEO.",
+        "Le netlinking reste crucial pour le SEO. Privilégiez la qualité à la quantité : un seul backlink provenant d'un site autoritaire dans votre domaine a plus de valeur que des dizaines de liens de faible qualité. Créez du contenu linkable et développez des partenariats avec d'autres sites de votre secteur."
+      ],
+      social: [
+        "Pour réussir sur les réseaux sociaux en 2024, misez sur l'authenticité et l'interaction plutôt que sur le volume de publication. Engagez-vous régulièrement avec votre communauté, répondez aux commentaires et créez du contenu qui suscite des conversations plutôt que de simplement promouvoir vos produits.",
+        "Chaque plateforme sociale a ses spécificités : Instagram pour le visuel, LinkedIn pour le professionnel, TikTok pour le divertissement créatif, etc. Adaptez votre contenu à chaque plateforme plutôt que de publier le même message partout. Un bon contenu sur une plateforme peut être totalement inefficace sur une autre.",
+        "L'algorithme de TikTok favorise particulièrement les premières secondes d'une vidéo. Captez immédiatement l'attention avec un hook puissant dans les 3 premières secondes. Si vous ne parvenez pas à retenir l'utilisateur dans ce court laps de temps, votre vidéo aura peu de chances d'être promue par l'algorithme.",
+        "Contrairement aux idées reçues, le meilleur moment pour publier sur les réseaux sociaux n'est pas toujours aux heures de pointe. Tester différents moments peut vous aider à trouver des créneaux où la concurrence est moindre mais où votre audience cible est active, augmentant ainsi votre visibilité organique."
+      ],
+      quora: [
+        "Pour maximiser votre visibilité sur Quora, répondez aux questions récentes dans votre domaine d'expertise. Une réponse détaillée et utile sur une question nouvelle aura plus de chances d'être mise en avant qu'une réponse sur une question qui a déjà reçu des dizaines de bonnes réponses.",
+        "La qualité prime sur Quora. Prenez le temps de rédiger des réponses complètes avec des exemples concrets, des données vérifiables et, si pertinent, des images ou des graphiques. Les réponses détaillées qui apportent une réelle valeur ajoutée reçoivent généralement plus de votes positifs.",
+        "Quora est un excellent outil pour comprendre les préoccupations de votre audience cible. Analysez les questions populaires dans votre domaine pour identifier les problèmes récurrents, puis créez du contenu sur votre site qui y répond en profondeur.",
+        "Pour utiliser Quora comme outil de marketing, évitez l'autopromotion directe qui peut être mal perçue. Établissez-vous d'abord comme une autorité en fournissant des réponses de qualité, puis intégrez subtilement des références à votre expertise ou à vos solutions lorsque c'est pertinent pour la question."
+      ],
+      voyage: [
+        "Pour économiser sur vos voyages, la flexibilité est clé. Recherchez vos vols en navigation privée, comparez sur différentes plateformes et envisagez des aéroports secondaires. Les meilleures offres se trouvent généralement 6-8 semaines avant le départ pour les vols internationaux.",
+        "Voyager hors saison peut transformer complètement votre expérience : prix réduits (jusqu'à 40%), moins de touristes et une expérience plus authentique. Renseignez-vous sur la 'saison des épaules' (juste avant ou après la haute saison) pour un bon compromis entre météo et affluence.",
+        "Les applications comme Google Maps, Maps.me ou Citymapper peuvent être utilisées hors ligne en téléchargeant les cartes à l'avance. C'est un excellent moyen d'économiser sur les données mobiles à l'étranger tout en gardant une navigation précise.",
+        "Pour une immersion culturelle authentique, éloignez-vous des circuits touristiques standards. Utilisez des applications comme Meetup ou Couchsurfing pour rencontrer des locaux, fréquentez les marchés de quartier et apprenez quelques phrases dans la langue locale, même si c'est juste pour commander au restaurant."
+      ],
+      cuisine: [
+        "La clé d'une cuisine réussie est dans la préparation. Lisez la recette en entier avant de commencer et préparez tous vos ingrédients (mise en place). Cela rend le processus plus fluide et réduit les risques d'erreur, surtout pour les recettes complexes.",
+        "Investissez dans quelques outils de qualité plutôt que dans un grand nombre d'ustensiles peu utilisés. Un bon couteau de chef, une planche à découper solide et une poêle en fonte sont essentiels et vous serviront pendant des années.",
+        "Pour améliorer instantanément le goût de vos plats, utilisez des herbes fraîches plutôt que séchées quand c'est possible. Ajoutez-les en fin de cuisson pour préserver leur arôme. Un peu de zeste d'agrume ou quelques gouttes de vinaigre peuvent également réveiller les saveurs d'un plat trop plat.",
+        "La cuisson de la viande continue après l'avoir retirée du feu (cuisson résiduelle). Sortez-la légèrement avant qu'elle n'atteigne la température souhaitée et laissez-la reposer. Ce repos permet également aux jus de se redistribuer, rendant la viande plus juteuse."
+      ],
+      default: [
+        "Merci pour votre question! Pour vous donner une réponse plus précise, pourriez-vous me donner plus de détails ou reformuler votre demande? Je suis spécialisé dans les domaines du marketing digital, SEO, YouTube, signatures email et réseaux sociaux.",
+        "Votre question touche un sujet intéressant. Pour mieux vous aider, pourriez-vous préciser dans quel contexte vous souhaitez appliquer ces informations? Cela me permettra de personnaliser ma réponse selon vos besoins spécifiques.",
+        "J'aimerais vous fournir des informations pertinentes sur ce sujet. Pourriez-vous partager un peu plus sur votre objectif ou le problème spécifique que vous cherchez à résoudre? Cela m'aidera à orienter ma réponse de façon plus adaptée.",
+        "C'est un sujet qui mérite une analyse approfondie. Pour vous offrir les conseils les plus utiles, pourriez-vous me préciser si vous cherchez des informations générales ou si vous avez une situation particulière à laquelle vous voulez appliquer ces connaissances?"
+      ]
+    };
+    
+    // Déterminer la catégorie de la question
+    let category = "default";
+    
+    if (lowerQuestion.includes("youtube") || lowerQuestion.includes("vidéo") || 
+        lowerQuestion.includes("abonné") || lowerQuestion.includes("chaîne") ||
+        lowerQuestion.includes("shorts")) {
+      category = "youtube";
+    } 
+    else if (lowerQuestion.includes("email") || lowerQuestion.includes("mail") || 
+             lowerQuestion.includes("signature") || lowerQuestion.includes("courriel")) {
+      category = "email";
+    }
+    else if (lowerQuestion.includes("marketing") || lowerQuestion.includes("publicité") || 
+             lowerQuestion.includes("promotion") || lowerQuestion.includes("marque")) {
+      category = "marketing";
+    }
+    else if (lowerQuestion.includes("seo") || lowerQuestion.includes("référencement") || 
+             lowerQuestion.includes("google") || lowerQuestion.includes("classement")) {
+      category = "seo";
+    }
+    else if (lowerQuestion.includes("instagram") || lowerQuestion.includes("facebook") || 
+             lowerQuestion.includes("tiktok") || lowerQuestion.includes("linkedin") ||
+             lowerQuestion.includes("réseau social") || lowerQuestion.includes("réseau")) {
+      category = "social";
+    }
+    else if (lowerQuestion.includes("quora") || lowerQuestion.includes("question") || 
+             lowerQuestion.includes("réponse") || lowerQuestion.includes("forum")) {
+      category = "quora";
+    }
+    else if (lowerQuestion.includes("voyage") || lowerQuestion.includes("destination") || 
+             lowerQuestion.includes("vacances") || lowerQuestion.includes("tourisme")) {
+      category = "voyage";
+    }
+    else if (lowerQuestion.includes("cuisine") || lowerQuestion.includes("recette") || 
+             lowerQuestion.includes("cuisson") || lowerQuestion.includes("ingrédient")) {
+      category = "cuisine";
+    }
+    
+    // Sélectionner une réponse aléatoire dans la catégorie appropriée
+    const categoryResponses = responses[category as keyof typeof responses];
+    const randomIndex = Math.floor(Math.random() * categoryResponses.length);
+    let response = categoryResponses[randomIndex];
+    
+    // Personnaliser la réponse en intégrant des éléments de la question
+    response = response.replace(/\[question\]/g, userQuestion);
+    
+    // S'assurer que la réponse a une longueur minimale
+    if (response.length < 500) {
+      response += "\n\nN'hésitez pas à me poser des questions plus spécifiques si vous souhaitez approfondir ce sujet. Je suis là pour vous aider à obtenir les informations les plus pertinentes pour votre situation.";
+    }
+    
+    return response;
   };
 
   const handleUseResponse = (response: string) => {
