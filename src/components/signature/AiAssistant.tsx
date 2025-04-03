@@ -1,11 +1,12 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Bot, SendIcon, User, Loader2 } from "lucide-react";
+import { Bot, SendIcon, User, Loader2, Link as LinkIcon } from "lucide-react";
 import { toast } from "sonner";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface AiAssistantProps {
   onUseResponse: (response: string) => void;
@@ -15,6 +16,14 @@ const AiAssistant = ({ onUseResponse }: AiAssistantProps) => {
   const [question, setQuestion] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [conversation, setConversation] = useState<Array<{role: 'user' | 'assistant', content: string}>>([]);
+  const [isReplyMode, setIsReplyMode] = useState(false);
+  const [replyingToIndex, setReplyingToIndex] = useState<number | null>(null);
+  const [linkUrl, setLinkUrl] = useState("");
+  const [linkText, setLinkText] = useState("");
+  const [showLinkPopover, setShowLinkPopover] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [selectionStart, setSelectionStart] = useState(0);
+  const [selectionEnd, setSelectionEnd] = useState(0);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,7 +34,17 @@ const AiAssistant = ({ onUseResponse }: AiAssistantProps) => {
     }
 
     // Ajouter la question à la conversation
-    setConversation(prev => [...prev, { role: 'user', content: question }]);
+    const newMessage = { role: 'user' as const, content: question };
+    if (isReplyMode && replyingToIndex !== null) {
+      // Créer une copie de la conversation
+      const updatedConversation = [...conversation];
+      // Insérer la réponse après la question à laquelle on répond
+      updatedConversation.splice(replyingToIndex + 1, 0, newMessage);
+      setConversation(updatedConversation);
+    } else {
+      setConversation(prev => [...prev, newMessage]);
+    }
+    
     setIsLoading(true);
     
     try {
@@ -68,7 +87,19 @@ const AiAssistant = ({ onUseResponse }: AiAssistantProps) => {
       }
       
       // Ajouter la réponse à la conversation
-      setConversation(prev => [...prev, { role: 'assistant', content: aiResponse }]);
+      if (isReplyMode && replyingToIndex !== null) {
+        // Créer une copie de la conversation
+        const updatedConversation = [...conversation];
+        // Insérer la réponse après notre réponse utilisateur
+        updatedConversation.splice(replyingToIndex + 2, 0, { role: 'assistant', content: aiResponse });
+        setConversation(updatedConversation);
+      } else {
+        setConversation(prev => [...prev, { role: 'assistant', content: aiResponse }]);
+      }
+      
+      // Réinitialiser le mode de réponse
+      setIsReplyMode(false);
+      setReplyingToIndex(null);
     } catch (error) {
       toast.error("Erreur lors de la génération de la réponse");
       console.error("Erreur IA:", error);
@@ -81,6 +112,56 @@ const AiAssistant = ({ onUseResponse }: AiAssistantProps) => {
   const handleUseResponse = (response: string) => {
     onUseResponse(response);
     toast.success("Réponse utilisée dans votre signature");
+  };
+  
+  const handleReplyClick = (index: number) => {
+    setIsReplyMode(true);
+    setReplyingToIndex(index);
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  };
+  
+  const insertLink = () => {
+    if (!linkUrl.trim() || !linkText.trim()) {
+      toast.error("Veuillez saisir une URL et un texte pour le lien");
+      return;
+    }
+    
+    const formattedLink = `[${linkText}](${linkUrl})`;
+    
+    // Insérer le lien à la position du curseur ou remplacer la sélection
+    const currentQuestion = question;
+    const newQuestion = 
+      currentQuestion.substring(0, selectionStart) + 
+      formattedLink + 
+      currentQuestion.substring(selectionEnd);
+    
+    setQuestion(newQuestion);
+    setShowLinkPopover(false);
+    setLinkUrl("");
+    setLinkText("");
+    
+    // Remettre le focus sur le textarea
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  };
+  
+  const handleTextareaSelection = () => {
+    if (textareaRef.current) {
+      const start = textareaRef.current.selectionStart;
+      const end = textareaRef.current.selectionEnd;
+      
+      setSelectionStart(start);
+      setSelectionEnd(end);
+      
+      // Si du texte est sélectionné, l'utiliser comme texte du lien
+      if (start !== end) {
+        const selectedText = question.substring(start, end);
+        setLinkText(selectedText);
+      }
+    }
   };
 
   return (
@@ -111,20 +192,38 @@ const AiAssistant = ({ onUseResponse }: AiAssistantProps) => {
                 <Bot className="w-5 h-5 mt-1 flex-shrink-0 text-primary" />
               )}
               <div className="flex-1">
-                <p className="text-sm">{message.content}</p>
-                {message.role === 'assistant' && (
-                  <div className="mt-1 flex items-center justify-between">
-                    <Button 
-                      variant="link" 
-                      size="sm" 
-                      className="p-0 h-auto text-xs"
-                      onClick={() => handleUseResponse(message.content)}
+                <p className="text-sm whitespace-pre-wrap" 
+                   dangerouslySetInnerHTML={{
+                     __html: message.content.replace(
+                       /\[([^\]]+)\]\(([^)]+)\)/g,
+                       '<a href="$2" class="text-blue-600 hover:underline" target="_blank">$1</a>'
+                     )
+                   }} 
+                />
+                <div className="mt-1 flex items-center justify-between">
+                  {message.role === 'assistant' ? (
+                    <>
+                      <Button 
+                        variant="link" 
+                        size="sm" 
+                        className="p-0 h-auto text-xs"
+                        onClick={() => handleUseResponse(message.content)}
+                      >
+                        Utiliser cette réponse
+                      </Button>
+                      <span className="text-xs text-gray-500">{message.content.length} caractères</span>
+                    </>
+                  ) : (
+                    <Button
+                      variant="link"
+                      size="sm"
+                      className="p-0 h-auto text-xs ml-auto"
+                      onClick={() => handleReplyClick(index)}
                     >
-                      Utiliser cette réponse
+                      Répondre
                     </Button>
-                    <span className="text-xs text-gray-500">{message.content.length} caractères</span>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
           ))
@@ -137,21 +236,95 @@ const AiAssistant = ({ onUseResponse }: AiAssistantProps) => {
         )}
       </div>
       
-      <form onSubmit={handleSubmit} className="flex gap-2">
-        <Input
-          placeholder="Posez une question (YouTube, SEO, email, marketing)..."
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          disabled={isLoading}
-          className="flex-1"
-        />
-        <Button type="submit" size="sm" disabled={isLoading}>
-          {isLoading ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <SendIcon className="w-4 h-4" />
-          )}
-        </Button>
+      <form onSubmit={handleSubmit} className="space-y-2">
+        <div className="flex items-center space-x-2">
+          <Popover open={showLinkPopover} onOpenChange={setShowLinkPopover}>
+            <PopoverTrigger asChild>
+              <Button 
+                type="button" 
+                variant="outline" 
+                size="sm" 
+                className="h-8 w-8 p-0"
+              >
+                <LinkIcon className="w-4 h-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80">
+              <div className="space-y-2">
+                <h4 className="font-medium text-sm">Insérer un lien</h4>
+                <div className="space-y-2">
+                  <Input
+                    placeholder="Texte du lien"
+                    value={linkText}
+                    onChange={(e) => setLinkText(e.target.value)}
+                    className="text-sm"
+                  />
+                  <Input
+                    placeholder="URL (https://...)"
+                    value={linkUrl}
+                    onChange={(e) => setLinkUrl(e.target.value)}
+                    className="text-sm"
+                  />
+                  <div className="flex justify-end">
+                    <Button 
+                      type="button" 
+                      size="sm" 
+                      onClick={insertLink}
+                      className="text-xs"
+                    >
+                      Insérer
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+          
+          <div className="flex-1 relative">
+            {isReplyMode && (
+              <div className="absolute -top-6 left-0 text-xs flex items-center text-gray-500">
+                <span>En réponse à la question {replyingToIndex !== null ? replyingToIndex + 1 : ''}</span>
+                <Button 
+                  variant="link" 
+                  size="sm" 
+                  className="p-0 h-auto text-xs ml-2"
+                  onClick={() => {
+                    setIsReplyMode(false);
+                    setReplyingToIndex(null);
+                  }}
+                >
+                  Annuler
+                </Button>
+              </div>
+            )}
+            <Textarea
+              ref={textareaRef}
+              placeholder={isReplyMode ? "Écrivez votre réponse..." : "Posez une question (YouTube, SEO, email, marketing)..."}
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              onSelect={handleTextareaSelection}
+              disabled={isLoading}
+              className="min-h-[80px] resize-none"
+              rows={3}
+            />
+          </div>
+        </div>
+
+        <div className="flex justify-between items-center">
+          <div className="text-xs text-gray-500">
+            {question.length > 0 && `${question.length} caractères`}
+          </div>
+          <Button type="submit" size="sm" disabled={isLoading} className="ml-auto">
+            {isLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <>
+                <SendIcon className="w-4 h-4 mr-2" />
+                {isReplyMode ? "Répondre" : "Envoyer"}
+              </>
+            )}
+          </Button>
+        </div>
       </form>
     </Card>
   );
