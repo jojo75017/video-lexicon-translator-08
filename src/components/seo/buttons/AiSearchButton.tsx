@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { getResponseForQuestion } from './QuoraConstants';
 
 const AiSearchButton = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -61,157 +62,182 @@ const AiSearchButton = () => {
     setIsSearching(true);
     
     setTimeout(() => {
-      const theme = detectTheme(searchQuery);
-      let summary = '';
-      let keyPoints: string[] = [];
-      let relatedKeywords: string[] = [];
+      // Utiliser la fonction getResponseForQuestion pour obtenir une réponse pertinente
+      const response = getResponseForQuestion(searchQuery);
       
-      // Contenus spécifiques par thème
-      switch (theme) {
-        case 'voyage':
-          summary = `${searchQuery} est un domaine passionnant du tourisme qui offre de nombreuses opportunités pour découvrir de nouvelles cultures et destinations. Les experts recommandent de bien planifier son voyage, de comparer les offres, et de rester flexible sur les dates pour obtenir les meilleurs tarifs. Les dernières tendances montrent une préférence pour les expériences authentiques et les voyages responsables.`;
-          
-          keyPoints = [
-            `Planifier à l'avance permet d'économiser jusqu'à 30% sur les tarifs`,
-            `Les applications mobiles dédiées au voyage facilitent l'organisation`,
-            `La flexibilité des dates peut réduire considérablement les coûts`,
-            `L'assurance voyage est essentielle pour voyager l'esprit tranquille`,
-            `Les avis en ligne sont précieux pour choisir les bonnes destinations`
-          ];
-          
-          relatedKeywords = [
-            `${searchQuery} économique`,
-            `${searchQuery} dernière minute`,
-            `${searchQuery} tout inclus`,
-            `conseils ${searchQuery}`,
-            `destinations populaires ${searchQuery}`,
-            `${searchQuery} en famille`,
-            `${searchQuery} hors saison`
-          ];
-          break;
-          
-        case 'marketing':
-          summary = `${searchQuery} représente un pilier fondamental du marketing digital moderne. Les stratégies de ${searchQuery} efficaces impliquent une compréhension approfondie de votre audience cible, une analyse régulière des données, et une adaptation continue aux évolutions des algorithmes et des comportements des utilisateurs. L'investissement dans ${searchQuery} génère généralement un ROI supérieur aux méthodes traditionnelles.`;
-          
-          keyPoints = [
-            `L'analyse concurrentielle est essentielle pour définir une stratégie de ${searchQuery} efficace`,
-            `Le contenu de qualité reste le facteur n°1 pour réussir en ${searchQuery}`,
-            `Les indicateurs clés de performance doivent être alignés avec vos objectifs business`,
-            `L'approche mobile-first est désormais incontournable pour ${searchQuery}`,
-            `L'optimisation de la vitesse et de l'expérience utilisateur impacte directement les résultats`
-          ];
-          
-          relatedKeywords = [
-            `${searchQuery} stratégie`,
-            `${searchQuery} outils`,
-            `${searchQuery} B2B`,
-            `${searchQuery} ROI`,
-            `${searchQuery} analytics`,
-            `${searchQuery} tendances 2024`,
-            `${searchQuery} optimisation`
-          ];
-          break;
-          
-        case 'technologie':
-          summary = `${searchQuery} représente une avancée technologique significative qui transforme rapidement plusieurs secteurs d'activité. L'adoption de ${searchQuery} par les entreprises augmente de 35% chaque année, selon les dernières études. L'intégration de ${searchQuery} dans les processus existants peut entraîner des gains d'efficacité considérables et ouvrir de nouvelles opportunités d'innovation.`;
-          
-          keyPoints = [
-            `L'investissement dans la formation est crucial pour maximiser le potentiel de ${searchQuery}`,
-            `L'interopérabilité avec les systèmes existants reste un défi majeur pour ${searchQuery}`,
-            `Les questions éthiques et de confidentialité doivent être adressées en amont`,
-            `Le marché de ${searchQuery} devrait atteindre 500 milliards $ d'ici 2028`,
-            `Les modèles open-source gagnent en popularité dans l'écosystème de ${searchQuery}`
-          ];
-          
-          relatedKeywords = [
-            `${searchQuery} implémentation`,
-            `${searchQuery} cas d'usage`,
-            `${searchQuery} sécurité`,
-            `${searchQuery} dans le cloud`,
-            `${searchQuery} vs technologies traditionnelles`,
-            `futur de ${searchQuery}`,
-            `${searchQuery} pour PME`
-          ];
-          break;
-          
-        case 'santé':
-          summary = `${searchQuery} joue un rôle essentiel dans le bien-être global et la qualité de vie. Les recherches récentes montrent qu'une approche holistique de ${searchQuery} offre les meilleurs résultats à long terme. Il est recommandé de consulter des professionnels qualifiés avant d'entreprendre tout programme significatif lié à ${searchQuery}.`;
-          
-          keyPoints = [
-            `La personnalisation est la clé du succès dans tout programme de ${searchQuery}`,
-            `La cohérence et la régularité sont plus importantes que l'intensité`,
-            `L'équilibre entre différents aspects de ${searchQuery} optimise les résultats`,
-            `Les nouvelles technologies facilitent le suivi et l'amélioration de ${searchQuery}`,
-            `L'approche préventive de ${searchQuery} gagne en reconnaissance scientifique`
-          ];
-          
-          relatedKeywords = [
-            `${searchQuery} naturel`,
-            `${searchQuery} optimisation`,
-            `${searchQuery} recherches récentes`,
-            `${searchQuery} et stress`,
-            `${searchQuery} pour débutants`,
-            `${searchQuery} à domicile`,
-            `${searchQuery} technologie`
-          ];
-          break;
-          
-        case 'business':
-          summary = `${searchQuery} est un aspect fondamental du développement d'entreprise dans l'économie actuelle. Les stratégies de ${searchQuery} efficaces nécessitent une vision claire, une exécution disciplinée et une capacité d'adaptation au changement. Les entreprises leaders intègrent ${searchQuery} à tous les niveaux de leur organisation pour maintenir un avantage concurrentiel.`;
-          
-          keyPoints = [
-            `Une culture d'entreprise alignée avec les objectifs de ${searchQuery} multiplie les chances de succès`,
-            `L'analyse de données permet d'optimiser continuellement les stratégies de ${searchQuery}`,
-            `Les partenariats stratégiques peuvent accélérer significativement vos initiatives de ${searchQuery}`,
-            `La gestion efficace du changement est cruciale pour l'implémentation réussie de ${searchQuery}`,
-            `Les modèles de ${searchQuery} agiles surpassent généralement les approches traditionnelles`
-          ];
-          
-          relatedKeywords = [
-            `${searchQuery} modèle`,
-            `${searchQuery} stratégie`,
-            `${searchQuery} innovation`,
-            `${searchQuery} financement`,
-            `${searchQuery} scalabilité`,
-            `${searchQuery} international`,
-            `${searchQuery} management`
-          ];
-          break;
-          
-        default: // cas général
-          summary = `${searchQuery} est un domaine en pleine expansion qui gagne en popularité notamment grâce à ses applications diverses. Les experts recommandent une approche stratégique intégrée pour maximiser les résultats. Les dernières tendances montrent une évolution vers des techniques plus personnalisées et axées sur l'expérience utilisateur.`;
-          
-          keyPoints = [
-            `L'importance de ${searchQuery} dans une stratégie globale`,
-            `Les principales méthodes d'optimisation de ${searchQuery} en 2024`,
-            `Comment mesurer l'efficacité de vos actions liées à ${searchQuery}`,
-            `Les erreurs courantes à éviter dans l'implémentation de ${searchQuery}`,
-            `Les tendances futures de ${searchQuery} pour les prochaines années`
-          ];
-          
-          relatedKeywords = [
-            `${searchQuery} optimisation`,
-            `${searchQuery} stratégie`,
-            `${searchQuery} analyse`,
-            `tendances ${searchQuery}`,
-            `outils ${searchQuery}`,
-            `mesurer ${searchQuery}`,
-            `${searchQuery} efficacité`
-          ];
-      }
+      // Extraire des points clés basés sur la réponse
+      const keyPoints = extractKeyPoints(response);
+      
+      // Générer des mots-clés associés
+      const relatedKeywords = generateRelatedKeywords(searchQuery);
       
       setSearchResult({
-        summary,
+        summary: response,
         keyPoints,
         relatedKeywords,
-        sources: [
-          { title: `Guide complet sur ${searchQuery}`, url: "https://example.com/guide" },
-          { title: `Étude de cas: Comment ${searchQuery} a transformé notre approche`, url: "https://example.com/case-study" },
-          { title: `Les 10 meilleures pratiques pour ${searchQuery} en 2024`, url: "https://example.com/best-practices" }
-        ]
+        sources: generateSources(searchQuery)
       });
+      
       setIsSearching(false);
     }, 1500);
+  };
+
+  // Fonction pour extraire des points clés à partir d'une longue réponse
+  const extractKeyPoints = (response: string): string[] => {
+    // Recherche des points marqués par des puces ou numéros dans la réponse
+    const bulletPoints = response.match(/•\s+(.*?)(?=\s+•|\n|$)/g);
+    
+    if (bulletPoints && bulletPoints.length >= 3) {
+      return bulletPoints.map(point => point.replace('• ', '').trim()).slice(0, 5);
+    }
+    
+    // Si pas de points avec puces, extraire des phrases clés
+    const sentences = response.split(/\.\s+/);
+    const keyPointSentences = sentences
+      .filter(sentence => 
+        sentence.length > 30 && 
+        sentence.length < 150 &&
+        !sentence.startsWith('En') &&
+        !sentence.startsWith('Il') &&
+        !sentence.startsWith('Cette')
+      )
+      .slice(0, 5);
+    
+    return keyPointSentences.map(sentence => sentence.trim() + '.');
+  };
+
+  // Fonction pour générer des mots-clés associés
+  const generateRelatedKeywords = (query: string): string[] => {
+    const theme = detectTheme(query);
+    const baseKeywords = [query];
+    
+    switch (theme) {
+      case 'marketing':
+        baseKeywords.push(
+          `${query} stratégie`,
+          `${query} outils`,
+          `${query} 2024`,
+          `${query} tendances`,
+          `${query} mesure performance`,
+          `${query} vs concurrence`
+        );
+        break;
+      case 'voyage':
+        baseKeywords.push(
+          `${query} pas cher`,
+          `${query} meilleure saison`,
+          `${query} conseils`,
+          `${query} expériences`,
+          `${query} hébergement`,
+          `${query} transport local`
+        );
+        break;
+      case 'technologie':
+        baseKeywords.push(
+          `${query} applications`,
+          `${query} formation`,
+          `${query} tendances`,
+          `${query} comparatif`,
+          `${query} implémentation`,
+          `${query} coûts`
+        );
+        break;
+      case 'santé':
+        baseKeywords.push(
+          `${query} bienfaits`,
+          `${query} risques`,
+          `${query} recherches scientifiques`,
+          `${query} témoignages`,
+          `${query} alternatives`,
+          `${query} routine quotidienne`
+        );
+        break;
+      case 'business':
+        baseKeywords.push(
+          `${query} modèle`,
+          `${query} financement`,
+          `${query} scalabilité`,
+          `${query} études de cas`,
+          `${query} KPIs`,
+          `${query} optimisation`
+        );
+        break;
+      default:
+        baseKeywords.push(
+          `${query} définition`,
+          `${query} exemples`,
+          `${query} avantages`,
+          `${query} inconvénients`,
+          `${query} alternatives`,
+          `${query} guide`
+        );
+    }
+    
+    // Retourner une sélection aléatoire de mots-clés (entre 5 et 7)
+    return shuffleArray(baseKeywords).slice(0, Math.floor(Math.random() * 3) + 5);
+  };
+
+  // Fonction pour générer des sources pertinentes
+  const generateSources = (query: string): { title: string; url: string }[] => {
+    const theme = detectTheme(query);
+    const sources = [];
+    
+    // Source 1: Guide général
+    sources.push({ 
+      title: `Guide complet sur ${query}`, 
+      url: "https://example.com/guide" 
+    });
+    
+    // Source 2: Étude de cas
+    sources.push({ 
+      title: `Étude de cas: L'impact de ${query} sur les résultats d'entreprise`, 
+      url: "https://example.com/case-study" 
+    });
+    
+    // Source 3: Tendances
+    sources.push({ 
+      title: `Les 10 meilleures pratiques pour ${query} en 2024`, 
+      url: "https://example.com/best-practices" 
+    });
+    
+    // Sources additionnelles selon le thème
+    switch (theme) {
+      case 'marketing':
+        sources.push({ 
+          title: `Comment mesurer le ROI de vos stratégies de ${query}`, 
+          url: "https://example.com/roi-measurement" 
+        });
+        break;
+      case 'voyage':
+        sources.push({ 
+          title: `Témoignages de voyageurs: Expériences de ${query}`, 
+          url: "https://example.com/traveler-experiences" 
+        });
+        break;
+      case 'technologie':
+        sources.push({ 
+          title: `L'avenir de ${query}: Tendances et prévisions`, 
+          url: "https://example.com/future-trends" 
+        });
+        break;
+      default:
+        sources.push({ 
+          title: `FAQ sur ${query}: Réponses aux questions courantes`, 
+          url: "https://example.com/faq" 
+        });
+    }
+    
+    return sources;
+  };
+
+  // Fonction utilitaire pour mélanger un tableau
+  const shuffleArray = <T,>(array: T[]): T[] => {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
   };
 
   const copyToClipboard = (text: string) => {
@@ -255,7 +281,7 @@ const AiSearchButton = () => {
                   id="search-query"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Ex: voyage, trip.com, SEO, e-commerce..."
+                  placeholder="Ex: voyage, SEO, e-commerce, marketing digital..."
                   className="flex-1"
                 />
                 <Button 
