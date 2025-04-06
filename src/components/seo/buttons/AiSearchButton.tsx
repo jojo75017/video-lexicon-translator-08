@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from "@/components/ui/dialog";
@@ -10,7 +9,83 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { getResponseForQuestion, suggestedQuestionsByCategory } from './QuoraConstants';
+import { getResponseForQuestion } from './QuoraConstants';
+
+// Define suggestionsByCategory directly here since it's missing from import
+const suggestedQuestionsByCategory = {
+  seo: [
+    "Comment améliorer le référencement de mon site e-commerce en 2024?",
+    "Quelles sont les meilleures stratégies de backlinks pour un nouveau site web?",
+    "Comment optimiser mon contenu pour le featured snippet de Google?",
+    "Comment mettre en place une stratégie SEO efficace pour un site local?",
+    "Quelles sont les tendances SEO à suivre absolument cette année?",
+    "Comment optimiser mes images pour améliorer mon SEO?"
+  ],
+  marketing: [
+    "Comment mesurer le ROI de mes campagnes marketing digital?",
+    "Quelles sont les meilleures stratégies d'email marketing pour augmenter les conversions?",
+    "Comment créer un plan marketing efficace avec un petit budget?",
+    "Quels KPIs privilégier pour mesurer l'efficacité de ma stratégie marketing?",
+    "Comment adapter ma stratégie marketing à la génération Z?",
+    "Quels outils utiliser pour automatiser mon marketing digital?"
+  ],
+  ecommerce: [
+    "Comment réduire le taux d'abandon de panier sur mon site e-commerce?",
+    "Quelles sont les tendances e-commerce à suivre en 2024?",
+    "Comment améliorer l'expérience utilisateur sur un site de vente en ligne?",
+    "Comment optimiser les fiches produit pour maximiser les conversions?",
+    "Quelles fonctionnalités privilégier pour un site e-commerce B2B?",
+    "Comment mettre en place une stratégie de cross-selling efficace?"
+  ],
+  contenu: [
+    "Comment créer un calendrier éditorial efficace pour mon blog?",
+    "Quelles sont les meilleures pratiques pour la rédaction SEO?",
+    "Comment mesurer l'impact de ma stratégie de contenu?",
+    "Quelle longueur idéale pour mes articles de blog en 2024?",
+    "Comment réutiliser intelligemment mon contenu sur différents canaux?",
+    "Comment créer des contenus evergreen qui performent sur le long terme?"
+  ],
+  reseaux_sociaux: [
+    "Comment augmenter mon engagement organique sur Instagram?",
+    "Quelles sont les meilleures heures pour poster sur LinkedIn?",
+    "Comment créer une stratégie TikTok efficace pour mon entreprise?",
+    "Faut-il privilégier la qualité ou la quantité sur les réseaux sociaux?",
+    "Comment mesurer le ROI de ma présence sur les réseaux sociaux?",
+    "Quels types de contenu fonctionnent le mieux sur chaque plateforme?"
+  ],
+  voyage: [
+    "Comment voyager en Europe avec un petit budget?",
+    "Quelles sont les destinations tendance pour 2024?",
+    "Comment planifier un voyage éco-responsable?",
+    "Quelles assurances voyage sont vraiment indispensables?",
+    "Comment trouver des hébergements authentiques hors des sentiers battus?",
+    "Quels sont les meilleurs moments pour réserver des vols à prix réduits?"
+  ],
+  sante: [
+    "Quels sont les meilleurs exercices pour renforcer son dos?",
+    "Comment adopter une alimentation équilibrée sans se priver?",
+    "Quelles techniques de méditation pour réduire le stress quotidien?",
+    "Comment améliorer la qualité de son sommeil naturellement?",
+    "Quels compléments alimentaires sont vraiment utiles?",
+    "Comment maintenir une routine fitness même en déplacement?"
+  ],
+  technologie: [
+    "Comment implémenter l'IA dans une petite entreprise?",
+    "Quels langages de programmation apprendre en 2024?",
+    "Comment protéger efficacement ses données personnelles en ligne?",
+    "Quelles sont les applications de la blockchain au-delà des cryptomonnaies?",
+    "Comment se former efficacement aux nouvelles technologies sans formation technique?",
+    "Quels outils no-code recommander pour créer une application?"
+  ],
+  business: [
+    "Comment créer un pitch deck efficace pour lever des fonds?",
+    "Quelles sont les étapes clés pour lancer une startup?",
+    "Comment développer une stratégie de croissance durable?",
+    "Quelles métriques suivre pendant les premières années de son business?",
+    "Comment valider son idée de business avant de se lancer?",
+    "Quelles sont les meilleures pratiques pour gérer une équipe à distance?"
+  ]
+};
 
 const AiSearchButton = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -81,9 +156,18 @@ const AiSearchButton = () => {
     const theme = detectTheme(searchQuery);
     console.log("Thème détecté:", theme);
     
-    // Mettre à jour les suggestions de questions basées sur le thème
+    // Générer de nouvelles questions suggérées à chaque recherche
+    // Sélection aléatoire de questions pour le thème détecté
     if (suggestedQuestionsByCategory[theme]) {
-      setSuggestedQuestions(suggestedQuestionsByCategory[theme]);
+      const allQuestions = [...suggestedQuestionsByCategory[theme]];
+      const randomQuestions = shuffleArray(allQuestions).slice(0, 3);
+      
+      // Ajouter quelques questions d'autres catégories pour plus de diversité
+      const otherCategories = Object.keys(suggestedQuestionsByCategory).filter(cat => cat !== theme);
+      const randomCategory = otherCategories[Math.floor(Math.random() * otherCategories.length)];
+      const additionalQuestions = shuffleArray(suggestedQuestionsByCategory[randomCategory as keyof typeof suggestedQuestionsByCategory]).slice(0, 2);
+      
+      setSuggestedQuestions([...randomQuestions, ...additionalQuestions]);
     }
     
     setTimeout(() => {
@@ -117,13 +201,10 @@ const AiSearchButton = () => {
 
   // Fonction pour extraire des points clés à partir d'une longue réponse
   const extractKeyPoints = (response: string): string[] => {
-    // Découper la réponse en phrases
     const sentences = response.split(/\.\s+/).filter(s => s.length > 30);
     
-    // Sélectionner les phrases les plus pertinentes (entre 3 et 5)
     const numPoints = Math.min(Math.max(3, Math.floor(sentences.length / 3)), 5);
     
-    // Prendre des phrases réparties uniformément dans le texte
     const keyPointSentences = [];
     
     if (sentences.length <= numPoints) {
@@ -276,10 +357,8 @@ const AiSearchButton = () => {
         ];
     }
     
-    // Fusionner les mots-clés de base avec les mots-clés thématiques
     const allKeywords = [...baseKeywords, ...themeKeywords];
     
-    // Mélanger et sélectionner un nombre aléatoire entre 5 et 8
     return shuffleArray(allKeywords).slice(0, Math.floor(Math.random() * 4) + 5);
   };
 
@@ -288,19 +367,16 @@ const AiSearchButton = () => {
     const sources = [];
     const queryFormatted = query.replace(/\s+/g, '-').toLowerCase();
     
-    // Source 1: Article général
     sources.push({ 
       title: `Guide complet sur ${query}`, 
       url: `https://example.com/guide/${queryFormatted}` 
     });
     
-    // Source 2: Statistiques/Données
     sources.push({ 
       title: `Statistiques et tendances: ${query} en 2024`, 
       url: `https://research.example.com/stats/${queryFormatted}-2024` 
     });
     
-    // Sources spécifiques au thème
     switch (theme) {
       case 'seo':
         sources.push({ 
@@ -431,8 +507,20 @@ const AiSearchButton = () => {
     
     // Charger des questions suggérées aléatoires au démarrage
     const allCategories = Object.keys(suggestedQuestionsByCategory) as Array<keyof typeof suggestedQuestionsByCategory>;
-    const randomCategory = allCategories[Math.floor(Math.random() * allCategories.length)];
-    setSuggestedQuestions(suggestedQuestionsByCategory[randomCategory]);
+    const randomCategories = shuffleArray(allCategories).slice(0, 2); // Prend 2 catégories au hasard
+    
+    let randomQuestions: string[] = [];
+    randomCategories.forEach(category => {
+      const categoryQuestions = suggestedQuestionsByCategory[category];
+      // Ajoute 2-3 questions aléatoires de chaque catégorie
+      const numToAdd = Math.floor(Math.random() * 2) + 2; // 2 ou 3 questions
+      randomQuestions = [
+        ...randomQuestions,
+        ...shuffleArray(categoryQuestions).slice(0, numToAdd)
+      ];
+    });
+    
+    setSuggestedQuestions(randomQuestions);
   };
 
   const handleSuggestedQuestionClick = (question: string) => {
