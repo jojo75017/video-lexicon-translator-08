@@ -203,7 +203,8 @@ const AiSearchButton = () => {
   const extractKeyPoints = (response: string): string[] => {
     const sentences = response.split(/\.\s+/).filter(s => s.length > 30);
     
-    const numPoints = Math.min(Math.max(3, Math.floor(sentences.length / 3)), 5);
+    // Ajouter de l'aléatoire dans le nombre de points clés
+    const numPoints = Math.min(Math.max(3, Math.floor(sentences.length / 3)), 5 + Math.floor(Math.random() * 3));
     
     const keyPointSentences = [];
     
@@ -211,11 +212,17 @@ const AiSearchButton = () => {
       return sentences.map(s => s.trim() + '.');
     }
     
-    const step = Math.floor(sentences.length / numPoints);
-    for (let i = 0; i < numPoints; i++) {
-      const index = Math.min(i * step, sentences.length - 1);
-      keyPointSentences.push(sentences[index].trim() + '.');
+    // Sélectionner des phrases aléatoires pour plus de variété
+    const selectedIndexes = new Set<number>();
+    while (selectedIndexes.size < numPoints && selectedIndexes.size < sentences.length) {
+      const randomIndex = Math.floor(Math.random() * sentences.length);
+      selectedIndexes.add(randomIndex);
     }
+    
+    // Convertir le Set en array et trier pour garder l'ordre logique du texte
+    Array.from(selectedIndexes).sort().forEach(index => {
+      keyPointSentences.push(sentences[index].trim() + '.');
+    });
     
     return keyPointSentences;
   };
@@ -225,6 +232,7 @@ const AiSearchButton = () => {
     const baseKeywords = [query];
     let themeKeywords: string[] = [];
     
+    // Générer des mots-clés spécifiques au thème
     switch (theme) {
       case 'marketing':
         themeKeywords = [
@@ -236,7 +244,10 @@ const AiSearchButton = () => {
           `${query} automation`,
           `${query} tendances`,
           `${query} analytics`,
-          `${query} conversion`
+          `${query} conversion`,
+          `${query} campagne`,
+          `${query} objectifs`,
+          `${query} budget`
         ];
         break;
       case 'seo':
@@ -249,7 +260,10 @@ const AiSearchButton = () => {
           `${query} technique`,
           `${query} local`,
           `${query} mobile`,
-          `${query} analytics`
+          `${query} analytics`,
+          `${query} sémantique`,
+          `${query} position zéro`,
+          `${query} e-réputation`
         ];
         break;
       case 'ecommerce':
@@ -353,13 +367,18 @@ const AiSearchButton = () => {
           `${query} meilleures pratiques`,
           `${query} tendances`,
           `${query} conseils`,
-          `${query} ressources`
+          `${query} ressources`,
+          `${query} formation`,
+          `${query} expertise`,
+          `${query} comparatif`
         ];
     }
     
     const allKeywords = [...baseKeywords, ...themeKeywords];
     
-    return shuffleArray(allKeywords).slice(0, Math.floor(Math.random() * 4) + 5);
+    // Aléatoire dans le nombre de mots-clés retournés (entre 5 et 9)
+    const numKeywords = Math.floor(Math.random() * 5) + 5;
+    return shuffleArray(allKeywords).slice(0, numKeywords);
   };
 
   // Fonction pour générer des sources pertinentes
@@ -367,115 +386,97 @@ const AiSearchButton = () => {
     const sources = [];
     const queryFormatted = query.replace(/\s+/g, '-').toLowerCase();
     
+    // Ajouter de la variété dans la génération des sources
+    const currentYear = new Date().getFullYear();
+    const randomMonth = Math.floor(Math.random() * 12) + 1;
+    const randomDay = Math.floor(Math.random() * 28) + 1;
+    const dateStr = `${currentYear}-${String(randomMonth).padStart(2, '0')}-${String(randomDay).padStart(2, '0')}`;
+    
+    // Domains variés pour les sources
+    const domains = [
+      "example.com",
+      "expertguide.org",
+      "proinsights.net",
+      "industrytrends.io",
+      "researchtopics.com",
+      "digitalstrategies.co",
+      "expertopinion.org",
+      "businessanalytics.net"
+    ];
+    
+    // Sélectionner 2 domaines aléatoires différents
+    const selectedDomains = shuffleArray([...domains]).slice(0, 3);
+    
     sources.push({ 
-      title: `Guide complet sur ${query}`, 
-      url: `https://example.com/guide/${queryFormatted}` 
+      title: `Guide complet sur ${query} (${currentYear})`, 
+      url: `https://${selectedDomains[0]}/guide/${queryFormatted}?updated=${dateStr}` 
     });
     
     sources.push({ 
-      title: `Statistiques et tendances: ${query} en 2024`, 
-      url: `https://research.example.com/stats/${queryFormatted}-2024` 
+      title: `Statistiques et tendances: ${query} en ${currentYear}`, 
+      url: `https://${selectedDomains[1]}/stats/${queryFormatted}-${currentYear}` 
     });
     
+    // Sources spécifiques au thème
     switch (theme) {
       case 'seo':
         sources.push({ 
-          title: `Étude de cas: Comment nous avons amélioré le classement pour "${query}"`, 
-          url: `https://seostudies.example.com/case-study/${queryFormatted}` 
-        });
-        sources.push({ 
-          title: `Guide technique SEO pour ${query}`, 
-          url: `https://developers.google.com/search/docs/advanced/guidelines` 
+          title: `Étude de cas: Amélioration du classement pour "${query}" en ${Math.floor(Math.random() * 3) + 1} mois`, 
+          url: `https://${selectedDomains[2]}/case-study/${queryFormatted}` 
         });
         break;
       case 'marketing':
         sources.push({ 
-          title: `10 stratégies de ${query} qui ont fait leurs preuves`, 
-          url: `https://marketing.example.com/strategies/${queryFormatted}` 
-        });
-        sources.push({ 
-          title: `Mesurer le ROI de vos initiatives de ${query}`, 
-          url: `https://analytics.example.com/roi/${queryFormatted}` 
+          title: `${Math.floor(Math.random() * 10) + 5} stratégies de ${query} prouvées par les données`, 
+          url: `https://${selectedDomains[2]}/strategies/${queryFormatted}` 
         });
         break;
       case 'ecommerce':
-        sources.push({ 
-          title: `Optimisation de la conversion pour ${query}`, 
-          url: `https://ecommerce.example.com/conversion/${queryFormatted}` 
-        });
-        sources.push({ 
-          title: `Tendances ${query} pour les boutiques en ligne`, 
-          url: `https://trends.example.com/ecommerce/${queryFormatted}` 
+        sources.push({
+          title: `Optimisation de la conversion pour ${query}`,
+          url: `https://${selectedDomains[2]}/conversion/${queryFormatted}`
         });
         break;
       case 'contenu':
-        sources.push({ 
-          title: `Stratégie de contenu pour ${query}: Guide étape par étape`, 
-          url: `https://content.example.com/strategy/${queryFormatted}` 
-        });
-        sources.push({ 
-          title: `Exemples inspirants de ${query} qui convertit`, 
-          url: `https://inspiration.example.com/content/${queryFormatted}` 
+        sources.push({
+          title: `Stratégie de contenu pour ${query}: Guide étape par étape`,
+          url: `https://${selectedDomains[2]}/strategy/${queryFormatted}`
         });
         break;
       case 'reseaux_sociaux':
-        sources.push({ 
-          title: `Comment utiliser ${query} sur les réseaux sociaux en 2024`, 
-          url: `https://social.example.com/howto/${queryFormatted}` 
-        });
-        sources.push({ 
-          title: `Les métriques à suivre pour votre stratégie ${query}`, 
-          url: `https://metrics.example.com/social/${queryFormatted}` 
+        sources.push({
+          title: `Comment utiliser ${query} sur les réseaux sociaux en ${currentYear}`,
+          url: `https://${selectedDomains[2]}/howto/${queryFormatted}`
         });
         break;
       case 'voyage':
-        sources.push({ 
-          title: `Les meilleures destinations pour ${query} en 2024`, 
-          url: `https://travel.example.com/destinations/${queryFormatted}` 
-        });
-        sources.push({ 
-          title: `Guide pour voyageurs: Tout savoir sur ${query}`, 
-          url: `https://traveler.example.com/guides/${queryFormatted}` 
+        sources.push({
+          title: `Les meilleures destinations pour ${query} en ${currentYear}`,
+          url: `https://${selectedDomains[2]}/destinations/${queryFormatted}`
         });
         break;
       case 'sante':
-        sources.push({ 
-          title: `Études scientifiques sur ${query} et la santé`, 
-          url: `https://health.example.com/research/${queryFormatted}` 
-        });
-        sources.push({ 
-          title: `Plan de 30 jours pour améliorer votre ${query}`, 
-          url: `https://wellness.example.com/programs/${queryFormatted}` 
+        sources.push({
+          title: `Études scientifiques sur ${query} et la santé`,
+          url: `https://${selectedDomains[2]}/research/${queryFormatted}`
         });
         break;
       case 'technologie':
-        sources.push({ 
-          title: `Comment implémenter ${query} dans votre entreprise`, 
-          url: `https://tech.example.com/implementation/${queryFormatted}` 
-        });
-        sources.push({ 
-          title: `L'avenir de ${query}: Tendances et prévisions`, 
-          url: `https://future.example.com/tech/${queryFormatted}` 
+        sources.push({
+          title: `Comment implémenter ${query} dans votre entreprise`,
+          url: `https://${selectedDomains[2]}/implementation/${queryFormatted}`
         });
         break;
       case 'business':
-        sources.push({ 
-          title: `Étude de cas: Comment ${query} a transformé notre entreprise`, 
-          url: `https://business.example.com/cases/${queryFormatted}` 
-        });
-        sources.push({ 
-          title: `Guide pour entrepreneurs: Maîtriser ${query}`, 
-          url: `https://startup.example.com/guides/${queryFormatted}` 
+        sources.push({
+          title: `Étude de cas: Comment ${query} a transformé notre entreprise`,
+          url: `https://${selectedDomains[2]}/cases/${queryFormatted}`
         });
         break;
       default:
         sources.push({ 
-          title: `FAQ sur ${query}: Réponses aux questions courantes`, 
-          url: `https://example.com/faq/${queryFormatted}` 
-        });
-        sources.push({ 
-          title: `Ressources pour en apprendre plus sur ${query}`, 
-          url: `https://example.com/resources/${queryFormatted}` 
+          title: `FAQ sur ${query}: Réponses aux questions fréquentes`, 
+          url: `https://${selectedDomains[2]}/faq/${queryFormatted}` 
         });
     }
     
@@ -505,7 +506,7 @@ const AiSearchButton = () => {
   const handleOpenDialog = () => {
     setIsOpen(true);
     
-    // Charger des questions suggérées aléatoires au démarrage
+    // Charger des questions suggérées aléatoires au démarrage en sélectionnant 2 catégories aléatoires
     const allCategories = Object.keys(suggestedQuestionsByCategory) as Array<keyof typeof suggestedQuestionsByCategory>;
     const randomCategories = shuffleArray(allCategories).slice(0, 2); // Prend 2 catégories au hasard
     

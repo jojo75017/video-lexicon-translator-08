@@ -82,7 +82,42 @@ export const questionCategories = {
   ]
 };
 
-// Réponses préconfigurées pour différentes questions
+// Réponses variées pour différents thèmes
+// Pour chaque thème, plusieurs variantes de réponses sont disponibles
+const questionResponseVariants = {
+  seo: [
+    "Pour améliorer votre référencement en 2024, concentrez-vous sur l'expérience utilisateur, le contenu E-E-A-T et les Core Web Vitals. Google privilégie désormais les sites qui offrent une expérience fluide et du contenu de qualité. Optimisez votre site pour mobile, améliorez la vitesse de chargement et créez du contenu qui répond précisément aux questions des utilisateurs. L'IA peut vous aider à identifier les opportunités de contenu et à analyser les intentions de recherche, mais assurez-vous que votre contenu reste authentique et apporte une réelle valeur ajoutée.",
+    "Le référencement en 2024 nécessite une approche holistique qui va au-delà des mots-clés. Privilégiez la création de contenu exhaustif qui couvre un sujet en profondeur plutôt que de nombreux articles courts. Utilisez le balisage schema.org pour aider Google à comprendre votre contenu. Les signaux comportementaux comme le temps passé sur page et le taux de rebond sont devenus des facteurs déterminants. Enfin, n'oubliez pas l'importance croissante de la recherche vocale et de l'optimisation pour les featured snippets.",
+    "En 2024, le référencement s'oriente davantage vers la satisfaction de l'intention de recherche que vers l'optimisation technique pure. Les mises à jour récentes de Google (comme Helpful Content Update) récompensent les sites qui répondent réellement aux besoins des utilisateurs. Créez du contenu original, basé sur votre expertise, et structuré de manière logique. L'optimisation technique reste importante (vitesse, responsive design, sécurité), mais elle doit servir l'expérience utilisateur plutôt que d'être une fin en soi."
+  ],
+  marketing: [
+    "Les stratégies de marketing digital les plus efficaces en 2024 combinent plusieurs approches complémentaires. Le marketing de contenu personnalisé basé sur les données comportementales permet de cibler précisément chaque segment d'audience. L'automatisation marketing intelligente optimise les campagnes en temps réel. Les micro-influenceurs offrent souvent un meilleur ROI que les célébrités, avec un taux d'engagement jusqu'à 60% supérieur. Enfin, l'intégration omnicanale assure une expérience cohérente entre tous les points de contact client.",
+    "Pour maximiser l'impact de votre marketing digital, adoptez une approche centrée sur les données tout en préservant l'authenticité de votre marque. Les vidéos courtes génèrent 30% plus d'engagement que les formats traditionnels. Le marketing conversationnel via chatbots et messageries instantanées permet de répondre aux attentes de réactivité des consommateurs. Les stratégies de social listening vous aident à identifier les tendances émergentes et à anticiper les besoins de votre audience avant vos concurrents.",
+    "Le marketing digital performant en 2024 repose sur l'hyperpersonnalisation et l'éthique. Les consommateurs attendent des marques qu'elles les comprennent parfaitement tout en respectant leur vie privée. Le contenu généré par les utilisateurs (UGC) est devenu crucial, avec une confiance 92% plus élevée que dans la publicité traditionnelle. Les expériences immersives (AR/VR) augmentent le temps d'engagement de 47%. Enfin, la transparence sur vos valeurs et pratiques commerciales n'est plus optionnelle mais essentielle pour bâtir des relations durables avec vos clients."
+  ],
+  voyage: [
+    "Parmi les destinations européennes les plus abordables en 2024, la Bulgarie se distingue avec un coût de vie 50% moins élevé que la moyenne européenne. Sofia, sa capitale, offre des nuits d'hôtel à partir de 30€ et des repas complets pour moins de 10€. L'Albanie, encore préservée du tourisme de masse, propose des plages comparables à celles de la Grèce à des prix bien inférieurs. En Europe centrale, Budapest et Cracovie continuent d'offrir un excellent rapport qualité-prix avec une vie nocturne animée et un riche patrimoine culturel accessible pour environ 40€/jour tout compris.",
+    "Pour voyager économiquement en Europe, privilégiez les destinations moins connues comme la côte baltique estonienne, les montagnes roumaines des Carpates ou les villes secondaires du Portugal (Braga, Coimbra). Les périodes de novembre à mars (hors vacances scolaires) permettent d'économiser jusqu'à 40% sur l'hébergement et de profiter d'une expérience plus authentique, loin des foules estivales. Utilisez des applications comme Hopper pour prédire les fluctuations de prix des billets d'avion et réserver au moment optimal, généralement 2-3 mois avant le départ.",
+    "Les voyageurs à petit budget devraient considérer l'Europe de l'Est et les Balkans en 2024. La Macédoine du Nord offre des paysages spectaculaires et le magnifique lac d'Ohrid pour moins de 35€/jour en budget backpacker. La Pologne combine architecture médiévale, histoire fascinante et cuisine délicieuse à des prix très compétitifs. Pour réduire les coûts, envisagez le house-sitting (garde de maison) qui permet un hébergement gratuit, ou les cartes touristiques qui incluent transports et entrées aux attractions principales avec des réductions significatives."
+  ],
+  technologie: [
+    "L'intelligence artificielle transforme les entreprises à plusieurs niveaux stratégiques. Au niveau opérationnel, l'IA automatise les tâches répétitives, réduisant les coûts administratifs de 20-30%. Dans la chaîne d'approvisionnement, les algorithmes prédictifs améliorent la précision des prévisions de demande de 10-40%, optimisant drastiquement la gestion des stocks. L'expérience client bénéficie de la personnalisation en temps réel et des chatbots qui résolvent jusqu'à 80% des demandes simples. Au niveau stratégique, l'analyse avancée des données révèle de nouvelles opportunités de marché et stimule l'innovation produit.",
+    "La révolution de l'IA en entreprise se manifeste d'abord par l'augmentation de la productivité humaine plutôt que par son remplacement. Les technologies d'IA générative permettent aux équipes créatives de produire 3 à 5 fois plus de contenu exploratoire. Dans le développement logiciel, les outils de codage assisté par IA réduisent le temps de programmation de 30-40%. L'IA explicable (XAI) devient essentielle pour les décisions critiques, permettant aux équipes de comprendre et d'auditer le raisonnement des algorithmes. Les entreprises qui implémentent l'IA de manière éthique et centrée sur l'humain constatent une amélioration de l'engagement des employés de 22% en moyenne.",
+    "L'impact transformationnel de l'IA sur les entreprises concerne maintenant toutes les fonctions, y compris les plus traditionnelles. Dans les ressources humaines, les algorithmes prédictifs identifient les candidats à haut potentiel et prédisent les risques de départ avec une précision de 85%. Le marketing bénéficie de l'analyse des sentiments en temps réel, ajustant les campagnes selon les réactions des consommateurs. Dans la R&D, l'IA accélère la découverte scientifique en simulant des milliers de scénarios impossibles à tester manuellement. La démocratisation des outils no-code basés sur l'IA permet même aux PME d'accéder à ces capacités sans expertise technique interne."
+  ],
+  business: [
+    "Pour lancer une startup réussie, la validation du problème est l'étape la plus critique et pourtant la plus négligée. Avant de développer une solution, confirmez que le problème que vous ciblez est suffisamment important pour que les clients paient pour le résoudre. Conduisez au minimum 30-50 interviews approfondies avec des clients potentiels. Développez ensuite un MVP (Produit Minimum Viable) permettant de tester rapidement votre hypothèse de valeur avec un investissement minimal. Le modèle économique doit être défini avec des métriques claires et des hypothèses vérifiables, et votre équipe fondatrice doit couvrir les compétences techniques et business essentielles à votre secteur.",
+    "La réussite d'une startup repose sur trois piliers fondamentaux : le timing, l'équipe et l'exécution. Une étude de CB Insights montre que 42% des startups échouent par absence de besoin marché, d'où l'importance de valider votre idée avant tout investissement significatif. Privilégiez le bootstrapping initial pour garder le contrôle et démontrer la viabilité de votre concept avant de chercher des financements externes. Définissez une proposition de valeur unique (UVP) claire et mesurable. Adoptez une approche lean avec des cycles d'itération rapides basés sur les retours utilisateurs, et construisez votre structure juridique et financière pour faciliter la scalabilité future.",
+    "Les startups qui réussissent suivent rarement un chemin linéaire, mais adaptent constamment leur stratégie en fonction des retours du marché. Le concept de pivot stratégique est essentiel - près de 70% des startups à succès ont significativement modifié leur idée initiale. Commencez par un problème que vous connaissez personnellement, mais validez-le auprès d'un large échantillon. Construisez une communauté avant même votre produit pour créer une base d'early adopters engagés. Pour le financement, considérez les nouvelles alternatives comme le crowdfunding equity ou les SAFE notes avant de vous tourner vers le capital-risque traditionnel, qui dilue significativement votre participation."
+  ],
+  sante: [
+    "Pour équilibrer vie professionnelle et bien-être personnel, la gestion des frontières est essentielle. Établissez des limites claires entre vos heures de travail et votre temps personnel, et communiquez-les à vos collaborateurs. Pratiquez une activité physique régulière de 30 minutes minimum 5 fois par semaine, idéalement en extérieur pour bénéficier de la lumière naturelle. Intégrez des micro-pauses de 2-3 minutes toutes les heures pour réduire la fatigue cognitive. La technique Pomodoro (25 minutes de travail concentré suivies de 5 minutes de pause) peut améliorer votre productivité de 25% tout en réduisant l'épuisement mental.",
+    "L'équilibre travail-vie personnelle repose sur une approche holistique du bien-être. Privilégiez la qualité du sommeil en maintenant un horaire régulier et en créant une routine de déconnexion digitale 1h avant le coucher. L'alimentation anti-inflammatoire riche en acides gras oméga-3, antioxydants et fibres améliore les fonctions cognitives et la résistance au stress. La pratique de la pleine conscience pendant 10-15 minutes par jour réduit le cortisol (hormone du stress) de 23% en moyenne. Enfin, entretenez activement vos relations sociales significatives, qui constituent le prédicteur le plus fiable de longévité et de satisfaction existentielle selon l'étude Harvard Grant.",
+    "Pour maintenir un équilibre optimal entre vie professionnelle et personnelle, adoptez l'approche des 4 piliers: le mouvement (activité physique adaptée à votre profil), la récupération (sommeil de qualité et moments de détente), la nutrition personnalisée et la gestion émotionnelle. Les exercices de respiration cohérente (6 respirations par minute) pratiqués 5 minutes avant chaque réunion importante réduisent significativement l'anxiété et améliorent la clarté mentale. Intégrez des activités qui stimulent votre système parasympathique comme la marche lente, le yoga restauratif ou le bain de forêt. Enfin, la planification hebdomadaire intentionnelle, avec des plages réservées aux activités régénérantes, augmente de 78% la probabilité de maintenir cet équilibre sur le long terme."
+  ]
+};
+
+// Réponses préconfigurées pour différentes questions spécifiques
 export const questionResponses = {
   // SEO & Marketing digital
   "Comment améliorer mon référencement SEO en 2024 ?": 
@@ -116,49 +151,111 @@ export const questionResponses = {
     "Pour développer une culture d'entreprise positive et productive, commencez par définir clairement vos valeurs fondamentales et assurez-vous qu'elles guident réellement les décisions quotidiennes. Recrutez en fonction de l'adéquation culturelle autant que des compétences techniques. Instaurez la transparence à tous les niveaux: objectifs d'entreprise, défis, performances et opportunités d'amélioration. Promouvez l'autonomie responsable: donnez aux équipes des objectifs clairs mais la liberté sur les méthodes pour les atteindre. Établissez des systèmes de reconnaissance qui célèbrent à la fois les résultats et les comportements exemplifiant vos valeurs. Facilitez le développement professionnel avec des plans d'apprentissage personnalisés. Créez des espaces pour les feedbacks réguliers et anonymes, et agissez visiblement sur ces retours. Enfin, intégrez le bien-être dans la structure organisationnelle plutôt que comme un simple avantage: horaires flexibles, politiques anti-burnout et respect des frontières vie professionnelle/personnelle."
 };
 
-// Fonction pour obtenir une réponse adaptée à une question
+// Fonction améliorée pour obtenir une réponse adaptée et variée à une question
 export const getResponseForQuestion = (question: string): string => {
+  // Utiliser une fonction pour ajouter de l'aléatoire à l'heure actuelle
+  const getRandomSeed = () => {
+    return Date.now() + Math.floor(Math.random() * 1000);
+  };
+  
+  // Fonction pour sélectionner aléatoirement un élément dans un tableau
+  const getRandomElement = <T>(array: T[]): T => {
+    const randomIndex = Math.floor((getRandomSeed() % array.length));
+    return array[randomIndex];
+  };
+  
   // Vérifier si on a une réponse directe pour cette question exacte
   if (questionResponses[question]) {
     return questionResponses[question];
   }
   
-  // Sinon, essayer de trouver une réponse basée sur les mots-clés de la question
+  // Sinon, essayer de trouver une réponse basée sur le thème de la question
   const questionLower = question.toLowerCase();
+  let identifiedThemes: string[] = [];
   
-  // Identifier les mots-clés importants dans la question
-  let keywords = [];
-  
-  if (questionLower.includes("seo") || questionLower.includes("référencement") || questionLower.includes("google")) {
-    keywords.push("seo", "référencement");
+  // Identifier les thèmes potentiels dans la question
+  if (questionLower.includes("seo") || questionLower.includes("référencement") || 
+      questionLower.includes("google") || questionLower.includes("moteur") || 
+      questionLower.includes("classement") || questionLower.includes("position")) {
+    identifiedThemes.push("seo");
   }
   
-  if (questionLower.includes("marketing") || questionLower.includes("digital") || questionLower.includes("contenu")) {
-    keywords.push("marketing", "digital", "contenu");
+  if (questionLower.includes("marketing") || questionLower.includes("stratégie") || 
+      questionLower.includes("campagne") || questionLower.includes("publicité") || 
+      questionLower.includes("audience")) {
+    identifiedThemes.push("marketing");
   }
   
-  if (questionLower.includes("voyag") || questionLower.includes("destination") || questionLower.includes("tourisme")) {
-    keywords.push("voyage", "destination");
+  if (questionLower.includes("voyag") || questionLower.includes("destination") || 
+      questionLower.includes("tourisme") || questionLower.includes("europe") ||
+      questionLower.includes("pays") || questionLower.includes("vacances")) {
+    identifiedThemes.push("voyage");
   }
   
-  if (questionLower.includes("ia") || questionLower.includes("intelligence artificielle") || questionLower.includes("tech")) {
-    keywords.push("ia", "technologie");
+  if (questionLower.includes("ia") || questionLower.includes("intelligence artificielle") || 
+      questionLower.includes("tech") || questionLower.includes("digital") ||
+      questionLower.includes("transformation") || questionLower.includes("innovation")) {
+    identifiedThemes.push("technologie");
   }
   
-  if (questionLower.includes("entreprise") || questionLower.includes("startup") || questionLower.includes("business")) {
-    keywords.push("business", "entreprise");
+  if (questionLower.includes("entreprise") || questionLower.includes("startup") || 
+      questionLower.includes("business") || questionLower.includes("entrepreneur") ||
+      questionLower.includes("lancer") || questionLower.includes("financement")) {
+    identifiedThemes.push("business");
   }
   
-  // Pour chaque réponse disponible, vérifier si elle correspond aux mots-clés
-  for (const [key, value] of Object.entries(questionResponses)) {
-    const keyLower = key.toLowerCase();
+  if (questionLower.includes("santé") || questionLower.includes("bien-être") || 
+      questionLower.includes("équilibre") || questionLower.includes("stress") ||
+      questionLower.includes("sommeil") || questionLower.includes("alimentation")) {
+    identifiedThemes.push("sante");
+  }
+  
+  // Si aucun thème n'est identifié, essayer de détecter des mots-clés généraux
+  if (identifiedThemes.length === 0) {
+    // Détecter par des mots-clés plus généraux en dernier recours
+    const keywordMap = {
+      "site": "seo",
+      "contenu": "marketing",
+      "client": "business",
+      "produit": "business",
+      "développement": "technologie",
+      "optimisation": "seo",
+      "performance": "seo",
+      "expérience": "marketing",
+      "trafic": "seo",
+      "conversion": "marketing",
+      "budget": "voyage",
+      "efficacit": "business",
+      "stress": "sante"
+    };
     
-    // Vérifier s'il y a correspondance de mots-clés entre la question et la réponse existante
-    if (keywords.some(keyword => keyLower.includes(keyword))) {
-      return value;
+    for (const [keyword, theme] of Object.entries(keywordMap)) {
+      if (questionLower.includes(keyword)) {
+        identifiedThemes.push(theme);
+      }
     }
   }
   
-  // Réponse générique si aucune correspondance n'est trouvée
-  return "Cette question nécessite une analyse approfondie. En général, il est recommandé d'explorer différentes perspectives, d'analyser les données disponibles et de consulter des experts dans ce domaine spécifique. Pourriez-vous préciser davantage votre question pour que je puisse vous fournir une réponse plus détaillée et pertinente?";
+  // S'il y a des thèmes identifiés, sélectionner une réponse de l'un des thèmes
+  if (identifiedThemes.length > 0) {
+    // Prendre un thème aléatoire parmi ceux identifiés
+    const selectedTheme = getRandomElement(identifiedThemes);
+    
+    // Vérifier si ce thème a des variantes de réponses
+    if (questionResponseVariants[selectedTheme]) {
+      return getRandomElement(questionResponseVariants[selectedTheme]);
+    }
+  }
+  
+  // Générer une réponse générique créative si aucun thème spécifique n'est identifié
+  const genericResponses = [
+    `Votre question sur "${question}" est pertinente. Cette thématique nécessite une analyse à plusieurs niveaux. D'une part, il faut considérer les tendances actuelles et l'évolution des meilleures pratiques dans ce domaine. D'autre part, il est important d'adapter toute stratégie à votre contexte spécifique. Je vous suggère d'explorer les ressources spécialisées sur ce sujet tout en testant différentes approches pour déterminer ce qui fonctionne le mieux dans votre situation.`,
+    
+    `"${question}" est un sujet fascinant qui évolue constamment. Les experts recommandent généralement d'adopter une approche expérimentale et data-driven. Commencez par établir des métriques claires pour mesurer vos résultats, puis testez différentes stratégies à petite échelle avant de vous engager pleinement. N'hésitez pas à vous inspirer des cas d'études dans votre industrie tout en développant votre propre méthode unique adaptée à vos objectifs spécifiques.`,
+    
+    `Pour répondre efficacement à "${question}", il est essentiel de combiner théorie et pratique. La recherche académique sur ce sujet suggère que les facteurs clés de succès incluent la cohérence, l'innovation contrôlée et l'écoute active de votre audience. Je vous recommande de commencer par un audit de votre situation actuelle, puis d'établir un plan d'action progressif avec des objectifs SMART. N'oubliez pas que l'apprentissage continu et l'adaptation sont indispensables dans ce domaine en constante évolution.`
+  ];
+  
+  return getRandomElement(genericResponses);
 };
+
