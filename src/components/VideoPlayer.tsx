@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useEffect } from 'react';
 import SubtitleOverlay from './SubtitleOverlay';
 import { toast } from 'sonner';
@@ -29,12 +30,21 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const [videoError, setVideoError] = useState<string | null>(null);
   const [isTestingApi, setIsTestingApi] = useState(false);
 
+  // Debug logs
+  useEffect(() => {
+    console.log("VideoPlayer mounted with URL:", videoUrl);
+    console.log("Subtitles count:", subtitles.length);
+    console.log("Language:", language);
+    console.log("Show subtitles:", showSubtitles);
+  }, [videoUrl, subtitles, language, showSubtitles]);
+
   const testApiKey = async () => {
     setIsTestingApi(true);
     setVideoError(null);
     
     try {
       const apiKey = process.env.ELEVEN_LABS_API_KEY;
+      console.log("Testing API key:", apiKey ? "Present" : "Missing");
       
       if (!apiKey) {
         throw new Error('Clé API manquante. Veuillez configurer votre clé API Eleven Labs.');
@@ -54,6 +64,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         }),
       });
 
+      console.log("API test response status:", response.status);
+
       if (!response.ok) {
         if (response.status === 401) {
           throw new Error('Clé API invalide. Veuillez vérifier votre clé.');
@@ -65,6 +77,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       toast.success('Connexion à l\'API réussie !');
       return true;
     } catch (error) {
+      console.error("API test error:", error);
       const message = error instanceof Error ? error.message : "Erreur de connexion à l'API";
       toast.error(message);
       setVideoError(message);
@@ -154,18 +167,26 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video) {
+      console.log("Video ref not available");
+      return;
+    }
 
     const handleTimeUpdate = () => {
       setCurrentTime(video.currentTime);
     };
 
+    console.log("Adding event listeners to video element");
     video.addEventListener('timeupdate', handleTimeUpdate);
-    return () => video.removeEventListener('timeupdate', handleTimeUpdate);
+    return () => {
+      console.log("Removing event listeners from video element");
+      video.removeEventListener('timeupdate', handleTimeUpdate);
+    };
   }, []);
 
   useEffect(() => {
     if (videoUrl && language === 'fr') {
+      console.log("Testing API key due to video URL and language=fr");
       testApiKey(); // Test de l'API au chargement
     }
   }, [videoUrl, language]);
@@ -173,6 +194,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   // Gestion de l'audio traduit
   useEffect(() => {
     if (audioBlob && videoRef.current) {
+      console.log("Setting up audio playback with translated audio");
       const audioUrl = URL.createObjectURL(audioBlob);
       const audioElement = new Audio(audioUrl);
       
@@ -183,6 +205,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       });
 
       return () => {
+        console.log("Cleaning up audio playback");
         URL.revokeObjectURL(audioUrl);
         audioElement.pause();
       };
@@ -190,8 +213,19 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   }, [audioBlob]);
 
   const handleRetry = () => {
+    console.log("Retrying API connection");
     setVideoError(null);
     testApiKey();
+  };
+
+  const handleVideoError = (event: React.SyntheticEvent<HTMLVideoElement, Event>) => {
+    console.error("Video error event:", event);
+    const videoElement = event.currentTarget;
+    console.error("Video error:", videoElement.error);
+    
+    const errorMsg = "Erreur lors de la lecture de la vidéo";
+    setVideoError(errorMsg);
+    toast.error(errorMsg);
   };
 
   return (
@@ -209,11 +243,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             src={videoUrl}
             controls
             className="w-full h-full object-contain"
-            onError={() => {
-              const errorMsg = "Erreur lors de la lecture de la vidéo";
-              setVideoError(errorMsg);
-              toast.error(errorMsg);
-            }}
+            onError={handleVideoError}
           >
             Votre navigateur ne prend pas en charge la lecture vidéo.
           </video>
@@ -236,7 +266,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         </>
       )}
 
-      {showSubtitles && (
+      {showSubtitles && subtitles.length > 0 && (
         <SubtitleOverlay
           subtitles={subtitles}
           currentTime={currentTime}

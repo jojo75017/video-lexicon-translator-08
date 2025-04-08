@@ -104,7 +104,7 @@ export const tabs: Tab[] = [
     label: 'Métriques',
     description: 'KPIs et statistiques',
     icon: <PieChart />,
-    group: 'performance',
+    group: 'metrics',
     color: 'text-emerald-600'
   },
   {

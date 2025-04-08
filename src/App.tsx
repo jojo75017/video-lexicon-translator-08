@@ -21,32 +21,36 @@ import TranslationPage from "./pages/TranslationPage";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Accueil />} />
-          <Route path="/index" element={<Navigate to="/" replace />} />
-          <Route path="/seo" element={<OutilsSeo />} />
-          <Route path="/quora" element={<QuoraPage />} />
-          <Route path="/signature" element={<SignaturePage />} />
-          <Route path="/hierarchy" element={<HierarchyPage />} />
-          <Route path="/wordcount" element={<WordCountPage />} />
-          <Route path="/structure" element={<StructurePage />} />
-          <Route path="/performance" element={<PerformancePage />} />
-          <Route path="/analytics" element={<AnalyticsPage />} />
-          <Route path="/local-business" element={<LocalBusinessPage />} />
-          <Route path="/backlinks" element={<BacklinksPage />} />
-          <Route path="/metrics" element={<MetricsPage />} />
-          <Route path="/suggestions" element={<SuggestionsPage />} />
-          <Route path="/translation" element={<TranslationPage />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  console.log("App rendering with all routes");
+  
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Accueil />} />
+            <Route path="/index" element={<Navigate to="/" replace />} />
+            <Route path="/seo" element={<OutilsSeo />} />
+            <Route path="/quora" element={<QuoraPage />} />
+            <Route path="/signature" element={<SignaturePage />} />
+            <Route path="/hierarchy" element={<HierarchyPage />} />
+            <Route path="/wordcount" element={<WordCountPage />} />
+            <Route path="/structure" element={<StructurePage />} />
+            <Route path="/performance" element={<PerformancePage />} />
+            <Route path="/analytics" element={<AnalyticsPage />} />
+            <Route path="/local-business" element={<LocalBusinessPage />} />
+            <Route path="/backlinks" element={<BacklinksPage />} />
+            <Route path="/metrics" element={<MetricsPage />} />
+            <Route path="/suggestions" element={<SuggestionsPage />} />
+            <Route path="/translation" element={<TranslationPage />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

@@ -13,7 +13,7 @@ const VideoInput: React.FC<VideoInputProps> = ({ onVideoSubmit }) => {
 
   // Debug props
   useEffect(() => {
-    console.log("VideoInput props:", { onVideoSubmit: !!onVideoSubmit });
+    console.log("VideoInput mounted with props:", { onVideoSubmit: !!onVideoSubmit });
   }, [onVideoSubmit]);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -36,25 +36,20 @@ const VideoInput: React.FC<VideoInputProps> = ({ onVideoSubmit }) => {
     }
   };
 
-  const handleButtonClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    console.log("Video submit button clicked with:", videoUrl);
+  // For testing - add a sample URL
+  useEffect(() => {
+    // Sample video URLs for testing
+    const sampleUrls = [
+      "https://samplelib.com/lib/preview/mp4/sample-5s.mp4",
+      "https://www.w3schools.com/html/mov_bbb.mp4",
+      "https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4"
+    ];
     
-    if (!videoUrl) {
-      toast.error("Please enter a video URL");
-      return;
-    }
-    
-    // Call the callback explicitly
-    try {
-      console.log("Calling onVideoSubmit with:", videoUrl);
-      onVideoSubmit(videoUrl);
-      toast.success("Video URL submitted successfully");
-    } catch (error) {
-      console.error("Error submitting video URL:", error);
-      toast.error("Failed to submit video URL");
-    }
-  };
+    // Set a random sample URL for easier testing
+    const randomUrl = sampleUrls[Math.floor(Math.random() * sampleUrls.length)];
+    console.log("Setting sample video URL for testing:", randomUrl);
+    setVideoUrl(randomUrl);
+  }, []);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 w-full max-w-xl mx-auto">
@@ -66,12 +61,14 @@ const VideoInput: React.FC<VideoInputProps> = ({ onVideoSubmit }) => {
           onChange={(e) => setVideoUrl(e.target.value)}
           className="w-full"
         />
+        <p className="text-xs text-gray-500 italic">
+          Astuce: Une URL d'exemple a été ajoutée pour tester la fonctionnalité
+        </p>
       </div>
       <Button 
-        type="button" 
+        type="submit" 
         className="w-full bg-primary hover:bg-primary-600"
         disabled={!videoUrl}
-        onClick={handleButtonClick}
       >
         Load Video
       </Button>

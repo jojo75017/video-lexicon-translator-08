@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,17 @@ const TranslationPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [subtitles, setSubtitles] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState('url');
+  
+  // Debug component mount
+  useEffect(() => {
+    console.log("TranslationPage component mounted");
+    document.title = "Traduction Vidéo | SEO-GPT";
+    
+    // Vérifier si la page se charge correctement
+    toast.info("Page de traduction vidéo chargée", {
+      duration: 2000
+    });
+  }, []);
 
   const handleTranslate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,6 +38,11 @@ const TranslationPage = () => {
     }
     
     setIsLoading(true);
+    toast.info("Génération de la traduction en cours...", {
+      duration: 3000
+    });
+    
+    console.log("Starting translation for video:", videoUrl);
     
     // Simulated subtitle generation (in a real app, you would fetch these from an API)
     setTimeout(() => {
@@ -39,15 +55,19 @@ const TranslationPage = () => {
       
       setSubtitles(mockSubtitles);
       setIsLoading(false);
+      console.log("Translation generated, subtitles:", mockSubtitles.length);
       toast.success("Traduction générée avec succès !");
     }, 2000);
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    console.log("File uploaded:", file?.name);
+    
     if (file) {
       // Create an object URL for the uploaded file
       const objectUrl = URL.createObjectURL(file);
+      console.log("Created object URL:", objectUrl);
       setVideoUrl(objectUrl);
       toast.success(`Fichier "${file.name}" chargé avec succès`);
     }
@@ -242,6 +262,7 @@ const TranslationPage = () => {
             </p>
             <div className="flex items-center gap-6">
               <Link to="/" className="text-sm text-gray-500 hover:text-gray-900">Tableau de bord</Link>
+              <Link to="/quora" className="text-sm text-gray-500 hover:text-gray-900">Assistant Quora</Link>
               <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Confidentialité</a>
               <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Conditions</a>
             </div>

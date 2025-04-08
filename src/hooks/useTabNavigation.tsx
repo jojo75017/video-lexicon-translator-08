@@ -69,6 +69,7 @@ export const useTabNavigation = () => {
       'quora': '/quora',
       'signature': '/signature',
       'local-business': '/local-business',
+      'translation': '/translation',
       'tools': '/signature'
     };
     
@@ -105,9 +106,9 @@ export const useTabNavigation = () => {
       return tabs.filter(tab => ['analytics'].includes(tab.id));
     }
     else if (mainCategory === 'tools') {
-      return tabs.filter(tab => ['signature', 'quora', 'local-business'].includes(tab.id));
+      return tabs.filter(tab => ['signature', 'quora', 'local-business', 'translation'].includes(tab.id));
     }
-    else if (['quora', 'signature', 'local-business'].includes(mainCategory)) {
+    else if (['quora', 'signature', 'local-business', 'translation'].includes(mainCategory)) {
       // Pour ces catégories spéciales, afficher uniquement l'onglet correspondant
       return tabs.filter(tab => tab.id === mainCategory);
     }

@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -18,7 +17,8 @@ import {
   CheckCircle2,
   AlertTriangle,
   PencilLine,
-  Send
+  Send,
+  Video
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -32,6 +32,12 @@ const QuoraPage = () => {
   const [questionDetails, setQuestionDetails] = useState("");
   const [questionTopic, setQuestionTopic] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Debug logging on mount
+  useEffect(() => {
+    console.log("QuoraPage mounted");
+    document.title = "Quora Assistant | SEO-GPT";
+  }, []);
 
   const handleSubmitQuestion = (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,12 +78,20 @@ const QuoraPage = () => {
               <MessageSquareText className="h-6 w-6 text-[#b92b27]" />
               <h1 className="text-2xl font-bold tracking-tight">Assistant Quora</h1>
             </div>
-            <Link to="/">
-              <Button variant="outline" className="gap-2">
-                <ArrowLeft className="h-4 w-4" />
-                Retour au tableau de bord
-              </Button>
-            </Link>
+            <div className="flex gap-2">
+              <Link to="/translation">
+                <Button variant="outline" className="gap-2">
+                  <Video className="h-4 w-4" />
+                  Traduction Vidéo
+                </Button>
+              </Link>
+              <Link to="/">
+                <Button variant="outline" className="gap-2">
+                  <ArrowLeft className="h-4 w-4" />
+                  Retour au tableau de bord
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </header>
@@ -489,7 +503,7 @@ const QuoraPage = () => {
             </p>
             <div className="flex items-center gap-6">
               <Link to="/" className="text-sm text-gray-500 hover:text-gray-900">Tableau de bord</Link>
-              <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Confidentialité</a>
+              <Link to="/translation" className="text-sm text-gray-500 hover:text-gray-900">Traduction Vidéo</Link>
               <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Conditions d'utilisation</a>
               <a href="#" className="text-sm text-gray-500 hover:text-gray-900">Contact</a>
             </div>
