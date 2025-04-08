@@ -17,7 +17,8 @@ import {
   Zap,
   Tag,
   Edit3,
-  FileSignature
+  FileSignature,
+  Languages
 } from 'lucide-react';
 
 export const groupLabels: Record<string, string> = {
@@ -138,6 +139,17 @@ export const tabs: Tab[] = [
     icon: <FileSignature />,
     group: 'tools',
     color: 'text-blue-600',
+    highlighted: true
+  },
+  // Nouvel onglet pour la traduction vidéo
+  {
+    id: 'translation',
+    label: 'Traduction Vidéo',
+    description: 'Traduire vos vidéos de l\'anglais au français',
+    icon: <Languages />,
+    group: 'tools',
+    color: 'text-indigo-600',
+    isNew: true,
     highlighted: true
   },
   {

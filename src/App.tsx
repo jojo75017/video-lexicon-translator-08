@@ -17,6 +17,7 @@ import LocalBusinessPage from "./pages/LocalBusinessPage";
 import BacklinksPage from "./pages/BacklinksPage";
 import MetricsPage from "./pages/MetricsPage";
 import SuggestionsPage from "./pages/SuggestionsPage";
+import TranslationPage from "./pages/TranslationPage";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
           <Route path="/backlinks" element={<BacklinksPage />} />
           <Route path="/metrics" element={<MetricsPage />} />
           <Route path="/suggestions" element={<SuggestionsPage />} />
+          <Route path="/translation" element={<TranslationPage />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
