@@ -8,7 +8,9 @@ import { DailyUpdatesButton } from '../seo/buttons/DailyUpdatesButton';
 import { OrganizeButton } from '../seo/buttons/OrganizeButton';
 import MapButton from '../seo/buttons/MapButton';
 import { Card } from '@/components/ui/card';
-import { FileText, Eye, PieChart, Map, Bell, BarChart2, FolderTree } from 'lucide-react';
+import { FileText, Eye, PieChart, Map, Bell, BarChart2, FolderTree, Languages } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 
 const SeoActionButtons = () => {
   return (
@@ -18,10 +20,10 @@ const SeoActionButtons = () => {
           <div className="w-1 h-6 bg-indigo-600 rounded-full mr-3"></div>
           <h2 className="text-xl font-bold text-gray-800">Outils SEO essentiels</h2>
         </div>
-        <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">7 outils disponibles</span>
+        <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">8 outils disponibles</span>
       </div>
       
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-4">
         <ToolButton 
           icon={<FileText className="h-5 w-5 text-emerald-600" />}
           label="Nouveau"
@@ -57,6 +59,28 @@ const SeoActionButtons = () => {
           label="Structure"
           component={<OrganizeButton />}
         />
+        <Link to="/translation" className="block">
+          <div className="flex flex-col items-center p-4 bg-indigo-50 rounded-lg border border-indigo-200 shadow-sm transition-all duration-200 cursor-pointer hover:border-indigo-300 hover:shadow-md hover:translate-y-[-2px] relative">
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">Nouveau</span>
+            <div className="mb-2 p-2.5 bg-indigo-100 rounded-full shadow-inner">
+              <Languages className="h-5 w-5 text-indigo-600" />
+            </div>
+            <span className="text-sm font-medium text-indigo-700">Traduction</span>
+          </div>
+        </Link>
+      </div>
+
+      <div className="mt-6 flex justify-center">
+        <Button 
+          variant="default"
+          className="bg-indigo-600 hover:bg-indigo-700"
+          asChild
+        >
+          <Link to="/translation" className="flex items-center gap-2">
+            <Languages className="h-4 w-4" />
+            Traduire une vidéo (Anglais → Français)
+          </Link>
+        </Button>
       </div>
     </Card>
   );
