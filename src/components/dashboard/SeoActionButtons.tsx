@@ -8,7 +8,7 @@ import { DailyUpdatesButton } from '../seo/buttons/DailyUpdatesButton';
 import { OrganizeButton } from '../seo/buttons/OrganizeButton';
 import MapButton from '../seo/buttons/MapButton';
 import { Card } from '@/components/ui/card';
-import { FileText, Eye, PieChart, Map, Bell, BarChart2, FolderTree, Languages } from 'lucide-react';
+import { FileText, Eye, PieChart, Map, Bell, BarChart2, FolderTree, Languages, Upload } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
@@ -66,6 +66,10 @@ const SeoActionButtons = () => {
               <Languages className="h-5 w-5 text-indigo-600" />
             </div>
             <span className="text-sm font-medium text-indigo-700">Traduction</span>
+            <span className="text-xs text-indigo-500 flex items-center mt-1">
+              <Upload className="h-3 w-3 mr-1" />
+              URL/Fichier
+            </span>
           </div>
         </Link>
       </div>
@@ -78,7 +82,7 @@ const SeoActionButtons = () => {
         >
           <Link to="/translation" className="flex items-center gap-2">
             <Languages className="h-4 w-4" />
-            Traduire une vidéo (Anglais → Français)
+            Traduire une vidéo (URL ou téléchargement)
           </Link>
         </Button>
       </div>

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Search, FileText, TrendingUp, Languages } from 'lucide-react';
+import { Search, FileText, TrendingUp, Languages, Upload } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const FeatureCards = () => {
@@ -49,7 +49,13 @@ export const FeatureCards = () => {
               <p className="text-sm opacity-90">
                 Traduisez vos vidéos de l'anglais vers le français avec notre outil de traduction avancé
               </p>
-              <span className="inline-block mt-2 bg-white text-indigo-700 text-xs font-bold px-2 py-1 rounded">NOUVEAU</span>
+              <div className="mt-3 flex items-center gap-2">
+                <span className="inline-block bg-white text-indigo-700 text-xs font-bold px-2 py-1 rounded">NOUVEAU</span>
+                <span className="text-xs font-medium flex items-center gap-1">
+                  <Upload className="h-3 w-3" />
+                  URL ou téléchargement
+                </span>
+              </div>
             </div>
           </div>
         </div>
