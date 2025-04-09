@@ -1,14 +1,12 @@
-
 // Constantes pour les réponses Quora
-import { shuffle } from '@/lib/utils';
 
 // Définition des différentes structures de réponses
 const responseTemplates = [
-  "Pour répondre à cette question sur %SUJET%, il est important de comprendre que %POINT_CLE_1%. D'abord, %EXPLICATION_1%. Ensuite, %EXPLICATION_2%. Enfin, %CONCLUSION%.",
-  "%SUJET% est un domaine fascinant. Si l'on considère que %POINT_CLE_1%, on peut affirmer que %EXPLICATION_1%. Par ailleurs, %EXPLICATION_2%. En résumé, %CONCLUSION%.",
-  "En tant qu'expert en %SUJET%, je peux vous dire que %POINT_CLE_1%. Voici pourquoi: %EXPLICATION_1%. Il faut aussi considérer que %EXPLICATION_2%. Pour conclure, %CONCLUSION%.",
-  "D'après mon expérience avec %SUJET%, je dirais que %POINT_CLE_1%. En effet, %EXPLICATION_1%. De plus, %EXPLICATION_2%. En définitive, %CONCLUSION%.",
-  "La question sur %SUJET% mérite une analyse approfondie. Premièrement, %POINT_CLE_1%. À cet égard, %EXPLICATION_1%. Aussi, n'oublions pas que %EXPLICATION_2%. Pour résumer, %CONCLUSION%."
+  "Pour répondre à cette question sur **%SUJET%**, il est important de comprendre que **%POINT_CLE_1%**. D'abord, %EXPLICATION_1%. Ensuite, %EXPLICATION_2%. Par ailleurs, %EXPLICATION_3%. Pour conclure, %CONCLUSION%. \n\n**En résumé**, l'approche optimale concernant **%SUJET%** nécessite une compréhension approfondie et une application méthodique des principes évoqués.",
+  "**%SUJET%** est un domaine fascinant qui mérite une analyse détaillée. Si l'on considère que **%POINT_CLE_1%**, on peut affirmer que %EXPLICATION_1%. Par ailleurs, %EXPLICATION_2%. Il est également important de noter que %EXPLICATION_3%. En résumé, %CONCLUSION%. \n\n**Pour approfondir** votre compréhension de **%SUJET%**, je vous recommande d'explorer les ressources spécialisées dans ce domaine.",
+  "En tant qu'expert en **%SUJET%**, je peux vous affirmer que **%POINT_CLE_1%**. Voici pourquoi: %EXPLICATION_1%. Il faut aussi considérer que %EXPLICATION_2%. Un autre aspect souvent négligé est que %EXPLICATION_3%. Pour conclure, %CONCLUSION%. \n\n**N'hésitez pas** à me contacter pour approfondir certains aspects spécifiques de **%SUJET%** qui vous intéressent particulièrement.",
+  "D'après mon expérience avec **%SUJET%**, je dirais que **%POINT_CLE_1%**. En effet, %EXPLICATION_1%. De plus, %EXPLICATION_2%. Un point crucial à ne pas négliger: %EXPLICATION_3%. En définitive, %CONCLUSION%. \n\n**Les professionnels** qui réussissent dans le domaine de **%SUJET%** comprennent l'importance de ces différents facteurs et savent les intégrer efficacement.",
+  "La question sur **%SUJET%** mérite une analyse approfondie. Premièrement, **%POINT_CLE_1%**. À cet égard, %EXPLICATION_1%. Aussi, n'oublions pas que %EXPLICATION_2%. Les recherches récentes montrent également que %EXPLICATION_3%. Pour résumer, %CONCLUSION%. \n\n**Pour maximiser** vos résultats concernant **%SUJET%**, une approche systématique et informée est indispensable."
 ];
 
 // Banque de données pour les différents sujets
@@ -40,29 +38,33 @@ const subjectData: Record<string, {
       "le marketing n'est plus un département isolé mais doit être intégré à l'ensemble de l'entreprise"
     ]
   },
+  
   "seo": {
     points: [
-      "Google modifie constamment ses algorithmes",
-      "le contenu de qualité reste le facteur le plus important",
-      "les signaux utilisateurs ont un impact croissant sur le classement",
-      "l'optimisation technique est fondamentale",
-      "une stratégie de backlinks naturelle est essentielle"
+      "Google modifie constamment ses algorithmes et s'adapter est essentiel",
+      "le contenu de qualité reste le facteur le plus important pour un bon référencement",
+      "les signaux utilisateurs ont un impact croissant sur le classement dans les moteurs de recherche",
+      "l'optimisation technique est fondamentale pour maximiser votre visibilité",
+      "une stratégie de backlinks naturelle et cohérente est essentielle pour l'autorité de votre site"
     ],
     explications: [
-      "les mises à jour comme Core Web Vitals montrent l'importance croissante de l'expérience utilisateur",
-      "les sites avec un contenu E-A-T (Expertise, Autorité, Fiabilité) sont favorisés",
-      "la vitesse de chargement est un facteur crucial tant pour les utilisateurs que pour les moteurs de recherche",
-      "l'optimisation pour la recherche vocale devient de plus en plus importante",
-      "une structure de site claire aide les robots à comprendre et indexer votre contenu"
+      "les mises à jour comme Core Web Vitals montrent l'importance croissante de l'expérience utilisateur et un site lent ou difficile à utiliser sera pénalisé",
+      "les sites avec un contenu E-A-T (Expertise, Autorité, Fiabilité) sont fortement favorisés par Google, et cette tendance se renforce chaque année",
+      "la vitesse de chargement est un facteur crucial tant pour les utilisateurs que pour les moteurs de recherche, chaque milliseconde compte",
+      "l'optimisation pour la recherche vocale devient incontournable avec la multiplication des assistants virtuels et des recherches mobiles",
+      "une structure de site claire et une architecture de l'information bien pensée aident les robots à comprendre et indexer votre contenu efficacement",
+      "les balises méta et le balisage sémantique continuent de jouer un rôle important pour aider les moteurs à comprendre votre contenu",
+      "une stratégie de maillage interne bien conçue distribue efficacement le 'link juice' et améliore l'indexation"
     ],
     conclusions: [
-      "le SEO est un marathon, pas un sprint, et nécessite des efforts constants",
-      "une approche holistique combinant contenu, technique et autorité est nécessaire",
-      "rester à jour avec les meilleures pratiques SEO est essentiel pour maintenir vos positions",
-      "mesurer et analyser vos performances vous permettra d'affiner votre stratégie",
-      "le SEO doit s'intégrer dans votre stratégie marketing globale pour maximiser son impact"
+      "le SEO est un marathon, pas un sprint, et nécessite des efforts constants et une stratégie à long terme pour obtenir des résultats durables",
+      "une approche holistique combinant contenu de qualité, optimisation technique et développement de l'autorité est nécessaire pour se démarquer",
+      "rester à jour avec les meilleures pratiques SEO et les évolutions des algorithmes est essentiel pour maintenir et améliorer vos positions",
+      "mesurer et analyser régulièrement vos performances vous permettra d'affiner votre stratégie et d'identifier rapidement les opportunités d'amélioration",
+      "le SEO doit s'intégrer dans votre stratégie marketing globale pour maximiser son impact et assurer la cohérence de votre présence en ligne"
     ]
   },
+  
   "voyage": {
     points: [
       "la planification à l'avance peut vous faire économiser beaucoup d'argent",
@@ -180,25 +182,27 @@ const subjectData: Record<string, {
   },
   "default": {
     points: [
-      "chaque question mérite une analyse approfondie",
-      "il est important de considérer différentes perspectives",
-      "la recherche et les données sont essentielles pour une réponse informée",
-      "le contexte spécifique influence grandement la réponse",
-      "les solutions ne sont jamais universelles"
+      "chaque question mérite une analyse approfondie et personnalisée",
+      "il est important de considérer différentes perspectives pour une vision complète",
+      "la recherche et les données empiriques sont essentielles pour une réponse véritablement informée",
+      "le contexte spécifique influence grandement la pertinence et l'applicabilité de toute solution",
+      "les solutions universelles sont rares, et l'adaptation est généralement nécessaire"
     ],
     explications: [
-      "les experts dans ce domaine recommandent généralement une approche méthodique",
-      "plusieurs études ont montré des résultats variés selon les circonstances",
-      "l'expérience pratique montre souvent des nuances que la théorie ne capture pas",
-      "en analysant des cas similaires, on observe des tendances intéressantes",
-      "les dernières recherches dans ce domaine suggèrent de nouvelles approches"
+      "les experts dans ce domaine recommandent généralement une approche méthodique qui tient compte de toutes les variables pertinentes",
+      "plusieurs études académiques récentes ont montré des résultats variés selon les circonstances, ce qui souligne l'importance du contexte",
+      "l'expérience pratique sur le terrain montre souvent des nuances importantes que la théorie pure ne capture pas toujours adéquatement",
+      "en analysant des cas similaires dans différents contextes, on observe des tendances intéressantes qui peuvent guider notre approche",
+      "les dernières recherches dans ce domaine suggèrent de nouvelles méthodologies qui remettent en question certaines idées reçues",
+      "une analyse comparative des différentes approches révèle des avantages et inconvénients spécifiques selon les objectifs poursuivis",
+      "les témoignages d'experts et de praticiens confirment l'importance d'une personnalisation basée sur les besoins spécifiques"
     ],
     conclusions: [
-      "il n'existe pas de solution miracle, mais plutôt des approches adaptées à chaque situation",
-      "rester informé et ouvert aux nouvelles idées est essentiel dans ce domaine",
-      "la clé est de trouver un équilibre adapté à votre situation spécifique",
-      "l'apprentissage continu et l'adaptation sont nécessaires pour réussir",
-      "commencer par des étapes simples et progresser graduellement reste la meilleure approche"
+      "il n'existe pas de solution miracle universelle, mais plutôt des approches adaptées qui doivent être personnalisées à chaque situation particulière",
+      "rester informé et ouvert aux nouvelles idées et méthodologies est essentiel pour maintenir l'efficacité de vos pratiques dans ce domaine",
+      "la clé du succès réside dans un équilibre judicieux adapté à votre situation spécifique, vos ressources et vos objectifs à long terme",
+      "l'apprentissage continu, l'adaptation et l'amélioration itérative sont nécessaires pour réussir durablement dans cet environnement changeant",
+      "commencer par des étapes simples et progresser graduellement vers des stratégies plus sophistiquées reste généralement la meilleure approche pour obtenir des résultats"
     ]
   }
 };
@@ -245,6 +249,11 @@ function determineSubject(question: string): string {
   return 'default';
 }
 
+// Fonction pour sélectionner aléatoirement un élément d'un tableau
+function getRandomElement<T>(array: T[]): T {
+  return array[Math.floor(Math.random() * array.length)];
+}
+
 // Fonction principale pour générer une réponse
 export function getResponseForQuestion(question: string): string {
   // Déterminer le sujet de la question
@@ -254,13 +263,24 @@ export function getResponseForQuestion(question: string): string {
   const data = subjectData[subject] || subjectData.default;
   
   // Sélectionner aléatoirement un template de réponse
-  const template = responseTemplates[Math.floor(Math.random() * responseTemplates.length)];
+  const template = getRandomElement(responseTemplates);
   
   // Sélectionner aléatoirement des éléments pour la réponse
-  const point = data.points[Math.floor(Math.random() * data.points.length)];
-  const explication1 = data.explications[Math.floor(Math.random() * data.explications.length)];
-  const explication2 = data.explications[Math.floor(Math.random() * data.explications.length)];
-  const conclusion = data.conclusions[Math.floor(Math.random() * data.conclusions.length)];
+  const point = getRandomElement(data.points);
+  const explanations = [...data.explications]; // Créer une copie pour éviter de modifier l'original
+  
+  // Sélectionner 3 explications différentes
+  const explication1 = getRandomElement(explanations);
+  // Retirer l'explication sélectionnée pour éviter les doublons
+  const index1 = explanations.indexOf(explication1);
+  if (index1 > -1) explanations.splice(index1, 1);
+  
+  const explication2 = getRandomElement(explanations);
+  const index2 = explanations.indexOf(explication2);
+  if (index2 > -1) explanations.splice(index2, 1);
+  
+  const explication3 = getRandomElement(explanations);
+  const conclusion = getRandomElement(data.conclusions);
   
   // Extraire un sujet mentionné dans la question ou utiliser le sujet déterminé
   let extractedSubject = subject;
@@ -271,11 +291,25 @@ export function getResponseForQuestion(question: string): string {
     extractedSubject = potentialSubject;
   }
   
+  // Ajouter du contenu supplémentaire pour garantir une réponse longue
+  const additionalContent = `\n\n**Pour aller plus loin sur ${extractedSubject}**:\n\n` +
+    `• Explorez les ressources spécialisées et les dernières recherches dans ce domaine\n` +
+    `• Rejoignez des communautés professionnelles pour échanger avec d'autres experts\n` +
+    `• Suivez les influenceurs et leaders d'opinion qui partagent régulièrement du contenu pertinent\n` +
+    `• Participez à des webinaires et formations pour approfondir vos connaissances\n` +
+    `• Expérimentez différentes approches et mesurez les résultats pour identifier ce qui fonctionne le mieux dans votre contexte spécifique`;
+  
   // Remplacer les placeholders dans le template
-  return template
-    .replace('%SUJET%', extractedSubject)
-    .replace('%POINT_CLE_1%', point)
-    .replace('%EXPLICATION_1%', explication1)
-    .replace('%EXPLICATION_2%', explication2)
-    .replace('%CONCLUSION%', conclusion);
+  let response = template
+    .replace(/%SUJET%/g, extractedSubject)
+    .replace(/%POINT_CLE_1%/g, point)
+    .replace(/%EXPLANATION_1%/g, explication1)
+    .replace(/%EXPLANATION_2%/g, explication2)
+    .replace(/%EXPLANATION_3%/g, explication3)
+    .replace(/%CONCLUSION%/g, conclusion);
+  
+  // Ajouter le contenu supplémentaire pour garantir une longue réponse
+  response += additionalContent;
+  
+  return response;
 }
