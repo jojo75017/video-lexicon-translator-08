@@ -1,3 +1,4 @@
+
 // Constantes pour les réponses Quora
 
 // Définition des différentes structures de réponses
@@ -180,6 +181,121 @@ const subjectData: Record<string, {
       "aider les autres à se développer contribue également à notre propre croissance"
     ]
   },
+  "design": {
+    points: [
+      "la compréhension des besoins utilisateurs est fondamentale",
+      "la cohérence visuelle est essentielle pour une bonne expérience",
+      "l'équilibre entre esthétique et fonctionnalité est crucial",
+      "la typographie impacte fortement la perception et la lisibilité",
+      "la simplicité est souvent plus efficace que la complexité"
+    ],
+    explications: [
+      "la recherche utilisateur initiale permet d'économiser beaucoup de temps et d'argent dans le développement final",
+      "un système de design bien défini garantit une expérience cohérente à travers différentes plateformes et produits",
+      "les tests d'utilisabilité réguliers permettent d'identifier les problèmes que les designers ne peuvent pas voir",
+      "la théorie des couleurs influence significativement les émotions et les comportements des utilisateurs",
+      "le principe de Hick stipule que le temps nécessaire pour prendre une décision augmente avec le nombre d'options disponibles"
+    ],
+    conclusions: [
+      "un bon design est invisible et permet aux utilisateurs d'accomplir leurs tâches sans friction",
+      "l'itération constante basée sur des données réelles d'utilisation est la clé du succès",
+      "le design thinking offre une méthodologie éprouvée pour résoudre des problèmes complexes",
+      "l'accessibilité ne devrait jamais être une réflexion après-coup mais intégrée dès le départ",
+      "le meilleur design résulte d'une collaboration étroite entre designers, développeurs et parties prenantes"
+    ]
+  },
+  "programmation": {
+    points: [
+      "la planification avant le codage est essentielle",
+      "la lisibilité du code est plus importante que son ingéniosité",
+      "les tests automatisés sont indispensables pour un code robuste",
+      "l'apprentissage continu est inévitable dans ce domaine",
+      "la documentation est cruciale pour la maintenance à long terme"
+    ],
+    explications: [
+      "investir du temps dans l'architecture logicielle au début d'un projet permet d'éviter des refactorisations coûteuses plus tard",
+      "selon des études, les développeurs passent plus de 70% de leur temps à lire du code plutôt qu'à en écrire",
+      "le TDD (Test-Driven Development) peut réduire significativement le nombre de bugs en production",
+      "les revues de code régulières améliorent la qualité globale et facilitent le transfert de connaissances",
+      "les principes SOLID fournissent une base solide pour créer des systèmes maintenables et évolutifs"
+    ],
+    conclusions: [
+      "écrire du code, c'est communiquer avec d'autres développeurs, pas seulement avec l'ordinateur",
+      "la simplicité et la modularité sont préférables à des solutions complexes difficiles à maintenir",
+      "investir dans des outils et des processus de qualité accélère le développement sur le long terme",
+      "la collaboration et le partage de connaissances sont essentiels dans les équipes performantes",
+      "l'équilibre entre perfectionnisme et pragmatisme est la clé pour livrer des produits de qualité dans les délais"
+    ]
+  },
+  "intelligence artificielle": {
+    points: [
+      "la qualité des données est fondamentale pour des modèles performants",
+      "l'explicabilité devient aussi importante que la précision",
+      "les considérations éthiques doivent être intégrées dès la conception",
+      "l'IA générative transforme de nombreux secteurs créatifs",
+      "l'alignement des systèmes d'IA avec les valeurs humaines est crucial"
+    ],
+    explications: [
+      "les modèles de deep learning nécessitent généralement de grandes quantités de données annotées pour être efficaces",
+      "les biais présents dans les données d'entraînement se retrouvent amplifiés dans les résultats des algorithmes",
+      "les techniques d'IA fédérée permettent de préserver la confidentialité tout en bénéficiant de données distribuées",
+      "l'apprentissage par renforcement a permis des avancées majeures dans des domaines comme les jeux et la robotique",
+      "les modèles de fondation comme GPT ont démontré des capacités de généralisation surprenantes à travers différentes tâches"
+    ],
+    conclusions: [
+      "l'IA n'est pas une solution magique mais un outil puissant qui nécessite une implémentation réfléchie",
+      "le développement responsable de l'IA implique une collaboration entre technologues, éthiciens et régulateurs",
+      "la combinaison de l'expertise humaine et des capacités de l'IA offre le meilleur potentiel dans la plupart des domaines",
+      "les compétences d'ingénierie des prompts deviennent aussi importantes que la programmation traditionnelle",
+      "l'adoption de l'IA nécessite souvent une transformation organisationnelle pour maximiser ses bénéfices"
+    ]
+  },
+  "education": {
+    points: [
+      "l'apprentissage personnalisé devient de plus en plus accessible",
+      "les compétences socio-émotionnelles sont aussi importantes que les connaissances académiques",
+      "l'apprentissage tout au long de la vie est devenu une nécessité",
+      "la technologie peut transformer l'expérience éducative",
+      "l'évaluation formative est plus efficace que l'évaluation sommative"
+    ],
+    explications: [
+      "les approches pédagogiques comme la classe inversée montrent des résultats prometteurs en termes d'engagement",
+      "l'apprentissage par projet permet aux élèves de développer des compétences transversales essentielles",
+      "les neurosciences cognitives ont révélé l'importance de la récupération espacée pour la mémorisation à long terme",
+      "l'intelligence artificielle permet désormais de créer des parcours d'apprentissage adaptatifs à grande échelle",
+      "la gamification peut significativement améliorer la motivation et l'engagement des apprenants"
+    ],
+    conclusions: [
+      "une éducation efficace combine tradition pédagogique et innovation technologique",
+      "le rôle de l'enseignant évolue vers celui de facilitateur et de guide plutôt que de simple transmetteur de connaissances",
+      "cultiver la curiosité et l'amour de l'apprentissage est plus important que l'accumulation de faits",
+      "l'équité éducative reste un défi majeur qui nécessite des approches multidimensionnelles",
+      "préparer les élèves aux emplois du futur implique de développer leur adaptabilité et leur pensée critique"
+    ]
+  },
+  "investissement": {
+    points: [
+      "la diversification est fondamentale pour gérer le risque",
+      "l'investissement à long terme surperforme généralement le trading à court terme",
+      "comprendre son profil de risque est essentiel avant d'investir",
+      "les frais peuvent éroder significativement les rendements sur le long terme",
+      "l'éducation financière est le meilleur investissement initial"
+    ],
+    explications: [
+      "historiquement, les marchés actions ont généré un rendement annualisé d'environ 7-10% sur le long terme",
+      "l'effet des intérêts composés fait que même de petites sommes investies tôt peuvent générer des montants importants",
+      "les investisseurs particuliers qui tentent de \"battre le marché\" sous-performent généralement les indices",
+      "les ETF indiciels offrent une diversification instantanée avec des frais généralement très faibles",
+      "les biais comportementaux comme l'aversion aux pertes influencent souvent négativement les décisions d'investissement"
+    ],
+    conclusions: [
+      "un plan d'investissement simple et discipliné est souvent plus efficace que des stratégies complexes",
+      "investir régulièrement indépendamment des conditions de marché (dollar-cost averaging) réduit le risque de timing",
+      "aligner ses investissements avec ses valeurs personnelles peut améliorer à la fois l'impact social et les rendements",
+      "rebalancer périodiquement son portefeuille permet de maintenir son allocation d'actifs cible",
+      "la patience et la discipline émotionnelle sont parmi les qualités les plus importantes pour réussir en investissement"
+    ]
+  },
   "default": {
     points: [
       "chaque question mérite une analyse approfondie et personnalisée",
@@ -246,6 +362,31 @@ function determineSubject(question: string): string {
     return 'développement personnel';
   }
   
+  if (lowerCaseQuestion.includes('design') || lowerCaseQuestion.includes('ux') || 
+      lowerCaseQuestion.includes('ui') || lowerCaseQuestion.includes('graphisme')) {
+    return 'design';
+  }
+  
+  if (lowerCaseQuestion.includes('programm') || lowerCaseQuestion.includes('code') || 
+      lowerCaseQuestion.includes('développement web') || lowerCaseQuestion.includes('logiciel')) {
+    return 'programmation';
+  }
+  
+  if (lowerCaseQuestion.includes('intelligence artificielle') || lowerCaseQuestion.includes('machine learning') || 
+      lowerCaseQuestion.includes('deep learning') || lowerCaseQuestion.includes('ia générative')) {
+    return 'intelligence artificielle';
+  }
+  
+  if (lowerCaseQuestion.includes('education') || lowerCaseQuestion.includes('apprentissage') || 
+      lowerCaseQuestion.includes('école') || lowerCaseQuestion.includes('enseignement')) {
+    return 'education';
+  }
+  
+  if (lowerCaseQuestion.includes('investissement') || lowerCaseQuestion.includes('finance') || 
+      lowerCaseQuestion.includes('bourse') || lowerCaseQuestion.includes('actions')) {
+    return 'investissement';
+  }
+  
   return 'default';
 }
 
@@ -303,9 +444,9 @@ export function getResponseForQuestion(question: string): string {
   let response = template
     .replace(/%SUJET%/g, extractedSubject)
     .replace(/%POINT_CLE_1%/g, point)
-    .replace(/%EXPLANATION_1%/g, explication1)
-    .replace(/%EXPLANATION_2%/g, explication2)
-    .replace(/%EXPLANATION_3%/g, explication3)
+    .replace(/%EXPLICATION_1%/g, explication1)
+    .replace(/%EXPLICATION_2%/g, explication2)
+    .replace(/%EXPLICATION_3%/g, explication3)
     .replace(/%CONCLUSION%/g, conclusion);
   
   // Ajouter le contenu supplémentaire pour garantir une longue réponse
@@ -313,3 +454,4 @@ export function getResponseForQuestion(question: string): string {
   
   return response;
 }
+
