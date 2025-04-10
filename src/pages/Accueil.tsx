@@ -4,7 +4,7 @@ import { PageLayout } from '@/components/layout/PageLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { Search, BarChart2, FileText, Globe } from 'lucide-react';
+import { Search, BarChart2, FileText, Globe, Image } from 'lucide-react';
 
 const Accueil = () => {
   return (
@@ -57,6 +57,29 @@ const Accueil = () => {
           </Card>
         </div>
         
+        {/* Nouvelle section pour Pinterest */}
+        <Card className="p-6 mb-8 bg-gradient-to-r from-red-50 to-white border-red-200">
+          <div className="flex flex-col md:flex-row gap-6 items-center">
+            <div className="w-16 h-16 rounded-full bg-red-100 flex-shrink-0 flex items-center justify-center">
+              <Image className="h-8 w-8 text-red-600" />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center space-x-2 mb-1">
+                <h3 className="text-xl font-bold text-gray-800">Images Pinterest</h3>
+                <span className="bg-red-100 text-red-700 text-xs px-2 py-0.5 rounded-full">Nouveau</span>
+              </div>
+              <p className="text-gray-600 mb-4">
+                Créez des visuels Pinterest optimisés (1000x1500) avec titres, descriptions et hashtags. Personnalisez vos designs et téléchargez des images prêtes à être partagées.
+              </p>
+              <Link to="/pinterest">
+                <Button className="bg-red-600 hover:bg-red-700">
+                  Créer des images Pinterest
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </Card>
+        
         <Card className="p-6 mb-8">
           <div className="flex flex-col md:flex-row gap-6 items-center">
             <div className="w-16 h-16 rounded-full bg-green-100 flex-shrink-0 flex items-center justify-center">
@@ -80,6 +103,20 @@ const Accueil = () => {
           <Card className="p-6">
             <h3 className="text-xl font-bold mb-4">Outils populaires</h3>
             <ul className="space-y-3">
+              <li>
+                <Link to="/pinterest" className="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 border-l-4 border-red-500">
+                  <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center mr-3">
+                    <Image className="h-4 w-4 text-red-600" />
+                  </div>
+                  <div>
+                    <div className="font-medium flex items-center">
+                      Images Pinterest
+                      <span className="ml-2 text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full">Nouveau</span>
+                    </div>
+                    <div className="text-sm text-gray-600">Créez des visuels Pinterest optimisés (1000x1500)</div>
+                  </div>
+                </Link>
+              </li>
               <li>
                 <Link to="/signature" className="flex items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100">
                   <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">

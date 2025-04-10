@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import { TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton"; 
@@ -8,6 +7,8 @@ import HierarchyTabContent from './HierarchyTabContent';
 import SeoResults from "@/components/SeoResults";
 import { CrawlForm } from "@/components/CrawlForm";
 import { useSiteAnalyzer } from "@/hooks/useSiteAnalyzer";
+import { Navigate, Link } from "react-router-dom";
+import PinterestGenerator from '@/components/pinterest/PinterestGenerator';
 
 interface TabContentsRendererProps {
   contentTabs: any[];
@@ -56,6 +57,11 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
         </AlertDescription>
       </Alert>
     );
+  }
+
+  // Si l'onglet Pinterest est actif, rediriger vers la page Pinterest
+  if (activeTab === 'pinterest') {
+    return <Navigate to="/pinterest" replace />;
   }
 
   return (
