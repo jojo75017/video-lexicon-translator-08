@@ -1,12 +1,11 @@
 
-import React, { useState, useRef, ChangeEvent } from 'react';
+import React, { useState, useRef, ChangeEvent, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -14,14 +13,18 @@ import { Image, Download, UploadCloud, Search, Palette, Tag, PenTool, RefreshCw,
 import { toast } from 'sonner';
 import html2canvas from 'html2canvas';
 import { PinterestPin, PinterestImage, PinterestDesign } from '@/types/pinterest';
-import { allImages, worldImages, europeImages, franceImages, pinterestDesigns, callToActions, popularHashtags } from '@/data/pinterestImages';
+import { pinterestDesigns, callToActions, popularHashtags } from '@/data/pinterestImages';
 import PinterestPreview from './PinterestPreview';
 import ImageGallery from './ImageGallery';
+import { searchPixabayImages, searchUnsplashImages, getPresetImagesByCategory } from '@/services/imageService';
 
 const PinterestGenerator: React.FC = () => {
   const [activeTab, setActiveTab] = useState('design');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedImageCategory, setSelectedImageCategory] = useState<'monde' | 'europe' | 'france' | 'all'>('all');
+  const [imageSource, setImageSource] = useState<'pixabay' | 'unsplash'>('pixabay');
+  const [images, setImages] = useState<PinterestImage[]>([]);
+  const [loading, setLoading] = useState(false);
   const [selectedHashtags, setSelectedHashtags] = useState<string[]>([]);
   const [customHashtag, setCustomHashtag] = useState('');
   const previewRef = useRef<HTMLDivElement>(null);
@@ -31,13 +34,31 @@ const PinterestGenerator: React.FC = () => {
     description: 'Explorez la ville romantique avec ses monuments emblématiques, sa gastronomie raffinée et son atmosphère unique. Un voyage inoubliable vous attend.',
     hashtags: ['paris', 'france', 'travel', 'eiffeltower'],
     callToAction: 'Découvrir',
-    image: franceImages[1], // Paris image
+    image: null,
     uploadedImage: null,
     design: pinterestDesigns[0]
   });
 
   const updatePin = (field: keyof PinterestPin, value: any) => {
     setPin({ ...pin, [field]: value });
+  };
+  
+  // Charger les images par défaut au montage du composant
+  useEffect(() => {
+    loadPresetImages();
+  }, [selectedImageCategory]);
+  
+  const loadPresetImages = async () => {
+    setLoading(true);
+    try {
+      const presetImages = await getPresetImagesByCategory(selectedImageCategory);
+      setImages(presetImages);
+    } catch (error) {
+      console.error("Erreur lors du chargement des images préréglées:", error);
+      toast.error("Impossible de charger les images préréglées");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -101,28 +122,34 @@ const PinterestGenerator: React.FC = () => {
     toast.success(`Image "${image.title}" sélectionnée`);
   };
 
-  const getFilteredImages = () => {
-    let images = allImages;
-    
-    if (selectedImageCategory === 'monde') {
-      images = worldImages;
-    } else if (selectedImageCategory === 'europe') {
-      images = europeImages;
-    } else if (selectedImageCategory === 'france') {
-      images = franceImages;
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) {
+      toast.warning("Veuillez entrer un terme de recherche");
+      return;
     }
     
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      return images.filter(
-        img => 
-          img.title.toLowerCase().includes(query) || 
-          img.country?.toLowerCase().includes(query) || 
-          img.region?.toLowerCase().includes(query)
-      );
+    setLoading(true);
+    try {
+      let searchResults: PinterestImage[] = [];
+      
+      if (imageSource === 'pixabay') {
+        searchResults = await searchPixabayImages(searchQuery);
+      } else {
+        searchResults = await searchUnsplashImages(searchQuery);
+      }
+      
+      if (searchResults.length === 0) {
+        toast.info("Aucun résultat trouvé. Essayez d'autres termes de recherche.");
+      } else {
+        setImages(searchResults);
+        toast.success(`${searchResults.length} images trouvées`);
+      }
+    } catch (error) {
+      console.error("Erreur lors de la recherche d'images:", error);
+      toast.error("Erreur lors de la recherche d'images");
+    } finally {
+      setLoading(false);
     }
-    
-    return images;
   };
 
   const handleDownload = async () => {
@@ -319,12 +346,12 @@ const PinterestGenerator: React.FC = () => {
               )}
               
               <div className="space-y-2">
-                <div className="flex space-x-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Select 
                     value={selectedImageCategory} 
                     onValueChange={(val: 'monde' | 'europe' | 'france' | 'all') => setSelectedImageCategory(val)}
                   >
-                    <SelectTrigger className="w-[200px]">
+                    <SelectTrigger className="w-full sm:w-[200px]">
                       <SelectValue placeholder="Catégorie" />
                     </SelectTrigger>
                     <SelectContent>
@@ -335,19 +362,41 @@ const PinterestGenerator: React.FC = () => {
                     </SelectContent>
                   </Select>
                   
-                  <div className="relative flex-1">
+                  <Select 
+                    value={imageSource} 
+                    onValueChange={(val: 'pixabay' | 'unsplash') => setImageSource(val)}
+                  >
+                    <SelectTrigger className="w-full sm:w-[150px]">
+                      <SelectValue placeholder="Source" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pixabay">Pixabay</SelectItem>
+                      <SelectItem value="unsplash">Unsplash</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  
+                  <div className="relative flex-1 flex items-center">
                     <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <Input
                       placeholder="Rechercher une image..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-8"
+                      className="pl-8 flex-1"
+                      onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                     />
+                    <Button 
+                      variant="secondary" 
+                      className="ml-2"
+                      onClick={handleSearch}
+                      disabled={loading}
+                    >
+                      {loading ? 'Chargement...' : 'Rechercher'}
+                    </Button>
                   </div>
                 </div>
                 
                 <ImageGallery 
-                  images={getFilteredImages()} 
+                  images={images} 
                   onSelectImage={handleSelectImage}
                   selectedImage={pin.image}
                 />
@@ -363,6 +412,7 @@ const PinterestGenerator: React.FC = () => {
                   value={customHashtag}
                   onChange={(e) => setCustomHashtag(e.target.value)}
                   className="flex-1"
+                  onKeyDown={(e) => e.key === 'Enter' && handleAddHashtag()}
                 />
                 <Button onClick={handleAddHashtag} type="button" disabled={!customHashtag}>
                   Ajouter
