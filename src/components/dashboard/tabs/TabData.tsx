@@ -18,7 +18,8 @@ import {
   Tag,
   Edit3,
   FileSignature,
-  Languages
+  Languages,
+  Image
 } from 'lucide-react';
 
 export const groupLabels: Record<string, string> = {
@@ -149,6 +150,17 @@ export const tabs: Tab[] = [
     icon: <Languages />,
     group: 'tools',
     color: 'text-indigo-600',
+    isNew: true,
+    highlighted: true
+  },
+  // Nouvel onglet pour Pinterest
+  {
+    id: 'pinterest',
+    label: 'Images Pinterest',
+    description: 'Créer des visuels Pinterest (1000x1500)',
+    icon: <Image />,
+    group: 'tools',
+    color: 'text-red-600',
     isNew: true,
     highlighted: true
   },

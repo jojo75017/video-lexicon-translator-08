@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { StepBack, StepForward, ArrowRight } from 'lucide-react';
+import { StepBack, StepForward, ArrowRight, Image } from 'lucide-react';
 import { toast } from "sonner";
 import { KeywordSuggestion } from "@/types/seo";
 import KeywordStep from './writer/KeywordStep';
@@ -15,6 +15,7 @@ import TwitterStep from './writer/TwitterStep';
 import LinkedInStep from './writer/LinkedInStep';
 import FacebookStep from './writer/FacebookStep';
 import { generateContentWithWordCount } from '@/utils/seo/contentGenerator';
+import { Link } from 'react-router-dom';
 
 interface AiWriterProps {
   keywords: KeywordSuggestion[];
@@ -193,6 +194,15 @@ const AiWriter: React.FC<AiWriterProps> = ({ keywords, onContentGenerated }) => 
                 Mode Facebook
               </Button>
             </div>
+            <Link to="/pinterest">
+              <Button 
+                variant="outline"
+                className="w-full flex items-center justify-center gap-2 border-red-500 text-red-500 hover:bg-red-50"
+              >
+                <Image className="h-4 w-4" />
+                Créer des images Pinterest (1000x1500)
+              </Button>
+            </Link>
           </div>
         )}
 
