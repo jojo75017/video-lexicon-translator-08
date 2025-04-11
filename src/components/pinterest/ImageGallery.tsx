@@ -17,9 +17,9 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onSelectImage, sele
       <ScrollArea className="h-[300px] w-full p-2">
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {images.length > 0 ? (
-            images.map(image => (
+            images.map((image, index) => (
               <div 
-                key={image.id}
+                key={`${image.source}-${image.id}-${index}`}
                 className={`relative rounded-md overflow-hidden cursor-pointer transition-all 
                   hover:opacity-90 group border ${selectedImage?.id === image.id ? 'ring-2 ring-primary' : ''}`}
                 onClick={() => onSelectImage(image)}
