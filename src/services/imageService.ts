@@ -3,15 +3,120 @@ import axios from 'axios';
 import { PixabayResponse, UnsplashResponse, PinterestImage } from '@/types/pinterest';
 import { toast } from 'sonner';
 
+// Mock image data for when APIs fail
+const MOCK_IMAGES = [
+  {
+    id: 'mock-1',
+    url: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=2073&auto=format&fit=crop',
+    title: 'Tour Eiffel, Paris',
+    category: 'france' as 'france',
+    country: 'France',
+    source: 'mock' as 'pixabay',
+    tags: ['paris', 'eiffel', 'architecture']
+  },
+  {
+    id: 'mock-2',
+    url: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?q=80&w=2073&auto=format&fit=crop',
+    title: 'Notre Dame, Paris',
+    category: 'france' as 'france',
+    country: 'France',
+    source: 'mock' as 'pixabay',
+    tags: ['paris', 'cathedral', 'architecture']
+  },
+  {
+    id: 'mock-3',
+    url: 'https://images.unsplash.com/photo-1522093007474-d86e9bf7ba6f?q=80&w=2064&auto=format&fit=crop',
+    title: 'Marseille Vieux Port',
+    category: 'france' as 'france',
+    country: 'France',
+    source: 'mock' as 'pixabay',
+    tags: ['marseille', 'port', 'mediterranean']
+  },
+  {
+    id: 'mock-4',
+    url: 'https://images.unsplash.com/photo-1520939817895-060bdaf4fe1b?q=80&w=2073&auto=format&fit=crop',
+    title: 'Lyon by Night',
+    category: 'france' as 'france',
+    country: 'France',
+    source: 'mock' as 'pixabay',
+    tags: ['lyon', 'night', 'city']
+  },
+  {
+    id: 'mock-5',
+    url: 'https://images.unsplash.com/photo-1562627090-efe63e5beeab?q=80&w=1965&auto=format&fit=crop',
+    title: 'Colosseum, Rome',
+    category: 'europe' as 'europe',
+    country: 'Italy',
+    source: 'mock' as 'pixabay',
+    tags: ['rome', 'colosseum', 'italy']
+  },
+  {
+    id: 'mock-6',
+    url: 'https://images.unsplash.com/photo-1558642084-fd07fae5282e?q=80&w=1936&auto=format&fit=crop',
+    title: 'Santorini, Greece',
+    category: 'europe' as 'europe',
+    country: 'Greece',
+    source: 'mock' as 'pixabay',
+    tags: ['santorini', 'greece', 'mediterranean']
+  },
+  {
+    id: 'mock-7',
+    url: 'https://images.unsplash.com/photo-1543832923-44667a44c804?q=80&w=1944&auto=format&fit=crop',
+    title: 'New York Skyline',
+    category: 'monde' as 'monde',
+    country: 'United States',
+    source: 'mock' as 'pixabay',
+    tags: ['new york', 'skyline', 'usa']
+  },
+  {
+    id: 'mock-8',
+    url: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=1950&auto=format&fit=crop',
+    title: 'Tokyo Tower',
+    category: 'monde' as 'monde',
+    country: 'Japan',
+    source: 'mock' as 'pixabay',
+    tags: ['tokyo', 'tower', 'japan']
+  }
+];
+
 // Clés d'API pour les services d'images
 // Dans un environnement de production, ces clés doivent être stockées dans des variables d'environnement
 const PIXABAY_API_KEY = '39696617-7bb5c5dbc12c51d28397ca3b0'; // Clé publique pour demo
 const UNSPLASH_ACCESS_KEY = 'HyoKoX5Yj8uIJBz_9dRrj3hVemnoXg66Pb--pXOgdlA'; // Clé publique pour demo
 
+// Function to get mock images filtered by query
+const getMockImages = (query: string, category: string = ''): PinterestImage[] => {
+  let filteredImages = [...MOCK_IMAGES];
+  
+  // Filter by query if provided
+  if (query) {
+    const lowerQuery = query.toLowerCase();
+    filteredImages = filteredImages.filter(img => 
+      img.title.toLowerCase().includes(lowerQuery) || 
+      img.country?.toLowerCase().includes(lowerQuery) ||
+      img.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
+    );
+  }
+  
+  // Filter by category if provided and not 'all'
+  if (category && category !== 'all') {
+    filteredImages = filteredImages.filter(img => img.category === category);
+  }
+  
+  console.log(`Found ${filteredImages.length} mock images for query: "${query}", category: "${category}"`);
+  return filteredImages;
+};
+
 // Fonction pour rechercher des images sur Pixabay
 export const searchPixabayImages = async (query: string, category: string = ''): Promise<PinterestImage[]> => {
   try {
     console.log('Searching Pixabay for:', query);
+    
+    // Temporarily use mock data due to API issues
+    console.log('Using mock data due to Pixabay API issues');
+    return getMockImages(query, category);
+    
+    /* Commented out real Pixabay API call due to issues
     const response = await axios.get<PixabayResponse>('https://pixabay.com/api/', {
       params: {
         key: PIXABAY_API_KEY,
@@ -44,10 +149,11 @@ export const searchPixabayImages = async (query: string, category: string = ''):
       source: 'pixabay',
       tags: image.tags.split(',').map(tag => tag.trim())
     }));
+    */
   } catch (error) {
     console.error('Erreur lors de la recherche sur Pixabay:', error);
-    toast.error('Impossible de récupérer les images depuis Pixabay');
-    return [];
+    toast.error('Impossible de récupérer les images depuis Pixabay. Utilisation des images locales.');
+    return getMockImages(query, category);
   }
 };
 
@@ -69,10 +175,8 @@ const generateTitleFromTags = (tags: string): string => {
 
 // Fonction pour rechercher des images sur Unsplash - désactivée pour le moment en raison de problèmes d'authentification
 export const searchUnsplashImages = async (query: string): Promise<PinterestImage[]> => {
-  // En raison des problèmes d'authentification avec l'API Unsplash, nous redirigerons vers Pixabay pour l'instant
-  console.log('Unsplash API a des problèmes d\'authentification, utilisation de Pixabay à la place');
-  toast.info('Recherche sur Pixabay (Unsplash temporairement indisponible)');
-  return searchPixabayImages(query);
+  console.log('Using mock data due to Unsplash API issues');
+  return getMockImages(query);
 };
 
 // Fonction pour mapper la catégorie en fonction de la requête
@@ -102,41 +206,8 @@ const extractLocationFromQuery = (query: string): string => {
 export const getPresetImagesByCategory = async (category: 'monde' | 'europe' | 'france' | 'all'): Promise<PinterestImage[]> => {
   console.log('Loading preset images for category:', category);
   
-  // Termes de recherche prédéfinis pour chaque catégorie
-  const searchTerms = {
-    monde: ['japon', 'états-unis', 'australie', 'canada', 'brésil'],
-    europe: ['italie', 'espagne', 'grèce', 'royaume-uni', 'allemagne'],
-    france: ['paris', 'provence', 'bretagne', 'normandie', 'alpes']
-  };
-  
-  try {
-    if (category === 'all') {
-      // Combiner toutes les recherches
-      const allTerms = [...searchTerms.monde, ...searchTerms.europe, ...searchTerms.france];
-      const randomTerms = allTerms.sort(() => 0.5 - Math.random()).slice(0, 5);
-      
-      console.log('Using random search terms for "all" category:', randomTerms);
-      
-      // Faire des recherches en parallèle
-      const results = await Promise.all(randomTerms.map(term => searchPixabayImages(term)));
-      const flatResults = results.flat();
-      
-      console.log(`Found ${flatResults.length} preset images for "all" category`);
-      return flatResults;
-    }
-    
-    // Rechercher des images pour la catégorie spécifique
-    console.log(`Using search terms for "${category}" category:`, searchTerms[category]);
-    const results = await Promise.all(searchTerms[category].map(term => searchPixabayImages(term)));
-    const flatResults = results.flat();
-    
-    console.log(`Found ${flatResults.length} preset images for "${category}" category`);
-    return flatResults;
-  } catch (error) {
-    console.error("Erreur lors du chargement des images prédéfinies:", error);
-    toast.error(`Erreur lors du chargement des images pour la catégorie "${category}"`);
-    return [];
-  }
+  // Use mock images instead of API calls
+  return getMockImages('', category);
 };
 
 // Fonction pour générer du contenu basé sur une image
