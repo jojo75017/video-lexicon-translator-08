@@ -92,6 +92,7 @@ const PinterestTabs: React.FC<PinterestTabsProps> = ({
         <TabsContent value="images">
           <ImagesTab 
             pin={pin}
+            updatePin={updatePin}
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
             selectedImageCategory={selectedImageCategory}

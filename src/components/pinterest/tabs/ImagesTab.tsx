@@ -11,6 +11,7 @@ import ImageGallery from '../ImageGallery';
 
 interface ImagesTabProps {
   pin: PinterestPin;
+  updatePin: (field: keyof PinterestPin, value: any) => void;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   selectedImageCategory: 'monde' | 'europe' | 'france' | 'all';
@@ -26,6 +27,7 @@ interface ImagesTabProps {
 
 const ImagesTab: React.FC<ImagesTabProps> = ({ 
   pin, 
+  updatePin,
   searchQuery, 
   setSearchQuery, 
   selectedImageCategory, 

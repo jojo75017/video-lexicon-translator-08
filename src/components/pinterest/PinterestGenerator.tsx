@@ -1,9 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { PinterestPin, PinterestImage } from '@/types/pinterest';
 import { pinterestDesigns } from '@/data/pinterestImages';
-import { searchPixabayImages, searchUnsplashImages, getPresetImagesByCategory } from '@/services/imageService';
+import { searchPixabayImages, searchUnsplashImages, getPresetImagesByCategory, generateContentFromImage } from '@/services/imageService';
 import { toast } from 'sonner';
 import PinterestPreviewCard from './PinterestPreviewCard';
 import PinterestTabs from './PinterestTabs';
@@ -85,7 +86,34 @@ const PinterestGenerator: React.FC = () => {
   const handleSelectImage = (image: PinterestImage) => {
     updatePin('image', image);
     updatePin('uploadedImage', null);
-    toast.success(`Image "${image.title}" sélectionnée`);
+    
+    // Générer automatiquement du contenu basé sur l'image
+    const generatedContent = generateContentFromImage(image);
+    
+    // Mettre à jour le titre et la description
+    updatePin('title', generatedContent.title);
+    updatePin('description', generatedContent.description);
+    
+    // Ajouter des hashtags basés sur l'image
+    if (image.tags && image.tags.length > 0) {
+      const newHashtags = [...pin.hashtags];
+      
+      // Ajouter jusqu'à 3 tags de l'image s'ils n'existent pas déjà
+      image.tags.slice(0, 3).forEach(tag => {
+        const cleanTag = tag.toLowerCase().replace(/[^\w\s]/g, '').trim();
+        if (cleanTag && !newHashtags.includes(cleanTag)) {
+          newHashtags.push(cleanTag);
+        }
+      });
+      
+      // Limiter à 10 hashtags maximum
+      updatePin('hashtags', newHashtags.slice(0, 10));
+    }
+    
+    toast.success(`Image "${image.title}" sélectionnée avec contenu généré`);
+    
+    // Passer automatiquement à l'onglet Contenu après la sélection d'une image
+    setActiveTab('content');
   };
 
   const handleSearch = async () => {
@@ -150,7 +178,7 @@ const PinterestGenerator: React.FC = () => {
         />
         
         <div className="flex justify-between pt-4">
-          <Button variant="outline" onClick={handleDownload}>
+          <Button variant="outline" onClick={() => handleDownload()}>
             <Download className="mr-2 h-4 w-4" />
             Télécharger
           </Button>

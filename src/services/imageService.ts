@@ -28,13 +28,17 @@ export const searchPixabayImages = async (query: string, category: string = ''):
     
     if (response.data.hits.length === 0) {
       console.log('No Pixabay results found');
+      toast.info(`Aucun résultat trouvé pour "${query}". Essayez d'autres termes.`);
       return [];
     }
 
+    // Ajouter des logs pour déboguer
+    console.log('First hit example:', response.data.hits[0]);
+
     return response.data.hits.map((image, index) => ({
       id: `pixabay-${image.id}-${index}`,
-      url: image.webformatURL || image.largeImageURL,
-      title: image.tags.split(',')[0] || 'Image Pixabay',
+      url: image.largeImageURL || image.webformatURL,
+      title: generateTitleFromTags(image.tags) || `Image de ${query}`,
       category: mapCategoryFromQuery(query),
       country: extractLocationFromQuery(query),
       source: 'pixabay',
@@ -47,49 +51,28 @@ export const searchPixabayImages = async (query: string, category: string = ''):
   }
 };
 
+// Fonction pour générer un titre à partir des tags
+const generateTitleFromTags = (tags: string): string => {
+  if (!tags) return '';
+  
+  const tagArray = tags.split(',').map(tag => tag.trim());
+  if (tagArray.length === 0) return '';
+  
+  // Capitaliser le premier tag
+  const firstTag = tagArray[0].charAt(0).toUpperCase() + tagArray[0].slice(1);
+  
+  if (tagArray.length === 1) return firstTag;
+  
+  // Ajouter un second tag s'il existe
+  return `${firstTag} ${tagArray[1]}`;
+};
+
 // Fonction pour rechercher des images sur Unsplash - désactivée pour le moment en raison de problèmes d'authentification
 export const searchUnsplashImages = async (query: string): Promise<PinterestImage[]> => {
   // En raison des problèmes d'authentification avec l'API Unsplash, nous redirigerons vers Pixabay pour l'instant
   console.log('Unsplash API a des problèmes d\'authentification, utilisation de Pixabay à la place');
   toast.info('Recherche sur Pixabay (Unsplash temporairement indisponible)');
   return searchPixabayImages(query);
-  
-  /* Code original désactivé:
-  try {
-    console.log('Searching Unsplash for:', query);
-    const response = await axios.get<UnsplashResponse>('https://api.unsplash.com/search/photos', {
-      params: {
-        query,
-        orientation: 'portrait',
-        per_page: 30,
-      },
-      headers: {
-        Authorization: `Client-ID ${UNSPLASH_ACCESS_KEY}`
-      }
-    });
-
-    console.log('Unsplash response:', response.data.results.length, 'results');
-    
-    if (response.data.results.length === 0) {
-      console.log('No Unsplash results found');
-      return [];
-    }
-
-    return response.data.results.map((image, index) => ({
-      id: `unsplash-${image.id}-${index}`,
-      url: image.urls.small || image.urls.regular,
-      title: image.description || image.alt_description || 'Image Unsplash',
-      category: mapCategoryFromQuery(query),
-      country: extractLocationFromQuery(query),
-      source: 'unsplash',
-      tags: image.tags.map(tag => tag.title)
-    }));
-  } catch (error) {
-    console.error('Erreur lors de la recherche sur Unsplash:', error);
-    toast.error('Impossible de récupérer les images depuis Unsplash');
-    return [];
-  }
-  */
 };
 
 // Fonction pour mapper la catégorie en fonction de la requête
@@ -154,4 +137,45 @@ export const getPresetImagesByCategory = async (category: 'monde' | 'europe' | '
     toast.error(`Erreur lors du chargement des images pour la catégorie "${category}"`);
     return [];
   }
+};
+
+// Fonction pour générer du contenu basé sur une image
+export const generateContentFromImage = (image: PinterestImage): { title: string, description: string } => {
+  if (!image) return { title: '', description: '' };
+  
+  let title = '';
+  let description = '';
+  
+  // Générer un titre basé sur l'image
+  if (image.title) {
+    title = `Découvrez ${image.title.charAt(0).toUpperCase() + image.title.slice(1)}`;
+  } else if (image.country) {
+    title = `Explorez les merveilles de ${image.country}`;
+  } else if (image.region) {
+    title = `Voyagez à travers ${image.region}`;
+  } else {
+    title = "Découvrez cette destination incroyable";
+  }
+  
+  // Limiter le titre à 40 caractères
+  if (title.length > 40) {
+    title = title.substring(0, 37) + '...';
+  }
+  
+  // Générer une description basée sur l'image
+  if (image.tags && image.tags.length > 0) {
+    const locationName = image.country || image.region || image.title || 'cette destination';
+    description = `Explorez ${locationName} avec ${image.tags.slice(0, 3).join(', ')}. `;
+    description += `Découvrez les paysages magnifiques, la culture fascinante et créez des souvenirs inoubliables lors de votre voyage.`;
+  } else {
+    const locationName = image.country || image.region || image.title || 'cette destination';
+    description = `Partez à la découverte de ${locationName}. Un lieu magique où nature, culture et aventure se rencontrent pour vous offrir une expérience inoubliable.`;
+  }
+  
+  // Limiter la description à 300 caractères
+  if (description.length > 300) {
+    description = description.substring(0, 297) + '...';
+  }
+  
+  return { title, description };
 };

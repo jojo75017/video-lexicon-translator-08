@@ -19,7 +19,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onSelectImage, sele
           {images.length > 0 ? (
             images.map((image, index) => (
               <div 
-                key={image.id || `image-${index}`}
+                key={`${image.id || `image-${index}`}-${index}`}
                 className={`relative rounded-md overflow-hidden cursor-pointer transition-all 
                   hover:opacity-90 group border ${selectedImage?.id === image.id ? 'ring-2 ring-primary' : ''}`}
                 onClick={() => onSelectImage(image)}
@@ -29,6 +29,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onSelectImage, sele
                   alt={image.title}
                   className="w-full h-32 object-cover"
                   onError={(e) => {
+                    console.log("Image error:", e);
                     e.currentTarget.src = 'https://placehold.co/400x600/gray/white?text=Image+non+disponible';
                   }}
                 />
