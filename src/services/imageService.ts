@@ -47,8 +47,14 @@ export const searchPixabayImages = async (query: string, category: string = ''):
   }
 };
 
-// Fonction pour rechercher des images sur Unsplash
+// Fonction pour rechercher des images sur Unsplash - désactivée pour le moment en raison de problèmes d'authentification
 export const searchUnsplashImages = async (query: string): Promise<PinterestImage[]> => {
+  // En raison des problèmes d'authentification avec l'API Unsplash, nous redirigerons vers Pixabay pour l'instant
+  console.log('Unsplash API a des problèmes d\'authentification, utilisation de Pixabay à la place');
+  toast.info('Recherche sur Pixabay (Unsplash temporairement indisponible)');
+  return searchPixabayImages(query);
+  
+  /* Code original désactivé:
   try {
     console.log('Searching Unsplash for:', query);
     const response = await axios.get<UnsplashResponse>('https://api.unsplash.com/search/photos', {
@@ -83,6 +89,7 @@ export const searchUnsplashImages = async (query: string): Promise<PinterestImag
     toast.error('Impossible de récupérer les images depuis Unsplash');
     return [];
   }
+  */
 };
 
 // Fonction pour mapper la catégorie en fonction de la requête
