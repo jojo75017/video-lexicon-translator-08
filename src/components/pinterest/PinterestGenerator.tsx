@@ -78,6 +78,30 @@ const PinterestGenerator: React.FC = () => {
       reader.onloadend = () => {
         updatePin('uploadedImage', reader.result as string);
         updatePin('image', null);
+        
+        // Auto-generate content based on the filename
+        const fileName = file.name.replace(/\.[^/.]+$/, ""); // Remove file extension
+        const words = fileName.split(/[-_\s.]/); // Split by common separators
+        
+        // Generate a title from the filename
+        const capitalizedWords = words.map(word => 
+          word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        );
+        const title = `Découvrez ${capitalizedWords.join(' ')}`;
+        updatePin('title', title);
+        
+        // Generate hashtags from the filename
+        const newHashtags = [...pin.hashtags];
+        words.forEach(word => {
+          const cleanWord = word.toLowerCase().replace(/[^\w]/g, '');
+          if (cleanWord.length > 2 && !newHashtags.includes(cleanWord)) {
+            newHashtags.push(cleanWord);
+          }
+        });
+        
+        updatePin('hashtags', newHashtags.slice(0, 10));
+        
+        toast.success('Image chargée avec succès et contenu généré');
       };
       reader.readAsDataURL(file);
     }
@@ -127,7 +151,7 @@ const PinterestGenerator: React.FC = () => {
       let searchResults: PinterestImage[] = [];
       
       if (imageSource === 'pixabay') {
-        searchResults = await searchPixabayImages(searchQuery);
+        searchResults = await searchPixabayImages(searchQuery, selectedImageCategory);
       } else {
         searchResults = await searchUnsplashImages(searchQuery);
       }

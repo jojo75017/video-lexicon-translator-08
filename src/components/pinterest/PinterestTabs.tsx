@@ -1,11 +1,12 @@
 
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Palette, PenTool, Image, Tag, RefreshCw } from 'lucide-react';
+import { Palette, PenTool, Image, Tag, RefreshCw, FolderOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import DesignTab from './tabs/DesignTab';
 import ContentTab from './tabs/ContentTab';
 import ImagesTab from './tabs/ImagesTab';
+import LocalImagesTab from './tabs/LocalImagesTab';
 import HashtagsTab from './tabs/HashtagsTab';
 import { PinterestPin } from '@/types/pinterest';
 
@@ -62,7 +63,7 @@ const PinterestTabs: React.FC<PinterestTabsProps> = ({
         onValueChange={setActiveTab} 
         className="w-full"
       >
-        <TabsList className="grid grid-cols-4 mb-4">
+        <TabsList className="grid grid-cols-5 mb-4">
           <TabsTrigger value="design" className="flex items-center gap-1">
             <Palette className="h-4 w-4" />
             <span className="hidden sm:inline">Design</span>
@@ -74,6 +75,10 @@ const PinterestTabs: React.FC<PinterestTabsProps> = ({
           <TabsTrigger value="images" className="flex items-center gap-1">
             <Image className="h-4 w-4" />
             <span className="hidden sm:inline">Images</span>
+          </TabsTrigger>
+          <TabsTrigger value="localImages" className="flex items-center gap-1">
+            <FolderOpen className="h-4 w-4" />
+            <span className="hidden sm:inline">Ordinateur</span>
           </TabsTrigger>
           <TabsTrigger value="hashtags" className="flex items-center gap-1">
             <Tag className="h-4 w-4" />
@@ -107,6 +112,14 @@ const PinterestTabs: React.FC<PinterestTabsProps> = ({
           />
         </TabsContent>
         
+        <TabsContent value="localImages">
+          <LocalImagesTab 
+            pin={pin}
+            updatePin={updatePin}
+            handleImageUpload={handleImageUpload}
+          />
+        </TabsContent>
+        
         <TabsContent value="hashtags">
           <HashtagsTab 
             pin={pin}
@@ -126,7 +139,8 @@ const PinterestTabs: React.FC<PinterestTabsProps> = ({
             if (activeTab === 'design') setActiveTab('hashtags');
             else if (activeTab === 'content') setActiveTab('design');
             else if (activeTab === 'images') setActiveTab('content');
-            else if (activeTab === 'hashtags') setActiveTab('images');
+            else if (activeTab === 'localImages') setActiveTab('images');
+            else if (activeTab === 'hashtags') setActiveTab('localImages');
           }}
         >
           <RefreshCw className="mr-2 h-4 w-4" />
