@@ -147,7 +147,40 @@ const PinterestTabs: React.FC<PinterestTabsProps> = ({
           Changer d'onglet
         </Button>
         
-        <Button onClick={() => {}}>
+        <Button onClick={() => {
+          if (activeTab === 'content') {
+            // Simulate refresh by clearing any user input and reverting to default state
+            if (pin.image) {
+              // If an image is selected, regenerate content based on image
+              const title = `Découvrez ${pin.image.title || 'cette destination'}`;
+              const description = `Explorez ${pin.image.country || pin.image.region || 'ce lieu'} avec ses particularités uniques, ses paysages magnifiques et son atmosphère inoubliable.`;
+              
+              updatePin('title', title.substring(0, 40));
+              updatePin('description', description.substring(0, 300));
+              toast.success("Contenu actualisé");
+            } else {
+              toast.info("Sélectionnez une image ou entrez un mot-clé pour générer du contenu");
+            }
+          } else if (activeTab === 'images') {
+            // Refresh image search
+            handleSearch();
+          } else if (activeTab === 'hashtags') {
+            // Refresh hashtags based on title/description
+            if (pin.title) {
+              const words = pin.title.toLowerCase().split(/\s+/);
+              const newTags = words
+                .filter(word => word.length > 3 && !pin.hashtags.includes(word))
+                .slice(0, 3);
+                
+              if (newTags.length > 0) {
+                updatePin('hashtags', [...pin.hashtags, ...newTags]);
+                toast.success("Hashtags générés à partir du titre");
+              } else {
+                toast.info("Aucun nouveau hashtag trouvé");
+              }
+            }
+          }
+        }}>
           <RefreshCw className="mr-2 h-4 w-4" />
           Actualiser
         </Button>

@@ -48,7 +48,8 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onSelectImage, sele
                     
                     {image.source && (
                       <Badge variant={image.source === 'pixabay' ? 'default' : 'secondary'} className="text-xs ml-1">
-                        {image.source === 'pixabay' ? 'Pixabay' : image.source === 'mock' ? 'Local' : 'Unsplash'}
+                        {image.source === 'pixabay' ? 'Pixabay' : 
+                         image.source === 'unsplash' ? 'Unsplash' : 'Local'}
                       </Badge>
                     )}
                   </div>
