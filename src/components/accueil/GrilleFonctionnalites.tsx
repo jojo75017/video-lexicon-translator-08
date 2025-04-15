@@ -1,93 +1,44 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  Search, 
-  BarChart2, 
-  Globe, 
-  Smartphone, 
-  Compass, 
-  Zap,
-  ListTree,
-  MessageSquare,
-  Signature
-} from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const GrilleFonctionnalites = () => {
-  const fonctionnalites = [
-    {
-      icon: <Search className="h-8 w-8 text-indigo-600" />,
-      titre: "Analyse SEO",
-      description: "Analysez et améliorez le référencement de votre site web",
-      lien: "/seo",
-      couleur: "bg-indigo-100"
-    },
-    {
-      icon: <BarChart2 className="h-8 w-8 text-green-600" />,
-      titre: "Performance",
-      description: "Optimisez la vitesse et l'efficacité de votre site",
-      lien: "/seo?tab=performance",
-      couleur: "bg-green-100"
-    },
-    {
-      icon: <Globe className="h-8 w-8 text-blue-600" />,
-      titre: "Accessibilité",
-      description: "Assurez-vous que votre site est accessible à tous",
-      lien: "/seo?tab=accessibility",
-      couleur: "bg-blue-100"
-    },
-    {
-      icon: <Smartphone className="h-8 w-8 text-purple-600" />,
-      titre: "Mobile",
-      description: "Optimisez votre site pour les appareils mobiles",
-      lien: "/seo?tab=mobile",
-      couleur: "bg-purple-100"
-    },
-    {
-      icon: <Compass className="h-8 w-8 text-orange-600" />,
-      titre: "Exploration",
-      description: "Découvrez des opportunités d'amélioration",
-      lien: "/seo?tab=exploration",
-      couleur: "bg-orange-100"
-    },
-    {
-      icon: <Zap className="h-8 w-8 text-yellow-600" />,
-      titre: "Vitesse",
-      description: "Améliorez la vitesse de chargement de votre site",
-      lien: "/seo?tab=vitesse",
-      couleur: "bg-yellow-100"
-    },
-    {
-      icon: <ListTree className="h-8 w-8 text-teal-600" />,
-      titre: "Structure",
-      description: "Analysez la structure de votre site web",
-      lien: "/seo?tab=serp",
-      couleur: "bg-teal-100"
-    },
-    {
-      icon: <Signature className="h-8 w-8 text-pink-600" />,
-      titre: "Signature Email",
-      description: "Créez une signature professionnelle pour vos emails",
-      lien: "/signature",
-      couleur: "bg-pink-100"
-    },
-  ];
-
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {fonctionnalites.map((fonctionnalite, index) => (
-        <Link 
-          key={index} 
-          to={fonctionnalite.lien || "#"} 
-          className={`block p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow ${fonctionnalite.couleur || 'bg-white'}`}
-        >
-          <div className="flex flex-col items-center text-center space-y-4">
-            {fonctionnalite.icon}
-            <h3 className="text-lg font-semibold">{fonctionnalite.titre}</h3>
-            <p className="text-gray-600 text-sm">{fonctionnalite.description}</p>
+    <div className="bg-white py-12">
+      <div className="container mx-auto px-4">
+        <h2 className="text-3xl font-bold text-center mb-12">Nos Fonctionnalités</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          
+          <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+            <Link to="/pinterest" className="text-xl font-semibold text-gray-900 mb-2 block hover:text-blue-600">
+              Générateur Pinterest
+            </Link>
+            <p className="text-gray-600 mb-4">
+              Créez des visuels Pinterest optimisés avec titres et descriptions
+            </p>
+            <Button asChild className="w-full">
+              <Link to="/pinterest">
+                Essayer
+              </Link>
+            </Button>
           </div>
-        </Link>
-      ))}
+          
+          <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+            <Link to="/image-generator" className="text-xl font-semibold text-gray-900 mb-2 block hover:text-blue-600">
+              Générateur d'Images IA
+            </Link>
+            <p className="text-gray-600 mb-4">
+              Créez des images uniques à partir de descriptions textuelles avec DALL-E
+            </p>
+            <Button asChild className="w-full">
+              <Link to="/image-generator">
+                Essayer
+              </Link>
+            </Button>
+          </div>
+          
+        </div>
+      </div>
     </div>
   );
 };
