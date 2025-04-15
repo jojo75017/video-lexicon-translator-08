@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Palette, PenTool, Image, Tag, RefreshCw, FolderOpen } from 'lucide-react';
@@ -9,6 +8,7 @@ import ImagesTab from './tabs/ImagesTab';
 import LocalImagesTab from './tabs/LocalImagesTab';
 import HashtagsTab from './tabs/HashtagsTab';
 import { PinterestPin } from '@/types/pinterest';
+import { toast } from 'sonner';
 
 interface PinterestTabsProps {
   activeTab: string;
