@@ -8,6 +8,7 @@ import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/comp
 import { UploadCloud, Search, Camera } from 'lucide-react';
 import { PinterestPin, PinterestImage } from '@/types/pinterest';
 import ImageGallery from '../ImageGallery';
+import { toast } from 'sonner';
 
 interface ImagesTabProps {
   pin: PinterestPin;
@@ -40,6 +41,9 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
   handleSelectImage, 
   handleImageUpload 
 }) => {
+  console.log("Images in ImagesTab:", images);
+  console.log("Selected image in ImagesTab:", pin.image);
+
   return (
     <div className="flex flex-col space-y-4">
       <div className="flex items-center space-x-2">
@@ -82,7 +86,10 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
             <Button 
               variant="destructive" 
               size="sm"
-              onClick={() => updatePin('uploadedImage', null)}
+              onClick={() => {
+                updatePin('uploadedImage', null);
+                toast.success("Image supprimée");
+              }}
             >
               Supprimer
             </Button>
@@ -142,7 +149,10 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
         
         <ImageGallery 
           images={images} 
-          onSelectImage={handleSelectImage}
+          onSelectImage={(image) => {
+            console.log("Image selected:", image);
+            handleSelectImage(image);
+          }}
           selectedImage={pin.image}
         />
       </div>

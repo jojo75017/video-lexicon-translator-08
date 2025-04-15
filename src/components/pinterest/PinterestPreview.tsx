@@ -34,6 +34,12 @@ const PinterestPreview: React.FC<PinterestPreviewProps> = ({ pin }) => {
     return {};
   };
 
+  console.log('Pin data in preview:', {
+    image: pin.image,
+    uploadedImage: pin.uploadedImage,
+    title: pin.title
+  });
+
   return (
     <div 
       className="relative rounded-lg overflow-hidden shadow-lg"
@@ -45,17 +51,25 @@ const PinterestPreview: React.FC<PinterestPreviewProps> = ({ pin }) => {
     >
       {/* Image principale */}
       <div className="absolute inset-0">
-        {pin.image ? (
+        {pin.image?.url ? (
           <img 
             src={pin.image.url} 
             alt={pin.title}
             className="w-full h-full object-cover"
+            onError={(e) => {
+              console.error("Error loading image in preview:", e);
+              e.currentTarget.src = 'https://placehold.co/400x600/gray/white?text=Image+non+disponible';
+            }}
           />
         ) : pin.uploadedImage ? (
           <img 
             src={pin.uploadedImage} 
             alt={pin.title}
             className="w-full h-full object-cover"
+            onError={(e) => {
+              console.error("Error loading uploaded image in preview:", e);
+              e.currentTarget.src = 'https://placehold.co/400x600/gray/white?text=Image+non+disponible';
+            }}
           />
         ) : (
           <div className="w-full h-full bg-gray-200 flex items-center justify-center">

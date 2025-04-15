@@ -26,7 +26,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onSelectImage, sele
               >
                 <img 
                   src={image.url} 
-                  alt={image.title}
+                  alt={image.title || 'Image sans titre'}
                   className="w-full h-32 object-cover"
                   onError={(e) => {
                     console.log("Image error:", e);
@@ -55,7 +55,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onSelectImage, sele
                   </div>
                   <div className="invisible group-hover:visible">
                     <p className="text-xs text-white bg-black bg-opacity-50 p-1 rounded">
-                      {image.title}
+                      {image.title || 'Sans titre'}
                     </p>
                   </div>
                 </div>

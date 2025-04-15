@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
@@ -30,7 +29,8 @@ const PinterestGenerator: React.FC = () => {
   });
 
   const updatePin = (field: keyof PinterestPin, value: any) => {
-    setPin({ ...pin, [field]: value });
+    console.log(`Updating pin field "${field}" with value:`, value);
+    setPin(prevPin => ({ ...prevPin, [field]: value }));
   };
   
   // Charger les images par défaut au montage du composant
@@ -42,6 +42,7 @@ const PinterestGenerator: React.FC = () => {
     setLoading(true);
     try {
       const presetImages = await getPresetImagesByCategory(selectedImageCategory);
+      console.log(`Loaded ${presetImages.length} preset images for category ${selectedImageCategory}`);
       setImages(presetImages);
     } catch (error) {
       console.error("Erreur lors du chargement des images préréglées:", error);
@@ -76,8 +77,10 @@ const PinterestGenerator: React.FC = () => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        updatePin('uploadedImage', reader.result as string);
+        // Clear the existing image if there is one
         updatePin('image', null);
+        // Set the uploaded image
+        updatePin('uploadedImage', reader.result as string);
         
         // Auto-generate content based on the filename
         const fileName = file.name.replace(/\.[^/.]+$/, ""); // Remove file extension
@@ -108,8 +111,12 @@ const PinterestGenerator: React.FC = () => {
   };
 
   const handleSelectImage = (image: PinterestImage) => {
-    updatePin('image', image);
+    console.log("Image selected in handleSelectImage:", image);
+    
+    // Clear the uploaded image if there is one
     updatePin('uploadedImage', null);
+    // Set the selected image
+    updatePin('image', image);
     
     // Générer automatiquement du contenu basé sur l'image
     const generatedContent = generateContentFromImage(image);
@@ -174,6 +181,11 @@ const PinterestGenerator: React.FC = () => {
     // This function is now in PinterestPreviewCard
     // Keeping it here for the button in the tabs section
   };
+
+  // Log the current pin state to help debugging
+  useEffect(() => {
+    console.log("Current pin state:", pin);
+  }, [pin]);
 
   return (
     <div className="flex flex-col lg:flex-row gap-6">
