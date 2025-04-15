@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -6,7 +5,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Wand2 } from 'lucide-react';
 import { PinterestPin } from '@/types/pinterest';
-import { analyzeKeywords, generateKeywordSuggestions } from '@/utils/seo/keywordAnalyzer';
 import { toast } from 'sonner';
 
 interface ContentTabProps {
@@ -20,15 +18,19 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin }) => {
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    // Limiter à 40 caractères
-    if (value.length <= 40) {
+    // Limit to 60 characters
+    if (value.length <= 60) {
       updatePin('title', value);
+    } else {
+      // Truncate to 60 characters if longer
+      updatePin('title', value.substring(0, 60));
+      toast.warning("Le titre a été tronqué à 60 caractères");
     }
   };
 
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
-    // Limiter à ~50 mots (environ 300 caractères)
+    // Limit to ~50 words (approximately 300 characters)
     if (value.length <= 300) {
       updatePin('description', value);
     }
@@ -43,15 +45,15 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin }) => {
     setIsGenerating(true);
     
     try {
-      // Générer du contenu directement à partir du mot-clé sans dépendre de l'analyse
-      const defaultTitle = `Découvrez les merveilles de ${keyword}`;
+      // Generate content directly from the keyword
+      const defaultTitle = `Découvrez les merveilles de ${keyword}`.substring(0, 60);
       const defaultDescription = `Explorez ${keyword} avec ses particularités uniques, ses paysages magnifiques et son atmosphère inoubliable. Une destination qui mérite d'être découverte.`;
       
-      // Mettre à jour le titre et la description
-      updatePin('title', truncateToLength(defaultTitle, 40));
-      updatePin('description', truncateToLength(defaultDescription, 300));
+      // Update title and description
+      updatePin('title', defaultTitle);
+      updatePin('description', defaultDescription);
       
-      // Ajouter le mot-clé aux hashtags s'il n'y est pas déjà
+      // Add keyword to hashtags if not already present
       if (!pin.hashtags.includes(keyword.toLowerCase())) {
         const updatedHashtags = [...pin.hashtags, keyword.toLowerCase()];
         updatePin('hashtags', updatedHashtags);
@@ -64,12 +66,6 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin }) => {
     } finally {
       setIsGenerating(false);
     }
-  };
-  
-  const truncateToLength = (text: string, maxLength: number): string => {
-    if (!text) return '';
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength);
   };
 
   return (
@@ -96,9 +92,9 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin }) => {
 
       <div>
         <Label htmlFor="title" className="flex justify-between">
-          <span>Titre (max 40 caractères)</span>
-          <span className={`text-xs ${pin.title.length > 35 ? 'text-orange-500' : ''}`}>
-            {pin.title.length}/40
+          <span>Titre (max 60 caractères)</span>
+          <span className={`text-xs ${pin.title.length > 55 ? 'text-orange-500' : ''}`}>
+            {pin.title.length}/60
           </span>
         </Label>
         <Input
