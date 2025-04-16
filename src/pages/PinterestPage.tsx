@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import PinterestGenerator from '@/components/pinterest/PinterestGenerator';
 
@@ -17,7 +17,13 @@ const PinterestPage = () => {
             </Link>
             <h1 className="text-xl font-bold hidden sm:block">Générateur d'Images Pinterest</h1>
           </div>
-          <div>
+          <div className="flex space-x-2">
+            <Button variant="outline" size="sm" asChild>
+              <a href="https://free.theresanaiforthat.com/@taaft/image-generator/?ref=header" target="_blank" rel="noopener noreferrer" className="flex items-center">
+                <ExternalLink className="h-4 w-4 mr-2" />
+                Générateur de Prompts AI
+              </a>
+            </Button>
             <Button variant="outline" size="sm">
               Documentation
             </Button>

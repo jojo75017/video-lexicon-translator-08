@@ -3,7 +3,7 @@ import { PixabayResponse, UnsplashResponse, PinterestImage } from '@/types/pinte
 import { toast } from 'sonner';
 import { worldImages, europeImages, franceImages } from '@/data/pinterestImages';
 
-// Mock image data for when APIs fail
+// Images de secours pour quand les APIs échouent
 const MOCK_IMAGES = [
   {
     id: 'mock-1',
@@ -86,6 +86,7 @@ const UNSPLASH_ACCESS_KEY = 'HyoKoX5Yj8uIJBz_9dRrj3hVemnoXg66Pb--pXOgdlA'; // Cl
 
 // Function to get mock images filtered by query
 const getMockImages = (query: string, category: string = ''): PinterestImage[] => {
+  console.log("Récupération d'images de test pour", query, category);
   let filteredImages = [...MOCK_IMAGES];
   
   // Filter by query if provided
@@ -103,53 +104,18 @@ const getMockImages = (query: string, category: string = ''): PinterestImage[] =
     filteredImages = filteredImages.filter(img => img.category === category);
   }
   
-  console.log(`Found ${filteredImages.length} mock images for query: "${query}", category: "${category}"`);
+  console.log(`Trouvé ${filteredImages.length} images pour la requête: "${query}", catégorie: "${category}"`);
   return filteredImages;
 };
 
 // Fonction pour rechercher des images sur Pixabay
 export const searchPixabayImages = async (query: string, category: string = ''): Promise<PinterestImage[]> => {
   try {
-    console.log('Searching Pixabay for:', query);
+    console.log('Recherche sur Pixabay pour:', query);
     
-    // Temporarily use mock data due to API issues
-    console.log('Using mock data due to Pixabay API issues');
+    // Utilisation temporaire des données de test en raison de problèmes d'API
+    console.log('Utilisation des données de test en raison de problèmes avec l\'API Pixabay');
     return getMockImages(query, category);
-    
-    /* Commented out real Pixabay API call due to issues
-    const response = await axios.get<PixabayResponse>('https://pixabay.com/api/', {
-      params: {
-        key: PIXABAY_API_KEY,
-        q: query,
-        category: category,
-        orientation: 'vertical',
-        per_page: 50,
-        image_type: 'photo',
-        safesearch: true,
-      }
-    });
-
-    console.log('Pixabay response:', response.data.hits.length, 'results');
-    
-    if (response.data.hits.length === 0) {
-      console.log('No Pixabay results found');
-      toast.info(`Aucun résultat trouvé pour "${query}". Essayez d'autres termes.`);
-      return [];
-    }
-
-    // Ajouter des logs pour déboguer
-    console.log('First hit example:', response.data.hits[0]);
-
-    return response.data.hits.map((image, index) => ({
-      id: `pixabay-${image.id}-${index}`,
-      url: image.largeImageURL || image.webformatURL,
-      title: generateTitleFromTags(image.tags) || `Image de ${query}`,
-      category: mapCategoryFromQuery(query),
-      country: extractLocationFromQuery(query),
-      source: 'pixabay',
-      tags: image.tags.split(',').map(tag => tag.trim())
-    }));
-    */
   } catch (error) {
     console.error('Erreur lors de la recherche sur Pixabay:', error);
     toast.error('Impossible de récupérer les images depuis Pixabay. Utilisation des images locales.');
@@ -173,9 +139,9 @@ const generateTitleFromTags = (tags: string): string => {
   return `${firstTag} ${tagArray[1]}`;
 };
 
-// Fonction pour rechercher des images sur Unsplash - désactivée pour le moment en raison de problèmes d'authentification
+// Fonction pour rechercher des images sur Unsplash
 export const searchUnsplashImages = async (query: string): Promise<PinterestImage[]> => {
-  console.log('Using mock data due to Unsplash API issues');
+  console.log('Utilisation des données de test en raison de problèmes avec l\'API Unsplash');
   return getMockImages(query);
 };
 
@@ -204,19 +170,26 @@ const extractLocationFromQuery = (query: string): string => {
 
 // Fonction pour obtenir des images prédéfinies par catégorie
 export const getPresetImagesByCategory = async (category: 'monde' | 'europe' | 'france' | 'all'): Promise<PinterestImage[]> => {
-  console.log('Loading preset images for category:', category);
+  console.log('Chargement des images prédéfinies pour la catégorie:', category);
   
   try {
+    let results: PinterestImage[] = [];
+    
     if (category === 'all') {
-      return [...worldImages, ...europeImages, ...franceImages];
+      results = [...worldImages, ...europeImages, ...franceImages];
     } else if (category === 'monde') {
-      return worldImages;
+      results = [...worldImages];
     } else if (category === 'europe') {
-      return europeImages;
+      results = [...europeImages];
     } else if (category === 'france') {
-      return franceImages;
+      results = [...franceImages];
     }
-    return [];
+    
+    // Vérifier que les images ont bien des URLs valides
+    results = results.filter(img => img.url && img.url.startsWith('http'));
+    
+    console.log(`Chargé ${results.length} images pour la catégorie ${category}`);
+    return results;
   } catch (error) {
     console.error('Erreur lors du chargement des images préréglées:', error);
     // Utiliser des images de secours en cas d'erreur

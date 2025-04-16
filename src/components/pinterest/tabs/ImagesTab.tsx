@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
-import { UploadCloud, Search, Camera } from 'lucide-react';
+import { UploadCloud, Search, Camera, ExternalLink } from 'lucide-react';
 import { PinterestPin, PinterestImage } from '@/types/pinterest';
 import ImageGallery from '../ImageGallery';
 import { toast } from 'sonner';
@@ -41,8 +41,8 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
   handleSelectImage, 
   handleImageUpload 
 }) => {
-  console.log("Images in ImagesTab:", images);
-  console.log("Selected image in ImagesTab:", pin.image);
+  console.log("Images dans ImagesTab:", images);
+  console.log("Image sélectionnée dans ImagesTab:", pin.image);
 
   return (
     <div className="flex flex-col space-y-4">
@@ -73,6 +73,13 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
+        
+        <Button variant="outline" size="sm" asChild className="ml-auto">
+          <a href="https://free.theresanaiforthat.com/@taaft/image-generator/?ref=header" target="_blank" rel="noopener noreferrer" className="flex items-center">
+            <ExternalLink className="h-4 w-4 mr-2" />
+            Générateur de Prompts AI
+          </a>
+        </Button>
       </div>
       
       {pin.uploadedImage && (
@@ -150,7 +157,7 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
         <ImageGallery 
           images={images} 
           onSelectImage={(image) => {
-            console.log("Image selected:", image);
+            console.log("Image sélectionnée:", image);
             handleSelectImage(image);
           }}
           selectedImage={pin.image}

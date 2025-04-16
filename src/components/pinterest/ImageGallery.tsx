@@ -12,12 +12,14 @@ interface ImageGalleryProps {
 }
 
 const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onSelectImage, selectedImage }) => {
+  console.log("Images reçues dans ImageGallery:", images);
+  
   return (
     <div className="border rounded-md">
-      <ScrollArea className="h-[300px] w-full p-2">
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-          {images.length > 0 ? (
-            images.map((image, index) => (
+      <ScrollArea className="h-[420px] w-full p-2">
+        {images.length > 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {images.map((image, index) => (
               <div 
                 key={`${image.id || `image-${index}`}-${index}`}
                 className={`relative rounded-md overflow-hidden cursor-pointer transition-all 
@@ -27,9 +29,9 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onSelectImage, sele
                 <img 
                   src={image.url} 
                   alt={image.title || 'Image sans titre'}
-                  className="w-full h-32 object-cover"
+                  className="w-full h-40 object-cover"
                   onError={(e) => {
-                    console.log("Image error:", e);
+                    console.error("Erreur de chargement d'image:", image.url);
                     e.currentTarget.src = 'https://placehold.co/400x600/gray/white?text=Image+non+disponible';
                   }}
                 />
@@ -54,19 +56,19 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onSelectImage, sele
                     )}
                   </div>
                   <div className="invisible group-hover:visible">
-                    <p className="text-xs text-white bg-black bg-opacity-50 p-1 rounded">
+                    <p className="text-xs text-white bg-black bg-opacity-60 p-1 rounded">
                       {image.title || 'Sans titre'}
                     </p>
                   </div>
                 </div>
               </div>
-            ))
-          ) : (
-            <div className="col-span-full h-32 flex items-center justify-center text-gray-500">
-              Aucune image correspondant à votre recherche
-            </div>
-          )}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="h-32 flex items-center justify-center text-gray-500">
+            Aucune image correspondant à votre recherche
+          </div>
+        )}
       </ScrollArea>
     </div>
   );
