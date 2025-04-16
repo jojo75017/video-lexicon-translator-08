@@ -1,11 +1,11 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
-import { UploadCloud, Search, Camera, ExternalLink, AlertCircle } from 'lucide-react';
+import { UploadCloud, Search, Camera, ExternalLink, AlertCircle, RefreshCcw } from 'lucide-react';
 import { PinterestPin, PinterestImage } from '@/types/pinterest';
 import ImageGallery from '../ImageGallery';
 import { toast } from 'sonner';
@@ -42,10 +42,36 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
   handleSelectImage, 
   handleImageUpload 
 }) => {
-  console.log("Images dans ImagesTab:", images);
-  console.log("Image sélectionnée dans ImagesTab:", pin.image);
+  const [failedImages, setFailedImages] = useState<number>(0);
   
-  const hasImageErrors = images.some(img => !img.url || !img.url.startsWith('http'));
+  // Vérifier si les images ont des problèmes
+  useEffect(() => {
+    const checkImages = () => {
+      let failed = 0;
+      images.forEach(img => {
+        if (!img.url || !img.url.startsWith('http')) {
+          failed++;
+        }
+      });
+      setFailedImages(failed);
+    };
+    
+    checkImages();
+  }, [images]);
+  
+  // Images de sources fiables pour recommandations
+  const reliableSources = [
+    {
+      name: 'Unsplash',
+      url: 'https://unsplash.com/fr',
+      icon: <ExternalLink className="h-4 w-4 mr-2" />
+    },
+    {
+      name: 'Pexels',
+      url: 'https://www.pexels.com/fr-fr/',
+      icon: <ExternalLink className="h-4 w-4 mr-2" />
+    }
+  ];
 
   return (
     <div className="flex flex-col space-y-4">
@@ -78,35 +104,40 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
         </TooltipProvider>
         
         <div className="flex gap-2 ml-auto">
-          <Button variant="outline" size="sm" asChild>
-            <a href="https://free.theresanaiforthat.com/@taaft/image-generator/?ref=header" target="_blank" rel="noopener noreferrer" className="flex items-center">
-              <ExternalLink className="h-4 w-4 mr-2" />
-              Générateur de Prompts AI
-            </a>
-          </Button>
-          
-          <Button variant="outline" size="sm" asChild>
-            <a href="https://www.pexels.com/fr-fr/" target="_blank" rel="noopener noreferrer" className="flex items-center">
-              <ExternalLink className="h-4 w-4 mr-2" />
-              Photos Pexels
-            </a>
-          </Button>
-          
-          <Button variant="outline" size="sm" asChild>
-            <a href="https://fr.freepik.com/photos-gratuite" target="_blank" rel="noopener noreferrer" className="flex items-center">
-              <ExternalLink className="h-4 w-4 mr-2" />
-              Photos Freepik Gratuites
-            </a>
-          </Button>
+          {reliableSources.map((source, index) => (
+            <Button key={index} variant="outline" size="sm" asChild>
+              <a href={source.url} target="_blank" rel="noopener noreferrer" className="flex items-center">
+                {source.icon}
+                {source.name}
+              </a>
+            </Button>
+          ))}
         </div>
       </div>
       
-      {hasImageErrors && (
-        <Alert variant="destructive" className="my-2">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Problème d'affichage</AlertTitle>
-          <AlertDescription>
-            Certaines images peuvent ne pas s'afficher correctement. Essayez de changer de source d'images ou de catégorie.
+      {failedImages > 0 && (
+        <Alert className="my-2 border-yellow-400 bg-yellow-50">
+          <AlertCircle className="h-4 w-4 text-yellow-600" />
+          <AlertTitle className="text-yellow-800">Problèmes d'affichage d'images détectés</AlertTitle>
+          <AlertDescription className="text-yellow-700">
+            Certaines images ({failedImages}) peuvent ne pas s'afficher correctement. Essayez d'utiliser Unsplash ou Pexels comme source d'images plus fiable.
+            <div className="mt-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setImageSource('unsplash')}
+                className="mr-2"
+              >
+                <RefreshCcw className="h-3 w-3 mr-1" /> Utiliser Unsplash
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setImageSource('pexels')}
+              >
+                <RefreshCcw className="h-3 w-3 mr-1" /> Utiliser Pexels
+              </Button>
+            </div>
           </AlertDescription>
         </Alert>
       )}
@@ -158,10 +189,10 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
               <SelectValue placeholder="Source" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="pixabay">Pixabay</SelectItem>
               <SelectItem value="unsplash">Unsplash</SelectItem>
-              <SelectItem value="freepik">Freepik</SelectItem>
               <SelectItem value="pexels">Pexels</SelectItem>
+              <SelectItem value="freepik">Freepik</SelectItem>
+              <SelectItem value="pixabay">Pixabay</SelectItem>
             </SelectContent>
           </Select>
           

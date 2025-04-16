@@ -40,6 +40,17 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onSelectImage, sele
     
     return true;
   };
+
+  // Utiliser une image de secours fiable en cas d'erreur
+  const getBackupImageUrl = (category: 'monde' | 'europe' | 'france') => {
+    const backupImages = {
+      'monde': 'https://images.unsplash.com/photo-1486299267070-83823f5448dd?q=80&w=2071&auto=format&fit=crop',
+      'europe': 'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?q=80&w=2070&auto=format&fit=crop',
+      'france': 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=2073&auto=format&fit=crop'
+    };
+    
+    return backupImages[category] || backupImages['monde'];
+  };
   
   return (
     <div className="border rounded-md">
@@ -62,10 +73,11 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onSelectImage, sele
                     loading="lazy"
                   />
                 ) : (
-                  <div className="w-full h-44 bg-gray-100 flex flex-col items-center justify-center">
-                    <ImageOff className="h-8 w-8 text-gray-400 mb-2" />
-                    <p className="text-xs text-gray-500">Image non disponible</p>
-                  </div>
+                  <img 
+                    src={getBackupImageUrl(image.category)}
+                    alt={image.title || 'Image de remplacement'}
+                    className="w-full h-44 object-cover"
+                  />
                 )}
                 
                 <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all p-2 flex flex-col justify-between">

@@ -33,6 +33,18 @@ const PinterestPreview: React.FC<PinterestPreviewProps> = ({ pin }) => {
     
     return {};
   };
+  
+  // Images de secours fiables par catégorie
+  const getBackupImage = () => {
+    const fallbackImages = {
+      default: 'https://images.unsplash.com/photo-1486299267070-83823f5448dd?q=80&w=2071&auto=format&fit=crop',
+      france: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=2073&auto=format&fit=crop',
+      europe: 'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?q=80&w=2070&auto=format&fit=crop'
+    };
+    
+    const category = pin.image?.category || 'default';
+    return fallbackImages[category] || fallbackImages.default;
+  };
 
   return (
     <div 
@@ -52,7 +64,7 @@ const PinterestPreview: React.FC<PinterestPreviewProps> = ({ pin }) => {
             className="w-full h-full object-cover"
             onError={(e) => {
               console.error("Error loading image in preview:", e);
-              e.currentTarget.src = 'https://placehold.co/400x600/gray/white?text=Image+non+disponible';
+              e.currentTarget.src = getBackupImage();
             }}
           />
         ) : pin.uploadedImage ? (
@@ -62,7 +74,7 @@ const PinterestPreview: React.FC<PinterestPreviewProps> = ({ pin }) => {
             className="w-full h-full object-cover"
             onError={(e) => {
               console.error("Error loading uploaded image in preview:", e);
-              e.currentTarget.src = 'https://placehold.co/400x600/gray/white?text=Image+non+disponible';
+              e.currentTarget.src = 'https://images.unsplash.com/photo-1486299267070-83823f5448dd?q=80&w=2071&auto=format&fit=crop';
             }}
           />
         ) : (

@@ -8,6 +8,7 @@ export interface PinterestImage {
   region?: string;
   source?: 'pixabay' | 'unsplash' | 'freepik' | 'pexels' | 'local';
   tags?: string[];
+  fallbackUrl?: string; // Ajout d'une URL de secours en cas de problème
 }
 
 export interface PinterestDesign {
@@ -26,7 +27,7 @@ export interface PinterestPin {
   title: string;
   description: string;
   hashtags: string[];
-  tags: string[];  // Ajout des étiquettes
+  tags: string[];  // Étiquettes
   callToAction: string;
   image: PinterestImage | null;
   uploadedImage: string | null;
@@ -110,3 +111,11 @@ export interface UnsplashImage {
   };
   tags: { title: string }[];
 }
+
+// Ajout de constantes pour les images de secours fiables
+export const RELIABLE_FALLBACK_IMAGES = {
+  monde: 'https://images.unsplash.com/photo-1486299267070-83823f5448dd?q=80&w=2071&auto=format&fit=crop',
+  europe: 'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?q=80&w=2070&auto=format&fit=crop',
+  france: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=2073&auto=format&fit=crop',
+  default: 'https://images.unsplash.com/photo-1488229297570-58520851e868?q=80&w=2069&auto=format&fit=crop'
+};
