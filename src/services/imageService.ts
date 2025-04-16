@@ -196,6 +196,22 @@ const FREEPIK_IMAGES = [
   }
 ];
 
+// Cette fonction améliore la cohérence entre les titres et les images
+const ensureTitleMatchesLocation = (images: PinterestImage[]): PinterestImage[] => {
+  return images.map(image => {
+    let updatedImage = {...image};
+    
+    // Si le pays ou la région est défini mais pas dans le titre, mettons à jour le titre
+    if (image.country && !image.title.toLowerCase().includes(image.country.toLowerCase())) {
+      updatedImage.title = `${image.country} - ${image.title}`;
+    } else if (image.region && !image.title.toLowerCase().includes(image.region.toLowerCase())) {
+      updatedImage.title = `${image.region} - ${image.title}`;
+    }
+    
+    return updatedImage;
+  });
+};
+
 // Function to get mock images filtered by query
 const getMockImages = (query: string, category: string = ''): PinterestImage[] => {
   console.log("Récupération d'images de test pour", query, category);
@@ -227,11 +243,12 @@ export const searchPixabayImages = async (query: string, category: string = ''):
     
     // Utilisation temporaire des données de test en raison de problèmes d'API
     console.log('Utilisation des données de test en raison de problèmes avec l\'API Pixabay');
-    return getMockImages(query, category);
+    const results = getMockImages(query, category);
+    return ensureTitleMatchesLocation(results);
   } catch (error) {
     console.error('Erreur lors de la recherche sur Pixabay:', error);
-    toast.error('Impossible de récupérer les images depuis Pixabay. Utilisation des images locales.');
-    return getMockImages(query, category);
+    // toast.error('Impossible de récupérer les images depuis Pixabay. Utilisation des images locales.');
+    return ensureTitleMatchesLocation(getMockImages(query, category));
   }
 };
 
@@ -261,10 +278,10 @@ export const searchFreepikImages = async (query: string, category: string = ''):
     // Vérifier que toutes les URLs sont valides
     results = results.filter(img => img.url && img.url.startsWith('http'));
     
-    return results;
+    return ensureTitleMatchesLocation(results);
   } catch (error) {
     console.error('Erreur lors de la recherche sur Freepik:', error);
-    toast.error('Impossible de récupérer les images depuis Freepik');
+    // toast.error('Impossible de récupérer les images depuis Freepik');
     return [];
   }
 };
@@ -342,12 +359,15 @@ export const getPresetImagesByCategory = async (category: 'monde' | 'europe' | '
     // Mélanger les résultats pour une présentation plus variée
     results.sort(() => Math.random() - 0.5);
     
+    // Assurer la cohérence des titres
+    results = ensureTitleMatchesLocation(results);
+    
     console.log(`Chargé ${results.length} images pour la catégorie ${category}`);
     return results;
   } catch (error) {
     console.error('Erreur lors du chargement des images préréglées:', error);
     // Utiliser des images de secours en cas d'erreur
-    return getMockImages('', category);
+    return ensureTitleMatchesLocation(getMockImages('', category));
   }
 };
 

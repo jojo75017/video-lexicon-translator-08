@@ -5,10 +5,11 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
-import { UploadCloud, Search, Camera, ExternalLink } from 'lucide-react';
+import { UploadCloud, Search, Camera, ExternalLink, AlertCircle } from 'lucide-react';
 import { PinterestPin, PinterestImage } from '@/types/pinterest';
 import ImageGallery from '../ImageGallery';
 import { toast } from 'sonner';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 interface ImagesTabProps {
   pin: PinterestPin;
@@ -43,6 +44,8 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
 }) => {
   console.log("Images dans ImagesTab:", images);
   console.log("Image sélectionnée dans ImagesTab:", pin.image);
+  
+  const hasImageErrors = images.some(img => !img.url || !img.url.startsWith('http'));
 
   return (
     <div className="flex flex-col space-y-4">
@@ -90,6 +93,16 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
           </Button>
         </div>
       </div>
+      
+      {hasImageErrors && (
+        <Alert variant="destructive" className="my-2">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Problème d'affichage</AlertTitle>
+          <AlertDescription>
+            Certaines images peuvent ne pas s'afficher correctement. Essayez de changer de source d'images ou de catégorie.
+          </AlertDescription>
+        </Alert>
+      )}
       
       {pin.uploadedImage && (
         <div className="relative group border rounded-md overflow-hidden h-[200px]">
