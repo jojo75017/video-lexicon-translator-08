@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
@@ -29,6 +28,7 @@ const PinterestGenerator: React.FC = () => {
     title: 'Découvrez les merveilles de Paris',
     description: 'Explorez la ville romantique avec ses monuments emblématiques, sa gastronomie raffinée et son atmosphère unique. Un voyage inoubliable vous attend.',
     hashtags: ['paris', 'france', 'travel', 'eiffeltower'],
+    tags: ['voyage', 'france', 'architecture', 'europe'],
     callToAction: 'Découvrir',
     image: null,
     uploadedImage: null,
@@ -111,6 +111,17 @@ const PinterestGenerator: React.FC = () => {
         
         updatePin('hashtags', newHashtags.slice(0, 10));
         
+        // Generate tags from the filename
+        const newTags = [...pin.tags];
+        words.forEach(word => {
+          const cleanWord = word.toLowerCase().replace(/[^\w]/g, '');
+          if (cleanWord.length > 2 && !newTags.includes(cleanWord)) {
+            newTags.push(cleanWord);
+          }
+        });
+        
+        updatePin('tags', newTags.slice(0, 10));
+        
         toast.success('Image chargée avec succès et contenu généré');
       };
       reader.readAsDataURL(file);
@@ -146,6 +157,20 @@ const PinterestGenerator: React.FC = () => {
       
       // Limiter à 10 hashtags maximum
       updatePin('hashtags', newHashtags.slice(0, 10));
+      
+      // Mettre à jour les étiquettes également
+      const newTags = [...pin.tags];
+      
+      // Ajouter tous les tags de l'image s'ils n'existent pas déjà
+      image.tags.forEach(tag => {
+        const cleanTag = tag.toLowerCase().replace(/[^\w\s]/g, '').trim();
+        if (cleanTag && !newTags.includes(cleanTag)) {
+          newTags.push(cleanTag);
+        }
+      });
+      
+      // Limiter à 15 étiquettes maximum
+      updatePin('tags', newTags.slice(0, 15));
     }
     
     toast.success(`Image "${image.title}" sélectionnée avec contenu généré`);

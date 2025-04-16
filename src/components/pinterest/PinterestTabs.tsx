@@ -6,6 +6,7 @@ import ImagesTab from './tabs/ImagesTab';
 import DesignTab from './tabs/DesignTab';
 import HashtagsTab from './tabs/HashtagsTab';
 import LocalImagesTab from './tabs/LocalImagesTab';
+import EtiquettesTab from './tabs/EtiquettesTab';
 import { PinterestPin, PinterestImage } from '@/types/pinterest';
 
 interface PinterestTabsProps {
@@ -55,12 +56,13 @@ const PinterestTabs: React.FC<PinterestTabsProps> = ({
 }) => {
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-      <TabsList className="grid grid-cols-5 w-full">
+      <TabsList className="grid grid-cols-6 w-full">
         <TabsTrigger value="content">Contenu</TabsTrigger>
         <TabsTrigger value="design">Design</TabsTrigger>
         <TabsTrigger value="images">Images</TabsTrigger>
         <TabsTrigger value="local">Images Locales</TabsTrigger>
         <TabsTrigger value="hashtags">Hashtags</TabsTrigger>
+        <TabsTrigger value="etiquettes">Étiquettes</TabsTrigger>
       </TabsList>
       
       <TabsContent value="content" className="py-4">
@@ -105,6 +107,13 @@ const PinterestTabs: React.FC<PinterestTabsProps> = ({
           handleAddHashtag={handleAddHashtag}
           handleRemoveHashtag={handleRemoveHashtag}
           handleSelectHashtag={handleSelectHashtag}
+        />
+      </TabsContent>
+
+      <TabsContent value="etiquettes" className="py-4">
+        <EtiquettesTab 
+          pin={pin}
+          updatePin={updatePin}
         />
       </TabsContent>
     </Tabs>

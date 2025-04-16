@@ -26,6 +26,7 @@ export interface PinterestPin {
   title: string;
   description: string;
   hashtags: string[];
+  tags: string[];  // Ajout des étiquettes
   callToAction: string;
   image: PinterestImage | null;
   uploadedImage: string | null;
