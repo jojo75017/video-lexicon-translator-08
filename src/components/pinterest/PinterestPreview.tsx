@@ -34,12 +34,6 @@ const PinterestPreview: React.FC<PinterestPreviewProps> = ({ pin }) => {
     return {};
   };
 
-  console.log('Pin data in preview:', {
-    image: pin.image,
-    uploadedImage: pin.uploadedImage,
-    title: pin.title
-  });
-
   return (
     <div 
       className="relative rounded-lg overflow-hidden shadow-lg"
@@ -112,32 +106,7 @@ const PinterestPreview: React.FC<PinterestPreviewProps> = ({ pin }) => {
             {pin.description}
           </p>
           
-          <div className="flex flex-wrap gap-1 mt-1">
-            {pin.hashtags.slice(0, 5).map(tag => (
-              <span 
-                key={tag} 
-                className="text-xs px-1.5 py-0.5 rounded"
-                style={{ 
-                  backgroundColor: `${pin.design.accentColor}cc`,
-                  color: pin.design.textColor
-                }}
-              >
-                #{tag}
-              </span>
-            ))}
-            {pin.hashtags.length > 5 && (
-              <span 
-                className="text-xs px-1.5 py-0.5 rounded"
-                style={{ 
-                  backgroundColor: `${pin.design.accentColor}cc`,
-                  color: pin.design.textColor
-                }}
-              >
-                +{pin.hashtags.length - 5}
-              </span>
-            )}
-          </div>
-          
+          {/* Bouton d'appel à l'action - Pas de hashtags affichés dans l'image */}
           <button 
             className="mt-2 text-sm font-semibold rounded-full px-4 py-1.5 text-center"
             style={{ 

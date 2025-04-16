@@ -2,6 +2,7 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PinterestPin } from '@/types/pinterest';
 import { pinterestDesigns, callToActions } from '@/data/pinterestImages';
@@ -17,6 +18,14 @@ const DesignTab: React.FC<DesignTabProps> = ({ pin, updatePin }) => {
     if (selectedDesign) {
       updatePin('design', selectedDesign);
     }
+  };
+  
+  const handleTextColorChange = (color: string) => {
+    const updatedDesign = {
+      ...pin.design,
+      textColor: color
+    };
+    updatePin('design', updatedDesign);
   };
 
   return (
@@ -53,6 +62,27 @@ const DesignTab: React.FC<DesignTabProps> = ({ pin, updatePin }) => {
             </div>
           </Card>
         ))}
+      </div>
+      
+      {/* Ajout de la personnalisation de la couleur du texte */}
+      <div className="mt-4 space-y-2">
+        <Label htmlFor="text-color">Couleur du texte</Label>
+        <div className="flex gap-2 items-center">
+          <Input 
+            id="text-color"
+            type="color" 
+            value={pin.design.textColor}
+            onChange={(e) => handleTextColorChange(e.target.value)}
+            className="w-12 h-10 p-1 cursor-pointer"
+          />
+          <Input 
+            type="text" 
+            value={pin.design.textColor}
+            onChange={(e) => handleTextColorChange(e.target.value)}
+            className="flex-1"
+            placeholder="#FFFFFF"
+          />
+        </div>
       </div>
       
       <div className="mt-4">
