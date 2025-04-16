@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { PinterestImage } from '@/types/pinterest';
-import { Globe, Map, ExternalLink, ImageOff, Info } from 'lucide-react';
+import { Globe, Map, ExternalLink, ImageOff, Info, AlertTriangle } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -30,12 +30,12 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onSelectImage, sele
     
     const lowerTitle = image.title.toLowerCase();
     
-    if (image.category === 'france' && image.region) {
-      return lowerTitle.includes(image.region.toLowerCase());
-    }
-    
     if (image.country) {
       return lowerTitle.includes(image.country.toLowerCase());
+    }
+    
+    if (image.category === 'france' && image.region) {
+      return lowerTitle.includes(image.region.toLowerCase());
     }
     
     return true;
@@ -43,7 +43,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onSelectImage, sele
   
   return (
     <div className="border rounded-md">
-      <ScrollArea className="h-[600px] w-full p-2">
+      <ScrollArea className="h-[700px] w-full p-2">
         {images.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-3">
             {images.map((image, index) => (
@@ -100,7 +100,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onSelectImage, sele
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Badge variant="destructive" className="text-xs">
-                                <Info className="h-3 w-3" />
+                                <AlertTriangle className="h-3 w-3" />
                               </Badge>
                             </TooltipTrigger>
                             <TooltipContent>
@@ -115,13 +115,15 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onSelectImage, sele
                           variant={
                             image.source === 'pixabay' ? 'default' : 
                             image.source === 'unsplash' ? 'secondary' :
-                            image.source === 'freepik' ? 'destructive' : 'outline'
+                            image.source === 'freepik' ? 'destructive' :
+                            image.source === 'pexels' ? 'outline' : 'outline'
                           } 
                           className="text-xs"
                         >
                           {image.source === 'pixabay' ? 'Pixabay' : 
                            image.source === 'unsplash' ? 'Unsplash' :
-                           image.source === 'freepik' ? 'Freepik' : 'Local'}
+                           image.source === 'freepik' ? 'Freepik' :
+                           image.source === 'pexels' ? 'Pexels' : 'Local'}
                         </Badge>
                       )}
                     </div>

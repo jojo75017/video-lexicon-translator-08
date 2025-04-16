@@ -18,8 +18,8 @@ interface ImagesTabProps {
   setSearchQuery: (query: string) => void;
   selectedImageCategory: 'monde' | 'europe' | 'france' | 'all';
   setSelectedImageCategory: (category: 'monde' | 'europe' | 'france' | 'all') => void;
-  imageSource: 'pixabay' | 'unsplash' | 'freepik';
-  setImageSource: (source: 'pixabay' | 'unsplash' | 'freepik') => void;
+  imageSource: 'pixabay' | 'unsplash' | 'freepik' | 'pexels';
+  setImageSource: (source: 'pixabay' | 'unsplash' | 'freepik' | 'pexels') => void;
   images: PinterestImage[];
   loading: boolean;
   handleSearch: () => void;
@@ -86,6 +86,13 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
           </Button>
           
           <Button variant="outline" size="sm" asChild>
+            <a href="https://www.pexels.com/fr-fr/" target="_blank" rel="noopener noreferrer" className="flex items-center">
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Photos Pexels
+            </a>
+          </Button>
+          
+          <Button variant="outline" size="sm" asChild>
             <a href="https://fr.freepik.com/photos-gratuite" target="_blank" rel="noopener noreferrer" className="flex items-center">
               <ExternalLink className="h-4 w-4 mr-2" />
               Photos Freepik Gratuites
@@ -145,7 +152,7 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
           
           <Select 
             value={imageSource} 
-            onValueChange={(val: 'pixabay' | 'unsplash' | 'freepik') => setImageSource(val)}
+            onValueChange={(val: 'pixabay' | 'unsplash' | 'freepik' | 'pexels') => setImageSource(val)}
           >
             <SelectTrigger className="w-full sm:w-[150px]">
               <SelectValue placeholder="Source" />
@@ -154,6 +161,7 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
               <SelectItem value="pixabay">Pixabay</SelectItem>
               <SelectItem value="unsplash">Unsplash</SelectItem>
               <SelectItem value="freepik">Freepik</SelectItem>
+              <SelectItem value="pexels">Pexels</SelectItem>
             </SelectContent>
           </Select>
           

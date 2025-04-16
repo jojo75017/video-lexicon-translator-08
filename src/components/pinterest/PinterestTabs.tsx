@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Palette, PenTool, Image, Tag, RefreshCw, FolderOpen } from 'lucide-react';
@@ -19,8 +20,8 @@ interface PinterestTabsProps {
   setSearchQuery: (query: string) => void;
   selectedImageCategory: 'monde' | 'europe' | 'france' | 'all';
   setSelectedImageCategory: (category: 'monde' | 'europe' | 'france' | 'all') => void;
-  imageSource: 'pixabay' | 'unsplash' | 'freepik';
-  setImageSource: (source: 'pixabay' | 'unsplash' | 'freepik') => void;
+  imageSource: 'pixabay' | 'unsplash' | 'freepik' | 'pexels';
+  setImageSource: (source: 'pixabay' | 'unsplash' | 'freepik' | 'pexels') => void;
   images: any[];
   loading: boolean;
   handleSearch: () => void;

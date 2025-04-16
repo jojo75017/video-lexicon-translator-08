@@ -196,6 +196,148 @@ const FREEPIK_IMAGES = [
   }
 ];
 
+// Images Pexels gratuites (exemples)
+const PEXELS_IMAGES = [
+  {
+    id: 'pexels-1',
+    url: 'https://images.pexels.com/photos/338515/pexels-photo-338515.jpeg',
+    title: 'Tour Eiffel, Paris',
+    category: 'france' as 'france',
+    country: 'France',
+    source: 'pexels' as 'pexels',
+    tags: ['paris', 'tour eiffel', 'france']
+  },
+  {
+    id: 'pexels-2',
+    url: 'https://images.pexels.com/photos/2363/france-landmark-lights-night.jpg',
+    title: 'Arc de Triomphe, Paris',
+    category: 'france' as 'france',
+    country: 'France',
+    source: 'pexels' as 'pexels',
+    tags: ['paris', 'arc de triomphe', 'france']
+  },
+  {
+    id: 'pexels-3',
+    url: 'https://images.pexels.com/photos/460740/pexels-photo-460740.jpeg',
+    title: 'Mont Saint-Michel, Normandie',
+    category: 'france' as 'france',
+    country: 'France',
+    source: 'pexels' as 'pexels',
+    tags: ['normandie', 'mont saint-michel', 'france']
+  },
+  {
+    id: 'pexels-4',
+    url: 'https://images.pexels.com/photos/1269805/pexels-photo-1269805.jpeg',
+    title: 'Santorini, Grèce',
+    category: 'europe' as 'europe',
+    country: 'Grèce',
+    source: 'pexels' as 'pexels',
+    tags: ['grèce', 'santorini', 'europe']
+  },
+  {
+    id: 'pexels-5',
+    url: 'https://images.pexels.com/photos/532826/pexels-photo-532826.jpeg',
+    title: 'Rome, Italie',
+    category: 'europe' as 'europe',
+    country: 'Italie',
+    source: 'pexels' as 'pexels',
+    tags: ['italie', 'rome', 'europe']
+  },
+  {
+    id: 'pexels-6',
+    url: 'https://images.pexels.com/photos/2538104/pexels-photo-2538104.jpeg',
+    title: 'Le Louvre, Paris',
+    category: 'france' as 'france',
+    country: 'France',
+    source: 'pexels' as 'pexels',
+    tags: ['paris', 'louvre', 'france']
+  },
+  {
+    id: 'pexels-7',
+    url: 'https://images.pexels.com/photos/358253/pexels-photo-358253.jpeg',
+    title: 'New York, États-Unis',
+    category: 'monde' as 'monde',
+    country: 'États-Unis',
+    source: 'pexels' as 'pexels',
+    tags: ['new york', 'usa', 'monde']
+  },
+  {
+    id: 'pexels-8',
+    url: 'https://images.pexels.com/photos/2835436/pexels-photo-2835436.jpeg',
+    title: 'Sydney, Australie',
+    category: 'monde' as 'monde',
+    country: 'Australie',
+    source: 'pexels' as 'pexels',
+    tags: ['sydney', 'australie', 'monde']
+  },
+  {
+    id: 'pexels-9',
+    url: 'https://images.pexels.com/photos/259447/pexels-photo-259447.jpeg',
+    title: 'Londres, Royaume-Uni',
+    category: 'europe' as 'europe',
+    country: 'Royaume-Uni',
+    source: 'pexels' as 'pexels',
+    tags: ['royaume-uni', 'londres', 'europe']
+  },
+  {
+    id: 'pexels-10',
+    url: 'https://images.pexels.com/photos/1388030/pexels-photo-1388030.jpeg',
+    title: 'Provence, France',
+    category: 'france' as 'france',
+    country: 'France',
+    region: 'Provence',
+    source: 'pexels' as 'pexels',
+    tags: ['provence', 'lavande', 'france']
+  },
+  {
+    id: 'pexels-11',
+    url: 'https://images.pexels.com/photos/921299/pexels-photo-921299.png',
+    title: 'Barcelone, Espagne',
+    category: 'europe' as 'europe',
+    country: 'Espagne',
+    source: 'pexels' as 'pexels',
+    tags: ['espagne', 'barcelone', 'europe']
+  },
+  {
+    id: 'pexels-12',
+    url: 'https://images.pexels.com/photos/753639/pexels-photo-753639.jpeg',
+    title: 'Tokyo, Japon',
+    category: 'monde' as 'monde',
+    country: 'Japon',
+    source: 'pexels' as 'pexels',
+    tags: ['japon', 'tokyo', 'monde']
+  },
+  {
+    id: 'pexels-13',
+    url: 'https://images.pexels.com/photos/2100814/pexels-photo-2100814.jpeg',
+    title: 'Bretagne, France',
+    category: 'france' as 'france',
+    country: 'France',
+    region: 'Bretagne',
+    source: 'pexels' as 'pexels',
+    tags: ['bretagne', 'côte', 'france']
+  },
+  {
+    id: 'pexels-14',
+    url: 'https://images.pexels.com/photos/1743165/pexels-photo-1743165.jpeg',
+    title: 'Alpes, France',
+    category: 'france' as 'france',
+    country: 'France',
+    region: 'Alpes',
+    source: 'pexels' as 'pexels',
+    tags: ['alpes', 'montagne', 'france']
+  },
+  {
+    id: 'pexels-15',
+    url: 'https://images.pexels.com/photos/3757144/pexels-photo-3757144.jpeg',
+    title: 'Madrid, Espagne',
+    category: 'europe' as 'europe',
+    country: 'Espagne',
+    source: 'pexels' as 'pexels',
+    tags: ['espagne', 'madrid', 'europe']
+  }
+];
+
 // Cette fonction améliore la cohérence entre les titres et les images
 const ensureTitleMatchesLocation = (images: PinterestImage[]): PinterestImage[] => {
   return images.map(image => {
@@ -286,6 +428,40 @@ export const searchFreepikImages = async (query: string, category: string = ''):
   }
 };
 
+// Nouvelle fonction pour rechercher des images sur Pexels
+export const searchPexelsImages = async (query: string, category: string = ''): Promise<PinterestImage[]> => {
+  try {
+    console.log('Recherche sur Pexels pour:', query, 'catégorie:', category);
+    
+    // Filtrer les images Pexels selon la requête et la catégorie
+    let results = [...PEXELS_IMAGES];
+    
+    if (query) {
+      const lowerQuery = query.toLowerCase();
+      results = results.filter(img => 
+        img.title.toLowerCase().includes(lowerQuery) || 
+        img.country?.toLowerCase().includes(lowerQuery) ||
+        img.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
+      );
+    }
+    
+    if (category && category !== 'all') {
+      results = results.filter(img => img.category === category);
+    }
+    
+    console.log(`Trouvé ${results.length} images Pexels pour la requête "${query}"`);
+    
+    // Vérifier que toutes les URLs sont valides
+    results = results.filter(img => img.url && img.url.startsWith('http'));
+    
+    return ensureTitleMatchesLocation(results);
+  } catch (error) {
+    console.error('Erreur lors de la recherche sur Pexels:', error);
+    // toast.error('Impossible de récupérer les images depuis Pexels');
+    return [];
+  }
+};
+
 // Fonction pour générer un titre à partir des tags
 const generateTitleFromTags = (tags: string): string => {
   if (!tags) return '';
@@ -338,19 +514,23 @@ export const getPresetImagesByCategory = async (category: 'monde' | 'europe' | '
   try {
     let results: PinterestImage[] = [];
     
-    // Ajouter des images Freepik pour améliorer les résultats
+    // Ajouter des images Freepik et Pexels pour améliorer les résultats
     const freepikImages = FREEPIK_IMAGES.filter(img => 
       category === 'all' || img.category === category
     );
     
+    const pexelsImages = PEXELS_IMAGES.filter(img => 
+      category === 'all' || img.category === category
+    );
+    
     if (category === 'all') {
-      results = [...worldImages, ...europeImages, ...franceImages, ...freepikImages];
+      results = [...worldImages, ...europeImages, ...franceImages, ...freepikImages, ...pexelsImages];
     } else if (category === 'monde') {
-      results = [...worldImages, ...freepikImages.filter(img => img.category === 'monde')];
+      results = [...worldImages, ...freepikImages.filter(img => img.category === 'monde'), ...pexelsImages.filter(img => img.category === 'monde')];
     } else if (category === 'europe') {
-      results = [...europeImages, ...freepikImages.filter(img => img.category === 'europe')];
+      results = [...europeImages, ...freepikImages.filter(img => img.category === 'europe'), ...pexelsImages.filter(img => img.category === 'europe')];
     } else if (category === 'france') {
-      results = [...franceImages, ...freepikImages.filter(img => img.category === 'france')];
+      results = [...franceImages, ...freepikImages.filter(img => img.category === 'france'), ...pexelsImages.filter(img => img.category === 'france')];
     }
     
     // Vérifier que les images ont bien des URLs valides
@@ -412,4 +592,17 @@ Préparez votre voyage et laissez-vous guider par l'appel de l'aventure dans ce 
   }
   
   return { title, description };
+};
+
+// Fonction pour valider toutes les images et corriger les titres
+export const validateAndFixImages = (images: PinterestImage[]): PinterestImage[] => {
+  if (!images || images.length === 0) return [];
+  
+  // Filtrer les images avec des URLs valides
+  let validImages = images.filter(img => img.url && img.url.startsWith('http'));
+  
+  // S'assurer que toutes les images ont des titres cohérents
+  validImages = ensureTitleMatchesLocation(validImages);
+  
+  return validImages;
 };
