@@ -17,8 +17,8 @@ interface ImagesTabProps {
   setSearchQuery: (query: string) => void;
   selectedImageCategory: 'monde' | 'europe' | 'france' | 'all';
   setSelectedImageCategory: (category: 'monde' | 'europe' | 'france' | 'all') => void;
-  imageSource: 'pixabay' | 'unsplash';
-  setImageSource: (source: 'pixabay' | 'unsplash') => void;
+  imageSource: 'pixabay' | 'unsplash' | 'freepik';
+  setImageSource: (source: 'pixabay' | 'unsplash' | 'freepik') => void;
   images: PinterestImage[];
   loading: boolean;
   handleSearch: () => void;
@@ -46,7 +46,7 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
 
   return (
     <div className="flex flex-col space-y-4">
-      <div className="flex items-center space-x-2">
+      <div className="flex flex-wrap items-center gap-2">
         <Label htmlFor="image-upload" className="cursor-pointer">
           <div className="flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2 rounded-md">
             <UploadCloud className="h-4 w-4" />
@@ -74,12 +74,21 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
           </Tooltip>
         </TooltipProvider>
         
-        <Button variant="outline" size="sm" asChild className="ml-auto">
-          <a href="https://free.theresanaiforthat.com/@taaft/image-generator/?ref=header" target="_blank" rel="noopener noreferrer" className="flex items-center">
-            <ExternalLink className="h-4 w-4 mr-2" />
-            Générateur de Prompts AI
-          </a>
-        </Button>
+        <div className="flex gap-2 ml-auto">
+          <Button variant="outline" size="sm" asChild>
+            <a href="https://free.theresanaiforthat.com/@taaft/image-generator/?ref=header" target="_blank" rel="noopener noreferrer" className="flex items-center">
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Générateur de Prompts AI
+            </a>
+          </Button>
+          
+          <Button variant="outline" size="sm" asChild>
+            <a href="https://fr.freepik.com/photos-gratuite" target="_blank" rel="noopener noreferrer" className="flex items-center">
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Photos Freepik Gratuites
+            </a>
+          </Button>
+        </div>
       </div>
       
       {pin.uploadedImage && (
@@ -123,7 +132,7 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
           
           <Select 
             value={imageSource} 
-            onValueChange={(val: 'pixabay' | 'unsplash') => setImageSource(val)}
+            onValueChange={(val: 'pixabay' | 'unsplash' | 'freepik') => setImageSource(val)}
           >
             <SelectTrigger className="w-full sm:w-[150px]">
               <SelectValue placeholder="Source" />
@@ -131,6 +140,7 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
             <SelectContent>
               <SelectItem value="pixabay">Pixabay</SelectItem>
               <SelectItem value="unsplash">Unsplash</SelectItem>
+              <SelectItem value="freepik">Freepik</SelectItem>
             </SelectContent>
           </Select>
           

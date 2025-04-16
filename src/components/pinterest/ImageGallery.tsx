@@ -1,7 +1,7 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { PinterestImage } from '@/types/pinterest';
-import { Globe, Map, ExternalLink } from 'lucide-react';
+import { Globe, Map, ExternalLink, ImageOff } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 
@@ -12,11 +12,20 @@ interface ImageGalleryProps {
 }
 
 const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onSelectImage, selectedImage }) => {
-  console.log("Images reçues dans ImageGallery:", images);
+  const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
+  
+  const handleImageError = (imageUrl: string) => {
+    console.error("Erreur de chargement d'image:", imageUrl);
+    setFailedImages(prev => {
+      const newSet = new Set(prev);
+      newSet.add(imageUrl);
+      return newSet;
+    });
+  };
   
   return (
     <div className="border rounded-md">
-      <ScrollArea className="h-[420px] w-full p-2">
+      <ScrollArea className="h-[520px] w-full p-2">
         {images.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {images.map((image, index) => (
@@ -26,15 +35,20 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onSelectImage, sele
                   hover:opacity-90 group border ${selectedImage?.id === image.id ? 'ring-2 ring-primary' : ''}`}
                 onClick={() => onSelectImage(image)}
               >
-                <img 
-                  src={image.url} 
-                  alt={image.title || 'Image sans titre'}
-                  className="w-full h-40 object-cover"
-                  onError={(e) => {
-                    console.error("Erreur de chargement d'image:", image.url);
-                    e.currentTarget.src = 'https://placehold.co/400x600/gray/white?text=Image+non+disponible';
-                  }}
-                />
+                {!failedImages.has(image.url) ? (
+                  <img 
+                    src={image.url} 
+                    alt={image.title || 'Image sans titre'}
+                    className="w-full h-40 object-cover"
+                    onError={() => handleImageError(image.url)}
+                  />
+                ) : (
+                  <div className="w-full h-40 bg-gray-100 flex flex-col items-center justify-center">
+                    <ImageOff className="h-8 w-8 text-gray-400 mb-2" />
+                    <p className="text-xs text-gray-500">Image non disponible</p>
+                  </div>
+                )}
+                
                 <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all p-2 flex flex-col justify-between">
                   <div className="flex items-center justify-between">
                     <Badge variant="outline" className="bg-white bg-opacity-75 text-xs">
@@ -49,9 +63,17 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onSelectImage, sele
                     </Badge>
                     
                     {image.source && (
-                      <Badge variant={image.source === 'pixabay' ? 'default' : 'secondary'} className="text-xs ml-1">
+                      <Badge 
+                        variant={
+                          image.source === 'pixabay' ? 'default' : 
+                          image.source === 'unsplash' ? 'secondary' :
+                          image.source === 'freepik' ? 'destructive' : 'outline'
+                        } 
+                        className="text-xs ml-1"
+                      >
                         {image.source === 'pixabay' ? 'Pixabay' : 
-                         image.source === 'unsplash' ? 'Unsplash' : 'Local'}
+                         image.source === 'unsplash' ? 'Unsplash' :
+                         image.source === 'freepik' ? 'Freepik' : 'Local'}
                       </Badge>
                     )}
                   </div>

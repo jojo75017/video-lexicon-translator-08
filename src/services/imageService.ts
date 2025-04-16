@@ -84,6 +84,118 @@ const MOCK_IMAGES = [
 const PIXABAY_API_KEY = '39696617-7bb5c5dbc12c51d28397ca3b0'; // Clé publique pour demo
 const UNSPLASH_ACCESS_KEY = 'HyoKoX5Yj8uIJBz_9dRrj3hVemnoXg66Pb--pXOgdlA'; // Clé publique pour demo
 
+// Images Freepik gratuites (exemples)
+const FREEPIK_IMAGES = [
+  {
+    id: 'freepik-1',
+    url: 'https://img.freepik.com/photos-gratuite/tour-eiffel-paris-ile-france_1232-3116.jpg',
+    title: 'Tour Eiffel, Paris',
+    category: 'france' as 'france',
+    country: 'France',
+    source: 'freepik' as 'freepik',
+    tags: ['paris', 'tour eiffel', 'france']
+  },
+  {
+    id: 'freepik-2',
+    url: 'https://img.freepik.com/photos-gratuite/bord-mer-du-lac-annecy_1232-3613.jpg',
+    title: 'Lac d\'Annecy',
+    category: 'france' as 'france',
+    country: 'France',
+    source: 'freepik' as 'freepik',
+    tags: ['annecy', 'lac', 'alpes']
+  },
+  {
+    id: 'freepik-3',
+    url: 'https://img.freepik.com/photos-gratuite/skyline-colline-parlementaire-ottawa-ontario-canada_1232-4698.jpg',
+    title: 'Ottawa, Canada',
+    category: 'monde' as 'monde',
+    country: 'Canada',
+    source: 'freepik' as 'freepik',
+    tags: ['ottawa', 'canada', 'parlement']
+  },
+  {
+    id: 'freepik-4',
+    url: 'https://img.freepik.com/photos-gratuite/pont-rialto-grand-canal-venise-italie_1232-4903.jpg',
+    title: 'Venise, Italie',
+    category: 'europe' as 'europe',
+    country: 'Italie',
+    source: 'freepik' as 'freepik',
+    tags: ['venise', 'italie', 'canal']
+  },
+  {
+    id: 'freepik-5',
+    url: 'https://img.freepik.com/photos-gratuite/great-wall-chine_1232-3921.jpg',
+    title: 'Grande Muraille, Chine',
+    category: 'monde' as 'monde',
+    country: 'Chine',
+    source: 'freepik' as 'freepik',
+    tags: ['chine', 'grande muraille', 'asie']
+  },
+  {
+    id: 'freepik-6',
+    url: 'https://img.freepik.com/photos-gratuite/vue-aerienne-barcelone-espagne-sagrada-familia_1232-3980.jpg',
+    title: 'Barcelone, Espagne',
+    category: 'europe' as 'europe',
+    country: 'Espagne',
+    source: 'freepik' as 'freepik',
+    tags: ['barcelone', 'espagne', 'sagrada familia']
+  },
+  {
+    id: 'freepik-7',
+    url: 'https://img.freepik.com/photos-gratuite/chateau-royal-chambord-loire-france_1232-4426.jpg',
+    title: 'Château de Chambord',
+    category: 'france' as 'france',
+    country: 'France',
+    source: 'freepik' as 'freepik',
+    tags: ['loire', 'château', 'chambord']
+  },
+  {
+    id: 'freepik-8',
+    url: 'https://img.freepik.com/photos-gratuite/quartier-petit-france-strasbourg-france_1232-4492.jpg',
+    title: 'Strasbourg, France',
+    category: 'france' as 'france',
+    country: 'France',
+    source: 'freepik' as 'freepik',
+    tags: ['strasbourg', 'alsace', 'petite france']
+  },
+  {
+    id: 'freepik-9',
+    url: 'https://img.freepik.com/photos-gratuite/times-square-new-york-etats-unis_1232-4352.jpg',
+    title: 'New York, États-Unis',
+    category: 'monde' as 'monde',
+    country: 'États-Unis',
+    source: 'freepik' as 'freepik',
+    tags: ['new york', 'times square', 'usa']
+  },
+  {
+    id: 'freepik-10',
+    url: 'https://img.freepik.com/photos-gratuite/london-eye-sur-tamise-coucher-du-soleil_1232-4536.jpg',
+    title: 'Londres, Royaume-Uni',
+    category: 'europe' as 'europe',
+    country: 'Royaume-Uni',
+    source: 'freepik' as 'freepik',
+    tags: ['londres', 'london eye', 'tamise']
+  },
+  {
+    id: 'freepik-11',
+    url: 'https://img.freepik.com/photos-gratuite/mont-fuji-avec-feuilles-automne-lac-kawaguchiko-japon_1232-4522.jpg',
+    title: 'Mont Fuji, Japon',
+    category: 'monde' as 'monde',
+    country: 'Japon',
+    source: 'freepik' as 'freepik',
+    tags: ['japon', 'mont fuji', 'kawaguchiko']
+  },
+  {
+    id: 'freepik-12',
+    url: 'https://img.freepik.com/photos-gratuite/cote-atlantique-pres-biarritz-france_1232-4530.jpg',
+    title: 'Biarritz, France',
+    category: 'france' as 'france',
+    country: 'France',
+    source: 'freepik' as 'freepik',
+    tags: ['biarritz', 'atlantique', 'pays basque']
+  }
+];
+
 // Function to get mock images filtered by query
 const getMockImages = (query: string, category: string = ''): PinterestImage[] => {
   console.log("Récupération d'images de test pour", query, category);
@@ -120,6 +232,40 @@ export const searchPixabayImages = async (query: string, category: string = ''):
     console.error('Erreur lors de la recherche sur Pixabay:', error);
     toast.error('Impossible de récupérer les images depuis Pixabay. Utilisation des images locales.');
     return getMockImages(query, category);
+  }
+};
+
+// Nouvelle fonction pour rechercher des images sur Freepik
+export const searchFreepikImages = async (query: string, category: string = ''): Promise<PinterestImage[]> => {
+  try {
+    console.log('Recherche sur Freepik pour:', query, 'catégorie:', category);
+    
+    // Filtrer les images Freepik selon la requête et la catégorie
+    let results = [...FREEPIK_IMAGES];
+    
+    if (query) {
+      const lowerQuery = query.toLowerCase();
+      results = results.filter(img => 
+        img.title.toLowerCase().includes(lowerQuery) || 
+        img.country?.toLowerCase().includes(lowerQuery) ||
+        img.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
+      );
+    }
+    
+    if (category && category !== 'all') {
+      results = results.filter(img => img.category === category);
+    }
+    
+    console.log(`Trouvé ${results.length} images Freepik pour la requête "${query}"`);
+    
+    // Vérifier que toutes les URLs sont valides
+    results = results.filter(img => img.url && img.url.startsWith('http'));
+    
+    return results;
+  } catch (error) {
+    console.error('Erreur lors de la recherche sur Freepik:', error);
+    toast.error('Impossible de récupérer les images depuis Freepik');
+    return [];
   }
 };
 
@@ -175,18 +321,26 @@ export const getPresetImagesByCategory = async (category: 'monde' | 'europe' | '
   try {
     let results: PinterestImage[] = [];
     
+    // Ajouter des images Freepik pour améliorer les résultats
+    const freepikImages = FREEPIK_IMAGES.filter(img => 
+      category === 'all' || img.category === category
+    );
+    
     if (category === 'all') {
-      results = [...worldImages, ...europeImages, ...franceImages];
+      results = [...worldImages, ...europeImages, ...franceImages, ...freepikImages];
     } else if (category === 'monde') {
-      results = [...worldImages];
+      results = [...worldImages, ...freepikImages.filter(img => img.category === 'monde')];
     } else if (category === 'europe') {
-      results = [...europeImages];
+      results = [...europeImages, ...freepikImages.filter(img => img.category === 'europe')];
     } else if (category === 'france') {
-      results = [...franceImages];
+      results = [...franceImages, ...freepikImages.filter(img => img.category === 'france')];
     }
     
     // Vérifier que les images ont bien des URLs valides
     results = results.filter(img => img.url && img.url.startsWith('http'));
+    
+    // Mélanger les résultats pour une présentation plus variée
+    results.sort(() => Math.random() - 0.5);
     
     console.log(`Chargé ${results.length} images pour la catégorie ${category}`);
     return results;

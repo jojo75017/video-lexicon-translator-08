@@ -6,7 +6,7 @@ export interface PinterestImage {
   category: 'monde' | 'europe' | 'france';
   country?: string;
   region?: string;
-  source?: 'pixabay' | 'unsplash' | 'local';
+  source?: 'pixabay' | 'unsplash' | 'freepik' | 'local';
   tags?: string[];
 }
 

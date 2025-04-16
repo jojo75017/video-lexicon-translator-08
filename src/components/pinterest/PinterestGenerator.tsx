@@ -1,9 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { PinterestPin, PinterestImage } from '@/types/pinterest';
 import { pinterestDesigns } from '@/data/pinterestImages';
-import { searchPixabayImages, searchUnsplashImages, getPresetImagesByCategory, generateContentFromImage } from '@/services/imageService';
+import { searchPixabayImages, searchUnsplashImages, searchFreepikImages, getPresetImagesByCategory, generateContentFromImage } from '@/services/imageService';
 import { toast } from 'sonner';
 import PinterestPreviewCard from './PinterestPreviewCard';
 import PinterestTabs from './PinterestTabs';
@@ -12,10 +13,9 @@ const PinterestGenerator: React.FC = () => {
   const [activeTab, setActiveTab] = useState('design');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedImageCategory, setSelectedImageCategory] = useState<'monde' | 'europe' | 'france' | 'all'>('all');
-  const [imageSource, setImageSource] = useState<'pixabay' | 'unsplash'>('pixabay');
+  const [imageSource, setImageSource] = useState<'pixabay' | 'unsplash' | 'freepik'>('pixabay');
   const [images, setImages] = useState<PinterestImage[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedHashtags, setSelectedHashtags] = useState<string[]>([]);
   const [customHashtag, setCustomHashtag] = useState('');
   
   const [pin, setPin] = useState<PinterestPin>({
@@ -159,8 +159,10 @@ const PinterestGenerator: React.FC = () => {
       
       if (imageSource === 'pixabay') {
         searchResults = await searchPixabayImages(searchQuery, selectedImageCategory);
-      } else {
+      } else if (imageSource === 'unsplash') {
         searchResults = await searchUnsplashImages(searchQuery);
+      } else if (imageSource === 'freepik') {
+        searchResults = await searchFreepikImages(searchQuery);
       }
       
       if (searchResults.length === 0) {

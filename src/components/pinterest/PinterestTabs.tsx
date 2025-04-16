@@ -19,8 +19,8 @@ interface PinterestTabsProps {
   setSearchQuery: (query: string) => void;
   selectedImageCategory: 'monde' | 'europe' | 'france' | 'all';
   setSelectedImageCategory: (category: 'monde' | 'europe' | 'france' | 'all') => void;
-  imageSource: 'pixabay' | 'unsplash';
-  setImageSource: (source: 'pixabay' | 'unsplash') => void;
+  imageSource: 'pixabay' | 'unsplash' | 'freepik';
+  setImageSource: (source: 'pixabay' | 'unsplash' | 'freepik') => void;
   images: any[];
   loading: boolean;
   handleSearch: () => void;
