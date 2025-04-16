@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ImageGenerator from '@/components/image-generator/ImageGenerator';
 
@@ -17,10 +17,17 @@ const ImageGeneratorPage: React.FC = () => {
             </Link>
             <h1 className="text-xl font-bold hidden sm:block">Générateur d'Images IA</h1>
           </div>
-          <div>
+          <div className="flex space-x-2">
             <Button variant="outline" size="sm" asChild>
               <a href="https://platform.openai.com/docs/guides/images" target="_blank" rel="noopener noreferrer">
-                Documentation OpenAI
+                <ExternalLink className="mr-2 h-4 w-4" />
+                Docs OpenAI
+              </a>
+            </Button>
+            <Button variant="outline" size="sm" asChild>
+              <a href="https://www.pexels.com/fr-fr/" target="_blank" rel="noopener noreferrer">
+                <ExternalLink className="mr-2 h-4 w-4" />
+                Pexels
               </a>
             </Button>
           </div>
@@ -29,9 +36,9 @@ const ImageGeneratorPage: React.FC = () => {
       
       <div className="container mx-auto p-4 space-y-8 py-8">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h1 className="text-2xl font-bold mb-2">Générateur d'Images IA (DALL-E)</h1>
+          <h1 className="text-2xl font-bold mb-2">Générateur d'Images</h1>
           <p className="text-gray-600 mb-6">
-            Créez des images uniques à partir de descriptions textuelles grâce à l'IA DALL-E d'OpenAI
+            Créez des images uniques à partir de descriptions textuelles ou trouvez des images gratuites
           </p>
           
           <ImageGenerator />
