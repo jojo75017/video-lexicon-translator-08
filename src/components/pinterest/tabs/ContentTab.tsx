@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -30,9 +31,13 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin }) => {
 
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
-    // Limit to ~50 words (approximately 300 characters)
-    if (value.length <= 300) {
+    // Limit to ~100 words (approximately 600 characters)
+    if (value.length <= 600) {
       updatePin('description', value);
+    } else {
+      // Truncate to 600 characters if longer
+      updatePin('description', value.substring(0, 600));
+      toast.warning("La description a été tronquée à environ 100 mots");
     }
   };
 
@@ -47,7 +52,9 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin }) => {
     try {
       // Generate content directly from the keyword
       const defaultTitle = `Découvrez les merveilles de ${keyword}`.substring(0, 60);
-      const defaultDescription = `Explorez ${keyword} avec ses particularités uniques, ses paysages magnifiques et son atmosphère inoubliable. Une destination qui mérite d'être découverte.`;
+      
+      // Description plus détaillée (environ 100 mots)
+      const defaultDescription = `Explorez ${keyword} et laissez-vous séduire par ses innombrables trésors. Des paysages à couper le souffle aux monuments historiques emblématiques, en passant par une gastronomie délicieuse et une culture fascinante. Chaque coin de rue révèle de nouvelles merveilles à découvrir et de précieux souvenirs à créer. Que vous soyez amateur d'architecture, passionné d'histoire, ou simplement en quête d'évasion, ${keyword} saura vous charmer par son authenticité et sa diversité. Préparez votre appareil photo et vos chaussures de marche, car cette destination regorge d'expériences inoubliables qui n'attendent que vous. Un voyage qui éveillera tous vos sens et vous laissera des souvenirs impérissables pour les années à venir.`;
       
       // Update title and description
       updatePin('title', defaultTitle);
@@ -108,17 +115,18 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin }) => {
       
       <div>
         <Label htmlFor="description" className="flex justify-between">
-          <span>Description (environ 50 mots)</span>
-          <span className={`text-xs ${pin.description.length > 270 ? 'text-orange-500' : ''}`}>
-            {pin.description.length}/300
+          <span>Description (environ 100 mots)</span>
+          <span className={`text-xs ${pin.description.length > 540 ? 'text-orange-500' : ''}`}>
+            {pin.description.length}/600
           </span>
         </Label>
         <Textarea
           id="description"
-          placeholder="Décrivez votre épingle en 50 mots environ"
+          placeholder="Décrivez votre épingle en détail (environ 100 mots)"
           value={pin.description}
           onChange={handleDescriptionChange}
-          className="mt-1 min-h-24"
+          className="mt-1 min-h-36"
+          rows={6}
         />
       </div>
     </div>

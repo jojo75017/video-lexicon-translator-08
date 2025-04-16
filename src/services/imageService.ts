@@ -1,7 +1,7 @@
-
 import axios from 'axios';
 import { PixabayResponse, UnsplashResponse, PinterestImage } from '@/types/pinterest';
 import { toast } from 'sonner';
+import { worldImages, europeImages, franceImages } from '@/data/pinterestImages';
 
 // Mock image data for when APIs fail
 const MOCK_IMAGES = [
@@ -206,8 +206,22 @@ const extractLocationFromQuery = (query: string): string => {
 export const getPresetImagesByCategory = async (category: 'monde' | 'europe' | 'france' | 'all'): Promise<PinterestImage[]> => {
   console.log('Loading preset images for category:', category);
   
-  // Use mock images instead of API calls
-  return getMockImages('', category);
+  try {
+    if (category === 'all') {
+      return [...worldImages, ...europeImages, ...franceImages];
+    } else if (category === 'monde') {
+      return worldImages;
+    } else if (category === 'europe') {
+      return europeImages;
+    } else if (category === 'france') {
+      return franceImages;
+    }
+    return [];
+  } catch (error) {
+    console.error('Erreur lors du chargement des images préréglées:', error);
+    // Utiliser des images de secours en cas d'erreur
+    return getMockImages('', category);
+  }
 };
 
 // Fonction pour générer du contenu basé sur une image
@@ -228,24 +242,26 @@ export const generateContentFromImage = (image: PinterestImage): { title: string
     title = "Découvrez cette destination incroyable";
   }
   
-  // Limiter le titre à 40 caractères
-  if (title.length > 40) {
-    title = title.substring(0, 37) + '...';
+  // Limiter le titre à 60 caractères
+  if (title.length > 60) {
+    title = title.substring(0, 57) + '...';
   }
   
-  // Générer une description basée sur l'image
-  if (image.tags && image.tags.length > 0) {
-    const locationName = image.country || image.region || image.title || 'cette destination';
-    description = `Explorez ${locationName} avec ${image.tags.slice(0, 3).join(', ')}. `;
-    description += `Découvrez les paysages magnifiques, la culture fascinante et créez des souvenirs inoubliables lors de votre voyage.`;
-  } else {
-    const locationName = image.country || image.region || image.title || 'cette destination';
-    description = `Partez à la découverte de ${locationName}. Un lieu magique où nature, culture et aventure se rencontrent pour vous offrir une expérience inoubliable.`;
-  }
+  // Générer une description plus détaillée basée sur l'image (environ 100 mots)
+  const locationName = image.country || image.region || image.title || 'cette destination';
+  const tags = image.tags && image.tags.length > 0 ? image.tags.slice(0, 3).join(', ') : 'paysages à couper le souffle, culture locale, histoire fascinante';
   
-  // Limiter la description à 300 caractères
-  if (description.length > 300) {
-    description = description.substring(0, 297) + '...';
+  description = `Partez à la découverte de ${locationName}, une destination qui ravira tous vos sens. Vous serez émerveillé par ses ${tags}. 
+  
+Chaque coin de rue révèle un nouveau trésor à explorer, chaque rencontre une histoire à écouter. Les couleurs vives, les parfums enivrants et les saveurs délicates vous transporteront dans un univers où le temps semble s'être arrêté.
+
+Que vous soyez amateur de photographie, passionné d'histoire, ou simplement en quête d'évasion, ${locationName} saura vous séduire par son authenticité et sa diversité. Des monuments emblématiques aux petites ruelles cachées, chaque lieu porte en lui l'empreinte d'un passé riche et d'une culture vivante.
+
+Préparez votre voyage et laissez-vous guider par l'appel de l'aventure dans ce lieu magique où nature et culture se rencontrent harmonieusement.`;
+  
+  // Limiter la description à 600 caractères (environ 100 mots)
+  if (description.length > 600) {
+    description = description.substring(0, 597) + '...';
   }
   
   return { title, description };

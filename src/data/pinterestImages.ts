@@ -1,7 +1,7 @@
 
 import { PinterestImage, PinterestDesign } from '@/types/pinterest';
 
-// 20 images de pays du monde
+// 30 images de pays du monde
 export const worldImages: PinterestImage[] = [
   { id: 'w1', url: 'https://cdn.pixabay.com/photo/2016/07/30/08/13/moscow-1556561_1280.jpg', title: 'Moscou, Russie', category: 'monde', country: 'Russie' },
   { id: 'w2', url: 'https://cdn.pixabay.com/photo/2019/09/11/03/31/chureito-pagoda-4467515_1280.jpg', title: 'Mont Fuji, Japon', category: 'monde', country: 'Japon' },
@@ -23,9 +23,19 @@ export const worldImages: PinterestImage[] = [
   { id: 'w18', url: 'https://cdn.pixabay.com/photo/2014/04/22/05/40/marina-bay-sands-329998_1280.jpg', title: 'Singapore', category: 'monde', country: 'Singapore' },
   { id: 'w19', url: 'https://cdn.pixabay.com/photo/2021/09/15/08/34/cenote-6626798_1280.jpg', title: 'Cenote, Mexique', category: 'monde', country: 'Mexique' },
   { id: 'w20', url: 'https://cdn.pixabay.com/photo/2017/10/28/07/47/morocco-2896291_1280.jpg', title: 'Marrakech, Maroc', category: 'monde', country: 'Maroc' },
+  { id: 'w21', url: 'https://cdn.pixabay.com/photo/2015/10/12/15/46/foz-do-iguacu-984039_1280.jpg', title: 'Chutes d\'Iguazu, Brésil', category: 'monde', country: 'Brésil' },
+  { id: 'w22', url: 'https://cdn.pixabay.com/photo/2013/02/21/19/06/drink-84533_1280.jpg', title: 'Rio de Janeiro, Brésil', category: 'monde', country: 'Brésil' },
+  { id: 'w23', url: 'https://cdn.pixabay.com/photo/2017/04/08/10/42/burj-khalifa-2212978_1280.jpg', title: 'Dubaï, Émirats Arabes Unis', category: 'monde', country: 'Émirats Arabes Unis' },
+  { id: 'w24', url: 'https://cdn.pixabay.com/photo/2019/03/27/15/24/bora-bora-4085078_1280.jpg', title: 'Bora Bora, Polynésie française', category: 'monde', country: 'France (Outre-mer)' },
+  { id: 'w25', url: 'https://cdn.pixabay.com/photo/2018/11/17/07/10/cape-town-3820157_1280.jpg', title: 'Cape Town, Afrique du Sud', category: 'monde', country: 'Afrique du Sud' },
+  { id: 'w26', url: 'https://cdn.pixabay.com/photo/2020/03/26/22/15/petra-4971956_1280.jpg', title: 'Pétra, Jordanie', category: 'monde', country: 'Jordanie' },
+  { id: 'w27', url: 'https://cdn.pixabay.com/photo/2020/06/05/16/18/temple-5263765_1280.jpg', title: 'Angkor Wat, Cambodge', category: 'monde', country: 'Cambodge' },
+  { id: 'w28', url: 'https://cdn.pixabay.com/photo/2019/05/02/18/13/volcano-4173848_1280.jpg', title: 'Volcan Arenal, Costa Rica', category: 'monde', country: 'Costa Rica' },
+  { id: 'w29', url: 'https://cdn.pixabay.com/photo/2017/08/24/01/12/mount-roraima-2674921_1280.jpg', title: 'Mont Roraima, Venezuela', category: 'monde', country: 'Venezuela' },
+  { id: 'w30', url: 'https://cdn.pixabay.com/photo/2017/08/07/23/50/mountains-2608866_1280.jpg', title: 'Machu Picchu, Pérou', category: 'monde', country: 'Pérou' },
 ];
 
-// 20 images de pays européens
+// 30 images de pays européens
 export const europeImages: PinterestImage[] = [
   { id: 'e1', url: 'https://cdn.pixabay.com/photo/2013/03/02/02/41/alley-89197_1280.jpg', title: 'Prague, République tchèque', category: 'europe', country: 'République tchèque' },
   { id: 'e2', url: 'https://cdn.pixabay.com/photo/2016/07/11/21/23/water-1510591_1280.jpg', title: 'Venise, Italie', category: 'europe', country: 'Italie' },
@@ -47,9 +57,19 @@ export const europeImages: PinterestImage[] = [
   { id: 'e18', url: 'https://cdn.pixabay.com/photo/2017/08/10/08/25/sweden-2620133_1280.jpg', title: 'Stockholm, Suède', category: 'europe', country: 'Suède' },
   { id: 'e19', url: 'https://cdn.pixabay.com/photo/2020/07/23/21/34/copenhagen-5432792_1280.jpg', title: 'Copenhague, Danemark', category: 'europe', country: 'Danemark' },
   { id: 'e20', url: 'https://cdn.pixabay.com/photo/2015/03/26/10/07/cyprus-691379_1280.jpg', title: 'Chypre', category: 'europe', country: 'Chypre' },
+  { id: 'e21', url: 'https://cdn.pixabay.com/photo/2017/12/16/22/22/iceland-3023638_1280.jpg', title: 'Islande', category: 'europe', country: 'Islande' },
+  { id: 'e22', url: 'https://cdn.pixabay.com/photo/2019/03/08/20/14/florence-4043227_1280.jpg', title: 'Florence, Italie', category: 'europe', country: 'Italie' },
+  { id: 'e23', url: 'https://cdn.pixabay.com/photo/2018/04/25/09/26/eiffel-tower-3349075_1280.jpg', title: 'Paris, France', category: 'europe', country: 'France' },
+  { id: 'e24', url: 'https://cdn.pixabay.com/photo/2014/09/07/21/52/city-438393_1280.jpg', title: 'Bruxelles, Belgique', category: 'europe', country: 'Belgique' },
+  { id: 'e25', url: 'https://cdn.pixabay.com/photo/2015/10/30/18/33/rome-1014894_1280.jpg', title: 'Rome, Italie', category: 'europe', country: 'Italie' },
+  { id: 'e26', url: 'https://cdn.pixabay.com/photo/2020/01/31/22/50/veliko-tarnovo-4810033_1280.jpg', title: 'Veliko Tarnovo, Bulgarie', category: 'europe', country: 'Bulgarie' },
+  { id: 'e27', url: 'https://cdn.pixabay.com/photo/2016/09/02/08/32/blue-sky-1638925_1280.jpg', title: 'Alicante, Espagne', category: 'europe', country: 'Espagne' },
+  { id: 'e28', url: 'https://cdn.pixabay.com/photo/2022/09/11/11/53/helsinki-cathedral-7447107_1280.jpg', title: 'Helsinki, Finlande', category: 'europe', country: 'Finlande' },
+  { id: 'e29', url: 'https://cdn.pixabay.com/photo/2022/04/13/14/45/old-town-7130690_1280.jpg', title: 'Tallinn, Estonie', category: 'europe', country: 'Estonie' },
+  { id: 'e30', url: 'https://cdn.pixabay.com/photo/2017/02/24/02/37/ljubljana-2093459_1280.jpg', title: 'Ljubljana, Slovénie', category: 'europe', country: 'Slovénie' },
 ];
 
-// 20 images de régions françaises
+// 30 images de régions françaises
 export const franceImages: PinterestImage[] = [
   { id: 'f1', url: 'https://cdn.pixabay.com/photo/2021/09/30/08/53/abbey-6669533_1280.jpg', title: 'Mont-Saint-Michel, Normandie', category: 'france', region: 'Normandie' },
   { id: 'f2', url: 'https://cdn.pixabay.com/photo/2016/11/18/19/01/paris-1836415_1280.jpg', title: 'Paris, Île-de-France', category: 'france', region: 'Île-de-France' },
@@ -71,6 +91,16 @@ export const franceImages: PinterestImage[] = [
   { id: 'f18', url: 'https://cdn.pixabay.com/photo/2018/10/19/10/24/albi-3758253_1280.jpg', title: 'Albi, Occitanie', category: 'france', region: 'Occitanie' },
   { id: 'f19', url: 'https://cdn.pixabay.com/photo/2016/09/01/13/52/annecy-1636868_1280.jpg', title: 'Annecy, Auvergne-Rhône-Alpes', category: 'france', region: 'Auvergne-Rhône-Alpes' },
   { id: 'f20', url: 'https://cdn.pixabay.com/photo/2018/11/20/13/02/port-3826131_1280.jpg', title: 'Bonifacio, Corse', category: 'france', region: 'Corse' },
+  { id: 'f21', url: 'https://cdn.pixabay.com/photo/2013/04/13/20/05/mont-blanc-103442_1280.jpg', title: 'Mont Blanc, Auvergne-Rhône-Alpes', category: 'france', region: 'Auvergne-Rhône-Alpes' },
+  { id: 'f22', url: 'https://cdn.pixabay.com/photo/2016/11/01/08/36/brittany-1787717_1280.jpg', title: 'Phare de Bretagne', category: 'france', region: 'Bretagne' },
+  { id: 'f23', url: 'https://cdn.pixabay.com/photo/2016/12/09/06/59/vineyard-1893138_1280.jpg', title: 'Vignobles, Bourgogne', category: 'france', region: 'Bourgogne-Franche-Comté' },
+  { id: 'f24', url: 'https://cdn.pixabay.com/photo/2019/05/12/15/11/dijon-4198411_1280.jpg', title: 'Dijon, Bourgogne', category: 'france', region: 'Bourgogne-Franche-Comté' },
+  { id: 'f25', url: 'https://cdn.pixabay.com/photo/2016/03/17/16/42/bordeaux-1263606_1280.jpg', title: 'Bordeaux, Nouvelle-Aquitaine', category: 'france', region: 'Nouvelle-Aquitaine' },
+  { id: 'f26', url: 'https://cdn.pixabay.com/photo/2015/11/18/15/57/castle-1049296_1280.jpg', title: 'Château de Carcassonne, Occitanie', category: 'france', region: 'Occitanie' },
+  { id: 'f27', url: 'https://cdn.pixabay.com/photo/2019/08/21/15/12/old-town-4421603_1280.jpg', title: 'Lille, Hauts-de-France', category: 'france', region: 'Hauts-de-France' },
+  { id: 'f28', url: 'https://cdn.pixabay.com/photo/2017/05/21/13/16/viaduct-2331312_1280.jpg', title: 'Viaduc de Millau, Occitanie', category: 'france', region: 'Occitanie' },
+  { id: 'f29', url: 'https://cdn.pixabay.com/photo/2014/09/08/17/31/avignon-439013_1280.jpg', title: 'Avignon, Provence-Alpes-Côte d\'Azur', category: 'france', region: 'Provence-Alpes-Côte d\'Azur' },
+  { id: 'f30', url: 'https://cdn.pixabay.com/photo/2022/10/18/07/06/cordes-sur-ciel-7530078_1280.jpg', title: 'Cordes-sur-Ciel, Occitanie', category: 'france', region: 'Occitanie' },
 ];
 
 // Combiner toutes les images
