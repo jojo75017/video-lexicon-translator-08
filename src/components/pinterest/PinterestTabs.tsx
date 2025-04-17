@@ -1,13 +1,14 @@
 
 import React from 'react';
+import { PinterestPin, PinterestImage } from '@/types/pinterest';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ContentTab from './tabs/ContentTab';
-import ImagesTab from './tabs/ImagesTab';
 import DesignTab from './tabs/DesignTab';
+import ImagesTab from './tabs/ImagesTab';
 import HashtagsTab from './tabs/HashtagsTab';
-import LocalImagesTab from './tabs/LocalImagesTab';
 import EtiquettesTab from './tabs/EtiquettesTab';
-import { PinterestPin, PinterestImage } from '@/types/pinterest';
+import SpecialPromptButton from './tabs/SpecialPromptButton';
+import { toast } from 'sonner';
 
 interface PinterestTabsProps {
   activeTab: string;
@@ -25,8 +26,8 @@ interface PinterestTabsProps {
   handleSearch: () => void;
   handleSelectImage: (image: PinterestImage) => void;
   handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  setCustomHashtag: React.Dispatch<React.SetStateAction<string>>;
   customHashtag: string;
-  setCustomHashtag: (hashtag: string) => void;
   handleAddHashtag: () => void;
   handleRemoveHashtag: (tag: string) => void;
   handleSelectHashtag: (tag: string) => void;
@@ -48,32 +49,44 @@ const PinterestTabs: React.FC<PinterestTabsProps> = ({
   handleSearch,
   handleSelectImage,
   handleImageUpload,
-  customHashtag,
   setCustomHashtag,
+  customHashtag,
   handleAddHashtag,
   handleRemoveHashtag,
   handleSelectHashtag
 }) => {
+  const handlePromptGenerated = (prompt: string) => {
+    // Mettre à jour la description avec le prompt généré
+    updatePin('description', prompt);
+    toast.success("Le prompt a été intégré à la description!");
+  };
+
   return (
-    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-      <TabsList className="grid grid-cols-6 w-full">
-        <TabsTrigger value="content">Contenu</TabsTrigger>
-        <TabsTrigger value="design">Design</TabsTrigger>
-        <TabsTrigger value="images">Images</TabsTrigger>
-        <TabsTrigger value="local">Images Locales</TabsTrigger>
-        <TabsTrigger value="hashtags">Hashtags</TabsTrigger>
-        <TabsTrigger value="etiquettes">Étiquettes</TabsTrigger>
-      </TabsList>
+    <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab} className="w-full">
+      <div className="flex justify-between items-center mb-4">
+        <TabsList>
+          <TabsTrigger value="design">Design</TabsTrigger>
+          <TabsTrigger value="content">Contenu</TabsTrigger>
+          <TabsTrigger value="images">Images</TabsTrigger>
+          <TabsTrigger value="hashtags">Hashtags</TabsTrigger>
+          <TabsTrigger value="etiquettes">Étiquettes</TabsTrigger>
+        </TabsList>
+        
+        <SpecialPromptButton 
+          currentTitle={pin.title} 
+          onPromptGenerated={handlePromptGenerated}
+        />
+      </div>
       
-      <TabsContent value="content" className="py-4">
-        <ContentTab pin={pin} updatePin={updatePin} />
-      </TabsContent>
-      
-      <TabsContent value="design" className="py-4">
+      <TabsContent value="design" className="space-y-4">
         <DesignTab pin={pin} updatePin={updatePin} />
       </TabsContent>
       
-      <TabsContent value="images" className="py-4">
+      <TabsContent value="content" className="space-y-4">
+        <ContentTab pin={pin} updatePin={updatePin} />
+      </TabsContent>
+      
+      <TabsContent value="images" className="space-y-4">
         <ImagesTab 
           pin={pin}
           updatePin={updatePin}
@@ -91,15 +104,7 @@ const PinterestTabs: React.FC<PinterestTabsProps> = ({
         />
       </TabsContent>
       
-      <TabsContent value="local" className="py-4">
-        <LocalImagesTab 
-          pin={pin}
-          updatePin={updatePin}
-          handleImageUpload={handleImageUpload}
-        />
-      </TabsContent>
-      
-      <TabsContent value="hashtags" className="py-4">
+      <TabsContent value="hashtags" className="space-y-4">
         <HashtagsTab 
           pin={pin}
           customHashtag={customHashtag}
@@ -109,8 +114,8 @@ const PinterestTabs: React.FC<PinterestTabsProps> = ({
           handleSelectHashtag={handleSelectHashtag}
         />
       </TabsContent>
-
-      <TabsContent value="etiquettes" className="py-4">
+      
+      <TabsContent value="etiquettes" className="space-y-4">
         <EtiquettesTab 
           pin={pin}
           updatePin={updatePin}
