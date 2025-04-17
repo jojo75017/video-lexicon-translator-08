@@ -1,608 +1,122 @@
-import axios from 'axios';
-import { PixabayResponse, UnsplashResponse, PinterestImage } from '@/types/pinterest';
-import { toast } from 'sonner';
-import { worldImages, europeImages, franceImages } from '@/data/pinterestImages';
 
-// Images de secours pour quand les APIs échouent
-const MOCK_IMAGES = [
-  {
-    id: 'mock-1',
-    url: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=2073&auto=format&fit=crop',
-    title: 'Tour Eiffel, Paris',
-    category: 'france' as 'france',
-    country: 'France',
-    source: 'mock' as 'pixabay',
-    tags: ['paris', 'eiffel', 'architecture']
-  },
-  {
-    id: 'mock-2',
-    url: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?q=80&w=2073&auto=format&fit=crop',
-    title: 'Notre Dame, Paris',
-    category: 'france' as 'france',
-    country: 'France',
-    source: 'mock' as 'pixabay',
-    tags: ['paris', 'cathedral', 'architecture']
-  },
-  {
-    id: 'mock-3',
-    url: 'https://images.unsplash.com/photo-1522093007474-d86e9bf7ba6f?q=80&w=2064&auto=format&fit=crop',
-    title: 'Marseille Vieux Port',
-    category: 'france' as 'france',
-    country: 'France',
-    source: 'mock' as 'pixabay',
-    tags: ['marseille', 'port', 'mediterranean']
-  },
-  {
-    id: 'mock-4',
-    url: 'https://images.unsplash.com/photo-1520939817895-060bdaf4fe1b?q=80&w=2073&auto=format&fit=crop',
-    title: 'Lyon by Night',
-    category: 'france' as 'france',
-    country: 'France',
-    source: 'mock' as 'pixabay',
-    tags: ['lyon', 'night', 'city']
-  },
-  {
-    id: 'mock-5',
-    url: 'https://images.unsplash.com/photo-1562627090-efe63e5beeab?q=80&w=1965&auto=format&fit=crop',
-    title: 'Colosseum, Rome',
-    category: 'europe' as 'europe',
-    country: 'Italy',
-    source: 'mock' as 'pixabay',
-    tags: ['rome', 'colosseum', 'italy']
-  },
-  {
-    id: 'mock-6',
-    url: 'https://images.unsplash.com/photo-1558642084-fd07fae5282e?q=80&w=1936&auto=format&fit=crop',
-    title: 'Santorini, Greece',
-    category: 'europe' as 'europe',
-    country: 'Greece',
-    source: 'mock' as 'pixabay',
-    tags: ['santorini', 'greece', 'mediterranean']
-  },
-  {
-    id: 'mock-7',
-    url: 'https://images.unsplash.com/photo-1543832923-44667a44c804?q=80&w=1944&auto=format&fit=crop',
-    title: 'New York Skyline',
-    category: 'monde' as 'monde',
-    country: 'United States',
-    source: 'mock' as 'pixabay',
-    tags: ['new york', 'skyline', 'usa']
-  },
-  {
-    id: 'mock-8',
-    url: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=1950&auto=format&fit=crop',
-    title: 'Tokyo Tower',
-    category: 'monde' as 'monde',
-    country: 'Japan',
-    source: 'mock' as 'pixabay',
-    tags: ['tokyo', 'tower', 'japan']
-  }
-];
+import { PinterestImage } from '@/types/pinterest';
+import { 
+  FRANCE_LOCATIONS, 
+  EUROPE_LOCATIONS, 
+  WORLD_LOCATIONS 
+} from '@/types/pinterest';
 
-// Clés d'API pour les services d'images
-// Dans un environnement de production, ces clés doivent être stockées dans des variables d'environnement
-const PIXABAY_API_KEY = '39696617-7bb5c5dbc12c51d28397ca3b0'; // Clé publique pour demo
-const UNSPLASH_ACCESS_KEY = 'HyoKoX5Yj8uIJBz_9dRrj3hVemnoXg66Pb--pXOgdlA'; // Clé publique pour demo
+// Interface pour le résultat de la validation
+interface ImageValidationResult {
+  image: PinterestImage;
+  confidenceScore: number;
+  isConsistent: boolean;
+}
 
-// Images Freepik gratuites (exemples)
-const FREEPIK_IMAGES = [
-  {
-    id: 'freepik-1',
-    url: 'https://img.freepik.com/photos-gratuite/tour-eiffel-paris-ile-france_1232-3116.jpg',
-    title: 'Tour Eiffel, Paris',
-    category: 'france' as 'france',
-    country: 'France',
-    source: 'freepik' as 'freepik',
-    tags: ['paris', 'tour eiffel', 'france']
-  },
-  {
-    id: 'freepik-2',
-    url: 'https://img.freepik.com/photos-gratuite/bord-mer-du-lac-annecy_1232-3613.jpg',
-    title: 'Lac d\'Annecy',
-    category: 'france' as 'france',
-    country: 'France',
-    source: 'freepik' as 'freepik',
-    tags: ['annecy', 'lac', 'alpes']
-  },
-  {
-    id: 'freepik-3',
-    url: 'https://img.freepik.com/photos-gratuite/skyline-colline-parlementaire-ottawa-ontario-canada_1232-4698.jpg',
-    title: 'Ottawa, Canada',
-    category: 'monde' as 'monde',
-    country: 'Canada',
-    source: 'freepik' as 'freepik',
-    tags: ['ottawa', 'canada', 'parlement']
-  },
-  {
-    id: 'freepik-4',
-    url: 'https://img.freepik.com/photos-gratuite/pont-rialto-grand-canal-venise-italie_1232-4903.jpg',
-    title: 'Venise, Italie',
-    category: 'europe' as 'europe',
-    country: 'Italie',
-    source: 'freepik' as 'freepik',
-    tags: ['venise', 'italie', 'canal']
-  },
-  {
-    id: 'freepik-5',
-    url: 'https://img.freepik.com/photos-gratuite/great-wall-chine_1232-3921.jpg',
-    title: 'Grande Muraille, Chine',
-    category: 'monde' as 'monde',
-    country: 'Chine',
-    source: 'freepik' as 'freepik',
-    tags: ['chine', 'grande muraille', 'asie']
-  },
-  {
-    id: 'freepik-6',
-    url: 'https://img.freepik.com/photos-gratuite/vue-aerienne-barcelone-espagne-sagrada-familia_1232-3980.jpg',
-    title: 'Barcelone, Espagne',
-    category: 'europe' as 'europe',
-    country: 'Espagne',
-    source: 'freepik' as 'freepik',
-    tags: ['barcelone', 'espagne', 'sagrada familia']
-  },
-  {
-    id: 'freepik-7',
-    url: 'https://img.freepik.com/photos-gratuite/chateau-royal-chambord-loire-france_1232-4426.jpg',
-    title: 'Château de Chambord',
-    category: 'france' as 'france',
-    country: 'France',
-    source: 'freepik' as 'freepik',
-    tags: ['loire', 'château', 'chambord']
-  },
-  {
-    id: 'freepik-8',
-    url: 'https://img.freepik.com/photos-gratuite/quartier-petit-france-strasbourg-france_1232-4492.jpg',
-    title: 'Strasbourg, France',
-    category: 'france' as 'france',
-    country: 'France',
-    source: 'freepik' as 'freepik',
-    tags: ['strasbourg', 'alsace', 'petite france']
-  },
-  {
-    id: 'freepik-9',
-    url: 'https://img.freepik.com/photos-gratuite/times-square-new-york-etats-unis_1232-4352.jpg',
-    title: 'New York, États-Unis',
-    category: 'monde' as 'monde',
-    country: 'États-Unis',
-    source: 'freepik' as 'freepik',
-    tags: ['new york', 'times square', 'usa']
-  },
-  {
-    id: 'freepik-10',
-    url: 'https://img.freepik.com/photos-gratuite/london-eye-sur-tamise-coucher-du-soleil_1232-4536.jpg',
-    title: 'Londres, Royaume-Uni',
-    category: 'europe' as 'europe',
-    country: 'Royaume-Uni',
-    source: 'freepik' as 'freepik',
-    tags: ['londres', 'london eye', 'tamise']
-  },
-  {
-    id: 'freepik-11',
-    url: 'https://img.freepik.com/photos-gratuite/mont-fuji-avec-feuilles-automne-lac-kawaguchiko-japon_1232-4522.jpg',
-    title: 'Mont Fuji, Japon',
-    category: 'monde' as 'monde',
-    country: 'Japon',
-    source: 'freepik' as 'freepik',
-    tags: ['japon', 'mont fuji', 'kawaguchiko']
-  },
-  {
-    id: 'freepik-12',
-    url: 'https://img.freepik.com/photos-gratuite/cote-atlantique-pres-biarritz-france_1232-4530.jpg',
-    title: 'Biarritz, France',
-    category: 'france' as 'france',
-    country: 'France',
-    source: 'freepik' as 'freepik',
-    tags: ['biarritz', 'atlantique', 'pays basque']
-  }
-];
+// Fonction améliorée de validation et de filtrage des images
+export const validateAndFixImages = (images: PinterestImage[]): PinterestImage[] => {
+  if (!images || images.length === 0) return [];
 
-// Images Pexels gratuites (exemples)
-const PEXELS_IMAGES = [
-  {
-    id: 'pexels-1',
-    url: 'https://images.pexels.com/photos/338515/pexels-photo-338515.jpeg',
-    title: 'Tour Eiffel, Paris',
-    category: 'france' as 'france',
-    country: 'France',
-    source: 'pexels' as 'pexels',
-    tags: ['paris', 'tour eiffel', 'france']
-  },
-  {
-    id: 'pexels-2',
-    url: 'https://images.pexels.com/photos/2363/france-landmark-lights-night.jpg',
-    title: 'Arc de Triomphe, Paris',
-    category: 'france' as 'france',
-    country: 'France',
-    source: 'pexels' as 'pexels',
-    tags: ['paris', 'arc de triomphe', 'france']
-  },
-  {
-    id: 'pexels-3',
-    url: 'https://images.pexels.com/photos/460740/pexels-photo-460740.jpeg',
-    title: 'Mont Saint-Michel, Normandie',
-    category: 'france' as 'france',
-    country: 'France',
-    source: 'pexels' as 'pexels',
-    tags: ['normandie', 'mont saint-michel', 'france']
-  },
-  {
-    id: 'pexels-4',
-    url: 'https://images.pexels.com/photos/1269805/pexels-photo-1269805.jpeg',
-    title: 'Santorini, Grèce',
-    category: 'europe' as 'europe',
-    country: 'Grèce',
-    source: 'pexels' as 'pexels',
-    tags: ['grèce', 'santorini', 'europe']
-  },
-  {
-    id: 'pexels-5',
-    url: 'https://images.pexels.com/photos/532826/pexels-photo-532826.jpeg',
-    title: 'Rome, Italie',
-    category: 'europe' as 'europe',
-    country: 'Italie',
-    source: 'pexels' as 'pexels',
-    tags: ['italie', 'rome', 'europe']
-  },
-  {
-    id: 'pexels-6',
-    url: 'https://images.pexels.com/photos/2538104/pexels-photo-2538104.jpeg',
-    title: 'Le Louvre, Paris',
-    category: 'france' as 'france',
-    country: 'France',
-    source: 'pexels' as 'pexels',
-    tags: ['paris', 'louvre', 'france']
-  },
-  {
-    id: 'pexels-7',
-    url: 'https://images.pexels.com/photos/358253/pexels-photo-358253.jpeg',
-    title: 'New York, États-Unis',
-    category: 'monde' as 'monde',
-    country: 'États-Unis',
-    source: 'pexels' as 'pexels',
-    tags: ['new york', 'usa', 'monde']
-  },
-  {
-    id: 'pexels-8',
-    url: 'https://images.pexels.com/photos/2835436/pexels-photo-2835436.jpeg',
-    title: 'Sydney, Australie',
-    category: 'monde' as 'monde',
-    country: 'Australie',
-    source: 'pexels' as 'pexels',
-    tags: ['sydney', 'australie', 'monde']
-  },
-  {
-    id: 'pexels-9',
-    url: 'https://images.pexels.com/photos/259447/pexels-photo-259447.jpeg',
-    title: 'Londres, Royaume-Uni',
-    category: 'europe' as 'europe',
-    country: 'Royaume-Uni',
-    source: 'pexels' as 'pexels',
-    tags: ['royaume-uni', 'londres', 'europe']
-  },
-  {
-    id: 'pexels-10',
-    url: 'https://images.pexels.com/photos/1388030/pexels-photo-1388030.jpeg',
-    title: 'Provence, France',
-    category: 'france' as 'france',
-    country: 'France',
-    region: 'Provence',
-    source: 'pexels' as 'pexels',
-    tags: ['provence', 'lavande', 'france']
-  },
-  {
-    id: 'pexels-11',
-    url: 'https://images.pexels.com/photos/921299/pexels-photo-921299.png',
-    title: 'Barcelone, Espagne',
-    category: 'europe' as 'europe',
-    country: 'Espagne',
-    source: 'pexels' as 'pexels',
-    tags: ['espagne', 'barcelone', 'europe']
-  },
-  {
-    id: 'pexels-12',
-    url: 'https://images.pexels.com/photos/753639/pexels-photo-753639.jpeg',
-    title: 'Tokyo, Japon',
-    category: 'monde' as 'monde',
-    country: 'Japon',
-    source: 'pexels' as 'pexels',
-    tags: ['japon', 'tokyo', 'monde']
-  },
-  {
-    id: 'pexels-13',
-    url: 'https://images.pexels.com/photos/2100814/pexels-photo-2100814.jpeg',
-    title: 'Bretagne, France',
-    category: 'france' as 'france',
-    country: 'France',
-    region: 'Bretagne',
-    source: 'pexels' as 'pexels',
-    tags: ['bretagne', 'côte', 'france']
-  },
-  {
-    id: 'pexels-14',
-    url: 'https://images.pexels.com/photos/1743165/pexels-photo-1743165.jpeg',
-    title: 'Alpes, France',
-    category: 'france' as 'france',
-    country: 'France',
-    region: 'Alpes',
-    source: 'pexels' as 'pexels',
-    tags: ['alpes', 'montagne', 'france']
-  },
-  {
-    id: 'pexels-15',
-    url: 'https://images.pexels.com/photos/3757144/pexels-photo-3757144.jpeg',
-    title: 'Madrid, Espagne',
-    category: 'europe' as 'europe',
-    country: 'Espagne',
-    source: 'pexels' as 'pexels',
-    tags: ['espagne', 'madrid', 'europe']
-  }
-];
+  // Filtrer et scorer les images
+  const validatedImages: ImageValidationResult[] = images
+    .filter(img => img.url && img.url.startsWith('http'))
+    .map(image => {
+      const validationResult = calculateImageConsistency(image);
+      return validationResult;
+    })
+    // Trier par score de confiance décroissant
+    .sort((a, b) => b.confidenceScore - a.confidenceScore)
+    // Ne garder que les images avec un score de confiance suffisant
+    .filter(result => result.confidenceScore > 0.5);
 
-// Cette fonction améliore la cohérence entre les titres et les images
-const ensureTitleMatchesLocation = (images: PinterestImage[]): PinterestImage[] => {
-  return images.map(image => {
-    let updatedImage = {...image};
-    
-    // Si le pays ou la région est défini mais pas dans le titre, mettons à jour le titre
-    if (image.country && !image.title.toLowerCase().includes(image.country.toLowerCase())) {
-      updatedImage.title = `${image.country} - ${image.title}`;
-    } else if (image.region && !image.title.toLowerCase().includes(image.region.toLowerCase())) {
-      updatedImage.title = `${image.region} - ${image.title}`;
-    }
-    
-    return updatedImage;
+  return validatedImages.map(result => {
+    // Corriger le titre si nécessaire
+    const correctedImage = ensureTitleMatchesLocation(result.image);
+    return correctedImage;
   });
 };
 
-// Function to get mock images filtered by query
-const getMockImages = (query: string, category: string = ''): PinterestImage[] => {
-  console.log("Récupération d'images de test pour", query, category);
-  let filteredImages = [...MOCK_IMAGES];
-  
-  // Filter by query if provided
-  if (query) {
-    const lowerQuery = query.toLowerCase();
-    filteredImages = filteredImages.filter(img => 
-      img.title.toLowerCase().includes(lowerQuery) || 
-      img.country?.toLowerCase().includes(lowerQuery) ||
-      img.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
-    );
-  }
-  
-  // Filter by category if provided and not 'all'
-  if (category && category !== 'all') {
-    filteredImages = filteredImages.filter(img => img.category === category);
-  }
-  
-  console.log(`Trouvé ${filteredImages.length} images pour la requête: "${query}", catégorie: "${category}"`);
-  return filteredImages;
-};
+// Fonction pour calculer la cohérence et le score de confiance
+const calculateImageConsistency = (image: PinterestImage): ImageValidationResult => {
+  let confidenceScore = 0;
+  const lowerTitle = image.title.toLowerCase();
+  const lowerTags = image.tags?.map(tag => tag.toLowerCase()) || [];
 
-// Fonction pour rechercher des images sur Pixabay
-export const searchPixabayImages = async (query: string, category: string = ''): Promise<PinterestImage[]> => {
-  try {
-    console.log('Recherche sur Pixabay pour:', query);
-    
-    // Utilisation temporaire des données de test en raison de problèmes d'API
-    console.log('Utilisation des données de test en raison de problèmes avec l\'API Pixabay');
-    const results = getMockImages(query, category);
-    return ensureTitleMatchesLocation(results);
-  } catch (error) {
-    console.error('Erreur lors de la recherche sur Pixabay:', error);
-    // toast.error('Impossible de récupérer les images depuis Pixabay. Utilisation des images locales.');
-    return ensureTitleMatchesLocation(getMockImages(query, category));
+  // Vérification de la catégorie
+  if (image.category) {
+    confidenceScore += 0.2;
   }
-};
 
-// Nouvelle fonction pour rechercher des images sur Freepik
-export const searchFreepikImages = async (query: string, category: string = ''): Promise<PinterestImage[]> => {
-  try {
-    console.log('Recherche sur Freepik pour:', query, 'catégorie:', category);
-    
-    // Filtrer les images Freepik selon la requête et la catégorie
-    let results = [...FREEPIK_IMAGES];
-    
-    if (query) {
-      const lowerQuery = query.toLowerCase();
-      results = results.filter(img => 
-        img.title.toLowerCase().includes(lowerQuery) || 
-        img.country?.toLowerCase().includes(lowerQuery) ||
-        img.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
-      );
+  // Vérification du pays/région
+  if (image.country) {
+    confidenceScore += 0.2;
+    if (lowerTitle.includes(image.country.toLowerCase())) {
+      confidenceScore += 0.2;
     }
-    
-    if (category && category !== 'all') {
-      results = results.filter(img => img.category === category);
+  }
+
+  if (image.region) {
+    confidenceScore += 0.2;
+    if (lowerTitle.includes(image.region.toLowerCase())) {
+      confidenceScore += 0.2;
     }
-    
-    console.log(`Trouvé ${results.length} images Freepik pour la requête "${query}"`);
-    
-    // Vérifier que toutes les URLs sont valides
-    results = results.filter(img => img.url && img.url.startsWith('http'));
-    
-    return ensureTitleMatchesLocation(results);
-  } catch (error) {
-    console.error('Erreur lors de la recherche sur Freepik:', error);
-    // toast.error('Impossible de récupérer les images depuis Freepik');
-    return [];
   }
-};
 
-// Nouvelle fonction pour rechercher des images sur Pexels
-export const searchPexelsImages = async (query: string, category: string = ''): Promise<PinterestImage[]> => {
-  try {
-    console.log('Recherche sur Pexels pour:', query, 'catégorie:', category);
-    
-    // Filtrer les images Pexels selon la requête et la catégorie
-    let results = [...PEXELS_IMAGES];
-    
-    if (query) {
-      const lowerQuery = query.toLowerCase();
-      results = results.filter(img => 
-        img.title.toLowerCase().includes(lowerQuery) || 
-        img.country?.toLowerCase().includes(lowerQuery) ||
-        img.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
-      );
-    }
-    
-    if (category && category !== 'all') {
-      results = results.filter(img => img.category === category);
-    }
-    
-    console.log(`Trouvé ${results.length} images Pexels pour la requête "${query}"`);
-    
-    // Vérifier que toutes les URLs sont valides
-    results = results.filter(img => img.url && img.url.startsWith('http'));
-    
-    return ensureTitleMatchesLocation(results);
-  } catch (error) {
-    console.error('Erreur lors de la recherche sur Pexels:', error);
-    // toast.error('Impossible de récupérer les images depuis Pexels');
-    return [];
+  // Vérification des tags
+  const locationTags = [...FRANCE_LOCATIONS, ...EUROPE_LOCATIONS, ...WORLD_LOCATIONS];
+  const matchingLocationTags = lowerTags.filter(tag => 
+    locationTags.some(location => tag.includes(location))
+  );
+
+  if (matchingLocationTags.length > 0) {
+    confidenceScore += 0.2;
   }
-};
 
-// Fonction pour générer un titre à partir des tags
-const generateTitleFromTags = (tags: string): string => {
-  if (!tags) return '';
-  
-  const tagArray = tags.split(',').map(tag => tag.trim());
-  if (tagArray.length === 0) return '';
-  
-  // Capitaliser le premier tag
-  const firstTag = tagArray[0].charAt(0).toUpperCase() + tagArray[0].slice(1);
-  
-  if (tagArray.length === 1) return firstTag;
-  
-  // Ajouter un second tag s'il existe
-  return `${firstTag} ${tagArray[1]}`;
-};
-
-// Fonction pour rechercher des images sur Unsplash
-export const searchUnsplashImages = async (query: string): Promise<PinterestImage[]> => {
-  console.log('Utilisation des données de test en raison de problèmes avec l\'API Unsplash');
-  return getMockImages(query);
-};
-
-// Fonction pour mapper la catégorie en fonction de la requête
-const mapCategoryFromQuery = (query: string): 'monde' | 'europe' | 'france' => {
-  const lowerQuery = query.toLowerCase();
-  const europeanCountries = ['allemagne', 'espagne', 'italie', 'royaume-uni', 'portugal', 'grèce', 'suisse', 'belgique', 'pays-bas', 'autriche'];
-  const frenchRegions = ['bretagne', 'normandie', 'provence', 'alsace', 'aquitaine', 'corse', 'paris', 'loire'];
-  
-  if (frenchRegions.some(region => lowerQuery.includes(region))) {
-    return 'france';
-  } else if (europeanCountries.some(country => lowerQuery.includes(country))) {
-    return 'europe';
-  } else {
-    return 'monde';
+  // Vérification des critères spécifiques par catégorie
+  switch (image.category) {
+    case 'france':
+      if (FRANCE_LOCATIONS.some(location => lowerTitle.includes(location))) {
+        confidenceScore += 0.2;
+      }
+      break;
+    case 'europe':
+      if (EUROPE_LOCATIONS.some(location => lowerTitle.includes(location))) {
+        confidenceScore += 0.2;
+      }
+      break;
+    case 'monde':
+      if (WORLD_LOCATIONS.some(location => lowerTitle.includes(location))) {
+        confidenceScore += 0.2;
+      }
+      break;
   }
+
+  // Limiter le score entre 0 et 1
+  confidenceScore = Math.min(Math.max(confidenceScore, 0), 1);
+
+  return {
+    image,
+    confidenceScore,
+    isConsistent: confidenceScore > 0.5
+  };
 };
 
-// Fonction pour extraire le lieu depuis la requête
-const extractLocationFromQuery = (query: string): string => {
-  // Extraire le premier mot qui pourrait être un lieu
-  const words = query.split(' ');
-  const potentialLocation = words[0].charAt(0).toUpperCase() + words[0].slice(1);
-  return potentialLocation;
-};
+// Fonction pour s'assurer que le titre correspond à la localisation
+const ensureTitleMatchesLocation = (image: PinterestImage): PinterestImage => {
+  let updatedTitle = image.title;
 
-// Fonction pour obtenir des images prédéfinies par catégorie
-export const getPresetImagesByCategory = async (category: 'monde' | 'europe' | 'france' | 'all'): Promise<PinterestImage[]> => {
-  console.log('Chargement des images prédéfinies pour la catégorie:', category);
-  
-  try {
-    let results: PinterestImage[] = [];
-    
-    // Ajouter des images Freepik et Pexels pour améliorer les résultats
-    const freepikImages = FREEPIK_IMAGES.filter(img => 
-      category === 'all' || img.category === category
-    );
-    
-    const pexelsImages = PEXELS_IMAGES.filter(img => 
-      category === 'all' || img.category === category
-    );
-    
-    if (category === 'all') {
-      results = [...worldImages, ...europeImages, ...franceImages, ...freepikImages, ...pexelsImages];
-    } else if (category === 'monde') {
-      results = [...worldImages, ...freepikImages.filter(img => img.category === 'monde'), ...pexelsImages.filter(img => img.category === 'monde')];
-    } else if (category === 'europe') {
-      results = [...europeImages, ...freepikImages.filter(img => img.category === 'europe'), ...pexelsImages.filter(img => img.category === 'europe')];
-    } else if (category === 'france') {
-      results = [...franceImages, ...freepikImages.filter(img => img.category === 'france'), ...pexelsImages.filter(img => img.category === 'france')];
-    }
-    
-    // Vérifier que les images ont bien des URLs valides
-    results = results.filter(img => img.url && img.url.startsWith('http'));
-    
-    // Mélanger les résultats pour une présentation plus variée
-    results.sort(() => Math.random() - 0.5);
-    
-    // Assurer la cohérence des titres
-    results = ensureTitleMatchesLocation(results);
-    
-    console.log(`Chargé ${results.length} images pour la catégorie ${category}`);
-    return results;
-  } catch (error) {
-    console.error('Erreur lors du chargement des images préréglées:', error);
-    // Utiliser des images de secours en cas d'erreur
-    return ensureTitleMatchesLocation(getMockImages('', category));
+  // Ajouter le pays/région au titre si absent
+  if (image.country && !updatedTitle.toLowerCase().includes(image.country.toLowerCase())) {
+    updatedTitle = `${image.country} - ${updatedTitle}`;
   }
+
+  if (image.region && !updatedTitle.toLowerCase().includes(image.region.toLowerCase())) {
+    updatedTitle = `${image.region} - ${updatedTitle}`;
+  }
+
+  return {
+    ...image,
+    title: updatedTitle
+  };
 };
 
-// Fonction pour générer du contenu basé sur une image
-export const generateContentFromImage = (image: PinterestImage): { title: string, description: string } => {
-  if (!image) return { title: '', description: '' };
-  
-  let title = '';
-  let description = '';
-  
-  // Générer un titre basé sur l'image
-  if (image.title) {
-    title = `Découvrez ${image.title.charAt(0).toUpperCase() + image.title.slice(1)}`;
-  } else if (image.country) {
-    title = `Explorez les merveilles de ${image.country}`;
-  } else if (image.region) {
-    title = `Voyagez à travers ${image.region}`;
-  } else {
-    title = "Découvrez cette destination incroyable";
-  }
-  
-  // Limiter le titre à 60 caractères
-  if (title.length > 60) {
-    title = title.substring(0, 57) + '...';
-  }
-  
-  // Générer une description plus détaillée basée sur l'image (environ 100 mots)
-  const locationName = image.country || image.region || image.title || 'cette destination';
-  const tags = image.tags && image.tags.length > 0 ? image.tags.slice(0, 3).join(', ') : 'paysages à couper le souffle, culture locale, histoire fascinante';
-  
-  description = `Partez à la découverte de ${locationName}, une destination qui ravira tous vos sens. Vous serez émerveillé par ses ${tags}. 
-  
-Chaque coin de rue révèle un nouveau trésor à explorer, chaque rencontre une histoire à écouter. Les couleurs vives, les parfums enivrants et les saveurs délicates vous transporteront dans un univers où le temps semble s'être arrêté.
-
-Que vous soyez amateur de photographie, passionné d'histoire, ou simplement en quête d'évasion, ${locationName} saura vous séduire par son authenticité et sa diversité. Des monuments emblématiques aux petites ruelles cachées, chaque lieu porte en lui l'empreinte d'un passé riche et d'une culture vivante.
-
-Préparez votre voyage et laissez-vous guider par l'appel de l'aventure dans ce lieu magique où nature et culture se rencontrent harmonieusement.`;
-  
-  // Limiter la description à 600 caractères (environ 100 mots)
-  if (description.length > 600) {
-    description = description.substring(0, 597) + '...';
-  }
-  
-  return { title, description };
-};
-
-// Fonction pour valider toutes les images et corriger les titres
-export const validateAndFixImages = (images: PinterestImage[]): PinterestImage[] => {
-  if (!images || images.length === 0) return [];
-  
-  // Filtrer les images avec des URLs valides
-  let validImages = images.filter(img => img.url && img.url.startsWith('http'));
-  
-  // S'assurer que toutes les images ont des titres cohérents
-  validImages = ensureTitleMatchesLocation(validImages);
-  
-  return validImages;
-};
