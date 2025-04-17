@@ -13,6 +13,7 @@ import { usePin } from '@/hooks/usePin';
 import { usePinHistory } from '@/hooks/usePinHistory';
 import { useSocialContent } from '@/hooks/useSocialContent';
 import type { SocialPlatform } from '@/data/socialContentTemplates';
+import { Input } from '@/components/ui/input';
 
 const PinterestGenerator: React.FC = () => {
   const [activeTab, setActiveTab] = useState('design');
@@ -22,6 +23,7 @@ const PinterestGenerator: React.FC = () => {
   const [images, setImages] = useState<PinterestImage[]>([]);
   const [loading, setLoading] = useState(false);
   const [customHashtag, setCustomHashtag] = useState('');
+  const [openaiApiKey, setOpenaiApiKey] = useState('');
 
   const { pin, updatePin, handleSelectImage, handleImageUpload, resetPin } = usePin({
     title: 'Découvrez les merveilles de Paris',
@@ -50,6 +52,14 @@ const PinterestGenerator: React.FC = () => {
   useEffect(() => {
     loadPresetImages();
   }, [selectedImageCategory]);
+
+  // Ajout d'un useEffect pour charger la clé API depuis localStorage
+  useEffect(() => {
+    const savedApiKey = localStorage.getItem('openai_api_key');
+    if (savedApiKey) {
+      setOpenaiApiKey(savedApiKey);
+    }
+  }, []);
 
   const loadPresetImages = async () => {
     setLoading(true);
@@ -117,6 +127,16 @@ const PinterestGenerator: React.FC = () => {
     updatePin('uploadedImage', restoredPin.uploadedImage);
     updatePin('design', restoredPin.design);
     toast.success('Pin restauré depuis l\'historique');
+  };
+
+  // Gestionnaire pour sauvegarder la clé API
+  const handleApiKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newApiKey = e.target.value;
+    setOpenaiApiKey(newApiKey);
+    if (newApiKey.startsWith('sk-')) {
+      localStorage.setItem('openai_api_key', newApiKey);
+      toast.success('Clé API OpenAI sauvegardée');
+    }
   };
   
 
@@ -216,6 +236,25 @@ const PinterestGenerator: React.FC = () => {
             Sauvegarder
           </Button>
         </div>
+      </div>
+
+      {/* Nouveau champ pour la clé API OpenAI */}
+      <div className="mt-4">
+        <label htmlFor="openaiApiKey" className="block text-sm font-medium text-gray-700">
+          Clé API OpenAI
+        </label>
+        <Input
+          id="openaiApiKey"
+          type="password"
+          placeholder="sk-..."
+          value={openaiApiKey}
+          onChange={handleApiKeyChange}
+          className="mt-1 w-full"
+        />
+        <p className="mt-2 text-xs text-gray-500">
+          Votre clé API est stockée localement et n'est jamais partagée. 
+          Elle est utilisée pour générer du contenu social et des images.
+        </p>
       </div>
       
       <div className="w-full lg:w-1/2 sticky top-4">
