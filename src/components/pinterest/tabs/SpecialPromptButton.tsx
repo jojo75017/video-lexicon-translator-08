@@ -29,7 +29,7 @@ const SpecialPromptButton: React.FC<SpecialPromptButtonProps> = ({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button 
-          className="bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600"
+          className="bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white"
           size="sm"
         >
           <Wand className="h-4 w-4 mr-2" />
@@ -37,7 +37,7 @@ const SpecialPromptButton: React.FC<SpecialPromptButtonProps> = ({
           <span className="sm:hidden">Prompts</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[550px]">
+      <DialogContent className="sm:max-w-[650px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-purple-500" />
