@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, Upload, History, Wand2 } from 'lucide-react';
+import { Download, Upload, History, Wand2, Facebook, Instagram, Hash } from 'lucide-react';
 import { PinterestImage } from '@/types/pinterest';
 import { pinterestDesigns } from '@/data/pinterestImages';
 import { 
@@ -118,6 +117,24 @@ const PinterestGenerator: React.FC = () => {
     updatePin('design', restoredPin.design);
     toast.success('Pin restauré depuis l\'historique');
   };
+  
+  const generateSocialContent = (platform: 'facebook' | 'instagram') => {
+    const title = platform === 'facebook' 
+      ? "Découvrez notre nouvelle collection"
+      : "✨ Nouveau sur Instagram";
+      
+    const description = platform === 'facebook'
+      ? "Nous sommes ravis de vous présenter notre dernière collection. Des designs uniques qui vous inspireront."
+      : "Nouvelle collection disponible 🎉 Des pièces uniques qui vous ressemblent 💫";
+      
+    const hashtags = ['design', 'inspiration', 'nouveaute', 'collection', platform];
+    
+    updatePin('title', title);
+    updatePin('description', description);
+    updatePin('hashtags', hashtags);
+    
+    toast.success(`Contenu ${platform} généré avec succès!`);
+  };
 
   return (
     <div className="flex flex-col lg:flex-row gap-6">
@@ -141,10 +158,24 @@ const PinterestGenerator: React.FC = () => {
               <Wand2 className="w-4 h-4 mr-2" />
               Réinitialiser
             </Button>
-            <SpecialPromptButton 
-              currentTitle={pin.title} 
-              onPromptGenerated={handleGeneratedPrompt}
-            />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => generateSocialContent('facebook')}
+              className="bg-[#1877F2] text-white hover:bg-[#1877F2]/90"
+            >
+              <Facebook className="w-4 h-4 mr-2" />
+              Facebook
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => generateSocialContent('instagram')}
+              className="bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-white hover:from-purple-600 hover:via-pink-600 hover:to-red-600"
+            >
+              <Instagram className="w-4 h-4 mr-2" />
+              Instagram
+            </Button>
           </div>
         </div>
 

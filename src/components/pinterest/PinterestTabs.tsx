@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { PinterestPin, PinterestImage } from '@/types/pinterest';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -28,7 +27,7 @@ interface PinterestTabsProps {
   handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   setCustomHashtag: React.Dispatch<React.SetStateAction<string>>;
   customHashtag: string;
-  handleAddHashtag: () => void;
+  handleAddHashtag: (tag: string) => void;
   handleRemoveHashtag: (tag: string) => void;
   handleSelectHashtag: (tag: string) => void;
 }
