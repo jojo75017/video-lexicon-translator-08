@@ -1,15 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, Upload, History, Wand2, Facebook, Instagram, Hash } from 'lucide-react';
+import { Download, Upload, History, Wand2, Facebook, Instagram } from 'lucide-react';
 import { PinterestImage } from '@/types/pinterest';
 import { pinterestDesigns } from '@/data/pinterestImages';
-import { 
-  searchPixabayImages, 
-  searchUnsplashImages, 
-  searchFreepikImages, 
-  searchPexelsImages, 
-  getPresetImagesByCategory 
-} from '@/services/imageService';
+import { searchPixabayImages, searchUnsplashImages, searchFreepikImages, searchPexelsImages, getPresetImagesByCategory } from '@/services/imageService';
 import { toast } from 'sonner';
 import PinterestPreviewCard from './PinterestPreviewCard';
 import PinterestTabs from './PinterestTabs';
@@ -17,33 +11,8 @@ import SpecialPromptButton from './tabs/SpecialPromptButton';
 import PinHistoryPanel from './PinHistoryPanel';
 import { usePin } from '@/hooks/usePin';
 import { usePinHistory } from '@/hooks/usePinHistory';
-
-const socialContentTemplates = {
-  facebook: [
-    {
-      title: "Découvrez notre nouvelle collection",
-      description: "Nous sommes ravis de vous présenter notre dernière collection. Des designs uniques qui vous inspireront.",
-      hashtags: ['design', 'inspiration', 'nouveaute', 'collection', 'facebook']
-    },
-    {
-      title: "Nouveauté exclusive",
-      description: "Une collection qui raconte une histoire. Chaque pièce est un voyage, chaque design une aventure.",
-      hashtags: ['exclusivite', 'design', 'tendance', 'collection', 'facebook']
-    }
-  ],
-  instagram: [
-    {
-      title: "✨ Nouveau sur Instagram",
-      description: "Nouvelle collection disponible 🎉 Des pièces uniques qui vous ressemblent 💫",
-      hashtags: ['design', 'inspiration', 'nouveaute', 'collection', 'instagram']
-    },
-    {
-      title: "🔥 Coup de cœur du moment",
-      description: "Une sélection qui capture l'essence de votre style personnel. Laissez-vous inspirer ! 🌟",
-      hashtags: ['styleunique', 'tendance', 'lookbook', 'inspiration', 'instagram']
-    }
-  ]
-};
+import { useSocialContent } from '@/hooks/useSocialContent';
+import type { SocialPlatform } from '@/data/socialContentTemplates';
 
 const PinterestGenerator: React.FC = () => {
   const [activeTab, setActiveTab] = useState('design');
@@ -72,6 +41,11 @@ const PinterestGenerator: React.FC = () => {
     saveToHistory, 
     restoreFromHistory 
   } = usePinHistory();
+
+  const { generateSocialContent } = useSocialContent({
+    updatePin,
+    setActiveTab
+  });
 
   useEffect(() => {
     loadPresetImages();
@@ -145,19 +119,6 @@ const PinterestGenerator: React.FC = () => {
     toast.success('Pin restauré depuis l\'historique');
   };
   
-  const generateSocialContent = (platform: 'facebook' | 'instagram') => {
-    const templates = socialContentTemplates[platform];
-    const randomTemplate = templates[Math.floor(Math.random() * templates.length)];
-    
-    updatePin('title', randomTemplate.title);
-    updatePin('description', randomTemplate.description);
-    updatePin('hashtags', randomTemplate.hashtags);
-    
-    // Automatiquement passer à l'onglet de contenu pour montrer le contenu généré
-    setActiveTab('content');
-    
-    toast.success(`Contenu ${platform} généré avec succès!`);
-  };
 
   return (
     <div className="flex flex-col lg:flex-row gap-6">
