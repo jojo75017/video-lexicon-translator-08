@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Download, Upload, History, Wand2, Facebook, Instagram, Hash } from 'lucide-react';
@@ -18,6 +17,33 @@ import SpecialPromptButton from './tabs/SpecialPromptButton';
 import PinHistoryPanel from './PinHistoryPanel';
 import { usePin } from '@/hooks/usePin';
 import { usePinHistory } from '@/hooks/usePinHistory';
+
+const socialContentTemplates = {
+  facebook: [
+    {
+      title: "Découvrez notre nouvelle collection",
+      description: "Nous sommes ravis de vous présenter notre dernière collection. Des designs uniques qui vous inspireront.",
+      hashtags: ['design', 'inspiration', 'nouveaute', 'collection', 'facebook']
+    },
+    {
+      title: "Nouveauté exclusive",
+      description: "Une collection qui raconte une histoire. Chaque pièce est un voyage, chaque design une aventure.",
+      hashtags: ['exclusivite', 'design', 'tendance', 'collection', 'facebook']
+    }
+  ],
+  instagram: [
+    {
+      title: "✨ Nouveau sur Instagram",
+      description: "Nouvelle collection disponible 🎉 Des pièces uniques qui vous ressemblent 💫",
+      hashtags: ['design', 'inspiration', 'nouveaute', 'collection', 'instagram']
+    },
+    {
+      title: "🔥 Coup de cœur du moment",
+      description: "Une sélection qui capture l'essence de votre style personnel. Laissez-vous inspirer ! 🌟",
+      hashtags: ['styleunique', 'tendance', 'lookbook', 'inspiration', 'instagram']
+    }
+  ]
+};
 
 const PinterestGenerator: React.FC = () => {
   const [activeTab, setActiveTab] = useState('design');
@@ -120,21 +146,14 @@ const PinterestGenerator: React.FC = () => {
   };
   
   const generateSocialContent = (platform: 'facebook' | 'instagram') => {
-    const title = platform === 'facebook' 
-      ? "Découvrez notre nouvelle collection"
-      : "✨ Nouveau sur Instagram";
-      
-    const description = platform === 'facebook'
-      ? "Nous sommes ravis de vous présenter notre dernière collection. Des designs uniques qui vous inspireront."
-      : "Nouvelle collection disponible 🎉 Des pièces uniques qui vous ressemblent 💫";
-      
-    const hashtags = ['design', 'inspiration', 'nouveaute', 'collection', platform];
+    const templates = socialContentTemplates[platform];
+    const randomTemplate = templates[Math.floor(Math.random() * templates.length)];
     
-    updatePin('title', title);
-    updatePin('description', description);
-    updatePin('hashtags', hashtags);
+    updatePin('title', randomTemplate.title);
+    updatePin('description', randomTemplate.description);
+    updatePin('hashtags', randomTemplate.hashtags);
     
-    // Automatically switch to the content tab to show the generated content
+    // Automatiquement passer à l'onglet de contenu pour montrer le contenu généré
     setActiveTab('content');
     
     toast.success(`Contenu ${platform} généré avec succès!`);
