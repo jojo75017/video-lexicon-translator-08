@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { PinterestPin, PinterestImage } from '@/types/pinterest';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';

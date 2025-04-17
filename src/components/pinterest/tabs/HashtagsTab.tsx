@@ -11,7 +11,7 @@ interface HashtagsTabProps {
   pin: PinterestPin;
   customHashtag: string;
   setCustomHashtag: (hashtag: string) => void;
-  handleAddHashtag: () => void;
+  handleAddHashtag: (tag: string) => void;
   handleRemoveHashtag: (tag: string) => void;
   handleSelectHashtag: (tag: string) => void;
 }
@@ -32,9 +32,9 @@ const HashtagsTab: React.FC<HashtagsTabProps> = ({
           value={customHashtag}
           onChange={(e) => setCustomHashtag(e.target.value)}
           className="flex-1"
-          onKeyDown={(e) => e.key === 'Enter' && handleAddHashtag()}
+          onKeyDown={(e) => e.key === 'Enter' && handleAddHashtag(customHashtag)}
         />
-        <Button onClick={handleAddHashtag} type="button" disabled={!customHashtag}>
+        <Button onClick={() => handleAddHashtag(customHashtag)} type="button" disabled={!customHashtag}>
           Ajouter
         </Button>
       </div>

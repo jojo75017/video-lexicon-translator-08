@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Download, Upload, History, Wand2, Facebook, Instagram, Hash } from 'lucide-react';
@@ -132,6 +133,9 @@ const PinterestGenerator: React.FC = () => {
     updatePin('title', title);
     updatePin('description', description);
     updatePin('hashtags', hashtags);
+    
+    // Automatically switch to the content tab to show the generated content
+    setActiveTab('content');
     
     toast.success(`Contenu ${platform} généré avec succès!`);
   };
