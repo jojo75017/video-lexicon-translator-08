@@ -8,7 +8,8 @@ export interface PinterestImage {
   region?: string;
   source?: 'pixabay' | 'unsplash' | 'freepik' | 'pexels' | 'local';
   tags?: string[];
-  fallbackUrl?: string; // Ajout d'une URL de secours en cas de problème
+  fallbackUrl?: string; // URL de secours en cas de problème
+  verified?: boolean;    // Indique si l'image a été vérifiée pour la cohérence
 }
 
 export interface PinterestDesign {
@@ -119,3 +120,21 @@ export const RELIABLE_FALLBACK_IMAGES = {
   france: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=2073&auto=format&fit=crop',
   default: 'https://images.unsplash.com/photo-1488229297570-58520851e868?q=80&w=2069&auto=format&fit=crop'
 };
+
+// Constantes pour la vérification de la cohérence
+export const FRANCE_LOCATIONS = [
+  'paris', 'marseille', 'lyon', 'nice', 'toulouse', 'bordeaux', 'lille', 'strasbourg', 'montpellier',
+  'dijon', 'nantes', 'bretagne', 'normandie', 'provence', 'alpes', 'corse', 'côte d\'azur', 'rhône'
+];
+
+export const EUROPE_LOCATIONS = [
+  'rome', 'berlin', 'barcelone', 'madrid', 'lisbonne', 'athènes', 'amsterdam', 'londres', 'venise',
+  'prague', 'vienne', 'budapest', 'dubrovnik', 'munich', 'copenhague', 'stockholm', 'oslo', 'milan',
+  'florence', 'dublin', 'bruxelles', 'édimbourg', 'porto', 'cracovie', 'zurich', 'genève'
+];
+
+export const WORLD_LOCATIONS = [
+  'new york', 'tokyo', 'sydney', 'dubai', 'rio de janeiro', 'miami', 'san francisco', 'los angeles',
+  'chicago', 'pékin', 'shanghai', 'hong kong', 'bangkok', 'delhi', 'mumbai', 'singapour', 'mexico',
+  'le caire', 'istanbul', 'cape town', 'marrakech', 'toronto', 'vancouver', 'montréal', 'québec'
+];

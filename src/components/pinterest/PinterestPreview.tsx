@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { PinterestPin } from '@/types/pinterest';
-import { Heart, MessageCircle, Share2 } from 'lucide-react';
+import { PinterestPin, RELIABLE_FALLBACK_IMAGES } from '@/types/pinterest';
+import { Heart, MessageCircle, Share2, AlertTriangle } from 'lucide-react';
 
 interface PinterestPreviewProps {
   pin: PinterestPin;
@@ -34,17 +34,37 @@ const PinterestPreview: React.FC<PinterestPreviewProps> = ({ pin }) => {
     return {};
   };
   
-  // Images de secours fiables par catégorie
+  // Obtenir une image de secours appropriée en fonction de la catégorie
   const getBackupImage = () => {
-    const fallbackImages = {
-      default: 'https://images.unsplash.com/photo-1486299267070-83823f5448dd?q=80&w=2071&auto=format&fit=crop',
-      france: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=2073&auto=format&fit=crop',
-      europe: 'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?q=80&w=2070&auto=format&fit=crop'
-    };
+    if (!pin.image) return RELIABLE_FALLBACK_IMAGES.default;
     
-    const category = pin.image?.category || 'default';
-    return fallbackImages[category] || fallbackImages.default;
+    const category = pin.image.category;
+    return RELIABLE_FALLBACK_IMAGES[category] || RELIABLE_FALLBACK_IMAGES.default;
   };
+  
+  // Vérifier la cohérence entre le titre et la localisation
+  const checkImageConsistency = () => {
+    if (!pin.image) return true;
+    
+    const { title, category, country, region } = pin.image;
+    if (!title) return true;
+    
+    const lowerTitle = title.toLowerCase();
+    
+    // Vérification par pays
+    if (country && lowerTitle.includes(country.toLowerCase())) {
+      return true;
+    }
+    
+    // Vérification par région pour la France
+    if (category === 'france' && region && lowerTitle.includes(region.toLowerCase())) {
+      return true;
+    }
+    
+    return false;
+  };
+  
+  const isConsistent = checkImageConsistency();
 
   return (
     <div 
@@ -74,7 +94,7 @@ const PinterestPreview: React.FC<PinterestPreviewProps> = ({ pin }) => {
             className="w-full h-full object-cover"
             onError={(e) => {
               console.error("Error loading uploaded image in preview:", e);
-              e.currentTarget.src = 'https://images.unsplash.com/photo-1486299267070-83823f5448dd?q=80&w=2071&auto=format&fit=crop';
+              e.currentTarget.src = RELIABLE_FALLBACK_IMAGES.default;
             }}
           />
         ) : (
@@ -89,6 +109,13 @@ const PinterestPreview: React.FC<PinterestPreviewProps> = ({ pin }) => {
           style={getOverlayStyle()}
         ></div>
       </div>
+      
+      {/* Indicateur d'incohérence */}
+      {pin.image && !isConsistent && (
+        <div className="absolute top-3 right-20 z-30 bg-red-500 rounded-full p-1.5 shadow-lg">
+          <AlertTriangle className="h-4 w-4 text-white" />
+        </div>
+      )}
       
       {/* Contenu textuel */}
       <div className="absolute inset-x-0 bottom-0 p-4 z-10">

@@ -4,7 +4,7 @@ import { PinterestImage } from '@/types/pinterest';
 import { Globe, Map, ExternalLink, ImageOff, Info, AlertTriangle } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipProvider, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface ImageGalleryProps {
   images: PinterestImage[];
@@ -24,21 +24,37 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onSelectImage, sele
     });
   };
   
-  // Vérifier si le titre est cohérent avec la catégorie/pays
+  // Vérification améliorée de la cohérence entre le titre et la catégorie/pays/région
   const checkTitleConsistency = (image: PinterestImage): boolean => {
     if (!image.title || !image.category) return true;
     
     const lowerTitle = image.title.toLowerCase();
     
+    // Vérifier si le pays est mentionné dans le titre
     if (image.country) {
       return lowerTitle.includes(image.country.toLowerCase());
     }
     
+    // Vérifier si la région est mentionnée dans le titre pour les images de France
     if (image.category === 'france' && image.region) {
       return lowerTitle.includes(image.region.toLowerCase());
     }
     
-    return true;
+    // Vérifier si la catégorie est cohérente avec le titre
+    const frenchCities = ['paris', 'marseille', 'lyon', 'nice', 'toulouse', 'strasbourg', 'bordeaux'];
+    const europeanCities = ['rome', 'berlin', 'barcelone', 'madrid', 'lisbonne', 'athènes', 'amsterdam', 'londres'];
+    
+    if (image.category === 'france' && 
+        frenchCities.some(city => lowerTitle.includes(city))) {
+      return true;
+    }
+    
+    if (image.category === 'europe' && 
+        europeanCities.some(city => lowerTitle.includes(city))) {
+      return true;
+    }
+    
+    return false;
   };
 
   // Utiliser une image de secours fiable en cas d'erreur
@@ -57,11 +73,14 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onSelectImage, sele
       <ScrollArea className="h-[700px] w-full p-2">
         {images.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-3">
-            {images.map((image, index) => (
+            {images.map((image, index) => {
+              const isInconsistent = !checkTitleConsistency(image);
+              return (
               <div 
                 key={`${image.id || `image-${index}`}-${index}`}
                 className={`relative rounded-md overflow-hidden cursor-pointer transition-all 
-                  hover:opacity-90 group border ${selectedImage?.id === image.id ? 'ring-2 ring-primary' : ''}`}
+                  hover:opacity-90 group border ${isInconsistent ? 'border-red-300' : ''} 
+                  ${selectedImage?.id === image.id ? 'ring-2 ring-primary' : ''}`}
                 onClick={() => onSelectImage(image)}
               >
                 {!failedImages.has(image.url) ? (
@@ -85,7 +104,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onSelectImage, sele
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Badge variant="outline" className="bg-white bg-opacity-75 text-xs">
+                          <Badge variant="outline" className={`bg-white bg-opacity-75 text-xs ${isInconsistent ? 'border-red-500' : ''}`}>
                             {image.category === 'monde' ? (
                               <Globe className="h-3 w-3 mr-1" />
                             ) : image.category === 'france' ? (
@@ -116,7 +135,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onSelectImage, sele
                               </Badge>
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p className="text-xs">Le titre peut ne pas correspondre à l'image</p>
+                              <p className="text-xs">Le titre ne correspond pas à la localisation indiquée!</p>
                             </TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
@@ -141,13 +160,17 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onSelectImage, sele
                     </div>
                   </div>
                   <div className="invisible group-hover:visible">
-                    <p className="text-xs text-white bg-black bg-opacity-60 p-1 rounded">
+                    <p className={`text-xs ${isInconsistent ? 'bg-red-500' : 'bg-black bg-opacity-60'} text-white p-1 rounded`}>
                       {image.title || 'Sans titre'}
                     </p>
                   </div>
                 </div>
+                
+                {isInconsistent && (
+                  <div className="absolute inset-0 border-2 border-red-500 pointer-events-none"></div>
+                )}
               </div>
-            ))}
+            )})}
           </div>
         ) : (
           <div className="h-32 flex items-center justify-center text-gray-500">

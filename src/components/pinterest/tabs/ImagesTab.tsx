@@ -5,8 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
-import { UploadCloud, Search, Camera, ExternalLink, AlertCircle, RefreshCcw } from 'lucide-react';
-import { PinterestPin, PinterestImage } from '@/types/pinterest';
+import { UploadCloud, Search, Camera, ExternalLink, AlertCircle, RefreshCcw, AlertTriangle } from 'lucide-react';
+import { PinterestPin, PinterestImage, FRANCE_LOCATIONS, EUROPE_LOCATIONS, WORLD_LOCATIONS } from '@/types/pinterest';
 import ImageGallery from '../ImageGallery';
 import { toast } from 'sonner';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
@@ -43,17 +43,47 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
   handleImageUpload 
 }) => {
   const [failedImages, setFailedImages] = useState<number>(0);
+  const [inconsistentImages, setInconsistentImages] = useState<number>(0);
   
-  // Vérifier si les images ont des problèmes
+  // Vérifier les problèmes d'images
   useEffect(() => {
     const checkImages = () => {
       let failed = 0;
+      let inconsistent = 0;
+      
       images.forEach(img => {
         if (!img.url || !img.url.startsWith('http')) {
           failed++;
         }
+        
+        // Vérifier la cohérence entre titre et catégorie
+        if (img.title && img.category) {
+          const lowerTitle = img.title.toLowerCase();
+          let isConsistent = false;
+          
+          if (img.country && lowerTitle.includes(img.country.toLowerCase())) {
+            isConsistent = true;
+          } else if (img.region && lowerTitle.includes(img.region.toLowerCase())) {
+            isConsistent = true;
+          } else if (img.category === 'france' && 
+                    FRANCE_LOCATIONS.some(loc => lowerTitle.includes(loc))) {
+            isConsistent = true;
+          } else if (img.category === 'europe' && 
+                    EUROPE_LOCATIONS.some(loc => lowerTitle.includes(loc))) {
+            isConsistent = true;
+          } else if (img.category === 'monde' && 
+                    WORLD_LOCATIONS.some(loc => lowerTitle.includes(loc))) {
+            isConsistent = true;
+          }
+          
+          if (!isConsistent) {
+            inconsistent++;
+          }
+        }
       });
+      
       setFailedImages(failed);
+      setInconsistentImages(inconsistent);
     };
     
     checkImages();
@@ -72,6 +102,42 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
       icon: <ExternalLink className="h-4 w-4 mr-2" />
     }
   ];
+
+  // Fonction pour corriger automatiquement le titre d'une image sélectionnée
+  const fixImageTitle = () => {
+    if (!pin.image) return;
+    
+    const { category, country, region } = pin.image;
+    let newTitle = pin.image.title;
+    
+    if (country) {
+      // Ajouter le pays au début du titre s'il n'y est pas déjà
+      if (!newTitle.toLowerCase().includes(country.toLowerCase())) {
+        newTitle = `${country} - ${newTitle}`;
+      }
+    } else if (region && category === 'france') {
+      // Ajouter la région au début du titre s'il n'y est pas déjà
+      if (!newTitle.toLowerCase().includes(region.toLowerCase())) {
+        newTitle = `${region} - ${newTitle}`;
+      }
+    } else {
+      // Ajouter une localisation basée sur la catégorie
+      if (category === 'france' && !FRANCE_LOCATIONS.some(loc => newTitle.toLowerCase().includes(loc))) {
+        newTitle = `France - ${newTitle}`;
+      } else if (category === 'europe' && !EUROPE_LOCATIONS.some(loc => newTitle.toLowerCase().includes(loc))) {
+        newTitle = `Europe - ${newTitle}`;
+      } else if (category === 'monde' && !WORLD_LOCATIONS.some(loc => newTitle.toLowerCase().includes(loc))) {
+        newTitle = `Destination internationale - ${newTitle}`;
+      }
+    }
+    
+    // Mettre à jour l'image avec le nouveau titre
+    if (newTitle !== pin.image.title) {
+      const updatedImage = { ...pin.image, title: newTitle, verified: true };
+      updatePin('image', updatedImage);
+      toast.success("Titre de l'image corrigé pour correspondre à la localisation");
+    }
+  };
 
   return (
     <div className="flex flex-col space-y-4">
@@ -114,6 +180,28 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
           ))}
         </div>
       </div>
+      
+      {inconsistentImages > 0 && (
+        <Alert className="my-2 border-amber-400 bg-amber-50">
+          <AlertTriangle className="h-4 w-4 text-amber-600" />
+          <AlertTitle className="text-amber-800">Incohérences détectées</AlertTitle>
+          <AlertDescription className="text-amber-700">
+            {inconsistentImages} image(s) ont des titres qui ne correspondent pas à leur localisation (pays/région).
+            {pin.image && (
+              <div className="mt-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={fixImageTitle}
+                  className="bg-amber-100"
+                >
+                  <RefreshCcw className="h-3 w-3 mr-1" /> Corriger le titre de l'image sélectionnée
+                </Button>
+              </div>
+            )}
+          </AlertDescription>
+        </Alert>
+      )}
       
       {failedImages > 0 && (
         <Alert className="my-2 border-yellow-400 bg-yellow-50">
