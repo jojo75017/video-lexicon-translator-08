@@ -14,6 +14,7 @@ import {
 import { toast } from 'sonner';
 import PinterestPreviewCard from './PinterestPreviewCard';
 import PinterestTabs from './PinterestTabs';
+import SpecialPromptButton from './tabs/SpecialPromptButton';
 
 const PinterestGenerator: React.FC = () => {
   const [activeTab, setActiveTab] = useState('design');
@@ -128,6 +129,19 @@ const PinterestGenerator: React.FC = () => {
     }
   };
 
+  const handleGeneratedPrompt = (prompt: string) => {
+    // Utiliser le prompt généré pour la recherche d'images
+    setSearchQuery(prompt);
+    setActiveTab('images');
+    
+    // Lancer automatiquement la recherche après une courte pause
+    setTimeout(() => {
+      handleSearch();
+    }, 500);
+    
+    toast.success("Prompt généré! Recherche d'images en cours...");
+  };
+
   const handleSelectImage = (image: PinterestImage) => {
     console.log("Image selected in handleSelectImage:", image);
     
@@ -226,6 +240,14 @@ const PinterestGenerator: React.FC = () => {
   return (
     <div className="flex flex-col lg:flex-row gap-6">
       <div className="w-full lg:w-1/2 space-y-6">
+        <div className="flex justify-between items-center">
+          <h2 className="text-lg font-semibold">Création de Pin</h2>
+          <SpecialPromptButton 
+            currentTitle={pin.title} 
+            onPromptGenerated={handleGeneratedPrompt}
+          />
+        </div>
+        
         <PinterestTabs 
           activeTab={activeTab}
           setActiveTab={setActiveTab}
