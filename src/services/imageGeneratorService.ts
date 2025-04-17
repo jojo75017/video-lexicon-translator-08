@@ -1,4 +1,3 @@
-
 /**
  * Service pour générer des images à l'aide de l'API OpenAI DALL-E
  */
@@ -11,6 +10,10 @@ export const generateImage = async (
   quality: 'standard' | 'hd' = 'hd',
   style: 'vivid' | 'natural' = 'vivid'
 ): Promise<string> => {
+  if (!apiKey?.startsWith('sk-')) {
+    throw new Error('Veuillez fournir une clé API OpenAI valide commençant par "sk-"');
+  }
+
   try {
     // Amélioration du prompt pour de meilleurs résultats
     const enhancedPrompt = enhancePromptForBetterResults(prompt);
@@ -23,11 +26,11 @@ export const generateImage = async (
       },
       body: JSON.stringify({
         prompt: enhancedPrompt,
-        model: model, // 'dall-e-3' pour le modèle le plus récent
+        model: model,
         n: 1,
         size,
-        quality, // 'hd' pour haute définition
-        style, // 'vivid' pour des couleurs plus vives
+        quality,
+        style,
         response_format: 'url'
       })
     });
@@ -48,15 +51,43 @@ export const generateImage = async (
 
 // Améliore le prompt pour obtenir de meilleurs résultats
 const enhancePromptForBetterResults = (prompt: string): string => {
+  const qualityModifiers = [
+    'haute résolution',
+    'image détaillée',
+    'qualité professionnelle',
+    'rendu photoréaliste',
+    'éclairage parfait'
+  ];
+  
+  const styleModifiers = [
+    'composition équilibrée',
+    'couleurs vibrantes',
+    'effets visuels élaborés'
+  ];
+  
   // Vérifier si le prompt contient déjà des instructions de qualité
-  const hasQualityInstructions = /haute qualité|haute résolution|détaillé|professional/i.test(prompt);
+  const hasQualityInstructions = qualityModifiers.some(modifier => 
+    prompt.toLowerCase().includes(modifier.toLowerCase())
+  );
+  
+  // Vérifier si le prompt contient déjà des instructions de style
+  const hasStyleInstructions = styleModifiers.some(modifier => 
+    prompt.toLowerCase().includes(modifier.toLowerCase())
+  );
+  
+  let enhancedPrompt = prompt;
   
   // Ajouter des instructions de qualité si elles ne sont pas déjà présentes
   if (!hasQualityInstructions) {
-    prompt = `${prompt}, haute résolution, image détaillée de qualité professionnelle`;
+    enhancedPrompt += ', haute résolution, image détaillée de qualité professionnelle';
   }
   
-  return prompt;
+  // Ajouter des instructions de style si elles ne sont pas déjà présentes
+  if (!hasStyleInstructions) {
+    enhancedPrompt += ', composition équilibrée avec des couleurs vibrantes';
+  }
+  
+  return enhancedPrompt;
 };
 
 /**

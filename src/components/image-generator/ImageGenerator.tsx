@@ -32,6 +32,25 @@ const ImageGenerator: React.FC = () => {
   const [generatedPrompts, setGeneratedPrompts] = useState<string[]>([]);
   const [selectedPrompt, setSelectedPrompt] = useState('');
 
+  // Ajout de useEffect pour charger la clé API depuis le localStorage
+  useEffect(() => {
+    const savedApiKey = localStorage.getItem('openai_api_key');
+    if (savedApiKey) {
+      setApiKey(savedApiKey);
+      toast.success('Clé API OpenAI chargée');
+    }
+  }, []);
+
+  // Mise à jour du gestionnaire pour sauvegarder la clé API
+  const handleApiKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newApiKey = e.target.value;
+    setApiKey(newApiKey);
+    if (newApiKey.startsWith('sk-')) {
+      localStorage.setItem('openai_api_key', newApiKey);
+      toast.success('Clé API OpenAI sauvegardée');
+    }
+  };
+
   const handleGenerateImage = async () => {
     if (!prompt) {
       toast.error('Veuillez entrer un prompt pour générer une image');
@@ -45,24 +64,25 @@ const ImageGenerator: React.FC = () => {
     try {
       let imageUrl: string;
 
-      // Sauvegarder le prompt dans l'historique
-      setGeneratedPrompts(prev => 
-        [prompt, ...prev.filter(p => p !== prompt)].slice(0, 10)
-      );
-
-      if (apiKey) {
+      if (apiKey?.startsWith('sk-')) {
         imageUrl = await generateImage(prompt, size, apiKey, model, quality, style);
+        toast.success('Image générée avec DALL-E en haute qualité');
       } else {
-        // Utilisation du mode mock si pas de clé API
+        toast.warning('Pas de clé API valide - utilisation du mode démo');
         imageUrl = await generateImageMock(prompt, size);
       }
 
       setGeneratedImageUrl(imageUrl);
-      toast.success('Image générée avec succès');
+      
+      // Sauvegarder le prompt dans l'historique
+      setGeneratedPrompts(prev => 
+        [prompt, ...prev.filter(p => p !== prompt)].slice(0, 10)
+      );
     } catch (err) {
       console.error('Erreur de génération:', err);
-      setError(err instanceof Error ? err.message : 'Erreur lors de la génération de l\'image');
-      toast.error('Erreur: ' + (err instanceof Error ? err.message : 'Échec de la génération d\'image'));
+      const errorMessage = err instanceof Error ? err.message : 'Erreur lors de la génération de l\'image';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -264,16 +284,23 @@ const ImageGenerator: React.FC = () => {
               )}
 
               <div className="space-y-2">
-                <label htmlFor="apiKey" className="text-sm font-medium">Clé API OpenAI (optionnel)</label>
+                <label htmlFor="apiKey" className="text-sm font-medium flex items-center justify-between">
+                  Clé API OpenAI
+                  <span className="text-xs text-blue-600 hover:underline cursor-help">
+                    Commence par "sk-"
+                  </span>
+                </label>
                 <Input
                   id="apiKey"
                   type="password"
                   placeholder="sk-..."
                   value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
+                  onChange={handleApiKeyChange}
+                  className="font-mono"
                 />
                 <p className="text-xs text-gray-500">
-                  Sans clé API, une image de démonstration sera utilisée.
+                  Votre clé API est stockée localement et n'est jamais partagée.
+                  {!apiKey?.startsWith('sk-') && " Sans clé API valide, des images de démonstration seront utilisées."}
                 </p>
               </div>
 
