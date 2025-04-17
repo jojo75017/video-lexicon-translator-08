@@ -1,11 +1,12 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Download, Loader, RefreshCw, Search, ImageOff, Sparkles, ExternalLink } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Download, Loader, RefreshCw, Search, ImageOff, Sparkles, ExternalLink, AlertCircle, Camera, Wand2, Sliders } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
 import { toast } from 'sonner';
 import { generateImage, generateImageMock, getCuratedPexelsImages, searchPexelsAPI } from '@/services/imageGeneratorService';
 import { PexelsResponse, PexelsPhoto } from '@/types/imageGenerator';
@@ -13,7 +14,7 @@ import PromptGenerator from './PromptGenerator';
 
 const ImageGenerator: React.FC = () => {
   const [prompt, setPrompt] = useState('');
-  const [size, setSize] = useState<'256x256' | '512x512' | '1024x1024'>('512x512');
+  const [size, setSize] = useState<'256x256' | '512x512' | '1024x1024' | '1792x1024' | '1024x1792'>('512x512');
   const [apiKey, setApiKey] = useState('');
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -22,6 +23,14 @@ const ImageGenerator: React.FC = () => {
   const [pexelsResults, setPexelsResults] = useState<PexelsPhoto[]>([]);
   const [pexelsQuery, setPexelsQuery] = useState('');
   const [pexelsLoading, setPexelsLoading] = useState(false);
+  
+  // Nouveaux paramètres
+  const [model, setModel] = useState<'dall-e-2' | 'dall-e-3'>('dall-e-3');
+  const [quality, setQuality] = useState<'standard' | 'hd'>('hd');
+  const [style, setStyle] = useState<'vivid' | 'natural'>('vivid');
+  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
+  const [generatedPrompts, setGeneratedPrompts] = useState<string[]>([]);
+  const [selectedPrompt, setSelectedPrompt] = useState('');
 
   const handleGenerateImage = async () => {
     if (!prompt) {
@@ -36,8 +45,13 @@ const ImageGenerator: React.FC = () => {
     try {
       let imageUrl: string;
 
+      // Sauvegarder le prompt dans l'historique
+      setGeneratedPrompts(prev => 
+        [prompt, ...prev.filter(p => p !== prompt)].slice(0, 10)
+      );
+
       if (apiKey) {
-        imageUrl = await generateImage(prompt, size, apiKey);
+        imageUrl = await generateImage(prompt, size, apiKey, model, quality, style);
       } else {
         // Utilisation du mode mock si pas de clé API
         imageUrl = await generateImageMock(prompt, size);
@@ -107,6 +121,12 @@ const ImageGenerator: React.FC = () => {
     setActiveTab('generate');
   };
 
+  // Nouveaux gestionnaires
+  const handleSelectPromptFromHistory = (selectedPrompt: string) => {
+    setPrompt(selectedPrompt);
+    toast.success('Prompt sélectionné dans l\'historique');
+  };
+
   React.useEffect(() => {
     // Charger des images à la une au chargement initial
     const loadCuratedImages = async () => {
@@ -153,17 +173,27 @@ const ImageGenerator: React.FC = () => {
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <label htmlFor="prompt" className="text-sm font-medium">Description de l'image</label>
-                <Input
-                  id="prompt"
-                  placeholder="ex: Une forêt enchantée avec des lucioles et un ruisseau qui serpente, style aquarelle"
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                />
+                <div className="flex gap-2">
+                  <Input
+                    id="prompt"
+                    placeholder="ex: Une forêt enchantée avec des lucioles et un ruisseau qui serpente, style aquarelle"
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    className="flex-1"
+                  />
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setActiveTab("prompt")}
+                    title="Générer un prompt avec l'assistant"
+                  >
+                    <Wand2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
 
               <div className="space-y-2">
                 <label htmlFor="size" className="text-sm font-medium">Taille de l'image</label>
-                <Select value={size} onValueChange={(value) => setSize(value as '256x256' | '512x512' | '1024x1024')}>
+                <Select value={size} onValueChange={(value) => setSize(value as any)}>
                   <SelectTrigger id="size">
                     <SelectValue placeholder="Sélectionnez une taille" />
                   </SelectTrigger>
@@ -171,9 +201,67 @@ const ImageGenerator: React.FC = () => {
                     <SelectItem value="256x256">Petite (256x256)</SelectItem>
                     <SelectItem value="512x512">Moyenne (512x512)</SelectItem>
                     <SelectItem value="1024x1024">Grande (1024x1024)</SelectItem>
+                    <SelectItem value="1792x1024">Paysage (1792x1024)</SelectItem>
+                    <SelectItem value="1024x1792">Portrait (1024x1792)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
+
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setShowAdvancedOptions(!showAdvancedOptions)}
+                className="w-full"
+              >
+                <Sliders className="h-4 w-4 mr-2" />
+                {showAdvancedOptions ? 'Masquer les options avancées' : 'Afficher les options avancées'}
+              </Button>
+
+              {showAdvancedOptions && (
+                <div className="p-4 border rounded-md space-y-4 bg-gray-50">
+                  <div className="space-y-2">
+                    <label htmlFor="model" className="text-sm font-medium">Modèle IA</label>
+                    <Select value={model} onValueChange={(value) => setModel(value as 'dall-e-2' | 'dall-e-3')}>
+                      <SelectTrigger id="model">
+                        <SelectValue placeholder="Sélectionnez un modèle" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="dall-e-2">DALL-E 2 (Standard)</SelectItem>
+                        <SelectItem value="dall-e-3">DALL-E 3 (Avancé)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-gray-500">
+                      DALL-E 3 offre des images plus détaillées et créatives que DALL-E 2.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="quality" className="text-sm font-medium">Qualité d'image</label>
+                    <Select value={quality} onValueChange={(value) => setQuality(value as 'standard' | 'hd')}>
+                      <SelectTrigger id="quality">
+                        <SelectValue placeholder="Sélectionnez la qualité" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="standard">Standard</SelectItem>
+                        <SelectItem value="hd">Haute définition (HD)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="style" className="text-sm font-medium">Style d'image</label>
+                    <Select value={style} onValueChange={(value) => setStyle(value as 'vivid' | 'natural')}>
+                      <SelectTrigger id="style">
+                        <SelectValue placeholder="Sélectionnez un style" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="vivid">Vivid (Couleurs éclatantes)</SelectItem>
+                        <SelectItem value="natural">Natural (Couleurs naturelles)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              )}
 
               <div className="space-y-2">
                 <label htmlFor="apiKey" className="text-sm font-medium">Clé API OpenAI (optionnel)</label>
@@ -189,6 +277,35 @@ const ImageGenerator: React.FC = () => {
                 </p>
               </div>
 
+              {generatedPrompts.length > 0 && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Historique des prompts</label>
+                  <div className="flex gap-2 overflow-x-auto pb-2 flex-wrap">
+                    {generatedPrompts.slice(0, 5).map((historyPrompt, index) => (
+                      <Button 
+                        key={index} 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleSelectPromptFromHistory(historyPrompt)}
+                        className="truncate max-w-[200px]"
+                      >
+                        {historyPrompt.length > 20 ? historyPrompt.substring(0, 20) + '...' : historyPrompt}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {!apiKey && (
+                <Alert className="bg-amber-50 border-amber-200">
+                  <AlertCircle className="h-4 w-4 text-amber-600" />
+                  <AlertTitle className="text-amber-800">Mode démo</AlertTitle>
+                  <AlertDescription className="text-amber-700">
+                    Sans clé API OpenAI, l'application affichera des images de démonstration. Pour de vrais résultats de génération IA, ajoutez votre clé API.
+                  </AlertDescription>
+                </Alert>
+              )}
+
               <Button
                 className="w-full"
                 onClick={handleGenerateImage}
@@ -201,7 +318,7 @@ const ImageGenerator: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    <Sparkles className="mr-2 h-4 w-4" />
+                    <Camera className="mr-2 h-4 w-4" />
                     Générer l'image
                   </>
                 )}
