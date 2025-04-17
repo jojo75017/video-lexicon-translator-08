@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Download } from 'lucide-react';
+import { Download, Upload, History, Wand2 } from 'lucide-react';
 import { PinterestPin, PinterestImage } from '@/types/pinterest';
 import { pinterestDesigns } from '@/data/pinterestImages';
 import { 
@@ -237,16 +237,100 @@ const PinterestGenerator: React.FC = () => {
     console.log("Current pin state:", pin);
   }, [pin]);
 
+  // Nouvelle fonctionnalité: historique des pins
+  const [pinHistory, setPinHistory] = useState<PinterestPin[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
+
+  // Sauvegarder l'historique dans le localStorage
+  useEffect(() => {
+    const savedHistory = localStorage.getItem('pinHistory');
+    if (savedHistory) {
+      setPinHistory(JSON.parse(savedHistory));
+    }
+  }, []);
+
+  // Fonction pour sauvegarder un pin dans l'historique
+  const saveToHistory = () => {
+    const newHistory = [pin, ...pinHistory.slice(0, 9)]; // Garde les 10 derniers pins
+    setPinHistory(newHistory);
+    localStorage.setItem('pinHistory', JSON.stringify(newHistory));
+    toast.success('Pin sauvegardé dans l\'historique');
+  };
+
+  // Fonction pour restaurer un pin depuis l'historique
+  const restoreFromHistory = (historicPin: PinterestPin) => {
+    setPin(historicPin);
+    setShowHistory(false);
+    toast.success('Pin restauré depuis l\'historique');
+  };
+
+  // Fonction pour réinitialiser le pin
+  const resetPin = () => {
+    setPin({
+      title: 'Découvrez les merveilles de Paris',
+      description: 'Explorez la ville romantique avec ses monuments emblématiques, sa gastronomie raffinée et son atmosphère unique. Un voyage inoubliable vous attend.',
+      hashtags: ['paris', 'france', 'travel', 'eiffeltower'],
+      tags: ['voyage', 'france', 'architecture', 'europe'],
+      callToAction: 'Découvrir',
+      image: null,
+      uploadedImage: null,
+      design: pinterestDesigns[0]
+    });
+    toast.success('Pin réinitialisé');
+  };
+
   return (
     <div className="flex flex-col lg:flex-row gap-6">
       <div className="w-full lg:w-1/2 space-y-6">
         <div className="flex justify-between items-center">
           <h2 className="text-lg font-semibold">Création de Pin</h2>
-          <SpecialPromptButton 
-            currentTitle={pin.title} 
-            onPromptGenerated={handleGeneratedPrompt}
-          />
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setShowHistory(!showHistory)}
+            >
+              <History className="w-4 h-4 mr-2" />
+              Historique
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={resetPin}
+            >
+              <Wand2 className="w-4 h-4 mr-2" />
+              Réinitialiser
+            </Button>
+            <SpecialPromptButton 
+              currentTitle={pin.title} 
+              onPromptGenerated={handleGeneratedPrompt}
+            />
+          </div>
         </div>
+
+        {showHistory && (
+          <div className="bg-white rounded-lg border p-4 space-y-4">
+            <h3 className="font-medium">Historique des Pins</h3>
+            {pinHistory.length === 0 ? (
+              <p className="text-gray-500">Aucun pin dans l'historique</p>
+            ) : (
+              <div className="space-y-2">
+                {pinHistory.map((historicPin, index) => (
+                  <div key={index} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded">
+                    <span className="truncate">{historicPin.title}</span>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => restoreFromHistory(historicPin)}
+                    >
+                      Restaurer
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
         
         <PinterestTabs 
           activeTab={activeTab}
@@ -275,6 +359,10 @@ const PinterestGenerator: React.FC = () => {
           <Button variant="outline" onClick={() => handleDownload()}>
             <Download className="mr-2 h-4 w-4" />
             Télécharger
+          </Button>
+          <Button variant="default" onClick={saveToHistory}>
+            <Upload className="mr-2 h-4 w-4" />
+            Sauvegarder
           </Button>
         </div>
       </div>
