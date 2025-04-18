@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { FileSignature } from 'lucide-react';
@@ -26,7 +26,48 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
   highlighted,
   onClick
 }) => {
-  // Contenu pour badge et icône partagé entre les versions de lien et d'onglet
+  const navigate = useNavigate();
+  
+  // Helper function to determine if a tab is active
+  const getPath = () => {
+    if (link) return link;
+    
+    const routeMap: Record<string, string> = {
+      'hierarchy': '/hierarchy',
+      'wordcount': '/wordcount',
+      'suggestions': '/suggestions',
+      'seo': '/seo',
+      'structure': '/structure',
+      'backlinks': '/backlinks',
+      'performance': '/performance',
+      'metrics': '/metrics',
+      'analytics': '/analytics',
+      'signature': '/signature',
+      'quora': '/quora',
+      'local-business': '/local-business',
+      'translation': '/translation',
+      'pinterest': '/pinterest'
+    };
+    
+    return routeMap[id] || '/';
+  };
+
+  // Handle click with combined navigation and callback
+  const handleClick = (e: React.MouseEvent) => {
+    // Prevent default Link behavior so we can handle navigation ourselves
+    e.preventDefault();
+    
+    // Call the onClick handler if provided
+    if (onClick) {
+      onClick();
+    }
+    
+    // Navigate to the appropriate path
+    const path = getPath();
+    navigate(path);
+  };
+
+  // Content for badge and icon shared between the versions of link and tab
   const TabContent = () => (
     <div 
       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md relative group transition-all duration-200 hover:bg-white ${
@@ -50,41 +91,19 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
     </div>
   );
 
-  // Obtenir le chemin correct pour la navigation
-  const getPath = () => {
-    if (link) return link;
-    
-    const routeMap: Record<string, string> = {
-      'hierarchy': '/hierarchy',
-      'wordcount': '/wordcount',
-      'suggestions': '/suggestions',
-      'seo': '/seo',
-      'structure': '/structure',
-      'backlinks': '/backlinks',
-      'performance': '/performance',
-      'metrics': '/metrics',
-      'analytics': '/analytics',
-      'signature': '/signature',
-      'quora': '/quora',
-      'local-business': '/local-business'
-    };
-    
-    return routeMap[id] || '/';
-  };
-
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Link 
-            to={getPath()} 
+          <a 
+            href={getPath()}
             className="inline-block" 
             data-value={id}
             data-tab-id={id}
-            onClick={onClick}
+            onClick={handleClick}
           >
             <TabContent />
-          </Link>
+          </a>
         </TooltipTrigger>
         <TooltipContent>
           <p className="text-xs">Accéder à {label}</p>

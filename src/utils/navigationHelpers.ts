@@ -1,4 +1,3 @@
-
 // Fonction pour vérifier si un URL est valide
 export const isValidUrl = (urlString: string): boolean => {
   try {
@@ -29,7 +28,7 @@ export const getMainTabCategory = (tabId: string): string => {
     return 'performance';
   } else if (tabId === 'analytics') {
     return 'analytics';
-  } else if (['signature', 'quora', 'local-business'].includes(tabId)) {
+  } else if (['signature', 'quora', 'local-business', 'translation', 'pinterest'].includes(tabId)) {
     return 'tools';
   }
   
@@ -89,7 +88,9 @@ export const getTabIdFromPath = (path: string): string => {
     '/analytics': 'analytics',
     '/quora': 'quora',
     '/signature': 'signature',
-    '/local-business': 'local-business'
+    '/local-business': 'local-business',
+    '/translation': 'translation',
+    '/pinterest': 'pinterest'
   };
   
   return pathToTabMap[cleanPath] || 'hierarchy';
