@@ -26,13 +26,14 @@ export interface PinterestDesign {
 export interface PinterestPin {
   title: string;
   description: string;
+  globalDescription: string;  // New field for longer description not shown in image
   hashtags: string[];
-  tags: string[];  // Étiquettes
+  tags: string[];
   callToAction: string;
   image: PinterestImage | null;
   uploadedImage: string | null;
   design: PinterestDesign;
-  showHashtags?: boolean; // New optional property
+  showHashtags?: boolean;
 }
 
 export interface PixabayResponse {

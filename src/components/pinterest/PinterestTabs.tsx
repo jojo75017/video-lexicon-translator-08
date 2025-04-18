@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { PinterestPin, PinterestImage } from '@/types/pinterest';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -28,9 +27,6 @@ interface PinterestTabsProps {
   handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   setCustomHashtag: React.Dispatch<React.SetStateAction<string>>;
   customHashtag: string;
-  handleAddHashtag: (tag: string) => void;
-  handleRemoveHashtag: (tag: string) => void;
-  handleSelectHashtag: (tag: string) => void;
 }
 
 const PinterestTabs: React.FC<PinterestTabsProps> = ({
@@ -50,10 +46,7 @@ const PinterestTabs: React.FC<PinterestTabsProps> = ({
   handleSelectImage,
   handleImageUpload,
   setCustomHashtag,
-  customHashtag,
-  handleAddHashtag,
-  handleRemoveHashtag,
-  handleSelectHashtag
+  customHashtag
 }) => {
   const handlePromptGenerated = (prompt: string) => {
     // Mettre à jour la description avec le prompt généré
@@ -109,9 +102,7 @@ const PinterestTabs: React.FC<PinterestTabsProps> = ({
           pin={pin}
           customHashtag={customHashtag}
           setCustomHashtag={setCustomHashtag}
-          handleAddHashtag={handleAddHashtag}
-          handleRemoveHashtag={handleRemoveHashtag}
-          handleSelectHashtag={handleSelectHashtag}
+          updatePin={updatePin}
         />
       </TabsContent>
       

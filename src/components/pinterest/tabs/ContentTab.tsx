@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import { PinterestPin } from '@/types/pinterest';
 import { Label } from '@/components/ui/label';
@@ -171,7 +172,7 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin, onGenerateConte
       
       <div className="flex flex-col space-y-2">
         <div className="flex justify-between items-center">
-          <Label htmlFor="description">Description</Label>
+          <Label htmlFor="description">Description (dans l'image)</Label>
           <div className="flex items-center gap-4">
             <span className="text-sm text-gray-500">
               {pin.description.length}/400
@@ -205,7 +206,36 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin, onGenerateConte
           onChange={handleDescriptionChange}
           rows={4}
           className="resize-none"
-          placeholder="Description attrayante pour votre pin (max 400 caractères)"
+          placeholder="Description affichée sur l'image (max 400 caractères)"
+          maxLength={400}
+        />
+      </div>
+
+      <div className="flex flex-col space-y-2">
+        <div className="flex justify-between items-center">
+          <Label htmlFor="globalDescription">Description globale</Label>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-500">
+              {pin.globalDescription?.length || 0}/400
+            </span>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => copyToClipboard(pin.globalDescription || '', 'Description globale')}
+              type="button"
+            >
+              <Copy className="h-4 w-4 mr-1" />
+              Copier
+            </Button>
+          </div>
+        </div>
+        <Textarea
+          id="globalDescription"
+          value={pin.globalDescription || ''}
+          onChange={(e) => updatePin('globalDescription', e.target.value.slice(0, 400))}
+          rows={4}
+          className="resize-none"
+          placeholder="Description globale du pin (max 400 caractères)"
           maxLength={400}
         />
       </div>
