@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
-import { UploadCloud, FolderOpen, Camera, Trash2 } from 'lucide-react';
+import { UploadCloud, FolderOpen, Camera, Trash2, Upload } from 'lucide-react';
 import { PinterestPin } from '@/types/pinterest';
 import { toast } from 'sonner';
 
@@ -82,8 +82,12 @@ const LocalImagesTab: React.FC<LocalImagesTabProps> = ({
   return (
     <div className="flex flex-col space-y-4">
       <div className="flex items-center space-x-2">
-        <Button onClick={triggerFileInput} className="flex items-center gap-2">
-          <FolderOpen className="h-4 w-4" />
+        <Button 
+          onClick={triggerFileInput} 
+          className="flex items-center gap-2"
+          variant="default"
+        >
+          <Upload className="h-4 w-4" />
           <span>Charger depuis l'ordinateur</span>
         </Button>
         <Input

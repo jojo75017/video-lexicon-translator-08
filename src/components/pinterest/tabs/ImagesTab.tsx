@@ -42,9 +42,9 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
 }) => {
   const [activeImageTab, setActiveImageTab] = useState<string>('stock');
   
-  // Helper function to get the image URL (handles both src and url properties)
+  // Helper function to get the image URL (handles both url property)
   const getImageUrl = (image: PinterestImage): string => {
-    return image.src || image.url || '';
+    return image.url || '';
   };
   
   return (
