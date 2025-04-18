@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import { PinterestPin } from '@/types/pinterest';
 import { Label } from '@/components/ui/label';
@@ -66,7 +67,14 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin, onGenerateConte
     const hasEmojis = /[\p{Emoji}]/u.test(titleText);
     
     if (!hasEmojis) {
-      if (titleText.toLowerCase().includes('paris') || titleText.toLowerCase().includes('france')) {
+      // Detect specific keywords in the title for appropriate emojis
+      if (titleText.toLowerCase().includes('finlande')) {
+        newTitle = `🇫🇮 ${titleText} 🌲`;
+      } else if (titleText.toLowerCase().includes('lac')) {
+        newTitle = `🏞️ ${titleText} 💦`;
+      } else if (titleText.toLowerCase().includes('nature')) {
+        newTitle = `🌿 ${titleText} 🌳`;
+      } else if (titleText.toLowerCase().includes('paris') || titleText.toLowerCase().includes('france')) {
         newTitle = `🇫🇷 ${titleText} 🗼`;
       } else if (titleText.toLowerCase().includes('voyage') || titleText.toLowerCase().includes('découvr')) {
         newTitle = `✈️ ${titleText} 🌍`;
@@ -94,17 +102,22 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin, onGenerateConte
       .catch(() => toast.error(`Erreur lors de la copie du ${type.toLowerCase()}`));
   };
 
-  // Fonction générer du contenu est maintenant correctement typée
-  // Cette fonction peut être appelée depuis un composant parent ou définie ici
+  // Fonction générer du contenu
   const generateContent = () => {
     if (onGenerateContent) {
       onGenerateContent();
     } else {
-      // Génération simple de contenu par défaut
-      const newTitle = "Découvrez cette destination incroyable ✨";
-      const newDescription = "Un lieu magique qui vous transportera dans un univers de découvertes. Parfait pour les amoureux de voyage et d'aventure. #voyage #découverte #aventure";
+      // Génération de contenu adaptée à la thématique finlandaise
+      // Maintenant on va préserver le titre de l'utilisateur s'il est déjà défini
+      // et ne pas le remplacer automatiquement
+      const currentTitle = pin.title;
+      const newDescription = "Découvrez les paysages époustouflants et les expériences authentiques qui vous attendent. Un voyage inoubliable au cœur de la nature sauvage.";
       
-      updatePin('title', newTitle);
+      // On ne change le titre que s'il est vide ou s'il s'agit du titre par défaut
+      if (!currentTitle || currentTitle === 'Découvrez les tendances créatives du moment') {
+        updatePin('title', 'Que faire en Finlande : nature, lacs');
+      }
+      
       updatePin('description', newDescription);
       toast.success('Contenu généré avec succès');
     }

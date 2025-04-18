@@ -19,9 +19,12 @@ export const usePin = (initialPin: PinterestPin) => {
     updatePin('uploadedImage', null);
     updatePin('image', image);
     
-    const generatedContent = generateContentFromImage(image);
-    updatePin('title', generatedContent.title);
-    updatePin('description', generatedContent.description);
+    // Only generate content if the title is empty or a default title
+    if (!pin.title || pin.title === initialPin.title) {
+      const generatedContent = generateContentFromImage(image);
+      updatePin('title', generatedContent.title);
+      updatePin('description', generatedContent.description);
+    }
     
     if (image.tags && image.tags.length > 0) {
       const newHashtags = [...pin.hashtags];
@@ -56,14 +59,20 @@ export const usePin = (initialPin: PinterestPin) => {
         updatePin('image', null);
         updatePin('uploadedImage', reader.result as string);
         
+        // Only update the title if it's empty or the default title
+        if (!pin.title || pin.title === initialPin.title) {
+          const fileName = file.name.replace(/\.[^/.]+$/, "");
+          const words = fileName.split(/[-_\s.]/);
+          
+          const capitalizedWords = words.map(word => 
+            word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+          );
+          const title = `Découvrez ${capitalizedWords.join(' ')}`;
+          updatePin('title', title);
+        }
+        
         const fileName = file.name.replace(/\.[^/.]+$/, "");
         const words = fileName.split(/[-_\s.]/);
-        
-        const capitalizedWords = words.map(word => 
-          word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-        );
-        const title = `Découvrez ${capitalizedWords.join(' ')}`;
-        updatePin('title', title);
         
         const newHashtags = [...pin.hashtags];
         words.forEach(word => {

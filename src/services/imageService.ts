@@ -32,6 +32,14 @@ export const generateContentFromImage = (image: PinterestImage): { title: string
     locationType = 'destination';
   }
   
+  // Special case for Finland
+  if (image.country?.toLowerCase() === 'finlande' || image.title.toLowerCase().includes('finlande')) {
+    return {
+      title: 'Que faire en Finlande : nature, lacs',
+      description: 'Découvrez les paysages époustouflants et les lacs cristallins de la Finlande. Un voyage inoubliable au cœur de la nature sauvage nordique, entre forêts de pins et aurores boréales.'
+    };
+  }
+  
   // Extraire des informations à partir du titre
   const titleParts = image.title.split(/[-,]/);
   let subject = titleParts.length > 1 ? titleParts[1].trim() : titleParts[0].trim();
@@ -97,7 +105,7 @@ export const generateContentFromImage = (image: PinterestImage): { title: string
   
   return {
     title,
-    description
+    description: location ? 'Découvrez les paysages époustouflants et les expériences authentiques qui vous attendent. Un voyage inoubliable au cœur de la nature sauvage.' : 'Découvrez les tendances créatives du moment'
   };
 };
 
