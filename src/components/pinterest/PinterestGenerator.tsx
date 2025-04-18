@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -10,6 +9,7 @@ import DesignTab from './tabs/DesignTab';
 import HashtagsTab from './tabs/HashtagsTab';
 import EtiquettesTab from './tabs/EtiquettesTab';
 import PinHistoryPanel from './PinHistoryPanel';
+import SpecialPromptButton from './tabs/SpecialPromptButton';
 import { usePin } from '@/hooks/usePin';
 import { PinterestPin, PinterestImage } from '@/types/pinterest';
 import { pinterestDesigns, worldImages, europeImages, franceImages, allImages } from '@/data/pinterestImages';
@@ -154,13 +154,23 @@ const PinterestGenerator: React.FC = () => {
     <div className="flex flex-col lg:flex-row gap-6">
       <div className="w-full lg:w-3/5 xl:w-2/3">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-5 mb-4">
-            <TabsTrigger value="content">Contenu</TabsTrigger>
-            <TabsTrigger value="images">Images</TabsTrigger>
-            <TabsTrigger value="design">Design</TabsTrigger>
-            <TabsTrigger value="hashtags">Hashtags</TabsTrigger>
-            <TabsTrigger value="etiquettes">Étiquettes</TabsTrigger>
-          </TabsList>
+          <div className="flex justify-between items-center mb-4">
+            <TabsList className="grid grid-cols-5">
+              <TabsTrigger value="content">Contenu</TabsTrigger>
+              <TabsTrigger value="images">Images</TabsTrigger>
+              <TabsTrigger value="design">Design</TabsTrigger>
+              <TabsTrigger value="hashtags">Hashtags</TabsTrigger>
+              <TabsTrigger value="etiquettes">Étiquettes</TabsTrigger>
+            </TabsList>
+            
+            <SpecialPromptButton 
+              currentTitle={pin.title} 
+              onPromptGenerated={(prompt) => {
+                updatePin('description', prompt);
+                toast.success("Prompt d'image généré avec succès!");
+              }}
+            />
+          </div>
           
           <TabsContent value="content">
             <ContentTab pin={pin} updatePin={updatePin} />
