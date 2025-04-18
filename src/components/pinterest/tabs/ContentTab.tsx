@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { PinterestPin } from '@/types/pinterest';
 import { Label } from '@/components/ui/label';
@@ -128,6 +127,12 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin, onGenerateConte
     updatePin('description', newDescription);
   };
 
+  // Fonction pour valider la longueur du texte global
+  const handleGlobalDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newDescription = e.target.value.slice(0, 400);
+    updatePin('globalDescription', newDescription);
+  };
+
   return (
     <div className="flex flex-col space-y-4">
       <div className="flex flex-col space-y-2">
@@ -221,7 +226,10 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin, onGenerateConte
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={() => copyToClipboard(pin.globalDescription || '', 'Description globale')}
+              onClick={() => pin.globalDescription && navigator.clipboard.writeText(pin.globalDescription).then(
+                () => toast.success('Description globale copiée'),
+                () => toast.error('Erreur lors de la copie')
+              )}
               type="button"
             >
               <Copy className="h-4 w-4 mr-1" />
@@ -232,7 +240,7 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin, onGenerateConte
         <Textarea
           id="globalDescription"
           value={pin.globalDescription || ''}
-          onChange={(e) => updatePin('globalDescription', e.target.value.slice(0, 400))}
+          onChange={handleGlobalDescriptionChange}
           rows={4}
           className="resize-none"
           placeholder="Description globale du pin (max 400 caractères)"
