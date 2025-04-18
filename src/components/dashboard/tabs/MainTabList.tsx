@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { getMainTabCategory, activateSection } from '@/utils/navigationHelpers';
 
 interface MainTab {
@@ -72,31 +72,15 @@ const MainTabList: React.FC<MainTabListProps> = ({
     // Naviguer vers la bonne page
     navigate(path);
     
-    // Forcer l'activation de la section appropriée après la navigation
-    setTimeout(() => {
-      console.log(`MainTabList: Activation de la section ${tabId} après changement d'onglet principal`);
-      
-      // Pour l'onglet "content", activer "hierarchy" par défaut
-      if (tabId === 'content') {
-        activateSection('hierarchy');
-        
-        // Force display of hierarchy section
-        const hierarchySection = document.querySelector('[data-section="hierarchy"]') || document.getElementById('hierarchy');
-        if (hierarchySection) {
-          console.log('MainTabList: Affichage forcé de la section hierarchy');
-          (hierarchySection as HTMLElement).style.display = 'block';
-        }
-      } else {
-        activateSection(tabId);
-        
-        // Force display of the section
-        const section = document.querySelector(`[data-section="${tabId}"]`) || document.getElementById(tabId);
-        if (section) {
-          console.log(`MainTabList: Affichage forcé de la section ${tabId}`);
-          (section as HTMLElement).style.display = 'block';
-        }
-      }
-    }, 800);
+    // Activer la section appropriée immédiatement (sans délai)
+    console.log(`MainTabList: Activation de la section ${tabId} après changement d'onglet principal`);
+    
+    // Pour l'onglet "content", activer "hierarchy" par défaut
+    if (tabId === 'content') {
+      activateSection('hierarchy');
+    } else {
+      activateSection(tabId);
+    }
   };
 
   return (

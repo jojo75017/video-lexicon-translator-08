@@ -21,20 +21,12 @@ const SubTabList: React.FC<SubTabListProps> = ({ tabs, activeTab, onTabChange })
     }
     
     // Sinon, naviguer en interne
+    console.log(`SubTabList: Clic sur l'onglet ${tabId}`);
     onTabChange(tabId);
     
-    // Délai plus long pour s'assurer que le DOM est prêt
-    setTimeout(() => {
-      console.log(`SubTabList: Activation de la section ${tabId} après changement d'onglet`);
-      activateSection(tabId);
-      
-      // Force display of the section
-      const section = document.querySelector(`[data-section="${tabId}"]`) || document.getElementById(tabId);
-      if (section) {
-        console.log(`SubTabList: Affichage forcé de la section ${tabId}`);
-        (section as HTMLElement).style.display = 'block';
-      }
-    }, 500);
+    // Activer immédiatement la section
+    console.log(`SubTabList: Activation de la section ${tabId}`);
+    activateSection(tabId);
   };
 
   return (

@@ -1,9 +1,8 @@
 
 import React from 'react';
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { FileSignature } from 'lucide-react';
 
 interface TabTriggerItemProps {
   id: string;
@@ -75,35 +74,6 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
     const path = getPath();
     console.log(`TabTriggerItem: Navigation vers: ${path}`);
     navigate(path);
-    
-    // Forcer l'affichage de la section appropriée avec un délai
-    setTimeout(() => {
-      console.log(`TabTriggerItem: Activation forcée de la section ${id}`);
-      
-      // Essayer de trouver la section avec plusieurs méthodes
-      const sectionByDataAttr = document.querySelector(`[data-section="${id}"]`);
-      const sectionById = document.getElementById(id);
-      const sectionByTabContent = document.querySelector(`[data-tab-content="${id}"]`);
-      
-      // Masquer d'abord toutes les sections
-      document.querySelectorAll('[data-section], [data-tab-content]').forEach(el => {
-        (el as HTMLElement).style.display = 'none';
-      });
-      
-      // Afficher la section trouvée
-      if (sectionByDataAttr) {
-        console.log(`TabTriggerItem: Affichage forcé de la section par data-section: ${id}`);
-        (sectionByDataAttr as HTMLElement).style.display = 'block';
-      } else if (sectionById) {
-        console.log(`TabTriggerItem: Affichage forcé de la section par id: ${id}`);
-        sectionById.style.display = 'block';
-      } else if (sectionByTabContent) {
-        console.log(`TabTriggerItem: Affichage forcé de la section par data-tab-content: ${id}`);
-        (sectionByTabContent as HTMLElement).style.display = 'block';
-      } else {
-        console.log(`TabTriggerItem: Section non trouvée: ${id}`);
-      }
-    }, 500);
   };
 
   return (
