@@ -24,9 +24,33 @@ const SubTabList: React.FC<SubTabListProps> = ({ tabs, activeTab, onTabChange })
     console.log(`SubTabList: Clic sur l'onglet ${tabId}`);
     onTabChange(tabId);
     
-    // Activer immédiatement la section
-    console.log(`SubTabList: Activation de la section ${tabId}`);
-    activateSection(tabId);
+    // Naviguer vers la bonne page
+    const tabRoutes: Record<string, string> = {
+      'hierarchy': '/hierarchy',
+      'wordcount': '/wordcount',
+      'suggestions': '/suggestions',
+      'seo': '/seo',
+      'structure': '/structure',
+      'backlinks': '/backlinks',
+      'performance': '/performance',
+      'metrics': '/metrics',
+      'analytics': '/analytics',
+      'quora': '/quora',
+      'signature': '/signature',
+      'local-business': '/local-business',
+      'translation': '/translation',
+      'pinterest': '/pinterest'
+    };
+    
+    if (tabRoutes[tabId]) {
+      navigate(tabRoutes[tabId]);
+    }
+    
+    // Attendre un peu avant d'activer la section pour laisser le temps à la navigation de se terminer
+    setTimeout(() => {
+      console.log(`SubTabList: Activation de la section ${tabId}`);
+      activateSection(tabId);
+    }, 200);
   };
 
   return (

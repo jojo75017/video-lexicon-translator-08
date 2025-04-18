@@ -72,15 +72,17 @@ const MainTabList: React.FC<MainTabListProps> = ({
     // Naviguer vers la bonne page
     navigate(path);
     
-    // Activer la section appropriée immédiatement (sans délai)
-    console.log(`MainTabList: Activation de la section ${tabId} après changement d'onglet principal`);
-    
-    // Pour l'onglet "content", activer "hierarchy" par défaut
-    if (tabId === 'content') {
-      activateSection('hierarchy');
-    } else {
-      activateSection(tabId);
-    }
+    // Attendre que la navigation soit terminée avant d'activer la section
+    setTimeout(() => {
+      console.log(`MainTabList: Activation de la section ${tabId} après changement d'onglet principal`);
+      
+      // Pour l'onglet "content", activer "hierarchy" par défaut
+      if (tabId === 'content') {
+        activateSection('hierarchy');
+      } else {
+        activateSection(tabId);
+      }
+    }, 200);
   };
 
   return (

@@ -69,11 +69,6 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
       window.open(link, '_blank');
       return;
     }
-    
-    // Navigate to the appropriate path for internal links
-    const path = getPath();
-    console.log(`TabTriggerItem: Navigation vers: ${path}`);
-    navigate(path);
   };
 
   return (

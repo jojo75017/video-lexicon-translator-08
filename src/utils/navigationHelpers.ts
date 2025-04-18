@@ -41,102 +41,139 @@ export const getMainTabCategory = (tabId: string): string => {
 export const activateSection = (sectionId: string): void => {
   console.log(`Activation de la section: ${sectionId}`);
   
-  // Vérifier si l'onglet est une catégorie principale et le convertir si nécessaire
-  const mainCategory = getMainTabCategory(sectionId);
-  const isMainCategory = mainCategory === sectionId;
+  if (!sectionId) {
+    console.error("ID de section non spécifié");
+    return;
+  }
   
-  // Délai plus court pour permettre au DOM de se mettre à jour, mais pas trop long
+  // Attendre que le DOM soit prêt
   setTimeout(() => {
     try {
-      // Masquer toutes les sections d'abord pour éviter les conflits d'affichage
-      const allSections = document.querySelectorAll('[data-section], [data-tab-content], #hierarchy, #wordcount, #suggestions, #seo, #structure, #backlinks, #performance, #metrics, #analytics, #quora, #signature, #local-business, #translation, #pinterest');
+      // Trouver tous les éléments qui peuvent être des sections
+      const allSections = document.querySelectorAll('[data-section], [data-tab-content], [id]');
       
-      console.log(`Nombre total de sections trouvées: ${allSections.length}`);
+      console.log(`Nombre total d'éléments trouvés: ${allSections.length}`);
       
-      if (allSections.length === 0) {
-        console.warn("Aucune section n'a été trouvée dans le DOM. Vérifiez que les sections sont correctement définies.");
-        return;
-      }
-      
+      // D'abord, masquer toutes les sections
       allSections.forEach(el => {
-        (el as HTMLElement).style.display = 'none';
+        // Vérifier si c'est une section valide (avec data-section, data-tab-content ou un id correspondant à un onglet)
+        const isSection = 
+          el.hasAttribute('data-section') || 
+          el.hasAttribute('data-tab-content') || 
+          (el.id && ['hierarchy', 'wordcount', 'suggestions', 'seo', 'structure', 'backlinks', 'performance', 'metrics', 'analytics', 'signature', 'quora', 'local-business', 'translation', 'pinterest'].includes(el.id));
+        
+        if (isSection) {
+          console.log(`Masquage de la section: ${el.id || el.getAttribute('data-section') || el.getAttribute('data-tab-content')}`);
+          (el as HTMLElement).style.display = 'none';
+        }
       });
       
-      // Stratégie 1: Chercher par data-section
-      const sectionByData = document.querySelector(`[data-section="${sectionId}"]`);
-      if (sectionByData) {
-        console.log(`Section "${sectionId}" trouvée par data-section, affichage en cours`);
-        (sectionByData as HTMLElement).style.display = 'block';
+      // Stratégie 1: Chercher par id direct
+      const sectionById = document.getElementById(sectionId);
+      if (sectionById) {
+        console.log(`Section "${sectionId}" trouvée par id direct`);
+        sectionById.style.display = 'block';
         return;
       }
       
-      // Stratégie 2: Chercher par id
-      const sectionById = document.getElementById(sectionId);
-      if (sectionById) {
-        console.log(`Section "${sectionId}" trouvée par id, affichage en cours`);
-        sectionById.style.display = 'block';
+      // Stratégie 2: Chercher par data-section
+      const sectionByData = document.querySelector(`[data-section="${sectionId}"]`);
+      if (sectionByData) {
+        console.log(`Section "${sectionId}" trouvée par data-section`);
+        (sectionByData as HTMLElement).style.display = 'block';
         return;
       }
       
       // Stratégie 3: Chercher par data-tab-content
       const sectionByTab = document.querySelector(`[data-tab-content="${sectionId}"]`);
       if (sectionByTab) {
-        console.log(`Section "${sectionId}" trouvée par data-tab-content, affichage en cours`);
+        console.log(`Section "${sectionId}" trouvée par data-tab-content`);
         (sectionByTab as HTMLElement).style.display = 'block';
         return;
       }
       
-      // Pour l'onglet principal "content", afficher hierarchy par défaut
-      if (sectionId === 'content' || mainCategory === 'content') {
-        const hierarchySection = document.querySelector('[data-section="hierarchy"]') || document.getElementById('hierarchy');
-        if (hierarchySection) {
-          console.log('Affichage de hierarchy pour l\'onglet content');
-          (hierarchySection as HTMLElement).style.display = 'block';
-          return;
-        }
-      }
-      
-      // Traitement spécial pour les onglets principaux
-      const mainTabs = ['content', 'seo', 'performance', 'analytics', 'tools'];
-      if (mainTabs.includes(sectionId)) {
-        // Pour chaque onglet principal, essayer d'afficher la section correspondante
-        const tabsMap: Record<string, string[]> = {
-          'content': ['hierarchy', 'wordcount', 'suggestions'],
-          'seo': ['seo', 'structure', 'backlinks'],
-          'performance': ['performance', 'metrics'],
-          'analytics': ['analytics'],
-          'tools': ['signature', 'quora', 'local-business', 'translation']
+      // Stratégie 4: Pour les onglets de catégorie principale, afficher leur sous-onglet par défaut
+      const mainCategory = getMainTabCategory(sectionId);
+      if (mainCategory === sectionId) {
+        console.log(`Recherche d'un sous-onglet pour la catégorie principale ${sectionId}`);
+        
+        const defaultSubTabs: Record<string, string> = {
+          'content': 'hierarchy',
+          'seo': 'seo',
+          'performance': 'performance',
+          'analytics': 'analytics',
+          'tools': 'signature'
         };
         
-        const defaultSections = tabsMap[sectionId] || [];
-        if (defaultSections.length > 0) {
-          const firstSectionId = defaultSections[0];
-          const firstSection = document.querySelector(`[data-section="${firstSectionId}"]`) || document.getElementById(firstSectionId);
+        const defaultTab = defaultSubTabs[mainCategory];
+        if (defaultTab) {
+          console.log(`Tentative d'afficher le sous-onglet par défaut: ${defaultTab}`);
           
-          if (firstSection) {
-            console.log(`Affichage de la section par défaut ${firstSectionId} pour l'onglet principal ${sectionId}`);
-            (firstSection as HTMLElement).style.display = 'block';
+          // Tenter d'afficher le sous-onglet par défaut
+          const defaultSection = document.getElementById(defaultTab) || 
+                                 document.querySelector(`[data-section="${defaultTab}"]`) || 
+                                 document.querySelector(`[data-tab-content="${defaultTab}"]`);
+          
+          if (defaultSection) {
+            console.log(`Affichage du sous-onglet par défaut: ${defaultTab}`);
+            (defaultSection as HTMLElement).style.display = 'block';
             return;
           }
         }
       }
       
-      // Si on arrive ici, essayer de trouver une section visible et l'afficher
-      console.warn(`La section "${sectionId}" n'a pas été trouvée dans le DOM. Tentative de fallback.`);
+      // Si aucune section n'a été trouvée, c'est probablement un bug de l'application
+      // Affichons alors un message d'erreur et essayons de montrer une section de secours
+      console.error(`Aucune section trouvée pour l'id: ${sectionId}`);
+      console.log("Page actuelle:", window.location.pathname);
       
-      // Fallback: Afficher la première section de la page
-      const firstAvailableSection = document.querySelector('[data-section], [data-tab-content]');
-      if (firstAvailableSection) {
-        console.log('Affichage de la première section disponible comme fallback');
-        (firstAvailableSection as HTMLElement).style.display = 'block';
-      } else {
-        // Si toujours rien, loguer une erreur claire
-        console.error('Erreur critique: Aucune section trouvée dans le DOM pour l\'affichage');
+      // En dernier recours, chercher une section qui correspond au chemin actuel
+      const currentPath = window.location.pathname;
+      const pathToTabMap: Record<string, string> = {
+        '/': 'hierarchy',
+        '/hierarchy': 'hierarchy',
+        '/wordcount': 'wordcount',
+        '/suggestions': 'suggestions',
+        '/seo': 'seo',
+        '/structure': 'structure',
+        '/backlinks': 'backlinks',
+        '/performance': 'performance',
+        '/metrics': 'metrics',
+        '/analytics': 'analytics',
+        '/quora': 'quora',
+        '/signature': 'signature',
+        '/local-business': 'local-business',
+        '/translation': 'translation',
+        '/pinterest': 'pinterest'
+      };
+      
+      const currentTabId = pathToTabMap[currentPath];
+      if (currentTabId) {
+        console.log(`Tentative d'afficher la section correspondant au chemin actuel: ${currentTabId}`);
+        
+        const currentSection = document.getElementById(currentTabId) || 
+                              document.querySelector(`[data-section="${currentTabId}"]`) || 
+                              document.querySelector(`[data-tab-content="${currentTabId}"]`);
+        
+        if (currentSection) {
+          console.log(`Affichage de la section correspondant au chemin actuel: ${currentTabId}`);
+          (currentSection as HTMLElement).style.display = 'block';
+          return;
+        }
       }
+      
+      // Si toujours rien, essayer d'afficher n'importe quelle section valide
+      console.log("Tentative d'afficher n'importe quelle section valide");
+      const anySections = document.querySelectorAll('[data-section], [data-tab-content]');
+      if (anySections.length > 0) {
+        console.log(`Affichage de la première section disponible: ${anySections[0].id || anySections[0].getAttribute('data-section')}`);
+        (anySections[0] as HTMLElement).style.display = 'block';
+      }
+      
     } catch (error) {
       console.error('Erreur lors de l\'activation de la section:', error);
     }
-  }, 100); // Délai réduit pour être plus réactif
+  }, 100);
 };
 
 // Fonction pour naviguer vers une section

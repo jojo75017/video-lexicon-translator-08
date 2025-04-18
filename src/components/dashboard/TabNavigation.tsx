@@ -27,17 +27,19 @@ const TabNavigation = () => {
         activateSection(activeTab);
         console.log('TabNavigation: Activation initiale de section:', activeTab);
         initialRender.current = false;
-      }, 500);
+      }, 300);
       
       return () => clearTimeout(timer);
     }
-  }, []);
+  }, [activeTab]);
 
   // Activer l'onglet lors du changement d'onglet actif
   useEffect(() => {
     if (!initialRender.current && activeTab) {
       console.log('Changement d\'onglet actif détecté:', activeTab);
-      activateSection(activeTab);
+      setTimeout(() => {
+        activateSection(activeTab);
+      }, 200);
     }
   }, [activeTab]);
 
@@ -47,7 +49,9 @@ const TabNavigation = () => {
     
     if (hash) {
       console.log(`Hash détecté dans l'URL: ${hash}, activation de la section`);
-      activateSection(hash);
+      setTimeout(() => {
+        activateSection(hash);
+      }, 200);
     }
   }, [location]);
 
