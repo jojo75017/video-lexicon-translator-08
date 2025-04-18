@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { PinterestPin } from '@/types/pinterest';
 import { pinterestDesigns } from '@/data/pinterestImages';
 import { toast } from 'sonner';
-import { generateContentFromImage } from '@/services/imageService';
+import { generateContentFromImage, generateGlobalDescriptionFromTitle } from '@/services/imageService';
 
 export const usePin = (initialPin: PinterestPin) => {
   const [pin, setPin] = useState<PinterestPin>(initialPin);
@@ -11,6 +11,14 @@ export const usePin = (initialPin: PinterestPin) => {
   const updatePin = (field: keyof PinterestPin, value: any) => {
     console.log(`Updating pin field "${field}" with value:`, value);
     setPin(prevPin => ({ ...prevPin, [field]: value }));
+    
+    // Si le titre est mis à jour, générer automatiquement une description globale
+    if (field === 'title' && value) {
+      const userTitle = value;
+      // Mettre à jour la description globale basée sur le nouveau titre
+      const globalDescription = generateGlobalDescriptionFromTitle(userTitle);
+      setPin(prevPin => ({ ...prevPin, globalDescription }));
+    }
   };
 
   const handleSelectImage = (image: any) => {
@@ -19,24 +27,27 @@ export const usePin = (initialPin: PinterestPin) => {
     updatePin('uploadedImage', null);
     updatePin('image', image);
     
-    // Only generate content if the title is empty or a default title
-    if (!pin.title || pin.title === initialPin.title) {
+    // Sauvegarder le titre personnalisé actuel
+    const currentTitle = pin.title;
+    const isDefaultTitle = currentTitle === initialPin.title;
+    
+    // Seulement générer un nouveau titre si l'utilisateur n'a pas déjà personnalisé le titre
+    if (isDefaultTitle) {
       const generatedContent = generateContentFromImage(image);
       updatePin('title', generatedContent.title);
       
-      // Only update description if it's the default description
+      // Mettre à jour la description si elle est vide ou à sa valeur par défaut
       if (!pin.description || pin.description === initialPin.description) {
         updatePin('description', generatedContent.description);
       }
       
-      // Mettre à jour également la description globale si elle est vide ou à la valeur par défaut
+      // Mettre à jour la description globale si elle est vide ou à sa valeur par défaut
       if (!pin.globalDescription || pin.globalDescription === initialPin.globalDescription) {
-        // Générer une description globale plus détaillée basée sur le contenu généré
-        const detailedDescription = `Explorez ${generatedContent.title.replace('Découvrez ', '').replace('Explorez ', '')}. ${generatedContent.description} Découvrez tous nos conseils pour rendre votre voyage inoubliable et vivre des expériences uniques qui resteront gravées dans votre mémoire.`;
+        const detailedDescription = generateGlobalDescriptionFromTitle(generatedContent.title);
         updatePin('globalDescription', detailedDescription);
       }
     } else {
-      // Keep the user's custom title and only generate a description if it's default
+      // Conserver le titre personnalisé, mais mettre à jour description si nécessaire
       if (!pin.description || pin.description === initialPin.description) {
         const generatedContent = generateContentFromImage(image);
         updatePin('description', generatedContent.description);
@@ -44,8 +55,7 @@ export const usePin = (initialPin: PinterestPin) => {
       
       // Mettre à jour la description globale uniquement si c'est la description par défaut
       if (!pin.globalDescription || pin.globalDescription === initialPin.globalDescription) {
-        const customTitle = pin.title;
-        const detailedDescription = `Explorez ${customTitle.replace('Découvrez ', '').replace('Explorez ', '')}. Nous vous proposons un guide complet avec des conseils pratiques et des informations essentielles pour profiter pleinement de cette destination. Planifiez votre voyage parfait avec nos recommandations d'experts.`;
+        const detailedDescription = generateGlobalDescriptionFromTitle(currentTitle);
         updatePin('globalDescription', detailedDescription);
       }
     }
@@ -83,8 +93,12 @@ export const usePin = (initialPin: PinterestPin) => {
         updatePin('image', null);
         updatePin('uploadedImage', reader.result as string);
         
-        // Only update the title if it's empty or the default title
-        if (!pin.title || pin.title === initialPin.title) {
+        // Sauvegarder le titre personnalisé actuel
+        const currentTitle = pin.title;
+        const isDefaultTitle = currentTitle === initialPin.title;
+        
+        // Seulement générer un nouveau titre si l'utilisateur n'a pas déjà personnalisé le titre
+        if (isDefaultTitle) {
           const fileName = file.name.replace(/\.[^/.]+$/, "");
           const words = fileName.split(/[-_\s.]/);
           
@@ -95,7 +109,7 @@ export const usePin = (initialPin: PinterestPin) => {
           updatePin('title', title);
           
           // Mettre à jour également la description globale avec un contenu basé sur le titre
-          const detailedDescription = `Explorez ${capitalizedWords.join(' ')}. Nous vous proposons un guide complet avec des conseils pratiques et des informations essentielles. Découvrez nos recommandations pour profiter pleinement de cette expérience unique.`;
+          const detailedDescription = generateGlobalDescriptionFromTitle(title);
           updatePin('globalDescription', detailedDescription);
         }
         
