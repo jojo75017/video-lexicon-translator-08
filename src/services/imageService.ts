@@ -1,3 +1,4 @@
+
 import { PinterestImage } from '@/types/pinterest';
 import { 
   FRANCE_LOCATIONS, 
@@ -340,7 +341,6 @@ export const searchFreepikImages = async (query: string, category?: 'monde' | 'e
     
     // Même logique améliorée que pour Unsplash et Pixabay
     
-    
     // Déterminer quelle catégorie d'images utiliser
     let imageCategory = category === 'all' 
       ? (Math.random() > 0.6 ? 'france' : Math.random() > 0.5 ? 'europe' : 'monde') 
@@ -637,4 +637,15 @@ export const getPresetImagesByCategory = async (category: 'monde' | 'europe' | '
           category: 'monde',
           country: country,
           source: 'local',
-          tags: ['monde', location, 'voyage', 'aventure',
+          tags: ['monde', location, 'voyage', 'aventure', 'exotique']
+        });
+      });
+    }
+    
+    return images;
+  } catch (error) {
+    console.error("Erreur lors du chargement des images préréglées:", error);
+    toast.error("Erreur lors du chargement des images");
+    return [];
+  }
+};
