@@ -12,11 +12,12 @@ import EtiquettesTab from './tabs/EtiquettesTab';
 import PinHistoryPanel from './PinHistoryPanel';
 import SpecialPromptButton from './tabs/SpecialPromptButton';
 import { usePinterestGenerator } from '@/hooks/usePinterestGenerator';
-import { pinterestDesigns } from '@/data/pinterestImages';
+import { pinterestDesigns, callToActions } from '@/data/pinterestImages';
 import { useSocialContent } from '@/hooks/useSocialContent';
 import { Wand } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const initialPin = {
   title: 'Découvrez les tendances créatives du moment',
@@ -68,6 +69,12 @@ const PinterestGenerator: React.FC = () => {
     toast.success('Clé OpenAI sauvegardée');
   };
 
+  // Function to handle Call to Action selection
+  const handleCallToActionChange = (value: string) => {
+    updatePin('callToAction', value);
+    toast.success('Call to Action mis à jour');
+  };
+
   return (
     <div className="flex flex-col lg:flex-row gap-6">
       <div className="w-full lg:w-3/5 xl:w-2/3">
@@ -104,7 +111,6 @@ const PinterestGenerator: React.FC = () => {
             />
           </div>
           
-          
           <TabsContent value="content">
             <ContentTab pin={pin} updatePin={updatePin} />
           </TabsContent>
@@ -129,6 +135,23 @@ const PinterestGenerator: React.FC = () => {
           
           <TabsContent value="design">
             <DesignTab pin={pin} updatePin={updatePin} />
+            
+            {/* Add Call to Action picker in the design tab */}
+            <div className="mt-6 p-4 border rounded-lg bg-white shadow-sm">
+              <Label htmlFor="call-to-action" className="mb-2 block">Call to Action</Label>
+              <Select value={pin.callToAction} onValueChange={handleCallToActionChange}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Choisir un Call to Action" />
+                </SelectTrigger>
+                <SelectContent>
+                  {callToActions.map((cta) => (
+                    <SelectItem key={cta} value={cta}>
+                      {cta}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </TabsContent>
           
           <TabsContent value="hashtags">

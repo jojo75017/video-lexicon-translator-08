@@ -6,11 +6,13 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Smile, Sparkles, ThumbsUp, Copy, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
 import EmojiPicker from './EmojiPicker';
 import { generateGlobalDescriptionFromTitle } from '@/services/imageService';
 import { generateTitleFromLocation } from '@/services/imageService';
+import { callToActions } from '@/data/pinterestImages';
 
 interface ContentTabProps {
   pin: PinterestPin;
@@ -213,6 +215,11 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin, onGenerateConte
     updatePin('globalDescription', newDescription);
   };
 
+  // Handler for Call to Action selection
+  const handleCallToActionChange = (value: string) => {
+    updatePin('callToAction', value);
+  };
+
   return (
     <div className="flex flex-col space-y-4">
       <div className="flex flex-col space-y-2">
@@ -356,12 +363,18 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin, onGenerateConte
       
       <div className="flex flex-col space-y-2">
         <Label htmlFor="callToAction">Call to Action</Label>
-        <Input
-          id="callToAction"
-          value={pin.callToAction}
-          onChange={(e) => updatePin('callToAction', e.target.value)}
-          placeholder="Ex: En savoir plus, Découvrir, Acheter..."
-        />
+        <Select value={pin.callToAction} onValueChange={handleCallToActionChange}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Choisir un Call to Action" />
+          </SelectTrigger>
+          <SelectContent>
+            {callToActions.map((cta) => (
+              <SelectItem key={cta} value={cta}>
+                {cta}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
       
       <div className="flex items-center space-x-2">
