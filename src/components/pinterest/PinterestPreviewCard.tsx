@@ -1,11 +1,12 @@
 
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Download, Copy } from 'lucide-react';
+import { Download, Copy, Instagram } from 'lucide-react';
 import { toast } from 'sonner';
 import html2canvas from 'html2canvas';
 import PinterestPreview from './PinterestPreview';
+import InstagramPreview from './InstagramPreview';
 import { PinterestPin } from '@/types/pinterest';
 
 interface PinterestPreviewCardProps {
@@ -14,6 +15,7 @@ interface PinterestPreviewCardProps {
 
 const PinterestPreviewCard: React.FC<PinterestPreviewCardProps> = ({ pin }) => {
   const previewRef = useRef<HTMLDivElement>(null);
+  const [previewType, setPreviewType] = useState<'pinterest' | 'instagram'>('pinterest');
 
   const handleDownload = async () => {
     if (!previewRef.current) return;
@@ -30,7 +32,7 @@ const PinterestPreviewCard: React.FC<PinterestPreviewCardProps> = ({ pin }) => {
       
       const image = canvas.toDataURL('image/png', 1.0);
       const link = document.createElement('a');
-      link.download = `pinterest-${pin.title.substring(0, 20).replace(/\s+/g, '-').toLowerCase()}.png`;
+      link.download = `${previewType}-${pin.title.substring(0, 20).replace(/\s+/g, '-').toLowerCase()}.png`;
       link.href = image;
       link.click();
       
@@ -43,12 +45,38 @@ const PinterestPreviewCard: React.FC<PinterestPreviewCardProps> = ({ pin }) => {
 
   return (
     <Card className="p-4">
-      <h2 className="text-lg font-medium mb-4">Aperçu Pinterest</h2>
-      <div className="flex justify-center">
-        <div ref={previewRef}>
-          <PinterestPreview pin={pin} />
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-medium">Aperçu</h2>
+        <div className="flex space-x-2">
+          <Button 
+            variant={previewType === 'pinterest' ? 'default' : 'outline'} 
+            size="sm"
+            onClick={() => setPreviewType('pinterest')}
+          >
+            Pinterest
+          </Button>
+          <Button 
+            variant={previewType === 'instagram' ? 'default' : 'outline'} 
+            size="sm"
+            className={previewType === 'instagram' ? 'bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-white' : ''}
+            onClick={() => setPreviewType('instagram')}
+          >
+            <Instagram className="h-4 w-4 mr-2" />
+            Instagram
+          </Button>
         </div>
       </div>
+      
+      <div className="flex justify-center">
+        <div ref={previewRef}>
+          {previewType === 'pinterest' ? (
+            <PinterestPreview pin={pin} />
+          ) : (
+            <InstagramPreview pin={pin} />
+          )}
+        </div>
+      </div>
+      
       <div className="mt-4 flex justify-center space-x-2">
         <Button variant="outline" onClick={handleDownload}>
           <Download className="mr-2 h-4 w-4" />
@@ -57,12 +85,13 @@ const PinterestPreviewCard: React.FC<PinterestPreviewCardProps> = ({ pin }) => {
         <Button 
           variant="outline" 
           onClick={() => {
-            toast.success("Lien copié!");
-            // Simuler la copie d'un lien
+            const platformText = previewType === 'pinterest' ? 'Pinterest' : 'Instagram';
+            navigator.clipboard.writeText(`${pin.title} - ${pin.hashtags.map(tag => `#${tag}`).join(' ')}`);
+            toast.success(`Texte ${platformText} copié!`);
           }}
         >
           <Copy className="mr-2 h-4 w-4" />
-          Copier le lien
+          Copier le texte
         </Button>
       </div>
     </Card>
