@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -25,8 +24,6 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
   highlighted,
   onClick
 }) => {
-  const navigate = useNavigate();
-  
   // Handle click with combined navigation and callback
   const handleClick = (e: React.MouseEvent) => {
     // Prevent default behavior
@@ -38,12 +35,6 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
     // Call the onClick handler if provided
     if (onClick) {
       onClick();
-    }
-    
-    // Si c'est un lien externe, ouvrir dans un nouvel onglet
-    if (link && (link.startsWith('http://') || link.startsWith('https://'))) {
-      window.open(link, '_blank');
-      return;
     }
   };
 

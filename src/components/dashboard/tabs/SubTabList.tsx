@@ -3,6 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import TabTriggerItem from './TabTriggerItem';
 import { activateSection } from '@/utils/navigationHelpers';
+import { toast } from "sonner";
 
 interface SubTabListProps {
   tabs: any[];
@@ -20,8 +21,16 @@ const SubTabList: React.FC<SubTabListProps> = ({ tabs, activeTab, onTabChange })
       return;
     }
     
-    // Sinon, naviguer en interne
+    // Sinon, naviguer en interne avec notification
     console.log(`SubTabList: Clic sur l'onglet ${tabId}`);
+    
+    // Notification de changement d'onglet
+    toast.info(`Navigation vers ${tabId}`, {
+      description: "Chargement de la page...",
+      duration: 1500
+    });
+    
+    // Mettre à jour l'onglet actif
     onTabChange(tabId);
     
     // Naviguer vers la bonne page
@@ -51,7 +60,7 @@ const SubTabList: React.FC<SubTabListProps> = ({ tabs, activeTab, onTabChange })
       setTimeout(() => {
         console.log(`SubTabList: Activation de la section ${tabId}`);
         activateSection(tabId);
-      }, 300);
+      }, 1000); // Augmenter le délai pour s'assurer que la page a le temps de charger
     }
   };
 

@@ -1,4 +1,3 @@
-
 // Fonction pour vérifier si un URL est valide
 export const isValidUrl = (urlString: string): boolean => {
   try {
@@ -56,23 +55,15 @@ export const activateSection = (sectionId: string): void => {
   setTimeout(() => {
     try {
       // Trouver tous les éléments qui peuvent être des sections
-      const allSections = document.querySelectorAll('[data-section], [data-tab-content], [id]');
+      const allSections = document.querySelectorAll('[data-section], [data-tab-content], [id^="hierarchy"], [id^="wordcount"], [id^="suggestions"], [id^="seo"], [id^="structure"], [id^="backlinks"], [id^="performance"], [id^="metrics"], [id^="analytics"], [id^="signature"], [id^="quora"], [id^="local-business"], [id^="translation"], [id^="pinterest"]');
       
       console.log(`Nombre total d'éléments trouvés: ${allSections.length}`);
       console.log("Éléments trouvés:", Array.from(allSections).map(el => el.id || el.getAttribute('data-section') || el.getAttribute('data-tab-content')));
       
       // D'abord, masquer toutes les sections
       allSections.forEach(el => {
-        // Vérifier si c'est une section valide (avec data-section, data-tab-content ou un id correspondant à un onglet)
-        const isSection = 
-          el.hasAttribute('data-section') || 
-          el.hasAttribute('data-tab-content') || 
-          (el.id && ['hierarchy', 'wordcount', 'suggestions', 'seo', 'structure', 'backlinks', 'performance', 'metrics', 'analytics', 'signature', 'quora', 'local-business', 'translation', 'pinterest'].includes(el.id));
-        
-        if (isSection) {
-          console.log(`Masquage de la section: ${el.id || el.getAttribute('data-section') || el.getAttribute('data-tab-content')}`);
-          (el as HTMLElement).style.display = 'none';
-        }
+        // Vérifier si c'est une section valide
+        (el as HTMLElement).style.display = 'none';
       });
       
       // Stratégie 1: Chercher par id direct
@@ -129,6 +120,23 @@ export const activateSection = (sectionId: string): void => {
         }
       }
       
+      // Tentative d'affichage par classe CSS
+      const sectionsByClass = document.querySelectorAll(`.${sectionId}-section`);
+      if (sectionsByClass.length > 0) {
+        console.log(`Section "${sectionId}" trouvée par classe CSS`);
+        displayElement(sectionsByClass[0] as HTMLElement);
+        return;
+      }
+      
+      // Si aucune section n'a été trouvée, rechercher par contenu similaire
+      console.log("Recherche de sections par contenu similaire");
+      const possibleSections = document.querySelectorAll(`[id*="${sectionId}"], [data-section*="${sectionId}"], [data-tab-content*="${sectionId}"]`);
+      if (possibleSections.length > 0) {
+        console.log(`Section trouvée par correspondance partielle: ${possibleSections[0].id || possibleSections[0].getAttribute('data-section')}`);
+        displayElement(possibleSections[0] as HTMLElement);
+        return;
+      }
+      
       // Si aucune section n'a été trouvée, c'est probablement un bug de l'application
       // Affichons alors un message d'erreur et essayons de montrer une section de secours
       console.error(`Aucune section trouvée pour l'id: ${sectionId}`);
@@ -178,36 +186,13 @@ export const activateSection = (sectionId: string): void => {
         }
       }
       
-      // Tentative d'afficher n'importe quelle section valide si tout a échoué
-      console.log("Tentative d'afficher n'importe quelle section valide");
-      
-      // Afficher la première section trouvée avec un ID correspondant à un tab connu
-      const knownTabIds = ['hierarchy', 'wordcount', 'suggestions', 'seo', 'structure', 'backlinks', 
-                          'performance', 'metrics', 'analytics', 'quora', 'signature', 
-                          'local-business', 'translation', 'pinterest'];
-      
-      for (const tabId of knownTabIds) {
-        const tabSection = document.getElementById(tabId) ||
-                          document.querySelector(`[data-section="${tabId}"]`) ||
-                          document.querySelector(`[data-tab-content="${tabId}"]`);
-        
-        if (tabSection) {
-          console.log(`Affichage de la section connue: ${tabId}`);
-          displayElement(tabSection as HTMLElement);
-          return;
-        }
-      }
-      
-      // En dernier recours, afficher la première section disponible
+      // Afficher la première section valide disponible si tout a échoué
       const anySections = document.querySelectorAll('[data-section], [data-tab-content], [id]');
       for (let i = 0; i < anySections.length; i++) {
-        const section = anySections[i];
-        // Vérifier que c'est bien une section et non un autre élément avec un ID
-        if (section.hasAttribute('data-section') || 
-            section.hasAttribute('data-tab-content') || 
-            knownTabIds.includes(section.id)) {
+        const section = anySections[i] as HTMLElement;
+        if (section && section.tagName !== 'SCRIPT' && section.tagName !== 'STYLE' && section.id !== 'root') {
           console.log(`Affichage de la première section disponible: ${section.id || section.getAttribute('data-section')}`);
-          displayElement(section as HTMLElement);
+          section.style.display = 'block';
           return;
         }
       }

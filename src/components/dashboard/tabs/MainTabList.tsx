@@ -2,6 +2,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getMainTabCategory, activateSection } from '@/utils/navigationHelpers';
+import { toast } from "sonner";
 
 interface MainTab {
   id: string;
@@ -66,6 +67,12 @@ const MainTabList: React.FC<MainTabListProps> = ({
   const handleTabClick = (tabId: string, path: string) => {
     console.log(`MainTabList: Clic sur onglet principal: ${tabId}, chemin: ${path}`);
     
+    // Notification de changement d'onglet
+    toast.info(`Navigation vers ${tabId}`, {
+      description: "Chargement de la page...",
+      duration: 1500
+    });
+    
     // Activer l'onglet
     onTabChange(tabId);
     
@@ -82,7 +89,7 @@ const MainTabList: React.FC<MainTabListProps> = ({
       } else {
         activateSection(tabId);
       }
-    }, 300); // Augmenter le délai pour s'assurer que la navigation est terminée
+    }, 1200); // Augmenter significativement le délai pour s'assurer que la navigation est terminée
   };
 
   return (
