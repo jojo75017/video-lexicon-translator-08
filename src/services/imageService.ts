@@ -113,7 +113,7 @@ export const searchImagesByKeyword = (
   
   const searchTerms = keyword.toLowerCase().trim().split(/\s+/);
   
-  return images.filter(image => {
+  const results = images.filter(image => {
     // Si la catégorie est spécifiée, filtrer d'abord par catégorie
     if (category !== 'all' && image.category !== category) {
       return false;
@@ -121,20 +121,52 @@ export const searchImagesByKeyword = (
     
     // Vérifier si l'image correspond à un des termes de recherche
     return searchTerms.some(term => {
-      const titleMatch = image.title.toLowerCase().includes(term);
+      // On donne priorité au pays et à la région
       const countryMatch = image.country && image.country.toLowerCase().includes(term);
       const regionMatch = image.region && image.region.toLowerCase().includes(term);
       
-      // Vérifier les correspondances avec les listes de localisations
-      const isFrenchLocation = FRANCE_LOCATIONS.some(loc => loc.toLowerCase().includes(term));
-      const isEuropeanLocation = EUROPE_LOCATIONS.some(loc => loc.toLowerCase().includes(term));
-      const isWorldLocation = WORLD_LOCATIONS.some(loc => loc.toLowerCase().includes(term));
+      // Si on a un match direct sur le pays ou la région, c'est prioritaire
+      if (countryMatch || regionMatch) {
+        return true;
+      }
       
-      return titleMatch || countryMatch || regionMatch || 
-             (image.category === 'france' && isFrenchLocation) ||
-             (image.category === 'europe' && isEuropeanLocation) ||
-             (image.category === 'monde' && isWorldLocation);
+      // Sinon, on vérifie le titre
+      const titleMatch = image.title.toLowerCase().includes(term);
+      
+      // Vérifier les correspondances avec les listes de localisations en fonction de la catégorie
+      if (image.category === 'france' && FRANCE_LOCATIONS.some(loc => loc.toLowerCase() === term)) {
+        return true;
+      }
+      
+      if (image.category === 'europe' && EUROPE_LOCATIONS.some(loc => loc.toLowerCase() === term)) {
+        return true;
+      }
+      
+      if (image.category === 'monde' && WORLD_LOCATIONS.some(loc => loc.toLowerCase() === term)) {
+        return true;
+      }
+      
+      return titleMatch;
     });
+  });
+  
+  // Trier les résultats pour mettre en avant les correspondances de pays/région
+  return results.sort((a, b) => {
+    // Priorité aux images dont le pays correspond exactement
+    const aCountryMatch = a.country && searchTerms.some(term => a.country?.toLowerCase() === term);
+    const bCountryMatch = b.country && searchTerms.some(term => b.country?.toLowerCase() === term);
+    
+    if (aCountryMatch && !bCountryMatch) return -1;
+    if (!aCountryMatch && bCountryMatch) return 1;
+    
+    // Ensuite priorité aux images dont la région correspond
+    const aRegionMatch = a.region && searchTerms.some(term => a.region?.toLowerCase() === term);
+    const bRegionMatch = b.region && searchTerms.some(term => b.region?.toLowerCase() === term);
+    
+    if (aRegionMatch && !bRegionMatch) return -1;
+    if (!aRegionMatch && bRegionMatch) return 1;
+    
+    return 0;
   });
 };
 

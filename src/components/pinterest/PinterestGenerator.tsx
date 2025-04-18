@@ -14,7 +14,7 @@ import { usePin } from '@/hooks/usePin';
 import { PinterestPin, PinterestImage } from '@/types/pinterest';
 import { pinterestDesigns, worldImages, europeImages, franceImages, allImages } from '@/data/pinterestImages';
 import { searchImagesByKeyword, filterImagesByCategory } from '@/services/imageService';
-import { undo, redo } from 'lucide-react';
+import { Undo, Redo } from 'lucide-react';
 
 const initialPin: PinterestPin = {
   title: 'Découvrez les merveilles de Paris',
@@ -37,6 +37,7 @@ const PinterestGenerator: React.FC = () => {
   const [imageSource, setImageSource] = useState<'pixabay' | 'unsplash' | 'freepik' | 'pexels'>('unsplash');
   const [images, setImages] = useState<PinterestImage[]>(allImages);
   const [loading, setLoading] = useState(false);
+  const [customHashtag, setCustomHashtag] = useState('');
   
   // Charger les images au démarrage
   useEffect(() => {
@@ -115,6 +116,29 @@ const PinterestGenerator: React.FC = () => {
     }
   };
 
+  const handleAddHashtag = (tag: string) => {
+    if (pin.hashtags.includes(tag)) {
+      toast.info(`Le hashtag #${tag} est déjà ajouté`);
+      return;
+    }
+    
+    updatePin('hashtags', [...pin.hashtags, tag]);
+    toast.success(`Hashtag #${tag} ajouté`);
+  };
+
+  const handleRemoveHashtag = (tag: string) => {
+    updatePin('hashtags', pin.hashtags.filter(t => t !== tag));
+    toast.success(`Hashtag #${tag} supprimé`);
+  };
+
+  const handleSelectHashtag = (tag: string) => {
+    if (pin.hashtags.includes(tag)) {
+      handleRemoveHashtag(tag);
+    } else {
+      handleAddHashtag(tag);
+    }
+  };
+
   const handleSavePin = () => {
     if (!pin.image && !pin.uploadedImage) {
       toast.error("Veuillez sélectionner ou charger une image");
@@ -165,7 +189,14 @@ const PinterestGenerator: React.FC = () => {
           </TabsContent>
           
           <TabsContent value="hashtags">
-            <HashtagsTab pin={pin} updatePin={updatePin} />
+            <HashtagsTab 
+              pin={pin}
+              customHashtag={customHashtag}
+              setCustomHashtag={setCustomHashtag}
+              handleAddHashtag={handleAddHashtag}
+              handleRemoveHashtag={handleRemoveHashtag}
+              handleSelectHashtag={handleSelectHashtag}
+            />
           </TabsContent>
           
           <TabsContent value="etiquettes">
@@ -194,7 +225,7 @@ const PinterestGenerator: React.FC = () => {
           
           {historyVisible && (
             <div className="mt-6">
-              <PinHistoryPanel onSelectPin={(savedPin) => {
+              <PinHistoryPanel selectedPin={pin} onSelect={(savedPin) => {
                 // Mettre à jour le pin actuel avec le pin sélectionné
                 Object.keys(savedPin).forEach((key) => {
                   updatePin(key as keyof PinterestPin, savedPin[key as keyof PinterestPin]);
