@@ -30,7 +30,7 @@ const MainTabList: React.FC<MainTabListProps> = ({
     
     // Check current path against tab path
     const tabPaths: Record<string, string[]> = {
-      'content': ['/hierarchy', '/wordcount', '/suggestions'],
+      'content': ['/', '/hierarchy', '/wordcount', '/suggestions'],
       'seo': ['/seo', '/structure', '/backlinks'],
       'performance': ['/performance', '/metrics'],
       'analytics': ['/analytics'],
@@ -52,7 +52,7 @@ const MainTabList: React.FC<MainTabListProps> = ({
   // Get the correct path for a main tab
   const getMainTabPath = (tabId: string): string => {
     const pathMap: Record<string, string> = {
-      'content': '/hierarchy',
+      'content': '/',  // Changé de '/hierarchy' à '/' pour corriger la navigation
       'seo': '/seo',
       'performance': '/performance',
       'analytics': '/analytics',

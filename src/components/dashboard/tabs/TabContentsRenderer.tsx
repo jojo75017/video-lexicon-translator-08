@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from 'react';
 import { TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton"; 
@@ -21,22 +22,34 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
 
   // Effect pour gérer l'affichage au premier chargement
   useEffect(() => {
+    console.log(`TabContentsRenderer: Initialisation pour l'onglet actif ${activeTab}`);
+    
     if (firstLoad.current) {
       firstLoad.current = false;
       setTimeout(() => {
-        const activeElement = document.getElementById(activeTab);
-        if (activeElement) {
-          activeElement.style.display = 'block';
-        }
-        
-        // Activer la section appropriée
+        // Activer la section appropriée en utilisant différentes stratégies de sélection
         document.querySelectorAll(`[data-section="${activeTab}"]`).forEach(el => {
           (el as HTMLElement).style.display = 'block';
+          console.log(`Section activée par data-section: ${activeTab}`);
         });
         
         document.querySelectorAll(`[data-tab-content="${activeTab}"]`).forEach(el => {
           (el as HTMLElement).style.display = 'block';
+          console.log(`Section activée par data-tab-content: ${activeTab}`);
         });
+        
+        document.querySelectorAll(`[id="${activeTab}"]`).forEach(el => {
+          (el as HTMLElement).style.display = 'block';
+          console.log(`Section activée par id: ${activeTab}`);
+        });
+        
+        // Force l'affichage si root est l'onglet actif (page d'accueil)
+        if (activeTab === 'hierarchy' || activeTab === 'root') {
+          document.querySelectorAll(`[data-section="hierarchy"]`).forEach(el => {
+            (el as HTMLElement).style.display = 'block';
+            console.log(`Section hierarchy forcée visible`);
+          });
+        }
       }, 500);
     }
   }, [activeTab]);
@@ -44,6 +57,28 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
   useEffect(() => {
     console.log(`TabContentsRenderer: Active tab changed to ${activeTab}`);
     console.log(`SEO Analysis availability:`, !!seoAnalysis);
+    
+    // Mise à jour de l'affichage quand l'onglet actif change
+    setTimeout(() => {
+      // Masquer tous les onglets d'abord
+      document.querySelectorAll('[data-section]').forEach(el => {
+        (el as HTMLElement).style.display = 'none';
+      });
+      
+      // Afficher l'onglet actif
+      document.querySelectorAll(`[data-section="${activeTab}"]`).forEach(el => {
+        (el as HTMLElement).style.display = 'block';
+        console.log(`Section activée: ${activeTab}`);
+      });
+      
+      // Forcer l'affichage de hierarchy si c'est la page d'accueil
+      if (activeTab === 'hierarchy' || activeTab === 'root' || window.location.pathname === '/') {
+        document.querySelectorAll(`[data-section="hierarchy"]`).forEach(el => {
+          (el as HTMLElement).style.display = 'block';
+          console.log(`Section hierarchy affichée car page d'accueil`);
+        });
+      }
+    }, 300);
   }, [activeTab, seoAnalysis]);
 
   // Si aucun onglet n'est trouvé
@@ -68,7 +103,7 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
     <>
       {/* Hierarchy Tab */}
       <TabsContent value="hierarchy" id="hierarchy" data-section="hierarchy" style={{
-        display: activeTab === "hierarchy" ? "block" : "none",
+        display: activeTab === "hierarchy" || window.location.pathname === '/' ? "block" : "none",
         position: "relative" as "relative",
         top: 0,
         left: 0,

@@ -28,12 +28,12 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
 }) => {
   const navigate = useNavigate();
   
-  // Helper function to determine if a tab is active
+  // Helper function to determine the path for a tab
   const getPath = () => {
     if (link) return link;
     
     const routeMap: Record<string, string> = {
-      'hierarchy': '/hierarchy',
+      'hierarchy': '/',  // Changé de '/hierarchy' à '/' pour utiliser la racine
       'wordcount': '/wordcount',
       'suggestions': '/suggestions',
       'seo': '/seo',
@@ -64,6 +64,7 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
     
     // Navigate to the appropriate path
     const path = getPath();
+    console.log(`Navigation vers: ${path}`);
     navigate(path);
   };
 
@@ -71,8 +72,7 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <a 
-            href={getPath()}
+          <button 
             className="inline-block" 
             data-value={id}
             data-tab-id={id}
@@ -99,7 +99,7 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
               
               <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 rounded-md transition-opacity"></span>
             </div>
-          </a>
+          </button>
         </TooltipTrigger>
         <TooltipContent>
           <p className="text-xs">Accéder à {label}</p>

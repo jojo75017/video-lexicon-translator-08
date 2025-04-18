@@ -19,8 +19,11 @@ const TabNavigation = () => {
   // Activer l'onglet courant
   useEffect(() => {
     if (activeTab) {
-      activateSection(activeTab);
-      console.log('TabNavigation activated section:', activeTab);
+      console.log('Tentative d\'activation de section:', activeTab);
+      setTimeout(() => {
+        activateSection(activeTab);
+        console.log('TabNavigation activation retardée de section:', activeTab);
+      }, 300); // Délai pour s'assurer que le DOM est prêt
     }
   }, [activeTab]);
 
@@ -31,7 +34,7 @@ const TabNavigation = () => {
       setTimeout(() => {
         console.log(`Hash détecté dans l'URL: ${hash}, activation de la section`);
         activateSection(hash);
-      }, 100);
+      }, 300);
     }
   }, [location]);
 
