@@ -15,11 +15,11 @@ interface ImageGalleryProps {
 const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onSelectImage, selectedImage }) => {
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
   
-  const handleImageError = (imageUrl: string) => {
+  const handleImageError = (imageId: string, imageUrl: string) => {
     console.error("Erreur de chargement d'image:", imageUrl);
     setFailedImages(prev => {
       const newSet = new Set(prev);
-      newSet.add(imageUrl);
+      newSet.add(imageId);
       return newSet;
     });
   };
@@ -75,20 +75,21 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onSelectImage, sele
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-3">
             {images.map((image, index) => {
               const isInconsistent = !checkTitleConsistency(image);
+              const imageId = `${image.id || `image-${index}`}-${index}`;
               return (
               <div 
-                key={`${image.id || `image-${index}`}-${index}`}
+                key={imageId}
                 className={`relative rounded-md overflow-hidden cursor-pointer transition-all 
                   hover:opacity-90 group border ${isInconsistent ? 'border-red-300' : ''} 
                   ${selectedImage?.id === image.id ? 'ring-2 ring-primary' : ''}`}
                 onClick={() => onSelectImage(image)}
               >
-                {!failedImages.has(image.url) ? (
+                {!failedImages.has(imageId) ? (
                   <img 
                     src={image.url} 
                     alt={image.title || 'Image sans titre'}
                     className="w-full h-44 object-cover"
-                    onError={() => handleImageError(image.url)}
+                    onError={() => handleImageError(imageId, image.url)}
                     loading="lazy"
                   />
                 ) : (

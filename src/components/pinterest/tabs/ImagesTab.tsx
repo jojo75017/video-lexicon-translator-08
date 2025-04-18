@@ -46,6 +46,20 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
   const [inconsistentImages, setInconsistentImages] = useState<number>(0);
   const [filteredImages, setFilteredImages] = useState<PinterestImage[]>(images);
   
+  // Mettre à jour les images filtrées quand les images ou la recherche changent
+  useEffect(() => {
+    setFilteredImages(images);
+    
+    // Vérifier si toutes les images ont le même URL (ce qui indiquerait un problème)
+    if (images.length > 1) {
+      const uniqueUrls = new Set(images.map(img => img.url));
+      if (uniqueUrls.size === 1) {
+        console.error("Attention: Toutes les images ont la même URL:", images[0].url);
+        toast.error("Problème détecté: Les images semblent être identiques");
+      }
+    }
+  }, [images]);
+  
   // Filter images based on search query
   useEffect(() => {
     if (!searchQuery.trim()) {
@@ -183,6 +197,18 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
     }
   };
 
+  // Force reload images - Nouvelle fonction pour forcer le rechargement des images
+  const forceReloadImages = () => {
+    // Forcer la réinitialisation des images basées sur la catégorie actuelle
+    setSelectedImageCategory(prevCategory => {
+      // Déclencher un nouveau chargement pour la même catégorie
+      setTimeout(() => handleSearch(), 100);
+      return prevCategory;
+    });
+    
+    toast.info("Rechargement des images en cours...");
+  };
+
   return (
     <div className="flex flex-col space-y-4">
       <div className="flex flex-wrap items-center gap-2">
@@ -212,6 +238,16 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
+        
+        {/* Bouton pour forcer le rechargement des images */}
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={forceReloadImages}
+          className="ml-2"
+        >
+          <RefreshCcw className="h-4 w-4 mr-1" /> Recharger les images
+        </Button>
         
         <div className="flex gap-2 ml-auto">
           {reliableSources.map((source, index) => (

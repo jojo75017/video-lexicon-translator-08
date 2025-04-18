@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { PinterestPin } from '@/types/pinterest';
 import { Badge } from '@/components/ui/badge';
@@ -45,6 +46,15 @@ const PinterestPreview: React.FC<PinterestPreviewProps> = ({ pin }) => {
         {pin.design.overlayStyle === 'frame' && (
           <div className={`absolute inset-0 border-8 border-${pin.design.primaryColor}`} />
         )}
+        
+        {/* Call to action sur l'image */}
+        <div className="absolute bottom-4 right-4 left-4">
+          <button 
+            className={`w-full py-2 px-4 rounded-full bg-${pin.design.primaryColor} text-white font-medium text-sm shadow-lg`}
+          >
+            {pin.callToAction}
+          </button>
+        </div>
       </div>
       
       <div className="p-4">
@@ -73,12 +83,6 @@ const PinterestPreview: React.FC<PinterestPreviewProps> = ({ pin }) => {
             ))}
           </div>
         )}
-        
-        <button 
-          className={`w-full py-2 px-4 rounded-full bg-${pin.design.primaryColor} text-white font-medium text-sm`}
-        >
-          {pin.callToAction}
-        </button>
       </div>
     </div>
   );
