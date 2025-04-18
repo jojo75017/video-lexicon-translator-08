@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { PinterestPin } from '@/types/pinterest';
 import { pinterestDesigns } from '@/data/pinterestImages';
@@ -23,7 +22,17 @@ export const usePin = (initialPin: PinterestPin) => {
     if (!pin.title || pin.title === initialPin.title) {
       const generatedContent = generateContentFromImage(image);
       updatePin('title', generatedContent.title);
-      updatePin('description', generatedContent.description);
+      
+      // Only update description if it's the default description
+      if (!pin.description || pin.description === initialPin.description) {
+        updatePin('description', generatedContent.description);
+      }
+    } else {
+      // Keep the user's custom title and only generate a description if it's default
+      if (!pin.description || pin.description === initialPin.description) {
+        const generatedContent = generateContentFromImage(image);
+        updatePin('description', generatedContent.description);
+      }
     }
     
     if (image.tags && image.tags.length > 0) {

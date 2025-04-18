@@ -107,17 +107,19 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin, onGenerateConte
     if (onGenerateContent) {
       onGenerateContent();
     } else {
-      // Génération de contenu adaptée à la thématique finlandaise
-      // Maintenant on va préserver le titre de l'utilisateur s'il est déjà défini
-      // et ne pas le remplacer automatiquement
+      // On préserve le titre défini par l'utilisateur
       const currentTitle = pin.title;
-      const newDescription = "Découvrez les paysages époustouflants et les expériences authentiques qui vous attendent. Un voyage inoubliable au cœur de la nature sauvage.";
       
-      // On ne change le titre que s'il est vide ou s'il s'agit du titre par défaut
-      if (!currentTitle || currentTitle === 'Découvrez les tendances créatives du moment') {
-        updatePin('title', 'Que faire en Finlande : nature, lacs');
+      // Nouvelle description pour la Finlande ou voyage
+      let newDescription = "Découvrez les paysages époustouflants et les expériences authentiques qui vous attendent. Un voyage inoubliable au cœur de la nature sauvage.";
+      
+      if (currentTitle.toLowerCase().includes('finlande')) {
+        newDescription = "La Finlande offre des paysages naturels époustouflants avec ses milliers de lacs, ses forêts de pins et ses aurores boréales magiques. Une destination parfaite pour les amoureux de nature et d'aventure.";
+      } else if (currentTitle.toLowerCase().includes('vietnam')) {
+        newDescription = "Le Vietnam séduit par ses paysages variés entre rizières en terrasses, baie d'Halong et villages traditionnels. Une culture riche et une gastronomie exceptionnelle vous attendent.";
       }
       
+      // On conserve toujours le titre personnalisé de l'utilisateur
       updatePin('description', newDescription);
       toast.success('Contenu généré avec succès');
     }

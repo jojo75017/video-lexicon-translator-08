@@ -32,11 +32,18 @@ export const generateContentFromImage = (image: PinterestImage): { title: string
     locationType = 'destination';
   }
   
-  // Special case for Finland
+  // Special cases for different countries
   if (image.country?.toLowerCase() === 'finlande' || image.title.toLowerCase().includes('finlande')) {
     return {
       title: 'Que faire en Finlande : nature, lacs',
-      description: 'Découvrez les paysages époustouflants et les lacs cristallins de la Finlande. Un voyage inoubliable au cœur de la nature sauvage nordique, entre forêts de pins et aurores boréales.'
+      description: 'La Finlande offre des paysages naturels époustouflants avec ses milliers de lacs, ses forêts de pins et ses aurores boréales magiques. Une destination parfaite pour les amoureux de nature et d\'aventure.'
+    };
+  }
+  
+  if (image.country?.toLowerCase() === 'vietnam' || image.title.toLowerCase().includes('vietnam')) {
+    return {
+      title: 'Découvrez le Vietnam : traditions et paysages',
+      description: 'Le Vietnam séduit par ses paysages variés entre rizières en terrasses, baie d\'Halong et villages traditionnels. Une culture riche et une gastronomie exceptionnelle vous attendent.'
     };
   }
   
@@ -96,6 +103,7 @@ export const generateContentFromImage = (image: PinterestImage): { title: string
   const randomMiddle = descriptionMiddles[Math.floor(Math.random() * descriptionMiddles.length)];
   const randomEnding = descriptionEndings[Math.floor(Math.random() * descriptionEndings.length)];
   
+  // Création d'une description personnalisée et détaillée
   let description = `${randomIntro} ${location}, ${randomMiddle}. ${randomEnding}`;
   
   // Assurer que la description n'est pas trop longue
@@ -105,7 +113,7 @@ export const generateContentFromImage = (image: PinterestImage): { title: string
   
   return {
     title,
-    description: location ? 'Découvrez les paysages époustouflants et les expériences authentiques qui vous attendent. Un voyage inoubliable au cœur de la nature sauvage.' : 'Découvrez les tendances créatives du moment'
+    description
   };
 };
 
