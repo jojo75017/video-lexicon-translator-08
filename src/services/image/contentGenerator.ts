@@ -46,8 +46,11 @@ export const generateContentFromImage = (image: PinterestImage): { title: string
     };
   }
 
+  // Identifier un sujet potentiel à partir du titre de l'image
+  const identifiedSubject = identifySubject(image.title);
+
   // Generate title and description using helper functions
-  const title = generateTitle(location, subject);
+  const title = generateTitle(location, identifiedSubject);
   const description = generateDescription(locationType, location);
   
   return { title, description };
@@ -151,6 +154,8 @@ export const generateGlobalDescriptionFromTitle = (title: string): string => {
     description = "Le Vietnam est une destination fascinante qui offre une diversité de paysages et d'expériences culturelles. Des rizières en terrasses du nord aux plages paradisiaques du centre, en passant par la mythique baie d'Halong, chaque région vous dévoile ses trésors.";
   } else if (title.toLowerCase().includes('grèce') || title.toLowerCase().includes('grece')) {
     description = "La Grèce est un pays aux paysages variés, entre mer azur, îles idylliques et sites antiques fascinants. Découvrez la richesse de sa culture millénaire, sa gastronomie méditerranéenne et l'hospitalité légendaire de ses habitants.";
+  } else if (title.toLowerCase().includes('corse')) {
+    description = "La Corse, île de beauté, vous émerveillera par ses paysages contrastés entre mer cristalline et montagnes majestueuses. Découvrez ses plages paradisiaques, ses villages pittoresques et sa culture unique. Une destination idéale pour les amoureux de nature, d'aventure et de gastronomie.";
   } else if (title.toLowerCase().includes('paris') || title.toLowerCase().includes('france')) {
     description = "Paris, capitale mondiale de l'art et de la culture, vous invite à découvrir ses trésors. Entre la majestueuse Tour Eiffel, le musée du Louvre et ses collections inestimables, chaque quartier raconte une histoire fascinante.";
   } else {

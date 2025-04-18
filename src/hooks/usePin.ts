@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { PinterestPin } from '@/types/pinterest';
 import { pinterestDesigns } from '@/data/pinterestImages';
 import { toast } from 'sonner';
@@ -10,14 +10,13 @@ export const usePin = (initialPin: PinterestPin) => {
   
   const updatePin = (field: keyof PinterestPin, value: any) => {
     console.log(`Updating pin field "${field}" with value:`, value);
+    
+    // Mettre à jour directement le champ sans logique spéciale
     setPin(prevPin => ({ ...prevPin, [field]: value }));
     
-    // Si le titre est mis à jour, générer automatiquement une description globale
+    // Si le titre est mis à jour, proposer de mettre à jour la description globale, mais ne pas le faire automatiquement
     if (field === 'title' && value) {
-      const userTitle = value;
-      // Mettre à jour la description globale basée sur le nouveau titre
-      const globalDescription = generateGlobalDescriptionFromTitle(userTitle);
-      setPin(prevPin => ({ ...prevPin, globalDescription }));
+      console.log("Title updated, global description could be updated manually");
     }
   };
 
@@ -41,7 +40,7 @@ export const usePin = (initialPin: PinterestPin) => {
         updatePin('description', generatedContent.description);
       }
       
-      // Mettre à jour la description globale si elle est vide ou à sa valeur par défaut
+      // Mettre à jour la description globale avec un contenu basé sur le titre généré
       if (!pin.globalDescription || pin.globalDescription === initialPin.globalDescription) {
         const detailedDescription = generateGlobalDescriptionFromTitle(generatedContent.title);
         updatePin('globalDescription', detailedDescription);
@@ -51,12 +50,6 @@ export const usePin = (initialPin: PinterestPin) => {
       if (!pin.description || pin.description === initialPin.description) {
         const generatedContent = generateContentFromImage(image);
         updatePin('description', generatedContent.description);
-      }
-      
-      // Mettre à jour la description globale uniquement si c'est la description par défaut
-      if (!pin.globalDescription || pin.globalDescription === initialPin.globalDescription) {
-        const detailedDescription = generateGlobalDescriptionFromTitle(currentTitle);
-        updatePin('globalDescription', detailedDescription);
       }
     }
     
@@ -107,10 +100,6 @@ export const usePin = (initialPin: PinterestPin) => {
           );
           const title = `Découvrez ${capitalizedWords.join(' ')}`;
           updatePin('title', title);
-          
-          // Mettre à jour également la description globale avec un contenu basé sur le titre
-          const detailedDescription = generateGlobalDescriptionFromTitle(title);
-          updatePin('globalDescription', detailedDescription);
         }
         
         const fileName = file.name.replace(/\.[^/.]+$/, "");

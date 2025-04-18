@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import { PinterestPin } from '@/types/pinterest';
 import { Label } from '@/components/ui/label';
@@ -70,6 +71,10 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin, onGenerateConte
       // Detect specific keywords in the title for appropriate emojis
       if (titleText.toLowerCase().includes('finlande')) {
         newTitle = `🇫🇮 ${titleText} 🌲`;
+      } else if (titleText.toLowerCase().includes('corse')) {
+        newTitle = `🏝️ ${titleText} 🌊`;
+      } else if (titleText.toLowerCase().includes('grèce') || titleText.toLowerCase().includes('grece')) {
+        newTitle = `🇬🇷 ${titleText} 🏛️`;
       } else if (titleText.toLowerCase().includes('lac')) {
         newTitle = `🏞️ ${titleText} 💦`;
       } else if (titleText.toLowerCase().includes('nature')) {
@@ -115,6 +120,8 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin, onGenerateConte
       
       if (currentTitle.toLowerCase().includes('finlande')) {
         newDescription = "La Finlande offre des paysages naturels époustouflants avec ses milliers de lacs, ses forêts de pins et ses aurores boréales magiques. Une destination parfaite pour les amoureux de nature et d'aventure.";
+      } else if (currentTitle.toLowerCase().includes('corse')) {
+        newDescription = "La Corse, île de beauté, vous séduira par ses plages de sable fin, ses montagnes majestueuses et ses villages pittoresques. Une destination idéale pour les amoureux de nature et d'authenticité.";
       } else if (currentTitle.toLowerCase().includes('vietnam')) {
         newDescription = "Le Vietnam séduit par ses paysages variés entre rizières en terrasses, baie d'Halong et villages traditionnels. Une culture riche et une gastronomie exceptionnelle vous attendent.";
       } else if (currentTitle.toLowerCase().includes('paris') || currentTitle.toLowerCase().includes('france')) {
@@ -133,7 +140,7 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin, onGenerateConte
     }
   };
 
-  // Fonction pour mettre à jour la description globale automatiquement basée sur le titre
+  // Fonction pour mettre à jour la description globale manuellement basée sur le titre
   const updateGlobalDescriptionBasedOnTitle = () => {
     const currentTitle = pin.title;
     
