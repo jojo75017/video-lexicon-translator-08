@@ -93,11 +93,11 @@ export const usePin = (initialPin: PinterestPin) => {
 
   const resetPin = () => {
     setPin({
-      title: 'Découvrez les merveilles de Paris',
-      description: 'Explorez la ville romantique avec ses monuments emblématiques, sa gastronomie raffinée et son atmosphère unique. Un voyage inoubliable vous attend.',
-      globalDescription: 'Découvrez Paris sous tous ses angles : monuments historiques, restaurants gastronomiques, boutiques de luxe et quartiers pittoresques. Une destination qui mêle histoire, culture et art de vivre à la française.',
-      hashtags: ['paris', 'france', 'travel', 'eiffeltower'],
-      tags: ['voyage', 'france', 'architecture', 'europe'],
+      title: 'Découvrez les tendances créatives du moment',
+      description: 'Des idées inspirantes pour stimuler votre créativité et donner vie à vos projets. Chaque détail compte pour créer quelque chose d\'unique et original.',
+      globalDescription: 'Explorez notre collection d\'idées créatives qui vous aideront à développer votre imagination et à concrétiser vos projets. Que vous soyez débutant ou expert, vous trouverez l\'inspiration pour vos créations, avec des conseils pratiques et des astuces professionnelles pour obtenir des résultats exceptionnels. Découvrez comment transformer des concepts simples en œuvres remarquables grâce à nos méthodes éprouvées et nos recommandations personnalisées.',
+      hashtags: ['créativité', 'inspiration', 'design', 'artisanat'],
+      tags: ['créatif', 'inspiration', 'idées', 'projets', 'design'],
       callToAction: 'Découvrir',
       image: null,
       uploadedImage: null,

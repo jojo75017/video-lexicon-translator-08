@@ -129,7 +129,7 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin, onGenerateConte
 
   // Fonction pour valider la longueur du texte global
   const handleGlobalDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newDescription = e.target.value.slice(0, 400);
+    const newDescription = validateTextLength(e.target.value, 400);
     updatePin('globalDescription', newDescription);
   };
 
@@ -226,10 +226,7 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin, onGenerateConte
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={() => pin.globalDescription && navigator.clipboard.writeText(pin.globalDescription).then(
-                () => toast.success('Description globale copiée'),
-                () => toast.error('Erreur lors de la copie')
-              )}
+              onClick={() => pin.globalDescription && copyToClipboard(pin.globalDescription, 'Description globale')}
               type="button"
             >
               <Copy className="h-4 w-4 mr-1" />
