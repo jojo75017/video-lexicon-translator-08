@@ -12,7 +12,7 @@ export const usePinterestGenerator = (initialPin: PinterestPin) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedImageCategory, setSelectedImageCategory] = useState<'monde' | 'europe' | 'france' | 'all'>('all');
   const [imageSource, setImageSource] = useState<'pixabay' | 'unsplash' | 'freepik' | 'pexels'>('unsplash');
-  const [images, setImages] = useState<PinterestImage[]>(allImages);
+  const [images, setImages] = useState<PinterestImage[]>(allImages as unknown as PinterestImage[]);
   const [loading, setLoading] = useState(false);
   const [customHashtag, setCustomHashtag] = useState('');
   const [instagramApiKey, setInstagramApiKey] = useState(localStorage.getItem('instagramApiKey') || '');
@@ -24,11 +24,11 @@ export const usePinterestGenerator = (initialPin: PinterestPin) => {
   const handleSearch = () => {
     setLoading(true);
     try {
-      const searchResults = searchImagesByKeyword(allImages, searchQuery, selectedImageCategory);
+      const searchResults = searchImagesByKeyword(allImages as unknown as PinterestImage[], searchQuery, selectedImageCategory);
       
       if (searchResults.length === 0) {
         toast.warning(`Aucune image trouvée pour "${searchQuery}"`);
-        const fallbackImages = filterImagesByCategory(allImages, selectedImageCategory);
+        const fallbackImages = filterImagesByCategory(allImages as unknown as PinterestImage[], selectedImageCategory);
         setImages(fallbackImages);
       } else {
         setImages(searchResults);
@@ -49,17 +49,17 @@ export const usePinterestGenerator = (initialPin: PinterestPin) => {
     
     switch (category) {
       case 'monde':
-        filteredImages = worldImages;
+        filteredImages = worldImages as unknown as PinterestImage[];
         break;
       case 'europe':
-        filteredImages = europeImages;
+        filteredImages = europeImages as unknown as PinterestImage[];
         break;
       case 'france':
-        filteredImages = franceImages;
+        filteredImages = franceImages as unknown as PinterestImage[];
         break;
       case 'all':
       default:
-        filteredImages = [...worldImages.slice(0, 5), ...europeImages.slice(0, 5), ...franceImages.slice(0, 5)];
+        filteredImages = [...worldImages.slice(0, 5), ...europeImages.slice(0, 5), ...franceImages.slice(0, 5)] as unknown as PinterestImage[];
         break;
     }
     
@@ -122,4 +122,3 @@ export const usePinterestGenerator = (initialPin: PinterestPin) => {
     resetPin
   };
 };
-

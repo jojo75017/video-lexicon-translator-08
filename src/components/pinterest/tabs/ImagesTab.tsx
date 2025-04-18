@@ -42,6 +42,11 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
 }) => {
   const [activeImageTab, setActiveImageTab] = useState<string>('stock');
   
+  // Helper function to get the image URL (handles both src and url properties)
+  const getImageUrl = (image: PinterestImage): string => {
+    return image.src || image.url || '';
+  };
+  
   return (
     <div className="space-y-4">
       <Tabs defaultValue="stock" value={activeImageTab} onValueChange={setActiveImageTab}>
@@ -103,7 +108,7 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
                     onClick={() => handleSelectImage(image)}
                   >
                     <img
-                      src={image.src}
+                      src={getImageUrl(image)}
                       alt={image.title}
                       className="w-full h-48 object-cover"
                     />
@@ -137,7 +142,7 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
           <h3 className="text-sm font-medium mb-2">Image sélectionnée :</h3>
           <div className="relative group border rounded-md overflow-hidden h-[200px]">
             <img 
-              src={pin.image.src} 
+              src={getImageUrl(pin.image)} 
               alt={pin.image.title}
               className="w-full h-full object-cover"
             />

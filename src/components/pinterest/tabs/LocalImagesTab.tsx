@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,7 @@ const LocalImagesTab: React.FC<LocalImagesTabProps> = ({
   handleImageUpload 
 }) => {
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleLocalImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -72,23 +73,28 @@ const LocalImagesTab: React.FC<LocalImagesTabProps> = ({
     toast.info('Image supprimée');
   };
 
+  const triggerFileInput = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
   return (
     <div className="flex flex-col space-y-4">
       <div className="flex items-center space-x-2">
-        <Label htmlFor="local-image-upload" className="cursor-pointer">
-          <div className="flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2 rounded-md">
-            <FolderOpen className="h-4 w-4" />
-            <span>Charger depuis l'ordinateur</span>
-          </div>
-          <Input
-            id="local-image-upload"
-            type="file"
-            accept="image/*"
-            multiple
-            className="hidden"
-            onChange={handleLocalImageUpload}
-          />
-        </Label>
+        <Button onClick={triggerFileInput} className="flex items-center gap-2">
+          <FolderOpen className="h-4 w-4" />
+          <span>Charger depuis l'ordinateur</span>
+        </Button>
+        <Input
+          ref={fileInputRef}
+          id="local-image-upload"
+          type="file"
+          accept="image/*"
+          multiple
+          className="hidden"
+          onChange={handleLocalImageUpload}
+        />
         
         <TooltipProvider>
           <Tooltip>
