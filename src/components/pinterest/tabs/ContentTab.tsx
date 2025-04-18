@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Wand2 } from 'lucide-react';
 import { PinterestPin } from '@/types/pinterest';
 import { toast } from 'sonner';
+import EmojiPicker from './EmojiPicker';
 
 interface ContentTabProps {
   pin: PinterestPin;
@@ -16,14 +17,14 @@ interface ContentTabProps {
 const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin }) => {
   const [keyword, setKeyword] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [titleCursorPosition, setTitleCursorPosition] = useState<number | null>(null);
+  const [descriptionCursorPosition, setDescriptionCursorPosition] = useState<number | null>(null);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    // Limit to 60 characters
     if (value.length <= 60) {
       updatePin('title', value);
     } else {
-      // Truncate to 60 characters if longer
       updatePin('title', value.substring(0, 60));
       toast.warning("Le titre a été tronqué à 60 caractères");
     }
@@ -31,14 +32,34 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin }) => {
 
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
-    // Limit to ~100 words (approximately 600 characters)
     if (value.length <= 600) {
       updatePin('description', value);
     } else {
-      // Truncate to 600 characters if longer
       updatePin('description', value.substring(0, 600));
       toast.warning("La description a été tronquée à environ 100 mots");
     }
+  };
+
+  const insertEmoji = (emoji: string, field: 'title' | 'description') => {
+    const currentText = pin[field];
+    const position = field === 'title' ? titleCursorPosition : descriptionCursorPosition;
+    
+    if (position !== null) {
+      const newText = currentText.slice(0, position) + emoji + currentText.slice(position);
+      updatePin(field, newText);
+    } else {
+      updatePin(field, currentText + emoji);
+    }
+  };
+
+  const handleTitleSelect = (e: React.SyntheticEvent<HTMLInputElement>) => {
+    const target = e.target as HTMLInputElement;
+    setTitleCursorPosition(target.selectionStart);
+  };
+
+  const handleDescriptionSelect = (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
+    const target = e.target as HTMLTextAreaElement;
+    setDescriptionCursorPosition(target.selectionStart);
   };
 
   const generateContentFromKeyword = () => {
@@ -98,36 +119,50 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin }) => {
       </div>
 
       <div>
-        <Label htmlFor="title" className="flex justify-between">
-          <span>Titre (max 60 caractères)</span>
+        <div className="flex items-center justify-between mb-1">
+          <Label htmlFor="title">
+            Titre (max 60 caractères)
+          </Label>
           <span className={`text-xs ${pin.title.length > 55 ? 'text-orange-500' : ''}`}>
             {pin.title.length}/60
           </span>
-        </Label>
-        <Input
-          id="title"
-          placeholder="Titre accrocheur"
-          value={pin.title}
-          onChange={handleTitleChange}
-          className="mt-1"
-        />
+        </div>
+        <div className="flex gap-2 items-center">
+          <Input
+            id="title"
+            placeholder="Titre accrocheur"
+            value={pin.title}
+            onChange={handleTitleChange}
+            onSelect={handleTitleSelect}
+            className="flex-1"
+          />
+          <EmojiPicker onEmojiSelect={(emoji) => insertEmoji(emoji, 'title')} />
+        </div>
       </div>
       
       <div>
-        <Label htmlFor="description" className="flex justify-between">
-          <span>Description (environ 100 mots)</span>
+        <div className="flex items-center justify-between mb-1">
+          <Label htmlFor="description">
+            Description (environ 100 mots)
+          </Label>
           <span className={`text-xs ${pin.description.length > 540 ? 'text-orange-500' : ''}`}>
             {pin.description.length}/600
           </span>
-        </Label>
-        <Textarea
-          id="description"
-          placeholder="Décrivez votre épingle en détail (environ 100 mots)"
-          value={pin.description}
-          onChange={handleDescriptionChange}
-          className="mt-1 min-h-36"
-          rows={6}
-        />
+        </div>
+        <div className="flex gap-2">
+          <Textarea
+            id="description"
+            placeholder="Décrivez votre épingle en détail (environ 100 mots)"
+            value={pin.description}
+            onChange={handleDescriptionChange}
+            onSelect={handleDescriptionSelect}
+            className="min-h-36 flex-1"
+            rows={6}
+          />
+          <div className="flex flex-col justify-start pt-2">
+            <EmojiPicker onEmojiSelect={(emoji) => insertEmoji(emoji, 'description')} />
+          </div>
+        </div>
       </div>
     </div>
   );
