@@ -27,30 +27,6 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
 }) => {
   const navigate = useNavigate();
   
-  // Helper function to determine the path for a tab
-  const getPath = () => {
-    if (link) return link;
-    
-    const routeMap: Record<string, string> = {
-      'hierarchy': '/hierarchy',
-      'wordcount': '/wordcount',
-      'suggestions': '/suggestions',
-      'seo': '/seo',
-      'structure': '/structure',
-      'backlinks': '/backlinks',
-      'performance': '/performance',
-      'metrics': '/metrics',
-      'analytics': '/analytics',
-      'signature': '/signature',
-      'quora': '/quora',
-      'local-business': '/local-business',
-      'translation': '/translation',
-      'pinterest': '/pinterest'
-    };
-    
-    return routeMap[id] || '/';
-  };
-
   // Handle click with combined navigation and callback
   const handleClick = (e: React.MouseEvent) => {
     // Prevent default behavior

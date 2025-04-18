@@ -22,12 +22,12 @@ const TabNavigation = () => {
     if (initialRender.current && activeTab) {
       console.log('Premier rendu de TabNavigation, activation de section:', activeTab);
       
-      // Donner un peu de temps au DOM pour charger
+      // Donner un peu plus de temps au DOM pour charger
       const timer = setTimeout(() => {
         activateSection(activeTab);
         console.log('TabNavigation: Activation initiale de section:', activeTab);
         initialRender.current = false;
-      }, 300);
+      }, 500);
       
       return () => clearTimeout(timer);
     }
@@ -39,7 +39,7 @@ const TabNavigation = () => {
       console.log('Changement d\'onglet actif détecté:', activeTab);
       setTimeout(() => {
         activateSection(activeTab);
-      }, 200);
+      }, 400);
     }
   }, [activeTab]);
 
@@ -51,7 +51,7 @@ const TabNavigation = () => {
       console.log(`Hash détecté dans l'URL: ${hash}, activation de la section`);
       setTimeout(() => {
         activateSection(hash);
-      }, 200);
+      }, 400);
     }
   }, [location]);
 

@@ -43,14 +43,16 @@ const SubTabList: React.FC<SubTabListProps> = ({ tabs, activeTab, onTabChange })
     };
     
     if (tabRoutes[tabId]) {
+      // Naviguer vers la page appropriée
+      console.log(`SubTabList: Navigation vers ${tabRoutes[tabId]}`);
       navigate(tabRoutes[tabId]);
+      
+      // Attendre un peu plus longtemps avant d'activer la section pour laisser le temps à la navigation de se terminer
+      setTimeout(() => {
+        console.log(`SubTabList: Activation de la section ${tabId}`);
+        activateSection(tabId);
+      }, 300);
     }
-    
-    // Attendre un peu avant d'activer la section pour laisser le temps à la navigation de se terminer
-    setTimeout(() => {
-      console.log(`SubTabList: Activation de la section ${tabId}`);
-      activateSection(tabId);
-    }, 200);
   };
 
   return (

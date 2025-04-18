@@ -64,7 +64,7 @@ const MainTabList: React.FC<MainTabListProps> = ({
 
   // Handle tab click with proper navigation
   const handleTabClick = (tabId: string, path: string) => {
-    console.log(`Clic sur onglet principal: ${tabId}, chemin: ${path}`);
+    console.log(`MainTabList: Clic sur onglet principal: ${tabId}, chemin: ${path}`);
     
     // Activer l'onglet
     onTabChange(tabId);
@@ -82,7 +82,7 @@ const MainTabList: React.FC<MainTabListProps> = ({
       } else {
         activateSection(tabId);
       }
-    }, 200);
+    }, 300); // Augmenter le délai pour s'assurer que la navigation est terminée
   };
 
   return (

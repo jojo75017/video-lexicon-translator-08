@@ -37,7 +37,7 @@ export const getMainTabCategory = (tabId: string): string => {
   return tabId;
 };
 
-// Fonction pour activer une section/onglet - version robuste
+// Fonction améliorée pour activer une section/onglet
 export const activateSection = (sectionId: string): void => {
   console.log(`Activation de la section: ${sectionId}`);
   
@@ -46,6 +46,12 @@ export const activateSection = (sectionId: string): void => {
     return;
   }
   
+  // Fonction pour afficher un élément
+  const displayElement = (element: HTMLElement) => {
+    console.log(`Affichage de l'élément:`, element.id || element.getAttribute('data-section') || element.getAttribute('data-tab-content'));
+    element.style.display = 'block';
+  };
+  
   // Attendre que le DOM soit prêt
   setTimeout(() => {
     try {
@@ -53,6 +59,7 @@ export const activateSection = (sectionId: string): void => {
       const allSections = document.querySelectorAll('[data-section], [data-tab-content], [id]');
       
       console.log(`Nombre total d'éléments trouvés: ${allSections.length}`);
+      console.log("Éléments trouvés:", Array.from(allSections).map(el => el.id || el.getAttribute('data-section') || el.getAttribute('data-tab-content')));
       
       // D'abord, masquer toutes les sections
       allSections.forEach(el => {
@@ -72,7 +79,7 @@ export const activateSection = (sectionId: string): void => {
       const sectionById = document.getElementById(sectionId);
       if (sectionById) {
         console.log(`Section "${sectionId}" trouvée par id direct`);
-        sectionById.style.display = 'block';
+        displayElement(sectionById);
         return;
       }
       
@@ -80,7 +87,7 @@ export const activateSection = (sectionId: string): void => {
       const sectionByData = document.querySelector(`[data-section="${sectionId}"]`);
       if (sectionByData) {
         console.log(`Section "${sectionId}" trouvée par data-section`);
-        (sectionByData as HTMLElement).style.display = 'block';
+        displayElement(sectionByData as HTMLElement);
         return;
       }
       
@@ -88,7 +95,7 @@ export const activateSection = (sectionId: string): void => {
       const sectionByTab = document.querySelector(`[data-tab-content="${sectionId}"]`);
       if (sectionByTab) {
         console.log(`Section "${sectionId}" trouvée par data-tab-content`);
-        (sectionByTab as HTMLElement).style.display = 'block';
+        displayElement(sectionByTab as HTMLElement);
         return;
       }
       
@@ -116,7 +123,7 @@ export const activateSection = (sectionId: string): void => {
           
           if (defaultSection) {
             console.log(`Affichage du sous-onglet par défaut: ${defaultTab}`);
-            (defaultSection as HTMLElement).style.display = 'block';
+            displayElement(defaultSection as HTMLElement);
             return;
           }
         }
@@ -126,6 +133,15 @@ export const activateSection = (sectionId: string): void => {
       // Affichons alors un message d'erreur et essayons de montrer une section de secours
       console.error(`Aucune section trouvée pour l'id: ${sectionId}`);
       console.log("Page actuelle:", window.location.pathname);
+      console.log("Elements présents dans le DOM:", 
+        Array.from(document.querySelectorAll('[id], [data-section], [data-tab-content]'))
+          .map(el => ({
+            id: el.id,
+            'data-section': el.getAttribute('data-section'),
+            'data-tab-content': el.getAttribute('data-tab-content'),
+            display: (el as HTMLElement).style.display
+          }))
+      );
       
       // En dernier recours, chercher une section qui correspond au chemin actuel
       const currentPath = window.location.pathname;
@@ -157,17 +173,43 @@ export const activateSection = (sectionId: string): void => {
         
         if (currentSection) {
           console.log(`Affichage de la section correspondant au chemin actuel: ${currentTabId}`);
-          (currentSection as HTMLElement).style.display = 'block';
+          displayElement(currentSection as HTMLElement);
           return;
         }
       }
       
-      // Si toujours rien, essayer d'afficher n'importe quelle section valide
+      // Tentative d'afficher n'importe quelle section valide si tout a échoué
       console.log("Tentative d'afficher n'importe quelle section valide");
-      const anySections = document.querySelectorAll('[data-section], [data-tab-content]');
-      if (anySections.length > 0) {
-        console.log(`Affichage de la première section disponible: ${anySections[0].id || anySections[0].getAttribute('data-section')}`);
-        (anySections[0] as HTMLElement).style.display = 'block';
+      
+      // Afficher la première section trouvée avec un ID correspondant à un tab connu
+      const knownTabIds = ['hierarchy', 'wordcount', 'suggestions', 'seo', 'structure', 'backlinks', 
+                          'performance', 'metrics', 'analytics', 'quora', 'signature', 
+                          'local-business', 'translation', 'pinterest'];
+      
+      for (const tabId of knownTabIds) {
+        const tabSection = document.getElementById(tabId) ||
+                          document.querySelector(`[data-section="${tabId}"]`) ||
+                          document.querySelector(`[data-tab-content="${tabId}"]`);
+        
+        if (tabSection) {
+          console.log(`Affichage de la section connue: ${tabId}`);
+          displayElement(tabSection as HTMLElement);
+          return;
+        }
+      }
+      
+      // En dernier recours, afficher la première section disponible
+      const anySections = document.querySelectorAll('[data-section], [data-tab-content], [id]');
+      for (let i = 0; i < anySections.length; i++) {
+        const section = anySections[i];
+        // Vérifier que c'est bien une section et non un autre élément avec un ID
+        if (section.hasAttribute('data-section') || 
+            section.hasAttribute('data-tab-content') || 
+            knownTabIds.includes(section.id)) {
+          console.log(`Affichage de la première section disponible: ${section.id || section.getAttribute('data-section')}`);
+          displayElement(section as HTMLElement);
+          return;
+        }
       }
       
     } catch (error) {
