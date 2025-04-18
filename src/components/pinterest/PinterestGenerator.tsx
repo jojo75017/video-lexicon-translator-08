@@ -1,8 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import PinterestPreview from './PinterestPreview';
+import PinterestPreviewCard from './PinterestPreviewCard';
 import ContentTab from './tabs/ContentTab';
 import ImagesTab from './tabs/ImagesTab';
 import DesignTab from './tabs/DesignTab';
@@ -11,10 +12,11 @@ import EtiquettesTab from './tabs/EtiquettesTab';
 import PinHistoryPanel from './PinHistoryPanel';
 import SpecialPromptButton from './tabs/SpecialPromptButton';
 import { usePin } from '@/hooks/usePin';
+import { useSocialContent } from '@/hooks/useSocialContent';
 import { PinterestPin, PinterestImage } from '@/types/pinterest';
 import { pinterestDesigns, worldImages, europeImages, franceImages, allImages } from '@/data/pinterestImages';
 import { searchImagesByKeyword, filterImagesByCategory } from '@/services/imageService';
-import { Undo, Redo } from 'lucide-react';
+import { Undo, Redo, Facebook, Instagram } from 'lucide-react';
 
 const initialPin: PinterestPin = {
   title: 'Découvrez les merveilles de Paris',
@@ -38,6 +40,9 @@ const PinterestGenerator: React.FC = () => {
   const [images, setImages] = useState<PinterestImage[]>(allImages);
   const [loading, setLoading] = useState(false);
   const [customHashtag, setCustomHashtag] = useState('');
+  const [instagramApiKey, setInstagramApiKey] = useState(localStorage.getItem('instagramApiKey') || '');
+  
+  const { generateSocialContent } = useSocialContent({ updatePin, setActiveTab });
   
   // Charger les images au démarrage
   useEffect(() => {
@@ -150,6 +155,11 @@ const PinterestGenerator: React.FC = () => {
     toast.success("Pin sauvegardé dans l'historique");
   };
 
+  const handleSaveInstagramApiKey = () => {
+    localStorage.setItem('instagramApiKey', instagramApiKey);
+    toast.success('Clé API Instagram sauvegardée avec succès');
+  };
+
   return (
     <div className="flex flex-col lg:flex-row gap-6">
       <div className="w-full lg:w-3/5 xl:w-2/3">
@@ -214,24 +224,65 @@ const PinterestGenerator: React.FC = () => {
           </TabsContent>
         </Tabs>
 
-        <div className="mt-6 flex justify-between">
-          <Button variant="outline" onClick={resetPin}>
-            Réinitialiser
-          </Button>
-          <div className="space-x-2">
-            <Button variant="outline" onClick={() => setHistoryVisible(!historyVisible)}>
-              {historyVisible ? 'Masquer l\'historique' : 'Voir l\'historique'}
+        <div className="mt-6 space-y-4">
+          <div className="flex flex-col space-y-2 p-4 border rounded-md">
+            <h3 className="text-lg font-medium mb-2">Réseaux sociaux</h3>
+            <div className="flex flex-wrap gap-2">
+              <Button 
+                variant="outline" 
+                className="flex items-center gap-2"
+                onClick={() => generateSocialContent('facebook')}
+              >
+                <Facebook className="h-4 w-4 text-blue-600" />
+                Contenu Facebook
+              </Button>
+              <Button 
+                variant="outline" 
+                className="flex items-center gap-2 bg-gradient-to-r from-purple-100 to-pink-100 hover:from-purple-200 hover:to-pink-200"
+                onClick={() => generateSocialContent('instagram')}
+              >
+                <Instagram className="h-4 w-4 text-pink-600" />
+                Contenu Instagram
+              </Button>
+            </div>
+            
+            <div className="mt-3">
+              <label className="block text-sm font-medium mb-1">Clé API Instagram</label>
+              <div className="flex gap-2">
+                <input 
+                  type="text" 
+                  value={instagramApiKey}
+                  onChange={(e) => setInstagramApiKey(e.target.value)}
+                  placeholder="Entrez votre clé API Instagram"
+                  className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm"
+                />
+                <Button variant="outline" onClick={handleSaveInstagramApiKey}>
+                  Sauvegarder
+                </Button>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">Cette clé est sauvegardée localement dans votre navigateur.</p>
+            </div>
+          </div>
+
+          <div className="flex justify-between">
+            <Button variant="outline" onClick={resetPin}>
+              Réinitialiser
             </Button>
-            <Button onClick={handleSavePin}>
-              Sauvegarder
-            </Button>
+            <div className="space-x-2">
+              <Button variant="outline" onClick={() => setHistoryVisible(!historyVisible)}>
+                {historyVisible ? 'Masquer l\'historique' : 'Voir l\'historique'}
+              </Button>
+              <Button onClick={handleSavePin}>
+                Sauvegarder
+              </Button>
+            </div>
           </div>
         </div>
       </div>
       
       <div className="w-full lg:w-2/5 xl:w-1/3">
         <div className="sticky top-4">
-          <PinterestPreview pin={pin} />
+          <PinterestPreviewCard pin={pin} />
           
           {historyVisible && (
             <div className="mt-6">
