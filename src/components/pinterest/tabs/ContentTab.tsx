@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { PinterestPin } from '@/types/pinterest';
 import { Label } from '@/components/ui/label';
@@ -10,6 +9,7 @@ import { Smile, Sparkles, ThumbsUp, Copy, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
 import EmojiPicker from './EmojiPicker';
 import { generateGlobalDescriptionFromTitle } from '@/services/imageService';
+import { generateTitleFromLocation } from '@/services/imageService';
 
 interface ContentTabProps {
   pin: PinterestPin;
@@ -23,6 +23,19 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin, onGenerateConte
   const [emojiTarget, setEmojiTarget] = useState<'title' | 'description'>('title');
   const titleRef = useRef<HTMLInputElement>(null);
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
+
+  // Ajout de la fonction de génération de titre
+  const [locationInput, setLocationInput] = useState('');
+
+  const handleGenerateTitle = () => {
+    if (!locationInput.trim()) {
+      toast.error('Veuillez entrer une ville ou un pays');
+      return;
+    }
+    const newTitle = generateTitleFromLocation(locationInput);
+    updatePin('title', newTitle);
+    toast.success('Titre généré avec succès');
+  };
 
   // Fonction pour insérer un emoji à la position du curseur
   const insertEmoji = (emoji: string) => {
@@ -176,6 +189,24 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin, onGenerateConte
 
   return (
     <div className="flex flex-col space-y-4">
+      <div className="flex flex-col space-y-2">
+        <div className="flex justify-between items-center">
+          <Label htmlFor="location">Générer un titre</Label>
+        </div>
+        <div className="flex gap-2">
+          <Input
+            id="location"
+            value={locationInput}
+            onChange={(e) => setLocationInput(e.target.value)}
+            placeholder="Entrez une ville ou un pays"
+            className="flex-1"
+          />
+          <Button onClick={handleGenerateTitle} type="button">
+            Générer
+          </Button>
+        </div>
+      </div>
+
       <div className="flex flex-col space-y-2">
         <div className="flex justify-between items-center">
           <Label htmlFor="title">Titre</Label>
