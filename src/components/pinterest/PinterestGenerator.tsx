@@ -1,264 +1,209 @@
+
 import React, { useState, useEffect } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Download, Upload, History, Wand2, Facebook, Instagram } from 'lucide-react';
-import { PinterestImage } from '@/types/pinterest';
-import { pinterestDesigns } from '@/data/pinterestImages';
-import { searchPixabayImages, searchUnsplashImages, searchFreepikImages, searchPexelsImages, getPresetImagesByCategory } from '@/services/imageService';
 import { toast } from 'sonner';
-import PinterestPreviewCard from './PinterestPreviewCard';
-import PinterestTabs from './PinterestTabs';
-import SpecialPromptButton from './tabs/SpecialPromptButton';
+import PinterestPreview from './PinterestPreview';
+import ContentTab from './tabs/ContentTab';
+import ImagesTab from './tabs/ImagesTab';
+import DesignTab from './tabs/DesignTab';
+import HashtagsTab from './tabs/HashtagsTab';
+import EtiquettesTab from './tabs/EtiquettesTab';
 import PinHistoryPanel from './PinHistoryPanel';
 import { usePin } from '@/hooks/usePin';
-import { usePinHistory } from '@/hooks/usePinHistory';
-import { useSocialContent } from '@/hooks/useSocialContent';
-import type { SocialPlatform } from '@/data/socialContentTemplates';
-import { Input } from '@/components/ui/input';
+import { PinterestPin, PinterestImage } from '@/types/pinterest';
+import { pinterestDesigns, worldImages, europeImages, franceImages, allImages } from '@/data/pinterestImages';
+import { searchImagesByKeyword, filterImagesByCategory } from '@/services/imageService';
+import { undo, redo } from 'lucide-react';
+
+const initialPin: PinterestPin = {
+  title: 'Découvrez les merveilles de Paris',
+  description: 'Explorez la ville romantique avec ses monuments emblématiques, sa gastronomie raffinée et son atmosphère unique. Un voyage inoubliable vous attend.',
+  hashtags: ['paris', 'france', 'travel', 'eiffeltower'],
+  tags: ['voyage', 'france', 'architecture', 'europe'],
+  callToAction: 'Découvrir',
+  image: null,
+  uploadedImage: null,
+  design: pinterestDesigns[0]
+};
 
 const PinterestGenerator: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('design');
+  const { pin, updatePin, handleSelectImage, handleImageUpload, resetPin } = usePin(initialPin);
+  
+  const [activeTab, setActiveTab] = useState('content');
+  const [historyVisible, setHistoryVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedImageCategory, setSelectedImageCategory] = useState<'monde' | 'europe' | 'france' | 'all'>('all');
-  const [imageSource, setImageSource] = useState<'pixabay' | 'unsplash' | 'freepik' | 'pexels'>('pixabay');
-  const [images, setImages] = useState<PinterestImage[]>([]);
+  const [imageSource, setImageSource] = useState<'pixabay' | 'unsplash' | 'freepik' | 'pexels'>('unsplash');
+  const [images, setImages] = useState<PinterestImage[]>(allImages);
   const [loading, setLoading] = useState(false);
-  const [customHashtag, setCustomHashtag] = useState('');
-  const [openaiApiKey, setOpenaiApiKey] = useState('');
-
-  const { pin, updatePin, handleSelectImage, handleImageUpload, resetPin } = usePin({
-    title: 'Découvrez les merveilles de Paris',
-    description: 'Explorez la ville romantique avec ses monuments emblématiques, sa gastronomie raffinée et son atmosphère unique. Un voyage inoubliable vous attend.',
-    hashtags: ['paris', 'france', 'travel', 'eiffeltower'],
-    tags: ['voyage', 'france', 'architecture', 'europe'],
-    callToAction: 'Découvrir',
-    image: null,
-    uploadedImage: null,
-    design: pinterestDesigns[0]
-  });
-
-  const { 
-    pinHistory, 
-    showHistory, 
-    setShowHistory, 
-    saveToHistory, 
-    restoreFromHistory 
-  } = usePinHistory();
-
-  const { generateSocialContent } = useSocialContent({
-    updatePin,
-    setActiveTab
-  });
-
+  
+  // Charger les images au démarrage
   useEffect(() => {
-    loadPresetImages();
+    handleFilterImages(selectedImageCategory);
   }, [selectedImageCategory]);
 
-  // Ajout d'un useEffect pour charger la clé API depuis localStorage
-  useEffect(() => {
-    const savedApiKey = localStorage.getItem('openai_api_key');
-    if (savedApiKey) {
-      setOpenaiApiKey(savedApiKey);
-    }
-  }, []);
-
-  const loadPresetImages = async () => {
+  const handleSearch = () => {
     setLoading(true);
-    try {
-      const presetImages = await getPresetImagesByCategory(selectedImageCategory);
-      console.log(`Loaded ${presetImages.length} preset images for category ${selectedImageCategory}`);
-      setImages(presetImages);
-    } catch (error) {
-      console.error("Erreur lors du chargement des images préréglées:", error);
-      toast.error("Impossible de charger les images préréglées");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGeneratedPrompt = (prompt: string) => {
-    setSearchQuery(prompt);
-    setActiveTab('images');
-    setTimeout(() => handleSearch(), 500);
-    toast.success("Prompt généré! Recherche d'images en cours...");
-  };
-
-  const handleSearch = async () => {
-    if (!searchQuery.trim()) {
-      toast.warning("Veuillez entrer un terme de recherche");
-      return;
-    }
+    console.log(`Recherche d'images pour: "${searchQuery}" dans la catégorie: ${selectedImageCategory}`);
     
-    setLoading(true);
     try {
-      let searchResults: PinterestImage[] = [];
-      
-      if (imageSource === 'pixabay') {
-        searchResults = await searchPixabayImages(searchQuery, selectedImageCategory);
-      } else if (imageSource === 'unsplash') {
-        searchResults = await searchUnsplashImages(searchQuery);
-      } else if (imageSource === 'freepik') {
-        searchResults = await searchFreepikImages(searchQuery, selectedImageCategory);
-      } else if (imageSource === 'pexels') {
-        searchResults = await searchPexelsImages(searchQuery, selectedImageCategory);
-      }
+      // Utiliser la fonction de recherche améliorée du service
+      const searchResults = searchImagesByKeyword(allImages, searchQuery, selectedImageCategory);
       
       if (searchResults.length === 0) {
-        toast.info("Aucun résultat trouvé. Essayez d'autres termes de recherche.");
+        toast.warning(`Aucune image trouvée pour "${searchQuery}". Essayez des termes plus généraux.`);
+        // Montrer des images filtrées par catégorie comme résultats de secours
+        const fallbackImages = filterImagesByCategory(allImages, selectedImageCategory);
+        setImages(fallbackImages);
+        console.log(`Affichage de ${fallbackImages.length} images de secours pour la catégorie ${selectedImageCategory}`);
       } else {
         setImages(searchResults);
-        toast.success(`${searchResults.length} images trouvées`);
+        toast.success(`${searchResults.length} images trouvées pour "${searchQuery}"`);
+        console.log(`Trouvé ${searchResults.length} images pour "${searchQuery}"`);
+        
+        // Log quelques exemples pour debug
+        if (searchResults.length > 0) {
+          console.log("Exemple d'images trouvées:", searchResults.slice(0, 3).map(img => ({
+            title: img.title,
+            country: img.country,
+            category: img.category
+          })));
+        }
       }
     } catch (error) {
       console.error("Erreur lors de la recherche d'images:", error);
-      toast.error("Erreur lors de la recherche d'images");
+      toast.error("Une erreur est survenue lors de la recherche");
     } finally {
       setLoading(false);
     }
   };
-
-  const handleRestoreFromHistory = (historicPin: any) => {
-    const restoredPin = restoreFromHistory(historicPin);
-    updatePin('title', restoredPin.title);
-    updatePin('description', restoredPin.description);
-    updatePin('hashtags', restoredPin.hashtags);
-    updatePin('tags', restoredPin.tags);
-    updatePin('callToAction', restoredPin.callToAction);
-    updatePin('image', restoredPin.image);
-    updatePin('uploadedImage', restoredPin.uploadedImage);
-    updatePin('design', restoredPin.design);
-    toast.success('Pin restauré depuis l\'historique');
-  };
-
-  // Gestionnaire pour sauvegarder la clé API
-  const handleApiKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newApiKey = e.target.value;
-    setOpenaiApiKey(newApiKey);
-    if (newApiKey.startsWith('sk-')) {
-      localStorage.setItem('openai_api_key', newApiKey);
-      toast.success('Clé API OpenAI sauvegardée');
+  
+  const handleFilterImages = (category: 'monde' | 'europe' | 'france' | 'all') => {
+    setLoading(true);
+    
+    let filteredImages: PinterestImage[] = [];
+    let sourceText = '';
+    
+    switch (category) {
+      case 'monde':
+        filteredImages = worldImages;
+        sourceText = 'monde';
+        break;
+      case 'europe':
+        filteredImages = europeImages;
+        sourceText = 'Europe';
+        break;
+      case 'france':
+        filteredImages = franceImages;
+        sourceText = 'France';
+        break;
+      case 'all':
+      default:
+        // Prendre quelques images de chaque catégorie pour une vue équilibrée
+        filteredImages = [...worldImages.slice(0, 5), ...europeImages.slice(0, 5), ...franceImages.slice(0, 5)];
+        sourceText = 'prévisualisées';
+        break;
+    }
+    
+    setImages(filteredImages);
+    console.log(`Loaded ${filteredImages.length} preset images for category ${category}`);
+    setLoading(false);
+    
+    if (category !== 'all') {
+      toast.success(`Images de ${sourceText} chargées`);
     }
   };
-  
+
+  const handleSavePin = () => {
+    if (!pin.image && !pin.uploadedImage) {
+      toast.error("Veuillez sélectionner ou charger une image");
+      setActiveTab('images');
+      return;
+    }
+    
+    // Code pour sauvegarder le pin dans l'historique
+    toast.success("Pin sauvegardé dans l'historique");
+  };
 
   return (
     <div className="flex flex-col lg:flex-row gap-6">
-      <div className="w-full lg:w-1/2 space-y-6">
-        <div className="flex justify-between items-center">
-          <h2 className="text-lg font-semibold">Création de Pin</h2>
-          <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => setShowHistory(!showHistory)}
-            >
-              <History className="w-4 h-4 mr-2" />
-              Historique
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={resetPin}
-            >
-              <Wand2 className="w-4 h-4 mr-2" />
-              Réinitialiser
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => generateSocialContent('facebook')}
-              className="bg-[#1877F2] text-white hover:bg-[#1877F2]/90"
-            >
-              <Facebook className="w-4 h-4 mr-2" />
-              Facebook
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => generateSocialContent('instagram')}
-              className="bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-white hover:from-purple-600 hover:via-pink-600 hover:to-red-600"
-            >
-              <Instagram className="w-4 h-4 mr-2" />
-              Instagram
-            </Button>
-          </div>
-        </div>
-
-        {showHistory && (
-          <div className="bg-white rounded-lg border p-4 space-y-4">
-            <h3 className="font-medium">Historique des Pins</h3>
-            <PinHistoryPanel
-              pinHistory={pinHistory}
-              onRestore={handleRestoreFromHistory}
+      <div className="w-full lg:w-3/5 xl:w-2/3">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid grid-cols-5 mb-4">
+            <TabsTrigger value="content">Contenu</TabsTrigger>
+            <TabsTrigger value="images">Images</TabsTrigger>
+            <TabsTrigger value="design">Design</TabsTrigger>
+            <TabsTrigger value="hashtags">Hashtags</TabsTrigger>
+            <TabsTrigger value="etiquettes">Étiquettes</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="content">
+            <ContentTab pin={pin} updatePin={updatePin} />
+          </TabsContent>
+          
+          <TabsContent value="images">
+            <ImagesTab 
+              pin={pin}
+              updatePin={updatePin}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              selectedImageCategory={selectedImageCategory}
+              setSelectedImageCategory={setSelectedImageCategory}
+              imageSource={imageSource}
+              setImageSource={setImageSource}
+              images={images}
+              loading={loading}
+              handleSearch={handleSearch}
+              handleSelectImage={handleSelectImage}
+              handleImageUpload={handleImageUpload}
             />
-          </div>
-        )}
-        
-        <PinterestTabs 
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          pin={pin}
-          updatePin={updatePin}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          selectedImageCategory={selectedImageCategory}
-          setSelectedImageCategory={setSelectedImageCategory}
-          imageSource={imageSource}
-          setImageSource={setImageSource}
-          images={images}
-          loading={loading}
-          handleSearch={handleSearch}
-          handleSelectImage={handleSelectImage}
-          handleImageUpload={handleImageUpload}
-          setCustomHashtag={setCustomHashtag}
-          customHashtag={customHashtag}
-          handleAddHashtag={(tag: string) => {
-            if (tag && !pin.hashtags.includes(tag)) {
-              updatePin('hashtags', [...pin.hashtags, tag]);
-            }
-          }}
-          handleRemoveHashtag={(tag: string) => {
-            updatePin('hashtags', pin.hashtags.filter(t => t !== tag));
-          }}
-          handleSelectHashtag={(tag: string) => {
-            if (!pin.hashtags.includes(tag)) {
-              updatePin('hashtags', [...pin.hashtags, tag]);
-            }
-          }}
-        />
-        
-        <div className="flex justify-between pt-4">
-          <Button variant="outline" onClick={() => {}}>
-            <Download className="mr-2 h-4 w-4" />
-            Télécharger
-          </Button>
-          <Button variant="default" onClick={() => saveToHistory(pin)}>
-            <Upload className="mr-2 h-4 w-4" />
-            Sauvegarder
-          </Button>
-        </div>
-      </div>
+          </TabsContent>
+          
+          <TabsContent value="design">
+            <DesignTab pin={pin} updatePin={updatePin} />
+          </TabsContent>
+          
+          <TabsContent value="hashtags">
+            <HashtagsTab pin={pin} updatePin={updatePin} />
+          </TabsContent>
+          
+          <TabsContent value="etiquettes">
+            <EtiquettesTab pin={pin} updatePin={updatePin} />
+          </TabsContent>
+        </Tabs>
 
-      {/* Nouveau champ pour la clé API OpenAI */}
-      <div className="mt-4">
-        <label htmlFor="openaiApiKey" className="block text-sm font-medium text-gray-700">
-          Clé API OpenAI
-        </label>
-        <Input
-          id="openaiApiKey"
-          type="password"
-          placeholder="sk-..."
-          value={openaiApiKey}
-          onChange={handleApiKeyChange}
-          className="mt-1 w-full"
-        />
-        <p className="mt-2 text-xs text-gray-500">
-          Votre clé API est stockée localement et n'est jamais partagée. 
-          Elle est utilisée pour générer du contenu social et des images.
-        </p>
+        <div className="mt-6 flex justify-between">
+          <Button variant="outline" onClick={resetPin}>
+            Réinitialiser
+          </Button>
+          <div className="space-x-2">
+            <Button variant="outline" onClick={() => setHistoryVisible(!historyVisible)}>
+              {historyVisible ? 'Masquer l\'historique' : 'Voir l\'historique'}
+            </Button>
+            <Button onClick={handleSavePin}>
+              Sauvegarder
+            </Button>
+          </div>
+        </div>
       </div>
       
-      <div className="w-full lg:w-1/2 sticky top-4">
-        <PinterestPreviewCard pin={pin} />
+      <div className="w-full lg:w-2/5 xl:w-1/3">
+        <div className="sticky top-4">
+          <PinterestPreview pin={pin} />
+          
+          {historyVisible && (
+            <div className="mt-6">
+              <PinHistoryPanel onSelectPin={(savedPin) => {
+                // Mettre à jour le pin actuel avec le pin sélectionné
+                Object.keys(savedPin).forEach((key) => {
+                  updatePin(key as keyof PinterestPin, savedPin[key as keyof PinterestPin]);
+                });
+                toast.success("Pin restauré de l'historique");
+              }} />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

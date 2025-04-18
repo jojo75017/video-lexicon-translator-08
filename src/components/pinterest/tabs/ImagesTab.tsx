@@ -44,6 +44,50 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
 }) => {
   const [failedImages, setFailedImages] = useState<number>(0);
   const [inconsistentImages, setInconsistentImages] = useState<number>(0);
+  const [filteredImages, setFilteredImages] = useState<PinterestImage[]>(images);
+  
+  // Filter images based on search query
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredImages(images);
+      return;
+    }
+    
+    const query = searchQuery.toLowerCase().trim();
+    const filtered = images.filter(img => {
+      const titleMatch = img.title.toLowerCase().includes(query);
+      const countryMatch = img.country && img.country.toLowerCase().includes(query);
+      const regionMatch = img.region && img.region.toLowerCase().includes(query);
+      
+      // Check for French regions
+      const isFrenchRegion = FRANCE_LOCATIONS.some(loc => 
+        loc.toLowerCase().includes(query)
+      );
+      
+      // Check for European countries
+      const isEuropeanCountry = EUROPE_LOCATIONS.some(loc => 
+        loc.toLowerCase().includes(query)
+      );
+      
+      // Check for worldwide locations
+      const isWorldLocation = WORLD_LOCATIONS.some(loc => 
+        loc.toLowerCase().includes(query)
+      );
+      
+      return titleMatch || countryMatch || regionMatch || 
+             (img.category === 'france' && isFrenchRegion) ||
+             (img.category === 'europe' && isEuropeanCountry) ||
+             (img.category === 'monde' && isWorldLocation);
+    });
+    
+    setFilteredImages(filtered);
+    
+    if (filtered.length === 0) {
+      console.log(`No images found for query: ${query}`);
+    } else {
+      console.log(`Found ${filtered.length} images for query: ${query}`);
+    }
+  }, [searchQuery, images]);
   
   // Vérifier les problèmes d'images
   useEffect(() => {
@@ -305,7 +349,7 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
         </div>
         
         <ImageGallery 
-          images={images} 
+          images={filteredImages.length > 0 ? filteredImages : images} 
           onSelectImage={(image) => {
             console.log("Image sélectionnée:", image);
             handleSelectImage(image);

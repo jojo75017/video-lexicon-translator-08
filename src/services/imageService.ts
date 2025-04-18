@@ -1,776 +1,189 @@
 
 import { PinterestImage } from '@/types/pinterest';
-import { 
-  FRANCE_LOCATIONS, 
-  EUROPE_LOCATIONS, 
-  WORLD_LOCATIONS,
-  RELIABLE_FALLBACK_IMAGES
-} from '@/types/pinterest';
-import { toast } from 'sonner';
+import { FRANCE_LOCATIONS, EUROPE_LOCATIONS, WORLD_LOCATIONS } from '@/types/pinterest';
 
-// Interface pour le résultat de la validation
-interface ImageValidationResult {
-  image: PinterestImage;
-  confidenceScore: number;
-  isConsistent: boolean;
-}
+// Fonction pour générer du contenu à partir d'une image
+export const generateContentFromImage = (image: PinterestImage): { title: string; description: string } => {
+  if (!image) {
+    return {
+      title: 'Image sans titre',
+      description: 'Aucune description disponible pour cette image.'
+    };
+  }
 
-// Fonction améliorée de validation et de filtrage des images
-export const validateAndFixImages = (images: PinterestImage[]): PinterestImage[] => {
-  if (!images || images.length === 0) return [];
+  // Déterminer la localisation principale
+  let location = '';
+  let locationType = '';
+  
+  if (image.country) {
+    location = image.country;
+    locationType = image.category === 'france' ? 'région' : 'pays';
+  } else if (image.region) {
+    location = image.region;
+    locationType = 'région';
+  } else if (image.category === 'france') {
+    location = 'France';
+    locationType = 'pays';
+  } else if (image.category === 'europe') {
+    location = 'Europe';
+    locationType = 'continent';
+  } else if (image.category === 'monde') {
+    location = 'monde';
+    locationType = 'destination';
+  }
+  
+  // Extraire des informations à partir du titre
+  const titleParts = image.title.split(/[-,]/);
+  let subject = titleParts.length > 1 ? titleParts[1].trim() : titleParts[0].trim();
+  
+  if (subject.toLowerCase().includes(location.toLowerCase())) {
+    // Éviter la répétition dans le titre
+    subject = subject.replace(new RegExp(location, 'i'), '').trim();
+  }
+  
+  // Générer un titre attractif
+  const titlePrefixes = [
+    `Découvrez ${location}`,
+    `Explorez ${location}`,
+    `Voyage à ${location}`,
+    `Visitez ${location}`,
+    `Les merveilles de ${location}`
+  ];
+  
+  const randomTitlePrefix = titlePrefixes[Math.floor(Math.random() * titlePrefixes.length)];
+  let title = subject ? `${randomTitlePrefix} et ses ${subject}` : randomTitlePrefix;
+  
+  // Nettoyer le titre
+  title = title.replace(/\s+/g, ' ').trim();
+  if (title.length > 60) {
+    title = title.substring(0, 57) + '...';
+  }
+  
+  // Générer une description détaillée
+  const descriptionIntros = [
+    `Partez à la découverte de ce magnifique ${locationType}`,
+    `Laissez-vous séduire par ce ${locationType} fascinant`,
+    `Une destination immanquable pour les amateurs de voyage`,
+    `Ce ${locationType} regorge de trésors à découvrir`,
+    `Voyagez au cœur de cette destination exceptionnelle`
+  ];
+  
+  const descriptionMiddles = [
+    `avec ses paysages à couper le souffle`,
+    `et sa culture riche et variée`,
+    `qui vous surprendra par sa diversité`,
+    `connu pour son patrimoine historique`,
+    `avec son atmosphère unique et authentique`
+  ];
+  
+  const descriptionEndings = [
+    `Une expérience inoubliable vous attend.`,
+    `Préparez-vous à être émerveillé.`,
+    `Idéal pour des vacances réussies.`,
+    `À découvrir absolument lors de votre prochain voyage.`,
+    `Une destination qui ne vous laissera pas indifférent.`
+  ];
+  
+  const randomIntro = descriptionIntros[Math.floor(Math.random() * descriptionIntros.length)];
+  const randomMiddle = descriptionMiddles[Math.floor(Math.random() * descriptionMiddles.length)];
+  const randomEnding = descriptionEndings[Math.floor(Math.random() * descriptionEndings.length)];
+  
+  let description = `${randomIntro} ${location}, ${randomMiddle}. ${randomEnding}`;
+  
+  // Assurer que la description n'est pas trop longue
+  if (description.length > 280) {
+    description = description.substring(0, 277) + '...';
+  }
+  
+  return {
+    title,
+    description
+  };
+};
 
-  // Filtrer et scorer les images
-  const validatedImages: ImageValidationResult[] = images
-    .filter(img => img.url && img.url.startsWith('http'))
-    .map(image => {
-      const validationResult = calculateImageConsistency(image);
-      return validationResult;
-    })
-    // Trier par score de confiance décroissant
-    .sort((a, b) => b.confidenceScore - a.confidenceScore)
-    // Ne garder que les images avec un score de confiance suffisant
-    .filter(result => result.confidenceScore > 0.5);
-
-  return validatedImages.map(result => {
-    // Corriger le titre si nécessaire
-    const correctedImage = ensureTitleMatchesLocation(result.image);
-    return correctedImage;
+// Fonction de recherche d'images par mot-clé
+export const searchImagesByKeyword = (
+  images: PinterestImage[],
+  keyword: string,
+  category: 'monde' | 'europe' | 'france' | 'all' = 'all'
+): PinterestImage[] => {
+  if (!keyword.trim()) {
+    return filterImagesByCategory(images, category);
+  }
+  
+  const searchTerms = keyword.toLowerCase().trim().split(/\s+/);
+  
+  return images.filter(image => {
+    // Si la catégorie est spécifiée, filtrer d'abord par catégorie
+    if (category !== 'all' && image.category !== category) {
+      return false;
+    }
+    
+    // Vérifier si l'image correspond à un des termes de recherche
+    return searchTerms.some(term => {
+      const titleMatch = image.title.toLowerCase().includes(term);
+      const countryMatch = image.country && image.country.toLowerCase().includes(term);
+      const regionMatch = image.region && image.region.toLowerCase().includes(term);
+      
+      // Vérifier les correspondances avec les listes de localisations
+      const isFrenchLocation = FRANCE_LOCATIONS.some(loc => loc.toLowerCase().includes(term));
+      const isEuropeanLocation = EUROPE_LOCATIONS.some(loc => loc.toLowerCase().includes(term));
+      const isWorldLocation = WORLD_LOCATIONS.some(loc => loc.toLowerCase().includes(term));
+      
+      return titleMatch || countryMatch || regionMatch || 
+             (image.category === 'france' && isFrenchLocation) ||
+             (image.category === 'europe' && isEuropeanLocation) ||
+             (image.category === 'monde' && isWorldLocation);
+    });
   });
 };
 
-// Fonction pour calculer la cohérence et le score de confiance
-const calculateImageConsistency = (image: PinterestImage): ImageValidationResult => {
-  let confidenceScore = 0;
-  const lowerTitle = image.title.toLowerCase();
-  const lowerTags = image.tags?.map(tag => tag.toLowerCase()) || [];
-
-  // Vérification de la catégorie
-  if (image.category) {
-    confidenceScore += 0.2;
-  }
-
-  // Vérification du pays/région
-  if (image.country) {
-    confidenceScore += 0.2;
-    if (lowerTitle.includes(image.country.toLowerCase())) {
-      confidenceScore += 0.2;
-    }
-  }
-
-  if (image.region) {
-    confidenceScore += 0.2;
-    if (lowerTitle.includes(image.region.toLowerCase())) {
-      confidenceScore += 0.2;
-    }
-  }
-
-  // Vérification des tags
-  const locationTags = [...FRANCE_LOCATIONS, ...EUROPE_LOCATIONS, ...WORLD_LOCATIONS];
-  const matchingLocationTags = lowerTags.filter(tag => 
-    locationTags.some(location => tag.includes(location))
-  );
-
-  if (matchingLocationTags.length > 0) {
-    confidenceScore += 0.2;
-  }
-
-  // Vérification des critères spécifiques par catégorie
-  switch (image.category) {
-    case 'france':
-      if (FRANCE_LOCATIONS.some(location => lowerTitle.includes(location))) {
-        confidenceScore += 0.2;
-      }
-      break;
-    case 'europe':
-      if (EUROPE_LOCATIONS.some(location => lowerTitle.includes(location))) {
-        confidenceScore += 0.2;
-      }
-      break;
-    case 'monde':
-      if (WORLD_LOCATIONS.some(location => lowerTitle.includes(location))) {
-        confidenceScore += 0.2;
-      }
-      break;
-  }
-
-  // Limiter le score entre 0 et 1
-  confidenceScore = Math.min(Math.max(confidenceScore, 0), 1);
-
-  return {
-    image,
-    confidenceScore,
-    isConsistent: confidenceScore > 0.5
-  };
-};
-
-// Fonction pour s'assurer que le titre correspond à la localisation
-const ensureTitleMatchesLocation = (image: PinterestImage): PinterestImage => {
-  let updatedTitle = image.title;
-
-  // Ajouter le pays/région au titre si absent
-  if (image.country && !updatedTitle.toLowerCase().includes(image.country.toLowerCase())) {
-    updatedTitle = `${image.country} - ${updatedTitle}`;
-  }
-
-  if (image.region && !updatedTitle.toLowerCase().includes(image.region.toLowerCase())) {
-    updatedTitle = `${image.region} - ${updatedTitle}`;
-  }
-
-  return {
-    ...image,
-    title: updatedTitle
-  };
-};
-
-// Fonction pour générer du contenu à partir d'une image (titre, description, tags)
-export const generateContentFromImage = (image: PinterestImage) => {
-  // Par défaut, on utilise le titre existant ou on crée un titre générique
-  let title = image.title || 'Magnifique destination';
-  let description = 'Explorez cette destination incroyable et découvrez ses merveilles.';
-  
-  // Extraire des informations du pays/région pour créer un contenu personnalisé
-  if (image.country) {
-    title = `Découvrez les merveilles de ${image.country}`;
-    
-    if (image.region) {
-      title = `Découvrez ${image.region} en ${image.country}`;
-      description = `Explorez la magnifique région de ${image.region} en ${image.country} avec ses paysages à couper le souffle, sa culture locale et sa gastronomie unique. Une destination incontournable pour votre prochain voyage.`;
-    } else {
-      description = `Explorez les beautés incontournables de ${image.country}, ses sites remarquables, sa culture riche et sa gastronomie délicieuse. Une destination qui saura vous charmer à chaque instant.`;
-    }
-  } else if (image.category) {
-    // Générer du contenu basé sur la catégorie
-    switch (image.category) {
-      case 'france':
-        title = "Découvrez les trésors de France";
-        description = "Explorez les merveilles de la France, entre patrimoine historique, gastronomie raffinée et paysages variés. Une expérience inoubliable à vivre absolument.";
-        break;
-      case 'europe':
-        title = "Aventure européenne à ne pas manquer";
-        description = "Partez à la découverte de l'Europe, son histoire millénaire, ses cultures diverses et ses paysages enchanteurs. Chaque pays vous offre une expérience unique.";
-        break;
-      case 'monde':
-        title = "Destination de rêve à explorer";
-        description = "Embarquez pour un voyage exceptionnel à travers le monde, à la découverte de paysages époustouflants et de cultures fascinantes. Des souvenirs impérissables vous attendent.";
-        break;
-    }
-  }
-  
-  return {
-    title: title,
-    description: description
-  };
-};
-
-// Nouvelles images variées pour les résultats simulés qui correspondent mieux aux localisations
-const DIVERSE_IMAGES = {
-  france: {
-    'paris': 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=2073&auto=format&fit=crop', // Paris
-    'marseille': 'https://images.unsplash.com/photo-1589519160732-576f165b9aad?q=80&w=2070&auto=format&fit=crop', // Marseille
-    'lyon': 'https://images.unsplash.com/photo-1618197109832-6feca3e0c3bc?q=80&w=2070&auto=format&fit=crop', // Lyon
-    'nice': 'https://images.unsplash.com/photo-1504719122466-9f967d4459c7?q=80&w=2070&auto=format&fit=crop', // Nice
-    'bordeaux': 'https://images.unsplash.com/photo-1560968950-be3315b4656c?q=80&w=2070&auto=format&fit=crop', // Bordeaux
-    'default': 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=2073&auto=format&fit=crop', // Image par défaut France
-  },
-  europe: {
-    'rome': 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?q=80&w=1996&auto=format&fit=crop', // Rome
-    'barcelone': 'https://images.unsplash.com/photo-1583422409516-2895a77efded?q=80&w=2070&auto=format&fit=crop', // Barcelone
-    'venise': 'https://images.unsplash.com/photo-1558033244-2fa755eb879d?q=80&w=1974&auto=format&fit=crop', // Venise
-    'santorini': 'https://images.unsplash.com/photo-1500380279785-371201be6a10?q=80&w=2069&auto=format&fit=crop', // Santorini
-    'londres': 'https://images.unsplash.com/photo-1565452344518-47faca79dc69?q=80&w=2035&auto=format&fit=crop', // Londres
-    'default': 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?q=80&w=1996&auto=format&fit=crop', // Image par défaut Europe
-  },
-  monde: {
-    'new york': 'https://images.unsplash.com/photo-1518391846015-55a9cc003b25?q=80&w=2070&auto=format&fit=crop', // New York
-    'tokyo': 'https://images.unsplash.com/photo-1480796927426-f609979314bd?q=80&w=2070&auto=format&fit=crop', // Tokyo
-    'dubai': 'https://images.unsplash.com/photo-1586041828039-b8d193d6d1dc?q=80&w=2036&auto=format&fit=crop', // Dubai
-    'sydney': 'https://images.unsplash.com/photo-1516306580123-e6e52b1b7b5f?q=80&w=2012&auto=format&fit=crop', // Sydney
-    'maroc': 'https://images.unsplash.com/photo-1539020140153-e839c3a2922f?q=80&w=2070&auto=format&fit=crop', // Maroc
-    'marrakech': 'https://images.unsplash.com/photo-1539020140153-e839c3a2922f?q=80&w=2070&auto=format&fit=crop', // Marrakech
-    'rio': 'https://images.unsplash.com/photo-1564662230624-73e317f08290?q=80&w=1974&auto=format&fit=crop', // Rio
-    'default': 'https://images.unsplash.com/photo-1518391846015-55a9cc003b25?q=80&w=2070&auto=format&fit=crop', // Image par défaut Monde
-  }
-};
-
-// Fonction pour obtenir l'URL d'image correspondant à une localisation
-const getImageUrlForLocation = (category: 'france' | 'europe' | 'monde', location: string): string => {
-  const lowerLocation = location.toLowerCase();
-  const categoryImages = DIVERSE_IMAGES[category];
-  
-  for (const [key, url] of Object.entries(categoryImages)) {
-    if (lowerLocation.includes(key.toLowerCase())) {
-      return url;
-    }
-  }
-  
-  return categoryImages.default;
-};
-
-// Recherche d'images sur Pixabay
-export const searchPixabayImages = async (query: string, category?: 'monde' | 'europe' | 'france' | 'all'): Promise<PinterestImage[]> => {
-  try {
-    // Simuler une recherche d'images pour l'exemple
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Déterminer quelle catégorie d'images utiliser
-    let imageCategory = category === 'all' 
-      ? (Math.random() > 0.6 ? 'france' : Math.random() > 0.5 ? 'europe' : 'monde') 
-      : (category as 'monde' | 'europe' | 'france');
-    
-    // Détection de la localisation dans la requête
-    const queryLower = query.toLowerCase();
-    let detectedLocation = '';
-    let country = '';
-    
-    // Détecter si la requête contient un lieu de France
-    if (FRANCE_LOCATIONS.some(loc => queryLower.includes(loc))) {
-      imageCategory = 'france';
-      detectedLocation = FRANCE_LOCATIONS.find(loc => queryLower.includes(loc)) || '';
-      country = 'France';
-    } 
-    // Détecter si la requête contient un lieu d'Europe
-    else if (EUROPE_LOCATIONS.some(loc => queryLower.includes(loc))) {
-      imageCategory = 'europe';
-      detectedLocation = EUROPE_LOCATIONS.find(loc => queryLower.includes(loc)) || '';
-      
-      // Déterminer le pays européen
-      if (detectedLocation.includes('rome') || detectedLocation.includes('venise')) {
-        country = 'Italie';
-      } else if (detectedLocation.includes('barcelone')) {
-        country = 'Espagne';
-      } else if (detectedLocation.includes('athènes')) {
-        country = 'Grèce';
-      } else {
-        country = ['Italie', 'Espagne', 'Grèce', 'Portugal', 'Allemagne'][Math.floor(Math.random() * 5)];
-      }
-    } 
-    // Détecter si la requête contient un lieu du monde
-    else if (WORLD_LOCATIONS.some(loc => queryLower.includes(loc))) {
-      imageCategory = 'monde';
-      detectedLocation = WORLD_LOCATIONS.find(loc => queryLower.includes(loc)) || '';
-      
-      // Déterminer le pays
-      if (detectedLocation.includes('new york') || detectedLocation.includes('chicago')) {
-        country = 'États-Unis';
-      } else if (detectedLocation.includes('tokyo')) {
-        country = 'Japon';
-      } else if (detectedLocation.includes('sydney')) {
-        country = 'Australie';
-      } else if (detectedLocation.includes('rio')) {
-        country = 'Brésil';
-      } else if (detectedLocation.includes('maroc') || detectedLocation.includes('marrakech')) {
-        country = 'Maroc';
-      } else {
-        country = ['États-Unis', 'Japon', 'Australie', 'Brésil', 'Maroc'][Math.floor(Math.random() * 5)];
-      }
-    }
-    
-    console.log(`Recherche pour "${query}" - Catégorie: ${imageCategory}, Localisation: ${detectedLocation}, Pays: ${country}`);
-    
-    // Générer des résultats variés
-    const results: PinterestImage[] = Array(10).fill(null).map((_, index) => {
-      // Si aucune localisation n'a été détectée, en choisir une en fonction de la catégorie
-      let location = detectedLocation;
-      if (!location) {
-        if (imageCategory === 'france') {
-          location = FRANCE_LOCATIONS[Math.floor(Math.random() * FRANCE_LOCATIONS.length)];
-          country = 'France';
-        } else if (imageCategory === 'europe') {
-          location = EUROPE_LOCATIONS[Math.floor(Math.random() * EUROPE_LOCATIONS.length)];
-          // Déterminer le pays européen si pas déjà défini
-          if (!country) {
-            if (location.includes('rome') || location.includes('venise')) {
-              country = 'Italie';
-            } else if (location.includes('barcelone')) {
-              country = 'Espagne';
-            } else {
-              country = ['Italie', 'Espagne', 'Grèce', 'Portugal', 'Allemagne'][Math.floor(Math.random() * 5)];
-            }
-          }
-        } else {
-          location = WORLD_LOCATIONS[Math.floor(Math.random() * WORLD_LOCATIONS.length)];
-          // Déterminer le pays mondial si pas déjà défini
-          if (!country) {
-            if (location.includes('new york')) {
-              country = 'États-Unis';
-            } else if (location.includes('tokyo')) {
-              country = 'Japon';
-            } else if (location.includes('maroc') || location.includes('marrakech')) {
-              country = 'Maroc';
-            } else {
-              country = ['États-Unis', 'Japon', 'Australie', 'Brésil', 'Maroc'][Math.floor(Math.random() * 5)];
-            }
-          }
-        }
-      }
-      
-      // Obtenir l'URL d'image appropriée pour cette localisation
-      const imageUrl = getImageUrlForLocation(imageCategory, location);
-      
-      return {
-        id: `pixabay-${index}-${Date.now()}`,
-        url: imageUrl,
-        title: `${country} - ${location.charAt(0).toUpperCase() + location.slice(1)} - ${query} ${index + 1}`,
-        category: imageCategory as 'monde' | 'europe' | 'france',
-        country: country,
-        region: imageCategory === 'france' ? location.charAt(0).toUpperCase() + location.slice(1) : undefined,
-        source: 'pixabay',
-        tags: [query, location, 'voyage', 'découverte', 'tourisme'].slice(0, 3 + Math.floor(Math.random() * 3)),
-        fallbackUrl: RELIABLE_FALLBACK_IMAGES.default
-      };
-    });
-    
-    return validateAndFixImages(results);
-  } catch (error) {
-    console.error("Erreur lors de la recherche d'images Pixabay:", error);
-    toast.error("Erreur lors de la recherche d'images Pixabay");
-    return [];
-  }
-};
-
-// Recherche d'images sur Unsplash avec même logique de correspondance améliorée
-export const searchUnsplashImages = async (query: string): Promise<PinterestImage[]> => {
-  try {
-    // Simuler une recherche d'images pour l'exemple
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Déterminer quelle catégorie d'images utiliser basée sur la requête
-    let imageCategory: 'france' | 'europe' | 'monde';
-    let detectedLocation = '';
-    let country = '';
-    
-    // Détection de la catégorie basée sur la requête
-    const queryLower = query.toLowerCase();
-    
-    if (FRANCE_LOCATIONS.some(loc => queryLower.includes(loc))) {
-      imageCategory = 'france';
-      detectedLocation = FRANCE_LOCATIONS.find(loc => queryLower.includes(loc)) || '';
-      country = 'France';
-    } else if (EUROPE_LOCATIONS.some(loc => queryLower.includes(loc))) {
-      imageCategory = 'europe';
-      detectedLocation = EUROPE_LOCATIONS.find(loc => queryLower.includes(loc)) || '';
-      
-      // Déterminer le pays européen
-      if (detectedLocation.includes('rome') || detectedLocation.includes('venise')) {
-        country = 'Italie';
-      } else if (detectedLocation.includes('barcelone')) {
-        country = 'Espagne';
-      } else if (detectedLocation.includes('athènes')) {
-        country = 'Grèce';
-      } else {
-        country = ['Italie', 'Espagne', 'Grèce', 'Portugal', 'Allemagne'][Math.floor(Math.random() * 5)];
-      }
-    } else if (WORLD_LOCATIONS.some(loc => queryLower.includes(loc))) {
-      imageCategory = 'monde';
-      detectedLocation = WORLD_LOCATIONS.find(loc => queryLower.includes(loc)) || '';
-      
-      // Déterminer le pays mondial
-      if (detectedLocation.includes('new york') || detectedLocation.includes('chicago')) {
-        country = 'États-Unis';
-      } else if (detectedLocation.includes('tokyo')) {
-        country = 'Japon';
-      } else if (detectedLocation.includes('sydney')) {
-        country = 'Australie';
-      } else if (detectedLocation.includes('rio')) {
-        country = 'Brésil';
-      } else if (detectedLocation.includes('maroc') || detectedLocation.includes('marrakech')) {
-        country = 'Maroc';
-      } else {
-        country = ['États-Unis', 'Japon', 'Australie', 'Brésil', 'Maroc'][Math.floor(Math.random() * 5)];
-      }
-    } else {
-      // Par défaut si aucune localisation n'est détectée
-      imageCategory = Math.random() > 0.6 ? 'france' : Math.random() > 0.5 ? 'europe' : 'monde';
-    }
-    
-    console.log(`Recherche Unsplash pour "${query}" - Catégorie: ${imageCategory}, Localisation: ${detectedLocation}, Pays: ${country}`);
-    
-    // Générer des résultats variés
-    const results: PinterestImage[] = Array(10).fill(null).map((_, index) => {
-      // Si aucune localisation n'a été détectée, en choisir une en fonction de la catégorie
-      let location = detectedLocation;
-      if (!location) {
-        if (imageCategory === 'france') {
-          location = FRANCE_LOCATIONS[Math.floor(Math.random() * FRANCE_LOCATIONS.length)];
-          country = 'France';
-        } else if (imageCategory === 'europe') {
-          location = EUROPE_LOCATIONS[Math.floor(Math.random() * EUROPE_LOCATIONS.length)];
-          // Déterminer le pays européen si pas déjà défini
-          if (!country) {
-            if (location.includes('rome') || location.includes('venise')) {
-              country = 'Italie';
-            } else if (location.includes('barcelone')) {
-              country = 'Espagne';
-            } else {
-              country = ['Italie', 'Espagne', 'Grèce', 'Portugal', 'Allemagne'][Math.floor(Math.random() * 5)];
-            }
-          }
-        } else {
-          location = WORLD_LOCATIONS[Math.floor(Math.random() * WORLD_LOCATIONS.length)];
-          // Déterminer le pays mondial si pas déjà défini
-          if (!country) {
-            if (location.includes('new york')) {
-              country = 'États-Unis';
-            } else if (location.includes('tokyo')) {
-              country = 'Japon';
-            } else if (location.includes('maroc') || location.includes('marrakech')) {
-              country = 'Maroc';
-            } else {
-              country = ['États-Unis', 'Japon', 'Australie', 'Brésil', 'Maroc'][Math.floor(Math.random() * 5)];
-            }
-          }
-        }
-      }
-      
-      // Obtenir l'URL d'image appropriée pour cette localisation
-      const imageUrl = getImageUrlForLocation(imageCategory, location);
-      
-      return {
-        id: `unsplash-${index}-${Date.now()}`,
-        url: imageUrl,
-        title: `${country} - ${location.charAt(0).toUpperCase() + location.slice(1)} - ${query} ${index + 1}`,
-        category: imageCategory,
-        country: country,
-        region: imageCategory === 'france' ? location.charAt(0).toUpperCase() + location.slice(1) : undefined,
-        source: 'unsplash',
-        tags: [query, location, 'travel', 'photography', 'voyage'].slice(0, 3 + Math.floor(Math.random() * 3)),
-        fallbackUrl: RELIABLE_FALLBACK_IMAGES.default
-      };
-    });
-    
-    return validateAndFixImages(results);
-  } catch (error) {
-    console.error("Erreur lors de la recherche d'images Unsplash:", error);
-    toast.error("Erreur lors de la recherche d'images Unsplash");
-    return [];
-  }
-};
-
-// Recherche d'images sur Freepik - mise à jour avec la même logique
-export const searchFreepikImages = async (query: string, category?: 'monde' | 'europe' | 'france' | 'all'): Promise<PinterestImage[]> => {
-  try {
-    // Simuler une recherche d'images pour l'exemple
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Même logique améliorée que pour Unsplash et Pixabay
-    
-    // Déterminer quelle catégorie d'images utiliser
-    let imageCategory = category === 'all' 
-      ? (Math.random() > 0.6 ? 'france' : Math.random() > 0.5 ? 'europe' : 'monde') 
-      : (category as 'monde' | 'europe' | 'france');
-    
-    // Détection de la localisation dans la requête
-    const queryLower = query.toLowerCase();
-    let detectedLocation = '';
-    let country = '';
-    
-    if (FRANCE_LOCATIONS.some(loc => queryLower.includes(loc))) {
-      imageCategory = 'france';
-      detectedLocation = FRANCE_LOCATIONS.find(loc => queryLower.includes(loc)) || '';
-      country = 'France';
-    } else if (EUROPE_LOCATIONS.some(loc => queryLower.includes(loc))) {
-      imageCategory = 'europe';
-      detectedLocation = EUROPE_LOCATIONS.find(loc => queryLower.includes(loc)) || '';
-      
-      // Déterminer le pays européen
-      if (detectedLocation.includes('rome') || detectedLocation.includes('venise')) {
-        country = 'Italie';
-      } else if (detectedLocation.includes('barcelone')) {
-        country = 'Espagne';
-      } else {
-        country = ['Italie', 'Espagne', 'Grèce', 'Portugal', 'Allemagne'][Math.floor(Math.random() * 5)];
-      }
-    } else if (WORLD_LOCATIONS.some(loc => queryLower.includes(loc))) {
-      imageCategory = 'monde';
-      detectedLocation = WORLD_LOCATIONS.find(loc => queryLower.includes(loc)) || '';
-      
-      // Déterminer le pays mondial
-      if (detectedLocation.includes('new york') || detectedLocation.includes('chicago')) {
-        country = 'États-Unis';
-      } else if (detectedLocation.includes('tokyo')) {
-        country = 'Japon';
-      } else if (detectedLocation.includes('sydney')) {
-        country = 'Australie';
-      } else if (detectedLocation.includes('rio')) {
-        country = 'Brésil';
-      } else if (detectedLocation.includes('maroc') || detectedLocation.includes('marrakech')) {
-        country = 'Maroc';
-      } else {
-        country = ['États-Unis', 'Japon', 'Australie', 'Brésil', 'Maroc'][Math.floor(Math.random() * 5)];
-      }
-    }
-    
-    console.log(`Recherche Freepik pour "${query}" - Catégorie: ${imageCategory}, Localisation: ${detectedLocation}, Pays: ${country}`);
-    
-    // Générer des résultats variés
-    const results: PinterestImage[] = Array(10).fill(null).map((_, index) => {
-      // Si aucune localisation n'a été détectée, en choisir une en fonction de la catégorie
-      let location = detectedLocation;
-      if (!location) {
-        if (imageCategory === 'france') {
-          location = FRANCE_LOCATIONS[Math.floor(Math.random() * FRANCE_LOCATIONS.length)];
-          country = 'France';
-        } else if (imageCategory === 'europe') {
-          location = EUROPE_LOCATIONS[Math.floor(Math.random() * EUROPE_LOCATIONS.length)];
-          // Déterminer le pays européen si pas déjà défini
-          if (!country) {
-            if (location.includes('rome') || location.includes('venise')) {
-              country = 'Italie';
-            } else if (location.includes('barcelone')) {
-              country = 'Espagne';
-            } else {
-              country = ['Italie', 'Espagne', 'Grèce', 'Portugal', 'Allemagne'][Math.floor(Math.random() * 5)];
-            }
-          }
-        } else {
-          location = WORLD_LOCATIONS[Math.floor(Math.random() * WORLD_LOCATIONS.length)];
-          // Déterminer le pays mondial si pas déjà défini
-          if (!country) {
-            if (location.includes('new york')) {
-              country = 'États-Unis';
-            } else if (location.includes('tokyo')) {
-              country = 'Japon';
-            } else if (location.includes('maroc') || location.includes('marrakech')) {
-              country = 'Maroc';
-            } else {
-              country = ['États-Unis', 'Japon', 'Australie', 'Brésil', 'Maroc'][Math.floor(Math.random() * 5)];
-            }
-          }
-        }
-      }
-      
-      // Obtenir l'URL d'image appropriée
-      const imageUrl = getImageUrlForLocation(imageCategory, location);
-      
-      return {
-        id: `freepik-${index}-${Date.now()}`,
-        url: imageUrl,
-        title: `${country} - ${location.charAt(0).toUpperCase() + location.slice(1)} - ${query} ${index + 1}`,
-        category: imageCategory,
-        country: country,
-        region: imageCategory === 'france' ? location.charAt(0).toUpperCase() + location.slice(1) : undefined,
-        source: 'freepik',
-        tags: [query, location, 'vector', 'illustration', 'design'].slice(0, 3 + Math.floor(Math.random() * 3)),
-        fallbackUrl: RELIABLE_FALLBACK_IMAGES.default
-      };
-    });
-    
-    return validateAndFixImages(results);
-  } catch (error) {
-    console.error("Erreur lors de la recherche d'images Freepik:", error);
-    toast.error("Erreur lors de la recherche d'images Freepik");
-    return [];
-  }
-};
-
-// Recherche d'images sur Pexels - mise à jour avec la même logique
-export const searchPexelsImages = async (query: string, category?: 'monde' | 'europe' | 'france' | 'all'): Promise<PinterestImage[]> => {
-  try {
-    
-    // Simuler une recherche d'images pour l'exemple
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Même logique que pour les autres fonctions de recherche
-    let imageCategory = category === 'all' 
-      ? (Math.random() > 0.6 ? 'france' : Math.random() > 0.5 ? 'europe' : 'monde') 
-      : (category as 'monde' | 'europe' | 'france');
-    
-    // Détection de la localisation dans la requête
-    const queryLower = query.toLowerCase();
-    let detectedLocation = '';
-    let country = '';
-    
-    if (FRANCE_LOCATIONS.some(loc => queryLower.includes(loc))) {
-      imageCategory = 'france';
-      detectedLocation = FRANCE_LOCATIONS.find(loc => queryLower.includes(loc)) || '';
-      country = 'France';
-    } else if (EUROPE_LOCATIONS.some(loc => queryLower.includes(loc))) {
-      imageCategory = 'europe';
-      detectedLocation = EUROPE_LOCATIONS.find(loc => queryLower.includes(loc)) || '';
-      
-      // Déterminer le pays européen
-      if (detectedLocation.includes('rome') || detectedLocation.includes('venise')) {
-        country = 'Italie';
-      } else if (detectedLocation.includes('barcelone')) {
-        country = 'Espagne';
-      } else {
-        country = ['Italie', 'Espagne', 'Grèce', 'Portugal', 'Allemagne'][Math.floor(Math.random() * 5)];
-      }
-    } else if (WORLD_LOCATIONS.some(loc => queryLower.includes(loc))) {
-      imageCategory = 'monde';
-      detectedLocation = WORLD_LOCATIONS.find(loc => queryLower.includes(loc)) || '';
-      
-      // Déterminer le pays mondial
-      if (detectedLocation.includes('new york') || detectedLocation.includes('chicago')) {
-        country = 'États-Unis';
-      } else if (detectedLocation.includes('tokyo')) {
-        country = 'Japon';
-      } else if (detectedLocation.includes('sydney')) {
-        country = 'Australie';
-      } else if (detectedLocation.includes('rio')) {
-        country = 'Brésil';
-      } else if (detectedLocation.includes('maroc') || detectedLocation.includes('marrakech')) {
-        country = 'Maroc';
-      } else {
-        country = ['États-Unis', 'Japon', 'Australie', 'Brésil', 'Maroc'][Math.floor(Math.random() * 5)];
-      }
-    }
-    
-    console.log(`Recherche Pexels pour "${query}" - Catégorie: ${imageCategory}, Localisation: ${detectedLocation}, Pays: ${country}`);
-    
-    // Générer des résultats variés
-    const results: PinterestImage[] = Array(10).fill(null).map((_, index) => {
-      // Si aucune localisation n'a été détectée, en choisir une en fonction de la catégorie
-      let location = detectedLocation;
-      if (!location) {
-        if (imageCategory === 'france') {
-          location = FRANCE_LOCATIONS[Math.floor(Math.random() * FRANCE_LOCATIONS.length)];
-          country = 'France';
-        } else if (imageCategory === 'europe') {
-          location = EUROPE_LOCATIONS[Math.floor(Math.random() * EUROPE_LOCATIONS.length)];
-          // Déterminer le pays européen si pas déjà défini
-          if (!country) {
-            if (location.includes('rome') || location.includes('venise')) {
-              country = 'Italie';
-            } else if (location.includes('barcelone')) {
-              country = 'Espagne';
-            } else {
-              country = ['Italie', 'Espagne', 'Grèce', 'Portugal', 'Allemagne'][Math.floor(Math.random() * 5)];
-            }
-          }
-        } else {
-          location = WORLD_LOCATIONS[Math.floor(Math.random() * WORLD_LOCATIONS.length)];
-          // Déterminer le pays mondial si pas déjà défini
-          if (!country) {
-            if (location.includes('new york')) {
-              country = 'États-Unis';
-            } else if (location.includes('tokyo')) {
-              country = 'Japon';
-            } else if (location.includes('maroc') || location.includes('marrakech')) {
-              country = 'Maroc';
-            } else {
-              country = ['États-Unis', 'Japon', 'Australie', 'Brésil', 'Maroc'][Math.floor(Math.random() * 5)];
-            }
-          }
-        }
-      }
-      
-      // Obtenir l'URL d'image appropriée
-      const imageUrl = getImageUrlForLocation(imageCategory, location);
-      
-      return {
-        id: `pexels-${index}-${Date.now()}`,
-        url: imageUrl,
-        title: `${country} - ${location.charAt(0).toUpperCase() + location.slice(1)} - ${query} ${index + 1}`,
-        category: imageCategory,
-        country: country,
-        region: imageCategory === 'france' ? location.charAt(0).toUpperCase() + location.slice(1) : undefined,
-        source: 'pexels',
-        tags: [query, location, 'photography', 'professional', 'voyage'].slice(0, 3 + Math.floor(Math.random() * 3)),
-        fallbackUrl: RELIABLE_FALLBACK_IMAGES.default
-      };
-    });
-    
-    return validateAndFixImages(results);
-  } catch (error) {
-    console.error("Erreur lors de la recherche d'images Pexels:", error);
-    toast.error("Erreur lors de la recherche d'images Pexels");
-    return [];
-  }
-};
-
-// Obtenir des images préréglées par catégorie - version améliorée
-export const getPresetImagesByCategory = async (category: 'monde' | 'europe' | 'france' | 'all'): Promise<PinterestImage[]> => {
-  try {
-    // Simuler le chargement des images préréglées
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    // Des images variées pour chaque catégorie
-    const images: PinterestImage[] = [];
-    
-    if (category === 'all' || category === 'france') {
-      // Utiliser les 5 premières locations françaises avec des images appropriées
-      FRANCE_LOCATIONS.slice(0, 5).forEach((location, index) => {
-        const imageUrl = getImageUrlForLocation('france', location);
-        images.push({
-          id: `preset-fr-${index}-${Date.now()}`,
-          url: imageUrl,
-          title: `France - ${location.charAt(0).toUpperCase() + location.slice(1)} - Vue magnifique`,
-          category: 'france',
-          country: 'France',
-          region: location.charAt(0).toUpperCase() + location.slice(1),
-          source: 'local',
-          tags: ['france', location, 'voyage', 'tourisme'],
-          verified: true
-        });
-      });
-    }
-    
-    if (category === 'all' || category === 'europe') {
-      // Utiliser les 5 premières locations européennes avec des images appropriées
-      EUROPE_LOCATIONS.slice(0, 5).forEach((location, index) => {
-        // Déterminer le pays en fonction de la localisation
-        let country = 'Europe';
-        if (location.includes('rome') || location.includes('venise') || location.includes('florence')) {
-          country = 'Italie';
-        } else if (location.includes('barcelone') || location.includes('madrid')) {
-          country = 'Espagne';
-        } else if (location.includes('athènes')) {
-          country = 'Grèce';
-        } else {
-          country = ['Italie', 'Espagne', 'Grèce', 'Portugal', 'Allemagne'][index % 5];
-        }
-        
-        const imageUrl = getImageUrlForLocation('europe', location);
-        images.push({
-          id: `preset-eu-${index}-${Date.now()}`,
-          url: imageUrl,
-          title: `${country} - ${location.charAt(0).toUpperCase() + location.slice(1)} - Découverte culturelle`,
-          category: 'europe',
-          country: country,
-          source: 'local',
-          tags: ['europe', location, 'voyage', 'culture'],
-          verified: true
-        });
-      });
-    }
-    
-    if (category === 'all' || category === 'monde') {
-      // Utiliser les 5 premières locations mondiales avec des images appropriées
-      WORLD_LOCATIONS.slice(0, 5).forEach((location, index) => {
-        // Déterminer le pays en fonction de la localisation
-        let country = 'International';
-        if (location.includes('new york') || location.includes('los angeles') || location.includes('chicago')) {
-          country = 'États-Unis';
-        } else if (location.includes('tokyo')) {
-          country = 'Japon';
-        } else if (location.includes('sydney')) {
-          country = 'Australie';
-        } else if (location.includes('rio')) {
-          country = 'Brésil';
-        } else if (location.includes('maroc') || location.includes('marrakech')) {
-          country = 'Maroc';
-        } else {
-          country = ['États-Unis', 'Japon', 'Australie', 'Brésil', 'Maroc'][index % 5];
-        }
-        
-        const imageUrl = getImageUrlForLocation('monde', location);
-        images.push({
-          id: `preset-world-${index}-${Date.now()}`,
-          url: imageUrl,
-          title: `${country} - ${location.charAt(0).toUpperCase() + location.slice(1)} - Aventure exotique`,
-          category: 'monde',
-          country: country,
-          source: 'local',
-          tags: ['monde', location, 'voyage', 'aventure', 'exotique']
-        });
-      });
-    }
-    
+// Fonction auxiliaire pour filtrer les images par catégorie
+export const filterImagesByCategory = (
+  images: PinterestImage[],
+  category: 'monde' | 'europe' | 'france' | 'all'
+): PinterestImage[] => {
+  if (category === 'all') {
     return images;
-  } catch (error) {
-    console.error("Erreur lors du chargement des images préréglées:", error);
-    toast.error("Erreur lors du chargement des images");
-    return [];
   }
+  
+  return images.filter(image => image.category === category);
+};
+
+// Helper pour extraire les tags pertinents d'une image
+export const extractTagsFromImage = (image: PinterestImage): string[] => {
+  const tags: string[] = [];
+  
+  // Ajouter le pays ou la région comme tag principal
+  if (image.country) {
+    tags.push(image.country.toLowerCase());
+  }
+  
+  if (image.region) {
+    tags.push(image.region.toLowerCase());
+  }
+  
+  // Ajouter la catégorie
+  tags.push(image.category);
+  
+  // Extraire des mots clés du titre
+  const titleWords = image.title.toLowerCase()
+    .replace(/[^\w\sà-ÿ]/g, ' ')
+    .split(/\s+/)
+    .filter(word => word.length > 3)
+    .filter(word => {
+      // Éviter les duplications avec le pays/région
+      return !(image.country && image.country.toLowerCase().includes(word)) && 
+             !(image.region && image.region.toLowerCase().includes(word));
+    });
+  
+  // Ajouter des mots clés uniques du titre
+  titleWords.forEach(word => {
+    if (!tags.includes(word)) {
+      tags.push(word);
+    }
+  });
+  
+  // Limiter le nombre de tags
+  return tags.slice(0, 10);
 };
