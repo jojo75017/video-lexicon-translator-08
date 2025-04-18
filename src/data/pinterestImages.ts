@@ -1,268 +1,199 @@
-import { PinterestDesign, PinterestImage } from '@/types/pinterest';
+export interface PinterestImage {
+  id: string;
+  src: string;
+  title: string;
+  tags: string[];
+}
+
+export interface PinterestDesign {
+  id: string;
+  name: string;
+  textColor: string;
+  primaryColor: string;
+  secondaryColor: string;
+  accentColor: string;
+  titleFont: string;
+  descriptionFont: string;
+  overlayStyle: 'none' | 'gradient' | 'solid' | 'frame';
+}
+
+export const pinterestDesigns: PinterestDesign[] = [
+  {
+    id: 'design1',
+    name: 'Élégant Moderne',
+    textColor: '#000000',
+    primaryColor: '#FFFFFF',
+    secondaryColor: '#F0F0F0',
+    accentColor: '#FF4081',
+    titleFont: 'Arial, sans-serif',
+    descriptionFont: 'Helvetica, sans-serif',
+    overlayStyle: 'none'
+  },
+  {
+    id: 'design2',
+    name: 'Naturel Chic',
+    textColor: '#FFFFFF',
+    primaryColor: '#4CAF50',
+    secondaryColor: '#388E3C',
+    accentColor: '#8BC34A',
+    titleFont: 'Georgia, serif',
+    descriptionFont: 'Verdana, sans-serif',
+    overlayStyle: 'gradient'
+  },
+  {
+    id: 'design3',
+    name: 'Minimaliste',
+    textColor: '#333333',
+    primaryColor: '#E0E0E0',
+    secondaryColor: '#BDBDBD',
+    accentColor: '#757575',
+    titleFont: 'Roboto, sans-serif',
+    descriptionFont: 'Open Sans, sans-serif',
+    overlayStyle: 'solid'
+  },
+  {
+    id: 'design4',
+    name: 'Vintage Retro',
+    textColor: '#FFFFFF',
+    primaryColor: '#795548',
+    secondaryColor: '#5D4037',
+    accentColor: '#A1887F',
+    titleFont: 'Times New Roman, serif',
+    descriptionFont: 'Courier New, monospace',
+    overlayStyle: 'frame'
+  },
+  {
+    id: 'design5',
+    name: 'Vibrant Artistique',
+    textColor: '#FFFFFF',
+    primaryColor: '#9C27B0',
+    secondaryColor: '#7B1FA2',
+    accentColor: '#E040FB',
+    titleFont: 'Impact, sans-serif',
+    descriptionFont: 'Comic Sans MS, cursive',
+    overlayStyle: 'gradient'
+  }
+];
 
 export const worldImages: PinterestImage[] = [
   {
-    id: 'world-1',
-    url: 'https://images.unsplash.com/photo-1486299267070-83823f5448dd?q=80&w=2071&auto=format&fit=crop',
-    title: 'Explorez le monde',
-    category: 'monde',
-    tags: ['voyage', 'monde', 'aventure'],
-    country: 'Global',
-    verified: true
+    id: 'world1',
+    src: 'https://images.pexels.com/photos/2387873/pexels-photo-2387873.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    title: 'Aventure au cœur de la forêt amazonienne',
+    tags: ['amazonie', 'forêt', 'nature', 'aventure']
   },
   {
-    id: 'world-2',
-    url: 'https://images.unsplash.com/photo-1506973035872-25bf1e9c138c?q=80&w=2073&auto=format&fit=crop',
-    title: 'Aventures autour du monde',
-    category: 'monde',
-    tags: ['voyage', 'monde', 'aventure'],
-    country: 'Global',
-    verified: true
+    id: 'world2',
+    src: 'https://images.pexels.com/photos/33045/lion-wild-africa-african.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    title: 'Safari inoubliable dans la savane africaine',
+    tags: ['safari', 'afrique', 'animaux', 'nature']
   },
   {
-    id: 'world-3',
-    url: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=2072&auto=format&fit=crop',
-    title: 'Destinations de rêve',
-    category: 'monde',
-    tags: ['voyage', 'monde', 'aventure'],
-    country: 'Global',
-    verified: true
+    id: 'world3',
+    src: 'https://images.pexels.com/photos/775201/pexels-photo-775201.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    title: 'Exploration des temples anciens de Kyoto, Japon',
+    tags: ['kyoto', 'japon', 'temples', 'culture']
   },
   {
-    id: 'world-4',
-    url: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=2071&auto=format&fit=crop',
-    title: 'Les plus beaux endroits',
-    category: 'monde',
-    tags: ['voyage', 'monde', 'aventure'],
-    country: 'Global',
-    verified: true
+    id: 'world4',
+    src: 'https://images.pexels.com/photos/1671325/pexels-photo-1671325.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    title: 'Randonnée spectaculaire dans les Andes, Pérou',
+    tags: ['andes', 'pérou', 'montagnes', 'randonnée']
   },
   {
-    id: 'world-5',
-    url: 'https://images.unsplash.com/photo-1476514524981-bb8f04e62e18?q=80&w=2070&auto=format&fit=crop',
-    title: 'Voyagez à travers le monde',
-    category: 'monde',
-    tags: ['voyage', 'monde', 'aventure'],
-    country: 'Global',
-    verified: true
-  },
+    id: 'world5',
+    src: 'https://images.pexels.com/photos/417252/pexels-photo-417252.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    title: 'Plongée dans la Grande Barrière de Corail, Australie',
+    tags: ['australie', 'corail', 'plongée', 'océan']
+  }
 ];
 
 export const europeImages: PinterestImage[] = [
   {
-    id: 'europe-1',
-    url: 'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?q=80&w=2070&auto=format&fit=crop',
-    title: 'Découvrez l\'Europe',
-    category: 'europe',
-    tags: ['voyage', 'europe', 'culture'],
-    country: 'Europe',
-    verified: true
+    id: 'europe1',
+    src: 'https://images.pexels.com/photos/730896/pexels-photo-730896.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    title: 'Romance et histoire à Rome, Italie',
+    tags: ['rome', 'italie', 'histoire', 'romance']
   },
   {
-    id: 'europe-2',
-    url: 'https://images.unsplash.com/photo-1518546305927-4d9b79dee37f?q=80&w=2070&auto=format&fit=crop',
-    title: 'Les joyaux de l\'Europe',
-    category: 'europe',
-    tags: ['voyage', 'europe', 'culture'],
-    country: 'Europe',
-    verified: true
+    id: 'europe2',
+    src: 'https://images.pexels.com/photos/1850619/pexels-photo-1850619.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    title: 'Découverte de la beauté sauvage de l\'Écosse',
+    tags: ['écosse', 'nature', 'paysages', 'châteaux']
   },
   {
-    id: 'europe-3',
-    url: 'https://images.unsplash.com/photo-1519046904884-53103b34b206?q=80&w=2070&auto=format&fit=crop',
-    title: 'Escapade européenne',
-    category: 'europe',
-    tags: ['voyage', 'europe', 'culture'],
-    country: 'Europe',
-    verified: true
+    id: 'europe3',
+    src: 'https://images.pexels.com/photos/1559181/pexels-photo-1559181.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    title: 'Exploration urbaine à Berlin, Allemagne',
+    tags: ['berlin', 'allemagne', 'urbain', 'culture']
   },
   {
-    id: 'europe-4',
-    url: 'https://images.unsplash.com/photo-1501127122-7cb56035ca5d?q=80&w=2070&auto=format&fit=crop',
-    title: 'L\'Europe à votre portée',
-    category: 'europe',
-    tags: ['voyage', 'europe', 'culture'],
-    country: 'Europe',
-    verified: true
+    id: 'europe4',
+    src: 'https://images.pexels.com/photos/699466/pexels-photo-699466.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    title: 'Aurores boréales en Islande',
+    tags: ['islande', 'aurores boréales', 'nature', 'hiver']
   },
   {
-    id: 'europe-5',
-    url: 'https://images.unsplash.com/photo-1470770841072-f978cf4aa3eb?q=80&w=2073&auto=format&fit=crop',
-    title: 'Un voyage inoubliable',
-    category: 'europe',
-    tags: ['voyage', 'europe', 'culture'],
-    country: 'Europe',
-    verified: true
-  },
+    id: 'europe5',
+    src: 'https://images.pexels.com/photos/372398/pexels-photo-372398.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    title: 'Charme et élégance à Paris, France',
+    tags: ['paris', 'france', 'romance', 'ville']
+  }
 ];
 
 export const franceImages: PinterestImage[] = [
   {
-    id: 'france-1',
-    url: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=2073&auto=format&fit=crop',
-    title: 'La beauté de la France',
-    category: 'france',
-    tags: ['voyage', 'france', 'paris'],
-    country: 'France',
-    region: 'Paris',
-    verified: true
+    id: 'france1',
+    src: 'https://images.pexels.com/photos/2246476/pexels-photo-2246476.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    title: 'Escapade ensoleillée sur la Côte d\'Azur',
+    tags: ['côte d\'azur', 'france', 'plage', 'soleil']
   },
   {
-    id: 'france-2',
-    url: 'https://images.unsplash.com/photo-1493571774187-8c99e25ca1c2?q=80&w=2074&auto=format&fit=crop',
-    title: 'Explorez la France',
-    category: 'france',
-    tags: ['voyage', 'france', 'paris'],
-    country: 'France',
-    region: 'Paris',
-    verified: true
+    id: 'france2',
+    src: 'https://images.pexels.com/photos/1462124/pexels-photo-1462124.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    title: 'Dégustation de vin dans les vignobles de Bordeaux',
+    tags: ['bordeaux', 'vin', 'vignobles', 'gastronomie']
   },
   {
-    id: 'france-3',
-    url: 'https://images.unsplash.com/photo-1471741907058-a93c49669a44?q=80&w=2070&auto=format&fit=crop',
-    title: 'La France authentique',
-    category: 'france',
-    tags: ['voyage', 'france', 'paris'],
-    country: 'France',
-    region: 'Paris',
-    verified: true
+    id: 'france3',
+    src: 'https://images.pexels.com/photos/34577/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    title: 'Exploration des châteaux de la Loire',
+    tags: ['châteaux de la loire', 'histoire', 'france', 'architecture']
   },
   {
-    id: 'france-4',
-    url: 'https://images.unsplash.com/photo-1505005426693-ec6d33e92829?q=80&w=2070&auto=format&fit=crop',
-    title: 'Les trésors de la France',
-    category: 'france',
-    tags: ['voyage', 'france', 'paris'],
-    country: 'France',
-    region: 'Paris',
-    verified: true
+    id: 'france4',
+    src: 'https://images.pexels.com/photos/672532/pexels-photo-672532.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    title: 'Randonnée dans les montagnes des Pyrénées',
+    tags: ['pyrénées', 'montagnes', 'randonnée', 'nature']
   },
   {
-    id: 'france-5',
-    url: 'https://images.unsplash.com/photo-1482822684348-e38998a4860c?q=80&w=2070&auto=format&fit=crop',
-    title: 'Un séjour en France',
-    category: 'france',
-    tags: ['voyage', 'france', 'paris'],
-    country: 'France',
-    region: 'Paris',
-    verified: true
-  },
-];
-
-export const allImages: PinterestImage[] = [...worldImages, ...europeImages, ...franceImages];
-
-export const pinterestDesigns: PinterestDesign[] = [
-  {
-    id: 'design-1',
-    name: 'Élégant',
-    primaryColor: '#E91E63',
-    secondaryColor: '#F8BBD0',
-    textColor: '#FFFFFF',
-    accentColor: '#000000',
-    overlayStyle: 'gradient',
-    titleFont: 'serif',
-    descriptionFont: 'sans-serif'
-  },
-  {
-    id: 'design-2',
-    name: 'Moderne',
-    primaryColor: '#3F51B5',
-    secondaryColor: '#C5CAE9',
-    textColor: '#FFFFFF',
-    accentColor: '#FFEB3B',
-    overlayStyle: 'solid',
-    titleFont: 'sans-serif',
-    descriptionFont: 'serif'
-  },
-  {
-    id: 'design-3',
-    name: 'Minimaliste',
-    primaryColor: '#607D8B',
-    secondaryColor: '#CFD8DC',
-    textColor: '#FFFFFF',
-    accentColor: '#A5D6A7',
-    overlayStyle: 'none',
-    titleFont: 'sans-serif',
-    descriptionFont: 'sans-serif'
-  },
-  {
-    id: 'design-4',
-    name: 'Classique',
-    primaryColor: '#795548',
-    secondaryColor: '#D7CCC8',
-    textColor: '#FFFFFF',
-    accentColor: '#90A4AE',
-    overlayStyle: 'frame',
-    titleFont: 'serif',
-    descriptionFont: 'serif'
-  },
-  {
-    id: 'design-5',
-    name: 'Vibrant',
-    primaryColor: '#009688',
-    secondaryColor: '#B2DFDB',
-    textColor: '#FFFFFF',
-    accentColor: '#FFC107',
-    overlayStyle: 'gradient',
-    titleFont: 'sans-serif',
-    descriptionFont: 'serif'
-  },
-  {
-    id: 'design-6',
-    name: 'Pastel',
-    primaryColor: '#9C27B0',
-    secondaryColor: '#E1BEE7',
-    textColor: '#FFFFFF',
-    accentColor: '#673AB7',
-    overlayStyle: 'solid',
-    titleFont: 'serif',
-    descriptionFont: 'sans-serif'
-  },
-  {
-    id: 'design-7',
-    name: 'Naturel',
-    primaryColor: '#4CAF50',
-    secondaryColor: '#C8E6C9',
-    textColor: '#FFFFFF',
-    accentColor: '#8BC34A',
-    overlayStyle: 'frame',
-    titleFont: 'sans-serif',
-    descriptionFont: 'serif'
-  },
-  {
-    id: 'design-8',
-    name: 'Sombre',
-    primaryColor: '#212121',
-    secondaryColor: '#616161',
-    textColor: '#FFFFFF',
-    accentColor: '#757575',
-    overlayStyle: 'none',
-    titleFont: 'serif',
-    descriptionFont: 'sans-serif'
-  },
-  {
-    id: 'design-9',
-    name: 'Créatif',
-    primaryColor: '#FF5722',
-    secondaryColor: '#FFCCBC',
-    textColor: '#FFFFFF',
-    accentColor: '#FF9800',
-    overlayStyle: 'gradient',
-    titleFont: 'sans-serif',
-    descriptionFont: 'serif'
+    id: 'france5',
+    src: 'https://images.pexels.com/photos/404280/pexels-photo-404280.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    title: 'Découverte de la culture bretonne en Bretagne',
+    tags: ['bretagne', 'culture bretonne', 'france', 'traditions']
   }
 ];
 
+export const allImages: PinterestImage[] = [
+  ...worldImages,
+  ...europeImages,
+  ...franceImages
+];
+
+// Ajout de plus d'options de Call to Action
 export const callToActions = [
   'Découvrir',
-  'Visiter',
   'En savoir plus',
   'Explorer',
-  'Réserver',
-  'Planifier',
-  'Voir les détails',
+  'Visiter',
+  'Télécharger',
+  'Réserver maintenant',
+  'Acheter',
+  'S\'inscrire',
   'Commencer',
-  'S\'inspirer',
-  'Regarder',
-  'Télécharger'
+  'Voir plus',
+  'Contacter',
+  'Lire l\'article',
+  'Obtenir l\'offre',
+  'Essayer gratuitement'
 ];

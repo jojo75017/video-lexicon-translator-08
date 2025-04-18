@@ -1,20 +1,13 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PinterestPin, PinterestImage } from '@/types/pinterest';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { UploadCloud } from 'lucide-react';
-import { toast } from 'sonner';
+import { Loader2, Search, Upload, Image as ImageIcon, FolderOpen } from 'lucide-react';
+import LocalImagesTab from './LocalImagesTab';
 
 interface ImagesTabProps {
   pin: PinterestPin;
@@ -47,114 +40,119 @@ const ImagesTab: React.FC<ImagesTabProps> = ({
   handleSelectImage,
   handleImageUpload
 }) => {
-  const handleCategoryChange = (category: 'monde' | 'europe' | 'france' | 'all') => {
-    setSelectedImageCategory(category);
-  };
-
+  const [activeImageTab, setActiveImageTab] = useState<string>('stock');
+  
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="search">Rechercher une image</Label>
-          <div className="flex gap-2">
-            <Input
-              type="search"
-              id="search"
-              placeholder="Rechercher..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <Button onClick={handleSearch} disabled={loading}>
-              {loading ? 'Recherche...' : 'Rechercher'}
-            </Button>
-          </div>
-        </div>
-
-        <div>
-          <Label>Catégorie</Label>
-          <RadioGroup defaultValue={selectedImageCategory} className="flex flex-col space-y-1.5" onValueChange={handleCategoryChange}>
-            <RadioGroupItem value="all" id="category-all" className="peer h-5 w-5 shrink-0 rounded-full border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground" />
-            <Label htmlFor="category-all" className="cursor-pointer peer-data-[state=checked]:text-primary">
-              Toutes les images
-            </Label>
-
-            <RadioGroupItem value="monde" id="category-monde" className="peer h-5 w-5 shrink-0 rounded-full border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground" />
-            <Label htmlFor="category-monde" className="cursor-pointer peer-data-[state=checked]:text-primary">
-              Monde
-            </Label>
-
-            <RadioGroupItem value="europe" id="category-europe" className="peer h-5 w-5 shrink-0 rounded-full border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground" />
-            <Label htmlFor="category-europe" className="cursor-pointer peer-data-[state=checked]:text-primary">
-              Europe
-            </Label>
-
-            <RadioGroupItem value="france" id="category-france" className="peer h-5 w-5 shrink-0 rounded-full border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground" />
-            <Label htmlFor="category-france" className="cursor-pointer peer-data-[state=checked]:text-primary">
-              France
-            </Label>
-          </RadioGroup>
-        </div>
-      </div>
-
-      <div>
-        <Label>Source de l'image</Label>
-        <Select value={imageSource} onValueChange={setImageSource}>
-          <SelectTrigger>
-            <SelectValue placeholder="Choisir une source" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="unsplash">Unsplash</SelectItem>
-            <SelectItem value="pixabay">Pixabay</SelectItem>
-            <SelectItem value="freepik">Freepik</SelectItem>
-            <SelectItem value="pexels">Pexels</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button variant="outline">
-            <UploadCloud className="mr-2 h-4 w-4" />
-            Téléverser une image
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Téléverser une image</DialogTitle>
-            <DialogDescription>
-              Téléversez votre propre image pour personnaliser votre Pin.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="picture" className="text-right">
-                Image
-              </Label>
-              <Input type="file" id="picture" className="col-span-3" onChange={handleImageUpload} />
+      <Tabs defaultValue="stock" value={activeImageTab} onValueChange={setActiveImageTab}>
+        <TabsList className="grid grid-cols-2">
+          <TabsTrigger value="stock">Images Stock</TabsTrigger>
+          <TabsTrigger value="local">Mes Images</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="stock" className="space-y-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1">
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Rechercher des images..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="flex-1"
+                />
+                <Button onClick={handleSearch} disabled={loading}>
+                  {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                </Button>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Select value={selectedImageCategory} onValueChange={(value: any) => setSelectedImageCategory(value)}>
+                <SelectTrigger className="w-[130px]">
+                  <SelectValue placeholder="Catégorie" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Toutes</SelectItem>
+                  <SelectItem value="monde">Monde</SelectItem>
+                  <SelectItem value="europe">Europe</SelectItem>
+                  <SelectItem value="france">France</SelectItem>
+                </SelectContent>
+              </Select>
+              
+              <Select value={imageSource} onValueChange={(value: any) => setImageSource(value)}>
+                <SelectTrigger className="w-[130px]">
+                  <SelectValue placeholder="Source" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="unsplash">Unsplash</SelectItem>
+                  <SelectItem value="pixabay">Pixabay</SelectItem>
+                  <SelectItem value="pexels">Pexels</SelectItem>
+                  <SelectItem value="freepik">Freepik</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
-
-      <div className="grid grid-cols-3 gap-4">
-        {images.map((image) => (
-          <div key={image.id} className="relative">
-            <img
-              src={image.url}
-              alt={image.title}
-              className="w-full h-32 object-cover rounded-md cursor-pointer hover:opacity-75 transition-opacity"
-              onClick={() => handleSelectImage(image)}
-              onError={(e) => {
-                e.currentTarget.src = image.fallbackUrl || '/placeholder.svg';
-                toast.error(`Erreur de chargement de l'image: ${image.title}`);
-              }}
+          
+          {images.length > 0 ? (
+            <ScrollArea className="h-[400px] w-full">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-1">
+                {images.map((image) => (
+                  <div
+                    key={image.id}
+                    className={`relative rounded-md overflow-hidden cursor-pointer transition-all 
+                      hover:opacity-90 border ${pin.image === image ? 'ring-2 ring-primary' : ''}`}
+                    onClick={() => handleSelectImage(image)}
+                  >
+                    <img
+                      src={image.src}
+                      alt={image.title}
+                      className="w-full h-48 object-cover"
+                    />
+                    <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 text-sm truncate">
+                      {image.title}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          ) : (
+            <div className="h-[300px] flex flex-col items-center justify-center text-gray-500">
+              <ImageIcon className="h-16 w-16 mb-2 opacity-20" />
+              <p>Aucune image trouvée</p>
+              <p className="text-sm">Essayez une autre recherche ou catégorie</p>
+            </div>
+          )}
+        </TabsContent>
+        
+        <TabsContent value="local">
+          <LocalImagesTab
+            pin={pin}
+            updatePin={updatePin}
+            handleImageUpload={handleImageUpload}
+          />
+        </TabsContent>
+      </Tabs>
+      
+      {pin.image && (
+        <div className="mt-4">
+          <h3 className="text-sm font-medium mb-2">Image sélectionnée :</h3>
+          <div className="relative group border rounded-md overflow-hidden h-[200px]">
+            <img 
+              src={pin.image.src} 
+              alt={pin.image.title}
+              className="w-full h-full object-cover"
             />
-            {pin.image?.id === image.id && (
-              <div className="absolute inset-0 bg-primary/20 border-2 border-primary rounded-md"></div>
-            )}
+            <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <Button 
+                variant="destructive" 
+                size="sm"
+                onClick={() => updatePin('image', null)}
+              >
+                Supprimer la sélection
+              </Button>
+            </div>
           </div>
-        ))}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

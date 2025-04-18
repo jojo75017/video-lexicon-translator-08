@@ -45,6 +45,11 @@ const LocalImagesTab: React.FC<LocalImagesTabProps> = ({
       reader.readAsDataURL(file);
     });
     
+    // Également utiliser la fonction handleImageUpload passée en prop
+    if (files[0]) {
+      handleImageUpload(e);
+    }
+    
     toast.success(`${files.length} image(s) chargée(s) depuis l'ordinateur`);
   };
   
