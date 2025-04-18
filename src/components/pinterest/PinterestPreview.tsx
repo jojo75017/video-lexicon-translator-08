@@ -32,22 +32,29 @@ const PinterestPreview: React.FC<PinterestPreviewProps> = ({ pin }) => {
           <div 
             className={`absolute inset-0 ${
               pin.design.overlayStyle === 'gradient' 
-                ? `bg-gradient-to-b from-transparent via-transparent to-${pin.design.primaryColor}/70` 
+                ? 'bg-gradient-to-b from-transparent via-transparent to-black/50' 
                 : pin.design.overlayStyle === 'solid' 
-                ? `bg-${pin.design.primaryColor}/30` 
+                ? 'bg-black/30' 
                 : ''
             }`}
+            style={{
+              background: pin.design.overlayStyle === 'gradient' 
+                ? `linear-gradient(to bottom, transparent, transparent, ${pin.design.primaryColor}70)` 
+                : pin.design.overlayStyle === 'solid' 
+                ? `${pin.design.primaryColor}30` 
+                : 'transparent'
+            }}
           />
         )}
         
         {pin.design.overlayStyle === 'frame' && (
-          <div className={`absolute inset-0 border-8 border-${pin.design.primaryColor}`} />
+          <div className="absolute inset-0 border-8 border-solid" style={{ borderColor: pin.design.primaryColor }} />
         )}
         
         {/* Call to action button - Now bigger */}
         <div className="absolute bottom-6 right-4 left-4">
           <button 
-            className={`w-full py-3 px-6 rounded-full text-base font-semibold shadow-lg`}
+            className="w-full py-3 px-6 rounded-full text-base font-semibold shadow-lg"
             style={{
               backgroundColor: pin.design.primaryColor,
               color: pin.design.textColor
@@ -60,7 +67,7 @@ const PinterestPreview: React.FC<PinterestPreviewProps> = ({ pin }) => {
       
       <div className="p-4">
         <h2 
-          className={`text-lg font-bold mb-2`}
+          className="text-lg font-bold mb-2"
           style={{
             fontFamily: pin.design.titleFont,
             color: pin.design.textColor
@@ -70,7 +77,7 @@ const PinterestPreview: React.FC<PinterestPreviewProps> = ({ pin }) => {
         </h2>
         
         <p 
-          className={`text-sm mb-3`}
+          className="text-sm mb-3"
           style={{
             fontFamily: pin.design.descriptionFont,
             color: pin.design.textColor
@@ -79,7 +86,7 @@ const PinterestPreview: React.FC<PinterestPreviewProps> = ({ pin }) => {
           {pin.description}
         </p>
         
-        {pin.showHashtags && pin.hashtags.length > 0 && (
+        {(pin.showHashtags === undefined || pin.showHashtags) && pin.hashtags.length > 0 && (
           <div className="flex flex-wrap gap-1 mb-3">
             {pin.hashtags.map((tag, index) => (
               <Badge 

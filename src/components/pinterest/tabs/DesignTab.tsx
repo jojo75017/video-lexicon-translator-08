@@ -44,6 +44,22 @@ const DesignTab: React.FC<DesignTabProps> = ({ pin, updatePin }) => {
     };
     updatePin('design', updatedDesign);
   };
+  
+  const handleAccentColorChange = (color: string) => {
+    const updatedDesign = {
+      ...pin.design,
+      accentColor: color
+    };
+    updatePin('design', updatedDesign);
+  };
+  
+  const handleOverlayStyleChange = (style: 'none' | 'gradient' | 'solid' | 'frame') => {
+    const updatedDesign = {
+      ...pin.design,
+      overlayStyle: style
+    };
+    updatePin('design', updatedDesign);
+  };
 
   return (
     <div className="space-y-4">
@@ -143,6 +159,44 @@ const DesignTab: React.FC<DesignTabProps> = ({ pin, updatePin }) => {
         </div>
         
         <div className="space-y-2">
+          <Label htmlFor="accent-color">Couleur d'accent (surlignage)</Label>
+          <div className="flex gap-2 items-center">
+            <Input 
+              id="accent-color"
+              type="color" 
+              value={pin.design.accentColor}
+              onChange={(e) => handleAccentColorChange(e.target.value)}
+              className="w-12 h-10 p-1 cursor-pointer"
+            />
+            <Input 
+              type="text" 
+              value={pin.design.accentColor}
+              onChange={(e) => handleAccentColorChange(e.target.value)}
+              className="flex-1"
+              placeholder="#0000FF"
+            />
+          </div>
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="overlay-style">Style de superposition</Label>
+          <Select 
+            value={pin.design.overlayStyle} 
+            onValueChange={(val) => handleOverlayStyleChange(val as 'none' | 'gradient' | 'solid' | 'frame')}
+          >
+            <SelectTrigger id="overlay-style">
+              <SelectValue placeholder="Choisir un style" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">Aucun</SelectItem>
+              <SelectItem value="gradient">Dégradé</SelectItem>
+              <SelectItem value="solid">Couleur pleine</SelectItem>
+              <SelectItem value="frame">Cadre</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <div className="space-y-2">
           <Label htmlFor="call-to-action">Appel à l'action</Label>
           <Select 
             value={pin.callToAction} 
@@ -163,13 +217,13 @@ const DesignTab: React.FC<DesignTabProps> = ({ pin, updatePin }) => {
       <div className="mt-4">
         <div className="flex items-center space-x-2">
           <Switch
-            id="button-on-image"
-            checked={true}
-            onCheckedChange={() => {}}
+            id="show-hashtags"
+            checked={pin.showHashtags === undefined ? true : pin.showHashtags}
+            onCheckedChange={(checked) => updatePin('showHashtags', checked)}
           />
-          <Label htmlFor="button-on-image">Afficher le bouton sur l'image</Label>
+          <Label htmlFor="show-hashtags">Afficher les hashtags sur l'image</Label>
         </div>
-        <p className="text-sm text-gray-500 mt-1">Le bouton d'appel à l'action sera affiché sur l'image</p>
+        <p className="text-sm text-gray-500 mt-1">Les hashtags seront affichés sur l'image</p>
       </div>
     </div>
   );

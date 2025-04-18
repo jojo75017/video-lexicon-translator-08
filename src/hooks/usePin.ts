@@ -95,12 +95,14 @@ export const usePin = (initialPin: PinterestPin) => {
     setPin({
       title: 'Découvrez les merveilles de Paris',
       description: 'Explorez la ville romantique avec ses monuments emblématiques, sa gastronomie raffinée et son atmosphère unique. Un voyage inoubliable vous attend.',
+      globalDescription: 'Découvrez Paris sous tous ses angles : monuments historiques, restaurants gastronomiques, boutiques de luxe et quartiers pittoresques. Une destination qui mêle histoire, culture et art de vivre à la française.',
       hashtags: ['paris', 'france', 'travel', 'eiffeltower'],
       tags: ['voyage', 'france', 'architecture', 'europe'],
       callToAction: 'Découvrir',
       image: null,
       uploadedImage: null,
-      design: pinterestDesigns[0]
+      design: pinterestDesigns[0],
+      showHashtags: true
     });
     toast.success('Pin réinitialisé');
   };
