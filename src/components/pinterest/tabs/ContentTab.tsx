@@ -1,169 +1,249 @@
 
-import React, { useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { Wand2 } from 'lucide-react';
+// Correction du type d'insertion du texte
+import React, { useState, useRef } from 'react';
 import { PinterestPin } from '@/types/pinterest';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
+import { Button } from '@/components/ui/button';
+import { Smile, Sparkles, ThumbsUp, Copy, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
 import EmojiPicker from './EmojiPicker';
 
 interface ContentTabProps {
   pin: PinterestPin;
   updatePin: (field: keyof PinterestPin, value: any) => void;
+  onGenerateContent?: () => void;
 }
 
-const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin }) => {
-  const [keyword, setKeyword] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [titleCursorPosition, setTitleCursorPosition] = useState<number | null>(null);
-  const [descriptionCursorPosition, setDescriptionCursorPosition] = useState<number | null>(null);
+const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin, onGenerateContent }) => {
+  const [autoEmojis, setAutoEmojis] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [emojiTarget, setEmojiTarget] = useState<'title' | 'description'>('title');
+  const titleRef = useRef<HTMLInputElement>(null);
+  const descriptionRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (value.length <= 60) {
-      updatePin('title', value);
-    } else {
-      updatePin('title', value.substring(0, 60));
-      toast.warning("Le titre a été tronqué à 60 caractères");
+  // Fonction pour insérer un emoji à la position du curseur
+  const insertEmoji = (emoji: string) => {
+    if (emojiTarget === 'title' && titleRef.current) {
+      const input = titleRef.current;
+      const start = input.selectionStart || input.value.length;
+      const end = input.selectionEnd || input.value.length;
+      const newValue = input.value.substring(0, start) + emoji + input.value.substring(end);
+      updatePin('title', newValue);
+      
+      // Rétablir la position du curseur après l'emoji
+      setTimeout(() => {
+        input.focus();
+        input.setSelectionRange(start + emoji.length, start + emoji.length);
+      }, 10);
+    } else if (emojiTarget === 'description' && descriptionRef.current) {
+      const textarea = descriptionRef.current;
+      const start = textarea.selectionStart || textarea.value.length;
+      const end = textarea.selectionEnd || textarea.value.length;
+      const newValue = textarea.value.substring(0, start) + emoji + textarea.value.substring(end);
+      updatePin('description', newValue);
+      
+      // Rétablir la position du curseur après l'emoji
+      setTimeout(() => {
+        textarea.focus();
+        textarea.setSelectionRange(start + emoji.length, start + emoji.length);
+      }, 10);
     }
   };
 
-  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value;
-    if (value.length <= 600) {
-      updatePin('description', value);
-    } else {
-      updatePin('description', value.substring(0, 600));
-      toast.warning("La description a été tronquée à environ 100 mots");
-    }
+  // Fonction pour activer le sélecteur d'emoji
+  const activateEmojiPicker = (target: 'title' | 'description') => {
+    setEmojiTarget(target);
+    setShowEmojiPicker(true);
   };
 
-  const insertEmoji = (emoji: string, field: 'title' | 'description') => {
-    const currentText = pin[field];
-    const position = field === 'title' ? titleCursorPosition : descriptionCursorPosition;
+  // Fonction pour ajouter des emojis automatiquement au titre
+  const addAutoEmojisToTitle = () => {
+    const titleText = pin.title;
+    let newTitle = titleText;
     
-    if (position !== null) {
-      const newText = currentText.slice(0, position) + emoji + currentText.slice(position);
-      updatePin(field, newText);
-    } else {
-      updatePin(field, currentText + emoji);
-    }
-  };
-
-  const handleTitleSelect = (e: React.SyntheticEvent<HTMLInputElement>) => {
-    const target = e.target as HTMLInputElement;
-    setTitleCursorPosition(target.selectionStart);
-  };
-
-  const handleDescriptionSelect = (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
-    const target = e.target as HTMLTextAreaElement;
-    setDescriptionCursorPosition(target.selectionStart);
-  };
-
-  const generateContentFromKeyword = () => {
-    if (!keyword.trim()) {
-      toast.error("Veuillez entrer un mot-clé");
-      return;
-    }
-
-    setIsGenerating(true);
+    // Vérifier si des emojis sont déjà présents
+    const hasEmojis = /[\p{Emoji}]/u.test(titleText);
     
-    try {
-      // Generate content directly from the keyword
-      const defaultTitle = `Découvrez les merveilles de ${keyword}`.substring(0, 60);
-      
-      // Description plus détaillée (environ 100 mots)
-      const defaultDescription = `Explorez ${keyword} et laissez-vous séduire par ses innombrables trésors. Des paysages à couper le souffle aux monuments historiques emblématiques, en passant par une gastronomie délicieuse et une culture fascinante. Chaque coin de rue révèle de nouvelles merveilles à découvrir et de précieux souvenirs à créer. Que vous soyez amateur d'architecture, passionné d'histoire, ou simplement en quête d'évasion, ${keyword} saura vous charmer par son authenticité et sa diversité. Préparez votre appareil photo et vos chaussures de marche, car cette destination regorge d'expériences inoubliables qui n'attendent que vous. Un voyage qui éveillera tous vos sens et vous laissera des souvenirs impérissables pour les années à venir.`;
-      
-      // Update title and description
-      updatePin('title', defaultTitle);
-      updatePin('description', defaultDescription);
-      
-      // Add keyword to hashtags if not already present
-      if (!pin.hashtags.includes(keyword.toLowerCase())) {
-        const updatedHashtags = [...pin.hashtags, keyword.toLowerCase()];
-        updatePin('hashtags', updatedHashtags);
+    if (!hasEmojis) {
+      if (titleText.toLowerCase().includes('paris') || titleText.toLowerCase().includes('france')) {
+        newTitle = `🇫🇷 ${titleText} 🗼`;
+      } else if (titleText.toLowerCase().includes('voyage') || titleText.toLowerCase().includes('découvr')) {
+        newTitle = `✈️ ${titleText} 🌍`;
+      } else if (titleText.toLowerCase().includes('recette') || titleText.toLowerCase().includes('cuisine')) {
+        newTitle = `👨‍🍳 ${titleText} 🍽️`;
+      } else if (titleText.toLowerCase().includes('jardin') || titleText.toLowerCase().includes('plante')) {
+        newTitle = `🌱 ${titleText} 🪴`;
+      } else if (titleText.toLowerCase().includes('maison') || titleText.toLowerCase().includes('déco')) {
+        newTitle = `🏠 ${titleText} ✨`;
+      } else {
+        newTitle = `✨ ${titleText} ✨`;
       }
       
-      toast.success("Contenu généré avec succès !");
-    } catch (error) {
-      console.error("Erreur lors de la génération de contenu:", error);
-      toast.error("Erreur lors de la génération du contenu");
-    } finally {
-      setIsGenerating(false);
+      updatePin('title', newTitle);
+      toast.success('Emojis ajoutés au titre');
+    } else {
+      toast.info('Le titre contient déjà des emojis');
+    }
+  };
+
+  // Fonction pour copier le texte dans le presse-papier
+  const copyToClipboard = (text: string, type: string) => {
+    navigator.clipboard.writeText(text)
+      .then(() => toast.success(`${type} copié dans le presse-papier`))
+      .catch(() => toast.error(`Erreur lors de la copie du ${type.toLowerCase()}`));
+  };
+
+  // Fonction générer du contenu est maintenant correctement typée
+  // Cette fonction peut être appelée depuis un composant parent ou définie ici
+  const generateContent = () => {
+    if (onGenerateContent) {
+      onGenerateContent();
+    } else {
+      // Génération simple de contenu par défaut
+      const newTitle = "Découvrez cette destination incroyable ✨";
+      const newDescription = "Un lieu magique qui vous transportera dans un univers de découvertes. Parfait pour les amoureux de voyage et d'aventure. #voyage #découverte #aventure";
+      
+      updatePin('title', newTitle);
+      updatePin('description', newDescription);
+      toast.success('Contenu généré avec succès');
     }
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-end gap-2 mb-4">
-        <div className="flex-1">
-          <Label htmlFor="keyword">Mot-clé pour générer du contenu</Label>
-          <Input
-            id="keyword"
-            placeholder="Ex: Paris, Italie, voyage..."
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-          />
-        </div>
-        <Button 
-          onClick={generateContentFromKeyword} 
-          disabled={isGenerating || !keyword.trim()}
-          className="flex items-center gap-2"
-        >
-          <Wand2 className="h-4 w-4" />
-          Générer
-        </Button>
-      </div>
-
-      <div>
-        <div className="flex items-center justify-between mb-1">
-          <Label htmlFor="title">
-            Titre (max 60 caractères)
-          </Label>
-          <span className={`text-xs ${pin.title.length > 55 ? 'text-orange-500' : ''}`}>
-            {pin.title.length}/60
-          </span>
-        </div>
-        <div className="flex gap-2 items-center">
-          <Input
-            id="title"
-            placeholder="Titre accrocheur"
-            value={pin.title}
-            onChange={handleTitleChange}
-            onSelect={handleTitleSelect}
-            className="flex-1"
-          />
-          <EmojiPicker onEmojiSelect={(emoji) => insertEmoji(emoji, 'title')} />
-        </div>
-      </div>
-      
-      <div>
-        <div className="flex items-center justify-between mb-1">
-          <Label htmlFor="description">
-            Description (environ 100 mots)
-          </Label>
-          <span className={`text-xs ${pin.description.length > 540 ? 'text-orange-500' : ''}`}>
-            {pin.description.length}/600
-          </span>
-        </div>
-        <div className="flex gap-2">
-          <Textarea
-            id="description"
-            placeholder="Décrivez votre épingle en détail (environ 100 mots)"
-            value={pin.description}
-            onChange={handleDescriptionChange}
-            onSelect={handleDescriptionSelect}
-            className="min-h-36 flex-1"
-            rows={6}
-          />
-          <div className="flex flex-col justify-start pt-2">
-            <EmojiPicker onEmojiSelect={(emoji) => insertEmoji(emoji, 'description')} />
+    <div className="flex flex-col space-y-4">
+      <div className="flex flex-col space-y-2">
+        <div className="flex justify-between items-center">
+          <Label htmlFor="title">Titre</Label>
+          <div className="flex items-center space-x-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => activateEmojiPicker('title')}
+              type="button"
+            >
+              <Smile className="h-4 w-4 mr-1" />
+              Emojis
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => copyToClipboard(pin.title, 'Titre')}
+              type="button"
+            >
+              <Copy className="h-4 w-4 mr-1" />
+              Copier
+            </Button>
           </div>
         </div>
+        <Input
+          id="title"
+          ref={titleRef}
+          value={pin.title}
+          onChange={(e) => updatePin('title', e.target.value)}
+          className="font-medium"
+          placeholder="Titre de votre pin"
+        />
       </div>
+      
+      <div className="flex flex-col space-y-2">
+        <div className="flex justify-between items-center">
+          <Label htmlFor="description">Description</Label>
+          <div className="flex items-center space-x-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => activateEmojiPicker('description')}
+              type="button"
+            >
+              <Smile className="h-4 w-4 mr-1" />
+              Emojis
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => copyToClipboard(pin.description, 'Description')}
+              type="button"
+            >
+              <Copy className="h-4 w-4 mr-1" />
+              Copier
+            </Button>
+          </div>
+        </div>
+        <Textarea
+          id="description"
+          ref={descriptionRef}
+          value={pin.description}
+          onChange={(e) => updatePin('description', e.target.value)}
+          rows={4}
+          className="resize-none"
+          placeholder="Description attrayante pour votre pin"
+        />
+      </div>
+      
+      <div className="flex flex-col space-y-2">
+        <Label htmlFor="callToAction">Call to Action</Label>
+        <Input
+          id="callToAction"
+          value={pin.callToAction}
+          onChange={(e) => updatePin('callToAction', e.target.value)}
+          placeholder="Ex: En savoir plus, Découvrir, Acheter..."
+        />
+      </div>
+      
+      <div className="flex items-center space-x-2">
+        <Switch
+          id="auto-emojis"
+          checked={autoEmojis}
+          onCheckedChange={setAutoEmojis}
+        />
+        <Label htmlFor="auto-emojis" className="cursor-pointer">Ajouter des emojis automatiquement</Label>
+        
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={addAutoEmojisToTitle}
+          className="ml-auto"
+          type="button"
+        >
+          <Sparkles className="h-4 w-4 mr-1" />
+          Ajouter emojis au titre
+        </Button>
+      </div>
+      
+      <Button 
+        variant="default" 
+        onClick={generateContent}
+        className="mt-4"
+        type="button"
+      >
+        <Wand2 className="h-4 w-4 mr-2" />
+        Générer du contenu
+      </Button>
+      
+      {/* Sélecteur d'emoji */}
+      {showEmojiPicker && (
+        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-4 shadow-lg max-w-md w-full">
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="font-medium">Choisir un emoji</h3>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setShowEmojiPicker(false)}
+              >
+                ✕
+              </Button>
+            </div>
+            <EmojiPicker onEmojiSelect={(emoji) => {
+              insertEmoji(emoji);
+              setShowEmojiPicker(false);
+            }} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
