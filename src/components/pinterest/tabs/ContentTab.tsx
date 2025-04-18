@@ -1,5 +1,3 @@
-
-// Correction du type d'insertion du texte
 import React, { useState, useRef } from 'react';
 import { PinterestPin } from '@/types/pinterest';
 import { Label } from '@/components/ui/label';
@@ -112,74 +110,103 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin, onGenerateConte
     }
   };
 
+  // Fonction pour valider la longueur du texte
+  const validateTextLength = (text: string, maxLength: number) => {
+    return text.slice(0, maxLength);
+  };
+
+  // Gestion du changement de titre avec limite
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newTitle = validateTextLength(e.target.value, 60);
+    updatePin('title', newTitle);
+  };
+
+  // Gestion du changement de description avec limite
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newDescription = validateTextLength(e.target.value, 400);
+    updatePin('description', newDescription);
+  };
+
   return (
     <div className="flex flex-col space-y-4">
       <div className="flex flex-col space-y-2">
         <div className="flex justify-between items-center">
           <Label htmlFor="title">Titre</Label>
-          <div className="flex items-center space-x-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => activateEmojiPicker('title')}
-              type="button"
-            >
-              <Smile className="h-4 w-4 mr-1" />
-              Emojis
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => copyToClipboard(pin.title, 'Titre')}
-              type="button"
-            >
-              <Copy className="h-4 w-4 mr-1" />
-              Copier
-            </Button>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-500">
+              {pin.title.length}/60
+            </span>
+            <div className="flex items-center space-x-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => activateEmojiPicker('title')}
+                type="button"
+              >
+                <Smile className="h-4 w-4 mr-1" />
+                Emojis
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => copyToClipboard(pin.title, 'Titre')}
+                type="button"
+              >
+                <Copy className="h-4 w-4 mr-1" />
+                Copier
+              </Button>
+            </div>
           </div>
         </div>
         <Input
           id="title"
           ref={titleRef}
           value={pin.title}
-          onChange={(e) => updatePin('title', e.target.value)}
+          onChange={handleTitleChange}
           className="font-medium"
-          placeholder="Titre de votre pin"
+          placeholder="Titre de votre pin (max 60 caractères)"
+          maxLength={60}
         />
       </div>
       
       <div className="flex flex-col space-y-2">
         <div className="flex justify-between items-center">
           <Label htmlFor="description">Description</Label>
-          <div className="flex items-center space-x-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => activateEmojiPicker('description')}
-              type="button"
-            >
-              <Smile className="h-4 w-4 mr-1" />
-              Emojis
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => copyToClipboard(pin.description, 'Description')}
-              type="button"
-            >
-              <Copy className="h-4 w-4 mr-1" />
-              Copier
-            </Button>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-500">
+              {pin.description.length}/400
+            </span>
+            <div className="flex items-center space-x-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => activateEmojiPicker('description')}
+                type="button"
+              >
+                <Smile className="h-4 w-4 mr-1" />
+                Emojis
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => copyToClipboard(pin.description, 'Description')}
+                type="button"
+              >
+                <Copy className="h-4 w-4 mr-1" />
+                Copier
+              </Button>
+            </div>
           </div>
         </div>
         <Textarea
           id="description"
           ref={descriptionRef}
           value={pin.description}
-          onChange={(e) => updatePin('description', e.target.value)}
+          onChange={handleDescriptionChange}
           rows={4}
           className="resize-none"
-          placeholder="Description attrayante pour votre pin"
+          placeholder="Description attrayante pour votre pin (max 400 caractères)"
+          maxLength={400}
         />
       </div>
       

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -14,6 +14,8 @@ import { usePinterestGenerator } from '@/hooks/usePinterestGenerator';
 import { pinterestDesigns } from '@/data/pinterestImages';
 import { useSocialContent } from '@/hooks/useSocialContent';
 import { Wand } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 
 const initialPin = {
   title: 'Découvrez les merveilles de Paris',
@@ -28,6 +30,8 @@ const initialPin = {
 };
 
 const PinterestGenerator: React.FC = () => {
+  const [openAIKey, setOpenAIKey] = useState(localStorage.getItem('openAIKey') || '');
+  
   const {
     pin,
     updatePin,
@@ -57,9 +61,28 @@ const PinterestGenerator: React.FC = () => {
 
   const { generateSocialContent } = useSocialContent({ updatePin, setActiveTab });
 
+  const handleSaveOpenAIKey = () => {
+    localStorage.setItem('openAIKey', openAIKey);
+    toast.success('Clé OpenAI sauvegardée');
+  };
+
   return (
     <div className="flex flex-col lg:flex-row gap-6">
       <div className="w-full lg:w-3/5 xl:w-2/3">
+        <div className="mb-6 p-4 border rounded-lg bg-white shadow-sm">
+          <Label htmlFor="openai-key">Clé API OpenAI</Label>
+          <div className="flex gap-2 mt-2">
+            <Input
+              id="openai-key"
+              type="password"
+              value={openAIKey}
+              onChange={(e) => setOpenAIKey(e.target.value)}
+              placeholder="sk-..."
+            />
+            <Button onClick={handleSaveOpenAIKey}>Sauvegarder</Button>
+          </div>
+        </div>
+
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="flex justify-between items-center mb-4">
             <TabsList className="grid grid-cols-5">
