@@ -1,3 +1,4 @@
+
 // Fonction pour vérifier si un URL est valide
 export const isValidUrl = (urlString: string): boolean => {
   try {
@@ -90,7 +91,7 @@ export const getTabIdFromPath = (path: string): string => {
     '/signature': 'signature',
     '/local-business': 'local-business',
     '/translation': 'translation',
-    '/pinterest': 'pinterest'
+    '/pinterest': 'pinterest'  // Ajout du chemin pour Pinterest
   };
   
   return pathToTabMap[cleanPath] || 'hierarchy';

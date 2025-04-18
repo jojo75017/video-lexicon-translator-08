@@ -66,10 +66,11 @@ const MainTabList: React.FC<MainTabListProps> = ({
   const handleTabClick = (tabId: string, path: string) => {
     onTabChange(tabId);
     navigate(path);
+    console.log(`Navigation vers l'onglet principal: ${tabId}, chemin: ${path}`);
   };
 
   return (
-    <div className="flex rounded-lg bg-white shadow-sm mb-4 overflow-hidden">
+    <nav className="flex rounded-lg bg-white shadow-sm mb-4 overflow-hidden" aria-label="Navigation principale">
       {mainTabs.map(tab => (
         <button
           key={tab.id}
@@ -80,11 +81,13 @@ const MainTabList: React.FC<MainTabListProps> = ({
           }`}
           data-main-tab={tab.id}
           onClick={() => handleTabClick(tab.id, tab.path || getMainTabPath(tab.id))}
+          aria-current={isTabActive(tab.id) ? "page" : undefined}
+          aria-label={`Accéder à la section ${tab.label}`}
         >
           {tab.label}
         </button>
       ))}
-    </div>
+    </nav>
   );
 };
 

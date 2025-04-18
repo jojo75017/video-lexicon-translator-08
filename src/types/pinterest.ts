@@ -12,6 +12,10 @@ export interface PinterestImage {
   uploadedAt?: string;
   authorName?: string;
   authorUrl?: string;
+  // Ajout des propriétés manquantes
+  category?: string;
+  country?: string;
+  region?: string;
 }
 
 export interface PinterestPin {
@@ -26,3 +30,8 @@ export interface PinterestPin {
   design: any;
   showHashtags: boolean;
 }
+
+// Constantes pour les emplacements géographiques
+export const FRANCE_LOCATIONS = ['Paris', 'Lyon', 'Marseille', 'Bordeaux', 'Nice', 'Toulouse', 'Strasbourg'];
+export const EUROPE_LOCATIONS = ['Londres', 'Berlin', 'Madrid', 'Rome', 'Amsterdam', 'Barcelone', 'Vienne'];
+export const WORLD_LOCATIONS = ['New York', 'Tokyo', 'Sydney', 'Bangkok', 'Rio de Janeiro', 'Dubaï', 'Toronto'];

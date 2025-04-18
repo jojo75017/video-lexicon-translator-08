@@ -67,30 +67,6 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
     navigate(path);
   };
 
-  // Content for badge and icon shared between the versions of link and tab
-  const TabContent = () => (
-    <div 
-      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md relative group transition-all duration-200 hover:bg-white ${
-        id === 'quora' ? 'bg-[#b92b27]/10' : 
-        id === 'signature' ? 'bg-blue-100' :
-        id === 'local-business' ? 'bg-indigo-100' :
-        highlighted ? 'bg-purple-100' : ''
-      }`}
-    >
-      <span className="absolute -top-1 -right-1 transform translate-x-1/2 -translate-y-1/2 z-10">
-        {isNew && (
-          <Badge variant="default" className="text-[10px] py-0 px-1.5 h-auto bg-[#b92b27] text-white">
-            Nouveau
-          </Badge>
-        )}
-      </span>
-      {icon}
-      <span className="font-medium text-sm">{label}</span>
-      
-      <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 rounded-md transition-opacity"></span>
-    </div>
-  );
-
   return (
     <TooltipProvider>
       <Tooltip>
@@ -101,8 +77,28 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
             data-value={id}
             data-tab-id={id}
             onClick={handleClick}
+            aria-label={`Accéder à ${label}`}
           >
-            <TabContent />
+            <div 
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md relative group transition-all duration-200 hover:bg-white ${
+                id === 'quora' ? 'bg-[#b92b27]/10' : 
+                id === 'signature' ? 'bg-blue-100' :
+                id === 'local-business' ? 'bg-indigo-100' :
+                highlighted ? 'bg-purple-100' : ''
+              }`}
+            >
+              <span className="absolute -top-1 -right-1 transform translate-x-1/2 -translate-y-1/2 z-10">
+                {isNew && (
+                  <Badge variant="default" className="text-[10px] py-0 px-1.5 h-auto bg-[#b92b27] text-white">
+                    Nouveau
+                  </Badge>
+                )}
+              </span>
+              <span className="text-gray-700">{icon}</span>
+              <span className="font-medium text-sm">{label}</span>
+              
+              <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 rounded-md transition-opacity"></span>
+            </div>
           </a>
         </TooltipTrigger>
         <TooltipContent>
