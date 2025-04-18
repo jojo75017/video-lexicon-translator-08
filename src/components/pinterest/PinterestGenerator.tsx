@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -80,7 +79,7 @@ const PinterestGenerator: React.FC = () => {
             />
           </div>
           
-          {/* Tabs Content */}
+          
           <TabsContent value="content">
             <ContentTab pin={pin} updatePin={updatePin} />
           </TabsContent>
@@ -112,6 +111,7 @@ const PinterestGenerator: React.FC = () => {
               pin={pin}
               customHashtag={customHashtag}
               setCustomHashtag={setCustomHashtag}
+              updatePin={updatePin}
             />
           </TabsContent>
           
@@ -120,7 +120,7 @@ const PinterestGenerator: React.FC = () => {
           </TabsContent>
         </Tabs>
 
-        {/* Additional controls */}
+        
         <div className="mt-6 space-y-4">
           <div className="flex justify-between">
             <Button variant="outline" onClick={resetPin}>
@@ -135,6 +135,7 @@ const PinterestGenerator: React.FC = () => {
           </div>
         </div>
       </div>
+      
       
       <div className="w-full lg:w-2/5 xl:w-1/3">
         <div className="sticky top-4">
@@ -160,4 +161,3 @@ const PinterestGenerator: React.FC = () => {
 };
 
 export default PinterestGenerator;
-

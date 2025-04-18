@@ -8,7 +8,6 @@ interface PinterestPreviewProps {
 }
 
 const PinterestPreview: React.FC<PinterestPreviewProps> = ({ pin }) => {
-  // Obtenir la source de l'image
   const getImageSource = () => {
     if (pin.uploadedImage) return pin.uploadedImage;
     if (pin.image?.url) return pin.image.url;
@@ -29,7 +28,6 @@ const PinterestPreview: React.FC<PinterestPreviewProps> = ({ pin }) => {
           />
         </div>
         
-        {/* Overlay avec le design sélectionné */}
         {pin.design.overlayStyle !== 'none' && (
           <div 
             className={`absolute inset-0 ${
@@ -42,15 +40,18 @@ const PinterestPreview: React.FC<PinterestPreviewProps> = ({ pin }) => {
           />
         )}
         
-        {/* Frame style */}
         {pin.design.overlayStyle === 'frame' && (
           <div className={`absolute inset-0 border-8 border-${pin.design.primaryColor}`} />
         )}
         
-        {/* Call to action sur l'image */}
-        <div className="absolute bottom-4 right-4 left-4">
+        {/* Call to action button - Now bigger */}
+        <div className="absolute bottom-6 right-4 left-4">
           <button 
-            className={`w-full py-2 px-4 rounded-full bg-${pin.design.primaryColor} text-white font-medium text-sm shadow-lg`}
+            className={`w-full py-3 px-6 rounded-full text-base font-semibold shadow-lg`}
+            style={{
+              backgroundColor: pin.design.primaryColor,
+              color: pin.design.textColor
+            }}
           >
             {pin.callToAction}
           </button>
@@ -59,24 +60,37 @@ const PinterestPreview: React.FC<PinterestPreviewProps> = ({ pin }) => {
       
       <div className="p-4">
         <h2 
-          className={`text-lg font-bold mb-2 font-${pin.design.titleFont} text-${pin.design.textColor}`}
+          className={`text-lg font-bold mb-2`}
+          style={{
+            fontFamily: pin.design.titleFont,
+            color: pin.design.textColor
+          }}
         >
           {pin.title}
         </h2>
         
         <p 
-          className={`text-sm mb-3 font-${pin.design.descriptionFont} text-${pin.design.textColor}`}
+          className={`text-sm mb-3`}
+          style={{
+            fontFamily: pin.design.descriptionFont,
+            color: pin.design.textColor
+          }}
         >
           {pin.description}
         </p>
         
-        {pin.showHashtags && (
+        {pin.showHashtags && pin.hashtags.length > 0 && (
           <div className="flex flex-wrap gap-1 mb-3">
             {pin.hashtags.map((tag, index) => (
               <Badge 
                 key={index} 
                 variant="outline" 
-                className={`text-xs bg-${pin.design.secondaryColor}/20 text-${pin.design.accentColor} border-${pin.design.secondaryColor}`}
+                style={{
+                  backgroundColor: `${pin.design.secondaryColor}20`,
+                  color: pin.design.accentColor,
+                  borderColor: pin.design.secondaryColor
+                }}
+                className="text-xs"
               >
                 #{tag}
               </Badge>
