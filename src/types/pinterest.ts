@@ -1,4 +1,3 @@
-
 export interface PinterestImage {
   id: string;
   url: string;
@@ -33,6 +32,7 @@ export interface PinterestPin {
   image: PinterestImage | null;
   uploadedImage: string | null;
   design: PinterestDesign;
+  showHashtags?: boolean; // New optional property
 }
 
 export interface PixabayResponse {

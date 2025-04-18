@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { PinterestPin } from '@/types/pinterest';
 import { Badge } from '@/components/ui/badge';
@@ -61,17 +60,19 @@ const PinterestPreview: React.FC<PinterestPreviewProps> = ({ pin }) => {
           {pin.description}
         </p>
         
-        <div className="flex flex-wrap gap-1 mb-3">
-          {pin.hashtags.map((tag, index) => (
-            <Badge 
-              key={index} 
-              variant="outline" 
-              className={`text-xs bg-${pin.design.secondaryColor}/20 text-${pin.design.accentColor} border-${pin.design.secondaryColor}`}
-            >
-              #{tag}
-            </Badge>
-          ))}
-        </div>
+        {pin.showHashtags && (
+          <div className="flex flex-wrap gap-1 mb-3">
+            {pin.hashtags.map((tag, index) => (
+              <Badge 
+                key={index} 
+                variant="outline" 
+                className={`text-xs bg-${pin.design.secondaryColor}/20 text-${pin.design.accentColor} border-${pin.design.secondaryColor}`}
+              >
+                #{tag}
+              </Badge>
+            ))}
+          </div>
+        )}
         
         <button 
           className={`w-full py-2 px-4 rounded-full bg-${pin.design.primaryColor} text-white font-medium text-sm`}

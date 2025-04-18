@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { PinterestPin } from '@/types/pinterest';
 import { Heart, MessageCircle, Bookmark, MoreHorizontal, Share, Map, Calendar } from 'lucide-react';
@@ -89,7 +88,6 @@ const InstagramPreview: React.FC<InstagramPreviewProps> = ({ pin }) => {
         />
       </div>
 
-      {/* Actions */}
       <div className="p-3">
         <div className="flex justify-between mb-2">
           <div className="flex space-x-4">
@@ -100,21 +98,20 @@ const InstagramPreview: React.FC<InstagramPreviewProps> = ({ pin }) => {
           <Bookmark className="h-6 w-6" />
         </div>
 
-        {/* Likes */}
         <div className="font-semibold text-sm mb-1">{likes} likes</div>
 
-        {/* Légende */}
         <div className="text-sm">
           <span className="font-semibold mr-1">{getAccountName()}</span>
           {truncateText(pin.description, 125)}
         </div>
 
         {/* Hashtags */}
-        <div className="text-sm text-blue-900 mt-1">
-          {pin.hashtags.map(tag => `#${tag}`).join(' ')}
-        </div>
+        {pin.showHashtags && (
+          <div className="text-sm text-blue-900 mt-1">
+            {pin.hashtags.map(tag => `#${tag}`).join(' ')}
+          </div>
+        )}
 
-        {/* Date */}
         <div className="text-xs text-gray-500 mt-1 flex items-center">
           <Calendar className="h-3 w-3 mr-1" />
           <span>Il y a {hours} heure{hours > 1 ? 's' : ''}</span>

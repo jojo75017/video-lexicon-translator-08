@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -17,6 +16,8 @@ import { PinterestPin, PinterestImage } from '@/types/pinterest';
 import { pinterestDesigns, worldImages, europeImages, franceImages, allImages } from '@/data/pinterestImages';
 import { searchImagesByKeyword, filterImagesByCategory } from '@/services/imageService';
 import { Undo, Redo, Facebook, Instagram } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 
 const initialPin: PinterestPin = {
   title: 'Découvrez les merveilles de Paris',
@@ -26,7 +27,8 @@ const initialPin: PinterestPin = {
   callToAction: 'Découvrir',
   image: null,
   uploadedImage: null,
-  design: pinterestDesigns[0]
+  design: pinterestDesigns[0],
+  showHashtags: true
 };
 
 const PinterestGenerator: React.FC = () => {
@@ -209,6 +211,14 @@ const PinterestGenerator: React.FC = () => {
           </TabsContent>
           
           <TabsContent value="hashtags">
+            <div className="mb-4 flex items-center justify-between">
+              <Label htmlFor="show-hashtags">Afficher les hashtags dans l'aperçu</Label>
+              <Switch
+                id="show-hashtags"
+                checked={pin.showHashtags}
+                onCheckedChange={(checked) => updatePin('showHashtags', checked)}
+              />
+            </div>
             <HashtagsTab 
               pin={pin}
               customHashtag={customHashtag}
