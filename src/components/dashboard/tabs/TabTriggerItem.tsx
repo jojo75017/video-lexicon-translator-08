@@ -56,6 +56,7 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
   const handleClick = (e: React.MouseEvent) => {
     // Prevent default Link behavior so we can handle navigation ourselves
     e.preventDefault();
+    e.stopPropagation();
     
     // Call the onClick handler if provided
     if (onClick) {
@@ -66,23 +67,37 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
     const path = getPath();
     console.log(`Navigation vers: ${path}`);
     
-    // Force display of the correct section after a short delay
+    // Force to show the correct section after a short delay
     navigate(path);
     
-    // Forcer l'affichage de la section appropriée
+    // Forcer l'affichage de la section appropriée avec un délai pour permettre au DOM de se mettre à jour
     setTimeout(() => {
       const sectionId = id;
-      const section = document.querySelector(`[data-section="${sectionId}"]`);
-      if (section) {
-        console.log(`Affichage forcé de la section: ${sectionId}`);
-        document.querySelectorAll('[data-section]').forEach(el => {
-          (el as HTMLElement).style.display = 'none';
-        });
-        (section as HTMLElement).style.display = 'block';
+      
+      // Rechercher la section avec plusieurs méthodes
+      const sectionByDataAttr = document.querySelector(`[data-section="${sectionId}"]`);
+      const sectionById = document.getElementById(sectionId);
+      const sectionByTabContent = document.querySelector(`[data-tab-content="${sectionId}"]`);
+      
+      // Masquer d'abord toutes les sections
+      document.querySelectorAll('[data-section]').forEach(el => {
+        (el as HTMLElement).style.display = 'none';
+      });
+      
+      // Afficher la section trouvée, quelle que soit la méthode de recherche
+      if (sectionByDataAttr) {
+        console.log(`Affichage forcé de la section par data-section: ${sectionId}`);
+        (sectionByDataAttr as HTMLElement).style.display = 'block';
+      } else if (sectionById) {
+        console.log(`Affichage forcé de la section par id: ${sectionId}`);
+        sectionById.style.display = 'block';
+      } else if (sectionByTabContent) {
+        console.log(`Affichage forcé de la section par data-tab-content: ${sectionId}`);
+        (sectionByTabContent as HTMLElement).style.display = 'block';
       } else {
         console.log(`Section non trouvée: ${sectionId}`);
       }
-    }, 100);
+    }, 300);
   };
 
   return (

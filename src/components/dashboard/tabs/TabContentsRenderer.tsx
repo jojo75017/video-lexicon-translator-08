@@ -10,6 +10,7 @@ import { CrawlForm } from "@/components/CrawlForm";
 import { useSiteAnalyzer } from "@/hooks/useSiteAnalyzer";
 import { Navigate, Link } from "react-router-dom";
 import PinterestGenerator from '@/components/pinterest/PinterestGenerator';
+import { activateSection } from '@/utils/navigationHelpers';
 
 interface TabContentsRendererProps {
   contentTabs: any[];
@@ -27,32 +28,11 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
     if (firstLoad.current) {
       firstLoad.current = false;
       setTimeout(() => {
-        // Activer la section appropriée en utilisant différentes stratégies de sélection
-        document.querySelectorAll(`[data-section="${activeTab}"]`).forEach(el => {
-          (el as HTMLElement).style.display = 'block';
-          console.log(`Section activée par data-section: ${activeTab}`);
-        });
-        
-        document.querySelectorAll(`[data-tab-content="${activeTab}"]`).forEach(el => {
-          (el as HTMLElement).style.display = 'block';
-          console.log(`Section activée par data-tab-content: ${activeTab}`);
-        });
-        
-        document.querySelectorAll(`[id="${activeTab}"]`).forEach(el => {
-          (el as HTMLElement).style.display = 'block';
-          console.log(`Section activée par id: ${activeTab}`);
-        });
-        
-        // Force l'affichage si root est l'onglet actif (page d'accueil)
-        if (activeTab === 'hierarchy' || activeTab === 'root') {
-          document.querySelectorAll(`[data-section="hierarchy"]`).forEach(el => {
-            (el as HTMLElement).style.display = 'block';
-            console.log(`Section hierarchy forcée visible`);
-          });
-        }
-      }, 500);
+        // Activer la section appropriée
+        activateSection(activeTab);
+      }, 800);
     }
-  }, [activeTab]);
+  }, []);
 
   useEffect(() => {
     console.log(`TabContentsRenderer: Active tab changed to ${activeTab}`);
@@ -60,25 +40,9 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
     
     // Mise à jour de l'affichage quand l'onglet actif change
     setTimeout(() => {
-      // Masquer tous les onglets d'abord
-      document.querySelectorAll('[data-section]').forEach(el => {
-        (el as HTMLElement).style.display = 'none';
-      });
-      
-      // Afficher l'onglet actif
-      document.querySelectorAll(`[data-section="${activeTab}"]`).forEach(el => {
-        (el as HTMLElement).style.display = 'block';
-        console.log(`Section activée: ${activeTab}`);
-      });
-      
-      // Forcer l'affichage de hierarchy si c'est la page d'accueil
-      if (activeTab === 'hierarchy' || activeTab === 'root' || window.location.pathname === '/') {
-        document.querySelectorAll(`[data-section="hierarchy"]`).forEach(el => {
-          (el as HTMLElement).style.display = 'block';
-          console.log(`Section hierarchy affichée car page d'accueil`);
-        });
-      }
-    }, 300);
+      // Activer la section
+      activateSection(activeTab);
+    }, 500);
   }, [activeTab, seoAnalysis]);
 
   // Si aucun onglet n'est trouvé

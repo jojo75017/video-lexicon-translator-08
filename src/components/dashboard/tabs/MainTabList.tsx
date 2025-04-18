@@ -66,7 +66,7 @@ const MainTabList: React.FC<MainTabListProps> = ({
   const handleTabClick = (tabId: string, path: string) => {
     console.log(`Clic sur onglet principal: ${tabId}, chemin: ${path}`);
     
-    // Activer l'onglet
+    // Activer l'onglet et naviguer vers la bonne page
     onTabChange(tabId);
     
     // Naviguer vers la bonne page
@@ -80,6 +80,12 @@ const MainTabList: React.FC<MainTabListProps> = ({
         const hierarchySection = document.querySelector('[data-section="hierarchy"]');
         if (hierarchySection) {
           (hierarchySection as HTMLElement).style.display = 'block';
+        }
+        
+        // Forcer également l'affichage de l'élément avec l'ID hierarchy
+        const hierarchyElement = document.getElementById('hierarchy');
+        if (hierarchyElement) {
+          hierarchyElement.style.display = 'block';
         }
       }
     }, 500);

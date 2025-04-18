@@ -16,31 +16,31 @@ const TabNavigation = () => {
   
   const location = useLocation();
 
-  // Activer l'onglet courant
+  // Activer l'onglet courant avec un délai plus important
   useEffect(() => {
     if (activeTab) {
       console.log('Tentative d\'activation de section:', activeTab);
       setTimeout(() => {
         activateSection(activeTab);
         console.log('TabNavigation activation retardée de section:', activeTab);
-      }, 600); // Délai augmenté pour s'assurer que le DOM est prêt
+      }, 1000); // Délai augmenté pour s'assurer que le DOM est prêt
     }
   }, [activeTab]);
 
-  // Gérer les changements d'URL pour la navigation
+  // Gérer les changements d'URL pour la navigation avec un délai plus important
   useEffect(() => {
     const hash = location.hash.replace('#', '');
     if (hash) {
       setTimeout(() => {
         console.log(`Hash détecté dans l'URL: ${hash}, activation de la section`);
         activateSection(hash);
-      }, 600); // Délai augmenté également ici
+      }, 1000); // Délai augmenté également ici
     } else {
       // Si pas de hash, activer l'onglet basé sur le chemin
       setTimeout(() => {
         console.log(`Pas de hash, activation de l'onglet basé sur le chemin:`, activeTab);
         activateSection(activeTab);
-      }, 600);
+      }, 1000);
     }
   }, [location, activeTab]);
 

@@ -1,6 +1,8 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import TabTriggerItem from './TabTriggerItem';
+import { activateSection } from '@/utils/navigationHelpers';
 
 interface SubTabListProps {
   tabs: any[];
@@ -20,6 +22,12 @@ const SubTabList: React.FC<SubTabListProps> = ({ tabs, activeTab, onTabChange })
     
     // Otherwise navigate internally
     onTabChange(tabId);
+    
+    // Utiliser la fonction activateSection avec un délai pour s'assurer
+    // que le DOM a eu le temps de se mettre à jour
+    setTimeout(() => {
+      activateSection(tabId);
+    }, 300);
   };
 
   return (
