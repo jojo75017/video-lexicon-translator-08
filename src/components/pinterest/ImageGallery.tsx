@@ -1,184 +1,148 @@
-
-import React, { useState } from 'react';
-import { PinterestImage } from '@/types/pinterest';
-import { Globe, Map, ExternalLink, ImageOff, Info, AlertTriangle } from 'lucide-react';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Badge } from '@/components/ui/badge';
-import { Tooltip, TooltipProvider, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Slider } from "@/components/ui/slider"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
+import { Textarea } from "@/components/ui/textarea"
+import { Badge } from "@/components/ui/badge"
+import { Copy, CheckCircle2, AlertCircle } from "lucide-react";
+import { toast } from "sonner";
 
 interface ImageGalleryProps {
-  images: PinterestImage[];
-  onSelectImage: (image: PinterestImage) => void;
-  selectedImage: PinterestImage | null;
+  generatedImages: string[];
+  selectedTitle: string;
+  selectedDescription: string;
+  selectedHashtags: string;
+  selectedGeoRegion: string;
+  onTitleChange: (title: string) => void;
+  onDescriptionChange: (description: string) => void;
+  onHashtagsChange: (hashtags: string) => void;
+  onGeoRegionChange: (geoRegion: string) => void;
 }
 
-const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onSelectImage, selectedImage }) => {
-  const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
-  
-  const handleImageError = (imageId: string, imageUrl: string) => {
-    console.error("Erreur de chargement d'image:", imageUrl);
-    setFailedImages(prev => {
-      const newSet = new Set(prev);
-      newSet.add(imageId);
-      return newSet;
-    });
-  };
-  
-  // Vérification améliorée de la cohérence entre le titre et la catégorie/pays/région
-  const checkTitleConsistency = (image: PinterestImage): boolean => {
-    if (!image.title || !image.category) return true;
-    
-    const lowerTitle = image.title.toLowerCase();
-    
-    // Vérifier si le pays est mentionné dans le titre
-    if (image.country) {
-      return lowerTitle.includes(image.country.toLowerCase());
-    }
-    
-    // Vérifier si la région est mentionnée dans le titre pour les images de France
-    if (image.category === 'france' && image.region) {
-      return lowerTitle.includes(image.region.toLowerCase());
-    }
-    
-    // Vérifier si la catégorie est cohérente avec le titre
-    const frenchCities = ['paris', 'marseille', 'lyon', 'nice', 'toulouse', 'strasbourg', 'bordeaux'];
-    const europeanCities = ['rome', 'berlin', 'barcelone', 'madrid', 'lisbonne', 'athènes', 'amsterdam', 'londres'];
-    
-    if (image.category === 'france' && 
-        frenchCities.some(city => lowerTitle.includes(city))) {
-      return true;
-    }
-    
-    if (image.category === 'europe' && 
-        europeanCities.some(city => lowerTitle.includes(city))) {
-      return true;
-    }
-    
-    return false;
-  };
+const ImageGallery: React.FC<ImageGalleryProps> = ({ 
+  generatedImages, 
+  selectedTitle, 
+  selectedDescription, 
+  selectedHashtags,
+  selectedGeoRegion,
+  onTitleChange, 
+  onDescriptionChange, 
+  onHashtagsChange,
+  onGeoRegionChange
+}) => {
+  const [copiedStates, setCopiedStates] = useState<boolean[]>(generatedImages.map(() => false));
 
-  // Utiliser une image de secours fiable en cas d'erreur
-  const getBackupImageUrl = (category: 'monde' | 'europe' | 'france') => {
-    const backupImages = {
-      'monde': 'https://images.unsplash.com/photo-1486299267070-83823f5448dd?q=80&w=2071&auto=format&fit=crop',
-      'europe': 'https://images.unsplash.com/photo-1467269204594-9661b134dd2b?q=80&w=2070&auto=format&fit=crop',
-      'france': 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=2073&auto=format&fit=crop'
-    };
-    
-    return backupImages[category] || backupImages['monde'];
-  };
-  
+  const handleCopyToClipboard = useCallback((text: string, index: number) => {
+    navigator.clipboard.writeText(text)
+      .then(() => {
+        const newCopiedStates = [...copiedStates];
+        newCopiedStates[index] = true;
+        setCopiedStates(newCopiedStates);
+        toast.success("Copié dans le presse-papier !");
+
+        setTimeout(() => {
+          const resetCopiedStates = [...copiedStates];
+          resetCopiedStates[index] = false;
+          setCopiedStates(resetCopiedStates);
+        }, 3000);
+      })
+      .catch(err => {
+        console.error('Erreur lors de la copie: ', err);
+        toast.error("Erreur lors de la copie");
+      });
+  }, [copiedStates]);
+
+  useEffect(() => {
+    setCopiedStates(generatedImages.map(() => false));
+  }, [generatedImages]);
+
   return (
-    <div className="border rounded-md">
-      <ScrollArea className="h-[700px] w-full p-2">
-        {images.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 gap-3">
-            {images.map((image, index) => {
-              const isInconsistent = !checkTitleConsistency(image);
-              const imageId = `${image.id || `image-${index}`}-${index}`;
-              return (
-              <div 
-                key={imageId}
-                className={`relative rounded-md overflow-hidden cursor-pointer transition-all 
-                  hover:opacity-90 group border ${isInconsistent ? 'border-red-300' : ''} 
-                  ${selectedImage?.id === image.id ? 'ring-2 ring-primary' : ''}`}
-                onClick={() => onSelectImage(image)}
-              >
-                {!failedImages.has(imageId) ? (
-                  <img 
-                    src={image.url} 
-                    alt={image.title || 'Image sans titre'}
-                    className="w-full h-44 object-cover"
-                    onError={() => handleImageError(imageId, image.url)}
-                    loading="lazy"
-                  />
-                ) : (
-                  <img 
-                    src={getBackupImageUrl(image.category)}
-                    alt={image.title || 'Image de remplacement'}
-                    className="w-full h-44 object-cover"
-                  />
-                )}
-                
-                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all p-2 flex flex-col justify-between">
-                  <div className="flex items-center justify-between">
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Badge variant="outline" className={`bg-white bg-opacity-75 text-xs ${isInconsistent ? 'border-red-500' : ''}`}>
-                            {image.category === 'monde' ? (
-                              <Globe className="h-3 w-3 mr-1" />
-                            ) : image.category === 'france' ? (
-                              <Map className="h-3 w-3 mr-1" />
-                            ) : (
-                              <Globe className="h-3 w-3 mr-1" />
-                            )}
-                            {image.country || image.region || image.category}
-                          </Badge>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p className="text-xs">
-                            {image.category === 'monde' ? 'Pays du monde' : 
-                             image.category === 'europe' ? 'Pays d\'Europe' : 
-                             image.category === 'france' ? 'Régions de France' : 'Catégorie'}
-                          </p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                    
-                    <div className="flex space-x-1">
-                      {!checkTitleConsistency(image) && (
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Badge variant="destructive" className="text-xs">
-                                <AlertTriangle className="h-3 w-3" />
-                              </Badge>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p className="text-xs">Le titre ne correspond pas à la localisation indiquée!</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      )}
-                      
-                      {image.source && (
-                        <Badge 
-                          variant={
-                            image.source === 'pixabay' ? 'default' : 
-                            image.source === 'unsplash' ? 'secondary' :
-                            image.source === 'freepik' ? 'destructive' :
-                            image.source === 'pexels' ? 'outline' : 'outline'
-                          } 
-                          className="text-xs"
-                        >
-                          {image.source === 'pixabay' ? 'Pixabay' : 
-                           image.source === 'unsplash' ? 'Unsplash' :
-                           image.source === 'freepik' ? 'Freepik' :
-                           image.source === 'pexels' ? 'Pexels' : 'Local'}
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                  <div className="invisible group-hover:visible">
-                    <p className={`text-xs ${isInconsistent ? 'bg-red-500' : 'bg-black bg-opacity-60'} text-white p-1 rounded`}>
-                      {image.title || 'Sans titre'}
-                    </p>
-                  </div>
-                </div>
-                
-                {isInconsistent && (
-                  <div className="absolute inset-0 border-2 border-red-500 pointer-events-none"></div>
-                )}
-              </div>
-            )})}
-          </div>
-        ) : (
-          <div className="h-32 flex items-center justify-center text-gray-500">
-            Aucune image correspondant à votre recherche
-          </div>
-        )}
-      </ScrollArea>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {generatedImages.map((image, index) => (
+        <Card key={index} className="bg-white shadow-md rounded-lg overflow-hidden">
+          <CardHeader className="p-4">
+            <CardTitle className="text-lg font-semibold text-gray-800">Image #{index + 1}</CardTitle>
+            <CardDescription className="text-sm text-gray-500">Visuel optimisé pour Pinterest</CardDescription>
+          </CardHeader>
+
+          <CardContent className="p-4">
+            <img src={image} alt={`Generated Image ${index + 1}`} className="w-full h-auto rounded-md mb-3" />
+            <div className="mb-3">
+              <Label htmlFor={`title-${index}`} className="block text-sm font-medium text-gray-700">Titre</Label>
+              <Input 
+                type="text" 
+                id={`title-${index}`} 
+                className="mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" 
+                value={selectedTitle}
+                onChange={(e) => onTitleChange(e.target.value)}
+              />
+            </div>
+            <div className="mb-3">
+              <Label htmlFor={`description-${index}`} className="block text-sm font-medium text-gray-700">Description</Label>
+              <Textarea 
+                id={`description-${index}`} 
+                className="mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" 
+                value={selectedDescription}
+                onChange={(e) => onDescriptionChange(e.target.value)}
+              />
+            </div>
+            <div className="mb-3">
+              <Label htmlFor={`hashtags-${index}`} className="block text-sm font-medium text-gray-700">Hashtags</Label>
+              <Input 
+                type="text" 
+                id={`hashtags-${index}`} 
+                className="mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" 
+                value={selectedHashtags}
+                onChange={(e) => onHashtagsChange(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor={`geoRegion-${index}`} className="block text-sm font-medium text-gray-700">Zone Géographique</Label>
+              <Select onValueChange={onGeoRegionChange} defaultValue={selectedGeoRegion}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Sélectionner une zone" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="france">France</SelectItem>
+                  <SelectItem value="europe">Europe</SelectItem>
+                  <SelectItem value="monde">Monde</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+
+          <CardFooter className="p-4 flex justify-end">
+            <Button 
+              variant="outline"
+              onClick={() => handleCopyToClipboard(`${selectedTitle} ${selectedDescription} ${selectedHashtags}`, index)}
+              disabled={copiedStates[index]}
+            >
+              {copiedStates[index] ? (
+                <>
+                  <CheckCircle2 className="mr-2 h-4 w-4" />
+                  Copié !
+                </>
+              ) : (
+                <>
+                  <Copy className="mr-2 h-4 w-4" />
+                  Copier le texte
+                </>
+              )}
+            </Button>
+          </CardFooter>
+        </Card>
+      ))}
     </div>
   );
 };

@@ -1,4 +1,3 @@
-
 // Fonction pour vérifier si un URL est valide
 export const isValidUrl = (urlString: string): boolean => {
   try {
@@ -37,78 +36,95 @@ export const getMainTabCategory = (tabId: string): string => {
   return tabId;
 };
 
-// Fonction pour activer une section/onglet - version améliorée
+// Fonction pour activer une section/onglet - version robuste
 export const activateSection = (sectionId: string): void => {
   console.log(`Activation de la section: ${sectionId}`);
   
   // Attendre que le DOM soit prêt
   setTimeout(() => {
-    // Masquer toutes les sections d'abord
-    document.querySelectorAll('[data-section]').forEach(el => {
-      (el as HTMLElement).style.display = 'none';
-    });
-    
-    document.querySelectorAll('[id]').forEach(el => {
-      if(['hierarchy', 'wordcount', 'suggestions', 'seo', 'structure', 'backlinks', 
-         'performance', 'metrics', 'analytics', 'quora', 'signature'].includes(el.id)) {
+    try {
+      // Masquer toutes les sections d'abord
+      document.querySelectorAll('[data-section]').forEach(el => {
         (el as HTMLElement).style.display = 'none';
-      }
-    });
-    
-    // D'abord chercher par data-section
-    const sectionByData = document.querySelector(`[data-section="${sectionId}"]`);
-    if (sectionByData) {
-      console.log(`Section ${sectionId} trouvée par data-section, affichage en cours`);
-      (sectionByData as HTMLElement).style.display = 'block';
-      return;
-    }
-    
-    // Ensuite chercher par id
-    const sectionById = document.getElementById(sectionId);
-    if (sectionById) {
-      console.log(`Section ${sectionId} trouvée par id, affichage en cours`);
-      sectionById.style.display = 'block';
-      return;
-    }
-    
-    // Puis chercher par data-tab-content
-    const sectionByTab = document.querySelector(`[data-tab-content="${sectionId}"]`);
-    if (sectionByTab) {
-      console.log(`Section ${sectionId} trouvée par data-tab-content, affichage en cours`);
-      (sectionByTab as HTMLElement).style.display = 'block';
-      return;
-    }
-    
-    // Si c'est l'onglet principal "content", afficher hierarchy par défaut
-    if (sectionId === 'content') {
-      const hierarchySection = document.querySelector('[data-section="hierarchy"]');
-      if (hierarchySection) {
-        console.log('Affichage de hierarchy pour l\'onglet content');
-        (hierarchySection as HTMLElement).style.display = 'block';
+      });
+      
+      document.querySelectorAll('[id]').forEach(el => {
+        if(['hierarchy', 'wordcount', 'suggestions', 'seo', 'structure', 'backlinks', 
+           'performance', 'metrics', 'analytics', 'quora', 'signature', 'local-business', 
+           'translation', 'pinterest'].includes(el.id)) {
+          (el as HTMLElement).style.display = 'none';
+        }
+      });
+      
+      // D'abord chercher par data-section
+      const sectionByData = document.querySelector(`[data-section="${sectionId}"]`);
+      if (sectionByData) {
+        console.log(`Section ${sectionId} trouvée par data-section, affichage en cours`);
+        (sectionByData as HTMLElement).style.display = 'block';
         return;
       }
-    }
-    
-    // Pour la page d'accueil, toujours montrer hierarchy
-    if (sectionId === 'hierarchy' || window.location.pathname === '/') {
-      const hierarchySections = document.querySelectorAll('[data-section="hierarchy"], #hierarchy');
-      if (hierarchySections.length > 0) {
-        console.log('Affichage forcé de la section hierarchy (page d\'accueil)');
-        hierarchySections.forEach(section => {
-          (section as HTMLElement).style.display = 'block';
-        });
+      
+      // Ensuite chercher par id
+      const sectionById = document.getElementById(sectionId);
+      if (sectionById) {
+        console.log(`Section ${sectionId} trouvée par id, affichage en cours`);
+        sectionById.style.display = 'block';
         return;
       }
+      
+      // Puis chercher par data-tab-content
+      const sectionByTab = document.querySelector(`[data-tab-content="${sectionId}"]`);
+      if (sectionByTab) {
+        console.log(`Section ${sectionId} trouvée par data-tab-content, affichage en cours`);
+        (sectionByTab as HTMLElement).style.display = 'block';
+        return;
+      }
+      
+      // Si c'est l'onglet principal "content", afficher hierarchy par défaut
+      if (sectionId === 'content') {
+        const hierarchySection = document.querySelector('[data-section="hierarchy"]') || document.getElementById('hierarchy');
+        if (hierarchySection) {
+          console.log('Affichage de hierarchy pour l\'onglet content');
+          (hierarchySection as HTMLElement).style.display = 'block';
+          return;
+        }
+      }
+      
+      // Vérification de section pour les onglets principaux
+      if (['seo', 'performance', 'analytics', 'tools'].includes(sectionId)) {
+        const mainSection = document.querySelector(`[data-section="${sectionId}"]`) || document.getElementById(sectionId);
+        if (mainSection) {
+          console.log(`Affichage de la section principale ${sectionId}`);
+          (mainSection as HTMLElement).style.display = 'block';
+          return;
+        }
+      }
+      
+      // Pour la page d'accueil, toujours montrer hierarchy
+      if (sectionId === 'hierarchy' || window.location.pathname === '/') {
+        const hierarchySections = document.querySelectorAll('[data-section="hierarchy"], #hierarchy');
+        if (hierarchySections.length > 0) {
+          console.log('Affichage forcé de la section hierarchy (page d\'accueil)');
+          hierarchySections.forEach(section => {
+            (section as HTMLElement).style.display = 'block';
+          });
+          return;
+        }
+      }
+      
+      // Afficher la première section disponible comme fallback
+      console.warn(`La section ${sectionId} n'existe pas dans le DOM.`);
+      const firstSection = document.querySelector('[data-section]');
+      if (firstSection) {
+        console.log('Affichage de la première section disponible comme fallback');
+        (firstSection as HTMLElement).style.display = 'block';
+      } else {
+        console.error('Aucune section trouvée dans le DOM');
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'activation de la section:', error);
     }
-    
-    // Afficher la première section disponible comme fallback
-    console.warn(`La section ${sectionId} n'existe pas dans le DOM.`);
-    const firstSection = document.querySelector('[data-section]');
-    if (firstSection) {
-      console.log('Affichage de la première section disponible comme fallback');
-      (firstSection as HTMLElement).style.display = 'block';
-    }
-  }, 200);
+  }, 300);
 };
 
 // Fonction pour naviguer vers une section

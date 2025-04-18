@@ -23,7 +23,14 @@ const TabNavigation = () => {
       setTimeout(() => {
         activateSection(activeTab);
         console.log('TabNavigation activation retardée de section:', activeTab);
-      }, 1000); // Délai augmenté pour s'assurer que le DOM est prêt
+        
+        // Force display of the section
+        const section = document.querySelector(`[data-section="${activeTab}"]`) || document.getElementById(activeTab);
+        if (section) {
+          console.log(`TabNavigation: Affichage forcé de la section ${activeTab}`);
+          (section as HTMLElement).style.display = 'block';
+        }
+      }, 1500); // Délai augmenté pour s'assurer que le DOM est prêt
     }
   }, [activeTab]);
 
@@ -34,13 +41,27 @@ const TabNavigation = () => {
       setTimeout(() => {
         console.log(`Hash détecté dans l'URL: ${hash}, activation de la section`);
         activateSection(hash);
-      }, 1000); // Délai augmenté également ici
+        
+        // Force display of the section
+        const section = document.querySelector(`[data-section="${hash}"]`) || document.getElementById(hash);
+        if (section) {
+          console.log(`TabNavigation: Affichage forcé de la section ${hash} depuis URL hash`);
+          (section as HTMLElement).style.display = 'block';
+        }
+      }, 1500); // Délai augmenté également ici
     } else {
       // Si pas de hash, activer l'onglet basé sur le chemin
       setTimeout(() => {
         console.log(`Pas de hash, activation de l'onglet basé sur le chemin:`, activeTab);
         activateSection(activeTab);
-      }, 1000);
+        
+        // Force display of the section
+        const section = document.querySelector(`[data-section="${activeTab}"]`) || document.getElementById(activeTab);
+        if (section) {
+          console.log(`TabNavigation: Affichage forcé de la section ${activeTab} depuis le chemin`);
+          (section as HTMLElement).style.display = 'block';
+        }
+      }, 1500);
     }
   }, [location, activeTab]);
 

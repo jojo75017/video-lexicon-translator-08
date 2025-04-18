@@ -14,20 +14,27 @@ const SubTabList: React.FC<SubTabListProps> = ({ tabs, activeTab, onTabChange })
   const navigate = useNavigate();
 
   const handleTabClick = (tabId: string, tabLink?: string) => {
-    // If the tab has a link, open in new tab
+    // Si le tab a un lien, ouvrir dans un nouvel onglet
     if (tabLink) {
       window.open(tabLink, '_blank');
       return;
     }
     
-    // Otherwise navigate internally
+    // Sinon, naviguer en interne
     onTabChange(tabId);
     
-    // Utiliser la fonction activateSection avec un délai pour s'assurer
-    // que le DOM a eu le temps de se mettre à jour
+    // Délai plus long pour s'assurer que le DOM est prêt
     setTimeout(() => {
+      console.log(`SubTabList: Activation de la section ${tabId} après changement d'onglet`);
       activateSection(tabId);
-    }, 300);
+      
+      // Force display of the section
+      const section = document.querySelector(`[data-section="${tabId}"]`) || document.getElementById(tabId);
+      if (section) {
+        console.log(`SubTabList: Affichage forcé de la section ${tabId}`);
+        (section as HTMLElement).style.display = 'block';
+      }
+    }, 500);
   };
 
   return (

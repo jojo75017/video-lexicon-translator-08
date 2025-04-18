@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { getMainTabCategory } from '@/utils/navigationHelpers';
+import { getMainTabCategory, activateSection } from '@/utils/navigationHelpers';
 
 interface MainTab {
   id: string;
@@ -52,7 +52,7 @@ const MainTabList: React.FC<MainTabListProps> = ({
   // Get the correct path for a main tab
   const getMainTabPath = (tabId: string): string => {
     const pathMap: Record<string, string> = {
-      'content': '/',
+      'content': '/hierarchy',
       'seo': '/seo',
       'performance': '/performance',
       'analytics': '/analytics',
@@ -66,7 +66,7 @@ const MainTabList: React.FC<MainTabListProps> = ({
   const handleTabClick = (tabId: string, path: string) => {
     console.log(`Clic sur onglet principal: ${tabId}, chemin: ${path}`);
     
-    // Activer l'onglet et naviguer vers la bonne page
+    // Activer l'onglet
     onTabChange(tabId);
     
     // Naviguer vers la bonne page
@@ -74,23 +74,29 @@ const MainTabList: React.FC<MainTabListProps> = ({
     
     // Forcer l'activation de la section appropriée après la navigation
     setTimeout(() => {
-      // Pour le contenu, activer hierarchy si on clique sur l'onglet principal
+      console.log(`MainTabList: Activation de la section ${tabId} après changement d'onglet principal`);
+      
+      // Pour l'onglet "content", activer "hierarchy" par défaut
       if (tabId === 'content') {
-        console.log('Activation forcée de la section hierarchy');
-        const hierarchySection = document.querySelector('[data-section="hierarchy"]');
+        activateSection('hierarchy');
+        
+        // Force display of hierarchy section
+        const hierarchySection = document.querySelector('[data-section="hierarchy"]') || document.getElementById('hierarchy');
         if (hierarchySection) {
+          console.log('MainTabList: Affichage forcé de la section hierarchy');
           (hierarchySection as HTMLElement).style.display = 'block';
         }
+      } else {
+        activateSection(tabId);
         
-        // Forcer également l'affichage de l'élément avec l'ID hierarchy
-        const hierarchyElement = document.getElementById('hierarchy');
-        if (hierarchyElement) {
-          hierarchyElement.style.display = 'block';
+        // Force display of the section
+        const section = document.querySelector(`[data-section="${tabId}"]`) || document.getElementById(tabId);
+        if (section) {
+          console.log(`MainTabList: Affichage forcé de la section ${tabId}`);
+          (section as HTMLElement).style.display = 'block';
         }
       }
-    }, 500);
-    
-    console.log(`Navigation vers l'onglet principal: ${tabId}, chemin: ${path}`);
+    }, 800);
   };
 
   return (
