@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { PinterestPin } from '@/types/pinterest';
 import { pinterestDesigns } from '@/data/pinterestImages';
@@ -27,11 +28,25 @@ export const usePin = (initialPin: PinterestPin) => {
       if (!pin.description || pin.description === initialPin.description) {
         updatePin('description', generatedContent.description);
       }
+      
+      // Mettre à jour également la description globale si elle est vide ou à la valeur par défaut
+      if (!pin.globalDescription || pin.globalDescription === initialPin.globalDescription) {
+        // Générer une description globale plus détaillée basée sur le contenu généré
+        const detailedDescription = `Explorez ${generatedContent.title.replace('Découvrez ', '').replace('Explorez ', '')}. ${generatedContent.description} Découvrez tous nos conseils pour rendre votre voyage inoubliable et vivre des expériences uniques qui resteront gravées dans votre mémoire.`;
+        updatePin('globalDescription', detailedDescription);
+      }
     } else {
       // Keep the user's custom title and only generate a description if it's default
       if (!pin.description || pin.description === initialPin.description) {
         const generatedContent = generateContentFromImage(image);
         updatePin('description', generatedContent.description);
+      }
+      
+      // Mettre à jour la description globale uniquement si c'est la description par défaut
+      if (!pin.globalDescription || pin.globalDescription === initialPin.globalDescription) {
+        const customTitle = pin.title;
+        const detailedDescription = `Explorez ${customTitle.replace('Découvrez ', '').replace('Explorez ', '')}. Nous vous proposons un guide complet avec des conseils pratiques et des informations essentielles pour profiter pleinement de cette destination. Planifiez votre voyage parfait avec nos recommandations d'experts.`;
+        updatePin('globalDescription', detailedDescription);
       }
     }
     
@@ -78,6 +93,10 @@ export const usePin = (initialPin: PinterestPin) => {
           );
           const title = `Découvrez ${capitalizedWords.join(' ')}`;
           updatePin('title', title);
+          
+          // Mettre à jour également la description globale avec un contenu basé sur le titre
+          const detailedDescription = `Explorez ${capitalizedWords.join(' ')}. Nous vous proposons un guide complet avec des conseils pratiques et des informations essentielles. Découvrez nos recommandations pour profiter pleinement de cette expérience unique.`;
+          updatePin('globalDescription', detailedDescription);
         }
         
         const fileName = file.name.replace(/\.[^/.]+$/, "");

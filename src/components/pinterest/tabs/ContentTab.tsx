@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { PinterestPin } from '@/types/pinterest';
 import { Label } from '@/components/ui/label';
@@ -102,7 +101,7 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin, onGenerateConte
       .catch(() => toast.error(`Erreur lors de la copie du ${type.toLowerCase()}`));
   };
 
-  // Fonction générer du contenu
+  // Fonction générer du contenu personnalisé basé sur le titre
   const generateContent = () => {
     if (onGenerateContent) {
       onGenerateContent();
@@ -110,19 +109,43 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin, onGenerateConte
       // On préserve le titre défini par l'utilisateur
       const currentTitle = pin.title;
       
-      // Nouvelle description pour la Finlande ou voyage
+      // Nouvelle description basée sur le titre actuel
       let newDescription = "Découvrez les paysages époustouflants et les expériences authentiques qui vous attendent. Un voyage inoubliable au cœur de la nature sauvage.";
+      let newGlobalDescription = "Explorez cette destination fascinante avec nos conseils d'experts. Nous vous proposons un guide complet pour organiser votre voyage, avec des recommandations personnalisées et des astuces pratiques pour une expérience inoubliable.";
       
       if (currentTitle.toLowerCase().includes('finlande')) {
         newDescription = "La Finlande offre des paysages naturels époustouflants avec ses milliers de lacs, ses forêts de pins et ses aurores boréales magiques. Une destination parfaite pour les amoureux de nature et d'aventure.";
+        newGlobalDescription = "La Finlande est un pays nordique aux paysages naturels époustouflants. Découvrez ses milliers de lacs, ses forêts infinies de pins et ses aurores boréales magiques. Explorez les activités incontournables comme le sauna finlandais traditionnel, les safaris en chiens de traîneau et la rencontre avec le Père Noël à Rovaniemi. Une destination idéale pour les voyageurs en quête d'authenticité et d'expériences uniques en pleine nature.";
       } else if (currentTitle.toLowerCase().includes('vietnam')) {
         newDescription = "Le Vietnam séduit par ses paysages variés entre rizières en terrasses, baie d'Halong et villages traditionnels. Une culture riche et une gastronomie exceptionnelle vous attendent.";
+        newGlobalDescription = "Le Vietnam est une destination fascinante qui offre une diversité de paysages et d'expériences culturelles. Des rizières en terrasses du nord aux plages paradisiaques du centre, en passant par la mythique baie d'Halong, chaque région vous dévoile ses trésors. Découvrez l'hospitalité légendaire des Vietnamiens, goûtez à une cuisine aux saveurs exquises et plongez dans l'histoire fascinante de ce pays aux multiples facettes.";
+      } else if (currentTitle.toLowerCase().includes('paris') || currentTitle.toLowerCase().includes('france')) {
+        newDescription = "Paris, ville de lumière et d'amour, vous enchante avec ses monuments emblématiques et son atmosphère romantique. Une destination incontournable pour les amoureux d'art et d'histoire.";
+        newGlobalDescription = "Paris, capitale mondiale de l'art et de la culture, vous invite à découvrir ses trésors. Entre la majestueuse Tour Eiffel, le musée du Louvre et ses collections inestimables, les Champs-Élysées et leurs boutiques prestigieuses, chaque quartier raconte une histoire fascinante. Flânez le long de la Seine, savourez la gastronomie française dans ses bistrots typiques et laissez-vous séduire par le charme inimitable de cette ville qui continue d'inspirer artistes et voyageurs du monde entier.";
       }
       
-      // On conserve toujours le titre personnalisé de l'utilisateur
+      // On met à jour la description mais on conserve toujours le titre personnalisé
       updatePin('description', newDescription);
+      updatePin('globalDescription', newGlobalDescription);
       toast.success('Contenu généré avec succès');
     }
+  };
+
+  // Fonction pour mettre à jour la description globale automatiquement basée sur le titre et la description
+  const updateGlobalDescriptionBasedOnTitle = () => {
+    const currentTitle = pin.title;
+    const currentDescription = pin.description;
+    
+    // Créer une description globale plus détaillée basée sur le titre et la description actuels
+    let newGlobalDescription = `Explorez ${currentTitle.replace('Découvrez ', '').replace('Explorez ', '')}. ${currentDescription} Nous vous proposons un guide complet avec des conseils pratiques et des informations essentielles pour profiter pleinement de cette expérience. Découvrez nos recommandations d'experts pour un voyage réussi.`;
+    
+    // Limiter à 400 caractères
+    if (newGlobalDescription.length > 400) {
+      newGlobalDescription = newGlobalDescription.substring(0, 397) + '...';
+    }
+    
+    updatePin('globalDescription', newGlobalDescription);
+    toast.success('Description globale mise à jour');
   };
 
   // Fonction pour valider la longueur du texte
@@ -238,15 +261,26 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin, onGenerateConte
             <span className="text-sm text-gray-500">
               {pin.globalDescription?.length || 0}/400
             </span>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => pin.globalDescription && copyToClipboard(pin.globalDescription, 'Description globale')}
-              type="button"
-            >
-              <Copy className="h-4 w-4 mr-1" />
-              Copier
-            </Button>
+            <div className="flex items-center space-x-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={updateGlobalDescriptionBasedOnTitle}
+                type="button"
+              >
+                <Wand2 className="h-4 w-4 mr-1" />
+                Générer
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => pin.globalDescription && copyToClipboard(pin.globalDescription, 'Description globale')}
+                type="button"
+              >
+                <Copy className="h-4 w-4 mr-1" />
+                Copier
+              </Button>
+            </div>
           </div>
         </div>
         <Textarea
@@ -300,7 +334,6 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin, onGenerateConte
         Générer du contenu
       </Button>
       
-      {/* Sélecteur d'emoji */}
       {showEmojiPicker && (
         <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-4 shadow-lg max-w-md w-full">

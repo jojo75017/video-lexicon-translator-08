@@ -46,6 +46,21 @@ export const generateContentFromImage = (image: PinterestImage): { title: string
     };
   }
 
+  // Identifier un sujet potentiel à partir du titre de l'image
+  let subject = '';
+  if (image.title) {
+    const titleLower = image.title.toLowerCase();
+    if (titleLower.includes('plage') || titleLower.includes('mer')) {
+      subject = 'plages';
+    } else if (titleLower.includes('montagne') || titleLower.includes('alpes')) {
+      subject = 'montagnes';
+    } else if (titleLower.includes('ville') || titleLower.includes('cité')) {
+      subject = 'villes historiques';
+    } else if (titleLower.includes('château') || titleLower.includes('monument')) {
+      subject = 'monuments';
+    }
+  }
+
   // Generate title and description using helper functions
   const title = generateTitle(location, subject);
   const description = generateDescription(locationType, location);
