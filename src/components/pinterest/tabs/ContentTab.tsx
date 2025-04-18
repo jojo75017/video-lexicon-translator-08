@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import { PinterestPin } from '@/types/pinterest';
 import { Label } from '@/components/ui/label';
@@ -34,6 +35,31 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin, onGenerateConte
     }
     const newTitle = generateTitleFromLocation(locationInput);
     updatePin('title', newTitle);
+    
+    // Générer automatiquement une description globale correspondante
+    const newGlobalDescription = generateGlobalDescriptionFromTitle(newTitle);
+    updatePin('globalDescription', newGlobalDescription);
+    
+    // Générer une description adéquate selon le pays/ville
+    let newDescription = "";
+    const location = locationInput.trim().toLowerCase();
+    
+    if (location === 'vietnam') {
+      newDescription = "Le Vietnam séduit par ses paysages variés entre rizières en terrasses, baie d'Halong et villages traditionnels. Une culture riche et une gastronomie exceptionnelle vous attendent.";
+    } else if (location === 'finlande') {
+      newDescription = "La Finlande offre des paysages naturels époustouflants avec ses milliers de lacs, ses forêts de pins et ses aurores boréales magiques. Une destination parfaite pour les amoureux de nature et d'aventure.";
+    } else if (location === 'grèce' || location === 'grece') {
+      newDescription = "La Grèce vous séduira par ses îles paradisiaques, ses vestiges antiques impressionnants et sa délicieuse cuisine méditerranéenne. Un voyage entre détente, culture et découvertes inoubliables.";
+    } else if (location === 'corse') {
+      newDescription = "La Corse vous émerveillera par ses plages de sable fin, ses montagnes majestueuses et ses villages pittoresques. Une destination idéale pour les amoureux de nature et d'authenticité.";
+    } else if (location === 'paris') {
+      newDescription = "Paris, ville de lumière et d'amour, vous séduira par ses monuments emblématiques, ses ruelles pleines de charme et sa gastronomie d'exception. Laissez-vous porter par l'atmosphère unique de la capitale française.";
+    } else {
+      newDescription = `Découvrez les merveilles de ${locationInput}, une destination qui vous surprendra par sa beauté et sa diversité. Des expériences authentiques et des paysages inoubliables vous attendent pour un voyage exceptionnel.`;
+    }
+    
+    updatePin('description', newDescription);
+    
     toast.success('Titre généré avec succès');
   };
 
