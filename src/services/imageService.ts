@@ -122,6 +122,34 @@ const ensureTitleMatchesLocation = (image: PinterestImage): PinterestImage => {
   };
 };
 
+// Nouvelles images variées pour les résultats simulés
+const DIVERSE_IMAGES = {
+  france: [
+    'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=2073&auto=format&fit=crop', // Paris - Tour Eiffel
+    'https://images.unsplash.com/photo-1529686342540-1b43aec0df75?q=80&w=2070&auto=format&fit=crop', // Mont Saint-Michel
+    'https://images.unsplash.com/photo-1549144511-f099e773c147?q=80&w=2034&auto=format&fit=crop', // Provence - Lavande
+    'https://images.unsplash.com/photo-1596642548090-3d6cccf8e7e1?q=80&w=1974&auto=format&fit=crop', // Marseille
+    'https://images.unsplash.com/photo-1576604303383-550e733e2cf9?q=80&w=2070&auto=format&fit=crop', // Lyon
+    'https://images.unsplash.com/photo-1623210553709-daec2c5c9965?q=80&w=1974&auto=format&fit=crop'  // Bordeaux
+  ],
+  europe: [
+    'https://images.unsplash.com/photo-1552832230-c0197dd311b5?q=80&w=1996&auto=format&fit=crop', // Rome - Colisée
+    'https://images.unsplash.com/photo-1558033244-2fa755eb879d?q=80&w=1974&auto=format&fit=crop', // Venise
+    'https://images.unsplash.com/photo-1561637253-e1b812103abd?q=80&w=1974&auto=format&fit=crop', // Barcelone
+    'https://images.unsplash.com/photo-1500380279785-371201be6a10?q=80&w=2069&auto=format&fit=crop', // Santorini
+    'https://images.unsplash.com/photo-1513026705753-bc3fffca8bf4?q=80&w=2070&auto=format&fit=crop', // Amsterdam
+    'https://images.unsplash.com/photo-1565452344518-47faca79dc69?q=80&w=2035&auto=format&fit=crop'  // Londres
+  ],
+  monde: [
+    'https://images.unsplash.com/photo-1518391846015-55a9cc003b25?q=80&w=2070&auto=format&fit=crop', // New York
+    'https://images.unsplash.com/photo-1480796927426-f609979314bd?q=80&w=2070&auto=format&fit=crop', // Tokyo
+    'https://images.unsplash.com/photo-1586041828039-b8d193d6d1dc?q=80&w=2036&auto=format&fit=crop', // Dubaï
+    'https://images.unsplash.com/photo-1516306580123-e6e52b1b7b5f?q=80&w=2012&auto=format&fit=crop', // Sydney
+    'https://images.unsplash.com/photo-1564662230624-73e317f08290?q=80&w=1974&auto=format&fit=crop', // Rio
+    'https://images.unsplash.com/photo-1562979314-bee7453e911c?q=80&w=1974&auto=format&fit=crop'    // Marrakech
+  ]
+};
+
 // Ajout des fonctions requises par PinterestGenerator
 
 // Recherche d'images sur Pixabay
@@ -130,17 +158,44 @@ export const searchPixabayImages = async (query: string, category?: 'monde' | 'e
     // Simuler une recherche d'images pour l'exemple
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    const results: PinterestImage[] = Array(10).fill(null).map((_, index) => ({
-      id: `pixabay-${index}-${Date.now()}`,
-      url: RELIABLE_FALLBACK_IMAGES[category as keyof typeof RELIABLE_FALLBACK_IMAGES] || RELIABLE_FALLBACK_IMAGES.default,
-      title: `${category === 'france' ? 'Paris' : category === 'europe' ? 'Rome' : 'New York'} - ${query} ${index + 1}`,
-      category: category === 'all' ? (Math.random() > 0.6 ? 'france' : Math.random() > 0.5 ? 'europe' : 'monde') : (category as 'monde' | 'europe' | 'france'),
-      country: category === 'france' ? 'France' : category === 'europe' ? 'Italie' : 'États-Unis',
-      region: category === 'france' ? 'Île-de-France' : undefined,
-      source: 'pixabay',
-      tags: [query, category === 'france' ? 'paris' : category === 'europe' ? 'rome' : 'new york', 'voyage'],
-      fallbackUrl: RELIABLE_FALLBACK_IMAGES.default
-    }));
+    // Déterminer quelle catégorie d'images utiliser
+    let imageCategory = category === 'all' 
+      ? (Math.random() > 0.6 ? 'france' : Math.random() > 0.5 ? 'europe' : 'monde') 
+      : (category as 'monde' | 'europe' | 'france');
+    
+    // Générer des résultats variés
+    const results: PinterestImage[] = Array(10).fill(null).map((_, index) => {
+      // Choisir une image aléatoire de la catégorie
+      const imageSet = DIVERSE_IMAGES[imageCategory as keyof typeof DIVERSE_IMAGES];
+      const imageUrl = imageSet[Math.floor(Math.random() * imageSet.length)];
+      
+      // Déterminer le titre en fonction de la catégorie
+      let location = '';
+      let country = '';
+      
+      if (imageCategory === 'france') {
+        location = FRANCE_LOCATIONS[Math.floor(Math.random() * FRANCE_LOCATIONS.length)];
+        country = 'France';
+      } else if (imageCategory === 'europe') {
+        location = EUROPE_LOCATIONS[Math.floor(Math.random() * EUROPE_LOCATIONS.length)];
+        country = ['Italie', 'Espagne', 'Grèce', 'Portugal', 'Allemagne'][Math.floor(Math.random() * 5)];
+      } else {
+        location = WORLD_LOCATIONS[Math.floor(Math.random() * WORLD_LOCATIONS.length)];
+        country = ['États-Unis', 'Japon', 'Australie', 'Brésil', 'Maroc'][Math.floor(Math.random() * 5)];
+      }
+      
+      return {
+        id: `pixabay-${index}-${Date.now()}`,
+        url: imageUrl,
+        title: `${country} - ${location.charAt(0).toUpperCase() + location.slice(1)} - ${query} ${index + 1}`,
+        category: imageCategory as 'monde' | 'europe' | 'france',
+        country: country,
+        region: imageCategory === 'france' ? location.charAt(0).toUpperCase() + location.slice(1) : undefined,
+        source: 'pixabay',
+        tags: [query, location, 'voyage', 'découverte', 'tourisme'].slice(0, 3 + Math.floor(Math.random() * 3)),
+        fallbackUrl: RELIABLE_FALLBACK_IMAGES.default
+      };
+    });
     
     return validateAndFixImages(results);
   } catch (error) {
@@ -156,16 +211,42 @@ export const searchUnsplashImages = async (query: string): Promise<PinterestImag
     // Simuler une recherche d'images pour l'exemple
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    const results: PinterestImage[] = Array(10).fill(null).map((_, index) => ({
-      id: `unsplash-${index}-${Date.now()}`,
-      url: `https://source.unsplash.com/random/1000x1500/?${query},travel`,
-      title: `${Math.random() > 0.5 ? 'Paris' : Math.random() > 0.5 ? 'Rome' : 'New York'} - ${query} ${index + 1}`,
-      category: Math.random() > 0.6 ? 'france' : Math.random() > 0.5 ? 'europe' : 'monde',
-      country: Math.random() > 0.6 ? 'France' : Math.random() > 0.5 ? 'Italie' : 'États-Unis',
-      source: 'unsplash',
-      tags: [query, 'travel', 'photography'],
-      fallbackUrl: RELIABLE_FALLBACK_IMAGES.default
-    }));
+    // Générer des résultats variés
+    const results: PinterestImage[] = Array(10).fill(null).map((_, index) => {
+      // Choisir une catégorie aléatoire
+      const imageCategory = Math.random() > 0.6 ? 'france' : Math.random() > 0.5 ? 'europe' : 'monde';
+      
+      // Choisir une image aléatoire de la catégorie
+      const imageSet = DIVERSE_IMAGES[imageCategory as keyof typeof DIVERSE_IMAGES];
+      const imageUrl = imageSet[Math.floor(Math.random() * imageSet.length)];
+      
+      // Déterminer le titre en fonction de la catégorie
+      let location = '';
+      let country = '';
+      
+      if (imageCategory === 'france') {
+        location = FRANCE_LOCATIONS[Math.floor(Math.random() * FRANCE_LOCATIONS.length)];
+        country = 'France';
+      } else if (imageCategory === 'europe') {
+        location = EUROPE_LOCATIONS[Math.floor(Math.random() * EUROPE_LOCATIONS.length)];
+        country = ['Italie', 'Espagne', 'Grèce', 'Portugal', 'Allemagne'][Math.floor(Math.random() * 5)];
+      } else {
+        location = WORLD_LOCATIONS[Math.floor(Math.random() * WORLD_LOCATIONS.length)];
+        country = ['États-Unis', 'Japon', 'Australie', 'Brésil', 'Maroc'][Math.floor(Math.random() * 5)];
+      }
+      
+      return {
+        id: `unsplash-${index}-${Date.now()}`,
+        url: imageUrl,
+        title: `${country} - ${location.charAt(0).toUpperCase() + location.slice(1)} - ${query} ${index + 1}`,
+        category: imageCategory as 'monde' | 'europe' | 'france',
+        country: country,
+        region: imageCategory === 'france' ? location.charAt(0).toUpperCase() + location.slice(1) : undefined,
+        source: 'unsplash',
+        tags: [query, location, 'travel', 'photography', 'voyage'].slice(0, 3 + Math.floor(Math.random() * 3)),
+        fallbackUrl: RELIABLE_FALLBACK_IMAGES.default
+      };
+    });
     
     return validateAndFixImages(results);
   } catch (error) {
@@ -181,16 +262,44 @@ export const searchFreepikImages = async (query: string, category?: 'monde' | 'e
     // Simuler une recherche d'images pour l'exemple
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    const results: PinterestImage[] = Array(10).fill(null).map((_, index) => ({
-      id: `freepik-${index}-${Date.now()}`,
-      url: RELIABLE_FALLBACK_IMAGES[category as keyof typeof RELIABLE_FALLBACK_IMAGES] || RELIABLE_FALLBACK_IMAGES.default,
-      title: `${category === 'france' ? 'Paris' : category === 'europe' ? 'Rome' : 'New York'} - ${query} ${index + 1}`,
-      category: category === 'all' ? (Math.random() > 0.6 ? 'france' : Math.random() > 0.5 ? 'europe' : 'monde') : (category as 'monde' | 'europe' | 'france'),
-      country: category === 'france' ? 'France' : category === 'europe' ? 'Italie' : 'États-Unis',
-      source: 'freepik',
-      tags: [query, category === 'france' ? 'paris' : category === 'europe' ? 'rome' : 'new york', 'vector'],
-      fallbackUrl: RELIABLE_FALLBACK_IMAGES.default
-    }));
+    // Déterminer quelle catégorie d'images utiliser
+    let imageCategory = category === 'all' 
+      ? (Math.random() > 0.6 ? 'france' : Math.random() > 0.5 ? 'europe' : 'monde') 
+      : (category as 'monde' | 'europe' | 'france');
+    
+    // Générer des résultats variés
+    const results: PinterestImage[] = Array(10).fill(null).map((_, index) => {
+      // Choisir une image aléatoire de la catégorie
+      const imageSet = DIVERSE_IMAGES[imageCategory as keyof typeof DIVERSE_IMAGES];
+      const imageUrl = imageSet[Math.floor(Math.random() * imageSet.length)];
+      
+      // Déterminer le titre en fonction de la catégorie
+      let location = '';
+      let country = '';
+      
+      if (imageCategory === 'france') {
+        location = FRANCE_LOCATIONS[Math.floor(Math.random() * FRANCE_LOCATIONS.length)];
+        country = 'France';
+      } else if (imageCategory === 'europe') {
+        location = EUROPE_LOCATIONS[Math.floor(Math.random() * EUROPE_LOCATIONS.length)];
+        country = ['Italie', 'Espagne', 'Grèce', 'Portugal', 'Allemagne'][Math.floor(Math.random() * 5)];
+      } else {
+        location = WORLD_LOCATIONS[Math.floor(Math.random() * WORLD_LOCATIONS.length)];
+        country = ['États-Unis', 'Japon', 'Australie', 'Brésil', 'Maroc'][Math.floor(Math.random() * 5)];
+      }
+      
+      return {
+        id: `freepik-${index}-${Date.now()}`,
+        url: imageUrl,
+        title: `${country} - ${location.charAt(0).toUpperCase() + location.slice(1)} - ${query} ${index + 1}`,
+        category: imageCategory as 'monde' | 'europe' | 'france',
+        country: country,
+        region: imageCategory === 'france' ? location.charAt(0).toUpperCase() + location.slice(1) : undefined,
+        source: 'freepik',
+        tags: [query, location, 'vector', 'illustration', 'design'].slice(0, 3 + Math.floor(Math.random() * 3)),
+        fallbackUrl: RELIABLE_FALLBACK_IMAGES.default
+      };
+    });
     
     return validateAndFixImages(results);
   } catch (error) {
@@ -206,17 +315,44 @@ export const searchPexelsImages = async (query: string, category?: 'monde' | 'eu
     // Simuler une recherche d'images pour l'exemple
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    const results: PinterestImage[] = Array(10).fill(null).map((_, index) => ({
-      id: `pexels-${index}-${Date.now()}`,
-      url: RELIABLE_FALLBACK_IMAGES[category as keyof typeof RELIABLE_FALLBACK_IMAGES] || RELIABLE_FALLBACK_IMAGES.default,
-      title: `${category === 'france' ? 'Paris' : category === 'europe' ? 'Rome' : 'New York'} - ${query} ${index + 1}`,
-      category: category === 'all' ? (Math.random() > 0.6 ? 'france' : Math.random() > 0.5 ? 'europe' : 'monde') : (category as 'monde' | 'europe' | 'france'),
-      country: category === 'france' ? 'France' : category === 'europe' ? 'Italie' : 'États-Unis',
-      region: category === 'france' ? 'Île-de-France' : undefined,
-      source: 'pexels',
-      tags: [query, category === 'france' ? 'paris' : category === 'europe' ? 'rome' : 'new york', 'photography'],
-      fallbackUrl: RELIABLE_FALLBACK_IMAGES.default
-    }));
+    // Déterminer quelle catégorie d'images utiliser
+    let imageCategory = category === 'all' 
+      ? (Math.random() > 0.6 ? 'france' : Math.random() > 0.5 ? 'europe' : 'monde') 
+      : (category as 'monde' | 'europe' | 'france');
+    
+    // Générer des résultats variés
+    const results: PinterestImage[] = Array(10).fill(null).map((_, index) => {
+      // Choisir une image aléatoire de la catégorie
+      const imageSet = DIVERSE_IMAGES[imageCategory as keyof typeof DIVERSE_IMAGES];
+      const imageUrl = imageSet[Math.floor(Math.random() * imageSet.length)];
+      
+      // Déterminer le titre en fonction de la catégorie
+      let location = '';
+      let country = '';
+      
+      if (imageCategory === 'france') {
+        location = FRANCE_LOCATIONS[Math.floor(Math.random() * FRANCE_LOCATIONS.length)];
+        country = 'France';
+      } else if (imageCategory === 'europe') {
+        location = EUROPE_LOCATIONS[Math.floor(Math.random() * EUROPE_LOCATIONS.length)];
+        country = ['Italie', 'Espagne', 'Grèce', 'Portugal', 'Allemagne'][Math.floor(Math.random() * 5)];
+      } else {
+        location = WORLD_LOCATIONS[Math.floor(Math.random() * WORLD_LOCATIONS.length)];
+        country = ['États-Unis', 'Japon', 'Australie', 'Brésil', 'Maroc'][Math.floor(Math.random() * 5)];
+      }
+      
+      return {
+        id: `pexels-${index}-${Date.now()}`,
+        url: imageUrl,
+        title: `${country} - ${location.charAt(0).toUpperCase() + location.slice(1)} - ${query} ${index + 1}`,
+        category: imageCategory as 'monde' | 'europe' | 'france',
+        country: country,
+        region: imageCategory === 'france' ? location.charAt(0).toUpperCase() + location.slice(1) : undefined,
+        source: 'pexels',
+        tags: [query, location, 'photography', 'professional', 'voyage'].slice(0, 3 + Math.floor(Math.random() * 3)),
+        fallbackUrl: RELIABLE_FALLBACK_IMAGES.default
+      };
+    });
     
     return validateAndFixImages(results);
   } catch (error) {
@@ -232,15 +368,17 @@ export const getPresetImagesByCategory = async (category: 'monde' | 'europe' | '
     // Simuler le chargement des images préréglées
     await new Promise(resolve => setTimeout(resolve, 800));
     
-    // Des images de secours pour chaque catégorie
+    // Des images variées pour chaque catégorie
     const images: PinterestImage[] = [];
     
     if (category === 'all' || category === 'france') {
+      // Utiliser les 5 premières locations françaises avec des images variées
       FRANCE_LOCATIONS.slice(0, 5).forEach((location, index) => {
+        const imageUrl = DIVERSE_IMAGES.france[index % DIVERSE_IMAGES.france.length];
         images.push({
           id: `preset-fr-${index}-${Date.now()}`,
-          url: RELIABLE_FALLBACK_IMAGES.france,
-          title: `${location.charAt(0).toUpperCase() + location.slice(1)} - Vue magnifique`,
+          url: imageUrl,
+          title: `France - ${location.charAt(0).toUpperCase() + location.slice(1)} - Vue magnifique`,
           category: 'france',
           country: 'France',
           region: location.charAt(0).toUpperCase() + location.slice(1),
@@ -252,13 +390,16 @@ export const getPresetImagesByCategory = async (category: 'monde' | 'europe' | '
     }
     
     if (category === 'all' || category === 'europe') {
+      // Utiliser les 5 premières locations européennes avec des images variées
       EUROPE_LOCATIONS.slice(0, 5).forEach((location, index) => {
+        const imageUrl = DIVERSE_IMAGES.europe[index % DIVERSE_IMAGES.europe.length];
+        const country = ['Italie', 'Espagne', 'Grèce', 'Portugal', 'Allemagne'][index % 5];
         images.push({
           id: `preset-eu-${index}-${Date.now()}`,
-          url: RELIABLE_FALLBACK_IMAGES.europe,
-          title: `${location.charAt(0).toUpperCase() + location.slice(1)} - Découverte culturelle`,
+          url: imageUrl,
+          title: `${country} - ${location.charAt(0).toUpperCase() + location.slice(1)} - Découverte culturelle`,
           category: 'europe',
-          country: EUROPE_LOCATIONS[index % EUROPE_LOCATIONS.length].charAt(0).toUpperCase() + EUROPE_LOCATIONS[index % EUROPE_LOCATIONS.length].slice(1),
+          country: country,
           source: 'local',
           tags: ['europe', location, 'voyage', 'culture'],
           verified: true
@@ -267,13 +408,16 @@ export const getPresetImagesByCategory = async (category: 'monde' | 'europe' | '
     }
     
     if (category === 'all' || category === 'monde') {
+      // Utiliser les 5 premières locations mondiales avec des images variées
       WORLD_LOCATIONS.slice(0, 5).forEach((location, index) => {
+        const imageUrl = DIVERSE_IMAGES.monde[index % DIVERSE_IMAGES.monde.length];
+        const country = ['États-Unis', 'Japon', 'Australie', 'Brésil', 'Maroc'][index % 5];
         images.push({
           id: `preset-world-${index}-${Date.now()}`,
-          url: RELIABLE_FALLBACK_IMAGES.monde,
-          title: `${location.charAt(0).toUpperCase() + location.slice(1)} - Aventure exotique`,
+          url: imageUrl,
+          title: `${country} - ${location.charAt(0).toUpperCase() + location.slice(1)} - Aventure exotique`,
           category: 'monde',
-          country: WORLD_LOCATIONS[index % WORLD_LOCATIONS.length].charAt(0).toUpperCase() + WORLD_LOCATIONS[index % WORLD_LOCATIONS.length].slice(1),
+          country: country,
           source: 'local',
           tags: ['monde', location, 'voyage', 'aventure', 'exotique'],
           verified: true
@@ -281,6 +425,7 @@ export const getPresetImagesByCategory = async (category: 'monde' | 'europe' | '
       });
     }
     
+    console.log(`Loaded ${images.length} preset images for category ${category}`);
     return validateAndFixImages(images);
   } catch (error) {
     console.error("Erreur lors du chargement des images préréglées:", error);
