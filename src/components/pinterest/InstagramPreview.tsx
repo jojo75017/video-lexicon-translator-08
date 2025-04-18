@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { PinterestPin } from '@/types/pinterest';
 import { Heart, MessageCircle, Bookmark, MoreHorizontal, Share, Map, Calendar } from 'lucide-react';
@@ -14,9 +15,9 @@ const InstagramPreview: React.FC<InstagramPreviewProps> = ({ pin }) => {
   };
 
   // Obtenir la source de l'image
-  const getImageSource = () => {
+  const getImageSource = (): string => {
     if (pin.uploadedImage) return pin.uploadedImage;
-    if (pin.image?.url) return pin.image.url;
+    if (pin.image?.url) return pin.image.url || '';
     return 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=600&h=600&fit=crop';
   };
 

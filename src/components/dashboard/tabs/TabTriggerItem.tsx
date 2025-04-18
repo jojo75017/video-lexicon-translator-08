@@ -33,7 +33,7 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
     if (link) return link;
     
     const routeMap: Record<string, string> = {
-      'hierarchy': '/',  // Changé de '/hierarchy' à '/' pour utiliser la racine
+      'hierarchy': '/',
       'wordcount': '/wordcount',
       'suggestions': '/suggestions',
       'seo': '/seo',
@@ -65,7 +65,24 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
     // Navigate to the appropriate path
     const path = getPath();
     console.log(`Navigation vers: ${path}`);
+    
+    // Force display of the correct section after a short delay
     navigate(path);
+    
+    // Forcer l'affichage de la section appropriée
+    setTimeout(() => {
+      const sectionId = id;
+      const section = document.querySelector(`[data-section="${sectionId}"]`);
+      if (section) {
+        console.log(`Affichage forcé de la section: ${sectionId}`);
+        document.querySelectorAll('[data-section]').forEach(el => {
+          (el as HTMLElement).style.display = 'none';
+        });
+        (section as HTMLElement).style.display = 'block';
+      } else {
+        console.log(`Section non trouvée: ${sectionId}`);
+      }
+    }, 100);
   };
 
   return (

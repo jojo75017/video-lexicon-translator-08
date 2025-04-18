@@ -23,7 +23,7 @@ const TabNavigation = () => {
       setTimeout(() => {
         activateSection(activeTab);
         console.log('TabNavigation activation retardée de section:', activeTab);
-      }, 300); // Délai pour s'assurer que le DOM est prêt
+      }, 600); // Délai augmenté pour s'assurer que le DOM est prêt
     }
   }, [activeTab]);
 
@@ -34,9 +34,15 @@ const TabNavigation = () => {
       setTimeout(() => {
         console.log(`Hash détecté dans l'URL: ${hash}, activation de la section`);
         activateSection(hash);
-      }, 300);
+      }, 600); // Délai augmenté également ici
+    } else {
+      // Si pas de hash, activer l'onglet basé sur le chemin
+      setTimeout(() => {
+        console.log(`Pas de hash, activation de l'onglet basé sur le chemin:`, activeTab);
+        activateSection(activeTab);
+      }, 600);
     }
-  }, [location]);
+  }, [location, activeTab]);
 
   return (
     <div className="mb-6" role="navigation" aria-label="Navigation du tableau de bord">

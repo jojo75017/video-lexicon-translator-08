@@ -15,7 +15,7 @@ export interface PinterestImage {
   // Ajout des propriétés manquantes
   category?: string;
   country?: string;
-  region?: string;
+  region?: GeoRegion;
 }
 
 export interface PinterestPin {
@@ -26,7 +26,7 @@ export interface PinterestPin {
   tags: string[];
   callToAction: string;
   image: PinterestImage | null;
-  uploadedImage: PinterestImage | null;
+  uploadedImage: string | null;
   design: any;
   showHashtags: boolean;
 }

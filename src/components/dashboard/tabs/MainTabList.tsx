@@ -52,7 +52,7 @@ const MainTabList: React.FC<MainTabListProps> = ({
   // Get the correct path for a main tab
   const getMainTabPath = (tabId: string): string => {
     const pathMap: Record<string, string> = {
-      'content': '/',  // Changé de '/hierarchy' à '/' pour corriger la navigation
+      'content': '/',
       'seo': '/seo',
       'performance': '/performance',
       'analytics': '/analytics',
@@ -64,8 +64,26 @@ const MainTabList: React.FC<MainTabListProps> = ({
 
   // Handle tab click with proper navigation
   const handleTabClick = (tabId: string, path: string) => {
+    console.log(`Clic sur onglet principal: ${tabId}, chemin: ${path}`);
+    
+    // Activer l'onglet
     onTabChange(tabId);
+    
+    // Naviguer vers la bonne page
     navigate(path);
+    
+    // Forcer l'activation de la section appropriée après la navigation
+    setTimeout(() => {
+      // Pour le contenu, activer hierarchy si on clique sur l'onglet principal
+      if (tabId === 'content') {
+        console.log('Activation forcée de la section hierarchy');
+        const hierarchySection = document.querySelector('[data-section="hierarchy"]');
+        if (hierarchySection) {
+          (hierarchySection as HTMLElement).style.display = 'block';
+        }
+      }
+    }, 500);
+    
     console.log(`Navigation vers l'onglet principal: ${tabId}, chemin: ${path}`);
   };
 

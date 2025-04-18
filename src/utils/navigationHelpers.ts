@@ -46,20 +46,46 @@ export const activateSection = (sectionId: string): void => {
     (el as HTMLElement).style.display = 'none';
   });
   
-  // Afficher la section demandée
-  const section = document.querySelector(`[data-section="${sectionId}"]`);
-  if (section) {
-    console.log(`Section ${sectionId} trouvée, affichage en cours`);
-    (section as HTMLElement).style.display = 'block';
-  } else {
-    console.warn(`La section ${sectionId} n'existe pas dans le DOM.`);
-    
-    // Afficher la première section disponible comme fallback
-    const firstSection = document.querySelector('[data-section]');
-    if (firstSection) {
-      console.log('Affichage de la première section disponible comme fallback');
-      (firstSection as HTMLElement).style.display = 'block';
+  // D'abord chercher par data-section
+  const sectionByData = document.querySelector(`[data-section="${sectionId}"]`);
+  if (sectionByData) {
+    console.log(`Section ${sectionId} trouvée par data-section, affichage en cours`);
+    (sectionByData as HTMLElement).style.display = 'block';
+    return;
+  }
+  
+  // Ensuite chercher par id
+  const sectionById = document.getElementById(sectionId);
+  if (sectionById) {
+    console.log(`Section ${sectionId} trouvée par id, affichage en cours`);
+    sectionById.style.display = 'block';
+    return;
+  }
+  
+  // Puis chercher par data-tab-content
+  const sectionByTab = document.querySelector(`[data-tab-content="${sectionId}"]`);
+  if (sectionByTab) {
+    console.log(`Section ${sectionId} trouvée par data-tab-content, affichage en cours`);
+    (sectionByTab as HTMLElement).style.display = 'block';
+    return;
+  }
+  
+  // Si c'est l'onglet principal "content", afficher hierarchy par défaut
+  if (sectionId === 'content') {
+    const hierarchySection = document.querySelector('[data-section="hierarchy"]');
+    if (hierarchySection) {
+      console.log('Affichage de hierarchy pour l\'onglet content');
+      (hierarchySection as HTMLElement).style.display = 'block';
+      return;
     }
+  }
+  
+  // Afficher la première section disponible comme fallback
+  console.warn(`La section ${sectionId} n'existe pas dans le DOM.`);
+  const firstSection = document.querySelector('[data-section]');
+  if (firstSection) {
+    console.log('Affichage de la première section disponible comme fallback');
+    (firstSection as HTMLElement).style.display = 'block';
   }
 };
 
@@ -91,7 +117,7 @@ export const getTabIdFromPath = (path: string): string => {
     '/signature': 'signature',
     '/local-business': 'local-business',
     '/translation': 'translation',
-    '/pinterest': 'pinterest'  // Ajout du chemin pour Pinterest
+    '/pinterest': 'pinterest'
   };
   
   return pathToTabMap[cleanPath] || 'hierarchy';
