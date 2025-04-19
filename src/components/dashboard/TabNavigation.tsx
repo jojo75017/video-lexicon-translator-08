@@ -78,6 +78,7 @@ const TabNavigation = () => {
             <TabsTrigger value="structure">Structure</TabsTrigger>
             <TabsTrigger value="performance">Performance</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="signature">Signature</TabsTrigger>
             <TabsTrigger value="pinterest">Pinterest</TabsTrigger>
           </TabsList>
         </Tabs>
