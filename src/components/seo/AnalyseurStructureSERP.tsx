@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FirecrawlService } from '@/utils/FirecrawlService';
@@ -45,7 +44,7 @@ const AnalyseurStructureSERP = () => {
         return `H${heading.level}`;
       } else if (typeof heading.level === 'string') {
         // Si c'est déjà au format "h1", "h2", etc.
-        if (heading.level.toLowerCase().startsWith('h')) {
+        if (heading.level.toLowerCase && typeof heading.level.toLowerCase === 'function' && heading.level.toLowerCase().startsWith('h')) {
           return heading.level.toUpperCase();
         }
         // Si c'est juste un nombre sous forme de chaîne
@@ -119,9 +118,29 @@ const AnalyseurStructureSERP = () => {
       }
     } catch (error) {
       console.error('Erreur lors de l\'analyse du site:', error);
-      setError(error instanceof Error ? error.message : "Une erreur s'est produite");
+      
+      // Création de données minimales en cas d'erreur
+      const basicDemoData = {
+        url: formattedUrl,
+        title: "Analyse échouée - Données de démonstration",
+        meta: [
+          { name: "description", content: "Données de démonstration pour " + formattedUrl }
+        ],
+        headings: [
+          { level: 1, text: "Titre de démonstration" },
+          { level: 2, text: "Sous-section de démonstration" }
+        ],
+        links: [
+          { href: formattedUrl, text: "Lien d'origine" }
+        ],
+        images: [],
+        sourceCode: "<html><body><h1>Titre de démonstration</h1><h2>Sous-section de démonstration</h2><p>Données de démonstration pour l'URL: " + formattedUrl + "</p></body></html>"
+      };
+      
+      setResult(basicDemoData);
+      setError("Une erreur s'est produite lors de l'analyse. Données de démonstration affichées.");
       toast.error("Erreur lors de l'analyse", {
-        description: "Impossible d'analyser le site web",
+        description: "Affichage de données de démonstration",
       });
     } finally {
       setIsLoading(false);

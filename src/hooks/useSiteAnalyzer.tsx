@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from "sonner";
 import { FirecrawlService } from '@/utils/FirecrawlService';
@@ -14,7 +13,13 @@ export const useSiteAnalyzer = () => {
   const [seoAnalysis, setSeoAnalysis] = useState<any>(null);
   const [resources, setResources] = useState<any>(null);
   const [siteStructure, setSiteStructure] = useState<any>(null);
-  const [proxyEnabled, setProxyEnabled] = useState<boolean>(false);
+  const [proxyEnabled, setProxyEnabled] = useState<boolean>(true); // Proxy enabled by default
+
+  // Activer le proxy CORS par défaut
+  useEffect(() => {
+    FirecrawlService.enableProxy();
+    setProxyEnabled(true);
+  }, []);
 
   // Fonction pour activer le proxy CORS
   const handleActivateProxy = () => {
@@ -186,15 +191,19 @@ export const useSiteAnalyzer = () => {
     
     // Message d'information pour l'utilisateur
     toast.info("Analyse en cours", {
-      description: "Cette opération peut prendre quelques instants...",
+      description: "Patientez pendant l'analyse...",
       duration: 5000,
     });
     
     try {
       console.log("Analyse du site:", url);
       
+      // S'assurer que le proxy est activé avant l'analyse
+      FirecrawlService.enableProxy();
+      setProxyEnabled(true);
+      
       // Utiliser le service FirecrawlService pour obtenir les données
-      const result = await FirecrawlService.crawlWebsite(url, proxyEnabled);
+      const result = await FirecrawlService.crawlWebsite(url, true);
       
       if (!result.success) {
         throw new Error(result.error || "Erreur inconnue lors de l'analyse");
@@ -202,8 +211,13 @@ export const useSiteAnalyzer = () => {
       
       console.log("Résultat de l'analyse:", result);
       
+      // S'assurer que les données sont valides
+      if (!result.data) {
+        throw new Error("Pas de données reçues lors de l'analyse");
+      }
+      
       // Analyser le résultat et créer des objets d'analyse
-      const crawlData = result.data[0];
+      const crawlData = result.data;
       
       // Analyser les titres avec une structure hiérarchique complète
       let headingStructure = null;
@@ -211,7 +225,8 @@ export const useSiteAnalyzer = () => {
       
       // Création d'un document temporaire pour analyser le code HTML
       const parser = new DOMParser();
-      const doc = parser.parseFromString(crawlData.sourceCode || "<html><body></body></html>", "text/html");
+      const sourceCode = crawlData.sourceCode || "<html><body></body></html>";
+      const doc = parser.parseFromString(sourceCode, "text/html");
       
       // Analyse avancée des titres
       headingStructure = analyzeHeadings(doc);
@@ -220,7 +235,7 @@ export const useSiteAnalyzer = () => {
       // Format attendu pour les headings
       if (crawlData.headings) {
         headings = crawlData.headings.map(h => ({
-          level: typeof h.level === 'string' ? parseInt(h.level.replace(/h/,'')) : h.level,
+          level: typeof h.level === 'string' ? parseInt(h.level.replace(/h/i,'')) : h.level,
           text: h.text,
           position: h.position || 0
         }));
@@ -292,7 +307,7 @@ export const useSiteAnalyzer = () => {
       // Mise à jour des états avec les données analysées
       setSeoAnalysis(seoData);
       setResources(getExternalLinkAnalysis());
-      setSiteStructure({...crawlData, sourceCode: crawlData.sourceCode || ""});
+      setSiteStructure({...crawlData, sourceCode: sourceCode});
       
       console.log("ANALYSE TERMINÉE");
       
@@ -404,7 +419,7 @@ export const useSiteAnalyzer = () => {
       setIsLoading(false);
       console.log("PROCESSUS D'ANALYSE TERMINÉ");
     }
-  }, [url, proxyEnabled, generateDemoData, getExternalLinkAnalysis, getPerformanceData]);
+  }, [url, generateDemoData, getExternalLinkAnalysis, getPerformanceData, proxyEnabled]);
 
   return {
     url,

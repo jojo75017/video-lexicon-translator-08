@@ -49,7 +49,8 @@ export const SiteInfo = ({ data }: SiteInfoProps) => {
       numericLevel = heading.level;
     } else if (typeof heading.level === 'string') {
       // Pour les formats comme "h1", "H2", etc.
-      if (heading.level.toLowerCase && heading.level.toLowerCase().startsWith('h')) {
+      if (heading.level.toLowerCase && typeof heading.level.toLowerCase === 'function' && 
+          heading.level.toLowerCase().startsWith('h')) {
         numericLevel = parseInt(heading.level.charAt(1));
       } else {
         // Pour les formats purement numériques comme "1", "2"

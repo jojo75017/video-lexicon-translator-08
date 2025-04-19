@@ -1,4 +1,6 @@
 
+// On met à jour uniquement les parties problématiques du service FirecrawlService
+
 import FirecrawlApp from '@mendable/firecrawl-js';
 
 interface ErrorResponse {
@@ -281,11 +283,14 @@ export class FirecrawlService {
         console.error('Error parsing HTML:', parseError);
         
         // En cas d'erreur de parsing, retourner une structure minimale
+        const domainMatch = url.match(/^(?:https?:\/\/)?(?:www\.)?([^:\/\n?]+)/);
+        const domain = domainMatch ? domainMatch[1] : url;
+        
         return {
           success: true,
           data: {
             url,
-            title: url,
+            title: domain || url,
             headings: [{ level: 1, text: "Contenu non disponible", position: 0 }],
             meta: [],
             images: [],
