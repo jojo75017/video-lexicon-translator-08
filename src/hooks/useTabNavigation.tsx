@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { tabs } from '@/components/dashboard/tabs/TabData';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { toast } from "sonner";
 
 export interface MainTab {
   id: string;
@@ -14,13 +15,13 @@ export const useTabNavigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // Déterminer l'onglet actif basé sur le chemin actuel
+  // Déterminer l'onglet actif basé sur le chemin actuel avec plus de précision
   const determineActiveTab = (): string => {
     const path = location.pathname.replace('/', '');
     
-    // Mappings des chemins aux onglets
     const pathToTabMap: Record<string, string> = {
       '': 'hierarchy',
+      'index': 'hierarchy',
       'hierarchy': 'hierarchy',
       'wordcount': 'wordcount',
       'seo': 'seo',
@@ -29,8 +30,13 @@ export const useTabNavigation = () => {
       'analytics': 'analytics',
       'suggestions': 'suggestions',
       'backlinks': 'backlinks',
-      'metrics': 'metrics'
+      'metrics': 'metrics',
+      // Ajoutez d'autres chemins si nécessaire
     };
+    
+    // Log pour le débogage
+    console.log('Current Path:', path);
+    console.log('Mapped Tab:', pathToTabMap[path] || 'hierarchy');
     
     return pathToTabMap[path] || 'hierarchy';
   };
@@ -39,7 +45,9 @@ export const useTabNavigation = () => {
   
   // Mettre à jour l'onglet actif lorsque le chemin change
   useEffect(() => {
-    setActiveTab(determineActiveTab());
+    const newActiveTab = determineActiveTab();
+    console.log('Updating active tab:', newActiveTab);
+    setActiveTab(newActiveTab);
   }, [location.pathname]);
   
   // Définir les catégories principales avec les chemins de navigation
@@ -75,9 +83,16 @@ export const useTabNavigation = () => {
       'analytics': '/analytics'
     };
     
-    // Forcer la navigation si nécessaire, mais sans rediriger si nous sommes déjà sur la bonne page
-    if (tabPaths[value] && location.pathname !== tabPaths[value]) {
+    // Forcer la navigation si nécessaire
+    if (tabPaths[value]) {
+      console.log(`Navigating to: ${tabPaths[value]}`);
       navigate(tabPaths[value]);
+      
+      // Notification visuelle du changement d'onglet
+      toast.info(`Navigation vers ${value}`, {
+        description: "Chargement de la page...",
+        duration: 1500
+      });
     }
   };
 
@@ -125,3 +140,4 @@ export const useTabNavigation = () => {
     handleTabChange
   };
 };
+
