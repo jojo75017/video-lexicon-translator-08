@@ -1,9 +1,6 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import TabTriggerItem from './TabTriggerItem';
-import { activateSection } from '@/utils/navigationHelpers';
-import { toast } from "sonner";
 
 interface SubTabListProps {
   tabs: any[];
@@ -14,70 +11,29 @@ interface SubTabListProps {
 const SubTabList: React.FC<SubTabListProps> = ({ tabs, activeTab, onTabChange }) => {
   const navigate = useNavigate();
 
-  const handleTabClick = (tabId: string, tabLink?: string) => {
-    // Si le tab a un lien externe, ouvrir dans un nouvel onglet
-    if (tabLink) {
-      window.open(tabLink, '_blank');
-      return;
-    }
-    
-    // Sinon, naviguer en interne avec notification
-    console.log(`SubTabList: Clic sur l'onglet ${tabId}`);
-    
-    // Notification de changement d'onglet
-    toast.info(`Navigation vers ${tabId}`, {
-      description: "Chargement de la page...",
-      duration: 1500
-    });
-    
-    // Mettre à jour l'onglet actif
+  const handleTabClick = (tabId: string) => {
+    console.log('SubTabList click:', tabId);
     onTabChange(tabId);
-    
-    // Naviguer vers la bonne page
-    const tabRoutes: Record<string, string> = {
-      'hierarchy': '/hierarchy',
-      'wordcount': '/wordcount',
-      'suggestions': '/suggestions',
-      'seo': '/seo',
-      'structure': '/structure',
-      'backlinks': '/backlinks',
-      'performance': '/performance',
-      'metrics': '/metrics',
-      'analytics': '/analytics',
-      'quora': '/quora',
-      'signature': '/signature',
-      'local-business': '/local-business',
-      'translation': '/translation',
-      'pinterest': '/pinterest'
-    };
-    
-    if (tabRoutes[tabId]) {
-      // Naviguer vers la page appropriée
-      console.log(`SubTabList: Navigation vers ${tabRoutes[tabId]}`);
-      navigate(tabRoutes[tabId]);
-      
-      // Attendre pour activer la section
-      setTimeout(() => {
-        console.log(`SubTabList: Activation de la section ${tabId}`);
-        activateSection(tabId);
-      }, 1500);
-    }
+    navigate(`/${tabId}`);
   };
 
   return (
-    <div className="flex gap-2 overflow-x-auto pb-2 hide-scrollbar">
+    <div className="flex flex-wrap gap-2">
       {tabs.map((tab) => (
-        <TabTriggerItem
+        <button
           key={tab.id}
-          id={tab.id}
-          icon={tab.icon}
-          label={tab.label}
-          color={tab.color}
-          isNew={tab.isNew}
-          link={tab.link}
-          highlighted={activeTab === tab.id}
-          onClick={() => handleTabClick(tab.id, tab.link)}
-        />
+          onClick={() => handleTabClick(tab.id)}
+          className={`
+            px-3 py-1.5 rounded-md text-sm font-medium transition-all
+            flex items-center gap-2
+            ${activeTab === tab.id ? 
+              'bg-primary/10 text-primary' : 
+              'hover:bg-gray-100 text-gray-600'}
+          `}
+        >
+          <span>{tab.icon}</span>
+          <span>{tab.label}</span>
+        </button>
       ))}
     </div>
   );

@@ -1,117 +1,56 @@
 
 import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { getMainTabCategory, activateSection } from '@/utils/navigationHelpers';
-import { toast } from "sonner";
+import { useNavigate } from 'react-router-dom';
+import { BarChart2, FileText, Zap, PieChart } from 'lucide-react';
 
-interface MainTab {
-  id: string;
-  label: string;
-  color: string;
-  path?: string;
-}
-
-interface MainTabListProps {
-  mainTabs: MainTab[];
+interface MainTabProps {
+  mainTabs: any[];
   activeTab: string;
-  onTabChange: (tabId: string) => void;
+  onTabChange: (value: string) => void;
 }
 
-const MainTabList: React.FC<MainTabListProps> = ({ 
-  mainTabs,
-  activeTab,
-  onTabChange
-}) => {
-  const location = useLocation();
+const MainTabList: React.FC<MainTabProps> = ({ mainTabs, activeTab, onTabChange }) => {
   const navigate = useNavigate();
   
-  // Helper function to determine if a tab is active
-  const isTabActive = (tabId: string): boolean => {
-    const currentPath = location.pathname;
-    
-    // Check current path against tab path
-    const tabPaths: Record<string, string[]> = {
-      'content': ['/', '/hierarchy', '/wordcount', '/suggestions'],
-      'seo': ['/seo', '/structure', '/backlinks'],
-      'performance': ['/performance', '/metrics'],
-      'analytics': ['/analytics'],
-      'tools': ['/signature', '/quora', '/local-business', '/translation', '/pinterest'],
-    };
-    
-    if (tabPaths[tabId] && tabPaths[tabId].includes(currentPath)) {
-      return true;
+  const getTabIcon = (id: string) => {
+    switch (id) {
+      case 'content':
+        return <FileText className="w-4 h-4" />;
+      case 'seo':
+        return <BarChart2 className="w-4 h-4" />;
+      case 'performance':
+        return <Zap className="w-4 h-4" />;
+      case 'analytics':
+        return <PieChart className="w-4 h-4" />;
+      default:
+        return <FileText className="w-4 h-4" />;
     }
-    
-    // Fallback to id-based check
-    if (activeTab === tabId) return true;
-    
-    // Check for subtabs
-    const currentTabCategory = getMainTabCategory(activeTab);
-    return currentTabCategory === tabId;
   };
 
-  // Get the correct path for a main tab
-  const getMainTabPath = (tabId: string): string => {
-    const pathMap: Record<string, string> = {
-      'content': '/hierarchy',
-      'seo': '/seo',
-      'performance': '/performance',
-      'analytics': '/analytics',
-      'tools': '/signature'
-    };
-    
-    return pathMap[tabId] || '/';
-  };
-
-  // Handle tab click with proper navigation
-  const handleTabClick = (tabId: string, path: string) => {
-    console.log(`MainTabList: Clic sur onglet principal: ${tabId}, chemin: ${path}`);
-    
-    // Notification de changement d'onglet
-    toast.info(`Navigation vers ${tabId}`, {
-      description: "Chargement de la page...",
-      duration: 1500
-    });
-    
-    // Activer l'onglet
+  const handleTabClick = (tabId: string, path: string = '/') => {
+    console.log('MainTabList click:', tabId);
     onTabChange(tabId);
-    
-    // Naviguer vers la bonne page
     navigate(path);
-    
-    // Attendre que la navigation soit terminée avant d'activer la section
-    setTimeout(() => {
-      console.log(`MainTabList: Activation de la section ${tabId} après changement d'onglet principal`);
-      
-      // Pour l'onglet "content", activer "hierarchy" par défaut
-      if (tabId === 'content') {
-        activateSection('hierarchy');
-      } else {
-        activateSection(tabId);
-      }
-    }, 1500);
   };
 
   return (
-    <nav className="flex rounded-lg bg-white shadow-sm mb-4 overflow-hidden" aria-label="Navigation principale">
-      {mainTabs.map(tab => (
+    <div className="flex space-x-2">
+      {mainTabs.map((tab) => (
         <button
           key={tab.id}
-          id={`main-tab-${tab.id}`}
-          className={`flex-1 py-3 px-4 text-center cursor-pointer transition-all border-b-2 ${
-            isTabActive(tab.id)
-              ? `border-b-2 ${tab.color} font-medium`
-              : 'border-transparent hover:bg-gray-50'
-          }`}
-          data-main-tab={tab.id}
-          onClick={() => handleTabClick(tab.id, tab.path || getMainTabPath(tab.id))}
-          aria-current={isTabActive(tab.id) ? "page" : undefined}
-          aria-label={`Accéder à la section ${tab.label}`}
+          onClick={() => handleTabClick(tab.id, tab.path)}
+          className={`
+            flex items-center px-4 py-2 rounded-lg transition-all
+            ${activeTab === tab.id ? 
+              'bg-primary text-white shadow-sm' : 
+              'hover:bg-gray-100 text-gray-600'}
+          `}
         >
-          {tab.label}
+          {getTabIcon(tab.id)}
+          <span className="ml-2 font-medium">{tab.label}</span>
         </button>
       ))}
-    </nav>
+    </div>
   );
 };
 
