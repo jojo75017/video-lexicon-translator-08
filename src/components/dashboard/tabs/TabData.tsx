@@ -162,7 +162,8 @@ export const tabs: Tab[] = [
     group: 'tools',
     color: 'text-red-600',
     isNew: true,
-    highlighted: true
+    highlighted: true,
+    path: '/pinterest'
   },
   {
     id: 'quora',

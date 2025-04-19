@@ -39,8 +39,10 @@ function App() {
         <Route path="/analytics" element={<AnalyticsPage />} />
         <Route path="/quora" element={<QuoraPage />} />
         <Route path="/signature" element={<SignaturePage />} />
+        <Route path="/pinterest" element={<PinterestPage />} />
+        <Route path="/generateur-images" element={<ImageGeneratorPage />} />
+        <Route path="/generateur-prompts" element={<PromptGeneratorPage />} />
         
-        {/* Keep all other routes */}
         <Route path="/hierarchie" element={<HierarchyPage />} />
         <Route path="/metriques" element={<MetricsPage />} />
         <Route path="/suggestions" element={<SuggestionsPage />} />
@@ -53,9 +55,6 @@ function App() {
         <Route path="/blog/categorie/:categorie" element={<CategorieBlogPage />} />
         <Route path="/blog/:slug" element={<ArticleBlogPage />} />
         <Route path="/entreprises-locales" element={<LocalBusinessPage />} />
-        <Route path="/pinterest" element={<PinterestPage />} />
-        <Route path="/generateur-images" element={<ImageGeneratorPage />} />
-        <Route path="/generateur-prompts" element={<PromptGeneratorPage />} />
       </Routes>
       <Toaster />
     </Router>

@@ -17,7 +17,8 @@ const TabNavigation = () => {
     '/performance': 'performance',
     '/analytics': 'analytics',
     '/quora': 'quora',
-    '/signature': 'signature'
+    '/signature': 'signature',
+    '/pinterest': 'pinterest'
   };
   
   // Get current active tab based on URL
@@ -36,7 +37,8 @@ const TabNavigation = () => {
       'performance': '/performance',
       'analytics': '/analytics',
       'quora': '/quora',
-      'signature': '/signature'
+      'signature': '/signature',
+      'pinterest': '/pinterest'
     };
     
     // Navigate to the corresponding route
@@ -76,6 +78,7 @@ const TabNavigation = () => {
             <TabsTrigger value="structure">Structure</TabsTrigger>
             <TabsTrigger value="performance">Performance</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="pinterest">Pinterest</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>

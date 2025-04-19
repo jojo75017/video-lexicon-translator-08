@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ScrollText, BarChart, Search, ExternalLink, CheckCircle, PenTool, FileSearch } from 'lucide-react';
+import { ScrollText, BarChart, Search, ExternalLink, CheckCircle, PenTool, FileSearch, Image } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate } from 'react-router-dom';
@@ -18,7 +18,8 @@ const PageHeader = () => {
       'seo': '/seo',
       'structure': '/structure',
       'performance': '/performance',
-      'analytics': '/analytics'
+      'analytics': '/analytics',
+      'pinterest': '/pinterest'
     };
     
     // Navigate to the corresponding route
@@ -133,6 +134,15 @@ const PageHeader = () => {
               >
                 <CheckCircle className="h-4 w-4" />
                 <span>Analytics</span>
+              </TabsTrigger>
+              
+              <TabsTrigger 
+                value="pinterest" 
+                className="data-[state=active]:bg-white/20 text-white data-[state=active]:text-white hover:bg-white/20 hover:text-white flex gap-2 items-center"
+                onClick={() => handleTabClick('pinterest')}
+              >
+                <Image className="h-4 w-4" />
+                <span>Pinterest</span>
               </TabsTrigger>
             </TabsList>
           </Tabs>
