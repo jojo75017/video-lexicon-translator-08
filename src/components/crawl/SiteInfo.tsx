@@ -21,14 +21,15 @@ export const SiteInfo = ({ data }: SiteInfoProps) => {
     dataObject: data
   });
   
-  // Fonction utilitaire pour formater le niveau de titre
+  // Fonction utilitaire pour formater le niveau de titre de manière sécurisée
   const formatHeadingLevel = (heading: any): string => {
     if (!heading || heading.level === undefined) return "H?";
     
     if (typeof heading.level === 'number') {
       return `H${heading.level}`;
     } else if (typeof heading.level === 'string') {
-      if (heading.level.toLowerCase && heading.level.toLowerCase().startsWith('h')) {
+      if (heading.level.toLowerCase && typeof heading.level.toLowerCase === 'function' && 
+          heading.level.toLowerCase().startsWith('h')) {
         return heading.level.toUpperCase();
       }
       return `H${heading.level}`;

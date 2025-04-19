@@ -21,7 +21,7 @@ type CrawlResponse = CrawlStatusResponse | ErrorResponse;
 export class FirecrawlService {
   private static API_KEY_STORAGE_KEY = 'firecrawl_api_key';
   private static firecrawlApp: FirecrawlApp | null = null;
-  private static proxyEnabled = true; // Always enable proxy by default
+  private static proxyEnabled = false; // Par défaut, le proxy est désactivé
   private static proxyUrl = 'https://corsproxy.io/?';
   private static proxyUrls = [
     'https://corsproxy.io/?',
@@ -68,27 +68,24 @@ export class FirecrawlService {
     }
   }
 
-  static async crawlWebsite(url: string, useProxy = true): Promise<{ success: boolean; error?: string; data?: any }> {
+  static async crawlWebsite(url: string, useProxy = false): Promise<{ success: boolean; error?: string; data?: any }> {
     console.log(`Crawling website: ${url}, useProxy: ${useProxy || this.proxyEnabled}`);
     
-    // Toujours utiliser le proxy pour une meilleure compatibilité
-    this.proxyEnabled = true;
+    // Vérifier si le proxy est activé manuellement ou via le paramètre
+    const shouldUseProxy = useProxy || this.proxyEnabled;
     
-    // Essayer d'abord avec fetchWithProxy qui est plus fiable
-    try {
-      console.log('Starting with proxy method directly');
-      const proxyResult = await this.fetchWithProxy(url);
-      
-      if (proxyResult.success && proxyResult.data) {
-        console.log('Proxy method succeeded directly');
-        return proxyResult;
+    // Si le proxy est activé, utiliser fetchWithProxy
+    if (shouldUseProxy) {
+      try {
+        console.log('Using proxy method');
+        return this.fetchWithProxy(url);
+      } catch (error) {
+        console.error('Error fetching with proxy:', error);
+        // Fallback to API key method
       }
-    } catch (error) {
-      console.error('Initial proxy fetch failed:', error);
-      // Continue to API key method
     }
 
-    // Méthode API key comme fallback
+    // Méthode API key comme fallback ou méthode principale si le proxy n'est pas activé
     const apiKey = this.getApiKey();
     if (apiKey) {
       try {
@@ -130,23 +127,28 @@ export class FirecrawlService {
         };
       } catch (error) {
         console.error('Error during crawl with API key:', error);
-        // Fallback to proxy method if API key method fails
-        console.log('Falling back to proxy method');
-        return this.fetchWithProxy(url);
+        // Fallback to proxy method if API key method fails and proxy wasn't already tried
+        if (!shouldUseProxy) {
+          console.log('Falling back to proxy method');
+          return this.fetchWithProxy(url);
+        } else {
+          throw error;
+        }
       }
     } else {
-      // No API key, use proxy method
-      console.log('No API key found, using proxy method');
-      return this.fetchWithProxy(url);
+      // No API key, use proxy method if not already tried
+      if (!shouldUseProxy) {
+        console.log('No API key found, using proxy method');
+        return this.fetchWithProxy(url);
+      } else {
+        throw new Error('No API key found and proxy method already failed');
+      }
     }
   }
 
   private static async fetchWithProxy(url: string): Promise<{ success: boolean; error?: string; data?: any }> {
     try {
       console.log('Fetching with proxy', this.proxyEnabled ? 'enabled' : 'disabled');
-      
-      // Toujours utiliser le proxy
-      this.proxyEnabled = true;
       
       let sourceCode = null;
       let error = null;

@@ -1,11 +1,12 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Loader2, Globe, Search, AlertTriangle, ExternalLink } from "lucide-react";
+import { Loader2, Globe, Search, AlertTriangle, ExternalLink, Shield } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import SiteAnalysisService from '@/utils/siteAnalysisUtils';
+import { FirecrawlService } from '@/utils/FirecrawlService';
 
 interface UrlInputProps {
   url: string;
@@ -24,6 +25,13 @@ const UrlInput = ({
   showCorsWarning = false, 
   handleActivateProxy 
 }: UrlInputProps) => {
+  const [proxyEnabled, setProxyEnabled] = useState(false);
+
+  // Vérifier si le proxy est déjà activé au chargement
+  useEffect(() => {
+    setProxyEnabled(FirecrawlService.isProxyEnabled());
+  }, []);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -68,14 +76,24 @@ const UrlInput = ({
     e.preventDefault();
     e.stopPropagation();
     console.log("Activating proxy");
+    
+    // Activation du proxy dans FirecrawlService
+    FirecrawlService.enableProxy();
+    setProxyEnabled(true);
+    
+    // Activation dans SiteAnalysisService si disponible
+    if (SiteAnalysisService && typeof SiteAnalysisService.enableProxy === 'function') {
+      SiteAnalysisService.enableProxy();
+    }
+    
+    // Appel du handler fourni par le parent si disponible
     if (handleActivateProxy) {
       handleActivateProxy();
-      // Activez également dans le service SiteAnalysis
-      SiteAnalysisService.enableProxy();
-      toast.success("Proxy CORS activé", {
-        description: "Vous pouvez maintenant analyser des sites externes"
-      });
     }
+    
+    toast.success("Proxy CORS activé", {
+      description: "Vous pouvez maintenant analyser des sites externes"
+    });
   };
 
   return (
@@ -120,7 +138,33 @@ const UrlInput = ({
         </div>
       </div>
       
-      {showCorsWarning && handleActivateProxy && (
+      {/* Bouton pour activer le proxy CORS (toujours visible) */}
+      <div className="flex justify-between items-center mt-4 bg-amber-50 p-3 rounded-md border border-amber-100">
+        <div className="flex items-center">
+          <Shield className="h-5 w-5 mr-3 text-amber-600" />
+          <div>
+            <p className="font-medium text-amber-800">Proxy CORS</p>
+            <p className="text-sm text-amber-700">
+              {proxyEnabled 
+                ? "Le proxy CORS est activé. Vous pouvez analyser des sites externes." 
+                : "Activez le proxy CORS pour analyser des sites externes."}
+            </p>
+          </div>
+        </div>
+        <Button
+          onClick={handleActivateProxyClick}
+          size="sm"
+          variant={proxyEnabled ? "outline" : "default"}
+          className={proxyEnabled 
+            ? "border-green-200 text-green-800 hover:bg-green-100" 
+            : "bg-amber-600 hover:bg-amber-700 text-white"}
+          type="button"
+        >
+          {proxyEnabled ? "Proxy Activé ✓" : "Activer le Proxy"}
+        </Button>
+      </div>
+      
+      {showCorsWarning && (
         <div className="text-sm text-amber-700 bg-amber-50 p-3 rounded-md border border-amber-100 flex items-start">
           <AlertTriangle className="h-4 w-4 mr-2 text-amber-600 flex-shrink-0 mt-0.5" />
           <div>
