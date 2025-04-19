@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { RocketIcon, Sparkles, Zap, BarChart4, Gauge, Globe, Search, FileSignature } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -7,23 +6,23 @@ import { Button } from '@/components/ui/button';
 
 const DashboardHeader = () => {
   const stats = [
-    { label: 'Score SEO', value: '78/100', icon: <Gauge className="h-5 w-5 text-success-500" />, change: '+12%', trend: 'up' },
-    { label: 'Pages analysées', value: '42', icon: <Search className="h-5 w-5 text-primary-500" />, change: '+5', trend: 'up' },
-    { label: 'Visiteurs', value: '1,245', icon: <Globe className="h-5 w-5 text-success-500" />, change: '+18%', trend: 'up' },
-    { label: 'Temps de chargement', value: '1.4s', icon: <Zap className="h-5 w-5 text-primary-500" />, change: '-0.3s', trend: 'down' },
+    { label: 'Score SEO', value: '78/100', icon: <Gauge className="h-5 w-5 text-light-green-300" />, change: '+12%', trend: 'up' },
+    { label: 'Pages analysées', value: '42', icon: <Search className="h-5 w-5 text-light-green-400" />, change: '+5', trend: 'up' },
+    { label: 'Visiteurs', value: '1,245', icon: <Globe className="h-5 w-5 text-light-green-300" />, change: '+18%', trend: 'up' },
+    { label: 'Temps de chargement', value: '1.4s', icon: <Zap className="h-5 w-5 text-light-green-400" />, change: '-0.3s', trend: 'down' },
   ];
 
   return (
     <>
-      <div className="bg-gradient-to-br from-primary-600 via-primary-500 to-primary-700 shadow-lg rounded-xl p-8 mb-8 text-white">
+      <div className="bg-gradient-to-br from-light-green-50 via-light-green-100 to-light-green-200 shadow-lg rounded-xl p-8 mb-8 text-gray-800">
         <div className="max-w-5xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-left">
               <h1 className="text-3xl font-bold mb-3 flex items-center">
-                <BarChart4 className="h-8 w-8 mr-3 text-white" />
+                <BarChart4 className="h-8 w-8 mr-3 text-gray-800" />
                 Tableau de bord SEO
               </h1>
-              <p className="text-primary-100 text-lg">
+              <p className="text-gray-600 text-lg">
                 Analysez et optimisez votre présence en ligne avec nos outils professionnels
               </p>
             </div>
@@ -50,7 +49,7 @@ const DashboardHeader = () => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
         {stats.map((stat, index) => (
-          <Card key={index} className="p-6 border-0 shadow-md hover:shadow-lg transition-shadow bg-white rounded-xl">
+          <Card key={index} className="p-6 border-0 shadow-md hover:shadow-lg transition-shadow bg-light-green-50 rounded-xl border border-light-green-200">
             <div className="flex justify-between items-start">
               <div>
                 <p className="text-sm font-medium text-gray-500 flex items-center">

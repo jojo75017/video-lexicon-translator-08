@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { NewProjectButton } from '../seo/buttons/NewProjectButton';
 import { RankingButton } from '../seo/buttons/RankingButton';
@@ -14,7 +13,7 @@ import { Button } from '@/components/ui/button';
 
 const SeoActionButtons = () => {
   return (
-    <Card className="p-6 shadow-lg mb-8 border-0 bg-gradient-to-br from-white to-gray-50">
+    <Card className="p-6 shadow-lg mb-8 border-0 bg-gradient-to-br from-light-green-50 to-light-green-100">
       <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center">
           <div className="w-1 h-6 bg-primary-600 rounded-full mr-3"></div>
