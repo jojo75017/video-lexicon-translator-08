@@ -71,10 +71,10 @@ export class FirecrawlService {
   static async crawlWebsite(url: string, useProxy = true): Promise<{ success: boolean; error?: string; data?: any }> {
     console.log(`Crawling website: ${url}, useProxy: ${useProxy || this.proxyEnabled}`);
     
-    // Always use proxy for better compatibility
+    // Toujours utiliser le proxy pour une meilleure compatibilité
     this.proxyEnabled = true;
     
-    // First try with fetchWithProxy which is more reliable
+    // Essayer d'abord avec fetchWithProxy qui est plus fiable
     try {
       console.log('Starting with proxy method directly');
       const proxyResult = await this.fetchWithProxy(url);
@@ -88,7 +88,7 @@ export class FirecrawlService {
       // Continue to API key method
     }
 
-    // API key method as fallback
+    // Méthode API key comme fallback
     const apiKey = this.getApiKey();
     if (apiKey) {
       try {
@@ -111,7 +111,7 @@ export class FirecrawlService {
 
         console.log('Crawl successful:', crawlResponse);
         
-        // Process the data to ensure it has a consistent structure
+        // Traiter les données pour assurer une structure cohérente
         let processedData;
         if (Array.isArray(crawlResponse.data) && crawlResponse.data.length > 0) {
           processedData = crawlResponse.data[0];
@@ -130,7 +130,7 @@ export class FirecrawlService {
         };
       } catch (error) {
         console.error('Error during crawl with API key:', error);
-        // Fall back to proxy method if API key method fails
+        // Fallback to proxy method if API key method fails
         console.log('Falling back to proxy method');
         return this.fetchWithProxy(url);
       }
@@ -145,13 +145,13 @@ export class FirecrawlService {
     try {
       console.log('Fetching with proxy', this.proxyEnabled ? 'enabled' : 'disabled');
       
-      // Always use proxy
+      // Toujours utiliser le proxy
       this.proxyEnabled = true;
       
       let sourceCode = null;
       let error = null;
       
-      // Try each proxy until one works
+      // Essayer chaque proxy jusqu'à ce qu'un fonctionne
       for (const proxy of this.proxyUrls) {
         try {
           const proxyUrl = proxy + encodeURIComponent(url);
@@ -182,7 +182,7 @@ export class FirecrawlService {
       if (!sourceCode) {
         console.warn('All proxies failed, creating minimal demo data');
         
-        // Create minimal demo data when all proxies fail
+        // Créer des données minimales de démo quand tous les proxys échouent
         const domainMatch = url.match(/^(?:https?:\/\/)?(?:www\.)?([^:\/\n?]+)/);
         const domain = domainMatch ? domainMatch[1] : url;
         
@@ -206,16 +206,16 @@ export class FirecrawlService {
 </html>`;
       }
       
-      // Extract basic metadata from HTML
+      // Extraire les métadonnées de base du HTML
       const parser = new DOMParser();
       const doc = parser.parseFromString(sourceCode, 'text/html');
       
       const title = doc.querySelector('title')?.textContent || url;
       
-      // Process headings with proper level formatting
+      // Traiter les titres avec un formatage de niveau approprié
       const headingElements = [...doc.querySelectorAll('h1, h2, h3, h4, h5, h6')];
       const headings = headingElements.map((el, index) => {
-        // Get the heading level from the tag name (h1, h2, etc.)
+        // Obtenir le niveau de titre à partir du nom de balise (h1, h2, etc.)
         const levelFromTag = parseInt(el.tagName.charAt(1));
         return { 
           level: levelFromTag, 
@@ -224,14 +224,14 @@ export class FirecrawlService {
         };
       });
       
-      // Extract meta tags
+      // Extraire les balises meta
       const meta = Array.from(doc.querySelectorAll('meta')).map(el => ({
         name: el.getAttribute('name'),
         property: el.getAttribute('property'),
         content: el.getAttribute('content')
       }));
       
-      // Extract images
+      // Extraire les images
       const images = Array.from(doc.querySelectorAll('img')).map(el => ({
         src: el.getAttribute('src'),
         alt: el.getAttribute('alt') || '',
@@ -239,7 +239,7 @@ export class FirecrawlService {
         height: el.getAttribute('height') || ''
       }));
       
-      // Extract paragraphs
+      // Extraire les paragraphes
       const paragraphs = Array.from(doc.querySelectorAll('p')).map((el, index) => ({
         text: el.textContent?.trim() || '',
         position: index
@@ -262,19 +262,24 @@ export class FirecrawlService {
       };
     } catch (error) {
       console.error('Error fetching with proxy:', error);
-      // Return a minimal valid response structure even on error
+      // Retourner une structure de réponse valide minimale même en cas d'erreur
+      const domainMatch = url.match(/^(?:https?:\/\/)?(?:www\.)?([^:\/\n?]+)/);
+      const domain = domainMatch ? domainMatch[1] : url;
+      
       return {
         success: true,
         data: {
           url,
-          title: url,
+          title: domain || url,
           headings: [
-            { level: 1, text: "Demo Content" },
-            { level: 2, text: "Error Information" }
+            { level: 1, text: "Contenu de démonstration", position: 0 },
+            { level: 2, text: "Informations d'erreur", position: 1 }
           ],
           meta: [],
-          sourceCode: "<html><body><h1>Demo Content</h1><p>Error fetching content</p></body></html>",
-          textContent: "Error fetching content"
+          images: [],
+          paragraphs: [{ text: "Erreur lors de la récupération du contenu", position: 0 }],
+          sourceCode: "<html><body><h1>Contenu de démonstration</h1><p>Erreur lors de la récupération du contenu</p></body></html>",
+          textContent: "Erreur lors de la récupération du contenu"
         }
       };
     }

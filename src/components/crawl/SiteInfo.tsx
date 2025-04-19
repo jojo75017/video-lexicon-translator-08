@@ -6,7 +6,7 @@ interface SiteInfoProps {
 }
 
 export const SiteInfo = ({ data }: SiteInfoProps) => {
-  // Safety checks to avoid errors if data is missing
+  // Vérifications de sécurité pour éviter les erreurs si les données sont manquantes
   const hasMeta = data?.meta && Array.isArray(data.meta) && data.meta.length > 0;
   const hasHeadings = data?.headings && Array.isArray(data.headings) && data.headings.length > 0;
   const hasLinks = data?.links && Array.isArray(data.links) && data.links.length > 0;
@@ -20,6 +20,22 @@ export const SiteInfo = ({ data }: SiteInfoProps) => {
     title: data?.title,
     dataObject: data
   });
+  
+  // Fonction utilitaire pour formater le niveau de titre
+  const formatHeadingLevel = (heading: any): string => {
+    if (!heading || heading.level === undefined) return "H?";
+    
+    if (typeof heading.level === 'number') {
+      return `H${heading.level}`;
+    } else if (typeof heading.level === 'string') {
+      if (heading.level.toLowerCase && heading.level.toLowerCase().startsWith('h')) {
+        return heading.level.toUpperCase();
+      }
+      return `H${heading.level}`;
+    }
+    
+    return "H?";
+  };
   
   return (
     <>
@@ -40,7 +56,7 @@ export const SiteInfo = ({ data }: SiteInfoProps) => {
           {hasMeta ? (
             data.meta.map((meta: any, index: number) => (
               <p key={index} className="flex gap-2 items-start py-1 border-b border-gray-100 last:border-0">
-                <span className="font-medium min-w-[80px]">{meta.name || "Sans nom"}:</span>
+                <span className="font-medium min-w-[80px]">{meta.name || meta.property || "Sans nom"}:</span>
                 <span className="text-gray-600">{meta.content || "Vide"}</span>
               </p>
             ))
@@ -57,20 +73,26 @@ export const SiteInfo = ({ data }: SiteInfoProps) => {
         </h4>
         <div className="text-sm space-y-1 max-h-60 overflow-y-auto">
           {hasHeadings ? (
-            data.headings.map((heading: any, index: number) => (
-              <div 
-                key={index} 
-                className={`py-1.5 px-3 rounded-md mb-1 ${
-                  heading.level === "h1" ? 'bg-blue-50 font-bold' : 
-                  heading.level === "h2" ? 'bg-blue-50/60 font-semibold ml-4' : 
-                  heading.level === "h3" ? 'bg-blue-50/30 ml-8' : 
-                  'bg-gray-50 ml-12'
-                }`}
-              >
-                <span className="font-medium mr-2">{heading.level.toUpperCase()}:</span>
-                <span>{heading.text}</span>
-              </div>
-            ))
+            data.headings.map((heading: any, index: number) => {
+              // Déterminer le niveau de titre de manière sécurisée
+              const headingLevel = formatHeadingLevel(heading);
+              const level = heading.level;
+              
+              return (
+                <div 
+                  key={index} 
+                  className={`py-1.5 px-3 rounded-md mb-1 ${
+                    level === 1 || level === "h1" || level === "H1" ? 'bg-blue-50 font-bold' : 
+                    level === 2 || level === "h2" || level === "H2" ? 'bg-blue-50/60 font-semibold ml-4' : 
+                    level === 3 || level === "h3" || level === "H3" ? 'bg-blue-50/30 ml-8' : 
+                    'bg-gray-50 ml-12'
+                  }`}
+                >
+                  <span className="font-medium mr-2">{headingLevel}:</span>
+                  <span>{heading.text}</span>
+                </div>
+              );
+            })
           ) : (
             <p className="text-gray-500 italic">Aucune donnée de structure disponible</p>
           )}
