@@ -1,6 +1,7 @@
+
 import React from 'react';
 import './App.css';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Accueil from './pages/Accueil';
 import HierarchyPage from './pages/HierarchyPage';
 import MetricsPage from './pages/MetricsPage';
@@ -27,10 +28,13 @@ import IndexPage from './pages/Index';
 import { Toaster } from '@/components/ui/sonner';
 
 function App() {
+  console.log("App rendering");
+  
   return (
     <Router>
       <Routes>
         <Route path="/" element={<IndexPage />} />
+        <Route path="/index" element={<Navigate to="/" replace />} />
         <Route path="/hierarchy" element={<HierarchyPage />} />
         <Route path="/wordcount" element={<WordCountPage />} />
         <Route path="/seo" element={<OutilsSeo />} />
@@ -42,10 +46,12 @@ function App() {
         <Route path="/pinterest" element={<PinterestPage />} />
         <Route path="/generateur-images" element={<ImageGeneratorPage />} />
         <Route path="/generateur-prompts" element={<PromptGeneratorPage />} />
+        <Route path="/suggestions" element={<SuggestionsPage />} />
+        <Route path="/backlinks" element={<OutilsSeo />} />
+        <Route path="/metrics" element={<MetricsPage />} />
         
         <Route path="/hierarchie" element={<HierarchyPage />} />
         <Route path="/metriques" element={<MetricsPage />} />
-        <Route path="/suggestions" element={<SuggestionsPage />} />
         <Route path="/nombre-mots" element={<WordCountPage />} />
         <Route path="/traduction" element={<TranslationPage />} />
         <Route path="/plan-du-site" element={<PlanDuSite />} />
