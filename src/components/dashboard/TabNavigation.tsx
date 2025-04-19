@@ -23,11 +23,7 @@ const TabNavigation = () => {
     '/pinterest': 'pinterest',
     '/suggestions': 'suggestions',
     '/backlinks': 'backlinks',
-    '/metrics': 'metrics',
-    // Additional mappings for any other routes
-    '/hierarchie': 'hierarchy',
-    '/nombre-mots': 'wordcount',
-    '/metriques': 'metrics'
+    '/metrics': 'metrics'
   };
   
   // Get current active tab based on URL
@@ -69,40 +65,9 @@ const TabNavigation = () => {
     }
   };
   
-  // Show section based on active tab
-  useEffect(() => {
-    const showSection = (sectionId: string) => {
-      console.log('Nombre total d\'éléments trouvés:', document.querySelectorAll('[data-section]').length);
-      console.log('Éléments trouvés:', Array.from(document.querySelectorAll('[data-section]')));
-      
-      // Hide all sections first
-      document.querySelectorAll('[data-section]').forEach(el => {
-        (el as HTMLElement).style.display = 'none';
-      });
-      
-      // Show the active section
-      const activeSection = document.querySelector(`[data-section="${sectionId}"]`);
-      if (activeSection) {
-        (activeSection as HTMLElement).style.display = 'block';
-        console.log(`Section ${sectionId} affichée`);
-      } else {
-        console.log(`Aucune section trouvée pour ${sectionId}, affichage de secours`);
-      }
-    };
-    
-    // Try showing the current section with helpful debug logs
-    try {
-      console.log('Tentative d\'afficher la section correspondant au chemin actuel:', currentTab);
-      console.log('Sections disponibles:', Array.from(document.querySelectorAll('[data-section]')).map(el => el.getAttribute('data-section')));
-      showSection(currentTab);
-    } catch (error) {
-      console.error('Erreur lors de l\'affichage de la section:', error);
-    }
-  }, [currentTab]);
-  
   return (
     <div className="mb-6" role="navigation" aria-label="Navigation du tableau de bord">
-      <h2 className="sr-only">Navigation principale et sous-navigation</h2>
+      <h2 className="sr-only">Navigation principale</h2>
       <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
         <Tabs defaultValue={currentTab} value={currentTab} onValueChange={handleTabChange}>
           <TabsList className="w-full justify-start bg-gradient-to-r from-primary-50 to-success-50 p-1">
@@ -116,7 +81,7 @@ const TabNavigation = () => {
               value="wordcount"
               className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary-500 data-[state=active]:to-primary-600 data-[state=active]:text-white"
             >
-              Nombre de mots
+              Mots-clés
             </TabsTrigger>
             <TabsTrigger 
               value="seo"
@@ -143,22 +108,16 @@ const TabNavigation = () => {
               Analytics
             </TabsTrigger>
             <TabsTrigger 
-              value="suggestions"
+              value="signature"
               className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary-500 data-[state=active]:to-primary-600 data-[state=active]:text-white"
             >
-              Suggestions
+              Signature
             </TabsTrigger>
             <TabsTrigger 
-              value="backlinks"
+              value="pinterest"
               className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary-500 data-[state=active]:to-primary-600 data-[state=active]:text-white"
             >
-              Backlinks
-            </TabsTrigger>
-            <TabsTrigger 
-              value="metrics"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary-500 data-[state=active]:to-primary-600 data-[state=active]:text-white"
-            >
-              Métriques
+              Pinterest
             </TabsTrigger>
           </TabsList>
         </Tabs>
