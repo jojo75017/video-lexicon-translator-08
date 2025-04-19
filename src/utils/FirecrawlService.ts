@@ -22,7 +22,12 @@ export class FirecrawlService {
   private static API_KEY_STORAGE_KEY = 'firecrawl_api_key';
   private static firecrawlApp: FirecrawlApp | null = null;
   private static proxyEnabled = false;
-  private static proxyUrl = 'https://api.allorigins.win/raw?url=';
+  private static proxyUrl = 'https://corsproxy.io/?';
+  private static proxyUrls = [
+    'https://corsproxy.io/?',
+    'https://api.allorigins.win/raw?url=',
+    'https://cors-anywhere.herokuapp.com/'
+  ];
 
   static saveApiKey(apiKey: string): void {
     localStorage.setItem(this.API_KEY_STORAGE_KEY, apiKey);
@@ -44,6 +49,10 @@ export class FirecrawlService {
     console.log('CORS proxy disabled');
   }
 
+  static isProxyEnabled(): boolean {
+    return this.proxyEnabled;
+  }
+
   static async testApiKey(apiKey: string): Promise<boolean> {
     try {
       console.log('Testing API key with Firecrawl API');
@@ -62,7 +71,7 @@ export class FirecrawlService {
   static async crawlWebsite(url: string, useProxy = false): Promise<{ success: boolean; error?: string; data?: any }> {
     console.log(`Crawling website: ${url}, useProxy: ${useProxy || this.proxyEnabled}`);
 
-    // If we have a Firecrawl API key, use it
+    // Si nous avons une clé API Firecrawl, utilisez-la
     const apiKey = this.getApiKey();
     if (apiKey) {
       try {
@@ -117,24 +126,21 @@ export class FirecrawlService {
 
   private static async fetchWithProxy(url: string): Promise<{ success: boolean; error?: string; data?: any }> {
     try {
-      console.log('Fetching with proxy:', this.proxyUrl + encodeURIComponent(url));
+      console.log('Fetching with proxy', this.proxyEnabled ? 'enabled' : 'disabled');
       
-      // Try multiple CORS proxies in order
-      const proxies = [
-        'https://api.allorigins.win/raw?url=',
-        'https://corsproxy.io/?',
-        'https://cors-anywhere.herokuapp.com/'
-      ];
+      // Activation automatique du proxy pour éviter les problèmes CORS
+      this.proxyEnabled = true;
       
-      let response = null;
       let sourceCode = null;
       let error = null;
       
       // Try each proxy until one works
-      for (const proxy of proxies) {
+      for (const proxy of this.proxyUrls) {
         try {
-          console.log(`Trying proxy: ${proxy}`);
-          response = await fetch(proxy + encodeURIComponent(url));
+          const proxyUrl = proxy + encodeURIComponent(url);
+          console.log(`Trying proxy: ${proxyUrl}`);
+          
+          const response = await fetch(proxyUrl);
           
           if (response.ok) {
             console.log(`Proxy ${proxy} worked!`);
@@ -150,6 +156,7 @@ export class FirecrawlService {
       }
       
       if (!sourceCode) {
+        console.warn('All proxies failed, returning minimal data');
         return {
           success: true,
           data: {
@@ -168,27 +175,36 @@ export class FirecrawlService {
       const doc = parser.parseFromString(sourceCode, 'text/html');
       
       const title = doc.querySelector('title')?.textContent || '';
-      const h1s = Array.from(doc.querySelectorAll('h1')).map(el => ({ 
+      const h1s = Array.from(doc.querySelectorAll('h1')).map((el, index) => ({ 
         level: 1, 
         text: el.textContent?.trim() || '', 
-        position: 0
+        position: index
       }));
-      const h2s = Array.from(doc.querySelectorAll('h2')).map(el => ({ 
+      const h2s = Array.from(doc.querySelectorAll('h2')).map((el, index) => ({ 
         level: 2, 
         text: el.textContent?.trim() || '', 
-        position: 0
+        position: h1s.length + index
       }));
-      const h3s = Array.from(doc.querySelectorAll('h3')).map(el => ({ 
+      const h3s = Array.from(doc.querySelectorAll('h3')).map((el, index) => ({ 
         level: 3, 
         text: el.textContent?.trim() || '', 
-        position: 0
+        position: h1s.length + h2s.length + index
       }));
       const headings = [...h1s, ...h2s, ...h3s].sort((a, b) => a.position - b.position);
       
+      // Extract meta tags
       const meta = Array.from(doc.querySelectorAll('meta')).map(el => ({
         name: el.getAttribute('name'),
         property: el.getAttribute('property'),
         content: el.getAttribute('content')
+      }));
+      
+      // Extract images
+      const images = Array.from(doc.querySelectorAll('img')).map(el => ({
+        src: el.getAttribute('src'),
+        alt: el.getAttribute('alt') || '',
+        width: el.getAttribute('width') || '',
+        height: el.getAttribute('height') || ''
       }));
       
       const result = {
@@ -196,8 +212,9 @@ export class FirecrawlService {
         title,
         headings,
         meta,
+        images,
         sourceCode,
-        textContent: doc.body.textContent
+        textContent: doc.body?.textContent || ''
       };
       
       return {

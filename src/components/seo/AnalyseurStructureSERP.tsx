@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FirecrawlService } from '@/utils/FirecrawlService';
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,11 @@ const AnalyseurStructureSERP = () => {
   const [activeTab, setActiveTab] = useState('info');
   const [showCorsWarning, setShowCorsWarning] = useState<boolean>(false);
 
+  // Activer le proxy CORS automatiquement au chargement du composant
+  useEffect(() => {
+    FirecrawlService.enableProxy();
+  }, []);
+
   const handleActivateProxy = () => {
     FirecrawlService.enableProxy();
     setShowCorsWarning(false);
@@ -31,6 +36,23 @@ const AnalyseurStructureSERP = () => {
     toast("Redirection vers CORS demo", {
       description: "Activez le service de démo, puis revenez ici",
     });
+  };
+
+  const getHeadingLevel = (heading: any): string => {
+    // Gérer différents formats de niveau de titre
+    if (heading && heading.level !== undefined) {
+      if (typeof heading.level === 'number') {
+        return `H${heading.level}`;
+      } else if (typeof heading.level === 'string') {
+        // Si c'est déjà au format "h1", "h2", etc.
+        if (heading.level.toLowerCase().startsWith('h')) {
+          return heading.level.toUpperCase();
+        }
+        // Si c'est juste un nombre sous forme de chaîne
+        return `H${heading.level}`;
+      }
+    }
+    return "H?"; // Niveau inconnu
   };
 
   const analyzeSite = async () => {
@@ -68,12 +90,16 @@ const AnalyseurStructureSERP = () => {
       }, 300);
 
       console.log('Analyse du site en cours:', formattedUrl);
-      const crawlResult = await FirecrawlService.crawlWebsite(formattedUrl);
+      
+      // Toujours utiliser le proxy pour éviter les problèmes CORS
+      FirecrawlService.enableProxy();
+      const crawlResult = await FirecrawlService.crawlWebsite(formattedUrl, true);
       
       clearInterval(progressInterval);
       setProgress(100);
       
       if (crawlResult.success) {
+        console.log("Crawl result data:", crawlResult.data);
         setResult(crawlResult.data);
         toast.success("Analyse terminée", {
           description: "Site analysé avec succès",
@@ -281,19 +307,19 @@ const AnalyseurStructureSERP = () => {
                         <div className="flex justify-between items-center py-1 border-b border-gray-100">
                           <span className="text-sm font-medium">Titres H1</span>
                           <span className="text-sm">
-                            {result?.headings?.filter((h: any) => h.level === 1 || h.level === "h1")?.length || 0}
+                            {result?.headings?.filter((h: any) => h.level === 1 || h.level === "h1" || h.level === "1")?.length || 0}
                           </span>
                         </div>
                         <div className="flex justify-between items-center py-1 border-b border-gray-100">
                           <span className="text-sm font-medium">Titres H2</span>
                           <span className="text-sm">
-                            {result?.headings?.filter((h: any) => h.level === 2 || h.level === "h2")?.length || 0}
+                            {result?.headings?.filter((h: any) => h.level === 2 || h.level === "h2" || h.level === "2")?.length || 0}
                           </span>
                         </div>
                         <div className="flex justify-between items-center py-1 border-b border-gray-100">
                           <span className="text-sm font-medium">Titres H3</span>
                           <span className="text-sm">
-                            {result?.headings?.filter((h: any) => h.level === 3 || h.level === "h3")?.length || 0}
+                            {result?.headings?.filter((h: any) => h.level === 3 || h.level === "h3" || h.level === "3")?.length || 0}
                           </span>
                         </div>
                         <div className="flex justify-between items-center py-1 border-b border-gray-100">
@@ -317,22 +343,19 @@ const AnalyseurStructureSERP = () => {
                     <div className="pl-4 border-l-2 border-blue-200 space-y-2">
                       {result?.headings && result.headings.length > 0 ? (
                         result.headings.map((heading: any, index: number) => {
-                          // Handle different formats of heading level
-                          const level = typeof heading.level === 'string' ? 
-                            heading.level.toLowerCase() : 
-                            `h${heading.level}`;
+                          const headingLevel = getHeadingLevel(heading);
                           
                           return (
                             <div 
                               key={index} 
                               className={`py-1.5 px-3 rounded-md ${
-                                level === "h1" || heading.level === 1 ? 'bg-blue-50 font-bold ml-0' : 
-                                level === "h2" || heading.level === 2 ? 'bg-blue-50/60 font-semibold ml-4' : 
-                                level === "h3" || heading.level === 3 ? 'bg-blue-50/30 ml-8' : 
+                                headingLevel === "H1" ? 'bg-blue-50 font-bold ml-0' : 
+                                headingLevel === "H2" ? 'bg-blue-50/60 font-semibold ml-4' : 
+                                headingLevel === "H3" ? 'bg-blue-50/30 ml-8' : 
                                 'bg-gray-50 ml-12'
                               }`}
                             >
-                              {`${typeof level === 'string' ? level.toUpperCase() : `H${heading.level}`}: ${heading.text}`}
+                              {`${headingLevel}: ${heading.text}`}
                             </div>
                           );
                         })
@@ -349,8 +372,8 @@ const AnalyseurStructureSERP = () => {
                       <li>Utilisez des H2 et H3 de manière hiérarchique</li>
                       <li>Incluez des mots-clés importants dans vos titres</li>
                       <li>Gardez une structure cohérente sur l'ensemble du site</li>
-                      {result?.headings?.filter((h: any) => h.level === "h1" || h.level === 1)?.length !== 1 && (
-                        <li className="text-red-600">Cette page contient {result?.headings?.filter((h: any) => h.level === "h1" || h.level === 1)?.length || 0} titre(s) H1. Il est recommandé d'avoir exactement un H1 par page.</li>
+                      {result?.headings?.filter((h: any) => h.level === "h1" || h.level === 1 || h.level === "1")?.length !== 1 && (
+                        <li className="text-red-600">Cette page contient {result?.headings?.filter((h: any) => h.level === "h1" || h.level === 1 || h.level === "1")?.length || 0} titre(s) H1. Il est recommandé d'avoir exactement un H1 par page.</li>
                       )}
                       {result?.images?.filter((img: any) => !img.alt)?.length > 0 && (
                         <li className="text-amber-600">Cette page contient {result?.images?.filter((img: any) => !img.alt)?.length || 0} image(s) sans attribut alt. Ajoutez des descriptions alt pour l'accessibilité et le SEO.</li>
@@ -364,7 +387,7 @@ const AnalyseurStructureSERP = () => {
                 <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
                   <h3 className="text-lg font-bold mb-4">Code Source</h3>
                   <div className="relative">
-                    <pre className="bg-gray-50 p-4 rounded-md overflow-x-auto text-xs">
+                    <pre className="bg-gray-50 p-4 rounded-md overflow-x-auto text-xs max-h-96">
                       <code className="language-html">
                         {result?.sourceCode || "<p>Aucun code source disponible</p>"}
                       </code>
