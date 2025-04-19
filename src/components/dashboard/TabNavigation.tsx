@@ -1,36 +1,83 @@
 
-import React from 'react';
-import { useTabNavigation } from '@/hooks/useTabNavigation';
-import MainTabList from './tabs/MainTabList';
-import SubTabList from './tabs/SubTabList';
+import React, { useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const TabNavigation = () => {
-  const { 
-    activeTab, 
-    mainTabs, 
-    subTabs, 
-    handleTabChange 
-  } = useTabNavigation();
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Simple mapping of routes to tab IDs
+  const routeToTabMap = {
+    '/': 'hierarchy',
+    '/hierarchy': 'hierarchy',
+    '/wordcount': 'wordcount',
+    '/seo': 'seo',
+    '/structure': 'structure',
+    '/performance': 'performance',
+    '/analytics': 'analytics',
+    '/quora': 'quora',
+    '/signature': 'signature'
+  };
+  
+  // Get current active tab based on URL
+  const currentTab = routeToTabMap[location.pathname] || 'hierarchy';
+  
+  // Handle tab change
+  const handleTabChange = (value: string) => {
+    console.log(`Tab changed to: ${value}`);
+    
+    // Mapping of tabs to routes
+    const tabToRouteMap: Record<string, string> = {
+      'hierarchy': '/',
+      'wordcount': '/wordcount',
+      'seo': '/seo',
+      'structure': '/structure',
+      'performance': '/performance',
+      'analytics': '/analytics',
+      'quora': '/quora',
+      'signature': '/signature'
+    };
+    
+    // Navigate to the corresponding route
+    if (tabToRouteMap[value]) {
+      navigate(tabToRouteMap[value]);
+    }
+  };
+  
+  // Show section based on active tab
+  useEffect(() => {
+    const showSection = (sectionId: string) => {
+      // Hide all sections first
+      document.querySelectorAll('[data-section]').forEach(el => {
+        (el as HTMLElement).style.display = 'none';
+      });
+      
+      // Show the active section
+      const activeSection = document.querySelector(`[data-section="${sectionId}"]`);
+      if (activeSection) {
+        (activeSection as HTMLElement).style.display = 'block';
+      }
+    };
+    
+    // Show the current section
+    showSection(currentTab);
+  }, [currentTab]);
   
   return (
     <div className="mb-6" role="navigation" aria-label="Navigation du tableau de bord">
       <h2 className="sr-only">Navigation principale et sous-navigation</h2>
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-        <div className="p-3">
-          <MainTabList 
-            mainTabs={mainTabs} 
-            activeTab={activeTab} 
-            onTabChange={handleTabChange} 
-          />
-        </div>
-        
-        <div className="border-t border-gray-100 p-3">
-          <SubTabList 
-            tabs={subTabs} 
-            activeTab={activeTab} 
-            onTabChange={handleTabChange} 
-          />
-        </div>
+      <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden p-4">
+        <Tabs value={currentTab} onValueChange={handleTabChange}>
+          <TabsList className="w-full justify-start">
+            <TabsTrigger value="hierarchy">Hiérarchie</TabsTrigger>
+            <TabsTrigger value="wordcount">Nombre de mots</TabsTrigger>
+            <TabsTrigger value="seo">SEO</TabsTrigger>
+            <TabsTrigger value="structure">Structure</TabsTrigger>
+            <TabsTrigger value="performance">Performance</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
     </div>
   );

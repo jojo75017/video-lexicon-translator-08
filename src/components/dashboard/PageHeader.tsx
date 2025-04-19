@@ -3,31 +3,36 @@ import React from 'react';
 import { ScrollText, BarChart, Search, ExternalLink, CheckCircle, PenTool, FileSearch } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { activateSection } from '@/utils/navigationHelpers';
+import { useNavigate } from 'react-router-dom';
 
 const PageHeader = () => {
+  const navigate = useNavigate();
+
   const handleTabClick = (id: string) => {
     console.log(`Header tab clicked: ${id}`);
     
-    // Vérifier que la section existe avant de tenter de l'activer
-    const section = document.querySelector(`[data-section="${id}"]`);
-    if (section) {
-      window.location.hash = id;
-      activateSection(id);
-    } else {
-      console.log(`Section "${id}" does not exist`);
+    // Simple mapping of tab IDs to routes
+    const tabToRouteMap: Record<string, string> = {
+      'hierarchy': '/',
+      'wordcount': '/wordcount',
+      'seo': '/seo',
+      'structure': '/structure',
+      'performance': '/performance',
+      'analytics': '/analytics'
+    };
+    
+    // Navigate to the corresponding route
+    if (tabToRouteMap[id]) {
+      navigate(tabToRouteMap[id]);
     }
   };
 
-  // Liste des onglets disponibles
-  const availableTabs = ['seo', 'structure', 'hierarchy', 'backlinks'];
-
   return (
     <div className="bg-gradient-to-r from-indigo-700 to-blue-600 rounded-xl p-8 shadow-lg mb-8 relative overflow-hidden">
-      {/* Blobs décoratifs en arrière-plan améliorés */}
-      <div className="absolute top-0 left-0 w-72 h-72 bg-indigo-500 opacity-20 rounded-full filter blur-3xl animate-blob"></div>
-      <div className="absolute bottom-0 right-0 w-72 h-72 bg-blue-500 opacity-20 rounded-full filter blur-3xl animate-blob animation-delay-2000"></div>
-      <div className="absolute bottom-20 left-1/4 w-48 h-48 bg-purple-500 opacity-10 rounded-full filter blur-3xl animate-blob animation-delay-4000"></div>
+      {/* Background blobs */}
+      <div className="absolute top-0 left-0 w-72 h-72 bg-indigo-500 opacity-20 rounded-full filter blur-3xl"></div>
+      <div className="absolute bottom-0 right-0 w-72 h-72 bg-blue-500 opacity-20 rounded-full filter blur-3xl"></div>
+      <div className="absolute bottom-20 left-1/4 w-48 h-48 bg-purple-500 opacity-10 rounded-full filter blur-3xl"></div>
       
       <div className="relative z-10 max-w-4xl mx-auto">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-6">
@@ -72,31 +77,10 @@ const PageHeader = () => {
           </div>
         </div>
         
-        {/* Navigation Tabs - uniquement pour les onglets disponibles */}
+        {/* Navigation Tabs */}
         <div className="mt-8 bg-white/15 backdrop-blur-sm rounded-lg p-1 border border-white/20 shadow-lg">
-          <Tabs defaultValue="seo" className="w-full">
+          <Tabs defaultValue="hierarchy" className="w-full">
             <TabsList className="w-full bg-transparent flex gap-1 justify-center">
-              {/* Onglet SEO */}
-              <TabsTrigger 
-                value="seo" 
-                className="data-[state=active]:bg-white/20 text-white data-[state=active]:text-white hover:bg-white/20 hover:text-white flex gap-2 items-center"
-                onClick={() => handleTabClick('seo')}
-              >
-                <Search className="h-4 w-4" />
-                <span>Analyse SEO</span>
-              </TabsTrigger>
-              
-              {/* Onglet Structure */}
-              <TabsTrigger 
-                value="structure" 
-                className="data-[state=active]:bg-white/20 text-white data-[state=active]:text-white hover:bg-white/20 hover:text-white flex gap-2 items-center"
-                onClick={() => handleTabClick('structure')}
-              >
-                <FileSearch className="h-4 w-4" />
-                <span>Structure</span>
-              </TabsTrigger>
-              
-              {/* Onglet Hiérarchie */}
               <TabsTrigger 
                 value="hierarchy" 
                 className="data-[state=active]:bg-white/20 text-white data-[state=active]:text-white hover:bg-white/20 hover:text-white flex gap-2 items-center"
@@ -106,14 +90,49 @@ const PageHeader = () => {
                 <span>Hiérarchie</span>
               </TabsTrigger>
               
-              {/* Onglet Backlinks */}
               <TabsTrigger 
-                value="backlinks" 
+                value="wordcount" 
                 className="data-[state=active]:bg-white/20 text-white data-[state=active]:text-white hover:bg-white/20 hover:text-white flex gap-2 items-center"
-                onClick={() => handleTabClick('backlinks')}
+                onClick={() => handleTabClick('wordcount')}
+              >
+                <ScrollText className="h-4 w-4" />
+                <span>Mots-clés</span>
+              </TabsTrigger>
+              
+              <TabsTrigger 
+                value="seo" 
+                className="data-[state=active]:bg-white/20 text-white data-[state=active]:text-white hover:bg-white/20 hover:text-white flex gap-2 items-center"
+                onClick={() => handleTabClick('seo')}
+              >
+                <Search className="h-4 w-4" />
+                <span>Analyse SEO</span>
+              </TabsTrigger>
+              
+              <TabsTrigger 
+                value="structure" 
+                className="data-[state=active]:bg-white/20 text-white data-[state=active]:text-white hover:bg-white/20 hover:text-white flex gap-2 items-center"
+                onClick={() => handleTabClick('structure')}
+              >
+                <FileSearch className="h-4 w-4" />
+                <span>Structure</span>
+              </TabsTrigger>
+              
+              <TabsTrigger 
+                value="performance" 
+                className="data-[state=active]:bg-white/20 text-white data-[state=active]:text-white hover:bg-white/20 hover:text-white flex gap-2 items-center"
+                onClick={() => handleTabClick('performance')}
+              >
+                <BarChart className="h-4 w-4" />
+                <span>Performance</span>
+              </TabsTrigger>
+              
+              <TabsTrigger 
+                value="analytics" 
+                className="data-[state=active]:bg-white/20 text-white data-[state=active]:text-white hover:bg-white/20 hover:text-white flex gap-2 items-center"
+                onClick={() => handleTabClick('analytics')}
               >
                 <CheckCircle className="h-4 w-4" />
-                <span>Backlinks</span>
+                <span>Analytics</span>
               </TabsTrigger>
             </TabsList>
           </Tabs>

@@ -13,7 +13,6 @@ import SeoAnalysisForm from '@/components/seo/analysis/SeoAnalysisForm';
 import ResultsDisplay from '@/components/seo/analysis/ResultsDisplay';
 import { toast } from "sonner";
 import { useSiteAnalyzer } from '@/hooks/useSiteAnalyzer';
-import { activateSection } from '@/utils/navigationHelpers';
 import PageHeader from '@/components/dashboard/PageHeader';
 import LocalBusinessSection from '@/components/LocalBusinessSection';
 import KeywordSuggestions from '@/components/seo/analysis/KeywordSuggestions';
@@ -44,53 +43,16 @@ const IndexPage = () => {
   } = useSiteAnalyzer();
 
   useEffect(() => {
-    // Hide all sections initially
-    document.querySelectorAll('[data-tab-content]').forEach(el => {
-      (el as HTMLElement).style.display = 'none';
-    });
-    
-    // Check for hash in URL to show correct content
-    const hash = window.location.hash.replace('#', '');
-    if (hash) {
-      setTimeout(() => {
-        console.log(`Initial hash found: ${hash}, activating section`);
-        const section = document.getElementById(hash) || document.querySelector(`[data-section="${hash}"]`);
-        if (section) {
-          (section as HTMLElement).style.display = 'block';
-        }
-      }, 100);
-    } else {
-      // Show hierarchy by default
-      setTimeout(() => {
-        const hierarchySection = document.getElementById('hierarchy') || document.querySelector('[data-section="hierarchy"]');
-        if (hierarchySection) {
-          (hierarchySection as HTMLElement).style.display = 'block';
-        }
-      }, 100);
-    }
-    
-    console.log('IndexPage initialized - hiding all sections initially');
+    console.log('IndexPage initialized');
   }, []);
 
   useEffect(() => {
     if (seoAnalysis) {
-      console.log('SEO analysis complete, showing SEO section');
-      console.log('Keyword suggestions available:', seoAnalysis.keywordSuggestions?.length || 0);
-      
-      setTimeout(() => {
-        window.location.hash = 'seo';
-        activateSection('seo');
-        
-        toast.success("Analyse SEO terminée", {
-          description: "Consultez les résultats ci-dessous",
-          duration: 3000
-        });
-        
-        const resultsDisplay = document.querySelector('.results-display');
-        if (resultsDisplay) {
-          (resultsDisplay as HTMLElement).style.display = 'block';
-        }
-      }, 100);
+      console.log('SEO analysis complete');
+      toast.success("Analyse SEO terminée", {
+        description: "Consultez les résultats ci-dessous",
+        duration: 3000
+      });
     }
   }, [seoAnalysis]);
 
@@ -197,7 +159,7 @@ const IndexPage = () => {
         </div>
         
         {seoAnalysis && (
-          <div className="mb-8 results-display" style={{ display: 'none' }}>
+          <div className="mb-8 results-display">
             <ResultsDisplay seoAnalysis={seoAnalysis} />
           </div>
         )}
@@ -216,62 +178,7 @@ const IndexPage = () => {
         
         <LocalBusinessSection />
         
-        <div id="seo" data-section="seo" data-tab-content="seo" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100" style={{ display: 'none' }}>
-          <h2 className="text-2xl font-bold mb-4 flex items-center">
-            <span className="w-1 h-6 bg-indigo-600 rounded-full mr-3"></span>
-            Analyse SEO
-          </h2>
-          <p className="text-gray-600">Consultez l'analyse détaillée des performances SEO de votre site.</p>
-          
-          {seoAnalysis && (
-            <div className="mt-4 p-4 bg-gray-50 rounded-md">
-              <h3 className="font-medium mb-2">Résultats de l'analyse pour {url}</h3>
-              <ul className="list-disc pl-5 space-y-1 text-gray-600">
-                <li>Titre: {seoAnalysis.title}</li>
-                <li>Balises Meta: {seoAnalysis.metaTagsAnalysis.hasDescriptionTag ? 'Description présente' : 'Description manquante'}</li>
-                <li>Titres H1: {seoAnalysis.h1Count}</li>
-                <li>Titres H2: {seoAnalysis.h2Count}</li>
-                <li>Images: {seoAnalysis.imgCount} (dont {seoAnalysis.imgWithoutAlt} sans attribut alt)</li>
-              </ul>
-            </div>
-          )}
-        </div>
-        
-        <div id="structure" data-section="structure" data-tab-content="structure" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100" style={{ display: 'none' }}>
-          <h2 className="text-2xl font-bold mb-4 flex items-center">
-            <span className="w-1 h-6 bg-indigo-600 rounded-full mr-3"></span>
-            Structure du Site
-          </h2>
-          <p className="text-gray-600 mb-4">Visualisez l'architecture de votre site web et identifiez les améliorations possibles.</p>
-          
-          <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-            <h3 className="text-lg font-semibold mb-4">Architecture des pages</h3>
-            <p className="text-gray-600 mb-4">Analysez comment les pages de votre site sont connectées entre elles et optimisez la navigation pour les utilisateurs et les moteurs de recherche.</p>
-            
-            {siteStructure && siteStructure.headings && (
-              <div className="mt-4 p-4 bg-gray-50 rounded-md">
-                <h3 className="font-medium mb-2">Hiérarchie des titres</h3>
-                <div className="pl-4 border-l-2 border-blue-200 space-y-2">
-                  {siteStructure.headings.map((heading: any, index: number) => (
-                    <div 
-                      key={index} 
-                      className={`py-1.5 px-3 rounded-md ${
-                        heading.level === "h1" ? 'bg-blue-50 font-bold ml-0' : 
-                        heading.level === "h2" ? 'bg-blue-50/60 font-semibold ml-4' : 
-                        heading.level === "h3" ? 'bg-blue-50/30 ml-8' : 
-                        'bg-gray-50 ml-12'
-                      }`}
-                    >
-                      {`${heading.level.toUpperCase()}: ${heading.text}`}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-        
-        <div id="hierarchy" data-section="hierarchy" data-tab-content="hierarchy" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100" style={{ display: 'none' }}>
+        <div id="hierarchy" data-section="hierarchy" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100">
           <h2 className="text-2xl font-bold mb-4 flex items-center">
             <span className="w-1 h-6 bg-blue-600 rounded-full mr-3"></span>
             Hiérarchie de contenu
@@ -321,7 +228,7 @@ const IndexPage = () => {
           </div>
         </div>
         
-        <div id="wordcount" data-section="wordcount" data-tab-content="wordcount" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100" style={{ display: 'none' }}>
+        <div id="wordcount" data-section="wordcount" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100">
           <h2 className="text-2xl font-bold mb-4 flex items-center">
             <span className="w-1 h-6 bg-green-600 rounded-full mr-3"></span>
             Analyse des mots-clés
@@ -363,51 +270,62 @@ const IndexPage = () => {
           </div>
         </div>
         
-        <div id="suggestions" data-section="suggestions" data-tab-content="suggestions" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100" style={{ display: 'none' }}>
+        <div id="seo" data-section="seo" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100">
           <h2 className="text-2xl font-bold mb-4 flex items-center">
-            <span className="w-1 h-6 bg-amber-600 rounded-full mr-3"></span>
-            Suggestions de contenu
+            <span className="w-1 h-6 bg-indigo-600 rounded-full mr-3"></span>
+            Analyse SEO
           </h2>
-          <p className="text-gray-600">Obtenez des suggestions personnalisées pour améliorer votre contenu et votre SEO.</p>
+          <p className="text-gray-600">Consultez l'analyse détaillée des performances SEO de votre site.</p>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-              <h3 className="text-lg font-medium mb-3">Sujets recommandés</h3>
-              <ul className="space-y-2">
-                <li className="bg-white p-3 rounded border border-gray-100">
-                  <p className="font-medium">Guide complet d'optimisation SEO on-page</p>
-                  <p className="text-sm text-gray-600 mt-1">Un guide étape par étape pour optimiser le contenu de votre site.</p>
-                </li>
-                <li className="bg-white p-3 rounded border border-gray-100">
-                  <p className="font-medium">Comment créer un maillage interne efficace</p>
-                  <p className="text-sm text-gray-600 mt-1">Techniques pour connecter vos pages et améliorer l'autorité de votre site.</p>
-                </li>
+          {seoAnalysis && (
+            <div className="mt-4 p-4 bg-gray-50 rounded-md">
+              <h3 className="font-medium mb-2">Résultats de l'analyse pour {url}</h3>
+              <ul className="list-disc pl-5 space-y-1 text-gray-600">
+                <li>Titre: {seoAnalysis.title}</li>
+                <li>Balises Meta: {seoAnalysis.metaTagsAnalysis.hasDescriptionTag ? 'Description présente' : 'Description manquante'}</li>
+                <li>Titres H1: {seoAnalysis.h1Count}</li>
+                <li>Titres H2: {seoAnalysis.h2Count}</li>
+                <li>Images: {seoAnalysis.imgCount} (dont {seoAnalysis.imgWithoutAlt} sans attribut alt)</li>
               </ul>
             </div>
+          )}
+        </div>
+        
+        <div id="structure" data-section="structure" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100">
+          <h2 className="text-2xl font-bold mb-4 flex items-center">
+            <span className="w-1 h-6 bg-indigo-600 rounded-full mr-3"></span>
+            Structure du Site
+          </h2>
+          <p className="text-gray-600 mb-4">Visualisez l'architecture de votre site web et identifiez les améliorations possibles.</p>
+          
+          <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+            <h3 className="text-lg font-semibold mb-4">Architecture des pages</h3>
+            <p className="text-gray-600 mb-4">Analysez comment les pages de votre site sont connectées entre elles et optimisez la navigation pour les utilisateurs et les moteurs de recherche.</p>
             
-            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-              <h3 className="text-lg font-medium mb-3">Mots-clés à cibler</h3>
-              <div className="space-y-2">
-                <div className="bg-white p-3 rounded border border-gray-100">
-                  <div className="flex justify-between">
-                    <p className="font-medium">"analyse seo gratuite"</p>
-                    <span className="text-green-600 text-sm">Difficulté: Faible</span>
-                  </div>
-                  <p className="text-sm text-gray-600 mt-1">Volume de recherche mensuel: ~1,200</p>
-                </div>
-                <div className="bg-white p-3 rounded border border-gray-100">
-                  <div className="flex justify-between">
-                    <p className="font-medium">"optimisation contenu web"</p>
-                    <span className="text-amber-600 text-sm">Difficulté: Moyenne</span>
-                  </div>
-                  <p className="text-sm text-gray-600 mt-1">Volume de recherche mensuel: ~2,800</p>
+            {siteStructure && siteStructure.headings && (
+              <div className="mt-4 p-4 bg-gray-50 rounded-md">
+                <h3 className="font-medium mb-2">Hiérarchie des titres</h3>
+                <div className="pl-4 border-l-2 border-blue-200 space-y-2">
+                  {siteStructure.headings.map((heading: any, index: number) => (
+                    <div 
+                      key={index} 
+                      className={`py-1.5 px-3 rounded-md ${
+                        heading.level === "h1" ? 'bg-blue-50 font-bold ml-0' : 
+                        heading.level === "h2" ? 'bg-blue-50/60 font-semibold ml-4' : 
+                        heading.level === "h3" ? 'bg-blue-50/30 ml-8' : 
+                        'bg-gray-50 ml-12'
+                      }`}
+                    >
+                      {`${heading.level.toUpperCase()}: ${heading.text}`}
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
         
-        <div id="performance" data-section="performance" data-tab-content="performance" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100" style={{ display: 'none' }}>
+        <div id="performance" data-section="performance" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100">
           <h2 className="text-2xl font-bold mb-4 flex items-center">
             <span className="w-1 h-6 bg-amber-600 rounded-full mr-3"></span>
             Performance du site
@@ -509,7 +427,7 @@ const IndexPage = () => {
           </div>
         </div>
         
-        <div id="analytics" data-section="analytics" data-tab-content="analytics" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100" style={{ display: 'none' }}>
+        <div id="analytics" data-section="analytics" className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-100">
           <h2 className="text-2xl font-bold mb-4 flex items-center">
             <span className="w-1 h-6 bg-emerald-600 rounded-full mr-3"></span>
             Analytics
