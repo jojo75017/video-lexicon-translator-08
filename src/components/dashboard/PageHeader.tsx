@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ScrollText, BarChart, Search, ExternalLink, CheckCircle, PenTool, FileSearch, Image, FileSignature } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -31,11 +30,10 @@ const PageHeader = () => {
   };
 
   return (
-    <div className="bg-gradient-to-r from-indigo-700 to-blue-600 rounded-xl p-8 shadow-lg mb-8 relative overflow-hidden">
+    <div className="bg-gradient-to-br from-primary-600 via-primary-500 to-primary-700 rounded-xl p-8 shadow-lg mb-8 relative overflow-hidden">
       {/* Background blobs */}
-      <div className="absolute top-0 left-0 w-72 h-72 bg-indigo-500 opacity-20 rounded-full filter blur-3xl"></div>
-      <div className="absolute bottom-0 right-0 w-72 h-72 bg-blue-500 opacity-20 rounded-full filter blur-3xl"></div>
-      <div className="absolute bottom-20 left-1/4 w-48 h-48 bg-purple-500 opacity-10 rounded-full filter blur-3xl"></div>
+      <div className="absolute top-0 left-0 w-72 h-72 bg-primary-300 opacity-20 rounded-full filter blur-3xl"></div>
+      <div className="absolute bottom-0 right-0 w-72 h-72 bg-success-400 opacity-20 rounded-full filter blur-3xl"></div>
       
       <div className="relative z-10 max-w-4xl mx-auto">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-6">
@@ -48,18 +46,18 @@ const PageHeader = () => {
             </p>
             
             <div className="flex gap-3">
-              <Button variant="outline" className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20 hover:text-white">
+              <Button variant="outline" className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20">
                 <Search className="mr-2 h-4 w-4" /> 
                 Analyser mon site
               </Button>
-              <Button variant="outline" className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20 hover:text-white">
+              <Button variant="outline" className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20">
                 <ExternalLink className="mr-2 h-4 w-4" /> 
                 Voir le guide SEO
               </Button>
             </div>
           </div>
           
-          <div className="flex flex-col gap-3 bg-white/15 backdrop-blur-md p-4 rounded-lg border border-white/20 shadow-xl">
+          <div className="flex flex-col gap-3 bg-white/15 backdrop-blur-md p-4 rounded-lg border border-white/20">
             <div className="text-white font-semibold text-center mb-2">Statistiques du mois</div>
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-white/15 p-3 rounded-lg shadow-inner border border-white/10">
@@ -80,8 +78,8 @@ const PageHeader = () => {
           </div>
         </div>
         
-        {/* Navigation Tabs */}
-        <div className="mt-8 bg-white/15 backdrop-blur-sm rounded-lg p-1 border border-white/20 shadow-lg">
+        {/* Navigation Tabs avec nouvelle apparence */}
+        <div className="mt-8 bg-white/15 backdrop-blur-sm rounded-lg p-1 border border-white/20">
           <Tabs defaultValue="hierarchy" className="w-full">
             <TabsList className="w-full bg-transparent flex gap-1 justify-center">
               <TabsTrigger 

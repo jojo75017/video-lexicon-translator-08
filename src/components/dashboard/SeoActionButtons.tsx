@@ -17,7 +17,7 @@ const SeoActionButtons = () => {
     <Card className="p-6 shadow-lg mb-8 border-0 bg-gradient-to-br from-white to-gray-50">
       <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center">
-          <div className="w-1 h-6 bg-indigo-600 rounded-full mr-3"></div>
+          <div className="w-1 h-6 bg-primary-600 rounded-full mr-3"></div>
           <h2 className="text-xl font-bold text-gray-800">Outils SEO essentiels</h2>
         </div>
         <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">8 outils disponibles</span>
@@ -76,8 +76,8 @@ const SeoActionButtons = () => {
 
       <div className="mt-6 flex justify-center">
         <Button 
-          variant="default"
-          className="bg-indigo-600 hover:bg-indigo-700"
+          variant="secondary"
+          className="bg-gradient-to-r from-success-500 to-success-600 hover:from-success-600 hover:to-success-700"
           asChild
         >
           <Link to="/translation" className="flex items-center gap-2">

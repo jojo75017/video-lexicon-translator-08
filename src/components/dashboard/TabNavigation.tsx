@@ -1,5 +1,4 @@
-
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
@@ -103,18 +102,63 @@ const TabNavigation = () => {
   return (
     <div className="mb-6" role="navigation" aria-label="Navigation du tableau de bord">
       <h2 className="sr-only">Navigation principale et sous-navigation</h2>
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden p-4">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
         <Tabs defaultValue={currentTab} value={currentTab} onValueChange={handleTabChange}>
-          <TabsList className="w-full justify-start">
-            <TabsTrigger value="hierarchy">Hiérarchie</TabsTrigger>
-            <TabsTrigger value="wordcount">Nombre de mots</TabsTrigger>
-            <TabsTrigger value="seo">SEO</TabsTrigger>
-            <TabsTrigger value="structure">Structure</TabsTrigger>
-            <TabsTrigger value="performance">Performance</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-            <TabsTrigger value="suggestions">Suggestions</TabsTrigger>
-            <TabsTrigger value="backlinks">Backlinks</TabsTrigger>
-            <TabsTrigger value="metrics">Métriques</TabsTrigger>
+          <TabsList className="w-full justify-start bg-gradient-to-r from-primary-50 to-success-50 p-1">
+            <TabsTrigger 
+              value="hierarchy"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary-500 data-[state=active]:to-primary-600 data-[state=active]:text-white"
+            >
+              Hiérarchie
+            </TabsTrigger>
+            <TabsTrigger 
+              value="wordcount"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary-500 data-[state=active]:to-primary-600 data-[state=active]:text-white"
+            >
+              Nombre de mots
+            </TabsTrigger>
+            <TabsTrigger 
+              value="seo"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary-500 data-[state=active]:to-primary-600 data-[state=active]:text-white"
+            >
+              SEO
+            </TabsTrigger>
+            <TabsTrigger 
+              value="structure"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary-500 data-[state=active]:to-primary-600 data-[state=active]:text-white"
+            >
+              Structure
+            </TabsTrigger>
+            <TabsTrigger 
+              value="performance"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary-500 data-[state=active]:to-primary-600 data-[state=active]:text-white"
+            >
+              Performance
+            </TabsTrigger>
+            <TabsTrigger 
+              value="analytics"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary-500 data-[state=active]:to-primary-600 data-[state=active]:text-white"
+            >
+              Analytics
+            </TabsTrigger>
+            <TabsTrigger 
+              value="suggestions"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary-500 data-[state=active]:to-primary-600 data-[state=active]:text-white"
+            >
+              Suggestions
+            </TabsTrigger>
+            <TabsTrigger 
+              value="backlinks"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary-500 data-[state=active]:to-primary-600 data-[state=active]:text-white"
+            >
+              Backlinks
+            </TabsTrigger>
+            <TabsTrigger 
+              value="metrics"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary-500 data-[state=active]:to-primary-600 data-[state=active]:text-white"
+            >
+              Métriques
+            </TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
