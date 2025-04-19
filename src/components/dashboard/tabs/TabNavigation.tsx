@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import MainTabList from './MainTabList';
 import SubTabList from './SubTabList';
@@ -9,17 +9,15 @@ const TabNavigation = () => {
   const { activeTab, mainTabs, subTabs, handleTabChange } = useTabNavigation();
   const location = useLocation();
 
-  React.useEffect(() => {
-    // Afficher la section correspondant à l'URL au chargement
+  // Activation initiale basée sur le chemin de l'URL
+  useEffect(() => {
     const path = location.pathname.replace('/', '') || 'hierarchy';
-    console.log('TabNavigation mounted, activating path:', path);
-    setTimeout(() => {
-      handleTabChange(path);
-    }, 500);
-  }, []);
+    console.log('TabNavigation initial path:', path);
+    handleTabChange(path);
+  }, [location.pathname]); // Dépendance au chemin pour réagir aux changements d'URL
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4">
+    <div className="bg-white rounded-lg shadow-md p-4 mb-6">
       <MainTabList 
         mainTabs={mainTabs} 
         activeTab={activeTab} 
