@@ -9,4 +9,5 @@ export interface Tab {
   isNew?: boolean;
   highlighted?: boolean;
   link?: string;
+  path?: string; // Add this property to fix the error
 }

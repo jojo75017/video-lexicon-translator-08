@@ -20,7 +20,8 @@ const PageHeader = () => {
       'performance': '/performance',
       'analytics': '/analytics',
       'signature': '/signature',
-      'pinterest': '/pinterest'
+      'pinterest': '/pinterest',
+      'quora': '/quora'
     };
     
     // Navigate to the corresponding route
