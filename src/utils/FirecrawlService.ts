@@ -21,7 +21,7 @@ type CrawlResponse = CrawlStatusResponse | ErrorResponse;
 export class FirecrawlService {
   private static API_KEY_STORAGE_KEY = 'firecrawl_api_key';
   private static firecrawlApp: FirecrawlApp | null = null;
-  private static proxyEnabled = false; // Par défaut, le proxy est désactivé
+  private static proxyEnabled = true; // Par défaut, le proxy est ACTIVÉ
   private static proxyUrl = 'https://corsproxy.io/?';
   private static proxyUrls = [
     'https://corsproxy.io/?',
@@ -70,6 +70,11 @@ export class FirecrawlService {
 
   static async crawlWebsite(url: string, useProxy = false): Promise<{ success: boolean; error?: string; data?: any }> {
     console.log(`Crawling website: ${url}, useProxy: ${useProxy || this.proxyEnabled}`);
+    
+    // S'assurer que l'URL a un protocole
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://' + url;
+    }
     
     // Vérifier si le proxy est activé manuellement ou via le paramètre
     const shouldUseProxy = useProxy || this.proxyEnabled;
@@ -184,10 +189,11 @@ export class FirecrawlService {
       if (!sourceCode) {
         console.warn('All proxies failed, creating minimal demo data');
         
-        // Créer des données minimales de démo quand tous les proxys échouent
+        // Extraire le domaine de l'URL
         const domainMatch = url.match(/^(?:https?:\/\/)?(?:www\.)?([^:\/\n?]+)/);
         const domain = domainMatch ? domainMatch[1] : url;
         
+        // Créer des données minimales de démo quand tous les proxys échouent
         sourceCode = `<!DOCTYPE html>
 <html>
 <head>
@@ -208,60 +214,88 @@ export class FirecrawlService {
 </html>`;
       }
       
-      // Extraire les métadonnées de base du HTML
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(sourceCode, 'text/html');
-      
-      const title = doc.querySelector('title')?.textContent || url;
-      
-      // Traiter les titres avec un formatage de niveau approprié
-      const headingElements = [...doc.querySelectorAll('h1, h2, h3, h4, h5, h6')];
-      const headings = headingElements.map((el, index) => {
-        // Obtenir le niveau de titre à partir du nom de balise (h1, h2, etc.)
-        const levelFromTag = parseInt(el.tagName.charAt(1));
-        return { 
-          level: levelFromTag, 
-          text: el.textContent?.trim() || '', 
+      try {
+        // Extraire les métadonnées de base du HTML
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(sourceCode, 'text/html');
+        
+        const title = doc.querySelector('title')?.textContent || url;
+        
+        // Traiter les titres avec un formatage de niveau approprié
+        const headingElements = [...doc.querySelectorAll('h1, h2, h3, h4, h5, h6')];
+        const headings = headingElements.map((el, index) => {
+          // Obtenir le niveau de titre à partir du nom de balise (h1, h2, etc.)
+          const levelFromTag = parseInt(el.tagName.charAt(1));
+          return { 
+            level: levelFromTag, 
+            text: el.textContent?.trim() || '', 
+            position: index
+          };
+        });
+        
+        // Extraire les balises meta
+        const meta = Array.from(doc.querySelectorAll('meta')).map(el => ({
+          name: el.getAttribute('name'),
+          property: el.getAttribute('property'),
+          content: el.getAttribute('content')
+        }));
+        
+        // Extraire les images
+        const images = Array.from(doc.querySelectorAll('img')).map(el => ({
+          src: el.getAttribute('src'),
+          alt: el.getAttribute('alt') || '',
+          width: el.getAttribute('width') || '',
+          height: el.getAttribute('height') || ''
+        }));
+        
+        // Extraire les paragraphes
+        const paragraphs = Array.from(doc.querySelectorAll('p')).map((el, index) => ({
+          text: el.textContent?.trim() || '',
           position: index
+        }));
+        
+        // Extraire les liens
+        const links = Array.from(doc.querySelectorAll('a')).map(el => ({
+          href: el.getAttribute('href') || '#',
+          text: el.textContent?.trim() || '',
+          isInternal: !(el.getAttribute('href')?.startsWith('http') || false)
+        }));
+        
+        const result = {
+          url,
+          title,
+          headings,
+          meta,
+          images,
+          paragraphs,
+          links,
+          sourceCode,
+          textContent: doc.body?.textContent || ''
         };
-      });
-      
-      // Extraire les balises meta
-      const meta = Array.from(doc.querySelectorAll('meta')).map(el => ({
-        name: el.getAttribute('name'),
-        property: el.getAttribute('property'),
-        content: el.getAttribute('content')
-      }));
-      
-      // Extraire les images
-      const images = Array.from(doc.querySelectorAll('img')).map(el => ({
-        src: el.getAttribute('src'),
-        alt: el.getAttribute('alt') || '',
-        width: el.getAttribute('width') || '',
-        height: el.getAttribute('height') || ''
-      }));
-      
-      // Extraire les paragraphes
-      const paragraphs = Array.from(doc.querySelectorAll('p')).map((el, index) => ({
-        text: el.textContent?.trim() || '',
-        position: index
-      }));
-      
-      const result = {
-        url,
-        title,
-        headings,
-        meta,
-        images,
-        paragraphs,
-        sourceCode,
-        textContent: doc.body?.textContent || ''
-      };
-      
-      return {
-        success: true,
-        data: result
-      };
+        
+        return {
+          success: true,
+          data: result
+        };
+      } catch (parseError) {
+        console.error('Error parsing HTML:', parseError);
+        
+        // En cas d'erreur de parsing, retourner une structure minimale
+        return {
+          success: true,
+          data: {
+            url,
+            title: url,
+            headings: [{ level: 1, text: "Contenu non disponible", position: 0 }],
+            meta: [],
+            images: [],
+            paragraphs: [{ text: "Erreur lors de l'analyse du contenu", position: 0 }],
+            links: [],
+            sourceCode: "<html><body><h1>Contenu non disponible</h1></body></html>",
+            textContent: "Contenu non disponible"
+          }
+        };
+      }
     } catch (error) {
       console.error('Error fetching with proxy:', error);
       // Retourner une structure de réponse valide minimale même en cas d'erreur
@@ -279,6 +313,7 @@ export class FirecrawlService {
           ],
           meta: [],
           images: [],
+          links: [],
           paragraphs: [{ text: "Erreur lors de la récupération du contenu", position: 0 }],
           sourceCode: "<html><body><h1>Contenu de démonstration</h1><p>Erreur lors de la récupération du contenu</p></body></html>",
           textContent: "Erreur lors de la récupération du contenu"

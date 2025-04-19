@@ -41,14 +41,30 @@ const UrlInput = ({
     }
     
     try {
+      // Nettoyer l'URL et s'assurer qu'elle a un protocole
+      let cleanUrl = url.trim();
+      if (!cleanUrl.startsWith('http://') && !cleanUrl.startsWith('https://')) {
+        cleanUrl = `https://${cleanUrl}`;
+      }
+      
       // Vérifie si l'URL est valide
-      new URL(url.startsWith('http') ? url : `https://${url}`);
-      console.log("URL is valid, triggering analysis:", url);
+      new URL(cleanUrl);
+      console.log("URL is valid, triggering analysis:", cleanUrl);
+      
+      // Mettre à jour l'URL avec la version propre et formatée
+      setUrl(cleanUrl);
       
       // Notification de démarrage
       toast.success("Analyse démarrée", {
         description: "Patientez pendant l'analyse..."
       });
+      
+      // Activer automatiquement le proxy pour les domaines externes
+      if (!cleanUrl.includes('localhost') && !cleanUrl.includes('127.0.0.1')) {
+        FirecrawlService.enableProxy();
+        setProxyEnabled(true);
+        console.log("Proxy automatically enabled for external domain:", cleanUrl);
+      }
       
       // Appel explicite de la fonction onAnalyze
       onAnalyze();

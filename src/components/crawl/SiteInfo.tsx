@@ -28,14 +28,49 @@ export const SiteInfo = ({ data }: SiteInfoProps) => {
     if (typeof heading.level === 'number') {
       return `H${heading.level}`;
     } else if (typeof heading.level === 'string') {
+      // Si c'est déjà au format h1, h2, etc.
       if (heading.level.toLowerCase && typeof heading.level.toLowerCase === 'function' && 
           heading.level.toLowerCase().startsWith('h')) {
         return heading.level.toUpperCase();
       }
+      // Si c'est un nombre sous forme de chaîne, comme "1", "2"
       return `H${heading.level}`;
     }
     
     return "H?";
+  };
+  
+  // Fonction utilitaire pour déterminer le style du titre en fonction du niveau
+  const getHeadingStyle = (heading: any) => {
+    // Extraire le niveau numérique
+    let numericLevel: number;
+    
+    if (typeof heading.level === 'number') {
+      numericLevel = heading.level;
+    } else if (typeof heading.level === 'string') {
+      // Pour les formats comme "h1", "H2", etc.
+      if (heading.level.toLowerCase && heading.level.toLowerCase().startsWith('h')) {
+        numericLevel = parseInt(heading.level.charAt(1));
+      } else {
+        // Pour les formats purement numériques comme "1", "2"
+        numericLevel = parseInt(heading.level);
+      }
+    } else {
+      // Valeur par défaut si le niveau est non déterminable
+      numericLevel = 3;
+    }
+    
+    // Déterminer les styles en fonction du niveau numérique
+    switch (numericLevel) {
+      case 1:
+        return 'bg-blue-50 font-bold';
+      case 2:
+        return 'bg-blue-50/60 font-semibold ml-4';
+      case 3:
+        return 'bg-blue-50/30 ml-8';
+      default:
+        return 'bg-gray-50 ml-12';
+    }
   };
   
   return (
@@ -77,17 +112,12 @@ export const SiteInfo = ({ data }: SiteInfoProps) => {
             data.headings.map((heading: any, index: number) => {
               // Déterminer le niveau de titre de manière sécurisée
               const headingLevel = formatHeadingLevel(heading);
-              const level = heading.level;
+              const headingStyle = getHeadingStyle(heading);
               
               return (
                 <div 
                   key={index} 
-                  className={`py-1.5 px-3 rounded-md mb-1 ${
-                    level === 1 || level === "h1" || level === "H1" ? 'bg-blue-50 font-bold' : 
-                    level === 2 || level === "h2" || level === "H2" ? 'bg-blue-50/60 font-semibold ml-4' : 
-                    level === 3 || level === "h3" || level === "H3" ? 'bg-blue-50/30 ml-8' : 
-                    'bg-gray-50 ml-12'
-                  }`}
+                  className={`py-1.5 px-3 rounded-md mb-1 ${headingStyle}`}
                 >
                   <span className="font-medium mr-2">{headingLevel}:</span>
                   <span>{heading.text}</span>
