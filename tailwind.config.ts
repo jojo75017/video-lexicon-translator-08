@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -14,9 +13,6 @@ export default {
       },
     },
     extend: {
-      fontFamily: {
-        'playfair': ['Playfair Display', 'serif'],
-      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -24,7 +20,7 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#2563eb",
+          DEFAULT: "#2563eb", // Bleu principal
           foreground: "#ffffff",
           100: "#dbeafe",
           200: "#bfdbfe",
@@ -33,6 +29,16 @@ export default {
           500: "#3b82f6",
           600: "#2563eb",
           700: "#1d4ed8",
+        },
+        success: {
+          DEFAULT: "#22c55e", // Vert systeme.io
+          50: "#f0fdf4",
+          100: "#dcfce7",
+          200: "#bbf7d0",
+          300: "#86efac",
+          400: "#4ade80",
+          500: "#22c55e",
+          600: "#16a34a",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
