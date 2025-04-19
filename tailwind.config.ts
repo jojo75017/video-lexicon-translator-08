@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -20,18 +21,19 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#2563eb", // Bleu principal
+          DEFAULT: "#1EAEDB", // Bleu Systeme.io
           foreground: "#ffffff",
-          100: "#dbeafe",
-          200: "#bfdbfe",
-          300: "#93c5fd",
-          400: "#60a5fa",
-          500: "#3b82f6",
-          600: "#2563eb",
-          700: "#1d4ed8",
+          50: "#f0f7ff",
+          100: "#e0f0ff",
+          200: "#bae0ff",
+          300: "#7cc9ff",
+          400: "#38b0ff",
+          500: "#1EAEDB",
+          600: "#0a8ecc",
+          700: "#0672a5",
         },
         success: {
-          DEFAULT: "#22c55e", // Vert systeme.io
+          DEFAULT: "#22c55e", // Vert Systeme.io
           50: "#f0fdf4",
           100: "#dcfce7",
           200: "#bbf7d0",
@@ -39,6 +41,7 @@ export default {
           400: "#4ade80",
           500: "#22c55e",
           600: "#16a34a",
+          700: "#15803d",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",

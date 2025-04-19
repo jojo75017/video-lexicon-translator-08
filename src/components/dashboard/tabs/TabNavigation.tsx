@@ -43,13 +43,13 @@ const TabNavigation = () => {
   }, [activeTab, location.pathname, subTabs, mainTabs]);
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+    <div className="bg-white rounded-xl shadow-md p-6 mb-6 border border-gray-100">
       <MainTabList 
         mainTabs={mainTabs} 
         activeTab={activeTab} 
         onTabChange={handleTabChange}
       />
-      <div className="mt-4">
+      <div className="mt-6">
         <SubTabList 
           tabs={subTabs} 
           activeTab={activeTab} 

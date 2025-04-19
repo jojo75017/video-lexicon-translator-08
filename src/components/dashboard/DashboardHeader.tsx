@@ -7,40 +7,40 @@ import { Button } from '@/components/ui/button';
 
 const DashboardHeader = () => {
   const stats = [
-    { label: 'Score SEO', value: '78/100', icon: <Gauge className="h-4 w-4 text-success-500" />, change: '+12%', trend: 'up' },
-    { label: 'Pages analysées', value: '42', icon: <Search className="h-4 w-4 text-primary-500" />, change: '+5', trend: 'up' },
-    { label: 'Visiteurs', value: '1,245', icon: <Globe className="h-4 w-4 text-success-500" />, change: '+18%', trend: 'up' },
-    { label: 'Temps de chargement', value: '1.4s', icon: <Zap className="h-4 w-4 text-primary-500" />, change: '-0.3s', trend: 'down' },
+    { label: 'Score SEO', value: '78/100', icon: <Gauge className="h-5 w-5 text-success-500" />, change: '+12%', trend: 'up' },
+    { label: 'Pages analysées', value: '42', icon: <Search className="h-5 w-5 text-primary-500" />, change: '+5', trend: 'up' },
+    { label: 'Visiteurs', value: '1,245', icon: <Globe className="h-5 w-5 text-success-500" />, change: '+18%', trend: 'up' },
+    { label: 'Temps de chargement', value: '1.4s', icon: <Zap className="h-5 w-5 text-primary-500" />, change: '-0.3s', trend: 'down' },
   ];
 
   return (
     <>
-      <div className="bg-gradient-to-r from-primary-600 to-primary-700 shadow-md rounded-lg p-6 mb-6 text-white">
+      <div className="bg-gradient-to-br from-primary-600 via-primary-500 to-primary-700 shadow-lg rounded-xl p-8 mb-8 text-white">
         <div className="max-w-5xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-left">
-              <h1 className="text-3xl font-bold mb-2 flex items-center">
-                <BarChart4 className="h-7 w-7 mr-2" />
+              <h1 className="text-3xl font-bold mb-3 flex items-center">
+                <BarChart4 className="h-8 w-8 mr-3 text-white" />
                 Tableau de bord SEO
               </h1>
-              <p className="text-blue-100">
+              <p className="text-primary-100 text-lg">
                 Analysez et optimisez votre présence en ligne avec nos outils professionnels
               </p>
             </div>
             
             <div className="flex flex-wrap gap-3">
-              <Link to="/signature" className="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 flex items-center shadow-sm hover:bg-white/20 transition-all duration-300 cursor-pointer">
-                <FileSignature className="h-5 w-5 mr-2" />
+              <Link to="/signature" className="px-5 py-3 bg-white/15 backdrop-blur-sm rounded-lg border border-white/30 flex items-center shadow-sm hover:bg-white/30 transition-all duration-300 cursor-pointer">
+                <FileSignature className="h-5 w-5 mr-2 text-white" />
                 <span className="font-medium">Signature Email</span>
               </Link>
               
-              <div className="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 flex items-center shadow-sm hover:bg-white/20 transition-all duration-300 cursor-pointer">
-                <RocketIcon className="h-5 w-5 mr-2" />
+              <div className="px-5 py-3 bg-white/15 backdrop-blur-sm rounded-lg border border-white/30 flex items-center shadow-sm hover:bg-white/30 transition-all duration-300 cursor-pointer">
+                <RocketIcon className="h-5 w-5 mr-2 text-white" />
                 <span className="font-medium">Analyse avancée</span>
               </div>
               
-              <div className="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 flex items-center shadow-sm hover:bg-white/20 transition-all duration-300 cursor-pointer">
-                <Sparkles className="h-5 w-5 mr-2" />
+              <div className="px-5 py-3 bg-white/15 backdrop-blur-sm rounded-lg border border-white/30 flex items-center shadow-sm hover:bg-white/30 transition-all duration-300 cursor-pointer">
+                <Sparkles className="h-5 w-5 mr-2 text-white" />
                 <span className="font-medium">IA Assistant</span>
               </div>
             </div>
@@ -48,21 +48,21 @@ const DashboardHeader = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
         {stats.map((stat, index) => (
-          <Card key={index} className="p-4 border-gray-200 shadow-sm hover:shadow-md transition-shadow bg-white">
+          <Card key={index} className="p-6 border-0 shadow-md hover:shadow-lg transition-shadow bg-white rounded-xl">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-sm text-gray-500 flex items-center">
+                <p className="text-sm font-medium text-gray-500 flex items-center">
                   {stat.icon}
-                  <span className="ml-1.5">{stat.label}</span>
+                  <span className="ml-2">{stat.label}</span>
                 </p>
-                <p className="text-2xl font-bold mt-1">{stat.value}</p>
+                <p className="text-3xl font-bold mt-2">{stat.value}</p>
               </div>
-              <div className={`text-xs font-medium px-2 py-1 rounded-full ${
+              <div className={`text-sm font-medium px-3 py-1.5 rounded-full ${
                 stat.trend === 'up' 
-                  ? 'bg-success-50 text-success-600' 
-                  : 'bg-primary-50 text-primary-600'
+                  ? 'bg-success-100 text-success-600' 
+                  : 'bg-primary-100 text-primary-600'
               }`}>
                 {stat.change}
               </div>
@@ -73,9 +73,9 @@ const DashboardHeader = () => {
       
       <div className="flex items-center justify-center gap-4 mb-8">
         <Link to="/signature">
-          <Button className="px-6 py-6 bg-primary-600 hover:bg-primary-700 flex items-center gap-2">
-            <FileSignature className="h-6 w-6" />
-            <span className="text-lg font-medium">Créer votre signature email</span>
+          <Button className="px-7 py-7 bg-success-500 hover:bg-success-600 flex items-center gap-3 rounded-xl shadow-md">
+            <FileSignature className="h-7 w-7" />
+            <span className="text-xl font-medium">Créer votre signature email</span>
           </Button>
         </Link>
       </div>
