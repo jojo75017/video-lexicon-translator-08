@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { ScrollText, BarChart, Search, ExternalLink, CheckCircle, PenTool, FileSearch, Image, FileSignature } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -136,25 +137,26 @@ const PageHeader = () => {
                 <span>Analytics</span>
               </TabsTrigger>
             
-            <TabsTrigger 
-              value="signature" 
-              className="data-[state=active]:bg-white/20 text-white data-[state=active]:text-white hover:bg-white/20 hover:text-white flex gap-2 items-center"
-              onClick={() => handleTabClick('signature')}
-            >
-              <FileSignature className="h-4 w-4" />
-              <span>Signature</span>
-            </TabsTrigger>
-            
-            <TabsTrigger 
-              value="pinterest" 
-              className="data-[state=active]:bg-white/20 text-white data-[state=active]:text-white hover:bg-white/20 hover:text-white flex gap-2 items-center"
-              onClick={() => handleTabClick('pinterest')}
-            >
-              <Image className="h-4 w-4" />
-              <span>Pinterest</span>
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+              <TabsTrigger 
+                value="signature" 
+                className="data-[state=active]:bg-white/20 text-white data-[state=active]:text-white hover:bg-white/20 hover:text-white flex gap-2 items-center"
+                onClick={() => handleTabClick('signature')}
+              >
+                <FileSignature className="h-4 w-4" />
+                <span>Signature</span>
+              </TabsTrigger>
+              
+              <TabsTrigger 
+                value="pinterest" 
+                className="data-[state=active]:bg-white/20 text-white data-[state=active]:text-white hover:bg-white/20 hover:text-white flex gap-2 items-center"
+                onClick={() => handleTabClick('pinterest')}
+              >
+                <Image className="h-4 w-4" />
+                <span>Pinterest</span>
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
       </div>
     </div>
   );
