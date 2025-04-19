@@ -1,8 +1,9 @@
+
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Rocket, Search, Signature, BarChart, ChevronRight } from "lucide-react";
+import { Rocket, Search, Signature, BarChart, ChevronRight, Settings } from "lucide-react";
 import { Github } from 'lucide-react';
 import { Sparkles } from 'lucide-react';
 import { MessageSquareText } from 'lucide-react';
@@ -19,6 +20,7 @@ import PageExplorer from '@/components/explorer/PageExplorer';
 import '@/styles/explorer-scrollbar.css';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import SeoActionButtons from '@/components/dashboard/SeoActionButtons';
+import AnalysisSettings from '@/components/settings/AnalysisSettings';
 
 console.log("🚀 Index Page - Rendering started");
 
@@ -67,6 +69,10 @@ const IndexPage = () => {
             <Link to="/seo" className="text-indigo-600 hover:text-indigo-800 font-medium">
               Outils SEO
             </Link>
+            <Link to="/settings" className="flex items-center space-x-1 text-gray-600 hover:text-gray-800">
+              <Settings className="h-4 w-4" />
+              <span>Paramètres</span>
+            </Link>
             <ModeToggle />
             <a href="https://github.com/your-github-repo" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-2 text-sm">
               <Github className="h-4 w-4" />
@@ -108,6 +114,12 @@ const IndexPage = () => {
             />
           </Card>
         </div>
+        
+        {!seoAnalysis && !isLoading && (
+          <div className="mb-8">
+            <AnalysisSettings />
+          </div>
+        )}
         
         {seoAnalysis && seoAnalysis.keywordSuggestions && seoAnalysis.keywordSuggestions.length > 0 && (
           <div className="mb-6">

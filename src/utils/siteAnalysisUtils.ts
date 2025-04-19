@@ -1,5 +1,6 @@
 
 import { toast } from "sonner";
+import { OpenAIService } from "./seo/openaiService";
 
 // Interface pour les résultats d'analyse
 export interface AnalysisResult {
@@ -13,6 +14,7 @@ export interface AnalysisOptions {
   useProxy?: boolean;
   timeout?: number;
   depth?: number;
+  useOpenAI?: boolean;
 }
 
 // Utilitaire principal d'analyse de site
@@ -21,7 +23,7 @@ export const SiteAnalysisService = {
   _proxyEnabled: false,
   
   // URL du proxy CORS
-  _proxyUrl: "https://cors-anywhere.herokuapp.com/",
+  _proxyUrl: "https://corsproxy.io/?",
   
   // Activer le proxy CORS
   enableProxy: () => {
@@ -51,7 +53,7 @@ export const SiteAnalysisService = {
     
     // Ajouter le proxy si activé
     if (SiteAnalysisService._proxyEnabled) {
-      return SiteAnalysisService._proxyUrl + url;
+      return SiteAnalysisService._proxyUrl + encodeURIComponent(url);
     }
     
     return url;
@@ -77,6 +79,7 @@ export const SiteAnalysisService = {
         method: 'GET',
         headers: {
           'Accept': 'text/html',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
           'X-Requested-With': 'XMLHttpRequest'
         },
         signal: options.timeout ? AbortSignal.timeout(options.timeout) : undefined
@@ -115,6 +118,13 @@ export const SiteAnalysisService = {
         };
       });
       
+      // Récupérer la description et les mots-clés
+      const descriptionTag = metaTags.find(tag => tag.name === 'description' || tag.name === 'og:description');
+      const keywordsTag = metaTags.find(tag => tag.name === 'keywords');
+      
+      const description = descriptionTag ? descriptionTag.content : "";
+      const keywords = keywordsTag ? keywordsTag.content.split(',').map(k => k.trim()) : [];
+      
       // Récupérer les titres (h1, h2, h3...)
       const headings = Array.from(doc.querySelectorAll('h1, h2, h3, h4, h5, h6')).map(heading => {
         return {
@@ -125,35 +135,176 @@ export const SiteAnalysisService = {
       
       // Récupérer les liens
       const links = Array.from(doc.querySelectorAll('a')).map(link => {
+        const href = link.getAttribute('href') || "";
         return {
-          href: link.getAttribute('href') || "",
+          href: href,
           text: link.textContent || "",
-          isExternal: link.getAttribute('href')?.startsWith('http') || false
+          isExternal: href.startsWith('http') || href.startsWith('https'),
+          isNofollow: link.getAttribute('rel')?.includes('nofollow') || false
         };
       });
       
       // Récupérer les images
       const images = Array.from(doc.querySelectorAll('img')).map(img => {
+        const src = img.getAttribute('src') || "";
+        const alt = img.getAttribute('alt') || "";
         return {
-          src: img.getAttribute('src') || "",
-          alt: img.getAttribute('alt') || "",
-          hasAlt: !!img.getAttribute('alt')
+          src: src,
+          alt: alt,
+          hasAlt: !!alt,
+          width: img.getAttribute('width'),
+          height: img.getAttribute('height'),
+          hasLazyLoading: img.getAttribute('loading') === 'lazy'
         };
       });
       
       // Récupérer le texte
-      const bodyText = doc.body.textContent || "";
+      const bodyText = doc.body?.textContent || "";
       const wordCount = bodyText.split(/\s+/).filter(Boolean).length;
+      
+      // Calculer la densité des mots
+      const wordFrequency: Record<string, number> = {};
+      const words = bodyText.toLowerCase().split(/\s+/).filter(word => 
+        word.length > 3 && !/^\d+$/.test(word) && !['dans', 'avec', 'pour', 'cette', 'votre', 'notre'].includes(word)
+      );
+      
+      words.forEach(word => {
+        wordFrequency[word] = (wordFrequency[word] || 0) + 1;
+      });
+      
+      // Trier les mots par fréquence
+      const sortedWords = Object.entries(wordFrequency)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 20)
+        .map(([word, count]) => ({
+          word,
+          count,
+          density: Number((count / words.length * 100).toFixed(2))
+        }));
+      
+      // Extraire les scripts et styles pour analyse de performance
+      const scripts = Array.from(doc.querySelectorAll('script')).map(script => ({
+        src: script.getAttribute('src') || '',
+        async: script.hasAttribute('async'),
+        defer: script.hasAttribute('defer'),
+        type: script.getAttribute('type') || '',
+        inlineSize: script.textContent?.length || 0
+      }));
+      
+      const styles = Array.from(doc.querySelectorAll('link[rel="stylesheet"], style')).map(style => {
+        if (style.tagName.toLowerCase() === 'link') {
+          return {
+            href: style.getAttribute('href') || '',
+            inline: false,
+            size: 0
+          };
+        } else {
+          return {
+            href: '',
+            inline: true,
+            size: style.textContent?.length || 0
+          };
+        }
+      });
+      
+      // Vérification OpenAI pour analyse avancée
+      let openAIAnalysis = null;
+      const apiKey = localStorage.getItem('openaiKey');
+      
+      if (apiKey && options.useOpenAI !== false) {
+        try {
+          console.log("Clé OpenAI trouvée, tentative d'analyse avancée");
+          const openaiService = new OpenAIService(apiKey);
+          openAIAnalysis = await openaiService.analyzeSeoContent(url, bodyText.substring(0, 4000));
+          console.log("Analyse OpenAI réussie:", openAIAnalysis);
+        } catch (error) {
+          console.error("Erreur lors de l'analyse OpenAI:", error);
+          toast.error("Erreur d'analyse IA", {
+            description: "L'analyse avancée avec OpenAI a échoué. Les résultats standards sont disponibles."
+          });
+        }
+      }
+      
+      // Évaluer la qualité SEO
+      const seoIssues = [];
+      let seoScore = 100;
+      
+      // Vérifier le titre
+      if (!title) {
+        seoIssues.push({ type: 'error', message: 'Page sans titre' });
+        seoScore -= 15;
+      } else if (title.length < 10) {
+        seoIssues.push({ type: 'warning', message: 'Titre trop court' });
+        seoScore -= 5;
+      } else if (title.length > 60) {
+        seoIssues.push({ type: 'warning', message: 'Titre trop long' });
+        seoScore -= 5;
+      }
+      
+      // Vérifier la description
+      if (!description) {
+        seoIssues.push({ type: 'error', message: 'Description meta manquante' });
+        seoScore -= 10;
+      } else if (description.length < 50) {
+        seoIssues.push({ type: 'warning', message: 'Description meta trop courte' });
+        seoScore -= 5;
+      } else if (description.length > 160) {
+        seoIssues.push({ type: 'warning', message: 'Description meta trop longue' });
+        seoScore -= 3;
+      }
+      
+      // Vérifier les headings H1
+      const h1s = headings.filter(h => h.level === 'h1');
+      if (h1s.length === 0) {
+        seoIssues.push({ type: 'error', message: 'H1 manquant' });
+        seoScore -= 10;
+      } else if (h1s.length > 1) {
+        seoIssues.push({ type: 'warning', message: 'Plusieurs H1 détectés' });
+        seoScore -= 5;
+      }
+      
+      // Vérifier les images sans attribut alt
+      const imagesWithoutAlt = images.filter(img => !img.hasAlt);
+      if (imagesWithoutAlt.length > 0) {
+        seoIssues.push({ 
+          type: 'warning', 
+          message: `${imagesWithoutAlt.length} image(s) sans attribut alt` 
+        });
+        seoScore -= Math.min(10, imagesWithoutAlt.length);
+      }
+      
+      // Vérifier la longueur du contenu
+      if (wordCount < 300) {
+        seoIssues.push({ type: 'warning', message: 'Contenu trop court (moins de 300 mots)' });
+        seoScore -= 8;
+      }
       
       // Créer l'objet de résultats
       const analysisData = {
         url,
         title,
+        description,
         meta: metaTags,
         headings,
         links,
         images,
         wordCount,
+        keywords: keywords.length > 0 ? keywords : sortedWords.slice(0, 10).map(w => w.word),
+        keywordSuggestions: [],
+        pageSpeed: {
+          resources: {
+            scripts: scripts.length,
+            styles: styles.length,
+            images: images.length,
+            totalResources: scripts.length + styles.length + images.length
+          }
+        },
+        seo: {
+          score: Math.max(0, seoScore),
+          issues: seoIssues,
+          mostFrequentWords: sortedWords
+        },
+        openAIAnalysis,
         sourceCode: html,
         timestamp: new Date().toISOString()
       };
@@ -162,6 +313,22 @@ export const SiteAnalysisService = {
       toast.success("Analyse terminée", {
         description: `${title} - ${wordCount} mots, ${headings.length} titres`
       });
+      
+      // Si une clé OpenAI est disponible, récupérer des suggestions de mots-clés
+      if (apiKey && options.useOpenAI !== false) {
+        try {
+          const openaiService = new OpenAIService(apiKey);
+          const mainKeyword = keywords.length > 0 ? keywords[0] : 
+            (sortedWords.length > 0 ? sortedWords[0].word : title.split(' ')[0]);
+          
+          if (mainKeyword) {
+            const keywordSuggestions = await openaiService.getKeywordSuggestions(mainKeyword);
+            analysisData.keywordSuggestions = keywordSuggestions;
+          }
+        } catch (error) {
+          console.error("Erreur lors de la récupération des suggestions de mots-clés:", error);
+        }
+      }
       
       return { 
         success: true, 

@@ -16,6 +16,7 @@ export class OpenAIService {
 
   async getKeywordSuggestions(baseKeyword: string): Promise<OpenAIKeywordResponse[]> {
     try {
+      console.log(`Récupération des suggestions de mots-clés pour: ${baseKeyword}`);
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -59,9 +60,65 @@ export class OpenAIService {
       }
       
       const keywordSuggestions = JSON.parse(jsonMatch[0]);
+      console.log("Suggestions générées:", keywordSuggestions);
       return keywordSuggestions;
     } catch (error) {
       console.error("Erreur lors de la récupération des suggestions via OpenAI:", error);
+      throw error;
+    }
+  }
+
+  async analyzeSeoContent(url: string, content: string): Promise<any> {
+    try {
+      console.log(`Analyse SEO du contenu pour: ${url}`);
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            {
+              role: 'system',
+              content: `Vous êtes un expert en SEO qui analyse le contenu des pages web.
+              Analysez le contenu fourni et retournez un JSON contenant:
+              - score: note générale sur 100
+              - readabilityScore: score de lisibilité sur 100
+              - keywordDensity: objet avec les mots-clés principaux et leur densité
+              - recommendations: tableau de recommandations pour améliorer le SEO
+              - contentGaps: sujets manquants qui devraient être couverts
+              - metaImprovements: suggestions pour améliorer les balises meta`
+            },
+            {
+              role: 'user',
+              content: `Analysez cette page web: ${url}\n\nContenu:\n${content.substring(0, 4000)}`
+            }
+          ],
+          temperature: 0.2,
+          max_tokens: 1500
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur de l'API OpenAI: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const content = data.choices[0].message.content;
+      
+      // Extraction du JSON de la réponse
+      const jsonMatch = content.match(/\{.*\}/s);
+      if (!jsonMatch) {
+        throw new Error("Format de réponse incorrect");
+      }
+      
+      const analysisResult = JSON.parse(jsonMatch[0]);
+      console.log("Analyse générée:", analysisResult);
+      return analysisResult;
+    } catch (error) {
+      console.error("Erreur lors de l'analyse via OpenAI:", error);
       throw error;
     }
   }
