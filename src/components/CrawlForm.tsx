@@ -4,15 +4,39 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Globe, Loader2, Search } from 'lucide-react';
+import { toast } from 'sonner';
+import { FirecrawlService } from '@/utils/FirecrawlService';
 
 interface CrawlFormProps {
-  onSubmit: (url: string) => void;
+  onSubmit?: (url: string) => void;
   isLoading?: boolean;
   progress?: number;
 }
 
 export const CrawlForm: React.FC<CrawlFormProps> = ({ 
-  onSubmit, 
+  onSubmit = async (url: string) => {
+    try {
+      toast.info("Analyse en cours", {
+        description: `Analyse de ${url} en cours...`
+      });
+      
+      const result = await FirecrawlService.crawlWebsite(url);
+      
+      if (result.success) {
+        toast.success("Analyse terminée", {
+          description: "Les données ont été récupérées avec succès"
+        });
+      } else {
+        toast.error("Erreur d'analyse", {
+          description: result.error || "Impossible d'analyser le site"
+        });
+      }
+    } catch (error) {
+      toast.error("Erreur", {
+        description: "Une erreur s'est produite lors de l'analyse"
+      });
+    }
+  }, 
   isLoading = false, 
   progress = 0 
 }) => {
@@ -20,7 +44,6 @@ export const CrawlForm: React.FC<CrawlFormProps> = ({
   const [internalLoading, setInternalLoading] = useState(false);
   const [internalProgress, setInternalProgress] = useState(0);
 
-  // Utiliser l'état local si aucun état n'est fourni par le parent
   const loading = isLoading || internalLoading;
   const currentProgress = progress || internalProgress;
 
@@ -29,44 +52,12 @@ export const CrawlForm: React.FC<CrawlFormProps> = ({
     
     if (!url) return;
     
-    // Si l'URL ne commence pas par http:// ou https://, ajouter https://
     let formattedUrl = url;
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
       formattedUrl = 'https://' + url;
     }
     
-    // Si une fonction onSubmit est fournie, l'utiliser
-    if (onSubmit) {
-      onSubmit(formattedUrl);
-      return;
-    }
-    
-    // Sinon, utiliser le comportement par défaut (pour rétrocompatibilité)
-    setInternalLoading(true);
-    setInternalProgress(10);
-    
-    // Simuler une progression
-    const interval = setInterval(() => {
-      setInternalProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          return 100;
-        }
-        return prev + 10;
-      });
-    }, 300);
-    
-    // Simuler un délai d'analyse
-    setTimeout(() => {
-      clearInterval(interval);
-      setInternalProgress(100);
-      setInternalLoading(false);
-      
-      // Réinitialiser après quelques secondes
-      setTimeout(() => {
-        setInternalProgress(0);
-      }, 2000);
-    }, 3000);
+    await onSubmit(formattedUrl);
   };
 
   return (
