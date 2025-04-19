@@ -33,23 +33,35 @@ function App() {
   return (
     <Router>
       <Routes>
+        {/* Root route showing IndexPage */}
         <Route path="/" element={<IndexPage />} />
         <Route path="/index" element={<Navigate to="/" replace />} />
+        
+        {/* Content related routes */}
         <Route path="/hierarchy" element={<HierarchyPage />} />
         <Route path="/wordcount" element={<WordCountPage />} />
+        <Route path="/suggestions" element={<SuggestionsPage />} />
+        
+        {/* SEO related routes */}
         <Route path="/seo" element={<OutilsSeo />} />
         <Route path="/structure" element={<StructurePage />} />
+        <Route path="/backlinks" element={<OutilsSeo />} />
+        
+        {/* Performance related routes */}
         <Route path="/performance" element={<PerformancePage />} />
+        <Route path="/metrics" element={<MetricsPage />} />
+        
+        {/* Analytics route */}
         <Route path="/analytics" element={<AnalyticsPage />} />
+        
+        {/* Tools routes */}
         <Route path="/quora" element={<QuoraPage />} />
         <Route path="/signature" element={<SignaturePage />} />
         <Route path="/pinterest" element={<PinterestPage />} />
         <Route path="/generateur-images" element={<ImageGeneratorPage />} />
         <Route path="/generateur-prompts" element={<PromptGeneratorPage />} />
-        <Route path="/suggestions" element={<SuggestionsPage />} />
-        <Route path="/backlinks" element={<OutilsSeo />} />
-        <Route path="/metrics" element={<MetricsPage />} />
         
+        {/* Localized routes (French) */}
         <Route path="/hierarchie" element={<HierarchyPage />} />
         <Route path="/metriques" element={<MetricsPage />} />
         <Route path="/nombre-mots" element={<WordCountPage />} />

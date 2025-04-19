@@ -31,12 +31,18 @@ export const useTabNavigation = () => {
       'suggestions': 'suggestions',
       'backlinks': 'backlinks',
       'metrics': 'metrics',
-      // Ajoutez d'autres chemins si nécessaire
+      'quora': 'quora',
+      'signature': 'signature',
+      'pinterest': 'pinterest',
+      // Localized routes (French)
+      'hierarchie': 'hierarchy',
+      'nombre-mots': 'wordcount',
+      'metriques': 'metrics',
     };
     
     // Log pour le débogage
-    console.log('Current Path:', path);
-    console.log('Mapped Tab:', pathToTabMap[path] || 'hierarchy');
+    console.log('useTabNavigation Current Path:', path);
+    console.log('useTabNavigation Mapped Tab:', pathToTabMap[path] || 'hierarchy');
     
     return pathToTabMap[path] || 'hierarchy';
   };
@@ -46,7 +52,7 @@ export const useTabNavigation = () => {
   // Mettre à jour l'onglet actif lorsque le chemin change
   useEffect(() => {
     const newActiveTab = determineActiveTab();
-    console.log('Updating active tab:', newActiveTab);
+    console.log('Updating active tab from', activeTab, 'to', newActiveTab);
     setActiveTab(newActiveTab);
   }, [location.pathname]);
   
@@ -60,7 +66,7 @@ export const useTabNavigation = () => {
   
   // Gérer la sélection d'onglet avec navigation vers les pages dédiées
   const handleTabChange = (value: string) => {
-    console.log(`Changement d'onglet vers: ${value}`);
+    console.log(`useTabNavigation: Changement d'onglet vers: ${value}`);
     
     // Ne pas continuer si c'est déjà l'onglet actif
     if (value === activeTab) {
@@ -80,12 +86,15 @@ export const useTabNavigation = () => {
       'backlinks': '/backlinks',
       'performance': '/performance',
       'metrics': '/metrics',
-      'analytics': '/analytics'
+      'analytics': '/analytics',
+      'quora': '/quora',
+      'signature': '/signature',
+      'pinterest': '/pinterest'
     };
     
     // Forcer la navigation si nécessaire
     if (tabPaths[value]) {
-      console.log(`Navigating to: ${tabPaths[value]}`);
+      console.log(`useTabNavigation: Navigating to: ${tabPaths[value]}`);
       navigate(tabPaths[value]);
       
       // Notification visuelle du changement d'onglet
@@ -108,12 +117,15 @@ export const useTabNavigation = () => {
         return 'performance';
       } else if (tabId === 'analytics') {
         return 'analytics';
+      } else if (tabId === 'quora' || tabId === 'signature' || tabId === 'pinterest') {
+        return tabId; // These are their own categories
       }
       
       return 'content'; // Par défaut, retourner 'content'
     };
     
     const mainCategory = getMainCategory(activeTab);
+    console.log('useTabNavigation: Main category for', activeTab, 'is', mainCategory);
     
     // Filtrer les onglets en fonction de la catégorie principale
     if (mainCategory === 'content') {
@@ -128,8 +140,12 @@ export const useTabNavigation = () => {
     else if (mainCategory === 'analytics') {
       return tabs.filter(tab => ['analytics'].includes(tab.id));
     }
+    else if (['quora', 'signature', 'pinterest'].includes(mainCategory)) {
+      return tabs.filter(tab => [mainCategory].includes(tab.id));
+    }
     
     // Par défaut - afficher les onglets de contenu
+    console.log('useTabNavigation: Using default content tabs');
     return tabs.filter(tab => ['hierarchy', 'wordcount', 'suggestions'].includes(tab.id));
   };
   
@@ -140,4 +156,3 @@ export const useTabNavigation = () => {
     handleTabChange
   };
 };
-

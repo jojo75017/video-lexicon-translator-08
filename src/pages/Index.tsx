@@ -56,6 +56,17 @@ const IndexPage = () => {
     }
   }, [seoAnalysis]);
 
+  // Helper function to safely format heading level
+  const formatHeadingLevel = (level: any) => {
+    if (typeof level === 'string' && level.toUpperCase) {
+      return level.toUpperCase();
+    }
+    if (typeof level === 'number') {
+      return `H${level}`;
+    }
+    return String(level || '');
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       <header className="px-4 py-3 bg-white border-b border-gray-200 shadow-sm">
@@ -310,13 +321,13 @@ const IndexPage = () => {
                     <div 
                       key={index} 
                       className={`py-1.5 px-3 rounded-md ${
-                        heading.level === "h1" ? 'bg-blue-50 font-bold ml-0' : 
-                        heading.level === "h2" ? 'bg-blue-50/60 font-semibold ml-4' : 
-                        heading.level === "h3" ? 'bg-blue-50/30 ml-8' : 
+                        heading.level === "h1" || heading.level === 1 ? 'bg-blue-50 font-bold ml-0' : 
+                        heading.level === "h2" || heading.level === 2 ? 'bg-blue-50/60 font-semibold ml-4' : 
+                        heading.level === "h3" || heading.level === 3 ? 'bg-blue-50/30 ml-8' : 
                         'bg-gray-50 ml-12'
                       }`}
                     >
-                      {`${heading.level.toUpperCase()}: ${heading.text}`}
+                      {`${formatHeadingLevel(heading.level)}: ${heading.text}`}
                     </div>
                   ))}
                 </div>

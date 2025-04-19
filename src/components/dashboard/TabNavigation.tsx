@@ -8,7 +8,7 @@ const TabNavigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // More comprehensive mapping of routes to tab IDs
+  // Comprehensive mapping of routes to tab IDs
   const routeToTabMap: Record<string, string> = {
     '/': 'hierarchy',
     '': 'hierarchy',
@@ -23,7 +23,11 @@ const TabNavigation = () => {
     '/pinterest': 'pinterest',
     '/suggestions': 'suggestions',
     '/backlinks': 'backlinks',
-    '/metrics': 'metrics'
+    '/metrics': 'metrics',
+    // Additional mappings for any other routes
+    '/hierarchie': 'hierarchy',
+    '/nombre-mots': 'wordcount',
+    '/metriques': 'metrics'
   };
   
   // Get current active tab based on URL
@@ -82,13 +86,14 @@ const TabNavigation = () => {
         (activeSection as HTMLElement).style.display = 'block';
         console.log(`Section ${sectionId} affichée`);
       } else {
-        console.log(`Aucune section trouvée, affichage de secours`);
+        console.log(`Aucune section trouvée pour ${sectionId}, affichage de secours`);
       }
     };
     
-    // Show the current section
+    // Try showing the current section with helpful debug logs
     try {
       console.log('Tentative d\'afficher la section correspondant au chemin actuel:', currentTab);
+      console.log('Sections disponibles:', Array.from(document.querySelectorAll('[data-section]')).map(el => el.getAttribute('data-section')));
       showSection(currentTab);
     } catch (error) {
       console.error('Erreur lors de l\'affichage de la section:', error);
