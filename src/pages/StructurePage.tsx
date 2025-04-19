@@ -10,14 +10,17 @@ import HierarchySection from '@/components/seo/HierarchySection';
 import { FirecrawlService } from '@/utils/FirecrawlService';
 import { analyzeHeadings } from '@/utils/seo/headingAnalyzer';
 import { toast } from 'sonner';
+import SiteStructureVisualizer from '@/components/SiteStructureVisualizer';
 
 const StructurePage = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [seoAnalysis, setSeoAnalysis] = useState<any>(null);
   const [siteStructure, setSiteStructure] = useState<any>(null);
 
   const handleCrawlSubmit = async (url: string) => {
     setIsLoading(true);
+    setProgress(10);
     setSeoAnalysis(null);
     setSiteStructure(null);
     
@@ -28,15 +31,18 @@ const StructurePage = () => {
       
       // Activer le proxy pour éviter les problèmes CORS
       FirecrawlService.enableProxy();
+      setProgress(20);
       
       // Analyser le site
       const result = await FirecrawlService.crawlWebsite(url, true);
       console.log("StructurePage crawl result:", result);
+      setProgress(60);
       
       if (result.success && result.data) {
         // Traitement des données
         const parser = new DOMParser();
         let doc;
+        setProgress(70);
         
         if (typeof result.data.sourceCode === 'string') {
           doc = parser.parseFromString(result.data.sourceCode, 'text/html');
@@ -49,8 +55,9 @@ const StructurePage = () => {
         // Analyse des titres et structure
         const headingStructure = analyzeHeadings(doc);
         console.log("Heading structure analyzed:", headingStructure);
+        setProgress(80);
         
-        // Générer la structure du site (simulation)
+        // Générer la structure du site
         const domain = url.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
         const siteStructureData = {
           name: `Structure de ${domain}`,
@@ -94,12 +101,15 @@ const StructurePage = () => {
           h1Count: headingStructure.h1Count || 0,
           h2Count: headingStructure.h2Count || 0,
           h3Count: headingStructure.h3Count || 0,
-          wordCount: result.data.textContent ? result.data.textContent.split(/\s+/).length : 0,
+          imgCount: headingStructure.imgCount || 0,
+          wordCount: result.data.textContent ? result.data.textContent.split(/\s+/).filter(Boolean).length : 0,
           readabilityScore: 75
         };
         
+        setProgress(90);
         setSeoAnalysis(analysisResult);
         setSiteStructure(siteStructureData);
+        setProgress(100);
         
         toast.success("Analyse terminée avec succès");
       } else {
@@ -107,6 +117,8 @@ const StructurePage = () => {
       }
     } catch (error) {
       console.error("Erreur d'analyse:", error);
+      setProgress(100);
+      
       toast.error("Erreur d'analyse", {
         description: error instanceof Error ? error.message : "Une erreur s'est produite"
       });
@@ -116,6 +128,7 @@ const StructurePage = () => {
         h1Count: 1,
         h2Count: 3,
         h3Count: 4,
+        imgCount: 5,
         wordCount: 1200,
         readabilityScore: 70
       };
@@ -138,8 +151,15 @@ const StructurePage = () => {
       setSeoAnalysis(mockData);
       setSiteStructure(mockStructure);
     } finally {
-      setIsLoading(false);
+      setTimeout(() => {
+        setIsLoading(false);
+        setProgress(0);
+      }, 1000);
     }
+  };
+
+  const updateProgress = (newProgress: number) => {
+    setProgress(newProgress);
   };
 
   return (
@@ -167,7 +187,12 @@ const StructurePage = () => {
             Cette analyse vous aidera à optimiser la navigation et le maillage interne.
           </p>
           
-          <CrawlForm onSubmit={handleCrawlSubmit} isLoading={isLoading} />
+          <CrawlForm 
+            onSubmit={handleCrawlSubmit} 
+            isLoading={isLoading} 
+            progress={progress}
+            onProgressUpdate={updateProgress}
+          />
         </Card>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -189,32 +214,7 @@ const StructurePage = () => {
         {siteStructure && (
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4">Structure complète du site</h3>
-            <div className="bg-white p-4 rounded-lg border border-gray-200">
-              <div className="font-medium text-emerald-700">{siteStructure.name}</div>
-              <ul className="mt-3 space-y-2">
-                {siteStructure.children.map((node: any, index: number) => (
-                  <li key={index} className="pl-4 border-l-2 border-emerald-100">
-                    <div className="font-medium">{node.name}</div>
-                    {node.children && node.children.length > 0 && (
-                      <ul className="mt-1 pl-3 space-y-1">
-                        {node.children.map((child: any, childIndex: number) => (
-                          <li key={childIndex} className="text-sm text-gray-600">
-                            {child.name}
-                            {child.children && child.children.length > 0 && (
-                              <ul className="mt-1 pl-3 text-xs text-gray-500">
-                                {child.children.map((grandChild: any, grandChildIndex: number) => (
-                                  <li key={grandChildIndex}>{grandChild.name}</li>
-                                ))}
-                              </ul>
-                            )}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <SiteStructureVisualizer structure={siteStructure} />
           </Card>
         )}
       </div>

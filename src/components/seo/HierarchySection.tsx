@@ -1,10 +1,18 @@
 
 import React from 'react';
 import { Card } from '@/components/ui/card';
-import { SeoAnalysisResult } from '@/types/seo';
 import { ListTree, Type, Heading, Quote, FileQuestion, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+
+interface SeoAnalysisResult {
+  h1Count?: number;
+  h2Count?: number;
+  h3Count?: number;
+  wordCount?: number;
+  readabilityScore?: number;
+  [key: string]: any;
+}
 
 interface HierarchySectionProps {
   isLoading: boolean;

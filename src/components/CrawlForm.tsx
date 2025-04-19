@@ -11,6 +11,7 @@ interface CrawlFormProps {
   onSubmit?: (url: string) => void;
   isLoading?: boolean;
   progress?: number;
+  onProgressUpdate?: (progress: number) => void;
 }
 
 export const CrawlForm: React.FC<CrawlFormProps> = ({ 
@@ -38,7 +39,8 @@ export const CrawlForm: React.FC<CrawlFormProps> = ({
     }
   }, 
   isLoading = false, 
-  progress = 0 
+  progress = 0,
+  onProgressUpdate
 }) => {
   const [url, setUrl] = useState('');
   const [internalLoading, setInternalLoading] = useState(false);
@@ -57,7 +59,38 @@ export const CrawlForm: React.FC<CrawlFormProps> = ({
       formattedUrl = 'https://' + url;
     }
     
-    await onSubmit(formattedUrl);
+    // Si nous utilisons la progression interne, simuler une progression
+    if (!isLoading && !onProgressUpdate) {
+      setInternalLoading(true);
+      
+      // Simuler une progression
+      const interval = setInterval(() => {
+        setInternalProgress(prev => {
+          const newProgress = Math.min(prev + 10, 95);
+          return newProgress;
+        });
+      }, 300);
+      
+      try {
+        await onSubmit(formattedUrl);
+        // Compléter la progression
+        clearInterval(interval);
+        setInternalProgress(100);
+        
+        // Réinitialiser après un délai
+        setTimeout(() => {
+          setInternalLoading(false);
+          setInternalProgress(0);
+        }, 1000);
+      } catch (error) {
+        clearInterval(interval);
+        setInternalLoading(false);
+        setInternalProgress(0);
+      }
+    } else {
+      // Utiliser le comportement fourni par le parent
+      await onSubmit(formattedUrl);
+    }
   };
 
   return (
