@@ -24,10 +24,14 @@ const TabNavigation = () => {
       
       // Donner plus de temps au DOM pour charger
       const timer = setTimeout(() => {
-        activateSection(activeTab);
-        console.log('TabNavigation: Activation initiale de section:', activeTab);
+        try {
+          activateSection(activeTab);
+          console.log('TabNavigation: Activation initiale de section:', activeTab);
+        } catch (error) {
+          console.error('Erreur lors de l\'activation initiale:', error);
+        }
         initialRender.current = false;
-      }, 1000); // Augmenter le délai pour s'assurer que le DOM est chargé
+      }, 1500); // Augmenter le délai pour s'assurer que le DOM est chargé
       
       return () => clearTimeout(timer);
     }
@@ -37,9 +41,15 @@ const TabNavigation = () => {
   useEffect(() => {
     if (!initialRender.current && activeTab) {
       console.log('Changement d\'onglet actif détecté:', activeTab);
-      setTimeout(() => {
-        activateSection(activeTab);
-      }, 800); // Augmenter le délai pour s'assurer que le DOM est à jour
+      const timer = setTimeout(() => {
+        try {
+          activateSection(activeTab);
+        } catch (error) {
+          console.error('Erreur lors de l\'activation après changement:', error);
+        }
+      }, 1000); // Augmenter le délai pour s'assurer que le DOM est à jour
+      
+      return () => clearTimeout(timer);
     }
   }, [activeTab]);
 
@@ -49,9 +59,15 @@ const TabNavigation = () => {
     
     if (hash) {
       console.log(`Hash détecté dans l'URL: ${hash}, activation de la section`);
-      setTimeout(() => {
-        activateSection(hash);
-      }, 800); // Augmenter le délai
+      const timer = setTimeout(() => {
+        try {
+          activateSection(hash);
+        } catch (error) {
+          console.error('Erreur lors de l\'activation via hash:', error);
+        }
+      }, 1000); // Augmenter le délai
+      
+      return () => clearTimeout(timer);
     }
   }, [location]);
 

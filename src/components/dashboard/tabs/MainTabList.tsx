@@ -89,7 +89,7 @@ const MainTabList: React.FC<MainTabListProps> = ({
       } else {
         activateSection(tabId);
       }
-    }, 1200); // Augmenter significativement le délai pour s'assurer que la navigation est terminée
+    }, 1500);
   };
 
   return (
@@ -97,6 +97,7 @@ const MainTabList: React.FC<MainTabListProps> = ({
       {mainTabs.map(tab => (
         <button
           key={tab.id}
+          id={`main-tab-${tab.id}`}
           className={`flex-1 py-3 px-4 text-center cursor-pointer transition-all border-b-2 ${
             isTabActive(tab.id)
               ? `border-b-2 ${tab.color} font-medium`

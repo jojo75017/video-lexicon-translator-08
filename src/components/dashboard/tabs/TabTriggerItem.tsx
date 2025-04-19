@@ -32,6 +32,12 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
     
     console.log(`TabTriggerItem: Clic sur ${id}`);
     
+    // Si c'est un lien externe, ouvrir dans un nouvel onglet
+    if (link) {
+      window.open(link, '_blank');
+      return;
+    }
+    
     // Call the onClick handler if provided
     if (onClick) {
       onClick();
@@ -48,6 +54,7 @@ const TabTriggerItem: React.FC<TabTriggerItemProps> = ({
             data-tab-id={id}
             onClick={handleClick}
             aria-label={`Accéder à ${label}`}
+            id={`tab-trigger-${id}`}
           >
             <div 
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md relative group transition-all duration-200 hover:bg-white ${

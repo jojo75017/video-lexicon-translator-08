@@ -15,7 +15,7 @@ const SubTabList: React.FC<SubTabListProps> = ({ tabs, activeTab, onTabChange })
   const navigate = useNavigate();
 
   const handleTabClick = (tabId: string, tabLink?: string) => {
-    // Si le tab a un lien, ouvrir dans un nouvel onglet
+    // Si le tab a un lien externe, ouvrir dans un nouvel onglet
     if (tabLink) {
       window.open(tabLink, '_blank');
       return;
@@ -56,11 +56,11 @@ const SubTabList: React.FC<SubTabListProps> = ({ tabs, activeTab, onTabChange })
       console.log(`SubTabList: Navigation vers ${tabRoutes[tabId]}`);
       navigate(tabRoutes[tabId]);
       
-      // Attendre un peu plus longtemps avant d'activer la section pour laisser le temps à la navigation de se terminer
+      // Attendre pour activer la section
       setTimeout(() => {
         console.log(`SubTabList: Activation de la section ${tabId}`);
         activateSection(tabId);
-      }, 1000); // Augmenter le délai pour s'assurer que la page a le temps de charger
+      }, 1500);
     }
   };
 

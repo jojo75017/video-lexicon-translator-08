@@ -1,3 +1,4 @@
+
 // Fonction pour vérifier si un URL est valide
 export const isValidUrl = (urlString: string): boolean => {
   try {
@@ -54,6 +55,23 @@ export const activateSection = (sectionId: string): void => {
   // Attendre que le DOM soit prêt
   setTimeout(() => {
     try {
+      // Sélecteurs pour trouver les sections
+      const sectionSelectors = [
+        // Sélecteur par ID direct
+        `#${sectionId}`,
+        // Sélecteurs par attributs data-
+        `[data-section="${sectionId}"]`,
+        `[data-tab-content="${sectionId}"]`,
+        // Sélecteurs par classe
+        `.${sectionId}-section`,
+        // Sélecteurs avec ID comme classe
+        `[class*="${sectionId}"]`,
+        // Sélecteurs par contenu
+        `[id*="${sectionId}"]`,
+        `[data-section*="${sectionId}"]`,
+        `[data-tab-content*="${sectionId}"]`
+      ].join(', ');
+      
       // Trouver tous les éléments qui peuvent être des sections
       const allSections = document.querySelectorAll('[data-section], [data-tab-content], [id^="hierarchy"], [id^="wordcount"], [id^="suggestions"], [id^="seo"], [id^="structure"], [id^="backlinks"], [id^="performance"], [id^="metrics"], [id^="analytics"], [id^="signature"], [id^="quora"], [id^="local-business"], [id^="translation"], [id^="pinterest"]');
       
@@ -66,27 +84,11 @@ export const activateSection = (sectionId: string): void => {
         (el as HTMLElement).style.display = 'none';
       });
       
-      // Stratégie 1: Chercher par id direct
-      const sectionById = document.getElementById(sectionId);
-      if (sectionById) {
-        console.log(`Section "${sectionId}" trouvée par id direct`);
-        displayElement(sectionById);
-        return;
-      }
-      
-      // Stratégie 2: Chercher par data-section
-      const sectionByData = document.querySelector(`[data-section="${sectionId}"]`);
-      if (sectionByData) {
-        console.log(`Section "${sectionId}" trouvée par data-section`);
-        displayElement(sectionByData as HTMLElement);
-        return;
-      }
-      
-      // Stratégie 3: Chercher par data-tab-content
-      const sectionByTab = document.querySelector(`[data-tab-content="${sectionId}"]`);
-      if (sectionByTab) {
-        console.log(`Section "${sectionId}" trouvée par data-tab-content`);
-        displayElement(sectionByTab as HTMLElement);
+      // Tenter de trouver la section demandée avec tous les sélecteurs possibles
+      const possibleSections = document.querySelectorAll(sectionSelectors);
+      if (possibleSections.length > 0) {
+        console.log(`Section "${sectionId}" trouvée avec sélecteur combiné`);
+        displayElement(possibleSections[0] as HTMLElement);
         return;
       }
       
@@ -108,10 +110,14 @@ export const activateSection = (sectionId: string): void => {
           console.log(`Tentative d'afficher le sous-onglet par défaut: ${defaultTab}`);
           
           // Tenter d'afficher le sous-onglet par défaut
-          const defaultSection = document.getElementById(defaultTab) || 
-                                 document.querySelector(`[data-section="${defaultTab}"]`) || 
-                                 document.querySelector(`[data-tab-content="${defaultTab}"]`);
+          const defaultSectionSelectors = [
+            `#${defaultTab}`,
+            `[data-section="${defaultTab}"]`,
+            `[data-tab-content="${defaultTab}"]`,
+            `.${defaultTab}-section`
+          ].join(', ');
           
+          const defaultSection = document.querySelector(defaultSectionSelectors);
           if (defaultSection) {
             console.log(`Affichage du sous-onglet par défaut: ${defaultTab}`);
             displayElement(defaultSection as HTMLElement);
@@ -119,37 +125,6 @@ export const activateSection = (sectionId: string): void => {
           }
         }
       }
-      
-      // Tentative d'affichage par classe CSS
-      const sectionsByClass = document.querySelectorAll(`.${sectionId}-section`);
-      if (sectionsByClass.length > 0) {
-        console.log(`Section "${sectionId}" trouvée par classe CSS`);
-        displayElement(sectionsByClass[0] as HTMLElement);
-        return;
-      }
-      
-      // Si aucune section n'a été trouvée, rechercher par contenu similaire
-      console.log("Recherche de sections par contenu similaire");
-      const possibleSections = document.querySelectorAll(`[id*="${sectionId}"], [data-section*="${sectionId}"], [data-tab-content*="${sectionId}"]`);
-      if (possibleSections.length > 0) {
-        console.log(`Section trouvée par correspondance partielle: ${possibleSections[0].id || possibleSections[0].getAttribute('data-section')}`);
-        displayElement(possibleSections[0] as HTMLElement);
-        return;
-      }
-      
-      // Si aucune section n'a été trouvée, c'est probablement un bug de l'application
-      // Affichons alors un message d'erreur et essayons de montrer une section de secours
-      console.error(`Aucune section trouvée pour l'id: ${sectionId}`);
-      console.log("Page actuelle:", window.location.pathname);
-      console.log("Elements présents dans le DOM:", 
-        Array.from(document.querySelectorAll('[id], [data-section], [data-tab-content]'))
-          .map(el => ({
-            id: el.id,
-            'data-section': el.getAttribute('data-section'),
-            'data-tab-content': el.getAttribute('data-tab-content'),
-            display: (el as HTMLElement).style.display
-          }))
-      );
       
       // En dernier recours, chercher une section qui correspond au chemin actuel
       const currentPath = window.location.pathname;
@@ -175,10 +150,14 @@ export const activateSection = (sectionId: string): void => {
       if (currentTabId) {
         console.log(`Tentative d'afficher la section correspondant au chemin actuel: ${currentTabId}`);
         
-        const currentSection = document.getElementById(currentTabId) || 
-                              document.querySelector(`[data-section="${currentTabId}"]`) || 
-                              document.querySelector(`[data-tab-content="${currentTabId}"]`);
+        const currentSectionSelectors = [
+          `#${currentTabId}`,
+          `[data-section="${currentTabId}"]`,
+          `[data-tab-content="${currentTabId}"]`,
+          `.${currentTabId}-section`
+        ].join(', ');
         
+        const currentSection = document.querySelector(currentSectionSelectors);
         if (currentSection) {
           console.log(`Affichage de la section correspondant au chemin actuel: ${currentTabId}`);
           displayElement(currentSection as HTMLElement);
@@ -186,14 +165,28 @@ export const activateSection = (sectionId: string): void => {
         }
       }
       
-      // Afficher la première section valide disponible si tout a échoué
-      const anySections = document.querySelectorAll('[data-section], [data-tab-content], [id]');
-      for (let i = 0; i < anySections.length; i++) {
-        const section = anySections[i] as HTMLElement;
-        if (section && section.tagName !== 'SCRIPT' && section.tagName !== 'STYLE' && section.id !== 'root') {
-          console.log(`Affichage de la première section disponible: ${section.id || section.getAttribute('data-section')}`);
-          section.style.display = 'block';
+      // Ultima fallback - essayer de charger la page index.html du root
+      if (document.getElementById('seo') || document.querySelector('[data-section="seo"]')) {
+        console.log("Fallback: Affichage de la section SEO");
+        const seoSection = document.getElementById('seo') || document.querySelector('[data-section="seo"]');
+        if (seoSection) {
+          displayElement(seoSection as HTMLElement);
           return;
+        }
+      }
+      
+      // Si tout échoue, essayer d'afficher un contenu visible sur la page
+      console.log("Aucune section trouvée, affichage de secours");
+      const mainContent = document.querySelector('main');
+      if (mainContent) {
+        const contentDivs = mainContent.querySelectorAll('div');
+        for (let i = 0; i < contentDivs.length; i++) {
+          const div = contentDivs[i] as HTMLElement;
+          if (div.offsetHeight > 100 && div.children.length > 0) {
+            div.style.display = 'block';
+            console.log("Affichage de secours activé");
+            return;
+          }
         }
       }
       
