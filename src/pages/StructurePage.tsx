@@ -101,9 +101,10 @@ const StructurePage = () => {
           h1Count: headingStructure.h1Count || 0,
           h2Count: headingStructure.h2Count || 0,
           h3Count: headingStructure.h3Count || 0,
-          imgCount: headingStructure.imgCount || 0,
+          imgCount: doc.querySelectorAll('img').length || 0, // Correction de l'erreur
           wordCount: result.data.textContent ? result.data.textContent.split(/\s+/).filter(Boolean).length : 0,
-          readabilityScore: 75
+          readabilityScore: 75,
+          hierarchy: headingStructure.hierarchy || []
         };
         
         setProgress(90);
@@ -130,7 +131,56 @@ const StructurePage = () => {
         h3Count: 4,
         imgCount: 5,
         wordCount: 1200,
-        readabilityScore: 70
+        readabilityScore: 70,
+        hierarchy: [
+          {
+            text: "Titre principal de la page",
+            tagName: "h1",
+            position: 0,
+            children: [
+              {
+                text: "Section À propos",
+                tagName: "h2",
+                position: 1,
+                children: [
+                  {
+                    text: "Notre Histoire",
+                    tagName: "h3",
+                    position: 2,
+                    children: [
+                      {
+                        text: "Nous sommes une entreprise dédiée à l'amélioration de l'expérience web.",
+                        tagName: "p",
+                        position: 3,
+                        children: []
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                text: "Nos Services",
+                tagName: "h2",
+                position: 4,
+                children: [
+                  {
+                    text: "Consultation SEO",
+                    tagName: "h3",
+                    position: 5,
+                    children: [
+                      {
+                        text: "Nous offrons des services de consultation pour améliorer votre visibilité en ligne.",
+                        tagName: "p",
+                        position: 6,
+                        children: []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       };
       
       const mockStructure = {
@@ -210,6 +260,21 @@ const StructurePage = () => {
             onAnalyze={() => document.querySelector('input[placeholder*="URL"]')?.scrollIntoView({ behavior: 'smooth' })}
           />
         </div>
+
+        {/* Section détaillée de la hiérarchie du contenu */}
+        {seoAnalysis && seoAnalysis.hierarchy && (
+          <Card className="p-6 mt-6">
+            <h3 className="text-xl font-semibold mb-4">Hiérarchie détaillée du contenu</h3>
+            <p className="text-gray-600 mb-4">
+              Cette section affiche tous les éléments de contenu de votre page, des titres H1 aux paragraphes.
+            </p>
+            <div className="bg-white rounded-lg border border-gray-200 p-4 max-h-[600px] overflow-y-auto">
+              {seoAnalysis.hierarchy.map((item, index) => (
+                <HierarchyItemRenderer key={index} item={item} level={0} />
+              ))}
+            </div>
+          </Card>
+        )}
         
         {siteStructure && (
           <Card className="p-6">
@@ -217,6 +282,61 @@ const StructurePage = () => {
             <SiteStructureVisualizer structure={siteStructure} />
           </Card>
         )}
+      </div>
+    </div>
+  );
+};
+
+// Composant pour l'affichage récursif de la hiérarchie
+const HierarchyItemRenderer = ({ item, level }: { item: any, level: number }) => {
+  const [isExpanded, setIsExpanded] = useState(true);
+  
+  const getTagColor = (tagName: string) => {
+    switch(tagName) {
+      case 'h1': return 'bg-blue-100 text-blue-800';
+      case 'h2': return 'bg-green-100 text-green-800';
+      case 'h3': return 'bg-amber-100 text-amber-800';
+      case 'h4': return 'bg-purple-100 text-purple-800';
+      case 'h5': return 'bg-pink-100 text-pink-800';
+      case 'h6': return 'bg-red-100 text-red-800';
+      case 'p': return 'bg-gray-100 text-gray-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  return (
+    <div className={`ml-${level * 4} mb-2`}>
+      <div className="flex items-start">
+        <button 
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="mr-2 p-1 rounded hover:bg-gray-100"
+          style={{ marginTop: '2px' }}
+        >
+          {item.children && item.children.length > 0 ? (
+            isExpanded ? (
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            )
+          ) : (
+            <div className="w-4"></div>
+          )}
+        </button>
+        <div className="flex-1">
+          <div className="flex items-center">
+            <span className={`px-2 py-1 rounded text-xs font-medium ${getTagColor(item.tagName)}`}>
+              {item.tagName}
+            </span>
+            <span className="ml-2">{item.text}</span>
+          </div>
+          {isExpanded && item.children && item.children.length > 0 && (
+            <div className="pl-6 border-l border-gray-200 mt-2">
+              {item.children.map((child: any, index: number) => (
+                <HierarchyItemRenderer key={index} item={child} level={level + 1} />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
