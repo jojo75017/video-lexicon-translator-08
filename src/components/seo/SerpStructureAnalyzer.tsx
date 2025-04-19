@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FirecrawlService } from '@/utils/FirecrawlService';
@@ -18,7 +17,7 @@ const SerpStructureAnalyzer = () => {
   const [activeTab, setActiveTab] = useState('info');
   const [showCorsWarning, setShowCorsWarning] = useState<boolean>(false);
 
-  // Activer le proxy CORS automatiquement au chargement du composant
+  // Enable CORS proxy automatically on component mount
   useEffect(() => {
     FirecrawlService.enableProxy();
   }, []);
@@ -39,20 +38,20 @@ const SerpStructureAnalyzer = () => {
   };
 
   const getHeadingLevel = (heading: any): string => {
-    // Gérer différents formats de niveau de titre
+    // Handle different heading level formats
     if (heading && heading.level !== undefined) {
       if (typeof heading.level === 'number') {
         return `H${heading.level}`;
       } else if (typeof heading.level === 'string') {
-        // Si c'est déjà au format "h1", "h2", etc.
-        if (heading.level.toLowerCase().startsWith('h')) {
+        // If already in "h1", "h2", etc. format
+        if (typeof heading.level.toLowerCase === 'function' && heading.level.toLowerCase().startsWith('h')) {
           return heading.level.toUpperCase();
         }
-        // Si c'est juste un nombre sous forme de chaîne
+        // If it's just a number as a string
         return `H${heading.level}`;
       }
     }
-    return "H?"; // Niveau inconnu
+    return "H?"; // Unknown level
   };
 
   const analyzeSite = async () => {
@@ -90,7 +89,8 @@ const SerpStructureAnalyzer = () => {
       }, 300);
 
       console.log('Starting analysis for URL:', formattedUrl);
-      // Toujours utiliser le proxy pour éviter les problèmes CORS
+      
+      // Always use proxy to avoid CORS issues
       FirecrawlService.enableProxy();
       const crawlResult = await FirecrawlService.crawlWebsite(formattedUrl, true);
       
@@ -126,6 +126,22 @@ const SerpStructureAnalyzer = () => {
       setIsLoading(false);
       setProgress(100);
     }
+  };
+
+  // Helper function to determine if a heading is of a specific level
+  const countHeadingsByLevel = (headings: any[], level: number): number => {
+    if (!headings || !Array.isArray(headings)) return 0;
+    
+    return headings.filter(h => {
+      if (typeof h.level === 'number') return h.level === level;
+      if (typeof h.level === 'string') {
+        if (h.level.toLowerCase && h.level.toLowerCase().startsWith('h')) {
+          return parseInt(h.level.substring(1)) === level;
+        }
+        return parseInt(h.level) === level;
+      }
+      return false;
+    }).length;
   };
 
   return (
@@ -306,19 +322,19 @@ const SerpStructureAnalyzer = () => {
                         <div className="flex justify-between items-center py-1 border-b border-gray-100">
                           <span className="text-sm font-medium">Titres H1</span>
                           <span className="text-sm">
-                            {result?.headings?.filter((h: any) => h.level === 1 || h.level === "h1" || h.level === "1")?.length || 0}
+                            {countHeadingsByLevel(result?.headings, 1)}
                           </span>
                         </div>
                         <div className="flex justify-between items-center py-1 border-b border-gray-100">
                           <span className="text-sm font-medium">Titres H2</span>
                           <span className="text-sm">
-                            {result?.headings?.filter((h: any) => h.level === 2 || h.level === "h2" || h.level === "2")?.length || 0}
+                            {countHeadingsByLevel(result?.headings, 2)}
                           </span>
                         </div>
                         <div className="flex justify-between items-center py-1 border-b border-gray-100">
                           <span className="text-sm font-medium">Titres H3</span>
                           <span className="text-sm">
-                            {result?.headings?.filter((h: any) => h.level === 3 || h.level === "h3" || h.level === "3")?.length || 0}
+                            {countHeadingsByLevel(result?.headings, 3)}
                           </span>
                         </div>
                         <div className="flex justify-between items-center py-1 border-b border-gray-100">
@@ -371,8 +387,8 @@ const SerpStructureAnalyzer = () => {
                       <li>Utilisez des H2 et H3 de manière hiérarchique</li>
                       <li>Incluez des mots-clés importants dans vos titres</li>
                       <li>Gardez une structure cohérente sur l'ensemble du site</li>
-                      {result?.headings?.filter((h: any) => h.level === 1 || h.level === "h1" || h.level === "1")?.length !== 1 && (
-                        <li className="text-red-600">Cette page contient {result?.headings?.filter((h: any) => h.level === 1 || h.level === "h1" || h.level === "1")?.length || 0} titre(s) H1. Il est recommandé d'avoir exactement un H1 par page.</li>
+                      {countHeadingsByLevel(result?.headings, 1) !== 1 && (
+                        <li className="text-red-600">Cette page contient {countHeadingsByLevel(result?.headings, 1)} titre(s) H1. Il est recommandé d'avoir exactement un H1 par page.</li>
                       )}
                       {result?.images?.filter((img: any) => !img.alt)?.length > 0 && (
                         <li className="text-amber-600">Cette page contient {result?.images?.filter((img: any) => !img.alt)?.length || 0} image(s) sans attribut alt. Ajoutez des descriptions alt pour l'accessibilité et le SEO.</li>
