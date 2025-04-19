@@ -234,13 +234,13 @@ const AnalyseurStructureSERP = () => {
                   <div className="mb-4 border-b border-gray-100 pb-4">
                     <div className="flex items-center mb-1 text-xs text-gray-500">
                       <ExternalLink className="h-3 w-3 mr-1" />
-                      {result.url || url}
+                      {result?.url || url}
                     </div>
                     <h4 className="text-xl text-blue-600 font-medium mb-1 hover:underline cursor-pointer">
-                      {result.title || "Titre non défini"}
+                      {result?.title || "Titre non défini"}
                     </h4>
                     <p className="text-sm text-gray-800">
-                      {result.meta?.find((m: any) => m.name === 'description')?.content || "Aucune description trouvée pour cette page."}
+                      {result?.meta?.find((m: any) => m.name === 'description')?.content || "Aucune description trouvée pour cette page."}
                     </p>
                   </div>
                   
@@ -250,12 +250,12 @@ const AnalyseurStructureSERP = () => {
                       <div className="space-y-2">
                         <div className="flex justify-between items-center py-1 border-b border-gray-100">
                           <span className="text-sm font-medium">Titre</span>
-                          <span className="text-sm">{result.title ? `${result.title.length} caractères` : "Non défini"}</span>
+                          <span className="text-sm">{result?.title ? `${result.title.length} caractères` : "Non défini"}</span>
                         </div>
                         <div className="flex justify-between items-center py-1 border-b border-gray-100">
                           <span className="text-sm font-medium">Description</span>
                           <span className="text-sm">
-                            {result.meta?.find((m: any) => m.name === 'description')?.content 
+                            {result?.meta?.find((m: any) => m.name === 'description')?.content 
                               ? `${result.meta.find((m: any) => m.name === 'description').content.length} caractères` 
                               : "Non définie"}
                           </span>
@@ -263,13 +263,13 @@ const AnalyseurStructureSERP = () => {
                         <div className="flex justify-between items-center py-1 border-b border-gray-100">
                           <span className="text-sm font-medium">Balises Open Graph</span>
                           <span className="text-sm">
-                            {result.meta?.some((m: any) => m.property?.startsWith('og:')) ? "Présentes" : "Absentes"}
+                            {result?.meta?.some((m: any) => m.property?.startsWith('og:')) ? "Présentes" : "Absentes"}
                           </span>
                         </div>
                         <div className="flex justify-between items-center py-1 border-b border-gray-100">
                           <span className="text-sm font-medium">Balises Twitter Card</span>
                           <span className="text-sm">
-                            {result.meta?.some((m: any) => m.name?.startsWith('twitter:')) ? "Présentes" : "Absentes"}
+                            {result?.meta?.some((m: any) => m.name?.startsWith('twitter:')) ? "Présentes" : "Absentes"}
                           </span>
                         </div>
                       </div>
@@ -280,19 +280,27 @@ const AnalyseurStructureSERP = () => {
                       <div className="space-y-2">
                         <div className="flex justify-between items-center py-1 border-b border-gray-100">
                           <span className="text-sm font-medium">Titres H1</span>
-                          <span className="text-sm">{result.headings?.filter((h: any) => h.level === 'h1')?.length || 0}</span>
+                          <span className="text-sm">
+                            {result?.headings?.filter((h: any) => h.level === 1 || h.level === "h1")?.length || 0}
+                          </span>
                         </div>
                         <div className="flex justify-between items-center py-1 border-b border-gray-100">
                           <span className="text-sm font-medium">Titres H2</span>
-                          <span className="text-sm">{result.headings?.filter((h: any) => h.level === 'h2')?.length || 0}</span>
+                          <span className="text-sm">
+                            {result?.headings?.filter((h: any) => h.level === 2 || h.level === "h2")?.length || 0}
+                          </span>
                         </div>
                         <div className="flex justify-between items-center py-1 border-b border-gray-100">
                           <span className="text-sm font-medium">Titres H3</span>
-                          <span className="text-sm">{result.headings?.filter((h: any) => h.level === 'h3')?.length || 0}</span>
+                          <span className="text-sm">
+                            {result?.headings?.filter((h: any) => h.level === 3 || h.level === "h3")?.length || 0}
+                          </span>
                         </div>
                         <div className="flex justify-between items-center py-1 border-b border-gray-100">
                           <span className="text-sm font-medium">Images</span>
-                          <span className="text-sm">{result.images?.length || 0} (dont {result.images?.filter((img: any) => !img.alt)?.length || 0} sans alt)</span>
+                          <span className="text-sm">
+                            {result?.images?.length || 0} (dont {result?.images?.filter((img: any) => !img.alt)?.length || 0} sans alt)
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -307,20 +315,27 @@ const AnalyseurStructureSERP = () => {
                   <div className="mb-4">
                     <h4 className="font-medium text-gray-700 mb-2">Hiérarchie des titres</h4>
                     <div className="pl-4 border-l-2 border-blue-200 space-y-2">
-                      {result.headings && result.headings.length > 0 ? (
-                        result.headings.map((heading: any, index: number) => (
-                          <div 
-                            key={index} 
-                            className={`py-1.5 px-3 rounded-md ${
-                              heading.level === "h1" ? 'bg-blue-50 font-bold ml-0' : 
-                              heading.level === "h2" ? 'bg-blue-50/60 font-semibold ml-4' : 
-                              heading.level === "h3" ? 'bg-blue-50/30 ml-8' : 
-                              'bg-gray-50 ml-12'
-                            }`}
-                          >
-                            {`${heading.level.toUpperCase()}: ${heading.text}`}
-                          </div>
-                        ))
+                      {result?.headings && result.headings.length > 0 ? (
+                        result.headings.map((heading: any, index: number) => {
+                          // Handle different formats of heading level
+                          const level = typeof heading.level === 'string' ? 
+                            heading.level.toLowerCase() : 
+                            `h${heading.level}`;
+                          
+                          return (
+                            <div 
+                              key={index} 
+                              className={`py-1.5 px-3 rounded-md ${
+                                level === "h1" || heading.level === 1 ? 'bg-blue-50 font-bold ml-0' : 
+                                level === "h2" || heading.level === 2 ? 'bg-blue-50/60 font-semibold ml-4' : 
+                                level === "h3" || heading.level === 3 ? 'bg-blue-50/30 ml-8' : 
+                                'bg-gray-50 ml-12'
+                              }`}
+                            >
+                              {`${typeof level === 'string' ? level.toUpperCase() : `H${heading.level}`}: ${heading.text}`}
+                            </div>
+                          );
+                        })
                       ) : (
                         <div className="text-gray-500">Aucune donnée de titres disponible</div>
                       )}
@@ -334,11 +349,11 @@ const AnalyseurStructureSERP = () => {
                       <li>Utilisez des H2 et H3 de manière hiérarchique</li>
                       <li>Incluez des mots-clés importants dans vos titres</li>
                       <li>Gardez une structure cohérente sur l'ensemble du site</li>
-                      {result.headings?.filter((h: any) => h.level === 'h1')?.length !== 1 && (
-                        <li className="text-red-600">Cette page contient {result.headings?.filter((h: any) => h.level === 'h1')?.length || 0} titre(s) H1. Il est recommandé d'avoir exactement un H1 par page.</li>
+                      {result?.headings?.filter((h: any) => h.level === "h1" || h.level === 1)?.length !== 1 && (
+                        <li className="text-red-600">Cette page contient {result?.headings?.filter((h: any) => h.level === "h1" || h.level === 1)?.length || 0} titre(s) H1. Il est recommandé d'avoir exactement un H1 par page.</li>
                       )}
-                      {result.images?.filter((img: any) => !img.alt)?.length > 0 && (
-                        <li className="text-amber-600">Cette page contient {result.images?.filter((img: any) => !img.alt)?.length || 0} image(s) sans attribut alt. Ajoutez des descriptions alt pour l'accessibilité et le SEO.</li>
+                      {result?.images?.filter((img: any) => !img.alt)?.length > 0 && (
+                        <li className="text-amber-600">Cette page contient {result?.images?.filter((img: any) => !img.alt)?.length || 0} image(s) sans attribut alt. Ajoutez des descriptions alt pour l'accessibilité et le SEO.</li>
                       )}
                     </ul>
                   </div>
@@ -351,7 +366,7 @@ const AnalyseurStructureSERP = () => {
                   <div className="relative">
                     <pre className="bg-gray-50 p-4 rounded-md overflow-x-auto text-xs">
                       <code className="language-html">
-                        {result.sourceCode || "<p>Aucun code source disponible</p>"}
+                        {result?.sourceCode || "<p>Aucun code source disponible</p>"}
                       </code>
                     </pre>
                   </div>
