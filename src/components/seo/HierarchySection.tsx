@@ -1,9 +1,9 @@
-
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
-import { Heading, List, Paragraph, Type, FileQuestion, Search } from 'lucide-react';
+import { Heading, List, Type, FileQuestion, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface SeoAnalysisResult {
   h1Count?: number;
@@ -53,141 +53,148 @@ const HierarchySection: React.FC<HierarchySectionProps> = ({
           Hiérarchie du contenu
         </h2>
       </div>
-      <p className="text-gray-600 mb-6">
-        Analysez les balises de titre et l'organisation du contenu de votre page
-      </p>
-      
-      {isLoading ? (
-        <div className="flex justify-center p-8">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
-        </div>
-      ) : (
-        <div>
-          {hasContent ? (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm">
-                  <div className="flex items-center mb-3">
-                    <Heading className="h-5 w-5 text-amber-500" />
-                    <h3 className="text-sm font-medium text-gray-700 ml-2">Titres et sous-titres</h3>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center">
-                        <div className="w-6 h-6 flex items-center justify-center bg-amber-100 text-amber-700 rounded-full text-xs font-medium">H1</div>
-                        <span className="ml-2 text-gray-700">Titres principaux</span>
+
+      <Tabs defaultValue="summary" className="w-full">
+        <TabsList className="mb-4">
+          <TabsTrigger value="summary">Résumé</TabsTrigger>
+          <TabsTrigger value="detailed">Structure détaillée</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="summary">
+          {isLoading ? (
+            <div className="flex justify-center p-8">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
+            </div>
+          ) : (
+            <div>
+              {hasContent ? (
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm">
+                      <div className="flex items-center mb-3">
+                        <Heading className="h-5 w-5 text-amber-500" />
+                        <h3 className="text-sm font-medium text-gray-700 ml-2">Titres et sous-titres</h3>
                       </div>
-                      <span className="font-semibold text-gray-800">{seoAnalysis?.h1Count || 0}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center">
-                        <div className="w-6 h-6 flex items-center justify-center bg-amber-50 text-amber-600 rounded-full text-xs font-medium">H2</div>
-                        <span className="ml-2 text-gray-700">Sous-titres</span>
-                      </div>
-                      <span className="font-semibold text-gray-800">{seoAnalysis?.h2Count || 0}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center">
-                        <div className="w-6 h-6 flex items-center justify-center bg-amber-50 text-amber-500 rounded-full text-xs font-medium">H3</div>
-                        <span className="ml-2 text-gray-700">Sections</span>
-                      </div>
-                      <span className="font-semibold text-gray-800">{seoAnalysis?.h3Count || 0}</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm">
-                  <div className="flex items-center mb-3">
-                    <Type className="h-5 w-5 text-blue-500" />
-                    <h3 className="text-sm font-medium text-gray-700 ml-2">Analyse du texte</h3>
-                  </div>
-                  <div className="space-y-4">
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-sm text-gray-500">Nombre de mots</span>
-                        <span className="text-sm font-medium text-gray-700">{seoAnalysis?.wordCount || 0}</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-1.5">
-                        <div 
-                          className="bg-blue-600 h-1.5 rounded-full" 
-                          style={{ width: `${Math.min(Math.max((seoAnalysis?.wordCount || 0) / 10, 10), 100)}%` }}
-                        ></div>
-                      </div>
-                      <div className="flex justify-between text-xs text-gray-400 mt-1">
-                        <span>Faible</span>
-                        <span>Optimal</span>
-                        <span>Élevé</span>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center">
+                            <div className="w-6 h-6 flex items-center justify-center bg-amber-100 text-amber-700 rounded-full text-xs font-medium">H1</div>
+                            <span className="ml-2 text-gray-700">Titres principaux</span>
+                          </div>
+                          <span className="font-semibold text-gray-800">{seoAnalysis?.h1Count || 0}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center">
+                            <div className="w-6 h-6 flex items-center justify-center bg-amber-50 text-amber-600 rounded-full text-xs font-medium">H2</div>
+                            <span className="ml-2 text-gray-700">Sous-titres</span>
+                          </div>
+                          <span className="font-semibold text-gray-800">{seoAnalysis?.h2Count || 0}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center">
+                            <div className="w-6 h-6 flex items-center justify-center bg-amber-50 text-amber-500 rounded-full text-xs font-medium">H3</div>
+                            <span className="ml-2 text-gray-700">Sections</span>
+                          </div>
+                          <span className="font-semibold text-gray-800">{seoAnalysis?.h3Count || 0}</span>
+                        </div>
                       </div>
                     </div>
                     
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-sm text-gray-500">Lisibilité</span>
-                        <span className="text-sm font-medium text-gray-700">{seoAnalysis?.readabilityScore || 0}/100</span>
+                    <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm">
+                      <div className="flex items-center mb-3">
+                        <Type className="h-5 w-5 text-blue-500" />
+                        <h3 className="text-sm font-medium text-gray-700 ml-2">Analyse du texte</h3>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-1.5">
-                        <div 
-                          className={`h-1.5 rounded-full ${
-                            (seoAnalysis?.readabilityScore || 0) > 70 
-                              ? 'bg-green-500' 
-                              : (seoAnalysis?.readabilityScore || 0) > 40 
-                                ? 'bg-amber-500' 
-                                : 'bg-red-500'
-                          }`}
-                          style={{ width: `${seoAnalysis?.readabilityScore || 0}%` }}
-                        ></div>
+                      <div className="space-y-4">
+                        <div>
+                          <div className="flex justify-between mb-1">
+                            <span className="text-sm text-gray-500">Nombre de mots</span>
+                            <span className="text-sm font-medium text-gray-700">{seoAnalysis?.wordCount || 0}</span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-1.5">
+                            <div 
+                              className="bg-blue-600 h-1.5 rounded-full" 
+                              style={{ width: `${Math.min(Math.max((seoAnalysis?.wordCount || 0) / 10, 10), 100)}%` }}
+                            ></div>
+                          </div>
+                          <div className="flex justify-between text-xs text-gray-400 mt-1">
+                            <span>Faible</span>
+                            <span>Optimal</span>
+                            <span>Élevé</span>
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <div className="flex justify-between mb-1">
+                            <span className="text-sm text-gray-500">Lisibilité</span>
+                            <span className="text-sm font-medium text-gray-700">{seoAnalysis?.readabilityScore || 0}/100</span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-1.5">
+                            <div 
+                              className={`h-1.5 rounded-full ${
+                                (seoAnalysis?.readabilityScore || 0) > 70 
+                                  ? 'bg-green-500' 
+                                  : (seoAnalysis?.readabilityScore || 0) > 40 
+                                    ? 'bg-amber-500' 
+                                    : 'bg-red-500'
+                              }`}
+                              style={{ width: `${seoAnalysis?.readabilityScore || 0}%` }}
+                            ></div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Bouton pour afficher la hiérarchie détaillée */}
-              <div className="flex justify-center">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setShowHierarchy(!showHierarchy)}
-                  className="flex items-center gap-2"
-                >
-                  <List className="h-4 w-4" />
-                  {showHierarchy ? "Masquer la hiérarchie" : "Afficher la hiérarchie du contenu"}
-                </Button>
-              </div>
-
-              {/* Section pour la hiérarchie détaillée */}
-              {showHierarchy && seoAnalysis?.hierarchy && seoAnalysis.hierarchy.length > 0 && (
-                <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm mt-4 max-h-[350px] overflow-y-auto">
-                  <div className="flex items-center mb-3">
-                    <Paragraph className="h-5 w-5 text-green-500" />
-                    <h3 className="text-sm font-medium text-gray-700 ml-2">Hiérarchie des éléments</h3>
+              ) : (
+                <div className="bg-gray-50 p-8 rounded-lg text-center">
+                  <div className="flex flex-col items-center justify-center">
+                    <FileQuestion className="h-12 w-12 text-gray-300 mb-4" />
+                    <p className="text-gray-600 font-medium mb-2">
+                      Aucun site web analysé
+                    </p>
+                    <p className="text-gray-400 text-sm max-w-md mb-6">
+                      Pour voir la structure du contenu, commencez par analyser un site web avec l'outil d'analyse SEO
+                    </p>
+                    <Button 
+                      variant="outline" 
+                      onClick={handleAnalyzeClick}
+                      className="flex items-center gap-2"
+                    >
+                      <Search className="h-4 w-4" />
+                      Analyser un site
+                    </Button>
                   </div>
-                  <HierarchyItems items={seoAnalysis.hierarchy} />
                 </div>
               )}
             </div>
-          ) : (
-            <div className="bg-gray-50 p-8 rounded-lg text-center">
-              <div className="flex flex-col items-center justify-center">
-                <FileQuestion className="h-12 w-12 text-gray-300 mb-4" />
-                <p className="text-gray-600 font-medium mb-2">
-                  Aucun site web analysé
-                </p>
-                <p className="text-gray-400 text-sm max-w-md mb-6">
-                  Pour voir la structure du contenu, commencez par analyser un site web avec l'outil d'analyse SEO
-                </p>
-                <Button 
-                  variant="outline" 
-                  onClick={handleAnalyzeClick}
-                  className="flex items-center gap-2"
-                >
-                  <Search className="h-4 w-4" />
-                  Analyser un site
-                </Button>
+          )}
+        </TabsContent>
+
+        <TabsContent value="detailed">
+          {!isLoading && seoAnalysis?.hierarchy && seoAnalysis.hierarchy.length > 0 ? (
+            <div className="bg-white rounded-lg border border-gray-100 shadow-sm p-4">
+              <div className="flex items-center mb-4">
+                <Type className="h-5 w-5 text-amber-500 mr-2" />
+                <h3 className="text-lg font-medium text-gray-700">Structure détaillée du contenu</h3>
+              </div>
+              <div className="max-h-[600px] overflow-y-auto">
+                <HierarchyItems items={seoAnalysis.hierarchy} />
               </div>
             </div>
+          ) : isLoading ? (
+            <div className="flex justify-center p-8">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              <FileQuestion className="h-12 w-12 mx-auto text-gray-300 mb-3" />
+              <p>Aucune structure détaillée disponible.</p>
+              <p className="text-sm">Analysez un site pour voir sa structure complète.</p>
+            </div>
           )}
-        </div>
-      )}
+        </TabsContent>
+      </Tabs>
     </Card>
   );
 };
