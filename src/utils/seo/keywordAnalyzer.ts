@@ -1,4 +1,3 @@
-
 interface KeywordAnalysis {
   keyword: string;
   frequency: number;
@@ -113,122 +112,75 @@ const generateSeoTitle = (keyword: string): string => {
   const containsMultipleEntities = keyword.includes(" et ") || keyword.includes(" & ") || 
                                   keyword.includes(" vs ") || keyword.includes(" ou ");
   
-  let prefixes = [];
-  let suffixes = [];
+  let title = "";
   
   if (isGeographic) {
     // Travel/Geographic content
-    prefixes = [
-      "Guide de Voyage : ",
-      "Explorer ",
-      "Découvrir ",
-      "Voyage en ",
-      "Aventures en ",
-      "Itinéraire ",
-      "Séjour en ",
-      "Visiter "
-    ];
-    suffixes = [
-      " | Guide Complet 2024",
-      " | Conseils de Voyage",
-      " | Que Voir et Faire",
-      " | Carnet de Voyage",
-      " | Meilleures Destinations"
-    ];
-  } else if (containsMultipleEntities) {
-    // Comparison or multi-entity content
-    prefixes = [
-      "Guide Combiné : ",
-      "Itinéraire ",
-      "Comparatif ",
-      "Voyage entre ",
-      "Circuit ",
-      "Explorer "
-    ];
-    suffixes = [
-      " | Itinéraire Optimal",
-      " | Circuit Complet",
-      " | Comparaison Détaillée",
-      " | Guide 2 en 1",
-      " | Meilleure Route"
-    ];
+    if (containsMultipleEntities) {
+      // Multiple geographic entities (e.g., "Namibie et Botswana")
+      const entities = keyword.split(/ et | & | vs | ou /);
+      if (entities.length >= 2) {
+        const options = [
+          `Circuit ${entities[0]} et ${entities[1]} : Guide Complet | Voyage 2024`,
+          `Voyage ${entities[0]}-${entities[1]} : Itinéraire et Conseils Pratiques`,
+          `Explorer ${entities[0]} et ${entities[1]} : Circuit Optimal | Guide`,
+          `${entities[0]} et ${entities[1]} : Comparatif et Itinéraire | Voyage`,
+          `Guide de Voyage : ${entities[0]} et ${entities[1]} | Circuit Idéal`
+        ];
+        title = options[Math.floor(Math.random() * options.length)];
+      }
+    } else {
+      // Single geographic entity
+      const options = [
+        `Guide Voyage ${keyword} : 10 Sites Incontournables | Conseils 2024`,
+        `Visiter ${keyword} : Itinéraire, Budget et Astuces | Guide Pratique`,
+        `Que Faire en ${keyword} ? Top 15 Activités | Guide de Voyage`,
+        `Découvrir ${keyword} : Conseils, Hébergements et Gastronomie`,
+        `${keyword} : Guide Complet, Monuments et Paysages | Voyage 2024`
+      ];
+      title = options[Math.floor(Math.random() * options.length)];
+    }
   } else if (lowercaseKeyword.includes("comment") || lowercaseKeyword.includes("faire") || 
       lowercaseKeyword.includes("créer") || lowercaseKeyword.includes("utiliser")) {
     // How-to content
-    prefixes = [
-      "Guide Étape par Étape : Comment ",
-      "Tutoriel Complet : Comment ",
-      "Mode d'Emploi Détaillé pour ",
-      "Méthode Facile pour ",
-      "5 Étapes Essentielles pour "
+    const options = [
+      `Comment ${keyword} : Guide Étape par Étape | Conseils d'Experts`,
+      `${keyword} Facilement : Méthode Complète | Tutoriel Détaillé`,
+      `Guide Pratique : ${keyword} en 5 Étapes | Résultats Garantis`,
+      `Tutoriel : ${keyword} | Technique Professionnelle Simplifiée`,
+      `${keyword} : Mode d'Emploi Complet | Astuces et Bonnes Pratiques`
     ];
-    suffixes = [
-      " | Guide Pratique 2024",
-      " | Tutoriel Expert",
-      " | Méthode Éprouvée",
-      " | Technique Optimale",
-      " | Démarche Simplifiée"
-    ];
+    title = options[Math.floor(Math.random() * options.length)];
   } else if (lowercaseKeyword.includes("meilleur") || lowercaseKeyword.includes("top") || 
              lowercaseKeyword.includes("comparatif") || lowercaseKeyword.includes("vs")) {
     // Comparison content
-    prefixes = [
-      "Comparatif 2024 : Les ",
-      "Top 10 des ",
-      "Guide d'Achat : ",
-      "Les Meilleurs ",
-      "Sélection Experte : "
+    const options = [
+      `Top 10 ${keyword} : Comparatif Complet | Guide d'Achat 2024`,
+      `Meilleurs ${keyword} : Tests et Avis | Comparatif Détaillé`,
+      `Comparatif ${keyword} : Quel Modèle Choisir ? | Guide Ultime`,
+      `Guide d'Achat ${keyword} : Notre Sélection | Critères de Choix`,
+      `${keyword} : Analyse Comparative | Rapport Qualité-Prix Optimal`
     ];
-    suffixes = [
-      " | Comparaison Détaillée",
-      " | Avis d'Experts",
-      " | Tests Complets",
-      " | Critères de Choix",
-      " | Qualité-Prix"
-    ];
+    title = options[Math.floor(Math.random() * options.length)];
   } else {
     // Default informational content
-    prefixes = [
-      "Guide Complet sur ",
-      "Tout Savoir sur ",
-      "L'Essentiel à Connaître sur ",
-      "Le Guide Définitif de ",
-      "Comprendre et Maîtriser "
+    const options = [
+      `${keyword} : Guide Complet et Conseils | Tout Savoir en 2024`,
+      `Guide Ultime du ${keyword} : Principes et Applications Pratiques`,
+      `${keyword} Expliqué : Concepts Clés | Guide Approfondi`,
+      `Tout Comprendre sur ${keyword} : Analyse Complète | Guide 2024`,
+      `${keyword} : Guide Définitif | Techniques et Stratégies Essentielles`
     ];
-    suffixes = [
-      " | Analyse Experte",
-      " | Conseils Professionnels",
-      " | Informations Clés",
-      " | Guide Complet 2024",
-      " | Approche Stratégique"
-    ];
+    title = options[Math.floor(Math.random() * options.length)];
   }
   
-  let title = "";
-  let attempts = 0;
-  
-  // Generate title with exactly 60 characters
-  while (title.length !== 60 && attempts < 50) {
-    const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
-    const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
-    
-    // Capitalize keyword properly
-    const capitalizedKeyword = keyword
-      .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(' ');
-    
-    title = (prefix + capitalizedKeyword + suffix).trim();
-    
-    // Adjust length to exactly 60 characters
-    if (title.length > 60) {
-      title = title.substring(0, 57) + "...";
-    } else if (title.length < 60) {
-      const padding = " • Guide Expert".substring(0, 60 - title.length);
-      title = title + padding;
-    }
-    
-    attempts++;
+  // Ensure exactly 60 characters
+  if (title.length > 60) {
+    title = title.substring(0, 57) + "...";
+  } else if (title.length < 60) {
+    // Padding with spaces or relevant content
+    const padding = " • Guide Expert".substring(0, 60 - title.length);
+    title = title + padding;
   }
   
   // Final check to ensure exactly 60 characters
@@ -250,68 +202,72 @@ const generateSeoDescription = (keyword: string): string => {
   const containsMultipleEntities = keyword.includes(" et ") || keyword.includes(" & ") || 
                                   keyword.includes(" vs ") || keyword.includes(" ou ");
   
-  // Create templates based on keyword intent
-  let templates = [];
-  const lowercaseKeyword = keyword.toLowerCase();
+  let description = "";
   
   if (isGeographic) {
-    // Travel content
-    templates = [
-      `Découvrez notre guide de voyage complet sur ${keyword}. Meilleurs sites à visiter, hébergements, gastronomie et conseils pratiques pour un séjour inoubliable.`,
-      `Planifiez votre voyage en ${keyword} avec nos conseils d'experts. Attractions incontournables, itinéraires optimisés et astuces locales pour une expérience unique.`,
-      `Guide de voyage ${keyword} : monuments historiques, parcs naturels, plages paradisiaques et activités culturelles. Préparez votre séjour parfait dès maintenant.`,
-      `Explorez les merveilles de ${keyword} avec notre guide détaillé. Des paysages époustouflants aux traditions locales, tout ce qu'il faut savoir avant de partir.`,
-      `Visitez ${keyword} en toute sérénité grâce à nos recommandations. Meilleure période, budget, transports et hébergements pour un voyage sur mesure réussi.`
-    ];
-  } else if (containsMultipleEntities) {
-    // Multi-entity content
-    const entities = keyword.split(/ et | & | vs | ou /);
-    if (entities.length >= 2) {
-      templates = [
-        `Voyage combiné ${keyword} : itinéraires optimisés, comparaison des destinations, meilleure période et conseils pratiques pour explorer ces deux régions.`,
-        `Circuit ${keyword} : planifiez votre itinéraire idéal entre ces destinations complémentaires. Transport, hébergement et attractions incontournables.`,
-        `Comparatif détaillé entre ${entities[0]} et ${entities[1]} : paysages, culture, coût de la vie et expériences uniques pour choisir votre prochaine destination.`,
-        `Découvrez comment combiner ${entities[0]} et ${entities[1]} dans un seul voyage. Itinéraires testés, durée recommandée et conseils de voyage pratiques.`,
-        `Guide complet pour voyager entre ${entities[0]} et ${entities[1]}. Frontières, transports, attractions incontournables et conseils d'organisation.`
+    if (containsMultipleEntities) {
+      // Multiple geographic entities (e.g., "Namibie et Botswana")
+      const entities = keyword.split(/ et | & | vs | ou /);
+      if (entities.length >= 2) {
+        const options = [
+          `Planifiez votre circuit combiné ${entities[0]}-${entities[1]} avec notre guide voyage. Itinéraires optimisés, visites incontournables et conseils pratiques pour un séjour réussi.`,
+          `Guide complet pour voyager entre ${entities[0]} et ${entities[1]}. Découvrez le meilleur itinéraire, les transports, hébergements et sites à ne pas manquer pour votre aventure.`,
+          `Comparatif détaillé ${entities[0]} et ${entities[1]} : paysages, culture, coût de la vie et activités. Organisez votre circuit idéal avec nos conseils d'experts.`,
+          `Circuit ${entities[0]}-${entities[1]} : itinéraire optimal, durée recommandée, budget et astuces locales. Notre guide complet pour une expérience de voyage inoubliable.`,
+          `Découvrez comment combiner ${entities[0]} et ${entities[1]} dans un seul voyage. Frontières, transports, attractions incontournables et conseils d'organisation pratiques.`
+        ];
+        description = options[Math.floor(Math.random() * options.length)];
+      }
+    } else {
+      // Single geographic entity
+      const options = [
+        `Découvrez notre guide complet sur ${keyword}. Sites incontournables, meilleurs hébergements, spécialités culinaires et conseils pratiques pour un voyage réussi.`,
+        `Planifiez votre voyage à ${keyword} avec notre guide expert. Monuments historiques, parcs naturels, plages magnifiques et expériences culturelles à ne pas manquer.`,
+        `Guide de voyage ${keyword} : quand partir, budget nécessaire, transports locaux et attractions populaires. Préparez votre séjour idéal avec nos conseils.`,
+        `Explorez les merveilles de ${keyword} avec notre guide détaillé. Itinéraires recommandés, astuces locales et meilleures activités pour une expérience authentique.`,
+        `Visitez ${keyword} en toute sérénité grâce à nos recommandations d'experts. Météo idéale, quartiers à privilégier et bonnes adresses pour un voyage mémorable.`
       ];
+      description = options[Math.floor(Math.random() * options.length)];
     }
   } else if (lowercaseKeyword.includes("comment") || lowercaseKeyword.includes("faire") || 
       lowercaseKeyword.includes("créer") || lowercaseKeyword.includes("utiliser")) {
     // How-to content
-    templates = [
-      `Découvrez notre méthode pas à pas pour ${keyword}. Guide complet avec exemples, astuces pratiques et conseils d'experts pour réussir facilement.`,
-      `Comment ${keyword} efficacement ? Notre guide détaillé vous révèle les techniques professionnelles et erreurs à éviter pour des résultats optimaux.`,
-      `Apprenez à ${keyword} avec notre tutoriel complet. Conseils pratiques, étapes détaillées et astuces pour obtenir les meilleurs résultats.`,
-      `Maîtrisez l'art de ${keyword} grâce à nos explications claires et étapes détaillées. Techniques éprouvées et méthodes professionnelles.`,
-      `Tutoriel expert : ${keyword}. Suivez notre guide étape par étape avec démonstrations, exemples et solutions aux problèmes courants.`
+    const options = [
+      `Apprenez à ${keyword} avec notre guide étape par étape. Méthodes testées, astuces professionnelles et solutions aux problèmes courants pour des résultats optimaux.`,
+      `Guide complet pour ${keyword} efficacement. Techniques éprouvées, exemples pratiques et erreurs à éviter pour maîtriser le sujet et obtenir les meilleurs résultats.`,
+      `Découvrez comment ${keyword} grâce à notre tutoriel détaillé. Conseils d'experts, outils recommandés et procédures simplifiées pour réussir à chaque fois.`,
+      `Tutoriel pratique : ${keyword} en suivant notre méthode claire et précise. Étapes détaillées, démonstrations et astuces pour faciliter votre apprentissage.`,
+      `Maîtrisez l'art de ${keyword} avec nos explications professionnelles. Techniques avancées, exercices pratiques et conseils personnalisés pour progresser rapidement.`
     ];
+    description = options[Math.floor(Math.random() * options.length)];
   } else if (lowercaseKeyword.includes("meilleur") || lowercaseKeyword.includes("top") || 
              lowercaseKeyword.includes("comparatif") || lowercaseKeyword.includes("vs")) {
     // Comparison content
-    templates = [
-      `Comparatif détaillé des ${keyword}. Notre analyse impartiale évalue performance, rapport qualité-prix et caractéristiques pour éclairer votre choix.`,
-      `À la recherche des ${keyword} ? Notre sélection rigoureuse compare les meilleures options selon des critères objectifs et avis d'utilisateurs.`,
-      `Découvrez notre top des ${keyword}. Tests approfondis, avis d'experts et comparaison des caractéristiques pour vous aider à choisir le meilleur.`,
-      `Quel est le meilleur ${keyword} ? Notre guide d'achat analyse les modèles populaires, critères essentiels et avis clients pour votre décision.`,
-      `Guide d'achat ${keyword} : comparaison objective des options premium et budget, avec analyses d'experts et retours d'expérience utilisateurs.`
+    const options = [
+      `Découvrez notre sélection des meilleurs ${keyword}. Analyse comparative détaillée, tests approfondis et avis d'utilisateurs pour vous aider à faire le choix idéal.`,
+      `Comparatif complet des ${keyword} disponibles sur le marché. Critères essentiels, rapport qualité-prix et performances pour un achat éclairé et sans regret.`,
+      `Guide d'achat ${keyword} : notre top 10 basé sur des tests rigoureux. Avantages, inconvénients et recommandations selon différents besoins et budgets.`,
+      `Trouvez le meilleur ${keyword} grâce à notre analyse d'experts. Caractéristiques techniques, performances réelles et retours d'expérience pour un choix optimal.`,
+      `${keyword} : notre comparatif détaillé pour vous aider à choisir. Modèles premium et options abordables analysés selon des critères objectifs et pratiques.`
     ];
+    description = options[Math.floor(Math.random() * options.length)];
   } else {
     // Default informational content
-    templates = [
-      `Tout ce que vous devez savoir sur ${keyword}. Informations essentielles, analyses d'experts et conseils pratiques pour une compréhension complète.`,
-      `${keyword.charAt(0).toUpperCase() + keyword.slice(1)} expliqué simplement : concepts clés, applications pratiques et stratégies optimales pour maîtriser le sujet.`,
-      `Explorez notre guide complet sur ${keyword}. Découvrez les principes fondamentaux, techniques avancées et dernières tendances du domaine.`,
-      `Approfondissez vos connaissances sur ${keyword} avec notre analyse experte. Informations vérifiées, conseils pratiques et ressources utiles.`,
-      `Guide définitif sur ${keyword} : origines, évolutions, applications actuelles et perspectives futures. Expertise complète pour tous niveaux.`
+    const options = [
+      `Tout ce que vous devez savoir sur ${keyword}. Guide complet avec définitions, concepts clés, applications pratiques et dernières évolutions du domaine.`,
+      `Découvrez notre guide détaillé sur ${keyword}. Principes fondamentaux, techniques avancées et stratégies optimales pour maîtriser parfaitement le sujet.`,
+      `${keyword} expliqué simplement : origines, développements récents et perspectives d'avenir. Informations vérifiées et conseils d'experts pour tous niveaux.`,
+      `Approfondissez vos connaissances sur ${keyword} avec notre analyse complète. Fondamentaux théoriques, applications concrètes et ressources complémentaires.`,
+      `Guide définitif sur ${keyword} : concepts essentiels, méthodologies éprouvées et conseils pratiques pour développer votre expertise dans ce domaine.`
     ];
+    description = options[Math.floor(Math.random() * options.length)];
   }
-  
-  let description = templates[Math.floor(Math.random() * templates.length)];
   
   // Ensure exactly 155 characters
   if (description.length > 155) {
     description = description.substring(0, 152) + "...";
   } else if (description.length < 155) {
+    // Add relevant context to reach 155 characters
     const extraContext = " Informations vérifiées et conseils d'experts pour des résultats optimaux.";
     description = description + extraContext.substring(0, 155 - description.length);
   }
