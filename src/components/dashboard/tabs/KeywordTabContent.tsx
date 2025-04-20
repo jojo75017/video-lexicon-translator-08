@@ -102,22 +102,26 @@ const KeywordTabContent = () => {
                 <FileText className="h-4 w-4" />
                 Balise Title
               </label>
-              <Badge variant={title.length > 60 ? "destructive" : "secondary"}>
+              <Badge variant={title.length < 50 || title.length > 60 ? "destructive" : "secondary"}>
                 {title.length}/60
               </Badge>
             </div>
             <Input
               id="title"
-              placeholder="Entrez votre titre (max 60 caractères)"
+              placeholder="Entrez votre titre (entre 50 et 60 caractères)"
               value={title}
               onChange={(e) => {
                 const newTitle = e.target.value.slice(0, 60); // Limit to 60 characters
                 setTitle(newTitle);
               }}
-              className={title.length > 60 ? "border-red-500" : ""}
+              className={title.length < 50 || title.length > 60 ? "border-red-500" : ""}
             />
-            {title.length > 60 && (
-              <p className="text-xs text-red-500">Le titre dépasse la limite de 60 caractères</p>
+            {(title.length < 50 || title.length > 60) && (
+              <p className="text-xs text-red-500">
+                {title.length < 50 
+                  ? "Le titre doit faire au moins 50 caractères" 
+                  : "Le titre dépasse la limite de 60 caractères"}
+              </p>
             )}
           </div>
 
