@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -102,19 +101,19 @@ const KeywordTabContent = () => {
                 <FileText className="h-4 w-4" />
                 Balise Title
               </label>
-              <Badge variant={title.length > 60 ? "destructive" : "secondary"}>
-                {title.length}/60
+              <Badge variant={title.length > 31 ? "destructive" : "secondary"}>
+                {title.length}/31
               </Badge>
             </div>
             <Input
               id="title"
-              placeholder="Entrez votre titre (max 60 caractères)"
+              placeholder="Entrez votre titre (max 31 caractères)"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className={title.length > 60 ? "border-red-500" : ""}
+              className={title.length > 31 ? "border-red-500" : ""}
             />
-            {title.length > 60 && (
-              <p className="text-xs text-red-500">Le titre dépasse la limite de 60 caractères</p>
+            {title.length > 31 && (
+              <p className="text-xs text-red-500">Le titre dépasse la limite de 31 caractères</p>
             )}
           </div>
 
@@ -124,26 +123,25 @@ const KeywordTabContent = () => {
                 <AlignLeft className="h-4 w-4" />
                 Meta Description
               </label>
-              <Badge variant={metaDescription.length > 155 ? "destructive" : "secondary"}>
-                {metaDescription.length}/155
+              <Badge variant={metaDescription.length > 145 ? "destructive" : "secondary"}>
+                {metaDescription.length}/145
               </Badge>
             </div>
             <Textarea
               id="metaDescription"
-              placeholder="Entrez votre meta description (max 155 caractères)"
+              placeholder="Entrez votre meta description (max 145 caractères)"
               value={metaDescription}
               onChange={(e) => setMetaDescription(e.target.value)}
-              className={metaDescription.length > 155 ? "border-red-500" : ""}
+              className={metaDescription.length > 145 ? "border-red-500" : ""}
               rows={4}
             />
-            {metaDescription.length > 155 && (
-              <p className="text-xs text-red-500">La description dépasse la limite de 155 caractères</p>
+            {metaDescription.length > 145 && (
+              <p className="text-xs text-red-500">La description dépasse la limite de 145 caractères</p>
             )}
           </div>
         </CardContent>
       </Card>
 
-      {/* Affichage des suggestions supplémentaires */}
       <KeywordSuggestions 
         generatedKeywords={generatedKeywords} 
         onGenerateClick={handleGenerateMore} 
