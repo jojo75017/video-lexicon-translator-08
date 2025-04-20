@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -109,7 +110,10 @@ const KeywordTabContent = () => {
               id="title"
               placeholder="Entrez votre titre (max 60 caractères)"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) => {
+                const newTitle = e.target.value.slice(0, 60); // Limit to 60 characters
+                setTitle(newTitle);
+              }}
               className={title.length > 60 ? "border-red-500" : ""}
             />
             {title.length > 60 && (
@@ -123,20 +127,27 @@ const KeywordTabContent = () => {
                 <AlignLeft className="h-4 w-4" />
                 Meta Description
               </label>
-              <Badge variant={metaDescription.length > 155 ? "destructive" : "secondary"}>
+              <Badge variant={(metaDescription.length < 150 || metaDescription.length > 155) ? "destructive" : "secondary"}>
                 {metaDescription.length}/155
               </Badge>
             </div>
             <Textarea
               id="metaDescription"
-              placeholder="Entrez votre meta description (max 155 caractères)"
+              placeholder="Entrez votre meta description (entre 150 et 155 caractères)"
               value={metaDescription}
-              onChange={(e) => setMetaDescription(e.target.value)}
-              className={metaDescription.length > 155 ? "border-red-500" : ""}
+              onChange={(e) => {
+                const newDescription = e.target.value.slice(0, 155); // Limit to 155 characters
+                setMetaDescription(newDescription);
+              }}
+              className={(metaDescription.length < 150 || metaDescription.length > 155) ? "border-red-500" : ""}
               rows={4}
             />
-            {metaDescription.length > 155 && (
-              <p className="text-xs text-red-500">La description dépasse la limite de 155 caractères</p>
+            {(metaDescription.length < 150 || metaDescription.length > 155) && (
+              <p className="text-xs text-red-500">
+                {metaDescription.length < 150 
+                  ? "La description doit faire au moins 150 caractères" 
+                  : "La description dépasse 155 caractères"}
+              </p>
             )}
           </div>
         </CardContent>
