@@ -46,10 +46,8 @@ const SeoPage = () => {
           </p>
           
           <CrawlForm 
-            onSubmit={analyzeSite}
+            onSubmit={() => analyzeSite()}
             isLoading={isLoading}
-            url={url}
-            setUrl={setUrl}
             showCorsWarning={showCorsWarning}
             error={error}
             handleActivateProxy={handleActivateProxy}
@@ -63,3 +61,4 @@ const SeoPage = () => {
 };
 
 export default SeoPage;
+
