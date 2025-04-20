@@ -1,4 +1,3 @@
-
 interface KeywordAnalysis {
   keyword: string;
   frequency: number;
@@ -99,35 +98,37 @@ const calculateRelevanceScore = (frequency: number, length: number): number => {
   return Math.min(lengthBonus + frequencyScore, 100);
 };
 
-// Génère un titre SEO optimisé basé sur un mot-clé (max 60 caractères)
 const generateSeoTitle = (keyword: string): string => {
   const prefixes = [
-    "Guide Ultime : ",
-    "Comment ",
-    "Les Meilleurs ",
-    "Tout Savoir sur ",
-    "Optimisez vos ",
-    "Découvrez ",
+    "Guide Ultime : ", 
+    "Comment ", 
+    "Les Meilleurs ", 
+    "Tout Savoir sur ", 
+    "Optimisez vos ", 
+    "Découvrez ", 
     "Améliorez votre "
   ];
   
   const suffixes = [
-    " - Guide Complet",
-    " - Conseils d'Experts",
-    " en 2024",
-    " pour Débutants",
-    " | Techniques Avancées",
+    " - Guide Complet", 
+    " - Conseils d'Experts", 
+    " en 2024", 
+    " pour Débutants", 
+    " | Techniques Avancées", 
     " pour de Meilleurs Résultats"
   ];
   
   const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
   const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
   
-  let title = prefix + keyword.charAt(0).toUpperCase() + keyword.slice(1) + suffix;
+  let title = (prefix + keyword.charAt(0).toUpperCase() + keyword.slice(1) + suffix).trim();
   
-  // Tronquer à 60 caractères si nécessaire
+  // Ensure exactly 60 characters
   if (title.length > 60) {
     title = title.substring(0, 57) + "...";
+  } else if (title.length < 60) {
+    // Pad with spaces or add more context
+    title = title.padEnd(60, ' ');
   }
   
   return title;
