@@ -1,3 +1,4 @@
+
 interface KeywordAnalysis {
   keyword: string;
   frequency: number;
@@ -104,14 +105,54 @@ const generateSeoTitle = (keyword: string): string => {
     keyword = "contenu optimisé";
   }
   
-  // Adapt prefix and suffix to the keyword's domain/intent
-  let prefixes = [];
-  let suffixes = [];
-  
   // Analyze keyword to determine the type of content
   const lowercaseKeyword = keyword.toLowerCase();
   
-  if (lowercaseKeyword.includes("comment") || lowercaseKeyword.includes("faire") || 
+  // Detect geographic locations or complex expressions
+  const isGeographic = detectGeographicKeyword(keyword);
+  const containsMultipleEntities = keyword.includes(" et ") || keyword.includes(" & ") || 
+                                  keyword.includes(" vs ") || keyword.includes(" ou ");
+  
+  let prefixes = [];
+  let suffixes = [];
+  
+  if (isGeographic) {
+    // Travel/Geographic content
+    prefixes = [
+      "Guide de Voyage : ",
+      "Explorer ",
+      "Découvrir ",
+      "Voyage en ",
+      "Aventures en ",
+      "Itinéraire ",
+      "Séjour en ",
+      "Visiter "
+    ];
+    suffixes = [
+      " | Guide Complet 2024",
+      " | Conseils de Voyage",
+      " | Que Voir et Faire",
+      " | Carnet de Voyage",
+      " | Meilleures Destinations"
+    ];
+  } else if (containsMultipleEntities) {
+    // Comparison or multi-entity content
+    prefixes = [
+      "Guide Combiné : ",
+      "Itinéraire ",
+      "Comparatif ",
+      "Voyage entre ",
+      "Circuit ",
+      "Explorer "
+    ];
+    suffixes = [
+      " | Itinéraire Optimal",
+      " | Circuit Complet",
+      " | Comparaison Détaillée",
+      " | Guide 2 en 1",
+      " | Meilleure Route"
+    ];
+  } else if (lowercaseKeyword.includes("comment") || lowercaseKeyword.includes("faire") || 
       lowercaseKeyword.includes("créer") || lowercaseKeyword.includes("utiliser")) {
     // How-to content
     prefixes = [
@@ -203,12 +244,38 @@ const generateSeoDescription = (keyword: string): string => {
   if (!keyword || keyword.trim().length === 0) {
     keyword = "sujet";
   }
+
+  // Analyze for geographic or complex expressions
+  const isGeographic = detectGeographicKeyword(keyword);
+  const containsMultipleEntities = keyword.includes(" et ") || keyword.includes(" & ") || 
+                                  keyword.includes(" vs ") || keyword.includes(" ou ");
   
   // Create templates based on keyword intent
   let templates = [];
   const lowercaseKeyword = keyword.toLowerCase();
   
-  if (lowercaseKeyword.includes("comment") || lowercaseKeyword.includes("faire") || 
+  if (isGeographic) {
+    // Travel content
+    templates = [
+      `Découvrez notre guide de voyage complet sur ${keyword}. Meilleurs sites à visiter, hébergements, gastronomie et conseils pratiques pour un séjour inoubliable.`,
+      `Planifiez votre voyage en ${keyword} avec nos conseils d'experts. Attractions incontournables, itinéraires optimisés et astuces locales pour une expérience unique.`,
+      `Guide de voyage ${keyword} : monuments historiques, parcs naturels, plages paradisiaques et activités culturelles. Préparez votre séjour parfait dès maintenant.`,
+      `Explorez les merveilles de ${keyword} avec notre guide détaillé. Des paysages époustouflants aux traditions locales, tout ce qu'il faut savoir avant de partir.`,
+      `Visitez ${keyword} en toute sérénité grâce à nos recommandations. Meilleure période, budget, transports et hébergements pour un voyage sur mesure réussi.`
+    ];
+  } else if (containsMultipleEntities) {
+    // Multi-entity content
+    const entities = keyword.split(/ et | & | vs | ou /);
+    if (entities.length >= 2) {
+      templates = [
+        `Voyage combiné ${keyword} : itinéraires optimisés, comparaison des destinations, meilleure période et conseils pratiques pour explorer ces deux régions.`,
+        `Circuit ${keyword} : planifiez votre itinéraire idéal entre ces destinations complémentaires. Transport, hébergement et attractions incontournables.`,
+        `Comparatif détaillé entre ${entities[0]} et ${entities[1]} : paysages, culture, coût de la vie et expériences uniques pour choisir votre prochaine destination.`,
+        `Découvrez comment combiner ${entities[0]} et ${entities[1]} dans un seul voyage. Itinéraires testés, durée recommandée et conseils de voyage pratiques.`,
+        `Guide complet pour voyager entre ${entities[0]} et ${entities[1]}. Frontières, transports, attractions incontournables et conseils d'organisation.`
+      ];
+    }
+  } else if (lowercaseKeyword.includes("comment") || lowercaseKeyword.includes("faire") || 
       lowercaseKeyword.includes("créer") || lowercaseKeyword.includes("utiliser")) {
     // How-to content
     templates = [
@@ -251,6 +318,36 @@ const generateSeoDescription = (keyword: string): string => {
   
   // Final check to ensure exactly 155 characters
   return description.padEnd(155, ' ');
+};
+
+// Fonction pour détecter si un mot-clé est géographique
+const detectGeographicKeyword = (keyword: string): boolean => {
+  const geographicTerms = [
+    // Pays 
+    "france", "espagne", "italie", "allemagne", "portugal", "états-unis", "canada", 
+    "japon", "chine", "australie", "brésil", "mexique", "maroc", "égypte", "thaïlande",
+    "vietnam", "cambodge", "inde", "namibie", "botswana", "afrique", "europe", "asie",
+    "amérique", "océanie",
+    
+    // Villes
+    "paris", "lyon", "marseille", "bordeaux", "lille", "toulouse", "nice", "nantes",
+    "strasbourg", "montpellier", "barcelone", "madrid", "rome", "berlin", "munich",
+    "londres", "new york", "tokyo", "kyoto", "bangkok", "prague", "vienne", "amsterdam",
+    "lisbonne", "porto",
+    
+    // Régions
+    "bretagne", "normandie", "provence", "alsace", "corse", "alpes", "pyrénées",
+    "côte d'azur", "toscane", "andalousie", "bavière", "catalogne"
+  ];
+  
+  const lowercaseKeyword = keyword.toLowerCase();
+  
+  // Vérifier si le mot-clé contient un terme géographique
+  return geographicTerms.some(term => 
+    lowercaseKeyword.includes(term) || 
+    // Gestion des mots composés et des accents
+    lowercaseKeyword.replace(/[-']/g, " ").includes(term)
+  );
 };
 
 export const generateKeywordSuggestions = (keywords: KeywordAnalysis[]): KeywordSuggestion[] => {
