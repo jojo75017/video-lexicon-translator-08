@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import { TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton"; 
@@ -11,6 +10,7 @@ import { useSiteAnalyzer } from "@/hooks/useSiteAnalyzer";
 import { Navigate, Link } from "react-router-dom";
 import PinterestGenerator from '@/components/pinterest/PinterestGenerator';
 import { activateSection } from '@/utils/navigationHelpers';
+import KeywordTabContent from './KeywordTabContent';
 
 interface TabContentsRendererProps {
   contentTabs: any[];
@@ -256,10 +256,22 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
           <CrawlForm />
         </div>
       </TabsContent>
+      
+      {/* Keyword Meta Tab */}
+      <TabsContent value="keyword-meta" id="keyword-meta" data-section="keyword-meta" style={{
+        display: activeTab === "keyword-meta" ? "block" : "none",
+        position: "relative" as "relative",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "auto",
+      }}>
+        <KeywordTabContent />
+      </TabsContent>
 
       {/* Fallback for any other tab */}
       {contentTabs
-        .filter(tab => !['hierarchy', 'wordcount', 'suggestions', 'seo', 'structure', 'backlinks', 'performance', 'metrics', 'analytics'].includes(tab.id))
+        .filter(tab => !['hierarchy', 'wordcount', 'suggestions', 'seo', 'structure', 'backlinks', 'performance', 'metrics', 'analytics', 'keyword-meta'].includes(tab.id))
         .map(tab => (
           <TabsContent key={tab.id} value={tab.id} id={tab.id} data-section={tab.id} style={{
             display: activeTab === tab.id ? "block" : "none",

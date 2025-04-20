@@ -164,6 +164,16 @@ export const tabs: Tab[] = [
     highlighted: true,
     path: '/pinterest'
   },
+    {
+    id: 'keyword-meta',
+    label: 'Title & Meta',
+    description: 'Optimisation des balises title et meta description',
+    icon: <Tag />,
+    group: 'seo',
+    color: 'text-blue-600',
+    isNew: true,
+    highlighted: true
+  },
   {
     id: 'quora',
     label: 'Questions Quora',
