@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { ScrollText, BarChart, Search, ExternalLink, CheckCircle, PenTool, FileSearch, Image, FileSignature } from 'lucide-react';
+import { ScrollText, BarChart, Search, ExternalLink, CheckCircle, PenTool, FileSearch, Image, FileSignature, Tag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate } from 'react-router-dom';
@@ -20,7 +21,8 @@ const PageHeader = () => {
       'analytics': '/analytics',
       'signature': '/signature',
       'pinterest': '/pinterest',
-      'quora': '/quora'
+      'quora': '/quora',
+      'keyword-meta': '/keyword-meta'
     };
     
     // Navigate to the corresponding route
@@ -152,6 +154,16 @@ const PageHeader = () => {
               >
                 <Image className="h-4 w-4" />
                 <span>Pinterest</span>
+              </TabsTrigger>
+              
+              {/* Nouvel onglet Title & Meta ajouté à la barre de navigation principale */}
+              <TabsTrigger 
+                value="keyword-meta" 
+                className="data-[state=active]:bg-white/20 text-white data-[state=active]:text-white hover:bg-white/20 hover:text-white flex gap-2 items-center bg-blue-400/30"
+                onClick={() => handleTabClick('keyword-meta')}
+              >
+                <Tag className="h-4 w-4" />
+                <span>Title & Meta</span>
               </TabsTrigger>
             </TabsList>
           </Tabs>

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import IndexPage from './pages/Index';
@@ -29,6 +30,8 @@ const App = () => {
         <Route path="/signature" element={<SignaturePage />} />
         <Route path="/pinterest" element={<PinterestPage />} />
         <Route path="/settings" element={<SettingsPage />} />
+        {/* Ajout d'une route pour la page keyword-meta qui affiche simplement la page d'index avec l'onglet actif */}
+        <Route path="/keyword-meta" element={<IndexPage />} />
       </Routes>
     </Router>
   );

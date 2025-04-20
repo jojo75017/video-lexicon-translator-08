@@ -1,3 +1,4 @@
+
 import { Tab } from './types';
 import { 
   BarChart2, 
@@ -164,7 +165,8 @@ export const tabs: Tab[] = [
     highlighted: true,
     path: '/pinterest'
   },
-    {
+  // Title & Meta - modification pour le rendre plus visible et accessible
+  {
     id: 'keyword-meta',
     label: 'Title & Meta',
     description: 'Optimisation des balises title et meta description',
@@ -172,7 +174,8 @@ export const tabs: Tab[] = [
     group: 'seo',
     color: 'text-blue-600',
     isNew: true,
-    highlighted: true
+    highlighted: true,
+    path: '/keyword-meta'  // Ajout d'un chemin dédié
   },
   {
     id: 'quora',
