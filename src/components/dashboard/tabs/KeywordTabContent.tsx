@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -59,9 +58,6 @@ const KeywordTabContent = () => {
   return (
     <div className="space-y-6">
       <Card className="w-full">
-        <CardHeader>
-          <CardTitle>Optimisation des mots-clés</CardTitle>
-        </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
             <label htmlFor="keyword" className="text-sm font-medium leading-none flex items-center gap-2">
@@ -95,32 +91,30 @@ const KeywordTabContent = () => {
               Entrez un mot-clé pour générer automatiquement un titre et une meta description optimisés
             </p>
           </div>
-
+          
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <label htmlFor="title" className="text-sm font-medium leading-none flex items-center gap-2">
                 <FileText className="h-4 w-4" />
                 Balise Title
               </label>
-              <Badge variant={title.length < 50 || title.length > 60 ? "destructive" : "secondary"}>
+              <Badge variant={title.length !== 60 ? "destructive" : "secondary"}>
                 {title.length}/60
               </Badge>
             </div>
             <Input
               id="title"
-              placeholder="Entrez votre titre (entre 50 et 60 caractères)"
+              placeholder="Entrez votre titre (exactement 60 caractères)"
               value={title}
               onChange={(e) => {
                 const newTitle = e.target.value.slice(0, 60); // Limit to 60 characters
                 setTitle(newTitle);
               }}
-              className={title.length < 50 || title.length > 60 ? "border-red-500" : ""}
+              className={title.length !== 60 ? "border-red-500" : ""}
             />
-            {(title.length < 50 || title.length > 60) && (
+            {title.length !== 60 && (
               <p className="text-xs text-red-500">
-                {title.length < 50 
-                  ? "Le titre doit faire au moins 50 caractères" 
-                  : "Le titre dépasse la limite de 60 caractères"}
+                Le titre doit faire exactement 60 caractères (actuellement {title.length})
               </p>
             )}
           </div>
@@ -149,11 +143,12 @@ const KeywordTabContent = () => {
             {(metaDescription.length < 150 || metaDescription.length > 155) && (
               <p className="text-xs text-red-500">
                 {metaDescription.length < 150 
-                  ? "La description doit faire au moins 150 caractères" 
-                  : "La description dépasse 155 caractères"}
+                  ? `La description doit faire au moins 150 caractères (actuellement ${metaDescription.length})` 
+                  : `La description dépasse 155 caractères (actuellement ${metaDescription.length})`}
               </p>
             )}
           </div>
+
         </CardContent>
       </Card>
 
