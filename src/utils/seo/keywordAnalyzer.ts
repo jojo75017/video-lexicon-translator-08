@@ -99,47 +99,98 @@ const calculateRelevanceScore = (frequency: number, length: number): number => {
 };
 
 const generateSeoTitle = (keyword: string): string => {
-  const prefixes = [
-    "Guide Ultime 2024 : ",
-    "Les Secrets pour ",
-    "Tout Savoir sur ",
-    "La Méthode pour ",
-    "Les Meilleurs ",
-  ];
+  // Ensure we're working with meaningful content
+  if (!keyword || keyword.trim().length === 0) {
+    keyword = "contenu optimisé";
+  }
   
-  const suffixes = [
-    " | Guide Expert et Complet",
-    " | Techniques Avancées",
-    " | Stratégies Gagnantes",
-    " | Conseils d'Experts",
-    " | Guide Professionnel"
-  ];
+  // Adapt prefix and suffix to the keyword's domain/intent
+  let prefixes = [];
+  let suffixes = [];
+  
+  // Analyze keyword to determine the type of content
+  const lowercaseKeyword = keyword.toLowerCase();
+  
+  if (lowercaseKeyword.includes("comment") || lowercaseKeyword.includes("faire") || 
+      lowercaseKeyword.includes("créer") || lowercaseKeyword.includes("utiliser")) {
+    // How-to content
+    prefixes = [
+      "Guide Étape par Étape : Comment ",
+      "Tutoriel Complet : Comment ",
+      "Mode d'Emploi Détaillé pour ",
+      "Méthode Facile pour ",
+      "5 Étapes Essentielles pour "
+    ];
+    suffixes = [
+      " | Guide Pratique 2024",
+      " | Tutoriel Expert",
+      " | Méthode Éprouvée",
+      " | Technique Optimale",
+      " | Démarche Simplifiée"
+    ];
+  } else if (lowercaseKeyword.includes("meilleur") || lowercaseKeyword.includes("top") || 
+             lowercaseKeyword.includes("comparatif") || lowercaseKeyword.includes("vs")) {
+    // Comparison content
+    prefixes = [
+      "Comparatif 2024 : Les ",
+      "Top 10 des ",
+      "Guide d'Achat : ",
+      "Les Meilleurs ",
+      "Sélection Experte : "
+    ];
+    suffixes = [
+      " | Comparaison Détaillée",
+      " | Avis d'Experts",
+      " | Tests Complets",
+      " | Critères de Choix",
+      " | Qualité-Prix"
+    ];
+  } else {
+    // Default informational content
+    prefixes = [
+      "Guide Complet sur ",
+      "Tout Savoir sur ",
+      "L'Essentiel à Connaître sur ",
+      "Le Guide Définitif de ",
+      "Comprendre et Maîtriser "
+    ];
+    suffixes = [
+      " | Analyse Experte",
+      " | Conseils Professionnels",
+      " | Informations Clés",
+      " | Guide Complet 2024",
+      " | Approche Stratégique"
+    ];
+  }
   
   let title = "";
   let attempts = 0;
   
-  // Try different combinations until we get exactly 60 characters
+  // Generate title with exactly 60 characters
   while (title.length !== 60 && attempts < 50) {
     const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
     const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
-    const capitalizedKeyword = keyword.charAt(0).toUpperCase() + keyword.slice(1);
+    
+    // Capitalize keyword properly
+    const capitalizedKeyword = keyword
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
     
     title = (prefix + capitalizedKeyword + suffix).trim();
     
-    // If too long, trim and add ellipsis
+    // Adjust length to exactly 60 characters
     if (title.length > 60) {
       title = title.substring(0, 57) + "...";
-    }
-    // If too short, pad with descriptive content
-    else if (title.length < 60) {
-      const padding = " - Le Guide".substring(0, 60 - title.length);
+    } else if (title.length < 60) {
+      const padding = " • Guide Expert".substring(0, 60 - title.length);
       title = title + padding;
     }
     
     attempts++;
   }
   
-  // Ensure we always return exactly 60 characters
+  // Final check to ensure exactly 60 characters
   if (title.length !== 60) {
     title = title.padEnd(60, ' ');
   }
@@ -147,15 +198,46 @@ const generateSeoTitle = (keyword: string): string => {
   return title;
 };
 
-// Meta description generation with exactly 155 characters
 const generateSeoDescription = (keyword: string): string => {
-  const templates = [
-    `Découvrez les meilleures stratégies pour ${keyword}. Nos conseils d'experts vous aideront à maximiser vos résultats avec des techniques testées et approuvées.`,
-    `Vous cherchez à optimiser ${keyword}? Notre guide complet présente les techniques éprouvées et garantit des résultats exceptionnels pour votre succès.`,
-    `Améliorez vos performances avec nos astuces spécialisées sur ${keyword}. Guide pratique complet avec exemples concrets et méthodes efficaces.`,
-    `Expert en ${keyword}? Découvrez nos techniques avancées et conseils professionnels pour atteindre l'excellence et dépasser vos objectifs.`,
-    `${keyword.charAt(0).toUpperCase() + keyword.slice(1)} : stratégies avancées et conseils d'experts pour maximiser votre potentiel. Méthodes testées et approuvées.`
-  ];
+  // Ensure we're working with meaningful content
+  if (!keyword || keyword.trim().length === 0) {
+    keyword = "sujet";
+  }
+  
+  // Create templates based on keyword intent
+  let templates = [];
+  const lowercaseKeyword = keyword.toLowerCase();
+  
+  if (lowercaseKeyword.includes("comment") || lowercaseKeyword.includes("faire") || 
+      lowercaseKeyword.includes("créer") || lowercaseKeyword.includes("utiliser")) {
+    // How-to content
+    templates = [
+      `Découvrez notre méthode pas à pas pour ${keyword}. Guide complet avec exemples, astuces pratiques et conseils d'experts pour réussir facilement.`,
+      `Comment ${keyword} efficacement ? Notre guide détaillé vous révèle les techniques professionnelles et erreurs à éviter pour des résultats optimaux.`,
+      `Apprenez à ${keyword} avec notre tutoriel complet. Conseils pratiques, étapes détaillées et astuces pour obtenir les meilleurs résultats.`,
+      `Maîtrisez l'art de ${keyword} grâce à nos explications claires et étapes détaillées. Techniques éprouvées et méthodes professionnelles.`,
+      `Tutoriel expert : ${keyword}. Suivez notre guide étape par étape avec démonstrations, exemples et solutions aux problèmes courants.`
+    ];
+  } else if (lowercaseKeyword.includes("meilleur") || lowercaseKeyword.includes("top") || 
+             lowercaseKeyword.includes("comparatif") || lowercaseKeyword.includes("vs")) {
+    // Comparison content
+    templates = [
+      `Comparatif détaillé des ${keyword}. Notre analyse impartiale évalue performance, rapport qualité-prix et caractéristiques pour éclairer votre choix.`,
+      `À la recherche des ${keyword} ? Notre sélection rigoureuse compare les meilleures options selon des critères objectifs et avis d'utilisateurs.`,
+      `Découvrez notre top des ${keyword}. Tests approfondis, avis d'experts et comparaison des caractéristiques pour vous aider à choisir le meilleur.`,
+      `Quel est le meilleur ${keyword} ? Notre guide d'achat analyse les modèles populaires, critères essentiels et avis clients pour votre décision.`,
+      `Guide d'achat ${keyword} : comparaison objective des options premium et budget, avec analyses d'experts et retours d'expérience utilisateurs.`
+    ];
+  } else {
+    // Default informational content
+    templates = [
+      `Tout ce que vous devez savoir sur ${keyword}. Informations essentielles, analyses d'experts et conseils pratiques pour une compréhension complète.`,
+      `${keyword.charAt(0).toUpperCase() + keyword.slice(1)} expliqué simplement : concepts clés, applications pratiques et stratégies optimales pour maîtriser le sujet.`,
+      `Explorez notre guide complet sur ${keyword}. Découvrez les principes fondamentaux, techniques avancées et dernières tendances du domaine.`,
+      `Approfondissez vos connaissances sur ${keyword} avec notre analyse experte. Informations vérifiées, conseils pratiques et ressources utiles.`,
+      `Guide définitif sur ${keyword} : origines, évolutions, applications actuelles et perspectives futures. Expertise complète pour tous niveaux.`
+    ];
+  }
   
   let description = templates[Math.floor(Math.random() * templates.length)];
   
@@ -163,7 +245,7 @@ const generateSeoDescription = (keyword: string): string => {
   if (description.length > 155) {
     description = description.substring(0, 152) + "...";
   } else if (description.length < 155) {
-    const extraContext = " Optimisez vos résultats dès maintenant.";
+    const extraContext = " Informations vérifiées et conseils d'experts pour des résultats optimaux.";
     description = description + extraContext.substring(0, 155 - description.length);
   }
   
