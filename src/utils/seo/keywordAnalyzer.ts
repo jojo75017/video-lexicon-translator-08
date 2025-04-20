@@ -100,58 +100,75 @@ const calculateRelevanceScore = (frequency: number, length: number): number => {
 
 const generateSeoTitle = (keyword: string): string => {
   const prefixes = [
-    "Guide Ultime : ", 
-    "Comment ", 
-    "Les Meilleurs ", 
-    "Tout Savoir sur ", 
-    "Optimisez vos ", 
-    "Découvrez ", 
-    "Améliorez votre "
+    "Guide Ultime 2024 : ",
+    "Les Secrets pour ",
+    "Tout Savoir sur ",
+    "La Méthode pour ",
+    "Les Meilleurs ",
   ];
   
   const suffixes = [
-    " - Guide Complet", 
-    " - Conseils d'Experts", 
-    " en 2024", 
-    " pour Débutants", 
-    " | Techniques Avancées", 
-    " pour de Meilleurs Résultats"
+    " | Guide Expert et Complet",
+    " | Techniques Avancées",
+    " | Stratégies Gagnantes",
+    " | Conseils d'Experts",
+    " | Guide Professionnel"
   ];
   
-  const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
-  const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+  let title = "";
+  let attempts = 0;
   
-  let title = (prefix + keyword.charAt(0).toUpperCase() + keyword.slice(1) + suffix).trim();
+  // Try different combinations until we get exactly 60 characters
+  while (title.length !== 60 && attempts < 50) {
+    const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+    const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+    const capitalizedKeyword = keyword.charAt(0).toUpperCase() + keyword.slice(1);
+    
+    title = (prefix + capitalizedKeyword + suffix).trim();
+    
+    // If too long, trim and add ellipsis
+    if (title.length > 60) {
+      title = title.substring(0, 57) + "...";
+    }
+    // If too short, pad with descriptive content
+    else if (title.length < 60) {
+      const padding = " - Le Guide".substring(0, 60 - title.length);
+      title = title + padding;
+    }
+    
+    attempts++;
+  }
   
-  // Ensure exactly 60 characters
-  if (title.length > 60) {
-    title = title.substring(0, 57) + "...";
-  } else if (title.length < 60) {
-    // Pad with spaces or add more context
+  // Ensure we always return exactly 60 characters
+  if (title.length !== 60) {
     title = title.padEnd(60, ' ');
   }
   
   return title;
 };
 
-// Génère une meta description SEO optimisée basée sur un mot-clé (max 155 caractères)
+// Meta description generation with exactly 155 characters
 const generateSeoDescription = (keyword: string): string => {
   const templates = [
-    `Découvrez les meilleures stratégies pour ${keyword}. Nos conseils d'experts vous aideront à maximiser vos résultats et améliorer votre visibilité en ligne.`,
-    `Vous cherchez à optimiser ${keyword}? Notre guide complet présente les techniques éprouvées et les dernières tendances pour des résultats garantis.`,
-    `Améliorez vos performances avec nos astuces spécialisées sur ${keyword}. Conseils pratiques, études de cas et stratégies recommandées par les experts.`,
-    `Tout ce que vous devez savoir sur ${keyword} en un seul endroit. Guide pratique avec exemples concrets et méthodes efficaces pour progresser rapidement.`,
-    `${keyword.charAt(0).toUpperCase() + keyword.slice(1)} : stratégies avancées et conseils d'experts pour maximiser votre ROI. Techniques testées et approuvées par les professionnels.`
+    `Découvrez les meilleures stratégies pour ${keyword}. Nos conseils d'experts vous aideront à maximiser vos résultats avec des techniques testées et approuvées.`,
+    `Vous cherchez à optimiser ${keyword}? Notre guide complet présente les techniques éprouvées et garantit des résultats exceptionnels pour votre succès.`,
+    `Améliorez vos performances avec nos astuces spécialisées sur ${keyword}. Guide pratique complet avec exemples concrets et méthodes efficaces.`,
+    `Expert en ${keyword}? Découvrez nos techniques avancées et conseils professionnels pour atteindre l'excellence et dépasser vos objectifs.`,
+    `${keyword.charAt(0).toUpperCase() + keyword.slice(1)} : stratégies avancées et conseils d'experts pour maximiser votre potentiel. Méthodes testées et approuvées.`
   ];
   
   let description = templates[Math.floor(Math.random() * templates.length)];
   
-  // Tronquer à 155 caractères si nécessaire
+  // Ensure exactly 155 characters
   if (description.length > 155) {
     description = description.substring(0, 152) + "...";
+  } else if (description.length < 155) {
+    const extraContext = " Optimisez vos résultats dès maintenant.";
+    description = description + extraContext.substring(0, 155 - description.length);
   }
   
-  return description;
+  // Final check to ensure exactly 155 characters
+  return description.padEnd(155, ' ');
 };
 
 export const generateKeywordSuggestions = (keywords: KeywordAnalysis[]): KeywordSuggestion[] => {
