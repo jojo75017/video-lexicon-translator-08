@@ -46,7 +46,9 @@ const SeoPage = () => {
           </p>
           
           <CrawlForm 
-            onSubmit={() => analyzeSite()}
+            url={url}
+            setUrl={setUrl}
+            onAnalyze={analyzeSite}
             isLoading={isLoading}
             showCorsWarning={showCorsWarning}
             error={error}
@@ -61,4 +63,3 @@ const SeoPage = () => {
 };
 
 export default SeoPage;
-
