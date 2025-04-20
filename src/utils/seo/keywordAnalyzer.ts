@@ -1,4 +1,3 @@
-
 interface KeywordAnalysis {
   keyword: string;
   frequency: number;
@@ -133,10 +132,10 @@ const generateSeoTitle = (keyword: string): string => {
     } else {
       // Single geographic entity
       const options = [
+        `Visiter ${keyword} : Paysages, Culture et Sites Incontournables`,
         `Guide Voyage ${keyword} : 10 Sites Incontournables | Conseils 2024`,
-        `Visiter ${keyword} : Itinéraire, Budget et Astuces | Guide Pratique`,
-        `Que Faire en ${keyword} ? Top 15 Activités | Guide de Voyage`,
-        `Découvrir ${keyword} : Conseils, Hébergements et Gastronomie`,
+        `${keyword} : Que Voir, Que Faire | Guide Touristique Complet`,
+        `Découvrir ${keyword} : Itinéraire, Attraits et Conseils Pratiques`,
         `${keyword} : Guide Complet, Monuments et Paysages | Voyage 2024`
       ];
       title = options[Math.floor(Math.random() * options.length)];
@@ -151,7 +150,7 @@ const generateSeoTitle = (keyword: string): string => {
       `Tutoriel : ${keyword} | Technique Professionnelle Simplifiée`,
       `${keyword} : Mode d'Emploi Complet | Astuces et Bonnes Pratiques`
     ];
-    title = options[Math.floor(Math.random() * options.length)];
+  title = options[Math.floor(Math.random() * options.length)];
   } else if (keywordLowerCase.includes("meilleur") || keywordLowerCase.includes("top") || 
              keywordLowerCase.includes("comparatif") || keywordLowerCase.includes("vs")) {
     // Comparison content
@@ -212,22 +211,22 @@ const generateSeoDescription = (keyword: string): string => {
       const entities = keyword.split(/ et | & | vs | ou /);
       if (entities.length >= 2) {
         const options = [
-          `Planifiez votre circuit combiné ${entities[0]}-${entities[1]} avec notre guide voyage. Itinéraires optimisés, visites incontournables et conseils pratiques pour un séjour réussi.`,
-          `Guide complet pour voyager entre ${entities[0]} et ${entities[1]}. Découvrez le meilleur itinéraire, les transports, hébergements et sites à ne pas manquer pour votre aventure.`,
-          `Comparatif détaillé ${entities[0]} et ${entities[1]} : paysages, culture, coût de la vie et activités. Organisez votre circuit idéal avec nos conseils d'experts.`,
-          `Circuit ${entities[0]}-${entities[1]} : itinéraire optimal, durée recommandée, budget et astuces locales. Notre guide complet pour une expérience de voyage inoubliable.`,
-          `Découvrez comment combiner ${entities[0]} et ${entities[1]} dans un seul voyage. Frontières, transports, attractions incontournables et conseils d'organisation pratiques.`
+          `Planifiez votre circuit ${entities[0]}-${entities[1]} avec notre guide voyage détaillé. Lieux à visiter, hébergements, transports et conseils locaux pour un voyage réussi.`,
+          `Guide complet pour voyager entre ${entities[0]} et ${entities[1]}. Itinéraires recommandés, attractions touristiques et expériences culturelles à ne pas manquer.`,
+          `Découvrez les trésors naturels et culturels de ${entities[0]} et ${entities[1]}. Notre guide propose des circuits optimisés et des conseils pratiques pour votre séjour.`,
+          `Circuit ${entities[0]}-${entities[1]} : plages, montagnes, villes historiques et gastronomie locale. Planifiez votre itinéraire idéal avec nos conseils d'experts.`,
+          `Explorez ${entities[0]} et ${entities[1]} en un seul voyage. Notre guide présente les meilleures routes, sites incontournables et astuces pour optimiser votre temps.`
         ];
         description = options[Math.floor(Math.random() * options.length)];
       }
     } else {
       // Single geographic entity
       const options = [
-        `Découvrez notre guide complet sur ${keyword}. Sites incontournables, meilleurs hébergements, spécialités culinaires et conseils pratiques pour un voyage réussi.`,
-        `Planifiez votre voyage à ${keyword} avec notre guide expert. Monuments historiques, parcs naturels, plages magnifiques et expériences culturelles à ne pas manquer.`,
-        `Guide de voyage ${keyword} : quand partir, budget nécessaire, transports locaux et attractions populaires. Préparez votre séjour idéal avec nos conseils.`,
-        `Explorez les merveilles de ${keyword} avec notre guide détaillé. Itinéraires recommandés, astuces locales et meilleures activités pour une expérience authentique.`,
-        `Visitez ${keyword} en toute sérénité grâce à nos recommandations d'experts. Météo idéale, quartiers à privilégier et bonnes adresses pour un voyage mémorable.`
+        `Découvrez ${keyword} avec notre guide de voyage complet. Paysages naturels, patrimoine culturel, gastronomie locale et activités incontournables pour un séjour mémorable.`,
+        `Guide touristique de ${keyword} : monuments historiques, plages magnifiques, sentiers de randonnée et spécialités culinaires. Tous nos conseils pour votre visite.`,
+        `Planifiez votre voyage à ${keyword} : sites touristiques, hébergements recommandés, meilleure période pour visiter et conseils pratiques pour des vacances réussies.`,
+        `Visitez ${keyword} : notre guide présente les lieux emblématiques, activités culturelles, expériences authentiques et itinéraires recommandés pour explorer la région.`,
+        `${keyword} vous attend : découvrez ses paysages variés, son riche patrimoine, sa culture locale et nos conseils d'initiés pour un séjour authentique et inoubliable.`
       ];
       description = options[Math.floor(Math.random() * options.length)];
     }
