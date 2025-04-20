@@ -1,3 +1,4 @@
+
 interface KeywordAnalysis {
   keyword: string;
   frequency: number;
@@ -105,7 +106,7 @@ const generateSeoTitle = (keyword: string): string => {
   }
   
   // Analyze keyword to determine the type of content
-  const lowercaseKeyword = keyword.toLowerCase();
+  const keywordLowerCase = keyword.toLowerCase();
   
   // Detect geographic locations or complex expressions
   const isGeographic = detectGeographicKeyword(keyword);
@@ -140,8 +141,8 @@ const generateSeoTitle = (keyword: string): string => {
       ];
       title = options[Math.floor(Math.random() * options.length)];
     }
-  } else if (lowercaseKeyword.includes("comment") || lowercaseKeyword.includes("faire") || 
-      lowercaseKeyword.includes("créer") || lowercaseKeyword.includes("utiliser")) {
+  } else if (keywordLowerCase.includes("comment") || keywordLowerCase.includes("faire") || 
+      keywordLowerCase.includes("créer") || keywordLowerCase.includes("utiliser")) {
     // How-to content
     const options = [
       `Comment ${keyword} : Guide Étape par Étape | Conseils d'Experts`,
@@ -151,8 +152,8 @@ const generateSeoTitle = (keyword: string): string => {
       `${keyword} : Mode d'Emploi Complet | Astuces et Bonnes Pratiques`
     ];
     title = options[Math.floor(Math.random() * options.length)];
-  } else if (lowercaseKeyword.includes("meilleur") || lowercaseKeyword.includes("top") || 
-             lowercaseKeyword.includes("comparatif") || lowercaseKeyword.includes("vs")) {
+  } else if (keywordLowerCase.includes("meilleur") || keywordLowerCase.includes("top") || 
+             keywordLowerCase.includes("comparatif") || keywordLowerCase.includes("vs")) {
     // Comparison content
     const options = [
       `Top 10 ${keyword} : Comparatif Complet | Guide d'Achat 2024`,
@@ -202,6 +203,7 @@ const generateSeoDescription = (keyword: string): string => {
   const containsMultipleEntities = keyword.includes(" et ") || keyword.includes(" & ") || 
                                   keyword.includes(" vs ") || keyword.includes(" ou ");
   
+  const keywordLowerCase = keyword.toLowerCase();
   let description = "";
   
   if (isGeographic) {
@@ -229,8 +231,8 @@ const generateSeoDescription = (keyword: string): string => {
       ];
       description = options[Math.floor(Math.random() * options.length)];
     }
-  } else if (lowercaseKeyword.includes("comment") || lowercaseKeyword.includes("faire") || 
-      lowercaseKeyword.includes("créer") || lowercaseKeyword.includes("utiliser")) {
+  } else if (keywordLowerCase.includes("comment") || keywordLowerCase.includes("faire") || 
+      keywordLowerCase.includes("créer") || keywordLowerCase.includes("utiliser")) {
     // How-to content
     const options = [
       `Apprenez à ${keyword} avec notre guide étape par étape. Méthodes testées, astuces professionnelles et solutions aux problèmes courants pour des résultats optimaux.`,
@@ -240,8 +242,8 @@ const generateSeoDescription = (keyword: string): string => {
       `Maîtrisez l'art de ${keyword} avec nos explications professionnelles. Techniques avancées, exercices pratiques et conseils personnalisés pour progresser rapidement.`
     ];
     description = options[Math.floor(Math.random() * options.length)];
-  } else if (lowercaseKeyword.includes("meilleur") || lowercaseKeyword.includes("top") || 
-             lowercaseKeyword.includes("comparatif") || lowercaseKeyword.includes("vs")) {
+  } else if (keywordLowerCase.includes("meilleur") || keywordLowerCase.includes("top") || 
+             keywordLowerCase.includes("comparatif") || keywordLowerCase.includes("vs")) {
     // Comparison content
     const options = [
       `Découvrez notre sélection des meilleurs ${keyword}. Analyse comparative détaillée, tests approfondis et avis d'utilisateurs pour vous aider à faire le choix idéal.`,
