@@ -10,6 +10,7 @@ import StructurePage from './pages/StructurePage';
 import PerformancePage from './pages/PerformancePage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import SeoPage from './pages/SeoPage';
+import KeywordMetaPage from './pages/KeywordMetaPage';
 import { Toaster } from 'sonner';
 
 const App = () => {
@@ -30,8 +31,7 @@ const App = () => {
         <Route path="/signature" element={<SignaturePage />} />
         <Route path="/pinterest" element={<PinterestPage />} />
         <Route path="/settings" element={<SettingsPage />} />
-        {/* Ajout d'une route pour la page keyword-meta qui affiche simplement la page d'index avec l'onglet actif */}
-        <Route path="/keyword-meta" element={<IndexPage />} />
+        <Route path="/keyword-meta" element={<KeywordMetaPage />} />
       </Routes>
     </Router>
   );

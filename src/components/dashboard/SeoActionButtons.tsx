@@ -11,8 +11,15 @@ import { Card } from '@/components/ui/card';
 import { FileText, Eye, PieChart, Map, Bell, BarChart2, FolderTree, Languages, Upload, Tag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 const SeoActionButtons = () => {
+  const navigate = useNavigate();
+  
+  const handleNavigate = (path: string) => {
+    navigate(path);
+  };
+  
   return (
     <Card className="p-6 shadow-lg mb-8 border-0 bg-gradient-to-br from-light-green-50 to-light-green-100">
       <div className="mb-6 flex items-center justify-between">
@@ -59,7 +66,7 @@ const SeoActionButtons = () => {
           label="Structure"
           component={<OrganizeButton />}
         />
-        <Link to="/translation" className="block">
+        <button onClick={() => handleNavigate('/translation')} className="block">
           <div className="flex flex-col items-center p-4 bg-indigo-50 rounded-lg border border-indigo-200 shadow-sm transition-all duration-200 cursor-pointer hover:border-indigo-300 hover:shadow-md hover:translate-y-[-2px] relative">
             <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">Nouveau</span>
             <div className="mb-2 p-2.5 bg-indigo-100 rounded-full shadow-inner">
@@ -71,10 +78,10 @@ const SeoActionButtons = () => {
               URL/Fichier
             </span>
           </div>
-        </Link>
+        </button>
 
-        {/* Nouveau bouton Title & Meta avec mise en évidence */}
-        <Link to="/keyword-meta" className="block">
+        {/* Bouton Title & Meta avec mise en évidence et navigation directe */}
+        <button onClick={() => handleNavigate('/keyword-meta')} className="block">
           <div className="flex flex-col items-center p-4 bg-blue-50 rounded-lg border border-blue-200 shadow-sm transition-all duration-200 cursor-pointer hover:border-blue-300 hover:shadow-md hover:translate-y-[-2px] relative">
             <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full px-1.5 py-0.5">SEO</span>
             <div className="mb-2 p-2.5 bg-blue-100 rounded-full shadow-inner">
@@ -85,19 +92,19 @@ const SeoActionButtons = () => {
               60/155 caract.
             </span>
           </div>
-        </Link>
+        </button>
       </div>
 
       <div className="mt-6 flex justify-center">
         <Button 
           variant="secondary"
           className="bg-gradient-to-r from-success-500 to-success-600 hover:from-success-600 hover:to-success-700"
-          asChild
+          onClick={() => handleNavigate('/keyword-meta')}
         >
-          <Link to="/keyword-meta" className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
             <Tag className="h-4 w-4" />
             Optimiser vos balises Title & Meta
-          </Link>
+          </div>
         </Button>
       </div>
     </Card>

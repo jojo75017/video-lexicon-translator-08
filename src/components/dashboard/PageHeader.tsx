@@ -156,7 +156,7 @@ const PageHeader = () => {
                 <span>Pinterest</span>
               </TabsTrigger>
               
-              {/* Nouvel onglet Title & Meta ajouté à la barre de navigation principale */}
+              {/* Onglet Title & Meta avec navigation directe */}
               <TabsTrigger 
                 value="keyword-meta" 
                 className="data-[state=active]:bg-white/20 text-white data-[state=active]:text-white hover:bg-white/20 hover:text-white flex gap-2 items-center bg-blue-400/30"

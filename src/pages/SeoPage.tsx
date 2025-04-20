@@ -45,15 +45,7 @@ const SeoPage = () => {
             Cette analyse vous aidera à optimiser votre site pour les moteurs de recherche.
           </p>
           
-          <CrawlForm 
-            url={url}
-            setUrl={setUrl}
-            onAnalyze={analyzeSite}
-            isLoading={isLoading}
-            showCorsWarning={showCorsWarning}
-            error={error}
-            handleActivateProxy={handleActivateProxy}
-          />
+          <CrawlForm />
           
           {seoAnalysis && <SeoResults seoAnalysis={seoAnalysis} />}
         </Card>
