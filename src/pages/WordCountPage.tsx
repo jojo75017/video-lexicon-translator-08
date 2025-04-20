@@ -32,48 +32,6 @@ const WordCountPage = () => {
             Cette analyse vous aidera à optimiser vos textes pour les moteurs de recherche.
           </p>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 mb-6">
-            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-              <h3 className="text-lg font-medium mb-3">Mots-clés principaux</h3>
-              <p className="text-gray-600 text-sm mb-4">
-                Identifiez les mots-clés les plus utilisés dans votre contenu.
-              </p>
-              
-              <div className="flex flex-wrap gap-2">
-                <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">référencement</div>
-                <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">SEO</div>
-                <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">analyse</div>
-                <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">optimisation</div>
-                <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">contenu</div>
-              </div>
-            </div>
-            
-            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-              <h3 className="text-lg font-medium mb-3">Densité de mots-clés</h3>
-              <p className="text-gray-600 text-sm mb-4">
-                Évaluez le pourcentage de présence des mots-clés principaux.
-              </p>
-              
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">SEO</span>
-                  <span className="text-sm font-medium">2.3%</span>
-                </div>
-                <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                  <div className="h-full bg-green-500 rounded-full" style={{ width: '57%' }}></div>
-                </div>
-                
-                <div className="flex justify-between items-center mt-2">
-                  <span className="text-sm">référencement</span>
-                  <span className="text-sm font-medium">1.8%</span>
-                </div>
-                <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                  <div className="h-full bg-blue-500 rounded-full" style={{ width: '45%' }}></div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
           <CrawlForm />
         </Card>
       </div>

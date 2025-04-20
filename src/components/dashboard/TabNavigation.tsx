@@ -18,12 +18,12 @@ const TabNavigation = () => {
     '/structure': 'structure',
     '/performance': 'performance',
     '/analytics': 'analytics',
-    '/quora': 'quora',
-    '/signature': 'signature',
-    '/pinterest': 'pinterest',
     '/suggestions': 'suggestions',
     '/backlinks': 'backlinks',
-    '/metrics': 'metrics'
+    '/metrics': 'metrics',
+    '/quora': 'quora',
+    '/signature': 'signature',
+    '/pinterest': 'pinterest'
   };
   
   // Get current active tab based on URL
@@ -64,6 +64,18 @@ const TabNavigation = () => {
       });
     }
   };
+  
+  // Effect to enforce synchronization between URL and active tab
+  useEffect(() => {
+    const mappedTab = routeToTabMap[location.pathname];
+    console.log('Current path:', location.pathname, 'Mapped tab:', mappedTab);
+    
+    // Force tab update if needed (URL changed externally)
+    if (mappedTab && mappedTab !== currentTab) {
+      console.log('Forcing tab update to match URL');
+      handleTabChange(mappedTab);
+    }
+  }, [location.pathname]);
   
   return (
     <div className="mb-6" role="navigation" aria-label="Navigation du tableau de bord">

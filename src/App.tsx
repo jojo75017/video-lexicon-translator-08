@@ -5,6 +5,7 @@ import IndexPage from './pages/Index';
 import SettingsPage from './pages/SettingsPage';
 import PinterestPage from './pages/PinterestPage';
 import SignaturePage from './pages/SignaturePage';
+import WordCountPage from './pages/WordCountPage';
 import { Toaster } from 'sonner';
 
 const App = () => {
@@ -14,7 +15,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<IndexPage />} />
         <Route path="/hierarchy" element={<IndexPage />} />
-        <Route path="/wordcount" element={<IndexPage />} />
+        <Route path="/wordcount" element={<WordCountPage />} />
         <Route path="/seo" element={<IndexPage />} />
         <Route path="/structure" element={<IndexPage />} />
         <Route path="/performance" element={<IndexPage />} />
