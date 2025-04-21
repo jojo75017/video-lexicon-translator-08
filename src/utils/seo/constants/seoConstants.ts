@@ -12,15 +12,19 @@ export const geographicTerms = [
   "france", "espagne", "italie", "allemagne", "portugal", "états-unis", "canada", 
   "japon", "chine", "australie", "brésil", "mexique", "maroc", "égypte", "thaïlande",
   "vietnam", "cambodge", "inde", "namibie", "botswana", "afrique", "europe", "asie",
-  "amérique", "océanie",
+  "amérique", "océanie", "bali", "indonésie",
   
   // Villes
   "paris", "lyon", "marseille", "bordeaux", "lille", "toulouse", "nice", "nantes",
   "strasbourg", "montpellier", "barcelone", "madrid", "rome", "berlin", "munich",
   "londres", "new york", "tokyo", "kyoto", "bangkok", "prague", "vienne", "amsterdam",
-  "lisbonne", "porto",
+  "lisbonne", "porto", "ubud", "denpasar",
   
   // Régions
   "bretagne", "normandie", "provence", "alsace", "corse", "alpes", "pyrénées",
-  "côte d'azur", "toscane", "andalousie", "bavière", "catalogne"
+  "côte d'azur", "toscane", "andalousie", "bavière", "catalogne",
+  
+  // Éléments géographiques spécifiques
+  "rizière", "rizières", "plage", "plages", "montagne", "montagnes", "lac", "lacs",
+  "forêt", "forêts", "volcan", "volcans", "île", "îles", "cascade", "cascades"
 ];

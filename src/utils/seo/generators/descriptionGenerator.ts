@@ -6,13 +6,25 @@ export const generateSeoDescription = (keyword: string): string => {
     keyword = "sujet";
   }
 
+  const keywordLowerCase = keyword.toLowerCase();
   const isGeographic = detectGeographicKeyword(keyword);
   const containsMultipleEntities = keyword.includes(" et ") || keyword.includes(" & ") || 
                                   keyword.includes(" vs ") || keyword.includes(" ou ");
+  const hasBali = keywordLowerCase.includes("bali");
+  const hasRizieres = keywordLowerCase.includes("rizière") || keywordLowerCase.includes("rizieres") || 
+                     keywordLowerCase.includes("riziere");
   
   let description = "";
   
-  if (isGeographic) {
+  if (hasRizieres && hasBali) {
+    // Descriptions spécifiques pour les rizières de Bali
+    const options = [
+      `Explorez les magnifiques rizières en terrasses de Bali. Notre guide détaille les meilleurs sites comme Tegallalang et Jatiluwih, quand y aller et comment s'y rendre.`,
+      `Découvrez les spectaculaires rizières de Bali, joyaux du patrimoine culturel indonésien. Histoire, culture locale et conseils pratiques pour une visite inoubliable.`,
+      `Guide complet des rizières de Bali : sites UNESCO, rencontre avec les agriculteurs locaux, randonnées panoramiques et photographie. Tout pour planifier votre visite.`
+    ];
+    description = options[Math.floor(Math.random() * options.length)];
+  } else if (isGeographic) {
     if (containsMultipleEntities) {
       const entities = keyword.split(/ et | & | vs | ou /);
       if (entities.length >= 2) {
@@ -42,6 +54,11 @@ export const generateSeoDescription = (keyword: string): string => {
   
   if (description.length > 155) {
     description = description.substring(0, 152) + "...";
+    
+    if (description.length > 155) {
+      // Assurer que la longueur ne dépasse jamais 155 après l'ajout des points de suspension
+      description = description.substring(0, 152) + "...";
+    }
   } else if (description.length < 155) {
     const extraContext = " Informations vérifiées par nos experts pour des résultats garantis.";
     description = description + extraContext.substring(0, 155 - description.length);

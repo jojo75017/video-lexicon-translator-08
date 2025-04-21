@@ -18,10 +18,23 @@ export const generateSeoTitle = (keyword: string): string => {
   const isGeographic = detectGeographicKeyword(keyword);
   const containsMultipleEntities = keyword.includes(" et ") || keyword.includes(" & ") || 
                                   keyword.includes(" vs ") || keyword.includes(" ou ");
+  const hasBali = keywordLowerCase.includes("bali");
+  const hasRizieres = keywordLowerCase.includes("rizière") || keywordLowerCase.includes("rizieres") || 
+                      keywordLowerCase.includes("riziere");
   
   let title = "";
   
-  if (isGeographic) {
+  if (hasRizieres && hasBali) {
+    // Options spécifiques pour les rizières de Bali
+    const options = [
+      `Rizières de Bali : Guide Complet des Paysages Époustouflants`,
+      `Découvrir les Rizières de Bali : Itinéraire et Conseils Pratiques`,
+      `Les Magnifiques Rizières de Bali : Sites Incontournables`,
+      `Guide des Rizières de Bali : Jatiluwih, Tegallalang et plus`,
+      `Bali et ses Rizières : Immersion dans la Culture Balinaise`
+    ];
+    title = options[Math.floor(Math.random() * options.length)];
+  } else if (isGeographic) {
     if (containsMultipleEntities) {
       const entities = keyword.split(/ et | & | vs | ou /);
       if (entities.length >= 2) {
