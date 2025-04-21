@@ -19,8 +19,17 @@ const KeywordTabContent = () => {
   const [longMetaDescription, setLongMetaDescription] = useState(''); // Nouvelle description longue
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedKeywords, setGeneratedKeywords] = useState<KeywordSuggestion[]>([]);
-  const [openAIKey, setOpenAIKey] = useState(localStorage.getItem('openai_key') || '');
-  const [useAI, setUseAI] = useState(!!localStorage.getItem('openai_key'));
+  const [openAIKey, setOpenAIKey] = useState('');
+  const [useAI, setUseAI] = useState(false);
+
+  // Charger la clé OpenAI depuis localStorage au chargement du composant
+  useEffect(() => {
+    const savedKey = localStorage.getItem('openai_key');
+    if (savedKey) {
+      setOpenAIKey(savedKey);
+      setUseAI(true);
+    }
+  }, []);
 
   // Génère le titre et la meta description lorsqu'un mot-clé est entré
   useEffect(() => {
@@ -235,7 +244,7 @@ const KeywordTabContent = () => {
   const handleCopyLongMeta = () => {
     if (longMetaDescription) {
       navigator.clipboard.writeText(longMetaDescription);
-      toast.success("Description longue copiée !");
+      toast.success("Description longue copiée !");
     }
   };
 
@@ -401,7 +410,7 @@ const KeywordTabContent = () => {
               </p>
             )}
             <p className="text-xs text-gray-500">
-              Cette description est idéale pour un usage avancé (ex : sites, réseaux sociaux…)
+              Cette description est idéale pour un usage avancé (ex : sites, réseaux sociaux…)
             </p>
           </div>
         </CardContent>
