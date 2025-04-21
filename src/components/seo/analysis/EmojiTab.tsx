@@ -5,7 +5,8 @@ import { Smile } from "lucide-react";
 
 const emojis = [
   "✨", "🔥", "💡", "🔝", "🚀", "✅", "⭐", "🎯", "😍", "🎉",
-  "🔍", "😎", "🤣", "😉", "👌", "🥇", "🥳", "🧐", "🦄"
+  "🔍", "😎", "🤣", "😉", "👌", "🥇", "🥳", "🧐", "🦄", "👍",
+  "💪", "🏆", "💯", "⚡", "📈", "🤩", "💫", "👑", "🌟", "🔆"
 ];
 
 interface EmojiTabProps {
@@ -18,13 +19,16 @@ const EmojiTab: React.FC<EmojiTabProps> = ({ fieldValue, onInsert, maxLength }) 
   const handleInsert = (emoji: string) => {
     if (fieldValue.length + emoji.length > maxLength) return;
     onInsert(fieldValue + emoji);
+    console.log("Emoji inséré:", emoji, "Nouvelle valeur:", fieldValue + emoji);
   };
+
+  console.log("EmojiTab rendu - valeur actuelle:", fieldValue, "max:", maxLength);
 
   return (
     <div>
       <div className="mb-2 text-sm text-gray-500 flex items-center gap-1">
         <Smile className="h-4 w-4 text-yellow-500" />
-        Cliquez pour ajouter un emoji à votre champ ci-dessous.
+        Cliquez pour ajouter un emoji à votre titre.
       </div>
       <div className="flex flex-wrap gap-1">
         {emojis.map((e) => (
@@ -49,4 +53,3 @@ const EmojiTab: React.FC<EmojiTabProps> = ({ fieldValue, onInsert, maxLength }) 
 };
 
 export default EmojiTab;
-

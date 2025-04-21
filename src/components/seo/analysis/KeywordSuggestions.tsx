@@ -1,10 +1,11 @@
+
 import React from 'react';
 import { KeywordSuggestion } from '@/types/seo';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, AlignLeft, Tag, TrendingUp, BarChart2, Copy, Check } from 'lucide-react';
+import { FileText, AlignLeft, Tag, TrendingUp, BarChart2, Copy, Check, Smile, Hash } from 'lucide-react';
 import { toast } from "sonner";
 import EmojiTab from './EmojiTab';
 import HashtagsTab from './HashtagsTab';
@@ -37,6 +38,9 @@ const KeywordSuggestions: React.FC<KeywordSuggestionsProps> = ({
     }
   }, [generatedKeywords]);
 
+  console.log("KeywordSuggestions rendu avec", generatedKeywords.length, "mots-clés");
+  console.log("État actuel - titre:", currentTitle, "description:", currentDescription);
+
   return (
     <Card className="border border-gray-200 rounded-lg">
       <CardHeader className="pb-2">
@@ -58,19 +62,22 @@ const KeywordSuggestions: React.FC<KeywordSuggestionsProps> = ({
           </Button>
         </div>
 
-        {generatedKeywords.length > 0 && (
-          <Tabs defaultValue="keywords" className="mt-4">
-            <TabsList className="mb-4 grid grid-cols-5 w-full">
-              <TabsTrigger value="keywords">Mots-clés</TabsTrigger>
-              <TabsTrigger value="titles">Balises Title</TabsTrigger>
-              <TabsTrigger value="descriptions">Meta Descriptions</TabsTrigger>
-              <TabsTrigger value="emojis">Emojis</TabsTrigger>
-              <TabsTrigger value="hashtags">Hashtags</TabsTrigger>
-            </TabsList>
+        <Tabs defaultValue="keywords" className="mt-4">
+          <TabsList className="mb-4 grid grid-cols-5 w-full">
+            <TabsTrigger value="keywords">Mots-clés</TabsTrigger>
+            <TabsTrigger value="titles">Balises Title</TabsTrigger>
+            <TabsTrigger value="descriptions">Meta Descriptions</TabsTrigger>
+            <TabsTrigger value="emojis">
+              <Smile className="h-4 w-4 mr-1" /> Emojis
+            </TabsTrigger>
+            <TabsTrigger value="hashtags">
+              <Hash className="h-4 w-4 mr-1" /> Hashtags
+            </TabsTrigger>
+          </TabsList>
 
-            {/* Onglet Mots-clés */}
-            <TabsContent value="keywords">
-              
+          {/* Onglet Mots-clés */}
+          <TabsContent value="keywords">
+            {generatedKeywords.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {generatedKeywords.map((keyword, index) => (
                   <div key={index} className="flex justify-between bg-gray-50 p-2 rounded-md">
@@ -81,11 +88,16 @@ const KeywordSuggestions: React.FC<KeywordSuggestionsProps> = ({
                   </div>
                 ))}
               </div>
-            </TabsContent>
+            ) : (
+              <div className="text-center p-4 bg-gray-50 rounded-md">
+                <p className="text-gray-500">Aucun mot-clé généré pour le moment.</p>
+              </div>
+            )}
+          </TabsContent>
 
-            {/* Onglet Titres */}
-            <TabsContent value="titles">
-              
+          {/* Onglet Titres */}
+          <TabsContent value="titles">
+            {generatedKeywords.length > 0 ? (
               <div className="space-y-3">
                 {generatedKeywords.map((keyword, index) => (
                   <div key={index} className="bg-gray-50 p-3 rounded-md">
@@ -110,11 +122,16 @@ const KeywordSuggestions: React.FC<KeywordSuggestionsProps> = ({
                   </div>
                 ))}
               </div>
-            </TabsContent>
+            ) : (
+              <div className="text-center p-4 bg-gray-50 rounded-md">
+                <p className="text-gray-500">Aucun titre généré pour le moment.</p>
+              </div>
+            )}
+          </TabsContent>
 
-            {/* Onglet Descriptions */}
-            <TabsContent value="descriptions">
-              
+          {/* Onglet Descriptions */}
+          <TabsContent value="descriptions">
+            {generatedKeywords.length > 0 ? (
               <div className="space-y-3">
                 {generatedKeywords.map((keyword, index) => (
                   <div key={index} className="bg-gray-50 p-3 rounded-md">
@@ -139,35 +156,39 @@ const KeywordSuggestions: React.FC<KeywordSuggestionsProps> = ({
                   </div>
                 ))}
               </div>
-            </TabsContent>
-
-            {/* Nouvel onglet Emojis */}
-            <TabsContent value="emojis">
-              <EmojiTab
-                fieldValue={currentTitle}
-                onInsert={setCurrentTitle}
-                maxLength={60}
-              />
-              <div className="mt-4">
-                <label className="text-xs text-gray-600">Aperçu du titre avec emojis :</label>
-                <div className="p-3 bg-blue-50 rounded">{currentTitle}</div>
+            ) : (
+              <div className="text-center p-4 bg-gray-50 rounded-md">
+                <p className="text-gray-500">Aucune description générée pour le moment.</p>
               </div>
-            </TabsContent>
+            )}
+          </TabsContent>
 
-            {/* Nouvel onglet Hashtags */}
-            <TabsContent value="hashtags">
-              <HashtagsTab
-                fieldValue={currentDescription}
-                onInsert={setCurrentDescription}
-                maxLength={155}
-              />
-              <div className="mt-4">
-                <label className="text-xs text-gray-600">Aperçu description + hashtags :</label>
-                <div className="p-3 bg-green-50 rounded">{currentDescription}</div>
-              </div>
-            </TabsContent>
-          </Tabs>
-        )}
+          {/* Onglet Emojis */}
+          <TabsContent value="emojis">
+            <EmojiTab
+              fieldValue={currentTitle}
+              onInsert={setCurrentTitle}
+              maxLength={60}
+            />
+            <div className="mt-4">
+              <label className="text-xs text-gray-600">Aperçu du titre avec emojis :</label>
+              <div className="p-3 bg-blue-50 rounded">{currentTitle || "Entrez un titre ou générez des suggestions"}</div>
+            </div>
+          </TabsContent>
+
+          {/* Onglet Hashtags */}
+          <TabsContent value="hashtags">
+            <HashtagsTab
+              fieldValue={currentDescription}
+              onInsert={setCurrentDescription}
+              maxLength={155}
+            />
+            <div className="mt-4">
+              <label className="text-xs text-gray-600">Aperçu description + hashtags :</label>
+              <div className="p-3 bg-green-50 rounded">{currentDescription || "Entrez une description ou générez des suggestions"}</div>
+            </div>
+          </TabsContent>
+        </Tabs>
       </CardContent>
     </Card>
   );

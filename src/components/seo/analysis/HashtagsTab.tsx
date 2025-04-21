@@ -5,7 +5,8 @@ import { Hash } from "lucide-react";
 
 const hashtags = [
   "#SEO", "#Référencement", "#Google", "#MetaTitle", "#Digital", "#ConseilSEO",
-  "#Ranking", "#Visibilité", "#Tendance", "#Marketing", "#Optimisation", "#StratégieSEO"
+  "#Ranking", "#Visibilité", "#Tendance", "#Marketing", "#Optimisation", "#StratégieSEO",
+  "#WebMarketing", "#ContentMarketing", "#TraficWeb", "#MotsClés", "#Performance", "#Conversion"
 ];
 
 interface HashtagsTabProps {
@@ -22,7 +23,10 @@ const HashtagsTab: React.FC<HashtagsTabProps> = ({ fieldValue, onInsert, maxLeng
     const total = insertVal.length + hashtag.length;
     if (total > maxLength) return;
     onInsert(insertVal + hashtag);
+    console.log("Hashtag inséré:", hashtag, "Nouvelle valeur:", insertVal + hashtag);
   };
+
+  console.log("HashtagsTab rendu - valeur actuelle:", fieldValue, "max:", maxLength);
 
   return (
     <div>

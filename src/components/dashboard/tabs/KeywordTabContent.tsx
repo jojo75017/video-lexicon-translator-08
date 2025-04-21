@@ -71,6 +71,14 @@ const KeywordTabContent = () => {
     }
   }, [keyword]);
 
+  // Ajout d'un effet pour le logging et débogage
+  useEffect(() => {
+    console.log("KeywordTabContent rendu");
+    console.log("Titre actuel:", title);
+    console.log("Description actuelle:", metaDescription);
+    console.log("Mots-clés générés:", generatedKeywords.length);
+  }, [title, metaDescription, generatedKeywords]);
+
   const generateWithOpenAI = async (keyword: string) => {
     if (!openAIKey) {
       console.log("Pas de clé OpenAI disponible");
@@ -558,6 +566,7 @@ const KeywordTabContent = () => {
       {/* Historique des générations */}
       <KeywordHistory history={history} onLoad={handleHistoryLoad} />
       {/* Suggestions */}
+      {console.log("Rendu de KeywordSuggestions avec", generatedKeywords.length, "mots-clés")}
       <KeywordSuggestions 
         generatedKeywords={generatedKeywords} 
         onGenerateClick={handleGenerateMore} 
