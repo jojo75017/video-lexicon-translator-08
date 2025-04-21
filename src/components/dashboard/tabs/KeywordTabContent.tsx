@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -17,6 +16,7 @@ const KeywordTabContent = () => {
   const [keyword, setKeyword] = useState('');
   const [title, setTitle] = useState('');
   const [metaDescription, setMetaDescription] = useState('');
+  const [longMetaDescription, setLongMetaDescription] = useState(''); // Nouvelle description longue
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedKeywords, setGeneratedKeywords] = useState<KeywordSuggestion[]>([]);
   const [openAIKey, setOpenAIKey] = useState(localStorage.getItem('openai_key') || '');
@@ -84,6 +84,58 @@ const KeywordTabContent = () => {
     }
   };
 
+  // Fonction de génération de meta description longue
+  const generateLongMetaDescription = async (keyword: string) => {
+    // OpenAI si activé
+    if (useAI && openAIKey) {
+      try {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${openAIKey}`
+          },
+          body: JSON.stringify({
+            model: "gpt-4o-mini",
+            messages: [
+              {
+                role: "system",
+                content: "Tu es un expert SEO spécialisé dans la rédaction de meta description longues et optimisées."
+              },
+              {
+                role: "user",
+                content: `Rédige uniquement une meta description optimisée SEO de 500 caractères (pas plus courte et pas plus longue) pour le mot-clé suivant : "${keyword}". Réponds uniquement par le texte de la meta description, sans rien d'autre.`
+              }
+            ]
+          })
+        });
+        const data = await response.json();
+        if (data.error) {
+          return '';
+        }
+        let content = data.choices?.[0]?.message?.content || '';
+        // On vérifie que la longueur est bien ajustée
+        if (content.length > 500) content = content.slice(0, 500);
+        return content;
+      } catch {
+        // Fallback si erreur d'appel OpenAI
+        return generateLocalLongMetaDescription(keyword);
+      }
+    } else {
+      // Génération locale
+      return generateLocalLongMetaDescription(keyword);
+    }
+  };
+
+  // Génération locale longue description
+  const generateLocalLongMetaDescription = (keyword: string) => {
+    let base = `Découvrez tout sur ${keyword} dans cet article complet : conseils d'experts, stratégies exclusives et analyses approfondies sur ${keyword}. Notre guide de 500 caractères vous apporte toutes les ressources, astuces et informations essentielles pour exceller dans ce domaine ! Optimisez votre référencement naturel (SEO) en maîtrisant toutes les subtilités liées à ${keyword}, lisez nos solutions pratiques et développez une stratégie gagnante durablement.`;
+    // On ajuste à 500 caractères exactement
+    if (base.length > 500) return base.slice(0, 500);
+    if (base.length < 500) return base.padEnd(500, '.');
+    return base;
+  };
+
   const generateSuggestion = async () => {
     if (!keyword.trim()) {
       toast.error("Veuillez d'abord entrer un mot-clé");
@@ -94,6 +146,7 @@ const KeywordTabContent = () => {
 
     let generatedTitle = '';
     let generatedDescription = '';
+    let generatedLongDescription = '';
 
     // Utiliser OpenAI si la clé est disponible et l'option activée
     if (useAI && openAIKey) {
@@ -107,14 +160,18 @@ const KeywordTabContent = () => {
         generatedTitle = generateSeoTitle(keyword);
         generatedDescription = generateSeoDescription(keyword);
       }
+      // Génére la longue description séparément
+      generatedLongDescription = await generateLongMetaDescription(keyword);
     } else {
       // Utiliser la génération locale
       generatedTitle = generateSeoTitle(keyword);
       generatedDescription = generateSeoDescription(keyword);
+      generatedLongDescription = generateLocalLongMetaDescription(keyword);
     }
 
     setTitle(generatedTitle);
     setMetaDescription(generatedDescription);
+    setLongMetaDescription(generatedLongDescription);
 
     // Simulation d'une analyse de mots-clés basée sur le mot entré
     const keywordAnalysis = analyzeKeywords(`Contenu exemple ${keyword} pour analyse. ${keyword} est un mot-clé important pour le référencement.`);
@@ -171,6 +228,14 @@ const KeywordTabContent = () => {
       localStorage.removeItem('openai_key');
       setUseAI(false);
       toast.info("Génération locale activée");
+    }
+  };
+
+  // Ajout copie dans le presse-papier pour la longue description
+  const handleCopyLongMeta = () => {
+    if (longMetaDescription) {
+      navigator.clipboard.writeText(longMetaDescription);
+      toast.success("Description longue copiée !");
     }
   };
 
@@ -295,7 +360,50 @@ const KeywordTabContent = () => {
               </p>
             )}
           </div>
-
+          {/* Section description longue */}
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <label htmlFor="longMetaDescription" className="text-sm font-medium flex items-center gap-2">
+                <AlignLeft className="h-4 w-4" />
+                Meta Description Longue (500 caractères)
+              </label>
+              <div>
+                <Badge variant={longMetaDescription.length !== 500 ? "destructive" : "secondary"}>
+                  {longMetaDescription.length}/500
+                </Badge>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="ml-2"
+                  onClick={handleCopyLongMeta}
+                  disabled={!longMetaDescription}
+                >
+                  Copier
+                </Button>
+              </div>
+            </div>
+            <Textarea
+              id="longMetaDescription"
+              placeholder="Une meta description SEO longue (exactement 500 caractères)"
+              value={longMetaDescription}
+              onChange={(e) => {
+                const newDesc = e.target.value.slice(0, 500);
+                setLongMetaDescription(newDesc);
+              }}
+              className={longMetaDescription.length !== 500 ? "border-red-500" : ""}
+              rows={5}
+            />
+            {longMetaDescription.length !== 500 && (
+              <p className="text-xs text-red-500">
+                {longMetaDescription.length < 500
+                  ? `La description doit faire exactement 500 caractères (actuellement ${longMetaDescription.length})`
+                  : `La description dépasse 500 caractères (actuellement ${longMetaDescription.length})`}
+              </p>
+            )}
+            <p className="text-xs text-gray-500">
+              Cette description est idéale pour un usage avancé (ex : sites, réseaux sociaux…)
+            </p>
+          </div>
         </CardContent>
       </Card>
 
