@@ -12,6 +12,30 @@ import { KeywordSuggestion } from '@/types/seo';
 import { generateSeoTitle } from '@/utils/seo/generators/titleGenerator';
 import { generateSeoDescription } from '@/utils/seo/generators/descriptionGenerator';
 
+// Fonction utilitaire pour le code couleur du badge Title
+function getTitleBadgeColor(title: string) {
+  if (title.length === 60) {
+    return "bg-green-100 text-green-800 border-green-200";
+  }
+  return "bg-red-100 text-red-800 border-red-200";
+}
+
+// Fonction utilitaire pour le code couleur du badge Meta Description
+function getMetaBadgeColor(meta: string) {
+  if (meta.length >= 150 && meta.length <= 155) {
+    return "bg-green-100 text-green-800 border-green-200";
+  }
+  return "bg-red-100 text-red-800 border-red-200";
+}
+
+// Fonction utilitaire pour le code couleur du badge Long Description (500)
+function getLongMetaBadgeColor(meta: string) {
+  if (meta.length === 500) {
+    return "bg-green-100 text-green-800 border-green-200";
+  }
+  return "bg-red-100 text-red-800 border-red-200";
+}
+
 const KeywordTabContent = () => {
   const [keyword, setKeyword] = useState('');
   const [title, setTitle] = useState('');
@@ -312,26 +336,37 @@ const KeywordTabContent = () => {
               Entrez un mot-clé pour générer automatiquement un titre et une meta description optimisés
             </p>
           </div>
-          
+
+          {/* BALISE TITLE */}
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <label htmlFor="title" className="text-sm font-medium leading-none flex items-center gap-2">
                 <FileText className="h-4 w-4" />
                 Balise Title
               </label>
-              <Badge variant={title.length !== 60 ? "destructive" : "secondary"}>
-                {title.length}/60
-              </Badge>
+              <span>
+                <Badge 
+                  className={getTitleBadgeColor(title) + " border"}
+                >
+                  {title.length}/60
+                </Badge>
+              </span>
             </div>
             <Input
               id="title"
               placeholder="Entrez votre titre (exactement 60 caractères)"
               value={title}
               onChange={(e) => {
-                const newTitle = e.target.value.slice(0, 60); // Limit to 60 characters
+                const newTitle = e.target.value.slice(0, 60); // Limite 60 caractères
                 setTitle(newTitle);
               }}
-              className={title.length !== 60 ? "border-red-500" : ""}
+              className={
+                (title.length !== 60 
+                  ? "border-2 border-red-400 focus:border-red-500 bg-red-50"
+                  : "border-2 border-green-400 focus:border-green-500 bg-green-50"
+                ) +
+                " transition duration-150"
+              }
             />
             {title.length !== 60 && (
               <p className="text-xs text-red-500">
@@ -340,13 +375,16 @@ const KeywordTabContent = () => {
             )}
           </div>
 
+          {/* META DESCRIPTION */}
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <label htmlFor="metaDescription" className="text-sm font-medium leading-none flex items-center gap-2">
                 <AlignLeft className="h-4 w-4" />
                 Meta Description
               </label>
-              <Badge variant={(metaDescription.length < 150 || metaDescription.length > 155) ? "destructive" : "secondary"}>
+              <Badge 
+                className={getMetaBadgeColor(metaDescription) + " border"}
+              >
                 {metaDescription.length}/155
               </Badge>
             </div>
@@ -355,10 +393,16 @@ const KeywordTabContent = () => {
               placeholder="Entrez votre meta description (entre 150 et 155 caractères)"
               value={metaDescription}
               onChange={(e) => {
-                const newDescription = e.target.value.slice(0, 155); // Limit to 155 characters
+                const newDescription = e.target.value.slice(0, 155); // Limite 155 caractères
                 setMetaDescription(newDescription);
               }}
-              className={(metaDescription.length < 150 || metaDescription.length > 155) ? "border-red-500" : ""}
+              className={
+                (metaDescription.length < 150 || metaDescription.length > 155 
+                  ? "border-2 border-red-400 bg-red-50 focus:border-red-500"
+                  : "border-2 border-green-400 bg-green-50 focus:border-green-500"
+                ) +
+                " transition duration-150"
+              }
               rows={4}
             />
             {(metaDescription.length < 150 || metaDescription.length > 155) && (
@@ -369,7 +413,8 @@ const KeywordTabContent = () => {
               </p>
             )}
           </div>
-          {/* Section description longue */}
+
+          {/* DESCRIPTION LONGUE */}
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <label htmlFor="longMetaDescription" className="text-sm font-medium flex items-center gap-2">
@@ -377,7 +422,7 @@ const KeywordTabContent = () => {
                 Meta Description Longue (500 caractères)
               </label>
               <div>
-                <Badge variant={longMetaDescription.length !== 500 ? "destructive" : "secondary"}>
+                <Badge className={getLongMetaBadgeColor(longMetaDescription) + " border"}>
                   {longMetaDescription.length}/500
                 </Badge>
                 <Button
@@ -399,7 +444,13 @@ const KeywordTabContent = () => {
                 const newDesc = e.target.value.slice(0, 500);
                 setLongMetaDescription(newDesc);
               }}
-              className={longMetaDescription.length !== 500 ? "border-red-500" : ""}
+              className={
+                (longMetaDescription.length !== 500
+                  ? "border-2 border-red-400 bg-red-50 focus:border-red-500"
+                  : "border-2 border-green-400 bg-green-50 focus:border-green-500"
+                ) +
+                " transition duration-150"
+              }
               rows={5}
             />
             {longMetaDescription.length !== 500 && (
@@ -415,7 +466,6 @@ const KeywordTabContent = () => {
           </div>
         </CardContent>
       </Card>
-
       <KeywordSuggestions 
         generatedKeywords={generatedKeywords} 
         onGenerateClick={handleGenerateMore} 
