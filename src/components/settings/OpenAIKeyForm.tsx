@@ -19,8 +19,11 @@ const OpenAIKeyForm = () => {
     if (storedKey) {
       setSavedApiKey(storedKey);
       setIsKeyValid(true);
+      console.log("Clé OpenAI chargée depuis localStorage");
       // Masquer la clé pour l'affichage
       setApiKey('');
+    } else {
+      console.log("Aucune clé OpenAI trouvée dans localStorage");
     }
   }, []);
 
@@ -33,15 +36,18 @@ const OpenAIKeyForm = () => {
     }
     
     setIsValidating(true);
+    console.log("Validation de la clé OpenAI en cours...");
     
     try {
       // Tester la clé API
-      const openaiService = new OpenAIService(apiKey);
       const isValid = await testOpenAIKey(apiKey);
+      console.log("Résultat de la validation:", isValid);
       
       if (isValid) {
         // Sauvegarder la clé dans localStorage
         localStorage.setItem('openaiKey', apiKey);
+        console.log("Clé OpenAI sauvegardée dans localStorage");
+        
         setSavedApiKey(apiKey);
         setApiKey(''); // Effacer le champ pour des raisons de sécurité
         setIsKeyValid(true);
@@ -50,6 +56,7 @@ const OpenAIKeyForm = () => {
           description: "Vous pouvez maintenant utiliser les fonctionnalités alimentées par OpenAI"
         });
       } else {
+        console.error("Clé API OpenAI invalide");
         toast.error("Clé API OpenAI invalide", {
           description: "Veuillez vérifier votre clé et réessayer"
         });
@@ -66,6 +73,7 @@ const OpenAIKeyForm = () => {
 
   const testOpenAIKey = async (key: string): Promise<boolean> => {
     try {
+      console.log("Test de la clé OpenAI");
       // Appel simple à l'API pour vérifier la validité de la clé
       const response = await fetch('https://api.openai.com/v1/models', {
         method: 'GET',
@@ -75,6 +83,7 @@ const OpenAIKeyForm = () => {
         },
       });
       
+      console.log("Statut de la réponse:", response.status);
       return response.status === 200;
     } catch (error) {
       console.error("Erreur lors du test de la clé OpenAI:", error);
@@ -87,6 +96,7 @@ const OpenAIKeyForm = () => {
     setSavedApiKey('');
     setApiKey('');
     setIsKeyValid(false);
+    console.log("Clé OpenAI supprimée du localStorage");
     
     toast.success("Clé API OpenAI supprimée", {
       description: "Les fonctionnalités OpenAI ne seront plus disponibles"

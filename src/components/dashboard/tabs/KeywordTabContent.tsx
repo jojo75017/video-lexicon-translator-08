@@ -12,6 +12,7 @@ import { KeywordSuggestion } from '@/types/seo';
 import { generateSeoTitle } from '@/utils/seo/generators/titleGenerator';
 import { generateSeoDescription } from '@/utils/seo/generators/descriptionGenerator';
 import KeywordHistory from "@/components/seo/analysis/KeywordHistory";
+import { OpenAIService } from '@/utils/seo/openaiService';
 
 // Fonction utilitaire pour le code couleur du badge Title
 function getTitleBadgeColor(title: string) {
@@ -53,7 +54,8 @@ const KeywordTabContent = () => {
 
   // Charger la clé OpenAI depuis localStorage au chargement du composant
   useEffect(() => {
-    const savedKey = localStorage.getItem('openai_key');
+    const savedKey = localStorage.getItem('openai_key') || localStorage.getItem('openaiKey');
+    console.log("Clé OpenAI trouvée:", savedKey ? "oui" : "non");
     if (savedKey) {
       setOpenAIKey(savedKey);
       setUseAI(true);
@@ -70,7 +72,12 @@ const KeywordTabContent = () => {
   }, [keyword]);
 
   const generateWithOpenAI = async (keyword: string) => {
-    if (!openAIKey) return null;
+    if (!openAIKey) {
+      console.log("Pas de clé OpenAI disponible");
+      return null;
+    }
+    
+    console.log("Génération avec OpenAI pour le mot-clé:", keyword);
     
     try {
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -94,7 +101,10 @@ const KeywordTabContent = () => {
         })
       });
       
+      console.log("Statut de réponse OpenAI:", response.status);
+      
       const data = await response.json();
+      console.log("Réponse OpenAI:", data);
       
       if (data.error) {
         console.error("Erreur OpenAI:", data.error);
@@ -104,13 +114,19 @@ const KeywordTabContent = () => {
       
       try {
         const content = data.choices[0].message.content;
+        console.log("Contenu de la réponse:", content);
+        
         const jsonMatch = content.match(/\{[\s\S]*\}/);
         const jsonString = jsonMatch ? jsonMatch[0] : content;
+        console.log("JSON extrait:", jsonString);
+        
         const parsed = JSON.parse(jsonString);
+        console.log("Données parsées:", parsed);
         
         if (parsed.title && parsed.description) {
           return parsed;
         } else {
+          console.error("Données incomplètes dans la réponse");
           return null;
         }
       } catch (e) {
@@ -204,6 +220,8 @@ const KeywordTabContent = () => {
     }
 
     setIsGenerating(true);
+    console.log("Génération de suggestions pour:", keyword);
+    console.log("Utilisation de l'IA:", useAI, "Clé disponible:", openAIKey ? "oui" : "non");
 
     let generatedTitle = '';
     let generatedDescription = '';
@@ -211,24 +229,32 @@ const KeywordTabContent = () => {
 
     // Utiliser OpenAI si la clé est disponible et l'option activée
     if (useAI && openAIKey) {
+      console.log("Tentative de génération avec OpenAI");
       const aiResult = await generateWithOpenAI(keyword);
       
       if (aiResult) {
+        console.log("Résultat OpenAI obtenu:", aiResult);
         generatedTitle = aiResult.title;
         generatedDescription = aiResult.description;
       } else {
+        console.log("Échec de génération avec OpenAI, repli sur génération locale");
         // Fallback to local generation if AI fails
         generatedTitle = generateSeoTitle(keyword);
         generatedDescription = generateSeoDescription(keyword);
       }
-      // Génére la longue description séparément
+      // Génère la longue description séparément
       generatedLongDescription = await generateLongMetaDescription(keyword);
     } else {
+      console.log("Utilisation de la génération locale");
       // Utiliser la génération locale
       generatedTitle = generateSeoTitle(keyword);
       generatedDescription = generateSeoDescription(keyword);
       generatedLongDescription = generateLocalLongMetaDescription(keyword);
     }
+
+    console.log("Titre généré:", generatedTitle);
+    console.log("Description générée:", generatedDescription);
+    console.log("Description longue générée:", generatedLongDescription);
 
     setTitle(generatedTitle);
     setMetaDescription(generatedDescription);
@@ -291,10 +317,37 @@ const KeywordTabContent = () => {
   const saveOpenAIKey = () => {
     if (openAIKey) {
       localStorage.setItem('openai_key', openAIKey);
+      localStorage.setItem('openaiKey', openAIKey); // Sauvegarde avec les deux noms de clé pour compatibilité
+      console.log("Clé OpenAI sauvegardée:", openAIKey.substring(0, 5) + "...");
       setUseAI(true);
       toast.success("Clé OpenAI sauvegardée");
+      
+      // Tester immédiatement la clé avec un appel simple
+      fetch('https://api.openai.com/v1/models', {
+        headers: {
+          'Authorization': `Bearer ${openAIKey}`,
+          'Content-Type': 'application/json',
+        }
+      })
+      .then(response => {
+        console.log("Test de la clé API - statut:", response.status);
+        if (!response.ok) {
+          toast.error("La clé API semble invalide. Veuillez vérifier et réessayer.");
+        } else {
+          toast.success("Clé API validée avec succès!");
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log("Modèles disponibles:", data);
+      })
+      .catch(err => {
+        console.error("Erreur lors du test de la clé API:", err);
+        toast.error("Erreur lors de la validation de la clé API");
+      });
     } else {
       localStorage.removeItem('openai_key');
+      localStorage.removeItem('openaiKey');
       setUseAI(false);
       toast.info("Génération locale activée");
     }
