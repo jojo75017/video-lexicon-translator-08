@@ -11,6 +11,7 @@ import KeywordSuggestions from '@/components/seo/analysis/KeywordSuggestions';
 import { KeywordSuggestion } from '@/types/seo';
 import { generateSeoTitle } from '@/utils/seo/generators/titleGenerator';
 import { generateSeoDescription } from '@/utils/seo/generators/descriptionGenerator';
+import KeywordHistory from "@/components/seo/analysis/KeywordHistory";
 
 // Fonction utilitaire pour le code couleur du badge Title
 function getTitleBadgeColor(title: string) {
@@ -36,6 +37,8 @@ function getLongMetaBadgeColor(meta: string) {
   return "bg-red-100 text-red-800 border-red-200";
 }
 
+const HISTORY_KEY = "seo_keyword_history";
+
 const KeywordTabContent = () => {
   const [keyword, setKeyword] = useState('');
   const [title, setTitle] = useState('');
@@ -45,6 +48,8 @@ const KeywordTabContent = () => {
   const [generatedKeywords, setGeneratedKeywords] = useState<KeywordSuggestion[]>([]);
   const [openAIKey, setOpenAIKey] = useState('');
   const [useAI, setUseAI] = useState(false);
+  // Nouvel état pour l'historique
+  const [history, setHistory] = useState<any[]>([]);
 
   // Charger la clé OpenAI depuis localStorage au chargement du composant
   useEffect(() => {
@@ -53,6 +58,8 @@ const KeywordTabContent = () => {
       setOpenAIKey(savedKey);
       setUseAI(true);
     }
+    const savedHistory = localStorage.getItem(HISTORY_KEY);
+    if (savedHistory) setHistory(JSON.parse(savedHistory));
   }, []);
 
   // Génère le titre et la meta description lorsqu'un mot-clé est entré
@@ -169,6 +176,27 @@ const KeywordTabContent = () => {
     return base;
   };
 
+  // Sauvegarde dans l'historique (appelle après chaque génération)
+  const saveHistory = (record: {
+    keyword: string, title: string, metaDescription: string, longMetaDescription: string
+  }) => {
+    // Empêcher les doublons (on va garder seulement 10 entrées max, la plus récente en tête)
+    let updated = [ 
+      { ...record, date: new Date().toLocaleString() },
+      ...history.filter(h => h.keyword !== record.keyword),
+    ].slice(0, 10);
+    setHistory(updated);
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(updated));
+  };
+
+  // Fonction pour charger/rétablir une génération historique
+  const handleHistoryLoad = (item: any) => {
+    setKeyword(item.keyword);
+    setTitle(item.title);
+    setMetaDescription(item.metaDescription);
+    setLongMetaDescription(item.longMetaDescription);
+  };
+
   const generateSuggestion = async () => {
     if (!keyword.trim()) {
       toast.error("Veuillez d'abord entrer un mot-clé");
@@ -246,6 +274,14 @@ const KeywordTabContent = () => {
 
     setIsGenerating(false);
     toast.success("Suggestions générées avec succès");
+
+    // === AJOUT: Sauvegarde dans l'historique ===
+    saveHistory({
+      keyword: keyword,
+      title: generatedTitle,
+      metaDescription: generatedDescription,
+      longMetaDescription: generatedLongDescription
+    });
   };
 
   const handleGenerateMore = () => {
@@ -466,6 +502,9 @@ const KeywordTabContent = () => {
           </div>
         </CardContent>
       </Card>
+      {/* Historique des générations */}
+      <KeywordHistory history={history} onLoad={handleHistoryLoad} />
+      {/* Suggestions */}
       <KeywordSuggestions 
         generatedKeywords={generatedKeywords} 
         onGenerateClick={handleGenerateMore} 
