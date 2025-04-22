@@ -100,3 +100,11 @@ export const generateSeoDescription = (keyword: string, maxLength: number = 155)
   
   return description;
 };
+
+// Fonction pour générer à la fois une description courte et longue
+export const generateBothDescriptions = (keyword: string): { short: string; long: string } => {
+  return {
+    short: generateSeoDescription(keyword, 155),
+    long: generateSeoDescription(keyword, 500)
+  };
+};

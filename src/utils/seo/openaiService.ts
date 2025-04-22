@@ -1,3 +1,4 @@
+
 import { KeywordSuggestion, OpenAIKeywordResponse } from '@/types/seo';
 
 export class OpenAIService {
@@ -87,7 +88,8 @@ Pour chaque mot-clé, fournit:
 2. Une estimation du volume de recherche (nombre)
 3. Une difficulté d'optimisation (nombre de 1 à 100)
 4. Un titre optimisé pour le SEO (max 60 caractères)
-5. Une meta description optimisée (entre 450 et 500 caractères)
+5. Une meta description courte optimisée (max 155 caractères)
+6. Une meta description longue optimisée (entre 450 et 500 caractères)
 
 Format en JSON comme ceci:
 [
@@ -96,7 +98,8 @@ Format en JSON comme ceci:
     "searchVolume": 1000,
     "difficulty": 40,
     "suggestedTitle": "Titre SEO optimisé pour ce mot-clé | Exemple",
-    "suggestedDescription": "Description meta optimisée détaillée qui explique en profondeur le sujet avec des informations utiles, pertinentes et qui incite à l'action. Cette description doit être complète, informative et convaincante pour les utilisateurs et les moteurs de recherche. Elle doit contenir suffisamment de détails pour donner un bon aperçu du contenu de la page tout en restant engageante."
+    "suggestedShortDescription": "Description courte optimisée pour le SEO avec le mot-clé cible et un appel à l'action clair, limitée à 155 caractères.",
+    "suggestedLongDescription": "Description meta optimisée détaillée qui explique en profondeur le sujet avec des informations utiles, pertinentes et qui incite à l'action. Cette description doit être complète, informative et convaincante pour les utilisateurs et les moteurs de recherche. Elle doit contenir suffisamment de détails pour donner un bon aperçu du contenu de la page tout en restant engageante."
   }
 ]`;
       
@@ -142,6 +145,8 @@ Format en JSON comme ceci:
       // Conversion vers le format KeywordSuggestion
       return keywordData.map(item => ({
         ...item,
+        // Pour la compatibilité, on met la même valeur dans suggestedDescription
+        suggestedDescription: item.suggestedShortDescription || item.suggestedLongDescription,
         relevance: Math.floor(Math.random() * 30) + 70, // Valeur aléatoire entre 70 et 100
         competition: Math.floor(Math.random() * 100),
         cpc: parseFloat((Math.random() * 3 + 0.5).toFixed(2))

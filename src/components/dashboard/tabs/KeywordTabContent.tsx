@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -5,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, AlertCircle, Tag, FileText, KeyRound, Info, Search, Link, Copy, Check } from 'lucide-react';
+import { Loader2, AlertCircle, Tag, FileText, KeyRound, Info, Search, Link, Copy, Check, SwitchCamera } from 'lucide-react';
 import { toast } from "sonner";
 import { KeywordSuggestion } from '@/types/seo';
 import { OpenAIService } from '@/utils/seo/openaiService';
@@ -22,7 +23,9 @@ const demoKeywords: KeywordSuggestion[] = [
     competition: 70,
     cpc: 2.50,
     suggestedTitle: "Analyse SEO complète : Boostez votre visibilité en ligne ✓",
-    suggestedDescription: "Découvrez comment optimiser votre site web avec notre analyse SEO experte. Améliorez votre classement et augmentez votre trafic organique."
+    suggestedDescription: "Découvrez comment optimiser votre site web avec notre analyse SEO experte. Améliorez votre classement et augmentez votre trafic organique.",
+    suggestedShortDescription: "Découvrez notre analyse SEO experte pour optimiser votre site web, améliorer votre classement et augmenter votre trafic organique.",
+    suggestedLongDescription: "Découvrez comment optimiser votre site web avec notre analyse SEO experte. Notre méthode complète examine tous les aspects techniques et stratégiques qui influencent votre positionnement dans les moteurs de recherche. Identifiez les opportunités d'amélioration, corrigez les problèmes techniques qui freinent votre visibilité, et développez une stratégie de contenu qui répond précisément aux attentes de votre audience. Nos experts vous accompagnent pour implémenter les bonnes pratiques SEO et vous aider à surpasser vos concurrents. Améliorez votre classement, augmentez votre trafic organique et boostez vos conversions grâce à une visibilité optimale."
   },
   {
     keyword: "audit référencement",
@@ -32,7 +35,9 @@ const demoKeywords: KeywordSuggestion[] = [
     competition: 65,
     cpc: 1.80,
     suggestedTitle: "Audit de Référencement Professionnel | Résultats Garantis",
-    suggestedDescription: "Un audit de référencement complet pour identifier les points forts et faibles de votre site. Recommandations personnalisées et plan d'action détaillé."
+    suggestedDescription: "Un audit de référencement complet pour identifier les points forts et faibles de votre site. Recommandations personnalisées et plan d'action détaillé.",
+    suggestedShortDescription: "Audit de référencement complet identifiant forces et faiblesses de votre site. Recommandations personnalisées et plan d'action détaillé.",
+    suggestedLongDescription: "Bénéficiez d'un audit de référencement complet réalisé par nos experts pour identifier précisément les points forts et les faiblesses de votre site web. Notre analyse approfondie examine plus de 200 facteurs SEO, de la structure technique aux stratégies de contenu et de linking. Vous recevrez un rapport détaillé incluant une évaluation de votre positionnement actuel, une analyse de votre concurrence, et surtout des recommandations personnalisées classées par priorité. Notre plan d'action détaillé vous guidera étape par étape pour améliorer votre visibilité en ligne et générer plus de trafic qualifié. Profitez de notre expertise pour optimiser durablement votre présence sur les moteurs de recherche."
   },
   {
     keyword: "seo google",
@@ -42,7 +47,9 @@ const demoKeywords: KeywordSuggestion[] = [
     competition: 75,
     cpc: 3.20,
     suggestedTitle: "SEO Google 2023 : Stratégies qui fonctionnent vraiment 🚀",
-    suggestedDescription: "Maîtrisez les dernières techniques SEO pour Google. Guide expert pour améliorer votre classement et respecter les algorithmes les plus récents."
+    suggestedDescription: "Maîtrisez les dernières techniques SEO pour Google. Guide expert pour améliorer votre classement et respecter les algorithmes les plus récents.",
+    suggestedShortDescription: "Maîtrisez les dernières techniques SEO pour Google. Améliorez votre classement avec des stratégies conformes aux algorithmes récents.",
+    suggestedLongDescription: "Maîtrisez les dernières techniques de référencement naturel pour Google avec notre guide expert complet. Découvrez les stratégies SEO 2023 qui fonctionnent réellement et qui vous permettront d'améliorer significativement votre positionnement dans les résultats de recherche. Notre approche est constamment mise à jour pour rester alignée avec les évolutions des algorithmes de Google, y compris les mises à jour Core, l'importance croissante des signaux d'expérience utilisateur et l'intelligence artificielle qui alimente désormais le moteur de recherche. Apprenez à optimiser vos pages pour les Featured Snippets, à créer un contenu qui répond parfaitement aux intentions de recherche, et à développer une stratégie d'acquisition de backlinks éthique et durable."
   },
   {
     keyword: "optimisation site web",
@@ -52,7 +59,9 @@ const demoKeywords: KeywordSuggestion[] = [
     competition: 60,
     cpc: 2.10,
     suggestedTitle: "Optimisation Site Web : Performance & Conversion Maximale",
-    suggestedDescription: "Services d'optimisation de site web pour une meilleure performance, un meilleur référencement et des taux de conversion plus élevés. Résultats mesurables."
+    suggestedDescription: "Services d'optimisation de site web pour une meilleure performance, un meilleur référencement et des taux de conversion plus élevés. Résultats mesurables.",
+    suggestedShortDescription: "Services d'optimisation web pour améliorer performance, référencement et taux de conversion. Résultats mesurables garantis.",
+    suggestedLongDescription: "Transformez votre site web en une véritable machine de performance et de conversion grâce à nos services d'optimisation professionnels. Notre approche globale combine l'amélioration technique (vitesse de chargement, responsive design, architecture de l'information), l'optimisation SEO (structure sémantique, maillage interne, stratégie de mots-clés) et l'optimisation de l'expérience utilisateur (parcours client, clarté des appels à l'action, tests A/B). Nos interventions sont basées sur une analyse approfondie de vos métriques actuelles et sur les meilleures pratiques du secteur. Vous bénéficierez d'un suivi détaillé avec des rapports réguliers montrant l'évolution de vos indicateurs clés de performance et le retour sur investissement de chaque optimisation réalisée."
   },
   {
     keyword: "meta description seo",
@@ -62,7 +71,9 @@ const demoKeywords: KeywordSuggestion[] = [
     competition: 50,
     cpc: 1.50,
     suggestedTitle: "Meta Descriptions SEO : Guide Complet pour 2023",
-    suggestedDescription: "Apprenez à rédiger des meta descriptions efficaces pour le SEO. Conseils d'experts, exemples et meilleures pratiques pour augmenter vos clics."
+    suggestedDescription: "Apprenez à rédiger des meta descriptions efficaces pour le SEO. Conseils d'experts, exemples et meilleures pratiques pour augmenter vos clics.",
+    suggestedShortDescription: "Apprenez à rédiger des meta descriptions efficaces pour le SEO. Conseils d'experts et exemples pour augmenter vos clics.",
+    suggestedLongDescription: "Apprenez à rédiger des meta descriptions parfaitement optimisées pour le SEO avec notre guide complet 2023. Ces courts paragraphes affichés dans les résultats de recherche sont essentiels pour convaincre les utilisateurs de cliquer sur votre lien plutôt que sur celui d'un concurrent. Découvrez comment trouver le juste équilibre entre optimisation pour les moteurs de recherche et copywriting persuasif, comment inclure intelligemment vos mots-clés sans faire de bourrage, et comment adapter vos descriptions à différents types de pages (accueil, produits, articles de blog, etc.). Notre guide inclut une analyse de nombreux exemples réussis dans différents secteurs, des templates personnalisables, et un processus étape par étape pour créer et tester l'efficacité de vos meta descriptions."
   }
 ];
 
@@ -78,7 +89,8 @@ const KeywordTabContent = () => {
   const [generatedKeywords, setGeneratedKeywords] = useState<KeywordSuggestion[]>([]);
   const [isCopied, setIsCopied] = useState<{title: boolean, description: boolean}>({title: false, description: false});
   const [error, setError] = useState<string | null>(null);
-  const maxLengthDescription = 500;
+  const [descriptionType, setDescriptionType] = useState<'short' | 'long'>('short');
+  const maxLengthDescription = descriptionType === 'short' ? 155 : 500;
 
   // Vérifier s'il y a une clé OpenAI dans le localStorage
   useEffect(() => {
@@ -244,7 +256,12 @@ const KeywordTabContent = () => {
           setTitle(suggestions[0].suggestedTitle);
         }
         
-        if (suggestions[0].suggestedDescription) {
+        // Utiliser la description appropriée selon le type sélectionné
+        if (descriptionType === 'short' && suggestions[0].suggestedShortDescription) {
+          setDescription(suggestions[0].suggestedShortDescription);
+        } else if (descriptionType === 'long' && suggestions[0].suggestedLongDescription) {
+          setDescription(suggestions[0].suggestedLongDescription);
+        } else if (suggestions[0].suggestedDescription) {
           setDescription(suggestions[0].suggestedDescription);
         }
         
@@ -309,6 +326,26 @@ const KeywordTabContent = () => {
     setDescription(newDescription);
     toast.success("Description mise à jour", {
       description: "La description a été mise à jour avec la suggestion"
+    });
+  };
+
+  // Basculer entre description courte et longue
+  const toggleDescriptionType = () => {
+    const newType = descriptionType === 'short' ? 'long' : 'short';
+    setDescriptionType(newType);
+    
+    // Si on a des suggestions, mettre à jour la description avec le nouveau type
+    if (generatedKeywords.length > 0) {
+      const firstKeyword = generatedKeywords[0];
+      if (newType === 'short' && firstKeyword.suggestedShortDescription) {
+        setDescription(firstKeyword.suggestedShortDescription);
+      } else if (newType === 'long' && firstKeyword.suggestedLongDescription) {
+        setDescription(firstKeyword.suggestedLongDescription);
+      }
+    }
+    
+    toast.info(`Mode description ${newType === 'short' ? 'courte' : 'longue'} activé`, {
+      description: `Longueur maximum: ${newType === 'short' ? '155' : '500'} caractères`
     });
   };
 
@@ -501,7 +538,18 @@ const KeywordTabContent = () => {
           
           <div>
             <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-              Meta Description (max {maxLengthDescription} caractères)
+              <div className="flex justify-between items-center">
+                <span>Meta Description (max {maxLengthDescription} caractères)</span>
+                <Button 
+                  variant="outline" 
+                  onClick={toggleDescriptionType}
+                  size="sm"
+                  className="h-7 gap-1 text-xs"
+                >
+                  <SwitchCamera className="h-3 w-3" />
+                  Mode {descriptionType === 'short' ? 'court' : 'long'} ({descriptionType === 'short' ? '155' : '500'})
+                </Button>
+              </div>
             </label>
             <div className="flex flex-col space-y-2">
               <div className="relative">
@@ -532,7 +580,10 @@ const KeywordTabContent = () => {
             </div>
             <p className="mt-1 text-xs text-gray-500 flex justify-between">
               <span>La description apparaît sous le titre dans les résultats de recherche.</span>
-              <span className={`font-medium ${description.length > maxLengthDescription ? 'text-red-500' : ''}`}>
+              <span className={`font-medium ${
+                description.length > maxLengthDescription ? 'text-red-500' : 
+                description.length > maxLengthDescription * 0.9 ? 'text-yellow-500' : 'text-green-500'
+              }`}>
                 {description.length}/{maxLengthDescription}
               </span>
             </p>
@@ -550,9 +601,11 @@ const KeywordTabContent = () => {
         descriptionValue={description}
         onInsertDescription={(val) => handleInsertIntoField(val, 'description')}
         maxLengthDescription={maxLengthDescription}
+        descriptionType={descriptionType}
       />
     </div>
   );
 };
 
 export default KeywordTabContent;
+

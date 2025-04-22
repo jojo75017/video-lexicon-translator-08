@@ -19,6 +19,7 @@ interface KeywordSuggestionsProps {
   descriptionValue?: string;
   onInsertDescription?: (val: string) => void;
   maxLengthDescription?: number;
+  descriptionType?: 'short' | 'long';
 }
 
 const KeywordSuggestions: React.FC<KeywordSuggestionsProps> = ({
@@ -29,7 +30,8 @@ const KeywordSuggestions: React.FC<KeywordSuggestionsProps> = ({
   maxLength = 60,
   descriptionValue = '',
   onInsertDescription = () => {},
-  maxLengthDescription = 155
+  maxLengthDescription = 155,
+  descriptionType = 'short'
 }) => {
   const [copiedIndex, setCopiedIndex] = React.useState<number | null>(null);
   const [currentTitle, setCurrentTitle] = React.useState('');
@@ -54,9 +56,16 @@ const KeywordSuggestions: React.FC<KeywordSuggestionsProps> = ({
     if (descriptionValue) {
       setCurrentDescription(descriptionValue);
     } else if (generatedKeywords.length > 0) {
-      setCurrentDescription(generatedKeywords[0].suggestedDescription || "");
+      const firstKeyword = generatedKeywords[0];
+      if (descriptionType === 'short') {
+        setCurrentDescription(firstKeyword.suggestedShortDescription || 
+                             firstKeyword.suggestedDescription || "");
+      } else {
+        setCurrentDescription(firstKeyword.suggestedLongDescription || 
+                             firstKeyword.suggestedDescription || "");
+      }
     }
-  }, [generatedKeywords, fieldValue, descriptionValue]);
+  }, [generatedKeywords, fieldValue, descriptionValue, descriptionType]);
 
   const handleEmojiInsert = (newValue: string) => {
     setCurrentTitle(newValue);
@@ -72,9 +81,24 @@ const KeywordSuggestions: React.FC<KeywordSuggestionsProps> = ({
     }
   };
 
+  // Fonction pour obtenir la description appropriée selon le type
+  const getDescription = (keyword: KeywordSuggestion) => {
+    if (descriptionType === 'short') {
+      return keyword.suggestedShortDescription || keyword.suggestedDescription || "Non disponible";
+    } else {
+      return keyword.suggestedLongDescription || keyword.suggestedDescription || "Non disponible";
+    }
+  };
+  
+  // Fonction pour obtenir la longueur de la description
+  const getDescriptionLength = (keyword: KeywordSuggestion) => {
+    const description = getDescription(keyword);
+    return description.length;
+  };
+
   console.log("KeywordSuggestions rendu avec", generatedKeywords.length, "mots-clés");
   console.log("État actuel - titre:", currentTitle, "description:", currentDescription);
-  console.log("Props:", { fieldValue, maxLength, descriptionValue, maxLengthDescription, activeTab });
+  console.log("Props:", { fieldValue, maxLength, descriptionValue, maxLengthDescription, activeTab, descriptionType });
 
   return (
     <Card className="border border-gray-200 rounded-lg">
@@ -171,6 +195,26 @@ const KeywordSuggestions: React.FC<KeywordSuggestionsProps> = ({
 
           {/* Onglet Descriptions */}
           <TabsContent value="descriptions">
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="text-sm font-medium">Meta descriptions</h3>
+              <div className="flex items-center gap-2">
+                <Badge 
+                  variant={descriptionType === 'short' ? "default" : "outline"} 
+                  className="cursor-pointer"
+                  onClick={() => descriptionType === 'long' && onInsertDescription && onInsertDescription(currentDescription)}
+                >
+                  Courte (155)
+                </Badge>
+                <Badge 
+                  variant={descriptionType === 'long' ? "default" : "outline"} 
+                  className="cursor-pointer"
+                  onClick={() => descriptionType === 'short' && onInsertDescription && onInsertDescription(currentDescription)}
+                >
+                  Longue (500)
+                </Badge>
+              </div>
+            </div>
+            
             {generatedKeywords.length > 0 ? (
               <div className="space-y-3">
                 {generatedKeywords.map((keyword, index) => (
@@ -178,20 +222,25 @@ const KeywordSuggestions: React.FC<KeywordSuggestionsProps> = ({
                     <div className="flex items-center gap-2 mb-1">
                       <AlignLeft className="h-4 w-4 text-green-600" />
                       <span className="font-medium">{keyword.keyword}</span>
-                      <Badge variant="outline" className="ml-auto text-xs">
-                        {keyword.suggestedDescription?.length || 0}/{maxLengthDescription}
+                      <Badge 
+                        variant="outline" 
+                        className={`ml-auto text-xs ${
+                          getDescriptionLength(keyword) > maxLengthDescription ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'
+                        }`}
+                      >
+                        {getDescriptionLength(keyword)}/{maxLengthDescription}
                       </Badge>
                       <Button
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8"
-                        onClick={() => copyToClipboard(keyword.suggestedDescription || "", index)}
+                        onClick={() => copyToClipboard(getDescription(keyword), index)}
                       >
                         {copiedIndex === index ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                       </Button>
                     </div>
                     <div className="p-3 bg-green-50 rounded text-sm mt-1 whitespace-pre-wrap max-h-48 overflow-y-auto">
-                      {keyword.suggestedDescription || "Non disponible"}
+                      {getDescription(keyword)}
                     </div>
                   </div>
                 ))}
@@ -235,3 +284,4 @@ const KeywordSuggestions: React.FC<KeywordSuggestionsProps> = ({
 };
 
 export default KeywordSuggestions;
+

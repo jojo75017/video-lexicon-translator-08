@@ -21,6 +21,8 @@ export interface KeywordSuggestion {
   cpc?: number;
   suggestedTitle?: string;
   suggestedDescription?: string;
+  suggestedShortDescription?: string;  // Description courte (155 caractères max)
+  suggestedLongDescription?: string;   // Description longue (500 caractères max)
   volume?: number; // Ajouté pour compatibilité
 }
 
@@ -30,6 +32,8 @@ export interface OpenAIKeywordResponse {
   difficulty?: number;
   suggestedTitle?: string;
   suggestedDescription?: string;
+  suggestedShortDescription?: string;  // Description courte
+  suggestedLongDescription?: string;   // Description longue
 }
 
 // Interfaces manquantes pour corriger les erreurs de compilation
@@ -40,6 +44,23 @@ export interface SeoAnalysis {
   metadata?: MetaTagsAnalysis;
   performance?: Performance;
   issues?: SeoIssue[];
+  title?: string;
+  description?: string;
+  keywords?: string[];
+  h1Count?: number;
+  h2Count?: number;
+  h3Count?: number;
+  imgCount?: number;
+  headings?: any[];
+  paragraphs?: any[];
+  wordCount?: number;
+  internalLinks?: number;
+  externalLinks?: number;
+  headingStructure?: { hierarchy?: HierarchyItem[] };
+  technicalSuggestions?: string[];
+  contentQuality?: { readingTime: number; complexity: number };
+  searchConsole?: { clicks: number; impressions: number };
+  keywordSuggestions?: KeywordSuggestion[];
 }
 
 export interface SeoAnalysisResult {
@@ -55,6 +76,8 @@ export interface MetaTagsAnalysis {
   hasCanonical: boolean;
   hasFavicon: boolean;
   socialTags: Record<string, string>;
+  hasTitleTag?: boolean;
+  hasDescriptionTag?: boolean;
 }
 
 export interface Performance {
@@ -65,6 +88,21 @@ export interface Performance {
   largestContentfulPaint: number;
   cumulativeLayoutShift: number;
   performanceScore: number;
+  timeToInteractive?: number;
+  resourceBreakdown?: {
+    images: number;
+    scripts: number;
+    styles: number;
+    fonts: number;
+    other: number;
+  };
+  totalSize?: number;
+  scriptCount?: number;
+  styleCount?: number;
+  responseTime?: number;
+  impressions?: number;
+  clickThroughRate?: number;
+  domLoadTime?: number; // Ajout pour compatibilité
 }
 
 export interface SeoIssue {
@@ -78,6 +116,7 @@ export interface ImageAnalysis {
   url: string;
   hasAlt: boolean;
   altText?: string;
+  alt?: string; // Pour compatibilité
   width?: number;
   height?: number;
   size?: number;
@@ -170,5 +209,23 @@ export interface SocialMetrics {
   pinterest: {
     pins: number;
     saves: number;
+  };
+}
+
+// Type pour la compatibilité avec PerformanceTabContent
+export interface PerformanceData {
+  loadTime: number;
+  firstContentfulPaint: number;
+  speedIndex: number;
+  totalBlockingTime: number;
+  largestContentfulPaint: number;
+  cumulativeLayoutShift: number;
+  domLoadTime: number;
+  resourceBreakdown?: {
+    images: number;
+    scripts: number;
+    styles: number;
+    fonts: number;
+    other: number;
   };
 }
