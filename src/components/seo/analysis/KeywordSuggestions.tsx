@@ -179,7 +179,7 @@ const KeywordSuggestions: React.FC<KeywordSuggestionsProps> = ({
                       <AlignLeft className="h-4 w-4 text-green-600" />
                       <span className="font-medium">{keyword.keyword}</span>
                       <Badge variant="outline" className="ml-auto text-xs">
-                        {keyword.suggestedDescription?.length || 0}/155
+                        {keyword.suggestedDescription?.length || 0}/{maxLengthDescription}
                       </Badge>
                       <Button
                         variant="ghost"
@@ -190,7 +190,7 @@ const KeywordSuggestions: React.FC<KeywordSuggestionsProps> = ({
                         {copiedIndex === index ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                       </Button>
                     </div>
-                    <div className="p-3 bg-green-50 rounded text-sm mt-1 whitespace-pre-wrap">
+                    <div className="p-3 bg-green-50 rounded text-sm mt-1 whitespace-pre-wrap max-h-48 overflow-y-auto">
                       {keyword.suggestedDescription || "Non disponible"}
                     </div>
                   </div>

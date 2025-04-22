@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -79,6 +78,7 @@ const KeywordTabContent = () => {
   const [generatedKeywords, setGeneratedKeywords] = useState<KeywordSuggestion[]>([]);
   const [isCopied, setIsCopied] = useState<{title: boolean, description: boolean}>({title: false, description: false});
   const [error, setError] = useState<string | null>(null);
+  const maxLengthDescription = 500;
 
   // Vérifier s'il y a une clé OpenAI dans le localStorage
   useEffect(() => {
@@ -501,7 +501,7 @@ const KeywordTabContent = () => {
           
           <div>
             <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-              Meta Description (max 155 caractères)
+              Meta Description (max {maxLengthDescription} caractères)
             </label>
             <div className="flex flex-col space-y-2">
               <div className="relative">
@@ -511,8 +511,8 @@ const KeywordTabContent = () => {
                   value={description} 
                   onChange={handleDescriptionChange}
                   className="pr-10 resize-none"
-                  rows={3}
-                  maxLength={155}
+                  rows={6}
+                  maxLength={maxLengthDescription}
                 />
                 <div className="absolute top-0 right-0 m-2">
                   <Button
@@ -532,8 +532,8 @@ const KeywordTabContent = () => {
             </div>
             <p className="mt-1 text-xs text-gray-500 flex justify-between">
               <span>La description apparaît sous le titre dans les résultats de recherche.</span>
-              <span className={`font-medium ${description.length > 155 ? 'text-red-500' : ''}`}>
-                {description.length}/155
+              <span className={`font-medium ${description.length > maxLengthDescription ? 'text-red-500' : ''}`}>
+                {description.length}/{maxLengthDescription}
               </span>
             </p>
           </div>
@@ -549,7 +549,7 @@ const KeywordTabContent = () => {
         maxLength={60}
         descriptionValue={description}
         onInsertDescription={(val) => handleInsertIntoField(val, 'description')}
-        maxLengthDescription={155}
+        maxLengthDescription={maxLengthDescription}
       />
     </div>
   );
