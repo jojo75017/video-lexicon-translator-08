@@ -2,6 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Smile } from "lucide-react";
+import { toast } from "sonner";
 
 const emojis = [
   "✨", "🔥", "💡", "🔝", "🚀", "✅", "⭐", "🎯", "😍", "🎉",
@@ -17,9 +18,15 @@ interface EmojiTabProps {
 
 const EmojiTab: React.FC<EmojiTabProps> = ({ fieldValue, onInsert, maxLength }) => {
   const handleInsert = (emoji: string) => {
-    if (fieldValue.length + emoji.length > maxLength) return;
-    onInsert(fieldValue + emoji);
-    console.log("Emoji inséré:", emoji, "Nouvelle valeur:", fieldValue + emoji);
+    if (fieldValue.length + emoji.length > maxLength) {
+      toast.warning(`Trop long ! La limite est de ${maxLength} caractères.`);
+      return;
+    }
+    
+    const newValue = fieldValue + emoji;
+    onInsert(newValue);
+    console.log("Emoji inséré:", emoji, "Nouvelle valeur:", newValue);
+    toast.success(`Emoji ${emoji} ajouté au titre`);
   };
 
   console.log("EmojiTab rendu - valeur actuelle:", fieldValue, "max:", maxLength);

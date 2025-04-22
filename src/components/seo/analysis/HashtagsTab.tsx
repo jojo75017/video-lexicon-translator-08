@@ -2,6 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Hash } from "lucide-react";
+import { toast } from "sonner";
 
 const hashtags = [
   "#SEO", "#Référencement", "#Google", "#MetaTitle", "#Digital", "#ConseilSEO",
@@ -20,10 +21,18 @@ const HashtagsTab: React.FC<HashtagsTabProps> = ({ fieldValue, onInsert, maxLeng
     // Ajoute un espace si besoin
     let insertVal = fieldValue;
     if (insertVal && !insertVal.endsWith(" ")) insertVal += " ";
-    const total = insertVal.length + hashtag.length;
-    if (total > maxLength) return;
-    onInsert(insertVal + hashtag);
-    console.log("Hashtag inséré:", hashtag, "Nouvelle valeur:", insertVal + hashtag);
+    
+    const newValue = insertVal + hashtag;
+    const total = newValue.length;
+    
+    if (total > maxLength) {
+      toast.warning(`Trop long ! La limite est de ${maxLength} caractères.`);
+      return;
+    }
+    
+    onInsert(newValue);
+    console.log("Hashtag inséré:", hashtag, "Nouvelle valeur:", newValue);
+    toast.success(`Hashtag ${hashtag} ajouté à la description`);
   };
 
   console.log("HashtagsTab rendu - valeur actuelle:", fieldValue, "max:", maxLength);
@@ -42,7 +51,7 @@ const HashtagsTab: React.FC<HashtagsTabProps> = ({ fieldValue, onInsert, maxLeng
             variant="outline"
             className="px-2 py-1 text-xs"
             onClick={() => handleInsert(h)}
-            disabled={fieldValue.length + h.length > maxLength}
+            disabled={fieldValue.length + h.length + (fieldValue ? 1 : 0) > maxLength}
             aria-label={`Ajouter ${h}`}
           >
             {h}

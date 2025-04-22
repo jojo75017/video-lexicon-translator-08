@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -80,6 +81,20 @@ const SeoAnalysisForm = ({
     }
   };
 
+  // Préparation de l'URL (ajout du protocole si absent)
+  const formatUrl = (inputUrl: string) => {
+    if (!inputUrl) return '';
+    
+    if (!inputUrl.startsWith('http://') && !inputUrl.startsWith('https://')) {
+      return 'https://' + inputUrl;
+    }
+    return inputUrl;
+  };
+
+  const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUrl(e.target.value);
+  };
+
   return (
     <form onSubmit={handleSubmit} className="mb-8 bg-white p-6 rounded-lg shadow-md border border-gray-100">
       <div className="mb-6">
@@ -98,7 +113,7 @@ const SeoAnalysisForm = ({
             type="url"
             placeholder="https://exemple.com"
             value={url}
-            onChange={(e) => setUrl(e.target.value)}
+            onChange={handleUrlChange}
             onKeyPress={handleKeyPress}
             className="w-full"
           />
@@ -107,7 +122,7 @@ const SeoAnalysisForm = ({
           type="button"
           onClick={handleAnalyzeClick}
           disabled={isLoading || !url}
-          className="whitespace-nowrap"
+          className="whitespace-nowrap bg-indigo-600 hover:bg-indigo-700 text-white"
         >
           {isLoading ? (
             <>
@@ -150,14 +165,6 @@ const SeoAnalysisForm = ({
               <Shield className="mr-2 h-4 w-4" />
               Activer le proxy CORS
             </Button>
-            <Button
-              variant="ghost"
-              onClick={() => window.open('https://cors-anywhere.herokuapp.com/corsdemo', '_blank')}
-              type="button"
-              className="text-blue-700 hover:bg-blue-50"
-            >
-              Activer service CORS externe
-            </Button>
           </div>
         </div>
       )}
@@ -181,14 +188,6 @@ const SeoAnalysisForm = ({
               >
                 <Shield className="mr-2 h-4 w-4" />
                 Essayer avec le proxy CORS
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={() => window.open('https://cors-anywhere.herokuapp.com/corsdemo', '_blank')}
-                type="button"
-                className="text-blue-700 hover:bg-blue-50"
-              >
-                Activer service CORS externe
               </Button>
             </div>
           </div>

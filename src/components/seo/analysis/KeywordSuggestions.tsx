@@ -13,15 +13,28 @@ import HashtagsTab from './HashtagsTab';
 interface KeywordSuggestionsProps {
   generatedKeywords: KeywordSuggestion[];
   onGenerateClick?: () => void;
+  fieldValue?: string;
+  onInsert?: (val: string) => void;
+  maxLength?: number;
+  descriptionValue?: string;
+  onInsertDescription?: (val: string) => void;
+  maxLengthDescription?: number;
 }
 
 const KeywordSuggestions: React.FC<KeywordSuggestionsProps> = ({
   generatedKeywords,
-  onGenerateClick
+  onGenerateClick,
+  fieldValue = '',
+  onInsert = () => {},
+  maxLength = 60,
+  descriptionValue = '',
+  onInsertDescription = () => {},
+  maxLengthDescription = 155
 }) => {
   const [copiedIndex, setCopiedIndex] = React.useState<number | null>(null);
   const [currentTitle, setCurrentTitle] = React.useState('');
   const [currentDescription, setCurrentDescription] = React.useState('');
+  const [activeTab, setActiveTab] = React.useState('keywords');
 
   const copyToClipboard = (text: string, index: number) => {
     navigator.clipboard.writeText(text);
@@ -30,16 +43,38 @@ const KeywordSuggestions: React.FC<KeywordSuggestionsProps> = ({
     setTimeout(() => setCopiedIndex(null), 2000);
   };
 
-  // On prend le 1er titre/desc générés pour prévisualisation
+  // On prend le 1er titre/desc générés pour prévisualisation ou utilise les valeurs fournies
   React.useEffect(() => {
-    if (generatedKeywords.length > 0) {
+    if (fieldValue) {
+      setCurrentTitle(fieldValue);
+    } else if (generatedKeywords.length > 0) {
       setCurrentTitle(generatedKeywords[0].suggestedTitle || "");
+    }
+    
+    if (descriptionValue) {
+      setCurrentDescription(descriptionValue);
+    } else if (generatedKeywords.length > 0) {
       setCurrentDescription(generatedKeywords[0].suggestedDescription || "");
     }
-  }, [generatedKeywords]);
+  }, [generatedKeywords, fieldValue, descriptionValue]);
+
+  const handleEmojiInsert = (newValue: string) => {
+    setCurrentTitle(newValue);
+    if (onInsert) {
+      onInsert(newValue);
+    }
+  };
+
+  const handleHashtagInsert = (newValue: string) => {
+    setCurrentDescription(newValue);
+    if (onInsertDescription) {
+      onInsertDescription(newValue);
+    }
+  };
 
   console.log("KeywordSuggestions rendu avec", generatedKeywords.length, "mots-clés");
   console.log("État actuel - titre:", currentTitle, "description:", currentDescription);
+  console.log("Props:", { fieldValue, maxLength, descriptionValue, maxLengthDescription, activeTab });
 
   return (
     <Card className="border border-gray-200 rounded-lg">
@@ -62,7 +97,12 @@ const KeywordSuggestions: React.FC<KeywordSuggestionsProps> = ({
           </Button>
         </div>
 
-        <Tabs defaultValue="keywords" className="mt-4">
+        <Tabs 
+          defaultValue="keywords" 
+          value={activeTab} 
+          onValueChange={setActiveTab} 
+          className="mt-4"
+        >
           <TabsList className="mb-4 grid grid-cols-5 w-full">
             <TabsTrigger value="keywords">Mots-clés</TabsTrigger>
             <TabsTrigger value="titles">Balises Title</TabsTrigger>
@@ -167,8 +207,8 @@ const KeywordSuggestions: React.FC<KeywordSuggestionsProps> = ({
           <TabsContent value="emojis">
             <EmojiTab
               fieldValue={currentTitle}
-              onInsert={setCurrentTitle}
-              maxLength={60}
+              onInsert={handleEmojiInsert}
+              maxLength={maxLength}
             />
             <div className="mt-4">
               <label className="text-xs text-gray-600">Aperçu du titre avec emojis :</label>
@@ -180,8 +220,8 @@ const KeywordSuggestions: React.FC<KeywordSuggestionsProps> = ({
           <TabsContent value="hashtags">
             <HashtagsTab
               fieldValue={currentDescription}
-              onInsert={setCurrentDescription}
-              maxLength={155}
+              onInsert={handleHashtagInsert}
+              maxLength={maxLengthDescription}
             />
             <div className="mt-4">
               <label className="text-xs text-gray-600">Aperçu description + hashtags :</label>
