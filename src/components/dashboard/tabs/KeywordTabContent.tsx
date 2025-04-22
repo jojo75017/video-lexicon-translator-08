@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -87,7 +86,7 @@ const KeywordTabContent = () => {
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [generatedKeywords, setGeneratedKeywords] = useState<KeywordSuggestion[]>([]);
-  const [isCopied, setIsCopied] = useState<{title: boolean, description: boolean}>({title: false, description: false});
+  const [isCopied, setIsCopied] = useState<{title: boolean, description: boolean}>({title: false, description: boolean});
   const [error, setError] = useState<string | null>(null);
   const [descriptionType, setDescriptionType] = useState<'short' | 'long'>('short');
   const maxLengthDescription = descriptionType === 'short' ? 155 : 500;
@@ -509,7 +508,7 @@ const KeywordTabContent = () => {
                   placeholder="Titre optimisé pour le SEO" 
                   value={title} 
                   onChange={handleTitleChange}
-                  className="pr-10"
+                  className={`pr-10 ${title.length > 60 ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-green-300 focus:border-green-500 focus:ring-green-500'}`}
                   maxLength={60}
                 />
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3">
@@ -530,7 +529,7 @@ const KeywordTabContent = () => {
             </div>
             <p className="mt-1 text-xs text-gray-500 flex justify-between">
               <span>Le titre apparaît dans les résultats de recherche.</span>
-              <span className={`font-medium ${title.length > 60 ? 'text-red-500' : ''}`}>
+              <span className={`font-medium ${title.length > 60 ? 'text-red-500' : 'text-green-500'}`}>
                 {title.length}/60
               </span>
             </p>
@@ -558,7 +557,7 @@ const KeywordTabContent = () => {
                   placeholder="Description optimisée pour le SEO avec mots-clés pertinents" 
                   value={description} 
                   onChange={handleDescriptionChange}
-                  className="pr-10 resize-none"
+                  className={`pr-10 resize-none ${description.length > maxLengthDescription ? 'border-red-300 focus:border-red-500' : 'border-green-300 focus:border-green-500'}`}
                   rows={6}
                   maxLength={maxLengthDescription}
                 />
@@ -608,4 +607,3 @@ const KeywordTabContent = () => {
 };
 
 export default KeywordTabContent;
-

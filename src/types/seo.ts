@@ -102,7 +102,7 @@ export interface Performance {
   responseTime?: number;
   impressions?: number;
   clickThroughRate?: number;
-  domLoadTime?: number; // Ajout pour compatibilité
+  domLoadTime: number; // Changement: domLoadTime requis
 }
 
 export interface SeoIssue {
@@ -141,6 +141,9 @@ export interface BacklinkInfo {
   isDofollow: boolean;
   firstDetected: string;
   lastDetected: string;
+  domain?: string; // Ajouté pour compatibilité
+  authority?: number; // Ajouté pour compatibilité
+  firstSeen?: string; // Ajouté pour compatibilité
 }
 
 export interface HeadingStructure {
@@ -157,6 +160,7 @@ export interface HierarchyItem {
   name: string;
   level: number;
   children?: HierarchyItem[];
+  tagName?: string; // Ajouté pour compatibilité
 }
 
 export interface KeywordData {
@@ -165,6 +169,8 @@ export interface KeywordData {
   competition: number;
   cpc: number;
   relevance: number;
+  count?: number; // Ajouté pour compatibilité
+  density?: number; // Ajouté pour compatibilité
 }
 
 export interface SearchConsoleData {
@@ -188,6 +194,11 @@ export interface SearchConsoleData {
     tablet: number;
   };
   countries: Record<string, number>;
+  position?: number; // Ajouté pour compatibilité
+  clicks?: number; // Ajouté pour compatibilité
+  impressions?: number; // Ajouté pour compatibilité
+  keywords?: any[]; // Ajouté pour compatibilité
+  topPages?: any[]; // Ajouté pour compatibilité
 }
 
 export interface SocialMetrics {

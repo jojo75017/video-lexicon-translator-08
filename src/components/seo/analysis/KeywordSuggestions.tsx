@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, AlignLeft, Tag, TrendingUp, BarChart2, Copy, Check, Smile, Hash } from 'lucide-react';
+import { FileText, AlignLeft, Tag, Smile, Hash } from 'lucide-react';
 import { toast } from "sonner";
 import EmojiTab from './EmojiTab';
 import HashtagsTab from './HashtagsTab';
@@ -96,10 +96,6 @@ const KeywordSuggestions: React.FC<KeywordSuggestionsProps> = ({
     return description.length;
   };
 
-  console.log("KeywordSuggestions rendu avec", generatedKeywords.length, "mots-clés");
-  console.log("État actuel - titre:", currentTitle, "description:", currentDescription);
-  console.log("Props:", { fieldValue, maxLength, descriptionValue, maxLengthDescription, activeTab, descriptionType });
-
   return (
     <Card className="border border-gray-200 rounded-lg">
       <CardHeader className="pb-2">
@@ -168,16 +164,32 @@ const KeywordSuggestions: React.FC<KeywordSuggestionsProps> = ({
                     <div className="flex items-center gap-2 mb-1">
                       <FileText className="h-4 w-4 text-blue-600" />
                       <span className="font-medium">{keyword.keyword}</span>
-                      <Badge variant="outline" className="ml-auto text-xs">
+                      <Badge variant="outline" className={`ml-auto text-xs ${
+                        (keyword.suggestedTitle?.length || 0) > 60 ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'
+                      }`}>
                         {keyword.suggestedTitle?.length || 0}/60
                       </Badge>
                       <Button
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8"
-                        onClick={() => copyToClipboard(keyword.suggestedTitle || "", index)}
+                        onClick={() => {
+                          if (keyword.suggestedTitle) {
+                            copyToClipboard(keyword.suggestedTitle, index);
+                            if (onInsert) onInsert(keyword.suggestedTitle);
+                          }
+                        }}
                       >
-                        {copiedIndex === index ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={copiedIndex === index ? 'text-green-500' : 'text-gray-500'}>
+                          {copiedIndex === index ? (
+                            <path d="M20 6L9 17l-5-5" />
+                          ) : (
+                            <>
+                              <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                            </>
+                          )}
+                        </svg>
                       </Button>
                     </div>
                     <div className="p-3 bg-blue-50 rounded text-sm mt-1 whitespace-pre-wrap">
@@ -217,33 +229,52 @@ const KeywordSuggestions: React.FC<KeywordSuggestionsProps> = ({
             
             {generatedKeywords.length > 0 ? (
               <div className="space-y-3">
-                {generatedKeywords.map((keyword, index) => (
-                  <div key={index} className="bg-gray-50 p-3 rounded-md">
-                    <div className="flex items-center gap-2 mb-1">
-                      <AlignLeft className="h-4 w-4 text-green-600" />
-                      <span className="font-medium">{keyword.keyword}</span>
-                      <Badge 
-                        variant="outline" 
-                        className={`ml-auto text-xs ${
-                          getDescriptionLength(keyword) > maxLengthDescription ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'
-                        }`}
-                      >
-                        {getDescriptionLength(keyword)}/{maxLengthDescription}
-                      </Badge>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => copyToClipboard(getDescription(keyword), index)}
-                      >
-                        {copiedIndex === index ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                      </Button>
+                {generatedKeywords.map((keyword, index) => {
+                  const descriptionText = getDescription(keyword);
+                  const descLength = descriptionText.length;
+                  const maxLen = descriptionType === 'short' ? 155 : 500;
+                  const isOverLimit = descLength > maxLen;
+                  
+                  return (
+                    <div key={index} className="bg-gray-50 p-3 rounded-md">
+                      <div className="flex items-center gap-2 mb-1">
+                        <AlignLeft className="h-4 w-4 text-green-600" />
+                        <span className="font-medium">{keyword.keyword}</span>
+                        <Badge 
+                          variant="outline" 
+                          className={`ml-auto text-xs ${
+                            isOverLimit ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'
+                          }`}
+                        >
+                          {descLength}/{maxLen}
+                        </Badge>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => {
+                            copyToClipboard(descriptionText, index);
+                            if (onInsertDescription) onInsertDescription(descriptionText);
+                          }}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={copiedIndex === index ? 'text-green-500' : 'text-gray-500'}>
+                            {copiedIndex === index ? (
+                              <path d="M20 6L9 17l-5-5" />
+                            ) : (
+                              <>
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                              </>
+                            )}
+                          </svg>
+                        </Button>
+                      </div>
+                      <div className="p-3 bg-green-50 rounded text-sm mt-1 whitespace-pre-wrap max-h-48 overflow-y-auto">
+                        {descriptionText}
+                      </div>
                     </div>
-                    <div className="p-3 bg-green-50 rounded text-sm mt-1 whitespace-pre-wrap max-h-48 overflow-y-auto">
-                      {getDescription(keyword)}
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <div className="text-center p-4 bg-gray-50 rounded-md">
@@ -284,4 +315,3 @@ const KeywordSuggestions: React.FC<KeywordSuggestionsProps> = ({
 };
 
 export default KeywordSuggestions;
-

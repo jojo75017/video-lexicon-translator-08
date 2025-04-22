@@ -1,27 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SeoAnalysis } from '@/types/seo';
-import SeoOverview from './seo/SeoOverview';
-import SearchTrends from './seo/SearchTrends';
-import DetailedMetrics from './seo/DetailedMetrics';
-import SiteComparison from './seo/SiteComparison';
-import LoadingSpeedAnalysis from './seo/LoadingSpeedAnalysis';
-import SeoStructure from './seo/SeoStructure';
-import KeywordAnalysis from './seo/KeywordAnalysis';
-import SiteStructureVisualizer from './SiteStructureVisualizer';
-import ReadabilityAnalysis from './seo/ReadabilityAnalysis';
-import AccessibilityReport from './seo/AccessibilityReport';
-import MobileAnalysis from './seo/MobileAnalysis';
 import { Card } from '@/components/ui/card';
-import { analyzeKeywords } from '@/utils/seo/keywordAnalyzer';
-import { analyzeLinkStructure } from '@/utils/seo/linkAnalyzer';
-import { analyzeAccessibility } from '@/utils/seo/accessibilityAnalyzer';
-import { analyzeReadability } from '@/utils/seo/semanticAnalyzer';
-import { analyzeMobilePerformance } from '@/utils/seo/mobileAnalyzer';
-import AnalyticsOverview from './seo/AnalyticsOverview';
-import ContentHierarchy from './ContentHierarchy';
-import SeoIntegrations from './seo/SeoIntegrations';
-import KeywordSuggestions from './seo/analysis/KeywordSuggestions';
 
 interface SeoResultsProps {
   seoAnalysis: SeoAnalysis;
@@ -35,15 +16,16 @@ const calculateSeoScore = (analysis: SeoAnalysis) => {
   if (analysis.h1Count === 0) score -= 20;
   if (analysis.imgCount === 0) score -= 5;
   
-  // Fix error: comparing MetaTagsAnalysis with number
-  // Check if metaTagsAnalysis exists and has properties instead
-  if (!analysis.metaTagsAnalysis.hasTitleTag) score -= 15;
-  if (!analysis.metaTagsAnalysis.hasDescriptionTag) score -= 10;
+  // Check if metadata exists and has properties
+  if (analysis.metadata) {
+    if (!analysis.metadata.hasTitleTag) score -= 15;
+    if (!analysis.metadata.hasDescriptionTag) score -= 10;
+  }
   if (!analysis.title) score -= 15;
 
   // Penalties for performance
-  if (analysis.performance.firstContentfulPaint > 2.5) score -= 10;
-  if (analysis.performance.timeToInteractive && analysis.performance.timeToInteractive > 3.8) score -= 10;
+  if (analysis.performance?.firstContentfulPaint > 2.5) score -= 10;
+  if (analysis.performance?.timeToInteractive && analysis.performance.timeToInteractive > 3.8) score -= 10;
 
   return Math.max(0, Math.min(100, score));
 };
@@ -63,7 +45,7 @@ const getSeoSuggestions = (analysis: SeoAnalysis) => {
   if (analysis.imgCount === 0) {
     suggestions.push("Ajoutez des images pertinentes");
   }
-  if (analysis.performance.firstContentfulPaint > 2.5) {
+  if (analysis.performance?.firstContentfulPaint > 2.5) {
     suggestions.push("Améliorez le temps de chargement initial");
   }
 
@@ -72,19 +54,7 @@ const getSeoSuggestions = (analysis: SeoAnalysis) => {
 
 const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
   const [showAllMetrics, setShowAllMetrics] = useState(false);
-  const [comparisonSite, setComparisonSite] = useState<{url: string; analysis: SeoAnalysis} | undefined>();
   
-  const handleImageClick = (image: { url: string; alt?: string }) => {
-    window.open(image.url, '_blank', 'width=800,height=600');
-  };
-
-  const handleCompare = (url: string) => {
-    setComparisonSite({
-      url: "https://example.com",
-      analysis: seoAnalysis
-    });
-  };
-
   useEffect(() => {
     console.log("SeoResults rendering with data:", {
       title: seoAnalysis.title,
@@ -99,127 +69,74 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
 
   const seoScore = calculateSeoScore(seoAnalysis);
   const suggestions = getSeoSuggestions(seoAnalysis);
-  const keywordAnalysis = analyzeKeywords(seoAnalysis.title + " " + seoAnalysis.description);
-  const accessibilityResults = analyzeAccessibility(document);
-  const readabilityScore = analyzeReadability(document.body.textContent || '');
-  const mobileResults = analyzeMobilePerformance(document);
-
-  const linkAnalysis = analyzeLinkStructure(document, window.location.href);
-  const siteStructure = {
-    name: "Structure du site",
-    children: [
-      {
-        name: "Page d'accueil",
-        path: window.location.origin,
-        children: linkAnalysis.links.map(link => ({
-          name: link.text || new URL(link.url).pathname,
-          path: link.url,
-          children: []
-        }))
-      }
-    ]
-  };
-
-  // Extract hierarchy from the seoAnalysis if available
-  const hierarchy = seoAnalysis.headingStructure?.hierarchy || [];
-
-  console.log("SEO STRUCTURE RENDERING:", { 
-    h1Count: seoAnalysis.h1Count,
-    h2Count: seoAnalysis.h2Count,
-    h3Count: seoAnalysis.h3Count,
-    headings: seoAnalysis.headings?.length || 0,
-    hierarchy: hierarchy?.length || 0,
-    keywordSuggestions: seoAnalysis.keywordSuggestions?.length || 0
-  });
 
   return (
-    <ScrollArea className="h-[calc(100vh-200px)] pr-4">
-      <div className="space-y-6 p-4">
-        <SeoOverview 
-          score={seoScore}
-          suggestions={suggestions}
-          performance={seoAnalysis.performance}
-        />
-
-        {/* Add KeywordSuggestions component to display SEO suggestions */}
-        {seoAnalysis.keywordSuggestions && seoAnalysis.keywordSuggestions.length > 0 && (
-          <KeywordSuggestions 
-            generatedKeywords={seoAnalysis.keywordSuggestions}
-            onGenerateClick={() => console.log("Generate new suggestions")}
-          />
+    <Card className="p-6 mt-6">
+      <h2 className="text-xl font-semibold mb-4">Résultats de l'analyse SEO</h2>
+      
+      <div className="space-y-6">
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <h3 className="text-lg font-medium mb-2">Score SEO global</h3>
+          <div className="flex items-center">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white text-xl font-bold">
+              {seoScore}
+            </div>
+            <div className="ml-4">
+              <p className="text-gray-700">
+                {seoScore >= 80 ? "Excellent" : 
+                 seoScore >= 60 ? "Bon" : 
+                 seoScore >= 40 ? "Moyen" : 
+                 "Nécessite des améliorations"}
+              </p>
+              <p className="text-sm text-gray-500 mt-1">
+                Basé sur {suggestions.length} recommandations
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        {suggestions.length > 0 && (
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <h3 className="text-lg font-medium mb-2">Recommandations</h3>
+            <ul className="list-disc list-inside space-y-1 text-gray-700">
+              {suggestions.map((suggestion, index) => (
+                <li key={index}>{suggestion}</li>
+              ))}
+            </ul>
+          </div>
         )}
-
-        <Card className="p-6">
-          <SeoStructure 
-            h1Count={seoAnalysis.h1Count}
-            h2Count={seoAnalysis.h2Count}
-            h3Count={seoAnalysis.h3Count}
-            imgCount={seoAnalysis.imgCount}
-            headings={seoAnalysis.headings}
-            showHeadingsList={true}
-            hierarchy={hierarchy}
-          />
-        </Card>
-
-        <ContentHierarchy 
-          headings={seoAnalysis.headings} 
-          paragraphs={seoAnalysis.paragraphs}
-          hierarchy={hierarchy}
-          recommendations={seoAnalysis.technicalSuggestions} 
-        />
-
-        <SiteStructureVisualizer structure={siteStructure} />
-
-        <SeoIntegrations />
-
-        <ReadabilityAnalysis 
-          score={readabilityScore}
-          readingTime={seoAnalysis.contentQuality?.readingTime || 0}
-          wordCount={seoAnalysis.wordCount}
-          complexity={seoAnalysis.contentQuality?.complexity || 0}
-        />
-
-        <AccessibilityReport {...accessibilityResults} />
-
-        <MobileAnalysis {...mobileResults} />
-
-        <KeywordAnalysis keywords={keywordAnalysis} />
-
-        <LoadingSpeedAnalysis performance={{
-          ...seoAnalysis.performance,
-          speedIndex: seoAnalysis.performance.speedIndex || 0,
-          largestContentfulPaint: seoAnalysis.performance.largestContentfulPaint || seoAnalysis.performance.firstContentfulPaint * 1.2,
-          timeToInteractive: seoAnalysis.performance.timeToInteractive || seoAnalysis.performance.domLoadTime,
-          resourceBreakdown: seoAnalysis.performance.resourceBreakdown || {
-            images: 0,
-            scripts: 0,
-            styles: 0,
-            fonts: 0,
-            other: 0
-          }
-        }} />
-
-        <SearchTrends 
-          clicks={seoAnalysis.searchConsole.clicks}
-          impressions={seoAnalysis.searchConsole.impressions}
-        />
-
-        <AnalyticsOverview />
-
-        <SiteComparison 
-          site1={{url: window.location.href, analysis: seoAnalysis}}
-          site2={comparisonSite}
-          onCompare={handleCompare}
-        />
-
-        <DetailedMetrics 
-          seoAnalysis={seoAnalysis}
-          showAllMetrics={showAllMetrics}
-          onToggleMetrics={() => setShowAllMetrics(!showAllMetrics)}
-          onImageClick={handleImageClick}
-        />
+        
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <h3 className="text-lg font-medium mb-2">Informations sur la page</h3>
+          <div className="space-y-2">
+            <div className="flex justify-between py-1 border-b border-gray-200">
+              <span className="text-gray-600">URL</span>
+              <span className="font-medium">{seoAnalysis.url}</span>
+            </div>
+            <div className="flex justify-between py-1 border-b border-gray-200">
+              <span className="text-gray-600">Titre</span>
+              <span className="font-medium">{seoAnalysis.title || "Non trouvé"}</span>
+            </div>
+            <div className="flex justify-between py-1 border-b border-gray-200">
+              <span className="text-gray-600">Description</span>
+              <span className="font-medium">{seoAnalysis.description || "Non trouvée"}</span>
+            </div>
+            <div className="flex justify-between py-1 border-b border-gray-200">
+              <span className="text-gray-600">Mots</span>
+              <span className="font-medium">{seoAnalysis.wordCount || 0}</span>
+            </div>
+            <div className="flex justify-between py-1 border-b border-gray-200">
+              <span className="text-gray-600">Liens internes</span>
+              <span className="font-medium">{seoAnalysis.internalLinks || 0}</span>
+            </div>
+            <div className="flex justify-between py-1">
+              <span className="text-gray-600">Liens externes</span>
+              <span className="font-medium">{seoAnalysis.externalLinks || 0}</span>
+            </div>
+          </div>
+        </div>
       </div>
-    </ScrollArea>
+    </Card>
   );
 };
 
