@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { KeywordSuggestion } from '@/types/seo';
 import { OpenAIService } from '@/utils/seo/openaiService';
 import KeywordSuggestions from '@/components/seo/analysis/KeywordSuggestions';
-import OpenAIKeyForm from '@/components/OpenAIKeyForm';
+import OpenAIKeyForm from '@/components/settings/OpenAIKeyForm';
 
 // Demo keywords pour tester l'interface sans API
 const demoKeywords: KeywordSuggestion[] = [
@@ -19,6 +19,9 @@ const demoKeywords: KeywordSuggestion[] = [
     keyword: "analyse seo",
     searchVolume: 9500,
     difficulty: 67,
+    relevance: 85,
+    competition: 70,
+    cpc: 2.50,
     suggestedTitle: "Analyse SEO complète : Boostez votre visibilité en ligne ✓",
     suggestedDescription: "Découvrez comment optimiser votre site web avec notre analyse SEO experte. Améliorez votre classement et augmentez votre trafic organique."
   },
@@ -26,6 +29,9 @@ const demoKeywords: KeywordSuggestion[] = [
     keyword: "audit référencement",
     searchVolume: 5400,
     difficulty: 45,
+    relevance: 80,
+    competition: 65,
+    cpc: 1.80,
     suggestedTitle: "Audit de Référencement Professionnel | Résultats Garantis",
     suggestedDescription: "Un audit de référencement complet pour identifier les points forts et faibles de votre site. Recommandations personnalisées et plan d'action détaillé."
   },
@@ -33,6 +39,9 @@ const demoKeywords: KeywordSuggestion[] = [
     keyword: "seo google",
     searchVolume: 12000,
     difficulty: 72,
+    relevance: 90,
+    competition: 75,
+    cpc: 3.20,
     suggestedTitle: "SEO Google 2023 : Stratégies qui fonctionnent vraiment 🚀",
     suggestedDescription: "Maîtrisez les dernières techniques SEO pour Google. Guide expert pour améliorer votre classement et respecter les algorithmes les plus récents."
   },
@@ -40,6 +49,9 @@ const demoKeywords: KeywordSuggestion[] = [
     keyword: "optimisation site web",
     searchVolume: 7200,
     difficulty: 53,
+    relevance: 75,
+    competition: 60,
+    cpc: 2.10,
     suggestedTitle: "Optimisation Site Web : Performance & Conversion Maximale",
     suggestedDescription: "Services d'optimisation de site web pour une meilleure performance, un meilleur référencement et des taux de conversion plus élevés. Résultats mesurables."
   },
@@ -47,6 +59,9 @@ const demoKeywords: KeywordSuggestion[] = [
     keyword: "meta description seo",
     searchVolume: 3600,
     difficulty: 38,
+    relevance: 70,
+    competition: 50,
+    cpc: 1.50,
     suggestedTitle: "Meta Descriptions SEO : Guide Complet pour 2023",
     suggestedDescription: "Apprenez à rédiger des meta descriptions efficaces pour le SEO. Conseils d'experts, exemples et meilleures pratiques pour augmenter vos clics."
   }
