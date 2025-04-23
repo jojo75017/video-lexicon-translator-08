@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -81,30 +80,25 @@ const KeywordTabContent = () => {
   const [openaiKey, setOpenaiKey] = useState<string>('');
   const [isValidKey, setIsValidKey] = useState<boolean>(false);
   const [isLoadingKey, setIsLoadingKey] = useState<boolean>(false);
-  const [url, setUrl] = useState<string>('');
-  const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
   const [keyword, setKeyword] = useState<string>('');
   const [title, setTitle] = useState<string>('');
-  const [description, setDescription] = useState<string>('');
+  const [shortDescription, setShortDescription] = useState<string>('');
+  const [longDescription, setLongDescription] = useState<string>('');
+  const [extraDescription, setExtraDescription] = useState<string>('');
   const [generatedKeywords, setGeneratedKeywords] = useState<KeywordSuggestion[]>([]);
-  const [isCopied, setIsCopied] = useState<{title: boolean, description: boolean}>({title: false, description: false});
+  const [isCopied, setIsCopied] = useState<{title: boolean, short: boolean, long: boolean, extra: boolean}>({title: false, short: false, long: false, extra: false});
   const [error, setError] = useState<string | null>(null);
-  const [descriptionType, setDescriptionType] = useState<'short' | 'long'>('short');
-  const maxLengthDescription = descriptionType === 'short' ? 155 : 500;
 
-  // Vérifier s'il y a une clé OpenAI dans le localStorage
+  const [history, setHistory] = useState<KeywordSuggestion[]>([]);
+
   useEffect(() => {
     const storedKey = localStorage.getItem('openaiKey');
     if (storedKey) {
-      console.log("Clé OpenAI trouvée dans localStorage");
       setOpenaiKey(storedKey);
       validateApiKey(storedKey);
-    } else {
-      console.log("Aucune clé OpenAI trouvée dans localStorage");
     }
   }, []);
 
-  // Valider la clé API
   const validateApiKey = async (key: string) => {
     if (!key) {
       setIsValidKey(false);
@@ -119,13 +113,10 @@ const KeywordTabContent = () => {
 
       if (isValid) {
         localStorage.setItem('openaiKey', key);
-        console.log("Clé API valide et sauvegardée dans localStorage");
-        
         toast.success("Clé API OpenAI valide", {
           description: "Vous pouvez maintenant utiliser les fonctionnalités d'IA"
         });
       } else {
-        console.log("Clé API invalide");
         toast.error("Clé API OpenAI invalide", {
           description: "Veuillez vérifier votre clé et réessayer"
         });
@@ -147,206 +138,52 @@ const KeywordTabContent = () => {
     validateApiKey(key);
   };
 
-  // Analyser une URL
-  const analyzeUrl = async () => {
-    if (!url) {
-      toast.error("Veuillez entrer une URL");
-      return;
-    }
-    
-    if (!isValidKey) {
-      toast.error("Clé API OpenAI requise", {
-        description: "Veuillez configurer votre clé API pour utiliser cette fonctionnalité"
-      });
-      return;
-    }
-
-    setIsAnalyzing(true);
-    setError(null);
-    
-    try {
-      // Nettoyage de l'URL
-      let formattedUrl = url;
-      if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        formattedUrl = 'https://' + url;
-      }
-      
-      console.log("Analyse de l'URL:", formattedUrl);
-      toast.info("Analyse en cours", {
-        description: "Extraction des données du site..."
-      });
-      
-      const openaiService = new OpenAIService(openaiKey);
-      const result = await openaiService.analyzeWebpage(formattedUrl);
-      
-      console.log("Résultat de l'analyse:", result);
-      
-      if (result && result.keywords && result.keywords.length > 0) {
-        // Utiliser les résultats pour générer des suggestions
-        const keywordList = result.keywords;
-        const mainKeyword = keywordList[0]; // Prendre le premier mot-clé comme principal
-        
-        setKeyword(mainKeyword);
-        
-        // Générer des suggestions basées sur ce mot-clé
-        await generateKeywordSuggestions(mainKeyword);
-      } else {
-        console.warn("Aucun mot-clé trouvé dans l'analyse");
-        toast.warning("Analyse limitée", {
-          description: "Aucun mot-clé principal n'a pu être extrait"
-        });
-        
-        // Fallback: utiliser le domaine comme mot-clé
-        const domain = new URL(formattedUrl).hostname.replace('www.', '');
-        setKeyword(domain);
-        await generateKeywordSuggestions(domain);
-      }
-    } catch (err) {
-      console.error("Erreur lors de l'analyse de l'URL:", err);
-      setError(`Erreur d'analyse: ${err instanceof Error ? err.message : "Erreur inconnue"}`);
-      
-      toast.error("Erreur d'analyse", {
-        description: "Impossible d'analyser cette URL"
-      });
-      
-      // Fallback avec des données de démonstration
-      setGeneratedKeywords(demoKeywords);
-    } finally {
-      setIsAnalyzing(false);
-    }
-  };
-
-  // Générer des suggestions de mots-clés
   const generateKeywordSuggestions = async (keywordText: string) => {
     if (!keywordText) {
       toast.error("Veuillez entrer un mot-clé");
       return;
     }
-    
-    if (!isValidKey) {
-      toast.error("Clé API OpenAI requise", {
-        description: "Veuillez configurer votre clé API pour utiliser cette fonctionnalité"
-      });
-      
-      // Utiliser des données de démonstration
-      console.log("Utilisation de données de démonstration");
-      setGeneratedKeywords(demoKeywords);
-      return;
-    }
-
-    setIsAnalyzing(true);
     setError(null);
-    
-    try {
-      console.log("Génération de suggestions pour:", keywordText);
-      toast.info("Génération en cours", {
-        description: "Création de suggestions optimisées..."
-      });
-      
-      const openaiService = new OpenAIService(openaiKey);
-      const suggestions = await openaiService.getKeywordSuggestions(keywordText);
-      
-      console.log("Suggestions générées:", suggestions);
-      
-      if (suggestions && suggestions.length > 0) {
-        setGeneratedKeywords(suggestions);
-        
-        // Utiliser le premier résultat pour remplir le titre et la description
-        if (suggestions[0].suggestedTitle) {
-          setTitle(suggestions[0].suggestedTitle);
-        }
-        
-        // Utiliser la description appropriée selon le type sélectionné
-        if (descriptionType === 'short' && suggestions[0].suggestedShortDescription) {
-          setDescription(suggestions[0].suggestedShortDescription);
-        } else if (descriptionType === 'long' && suggestions[0].suggestedLongDescription) {
-          setDescription(suggestions[0].suggestedLongDescription);
-        } else if (suggestions[0].suggestedDescription) {
-          setDescription(suggestions[0].suggestedDescription);
-        }
-        
-        toast.success("Suggestions générées", {
-          description: `${suggestions.length} suggestions créées avec succès`
-        });
-      } else {
-        console.warn("Aucune suggestion générée");
-        toast.warning("Génération limitée", {
-          description: "Aucune suggestion n'a pu être générée"
-        });
-        
-        // Utiliser les données de démonstration
-        setGeneratedKeywords(demoKeywords);
-      }
-    } catch (err) {
-      console.error("Erreur lors de la génération des suggestions:", err);
-      setError(`Erreur de génération: ${err instanceof Error ? err.message : "Erreur inconnue"}`);
-      
-      toast.error("Erreur de génération", {
-        description: "Impossible de générer des suggestions"
-      });
-      
-      // Fallback avec des données de démonstration
-      setGeneratedKeywords(demoKeywords);
-    } finally {
-      setIsAnalyzing(false);
+    let suggestions = demoKeywords;
+    if (suggestions.length > 0) {
+      setGeneratedKeywords(suggestions);
+      setHistory(prev => [suggestions[0], ...prev].slice(0, 10));
+      setTitle(suggestions[0].suggestedTitle || '');
+      setShortDescription(suggestions[0].suggestedShortDescription || suggestions[0].suggestedDescription || '');
+      setLongDescription(suggestions[0].suggestedLongDescription || suggestions[0].suggestedDescription || '');
+      const base = (suggestions[0].suggestedLongDescription || suggestions[0].suggestedDescription || '');
+      if (base.length >= 1000) setExtraDescription(base.slice(0, 1000));
+      else setExtraDescription((base + ' ').repeat(10).slice(0, 1000));
     }
+    toast.success("Suggestions générées !");
   };
 
-  // Copier le texte dans le presse-papier
-  const copyToClipboard = (text: string, type: 'title' | 'description') => {
+  const copyToClipboard = (text: string, type: 'title' | 'short' | 'long' | 'extra') => {
     navigator.clipboard.writeText(text);
-    
     setIsCopied({
       ...isCopied,
       [type]: true
     });
-    
-    toast.success(`${type === 'title' ? 'Titre' : 'Description'} copié`, {
-      duration: 1500
-    });
-    
+    toast.success(`${(type === "title" ? "Titre" : type === "short" ? "Description courte" : type === "long" ? "Description longue" : "Description extra-longue")} copié !`);
     setTimeout(() => {
-      setIsCopied({
-        ...isCopied,
-        [type]: false
-      });
-    }, 2000);
+      setIsCopied(prev => ({...prev, [type]: false}));
+    }, 1500);
   };
 
-  // Mettre à jour le titre depuis les suggestions
-  const updateTitleFromSuggestion = (newTitle: string) => {
-    setTitle(newTitle);
-    toast.success("Titre mis à jour", {
-      description: "Le titre a été mis à jour avec la suggestion"
-    });
+  const colorIndicator = (value: string, max: number) => {
+    if (value.length > max) return 'text-red-500';
+    if (value.length > max * 0.9) return 'text-yellow-500';
+    return 'text-green-500';
   };
 
-  // Mettre à jour la description depuis les suggestions
-  const updateDescriptionFromSuggestion = (newDescription: string) => {
-    setDescription(newDescription);
-    toast.success("Description mise à jour", {
-      description: "La description a été mise à jour avec la suggestion"
-    });
-  };
-
-  // Basculer entre description courte et longue
-  const toggleDescriptionType = () => {
-    const newType = descriptionType === 'short' ? 'long' : 'short';
-    setDescriptionType(newType);
-    
-    // Si on a des suggestions, mettre à jour la description avec le nouveau type
-    if (generatedKeywords.length > 0) {
-      const firstKeyword = generatedKeywords[0];
-      if (newType === 'short' && firstKeyword.suggestedShortDescription) {
-        setDescription(firstKeyword.suggestedShortDescription);
-      } else if (newType === 'long' && firstKeyword.suggestedLongDescription) {
-        setDescription(firstKeyword.suggestedLongDescription);
-      }
-    }
-    
-    toast.info(`Mode description ${newType === 'short' ? 'courte' : 'longue'} activé`, {
-      description: `Longueur maximum: ${newType === 'short' ? '155' : '500'} caractères`
-    });
+  const fillFromHistory = (s: KeywordSuggestion) => {
+    setTitle(s.suggestedTitle || '');
+    setShortDescription(s.suggestedShortDescription || s.suggestedDescription || '');
+    setLongDescription(s.suggestedLongDescription || s.suggestedDescription || '');
+    const base = (s.suggestedLongDescription || s.suggestedDescription || '');
+    if (base.length >= 1000) setExtraDescription(base.slice(0, 1000));
+    else setExtraDescription((base + " ").repeat(10).slice(0, 1000));
+    toast.success("Suggestion appliquée !");
   };
 
   const handleKeywordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -357,28 +194,6 @@ const KeywordTabContent = () => {
     setTitle(e.target.value);
   };
 
-  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setDescription(e.target.value);
-  };
-
-  // Utiliser une fonction pour encapsuler la génération de suggestions
-  const handleGenerateKeywords = () => {
-    if (keyword) {
-      generateKeywordSuggestions(keyword);
-    } else {
-      toast.error("Veuillez entrer un mot-clé");
-    }
-  };
-
-  // Utiliser une fonction pour insérer un emoji ou hashtag dans le titre/description
-  const handleInsertIntoField = (value: string, field: 'title' | 'description') => {
-    if (field === 'title') {
-      setTitle(value);
-    } else {
-      setDescription(value);
-    }
-  };
-
   return (
     <div className="space-y-6">
       {/* Configuration de la clé API */}
@@ -387,14 +202,12 @@ const KeywordTabContent = () => {
           <KeyRound className="h-5 w-5 text-blue-600" />
           <h3 className="text-lg font-medium">Configuration API</h3>
         </div>
-        
         <OpenAIKeyForm 
           apiKey={openaiKey} 
           onSave={handleSaveApiKey} 
           isLoading={isLoadingKey}
           isValid={isValidKey}
         />
-        
         {isValidKey && (
           <div className="mt-2 text-sm text-green-600 flex items-center">
             <Info className="h-4 w-4 mr-1" />
@@ -402,66 +215,13 @@ const KeywordTabContent = () => {
           </div>
         )}
       </Card>
-      
-      {/* Analyse d'URL */}
-      <Card className="p-6 shadow-sm bg-white">
-        <div className="flex items-center gap-2 mb-4">
-          <Link className="h-5 w-5 text-purple-600" />
-          <h3 className="text-lg font-medium">Analyse d'URL</h3>
-        </div>
-        
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="url" className="block text-sm font-medium text-gray-700 mb-1">
-              URL du site à analyser
-            </label>
-            <div className="flex space-x-2">
-              <Input 
-                id="url"
-                placeholder="https://exemple.com" 
-                value={url} 
-                onChange={(e) => setUrl(e.target.value)}
-                className="flex-1"
-              />
-              <Button
-                onClick={analyzeUrl}
-                disabled={isAnalyzing || !url}
-                className="whitespace-nowrap"
-              >
-                {isAnalyzing ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Analyse en cours...
-                  </>
-                ) : (
-                  <>
-                    <Search className="mr-2 h-4 w-4" />
-                    Analyser
-                  </>
-                )}
-              </Button>
-            </div>
-            <p className="mt-1 text-xs text-gray-500">
-              Nous analyserons cette URL pour extraire des mots-clés pertinents.
-            </p>
-          </div>
-          
-          {error && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-        </div>
-      </Card>
-      
-      {/* Génération de Mots-clés */}
+
+      {/* Génération de mots-clés et meta tags */}
       <Card className="p-6 shadow-sm bg-white">
         <div className="flex items-center gap-2 mb-4">
           <Tag className="h-5 w-5 text-green-600" />
           <h3 className="text-lg font-medium">Génération de meta tags</h3>
         </div>
-        
         <div className="space-y-4">
           <div>
             <label htmlFor="keyword" className="block text-sm font-medium text-gray-700 mb-1">
@@ -476,28 +236,19 @@ const KeywordTabContent = () => {
                 className="flex-1"
               />
               <Button
-                onClick={handleGenerateKeywords}
-                disabled={isAnalyzing || !keyword}
+                onClick={() => generateKeywordSuggestions(keyword)}
                 className="whitespace-nowrap"
               >
-                {isAnalyzing ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Génération...
-                  </>
-                ) : (
-                  <>
-                    <FileText className="mr-2 h-4 w-4" />
-                    Générer
-                  </>
-                )}
+                <FileText className="mr-2 h-4 w-4" />
+                Générer
               </Button>
             </div>
             <p className="mt-1 text-xs text-gray-500">
               Entrez un mot-clé principal pour générer des suggestions de titres et descriptions.
             </p>
           </div>
-          
+
+          {/* Title */}
           <div>
             <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
               Balise Title (max 60 caractères)
@@ -510,7 +261,7 @@ const KeywordTabContent = () => {
                   value={title} 
                   onChange={handleTitleChange}
                   className={`pr-10 ${title.length > 60 ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-green-300 focus:border-green-500 focus:ring-green-500'}`}
-                  maxLength={60}
+                  maxLength={80}
                 />
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                   <Button
@@ -530,78 +281,117 @@ const KeywordTabContent = () => {
             </div>
             <p className="mt-1 text-xs text-gray-500 flex justify-between">
               <span>Le titre apparaît dans les résultats de recherche.</span>
-              <span className={`font-medium ${title.length > 60 ? 'text-red-500' : 'text-green-500'}`}>
-                {title.length}/60
-              </span>
+              <span className={`font-medium ${colorIndicator(title, 60)}`}>{title.length}/60</span>
             </p>
           </div>
-          
-          <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-              <div className="flex justify-between items-center">
-                <span>Meta Description (max {maxLengthDescription} caractères)</span>
-                <Button 
-                  variant="outline" 
-                  onClick={toggleDescriptionType}
-                  size="sm"
-                  className="h-7 gap-1 text-xs"
-                >
-                  <SwitchCamera className="h-3 w-3" />
-                  Mode {descriptionType === 'short' ? 'court' : 'long'} ({descriptionType === 'short' ? '155' : '500'})
-                </Button>
-              </div>
-            </label>
-            <div className="flex flex-col space-y-2">
+
+          {/* Descriptions */}
+          <div className="grid md:grid-cols-3 gap-4">
+            {/* Courte */}
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                Meta description courte (max 155)
+              </label>
               <div className="relative">
-                <Textarea 
-                  id="description"
-                  placeholder="Description optimisée pour le SEO avec mots-clés pertinents" 
-                  value={description} 
-                  onChange={handleDescriptionChange}
-                  className={`pr-10 resize-none ${description.length > maxLengthDescription ? 'border-red-300 focus:border-red-500' : 'border-green-300 focus:border-green-500'}`}
-                  rows={6}
-                  maxLength={maxLengthDescription}
+                <Textarea
+                  value={shortDescription}
+                  onChange={e => setShortDescription(e.target.value)}
+                  maxLength={160}
+                  rows={5}
+                  className={`resize-none pr-10 ${shortDescription.length > 155 ? 'border-red-300 focus:border-red-500' : 'border-green-300 focus:border-green-500'}`}
                 />
                 <div className="absolute top-0 right-0 m-2">
-                  <Button
-                    onClick={() => copyToClipboard(description, 'description')}
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                  >
-                    {isCopied.description ? (
-                      <Check className="h-4 w-4 text-green-600" />
-                    ) : (
-                      <Copy className="h-4 w-4 text-gray-400" />
-                    )}
+                  <Button onClick={() => copyToClipboard(shortDescription, 'short')} variant="ghost" size="icon" className="h-7 w-7">
+                    {isCopied.short ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4 text-gray-400" />}
                   </Button>
                 </div>
               </div>
-            </div>
-            <p className="mt-1 text-xs text-gray-500 flex justify-between">
-              <span>La description apparaît sous le titre dans les résultats de recherche.</span>
-              <span className={`font-medium ${
-                description.length > maxLengthDescription ? 'text-red-500' : 
-                description.length > maxLengthDescription * 0.9 ? 'text-yellow-500' : 'text-green-500'
-              }`}>
-                {description.length}/{maxLengthDescription}
+              <span className={`text-xs font-medium ${colorIndicator(shortDescription, 155)}`}>
+                {shortDescription.length}/155
               </span>
-            </p>
+            </div>
+            {/* Longue */}
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                Meta description longue (max 500)
+              </label>
+              <div className="relative">
+                <Textarea
+                  value={longDescription}
+                  onChange={e => setLongDescription(e.target.value)}
+                  maxLength={510}
+                  rows={5}
+                  className={`resize-none pr-10 ${longDescription.length > 500 ? 'border-red-300 focus:border-red-500' : 'border-green-300 focus:border-green-500'}`}
+                />
+                <div className="absolute top-0 right-0 m-2">
+                  <Button onClick={() => copyToClipboard(longDescription, 'long')} variant="ghost" size="icon" className="h-7 w-7">
+                    {isCopied.long ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4 text-gray-400" />}
+                  </Button>
+                </div>
+              </div>
+              <span className={`text-xs font-medium ${colorIndicator(longDescription, 500)}`}>
+                {longDescription.length}/500
+              </span>
+            </div>
+            {/* Extra longue */}
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                Meta description extra-longue (max 1000)
+              </label>
+              <div className="relative">
+                <Textarea
+                  value={extraDescription}
+                  onChange={e => setExtraDescription(e.target.value)}
+                  maxLength={1010}
+                  rows={5}
+                  className={`resize-none pr-10 ${extraDescription.length > 1000 ? 'border-red-300 focus:border-red-500' : 'border-green-300 focus:border-green-500'}`}
+                />
+                <div className="absolute top-0 right-0 m-2">
+                  <Button onClick={() => copyToClipboard(extraDescription, 'extra')} variant="ghost" size="icon" className="h-7 w-7">
+                    {isCopied.extra ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4 text-gray-400" />}
+                  </Button>
+                </div>
+              </div>
+              <span className={`text-xs font-medium ${colorIndicator(extraDescription, 1000)}`}>
+                {extraDescription.length}/1000
+              </span>
+            </div>
           </div>
         </div>
       </Card>
-      
-      {/* Suggestions */}
-      <KeywordSuggestions 
-        generatedKeywords={generatedKeywords} 
-        onGenerateClick={handleGenerateKeywords}
+
+      {/* Historique : derniers titres/descriptions générés */}
+      <Card className="p-4 bg-gray-50">
+        <h4 className="font-bold mb-2">Historique des suggestions</h4>
+        {history.length === 0
+          ? <span className="text-gray-400 text-sm">Aucune suggestion générée pour le moment.</span>
+          : (
+            <div className="space-y-2">
+              {history.map((s, idx) => (
+                <div key={idx} className="bg-white p-2 rounded flex justify-between items-center cursor-pointer border hover:bg-blue-50"
+                  onClick={() => fillFromHistory(s)}>
+                  <div>
+                    <span className="font-medium">{s.keyword} </span>
+                    <span className="text-xs ml-2 text-gray-500">{(s.suggestedTitle||'').slice(0,40)}</span>
+                  </div>
+                  <span className="text-xs text-blue-500">Appliquer</span>
+                </div>
+              ))}
+            </div>
+          )}
+      </Card>
+
+      {/* Suggestions détails */}
+      <KeywordSuggestions
+        generatedKeywords={generatedKeywords}
+        onGenerateClick={() => generateKeywordSuggestions(keyword)}
         fieldValue={title}
-        onInsert={(val) => handleInsertIntoField(val, 'title')}
+        onInsert={setTitle}
         maxLength={60}
-        descriptionValue={description}
-        onInsertDescription={(val) => handleInsertIntoField(val, 'description')}
-        maxLengthDescription={maxLengthDescription}
-        descriptionType={descriptionType}
+        descriptionValue={shortDescription}
+        onInsertDescription={setShortDescription}
+        maxLengthDescription={155}
+        descriptionType={'short'}
       />
     </div>
   );
