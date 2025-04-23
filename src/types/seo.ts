@@ -61,12 +61,32 @@ export interface SeoAnalysis {
   contentQuality?: { readingTime: number; complexity: number };
   searchConsole?: { clicks: number; impressions: number };
   keywordSuggestions?: KeywordSuggestion[];
+  
+  // Ajouts pour compatibilité avec les composants
+  backlinkDetails?: BacklinkInfo[];
+  topBacklinkDomains?: string[];
+  doFollowBacklinks?: number;
+  noFollowBacklinks?: number;
+  organicTraffic?: number;
+  readabilityScore?: number;
+  topKeywords?: KeywordData[];
+  socialMetrics?: SocialMetrics;
+  mobileAnalysis?: any;
+  imgWithoutAlt?: number;
+  metaTagsAnalysis?: any;
+  imagesDetails?: ImageDetails[];
+  socialTags?: Record<string, string>;
+  brokenLinks?: any[];
 }
 
 export interface SeoAnalysisResult {
   success: boolean;
   data?: SeoAnalysis;
   error?: string;
+  backlinks?: BacklinkInfo[];
+  authorityScore?: number;
+  doFollowBacklinks?: number;
+  noFollowBacklinks?: number;
 }
 
 export interface MetaTagsAnalysis {
@@ -102,7 +122,12 @@ export interface Performance {
   responseTime?: number;
   impressions?: number;
   clickThroughRate?: number;
-  domLoadTime: number; // Changement: domLoadTime requis
+  domLoadTime: number;
+  
+  // Propriétés supplémentaires
+  score?: number;
+  resourceCount?: number;
+  imageCount?: number;
 }
 
 export interface SeoIssue {
@@ -161,6 +186,7 @@ export interface HierarchyItem {
   level: number;
   children?: HierarchyItem[];
   tagName?: string; // Ajouté pour compatibilité
+  text?: string; // Ajouté pour compatibilité
 }
 
 export interface KeywordData {
@@ -206,11 +232,14 @@ export interface SocialMetrics {
     shares: number;
     comments: number;
     likes: number;
+    engagements?: number; // Ajouté pour compatibilité
   };
   twitter: {
     tweets: number;
     retweets: number;
     likes: number;
+    shares?: number; // Ajouté pour compatibilité
+    replies?: number; // Ajouté pour compatibilité
   };
   linkedin: {
     shares: number;

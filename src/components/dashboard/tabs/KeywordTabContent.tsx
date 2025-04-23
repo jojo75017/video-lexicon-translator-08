@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -86,7 +87,7 @@ const KeywordTabContent = () => {
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   const [generatedKeywords, setGeneratedKeywords] = useState<KeywordSuggestion[]>([]);
-  const [isCopied, setIsCopied] = useState<{title: boolean, description: boolean}>({title: false, description: boolean});
+  const [isCopied, setIsCopied] = useState<{title: boolean, description: boolean}>({title: false, description: false});
   const [error, setError] = useState<string | null>(null);
   const [descriptionType, setDescriptionType] = useState<'short' | 'long'>('short');
   const maxLengthDescription = descriptionType === 'short' ? 155 : 500;
