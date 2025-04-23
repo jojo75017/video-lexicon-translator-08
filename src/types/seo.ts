@@ -99,6 +99,7 @@ export interface MetaTagsAnalysis {
   socialTags: Record<string, string>;
   hasTitleTag?: boolean;
   hasDescriptionTag?: boolean;
+  hasOpenGraphTags?: boolean; // Ajouté pour compatibilité
 }
 
 export interface Performance {
@@ -129,6 +130,7 @@ export interface Performance {
   score?: number;
   resourceCount?: number;
   imageCount?: number;
+  cacheLifetime?: number; // Ajouté pour compatibilité
 }
 
 export interface SeoIssue {
@@ -149,6 +151,7 @@ export interface ImageAnalysis {
   format?: string;
   isOptimized?: boolean;
   optimizationSuggestions?: string[];
+  dimensions?: any; // Ajouté pour compatibilité
 }
 
 export interface ImageDetails extends ImageAnalysis {
@@ -165,13 +168,14 @@ export interface BacklinkInfo {
   url: string;
   anchorText: string;
   domainAuthority: number;
-  isDofollow: boolean;
+  isDofollow: boolean; // correction de isDoFollow -> isDofollow
   firstDetected: string;
   lastDetected: string;
   domain?: string; // Ajouté pour compatibilité
   authority?: number; // Ajouté pour compatibilité
   firstSeen?: string; // Ajouté pour compatibilité
   followType?: string; // Ajouté pour compatibilité
+  date?: string; // Ajouté pour compatibilité
 }
 
 export interface HeadingStructure {
@@ -185,6 +189,7 @@ export interface HeadingStructure {
   h2Count?: number;
   h3Count?: number;
   hierarchy?: HierarchyItem[];
+  headings?: any[]; // Ajouté pour compatibilité
 }
 
 export interface HierarchyItem {
@@ -234,6 +239,8 @@ export interface SearchConsoleData {
   impressions?: number; // Ajouté pour compatibilité
   keywords?: any[]; // Ajouté pour compatibilité
   topPages?: any[]; // Ajouté pour compatibilité
+  ctr?: number; // Ajouté pour compatibilité
+  topQueries?: any[]; // Ajouté pour compatibilité
 }
 
 export interface SocialMetrics {

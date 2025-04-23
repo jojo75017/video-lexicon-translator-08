@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -261,7 +262,7 @@ const KeywordTabContent = () => {
                   value={title} 
                   onChange={handleTitleChange}
                   className={`pr-10 ${title.length > 60 ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : 'border-green-300 focus:border-green-500 focus:ring-green-500'}`}
-                  maxLength={80}
+                  maxLength={60}
                 />
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                   <Button
