@@ -296,7 +296,7 @@ const KeywordTabContent = () => {
                 <Textarea
                   value={shortDescription}
                   onChange={e => setShortDescription(e.target.value)}
-                  maxLength={160}
+                  maxLength={155}
                   rows={5}
                   className={`resize-none pr-10 ${shortDescription.length > 155 ? 'border-red-300 focus:border-red-500' : 'border-green-300 focus:border-green-500'}`}
                 />
@@ -319,7 +319,7 @@ const KeywordTabContent = () => {
                 <Textarea
                   value={longDescription}
                   onChange={e => setLongDescription(e.target.value)}
-                  maxLength={510}
+                  maxLength={500}
                   rows={5}
                   className={`resize-none pr-10 ${longDescription.length > 500 ? 'border-red-300 focus:border-red-500' : 'border-green-300 focus:border-green-500'}`}
                 />
@@ -342,7 +342,7 @@ const KeywordTabContent = () => {
                 <Textarea
                   value={extraDescription}
                   onChange={e => setExtraDescription(e.target.value)}
-                  maxLength={1010}
+                  maxLength={1000}
                   rows={5}
                   className={`resize-none pr-10 ${extraDescription.length > 1000 ? 'border-red-300 focus:border-red-500' : 'border-green-300 focus:border-green-500'}`}
                 />

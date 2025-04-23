@@ -59,12 +59,12 @@ export interface SeoAnalysis {
   headingStructure?: { hierarchy?: HierarchyItem[] };
   technicalSuggestions?: string[];
   contentQuality?: { readingTime: number; complexity: number };
-  searchConsole?: { clicks: number; impressions: number };
+  searchConsole?: { clicks: number; impressions: number; position?: number; keywords?: any[]; topPages?: any[] };
   keywordSuggestions?: KeywordSuggestion[];
   
   // Ajouts pour compatibilité avec les composants
   backlinkDetails?: BacklinkInfo[];
-  topBacklinkDomains?: string[];
+  topBacklinkDomains?: {domain: string; count: number}[];
   doFollowBacklinks?: number;
   noFollowBacklinks?: number;
   organicTraffic?: number;
@@ -77,6 +77,7 @@ export interface SeoAnalysis {
   imagesDetails?: ImageDetails[];
   socialTags?: Record<string, string>;
   brokenLinks?: any[];
+  backlinks?: BacklinkInfo[];
 }
 
 export interface SeoAnalysisResult {
@@ -150,13 +151,14 @@ export interface ImageAnalysis {
   optimizationSuggestions?: string[];
 }
 
-export interface ImageDetails {
+export interface ImageDetails extends ImageAnalysis {
   url: string;
   alt: string;
   width: number;
   height: number;
   size: number;
   format: string;
+  hasAlt: boolean;
 }
 
 export interface BacklinkInfo {
@@ -169,6 +171,7 @@ export interface BacklinkInfo {
   domain?: string; // Ajouté pour compatibilité
   authority?: number; // Ajouté pour compatibilité
   firstSeen?: string; // Ajouté pour compatibilité
+  followType?: string; // Ajouté pour compatibilité
 }
 
 export interface HeadingStructure {
@@ -178,6 +181,10 @@ export interface HeadingStructure {
   h4: string[];
   h5: string[];
   h6: string[];
+  h1Count?: number;
+  h2Count?: number;
+  h3Count?: number;
+  hierarchy?: HierarchyItem[];
 }
 
 export interface HierarchyItem {
@@ -187,6 +194,7 @@ export interface HierarchyItem {
   children?: HierarchyItem[];
   tagName?: string; // Ajouté pour compatibilité
   text?: string; // Ajouté pour compatibilité
+  position?: number; // Ajouté pour compatibilité
 }
 
 export interface KeywordData {
@@ -197,6 +205,7 @@ export interface KeywordData {
   relevance: number;
   count?: number; // Ajouté pour compatibilité
   density?: number; // Ajouté pour compatibilité
+  position?: number; // Ajouté pour compatibilité
 }
 
 export interface SearchConsoleData {
