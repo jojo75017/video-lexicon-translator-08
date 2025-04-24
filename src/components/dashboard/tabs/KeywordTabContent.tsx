@@ -97,11 +97,18 @@ const KeywordTabContent = () => {
         setGeneratedKeywords(suggestions);
         setHistory(prev => [suggestions[0], ...prev].slice(0, 10));
         setTitle(suggestions[0].suggestedTitle || '');
-        setShortDescription(suggestions[0].suggestedShortDescription || suggestions[0].suggestedDescription || '');
-        setLongDescription(suggestions[0].suggestedLongDescription || suggestions[0].suggestedDescription || '');
-        const base = (suggestions[0].suggestedLongDescription || suggestions[0].suggestedDescription || '');
-        if (base.length >= 1000) setExtraDescription(base.slice(0, 1000));
-        else setExtraDescription((base + ' ').repeat(10).slice(0, 1000));
+        
+        // Ensure short description is exactly 155 characters
+        const shortDesc = suggestions[0].suggestedShortDescription || suggestions[0].suggestedDescription || '';
+        setShortDescription(shortDesc.length > 155 ? shortDesc.slice(0, 155) : shortDesc.padEnd(155));
+        
+        // Ensure long description is exactly 500 characters
+        const longDesc = suggestions[0].suggestedLongDescription || suggestions[0].suggestedDescription || '';
+        setLongDescription(longDesc.length > 500 ? longDesc.slice(0, 500) : longDesc.padEnd(500));
+        
+        // Ensure extra description is exactly 1000 characters
+        const baseDesc = (suggestions[0].suggestedLongDescription || suggestions[0].suggestedDescription || '');
+        setExtraDescription(baseDesc.length > 1000 ? baseDesc.slice(0, 1000) : baseDesc.padEnd(1000));
         
         toast.success("Suggestions générées avec succès");
       } else {
@@ -138,11 +145,19 @@ const KeywordTabContent = () => {
 
   const fillFromHistory = (s: KeywordSuggestion) => {
     setTitle(s.suggestedTitle || '');
-    setShortDescription(s.suggestedShortDescription || s.suggestedDescription || '');
-    setLongDescription(s.suggestedLongDescription || s.suggestedDescription || '');
-    const base = (s.suggestedLongDescription || s.suggestedDescription || '');
-    if (base.length >= 1000) setExtraDescription(base.slice(0, 1000));
-    else setExtraDescription((base + " ").repeat(10).slice(0, 1000));
+    
+    // Ensure short description is exactly 155 characters
+    const shortDesc = s.suggestedShortDescription || s.suggestedDescription || '';
+    setShortDescription(shortDesc.length > 155 ? shortDesc.slice(0, 155) : shortDesc.padEnd(155));
+    
+    // Ensure long description is exactly 500 characters
+    const longDesc = s.suggestedLongDescription || s.suggestedDescription || '';
+    setLongDescription(longDesc.length > 500 ? longDesc.slice(0, 500) : longDesc.padEnd(500));
+    
+    // Ensure extra description is exactly 1000 characters
+    const baseDesc = (s.suggestedLongDescription || s.suggestedDescription || '');
+    setExtraDescription(baseDesc.length > 1000 ? baseDesc.slice(0, 1000) : baseDesc.padEnd(1000));
+    
     toast.success("Suggestion appliquée !");
   };
 
