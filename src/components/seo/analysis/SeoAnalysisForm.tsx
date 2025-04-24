@@ -1,10 +1,11 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, AlertCircle, Loader2, Shield } from "lucide-react";
+import { Search, AlertCircle, Loader2, Shield, Globe } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
+import { OpenAIService } from '@/utils/seo/openaiService';
 
 interface SeoAnalysisFormProps {
   url: string;
@@ -25,16 +26,21 @@ const SeoAnalysisForm = ({
   error,
   handleActivateProxy
 }: SeoAnalysisFormProps) => {
+  const [proxyEnabled, setProxyEnabled] = useState<boolean>(false);
   
-  // Debug props
+  // Vérifier si le proxy est déjà activé au chargement
   useEffect(() => {
+    setProxyEnabled(OpenAIService.isProxyEnabled());
+    
+    // Debug props
     console.log("SeoAnalysisForm props:", { 
       url, 
       isLoading, 
       showCorsWarning, 
       analyzeSite: !!analyzeSite, 
       error, 
-      handleActivateProxy: !!handleActivateProxy 
+      handleActivateProxy: !!handleActivateProxy,
+      proxyEnabled: OpenAIService.isProxyEnabled()
     });
   }, [url, isLoading, showCorsWarning, analyzeSite, error, handleActivateProxy]);
 
@@ -64,7 +70,16 @@ const SeoAnalysisForm = ({
     e.preventDefault();
     e.stopPropagation();
     console.log("Proxy button clicked manually");
-    handleActivateProxy();
+    
+    // Activer le proxy dans le service OpenAI
+    OpenAIService.enableProxy();
+    setProxyEnabled(true);
+    
+    // Appeler la fonction fournie par le parent
+    if (handleActivateProxy) {
+      handleActivateProxy();
+    }
+    
     toast.success("Proxy CORS activé", {
       description: "Vous pouvez maintenant analyser des sites externes"
     });
@@ -79,16 +94,6 @@ const SeoAnalysisForm = ({
       }
       analyzeSite();
     }
-  };
-
-  // Préparation de l'URL (ajout du protocole si absent)
-  const formatUrl = (inputUrl: string) => {
-    if (!inputUrl) return '';
-    
-    if (!inputUrl.startsWith('http://') && !inputUrl.startsWith('https://')) {
-      return 'https://' + inputUrl;
-    }
-    return inputUrl;
   };
 
   const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -107,15 +112,43 @@ const SeoAnalysisForm = ({
         </p>
       </div>
 
+      {/* Bouton pour activer le proxy CORS (toujours visible) */}
+      <div className="mb-4 p-3 border border-amber-200 bg-amber-50 rounded-md flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          <Shield className="h-5 w-5 text-amber-500" />
+          <div>
+            <p className="font-medium text-amber-800">Proxy CORS</p>
+            <p className="text-sm text-amber-700">
+              {proxyEnabled 
+                ? "Le proxy CORS est activé. Vous pouvez analyser des sites externes." 
+                : "Activez le proxy CORS pour analyser des sites externes."}
+            </p>
+          </div>
+        </div>
+        <Button 
+          type="button" 
+          onClick={handleProxyClick}
+          variant={proxyEnabled ? "outline" : "default"}
+          size="sm"
+          className={proxyEnabled 
+            ? "border-green-300 bg-green-50 text-green-700 hover:bg-green-100" 
+            : "bg-amber-600 hover:bg-amber-700 text-white"}
+        >
+          <Shield className="mr-2 h-4 w-4" />
+          {proxyEnabled ? "Proxy activé ✓" : "Activer le proxy"}
+        </Button>
+      </div>
+
       <div className="flex flex-col sm:flex-row gap-4">
-        <div className="flex-1">
+        <div className="flex-1 relative">
+          <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
             type="url"
             placeholder="https://exemple.com"
             value={url}
             onChange={handleUrlChange}
             onKeyPress={handleKeyPress}
-            className="w-full"
+            className="w-full pl-10"
           />
         </div>
         <Button 
@@ -141,7 +174,21 @@ const SeoAnalysisForm = ({
       {error && (
         <Alert variant="destructive" className="mt-4">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
+          <AlertDescription className="flex items-center justify-between">
+            <span>{error}</span>
+            {(error.includes("CORS") || error.includes("connexion") || error.includes("Failed to fetch")) && (
+              <Button 
+                variant="outline" 
+                onClick={handleProxyClick}
+                type="button"
+                size="sm"
+                className="ml-2 bg-red-100 text-red-800 border-red-300 hover:bg-red-200"
+              >
+                <Shield className="mr-2 h-4 w-4" />
+                Activer le proxy
+              </Button>
+            )}
+          </AlertDescription>
         </Alert>
       )}
 

@@ -3,15 +3,49 @@ import { KeywordSuggestion, OpenAIKeywordResponse } from '@/types/seo';
 
 export class OpenAIService {
   private apiKey: string;
+  private static proxyEnabled: boolean = false;
+  private static proxyUrl: string = 'https://corsproxy.io/?';
   
   constructor(apiKey: string) {
     this.apiKey = apiKey;
   }
   
+  // Méthodes statiques pour gérer le proxy
+  static enableProxy(): void {
+    OpenAIService.proxyEnabled = true;
+    console.log("Proxy CORS activé dans OpenAIService");
+    localStorage.setItem('openai_proxy_enabled', 'true');
+  }
+  
+  static disableProxy(): void {
+    OpenAIService.proxyEnabled = false;
+    console.log("Proxy CORS désactivé dans OpenAIService");
+    localStorage.setItem('openai_proxy_enabled', 'false');
+  }
+  
+  static isProxyEnabled(): boolean {
+    const savedState = localStorage.getItem('openai_proxy_enabled');
+    if (savedState !== null) {
+      return savedState === 'true';
+    }
+    return OpenAIService.proxyEnabled;
+  }
+  
+  // Applique le proxy à l'URL si nécessaire
+  private static applyProxy(url: string): string {
+    if (OpenAIService.isProxyEnabled()) {
+      return OpenAIService.proxyUrl + encodeURIComponent(url);
+    }
+    return url;
+  }
+  
   // Méthode pour valider la clé API
   async validateApiKey(): Promise<boolean> {
     try {
-      const response = await fetch('https://api.openai.com/v1/models', {
+      const url = 'https://api.openai.com/v1/models';
+      const finalUrl = OpenAIService.applyProxy(url);
+      
+      const response = await fetch(finalUrl, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${this.apiKey}`,
@@ -33,7 +67,10 @@ export class OpenAIService {
       
       const prompt = `Analyse cette URL: ${url}. Extrait les mots-clés importants pour le SEO.`;
       
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      const apiUrl = 'https://api.openai.com/v1/chat/completions';
+      const finalApiUrl = OpenAIService.applyProxy(apiUrl);
+      
+      const response = await fetch(finalApiUrl, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${this.apiKey}`,
@@ -104,8 +141,11 @@ Format en JSON comme ceci:
 ]
 
 Assure-toi que les descriptions font EXACTEMENT le nombre de caractères demandé.`;
+
+      const apiUrl = 'https://api.openai.com/v1/chat/completions';
+      const finalApiUrl = OpenAIService.applyProxy(apiUrl);
       
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      const response = await fetch(finalApiUrl, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${this.apiKey}`,
@@ -165,7 +205,10 @@ Assure-toi que les descriptions font EXACTEMENT le nombre de caractères demand�
   
   async analyzeSeoContent(url: string, content: string): Promise<any> {
     try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      const apiUrl = 'https://api.openai.com/v1/chat/completions';
+      const finalApiUrl = OpenAIService.applyProxy(apiUrl);
+      
+      const response = await fetch(finalApiUrl, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${this.apiKey}`,
