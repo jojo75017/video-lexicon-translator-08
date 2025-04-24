@@ -1,11 +1,40 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import OpenAIKeyForm from './OpenAIKeyForm';
 import { Cog, Wrench, Key, Lock } from 'lucide-react';
+import { useSiteAnalyzer } from '@/hooks/useSiteAnalyzer';
 
 const AnalysisSettings = () => {
+  const [apiKey, setApiKey] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isValidKey, setIsValidKey] = useState<boolean>(false);
+  const { saveApiKey, validateApiKey } = useSiteAnalyzer();
+
+  useEffect(() => {
+    const storedKey = localStorage.getItem('openaiKey');
+    if (storedKey) {
+      setApiKey(storedKey);
+      setIsValidKey(true);
+    }
+  }, []);
+
+  const handleSaveApiKey = async (key: string) => {
+    if (!key) return;
+    
+    setIsLoading(true);
+    try {
+      const isValid = await validateApiKey(key);
+      setIsValidKey(isValid);
+      if (isValid) {
+        saveApiKey(key);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <Card className="p-6">
       <div className="flex items-center justify-between mb-6">
@@ -28,7 +57,12 @@ const AnalysisSettings = () => {
         </TabsList>
         
         <TabsContent value="api" className="space-y-6">
-          <OpenAIKeyForm />
+          <OpenAIKeyForm 
+            apiKey={apiKey} 
+            onSave={handleSaveApiKey} 
+            isLoading={isLoading} 
+            isValid={isValidKey} 
+          />
           
           <Card className="p-6 bg-gray-50 border border-gray-200">
             <h3 className="text-lg font-bold mb-4 flex items-center">

@@ -13,9 +13,17 @@ export const useSiteAnalyzer = () => {
   const [resources, setResources] = useState<any>(null);
   const [siteStructure, setSiteStructure] = useState<any>(null);
   const [proxyEnabled, setProxyEnabled] = useState<boolean>(false);
+  const [apiKey, setApiKey] = useState<string>('');
 
-  // Vérifier l'état du proxy au chargement
+  // Vérifier l'état du proxy et charger la clé API au chargement
   useEffect(() => {
+    // Récupérer la clé API stockée
+    const storedApiKey = localStorage.getItem('openaiKey');
+    if (storedApiKey) {
+      setApiKey(storedApiKey);
+      console.log("API key loaded from localStorage");
+    }
+
     const isProxyEnabled = OpenAIService.isProxyEnabled() || FirecrawlService.isProxyEnabled();
     setProxyEnabled(isProxyEnabled);
     
@@ -23,7 +31,8 @@ export const useSiteAnalyzer = () => {
     console.log("useSiteAnalyzer - État initial du proxy:", {
       openAIProxy: OpenAIService.isProxyEnabled(),
       firecrawlProxy: FirecrawlService.isProxyEnabled(),
-      combined: isProxyEnabled
+      combined: isProxyEnabled,
+      apiKey: storedApiKey ? "API key found" : "No API key"
     });
     
     // Debug logs
@@ -32,6 +41,48 @@ export const useSiteAnalyzer = () => {
     console.log("Loading state:", isLoading);
     console.log("Error:", error);
   }, [url, seoAnalysis, isLoading, error]);
+
+  // Fonction pour sauvegarder la clé API
+  const saveApiKey = useCallback((key: string) => {
+    if (!key) return;
+    
+    localStorage.setItem('openaiKey', key);
+    setApiKey(key);
+    
+    toast.success("Clé API sauvegardée", {
+      description: "Votre clé API a été sauvegardée localement",
+    });
+    
+    console.log("API key saved to localStorage");
+  }, []);
+
+  // Valider la clé API
+  const validateApiKey = useCallback(async (key: string) => {
+    if (!key) {
+      return false;
+    }
+
+    try {
+      const openaiService = new OpenAIService(key);
+      const isValid = await openaiService.validateApiKey();
+      
+      if (isValid) {
+        saveApiKey(key);
+        return true;
+      } else {
+        toast.error("Clé API OpenAI invalide", {
+          description: "Veuillez vérifier votre clé et réessayer"
+        });
+        return false;
+      }
+    } catch (err) {
+      console.error("Erreur lors de la validation de la clé API:", err);
+      toast.error("Erreur de validation", {
+        description: "Impossible de valider la clé API"
+      });
+      return false;
+    }
+  }, [saveApiKey]);
 
   // Fonction pour activer le proxy CORS
   const handleActivateProxy = useCallback(() => {
@@ -82,8 +133,8 @@ export const useSiteAnalyzer = () => {
 
     console.log(`Analyse du site: ${formattedUrl}`);
     
-    const apiKey = localStorage.getItem('openaiKey');
-    if (apiKey) {
+    const currentApiKey = apiKey || localStorage.getItem('openaiKey');
+    if (currentApiKey) {
       console.log("Clé OpenAI trouvée, analyse avec OpenAI activée");
     }
 
@@ -142,7 +193,7 @@ export const useSiteAnalyzer = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [url, proxyEnabled, handleActivateProxy]);
+  }, [url, proxyEnabled, handleActivateProxy, apiKey]);
 
   return {
     url,
@@ -153,7 +204,10 @@ export const useSiteAnalyzer = () => {
     analyzeSite,
     error,
     handleActivateProxy,
-    proxyEnabled
+    proxyEnabled,
+    apiKey,
+    saveApiKey,
+    validateApiKey
   };
 };
 
