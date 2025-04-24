@@ -9,6 +9,8 @@ import SeoResults from "@/components/SeoResults";
 import { useSiteAnalyzer } from '@/hooks/useSiteAnalyzer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AnalysisSettings from '@/components/settings/AnalysisSettings';
+import SeoAnalysisForm from '@/components/seo/analysis/SeoAnalysisForm';
+import { toast } from "sonner";
 
 const SeoPage = () => {
   const { 
@@ -27,6 +29,16 @@ const SeoPage = () => {
     // Debug log
     console.log("SeoPage - API Key status: ", apiKey ? "Présente" : "Absente");
   }, [apiKey]);
+
+  // Fonction pour activer le proxy depuis la page principale
+  const activateProxyHandler = () => {
+    if (handleActivateProxy) {
+      handleActivateProxy();
+      toast.success("Proxy CORS activé", {
+        description: "Vous pouvez maintenant analyser des sites externes"
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 pb-10">
@@ -60,7 +72,15 @@ const SeoPage = () => {
                 Cette analyse vous aidera à optimiser votre site pour les moteurs de recherche.
               </p>
               
-              <CrawlForm />
+              <SeoAnalysisForm
+                url={url}
+                setUrl={setUrl}
+                isLoading={isLoading}
+                showCorsWarning={showCorsWarning}
+                analyzeSite={analyzeSite}
+                error={error}
+                handleActivateProxy={activateProxyHandler}
+              />
               
               {seoAnalysis && <SeoResults seoAnalysis={seoAnalysis} />}
             </Card>

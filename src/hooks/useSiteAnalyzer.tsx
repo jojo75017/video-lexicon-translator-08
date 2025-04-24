@@ -4,7 +4,22 @@ import { toast } from "sonner";
 import { FirecrawlService } from '@/utils/FirecrawlService';
 import { OpenAIService } from '@/utils/seo/openaiService';
 
-export const useSiteAnalyzer = () => {
+export interface SiteAnalyzerResult {
+  url: string;
+  setUrl: (url: string) => void;
+  isLoading: boolean;
+  showCorsWarning: boolean;
+  seoAnalysis: any;
+  analyzeSite: () => void;
+  error: string | null;
+  handleActivateProxy: () => void;
+  proxyEnabled: boolean;
+  apiKey: string;
+  saveApiKey: (key: string) => void;
+  validateApiKey: (key: string) => Promise<boolean>;
+}
+
+export const useSiteAnalyzer = (): SiteAnalyzerResult => {
   const [url, setUrl] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,13 +49,7 @@ export const useSiteAnalyzer = () => {
       combined: isProxyEnabled,
       apiKey: storedApiKey ? "API key found" : "No API key"
     });
-    
-    // Debug logs
-    console.log("Current URL state:", url);
-    console.log("SEO Analysis:", seoAnalysis);
-    console.log("Loading state:", isLoading);
-    console.log("Error:", error);
-  }, [url, seoAnalysis, isLoading, error]);
+  }, []);
 
   // Fonction pour sauvegarder la clé API
   const saveApiKey = useCallback((key: string) => {
