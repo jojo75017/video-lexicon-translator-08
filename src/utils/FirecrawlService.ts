@@ -1,6 +1,4 @@
 
-// On met à jour uniquement les parties problématiques du service FirecrawlService
-
 import FirecrawlApp from '@mendable/firecrawl-js';
 
 interface ErrorResponse {
@@ -28,7 +26,8 @@ export class FirecrawlService {
   private static proxyUrls = [
     'https://corsproxy.io/?',
     'https://api.allorigins.win/raw?url=',
-    'https://cors-anywhere.herokuapp.com/'
+    'https://cors-anywhere.herokuapp.com/',
+    'https://cors.bridged.cc/'
   ];
 
   static saveApiKey(apiKey: string): void {
@@ -43,16 +42,22 @@ export class FirecrawlService {
 
   static enableProxy(): void {
     this.proxyEnabled = true;
+    localStorage.setItem('firecrawl_proxy_enabled', 'true');
     console.log('CORS proxy enabled');
   }
 
   static disableProxy(): void {
     this.proxyEnabled = false;
+    localStorage.setItem('firecrawl_proxy_enabled', 'false');
     console.log('CORS proxy disabled');
   }
 
   static isProxyEnabled(): boolean {
-    return this.proxyEnabled;
+    const savedSetting = localStorage.getItem('firecrawl_proxy_enabled');
+    if (savedSetting !== null) {
+      return savedSetting === 'true';
+    }
+    return this.proxyEnabled; // Utiliser la valeur par défaut si rien n'est enregistré
   }
 
   static async testApiKey(apiKey: string): Promise<boolean> {
@@ -70,260 +75,265 @@ export class FirecrawlService {
     }
   }
 
-  static async crawlWebsite(url: string, useProxy = false): Promise<{ success: boolean; error?: string; data?: any }> {
-    console.log(`Crawling website: ${url}, useProxy: ${useProxy || this.proxyEnabled}`);
+  static async crawlWebsite(url: string, useProxy = this.isProxyEnabled()): Promise<{ success: boolean; error?: string; data?: any }> {
+    console.log(`Crawling website: ${url}, useProxy: ${useProxy}`);
     
     // S'assurer que l'URL a un protocole
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
       url = 'https://' + url;
     }
     
-    // Vérifier si le proxy est activé manuellement ou via le paramètre
-    const shouldUseProxy = useProxy || this.proxyEnabled;
-    
-    // Si le proxy est activé, utiliser fetchWithProxy
-    if (shouldUseProxy) {
+    // Méthode de fetch avec proxy
+    if (useProxy) {
       try {
-        console.log('Using proxy method');
-        return this.fetchWithProxy(url);
-      } catch (error) {
-        console.error('Error fetching with proxy:', error);
-        // Fallback to API key method
-      }
-    }
-
-    // Méthode API key comme fallback ou méthode principale si le proxy n'est pas activé
-    const apiKey = this.getApiKey();
-    if (apiKey) {
-      try {
-        console.log('Using Firecrawl API with API key');
-        if (!this.firecrawlApp) {
-          this.firecrawlApp = new FirecrawlApp({ apiKey });
-        }
-
-        const crawlResponse = await this.firecrawlApp.crawlUrl(url, {
-          limit: 100,
-          scrapeOptions: {
-            formats: ['markdown', 'html'],
+        console.log('Using direct fetch with proxy method');
+        return await this.fetchWithProxy(url);
+      } catch (proxyError) {
+        console.error('Error with proxy fetch method:', proxyError);
+        
+        // Fallback to API key method if available
+        const apiKey = this.getApiKey();
+        if (apiKey) {
+          console.log('Falling back to Firecrawl API method after proxy failure');
+          try {
+            return await this.fetchWithApiKey(url, apiKey);
+          } catch (apiError) {
+            console.error('Error with API key method (fallback):', apiError);
+            throw apiError;
           }
-        }) as CrawlResponse;
-
-        if (!crawlResponse.success) {
-          console.error('Crawl failed:', (crawlResponse as ErrorResponse).error);
-          throw new Error((crawlResponse as ErrorResponse).error || 'Failed to crawl website');
-        }
-
-        console.log('Crawl successful:', crawlResponse);
-        
-        // Traiter les données pour assurer une structure cohérente
-        let processedData;
-        if (Array.isArray(crawlResponse.data) && crawlResponse.data.length > 0) {
-          processedData = crawlResponse.data[0];
         } else {
-          processedData = {
-            url: url,
-            sourceCode: "<html><body><p>No detailed content available</p></body></html>",
-            title: "Website Analysis",
-            meta: []
-          };
-        }
-        
-        return { 
-          success: true,
-          data: processedData 
-        };
-      } catch (error) {
-        console.error('Error during crawl with API key:', error);
-        // Fallback to proxy method if API key method fails and proxy wasn't already tried
-        if (!shouldUseProxy) {
-          console.log('Falling back to proxy method');
-          return this.fetchWithProxy(url);
-        } else {
-          throw error;
+          throw proxyError;
         }
       }
     } else {
-      // No API key, use proxy method if not already tried
-      if (!shouldUseProxy) {
-        console.log('No API key found, using proxy method');
-        return this.fetchWithProxy(url);
+      // Méthode API key directe
+      const apiKey = this.getApiKey();
+      if (apiKey) {
+        try {
+          console.log('Using Firecrawl API with API key');
+          return await this.fetchWithApiKey(url, apiKey);
+        } catch (error) {
+          console.error('Error with API key method:', error);
+          
+          // Si l'API échoue, essayons le proxy comme dernier recours
+          console.log('Falling back to proxy method after API key failure');
+          return await this.fetchWithProxy(url);
+        }
       } else {
-        throw new Error('No API key found and proxy method already failed');
+        // No API key, use proxy method
+        console.log('No API key found, using proxy method by default');
+        return await this.fetchWithProxy(url);
       }
     }
   }
 
-  private static async fetchWithProxy(url: string): Promise<{ success: boolean; error?: string; data?: any }> {
+  private static async fetchWithApiKey(url: string, apiKey: string): Promise<{ success: boolean; data?: any; error?: string }> {
     try {
-      console.log('Fetching with proxy', this.proxyEnabled ? 'enabled' : 'disabled');
-      
-      let sourceCode = null;
-      let error = null;
-      
-      // Essayer chaque proxy jusqu'à ce qu'un fonctionne
-      for (const proxy of this.proxyUrls) {
-        try {
-          const proxyUrl = proxy + encodeURIComponent(url);
-          console.log(`Trying proxy: ${proxyUrl}`);
-          
-          const response = await fetch(proxyUrl, {
-            method: 'GET',
-            headers: {
-              'Accept': 'text/html,application/xhtml+xml,application/xml',
-              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-            },
-            cache: 'no-cache'
-          });
-          
-          if (response.ok) {
-            console.log(`Proxy ${proxy} worked!`);
-            sourceCode = await response.text();
-            break;
-          } else {
-            console.warn(`Proxy ${proxy} returned status: ${response.status}`);
-          }
-        } catch (err) {
-          console.warn(`Error with proxy ${proxy}:`, err);
-          continue;
+      if (!this.firecrawlApp) {
+        this.firecrawlApp = new FirecrawlApp({ apiKey });
+      }
+
+      const crawlResponse = await this.firecrawlApp.crawlUrl(url, {
+        limit: 100,
+        scrapeOptions: {
+          formats: ['markdown', 'html'],
         }
+      }) as CrawlResponse;
+
+      if (!crawlResponse.success) {
+        console.error('Crawl failed with API key:', (crawlResponse as ErrorResponse).error);
+        return { 
+          success: false, 
+          error: (crawlResponse as ErrorResponse).error || 'Failed to crawl website with API key' 
+        };
+      }
+
+      console.log('Crawl successful with API key:', crawlResponse);
+      
+      // Traiter les données pour assurer une structure cohérente
+      let processedData;
+      if (Array.isArray(crawlResponse.data) && crawlResponse.data.length > 0) {
+        processedData = crawlResponse.data[0];
+      } else {
+        processedData = {
+          url: url,
+          sourceCode: "<html><body><p>No detailed content available from API</p></body></html>",
+          title: "Website Analysis",
+          meta: []
+        };
       }
       
-      if (!sourceCode) {
-        console.warn('All proxies failed, creating minimal demo data');
-        
-        // Extraire le domaine de l'URL
-        const domainMatch = url.match(/^(?:https?:\/\/)?(?:www\.)?([^:\/\n?]+)/);
-        const domain = domainMatch ? domainMatch[1] : url;
-        
-        // Créer des données minimales de démo quand tous les proxys échouent
-        sourceCode = `<!DOCTYPE html>
-<html>
-<head>
-  <title>${domain} - Demo Data</title>
-  <meta name="description" content="Demo data for ${domain}">
-</head>
-<body>
-  <h1>Demo Data for ${domain}</h1>
-  <h2>About This Page</h2>
-  <p>This is demo content generated because we couldn't fetch the original page.</p>
-  <h2>Why Am I Seeing This?</h2>
-  <p>The proxy servers couldn't access the original content due to CORS or connectivity issues.</p>
-  <h3>Try These Solutions</h3>
-  <p>1. Check your internet connection</p>
-  <p>2. Try a different URL</p>
-  <p>3. Try again later</p>
-</body>
-</html>`;
-      }
-      
+      return { success: true, data: processedData };
+    } catch (error) {
+      console.error('Error during crawl with API key:', error);
+      throw error;
+    }
+  }
+
+  private static async fetchWithProxy(url: string): Promise<{ success: boolean; error?: string; data?: any }> {
+    console.log('Fetching with proxy method', { url });
+    
+    let sourceCode = null;
+    let lastError = null;
+    
+    // Essayer chaque proxy jusqu'à ce qu'un fonctionne
+    for (const proxy of this.proxyUrls) {
       try {
-        // Extraire les métadonnées de base du HTML
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(sourceCode, 'text/html');
+        const proxyUrl = proxy + encodeURIComponent(url);
+        console.log(`Trying proxy: ${proxyUrl}`);
         
-        const title = doc.querySelector('title')?.textContent || url;
-        
-        // Traiter les titres avec un formatage de niveau approprié
-        const headingElements = [...doc.querySelectorAll('h1, h2, h3, h4, h5, h6')];
-        const headings = headingElements.map((el, index) => {
-          // Obtenir le niveau de titre à partir du nom de balise (h1, h2, etc.)
-          const levelFromTag = parseInt(el.tagName.charAt(1));
-          return { 
-            level: levelFromTag, 
-            text: el.textContent?.trim() || '', 
-            position: index
-          };
+        const response = await fetch(proxyUrl, {
+          method: 'GET',
+          headers: {
+            'Accept': 'text/html,application/xhtml+xml,application/xml',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          cache: 'no-cache',
+          mode: 'cors',
+          credentials: 'omit'
         });
         
-        // Extraire les balises meta
-        const meta = Array.from(doc.querySelectorAll('meta')).map(el => ({
-          name: el.getAttribute('name'),
-          property: el.getAttribute('property'),
-          content: el.getAttribute('content')
-        }));
-        
-        // Extraire les images
-        const images = Array.from(doc.querySelectorAll('img')).map(el => ({
-          src: el.getAttribute('src'),
-          alt: el.getAttribute('alt') || '',
-          width: el.getAttribute('width') || '',
-          height: el.getAttribute('height') || ''
-        }));
-        
-        // Extraire les paragraphes
-        const paragraphs = Array.from(doc.querySelectorAll('p')).map((el, index) => ({
-          text: el.textContent?.trim() || '',
-          position: index
-        }));
-        
-        // Extraire les liens
-        const links = Array.from(doc.querySelectorAll('a')).map(el => ({
-          href: el.getAttribute('href') || '#',
-          text: el.textContent?.trim() || '',
-          isInternal: !(el.getAttribute('href')?.startsWith('http') || false)
-        }));
-        
-        const result = {
-          url,
-          title,
-          headings,
-          meta,
-          images,
-          paragraphs,
-          links,
-          sourceCode,
-          textContent: doc.body?.textContent || ''
-        };
-        
-        return {
-          success: true,
-          data: result
-        };
-      } catch (parseError) {
-        console.error('Error parsing HTML:', parseError);
-        
-        // En cas d'erreur de parsing, retourner une structure minimale
-        const domainMatch = url.match(/^(?:https?:\/\/)?(?:www\.)?([^:\/\n?]+)/);
-        const domain = domainMatch ? domainMatch[1] : url;
-        
-        return {
-          success: true,
-          data: {
-            url,
-            title: domain || url,
-            headings: [{ level: 1, text: "Contenu non disponible", position: 0 }],
-            meta: [],
-            images: [],
-            paragraphs: [{ text: "Erreur lors de l'analyse du contenu", position: 0 }],
-            links: [],
-            sourceCode: "<html><body><h1>Contenu non disponible</h1></body></html>",
-            textContent: "Contenu non disponible"
-          }
-        };
+        if (response.ok) {
+          console.log(`Proxy ${proxy} worked!`);
+          sourceCode = await response.text();
+          break;
+        } else {
+          console.warn(`Proxy ${proxy} returned status: ${response.status}`);
+          lastError = `HTTP status: ${response.status} from proxy ${proxy}`;
+        }
+      } catch (err) {
+        console.warn(`Error with proxy ${proxy}:`, err);
+        lastError = err instanceof Error ? err.message : String(err);
+        continue;
       }
-    } catch (error) {
-      console.error('Error fetching with proxy:', error);
-      // Retourner une structure de réponse valide minimale même en cas d'erreur
-      const domainMatch = url.match(/^(?:https?:\/\/)?(?:www\.)?([^:\/\n?]+)/);
-      const domain = domainMatch ? domainMatch[1] : url;
+    }
+    
+    if (!sourceCode) {
+      console.warn('All proxies failed:', lastError);
+      
+      // Retourner une erreur claire indiquant que tous les proxies ont échoué
+      return {
+        success: false,
+        error: `Impossible de se connecter au site. Tous les proxies ont échoué. Dernière erreur: ${lastError}`
+      };
+    }
+    
+    try {
+      // Extraire les métadonnées de base du HTML
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(sourceCode, 'text/html');
+      
+      const title = doc.querySelector('title')?.textContent || url;
+      
+      // Traiter les titres avec un formatage de niveau approprié
+      const headingElements = [...doc.querySelectorAll('h1, h2, h3, h4, h5, h6')];
+      const headings = headingElements.map((el, index) => {
+        // Obtenir le niveau de titre à partir du nom de balise (h1, h2, etc.)
+        const levelFromTag = parseInt(el.tagName.charAt(1));
+        return { 
+          level: levelFromTag, 
+          text: el.textContent?.trim() || '', 
+          position: index
+        };
+      });
+      
+      // Extraire les balises meta
+      const meta = Array.from(doc.querySelectorAll('meta')).map(el => ({
+        name: el.getAttribute('name'),
+        property: el.getAttribute('property'),
+        content: el.getAttribute('content')
+      }));
+      
+      // Extraire les images
+      const images = Array.from(doc.querySelectorAll('img')).map(el => ({
+        src: el.getAttribute('src'),
+        alt: el.getAttribute('alt') || '',
+        width: el.getAttribute('width') || '',
+        height: el.getAttribute('height') || ''
+      }));
+      
+      // Extraire les paragraphes
+      const paragraphs = Array.from(doc.querySelectorAll('p')).map((el, index) => ({
+        text: el.textContent?.trim() || '',
+        position: index
+      }));
+      
+      // Extraire les liens
+      const links = Array.from(doc.querySelectorAll('a')).map(el => ({
+        href: el.getAttribute('href') || '#',
+        text: el.textContent?.trim() || '',
+        isExternal: !(el.getAttribute('href')?.startsWith('http') || false)
+      }));
+      
+      const result = {
+        url,
+        title,
+        headings,
+        meta,
+        images,
+        paragraphs,
+        links,
+        sourceCode,
+        textContent: doc.body?.textContent || ''
+      };
       
       return {
         success: true,
-        data: {
-          url,
-          title: domain || url,
-          headings: [
-            { level: 1, text: "Contenu de démonstration", position: 0 },
-            { level: 2, text: "Informations d'erreur", position: 1 }
-          ],
-          meta: [],
-          images: [],
-          links: [],
-          paragraphs: [{ text: "Erreur lors de la récupération du contenu", position: 0 }],
-          sourceCode: "<html><body><h1>Contenu de démonstration</h1><p>Erreur lors de la récupération du contenu</p></body></html>",
-          textContent: "Erreur lors de la récupération du contenu"
-        }
+        data: result
+      };
+    } catch (parseError) {
+      console.error('Error parsing HTML:', parseError);
+      return {
+        success: false,
+        error: `Erreur d'analyse du HTML: ${parseError instanceof Error ? parseError.message : 'Erreur inconnue'}`
       };
     }
+  }
+
+  // Méthode utilitaire pour tester la connectivité avec chaque proxy
+  static async testProxyConnectivity(): Promise<{ proxy: string; working: boolean; latency: number }[]> {
+    const testUrl = 'https://example.com';
+    const results = [];
+    
+    for (const proxy of this.proxyUrls) {
+      try {
+        const proxyUrl = proxy + encodeURIComponent(testUrl);
+        const startTime = Date.now();
+        
+        const response = await fetch(proxyUrl, { 
+          method: 'HEAD',
+          timeout: 5000,
+          mode: 'cors',
+          credentials: 'omit'
+        });
+        
+        const endTime = Date.now();
+        const latency = endTime - startTime;
+        
+        results.push({
+          proxy,
+          working: response.ok,
+          latency
+        });
+      } catch (error) {
+        results.push({
+          proxy,
+          working: false,
+          latency: -1
+        });
+      }
+    }
+    
+    // Trier par les proxies qui fonctionnent et par latence
+    return results.sort((a, b) => {
+      if (a.working === b.working) {
+        // Si les deux fonctionnent ou ne fonctionnent pas, trier par latence
+        if (!a.working) return 0; // Pour les non-fonctionnels, l'ordre n'importe pas
+        return a.latency - b.latency;
+      }
+      // Mettre les proxy fonctionnels en premier
+      return a.working ? -1 : 1;
+    });
   }
 }
