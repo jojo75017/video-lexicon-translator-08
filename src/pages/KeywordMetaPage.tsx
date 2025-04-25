@@ -13,19 +13,31 @@ const KeywordMetaPage = () => {
   
   // Initialiser les services au chargement de la page
   useEffect(() => {
-    // Activer les proxys CORS
-    if (!apiInitialized) {
-      OpenAIService.enableProxy();
+    // Activer les proxys CORS immédiatement
+    OpenAIService.enableProxy();
+    
+    // Vérifier si une clé API est disponible
+    const storedKey = localStorage.getItem('openaiKey');
+    console.log("Page KeywordMetaPage chargée, clé API OpenAI:", storedKey ? "trouvée" : "non trouvée");
+    
+    if (storedKey) {
+      // Si une clé existe, marquer l'API comme initialisée
+      setApiInitialized(true);
       
-      const storedKey = localStorage.getItem('openaiKey');
-      console.log("Page KeywordMetaPage chargée, clé API OpenAI:", storedKey ? "trouvée" : "non trouvée");
-      
-      // Simplement vérifier si une clé existe
-      if (storedKey) {
-        setApiInitialized(true);
+      // Vérifier le format de la clé
+      const hasValidFormat = storedKey.length > 20 && storedKey.startsWith('sk-');
+      if (!hasValidFormat) {
+        toast.warning("Format de clé API potentiellement invalide", {
+          description: "Veuillez vérifier votre clé OpenAI dans les paramètres"
+        });
       }
+    } else {
+      // Si aucune clé n'est trouvée, afficher un message d'information
+      toast.info("Configuration requise", {
+        description: "Veuillez configurer une clé API OpenAI pour utiliser toutes les fonctionnalités"
+      });
     }
-  }, [apiInitialized]);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 pb-10">

@@ -1,3 +1,4 @@
+
 import { KeywordSuggestion, OpenAIKeywordResponse } from '@/types/seo';
 
 export class OpenAIService {
@@ -13,7 +14,7 @@ export class OpenAIService {
   
   constructor(apiKey: string) {
     this.apiKey = apiKey || '';
-    console.log("OpenAIService initialisé avec une clé API", apiKey ? "valide" : "manquante");
+    console.log("OpenAIService initialisé avec une clé API", apiKey ? "présente" : "manquante");
   }
   
   // Méthodes statiques pour gérer le proxy
@@ -55,17 +56,22 @@ export class OpenAIService {
     return newProxy;
   }
   
+  // Vérifie rapidement si la clé API a un format valide
+  private isValidApiKeyFormat(): boolean {
+    return !!this.apiKey && this.apiKey.trim().length > 20 && this.apiKey.startsWith('sk-');
+  }
+  
   // Méthode pour valider la clé API
   async validateApiKey(): Promise<boolean> {
-    if (!this.apiKey || this.apiKey.trim() === '') {
-      console.log('Clé API vide ou non définie');
+    if (!this.isValidApiKeyFormat()) {
+      console.log('Clé API vide, trop courte ou format incorrect');
       return false;
     }
 
     console.log('Vérification de la clé API OpenAI:', this.apiKey.substring(0, 5) + "...");
 
     try {
-      console.log('Validating OpenAI API Key with proxy...');
+      console.log('Validation de la clé OpenAI avec proxy...');
       const url = 'https://api.openai.com/v1/models';
       const finalUrl = OpenAIService.applyProxy(url);
       
@@ -80,7 +86,7 @@ export class OpenAIService {
       });
       
       const isValid = response.status === 200;
-      console.log(`API key validation result: ${isValid ? 'Valid' : 'Invalid'} (Status: ${response.status})`);
+      console.log(`Résultat de validation de clé API: ${isValid ? 'Valide' : 'Invalide'} (Status: ${response.status})`);
       
       // Si la validation échoue, essayer un autre proxy
       if (!isValid && response.status === 0) {
@@ -90,7 +96,8 @@ export class OpenAIService {
       
       if (!isValid) {
         const responseText = await response.text();
-        console.error('Erreur de validation OpenAI:', responseText);
+        console.error('Erreur de validation OpenAI:', response.status, responseText);
+        throw new Error(`Validation échouée avec statut ${response.status}: ${responseText}`);
       }
       
       return isValid;
@@ -110,9 +117,9 @@ export class OpenAIService {
   
   // Méthode pour obtenir des suggestions de mots-clés
   async getKeywordSuggestions(keyword: string): Promise<KeywordSuggestion[]> {
-    if (!this.apiKey || this.apiKey.trim() === '') {
+    if (!this.isValidApiKeyFormat()) {
       console.error('Tentative d\'utilisation de getKeywordSuggestions sans clé API valide');
-      throw new Error('Clé API OpenAI non définie');
+      throw new Error('Clé API OpenAI non définie ou invalide');
     }
 
     if (!keyword || keyword.trim() === '') {
@@ -150,7 +157,7 @@ Assure-toi que les descriptions font EXACTEMENT le nombre de caractères demand�
       const apiUrl = 'https://api.openai.com/v1/chat/completions';
       const finalApiUrl = OpenAIService.applyProxy(apiUrl);
       
-      console.log("Sending OpenAI request to:", finalApiUrl, "with key:", this.apiKey ? "Key exists" : "No key");
+      console.log("Envoi de requête OpenAI à:", finalApiUrl);
       
       const response = await fetch(finalApiUrl, {
         method: 'POST',
@@ -177,19 +184,31 @@ Assure-toi que les descriptions font EXACTEMENT le nombre de caractères demand�
       
       if (!response.ok) {
         const errorText = await response.text();
-        console.error(`OpenAI API error: ${response.status}`, errorText);
+        console.error(`Erreur API OpenAI: ${response.status}`, errorText);
         
-        // Si erreur de CORS, essayer un autre proxy
+        // Si erreur de CORS ou connexion, essayer un autre proxy
         if (response.status === 0) {
           OpenAIService.rotateProxy();
           return this.getKeywordSuggestions(keyword);
         }
         
-        throw new Error(`Erreur API OpenAI: ${response.status}`);
+        // Message d'erreur plus précis selon le code d'état
+        if (response.status === 401) {
+          throw new Error(`Erreur d'authentification (401): Clé API invalide ou expirée`);
+        } else if (response.status === 429) {
+          throw new Error(`Limite de requêtes dépassée (429): Réessayez plus tard`);
+        } else {
+          throw new Error(`Erreur API OpenAI: ${response.status} - ${errorText.substring(0, 100)}`);
+        }
       }
       
       const data = await response.json();
-      console.log("OpenAI response received:", data.choices[0].message.content.substring(0, 100) + "...");
+      console.log("Réponse OpenAI reçue");
+      
+      if (!data.choices || !data.choices[0] || !data.choices[0].message || !data.choices[0].message.content) {
+        console.error("Format de réponse inattendu:", data);
+        throw new Error("La réponse API OpenAI est dans un format inattendu");
+      }
       
       const content = data.choices[0].message.content;
       
@@ -198,16 +217,21 @@ Assure-toi que les descriptions font EXACTEMENT le nombre de caractères demand�
       
       if (!jsonMatch) {
         console.error("Format de réponse invalide:", content);
-        throw new Error('Format de réponse invalide');
+        throw new Error('Format de réponse invalide: JSON non trouvé');
       }
       
       let keywordData;
       try {
         keywordData = JSON.parse(jsonMatch[0]) as OpenAIKeywordResponse[];
-        console.log("Parsed keyword data:", keywordData);
+        console.log("Données de mots-clés analysées:", keywordData.length, "suggestions");
       } catch (e) {
-        console.error("JSON parsing error:", e, "Raw response:", content);
-        throw new Error('Erreur de parsing JSON');
+        console.error("Erreur d'analyse JSON:", e, "Réponse brute:", content);
+        throw new Error('Erreur d\'analyse du format JSON');
+      }
+      
+      if (!Array.isArray(keywordData) || keywordData.length === 0) {
+        console.error("Données de mots-clés invalides:", keywordData);
+        throw new Error('Aucune suggestion de mot-clé n\'a été générée');
       }
       
       // Conversion vers le format KeywordSuggestion
@@ -219,7 +243,7 @@ Assure-toi que les descriptions font EXACTEMENT le nombre de caractères demand�
         suggestedDescription: item.suggestedDescription || `Découvrez notre guide complet sur ${keyword}. Conseils d'experts, astuces et stratégies éprouvées pour maximiser vos résultats.`.substring(0, 155),
         suggestedShortDescription: item.suggestedShortDescription || item.suggestedDescription || `Découvrez notre guide complet sur ${keyword}. Conseils d'experts, astuces et stratégies éprouvées pour maximiser vos résultats.`.substring(0, 155),
         suggestedLongDescription: item.suggestedLongDescription || `${item.suggestedDescription || `Plongez dans notre guide détaillé sur ${keyword}. Nos experts partagent leurs connaissances et meilleures pratiques pour vous aider à maîtriser ce sujet essentiel.`}`.substring(0, 500),
-        relevance: Math.floor(Math.random() * 30) + 70, // Valeur aléatoire entre 70 et 100
+        relevance: Math.floor(Math.random() * 30) + 70,
         competition: Math.random(),
         cpc: parseFloat((Math.random() * 3 + 0.5).toFixed(2)),
         volume: item.searchVolume || Math.floor(Math.random() * 10000)

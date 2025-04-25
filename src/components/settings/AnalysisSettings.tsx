@@ -6,6 +6,7 @@ import OpenAIKeyForm from './OpenAIKeyForm';
 import { Cog, Wrench, Key, Lock } from 'lucide-react';
 import { useSiteAnalyzer } from '@/hooks/useSiteAnalyzer';
 import { toast } from 'sonner';
+import { OpenAIService } from '@/utils/seo/openaiService';
 
 const AnalysisSettings = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -17,39 +18,72 @@ const AnalysisSettings = () => {
     // Récupérer la clé stockée lors du chargement du composant
     const storedKey = localStorage.getItem('openaiKey');
     if (storedKey) {
+      console.log("Clé OpenAI trouvée dans AnalysisSettings");
       setApiKey(storedKey);
-      setIsValidKey(true); // On présume que la clé stockée est valide
+      checkApiKeyFormat(storedKey);
     }
+    
+    // Activer le proxy par défaut
+    OpenAIService.enableProxy();
   }, []);
 
+  const checkApiKeyFormat = (key: string) => {
+    const hasValidFormat = key && key.length > 20 && key.startsWith('sk-');
+    setIsValidKey(hasValidFormat);
+    return hasValidFormat;
+  };
+
   const handleSaveApiKey = async (key: string) => {
-    if (!key) return;
+    if (!key) {
+      toast.error("Clé API manquante", {
+        description: "Veuillez entrer une clé API OpenAI valide"
+      });
+      return;
+    }
     
     setIsLoading(true);
     try {
-      // Vérifier explicitement que la clé a une longueur minimale
-      if (key.length < 20) {
-        toast.error("Clé API trop courte", {
-          description: "Veuillez vérifier votre clé OpenAI"
+      // Vérifier d'abord le format de la clé
+      const hasValidFormat = checkApiKeyFormat(key);
+      if (!hasValidFormat) {
+        toast.error("Format de clé API incorrect", {
+          description: "La clé doit commencer par 'sk-' et avoir une longueur suffisante"
         });
+        setIsLoading(false);
         return;
       }
       
-      console.log("Tentative de validation de la clé:", key.substring(0, 5) + "...");
+      console.log("Sauvegarde et validation de la clé API:", key.substring(0, 5) + "...");
       
-      // Sauvegarder la clé dans localStorage immédiatement pour éviter des problèmes de timing
+      // Sauvegarder la clé dans localStorage immédiatement
       localStorage.setItem('openaiKey', key);
       setApiKey(key);
       
-      toast.success("Clé API sauvegardée", {
-        description: "Votre clé API a été sauvegardée localement",
-      });
+      // S'assurer que le proxy est activé
+      OpenAIService.enableProxy();
       
-      setIsValidKey(true);
+      // Créer une instance OpenAIService pour valider la clé
+      const openaiService = new OpenAIService(key);
+      const isValid = await openaiService.validateApiKey();
+      
+      // Mettre à jour l'état de validation
+      setIsValidKey(isValid);
+      
+      if (isValid) {
+        toast.success("Clé API validée avec succès", {
+          description: "Votre clé API a été sauvegardée et validée"
+        });
+      } else {
+        toast.error("Clé API non valide", {
+          description: "La clé a été sauvegardée mais n'a pas pu être validée auprès d'OpenAI"
+        });
+      }
     } catch (error) {
       console.error("Erreur lors de la validation de la clé API:", error);
-      toast.error("Erreur de validation", {
-        description: "Impossible de valider la clé API. Vérifiez votre connexion internet."
+      
+      // Malgré l'erreur, on garde la clé stockée
+      toast.warning("Clé sauvegardée", {
+        description: "La clé a été sauvegardée mais n'a pas pu être validée en raison d'une erreur de connexion"
       });
     } finally {
       setIsLoading(false);

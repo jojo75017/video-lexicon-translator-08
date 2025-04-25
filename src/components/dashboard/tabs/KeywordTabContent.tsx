@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -33,7 +34,7 @@ const KeywordTabContent = () => {
     if (storedKey) {
       console.log("Clé OpenAI trouvée dans KeywordTabContent:", storedKey.substring(0, 5) + "...");
       setOpenaiKey(storedKey);
-      setIsValidKey(true); // Présumer que la clé stockée est valide
+      checkApiKey(storedKey);
     } else {
       console.log("Aucune clé OpenAI trouvée dans KeywordTabContent");
     }
@@ -42,6 +43,17 @@ const KeywordTabContent = () => {
     OpenAIService.enableProxy();
   }, []);
 
+  // Vérifier rapidement si une clé API existe sans faire de requête
+  const checkApiKey = (key: string) => {
+    if (key && key.length > 20 && key.startsWith('sk-')) {
+      setIsValidKey(true);
+      console.log("Clé API semble valide (format correct)");
+    } else {
+      setIsValidKey(false);
+      console.log("Clé API semble invalide (format incorrect)");
+    }
+  };
+
   // Valider la clé API
   const validateApiKey = async (key: string) => {
     if (!key) {
@@ -49,6 +61,9 @@ const KeywordTabContent = () => {
       setIsValidKey(false);
       return false;
     }
+
+    // Vérifier d'abord le format de la clé
+    checkApiKey(key);
 
     setIsLoadingKey(true);
     try {
@@ -97,14 +112,12 @@ const KeywordTabContent = () => {
     
     setOpenaiKey(key);
     
-    // Sauvegarder temporairement même sans validation
+    // Sauvegarder immédiatement même sans validation
     localStorage.setItem('openaiKey', key);
+    console.log("Clé API sauvegardée:", key.substring(0, 5) + "...");
     
-    // Valider après sauvegarde
-    const isValid = await validateApiKey(key);
-    if (isValid) {
-      toast.success("Clé API enregistrée et prête à l'utilisation");
-    }
+    // Valider après sauvegarde pour confirmer qu'elle fonctionne
+    await validateApiKey(key);
   };
 
   // Générer des suggestions de mots-clés
@@ -121,6 +134,7 @@ const KeywordTabContent = () => {
       if (storedKey) {
         keyToUse = storedKey;
         setOpenaiKey(storedKey);
+        console.log("Utilisation de la clé stockée:", storedKey.substring(0, 5) + "...");
       } else {
         toast.error("Veuillez configurer une clé API OpenAI valide");
         return;
@@ -163,11 +177,25 @@ const KeywordTabContent = () => {
         toast.error("Aucune suggestion n'a pu être générée");
         setError("Aucune suggestion n'a pu être générée pour ce mot-clé");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Erreur lors de la génération des suggestions:", err);
-      setError("Une erreur est survenue lors de la génération des suggestions");
+      
+      // Message d'erreur plus spécifique
+      let errorMessage = "Une erreur est survenue lors de la génération des suggestions";
+      if (err?.message) {
+        if (err.message.includes("401")) {
+          errorMessage = "Clé API invalide ou expirée. Veuillez vérifier votre clé.";
+          setIsValidKey(false);
+        } else if (err.message.includes("429")) {
+          errorMessage = "Limite d'API dépassée. Réessayez plus tard.";
+        } else if (err.message.includes("network") || err.message.includes("fetch") || err.message.includes("connection")) {
+          errorMessage = "Problème de connexion internet. Vérifiez votre connexion.";
+        }
+      }
+      
+      setError(errorMessage);
       toast.error("Erreur de génération", {
-        description: "Impossible de générer des suggestions pour ce mot-clé. Vérifiez votre clé API et votre connexion."
+        description: errorMessage
       });
     } finally {
       setIsGenerating(false);
@@ -262,7 +290,7 @@ const KeywordTabContent = () => {
               <Button
                 onClick={() => generateKeywordSuggestions(keyword)}
                 className="whitespace-nowrap bg-blue-600 hover:bg-blue-700"
-                disabled={isGenerating || !openaiKey}
+                disabled={isGenerating || !isValidKey}
               >
                 {isGenerating ? (
                   <>
@@ -438,18 +466,6 @@ const KeywordTabContent = () => {
       )}
     </div>
   );
-};
-
-// Fonctions que nous avions omises mais qui sont référencées dans le code
-const copyToClipboard = (text: string, type: 'title' | 'short' | 'long' | 'extra') => {
-  navigator.clipboard.writeText(text);
-  toast.success(`${(type === "title" ? "Titre" : type === "short" ? "Description courte" : type === "long" ? "Description longue" : "Description extra-longue")} copié !`);
-};
-
-const colorIndicator = (value: string, max: number) => {
-  if (value.length > max) return 'text-red-500';
-  if (value.length > max * 0.9) return 'text-yellow-500';
-  return 'text-green-500';
 };
 
 export default KeywordTabContent;
