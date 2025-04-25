@@ -14,9 +14,6 @@ export interface SiteAnalyzerResult {
   error: string | null;
   handleActivateProxy: () => void;
   proxyEnabled: boolean;
-  apiKey: string;
-  saveApiKey: (key: string) => void;
-  validateApiKey: (key: string) => Promise<boolean>;
 }
 
 export const useSiteAnalyzer = (): SiteAnalyzerResult => {
@@ -28,85 +25,15 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
   const [resources, setResources] = useState<any>(null);
   const [siteStructure, setSiteStructure] = useState<any>(null);
   const [proxyEnabled, setProxyEnabled] = useState<boolean>(FirecrawlService.isProxyEnabled());
-  const [apiKey, setApiKey] = useState<string>('');
 
   // Vérifier l'état du proxy et charger la clé API au chargement
   useEffect(() => {
-    // Récupérer la clé API stockée
-    const storedApiKey = localStorage.getItem('openaiKey');
-    if (storedApiKey) {
-      setApiKey(storedApiKey);
-      console.log("API key loaded from localStorage:", storedApiKey ? "API key found" : "No API key");
-    }
-
     // S'assurer que le proxy est activé par défaut
     if (!FirecrawlService.isProxyEnabled()) {
       FirecrawlService.enableProxy();
     }
     setProxyEnabled(FirecrawlService.isProxyEnabled());
-    
-    // Log status
-    console.log("useSiteAnalyzer - État initial:", {
-      proxyEnabled: FirecrawlService.isProxyEnabled(),
-      apiKey: storedApiKey ? "API key found" : "No API key"
-    });
   }, []);
-
-  // Fonction pour sauvegarder la clé API
-  const saveApiKey = useCallback((key: string) => {
-    if (!key) return;
-    
-    console.log("Saving API key to localStorage");
-    localStorage.setItem('openaiKey', key);
-    setApiKey(key);
-    
-    toast.success("Clé API sauvegardée", {
-      description: "Votre clé API a été sauvegardée localement",
-    });
-    
-    console.log("API key saved to localStorage");
-  }, []);
-
-  // Valider la clé API
-  const validateApiKey = useCallback(async (key: string) => {
-    if (!key) {
-      toast.error("Clé API vide", {
-        description: "Veuillez entrer une clé API valide"
-      });
-      return false;
-    }
-
-    try {
-      console.log("Validating API key: ", key.substring(0, 5) + "...");
-      const openaiService = new OpenAIService(key);
-      
-      // Enable proxy for API validation
-      OpenAIService.enableProxy();
-      
-      const isValid = await openaiService.validateApiKey();
-      
-      if (isValid) {
-        console.log("API key validation successful");
-        saveApiKey(key);
-        toast.success("Clé API OpenAI valide", {
-          description: "Votre clé API a été validée avec succès"
-        });
-        return true;
-      } else {
-        console.log("API key validation failed");
-        toast.error("Clé API OpenAI invalide", {
-          description: "Veuillez vérifier votre clé et réessayer"
-        });
-        return false;
-      }
-    } catch (err) {
-      console.error("Erreur lors de la validation de la clé API:", err);
-      toast.error("Erreur de validation", {
-        description: "Impossible de valider la clé API. Vérifiez votre connexion internet."
-      });
-      return false;
-    }
-  }, [saveApiKey]);
 
   // Fonction pour activer le proxy CORS
   const handleActivateProxy = useCallback(() => {
@@ -157,7 +84,7 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
 
     console.log(`Analyse du site: ${formattedUrl}`);
     
-    const currentApiKey = apiKey || localStorage.getItem('openaiKey');
+    const currentApiKey = localStorage.getItem('openaiKey');
     if (currentApiKey) {
       console.log("Clé OpenAI trouvée, analyse avec OpenAI activée");
     }
@@ -221,7 +148,7 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
     } finally {
       setIsLoading(false);
     }
-  }, [url, proxyEnabled, handleActivateProxy, apiKey]);
+  }, [url, proxyEnabled, handleActivateProxy]);
 
   return {
     url,
@@ -232,10 +159,7 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
     analyzeSite,
     error,
     handleActivateProxy,
-    proxyEnabled,
-    apiKey,
-    saveApiKey,
-    validateApiKey
+    proxyEnabled
   };
 };
 

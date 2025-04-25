@@ -28,28 +28,30 @@ const KeywordTabContent = () => {
   const [error, setError] = useState<string | null>(null);
   const [history, setHistory] = useState<KeywordSuggestion[]>([]);
 
+  // Charger la clé API au démarrage
   useEffect(() => {
     const storedKey = localStorage.getItem('openaiKey');
     if (storedKey) {
       console.log("Found stored OpenAI key in KeywordTabContent");
       setOpenaiKey(storedKey);
-      validateApiKey(storedKey);
+      setIsValidKey(true); // Présumer que la clé stockée est valide
     } else {
       console.log("No stored OpenAI key found in KeywordTabContent");
     }
   }, []);
 
+  // Valider la clé API
   const validateApiKey = async (key: string) => {
     if (!key) {
       setIsValidKey(false);
-      return;
+      return false;
     }
 
     setIsLoadingKey(true);
     try {
       console.log("Validating API key in KeywordTabContent");
       
-      // Make sure the proxy is enabled for validation
+      // S'assurer que le proxy est activé pour la validation
       OpenAIService.enableProxy();
       
       const openaiService = new OpenAIService(key);
@@ -63,10 +65,12 @@ const KeywordTabContent = () => {
         toast.success("Clé API OpenAI valide", {
           description: "Vous pouvez maintenant utiliser les fonctionnalités d'IA"
         });
+        return true;
       } else {
         toast.error("Clé API OpenAI invalide", {
           description: "Veuillez vérifier votre clé et réessayer"
         });
+        return false;
       }
     } catch (err) {
       console.error("Erreur lors de la validation de la clé API:", err);
@@ -75,16 +79,22 @@ const KeywordTabContent = () => {
       toast.error("Erreur de validation", {
         description: "Impossible de valider la clé API. Vérifiez votre connexion internet."
       });
+      return false;
     } finally {
       setIsLoadingKey(false);
     }
   };
 
-  const handleSaveApiKey = (key: string) => {
+  // Sauvegarder la clé API
+  const handleSaveApiKey = async (key: string) => {
     setOpenaiKey(key);
-    validateApiKey(key);
+    const isValid = await validateApiKey(key);
+    if (isValid) {
+      toast.success("Clé API enregistrée et prête à l'utilisation");
+    }
   };
 
+  // Générer des suggestions de mots-clés
   const generateKeywordSuggestions = async (keywordText: string) => {
     if (!keywordText) {
       toast.error("Veuillez entrer un mot-clé");
@@ -110,7 +120,7 @@ const KeywordTabContent = () => {
     try {
       console.log("Generating keyword suggestions for:", keywordText, "with key:", keyToUse ? "Key exists" : "No key");
       
-      // Make sure proxy is enabled
+      // S'assurer que le proxy est activé
       OpenAIService.enableProxy();
       
       const openaiService = new OpenAIService(keyToUse);
@@ -123,15 +133,15 @@ const KeywordTabContent = () => {
         setHistory(prev => [suggestions[0], ...prev].slice(0, 10));
         setTitle(suggestions[0].suggestedTitle || '');
         
-        // Ensure short description is exactly 155 characters
+        // S'assurer que la description courte fait exactement 155 caractères
         const shortDesc = suggestions[0].suggestedShortDescription || suggestions[0].suggestedDescription || '';
         setShortDescription(shortDesc.length > 155 ? shortDesc.slice(0, 155) : shortDesc.padEnd(155));
         
-        // Ensure long description is exactly 500 characters
+        // S'assurer que la description longue fait exactement 500 caractères
         const longDesc = suggestions[0].suggestedLongDescription || suggestions[0].suggestedDescription || '';
         setLongDescription(longDesc.length > 500 ? longDesc.slice(0, 500) : longDesc.padEnd(500));
         
-        // Ensure extra description is exactly 1000 characters
+        // S'assurer que la description extra fait exactement 1000 caractères
         const baseDesc = (suggestions[0].suggestedLongDescription || suggestions[0].suggestedDescription || '');
         setExtraDescription(baseDesc.length > 1000 ? baseDesc.slice(0, 1000) : baseDesc.padEnd(1000));
         
@@ -232,13 +242,13 @@ const KeywordTabContent = () => {
                 id="keyword"
                 placeholder="seo, marketing digital, etc." 
                 value={keyword} 
-                onChange={(e) => setKeyword(e.target.value)}
+                onChange={handleKeywordChange}
                 className="flex-1"
               />
               <Button
                 onClick={() => generateKeywordSuggestions(keyword)}
                 className="whitespace-nowrap"
-                disabled={isGenerating}
+                disabled={isGenerating || !isValidKey}
               >
                 {isGenerating ? (
                   <>
@@ -392,17 +402,19 @@ const KeywordTabContent = () => {
       </Card>
 
       {/* Suggestions détails */}
-      <KeywordSuggestions
-        generatedKeywords={generatedKeywords}
-        onGenerateClick={() => generateKeywordSuggestions(keyword)}
-        fieldValue={title}
-        onInsert={setTitle}
-        maxLength={60}
-        descriptionValue={shortDescription}
-        onInsertDescription={setShortDescription}
-        maxLengthDescription={155}
-        descriptionType={'short'}
-      />
+      {generatedKeywords.length > 0 && (
+        <KeywordSuggestions
+          generatedKeywords={generatedKeywords}
+          onGenerateClick={() => generateKeywordSuggestions(keyword)}
+          fieldValue={title}
+          onInsert={setTitle}
+          maxLength={60}
+          descriptionValue={shortDescription}
+          onInsertDescription={setShortDescription}
+          maxLengthDescription={155}
+          descriptionType={'short'}
+        />
+      )}
       
       {error && (
         <Alert variant="destructive">
@@ -412,6 +424,18 @@ const KeywordTabContent = () => {
       )}
     </div>
   );
+};
+
+// Fonctions que nous avions omises mais qui sont référencées dans le code
+const copyToClipboard = (text: string, type: 'title' | 'short' | 'long' | 'extra') => {
+  navigator.clipboard.writeText(text);
+  toast.success(`${(type === "title" ? "Titre" : type === "short" ? "Description courte" : type === "long" ? "Description longue" : "Description extra-longue")} copié !`);
+};
+
+const colorIndicator = (value: string, max: number) => {
+  if (value.length > max) return 'text-red-500';
+  if (value.length > max * 0.9) return 'text-yellow-500';
+  return 'text-green-500';
 };
 
 export default KeywordTabContent;

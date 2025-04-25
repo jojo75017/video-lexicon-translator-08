@@ -5,6 +5,12 @@ export class OpenAIService {
   private apiKey: string;
   private static proxyEnabled: boolean = true; // Enabled by default to avoid CORS issues
   private static proxyUrl: string = 'https://corsproxy.io/?';
+  private static alternativeProxies: string[] = [
+    'https://corsproxy.io/?',
+    'https://cors-proxy.htmldriven.com/?url=',
+    'https://cors-anywhere.herokuapp.com/'
+  ];
+  private static currentProxyIndex: number = 0;
   
   constructor(apiKey: string) {
     this.apiKey = apiKey || '';
@@ -34,9 +40,19 @@ export class OpenAIService {
   // Applique le proxy à l'URL si nécessaire
   private static applyProxy(url: string): string {
     if (OpenAIService.isProxyEnabled()) {
-      return OpenAIService.proxyUrl + encodeURIComponent(url);
+      const proxyUrl = OpenAIService.alternativeProxies[OpenAIService.currentProxyIndex];
+      console.log(`Utilisation du proxy: ${proxyUrl} pour ${url}`);
+      return proxyUrl + encodeURIComponent(url);
     }
     return url;
+  }
+
+  // Essayer le proxy suivant
+  private static rotateProxy(): string {
+    OpenAIService.currentProxyIndex = (OpenAIService.currentProxyIndex + 1) % OpenAIService.alternativeProxies.length;
+    const newProxy = OpenAIService.alternativeProxies[OpenAIService.currentProxyIndex];
+    console.log(`Rotation vers le proxy: ${newProxy}`);
+    return newProxy;
   }
   
   // Méthode pour valider la clé API
@@ -47,9 +63,11 @@ export class OpenAIService {
     }
 
     try {
-      console.log('Validating OpenAI API Key...');
+      console.log('Validating OpenAI API Key with proxy...');
       const url = 'https://api.openai.com/v1/models';
       const finalUrl = OpenAIService.applyProxy(url);
+      
+      console.log(`Validation avec URL: ${finalUrl}`);
       
       const response = await fetch(finalUrl, {
         method: 'GET',
@@ -62,6 +80,12 @@ export class OpenAIService {
       const isValid = response.status === 200;
       console.log(`API key validation result: ${isValid ? 'Valid' : 'Invalid'} (Status: ${response.status})`);
       
+      // Si la validation échoue, essayer un autre proxy
+      if (!isValid && response.status === 0) {
+        OpenAIService.rotateProxy();
+        return this.validateApiKey(); // Essayer à nouveau avec un proxy différent
+      }
+      
       if (!isValid) {
         const responseText = await response.text();
         console.error('Erreur de validation OpenAI:', responseText);
@@ -70,6 +94,14 @@ export class OpenAIService {
       return isValid;
     } catch (error) {
       console.error('Erreur lors de la validation de la clé API:', error);
+      // Essayer un autre proxy en cas d'erreur de connexion
+      OpenAIService.rotateProxy();
+      console.log('Essai avec un autre proxy...');
+      
+      // Ne pas retenter indéfiniment pour éviter les boucles infinies
+      if (OpenAIService.currentProxyIndex !== 0) {
+        return this.validateApiKey();
+      }
       return false;
     }
   }
@@ -198,12 +230,20 @@ Assure-toi que les descriptions font EXACTEMENT le nombre de caractères demand�
       if (!response.ok) {
         const errorText = await response.text();
         console.error(`OpenAI API error: ${response.status}`, errorText);
+        
+        // Si erreur de CORS, essayer un autre proxy
+        if (response.status === 0) {
+          OpenAIService.rotateProxy();
+          return this.getKeywordSuggestions(keyword);
+        }
+        
         throw new Error(`Erreur API OpenAI: ${response.status}`);
       }
       
       const data = await response.json();
+      console.log("OpenAI response received:", data.choices[0].message.content.substring(0, 100) + "...");
+      
       const content = data.choices[0].message.content;
-      console.log("OpenAI response:", content);
       
       // Extraction du JSON de la réponse
       const jsonMatch = content.match(/\[[\s\S]*\]/);

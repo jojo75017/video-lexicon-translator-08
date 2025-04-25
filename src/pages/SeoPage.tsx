@@ -21,14 +21,8 @@ const SeoPage = () => {
     seoAnalysis, 
     analyzeSite, 
     error, 
-    handleActivateProxy,
-    apiKey
+    handleActivateProxy
   } = useSiteAnalyzer();
-
-  useEffect(() => {
-    // Debug log
-    console.log("SeoPage - API Key status: ", apiKey ? "Présente" : "Absente");
-  }, [apiKey]);
 
   // Fonction pour activer le proxy depuis la page principale
   const activateProxyHandler = () => {

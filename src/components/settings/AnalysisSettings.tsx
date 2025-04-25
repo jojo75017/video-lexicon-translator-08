@@ -5,6 +5,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import OpenAIKeyForm from './OpenAIKeyForm';
 import { Cog, Wrench, Key, Lock } from 'lucide-react';
 import { useSiteAnalyzer } from '@/hooks/useSiteAnalyzer';
+import { toast } from 'sonner';
+import { OpenAIService } from '@/utils/seo/openaiService';
 
 const AnalysisSettings = () => {
   const [apiKey, setApiKey] = useState<string>('');
@@ -25,14 +27,32 @@ const AnalysisSettings = () => {
     
     setIsLoading(true);
     try {
-      // Utilisation de la méthode validateApiKey du hook useSiteAnalyzer
-      const isValid = await siteAnalyzer.validateApiKey(key);
+      // Activer le proxy pour la validation
+      OpenAIService.enableProxy();
+      
+      // Créer une instance directe de OpenAIService pour la validation
+      const openaiService = new OpenAIService(key);
+      const isValid = await openaiService.validateApiKey();
+      
       setIsValidKey(isValid);
       if (isValid) {
-        // Utilisation de la méthode saveApiKey du hook useSiteAnalyzer
-        siteAnalyzer.saveApiKey(key);
+        // Sauvegarder la clé directement dans localStorage
+        localStorage.setItem('openaiKey', key);
         setApiKey(key);
+        
+        toast.success("Clé API sauvegardée", {
+          description: "Votre clé API a été sauvegardée localement",
+        });
+      } else {
+        toast.error("Clé API OpenAI invalide", {
+          description: "Veuillez vérifier votre clé et réessayer"
+        });
       }
+    } catch (error) {
+      console.error("Erreur lors de la validation de la clé API:", error);
+      toast.error("Erreur de validation", {
+        description: "Impossible de valider la clé API. Vérifiez votre connexion internet."
+      });
     } finally {
       setIsLoading(false);
     }
