@@ -32,7 +32,15 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
     if (!FirecrawlService.isProxyEnabled()) {
       FirecrawlService.enableProxy();
     }
+    if (!OpenAIService.isProxyEnabled()) {
+      OpenAIService.enableProxy();
+    }
     setProxyEnabled(FirecrawlService.isProxyEnabled());
+    
+    console.log("État initial du useSiteAnalyzer hook:", {
+      proxyEnabled: FirecrawlService.isProxyEnabled(),
+      openAIKeyExists: !!localStorage.getItem('openaiKey')
+    });
   }, []);
 
   // Fonction pour activer le proxy CORS

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -32,24 +31,28 @@ const KeywordTabContent = () => {
   useEffect(() => {
     const storedKey = localStorage.getItem('openaiKey');
     if (storedKey) {
-      console.log("Found stored OpenAI key in KeywordTabContent");
+      console.log("Clé OpenAI trouvée dans KeywordTabContent:", storedKey.substring(0, 5) + "...");
       setOpenaiKey(storedKey);
       setIsValidKey(true); // Présumer que la clé stockée est valide
     } else {
-      console.log("No stored OpenAI key found in KeywordTabContent");
+      console.log("Aucune clé OpenAI trouvée dans KeywordTabContent");
     }
+    
+    // S'assurer que le proxy est activé pour OpenAIService
+    OpenAIService.enableProxy();
   }, []);
 
   // Valider la clé API
   const validateApiKey = async (key: string) => {
     if (!key) {
+      toast.error("Veuillez entrer une clé API valide");
       setIsValidKey(false);
       return false;
     }
 
     setIsLoadingKey(true);
     try {
-      console.log("Validating API key in KeywordTabContent");
+      console.log("Validation de la clé API dans KeywordTabContent:", key.substring(0, 5) + "...");
       
       // S'assurer que le proxy est activé pour la validation
       OpenAIService.enableProxy();
@@ -57,7 +60,7 @@ const KeywordTabContent = () => {
       const openaiService = new OpenAIService(key);
       const isValid = await openaiService.validateApiKey();
       
-      console.log("API key validation result:", isValid);
+      console.log("Résultat de la validation de la clé API:", isValid);
       setIsValidKey(isValid);
 
       if (isValid) {
@@ -87,7 +90,17 @@ const KeywordTabContent = () => {
 
   // Sauvegarder la clé API
   const handleSaveApiKey = async (key: string) => {
+    if (!key) {
+      toast.error("Veuillez entrer une clé API valide");
+      return;
+    }
+    
     setOpenaiKey(key);
+    
+    // Sauvegarder temporairement même sans validation
+    localStorage.setItem('openaiKey', key);
+    
+    // Valider après sauvegarde
     const isValid = await validateApiKey(key);
     if (isValid) {
       toast.success("Clé API enregistrée et prête à l'utilisation");
@@ -118,7 +131,7 @@ const KeywordTabContent = () => {
     setIsGenerating(true);
 
     try {
-      console.log("Generating keyword suggestions for:", keywordText, "with key:", keyToUse ? "Key exists" : "No key");
+      console.log("Génération de suggestions pour:", keywordText, "avec clé:", keyToUse ? keyToUse.substring(0, 5) + "..." : "Aucune clé");
       
       // S'assurer que le proxy est activé
       OpenAIService.enableProxy();
@@ -126,7 +139,7 @@ const KeywordTabContent = () => {
       const openaiService = new OpenAIService(keyToUse);
       const suggestions = await openaiService.getKeywordSuggestions(keywordText);
       
-      console.log("Generated suggestions:", suggestions);
+      console.log("Suggestions générées:", suggestions);
       
       if (suggestions && suggestions.length > 0) {
         setGeneratedKeywords(suggestions);
@@ -148,6 +161,7 @@ const KeywordTabContent = () => {
         toast.success("Suggestions générées avec succès");
       } else {
         toast.error("Aucune suggestion n'a pu être générée");
+        setError("Aucune suggestion n'a pu être générée pour ce mot-clé");
       }
     } catch (err) {
       console.error("Erreur lors de la génération des suggestions:", err);
@@ -247,8 +261,8 @@ const KeywordTabContent = () => {
               />
               <Button
                 onClick={() => generateKeywordSuggestions(keyword)}
-                className="whitespace-nowrap"
-                disabled={isGenerating || !isValidKey}
+                className="whitespace-nowrap bg-blue-600 hover:bg-blue-700"
+                disabled={isGenerating || !openaiKey}
               >
                 {isGenerating ? (
                   <>
@@ -378,6 +392,13 @@ const KeywordTabContent = () => {
             </div>
           </div>
         </div>
+
+        {error && (
+          <Alert variant="destructive" className="mt-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
       </Card>
 
       {/* Historique : derniers titres/descriptions générés */}
@@ -414,13 +435,6 @@ const KeywordTabContent = () => {
           maxLengthDescription={155}
           descriptionType={'short'}
         />
-      )}
-      
-      {error && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
       )}
     </div>
   );

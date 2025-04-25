@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { KeywordSuggestion } from '@/types/seo';
 import { toast } from "sonner";
 
-interface KeywordSuggestionsProps {
+export interface KeywordSuggestionsProps {
   generatedKeywords: KeywordSuggestion[];
   onGenerateClick: () => void;
   fieldValue: string;
@@ -108,6 +108,16 @@ const KeywordSuggestions = ({
             </div>
           </div>
         )}
+
+        <div className="pt-4 mt-4 border-t border-gray-200">
+          <Button 
+            onClick={onGenerateClick}
+            variant="outline"
+            className="w-full bg-blue-50 hover:bg-blue-100 text-blue-700"
+          >
+            Générer plus de suggestions
+          </Button>
+        </div>
       </div>
     </Card>
   );

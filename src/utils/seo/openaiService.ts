@@ -1,4 +1,3 @@
-
 import { KeywordSuggestion, OpenAIKeywordResponse } from '@/types/seo';
 
 export class OpenAIService {
@@ -14,6 +13,7 @@ export class OpenAIService {
   
   constructor(apiKey: string) {
     this.apiKey = apiKey || '';
+    console.log("OpenAIService initialisé avec une clé API", apiKey ? "valide" : "manquante");
   }
   
   // Méthodes statiques pour gérer le proxy
@@ -62,6 +62,8 @@ export class OpenAIService {
       return false;
     }
 
+    console.log('Vérification de la clé API OpenAI:', this.apiKey.substring(0, 5) + "...");
+
     try {
       console.log('Validating OpenAI API Key with proxy...');
       const url = 'https://api.openai.com/v1/models';
@@ -103,60 +105,6 @@ export class OpenAIService {
         return this.validateApiKey();
       }
       return false;
-    }
-  }
-  
-  // Méthode pour analyser une page web
-  async analyzeWebpage(url: string): Promise<{ keywords: string[] }> {
-    try {
-      console.log("Analyse de la page web:", url);
-      
-      const prompt = `Analyse cette URL: ${url}. Extrait les mots-clés importants pour le SEO.`;
-      
-      const apiUrl = 'https://api.openai.com/v1/chat/completions';
-      const finalApiUrl = OpenAIService.applyProxy(apiUrl);
-      
-      const response = await fetch(finalApiUrl, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [
-            { 
-              role: 'system', 
-              content: 'Tu es un assistant SEO expert. Extrait les mots-clés importants d\'une URL.' 
-            },
-            { 
-              role: 'user', 
-              content: prompt 
-            }
-          ],
-          temperature: 0.3,
-          max_tokens: 1000
-        })
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Erreur API: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      const content = data.choices[0].message.content;
-      
-      // Extraction des mots-clés (simplifié)
-      const keywords = content
-        .split('\n')
-        .filter(line => line.trim().length > 0)
-        .map(line => line.replace(/^[^a-zA-Z0-9]+/, '').trim())
-        .filter(keyword => keyword.length > 0);
-      
-      return { keywords: keywords.slice(0, 10) }; // Limiter à 10 mots-clés
-    } catch (error) {
-      console.error('Erreur lors de l\'analyse de la page web:', error);
-      throw error;
     }
   }
   
@@ -278,6 +226,59 @@ Assure-toi que les descriptions font EXACTEMENT le nombre de caractères demand�
       }));
     } catch (error) {
       console.error('Erreur lors de la génération de suggestions:', error);
+      throw error;
+    }
+  }
+  
+  async analyzeWebpage(url: string): Promise<{ keywords: string[] }> {
+    try {
+      console.log("Analyse de la page web:", url);
+      
+      const prompt = `Analyse cette URL: ${url}. Extrait les mots-clés importants pour le SEO.`;
+      
+      const apiUrl = 'https://api.openai.com/v1/chat/completions';
+      const finalApiUrl = OpenAIService.applyProxy(apiUrl);
+      
+      const response = await fetch(finalApiUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            { 
+              role: 'system', 
+              content: 'Tu es un assistant SEO expert. Extrait les mots-clés importants d\'une URL.' 
+            },
+            { 
+              role: 'user', 
+              content: prompt 
+            }
+          ],
+          temperature: 0.3,
+          max_tokens: 1000
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Erreur API: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      const content = data.choices[0].message.content;
+      
+      // Extraction des mots-clés (simplifié)
+      const keywords = content
+        .split('\n')
+        .filter(line => line.trim().length > 0)
+        .map(line => line.replace(/^[^a-zA-Z0-9]+/, '').trim())
+        .filter(keyword => keyword.length > 0);
+      
+      return { keywords: keywords.slice(0, 10) }; // Limiter à 10 mots-clés
+    } catch (error) {
+      console.error('Erreur lors de l\'analyse de la page web:', error);
       throw error;
     }
   }
