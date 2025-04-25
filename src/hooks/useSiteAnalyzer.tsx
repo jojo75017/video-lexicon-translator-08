@@ -70,6 +70,9 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
   // Valider la clé API
   const validateApiKey = useCallback(async (key: string) => {
     if (!key) {
+      toast.error("Clé API vide", {
+        description: "Veuillez entrer une clé API valide"
+      });
       return false;
     }
 
@@ -85,6 +88,9 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
       if (isValid) {
         console.log("API key validation successful");
         saveApiKey(key);
+        toast.success("Clé API OpenAI valide", {
+          description: "Votre clé API a été validée avec succès"
+        });
         return true;
       } else {
         console.log("API key validation failed");

@@ -25,10 +25,13 @@ const AnalysisSettings = () => {
     
     setIsLoading(true);
     try {
+      // Utilisation de la méthode validateApiKey du hook useSiteAnalyzer
       const isValid = await siteAnalyzer.validateApiKey(key);
       setIsValidKey(isValid);
       if (isValid) {
+        // Utilisation de la méthode saveApiKey du hook useSiteAnalyzer
         siteAnalyzer.saveApiKey(key);
+        setApiKey(key);
       }
     } finally {
       setIsLoading(false);

@@ -7,7 +7,7 @@ export class OpenAIService {
   private static proxyUrl: string = 'https://corsproxy.io/?';
   
   constructor(apiKey: string) {
-    this.apiKey = apiKey;
+    this.apiKey = apiKey || '';
   }
   
   // Méthodes statiques pour gérer le proxy
@@ -41,6 +41,11 @@ export class OpenAIService {
   
   // Méthode pour valider la clé API
   async validateApiKey(): Promise<boolean> {
+    if (!this.apiKey || this.apiKey.trim() === '') {
+      console.log('Clé API vide ou non définie');
+      return false;
+    }
+
     try {
       console.log('Validating OpenAI API Key...');
       const url = 'https://api.openai.com/v1/models';
@@ -55,7 +60,13 @@ export class OpenAIService {
       });
       
       const isValid = response.status === 200;
-      console.log(`API key validation result: ${isValid ? 'Valid' : 'Invalid'}`);
+      console.log(`API key validation result: ${isValid ? 'Valid' : 'Invalid'} (Status: ${response.status})`);
+      
+      if (!isValid) {
+        const responseText = await response.text();
+        console.error('Erreur de validation OpenAI:', responseText);
+      }
+      
       return isValid;
     } catch (error) {
       console.error('Erreur lors de la validation de la clé API:', error);
@@ -119,6 +130,16 @@ export class OpenAIService {
   
   // Méthode pour obtenir des suggestions de mots-clés
   async getKeywordSuggestions(keyword: string): Promise<KeywordSuggestion[]> {
+    if (!this.apiKey || this.apiKey.trim() === '') {
+      console.error('Tentative d\'utilisation de getKeywordSuggestions sans clé API valide');
+      throw new Error('Clé API OpenAI non définie');
+    }
+
+    if (!keyword || keyword.trim() === '') {
+      console.error('Mot-clé vide fourni à getKeywordSuggestions');
+      throw new Error('Mot-clé non défini');
+    }
+
     try {
       console.log("Génération de suggestions pour le mot-clé:", keyword);
       
@@ -149,7 +170,7 @@ Assure-toi que les descriptions font EXACTEMENT le nombre de caractères demand�
       const apiUrl = 'https://api.openai.com/v1/chat/completions';
       const finalApiUrl = OpenAIService.applyProxy(apiUrl);
       
-      console.log("Sending OpenAI request to:", finalApiUrl);
+      console.log("Sending OpenAI request to:", finalApiUrl, "with key:", this.apiKey ? "Key exists" : "No key");
       
       const response = await fetch(finalApiUrl, {
         method: 'POST',
@@ -175,8 +196,9 @@ Assure-toi que les descriptions font EXACTEMENT le nombre de caractères demand�
       });
       
       if (!response.ok) {
-        console.error(`OpenAI API error: ${response.status}`, await response.text());
-        throw new Error(`Erreur API: ${response.status}`);
+        const errorText = await response.text();
+        console.error(`OpenAI API error: ${response.status}`, errorText);
+        throw new Error(`Erreur API OpenAI: ${response.status}`);
       }
       
       const data = await response.json();
@@ -187,6 +209,7 @@ Assure-toi que les descriptions font EXACTEMENT le nombre de caractères demand�
       const jsonMatch = content.match(/\[[\s\S]*\]/);
       
       if (!jsonMatch) {
+        console.error("Format de réponse invalide:", content);
         throw new Error('Format de réponse invalide');
       }
       
@@ -195,7 +218,7 @@ Assure-toi que les descriptions font EXACTEMENT le nombre de caractères demand�
         keywordData = JSON.parse(jsonMatch[0]) as OpenAIKeywordResponse[];
         console.log("Parsed keyword data:", keywordData);
       } catch (e) {
-        console.error("JSON parsing error:", e);
+        console.error("JSON parsing error:", e, "Raw response:", content);
         throw new Error('Erreur de parsing JSON');
       }
       

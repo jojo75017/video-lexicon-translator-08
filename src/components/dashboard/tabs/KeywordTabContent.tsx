@@ -91,9 +91,12 @@ const KeywordTabContent = () => {
       return;
     }
 
-    if (!openaiKey) {
+    // Récupérer la clé API depuis l'état local ou localStorage
+    let keyToUse = openaiKey;
+    if (!keyToUse) {
       const storedKey = localStorage.getItem('openaiKey');
       if (storedKey) {
+        keyToUse = storedKey;
         setOpenaiKey(storedKey);
       } else {
         toast.error("Veuillez configurer une clé API OpenAI valide");
@@ -105,12 +108,12 @@ const KeywordTabContent = () => {
     setIsGenerating(true);
 
     try {
-      console.log("Generating keyword suggestions for:", keywordText);
+      console.log("Generating keyword suggestions for:", keywordText, "with key:", keyToUse ? "Key exists" : "No key");
       
       // Make sure proxy is enabled
       OpenAIService.enableProxy();
       
-      const openaiService = new OpenAIService(openaiKey);
+      const openaiService = new OpenAIService(keyToUse);
       const suggestions = await openaiService.getKeywordSuggestions(keywordText);
       
       console.log("Generated suggestions:", suggestions);
@@ -140,7 +143,7 @@ const KeywordTabContent = () => {
       console.error("Erreur lors de la génération des suggestions:", err);
       setError("Une erreur est survenue lors de la génération des suggestions");
       toast.error("Erreur de génération", {
-        description: "Impossible de générer des suggestions pour ce mot-clé"
+        description: "Impossible de générer des suggestions pour ce mot-clé. Vérifiez votre clé API et votre connexion."
       });
     } finally {
       setIsGenerating(false);
@@ -235,7 +238,7 @@ const KeywordTabContent = () => {
               <Button
                 onClick={() => generateKeywordSuggestions(keyword)}
                 className="whitespace-nowrap"
-                disabled={isGenerating || (!isValidKey && !localStorage.getItem('openaiKey'))}
+                disabled={isGenerating}
               >
                 {isGenerating ? (
                   <>
