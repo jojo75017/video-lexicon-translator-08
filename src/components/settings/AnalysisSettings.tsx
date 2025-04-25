@@ -10,7 +10,7 @@ const AnalysisSettings = () => {
   const [apiKey, setApiKey] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isValidKey, setIsValidKey] = useState<boolean>(false);
-  const { saveApiKey, validateApiKey } = useSiteAnalyzer();
+  const siteAnalyzer = useSiteAnalyzer();
 
   useEffect(() => {
     const storedKey = localStorage.getItem('openaiKey');
@@ -25,10 +25,10 @@ const AnalysisSettings = () => {
     
     setIsLoading(true);
     try {
-      const isValid = await validateApiKey(key);
+      const isValid = await siteAnalyzer.validateApiKey(key);
       setIsValidKey(isValid);
       if (isValid) {
-        saveApiKey(key);
+        siteAnalyzer.saveApiKey(key);
       }
     } finally {
       setIsLoading(false);
@@ -79,11 +79,8 @@ const AnalysisSettings = () => {
           <Card className="p-6 bg-gray-50 border border-gray-200">
             <h3 className="text-lg font-bold mb-4">Paramètres d'analyse</h3>
             <p className="text-gray-600 mb-4">
-              Ces paramètres contrôlent le comportement des analyses SEO et la manière dont les données sont collectées et présentées.
+              Ces paramètres contrôlent le comportement des fonctions d'analyse.
             </p>
-            <div className="bg-amber-50 border border-amber-200 rounded-md p-4 text-amber-700">
-              Cette fonctionnalité sera disponible dans une prochaine mise à jour.
-            </div>
           </Card>
         </TabsContent>
       </Tabs>

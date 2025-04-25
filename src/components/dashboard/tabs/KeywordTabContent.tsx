@@ -31,8 +31,11 @@ const KeywordTabContent = () => {
   useEffect(() => {
     const storedKey = localStorage.getItem('openaiKey');
     if (storedKey) {
+      console.log("Found stored OpenAI key in KeywordTabContent");
       setOpenaiKey(storedKey);
       validateApiKey(storedKey);
+    } else {
+      console.log("No stored OpenAI key found in KeywordTabContent");
     }
   }, []);
 
@@ -44,8 +47,15 @@ const KeywordTabContent = () => {
 
     setIsLoadingKey(true);
     try {
+      console.log("Validating API key in KeywordTabContent");
+      
+      // Make sure the proxy is enabled for validation
+      OpenAIService.enableProxy();
+      
       const openaiService = new OpenAIService(key);
       const isValid = await openaiService.validateApiKey();
+      
+      console.log("API key validation result:", isValid);
       setIsValidKey(isValid);
 
       if (isValid) {
@@ -63,7 +73,7 @@ const KeywordTabContent = () => {
       setIsValidKey(false);
       
       toast.error("Erreur de validation", {
-        description: "Impossible de valider la clé API"
+        description: "Impossible de valider la clé API. Vérifiez votre connexion internet."
       });
     } finally {
       setIsLoadingKey(false);
@@ -81,17 +91,29 @@ const KeywordTabContent = () => {
       return;
     }
 
-    if (!isValidKey) {
-      toast.error("Veuillez configurer une clé API OpenAI valide");
-      return;
+    if (!openaiKey) {
+      const storedKey = localStorage.getItem('openaiKey');
+      if (storedKey) {
+        setOpenaiKey(storedKey);
+      } else {
+        toast.error("Veuillez configurer une clé API OpenAI valide");
+        return;
+      }
     }
 
     setError(null);
     setIsGenerating(true);
 
     try {
+      console.log("Generating keyword suggestions for:", keywordText);
+      
+      // Make sure proxy is enabled
+      OpenAIService.enableProxy();
+      
       const openaiService = new OpenAIService(openaiKey);
       const suggestions = await openaiService.getKeywordSuggestions(keywordText);
+      
+      console.log("Generated suggestions:", suggestions);
       
       if (suggestions && suggestions.length > 0) {
         setGeneratedKeywords(suggestions);
@@ -207,13 +229,13 @@ const KeywordTabContent = () => {
                 id="keyword"
                 placeholder="seo, marketing digital, etc." 
                 value={keyword} 
-                onChange={handleKeywordChange}
+                onChange={(e) => setKeyword(e.target.value)}
                 className="flex-1"
               />
               <Button
                 onClick={() => generateKeywordSuggestions(keyword)}
                 className="whitespace-nowrap"
-                disabled={isGenerating || !isValidKey}
+                disabled={isGenerating || (!isValidKey && !localStorage.getItem('openaiKey'))}
               >
                 {isGenerating ? (
                   <>

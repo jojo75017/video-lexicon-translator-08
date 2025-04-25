@@ -36,7 +36,7 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
     const storedApiKey = localStorage.getItem('openaiKey');
     if (storedApiKey) {
       setApiKey(storedApiKey);
-      console.log("API key loaded from localStorage");
+      console.log("API key loaded from localStorage:", storedApiKey ? "API key found" : "No API key");
     }
 
     // S'assurer que le proxy est activé par défaut
@@ -56,6 +56,7 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
   const saveApiKey = useCallback((key: string) => {
     if (!key) return;
     
+    console.log("Saving API key to localStorage");
     localStorage.setItem('openaiKey', key);
     setApiKey(key);
     
@@ -73,13 +74,20 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
     }
 
     try {
+      console.log("Validating API key: ", key.substring(0, 5) + "...");
       const openaiService = new OpenAIService(key);
+      
+      // Enable proxy for API validation
+      OpenAIService.enableProxy();
+      
       const isValid = await openaiService.validateApiKey();
       
       if (isValid) {
+        console.log("API key validation successful");
         saveApiKey(key);
         return true;
       } else {
+        console.log("API key validation failed");
         toast.error("Clé API OpenAI invalide", {
           description: "Veuillez vérifier votre clé et réessayer"
         });
@@ -88,7 +96,7 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
     } catch (err) {
       console.error("Erreur lors de la validation de la clé API:", err);
       toast.error("Erreur de validation", {
-        description: "Impossible de valider la clé API"
+        description: "Impossible de valider la clé API. Vérifiez votre connexion internet."
       });
       return false;
     }
@@ -108,7 +116,8 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
     });
     
     console.log("Proxy activé:", {
-      firecrawlProxy: FirecrawlService.isProxyEnabled()
+      firecrawlProxy: FirecrawlService.isProxyEnabled(),
+      openaiProxy: OpenAIService.isProxyEnabled()
     });
   }, []);
 

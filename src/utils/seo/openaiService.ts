@@ -3,7 +3,7 @@ import { KeywordSuggestion, OpenAIKeywordResponse } from '@/types/seo';
 
 export class OpenAIService {
   private apiKey: string;
-  private static proxyEnabled: boolean = false;
+  private static proxyEnabled: boolean = true; // Enabled by default to avoid CORS issues
   private static proxyUrl: string = 'https://corsproxy.io/?';
   
   constructor(apiKey: string) {
@@ -42,6 +42,7 @@ export class OpenAIService {
   // Méthode pour valider la clé API
   async validateApiKey(): Promise<boolean> {
     try {
+      console.log('Validating OpenAI API Key...');
       const url = 'https://api.openai.com/v1/models';
       const finalUrl = OpenAIService.applyProxy(url);
       
@@ -53,7 +54,9 @@ export class OpenAIService {
         }
       });
       
-      return response.status === 200;
+      const isValid = response.status === 200;
+      console.log(`API key validation result: ${isValid ? 'Valid' : 'Invalid'}`);
+      return isValid;
     } catch (error) {
       console.error('Erreur lors de la validation de la clé API:', error);
       return false;
@@ -135,8 +138,9 @@ Format en JSON comme ceci:
     "searchVolume": 1000,
     "difficulty": 40,
     "suggestedTitle": "Titre SEO optimisé pour ce mot-clé | Exemple",
-    "suggestedShortDescription": "Description courte optimisée pour le SEO avec le mot-clé cible et un appel à l'action clair, limitée à exactement 155 caractères.",
-    "suggestedLongDescription": "Description meta optimisée détaillée qui explique en profondeur le sujet avec des informations utiles, pertinentes et qui incite à l'action. Cette description doit être complète, informative et convaincante pour les utilisateurs et les moteurs de recherche. Elle doit contenir suffisamment de détails pour donner un bon aperçu du contenu de la page tout en restant engageante et doit faire exactement 500 caractères."
+    "suggestedDescription": "Description courte optimisée pour le SEO avec le mot-clé cible et un appel à l'action clair, limitée à exactement 155 caractères.",
+    "suggestedShortDescription": "Description courte exactement 155 caractères avec mot-clé et appel à l'action",
+    "suggestedLongDescription": "Description longue 500 caractères"
   }
 ]
 
@@ -144,6 +148,8 @@ Assure-toi que les descriptions font EXACTEMENT le nombre de caractères demand�
 
       const apiUrl = 'https://api.openai.com/v1/chat/completions';
       const finalApiUrl = OpenAIService.applyProxy(apiUrl);
+      
+      console.log("Sending OpenAI request to:", finalApiUrl);
       
       const response = await fetch(finalApiUrl, {
         method: 'POST',
@@ -169,11 +175,13 @@ Assure-toi que les descriptions font EXACTEMENT le nombre de caractères demand�
       });
       
       if (!response.ok) {
+        console.error(`OpenAI API error: ${response.status}`, await response.text());
         throw new Error(`Erreur API: ${response.status}`);
       }
       
       const data = await response.json();
       const content = data.choices[0].message.content;
+      console.log("OpenAI response:", content);
       
       // Extraction du JSON de la réponse
       const jsonMatch = content.match(/\[[\s\S]*\]/);
@@ -182,7 +190,14 @@ Assure-toi que les descriptions font EXACTEMENT le nombre de caractères demand�
         throw new Error('Format de réponse invalide');
       }
       
-      const keywordData = JSON.parse(jsonMatch[0]) as OpenAIKeywordResponse[];
+      let keywordData;
+      try {
+        keywordData = JSON.parse(jsonMatch[0]) as OpenAIKeywordResponse[];
+        console.log("Parsed keyword data:", keywordData);
+      } catch (e) {
+        console.error("JSON parsing error:", e);
+        throw new Error('Erreur de parsing JSON');
+      }
       
       // Conversion vers le format KeywordSuggestion
       return keywordData.map(item => ({
@@ -190,12 +205,13 @@ Assure-toi que les descriptions font EXACTEMENT le nombre de caractères demand�
         searchVolume: item.searchVolume || Math.floor(Math.random() * 10000),
         difficulty: item.difficulty || Math.floor(Math.random() * 100),
         suggestedTitle: item.suggestedTitle || `${keyword} - Titre optimisé pour le SEO | Guide complet`,
-        suggestedShortDescription: item.suggestedShortDescription || item.suggestedDescription || `Découvrez notre guide complet sur ${keyword}. Conseils d'experts, astuces et stratégies éprouvées pour maximiser vos résultats. Cliquez pour en savoir plus!`.padEnd(155, ' ').substring(0, 155),
-        suggestedLongDescription: item.suggestedLongDescription || `${item.suggestedDescription || `Plongez dans notre guide détaillé sur ${keyword}. Nos experts partagent leurs connaissances et meilleures pratiques pour vous aider à maîtriser ce sujet essentiel. Que vous soyez débutant ou professionnel, découvrez des stratégies éprouvées, des astuces pratiques et des conseils personnalisés pour atteindre vos objectifs plus rapidement. Notre approche complète vous permettra de développer une expertise solide et d'améliorer vos performances.`}`.padEnd(500, ' ').substring(0, 500),
-        suggestedDescription: item.suggestedShortDescription || item.suggestedDescription || `Découvrez notre guide complet sur ${keyword}. Conseils d'experts, astuces et stratégies éprouvées pour maximiser vos résultats.`.padEnd(155, ' ').substring(0, 155),
+        suggestedDescription: item.suggestedDescription || `Découvrez notre guide complet sur ${keyword}. Conseils d'experts, astuces et stratégies éprouvées pour maximiser vos résultats.`.substring(0, 155),
+        suggestedShortDescription: item.suggestedShortDescription || item.suggestedDescription || `Découvrez notre guide complet sur ${keyword}. Conseils d'experts, astuces et stratégies éprouvées pour maximiser vos résultats.`.substring(0, 155),
+        suggestedLongDescription: item.suggestedLongDescription || `${item.suggestedDescription || `Plongez dans notre guide détaillé sur ${keyword}. Nos experts partagent leurs connaissances et meilleures pratiques pour vous aider à maîtriser ce sujet essentiel.`}`.substring(0, 500),
         relevance: Math.floor(Math.random() * 30) + 70, // Valeur aléatoire entre 70 et 100
-        competition: Math.floor(Math.random() * 100),
-        cpc: parseFloat((Math.random() * 3 + 0.5).toFixed(2))
+        competition: Math.random(),
+        cpc: parseFloat((Math.random() * 3 + 0.5).toFixed(2)),
+        volume: item.searchVolume || Math.floor(Math.random() * 10000)
       }));
     } catch (error) {
       console.error('Erreur lors de la génération de suggestions:', error);

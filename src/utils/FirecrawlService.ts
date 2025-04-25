@@ -1,4 +1,3 @@
-
 import FirecrawlApp from '@mendable/firecrawl-js';
 
 interface ErrorResponse {
@@ -303,7 +302,6 @@ export class FirecrawlService {
         
         const response = await fetch(proxyUrl, { 
           method: 'HEAD',
-          timeout: 5000,
           mode: 'cors',
           credentials: 'omit'
         });
