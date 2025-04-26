@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { KeywordSuggestion } from '@/types/seo';
 import KeywordSuggestions from '@/components/seo/analysis/KeywordSuggestions';
 import { Input } from "@/components/ui/input";
@@ -61,9 +61,35 @@ const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
   handleContentKeywordChange,
   handleGeneratedKeywords
 }) => {
-  // Add these state variables and functions needed for KeywordSuggestions
+  // State variables for KeywordSuggestions
   const [title, setTitle] = React.useState('');
   const [description, setDescription] = React.useState('');
+  const [openaiKey, setOpenaiKey] = React.useState(() => localStorage.getItem('openaiKey') || '');
+  
+  // Handle saving the API key
+  const handleSaveApiKey = () => {
+    if (openaiKey) {
+      localStorage.setItem('openaiKey', openaiKey);
+      toast.success("Clé API OpenAI sauvegardée");
+      
+      // Valider la clé API
+      const openAIService = new OpenAIService(openaiKey);
+      OpenAIService.enableProxy();
+      openAIService.validateApiKey()
+        .then(isValid => {
+          if (isValid) {
+            toast.success("Clé API validée avec succès");
+          } else {
+            toast.error("La clé API n'a pas pu être validée");
+          }
+        })
+        .catch(() => {
+          toast.warning("Clé sauvegardée mais impossible de la valider (problème réseau)");
+        });
+    } else {
+      toast.error("Veuillez entrer une clé API");
+    }
+  };
   
   const handleInsertTitle = (value: string) => {
     setTitle(value);
@@ -76,8 +102,32 @@ const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
   };
   
   const handleGenerateMore = () => {
+    if (!openaiKey) {
+      toast.error("Veuillez d'abord configurer votre clé API OpenAI");
+      return;
+    }
+    
     toast.info("Génération de nouvelles suggestions...");
-    // Here you would typically call your generation function
+    // Appel à l'API pour générer de nouvelles suggestions
+    const openAIService = new OpenAIService(openaiKey);
+    OpenAIService.enableProxy();
+    
+    // Exemple avec un mot-clé par défaut si aucun n'est défini
+    const keyword = generatedKeywords.length > 0 
+      ? generatedKeywords[0].keyword 
+      : "référencement";
+      
+    openAIService.getKeywordSuggestions(keyword)
+      .then(newKeywords => {
+        if (handleGeneratedKeywords) {
+          handleGeneratedKeywords(newKeywords);
+          toast.success("Nouvelles suggestions générées");
+        }
+      })
+      .catch(error => {
+        console.error("Erreur lors de la génération:", error);
+        toast.error("Impossible de générer des suggestions");
+      });
   };
 
   return (
@@ -89,6 +139,26 @@ const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
       </p>
       
       <div className="space-y-6">
+        {/* Section de configuration de la clé API */}
+        <div className="bg-slate-50 p-4 rounded-md border border-slate-200">
+          <h3 className="font-medium mb-2">Configuration de l'API OpenAI</h3>
+          <div className="flex gap-2 mb-2">
+            <Input
+              type="password"
+              placeholder="Entrez votre clé API OpenAI (sk-...)"
+              value={openaiKey}
+              onChange={(e) => setOpenaiKey(e.target.value)}
+              className="flex-1"
+            />
+            <Button onClick={handleSaveApiKey}>
+              Sauvegarder
+            </Button>
+          </div>
+          <p className="text-xs text-slate-500">
+            Votre clé API est nécessaire pour générer des suggestions de titres et descriptions.
+          </p>
+        </div>
+        
         <SeoAnalysisForm 
           url={url}
           setUrl={setUrl}

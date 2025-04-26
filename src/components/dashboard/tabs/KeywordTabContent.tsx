@@ -21,6 +21,7 @@ const KeywordTabContent = () => {
   const [longDescription, setLongDescription] = useState('');
   const [descriptionType, setDescriptionType] = useState<'short' | 'long'>('short');
   const [apiKeyStatus, setApiKeyStatus] = useState<'unchecked' | 'valid' | 'invalid'>('unchecked');
+  const [openaiKey, setOpenaiKey] = useState(() => localStorage.getItem('openaiKey') || '');
 
   // Vérifier la clé API au chargement du composant
   useEffect(() => {
@@ -54,6 +55,32 @@ const KeywordTabContent = () => {
     checkApiKey();
   }, []);
 
+  // Gérer la sauvegarde de la clé API
+  const handleSaveApiKey = () => {
+    if (openaiKey) {
+      localStorage.setItem('openaiKey', openaiKey);
+      toast.success("Clé API OpenAI sauvegardée");
+      
+      // Valider la clé API
+      const openAIService = new OpenAIService(openaiKey);
+      OpenAIService.enableProxy();
+      openAIService.validateApiKey()
+        .then(isValid => {
+          setApiKeyStatus(isValid ? 'valid' : 'invalid');
+          if (isValid) {
+            toast.success("Clé API validée avec succès");
+          } else {
+            toast.error("La clé API n'a pas pu être validée");
+          }
+        })
+        .catch(() => {
+          toast.warning("Clé sauvegardée mais impossible de la valider (problème réseau)");
+        });
+    } else {
+      toast.error("Veuillez entrer une clé API");
+    }
+  };
+
   const handleGenerateKeywords = async () => {
     if (!keyword) {
       toast.error("Veuillez entrer un mot-clé");
@@ -62,10 +89,10 @@ const KeywordTabContent = () => {
 
     setIsLoading(true);
     try {
-      const apiKey = localStorage.getItem('openaiKey');
+      const apiKey = openaiKey || localStorage.getItem('openaiKey');
       if (!apiKey) {
         toast.error("Clé API OpenAI manquante", {
-          description: "Veuillez configurer votre clé API dans les paramètres"
+          description: "Veuillez configurer votre clé API dans le champ ci-dessus"
         });
         setIsLoading(false);
         return;
@@ -208,6 +235,29 @@ const KeywordTabContent = () => {
 
   return (
     <div className="space-y-6">
+      {/* Section clé API */}
+      <Card className="p-4 border border-blue-100">
+        <h3 className="font-medium text-blue-800 mb-2">Configuration de l'API OpenAI</h3>
+        <div className="flex gap-2">
+          <Input
+            type="password"
+            placeholder="Entrez votre clé API OpenAI (sk-...)"
+            value={openaiKey}
+            onChange={(e) => setOpenaiKey(e.target.value)}
+            className="flex-1"
+          />
+          <Button onClick={handleSaveApiKey} variant="outline" className="whitespace-nowrap">
+            Sauvegarder la clé
+          </Button>
+        </div>
+        {apiKeyStatus === 'valid' && (
+          <p className="text-xs text-green-600 mt-1">✓ Clé API validée</p>
+        )}
+        {apiKeyStatus === 'invalid' && (
+          <p className="text-xs text-red-600 mt-1">⚠ Clé API non valide ou non vérifiée</p>
+        )}
+      </Card>
+
       <div className="flex gap-4">
         <Input
           placeholder="Entrez votre mot-clé principal"
@@ -223,10 +273,10 @@ const KeywordTabContent = () => {
         </Button>
       </div>
 
-      {apiKeyStatus === 'invalid' && (
+      {apiKeyStatus === 'invalid' && openaiKey === '' && (
         <Card className="p-4 border-yellow-300 bg-yellow-50">
           <p className="text-sm text-yellow-800">
-            Aucune clé API OpenAI valide détectée. Veuillez configurer votre clé dans les paramètres pour des résultats optimaux.
+            Aucune clé API OpenAI valide détectée. Veuillez configurer votre clé pour des résultats optimaux.
           </p>
         </Card>
       )}
