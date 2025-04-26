@@ -1,4 +1,4 @@
-import { KeywordSuggestion, OpenAIKeywordResponse } from '@/types/seo';
+import { KeywordSuggestion } from '@/types/seo';
 
 export class OpenAIService {
   private apiKey: string;
@@ -10,6 +10,7 @@ export class OpenAIService {
     'https://cors-anywhere.herokuapp.com/'
   ];
   private static currentProxyIndex: number = 0;
+  private static maxRetries: number = 2;
   
   constructor(apiKey: string) {
     this.apiKey = apiKey || '';
@@ -115,64 +116,89 @@ export class OpenAIService {
   }
   
   // Méthode pour obtenir des suggestions de mots-clés
-  async getKeywordSuggestions(keyword: string): Promise<KeywordSuggestion[]> {
+  async getKeywordSuggestions(keyword: string, retryCount = 0): Promise<KeywordSuggestion[]> {
     if (!this.isValidApiKeyFormat()) {
       console.error('Tentative d\'utilisation de getKeywordSuggestions sans clé API valide');
       throw new Error('Clé API OpenAI non définie ou invalide');
     }
 
-  try {
-    console.log("Génération de suggestions pour le mot-clé:", keyword);
-    
-    const apiUrl = 'https://api.openai.com/v1/chat/completions';
-    const finalApiUrl = OpenAIService.applyProxy(apiUrl);
-    
-    const response = await fetch(finalApiUrl, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${this.apiKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: 'Génère des suggestions SEO au format JSON.' },
-          { 
-            role: 'user',
-            content: `Génère 5 suggestions SEO pour le mot-clé: "${keyword}". Format JSON avec: keyword, searchVolume (nombre), difficulty (1-100), suggestedTitle (max 60 caractères), suggestedDescription (155 caractères), relevance (1-100), competition (0-1), cpc (nombre décimal), volume (nombre).` 
-          }
-        ],
-        temperature: 0.7
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`Erreur API OpenAI: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const content = data.choices[0].message.content;
-    
     try {
-      const suggestions = JSON.parse(content);
-      return suggestions.map((item: any) => ({
-        ...item,
-        searchVolume: item.searchVolume || Math.floor(Math.random() * 10000),
-        difficulty: item.difficulty || Math.floor(Math.random() * 100),
-        relevance: item.relevance || Math.floor(Math.random() * 30) + 70,
-        competition: item.competition || Math.random(),
-        cpc: item.cpc || parseFloat((Math.random() * 3 + 0.5).toFixed(2)),
-        volume: item.volume || Math.floor(Math.random() * 10000)
-      }));
+      console.log("Génération de suggestions pour le mot-clé:", keyword);
+      
+      const apiUrl = 'https://api.openai.com/v1/chat/completions';
+      const finalApiUrl = OpenAIService.applyProxy(apiUrl);
+      
+      console.log(`Tentative d'appel à l'API: ${finalApiUrl}`);
+      
+      const response = await fetch(finalApiUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            { role: 'system', content: 'Génère des suggestions SEO au format JSON.' },
+            { 
+              role: 'user',
+              content: `Génère 5 suggestions SEO pour le mot-clé: "${keyword}". Format JSON avec: keyword, searchVolume (nombre), difficulty (1-100), suggestedTitle (max 60 caractères), suggestedDescription (155 caractères), suggestedShortDescription (variante courte), suggestedLongDescription (variante longue), relevance (1-100), competition (0-1), cpc (nombre décimal), volume (nombre).` 
+            }
+          ],
+          temperature: 0.7
+        })
+      });
+
+      if (!response.ok) {
+        console.error(`Erreur API HTTP: ${response.status}`);
+        
+        // Tenter avec un autre proxy
+        if (retryCount < OpenAIService.maxRetries) {
+          console.log(`Rotation du proxy et nouvelle tentative (${retryCount + 1}/${OpenAIService.maxRetries})`);
+          OpenAIService.rotateProxy();
+          return this.getKeywordSuggestions(keyword, retryCount + 1);
+        }
+        
+        throw new Error(`Erreur API OpenAI: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const content = data.choices[0].message.content;
+      
+      try {
+        console.log("Analyse de la réponse JSON de l'API");
+        const suggestions = JSON.parse(content);
+        
+        return suggestions.map((item: any) => ({
+          ...item,
+          searchVolume: item.searchVolume || Math.floor(Math.random() * 10000),
+          difficulty: item.difficulty || Math.floor(Math.random() * 100),
+          relevance: item.relevance || Math.floor(Math.random() * 30) + 70,
+          competition: item.competition || Math.random(),
+          cpc: item.cpc || parseFloat((Math.random() * 3 + 0.5).toFixed(2)),
+          volume: item.volume || Math.floor(Math.random() * 10000),
+          suggestedShortDescription: item.suggestedShortDescription || item.suggestedDescription,
+          suggestedLongDescription: item.suggestedLongDescription || item.suggestedDescription
+        }));
+      } catch (error) {
+        console.error("Erreur parsing JSON:", error, "Contenu:", content);
+        throw new Error('Format de réponse invalide');
+      }
     } catch (error) {
-      console.error("Erreur parsing JSON:", error);
-      throw new Error('Format de réponse invalide');
+      console.error('Erreur lors de la génération de suggestions:', error);
+      
+      // Si c'est une erreur réseau (Failed to fetch) et qu'on n'a pas dépassé le nombre de tentatives
+      if (error instanceof Error && 
+          error.message.includes('fetch') && 
+          retryCount < OpenAIService.maxRetries) {
+        console.log(`Erreur réseau, rotation du proxy et nouvelle tentative (${retryCount + 1}/${OpenAIService.maxRetries})`);
+        OpenAIService.rotateProxy();
+        return this.getKeywordSuggestions(keyword, retryCount + 1);
+      }
+      
+      throw error;
     }
-  } catch (error) {
-    console.error('Erreur lors de la génération de suggestions:', error);
-    throw error;
   }
-}
   
   async analyzeWebpage(url: string): Promise<{ keywords: string[] }> {
     try {
