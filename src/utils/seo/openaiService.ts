@@ -1,4 +1,3 @@
-
 import { KeywordSuggestion, OpenAIKeywordResponse } from '@/types/seo';
 
 export class OpenAIService {
@@ -122,137 +121,58 @@ export class OpenAIService {
       throw new Error('Clé API OpenAI non définie ou invalide');
     }
 
-    if (!keyword || keyword.trim() === '') {
-      console.error('Mot-clé vide fourni à getKeywordSuggestions');
-      throw new Error('Mot-clé non défini');
+  try {
+    console.log("Génération de suggestions pour le mot-clé:", keyword);
+    
+    const apiUrl = 'https://api.openai.com/v1/chat/completions';
+    const finalApiUrl = OpenAIService.applyProxy(apiUrl);
+    
+    const response = await fetch(finalApiUrl, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${this.apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: 'Génère des suggestions SEO au format JSON.' },
+          { 
+            role: 'user',
+            content: `Génère 5 suggestions SEO pour le mot-clé: "${keyword}". Format JSON avec: keyword, searchVolume (nombre), difficulty (1-100), suggestedTitle (max 60 caractères), suggestedDescription (155 caractères), relevance (1-100), competition (0-1), cpc (nombre décimal), volume (nombre).` 
+          }
+        ],
+        temperature: 0.7
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erreur API OpenAI: ${response.status}`);
     }
 
+    const data = await response.json();
+    const content = data.choices[0].message.content;
+    
     try {
-      console.log("Génération de suggestions pour le mot-clé:", keyword);
-      
-      const prompt = `Génère 5 suggestions de mots-clés SEO pour: "${keyword}".
-Pour chaque mot-clé, fournit:
-1. Le mot-clé
-2. Une estimation du volume de recherche (nombre)
-3. Une difficulté d'optimisation (nombre de 1 à 100)
-4. Un titre optimisé pour le SEO (max 60 caractères)
-5. Une meta description courte optimisée (exactement 155 caractères)
-6. Une meta description longue optimisée (exactement 500 caractères)
-
-Format en JSON comme ceci:
-[
-  {
-    "keyword": "exemple mot-clé",
-    "searchVolume": 1000,
-    "difficulty": 40,
-    "suggestedTitle": "Titre SEO optimisé pour ce mot-clé | Exemple",
-    "suggestedDescription": "Description courte optimisée pour le SEO avec le mot-clé cible et un appel à l'action clair, limitée à exactement 155 caractères.",
-    "suggestedShortDescription": "Description courte exactement 155 caractères avec mot-clé et appel à l'action",
-    "suggestedLongDescription": "Description longue 500 caractères"
-  }
-]
-
-Assure-toi que les descriptions font EXACTEMENT le nombre de caractères demandé.`;
-
-      const apiUrl = 'https://api.openai.com/v1/chat/completions';
-      const finalApiUrl = OpenAIService.applyProxy(apiUrl);
-      
-      console.log("Envoi de requête OpenAI à:", finalApiUrl);
-      
-      const response = await fetch(finalApiUrl, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [
-            { 
-              role: 'system', 
-              content: 'Tu es un expert SEO. Génère des suggestions de mots-clés au format JSON. Les descriptions doivent faire exactement le nombre de caractères spécifié.' 
-            },
-            { 
-              role: 'user', 
-              content: prompt 
-            }
-          ],
-          temperature: 0.5,
-          max_tokens: 2000
-        })
-      });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`Erreur API OpenAI: ${response.status}`, errorText);
-        
-        // Si erreur de CORS ou connexion, essayer un autre proxy
-        if (response.status === 0) {
-          OpenAIService.rotateProxy();
-          return this.getKeywordSuggestions(keyword);
-        }
-        
-        // Message d'erreur plus précis selon le code d'état
-        if (response.status === 401) {
-          throw new Error(`Erreur d'authentification (401): Clé API invalide ou expirée`);
-        } else if (response.status === 429) {
-          throw new Error(`Limite de requêtes dépassée (429): Réessayez plus tard`);
-        } else {
-          throw new Error(`Erreur API OpenAI: ${response.status} - ${errorText.substring(0, 100)}`);
-        }
-      }
-      
-      const data = await response.json();
-      console.log("Réponse OpenAI reçue");
-      
-      if (!data.choices || !data.choices[0] || !data.choices[0].message || !data.choices[0].message.content) {
-        console.error("Format de réponse inattendu:", data);
-        throw new Error("La réponse API OpenAI est dans un format inattendu");
-      }
-      
-      const content = data.choices[0].message.content;
-      
-      // Extraction du JSON de la réponse
-      const jsonMatch = content.match(/\[[\s\S]*\]/);
-      
-      if (!jsonMatch) {
-        console.error("Format de réponse invalide:", content);
-        throw new Error('Format de réponse invalide: JSON non trouvé');
-      }
-      
-      let keywordData;
-      try {
-        keywordData = JSON.parse(jsonMatch[0]) as OpenAIKeywordResponse[];
-        console.log("Données de mots-clés analysées:", keywordData.length, "suggestions");
-      } catch (e) {
-        console.error("Erreur d'analyse JSON:", e, "Réponse brute:", content);
-        throw new Error('Erreur d\'analyse du format JSON');
-      }
-      
-      if (!Array.isArray(keywordData) || keywordData.length === 0) {
-        console.error("Données de mots-clés invalides:", keywordData);
-        throw new Error('Aucune suggestion de mot-clé n\'a été générée');
-      }
-      
-      // Conversion vers le format KeywordSuggestion
-      return keywordData.map(item => ({
-        keyword: item.keyword || keyword,
+      const suggestions = JSON.parse(content);
+      return suggestions.map((item: any) => ({
+        ...item,
         searchVolume: item.searchVolume || Math.floor(Math.random() * 10000),
         difficulty: item.difficulty || Math.floor(Math.random() * 100),
-        suggestedTitle: item.suggestedTitle || `${keyword} - Titre optimisé pour le SEO | Guide complet`,
-        suggestedDescription: item.suggestedDescription || `Découvrez notre guide complet sur ${keyword}. Conseils d'experts, astuces et stratégies éprouvées pour maximiser vos résultats.`.substring(0, 155),
-        suggestedShortDescription: item.suggestedShortDescription || item.suggestedDescription || `Découvrez notre guide complet sur ${keyword}. Conseils d'experts, astuces et stratégies éprouvées pour maximiser vos résultats.`.substring(0, 155),
-        suggestedLongDescription: item.suggestedLongDescription || `${item.suggestedDescription || `Plongez dans notre guide détaillé sur ${keyword}. Nos experts partagent leurs connaissances et meilleures pratiques pour vous aider à maîtriser ce sujet essentiel.`}`.substring(0, 500),
-        relevance: Math.floor(Math.random() * 30) + 70,
-        competition: Math.random(),
-        cpc: parseFloat((Math.random() * 3 + 0.5).toFixed(2)),
-        volume: item.searchVolume || Math.floor(Math.random() * 10000)
+        relevance: item.relevance || Math.floor(Math.random() * 30) + 70,
+        competition: item.competition || Math.random(),
+        cpc: item.cpc || parseFloat((Math.random() * 3 + 0.5).toFixed(2)),
+        volume: item.volume || Math.floor(Math.random() * 10000)
       }));
     } catch (error) {
-      console.error('Erreur lors de la génération de suggestions:', error);
-      throw error;
+      console.error("Erreur parsing JSON:", error);
+      throw new Error('Format de réponse invalide');
     }
+  } catch (error) {
+    console.error('Erreur lors de la génération de suggestions:', error);
+    throw error;
   }
+}
   
   async analyzeWebpage(url: string): Promise<{ keywords: string[] }> {
     try {
