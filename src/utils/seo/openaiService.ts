@@ -172,14 +172,16 @@ export class OpenAIService {
         
         return suggestions.map((item: any) => ({
           ...item,
+          keyword: item.keyword || keyword,
           searchVolume: item.searchVolume || Math.floor(Math.random() * 10000),
           difficulty: item.difficulty || Math.floor(Math.random() * 100),
           relevance: item.relevance || Math.floor(Math.random() * 30) + 70,
           competition: item.competition || Math.random(),
           cpc: item.cpc || parseFloat((Math.random() * 3 + 0.5).toFixed(2)),
           volume: item.volume || Math.floor(Math.random() * 10000),
-          suggestedShortDescription: item.suggestedShortDescription || item.suggestedDescription || `Description courte pour "${item.keyword}" générée automatiquement.`,
-          suggestedLongDescription: item.suggestedLongDescription || `Description longue pour "${item.keyword}" générée automatiquement. Cette description est plus détaillée et contient environ 500 caractères pour donner une explication complète du sujet. Elle peut inclure des points clés, des avantages, et des informations contextuelles importantes pour aider le lecteur à comprendre en profondeur le contenu lié au mot-clé.`
+          suggestedDescription: item.suggestedDescription || `Description pour "${item.keyword || keyword}" générée automatiquement.`,
+          suggestedShortDescription: item.suggestedShortDescription || item.suggestedDescription || `Description courte pour "${item.keyword || keyword}" générée automatiquement.`,
+          suggestedLongDescription: item.suggestedLongDescription || `Description longue pour "${item.keyword || keyword}" générée automatiquement. Cette description est plus détaillée et contient environ 500 caractères pour donner une explication complète du sujet. Elle peut inclure des points clés, des avantages, et des informations contextuelles importantes pour aider le lecteur à comprendre en profondeur le contenu lié au mot-clé.`
         }));
       } catch (error) {
         console.error("Erreur parsing JSON:", error, "Contenu:", content);

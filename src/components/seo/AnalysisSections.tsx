@@ -1,11 +1,19 @@
 
 import React from 'react';
-import { SeoAnalysis, KeywordSuggestion } from '@/types/seo';
-import { Card } from '@/components/ui/card';
+import { KeywordSuggestion } from '@/types/seo';
+import KeywordSuggestions from '@/components/seo/analysis/KeywordSuggestions';
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { OpenAIService } from '@/utils/seo/openaiService';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import EmojiTab from '@/components/seo/analysis/EmojiTab';
+import HashtagsTab from '@/components/seo/analysis/HashtagsTab';
+import { Card } from "@/components/ui/card";
+import { generateBothDescriptions } from '@/utils/seo/generators/descriptionGenerator';
 import SeoAnalysisForm from './analysis/SeoAnalysisForm';
 import ResultsDisplay from './analysis/ResultsDisplay';
 import ComparisonSection from './analysis/ComparisonSection';
-import KeywordSuggestions from './analysis/KeywordSuggestions';
 import ContentGenerator from './analysis/ContentGenerator';
 
 interface AnalysisSectionsProps {
@@ -13,8 +21,8 @@ interface AnalysisSectionsProps {
   setUrl: (url: string) => void;
   isLoading: boolean;
   showCorsWarning: boolean;
-  seoAnalysis: SeoAnalysis | null;
-  setSeoAnalysis: (analysis: SeoAnalysis) => void;
+  seoAnalysis: any | null;
+  setSeoAnalysis: (analysis: any) => void;
   comparisonSite: string;
   setComparisonSite: (site: string) => void;
   generatedKeywords: KeywordSuggestion[];
@@ -50,8 +58,28 @@ const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
   analyzeSite,
   error,
   handleActivateProxy,
-  handleContentKeywordChange
+  handleContentKeywordChange,
+  handleGeneratedKeywords
 }) => {
+  // Add these state variables and functions needed for KeywordSuggestions
+  const [title, setTitle] = React.useState('');
+  const [description, setDescription] = React.useState('');
+  
+  const handleInsertTitle = (value: string) => {
+    setTitle(value);
+    toast.success("Titre inséré");
+  };
+  
+  const handleInsertDescription = (value: string) => {
+    setDescription(value);
+    toast.success("Description insérée");
+  };
+  
+  const handleGenerateMore = () => {
+    toast.info("Génération de nouvelles suggestions...");
+    // Here you would typically call your generation function
+  };
+
   return (
     <Card className="p-6">
       <h2 className="text-xl font-bold mb-4">Analyse SEO</h2>
@@ -81,6 +109,13 @@ const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
         
         <KeywordSuggestions 
           generatedKeywords={generatedKeywords}
+          onGenerateClick={handleGenerateMore}
+          fieldValue={title}
+          onInsert={handleInsertTitle}
+          maxLength={60}
+          descriptionValue={description}
+          onInsertDescription={handleInsertDescription}
+          maxLengthDescription={155}
         />
         
         <ContentGenerator 

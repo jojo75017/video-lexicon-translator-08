@@ -53,9 +53,9 @@ const KeywordSuggestions = ({
   // Obtenir la bonne description en fonction du type demandé
   const getDescription = (kw: KeywordSuggestion): string => {
     if (descriptionType === 'short') {
-      return kw.suggestedShortDescription || kw.suggestedDescription;
+      return kw.suggestedShortDescription || kw.suggestedDescription || '';
     }
-    return kw.suggestedLongDescription || kw.suggestedDescription;
+    return kw.suggestedLongDescription || kw.suggestedDescription || '';
   };
 
   return (
