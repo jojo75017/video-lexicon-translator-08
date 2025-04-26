@@ -47,7 +47,7 @@ const KeywordSuggestions = ({
       return;
     }
     onInsertDescription(description);
-    toast.success(`Description ${descriptionType} insérée`);
+    toast.success(`Description ${descriptionType === 'short' ? 'courte' : 'longue'} insérée`);
   };
 
   // Obtenir la bonne description en fonction du type demandé
@@ -106,32 +106,63 @@ const KeywordSuggestions = ({
         </TabsContent>
         
         <TabsContent value="descriptions">
-          <div className="space-y-3">
-            <h4 className="font-medium text-gray-700">Descriptions suggérées</h4>
-            <div className="grid gap-3">
-              {generatedKeywords.map((kw, idx) => {
-                const description = getDescription(kw);
-                
-                return (
-                  <div key={idx} className="bg-gray-50 p-3 rounded-lg flex justify-between items-center">
-                    <div className="flex-1">
-                      <p className="text-sm line-clamp-2">{description || "Pas de description disponible"}</p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        Longueur: {description?.length || 0}/{maxLengthDescription} caractères
-                      </p>
+          <div className="space-y-6">
+            <div>
+              <h4 className="font-medium text-gray-700 mb-3">Descriptions courtes (155 caractères)</h4>
+              <div className="grid gap-3">
+                {generatedKeywords.map((kw, idx) => {
+                  const shortDescription = kw.suggestedShortDescription || kw.suggestedDescription;
+                  
+                  return (
+                    <div key={`short-${idx}`} className="bg-gray-50 p-3 rounded-lg flex justify-between items-center">
+                      <div className="flex-1">
+                        <p className="text-sm line-clamp-2">{shortDescription || "Pas de description disponible"}</p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Longueur: {shortDescription?.length || 0}/155 caractères
+                        </p>
+                      </div>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => onInsertDescription && handleInsertDescription(shortDescription)}
+                        disabled={!shortDescription || !onInsertDescription}
+                        className="ml-3 whitespace-nowrap"
+                      >
+                        Utiliser (courte)
+                      </Button>
                     </div>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => handleInsertDescription(description)}
-                      disabled={!description}
-                      className="ml-3 whitespace-nowrap"
-                    >
-                      Utiliser
-                    </Button>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
+            </div>
+            
+            <div>
+              <h4 className="font-medium text-gray-700 mb-3">Descriptions longues (500 caractères)</h4>
+              <div className="grid gap-3">
+                {generatedKeywords.map((kw, idx) => {
+                  const longDescription = kw.suggestedLongDescription || "";
+                  
+                  return (
+                    <div key={`long-${idx}`} className="bg-gray-50 p-3 rounded-lg">
+                      <div className="flex justify-between items-start mb-2">
+                        <p className="text-sm font-medium">{kw.keyword}</p>
+                        <p className="text-xs text-gray-500">
+                          {longDescription.length}/500 caractères
+                        </p>
+                      </div>
+                      <p className="text-sm mb-3 line-clamp-3">{longDescription || "Pas de description longue disponible"}</p>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => onInsertDescription && handleInsertDescription(longDescription)}
+                        disabled={!longDescription || !onInsertDescription}
+                      >
+                        Utiliser (longue)
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </TabsContent>

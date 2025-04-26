@@ -1,3 +1,4 @@
+
 import { KeywordSuggestion } from '@/types/seo';
 
 export class OpenAIService {
@@ -142,7 +143,7 @@ export class OpenAIService {
             { role: 'system', content: 'Génère des suggestions SEO au format JSON.' },
             { 
               role: 'user',
-              content: `Génère 5 suggestions SEO pour le mot-clé: "${keyword}". Format JSON avec: keyword, searchVolume (nombre), difficulty (1-100), suggestedTitle (max 60 caractères), suggestedDescription (155 caractères), suggestedShortDescription (variante courte), suggestedLongDescription (variante longue), relevance (1-100), competition (0-1), cpc (nombre décimal), volume (nombre).` 
+              content: `Génère 5 suggestions SEO pour le mot-clé: "${keyword}". Format JSON avec: keyword, searchVolume (nombre), difficulty (1-100), suggestedTitle (max 60 caractères), suggestedDescription (155 caractères), suggestedShortDescription (variante courte, 155 car max), suggestedLongDescription (variante longue, 500 car), relevance (1-100), competition (0-1), cpc (nombre décimal), volume (nombre).` 
             }
           ],
           temperature: 0.7
@@ -177,8 +178,8 @@ export class OpenAIService {
           competition: item.competition || Math.random(),
           cpc: item.cpc || parseFloat((Math.random() * 3 + 0.5).toFixed(2)),
           volume: item.volume || Math.floor(Math.random() * 10000),
-          suggestedShortDescription: item.suggestedShortDescription || item.suggestedDescription,
-          suggestedLongDescription: item.suggestedLongDescription || item.suggestedDescription
+          suggestedShortDescription: item.suggestedShortDescription || item.suggestedDescription || `Description courte pour "${item.keyword}" générée automatiquement.`,
+          suggestedLongDescription: item.suggestedLongDescription || `Description longue pour "${item.keyword}" générée automatiquement. Cette description est plus détaillée et contient environ 500 caractères pour donner une explication complète du sujet. Elle peut inclure des points clés, des avantages, et des informations contextuelles importantes pour aider le lecteur à comprendre en profondeur le contenu lié au mot-clé.`
         }));
       } catch (error) {
         console.error("Erreur parsing JSON:", error, "Contenu:", content);
