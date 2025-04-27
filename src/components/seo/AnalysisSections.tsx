@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { KeywordSuggestion } from '@/types/seo';
 import KeywordSuggestions from '@/components/seo/analysis/KeywordSuggestions';
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,7 @@ import SeoAnalysisForm from './analysis/SeoAnalysisForm';
 import ResultsDisplay from './analysis/ResultsDisplay';
 import ComparisonSection from './analysis/ComparisonSection';
 import ContentGenerator from './analysis/ContentGenerator';
+import { CheckCircle, AlertCircle } from 'lucide-react';
 
 interface AnalysisSectionsProps {
   url: string;
@@ -65,29 +66,95 @@ const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
   const [title, setTitle] = React.useState('');
   const [description, setDescription] = React.useState('');
   const [openaiKey, setOpenaiKey] = React.useState(() => localStorage.getItem('openaiKey') || '');
+  const [apiKeyStatus, setApiKeyStatus] = useState<'unchecked' | 'valid' | 'invalid'>('unchecked');
+  const [validationMessage, setValidationMessage] = useState<string>('');
+  
+  // Vérifier la clé API au chargement du composant
+  useEffect(() => {
+    const checkApiKey = async () => {
+      const apiKey = localStorage.getItem('openaiKey');
+      if (!apiKey) {
+        setApiKeyStatus('invalid');
+        setValidationMessage("Aucune clé API configurée");
+        return;
+      }
+
+      try {
+        setOpenaiKey(apiKey);
+        const openAIService = new OpenAIService(apiKey);
+        // Essayer de valider la clé API
+        OpenAIService.enableProxy();
+        const isValid = await openAIService.validateApiKey();
+        setApiKeyStatus(isValid ? 'valid' : 'invalid');
+        
+        if (isValid) {
+          setValidationMessage("Clé API validée avec succès");
+          // Générer automatiquement des suggestions
+          if (generatedKeywords.length === 0) {
+            generateKeywordSuggestions(openAIService);
+          }
+        } else {
+          setValidationMessage("La clé API n'a pas pu être validée");
+        }
+      } catch (error) {
+        console.error("Erreur lors de la vérification de la clé API:", error);
+        setApiKeyStatus('invalid');
+        setValidationMessage("Impossible de vérifier la clé API (problème réseau)");
+      }
+    };
+    
+    checkApiKey();
+  }, []);
   
   // Handle saving the API key
-  const handleSaveApiKey = () => {
+  const handleSaveApiKey = async () => {
     if (openaiKey) {
       localStorage.setItem('openaiKey', openaiKey);
-      toast.success("Clé API OpenAI sauvegardée");
+      toast.info("Validation de la clé API en cours...");
       
       // Valider la clé API
       const openAIService = new OpenAIService(openaiKey);
       OpenAIService.enableProxy();
-      openAIService.validateApiKey()
-        .then(isValid => {
-          if (isValid) {
-            toast.success("Clé API validée avec succès");
-          } else {
-            toast.error("La clé API n'a pas pu être validée");
-          }
-        })
-        .catch(() => {
-          toast.warning("Clé sauvegardée mais impossible de la valider (problème réseau)");
-        });
+      try {
+        const isValid = await openAIService.validateApiKey();
+        setApiKeyStatus(isValid ? 'valid' : 'invalid');
+        
+        if (isValid) {
+          setValidationMessage("Clé API validée avec succès");
+          toast.success("Clé API OpenAI validée avec succès");
+          
+          // Générer automatiquement des suggestions
+          generateKeywordSuggestions(openAIService);
+        } else {
+          setValidationMessage("La clé API n'a pas pu être validée");
+          toast.error("La clé API n'a pas pu être validée");
+        }
+      } catch (error) {
+        console.error("Erreur lors de la validation:", error);
+        setApiKeyStatus('invalid');
+        setValidationMessage("Impossible de vérifier la clé API (problème réseau)");
+        toast.warning("Clé sauvegardée mais impossible de la valider (problème réseau)");
+      }
     } else {
       toast.error("Veuillez entrer une clé API");
+    }
+  };
+  
+  const generateKeywordSuggestions = async (openAIService: OpenAIService) => {
+    toast.info("Génération automatique de suggestions...");
+    
+    try {
+      // Utiliser un mot-clé par défaut pour la première génération
+      const defaultKeyword = "référencement";
+      const newKeywords = await openAIService.getKeywordSuggestions(defaultKeyword);
+      
+      if (handleGeneratedKeywords) {
+        handleGeneratedKeywords(newKeywords);
+        toast.success("Suggestions générées avec succès");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la génération:", error);
+      toast.error("Impossible de générer des suggestions");
     }
   };
   
@@ -148,15 +215,29 @@ const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
               placeholder="Entrez votre clé API OpenAI (sk-...)"
               value={openaiKey}
               onChange={(e) => setOpenaiKey(e.target.value)}
-              className="flex-1"
+              className={`flex-1 ${apiKeyStatus === 'valid' ? 'border-green-500' : apiKeyStatus === 'invalid' ? 'border-red-500' : ''}`}
             />
             <Button onClick={handleSaveApiKey}>
               Sauvegarder
             </Button>
           </div>
-          <p className="text-xs text-slate-500">
-            Votre clé API est nécessaire pour générer des suggestions de titres et descriptions.
-          </p>
+          <div className="flex items-center mt-2">
+            {apiKeyStatus === 'valid' && (
+              <div className="flex items-center text-xs text-green-600">
+                <CheckCircle className="h-4 w-4 mr-1" />
+                <span>{validationMessage}</span>
+              </div>
+            )}
+            {apiKeyStatus === 'invalid' && (
+              <div className="flex items-center text-xs text-red-600">
+                <AlertCircle className="h-4 w-4 mr-1" />
+                <span>{validationMessage}</span>
+              </div>
+            )}
+            {apiKeyStatus === 'unchecked' && (
+              <span className="text-xs text-gray-500">Aucune clé API vérifiée</span>
+            )}
+          </div>
         </div>
         
         <SeoAnalysisForm 
