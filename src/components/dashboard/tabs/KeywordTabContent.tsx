@@ -11,6 +11,7 @@ import EmojiTab from '@/components/seo/analysis/EmojiTab';
 import HashtagsTab from '@/components/seo/analysis/HashtagsTab';
 import { Card } from "@/components/ui/card";
 import { generateBothDescriptions } from '@/utils/seo/generators/descriptionGenerator';
+import { CheckCircle, AlertCircle } from 'lucide-react';
 
 const KeywordTabContent = () => {
   const [keyword, setKeyword] = useState('');
@@ -22,13 +23,15 @@ const KeywordTabContent = () => {
   const [descriptionType, setDescriptionType] = useState<'short' | 'long'>('short');
   const [apiKeyStatus, setApiKeyStatus] = useState<'unchecked' | 'valid' | 'invalid'>('unchecked');
   const [openaiKey, setOpenaiKey] = useState(() => localStorage.getItem('openaiKey') || '');
-
+  const [validationMessage, setValidationMessage] = useState<string>('');
+  
   // Vérifier la clé API au chargement du composant
   useEffect(() => {
     const checkApiKey = async () => {
       const apiKey = localStorage.getItem('openaiKey');
       if (!apiKey) {
         setApiKeyStatus('invalid');
+        setValidationMessage("Aucune clé API configurée");
         return;
       }
 
@@ -39,13 +42,40 @@ const KeywordTabContent = () => {
         const isValid = await openAIService.validateApiKey();
         setApiKeyStatus(isValid ? 'valid' : 'invalid');
         
-        if (!isValid) {
-          toast.warning("Clé API potentiellement invalide", {
-            description: "La validation de votre clé API a échoué"
-          });
+        if (isValid) {
+          setValidationMessage("Clé API validée avec succès");
+          toast.success("Clé API OpenAI validée");
+          
+          // Générer automatiquement des suggestions avec un mot-clé par défaut
+          if (suggestions.length === 0) {
+            setIsLoading(true);
+            try {
+              const defaultKeyword = "référencement";
+              const newKeywords = await openAIService.getKeywordSuggestions(defaultKeyword);
+              setSuggestions(newKeywords);
+              setKeyword(defaultKeyword);
+              toast.success("Suggestions générées automatiquement");
+            } catch (error) {
+              console.error("Erreur lors de la génération automatique:", error);
+              // Générer des données de démonstration en cas d'échec
+              const demoKeywords = generateDemoKeywords("référencement");
+              setSuggestions(demoKeywords);
+              setKeyword("référencement");
+              toast.warning("Mode démonstration activé", {
+                description: "Utilisation de données de démonstration."
+              });
+            } finally {
+              setIsLoading(false);
+            }
+          }
+        } else {
+          setValidationMessage("La clé API n'a pas pu être validée");
+          toast.error("La clé API n'a pas pu être validée");
         }
       } catch (error) {
         console.error("Erreur lors de la vérification de la clé API:", error);
+        setApiKeyStatus('invalid');
+        setValidationMessage("Impossible de vérifier la clé API (problème réseau)");
         toast.error("Erreur de connexion", {
           description: "Impossible de vérifier votre clé API. Vérifiez votre connexion Internet."
         });
@@ -56,26 +86,54 @@ const KeywordTabContent = () => {
   }, []);
 
   // Gérer la sauvegarde de la clé API
-  const handleSaveApiKey = () => {
+  const handleSaveApiKey = async () => {
     if (openaiKey) {
       localStorage.setItem('openaiKey', openaiKey);
-      toast.success("Clé API OpenAI sauvegardée");
+      toast.info("Validation de la clé API en cours...");
+      setValidationMessage("Validation en cours...");
       
       // Valider la clé API
       const openAIService = new OpenAIService(openaiKey);
       OpenAIService.enableProxy();
-      openAIService.validateApiKey()
-        .then(isValid => {
-          setApiKeyStatus(isValid ? 'valid' : 'invalid');
-          if (isValid) {
-            toast.success("Clé API validée avec succès");
-          } else {
-            toast.error("La clé API n'a pas pu être validée");
+      try {
+        const isValid = await openAIService.validateApiKey();
+        setApiKeyStatus(isValid ? 'valid' : 'invalid');
+        
+        if (isValid) {
+          setValidationMessage("Clé API validée avec succès");
+          toast.success("Clé API OpenAI validée avec succès");
+          
+          // Générer automatiquement des suggestions
+          setIsLoading(true);
+          try {
+            // Utiliser un mot-clé par défaut pour la première génération
+            const defaultKeyword = "référencement";
+            const newKeywords = await openAIService.getKeywordSuggestions(defaultKeyword);
+            setSuggestions(newKeywords);
+            setKeyword(defaultKeyword);
+            toast.success("Suggestions générées automatiquement");
+          } catch (error) {
+            console.error("Erreur lors de la génération:", error);
+            // Générer des données de démonstration
+            const demoKeywords = generateDemoKeywords("référencement");
+            setSuggestions(demoKeywords);
+            setKeyword("référencement");
+            toast.warning("Mode démonstration activé", {
+              description: "Utilisation de données de démonstration."
+            });
+          } finally {
+            setIsLoading(false);
           }
-        })
-        .catch(() => {
-          toast.warning("Clé sauvegardée mais impossible de la valider (problème réseau)");
-        });
+        } else {
+          setValidationMessage("La clé API n'a pas pu être validée");
+          toast.error("La clé API n'a pas pu être validée");
+        }
+      } catch (error) {
+        console.error("Erreur lors de la validation:", error);
+        setApiKeyStatus('invalid');
+        setValidationMessage("Impossible de vérifier la clé API (problème réseau)");
+        toast.warning("Clé sauvegardée mais impossible de la valider (problème réseau)");
+      }
     } else {
       toast.error("Veuillez entrer une clé API");
     }
@@ -244,18 +302,29 @@ const KeywordTabContent = () => {
             placeholder="Entrez votre clé API OpenAI (sk-...)"
             value={openaiKey}
             onChange={(e) => setOpenaiKey(e.target.value)}
-            className="flex-1"
+            className={`flex-1 ${apiKeyStatus === 'valid' ? 'border-green-500' : apiKeyStatus === 'invalid' ? 'border-red-500' : ''}`}
           />
           <Button onClick={handleSaveApiKey} variant="outline" className="whitespace-nowrap">
             Sauvegarder la clé
           </Button>
         </div>
-        {apiKeyStatus === 'valid' && (
-          <p className="text-xs text-green-600 mt-1">✓ Clé API validée</p>
-        )}
-        {apiKeyStatus === 'invalid' && (
-          <p className="text-xs text-red-600 mt-1">⚠ Clé API non valide ou non vérifiée</p>
-        )}
+        <div className="flex items-center mt-2">
+          {apiKeyStatus === 'valid' && (
+            <div className="flex items-center text-xs text-green-600">
+              <CheckCircle className="h-4 w-4 mr-1" />
+              <span>{validationMessage}</span>
+            </div>
+          )}
+          {apiKeyStatus === 'invalid' && (
+            <div className="flex items-center text-xs text-red-600">
+              <AlertCircle className="h-4 w-4 mr-1" />
+              <span>{validationMessage}</span>
+            </div>
+          )}
+          {apiKeyStatus === 'unchecked' && (
+            <span className="text-xs text-gray-500">Aucune clé API vérifiée</span>
+          )}
+        </div>
       </Card>
 
       <div className="flex gap-4">

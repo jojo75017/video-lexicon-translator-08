@@ -111,6 +111,7 @@ const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
     if (openaiKey) {
       localStorage.setItem('openaiKey', openaiKey);
       toast.info("Validation de la clé API en cours...");
+      setValidationMessage("Validation en cours...");
       
       // Valider la clé API
       const openAIService = new OpenAIService(openaiKey);
