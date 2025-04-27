@@ -56,16 +56,13 @@ const KeywordTabContent = () => {
               
               // S'assurer que chaque suggestion a des descriptions courtes et longues
               const enhancedKeywords = newKeywords.map(kw => {
-                if (!kw.suggestedShortDescription || !kw.suggestedLongDescription) {
-                  const descriptions = generateBothDescriptions(kw.keyword);
-                  return {
-                    ...kw,
-                    suggestedShortDescription: descriptions.short,
-                    suggestedLongDescription: descriptions.long,
-                    suggestedDescription: descriptions.short
-                  };
-                }
-                return kw;
+                const descriptions = generateBothDescriptions(kw.keyword);
+                return {
+                  ...kw,
+                  suggestedShortDescription: descriptions.short,
+                  suggestedLongDescription: descriptions.long,
+                  suggestedDescription: descriptions.short
+                };
               });
               
               setSuggestions(enhancedKeywords);
@@ -104,15 +101,20 @@ const KeywordTabContent = () => {
   // Gérer la sauvegarde de la clé API
   const handleSaveApiKey = async () => {
     if (openaiKey) {
-      localStorage.setItem('openaiKey', openaiKey);
+      // Retirer les espaces et guillemets qui pourraient exister autour de la clé
+      const cleanKey = openaiKey.trim().replace(/^['"]|['"]$/g, '');
+      
+      localStorage.setItem('openaiKey', cleanKey);
       toast.info("Validation de la clé API en cours...");
       setValidationMessage("Validation en cours...");
       
       // Valider la clé API
-      const openAIService = new OpenAIService(openaiKey);
+      const openAIService = new OpenAIService(cleanKey);
       OpenAIService.enableProxy();
       try {
+        console.log("Tentative de validation de clé:", cleanKey.substring(0, 10) + "...");
         const isValid = await openAIService.validateApiKey();
+        console.log("Résultat validation:", isValid);
         setApiKeyStatus(isValid ? 'valid' : 'invalid');
         
         if (isValid) {
@@ -128,16 +130,13 @@ const KeywordTabContent = () => {
             
             // S'assurer que chaque suggestion a des descriptions courtes et longues
             const enhancedKeywords = newKeywords.map(kw => {
-              if (!kw.suggestedShortDescription || !kw.suggestedLongDescription) {
-                const descriptions = generateBothDescriptions(kw.keyword);
-                return {
-                  ...kw,
-                  suggestedShortDescription: descriptions.short,
-                  suggestedLongDescription: descriptions.long,
-                  suggestedDescription: descriptions.short
-                };
-              }
-              return kw;
+              const descriptions = generateBothDescriptions(kw.keyword);
+              return {
+                ...kw,
+                suggestedShortDescription: descriptions.short,
+                suggestedLongDescription: descriptions.long,
+                suggestedDescription: descriptions.short
+              };
             });
             
             setSuggestions(enhancedKeywords);
@@ -213,9 +212,9 @@ const KeywordTabContent = () => {
         
         return {
           ...kw,
-          suggestedShortDescription: kw.suggestedShortDescription || descriptions.short,
-          suggestedLongDescription: kw.suggestedLongDescription || descriptions.long,
-          suggestedDescription: kw.suggestedDescription || descriptions.short
+          suggestedShortDescription: descriptions.short,
+          suggestedLongDescription: descriptions.long,
+          suggestedDescription: descriptions.short
         };
       });
       
