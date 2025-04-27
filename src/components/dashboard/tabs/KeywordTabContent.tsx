@@ -45,6 +45,7 @@ const KeywordTabContent = () => {
         if (isValid) {
           setValidationMessage("Clé API validée avec succès");
           toast.success("Clé API OpenAI validée");
+          setOpenaiKey(apiKey);
           
           // Générer automatiquement des suggestions avec un mot-clé par défaut
           if (suggestions.length === 0) {
@@ -52,7 +53,22 @@ const KeywordTabContent = () => {
             try {
               const defaultKeyword = "référencement";
               const newKeywords = await openAIService.getKeywordSuggestions(defaultKeyword);
-              setSuggestions(newKeywords);
+              
+              // S'assurer que chaque suggestion a des descriptions courtes et longues
+              const enhancedKeywords = newKeywords.map(kw => {
+                if (!kw.suggestedShortDescription || !kw.suggestedLongDescription) {
+                  const descriptions = generateBothDescriptions(kw.keyword);
+                  return {
+                    ...kw,
+                    suggestedShortDescription: descriptions.short,
+                    suggestedLongDescription: descriptions.long,
+                    suggestedDescription: descriptions.short
+                  };
+                }
+                return kw;
+              });
+              
+              setSuggestions(enhancedKeywords);
               setKeyword(defaultKeyword);
               toast.success("Suggestions générées automatiquement");
             } catch (error) {
@@ -109,7 +125,22 @@ const KeywordTabContent = () => {
             // Utiliser un mot-clé par défaut pour la première génération
             const defaultKeyword = "référencement";
             const newKeywords = await openAIService.getKeywordSuggestions(defaultKeyword);
-            setSuggestions(newKeywords);
+            
+            // S'assurer que chaque suggestion a des descriptions courtes et longues
+            const enhancedKeywords = newKeywords.map(kw => {
+              if (!kw.suggestedShortDescription || !kw.suggestedLongDescription) {
+                const descriptions = generateBothDescriptions(kw.keyword);
+                return {
+                  ...kw,
+                  suggestedShortDescription: descriptions.short,
+                  suggestedLongDescription: descriptions.long,
+                  suggestedDescription: descriptions.short
+                };
+              }
+              return kw;
+            });
+            
+            setSuggestions(enhancedKeywords);
             setKeyword(defaultKeyword);
             toast.success("Suggestions générées automatiquement");
           } catch (error) {
@@ -177,15 +208,15 @@ const KeywordTabContent = () => {
 
       // Assurons-nous que chaque suggestion a des descriptions courtes et longues
       const enhancedResults = results.map(kw => {
-        if (!kw.suggestedShortDescription || !kw.suggestedLongDescription) {
-          const descriptions = generateBothDescriptions(kw.keyword);
-          return {
-            ...kw,
-            suggestedShortDescription: kw.suggestedShortDescription || descriptions.short,
-            suggestedLongDescription: kw.suggestedLongDescription || descriptions.long
-          };
-        }
-        return kw;
+        // Générer les deux types de descriptions
+        const descriptions = generateBothDescriptions(kw.keyword);
+        
+        return {
+          ...kw,
+          suggestedShortDescription: kw.suggestedShortDescription || descriptions.short,
+          suggestedLongDescription: kw.suggestedLongDescription || descriptions.long,
+          suggestedDescription: kw.suggestedDescription || descriptions.short
+        };
       });
       
       setSuggestions(enhancedResults);
@@ -203,15 +234,13 @@ const KeywordTabContent = () => {
   // Fonction pour générer des données de démonstration
   const generateDemoKeywords = (keyword: string): KeywordSuggestion[] => {
     const baseKeyword = keyword.toLowerCase();
-    return [
+    // Générer des descriptions pour chaque mot-clé de démonstration
+    const keywords = [
       {
         keyword: baseKeyword,
         searchVolume: 5200,
         difficulty: 67,
         suggestedTitle: `Guide ultime ${baseKeyword} : Les secrets des experts | 2024`,
-        suggestedDescription: `Découvrez tout sur ${baseKeyword}. Conseils d'experts, astuces pratiques et stratégies éprouvées pour maîtriser ${baseKeyword} en 2024.`,
-        suggestedShortDescription: `Guide complet sur ${baseKeyword} avec conseils d'experts et stratégies éprouvées.`,
-        suggestedLongDescription: `Explorez notre guide approfondi sur ${baseKeyword}. Des conseils d'experts aux astuces pratiques, découvrez comment maîtriser ${baseKeyword} efficacement et obtenir des résultats tangibles en 2024. Nous avons rassemblé les meilleures techniques et tactiques utilisées par les professionnels du secteur pour vous aider à progresser rapidement et à atteindre vos objectifs avec ${baseKeyword}. Que vous soyez débutant ou que vous souhaitiez perfectionner vos compétences, vous trouverez des informations précieuses adaptées à votre niveau et à vos besoins spécifiques.`,
         relevance: 95,
         competition: 0.78,
         cpc: 2.34,
@@ -222,9 +251,6 @@ const KeywordTabContent = () => {
         searchVolume: 3800,
         difficulty: 58,
         suggestedTitle: `Top 10 des meilleurs ${baseKeyword} | Comparatif complet`,
-        suggestedDescription: `Notre classement des meilleurs ${baseKeyword} en 2024. Comparatif détaillé, avantages et inconvénients pour choisir en toute connaissance.`,
-        suggestedShortDescription: `Comparatif détaillé des 10 meilleurs ${baseKeyword} en 2024.`,
-        suggestedLongDescription: `Explorez notre sélection rigoureuse des 10 meilleurs ${baseKeyword} disponibles aujourd'hui. Analysez les avantages, inconvénients et fonctionnalités clés pour faire un choix éclairé selon vos besoins spécifiques. Notre équipe d'experts a testé et évalué chaque option selon des critères précis comme la qualité, la durabilité, le rapport qualité-prix et la satisfaction des utilisateurs. Ce guide complet vous accompagne étape par étape dans votre processus de décision, avec des conseils personnalisés pour identifier la solution qui correspond parfaitement à vos exigences particulières.`,
         relevance: 88,
         competition: 0.82,
         cpc: 3.12,
@@ -235,9 +261,6 @@ const KeywordTabContent = () => {
         searchVolume: 2900,
         difficulty: 45,
         suggestedTitle: `${baseKeyword} pas cher : Guide d'achat pour petits budgets 2024`,
-        suggestedDescription: `Comment trouver des ${baseKeyword} abordables sans compromettre la qualité ? Bons plans, conseils d'achat et options économiques pour tous les budgets.`,
-        suggestedShortDescription: `Guide d'achat ${baseKeyword} pour petits budgets avec bons plans.`,
-        suggestedLongDescription: `Économisez sans compromis avec notre guide des ${baseKeyword} abordables. Découvrez où et comment trouver des options de qualité à prix réduits, les périodes idéales pour acheter, et nos astuces pour maximiser votre investissement. Nous révélons les secrets des professionnels pour identifier les véritables bonnes affaires et éviter les pièges des fausses promotions. Apprenez à reconnaître les caractéristiques essentielles à préserver même à petit prix et celles sur lesquelles vous pouvez faire des concessions sans impact majeur sur la qualité globale. Des alternatives économiques aux modèles premium sont analysées en détail.`,
         relevance: 82,
         competition: 0.65,
         cpc: 1.88,
@@ -248,9 +271,6 @@ const KeywordTabContent = () => {
         searchVolume: 2200,
         difficulty: 42,
         suggestedTitle: `Comment choisir le bon ${baseKeyword} ? Guide pratique 2024`,
-        suggestedDescription: `Les critères essentiels pour bien choisir votre ${baseKeyword}. Méthodologie pas à pas, erreurs à éviter et conseils personnalisés selon vos besoins.`,
-        suggestedShortDescription: `Guide complet pour choisir le ${baseKeyword} idéal selon vos besoins.`,
-        suggestedLongDescription: `Apprenez à sélectionner le ${baseKeyword} parfait pour vos besoins spécifiques. Notre guide détaille les caractéristiques techniques à considérer, propose une méthode d'évaluation en 5 étapes et vous aide à éviter les pièges courants lors de votre achat. Découvrez comment identifier vos priorités personnelles et comment les traduire en critères de sélection concrets. Nos experts partagent leur méthodologie éprouvée pour comparer objectivement différentes options disponibles sur le marché, en tenant compte de facteurs comme la qualité de fabrication, la durabilité, les fonctionnalités innovantes et le service après-vente. Des témoignages d'utilisateurs complètent cette analyse.`,
         relevance: 79,
         competition: 0.58,
         cpc: 1.65,
@@ -261,15 +281,23 @@ const KeywordTabContent = () => {
         searchVolume: 4100,
         difficulty: 51,
         suggestedTitle: `Avis ${baseKeyword} : Ce qu'en pensent vraiment les utilisateurs`,
-        suggestedDescription: `Découvrez les avis authentiques sur ${baseKeyword}. Témoignages d'utilisateurs, tests indépendants et analyse objective des avantages et inconvénients.`,
-        suggestedShortDescription: `Avis et témoignages objectifs sur ${baseKeyword} par des utilisateurs réels.`,
-        suggestedLongDescription: `Plongez dans notre analyse complète des avis sur ${baseKeyword}. Nous avons recueilli et synthétisé les retours de centaines d'utilisateurs, de tests professionnels et d'évaluations à long terme pour vous offrir une vision réelle et impartiale des performances et de la satisfaction. Notre équipe a analysé méticuleusement les tendances communes dans les retours clients pour identifier les véritables forces et faiblesses de chaque option. Découvrez comment ces produits ou services se comportent dans des conditions réelles d'utilisation quotidienne, au-delà des promesses marketing. Les évaluations sont segmentées par profils d'utilisateurs pour vous aider à trouver des avis pertinents pour votre situation spécifique.`,
         relevance: 86,
         competition: 0.72,
         cpc: 2.05,
         volume: 4100
       }
     ];
+    
+    // Ajouter des descriptions courtes et longues à chaque mot-clé
+    return keywords.map(kw => {
+      const descriptions = generateBothDescriptions(kw.keyword);
+      return {
+        ...kw,
+        suggestedDescription: descriptions.short,
+        suggestedShortDescription: descriptions.short,
+        suggestedLongDescription: descriptions.long
+      };
+    });
   };
 
   const handleInsertTitle = (value: string) => {
