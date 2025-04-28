@@ -161,15 +161,19 @@ export class OpenAIService {
       
       // Vérifier rapidement le format
       if (!this.validateKeyFormat()) {
+        console.error("Format de clé invalide, validation échouée");
         return false;
       }
       
       // Tenter d'abord la validation avec proxy si activé
       if (OpenAIService.proxyEnabled) {
+        console.log("Tentative de validation avec proxy");
         const proxyResult = await this.validateApiKeyWithProxy();
         if (proxyResult) {
           console.log("Validation avec proxy réussie");
           return true;
+        } else {
+          console.log("Validation avec proxy échouée, essai sans proxy");
         }
       }
       
@@ -178,6 +182,8 @@ export class OpenAIService {
       if (directResult) {
         console.log("Validation directe réussie");
         return true;
+      } else {
+        console.log("Validation directe échouée");
       }
       
       // Si les deux méthodes échouent mais que le format est valide, 
@@ -187,6 +193,7 @@ export class OpenAIService {
         return true;
       }
       
+      console.error("Validation échouée pour toutes les méthodes");
       return false;
     } catch (error: any) {
       console.error("Erreur lors de la validation de la clé API:", error.message);
@@ -209,6 +216,10 @@ export class OpenAIService {
       console.log(`Génération de suggestions pour "${keyword}"...`);
       const url = this.formatUrl('https://api.openai.com/v1/chat/completions');
       
+      // Nettoyer la clé API avant utilisation
+      const cleanKey = this.cleanApiKey(this.apiKey);
+      
+      console.log("Envoi de requête à OpenAI pour générer des suggestions...");
       const response = await axios.post(
         url,
         {
@@ -220,52 +231,64 @@ export class OpenAIService {
             },
             {
               role: 'user',
-              content: `Donne-moi 5 suggestions de mots-clés SEO autour du terme "${keyword}". Pour chaque mot-clé, fournis: le volume de recherche mensuel approximatif, la difficulté (sur 100), la pertinence (%), un titre SEO optimal de 60 caractères maximum, une description courte de 155 caractères maximum, et une description longue de 500 caractères maximum. Réponds sous format JSON avec cette structure exacte: [{"keyword": "mot-clé", "searchVolume": nombre, "difficulty": nombre, "relevance": nombre, "competition": nombre entre 0 et 1, "cpc": nombre, "volume": nombre, "suggestedTitle": "titre", "suggestedDescription": "description courte", "suggestedShortDescription": "description courte de 155 caractères", "suggestedLongDescription": "description longue de 500 caractères"}]`
+              content: `Donne-moi 5 suggestions de mots-clés SEO autour du terme "${keyword}". Pour chaque mot-clé, fournis: le volume de recherche mensuel approximatif, la difficulté (sur 100), la pertinence (%), un titre SEO optimal de 60 caractères maximum, une description courte de 155 caractères maximum, une description longue de 500 caractères maximum, et une suggestion de contenu. Réponds sous format JSON avec cette structure exacte: [{"keyword": "mot-clé", "searchVolume": nombre, "difficulty": nombre, "relevance": nombre, "competition": nombre entre 0 et 1, "cpc": nombre, "volume": nombre, "suggestedTitle": "titre", "suggestedDescription": "description courte", "suggestedShortDescription": "description courte de 155 caractères", "suggestedLongDescription": "description longue de 500 caractères"}]`
             }
           ],
           temperature: 0.7,
-          max_tokens: 1500
+          max_tokens: 2000
         },
         {
           headers: {
-            'Authorization': `Bearer ${this.apiKey}`,
+            'Authorization': `Bearer ${cleanKey}`,
             'Content-Type': 'application/json'
           }
         }
       );
 
       // Récupérer la réponse de l'API
+      console.log("Réponse reçue de OpenAI, traitement des données...");
       const content = response.data.choices[0].message.content;
+      console.log("Contenu de la réponse:", content);
       
       // Extraire le JSON de la réponse
       const jsonMatch = content.match(/\[\s*\{.*\}\s*\]/s);
       
       if (jsonMatch) {
         const jsonStr = jsonMatch[0];
-        const parsedData = JSON.parse(jsonStr);
+        console.log("JSON extrait:", jsonStr);
         
-        // Vérifier et compléter les données si nécessaire
-        return parsedData.map((kw: any) => ({
-          ...kw,
-          // S'assurer que toutes les propriétés requises sont présentes
-          searchVolume: kw.searchVolume || Math.floor(Math.random() * 5000) + 1000,
-          difficulty: kw.difficulty || Math.floor(Math.random() * 100),
-          relevance: kw.relevance || Math.floor(Math.random() * 30) + 70,
-          competition: kw.competition || Math.random().toFixed(2),
-          cpc: kw.cpc || (Math.random() * 5).toFixed(2),
-          volume: kw.volume || kw.searchVolume || Math.floor(Math.random() * 5000) + 1000,
-          suggestedTitle: kw.suggestedTitle || `Titre optimisé pour ${kw.keyword}`,
-          suggestedDescription: kw.suggestedDescription || `Description courte optimisée pour le mot-clé ${kw.keyword}. Cette description est conçue pour attirer l'attention des utilisateurs dans les résultats de recherche.`,
-          suggestedShortDescription: kw.suggestedShortDescription || kw.suggestedDescription || `Description courte optimisée pour le mot-clé ${kw.keyword}. Idéale pour les métadonnées de votre page.`,
-          suggestedLongDescription: kw.suggestedLongDescription || `Description longue et détaillée pour le mot-clé ${kw.keyword}. Cette description complète permet d'intégrer plus de mots-clés secondaires et de donner plus d'informations sur votre contenu. Elle est parfaite pour les pages d'atterrissage ou les descriptions de produits où vous avez besoin de plus d'espace pour convaincre vos visiteurs et améliorer votre référencement avec un contenu plus riche.`
-        }));
+        try {
+          const parsedData = JSON.parse(jsonStr);
+          console.log("Données parsées avec succès:", parsedData.length, "suggestions trouvées");
+          
+          // Vérifier et compléter les données si nécessaire
+          return parsedData.map((kw: any) => ({
+            ...kw,
+            // S'assurer que toutes les propriétés requises sont présentes
+            searchVolume: kw.searchVolume || Math.floor(Math.random() * 5000) + 1000,
+            difficulty: kw.difficulty || Math.floor(Math.random() * 100),
+            relevance: kw.relevance || Math.floor(Math.random() * 30) + 70,
+            competition: kw.competition || Math.random().toFixed(2),
+            cpc: kw.cpc || (Math.random() * 5).toFixed(2),
+            volume: kw.volume || kw.searchVolume || Math.floor(Math.random() * 5000) + 1000,
+            suggestedTitle: kw.suggestedTitle || `Titre optimisé pour ${kw.keyword}`,
+            suggestedDescription: kw.suggestedDescription || `Description courte optimisée pour le mot-clé ${kw.keyword}. Cette description est conçue pour attirer l'attention des utilisateurs dans les résultats de recherche.`,
+            suggestedShortDescription: kw.suggestedShortDescription || kw.suggestedDescription || `Description courte optimisée pour le mot-clé ${kw.keyword}. Idéale pour les métadonnées de votre page.`,
+            suggestedLongDescription: kw.suggestedLongDescription || `Description longue et détaillée pour le mot-clé ${kw.keyword}. Cette description complète permet d'intégrer plus de mots-clés secondaires et de donner plus d'informations sur votre contenu. Elle est parfaite pour les pages d'atterrissage ou les descriptions de produits où vous avez besoin de plus d'espace pour convaincre vos visiteurs et améliorer votre référencement avec un contenu plus riche.`
+          }));
+        } catch (parseError) {
+          console.error("Erreur lors du parsing JSON:", parseError);
+          console.log("Génération de données de démonstration due à l'erreur de parsing");
+          return this.generateDemoKeywordSuggestions(keyword);
+        }
+      } else {
+        console.warn("Format de réponse invalide, impossible d'extraire du JSON");
+        console.log("Génération de données de démonstration due au format invalide");
+        return this.generateDemoKeywordSuggestions(keyword);
       }
-      
-      // Si on n'arrive pas à extraire le JSON, générer des données fictives
-      console.warn("Format de réponse invalide, génération de données de démonstration");
-      return this.generateDemoKeywordSuggestions(keyword);
     } catch (error) {
       console.error("Erreur lors de la génération des suggestions:", error);
+      console.log("Génération de données de démonstration due à l'erreur API");
       // En cas d'erreur, générer des données de démonstration
       return this.generateDemoKeywordSuggestions(keyword);
     }
