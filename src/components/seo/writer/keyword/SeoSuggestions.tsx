@@ -1,55 +1,84 @@
 
 import React from 'react';
-import { FileText, AlignLeft, ShieldCheck } from 'lucide-react';
 import { KeywordSuggestion } from "@/types/seo";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface SeoSuggestionsProps {
   keywordData: KeywordSuggestion;
+  onInsertTitle: (title: string) => void;
+  onInsertDescription: (description: string) => void;
 }
 
-const SeoSuggestions: React.FC<SeoSuggestionsProps> = ({ keywordData }) => {
-  const getCharacterLimitClass = (length: number, limit: number) => {
-    if (length > limit) return "text-red-500";
-    if (length > limit * 0.9) return "text-yellow-500";
-    return "text-green-500";
-  };
-
+const SeoSuggestions: React.FC<SeoSuggestionsProps> = ({ 
+  keywordData,
+  onInsertTitle,
+  onInsertDescription
+}) => {
   return (
     <div className="space-y-4">
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <FileText className="h-4 w-4 text-blue-600" />
-            <h3 className="font-medium">Balise Title</h3>
-          </div>
-          <div className="flex items-center gap-2">
-            <ShieldCheck className={`h-4 w-4 ${keywordData.suggestedTitle.length <= 60 ? 'text-green-500' : 'text-red-500'}`} />
-            <span className={`text-xs ${getCharacterLimitClass(keywordData.suggestedTitle.length, 60)}`}>
-              {keywordData.suggestedTitle.length}/60
-            </span>
+      <div className="bg-white p-3 rounded-lg border border-gray-200">
+        <div className="flex justify-between items-center">
+          <h4 className="font-medium">Titre suggéré</h4>
+          <div className="text-xs text-gray-500">
+            {keywordData.suggestedTitle?.length || 0}/60 caractères
           </div>
         </div>
-        <div className="p-3 bg-blue-50 rounded-md text-sm">
-          {keywordData.suggestedTitle}
-        </div>
+        <p className="my-2 text-sm">{keywordData.suggestedTitle}</p>
+        <Button 
+          onClick={() => onInsertTitle(keywordData.suggestedTitle || '')} 
+          variant="outline" 
+          size="sm"
+        >
+          Utiliser ce titre
+        </Button>
       </div>
-      
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <AlignLeft className="h-4 w-4 text-green-600" />
-            <h3 className="font-medium">Meta Description</h3>
-          </div>
-          <div className="flex items-center gap-2">
-            <ShieldCheck className={`h-4 w-4 ${keywordData.suggestedDescription.length <= 155 ? 'text-green-500' : 'text-red-500'}`} />
-            <span className={`text-xs ${getCharacterLimitClass(keywordData.suggestedDescription.length, 155)}`}>
-              {keywordData.suggestedDescription.length}/155
-            </span>
-          </div>
-        </div>
-        <div className="p-3 bg-green-50 rounded-md text-sm">
-          {keywordData.suggestedDescription}
-        </div>
+
+      <div>
+        <Tabs defaultValue="short">
+          <TabsList className="w-full mb-2">
+            <TabsTrigger value="short" className="flex-1">Description courte</TabsTrigger>
+            <TabsTrigger value="long" className="flex-1">Description longue</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="short">
+            <div className="bg-white p-3 rounded-lg border border-gray-200">
+              <div className="flex justify-between items-center">
+                <h4 className="font-medium">Description courte</h4>
+                <div className="text-xs text-gray-500">
+                  {keywordData.suggestedDescription?.length || 0}/155 caractères
+                </div>
+              </div>
+              <p className="my-2 text-sm">{keywordData.suggestedDescription}</p>
+              <Button 
+                onClick={() => onInsertDescription(keywordData.suggestedDescription || '')} 
+                variant="outline" 
+                size="sm"
+              >
+                Utiliser cette description
+              </Button>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="long">
+            <div className="bg-white p-3 rounded-lg border border-gray-200">
+              <div className="flex justify-between items-center">
+                <h4 className="font-medium">Description longue</h4>
+                <div className="text-xs text-gray-500">
+                  {keywordData.suggestedLongDescription?.length || 0}/500 caractères
+                </div>
+              </div>
+              <p className="my-2 text-sm line-clamp-3">{keywordData.suggestedLongDescription}</p>
+              <Button 
+                onClick={() => onInsertDescription(keywordData.suggestedLongDescription || '')} 
+                variant="outline" 
+                size="sm"
+              >
+                Utiliser cette description
+              </Button>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
