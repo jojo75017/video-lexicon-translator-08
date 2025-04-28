@@ -209,6 +209,34 @@ export class OpenAIService {
   }
 
   /**
+   * Générer des descriptions courtes et longues pour un mot-clé
+   */
+  private generateDescriptions(keyword: string): {short: string, long: string} {
+    // Descriptions courtes (155 caractères max)
+    const shortDescriptions = [
+      `Découvrez tout sur ${keyword} dans notre guide complet. Conseils d'experts, astuces et méthodes pour optimiser vos résultats et améliorer votre stratégie.`,
+      `Améliorez votre stratégie de ${keyword} avec nos conseils professionnels. Guide pratique et astuces pour maximiser vos performances et votre ROI.`,
+      `${keyword.charAt(0).toUpperCase() + keyword.slice(1)} : techniques avancées et méthodes prouvées pour réussir. Découvrez comment optimiser vos résultats dès maintenant.`
+    ];
+    
+    // Descriptions longues (500 caractères max)
+    const longDescriptions = [
+      `Notre guide complet sur le ${keyword} vous offre toutes les informations essentielles pour maîtriser ce domaine complexe. Que vous soyez débutant ou expert, découvrez les stratégies les plus efficaces et les dernières tendances pour optimiser vos résultats. Nous avons rassemblé des conseils d'experts, des études de cas et des exemples concrets pour vous aider à comprendre comment implémenter les meilleures pratiques de ${keyword} dans votre propre contexte. Avec nos techniques éprouvées, vous pourrez rapidement améliorer vos performances, augmenter votre visibilité et obtenir un meilleur retour sur investissement. Ne perdez plus de temps avec des méthodes obsolètes, adoptez les approches qui fonctionnent réellement.`,
+      `Le ${keyword} est un élément crucial pour le succès de votre stratégie digitale. Notre article détaillé vous guide pas à pas à travers les techniques les plus efficaces et les outils les plus performants pour maximiser vos résultats. Nous analysons les différentes approches, leurs avantages et inconvénients, et vous proposons des solutions adaptées à vos besoins spécifiques. Apprenez comment éviter les erreurs courantes et découvrez les astuces peu connues qui font la différence. Nos experts partagent leur expérience et vous offrent des conseils pratiques que vous pouvez mettre en œuvre immédiatement. Que vous cherchiez à améliorer votre classement, augmenter votre trafic ou convertir davantage de visiteurs, ce guide est votre ressource incontournable pour tous les aspects du ${keyword}.`,
+      `Vous cherchez à perfectionner votre maîtrise du ${keyword} ? Notre guide complet aborde tous les aspects essentiels, des fondamentaux aux stratégies avancées. Nous explorons les méthodologies qui ont fait leurs preuves et les innovations récentes qui transforment ce domaine. À travers des exemples concrets et des analyses de cas réels, nous illustrons comment appliquer ces concepts à votre propre situation. Notre approche pratique vous permet de comprendre non seulement le "quoi" mais aussi le "comment" et le "pourquoi" derrière chaque stratégie de ${keyword}. Découvrez également comment mesurer efficacement vos performances, analyser vos résultats et ajuster votre stratégie pour une amélioration continue. Ce guide est conçu pour vous donner tous les outils nécessaires pour exceller dans le domaine du ${keyword}.`
+    ];
+    
+    // Sélectionner aléatoirement une description de chaque type
+    const shortDescIndex = Math.floor(Math.random() * shortDescriptions.length);
+    const longDescIndex = Math.floor(Math.random() * longDescriptions.length);
+    
+    return {
+      short: shortDescriptions[shortDescIndex],
+      long: longDescriptions[longDescIndex]
+    };
+  }
+
+  /**
    * Obtenir des suggestions de mots-clés via l'API OpenAI
    */
   public async getKeywordSuggestions(keyword: string): Promise<KeywordSuggestion[]> {
@@ -262,20 +290,25 @@ export class OpenAIService {
           console.log("Données parsées avec succès:", parsedData.length, "suggestions trouvées");
           
           // Vérifier et compléter les données si nécessaire
-          return parsedData.map((kw: any) => ({
-            ...kw,
-            // S'assurer que toutes les propriétés requises sont présentes
-            searchVolume: kw.searchVolume || Math.floor(Math.random() * 5000) + 1000,
-            difficulty: kw.difficulty || Math.floor(Math.random() * 100),
-            relevance: kw.relevance || Math.floor(Math.random() * 30) + 70,
-            competition: kw.competition || Math.random().toFixed(2),
-            cpc: kw.cpc || (Math.random() * 5).toFixed(2),
-            volume: kw.volume || kw.searchVolume || Math.floor(Math.random() * 5000) + 1000,
-            suggestedTitle: kw.suggestedTitle || `Titre optimisé pour ${kw.keyword}`,
-            suggestedDescription: kw.suggestedDescription || `Description courte optimisée pour le mot-clé ${kw.keyword}. Cette description est conçue pour attirer l'attention des utilisateurs dans les résultats de recherche.`,
-            suggestedShortDescription: kw.suggestedShortDescription || kw.suggestedDescription || `Description courte optimisée pour le mot-clé ${kw.keyword}. Idéale pour les métadonnées de votre page.`,
-            suggestedLongDescription: kw.suggestedLongDescription || `Description longue et détaillée pour le mot-clé ${kw.keyword}. Cette description complète permet d'intégrer plus de mots-clés secondaires et de donner plus d'informations sur votre contenu. Elle est parfaite pour les pages d'atterrissage ou les descriptions de produits où vous avez besoin de plus d'espace pour convaincre vos visiteurs et améliorer votre référencement avec un contenu plus riche.`
-          }));
+          return parsedData.map((kw: any) => {
+            // Générer des descriptions si elles manquent
+            const descriptions = this.generateDescriptions(kw.keyword);
+            
+            return {
+              ...kw,
+              // S'assurer que toutes les propriétés requises sont présentes
+              searchVolume: kw.searchVolume || Math.floor(Math.random() * 5000) + 1000,
+              difficulty: kw.difficulty || Math.floor(Math.random() * 100),
+              relevance: kw.relevance || Math.floor(Math.random() * 30) + 70,
+              competition: kw.competition || Math.random().toFixed(2),
+              cpc: kw.cpc || (Math.random() * 5).toFixed(2),
+              volume: kw.volume || kw.searchVolume || Math.floor(Math.random() * 5000) + 1000,
+              suggestedTitle: kw.suggestedTitle || `Titre optimisé pour ${kw.keyword}`,
+              suggestedDescription: kw.suggestedDescription || descriptions.short,
+              suggestedShortDescription: kw.suggestedShortDescription || kw.suggestedDescription || descriptions.short,
+              suggestedLongDescription: kw.suggestedLongDescription || descriptions.long
+            };
+          });
         } catch (parseError) {
           console.error("Erreur lors du parsing JSON:", parseError);
           console.log("Génération de données de démonstration due à l'erreur de parsing");
@@ -311,10 +344,7 @@ export class OpenAIService {
         competition: 0.78,
         cpc: 2.34,
         volume: 5200,
-        suggestedTitle: `Guide ultime ${baseKeyword} : Les secrets des experts | 2024`,
-        suggestedDescription: `Découvrez notre guide complet sur ${baseKeyword}. Conseils d'experts, astuces et méthodes éprouvées pour optimiser vos résultats. Cliquez pour en savoir plus !`,
-        suggestedShortDescription: `Découvrez notre guide complet sur ${baseKeyword}. Conseils d'experts, astuces et méthodes éprouvées pour optimiser vos résultats.`,
-        suggestedLongDescription: `Notre guide ultime sur ${baseKeyword} vous donne accès à toutes les informations dont vous avez besoin pour maîtriser ce domaine. Que vous soyez débutant ou expert, vous trouverez des conseils pratiques, des astuces exclusives et des méthodes éprouvées par les professionnels. Nous avons rassemblé les meilleures pratiques et les dernières innovations pour vous aider à optimiser vos résultats et à vous démarquer de la concurrence. Notre approche détaillée vous permettra de comprendre les subtilités du ${baseKeyword} et d'appliquer ces connaissances immédiatement. Ne perdez plus de temps avec des méthodes inefficaces, consultez notre guide dès maintenant pour transformer votre approche et atteindre vos objectifs plus rapidement.`
+        suggestedTitle: `Guide ultime ${baseKeyword} : Les secrets des experts | 2024`
       },
       {
         keyword: `meilleur ${baseKeyword}`,
@@ -324,10 +354,7 @@ export class OpenAIService {
         competition: 0.82,
         cpc: 3.12,
         volume: 3800,
-        suggestedTitle: `Top 10 des meilleurs ${baseKeyword} | Comparatif complet 2024`,
-        suggestedDescription: `Comparatif des meilleurs ${baseKeyword} en 2024. Avis, prix et performances analysés pour vous aider à choisir. Découvrez notre sélection exclusive !`,
-        suggestedShortDescription: `Comparatif des meilleurs ${baseKeyword} en 2024. Avis, prix et performances analysés pour vous aider à choisir.`,
-        suggestedLongDescription: `Notre comparatif complet des meilleurs ${baseKeyword} de 2024 vous aide à prendre une décision éclairée avant votre achat. Nous avons testé et analysé en profondeur les options les plus populaires du marché en tenant compte de critères essentiels comme la qualité, le rapport qualité-prix, la durabilité et les fonctionnalités. Chaque produit a été évalué par notre équipe d'experts qui ont pris le temps d'examiner tous les détails importants. Vous trouverez également des avis détaillés d'utilisateurs réels qui partagent leur expérience au quotidien. Que vous cherchiez la solution haut de gamme ou l'option la plus économique, notre guide vous présente les avantages et inconvénients de chaque choix pour vous permettre de trouver exactement ce qui correspond à vos besoins spécifiques.`
+        suggestedTitle: `Top 10 des meilleurs ${baseKeyword} | Comparatif complet 2024`
       },
       {
         keyword: `${baseKeyword} pas cher`,
@@ -337,10 +364,7 @@ export class OpenAIService {
         competition: 0.65,
         cpc: 1.88,
         volume: 2900,
-        suggestedTitle: `${baseKeyword} pas cher : Guide d'achat pour petits budgets 2024`,
-        suggestedDescription: `Économisez sur votre ${baseKeyword} sans compromettre la qualité. Astuces, bons plans et comparatifs pour trouver les meilleures offres à petit prix.`,
-        suggestedShortDescription: `Économisez sur votre ${baseKeyword} sans compromettre la qualité. Astuces et bons plans pour les petits budgets.`,
-        suggestedLongDescription: `Vous cherchez un ${baseKeyword} pas cher mais efficace ? Notre guide d'achat 2024 pour petits budgets vous révèle comment obtenir le meilleur rapport qualité-prix sans faire de compromis sur l'essentiel. Nous avons recherché et analysé les options les plus économiques du marché pour vous présenter uniquement celles qui offrent une valeur réelle malgré leur prix abordable. Découvrez nos astuces pour dénicher les bonnes affaires, les périodes de promotion à ne pas manquer et les alternatives moins connues mais tout aussi performantes que les marques populaires. Nous partageons également des conseils pour identifier les fonctionnalités vraiment indispensables et celles dont vous pouvez vous passer pour économiser. Avec notre guide, vous apprendrez à distinguer les vraies opportunités des fausses bonnes affaires pour faire un achat intelligent et adapté à votre budget.`
+        suggestedTitle: `${baseKeyword} pas cher : Guide d'achat pour petits budgets 2024`
       },
       {
         keyword: `comment choisir ${baseKeyword}`,
@@ -350,10 +374,7 @@ export class OpenAIService {
         competition: 0.58,
         cpc: 1.65,
         volume: 2200,
-        suggestedTitle: `Comment choisir le bon ${baseKeyword} ? Guide pratique 2024`,
-        suggestedDescription: `Conseils d'experts pour choisir le ${baseKeyword} parfait. Critères essentiels, erreurs à éviter et recommandations personnalisées pour votre situation.`,
-        suggestedShortDescription: `Conseils d'experts pour choisir le ${baseKeyword} parfait. Critères essentiels et erreurs à éviter pour votre achat.`,
-        suggestedLongDescription: `Choisir le bon ${baseKeyword} peut s'avérer complexe face à la multitude d'options disponibles sur le marché. Notre guide pratique 2024 vous accompagne étape par étape dans ce processus de décision important. Nous décomposons les critères essentiels à prendre en compte selon vos besoins spécifiques : niveau d'utilisation, budget, caractéristiques techniques importantes et durabilité. Vous découvrirez les pièges à éviter lors de votre recherche et les questions cruciales à vous poser avant de finaliser votre achat. Notre méthodologie, développée avec des experts du secteur, vous permet d'identifier rapidement les options qui correspondent vraiment à vos attentes. Que vous soyez novice ou utilisateur expérimenté, ce guide vous fournit toutes les clés pour faire un choix éclairé et trouver le ${baseKeyword} qui vous donnera entière satisfaction pour les années à venir.`
+        suggestedTitle: `Comment choisir le bon ${baseKeyword} ? Guide pratique 2024`
       },
       {
         keyword: `${baseKeyword} avis`,
@@ -363,13 +384,20 @@ export class OpenAIService {
         competition: 0.72,
         cpc: 2.05,
         volume: 4100,
-        suggestedTitle: `Avis ${baseKeyword} : Ce qu'en pensent vraiment les utilisateurs`,
-        suggestedDescription: `Découvrez les avis authentiques sur ${baseKeyword}. Points forts, inconvénients et retours d'expérience pour vous aider à prendre la bonne décision.`,
-        suggestedShortDescription: `Découvrez les avis authentiques sur ${baseKeyword}. Points forts, inconvénients et retours d'expérience détaillés.`,
-        suggestedLongDescription: `Avant de vous décider sur un ${baseKeyword}, consultez notre compilation complète d'avis authentiques d'utilisateurs qui partagent leur expérience réelle. Notre analyse approfondie va au-delà des simples évaluations en étoiles pour vous offrir une vision nuancée et honnête des produits les plus populaires dans cette catégorie. Nous avons recueilli et vérifié les témoignages de centaines d'utilisateurs, des débutants aux experts, pour identifier les forces et faiblesses récurrentes de chaque option. Les commentaires sont organisés par thématiques (facilité d'utilisation, performance, durabilité, service après-vente) pour vous permettre de vous concentrer sur les aspects qui vous importent le plus. Découvrez également comment ces produits s'intègrent dans différentes situations d'utilisation et quelles sont les évolutions notées par les utilisateurs de longue date, vous donnant ainsi une perspective complète avant votre achat.`
+        suggestedTitle: `Avis ${baseKeyword} : Ce qu'en pensent vraiment les utilisateurs`
       }
     ];
     
-    return keywords;
+    // Pour chaque mot-clé, générer des descriptions courtes et longues
+    return keywords.map(kw => {
+      const descriptions = this.generateDescriptions(kw.keyword);
+      
+      return {
+        ...kw,
+        suggestedDescription: descriptions.short,
+        suggestedShortDescription: descriptions.short,
+        suggestedLongDescription: descriptions.long
+      };
+    });
   }
 }
