@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -6,7 +5,7 @@ import { KeywordSuggestion } from "@/types/seo";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MessagesSquare, TrendingUp, BarChart2, Users, ArrowRight, FileText, AlignLeft } from 'lucide-react';
+import { MessagesSquare, TrendingUp, BarChart2, Users, ArrowRight, FileText, AlignLeft, ShieldCheck } from 'lucide-react';
 import {
   LineChart,
   Line,
@@ -44,6 +43,12 @@ const KeywordStep: React.FC<KeywordStepProps> = ({
   ];
 
   const selectedKeywordData = keywords.find(kw => kw.keyword === selectedKeyword);
+
+  const getCharacterLimitClass = (length: number, limit: number) => {
+    if (length > limit) return "text-red-500";
+    if (length > limit * 0.9) return "text-yellow-500";
+    return "text-green-500";
+  };
 
   return (
     <div className="space-y-6">
@@ -165,12 +170,17 @@ const KeywordStep: React.FC<KeywordStepProps> = ({
               {selectedKeywordData?.suggestedTitle && selectedKeywordData?.suggestedDescription && (
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-blue-600" />
-                      <h3 className="font-medium">Balise Title</h3>
-                      <Badge variant="outline" className="bg-blue-50 text-blue-700 ml-2 text-xs">
-                        {selectedKeywordData.suggestedTitle.length}/60
-                      </Badge>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <FileText className="h-4 w-4 text-blue-600" />
+                        <h3 className="font-medium">Balise Title</h3>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <ShieldCheck className={`h-4 w-4 ${selectedKeywordData.suggestedTitle.length <= 60 ? 'text-green-500' : 'text-red-500'}`} />
+                        <span className={`text-xs ${getCharacterLimitClass(selectedKeywordData.suggestedTitle.length, 60)}`}>
+                          {selectedKeywordData.suggestedTitle.length}/60
+                        </span>
+                      </div>
                     </div>
                     <div className="p-3 bg-blue-50 rounded-md text-sm">
                       {selectedKeywordData.suggestedTitle}
@@ -178,12 +188,17 @@ const KeywordStep: React.FC<KeywordStepProps> = ({
                   </div>
                   
                   <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <AlignLeft className="h-4 w-4 text-green-600" />
-                      <h3 className="font-medium">Meta Description</h3>
-                      <Badge variant="outline" className="bg-green-50 text-green-700 ml-2 text-xs">
-                        {selectedKeywordData.suggestedDescription.length}/155
-                      </Badge>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <AlignLeft className="h-4 w-4 text-green-600" />
+                        <h3 className="font-medium">Meta Description</h3>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <ShieldCheck className={`h-4 w-4 ${selectedKeywordData.suggestedDescription.length <= 155 ? 'text-green-500' : 'text-red-500'}`} />
+                        <span className={`text-xs ${getCharacterLimitClass(selectedKeywordData.suggestedDescription.length, 155)}`}>
+                          {selectedKeywordData.suggestedDescription.length}/155
+                        </span>
+                      </div>
                     </div>
                     <div className="p-3 bg-green-50 rounded-md text-sm">
                       {selectedKeywordData.suggestedDescription}
