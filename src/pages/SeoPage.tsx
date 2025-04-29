@@ -28,20 +28,28 @@ const SeoPage = () => {
 
   // Activer automatiquement le proxy au chargement de la page
   useEffect(() => {
-    if (!proxyEnabled) {
-      FirecrawlService.enableProxy();
-      console.log("Proxy activé automatiquement au chargement de la page SeoPage");
+    // Toujours activer le proxy
+    FirecrawlService.enableProxy();
+    console.log("Proxy activé automatiquement au chargement de la page SeoPage");
+    
+    // Si l'URL est déjà définie, lancer l'analyse automatiquement
+    if (url && !isLoading && !seoAnalysis) {
+      console.log("URL déjà définie, lancement automatique de l'analyse:", url);
+      analyzeSite();
     }
-  }, [proxyEnabled]);
+  }, []);
 
   // Fonction pour activer le proxy depuis la page principale
   const activateProxyHandler = () => {
+    FirecrawlService.enableProxy();
+    
     if (handleActivateProxy) {
       handleActivateProxy();
-      toast.success("Proxy CORS activé", {
-        description: "Vous pouvez maintenant analyser des sites externes"
-      });
     }
+    
+    toast.success("Proxy CORS activé", {
+      description: "Vous pouvez maintenant analyser des sites externes"
+    });
   };
 
   return (

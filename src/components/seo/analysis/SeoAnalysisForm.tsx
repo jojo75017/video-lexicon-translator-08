@@ -31,6 +31,8 @@ const SeoAnalysisForm = ({
   
   // Vérifier si le proxy est déjà activé au chargement
   useEffect(() => {
+    // Toujours activer le proxy au chargement
+    FirecrawlService.enableProxy();
     const isProxyEnabled = FirecrawlService.isProxyEnabled();
     setProxyEnabled(isProxyEnabled);
     
@@ -60,12 +62,9 @@ const SeoAnalysisForm = ({
       setUrl(formattedUrl); // Mettre à jour l'URL avec le protocole
     }
     
-    // Activer le proxy si ce n'est pas déjà fait
-    if (!proxyEnabled) {
-      handleActivateProxy();
-      setProxyEnabled(true);
-      console.log("Proxy activé automatiquement avant l'analyse");
-    }
+    // Activer le proxy avant l'analyse
+    FirecrawlService.enableProxy();
+    setProxyEnabled(true);
     
     toast.info("Lancement de l'analyse...", {
       description: "Préparation de l'analyse du site " + formattedUrl
@@ -78,14 +77,21 @@ const SeoAnalysisForm = ({
   };
 
   const handleProxyClick = () => {
-    // Appeler la fonction fournie par le parent
+    // Appeler la fonction fournie par le parent pour activer le proxy
+    FirecrawlService.enableProxy();
+    setProxyEnabled(true);
+    
+    // Si le parent a fourni une fonction, l'appeler aussi
     if (handleActivateProxy) {
       handleActivateProxy();
-      setProxyEnabled(true);
-      toast.success("Proxy CORS activé", {
-        description: "Vous pouvez maintenant analyser des sites externes"
-      });
     }
+    
+    toast.success("Proxy CORS activé", {
+      description: "Vous pouvez maintenant analyser des sites externes"
+    });
+    
+    // Tester la connexion aux proxies
+    testProxyConnection();
   };
 
   const testProxyConnection = async () => {    

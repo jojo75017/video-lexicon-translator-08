@@ -29,13 +29,11 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
   // Vérifier l'état du proxy et charger la clé API au chargement
   useEffect(() => {
     // S'assurer que le proxy est activé par défaut
-    if (!FirecrawlService.isProxyEnabled()) {
-      FirecrawlService.enableProxy();
-    }
+    FirecrawlService.enableProxy();
     if (!OpenAIService.isProxyEnabled()) {
       OpenAIService.enableProxy();
     }
-    setProxyEnabled(FirecrawlService.isProxyEnabled());
+    setProxyEnabled(true);
     
     console.log("État initial du useSiteAnalyzer hook:", {
       proxyEnabled: FirecrawlService.isProxyEnabled(),
@@ -99,18 +97,14 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
     }
 
     try {
-      // Vérifier si le site est externe (pas localhost)
-      const isExternalSite = !formattedUrl.includes('localhost') && !formattedUrl.includes('127.0.0.1');
-      
-      // S'assurer que le proxy est activé pour les sites externes
-      if (isExternalSite && !proxyEnabled) {
-        console.log("Site externe détecté, activation automatique du proxy");
-        handleActivateProxy(); // Activer le proxy
-      }
+      // Activer le proxy si ce n'est pas déjà fait - le forcer à chaque fois
+      console.log("Activation forcée du proxy avant l'analyse");
+      FirecrawlService.enableProxy();
+      setProxyEnabled(true);
       
       console.log("Début de l'analyse avec FirecrawlService...");
       
-      // Utiliser FirecrawlService pour l'analyse avec le proxy activé
+      // Utiliser FirecrawlService pour l'analyse avec le proxy TOUJOURS activé
       const result = await FirecrawlService.crawlWebsite(formattedUrl, true);
       console.log("Résultat de l'analyse:", result);
       
@@ -149,7 +143,7 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
           error.message.includes('connexion')
       )) {
         setShowCorsWarning(true);
-        setError("Erreur de connexion - Veuillez vérifier l'URL ou réessayer.");
+        setError("Erreur de connexion - Activez le proxy pour analyser ce site.");
       } else {
         setError(error instanceof Error ? error.message : "Une erreur s'est produite");
       }
@@ -160,7 +154,7 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
     } finally {
       setIsLoading(false);
     }
-  }, [url, proxyEnabled, handleActivateProxy]);
+  }, [url, proxyEnabled]);
 
   return {
     url,
