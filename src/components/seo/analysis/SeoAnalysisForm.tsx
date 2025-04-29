@@ -34,7 +34,6 @@ const SeoAnalysisForm = ({
     const isProxyEnabled = FirecrawlService.isProxyEnabled();
     setProxyEnabled(isProxyEnabled);
     
-    // Debug props
     console.log("SeoAnalysisForm props:", { 
       url, 
       isLoading, 
@@ -48,38 +47,47 @@ const SeoAnalysisForm = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    e.stopPropagation();
-    if (!url) {
-      toast.error("Veuillez entrer une URL valide");
-      return;
-    }
-    analyzeSite();
-  };
-
-  const handleAnalyzeClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!url) {
-      toast.error("Veuillez entrer une URL valide");
-      return;
-    }
-    analyzeSite();
-  };
-
-  const handleProxyClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
     
+    if (!url) {
+      toast.error("Veuillez entrer une URL valide");
+      return;
+    }
+    
+    // S'assurer que l'URL est bien formatée avant l'analyse
+    let formattedUrl = url.trim();
+    if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
+      formattedUrl = `https://${formattedUrl}`;
+      setUrl(formattedUrl); // Mettre à jour l'URL avec le protocole
+    }
+    
+    // Activer le proxy si ce n'est pas déjà fait
+    if (!proxyEnabled) {
+      handleActivateProxy();
+      setProxyEnabled(true);
+    }
+    
+    toast.info("Lancement de l'analyse...", {
+      description: "Préparation de l'analyse du site " + formattedUrl
+    });
+    
+    // Délai court pour permettre au proxy de s'activer
+    setTimeout(() => {
+      analyzeSite();
+    }, 500);
+  };
+
+  const handleProxyClick = () => {
     // Appeler la fonction fournie par le parent
     if (handleActivateProxy) {
       handleActivateProxy();
       setProxyEnabled(true);
+      toast.success("Proxy CORS activé", {
+        description: "Vous pouvez maintenant analyser des sites externes"
+      });
     }
   };
 
-  const testProxyConnection = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    
+  const testProxyConnection = async () => {    
     toast.loading("Test des proxies en cours...");
     setProxyTested(true);
     
@@ -167,8 +175,7 @@ const SeoAnalysisForm = ({
           />
         </div>
         <Button 
-          type="button"
-          onClick={handleAnalyzeClick}
+          type="submit"
           disabled={isLoading || !url}
           className="whitespace-nowrap bg-indigo-600 hover:bg-indigo-700 text-white"
         >

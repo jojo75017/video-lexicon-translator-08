@@ -9,7 +9,7 @@ interface HashtagsTabProps {
   fieldValue: string;
   onInsert: (val: string) => void;
   maxLength: number;
-  keywordToUse?: string; // Optionnel: mot-clé pour générer des hashtags pertinents
+  keywordToUse?: string; // Mot-clé pour générer des hashtags pertinents
 }
 
 const HashtagsTab: React.FC<HashtagsTabProps> = ({
@@ -44,8 +44,6 @@ const HashtagsTab: React.FC<HashtagsTabProps> = ({
     console.log("Hashtag inséré:", hashtag, "Nouvelle valeur:", newValue);
     toast.success(`Hashtag ${hashtag} ajouté à la description`);
   };
-
-  console.log("HashtagsTab rendu - valeur actuelle:", fieldValue, "max:", maxLength);
 
   return (
     <div>

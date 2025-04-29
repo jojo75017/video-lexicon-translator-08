@@ -55,6 +55,7 @@ const KeywordStep: React.FC<KeywordStepProps> = ({
       // Générer des hashtags pertinents pour le mot-clé sélectionné
       const hashtags = generateHashtagsForKeyword(selectedKeyword);
       setSuggestedHashtags(hashtags);
+      console.log("Hashtags générés pour", selectedKeyword, ":", hashtags);
     }
   }, [selectedKeywordData, selectedKeyword]);
 
@@ -93,6 +94,23 @@ const KeywordStep: React.FC<KeywordStepProps> = ({
     if (length > 145) return "border-yellow-500";
     if (length > 120) return "border-green-500";
     return "border-gray-300";
+  };
+
+  const addHashtagToDescription = (hashtag: string) => {
+    // Ajoute un espace si besoin
+    let newDescription = description;
+    if (newDescription && !newDescription.endsWith(" ")) {
+      newDescription += " ";
+    }
+    
+    newDescription += hashtag;
+    
+    if (newDescription.length <= 155) {
+      setDescription(newDescription);
+      toast.success(`Hashtag ${hashtag} ajouté à la description`);
+    } else {
+      toast.warning("Description trop longue pour ajouter ce hashtag");
+    }
   };
 
   return (
@@ -209,6 +227,26 @@ const KeywordStep: React.FC<KeywordStepProps> = ({
             onUpdateTitle={setTitle}
             onUpdateDescription={setDescription}
           />
+          
+          {/* Section hashtags générés spécifiquement pour le mot-clé */}
+          {selectedKeyword && suggestedHashtags.length > 0 && (
+            <div className="mt-4 border-t pt-4">
+              <h4 className="text-sm font-medium mb-2">Hashtags suggérés pour "{selectedKeyword}"</h4>
+              <div className="flex flex-wrap gap-1">
+                {suggestedHashtags.map((hashtag) => (
+                  <Button
+                    key={hashtag}
+                    size="sm"
+                    variant="outline"
+                    onClick={() => addHashtagToDescription(hashtag)}
+                    className="px-2 py-1 text-xs"
+                  >
+                    {hashtag}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
         </Card>
 
         <Card className="p-4">
