@@ -26,15 +26,14 @@ const SeoAnalysisForm = ({
   error,
   handleActivateProxy
 }: SeoAnalysisFormProps) => {
-  const [proxyEnabled, setProxyEnabled] = useState<boolean>(false);
+  const [proxyEnabled, setProxyEnabled] = useState<boolean>(true);
   const [proxyTested, setProxyTested] = useState<boolean>(false);
   
   // Vérifier si le proxy est déjà activé au chargement
   useEffect(() => {
     // Toujours activer le proxy au chargement
     FirecrawlService.enableProxy();
-    const isProxyEnabled = FirecrawlService.isProxyEnabled();
-    setProxyEnabled(isProxyEnabled);
+    setProxyEnabled(true);
     
     console.log("SeoAnalysisForm props:", { 
       url, 
@@ -43,7 +42,7 @@ const SeoAnalysisForm = ({
       analyzeSite: !!analyzeSite, 
       error, 
       handleActivateProxy: !!handleActivateProxy,
-      proxyEnabled: isProxyEnabled
+      proxyEnabled: true
     });
   }, [url, isLoading, showCorsWarning, analyzeSite, error, handleActivateProxy]);
 
@@ -238,7 +237,7 @@ const SeoAnalysisForm = ({
             Erreur d'accès détectée
           </h3>
           <p className="text-yellow-700 mb-3">
-            Une erreur s'est produite lors de l'accès au site. 
+            Les restrictions de sécurité du navigateur empêchent l'accès au site. 
             Vérifiez que l'URL est correcte et que le site est accessible. 
             Vous pouvez essayer d'utiliser un autre proxy.
           </p>

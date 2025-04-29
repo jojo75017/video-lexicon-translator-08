@@ -22,12 +22,12 @@ export class FirecrawlService {
   private static API_KEY_STORAGE_KEY = 'firecrawl_api_key';
   private static firecrawlApp: FirecrawlApp | null = null;
   private static proxyEnabled = true; // Par défaut, le proxy est ACTIVÉ
-  private static proxyUrl = 'https://corsproxy.io/?';
+  // Utiliser plusieurs options de proxies pour maximiser les chances
   private static proxyUrls = [
     'https://api.allorigins.win/raw?url=',  // Mettre celui-ci en premier car plus fiable
     'https://corsproxy.io/?',
-    'https://cors-anywhere.herokuapp.com/',
-    'https://cors.bridged.cc/'
+    'https://crossorigin.me/',
+    'https://cors-anywhere.herokuapp.com/'
   ];
 
   static saveApiKey(apiKey: string): void {
@@ -91,31 +91,23 @@ export class FirecrawlService {
     
     // Méthode de fetch avec proxy
     try {
-      console.log('Using direct fetch with proxy method for URL:', url);
-      return await this.fetchWithProxy(url);
+      console.log('Using direct fetch with multiple proxies for URL:', url);
+      return await this.fetchWithMultipleProxies(url);
     } catch (proxyError) {
-      console.error('Error with proxy fetch method:', proxyError);
+      console.error('Error with all proxy methods:', proxyError);
       
-      // Essayer avec un autre proxy
-      try {
-        console.log('Trying alternative proxy method...');
-        return await this.fetchWithAlternativeProxy(url);
-      } catch (altProxyError) {
-        console.error('Error with alternative proxy method:', altProxyError);
-        
-        // Fallback to API key method if available
-        const apiKey = this.getApiKey();
-        if (apiKey) {
-          console.log('Falling back to Firecrawl API method after proxy failure');
-          try {
-            return await this.fetchWithApiKey(url, apiKey);
-          } catch (apiError) {
-            console.error('Error with API key method (fallback):', apiError);
-            throw apiError;
-          }
-        } else {
-          throw proxyError;
+      // Fallback to API key method if available
+      const apiKey = this.getApiKey();
+      if (apiKey) {
+        console.log('Falling back to Firecrawl API method after proxy failure');
+        try {
+          return await this.fetchWithApiKey(url, apiKey);
+        } catch (apiError) {
+          console.error('Error with API key method (fallback):', apiError);
+          throw apiError;
         }
+      } else {
+        throw new Error('Tous les proxies ont échoué et aucune clé API n\'est disponible');
       }
     }
   }
@@ -163,50 +155,15 @@ export class FirecrawlService {
     }
   }
 
-  private static async fetchWithProxy(url: string): Promise<{ success: boolean; error?: string; data?: any }> {
-    console.log('Fetching with proxy method', { url });
-    
-    // Utiliser le proxy principal
-    try {
-      const proxyUrl = this.proxyUrls[0] + encodeURIComponent(url);
-      console.log(`Trying main proxy: ${proxyUrl}`);
-      
-      const response = await fetch(proxyUrl, {
-        method: 'GET',
-        headers: {
-          'Accept': 'text/html,application/xhtml+xml,application/xml',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-        },
-        cache: 'no-store',
-        mode: 'cors'
-      });
-      
-      if (response.ok) {
-        console.log(`Main proxy worked! Status: ${response.status}`);
-        const sourceCode = await response.text();
-        console.log(`Received ${sourceCode.length} chars of HTML`);
-        return this.processHtmlContent(sourceCode, url);
-      } else {
-        throw new Error(`HTTP status: ${response.status}`);
-      }
-    } catch (err) {
-      console.warn(`Error with main proxy:`, err);
-      throw err; // Laisser l'erreur se propager pour essayer d'autres méthodes
-    }
-  }
-
-  private static async fetchWithAlternativeProxy(url: string): Promise<{ success: boolean; error?: string; data?: any }> {
-    console.log('Fetching with alternative proxies', { url });
-    
-    let sourceCode = null;
+  // Nouvelle méthode pour tenter avec plusieurs proxies
+  private static async fetchWithMultipleProxies(url: string): Promise<{ success: boolean; error?: string; data?: any }> {
     let lastError = null;
     
-    // Essayer chaque proxy alternatif
-    for (let i = 1; i < this.proxyUrls.length; i++) {
-      const proxy = this.proxyUrls[i];
+    // Essayer chaque proxy jusqu'à ce qu'un fonctionne
+    for (const proxy of this.proxyUrls) {
       try {
         const proxyUrl = proxy + encodeURIComponent(url);
-        console.log(`Trying alternative proxy ${i}: ${proxyUrl}`);
+        console.log(`Trying proxy: ${proxy} for URL: ${url}`);
         
         const response = await fetch(proxyUrl, {
           method: 'GET',
@@ -222,9 +179,9 @@ export class FirecrawlService {
         
         if (response.ok) {
           console.log(`Proxy ${proxy} worked! Status: ${response.status}`);
-          sourceCode = await response.text();
+          const sourceCode = await response.text();
           console.log(`Received ${sourceCode.length} chars of HTML`);
-          break;
+          return this.processHtmlContent(sourceCode, url);
         } else {
           console.warn(`Proxy ${proxy} returned status: ${response.status}`);
           lastError = `HTTP status: ${response.status} from proxy ${proxy}`;
@@ -236,31 +193,28 @@ export class FirecrawlService {
       }
     }
     
-    if (!sourceCode) {
-      console.warn('All proxies failed:', lastError);
-      
-      // Créer un résultat de secours pour éviter l'erreur
-      return {
-        success: true,
-        data: {
-          url,
-          title: "Analyse du site " + url,
-          headings: [],
-          meta: [],
-          images: [],
-          paragraphs: [],
-          links: [],
-          sourceCode: "<html><body><p>Contenu non disponible</p></body></html>",
-          textContent: "Contenu non disponible"
-        }
-      };
-    }
+    // Si tous les proxies ont échoué
+    console.error('All proxies failed:', lastError);
     
-    return this.processHtmlContent(sourceCode, url);
+    // Créer un résultat minimal pour éviter une page blanche
+    return {
+      success: true,
+      data: {
+        url,
+        title: "Analyse du site " + url,
+        headings: [],
+        meta: [],
+        images: [],
+        paragraphs: [],
+        links: [],
+        sourceCode: "<html><body><p>Tous les proxies ont échoué. Essayez une autre URL ou réessayez plus tard.</p></body></html>",
+        textContent: "Contenu non disponible - Tous les proxies ont échoué"
+      }
+    };
   }
   
   // Méthode pour traiter le HTML et extraire les métadonnées
-  private static processHtmlContent(sourceCode: string, url: string): Promise<{ success: boolean; error?: string; data?: any }> {
+  private static processHtmlContent(sourceCode: string, url: string): { success: boolean; error?: string; data?: any } {
     try {
       // Extraire les métadonnées de base du HTML
       console.log('Parsing HTML content...');

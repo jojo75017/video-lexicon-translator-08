@@ -24,7 +24,7 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
   const [seoAnalysis, setSeoAnalysis] = useState<any>(null);
   const [resources, setResources] = useState<any>(null);
   const [siteStructure, setSiteStructure] = useState<any>(null);
-  const [proxyEnabled, setProxyEnabled] = useState<boolean>(FirecrawlService.isProxyEnabled());
+  const [proxyEnabled, setProxyEnabled] = useState<boolean>(true); // Always set to true by default
 
   // Vérifier l'état du proxy et charger la clé API au chargement
   useEffect(() => {
@@ -89,7 +89,11 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
     setShowCorsWarning(false);
     setSeoAnalysis(null); // Réinitialiser les résultats précédents
 
-    console.log(`Analyse du site: ${formattedUrl}`, { proxyEnabled });
+    console.log(`Analyse du site: ${formattedUrl}`);
+    
+    // Force enable proxy before analysis
+    FirecrawlService.enableProxy();
+    setProxyEnabled(true);
     
     const currentApiKey = localStorage.getItem('openaiKey');
     if (currentApiKey) {
@@ -97,11 +101,6 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
     }
 
     try {
-      // Activer le proxy si ce n'est pas déjà fait - le forcer à chaque fois
-      console.log("Activation forcée du proxy avant l'analyse");
-      FirecrawlService.enableProxy();
-      setProxyEnabled(true);
-      
       console.log("Début de l'analyse avec FirecrawlService...");
       
       // Utiliser FirecrawlService pour l'analyse avec le proxy TOUJOURS activé
@@ -121,9 +120,9 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
             result.error.includes('connexion')
         )) {
           setShowCorsWarning(true);
-          setError("Erreur CORS détectée. Veuillez vérifier l'URL ou réessayer.");
+          setError("Erreur CORS détectée. Veuillez vérifier l'URL ou réessayer avec un autre proxy.");
           toast.error("Erreur CORS détectée", {
-            description: "Veuillez vérifier l'URL ou réessayer",
+            description: "Veuillez vérifier l'URL ou réessayer avec un autre proxy",
           });
         } else {
           setError(result.error || "Erreur d'analyse inconnue");
@@ -143,18 +142,18 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
           error.message.includes('connexion')
       )) {
         setShowCorsWarning(true);
-        setError("Erreur de connexion - Activez le proxy pour analyser ce site.");
+        setError("Erreur de connexion - Essayez un autre proxy ou une autre URL.");
       } else {
         setError(error instanceof Error ? error.message : "Une erreur s'est produite");
       }
       
       toast.error("Échec de l'analyse", {
-        description: "Impossible d'analyser le site web. Veuillez vérifier l'URL.",
+        description: "Impossible d'analyser le site web. Veuillez essayer un autre proxy ou une autre URL.",
       });
     } finally {
       setIsLoading(false);
     }
-  }, [url, proxyEnabled]);
+  }, [url]);
 
   return {
     url,

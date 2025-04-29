@@ -4,7 +4,6 @@ import { ArrowLeft, Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { CrawlForm } from "@/components/CrawlForm";
 import SeoResults from "@/components/SeoResults";
 import { useSiteAnalyzer } from '@/hooks/useSiteAnalyzer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
