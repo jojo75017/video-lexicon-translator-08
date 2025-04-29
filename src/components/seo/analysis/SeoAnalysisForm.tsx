@@ -64,16 +64,17 @@ const SeoAnalysisForm = ({
     if (!proxyEnabled) {
       handleActivateProxy();
       setProxyEnabled(true);
+      console.log("Proxy activé automatiquement avant l'analyse");
     }
     
     toast.info("Lancement de l'analyse...", {
       description: "Préparation de l'analyse du site " + formattedUrl
     });
     
-    // Délai court pour permettre au proxy de s'activer
-    setTimeout(() => {
-      analyzeSite();
-    }, 500);
+    console.log("Déclenchement de l'analyse pour:", formattedUrl);
+    
+    // Lancer l'analyse immédiatement
+    analyzeSite();
   };
 
   const handleProxyClick = () => {

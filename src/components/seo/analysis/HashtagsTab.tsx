@@ -18,7 +18,7 @@ const HashtagsTab: React.FC<HashtagsTabProps> = ({
   maxLength,
   keywordToUse
 }) => {
-  // Générer des hashtags soit génériques, soit basés sur le mot-clé
+  // Générer des hashtags spécifiques au mot-clé ou utiliser des hashtags génériques
   const hashtags = keywordToUse 
     ? generateHashtagsForKeyword(keywordToUse)
     : [
@@ -41,7 +41,7 @@ const HashtagsTab: React.FC<HashtagsTabProps> = ({
     }
     
     onInsert(newValue);
-    console.log("Hashtag inséré:", hashtag, "Nouvelle valeur:", newValue);
+    console.log("Hashtag inséré:", hashtag, "Nouvelle valeur:", newValue, "Mot-clé utilisé:", keywordToUse);
     toast.success(`Hashtag ${hashtag} ajouté à la description`);
   };
 
@@ -50,6 +50,11 @@ const HashtagsTab: React.FC<HashtagsTabProps> = ({
       <div className="mb-2 text-sm text-gray-500 flex items-center gap-1">
         <Hash className="h-4 w-4 text-violet-500" />
         <span>Cliquez pour insérer un hashtag dans la description.</span>
+        {keywordToUse && (
+          <span className="font-medium text-violet-600">
+            Hashtags générés pour : {keywordToUse}
+          </span>
+        )}
       </div>
       <div className="flex flex-wrap gap-1">
         {hashtags.map((h) => (

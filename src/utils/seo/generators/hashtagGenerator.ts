@@ -5,6 +5,16 @@ import { detectGeographicKeyword } from './titleGenerator';
  * Génère une liste de hashtags pertinents pour un mot-clé donné
  */
 export const generateHashtagsForKeyword = (keyword: string): string[] => {
+  if (!keyword || typeof keyword !== 'string') {
+    console.warn("Mot-clé invalide fourni au générateur de hashtags:", keyword);
+    return [
+      "#SEO", "#Référencement", "#Digital", "#Marketing", 
+      "#Web", "#Conseils", "#Stratégie", "#Optimisation"
+    ];
+  }
+  
+  console.log("Génération de hashtags pour le mot-clé:", keyword);
+  
   // Normaliser le keyword
   const normalizedKeyword = keyword.toLowerCase().trim();
   
@@ -104,6 +114,8 @@ export const generateHashtagsForKeyword = (keyword: string): string[] => {
       uniqueHashtags.push(hashtag);
     }
   }
+  
+  console.log("Hashtags générés:", uniqueHashtags.slice(0, 12));
   
   // Limiter à un nombre raisonnable de hashtags (max 12)
   return uniqueHashtags.slice(0, 12);

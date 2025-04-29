@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AnalysisSettings from '@/components/settings/AnalysisSettings';
 import SeoAnalysisForm from '@/components/seo/analysis/SeoAnalysisForm';
 import { toast } from "sonner";
+import { FirecrawlService } from '@/utils/FirecrawlService';
 
 const SeoPage = () => {
   const { 
@@ -21,8 +22,17 @@ const SeoPage = () => {
     seoAnalysis, 
     analyzeSite, 
     error, 
-    handleActivateProxy
+    handleActivateProxy,
+    proxyEnabled
   } = useSiteAnalyzer();
+
+  // Activer automatiquement le proxy au chargement de la page
+  useEffect(() => {
+    if (!proxyEnabled) {
+      FirecrawlService.enableProxy();
+      console.log("Proxy activé automatiquement au chargement de la page SeoPage");
+    }
+  }, [proxyEnabled]);
 
   // Fonction pour activer le proxy depuis la page principale
   const activateProxyHandler = () => {
@@ -77,6 +87,17 @@ const SeoPage = () => {
               />
               
               {seoAnalysis && <SeoResults seoAnalysis={seoAnalysis} />}
+              
+              {!seoAnalysis && !isLoading && url && (
+                <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 mt-6">
+                  <p className="text-blue-700 font-medium">
+                    Aucun résultat d'analyse disponible
+                  </p>
+                  <p className="text-blue-600 text-sm mt-1">
+                    Cliquez sur "Analyser le site" pour lancer l'analyse SEO de {url}
+                  </p>
+                </div>
+              )}
             </Card>
           </TabsContent>
           

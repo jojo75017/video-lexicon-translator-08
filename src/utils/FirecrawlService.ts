@@ -82,10 +82,20 @@ export class FirecrawlService {
       url = 'https://' + url;
     }
     
+    // Vérifier le statut du proxy
+    const isProxyEnabled = this.isProxyEnabled();
+    console.log(`État actuel du proxy: ${isProxyEnabled ? 'activé' : 'désactivé'}, useProxy paramètre: ${useProxy}`);
+    
+    // Forcer l'activation du proxy si nécessaire
+    if (useProxy && !isProxyEnabled) {
+      console.log("Activation forcée du proxy avant l'analyse");
+      this.enableProxy();
+    }
+    
     // Méthode de fetch avec proxy
     if (useProxy) {
       try {
-        console.log('Using direct fetch with proxy method');
+        console.log('Using direct fetch with proxy method for URL:', url);
         return await this.fetchWithProxy(url);
       } catch (proxyError) {
         console.error('Error with proxy fetch method:', proxyError);
@@ -194,8 +204,9 @@ export class FirecrawlService {
         });
         
         if (response.ok) {
-          console.log(`Proxy ${proxy} worked!`);
+          console.log(`Proxy ${proxy} worked! Status: ${response.status}`);
           sourceCode = await response.text();
+          console.log(`Received ${sourceCode.length} chars of HTML`);
           break;
         } else {
           console.warn(`Proxy ${proxy} returned status: ${response.status}`);
@@ -220,13 +231,16 @@ export class FirecrawlService {
     
     try {
       // Extraire les métadonnées de base du HTML
+      console.log('Parsing HTML content...');
       const parser = new DOMParser();
       const doc = parser.parseFromString(sourceCode, 'text/html');
       
       const title = doc.querySelector('title')?.textContent || url;
+      console.log('Extracted title:', title);
       
       // Traiter les titres avec un formatage de niveau approprié
       const headingElements = [...doc.querySelectorAll('h1, h2, h3, h4, h5, h6')];
+      console.log(`Found ${headingElements.length} heading elements`);
       const headings = headingElements.map((el, index) => {
         // Obtenir le niveau de titre à partir du nom de balise (h1, h2, etc.)
         const levelFromTag = parseInt(el.tagName.charAt(1));
@@ -276,6 +290,8 @@ export class FirecrawlService {
         sourceCode,
         textContent: doc.body?.textContent || ''
       };
+      
+      console.log('Analysis complete, returning data');
       
       return {
         success: true,

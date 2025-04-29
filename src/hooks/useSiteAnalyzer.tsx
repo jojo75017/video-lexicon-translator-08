@@ -89,8 +89,9 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
     setIsLoading(true);
     setError(null);
     setShowCorsWarning(false);
+    setSeoAnalysis(null); // Réinitialiser les résultats précédents
 
-    console.log(`Analyse du site: ${formattedUrl}`);
+    console.log(`Analyse du site: ${formattedUrl}`, { proxyEnabled });
     
     const currentApiKey = localStorage.getItem('openaiKey');
     if (currentApiKey) {
@@ -107,8 +108,11 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
         handleActivateProxy(); // Activer le proxy
       }
       
+      console.log("Début de l'analyse avec FirecrawlService...");
+      
       // Utiliser FirecrawlService pour l'analyse avec le proxy activé
       const result = await FirecrawlService.crawlWebsite(formattedUrl, true);
+      console.log("Résultat de l'analyse:", result);
       
       if (result.success && result.data) {
         setSeoAnalysis(result.data);
