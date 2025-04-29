@@ -10,9 +10,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import KeywordMetrics from './keyword/KeywordMetrics';
 import KeywordTrends from './keyword/KeywordTrends';
 import SeoSuggestions from './keyword/SeoSuggestions';
+import TitleEnhancementTabs from './keyword/TitleEnhancementTabs';
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { OpenAIService } from "@/utils/seo/openaiService";
+import { generateHashtagsForKeyword } from '@/utils/seo/generators/hashtagGenerator';
 
 interface KeywordStepProps {
   selectedKeyword: string;
@@ -33,6 +35,7 @@ const KeywordStep: React.FC<KeywordStepProps> = ({
   const selectedKeywordData = keywords.find(kw => kw.keyword === selectedKeyword);
   const [title, setTitle] = useState(selectedKeywordData?.suggestedTitle || '');
   const [description, setDescription] = useState(selectedKeywordData?.suggestedDescription || '');
+  const [suggestedHashtags, setSuggestedHashtags] = useState<string[]>([]);
   
   // Vérifier l'état de la clé API au chargement
   useEffect(() => {
@@ -48,8 +51,12 @@ const KeywordStep: React.FC<KeywordStepProps> = ({
     if (selectedKeywordData) {
       setTitle(selectedKeywordData.suggestedTitle || '');
       setDescription(selectedKeywordData.suggestedDescription || '');
+      
+      // Générer des hashtags pertinents pour le mot-clé sélectionné
+      const hashtags = generateHashtagsForKeyword(selectedKeyword);
+      setSuggestedHashtags(hashtags);
     }
-  }, [selectedKeywordData]);
+  }, [selectedKeywordData, selectedKeyword]);
 
   const validateApiKey = async (key: string) => {
     try {
@@ -193,6 +200,15 @@ const KeywordStep: React.FC<KeywordStepProps> = ({
               />
             </div>
           </div>
+          
+          {/* Onglets pour ajouter emojis et hashtags */}
+          <TitleEnhancementTabs 
+            title={title}
+            description={description}
+            selectedKeyword={selectedKeyword}
+            onUpdateTitle={setTitle}
+            onUpdateDescription={setDescription}
+          />
         </Card>
 
         <Card className="p-4">

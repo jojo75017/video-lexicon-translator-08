@@ -3,20 +3,30 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Hash } from "lucide-react";
 import { toast } from "sonner";
-
-const hashtags = [
-  "#SEO", "#Référencement", "#Google", "#MetaTitle", "#Digital", "#ConseilSEO",
-  "#Ranking", "#Visibilité", "#Tendance", "#Marketing", "#Optimisation", "#StratégieSEO",
-  "#WebMarketing", "#ContentMarketing", "#TraficWeb", "#MotsClés", "#Performance", "#Conversion"
-];
+import { generateHashtagsForKeyword } from '@/utils/seo/generators/hashtagGenerator';
 
 interface HashtagsTabProps {
   fieldValue: string;
   onInsert: (val: string) => void;
   maxLength: number;
+  keywordToUse?: string; // Optionnel: mot-clé pour générer des hashtags pertinents
 }
 
-const HashtagsTab: React.FC<HashtagsTabProps> = ({ fieldValue, onInsert, maxLength }) => {
+const HashtagsTab: React.FC<HashtagsTabProps> = ({
+  fieldValue,
+  onInsert,
+  maxLength,
+  keywordToUse
+}) => {
+  // Générer des hashtags soit génériques, soit basés sur le mot-clé
+  const hashtags = keywordToUse 
+    ? generateHashtagsForKeyword(keywordToUse)
+    : [
+        "#SEO", "#Référencement", "#Google", "#MetaTitle", "#Digital", "#ConseilSEO",
+        "#Ranking", "#Visibilité", "#Tendance", "#Marketing", "#Optimisation", "#StratégieSEO",
+        "#WebMarketing", "#ContentMarketing", "#TraficWeb", "#MotsClés", "#Performance", "#Conversion"
+      ];
+
   const handleInsert = (hashtag: string) => {
     // Ajoute un espace si besoin
     let insertVal = fieldValue;
@@ -41,7 +51,7 @@ const HashtagsTab: React.FC<HashtagsTabProps> = ({ fieldValue, onInsert, maxLeng
     <div>
       <div className="mb-2 text-sm text-gray-500 flex items-center gap-1">
         <Hash className="h-4 w-4 text-violet-500" />
-        Cliquez pour insérer un hashtag dans la description.
+        <span>Cliquez pour insérer un hashtag dans la description.</span>
       </div>
       <div className="flex flex-wrap gap-1">
         {hashtags.map((h) => (
