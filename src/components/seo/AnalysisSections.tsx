@@ -1,21 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { KeywordSuggestion } from '@/types/seo';
-import KeywordSuggestions from '@/components/seo/analysis/KeywordSuggestions';
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-import { OpenAIService } from '@/utils/seo/openaiService';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import EmojiTab from '@/components/seo/analysis/EmojiTab';
-import HashtagsTab from '@/components/seo/analysis/HashtagsTab';
 import { Card } from "@/components/ui/card";
-import { generateBothDescriptions } from '@/utils/seo/generators/descriptionGenerator';
-import SeoAnalysisForm from './analysis/SeoAnalysisForm';
-import ResultsDisplay from './analysis/ResultsDisplay';
-import ComparisonSection from './analysis/ComparisonSection';
-import ContentGenerator from './analysis/ContentGenerator';
-import { CheckCircle, AlertCircle } from 'lucide-react';
+import { OpenAIService } from '@/utils/seo/openaiService';
+import ApiKeyConfig from './analysis/ApiKeyConfig';
+import AnalysisWrapper from './analysis/AnalysisWrapper';
 
 interface AnalysisSectionsProps {
   url: string;
@@ -62,14 +51,14 @@ const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
   handleContentKeywordChange,
   handleGeneratedKeywords
 }) => {
-  // State variables for KeywordSuggestions
+  // State variables for component
   const [title, setTitle] = React.useState('');
   const [description, setDescription] = React.useState('');
   const [openaiKey, setOpenaiKey] = React.useState(() => localStorage.getItem('openaiKey') || '');
   const [apiKeyStatus, setApiKeyStatus] = useState<'unchecked' | 'valid' | 'invalid'>('unchecked');
   const [validationMessage, setValidationMessage] = useState<string>('');
   
-  // Vérifier la clé API au chargement du composant
+  // Check API key on component load
   useEffect(() => {
     const checkApiKey = async () => {
       const apiKey = localStorage.getItem('openaiKey');
@@ -82,14 +71,14 @@ const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
       try {
         setOpenaiKey(apiKey);
         const openAIService = new OpenAIService(apiKey);
-        // Essayer de valider la clé API
+        // Try to validate API key
         OpenAIService.enableProxy();
         const isValid = await openAIService.validateApiKey();
         setApiKeyStatus(isValid ? 'valid' : 'invalid');
         
         if (isValid) {
           setValidationMessage("Clé API validée avec succès");
-          // Générer automatiquement des suggestions
+          // Generate suggestions automatically
           if (generatedKeywords.length === 0) {
             generateKeywordSuggestions(openAIService);
           }
@@ -106,81 +95,30 @@ const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
     checkApiKey();
   }, []);
   
-  // Handle saving the API key
-  const handleSaveApiKey = async () => {
-    if (openaiKey) {
-      localStorage.setItem('openaiKey', openaiKey);
-      toast.info("Validation de la clé API en cours...");
-      setValidationMessage("Validation en cours...");
-      
-      // Valider la clé API
-      const openAIService = new OpenAIService(openaiKey);
-      OpenAIService.enableProxy();
-      try {
-        const isValid = await openAIService.validateApiKey();
-        setApiKeyStatus(isValid ? 'valid' : 'invalid');
-        
-        if (isValid) {
-          setValidationMessage("Clé API validée avec succès");
-          toast.success("Clé API OpenAI validée avec succès");
-          
-          // Générer automatiquement des suggestions
-          generateKeywordSuggestions(openAIService);
-        } else {
-          setValidationMessage("La clé API n'a pas pu être validée");
-          toast.error("La clé API n'a pas pu être validée");
-        }
-      } catch (error) {
-        console.error("Erreur lors de la validation:", error);
-        setApiKeyStatus('invalid');
-        setValidationMessage("Impossible de vérifier la clé API (problème réseau)");
-        toast.warning("Clé sauvegardée mais impossible de la valider (problème réseau)");
-      }
-    } else {
-      toast.error("Veuillez entrer une clé API");
-    }
-  };
-  
   const generateKeywordSuggestions = async (openAIService: OpenAIService) => {
-    toast.info("Génération automatique de suggestions...");
-    
     try {
-      // Utiliser un mot-clé par défaut pour la première génération
+      // Use a default keyword for the first generation
       const defaultKeyword = "référencement";
       const newKeywords = await openAIService.getKeywordSuggestions(defaultKeyword);
       
       if (handleGeneratedKeywords) {
         handleGeneratedKeywords(newKeywords);
-        toast.success("Suggestions générées avec succès");
       }
     } catch (error) {
       console.error("Erreur lors de la génération:", error);
-      toast.error("Impossible de générer des suggestions");
     }
-  };
-  
-  const handleInsertTitle = (value: string) => {
-    setTitle(value);
-    toast.success("Titre inséré");
-  };
-  
-  const handleInsertDescription = (value: string) => {
-    setDescription(value);
-    toast.success("Description insérée");
   };
   
   const handleGenerateMore = () => {
     if (!openaiKey) {
-      toast.error("Veuillez d'abord configurer votre clé API OpenAI");
       return;
     }
     
-    toast.info("Génération de nouvelles suggestions...");
-    // Appel à l'API pour générer de nouvelles suggestions
+    // Call to API to generate new suggestions
     const openAIService = new OpenAIService(openaiKey);
     OpenAIService.enableProxy();
     
-    // Exemple avec un mot-clé par défaut si aucun n'est défini
+    // Example with a default keyword if none is defined
     const keyword = generatedKeywords.length > 0 
       ? generatedKeywords[0].keyword 
       : "référencement";
@@ -189,13 +127,28 @@ const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
       .then(newKeywords => {
         if (handleGeneratedKeywords) {
           handleGeneratedKeywords(newKeywords);
-          toast.success("Nouvelles suggestions générées");
         }
       })
       .catch(error => {
         console.error("Erreur lors de la génération:", error);
-        toast.error("Impossible de générer des suggestions");
       });
+  };
+
+  const handleInsertTitle = (value: string) => {
+    setTitle(value);
+  };
+  
+  const handleInsertDescription = (value: string) => {
+    setDescription(value);
+  };
+  
+  const handleKeyValidated = () => {
+    // Generate suggestions automatically when key is validated
+    const apiKey = localStorage.getItem('openaiKey');
+    if (apiKey) {
+      const openAIService = new OpenAIService(apiKey);
+      generateKeywordSuggestions(openAIService);
+    }
   };
 
   return (
@@ -207,74 +160,37 @@ const AnalysisSections: React.FC<AnalysisSectionsProps> = ({
       </p>
       
       <div className="space-y-6">
-        {/* Section de configuration de la clé API */}
-        <div className="bg-slate-50 p-4 rounded-md border border-slate-200">
-          <h3 className="font-medium mb-2">Configuration de l'API OpenAI</h3>
-          <div className="flex gap-2 mb-2">
-            <Input
-              type="password"
-              placeholder="Entrez votre clé API OpenAI (sk-...)"
-              value={openaiKey}
-              onChange={(e) => setOpenaiKey(e.target.value)}
-              className={`flex-1 ${apiKeyStatus === 'valid' ? 'border-green-500' : apiKeyStatus === 'invalid' ? 'border-red-500' : ''}`}
-            />
-            <Button onClick={handleSaveApiKey}>
-              Sauvegarder
-            </Button>
-          </div>
-          <div className="flex items-center mt-2">
-            {apiKeyStatus === 'valid' && (
-              <div className="flex items-center text-xs text-green-600">
-                <CheckCircle className="h-4 w-4 mr-1" />
-                <span>{validationMessage}</span>
-              </div>
-            )}
-            {apiKeyStatus === 'invalid' && (
-              <div className="flex items-center text-xs text-red-600">
-                <AlertCircle className="h-4 w-4 mr-1" />
-                <span>{validationMessage}</span>
-              </div>
-            )}
-            {apiKeyStatus === 'unchecked' && (
-              <span className="text-xs text-gray-500">Aucune clé API vérifiée</span>
-            )}
-          </div>
-        </div>
+        {/* API Key Configuration Section */}
+        <ApiKeyConfig
+          openaiKey={openaiKey}
+          setOpenaiKey={setOpenaiKey}
+          apiKeyStatus={apiKeyStatus}
+          setApiKeyStatus={setApiKeyStatus}
+          validationMessage={validationMessage}
+          setValidationMessage={setValidationMessage}
+          onKeyValidated={handleKeyValidated}
+        />
         
-        <SeoAnalysisForm 
+        {/* Main Analysis Components */}
+        <AnalysisWrapper
           url={url}
           setUrl={setUrl}
           isLoading={isLoading}
           showCorsWarning={showCorsWarning}
+          seoAnalysis={seoAnalysis}
+          comparisonSite={comparisonSite}
+          setComparisonSite={setComparisonSite}
+          generatedKeywords={generatedKeywords}
+          contentKeyword={contentKeyword}
+          generatedContent={generatedContent}
+          mockContentIdeas={mockContentIdeas}
           analyzeSite={analyzeSite}
           error={error}
           handleActivateProxy={handleActivateProxy}
-        />
-        
-        {seoAnalysis && <ResultsDisplay seoAnalysis={seoAnalysis} />}
-        
-        <ComparisonSection 
-          comparisonSite={comparisonSite}
-          setComparisonSite={setComparisonSite}
-          isLoading={isLoading}
-        />
-        
-        <KeywordSuggestions 
-          generatedKeywords={generatedKeywords}
-          onGenerateClick={handleGenerateMore}
-          fieldValue={title}
-          onInsert={handleInsertTitle}
-          maxLength={60}
-          descriptionValue={description}
-          onInsertDescription={handleInsertDescription}
-          maxLengthDescription={155}
-        />
-        
-        <ContentGenerator 
-          contentKeyword={contentKeyword}
           handleContentKeywordChange={handleContentKeywordChange}
-          generatedContent={generatedContent}
-          mockContentIdeas={mockContentIdeas}
+          handleGenerateMore={handleGenerateMore}
+          onInsertTitle={handleInsertTitle}
+          onInsertDescription={handleInsertDescription}
         />
       </div>
     </Card>
