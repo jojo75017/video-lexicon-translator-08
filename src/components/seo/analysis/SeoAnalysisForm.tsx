@@ -6,6 +6,7 @@ import { Search, AlertCircle, Loader2, Shield, Globe, RefreshCw } from "lucide-r
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 import { FirecrawlService } from '@/utils/FirecrawlService';
+import { Progress } from "@/components/ui/progress";
 
 interface SeoAnalysisFormProps {
   url: string;
@@ -28,6 +29,8 @@ const SeoAnalysisForm = ({
 }: SeoAnalysisFormProps) => {
   const [proxyEnabled, setProxyEnabled] = useState<boolean>(true);
   const [proxyTested, setProxyTested] = useState<boolean>(false);
+  const [progress, setProgress] = useState<number>(0);
+  const [proxyTestResults, setProxyTestResults] = useState<any[]>([]);
   
   // Vérifier si le proxy est déjà activé au chargement
   useEffect(() => {
@@ -45,6 +48,27 @@ const SeoAnalysisForm = ({
       proxyEnabled: true
     });
   }, [url, isLoading, showCorsWarning, analyzeSite, error, handleActivateProxy]);
+
+  // Effect to update progress during loading
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
+    
+    if (isLoading) {
+      setProgress(0);
+      interval = setInterval(() => {
+        setProgress(prev => {
+          const increment = Math.random() * 15;
+          return Math.min(prev + increment, 90);
+        });
+      }, 1000);
+    } else {
+      setProgress(100);
+    }
+    
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isLoading]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,9 +120,18 @@ const SeoAnalysisForm = ({
   const testProxyConnection = async () => {    
     toast.loading("Test des proxies en cours...");
     setProxyTested(true);
+    setProgress(0);
     
     try {
+      // Démarre la progression
+      const interval = setInterval(() => {
+        setProgress(prev => Math.min(prev + 5, 90));
+      }, 300);
+      
       const results = await FirecrawlService.testProxyConnectivity();
+      clearInterval(interval);
+      setProgress(100);
+      setProxyTestResults(results);
       
       const workingProxies = results.filter(r => r.working);
       if (workingProxies.length > 0) {
@@ -114,6 +147,7 @@ const SeoAnalysisForm = ({
       toast.error("Erreur lors du test des proxies", {
         description: error instanceof Error ? error.message : "Erreur inconnue"
       });
+      setProgress(100);
     }
   };
 
@@ -199,6 +233,16 @@ const SeoAnalysisForm = ({
         </Button>
       </div>
 
+      {isLoading && (
+        <div className="mt-4">
+          <div className="flex justify-between text-sm mb-1">
+            <span>Analyse en cours...</span>
+            <span>{Math.round(progress)}%</span>
+          </div>
+          <Progress value={progress} className="h-2" />
+        </div>
+      )}
+
       {error && (
         <Alert variant="destructive" className="mt-4">
           <AlertCircle className="h-4 w-4" />
@@ -264,14 +308,30 @@ const SeoAnalysisForm = ({
         </div>
       )}
       
-      {isLoading && (
-        <div className="mt-4 p-3 bg-blue-50 rounded-md border border-blue-100 flex items-center">
-          <Loader2 className="mr-2 h-4 w-4 animate-spin text-blue-500" />
-          <span className="text-blue-700">Analyse en cours, veuillez patienter...</span>
+      {proxyTestResults.length > 0 && (
+        <div className="mt-4 p-3 bg-gray-50 rounded-md border border-gray-100">
+          <h4 className="font-medium text-gray-700 mb-2">Résultats des tests de proxies</h4>
+          <div className="space-y-2 max-h-40 overflow-y-auto">
+            {proxyTestResults.map((result, index) => (
+              <div 
+                key={index} 
+                className={`p-2 rounded-md flex justify-between ${
+                  result.working ? 'bg-green-50 border border-green-100' : 'bg-red-50 border border-red-100'
+                }`}
+              >
+                <span className={`text-xs font-mono ${result.working ? 'text-green-700' : 'text-red-700'}`}>
+                  {result.proxy.substring(0, 30)}...
+                </span>
+                <span className={`text-xs ${result.working ? 'text-green-700' : 'text-red-700'}`}>
+                  {result.working ? `${result.latency}ms` : 'Échec'}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
-      {proxyTested && !isLoading && !error && !showCorsWarning && (
+      {!isLoading && !error && !showCorsWarning && proxyTested && (
         <div className="mt-4 p-3 bg-blue-50 rounded-md border border-blue-100 flex items-center">
           <p className="text-blue-700">
             Test des proxies terminé. Vous pouvez maintenant tenter d'analyser votre site.

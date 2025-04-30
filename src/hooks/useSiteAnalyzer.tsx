@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { toast } from "sonner";
 import { FirecrawlService } from '@/utils/FirecrawlService';
 import { OpenAIService } from '@/utils/seo/openaiService';
+import { ProxyService } from '@/utils/seo/proxyService';
 
 export interface SiteAnalyzerResult {
   url: string;
@@ -29,11 +30,10 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
 
   // Check proxy status and load API key on mount
   useEffect(() => {
-    // Ensure proxy is enabled by default
+    // Ensure all proxies are enabled by default
     FirecrawlService.enableProxy();
-    if (!OpenAIService.isProxyEnabled()) {
-      OpenAIService.enableProxy();
-    }
+    OpenAIService.enableProxy();
+    ProxyService.enableProxy();
     setProxyEnabled(true);
     
     // Load OpenAI API key from localStorage
@@ -41,16 +41,17 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
     setOpenaiApiKey(apiKey);
     
     console.log("Initial useSiteAnalyzer hook state:", {
-      proxyEnabled: FirecrawlService.isProxyEnabled(),
+      proxyEnabled: true,
       openAIKeyExists: !!apiKey
     });
   }, []);
 
   // Function to activate CORS proxy
   const handleActivateProxy = useCallback(() => {
-    // Activate proxy in FirecrawlService
+    // Activate proxy in all services
     FirecrawlService.enableProxy();
     OpenAIService.enableProxy();
+    ProxyService.enableProxy();
     
     setProxyEnabled(true);
     setShowCorsWarning(false);
@@ -59,10 +60,7 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
       description: "Les requêtes utiliseront désormais un proxy pour contourner les restrictions CORS",
     });
     
-    console.log("Proxy activated:", {
-      firecrawlProxy: FirecrawlService.isProxyEnabled(),
-      openaiProxy: OpenAIService.isProxyEnabled()
-    });
+    console.log("All proxies activated");
   }, []);
 
   // Analyze the site
@@ -98,6 +96,8 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
     
     // Force enable proxy before analysis
     FirecrawlService.enableProxy();
+    OpenAIService.enableProxy();
+    ProxyService.enableProxy();
     setProxyEnabled(true);
     
     // Check for OpenAI API key
@@ -113,6 +113,9 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
 
     try {
       console.log("Starting analysis with FirecrawlService...");
+      toast.info(`Analyse de ${formattedUrl}`, {
+        description: "Tentative d'extraction du contenu via proxies..."
+      });
       
       // Use FirecrawlService for analysis with proxy ALWAYS enabled
       const result = await FirecrawlService.crawlWebsite(formattedUrl, true);
@@ -120,7 +123,7 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
       
       if (result.success && result.data) {
         setSeoAnalysis(result.data);
-        toast.success("Analysis completed successfully", {
+        toast.success("Analyse terminée avec succès", {
           description: `${result.data.title || formattedUrl}`
         });
         
@@ -128,6 +131,10 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
         if (currentApiKey && result.data.textContent) {
           try {
             console.log("Enhancing analysis with OpenAI...");
+            toast.info("Amélioration avec IA...", {
+              description: "Analyse du contenu avec OpenAI en cours..."
+            });
+            
             const openAIService = new OpenAIService(currentApiKey);
             const enhancedAnalysis = await openAIService.analyzeSeoContent(
               formattedUrl,
@@ -140,9 +147,16 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
                 ...prev,
                 openAIAnalysis: enhancedAnalysis
               }));
+              
+              toast.success("Analyse IA complétée", {
+                description: "Les données d'analyse ont été enrichies avec OpenAI"
+              });
             }
           } catch (aiError) {
             console.error("Error enhancing analysis with OpenAI:", aiError);
+            toast.error("Erreur d'analyse IA", {
+              description: "L'amélioration avec OpenAI a échoué mais l'analyse de base est disponible"
+            });
             // Non-blocking error, continue with basic analysis
           }
         }
@@ -154,14 +168,14 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
             result.error.includes('connexion')
         )) {
           setShowCorsWarning(true);
-          setError("CORS error detected. Please check the URL or try with a different proxy.");
-          toast.error("CORS error detected", {
-            description: "Please check the URL or try with a different proxy",
+          setError("Erreur CORS détectée. Vérifiez l'URL ou essayez avec un autre proxy.");
+          toast.error("Erreur CORS détectée", {
+            description: "Vérifiez l'URL ou essayez avec un autre proxy",
           });
         } else {
-          setError(result.error || "Unknown analysis error");
-          toast.error("Analysis error", {
-            description: result.error || "An error occurred during analysis",
+          setError(result.error || "Erreur d'analyse inconnue");
+          toast.error("Erreur d'analyse", {
+            description: result.error || "Une erreur est survenue pendant l'analyse",
           });
         }
       }
@@ -176,13 +190,13 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
           error.message.includes('connexion')
       )) {
         setShowCorsWarning(true);
-        setError("Connection error - Try another proxy or URL.");
+        setError("Erreur de connexion - Essayez un autre proxy ou URL.");
       } else {
-        setError(error instanceof Error ? error.message : "An error occurred");
+        setError(error instanceof Error ? error.message : "Une erreur est survenue");
       }
       
-      toast.error("Analysis failed", {
-        description: "Unable to analyze the website. Please try another proxy or URL.",
+      toast.error("Analyse échouée", {
+        description: "Impossible d'analyser le site web. Veuillez essayer un autre proxy ou URL.",
       });
     } finally {
       setIsLoading(false);
