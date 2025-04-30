@@ -1,30 +1,34 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import OpenAIKeyForm from './OpenAIKeyForm';
-import { Cog, Wrench, Key, Lock } from 'lucide-react';
+import { Cog, Wrench, Key, Lock, CheckCircle, AlertCircle } from 'lucide-react';
 import { useSiteAnalyzer } from '@/hooks/useSiteAnalyzer';
 import { toast } from 'sonner';
 import { OpenAIService } from '@/utils/seo/openaiService';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const AnalysisSettings = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const siteAnalyzer = useSiteAnalyzer();
   const [apiKey, setApiKey] = useState<string>('');
   const [isValidKey, setIsValidKey] = useState<boolean>(false);
+  const [apiStatus, setApiStatus] = useState<{ exists: boolean, valid: boolean, message: string } | null>(null);
 
   useEffect(() => {
-    // Récupérer la clé stockée lors du chargement du composant
+    // Retrieve stored key when component loads
     const storedKey = localStorage.getItem('openaiKey');
     if (storedKey) {
-      console.log("Clé OpenAI trouvée dans AnalysisSettings");
+      console.log("OpenAI key found in AnalysisSettings");
       setApiKey(storedKey);
       checkApiKeyFormat(storedKey);
     }
     
-    // Activer le proxy par défaut
+    // Enable proxy by default
     OpenAIService.enableProxy();
+    
+    // Check API key status
+    checkApiKeyStatus();
   }, []);
 
   const checkApiKeyFormat = (key: string) => {
@@ -32,58 +36,72 @@ const AnalysisSettings = () => {
     setIsValidKey(hasValidFormat);
     return hasValidFormat;
   };
+  
+  const checkApiKeyStatus = async () => {
+    const status = await OpenAIService.checkApiKeyStatus();
+    setApiStatus(status);
+    setIsValidKey(status.valid);
+    console.log("API key status checked:", status);
+    return status;
+  };
 
   const handleSaveApiKey = async (key: string) => {
     if (!key) {
-      toast.error("Clé API manquante", {
-        description: "Veuillez entrer une clé API OpenAI valide"
+      toast.error("Missing API key", {
+        description: "Please enter a valid OpenAI API key"
       });
       return;
     }
     
     setIsLoading(true);
     try {
-      // Vérifier d'abord le format de la clé
+      // First check format
       const hasValidFormat = checkApiKeyFormat(key);
       if (!hasValidFormat) {
-        toast.error("Format de clé API incorrect", {
-          description: "La clé doit commencer par 'sk-' et avoir une longueur suffisante"
+        toast.error("Incorrect API key format", {
+          description: "Key must start with 'sk-' and be of sufficient length"
         });
         setIsLoading(false);
         return;
       }
       
-      console.log("Sauvegarde et validation de la clé API:", key.substring(0, 5) + "...");
+      console.log("Saving and validating API key:", key.substring(0, 5) + "...");
       
-      // Sauvegarder la clé dans localStorage immédiatement
+      // Immediately save key to localStorage
       localStorage.setItem('openaiKey', key);
       setApiKey(key);
       
-      // S'assurer que le proxy est activé
+      // Set key in OpenAIService
+      OpenAIService.setApiKey(key);
+      
+      // Ensure proxy is enabled
       OpenAIService.enableProxy();
       
-      // Créer une instance OpenAIService pour valider la clé
+      // Create OpenAIService instance to validate key
       const openaiService = new OpenAIService(key);
       const isValid = await openaiService.validateApiKey();
       
-      // Mettre à jour l'état de validation
+      // Update validation state
       setIsValidKey(isValid);
       
       if (isValid) {
-        toast.success("Clé API validée avec succès", {
-          description: "Votre clé API a été sauvegardée et validée"
+        toast.success("API key validated successfully", {
+          description: "Your API key has been saved and validated"
         });
       } else {
-        toast.error("Clé API non valide", {
-          description: "La clé a été sauvegardée mais n'a pas pu être validée auprès d'OpenAI"
+        toast.error("Invalid API key", {
+          description: "The key was saved but could not be validated with OpenAI"
         });
       }
-    } catch (error) {
-      console.error("Erreur lors de la validation de la clé API:", error);
       
-      // Malgré l'erreur, on garde la clé stockée
-      toast.warning("Clé sauvegardée", {
-        description: "La clé a été sauvegardée mais n'a pas pu être validée en raison d'une erreur de connexion"
+      // Update overall status
+      await checkApiKeyStatus();
+    } catch (error) {
+      console.error("Error validating API key:", error);
+      
+      // Despite error, keep key stored
+      toast.warning("Key saved", {
+        description: "The key was saved but could not be validated due to a connection error"
       });
     } finally {
       setIsLoading(false);
@@ -95,15 +113,27 @@ const AnalysisSettings = () => {
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold flex items-center">
           <Cog className="mr-2 h-6 w-6 text-gray-800" />
-          Paramètres d'analyse
+          Analysis Settings
         </h2>
       </div>
+      
+      {apiStatus && (
+        <Alert className={`mb-4 ${apiStatus.valid ? 'bg-green-50 text-green-800 border-green-200' : 'bg-amber-50 text-amber-800 border-amber-200'}`}>
+          <div className="flex items-center">
+            {apiStatus.valid ? <CheckCircle className="h-5 w-5 mr-2" /> : <AlertCircle className="h-5 w-5 mr-2" />}
+            <AlertTitle>{apiStatus.valid ? "OpenAI Integration Active" : "OpenAI Integration Issue"}</AlertTitle>
+          </div>
+          <AlertDescription className="mt-2">
+            {apiStatus.message}
+          </AlertDescription>
+        </Alert>
+      )}
       
       <Tabs defaultValue="api" className="space-y-6">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="api" className="flex items-center">
             <Key className="mr-2 h-4 w-4" />
-            Clés API
+            API Keys
           </TabsTrigger>
           <TabsTrigger value="settings" className="flex items-center">
             <Wrench className="mr-2 h-4 w-4" />
@@ -122,19 +152,19 @@ const AnalysisSettings = () => {
           <Card className="p-6 bg-gray-50 border border-gray-200">
             <h3 className="text-lg font-bold mb-4 flex items-center">
               <Lock className="mr-2 h-5 w-5 text-gray-600" />
-              Autres API
+              Other APIs
             </h3>
             <p className="text-gray-600">
-              D'autres intégrations API seront disponibles prochainement pour enrichir vos analyses SEO.
+              More API integrations will be available soon to enhance your SEO analyses.
             </p>
           </Card>
         </TabsContent>
         
         <TabsContent value="settings" className="space-y-6">
           <Card className="p-6 bg-gray-50 border border-gray-200">
-            <h3 className="text-lg font-bold mb-4">Paramètres d'analyse</h3>
+            <h3 className="text-lg font-bold mb-4">Analysis Settings</h3>
             <p className="text-gray-600 mb-4">
-              Ces paramètres contrôlent le comportement des fonctions d'analyse.
+              These settings control the behavior of the analysis functions.
             </p>
           </Card>
         </TabsContent>
