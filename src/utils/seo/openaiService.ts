@@ -7,6 +7,13 @@ export class OpenAIService {
   private static proxyEnabled = true;
   private static apiEndpointBase = 'https://api.openai.com/v1';
   private static proxyEndpointBase = 'https://corsproxy.io/?https%3A%2F%2Fapi.openai.com%2Fv1';
+  // Add alternate proxy endpoints
+  private static alternateProxyEndpoints = [
+    'https://corsproxy.io/?https%3A%2F%2Fapi.openai.com%2Fv1',
+    'https://api.allorigins.win/raw?url=https%3A%2F%2Fapi.openai.com%2Fv1',
+    'https://crossorigin.me/https://api.openai.com/v1'
+  ];
+  private static currentProxyIndex = 0;
 
   // Store the instance for singleton pattern
   private static instance: OpenAIService | null = null;
@@ -66,7 +73,19 @@ export class OpenAIService {
   
   // Get the correct endpoint based on proxy setting
   private static getEndpointBase(): string {
-    return this.isProxyEnabled() ? this.proxyEndpointBase : this.apiEndpointBase;
+    if (!this.isProxyEnabled()) {
+      return this.apiEndpointBase;
+    }
+    
+    // Use the current proxy from the rotation
+    return this.alternateProxyEndpoints[this.currentProxyIndex];
+  }
+  
+  // Try the next proxy in the rotation
+  private static rotateProxy(): string {
+    this.currentProxyIndex = (this.currentProxyIndex + 1) % this.alternateProxyEndpoints.length;
+    console.log(`Rotating to next proxy: ${this.currentProxyIndex}`);
+    return this.alternateProxyEndpoints[this.currentProxyIndex];
   }
 
   // Check API key status
@@ -92,8 +111,28 @@ export class OpenAIService {
     
     // Create an instance to test the key
     const service = new OpenAIService(apiKey);
+    
+    // Make sure proxy is enabled for validation
+    this.enableProxy();
+    
     try {
-      const isValid = await service.validateApiKey();
+      // Try validation with multiple proxies if needed
+      let isValid = false;
+      let attempts = 0;
+      const maxAttempts = this.alternateProxyEndpoints.length;
+      
+      while (!isValid && attempts < maxAttempts) {
+        try {
+          console.log(`Attempting key validation with proxy ${this.currentProxyIndex}`);
+          isValid = await service.validateApiKey();
+          if (isValid) break;
+        } catch (error) {
+          console.warn(`Proxy ${this.currentProxyIndex} failed, trying next`);
+          this.rotateProxy();
+        }
+        attempts++;
+      }
+      
       if (isValid) {
         return {
           exists: true,
@@ -125,6 +164,7 @@ export class OpenAIService {
     }
 
     try {
+      console.log("Validating API key using endpoint:", OpenAIService.getEndpointBase());
       const endpoint = OpenAIService.getEndpointBase() + '/models';
       
       const response = await fetch(endpoint, {
@@ -135,18 +175,29 @@ export class OpenAIService {
         }
       });
       
+      // Check if we got a valid response status before attempting to parse
+      if (!response.ok) {
+        console.error("API key validation failed with status:", response.status);
+        const errorText = await response.text();
+        console.error("Error details:", errorText);
+        return false;
+      }
+      
       const result = await response.json();
       
-      if (response.ok && result.data) {
-        console.log("API key validation successful");
+      if (result && result.data && Array.isArray(result.data)) {
+        console.log("API key validation successful, found models:", result.data.length);
         return true;
       } else {
-        console.error("API key validation failed:", result.error);
+        console.error("API key validation failed - unexpected response format");
+        console.log("Response:", result);
         return false;
       }
     } catch (error) {
       console.error("Error validating API key:", error);
-      return false;
+      // Try with a different proxy
+      OpenAIService.rotateProxy();
+      throw error;
     }
   }
 
@@ -200,9 +251,9 @@ Provide analysis in JSON format with these fields:
       }
 
       const result = await response.json();
-      const content = result.choices?.[0]?.message?.content;
+      const contentResponse = result.choices?.[0]?.message?.content;
       
-      if (!content) {
+      if (!contentResponse) {
         console.error("Empty response from OpenAI");
         return null;
       }
@@ -210,26 +261,34 @@ Provide analysis in JSON format with these fields:
       // Try to parse JSON from the response
       try {
         // Extract JSON if it's wrapped in markdown code blocks
-        const jsonMatch = content.match(/```json\n([\s\S]*)\n```/) || 
-                         content.match(/```\n([\s\S]*)\n```/) ||
-                         content.match(/{[\s\S]*}/);
+        const jsonMatch = contentResponse.match(/```json\n([\s\S]*)\n```/) || 
+                         contentResponse.match(/```\n([\s\S]*)\n```/) ||
+                         contentResponse.match(/{[\s\S]*}/);
                          
-        const jsonString = jsonMatch ? jsonMatch[1] || jsonMatch[0] : content;
+        const jsonString = jsonMatch ? jsonMatch[1] || jsonMatch[0] : contentResponse;
         const parsedResult = JSON.parse(jsonString);
         
         console.log("Parsed OpenAI analysis:", parsedResult);
         return parsedResult;
       } catch (parseError) {
-        console.error("Error parsing OpenAI response:", parseError, "Raw content:", content);
+        console.error("Error parsing OpenAI response:", parseError, "Raw content:", contentResponse);
         // Return a formatted object with the raw content
         return {
-          rawContent: content,
+          rawContent: contentResponse,
           error: "Could not parse JSON response"
         };
       }
     } catch (error) {
       console.error("Error calling OpenAI API:", error);
-      return null;
+      // Try with a different proxy
+      OpenAIService.rotateProxy();
+      
+      toast.error("Erreur de connexion à l'API OpenAI", { 
+        description: "Tentative avec un autre proxy..." 
+      });
+      
+      // Try again with a different proxy
+      return await this.analyzeSeoContent(url, content);
     }
   }
 
@@ -261,6 +320,13 @@ Provide analysis in JSON format with these fields:
           temperature: 0.7
         })
       });
+
+      if (!response.ok) {
+        console.error("OpenAI API error:", response.status);
+        // Try with a different proxy
+        OpenAIService.rotateProxy();
+        return [];
+      }
 
       const result = await response.json();
       const content = result.choices?.[0]?.message?.content;
@@ -295,6 +361,8 @@ Provide analysis in JSON format with these fields:
       }
     } catch (error) {
       console.error("Error fetching keyword suggestions:", error);
+      // Try with a different proxy
+      OpenAIService.rotateProxy();
       return [];
     }
   }

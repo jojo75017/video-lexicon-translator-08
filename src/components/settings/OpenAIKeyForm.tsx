@@ -24,6 +24,7 @@ const OpenAIKeyForm: React.FC<OpenAIKeyFormProps> = ({
   const [showKey, setShowKey] = useState(false);
   const [hasBeenValidated, setHasBeenValidated] = useState(false);
   const [validationInProgress, setValidationInProgress] = useState(false);
+  const [manualKeyStatus, setManualKeyStatus] = useState<'none' | 'valid' | 'invalid'>('none');
 
   useEffect(() => {
     // Update local key when prop changes
@@ -34,6 +35,7 @@ const OpenAIKeyForm: React.FC<OpenAIKeyFormProps> = ({
     // Check if key exists and mark as validated
     if (apiKey && isValid) {
       setHasBeenValidated(true);
+      setManualKeyStatus('valid');
     }
   }, [apiKey, isValid, localKey]);
 
@@ -67,18 +69,34 @@ const OpenAIKeyForm: React.FC<OpenAIKeyFormProps> = ({
       // Ensure proxy is enabled
       OpenAIService.enableProxy();
       
+      // Try to validate with a direct request to OpenAI
+      const service = new OpenAIService(localKey);
+      const validationResult = await service.validateApiKey();
+      
+      console.log("Validation result:", validationResult);
+      
       setHasBeenValidated(true);
+      setManualKeyStatus(validationResult ? 'valid' : 'invalid');
       
       // Notify parent component
       onSave(localKey);
       
-      toast.success("Clé API sauvegardée", {
-        description: "La clé OpenAI a été enregistrée et sera utilisée pour l'analyse"
-      });
+      if (validationResult) {
+        toast.success("Clé API validée et sauvegardée", {
+          description: "La clé OpenAI a été validée avec succès et sera utilisée pour l'analyse"
+        });
+      } else {
+        toast.warning("Clé API sauvegardée mais non validée", {
+          description: "La clé a été enregistrée mais n'a pas pu être validée avec OpenAI. Vérifiez qu'elle est correcte."
+        });
+      }
     } catch (error) {
-      console.error("Erreur lors de la sauvegarde de la clé API:", error);
-      toast.error("Erreur", {
-        description: "Une erreur s'est produite lors de l'enregistrement de la clé"
+      console.error("Erreur lors de la validation de la clé API:", error);
+      setManualKeyStatus('invalid');
+      
+      // Still save the key even if validation fails
+      toast.warning("Clé API sauvegardée sans validation", {
+        description: "Une erreur s'est produite lors de la validation, mais la clé a été enregistrée. Vérifiez votre connexion internet et la validité de la clé."
       });
     } finally {
       setValidationInProgress(false);
@@ -94,7 +112,7 @@ const OpenAIKeyForm: React.FC<OpenAIKeyFormProps> = ({
         <div className="flex items-center justify-between">
           <label htmlFor="api-key" className="text-sm font-medium text-gray-700 mr-2 flex items-center">
             OpenAI API Key
-            {isValid && hasBeenValidated && <Check className="ml-2 h-4 w-4 text-green-500" />}
+            {manualKeyStatus === 'valid' && <Check className="ml-2 h-4 w-4 text-green-500" />}
           </label>
           <a 
             href="https://platform.openai.com/api-keys" 
@@ -113,7 +131,7 @@ const OpenAIKeyForm: React.FC<OpenAIKeyFormProps> = ({
             value={localKey}
             onChange={(e) => setLocalKey(e.target.value)}
             placeholder="sk-..."
-            className={`flex-1 ${hasBeenValidated && (isValid ? 'border-green-500 focus:ring-green-500' : 'border-red-500 focus:ring-red-500')}`}
+            className={`flex-1 ${hasBeenValidated && (manualKeyStatus === 'valid' ? 'border-green-500 focus:ring-green-500' : manualKeyStatus === 'invalid' ? 'border-red-500 focus:ring-red-500' : '')}`}
           />
           <Button 
             type="button" 
@@ -139,16 +157,16 @@ const OpenAIKeyForm: React.FC<OpenAIKeyFormProps> = ({
         </Alert>
       )}
       
-      {hasBeenValidated && !isValid && (
+      {hasBeenValidated && manualKeyStatus === 'invalid' && (
         <Alert variant="destructive" className="py-2">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            La clé API n'a pas pu être validée. Vérifiez qu'elle est correcte.
+            La clé API n'a pas pu être validée. Vérifiez qu'elle est correcte et que vous avez accès à l'API OpenAI.
           </AlertDescription>
         </Alert>
       )}
       
-      {hasBeenValidated && isValid && (
+      {hasBeenValidated && manualKeyStatus === 'valid' && (
         <Alert variant="default" className="py-2 bg-green-50 text-green-800 border-green-200">
           <Check className="h-4 w-4" />
           <AlertDescription>
@@ -165,12 +183,12 @@ const OpenAIKeyForm: React.FC<OpenAIKeyFormProps> = ({
         {isLoading || validationInProgress ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Enregistrement...
+            Validation en cours...
           </>
         ) : (
           <>
             <KeyRound className="mr-2 h-4 w-4" />
-            Enregistrer la clé API
+            Valider et Enregistrer la clé API
           </>
         )}
       </Button>

@@ -16,6 +16,9 @@ const AnalysisSettings = () => {
   const [apiStatus, setApiStatus] = useState<{ exists: boolean, valid: boolean, message: string } | null>(null);
 
   useEffect(() => {
+    // Ensure proxy is always enabled
+    OpenAIService.enableProxy();
+    
     // Retrieve stored key when component loads
     const storedKey = localStorage.getItem('openaiKey');
     if (storedKey) {
@@ -40,9 +43,6 @@ const AnalysisSettings = () => {
         message: "Aucune clé API définie. Configurez une clé OpenAI pour activer les fonctionnalités d'analyse avancées."
       });
     }
-    
-    // Enable proxy by default
-    OpenAIService.enableProxy();
   }, []);
 
   const checkApiKeyFormat = (key: string) => {
@@ -52,11 +52,19 @@ const AnalysisSettings = () => {
   };
   
   const checkApiKeyStatus = async () => {
+    setIsLoading(true);
     try {
       const status = await OpenAIService.checkApiKeyStatus();
       setApiStatus(status);
       setIsValidKey(status.valid);
       console.log("API key status checked:", status);
+      
+      if (status.valid) {
+        toast.success("Clé API validée", {
+          description: "Votre clé OpenAI est valide et prête à être utilisée."
+        });
+      }
+      setIsLoading(false);
       return status;
     } catch (error) {
       console.error("Error checking API key status:", error);
@@ -66,6 +74,7 @@ const AnalysisSettings = () => {
         message: "Impossible de vérifier la clé API. Vérifiez votre connexion internet."
       });
       setIsValidKey(false);
+      setIsLoading(false);
       return { exists: true, valid: false, message: "Erreur de connexion" };
     }
   };
@@ -110,19 +119,34 @@ const AnalysisSettings = () => {
       setIsValidKey(isValid);
       
       if (isValid) {
+        setApiStatus({
+          exists: true,
+          valid: true,
+          message: "Clé OpenAI valide. Les fonctionnalités d'analyse AI sont activées."
+        });
+        
         toast.success("Clé API validée avec succès", {
           description: "Votre clé API a été enregistrée et validée"
         });
       } else {
+        setApiStatus({
+          exists: true,
+          valid: false,
+          message: "La clé API existe mais semble invalide. Vérifiez les crédits et l'accès à votre compte OpenAI."
+        });
+        
         toast.error("Clé API invalide", {
           description: "La clé a été enregistrée mais n'a pas pu être validée avec OpenAI"
         });
       }
-      
-      // Update overall status
-      await checkApiKeyStatus();
     } catch (error) {
       console.error("Error validating API key:", error);
+      
+      setApiStatus({
+        exists: true,
+        valid: false,
+        message: "Impossible de valider la clé API. Vérifiez votre connexion internet."
+      });
       
       // Despite error, keep key stored
       toast.warning("Clé enregistrée", {
