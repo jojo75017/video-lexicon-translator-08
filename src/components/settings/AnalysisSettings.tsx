@@ -21,14 +21,28 @@ const AnalysisSettings = () => {
     if (storedKey) {
       console.log("OpenAI key found in AnalysisSettings");
       setApiKey(storedKey);
-      checkApiKeyFormat(storedKey);
+      
+      // Set the key in OpenAIService immediately
+      OpenAIService.setApiKey(storedKey);
+      
+      // Check format first
+      const hasValidFormat = checkApiKeyFormat(storedKey);
+      
+      if (hasValidFormat) {
+        // Check if the key is valid against API
+        checkApiKeyStatus();
+      }
+    } else {
+      console.log("No OpenAI key found in localStorage");
+      setApiStatus({
+        exists: false,
+        valid: false,
+        message: "Aucune clé API définie. Configurez une clé OpenAI pour activer les fonctionnalités d'analyse avancées."
+      });
     }
     
     // Enable proxy by default
     OpenAIService.enableProxy();
-    
-    // Check API key status
-    checkApiKeyStatus();
   }, []);
 
   const checkApiKeyFormat = (key: string) => {
@@ -38,17 +52,28 @@ const AnalysisSettings = () => {
   };
   
   const checkApiKeyStatus = async () => {
-    const status = await OpenAIService.checkApiKeyStatus();
-    setApiStatus(status);
-    setIsValidKey(status.valid);
-    console.log("API key status checked:", status);
-    return status;
+    try {
+      const status = await OpenAIService.checkApiKeyStatus();
+      setApiStatus(status);
+      setIsValidKey(status.valid);
+      console.log("API key status checked:", status);
+      return status;
+    } catch (error) {
+      console.error("Error checking API key status:", error);
+      setApiStatus({
+        exists: true,
+        valid: false,
+        message: "Impossible de vérifier la clé API. Vérifiez votre connexion internet."
+      });
+      setIsValidKey(false);
+      return { exists: true, valid: false, message: "Erreur de connexion" };
+    }
   };
 
   const handleSaveApiKey = async (key: string) => {
     if (!key) {
-      toast.error("Missing API key", {
-        description: "Please enter a valid OpenAI API key"
+      toast.error("Clé API manquante", {
+        description: "Veuillez entrer une clé OpenAI API valide"
       });
       return;
     }
@@ -58,8 +83,8 @@ const AnalysisSettings = () => {
       // First check format
       const hasValidFormat = checkApiKeyFormat(key);
       if (!hasValidFormat) {
-        toast.error("Incorrect API key format", {
-          description: "Key must start with 'sk-' and be of sufficient length"
+        toast.error("Format de clé incorrect", {
+          description: "La clé doit commencer par 'sk-' et être de longueur suffisante"
         });
         setIsLoading(false);
         return;
@@ -85,12 +110,12 @@ const AnalysisSettings = () => {
       setIsValidKey(isValid);
       
       if (isValid) {
-        toast.success("API key validated successfully", {
-          description: "Your API key has been saved and validated"
+        toast.success("Clé API validée avec succès", {
+          description: "Votre clé API a été enregistrée et validée"
         });
       } else {
-        toast.error("Invalid API key", {
-          description: "The key was saved but could not be validated with OpenAI"
+        toast.error("Clé API invalide", {
+          description: "La clé a été enregistrée mais n'a pas pu être validée avec OpenAI"
         });
       }
       
@@ -100,8 +125,8 @@ const AnalysisSettings = () => {
       console.error("Error validating API key:", error);
       
       // Despite error, keep key stored
-      toast.warning("Key saved", {
-        description: "The key was saved but could not be validated due to a connection error"
+      toast.warning("Clé enregistrée", {
+        description: "La clé a été enregistrée mais n'a pas pu être validée en raison d'une erreur de connexion"
       });
     } finally {
       setIsLoading(false);
@@ -113,7 +138,7 @@ const AnalysisSettings = () => {
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold flex items-center">
           <Cog className="mr-2 h-6 w-6 text-gray-800" />
-          Analysis Settings
+          Paramètres d'analyse
         </h2>
       </div>
       
@@ -121,7 +146,7 @@ const AnalysisSettings = () => {
         <Alert className={`mb-4 ${apiStatus.valid ? 'bg-green-50 text-green-800 border-green-200' : 'bg-amber-50 text-amber-800 border-amber-200'}`}>
           <div className="flex items-center">
             {apiStatus.valid ? <CheckCircle className="h-5 w-5 mr-2" /> : <AlertCircle className="h-5 w-5 mr-2" />}
-            <AlertTitle>{apiStatus.valid ? "OpenAI Integration Active" : "OpenAI Integration Issue"}</AlertTitle>
+            <AlertTitle>{apiStatus.valid ? "Intégration OpenAI Active" : "Problème avec l'intégration OpenAI"}</AlertTitle>
           </div>
           <AlertDescription className="mt-2">
             {apiStatus.message}
@@ -133,7 +158,7 @@ const AnalysisSettings = () => {
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="api" className="flex items-center">
             <Key className="mr-2 h-4 w-4" />
-            API Keys
+            Clés API
           </TabsTrigger>
           <TabsTrigger value="settings" className="flex items-center">
             <Wrench className="mr-2 h-4 w-4" />
@@ -152,19 +177,19 @@ const AnalysisSettings = () => {
           <Card className="p-6 bg-gray-50 border border-gray-200">
             <h3 className="text-lg font-bold mb-4 flex items-center">
               <Lock className="mr-2 h-5 w-5 text-gray-600" />
-              Other APIs
+              Autres APIs
             </h3>
             <p className="text-gray-600">
-              More API integrations will be available soon to enhance your SEO analyses.
+              D'autres intégrations d'API seront bientôt disponibles pour améliorer vos analyses SEO.
             </p>
           </Card>
         </TabsContent>
         
         <TabsContent value="settings" className="space-y-6">
           <Card className="p-6 bg-gray-50 border border-gray-200">
-            <h3 className="text-lg font-bold mb-4">Analysis Settings</h3>
+            <h3 className="text-lg font-bold mb-4">Paramètres d'analyse</h3>
             <p className="text-gray-600 mb-4">
-              These settings control the behavior of the analysis functions.
+              Ces paramètres contrôlent le comportement des fonctions d'analyse.
             </p>
           </Card>
         </TabsContent>

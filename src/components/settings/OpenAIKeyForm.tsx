@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { KeyRound, Loader2, Check, AlertCircle, ExternalLink } from 'lucide-react';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { OpenAIService } from '@/utils/seo/openaiService';
+import { toast } from 'sonner';
 
 interface OpenAIKeyFormProps {
   apiKey: string;
@@ -22,6 +23,7 @@ const OpenAIKeyForm: React.FC<OpenAIKeyFormProps> = ({
   const [localKey, setLocalKey] = useState(apiKey);
   const [showKey, setShowKey] = useState(false);
   const [hasBeenValidated, setHasBeenValidated] = useState(false);
+  const [validationInProgress, setValidationInProgress] = useState(false);
 
   useEffect(() => {
     // Update local key when prop changes
@@ -33,15 +35,58 @@ const OpenAIKeyForm: React.FC<OpenAIKeyFormProps> = ({
     if (apiKey && isValid) {
       setHasBeenValidated(true);
     }
-  }, [apiKey, isValid]);
+  }, [apiKey, isValid, localKey]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (localKey) {
+    
+    if (!localKey) {
+      toast.error("Clé API manquante", {
+        description: "Veuillez entrer une clé OpenAI API valide"
+      });
+      return;
+    }
+    
+    // Validate format before submitting
+    if (!localKey.startsWith('sk-') || localKey.length < 20) {
+      toast.error("Format de clé incorrect", {
+        description: "La clé doit commencer par 'sk-' et être suffisamment longue"
+      });
+      return;
+    }
+    
+    setValidationInProgress(true);
+    
+    try {
+      // Save key immediately to localStorage to ensure it's available
+      localStorage.setItem('openaiKey', localKey);
+      
+      // Set the key in OpenAIService
+      OpenAIService.setApiKey(localKey);
+      
+      // Ensure proxy is enabled
+      OpenAIService.enableProxy();
+      
       setHasBeenValidated(true);
+      
+      // Notify parent component
       onSave(localKey);
+      
+      toast.success("Clé API sauvegardée", {
+        description: "La clé OpenAI a été enregistrée et sera utilisée pour l'analyse"
+      });
+    } catch (error) {
+      console.error("Erreur lors de la sauvegarde de la clé API:", error);
+      toast.error("Erreur", {
+        description: "Une erreur s'est produite lors de l'enregistrement de la clé"
+      });
+    } finally {
+      setValidationInProgress(false);
     }
   };
+
+  // Simplified format validation to give immediate feedback
+  const isValidFormat = localKey && localKey.startsWith('sk-') && localKey.length > 20;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -80,15 +125,25 @@ const OpenAIKeyForm: React.FC<OpenAIKeyFormProps> = ({
         </div>
         
         <p className="text-xs text-gray-500">
-          Your API key is stored locally in your browser and is never transmitted to our servers.
+          Votre clé API est stockée localement dans votre navigateur et n'est jamais transmise à nos serveurs.
         </p>
       </div>
+      
+      {/* Format validation message */}
+      {localKey && !isValidFormat && (
+        <Alert variant="destructive" className="py-2">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Format de clé incorrect. La clé doit commencer par 'sk-' et être suffisamment longue.
+          </AlertDescription>
+        </Alert>
+      )}
       
       {hasBeenValidated && !isValid && (
         <Alert variant="destructive" className="py-2">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            The API key could not be validated. Please check that it is correct.
+            La clé API n'a pas pu être validée. Vérifiez qu'elle est correcte.
           </AlertDescription>
         </Alert>
       )}
@@ -97,25 +152,25 @@ const OpenAIKeyForm: React.FC<OpenAIKeyFormProps> = ({
         <Alert variant="default" className="py-2 bg-green-50 text-green-800 border-green-200">
           <Check className="h-4 w-4" />
           <AlertDescription>
-            API key validated successfully.
+            Clé API validée avec succès.
           </AlertDescription>
         </Alert>
       )}
       
       <Button 
         type="submit" 
-        disabled={isLoading || !localKey}
+        disabled={isLoading || validationInProgress || !localKey || !isValidFormat}
         className="w-full"
       >
-        {isLoading ? (
+        {isLoading || validationInProgress ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Validating...
+            Enregistrement...
           </>
         ) : (
           <>
             <KeyRound className="mr-2 h-4 w-4" />
-            Save API Key
+            Enregistrer la clé API
           </>
         )}
       </Button>

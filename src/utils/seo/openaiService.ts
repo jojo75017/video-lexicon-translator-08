@@ -1,238 +1,309 @@
+
+import { toast } from 'sonner';
+
+// Simple implementation of OpenAI service for SEO analysis
 export class OpenAIService {
-  private static apiKey: string | null = null;
-  private static proxyEnabled: boolean = true;
-  private apiKeyInstance: string;
+  private apiKey: string;
+  private static proxyEnabled = true;
+  private static apiEndpointBase = 'https://api.openai.com/v1';
+  private static proxyEndpointBase = 'https://corsproxy.io/?https%3A%2F%2Fapi.openai.com%2Fv1';
 
-  constructor(apiKey: string) {
-    this.apiKeyInstance = apiKey;
-    OpenAIService.apiKey = apiKey; // Update static key as well
-  }
+  // Store the instance for singleton pattern
+  private static instance: OpenAIService | null = null;
 
-  // Static method to set API key
-  static setApiKey(key: string): void {
-    OpenAIService.apiKey = key;
-    // Store in localStorage as well for persistence
-    localStorage.setItem('openaiKey', key);
-    console.log("OpenAI API key set successfully");
-  }
-
-  // Static method to get API key
-  static getApiKey(): string | null {
-    if (!OpenAIService.apiKey) {
-      OpenAIService.apiKey = localStorage.getItem('openaiKey');
+  constructor(apiKey?: string) {
+    this.apiKey = apiKey || localStorage.getItem('openaiKey') || '';
+    
+    // If no API key, try to get from localStorage
+    if (!this.apiKey) {
+      this.apiKey = localStorage.getItem('openaiKey') || '';
+      console.log("OpenAI API key from localStorage:", this.apiKey ? "Found" : "Not found");
     }
-    return OpenAIService.apiKey;
   }
 
+  // Set API key globally
+  static setApiKey(key: string): void {
+    if (key) {
+      localStorage.setItem('openaiKey', key);
+      console.log("OpenAI API key set globally");
+      
+      // Update instance if it exists
+      if (this.instance) {
+        this.instance.apiKey = key;
+      }
+    } else {
+      console.error("Attempted to set empty API key");
+    }
+  }
+  
+  // Get current API key
+  static getApiKey(): string {
+    return localStorage.getItem('openaiKey') || '';
+  }
+
+  // Enable proxy for CORS
   static enableProxy(): void {
-    OpenAIService.proxyEnabled = true;
+    this.proxyEnabled = true;
     localStorage.setItem('openai_proxy_enabled', 'true');
-    console.log("OpenAI CORS proxy enabled");
+    console.log("OpenAI proxy enabled");
   }
 
+  // Disable proxy
   static disableProxy(): void {
-    OpenAIService.proxyEnabled = false;
+    this.proxyEnabled = false;
     localStorage.setItem('openai_proxy_enabled', 'false');
-    console.log("OpenAI CORS proxy disabled");
+    console.log("OpenAI proxy disabled");
   }
-
+  
+  // Check if proxy is enabled
   static isProxyEnabled(): boolean {
     const savedSetting = localStorage.getItem('openai_proxy_enabled');
     if (savedSetting !== null) {
       return savedSetting === 'true';
     }
-    return OpenAIService.proxyEnabled; // Default to enabled
+    return this.proxyEnabled; // Default to enabled
+  }
+  
+  // Get the correct endpoint based on proxy setting
+  private static getEndpointBase(): string {
+    return this.isProxyEnabled() ? this.proxyEndpointBase : this.apiEndpointBase;
   }
 
-  // Ensure API key is valid format (basic validation)
-  static validateKeyFormat(key: string): boolean {
-    return key && key.startsWith('sk-') && key.length > 20;
+  // Check API key status
+  static async checkApiKeyStatus(): Promise<{ exists: boolean, valid: boolean, message: string }> {
+    const apiKey = localStorage.getItem('openaiKey');
+    
+    if (!apiKey) {
+      return {
+        exists: false,
+        valid: false,
+        message: "Aucune clé API définie. Configurez une clé OpenAI pour activer les fonctionnalités d'analyse avancées."
+      };
+    }
+    
+    const hasValidFormat = apiKey && apiKey.length > 20 && apiKey.startsWith('sk-');
+    if (!hasValidFormat) {
+      return {
+        exists: true,
+        valid: false,
+        message: "Format de clé API invalide. La clé doit commencer par 'sk-' et être suffisamment longue."
+      };
+    }
+    
+    // Create an instance to test the key
+    const service = new OpenAIService(apiKey);
+    try {
+      const isValid = await service.validateApiKey();
+      if (isValid) {
+        return {
+          exists: true,
+          valid: true,
+          message: "Clé OpenAI valide. Les fonctionnalités d'analyse AI sont activées."
+        };
+      } else {
+        return {
+          exists: true,
+          valid: false,
+          message: "La clé API existe mais semble invalide. Vérifiez les crédits et l'accès à votre compte OpenAI."
+        };
+      }
+    } catch (error) {
+      console.error("Error validating API key:", error);
+      return {
+        exists: true,
+        valid: false,
+        message: "Impossible de valider la clé API. Vérifiez votre connexion internet."
+      };
+    }
   }
 
-  // Validate API key with OpenAI (test connection)
-  async validateApiKey(): Promise<boolean> {
-    const key = this.apiKeyInstance || OpenAIService.getApiKey();
-    if (!key || !OpenAIService.validateKeyFormat(key)) {
-      console.error("Invalid API key format");
+  // Validate API key with a simple request
+  public async validateApiKey(): Promise<boolean> {
+    if (!this.apiKey) {
+      console.error("No API key provided for validation");
       return false;
     }
 
     try {
-      // Using a minimal request to test the API key
-      const response = await fetch('https://api.openai.com/v1/models', {
+      const endpoint = OpenAIService.getEndpointBase() + '/models';
+      
+      const response = await fetch(endpoint, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${key}`,
+          'Authorization': `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json'
         }
+      });
+      
+      const result = await response.json();
+      
+      if (response.ok && result.data) {
+        console.log("API key validation successful");
+        return true;
+      } else {
+        console.error("API key validation failed:", result.error);
+        return false;
+      }
+    } catch (error) {
+      console.error("Error validating API key:", error);
+      return false;
+    }
+  }
+
+  // Analyze SEO content with OpenAI
+  public async analyzeSeoContent(url: string, content: string): Promise<any> {
+    if (!this.apiKey) {
+      console.error("No API key provided for SEO analysis");
+      return null;
+    }
+
+    try {
+      const prompt = `
+Analyze this webpage content from "${url}" for SEO improvement:
+
+${content.substring(0, 3000)}
+
+Provide analysis in JSON format with these fields:
+1. "metaDescription": A suggested meta description (150-160 chars)
+2. "mainKeywords": Array of 5 most important keywords/phrases
+3. "contentQualityScore": Number 1-10
+4. "suggestions": Array of 3-5 specific improvements
+5. "titleSuggestion": An optimized page title
+`;
+
+      const endpoint = OpenAIService.getEndpointBase() + '/chat/completions';
+      
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'gpt-3.5-turbo', // Use 3.5 to save on costs
+          messages: [
+            { role: 'system', content: 'You are an SEO expert. Provide concise, actionable analysis.' },
+            { role: 'user', content: prompt }
+          ],
+          max_tokens: 1000,
+          temperature: 0.3
+        })
+      });
+
+      if (!response.ok) {
+        const errorResult = await response.json();
+        console.error("OpenAI API error:", errorResult);
+        toast.error("Erreur lors de l'analyse OpenAI", { 
+          description: errorResult.error?.message || "Vérifiez votre clé API et réessayez" 
+        });
+        return null;
+      }
+
+      const result = await response.json();
+      const content = result.choices?.[0]?.message?.content;
+      
+      if (!content) {
+        console.error("Empty response from OpenAI");
+        return null;
+      }
+      
+      // Try to parse JSON from the response
+      try {
+        // Extract JSON if it's wrapped in markdown code blocks
+        const jsonMatch = content.match(/```json\n([\s\S]*)\n```/) || 
+                         content.match(/```\n([\s\S]*)\n```/) ||
+                         content.match(/{[\s\S]*}/);
+                         
+        const jsonString = jsonMatch ? jsonMatch[1] || jsonMatch[0] : content;
+        const parsedResult = JSON.parse(jsonString);
+        
+        console.log("Parsed OpenAI analysis:", parsedResult);
+        return parsedResult;
+      } catch (parseError) {
+        console.error("Error parsing OpenAI response:", parseError, "Raw content:", content);
+        // Return a formatted object with the raw content
+        return {
+          rawContent: content,
+          error: "Could not parse JSON response"
+        };
+      }
+    } catch (error) {
+      console.error("Error calling OpenAI API:", error);
+      return null;
+    }
+  }
+
+  // Get keyword suggestions
+  public async getKeywordSuggestions(mainKeyword: string): Promise<string[]> {
+    if (!this.apiKey) {
+      console.error("No API key provided for keyword suggestions");
+      return [];
+    }
+
+    try {
+      const prompt = `Generate 10 keyword suggestions related to "${mainKeyword}" for SEO. Return only an array of strings with no explanation or additional formatting.`;
+
+      const endpoint = OpenAIService.getEndpointBase() + '/chat/completions';
+      
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'gpt-3.5-turbo',
+          messages: [
+            { role: 'system', content: 'Return only the requested array of keywords with no additional text.' },
+            { role: 'user', content: prompt }
+          ],
+          max_tokens: 500,
+          temperature: 0.7
+        })
       });
 
       const result = await response.json();
-      const isValid = response.ok && result.data && Array.isArray(result.data);
+      const content = result.choices?.[0]?.message?.content;
       
-      if (isValid) {
-        console.log("OpenAI API key validation successful");
-        // Save the valid key
-        OpenAIService.setApiKey(key);
-      } else {
-        console.error("OpenAI API key validation failed:", result.error || "Unknown error");
+      if (!content) {
+        return [];
       }
       
-      return isValid;
-    } catch (error) {
-      console.error("Error validating OpenAI API key:", error);
-      return false;
-    }
-  }
-
-  async analyzeSeoContent(url: string, content: string): Promise<any> {
-    const apiKey = this.apiKeyInstance || OpenAIService.getApiKey();
-    if (!apiKey) {
-      console.warn("No OpenAI API key provided.");
-      return null;
-    }
-
-    const prompt = `Analyze the following content from ${url} for SEO best practices. Provide insights on keyword usage, readability, and potential improvements:\n\n${content}`;
-
-    try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model: "gpt-3.5-turbo",
-          messages: [{ role: "user", content: prompt }],
-          max_tokens: 150,
-          temperature: 0.7
-        })
-      });
-
-      const data = await response.json();
-      if (data.choices && data.choices.length > 0) {
-        return data.choices[0].message.content;
-      } else {
-        console.error("OpenAI content analysis failed:", data.error);
-        return null;
-      }
-    } catch (error) {
-      console.error("Error during OpenAI content analysis:", error);
-      return null;
-    }
-  }
-
-  async getKeywordSuggestions(keyword: string): Promise<any> {
-    const apiKey = this.apiKeyInstance || OpenAIService.getApiKey();
-    if (!apiKey) {
-      console.warn("No OpenAI API key provided.");
-      return [];
-    }
-
-    const prompt = `Suggest 5 related keywords, their search volume, SEO difficulty (1-100), a title (max 60 chars), and a meta description (max 160 chars) for the keyword "${keyword}". Return as JSON.`;
-
-    try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model: "gpt-3.5-turbo",
-          messages: [{ role: "user", content: prompt }],
-          max_tokens: 1500,
-          temperature: 0.7
-        })
-      });
-
-      const data = await response.json();
-      if (data.choices && data.choices.length > 0) {
-        try {
-          const content = data.choices[0].message.content.trim();
-          const suggestions = this.parseKeywordSuggestions(content);
-          return suggestions;
-        } catch (e) {
-          console.error("Failed to parse keyword suggestions:", e);
-          console.log("Raw response from OpenAI:", data.choices[0].message.content);
-          return [];
+      // Try to parse suggestions from response
+      try {
+        // Check for array in markdown code block or direct array
+        const arrayMatch = content.match(/```(?:json)?\n(\[[\s\S]*\])\n```/) || 
+                          content.match(/\[([\s\S]*)\]/);
+                          
+        if (arrayMatch) {
+          const arrayString = arrayMatch[1].includes('[') ? arrayMatch[1] : `[${arrayMatch[1]}]`;
+          return JSON.parse(arrayString);
         }
-      } else {
-        console.error("OpenAI keyword suggestion failed:", data.error);
+        
+        // Fallback: extract keywords by lines
+        const lines = content
+          .split('\n')
+          .map(line => line.trim())
+          .filter(line => line.length > 0)
+          .map(line => line.replace(/^\d+\.\s*/, '')) // Remove numbering
+          .map(line => line.replace(/^["-\s]+|["-\s]+$/g, '')); // Remove quotes and dashes
+        
+        return lines.slice(0, 10); // Return max 10 keywords
+      } catch (parseError) {
+        console.error("Error parsing keyword suggestions:", parseError);
         return [];
       }
     } catch (error) {
-      console.error("Error during OpenAI keyword suggestion:", error);
+      console.error("Error fetching keyword suggestions:", error);
       return [];
     }
   }
 
-  private parseKeywordSuggestions(jsonString: string): any[] {
-    try {
-      // Attempt to clean the JSON string by removing leading/trailing whitespace and extra characters
-      const cleanedJsonString = jsonString.trim().replace(/^```json\n/, '').replace(/```$/, '');
-      const parsedObject = JSON.parse(cleanedJsonString);
-
-      if (Array.isArray(parsedObject)) {
-        return parsedObject.map(item => ({
-          keyword: item.keyword || '',
-          searchVolume: item.searchVolume || 0,
-          difficulty: item.difficulty || 0,
-          suggestedTitle: item.suggestedTitle || '',
-          suggestedDescription: item.suggestedDescription || '',
-          relevance: item.relevance || 0,
-          competition: item.competition || 0,
-          cpc: item.cpc || 0,
-          volume: item.volume || 0
-        }));
-      } else {
-        console.error("Parsed object is not an array:", parsedObject);
-        return [];
-      }
-    } catch (error) {
-      console.error("Error parsing JSON:", error);
-      console.log("Failing JSON string:", jsonString);
-      return [];
+  // Get singleton instance
+  public static getInstance(): OpenAIService {
+    if (!this.instance) {
+      this.instance = new OpenAIService();
     }
-  }
-
-  // Add this method to help with OpenAI integration diagnostics
-  static async checkApiKeyStatus(): Promise<{ exists: boolean, valid: boolean, message: string }> {
-    const key = OpenAIService.getApiKey();
-    
-    if (!key) {
-      return {
-        exists: false, 
-        valid: false,
-        message: "No API key found. Please add your OpenAI API key in settings."
-      };
-    }
-    
-    if (!OpenAIService.validateKeyFormat(key)) {
-      return {
-        exists: true,
-        valid: false,
-        message: "API key format is invalid. It should start with 'sk-'."
-      };
-    }
-    
-    try {
-      const service = new OpenAIService(key);
-      const isValid = await service.validateApiKey();
-      
-      return {
-        exists: true,
-        valid: isValid,
-        message: isValid 
-          ? "API key is valid and ready to use."
-          : "API key exists but could not be validated."
-      };
-    } catch (error) {
-      return {
-        exists: true,
-        valid: false,
-        message: "Error checking API key: " + (error instanceof Error ? error.message : "Unknown error")
-      };
-    }
+    return this.instance;
   }
 }
