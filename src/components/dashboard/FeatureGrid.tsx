@@ -1,5 +1,6 @@
+
 import React from "react"
-import { SparklesIcon, FileText, LayoutDashboard } from "lucide-react"
+import { SparklesIcon, FileText, LayoutDashboard, Zap } from "lucide-react"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
@@ -44,14 +45,20 @@ const featureCards = [
   {
     title: "Outils SEO Avancés",
     description: "Générateur de méta-descriptions, vérificateur de liens et structures de contenu",
-    icon: <FileText className="h-6 w-6 text-primary" />,
+    icon: <FileText className="h-6 w-6 text-orange-500" />,
     link: "/outils-seo"
   },
+  {
+    title: "Performances",
+    description: "Analysez les performances et la vitesse de votre site web.",
+    icon: <Zap className="h-6 w-6 text-primary" />,
+    link: "/performance"
+  }
 ]
 
 const FeatureGrid: React.FC = () => {
   return (
-    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
       {featureCards.map((card, index) => (
         <FeatureCard key={index} {...card} />
       ))}

@@ -120,6 +120,12 @@ const TabNavigation = () => {
               Analytics
             </TabsTrigger>
             <TabsTrigger 
+              value="outils-seo"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white"
+            >
+              Outils SEO
+            </TabsTrigger>
+            <TabsTrigger 
               value="signature"
               className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary-500 data-[state=active]:to-primary-600 data-[state=active]:text-white"
             >
