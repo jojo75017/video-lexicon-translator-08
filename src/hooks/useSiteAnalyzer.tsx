@@ -36,6 +36,9 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
     ProxyService.enableProxy();
     setProxyEnabled(true);
     
+    // Force reset proxy rotation to start with first proxy
+    ProxyService.resetProxyRotation();
+    
     // Load OpenAI API key from localStorage
     const apiKey = localStorage.getItem('openaiKey');
     setOpenaiApiKey(apiKey);
@@ -53,6 +56,9 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
     OpenAIService.enableProxy();
     ProxyService.enableProxy();
     
+    // Reset proxy rotation
+    ProxyService.resetProxyRotation();
+    
     setProxyEnabled(true);
     setShowCorsWarning(false);
     
@@ -60,7 +66,21 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
       description: "Les requêtes utiliseront désormais un proxy pour contourner les restrictions CORS",
     });
     
-    console.log("All proxies activated");
+    // Test proxies to find the best one
+    ProxyService.testAllProxies()
+      .then(results => {
+        const working = results.filter(r => r.working);
+        if (working.length > 0) {
+          toast.success(`${working.length} proxy(s) fonctionnels trouvés`);
+        } else {
+          toast.warning("Aucun proxy fonctionnel trouvé");
+        }
+      })
+      .catch(err => {
+        console.error("Error testing proxies:", err);
+      });
+    
+    console.log("All proxies activated and tested");
   }, []);
 
   // Analyze the site
@@ -98,6 +118,10 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
     FirecrawlService.enableProxy();
     OpenAIService.enableProxy();
     ProxyService.enableProxy();
+    
+    // Reset proxy rotation to start fresh
+    ProxyService.resetProxyRotation();
+    
     setProxyEnabled(true);
     
     // Check for OpenAI API key
@@ -116,6 +140,9 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
       toast.info(`Analyse de ${formattedUrl}`, {
         description: "Tentative d'extraction du contenu via proxies..."
       });
+      
+      // Pre-test proxies to find the best one
+      await ProxyService.testAllProxies();
       
       // Use FirecrawlService for analysis with proxy ALWAYS enabled
       const result = await FirecrawlService.crawlWebsite(formattedUrl, true);

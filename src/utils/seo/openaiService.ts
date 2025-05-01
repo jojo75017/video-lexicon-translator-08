@@ -1,16 +1,10 @@
 
 import { OpenAI } from "openai";
 import { toast } from "sonner";
+import { ProxyService } from "./proxyService";
 
 export class OpenAIService {
   private static proxyEnabled = true;
-  private static proxyUrls = [
-    'https://api.allorigins.win/raw?url=',
-    'https://corsproxy.io/?',
-    'https://thingproxy.freeboard.io/fetch/',
-    'https://crossorigin.me/'
-  ];
-  private static currentProxyIndex = 0;
   
   private apiKey: string;
   private openai: OpenAI | null = null;
@@ -21,10 +15,12 @@ export class OpenAIService {
       apiKey: apiKey,
       dangerouslyAllowBrowser: true
     });
+    console.log("OpenAI service initialized");
   }
 
   static setApiKey(apiKey: string): void {
     localStorage.setItem('openaiKey', apiKey);
+    console.log("API key saved to localStorage");
   }
 
   static getApiKey(): string | null {
@@ -35,6 +31,9 @@ export class OpenAIService {
     OpenAIService.proxyEnabled = true;
     localStorage.setItem('openai_proxy_enabled', 'true');
     console.log('OpenAI CORS proxy enabled');
+    
+    // Also enable proxy in ProxyService
+    ProxyService.enableProxy();
   }
 
   static disableProxy(): void {
@@ -44,59 +43,31 @@ export class OpenAIService {
   }
 
   static isProxyEnabled(): boolean {
-    return OpenAIService.proxyEnabled;
-  }
-
-  static getNextProxy(): string {
-    const proxy = OpenAIService.proxyUrls[OpenAIService.currentProxyIndex];
-    // Rotate to next proxy for future requests
-    OpenAIService.currentProxyIndex = (OpenAIService.currentProxyIndex + 1) % OpenAIService.proxyUrls.length;
-    console.log(`Using proxy: ${proxy}`);
-    return proxy;
+    return true; // Always enable proxy
   }
 
   static async fetchWithProxy(url: string): Promise<string> {
-    // Try all available proxies in sequence
-    let lastError: Error | null = null;
-    
-    for (let i = 0; i < OpenAIService.proxyUrls.length; i++) {
-      const proxy = OpenAIService.proxyUrls[(OpenAIService.currentProxyIndex + i) % OpenAIService.proxyUrls.length];
-      const proxyUrl = proxy + encodeURIComponent(url);
-      
-      try {
-        console.log(`Attempting fetch with proxy (${i+1}/${OpenAIService.proxyUrls.length}): ${proxy}`);
-        const response = await fetch(proxyUrl, {
-          method: 'GET',
-          headers: {
-            'Accept': 'text/html,application/xhtml+xml,application/xml',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-          }
-        });
-        
-        if (response.ok) {
-          console.log(`Proxy ${proxy} worked! Content retrieved.`);
-          OpenAIService.currentProxyIndex = (OpenAIService.currentProxyIndex + i) % OpenAIService.proxyUrls.length;
-          return await response.text();
-        }
-        
-        console.log(`Proxy ${proxy} failed with status: ${response.status}`);
-        lastError = new Error(`HTTP status: ${response.status}`);
-      } catch (error) {
-        console.error(`Error with proxy ${proxy}:`, error);
-        lastError = error instanceof Error ? error : new Error(String(error));
-      }
+    try {
+      const response = await ProxyService.fetchWithProxies(url);
+      return await response.text();
+    } catch (error) {
+      console.error("Error fetching with proxy:", error);
+      throw error;
     }
-    
-    throw lastError || new Error('All proxies failed');
   }
 
   async validateApiKey(): Promise<boolean> {
     if (!this.apiKey || !this.openai) {
+      console.error("No API key provided");
       return false;
     }
 
     try {
       console.log("Validating OpenAI API key...");
+      toast.loading("Validation de la clé API OpenAI...", {
+        id: "validate-key"
+      });
+      
       const response = await this.openai.chat.completions.create({
         model: "gpt-3.5-turbo",
         messages: [
@@ -110,10 +81,25 @@ export class OpenAIService {
                       response.choices && 
                       response.choices[0]?.message?.content?.toLowerCase().includes('valid');
       
+      if (isValid) {
+        toast.success("Clé API OpenAI valide", {
+          id: "validate-key"
+        });
+      } else {
+        toast.error("Clé API OpenAI invalide", {
+          id: "validate-key",
+          description: "La réponse n'est pas celle attendue"
+        });
+      }
+      
       console.log("API key validation result:", isValid);
       return isValid;
     } catch (error) {
       console.error("API key validation error:", error);
+      toast.error("Erreur de validation de la clé API", {
+        id: "validate-key",
+        description: error instanceof Error ? error.message : "Erreur inconnue"
+      });
       return false;
     }
   }
@@ -124,6 +110,10 @@ export class OpenAIService {
     }
     
     try {
+      toast.loading("Analyse du contenu avec OpenAI...", {
+        id: "analyze-content"
+      });
+      
       const response = await this.openai.chat.completions.create({
         model: "gpt-3.5-turbo",
         messages: [
@@ -143,13 +133,24 @@ export class OpenAIService {
       
       const result = response.choices[0]?.message?.content;
       if (!result) {
+        toast.error("Aucun résultat d'analyse reçu", {
+          id: "analyze-content"
+        });
         throw new Error("No analysis result received");
       }
+      
+      toast.success("Analyse OpenAI terminée", {
+        id: "analyze-content"
+      });
       
       console.log("SEO analysis result:", result);
       return JSON.parse(result);
     } catch (error) {
       console.error("Error during SEO analysis:", error);
+      toast.error("Erreur lors de l'analyse SEO", {
+        id: "analyze-content",
+        description: error instanceof Error ? error.message : "Erreur inconnue"
+      });
       throw error;
     }
   }
@@ -160,6 +161,10 @@ export class OpenAIService {
     }
     
     try {
+      toast.loading(`Génération de suggestions pour "${seedKeyword}"...`, {
+        id: "keyword-suggestions"
+      });
+      
       const response = await this.openai.chat.completions.create({
         model: "gpt-3.5-turbo",
         messages: [
@@ -179,8 +184,15 @@ export class OpenAIService {
       
       const result = response.choices[0]?.message?.content;
       if (!result) {
+        toast.error("Aucune suggestion de mots-clés reçue", {
+          id: "keyword-suggestions"
+        });
         throw new Error("No keyword suggestions received");
       }
+      
+      toast.success(`Suggestions générées pour "${seedKeyword}"`, {
+        id: "keyword-suggestions"
+      });
       
       try {
         const parsedResult = JSON.parse(result);
@@ -198,6 +210,10 @@ export class OpenAIService {
       }
     } catch (error) {
       console.error("Error getting keyword suggestions:", error);
+      toast.error("Erreur lors de la génération de suggestions", {
+        id: "keyword-suggestions",
+        description: error instanceof Error ? error.message : "Erreur inconnue"
+      });
       throw error;
     }
   }

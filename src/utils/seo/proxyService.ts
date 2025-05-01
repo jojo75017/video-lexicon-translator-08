@@ -7,11 +7,11 @@ import { toast } from "sonner";
 
 export class ProxyService {
   private static proxyUrls = [
-    'https://api.allorigins.win/raw?url=',
     'https://corsproxy.io/?',
+    'https://api.allorigins.win/raw?url=',
+    'https://cors-anywhere.herokuapp.com/',
     'https://thingproxy.freeboard.io/fetch/',
-    'https://crossorigin.me/',
-    'https://cors-anywhere.herokuapp.com/'
+    'https://crossorigin.me/'
   ];
   private static currentProxyIndex = 0;
   private static proxyEnabled = true;
@@ -23,6 +23,8 @@ export class ProxyService {
     this.proxyEnabled = true;
     localStorage.setItem('proxy_enabled', 'true');
     console.log('Proxy Service: proxy enabled');
+    // Force reset proxy index to the first one
+    this.currentProxyIndex = 0;
   }
 
   /**
@@ -38,8 +40,8 @@ export class ProxyService {
    * Check if the proxy is enabled
    */
   static isProxyEnabled(): boolean {
-    const savedSetting = localStorage.getItem('proxy_enabled');
-    return savedSetting === 'false' ? false : this.proxyEnabled;
+    // Always return true to ensure proxy is active
+    return true;
   }
 
   /**
@@ -49,14 +51,23 @@ export class ProxyService {
     const proxy = this.proxyUrls[this.currentProxyIndex];
     // Rotate to next proxy
     this.currentProxyIndex = (this.currentProxyIndex + 1) % this.proxyUrls.length;
+    console.log(`Using proxy: ${proxy}`);
     return proxy;
+  }
+
+  /**
+   * Reset to first proxy
+   */
+  static resetProxyRotation(): void {
+    this.currentProxyIndex = 0;
+    console.log('Proxy rotation reset to first proxy');
   }
 
   /**
    * Get URL with proxy prefix if enabled
    */
   static getProxiedUrl(url: string): string {
-    if (!this.proxyEnabled) return url;
+    // Always apply proxy regardless of setting
     return this.getNextProxy() + encodeURIComponent(url);
   }
 
@@ -79,12 +90,39 @@ export class ProxyService {
    * Fetch content from URL using all available proxies in sequence
    */
   static async fetchWithProxies(url: string, options: RequestInit = {}): Promise<Response> {
-    if (!this.proxyEnabled) {
-      console.log('Proxy disabled, fetching directly:', url);
-      return fetch(url, options);
-    }
-
+    console.log(`Fetching ${url} with proxies enabled`);
+    
     let lastError: Error | null = null;
+    
+    // Notify user that we're trying proxies
+    toast.info("Tentative avec proxies CORS...", {
+      description: `Connexion à ${url}`,
+      duration: 3000
+    });
+    
+    // Always try direct fetch first
+    try {
+      console.log("Attempting direct fetch first...");
+      const directResponse = await fetch(url, {
+        ...options,
+        mode: 'cors',
+        credentials: 'same-origin',
+        cache: 'no-store',
+        headers: {
+          ...options.headers,
+          'Accept': 'text/html,application/xhtml+xml,application/xml',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        },
+        signal: options.signal || AbortSignal.timeout(8000) // 8s timeout
+      });
+      
+      if (response.ok) {
+        console.log("Direct fetch worked!");
+        return directResponse;
+      }
+    } catch (error) {
+      console.log("Direct fetch failed, trying proxies...");
+    }
     
     // Try each proxy in sequence
     for (let i = 0; i < this.proxyUrls.length; i++) {
@@ -93,6 +131,10 @@ export class ProxyService {
       
       try {
         console.log(`Attempting fetch with proxy (${i+1}/${this.proxyUrls.length}): ${proxy}`);
+        toast.loading(`Test proxy ${i+1}/${this.proxyUrls.length}...`, {
+          id: `proxy-test-${i}`,
+          duration: 2000
+        });
         
         // Merge headers with defaults
         const headers = {
@@ -107,11 +149,14 @@ export class ProxyService {
           cache: 'no-store',
           mode: 'cors',
           credentials: 'omit',
-          signal: options.signal || AbortSignal.timeout(20000) // 20s timeout
+          signal: options.signal || AbortSignal.timeout(15000) // 15s timeout
         });
         
         if (response.ok) {
           console.log(`Proxy ${proxy} worked!`);
+          toast.success(`Proxy fonctionnel trouvé`, {
+            id: `proxy-test-${i}`,
+          });
           
           // Update the current proxy index to the working proxy
           this.currentProxyIndex = (this.currentProxyIndex + i) % this.proxyUrls.length;
@@ -120,15 +165,25 @@ export class ProxyService {
         }
         
         console.log(`Proxy ${proxy} failed with status: ${response.status}`);
+        toast.error(`Proxy ${i+1} échoué: ${response.status}`, {
+          id: `proxy-test-${i}`,
+          duration: 1000
+        });
         lastError = new Error(`HTTP status: ${response.status}`);
       } catch (error) {
         console.error(`Error with proxy ${proxy}:`, error);
+        toast.error(`Proxy ${i+1} erreur: ${error instanceof Error ? error.message : 'Inconnu'}`, {
+          id: `proxy-test-${i}`,
+          duration: 1000
+        });
         lastError = error instanceof Error ? error : new Error(String(error));
       }
     }
     
     // All proxies failed
-    toast.error("Tous les proxies ont échoué");
+    toast.error("Tous les proxies ont échoué", {
+      description: "Essayez un autre site ou vérifiez votre connexion internet"
+    });
     throw lastError || new Error('All proxies failed');
   }
 
@@ -142,6 +197,8 @@ export class ProxyService {
   }[]> {
     const results = [];
     
+    toast.info("Test de tous les proxies en cours...");
+    
     for (const proxy of this.proxyUrls) {
       try {
         const proxyUrl = proxy + encodeURIComponent(testUrl);
@@ -149,13 +206,16 @@ export class ProxyService {
         
         // Try fetching with a timeout
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
         
         try {
           const response = await fetch(proxyUrl, {
             method: 'HEAD', 
             mode: 'cors',
-            signal: controller.signal
+            signal: controller.signal,
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            }
           });
           
           clearTimeout(timeoutId);
@@ -184,12 +244,21 @@ export class ProxyService {
     }
     
     // Sort by working status first, then by latency
-    return results.sort((a, b) => {
+    const sortedResults = results.sort((a, b) => {
       if (a.working !== b.working) {
         return a.working ? -1 : 1;
       }
       return a.latency - b.latency;
     });
+    
+    // If any proxy is working, update the index to the best one
+    const workingProxy = sortedResults.find(r => r.working);
+    if (workingProxy) {
+      this.currentProxyIndex = this.proxyUrls.indexOf(workingProxy.proxy);
+      console.log(`Set best proxy to: ${workingProxy.proxy} (index: ${this.currentProxyIndex})`);
+    }
+    
+    return sortedResults;
   }
 }
 

@@ -2,10 +2,11 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, AlertCircle, Loader2, Shield, Globe, RefreshCw } from "lucide-react";
+import { Search, AlertCircle, Loader2, Shield, Globe, RefreshCw, Check } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 import { FirecrawlService } from '@/utils/FirecrawlService';
+import { ProxyService } from '@/utils/seo/proxyService';
 import { Progress } from "@/components/ui/progress";
 
 interface SeoAnalysisFormProps {
@@ -31,23 +32,20 @@ const SeoAnalysisForm = ({
   const [proxyTested, setProxyTested] = useState<boolean>(false);
   const [progress, setProgress] = useState<number>(0);
   const [proxyTestResults, setProxyTestResults] = useState<any[]>([]);
+  const [bestProxy, setBestProxy] = useState<string>('');
   
-  // Vérifier si le proxy est déjà activé au chargement
+  // Toujours activer le proxy au chargement
   useEffect(() => {
-    // Toujours activer le proxy au chargement
+    // Activer tous les proxies au chargement
     FirecrawlService.enableProxy();
+    ProxyService.enableProxy();
     setProxyEnabled(true);
     
-    console.log("SeoAnalysisForm props:", { 
-      url, 
-      isLoading, 
-      showCorsWarning, 
-      analyzeSite: !!analyzeSite, 
-      error, 
-      handleActivateProxy: !!handleActivateProxy,
-      proxyEnabled: true
-    });
-  }, [url, isLoading, showCorsWarning, analyzeSite, error, handleActivateProxy]);
+    // Réinitialiser la rotation des proxies
+    ProxyService.resetProxyRotation();
+    
+    console.log("SeoAnalysisForm: proxy activé automatiquement");
+  }, []);
 
   // Effect to update progress during loading
   useEffect(() => {
@@ -85,23 +83,30 @@ const SeoAnalysisForm = ({
       setUrl(formattedUrl); // Mettre à jour l'URL avec le protocole
     }
     
-    // Activer le proxy avant l'analyse
+    // Activer le proxy avant l'analyse et réinitialiser la rotation
     FirecrawlService.enableProxy();
+    ProxyService.enableProxy();
+    ProxyService.resetProxyRotation();
     setProxyEnabled(true);
     
     toast.info("Lancement de l'analyse...", {
       description: "Préparation de l'analyse du site " + formattedUrl
     });
     
-    console.log("Déclenchement de l'analyse pour:", formattedUrl);
+    console.log("Analyse lancée pour:", formattedUrl);
     
-    // Lancer l'analyse immédiatement
-    analyzeSite();
+    // Tester les proxies avant l'analyse
+    testProxyConnection().then(() => {
+      // Lancer l'analyse après le test des proxies
+      analyzeSite();
+    });
   };
 
   const handleProxyClick = () => {
     // Appeler la fonction fournie par le parent pour activer le proxy
     FirecrawlService.enableProxy();
+    ProxyService.enableProxy();
+    ProxyService.resetProxyRotation();
     setProxyEnabled(true);
     
     // Si le parent a fourni une fonction, l'appeler aussi
@@ -128,26 +133,31 @@ const SeoAnalysisForm = ({
         setProgress(prev => Math.min(prev + 5, 90));
       }, 300);
       
-      const results = await FirecrawlService.testProxyConnectivity();
+      // Utiliser le service proxy amélioré
+      const results = await ProxyService.testAllProxies();
       clearInterval(interval);
       setProgress(100);
       setProxyTestResults(results);
       
       const workingProxies = results.filter(r => r.working);
       if (workingProxies.length > 0) {
+        setBestProxy(workingProxies[0].proxy);
         toast.success(`${workingProxies.length} proxy(s) fonctionnels trouvés`, { 
           description: `Le meilleur proxy a une latence de ${workingProxies[0].latency}ms`
         });
+        return true;
       } else {
         toast.error("Aucun proxy ne fonctionne actuellement", {
           description: "Veuillez réessayer plus tard ou entrer une URL différente"
         });
+        return false;
       }
     } catch (error) {
       toast.error("Erreur lors du test des proxies", {
         description: error instanceof Error ? error.message : "Erreur inconnue"
       });
       setProgress(100);
+      return false;
     }
   };
 
@@ -163,43 +173,37 @@ const SeoAnalysisForm = ({
         </p>
       </div>
 
-      {/* Bouton pour activer le proxy CORS (toujours visible) */}
-      <div className="mb-4 p-3 border border-amber-200 bg-amber-50 rounded-md flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <Shield className="h-5 w-5 text-amber-500" />
+      {/* Status du proxy - visuellement plus évident */}
+      <div className="mb-4 p-4 border border-green-200 bg-green-50 rounded-md flex justify-between items-center">
+        <div className="flex items-center gap-3">
+          <div className="bg-green-100 p-2 rounded-full">
+            <Check className="h-5 w-5 text-green-600" />
+          </div>
           <div>
-            <p className="font-medium text-amber-800">Proxy CORS</p>
-            <p className="text-sm text-amber-700">
-              {proxyEnabled 
-                ? "Le proxy CORS est activé. Vous pouvez analyser des sites externes." 
-                : "Activez le proxy CORS pour analyser des sites externes."}
+            <p className="font-medium text-green-800">Proxy CORS activé</p>
+            <p className="text-sm text-green-700">
+              Le proxy est activé et prêt à analyser des sites externes
             </p>
           </div>
         </div>
         <div className="flex gap-2">
           <Button 
             type="button" 
-            onClick={handleProxyClick}
-            variant={proxyEnabled ? "outline" : "default"}
-            size="sm"
-            className={proxyEnabled 
-              ? "border-green-300 bg-green-50 text-green-700 hover:bg-green-100" 
-              : "bg-amber-600 hover:bg-amber-700 text-white"}
-          >
-            <Shield className="mr-2 h-4 w-4" />
-            {proxyEnabled ? "Proxy activé ✓" : "Activer le proxy"}
-          </Button>
-          
-          <Button
-            type="button"
             onClick={testProxyConnection}
             variant="outline"
             size="sm"
-            className="border-blue-300 bg-blue-50 text-blue-700 hover:bg-blue-100"
+            className="border-green-300 bg-white text-green-700 hover:bg-green-100"
           >
             <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
             Tester les proxies
           </Button>
+          
+          {bestProxy && (
+            <span className="text-xs bg-green-100 px-2 py-1 rounded flex items-center">
+              <Check className="h-3 w-3 mr-1 text-green-600" />
+              Proxy actif
+            </span>
+          )}
         </div>
       </div>
 
@@ -257,7 +261,7 @@ const SeoAnalysisForm = ({
                 className="ml-2 bg-red-100 text-red-800 border-red-300 hover:bg-red-200"
               >
                 <Shield className="mr-2 h-4 w-4" />
-                Activer le proxy
+                Réinitialiser le proxy
               </Button>
               <Button 
                 variant="outline" 
@@ -281,9 +285,8 @@ const SeoAnalysisForm = ({
             Erreur d'accès détectée
           </h3>
           <p className="text-yellow-700 mb-3">
-            Les restrictions de sécurité du navigateur empêchent l'accès au site. 
-            Vérifiez que l'URL est correcte et que le site est accessible. 
-            Vous pouvez essayer d'utiliser un autre proxy.
+            Certains sites sont fortement protégés contre les analyses automatisées.
+            Essayez de réinitialiser le proxy ou testez avec une autre URL.
           </p>
           <div className="flex flex-wrap gap-2">
             <Button 
@@ -293,7 +296,7 @@ const SeoAnalysisForm = ({
               className="bg-yellow-100 text-yellow-800 border-yellow-300 hover:bg-yellow-200"
             >
               <Shield className="mr-2 h-4 w-4" />
-              Réactiver le proxy CORS
+              Réinitialiser le proxy
             </Button>
             <Button 
               variant="outline" 
@@ -310,7 +313,10 @@ const SeoAnalysisForm = ({
       
       {proxyTestResults.length > 0 && (
         <div className="mt-4 p-3 bg-gray-50 rounded-md border border-gray-100">
-          <h4 className="font-medium text-gray-700 mb-2">Résultats des tests de proxies</h4>
+          <h4 className="font-medium text-gray-700 mb-2 flex items-center">
+            <Shield className="h-4 w-4 mr-2 text-blue-500" />
+            Résultats des tests de proxies
+          </h4>
           <div className="space-y-2 max-h-40 overflow-y-auto">
             {proxyTestResults.map((result, index) => (
               <div 
@@ -331,13 +337,11 @@ const SeoAnalysisForm = ({
         </div>
       )}
 
-      {!isLoading && !error && !showCorsWarning && proxyTested && (
-        <div className="mt-4 p-3 bg-blue-50 rounded-md border border-blue-100 flex items-center">
-          <p className="text-blue-700">
-            Test des proxies terminé. Vous pouvez maintenant tenter d'analyser votre site.
-          </p>
-        </div>
-      )}
+      <div className="mt-4 p-3 bg-blue-50 rounded-md border border-blue-100 flex items-center">
+        <p className="text-blue-700 text-sm">
+          <b>Conseil:</b> Certains sites peuvent bloquer les analyses automatiques. Si l'analyse échoue, essayez avec un autre site ou vérifiez votre connexion internet.
+        </p>
+      </div>
     </form>
   );
 };
