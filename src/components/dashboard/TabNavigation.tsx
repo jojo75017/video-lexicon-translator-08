@@ -23,7 +23,8 @@ const TabNavigation = () => {
     '/metrics': 'metrics',
     '/quora': 'quora',
     '/signature': 'signature',
-    '/pinterest': 'pinterest'
+    '/pinterest': 'pinterest',
+    '/outils-seo': 'outils-seo',
   };
   
   // Get current active tab based on URL
@@ -49,7 +50,8 @@ const TabNavigation = () => {
       'pinterest': '/pinterest',
       'suggestions': '/suggestions',
       'backlinks': '/backlinks',
-      'metrics': '/metrics'
+      'metrics': '/metrics',
+      'outils-seo': '/outils-seo',
     };
     
     // Navigate to the corresponding route
@@ -121,9 +123,9 @@ const TabNavigation = () => {
             </TabsTrigger>
             <TabsTrigger 
               value="outils-seo"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white"
+              className="bg-gradient-to-r from-orange-400 to-red-500 text-white font-bold animate-pulse shadow-lg border border-orange-300"
             >
-              Outils SEO
+              OUTILS SEO
             </TabsTrigger>
             <TabsTrigger 
               value="signature"

@@ -19,10 +19,13 @@ const SeoActionButtons = () => {
           <span>Analyser les performances</span>
         </Button>
       </Link>
-      <Link to="/outils-seo" className="hidden sm:block">
-        <Button variant="outline" className="w-full flex gap-2 items-center justify-start h-12">
-          <FileText className="h-5 w-5 text-orange-500" />
-          <span>Boîte à outils SEO</span>
+      <Link to="/outils-seo" className="sm:block">
+        <Button 
+          variant="quora" 
+          className="w-full flex gap-2 items-center justify-start h-16 text-lg animate-pulse shadow-xl border-2 border-orange-300"
+        >
+          <FileText className="h-6 w-6 text-white" />
+          <span className="font-bold">Boîte à outils SEO</span>
         </Button>
       </Link>
       <Link to="/analytics" className="hidden lg:block">

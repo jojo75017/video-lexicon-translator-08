@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { RocketIcon, Sparkles, Zap, BarChart4, Gauge, Globe, Search, FileSignature } from 'lucide-react';
+import { RocketIcon, Sparkles, Zap, BarChart4, Gauge, Globe, Search, FileSignature, FileText } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -75,6 +76,13 @@ const DashboardHeader = () => {
           <Button className="px-7 py-7 bg-success-500 hover:bg-success-600 flex items-center gap-3 rounded-xl shadow-md">
             <FileSignature className="h-7 w-7" />
             <span className="text-xl font-medium">Créer votre signature email</span>
+          </Button>
+        </Link>
+        
+        <Link to="/outils-seo">
+          <Button className="px-7 py-7 bg-gradient-to-r from-[#b92b27] to-[#8B5CF6] hover:from-[#a72724] hover:to-[#7849e0] flex items-center gap-3 rounded-xl shadow-xl text-white border-2 border-purple-300 animate-pulse">
+            <FileText className="h-7 w-7" />
+            <span className="text-xl font-bold">BOÎTE À OUTILS SEO</span>
           </Button>
         </Link>
       </div>
