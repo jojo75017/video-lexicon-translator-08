@@ -12,9 +12,30 @@ interface FeatureCardProps {
   icon: React.ReactNode
   link: string
   highlight?: boolean
+  ultraHighlight?: boolean
 }
 
-const FeatureCard: React.FC<FeatureCardProps> = ({ title, description, icon, link, highlight }) => {
+const FeatureCard: React.FC<FeatureCardProps> = ({ title, description, icon, link, highlight, ultraHighlight }) => {
+  if (ultraHighlight) {
+    return (
+      <Link to={link} className="transform hover:scale-105 transition-all duration-300">
+        <Card className="bg-gradient-to-r from-violet-600 via-fuchsia-500 to-pink-500 text-white border-2 border-purple-300 shadow-2xl animate-pulse">
+          <CardHeader className="pb-2">
+            <div className="bg-white/20 p-3 w-fit rounded-full mb-2">
+              {icon}
+            </div>
+            <CardTitle className="text-2xl font-black flex items-center gap-2">
+              {title}
+            </CardTitle>
+            <CardDescription className="text-white/90 font-medium">
+              {description}
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      </Link>
+    );
+  }
+  
   return (
     <Link to={link}>
       <Card className={cn(
@@ -43,28 +64,32 @@ const featureCards = [
     description: "Effectuez une analyse SEO complète de n'importe quel site web.",
     icon: <SparklesIcon className="h-6 w-6 text-primary" />,
     link: "/seo",
-    highlight: false
+    highlight: false,
+    ultraHighlight: false
   },
   {
     title: "Tableau de Bord",
     description: "Vue d'ensemble de vos analyses et outils SEO.",
     icon: <LayoutDashboard className="h-6 w-6 text-primary" />,
     link: "/",
-    highlight: false
+    highlight: false,
+    ultraHighlight: false
   },
   {
     title: "BOÎTE À OUTILS SEO",
     description: "Générateur de méta-descriptions, vérificateur de liens et structures de contenu",
-    icon: <FileText className="h-6 w-6 text-white" />,
+    icon: <FileText className="h-8 w-8 text-white" />,
     link: "/outils-seo",
-    highlight: true
+    highlight: false,
+    ultraHighlight: true
   },
   {
     title: "Performances",
     description: "Analysez les performances et la vitesse de votre site web.",
     icon: <Zap className="h-6 w-6 text-primary" />,
     link: "/performance",
-    highlight: false
+    highlight: false,
+    ultraHighlight: false
   }
 ]
 

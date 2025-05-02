@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { RocketIcon, Sparkles, Zap, BarChart4, Gauge, Globe, Search, FileSignature, FileText } from 'lucide-react';
+import { RocketIcon, Sparkles, Zap, BarChart4, Gauge, Globe, Search, FileSignature, FileText, ZapIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -48,6 +48,31 @@ const DashboardHeader = () => {
         </div>
       </div>
 
+      {/* ÉNORME BOUTON SUPER VISIBLE IMPOSSIBLE À MANQUER */}
+      <div className="mb-8">
+        <Link to="/outils-seo">
+          <div className="relative overflow-hidden bg-gradient-to-r from-purple-600 via-pink-500 to-red-500 rounded-xl shadow-2xl transform hover:scale-105 transition-all">
+            <div className="absolute inset-0 bg-grid-white/5"></div>
+            <div className="relative px-6 py-8 md:py-10 flex flex-col md:flex-row items-center justify-between">
+              <div className="flex flex-col items-center md:items-start mb-6 md:mb-0">
+                <div className="flex items-center">
+                  <ZapIcon className="h-12 w-12 text-white mr-3" />
+                  <h2 className="text-3xl md:text-4xl font-black text-white">
+                    BOÎTE À OUTILS SEO
+                  </h2>
+                </div>
+                <p className="text-xl text-white/90 mt-3 text-center md:text-left">
+                  Générateurs de méta-descriptions, vérificateurs de liens et assistants d'optimisation
+                </p>
+              </div>
+              <Button size="lg" className="bg-white hover:bg-white/90 text-pink-600 font-bold text-lg px-8 py-6 rounded-lg shadow-md animate-pulse">
+                ACCÉDER AUX OUTILS
+              </Button>
+            </div>
+          </div>
+        </Link>
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
         {stats.map((stat, index) => (
           <Card key={index} className="p-6 border-0 shadow-md hover:shadow-lg transition-shadow bg-light-green-50 rounded-xl border border-light-green-200">
@@ -80,7 +105,7 @@ const DashboardHeader = () => {
         </Link>
         
         <Link to="/outils-seo">
-          <Button className="px-7 py-7 bg-gradient-to-r from-[#b92b27] to-[#8B5CF6] hover:from-[#a72724] hover:to-[#7849e0] flex items-center gap-3 rounded-xl shadow-xl text-white border-2 border-purple-300 animate-pulse">
+          <Button className="px-7 py-7 bg-gradient-to-r from-violet-600 via-pink-500 to-red-500 hover:from-violet-700 hover:via-pink-600 hover:to-red-600 flex items-center gap-3 rounded-xl shadow-xl text-white border-2 border-purple-300 animate-pulse">
             <FileText className="h-7 w-7" />
             <span className="text-xl font-bold">BOÎTE À OUTILS SEO</span>
           </Button>
