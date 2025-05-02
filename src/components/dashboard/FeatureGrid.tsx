@@ -69,7 +69,7 @@ const featureCards = [
     description: "Effectuez une analyse SEO complète de n'importe quel site web.",
     icon: <SparklesIcon className="h-6 w-6 text-primary" />,
     link: "/seo",
-    highlight: false,
+    highlight: true,
     ultraHighlight: false
   },
   {
@@ -93,7 +93,7 @@ const featureCards = [
     description: "Analysez les performances et la vitesse de votre site web.",
     icon: <Zap className="h-6 w-6 text-primary" />,
     link: "/performance",
-    highlight: false,
+    highlight: true,
     ultraHighlight: false
   }
 ]

@@ -28,23 +28,23 @@ const SeoActionButtons = () => {
         </div>
       </Link>
       
-      {/* Autres boutons */}
+      {/* Autres boutons colorés */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
         <Link to="/seo">
-          <Button variant="outline" className="w-full flex gap-2 items-center justify-start h-12">
-            <Search className="h-5 w-5 text-primary" />
+          <Button variant="outline" className="w-full flex gap-2 items-center justify-start h-12 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white border-blue-400">
+            <Search className="h-5 w-5 text-white" />
             <span>Analyser un site web</span>
           </Button>
         </Link>
         <Link to="/performance">
-          <Button variant="outline" className="w-full flex gap-2 items-center justify-start h-12">
-            <LineChart className="h-5 w-5 text-orange-500" />
+          <Button variant="outline" className="w-full flex gap-2 items-center justify-start h-12 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white border-orange-400">
+            <LineChart className="h-5 w-5 text-white" />
             <span>Analyser les performances</span>
           </Button>
         </Link>
         <Link to="/analytics" className="hidden lg:block">
-          <Button variant="outline" className="w-full flex gap-2 items-center justify-start h-12">
-            <FileSearch className="h-5 w-5 text-primary" />
+          <Button variant="outline" className="w-full flex gap-2 items-center justify-start h-12 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white border-green-400">
+            <FileSearch className="h-5 w-5 text-white" />
             <span>Afficher les rapports</span>
           </Button>
         </Link>
