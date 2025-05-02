@@ -5,6 +5,7 @@ import { SparklesIcon, FileText, LayoutDashboard, Zap } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import { Link } from "react-router-dom"
+import { Button } from "@/components/ui/button"
 
 interface FeatureCardProps {
   title: string
@@ -18,9 +19,10 @@ interface FeatureCardProps {
 const FeatureCard: React.FC<FeatureCardProps> = ({ title, description, icon, link, highlight, ultraHighlight }) => {
   if (ultraHighlight) {
     return (
-      <Link to={link} className="transform hover:scale-105 transition-all duration-300">
-        <Card className="bg-gradient-to-r from-violet-600 via-fuchsia-500 to-pink-500 text-white border-2 border-purple-300 shadow-2xl animate-pulse">
-          <CardHeader className="pb-2">
+      <Link to={link} className="transform hover:scale-110 transition-all duration-500">
+        <Card className="bg-gradient-to-r from-violet-600 via-fuchsia-500 to-pink-500 text-white border-2 border-purple-300 shadow-2xl overflow-hidden">
+          <div className="absolute inset-0 bg-grid-white/10 opacity-20"></div>
+          <CardHeader className="relative z-10 pb-2">
             <div className="bg-white/20 p-3 w-fit rounded-full mb-2">
               {icon}
             </div>
@@ -30,6 +32,9 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ title, description, icon, lin
             <CardDescription className="text-white/90 font-medium">
               {description}
             </CardDescription>
+            <Button className="mt-4 bg-white/30 hover:bg-white/50 text-white w-full font-bold animate-pulse">
+              DÉCOUVRIR
+            </Button>
           </CardHeader>
         </Card>
       </Link>

@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import { ZapIcon } from "lucide-react";
 
 const TabNavigation = () => {
   const navigate = useNavigate();
@@ -87,8 +88,9 @@ const TabNavigation = () => {
         <div className="absolute -top-16 right-4 z-10">
           <div 
             onClick={() => handleTabChange('outils-seo')}
-            className="cursor-pointer bg-gradient-to-r from-purple-600 via-pink-500 to-red-500 px-5 py-2 rounded-full text-white font-bold shadow-lg flex items-center gap-2 animate-pulse hover:scale-105 transition-all"
+            className="cursor-pointer bg-gradient-to-r from-purple-600 via-pink-500 to-red-500 px-5 py-2 rounded-full text-white font-bold shadow-lg flex items-center gap-2 animate-pulse hover:scale-125 transition-all duration-300 hover:shadow-2xl border-2 border-white/30"
           >
+            <ZapIcon className="h-5 w-5" />
             OUTILS SEO
           </div>
         </div>
@@ -134,7 +136,7 @@ const TabNavigation = () => {
               </TabsTrigger>
               <TabsTrigger 
                 value="outils-seo"
-                className="bg-gradient-to-r from-violet-600 via-pink-500 to-red-600 text-white font-bold animate-pulse shadow-lg border border-purple-300 text-base px-4 py-1.5"
+                className="bg-gradient-to-r from-violet-600 via-pink-500 to-red-600 text-white font-bold animate-pulse shadow-lg border border-purple-300 text-base px-4 py-1.5 hover:scale-110 transition-transform duration-300 hover:shadow-xl"
               >
                 OUTILS SEO
               </TabsTrigger>
