@@ -36,141 +36,181 @@
     animation-delay: 4s;
   }
   
+  /* Désactivation des animations pour éviter les problèmes de visibilité */
   .animate-blob {
-    animation: blob-bounce 7s infinite;
+    animation: none !important;
   }
   
   .animate-gradient {
-    background-size: 200% 200%;
-    animation: gradient 15s ease infinite;
+    background-size: 100% 100% !important;
+    animation: none !important;
   }
   
   .animate-text-gradient {
-    background-size: 200% auto;
-    animation: text-gradient 5s ease infinite;
+    background-size: 100% auto !important;
+    animation: none !important;
   }
 
   .bg-grid-white\/10 {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(255 255 255 / 0.1)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
   }
 
-  /* Classes pour les boutons et sections IA */
+  /* Classes pour la visibilité forcée */
   .btn-glow {
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.8) !important;
   }
   
   .section-highlight {
-    border: 2px solid transparent;
-    border-image: linear-gradient(to right, #f953c6, #b91d73);
-    border-image-slice: 1;
+    border: 4px solid !important;
+    border-image: linear-gradient(to right, #f953c6, #b91d73) !important;
+    border-image-slice: 1 !important;
   }
   
-  /* Classe pour s'assurer que les boutons restent visibles */
+  /* Classes pour garantir la visibilité permanente */
   .always-visible {
     opacity: 1 !important;
     visibility: visible !important;
     display: block !important;
     position: relative !important;
+    z-index: 9999 !important;
+  }
+  
+  .ultra-visible {
+    position: relative !important;
+    z-index: 9999 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
   }
 }
 
+/* Désactivation des animations problématiques */
 @keyframes blob-bounce {
   0%, 100% {
-    transform: translate(0px, 0px) scale(1);
-  }
-  50% {
-    transform: translate(10px, -10px) scale(1.05);
+    transform: none !important;
   }
 }
 
 @keyframes gradient {
   0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
+    background-position: 0% 0% !important;
   }
 }
 
 @keyframes text-gradient {
   0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
+    background-position: 0% 0% !important;
   }
 }
 
-/* Ajout d'effets de glassmorphisme */
+/* Ajout d'effets de glassmorphisme avec visibilité forcée */
 .glassmorphism {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 2px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2) !important;
+  z-index: 50 !important;
+  position: relative !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
-/* Amélioration des effets de survol */
+/* Désactivation des effets de survol */
 .hover-lift {
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: none !important;
 }
 
 .hover-lift:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  transform: none !important;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
 }
 
-/* Animations d'apparition fluides */
+/* Remplacement des animations par des effets statiques */
 .fade-in {
-  animation: fadeIn 0.5s ease-in;
+  opacity: 1 !important;
+  transform: none !important;
+  animation: none !important;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Boutons toujours visibles et mis en évidence */
+/* Boutons toujours visibles avec style amélioré */
 .important-button {
-  position: relative;
-  z-index: 50;
-  transform: scale(1);
-  transition: transform 0.3s;
-  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.3);
+  position: relative !important;
+  z-index: 50 !important;
+  transform: scale(1) !important;
+  transition: none !important;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.5), 0 5px 15px rgba(0, 0, 0, 0.3) !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 .important-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.5), 0 5px 15px rgba(0, 0, 0, 0.2);
+  transform: scale(1) !important;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.5), 0 5px 15px rgba(0, 0, 0, 0.3) !important;
 }
 
 .ultra-visible {
-  animation: pulsate 2s infinite;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.7), 0 0 20px rgba(147, 51, 234, 0.5) !important;
+  z-index: 9999 !important;
+  position: relative !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
-@keyframes pulsate {
-  0%, 100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
-  }
-  50% {
-    transform: scale(1.05);
-    box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
-  }
-}
-
-/* Renforcement du contraste pour une meilleure visibilité */
+/* Renforcement des contrastes et de la visibilité */
 .high-contrast {
-  text-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.9) !important;
 }
 
-/* S'assurer que les gradients sont toujours visibles */
+/* Stabilisation des gradients */
 .stable-gradient {
   background-size: 100% 100% !important;
   background-position: 0 0 !important;
   animation: none !important;
+  background-attachment: fixed !important;
+}
+
+/* Styles fixes pour les boutons */
+:is(button, .button, [role="button"], a[href]) {
+  position: relative !important;
+  z-index: 50 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Styles globaux pour les cartes */
+:is(.card, [class*="card"]) {
+  position: relative !important;
+  z-index: 40 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+}
+
+/* Styles fixes pour les conteneurs de fonctionnalités */
+div[class*="feature"], div[class*="grid"], div[class*="container"] {
+  position: relative !important;
+  z-index: 30 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+}
+
+/* Éliminer les transitions qui peuvent causer des problèmes */
+* {
+  transition-duration: 0s !important;
+}
+
+/* Styles pour la section fixe en haut */
+.fixed-feature-section {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 9999 !important;
+  background-color: white !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
+  padding: 1rem !important;
+  margin-bottom: 1rem !important;
+  border-radius: 0.5rem !important;
+  border: 2px solid #9333ea !important;
 }

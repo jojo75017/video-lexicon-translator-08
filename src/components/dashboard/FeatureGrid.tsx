@@ -24,35 +24,37 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ title, description, icon, lin
 
   if (ultraHighlight) {
     return (
-      <Link to={link} className="block mb-1" onClick={handleClick}>
-        <Card className="bg-gradient-to-r from-violet-600 via-fuchsia-500 to-pink-500 text-white border-4 border-purple-300 shadow-2xl overflow-hidden relative">
-          <div className="absolute inset-0 bg-grid-white/10 opacity-20"></div>
-          <CardHeader className="relative z-10 pb-2">
-            <div className="bg-white/20 p-3 w-fit rounded-full mb-2">
-              {icon}
-            </div>
-            <CardTitle className="text-2xl font-black flex items-center gap-2">
-              {title}
-            </CardTitle>
-            <CardDescription className="text-white/90 font-medium">
-              {description}
-            </CardDescription>
-            <Button className="mt-4 bg-white/30 hover:bg-white/50 text-white w-full font-bold">
-              DÉCOUVRIR
-            </Button>
-          </CardHeader>
-        </Card>
+      <Link to={link} className="block mb-1 relative z-50" onClick={handleClick}>
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 md:relative md:top-auto md:left-auto md:transform-none">
+          <Card className="bg-gradient-to-r from-violet-600 via-fuchsia-500 to-pink-500 text-white border-4 border-purple-300 shadow-2xl overflow-hidden relative">
+            <div className="absolute inset-0 bg-grid-white/10 opacity-20"></div>
+            <CardHeader className="relative z-10 pb-2">
+              <div className="bg-white/20 p-3 w-fit rounded-full mb-2">
+                {icon}
+              </div>
+              <CardTitle className="text-2xl font-black flex items-center gap-2">
+                {title}
+              </CardTitle>
+              <CardDescription className="text-white/90 font-medium">
+                {description}
+              </CardDescription>
+              <Button className="mt-4 bg-white/30 hover:bg-white/50 text-white w-full font-bold border-2 border-white">
+                DÉCOUVRIR
+              </Button>
+            </CardHeader>
+          </Card>
+        </div>
       </Link>
     );
   }
   
   return (
-    <Link to={link} className="block mb-1" onClick={handleClick}>
+    <Link to={link} className="block mb-1 relative" onClick={handleClick}>
       <Card className={cn(
-        "transition-colors relative border-2", 
+        "transition-none border-2 shadow-lg", 
         highlight 
-          ? "bg-gradient-to-r from-[#b92b27] to-[#8B5CF6] text-white border-orange-300 shadow-lg" 
-          : "hover:border-primary"
+          ? "bg-gradient-to-r from-[#b92b27] to-[#8B5CF6] text-white border-orange-300" 
+          : "border-primary hover:border-primary-dark"
       )}>
         <CardHeader>
           <CardTitle className="text-lg font-semibold flex items-center gap-2">
@@ -123,7 +125,7 @@ const FeatureGrid: React.FC = () => {
   return (
     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {featureCards.map((card, index) => (
-        <div key={index} className="relative">
+        <div key={index} className={`relative ${card.ultraHighlight ? 'col-span-full mb-8' : ''}`}>
           <FeatureCard {...card} />
         </div>
       ))}
