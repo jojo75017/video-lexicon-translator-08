@@ -1,11 +1,12 @@
 
 import React from "react"
-import { SparklesIcon, FileText, LayoutDashboard, Zap } from "lucide-react"
+import { SparklesIcon, FileText, LayoutDashboard, Zap, Search, BarChart } from "lucide-react"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
 
 interface FeatureCardProps {
   title: string
@@ -17,9 +18,13 @@ interface FeatureCardProps {
 }
 
 const FeatureCard: React.FC<FeatureCardProps> = ({ title, description, icon, link, highlight, ultraHighlight }) => {
+  const handleClick = () => {
+    toast.info(`Navigation vers ${title}...`);
+  }
+
   if (ultraHighlight) {
     return (
-      <Link to={link} className="transform hover:scale-110 transition-all duration-500">
+      <Link to={link} className="transform hover:scale-110 transition-all duration-500" onClick={handleClick}>
         <Card className="bg-gradient-to-r from-violet-600 via-fuchsia-500 to-pink-500 text-white border-2 border-purple-300 shadow-2xl overflow-hidden">
           <div className="absolute inset-0 bg-grid-white/10 opacity-20"></div>
           <CardHeader className="relative z-10 pb-2">
@@ -42,7 +47,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ title, description, icon, lin
   }
   
   return (
-    <Link to={link}>
+    <Link to={link} onClick={handleClick}>
       <Card className={cn(
         "transition-colors", 
         highlight 
@@ -81,12 +86,20 @@ const featureCards = [
     ultraHighlight: false
   },
   {
-    title: "BOÎTE À OUTILS SEO",
-    description: "Générateur de méta-descriptions, vérificateur de liens et structures de contenu",
+    title: "BOÎTE À OUTILS SEO & IA",
+    description: "Générateurs IA, méta-descriptions, vérificateur de liens et structures",
     icon: <FileText className="h-8 w-8 text-white" />,
     link: "/outils-seo",
     highlight: false,
     ultraHighlight: true
+  },
+  {
+    title: "Recherche IA",
+    description: "Analyse de mots-clés et concurrence avec intelligence artificielle.",
+    icon: <Search className="h-6 w-6 text-white" />,
+    link: "/outils-seo",
+    highlight: true,
+    ultraHighlight: false
   },
   {
     title: "Performances",
@@ -95,12 +108,20 @@ const featureCards = [
     link: "/performance",
     highlight: true,
     ultraHighlight: false
+  },
+  {
+    title: "Analytics Avancées",
+    description: "Visualisez les statistiques détaillées de votre site.",
+    icon: <BarChart className="h-6 w-6 text-primary" />,
+    link: "/analytics",
+    highlight: false,
+    ultraHighlight: false
   }
 ]
 
 const FeatureGrid: React.FC = () => {
   return (
-    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {featureCards.map((card, index) => (
         <FeatureCard key={index} {...card} />
       ))}
