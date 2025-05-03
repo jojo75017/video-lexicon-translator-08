@@ -28,189 +28,79 @@
   }
 }
 
-@layer utilities {
-  .animation-delay-2000 {
-    animation-delay: 2s;
-  }
-  .animation-delay-4000 {
-    animation-delay: 4s;
-  }
-  
-  /* Désactivation des animations pour éviter les problèmes de visibilité */
-  .animate-blob {
-    animation: none !important;
-  }
-  
-  .animate-gradient {
-    background-size: 100% 100% !important;
-    animation: none !important;
-  }
-  
-  .animate-text-gradient {
-    background-size: 100% auto !important;
-    animation: none !important;
-  }
-
-  .bg-grid-white\/10 {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(255 255 255 / 0.1)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
-  }
-
-  /* Classes pour la visibilité forcée */
-  .btn-glow {
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.8) !important;
-  }
-  
-  .section-highlight {
-    border: 4px solid !important;
-    border-image: linear-gradient(to right, #f953c6, #b91d73) !important;
-    border-image-slice: 1 !important;
-  }
-  
-  /* Classes pour garantir la visibilité permanente */
-  .always-visible {
-    opacity: 1 !important;
-    visibility: visible !important;
-    display: block !important;
-    position: relative !important;
-    z-index: 9999 !important;
-  }
-  
-  .ultra-visible {
-    position: relative !important;
-    z-index: 9999 !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-  }
-}
-
-/* Désactivation des animations problématiques */
-@keyframes blob-bounce {
-  0%, 100% {
-    transform: none !important;
-  }
-}
-
-@keyframes gradient {
-  0%, 100% {
-    background-position: 0% 0% !important;
-  }
-}
-
-@keyframes text-gradient {
-  0%, 100% {
-    background-position: 0% 0% !important;
-  }
-}
-
-/* Ajout d'effets de glassmorphisme avec visibilité forcée */
-.glassmorphism {
-  background: rgba(255, 255, 255, 0.9) !important;
-  backdrop-filter: blur(10px) !important;
-  border: 2px solid rgba(255, 255, 255, 0.5) !important;
-  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2) !important;
-  z-index: 50 !important;
+/* Classes communes pour garantir la visibilité de tous les éléments importants */
+:is(button, .button, a[href], .card, [class*="card"], div[class*="feature"], div[class*="grid"], div[class*="container"], div[class*="section"]) {
   position: relative !important;
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-
-/* Désactivation des effets de survol */
-.hover-lift {
-  transition: none !important;
-}
-
-.hover-lift:hover {
-  transform: none !important;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
-}
-
-/* Remplacement des animations par des effets statiques */
-.fade-in {
-  opacity: 1 !important;
-  transform: none !important;
-  animation: none !important;
-}
-
-/* Boutons toujours visibles avec style amélioré */
-.important-button {
-  position: relative !important;
-  z-index: 50 !important;
-  transform: scale(1) !important;
-  transition: none !important;
-  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.5), 0 5px 15px rgba(0, 0, 0, 0.3) !important;
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-
-.important-button:hover {
-  transform: scale(1) !important;
-  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.5), 0 5px 15px rgba(0, 0, 0, 0.3) !important;
-}
-
-.ultra-visible {
-  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.7), 0 0 20px rgba(147, 51, 234, 0.5) !important;
-  z-index: 9999 !important;
-  position: relative !important;
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-
-/* Renforcement des contrastes et de la visibilité */
-.high-contrast {
-  text-shadow: 0 0 4px rgba(0, 0, 0, 0.9) !important;
-}
-
-/* Stabilisation des gradients */
-.stable-gradient {
-  background-size: 100% 100% !important;
-  background-position: 0 0 !important;
-  animation: none !important;
-  background-attachment: fixed !important;
-}
-
-/* Styles fixes pour les boutons */
-:is(button, .button, [role="button"], a[href]) {
-  position: relative !important;
-  z-index: 50 !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-
-/* Styles globaux pour les cartes */
-:is(.card, [class*="card"]) {
-  position: relative !important;
-  z-index: 40 !important;
+  z-index: 5 !important;
   opacity: 1 !important;
   visibility: visible !important;
   display: block !important;
 }
 
-/* Styles fixes pour les conteneurs de fonctionnalités */
-div[class*="feature"], div[class*="grid"], div[class*="container"] {
-  position: relative !important;
-  z-index: 30 !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  display: block !important;
-}
-
-/* Éliminer les transitions qui peuvent causer des problèmes */
-* {
-  transition-duration: 0s !important;
-}
-
-/* Styles pour la section fixe en haut */
+/* Classe spéciale pour les éléments qui disparaissent */
 .fixed-feature-section {
-  position: sticky !important;
-  top: 0 !important;
+  position: relative !important;
   z-index: 9999 !important;
-  background-color: white !important;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
-  padding: 1rem !important;
-  margin-bottom: 1rem !important;
-  border-radius: 0.5rem !important;
-  border: 2px solid #9333ea !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  margin-bottom: 2rem !important;
+  border: 4px solid #9333ea !important;
+  box-shadow: 0 0 30px rgba(147, 51, 234, 0.7) !important;
+  border-radius: 1rem !important;
+}
+
+/* Background pattern stable */
+.bg-grid-white\/10 {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(255 255 255 / 0.1)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
+}
+
+/* Classes pour les boutons d'action */
+.action-button {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  z-index: 100 !important;
+  border-width: 4px !important;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Classe pour les cartes importantes */
+.important-card {
+  position: relative !important;
+  z-index: 50 !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  border-width: 4px !important;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Classe spéciale pour la boîte à outils SEO & IA */
+.seo-tools-card {
+  position: relative !important;
+  z-index: 9999 !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  margin: 0 auto !important;
+  max-width: 800px !important;
+  background: linear-gradient(to right, #9333ea, #d946ef, #f97316) !important;
+  border: 4px solid white !important;
+  box-shadow: 0 0 30px rgba(147, 51, 234, 0.7) !important;
+}
+
+/* Éliminer toutes les transitions problématiques */
+* {
+  transition: none !important;
+}
+
+/* Désactiver toutes les animations */
+@keyframes none {
+  0%, 100% { transform: none; }
+}
+
+[class*="animate-"] {
+  animation: none !important;
 }

@@ -24,9 +24,12 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ title, description, icon, lin
 
   if (ultraHighlight) {
     return (
-      <Link to={link} className="block mb-1 relative z-50" onClick={handleClick}>
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 md:relative md:top-auto md:left-auto md:transform-none">
-          <Card className="bg-gradient-to-r from-violet-600 via-fuchsia-500 to-pink-500 text-white border-4 border-purple-300 shadow-2xl overflow-hidden relative">
+      <Link to={link} className="block mb-6 relative z-50" onClick={handleClick}>
+        <div className="fixed-feature-section top-4 left-1/2 -translate-x-1/2 z-50 md:relative md:top-auto md:left-auto md:transform-none">
+          <Card className="bg-gradient-to-r from-violet-600 via-fuchsia-500 to-pink-500 text-white border-4 border-purple-300 shadow-2xl overflow-hidden relative" style={{
+            boxShadow: "0 0 25px rgba(147, 51, 234, 0.7)",
+            zIndex: 9999
+          }}>
             <div className="absolute inset-0 bg-grid-white/10 opacity-20"></div>
             <CardHeader className="relative z-10 pb-2">
               <div className="bg-white/20 p-3 w-fit rounded-full mb-2">
@@ -55,7 +58,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ title, description, icon, lin
         highlight 
           ? "bg-gradient-to-r from-[#b92b27] to-[#8B5CF6] text-white border-orange-300" 
           : "border-primary hover:border-primary-dark"
-      )}>
+      )} style={{ display: "block", visibility: "visible", opacity: 1 }}>
         <CardHeader>
           <CardTitle className="text-lg font-semibold flex items-center gap-2">
             {icon}

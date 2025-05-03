@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
@@ -68,65 +68,22 @@ const TabNavigation = () => {
     }
   };
   
-  // Effect to enforce synchronization between URL and active tab
-  useEffect(() => {
-    const mappedTab = routeToTabMap[location.pathname];
-    console.log('Current path:', location.pathname, 'Mapped tab:', mappedTab);
-    
-    // Force tab update if needed (URL changed externally)
-    if (mappedTab && mappedTab !== currentTab) {
-      console.log('Forcing tab update to match URL');
-      handleTabChange(mappedTab);
-    }
-  }, [location.pathname]);
-  
-  // Force les éléments à rester visibles
-  useEffect(() => {
-    const toolsButton = document.querySelector('.outils-seo-button');
-    
-    if (toolsButton) {
-      const forceVisibility = () => {
-        if (toolsButton) {
-          (toolsButton as HTMLElement).style.display = 'flex';
-          (toolsButton as HTMLElement).style.visibility = 'visible';
-          (toolsButton as HTMLElement).style.opacity = '1';
-          (toolsButton as HTMLElement).style.zIndex = '9999';
-          (toolsButton as HTMLElement).style.position = 'relative';
-          (toolsButton as HTMLElement).classList.add('ultra-visible');
-        }
-      };
-      
-      // Appliquer immédiatement et périodiquement
-      forceVisibility();
-      const interval = setInterval(forceVisibility, 500);
-      
-      // Observer les changements d'attributs
-      const observer = new MutationObserver(forceVisibility);
-      observer.observe(toolsButton, { attributes: true, childList: false, subtree: false });
-      
-      return () => {
-        clearInterval(interval);
-        observer.disconnect();
-      };
-    }
-  }, []);
-  
   return (
-    <div className="mb-6" role="navigation" aria-label="Navigation du tableau de bord">
+    <div className="mb-6" role="navigation" aria-label="Navigation du tableau de bord" style={{position: 'relative', zIndex: 40}}>
       <h2 className="sr-only">Navigation principale</h2>
       <div className="relative">
-        {/* Super gros bouton d'outils SEO au-dessus des tabs - stabilisé et fixé */}
-        <div className="fixed top-4 right-4 z-[9999] md:absolute md:top-0 md:right-4 md:-top-16" style={{display: 'block', visibility: 'visible', opacity: 1}}>
+        {/* Super gros bouton d'outils SEO au-dessus des tabs - Stabilisé */}
+        <div style={{position: 'absolute', top: '-20px', right: '20px', zIndex: 9999, display: 'block', visibility: 'visible', opacity: 1}}>
           <div 
             onClick={() => handleTabChange('outils-seo')}
-            className="outils-seo-button cursor-pointer bg-red-600 px-5 py-2 rounded-full text-white font-bold shadow-lg flex items-center gap-2 border-4 border-white ultra-visible"
+            className="cursor-pointer px-5 py-3 rounded-full text-white font-bold shadow-lg flex items-center gap-2 border-4 border-white"
             style={{
               background: 'linear-gradient(to right, #9333ea, #d946ef, #f97316)',
               boxShadow: '0 0 15px rgba(147, 51, 234, 0.6), 0 0 30px rgba(147, 51, 234, 0.3)',
               zIndex: 9999,
               position: 'relative',
               display: 'flex',
-              visibility: 'visible',
+              visibility: 'visible', 
               opacity: 1
             }}
           >
@@ -135,7 +92,7 @@ const TabNavigation = () => {
           </div>
         </div>
         
-        <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden" style={{border: '2px solid #d1d5db'}}>
           <Tabs defaultValue={currentTab} value={currentTab} onValueChange={handleTabChange}>
             <TabsList className="w-full justify-start bg-white p-1">
               <TabsTrigger 
@@ -176,12 +133,15 @@ const TabNavigation = () => {
               </TabsTrigger>
               <TabsTrigger 
                 value="outils-seo"
-                className="outils-seo-button bg-red-600 text-white font-bold shadow-lg border-2 border-white text-base px-4 py-1.5 ultra-visible"
+                className="bg-red-600 text-white font-bold shadow-lg border-2 border-white text-base px-4 py-1.5"
                 style={{
                   background: 'linear-gradient(to right, #9333ea, #d946ef, #f97316)',
                   boxShadow: '0 0 10px rgba(147, 51, 234, 0.5)',
                   zIndex: 9999,
-                  position: 'relative'
+                  position: 'relative',
+                  display: 'flex',
+                  visibility: 'visible',
+                  opacity: 1
                 }}
               >
                 OUTILS SEO
