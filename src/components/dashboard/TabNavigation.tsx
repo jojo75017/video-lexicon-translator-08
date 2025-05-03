@@ -84,11 +84,11 @@ const TabNavigation = () => {
     <div className="mb-6" role="navigation" aria-label="Navigation du tableau de bord">
       <h2 className="sr-only">Navigation principale</h2>
       <div className="relative">
-        {/* Super gros bouton d'outils SEO au-dessus des tabs */}
-        <div className="absolute -top-16 right-4 z-10">
+        {/* Super gros bouton d'outils SEO au-dessus des tabs - stabilisé */}
+        <div className="absolute -top-16 right-4 z-50 always-visible important-button">
           <div 
             onClick={() => handleTabChange('outils-seo')}
-            className="cursor-pointer bg-gradient-to-r from-purple-600 via-pink-500 to-red-500 px-5 py-2 rounded-full text-white font-bold shadow-lg flex items-center gap-2 animate-pulse hover:scale-125 transition-all duration-300 hover:shadow-2xl border-2 border-white/30"
+            className="cursor-pointer bg-gradient-to-r from-purple-600 via-pink-500 to-red-500 px-5 py-2 rounded-full text-white font-bold shadow-lg flex items-center gap-2 hover:shadow-2xl border-2 border-white/30 stable-gradient"
           >
             <ZapIcon className="h-5 w-5" />
             OUTILS SEO
@@ -136,7 +136,7 @@ const TabNavigation = () => {
               </TabsTrigger>
               <TabsTrigger 
                 value="outils-seo"
-                className="bg-gradient-to-r from-violet-600 via-pink-500 to-red-600 text-white font-bold animate-pulse shadow-lg border border-purple-300 text-base px-4 py-1.5 hover:scale-110 transition-transform duration-300 hover:shadow-xl"
+                className="bg-gradient-to-r from-violet-600 via-pink-500 to-red-600 text-white font-bold shadow-lg border border-purple-300 text-base px-4 py-1.5 hover:shadow-xl stable-gradient ultra-visible important-button"
               >
                 OUTILS SEO
               </TabsTrigger>

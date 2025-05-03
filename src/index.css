@@ -54,10 +54,9 @@
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(255 255 255 / 0.1)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
   }
 
-  /* Nouvelles classes pour les boutons et sections IA */
+  /* Classes pour les boutons et sections IA */
   .btn-glow {
     box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
-    animation: glow 2s infinite;
   }
   
   .section-highlight {
@@ -65,52 +64,41 @@
     border-image: linear-gradient(to right, #f953c6, #b91d73);
     border-image-slice: 1;
   }
+  
+  /* Classe pour s'assurer que les boutons restent visibles */
+  .always-visible {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: block !important;
+    position: relative !important;
+  }
 }
 
 @keyframes blob-bounce {
-  0% {
+  0%, 100% {
     transform: translate(0px, 0px) scale(1);
   }
-  33% {
-    transform: translate(30px, -50px) scale(1.1);
-  }
-  66% {
-    transform: translate(-20px, 20px) scale(0.9);
-  }
-  100% {
-    transform: translate(0px, 0px) scale(1);
+  50% {
+    transform: translate(10px, -10px) scale(1.05);
   }
 }
 
 @keyframes gradient {
-  0% {
+  0%, 100% {
     background-position: 0% 50%;
   }
   50% {
     background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
   }
 }
 
 @keyframes text-gradient {
-  0% {
+  0%, 100% {
     background-position: 0% 50%;
   }
   50% {
     background-position: 100% 50%;
   }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-/* Animation pour les boutons IA - effet de lueur */
-@keyframes glow {
-  0% { box-shadow: 0 0 5px rgba(255, 255, 255, 0.5); }
-  50% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.8); }
-  100% { box-shadow: 0 0 5px rgba(255, 255, 255, 0.5); }
 }
 
 /* Ajout d'effets de glassmorphisme */
@@ -144,4 +132,45 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Boutons toujours visibles et mis en évidence */
+.important-button {
+  position: relative;
+  z-index: 50;
+  transform: scale(1);
+  transition: transform 0.3s;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.3);
+}
+
+.important-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.5), 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.ultra-visible {
+  animation: pulsate 2s infinite;
+}
+
+@keyframes pulsate {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+  }
+}
+
+/* Renforcement du contraste pour une meilleure visibilité */
+.high-contrast {
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
+}
+
+/* S'assurer que les gradients sont toujours visibles */
+.stable-gradient {
+  background-size: 100% 100% !important;
+  background-position: 0 0 !important;
+  animation: none !important;
 }

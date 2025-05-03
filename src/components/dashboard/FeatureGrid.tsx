@@ -24,8 +24,8 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ title, description, icon, lin
 
   if (ultraHighlight) {
     return (
-      <Link to={link} className="transform hover:scale-110 transition-all duration-500" onClick={handleClick}>
-        <Card className="bg-gradient-to-r from-violet-600 via-fuchsia-500 to-pink-500 text-white border-2 border-purple-300 shadow-2xl overflow-hidden">
+      <Link to={link} className="block mb-1" onClick={handleClick}>
+        <Card className="bg-gradient-to-r from-violet-600 via-fuchsia-500 to-pink-500 text-white border-4 border-purple-300 shadow-2xl overflow-hidden relative">
           <div className="absolute inset-0 bg-grid-white/10 opacity-20"></div>
           <CardHeader className="relative z-10 pb-2">
             <div className="bg-white/20 p-3 w-fit rounded-full mb-2">
@@ -37,7 +37,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ title, description, icon, lin
             <CardDescription className="text-white/90 font-medium">
               {description}
             </CardDescription>
-            <Button className="mt-4 bg-white/30 hover:bg-white/50 text-white w-full font-bold animate-pulse">
+            <Button className="mt-4 bg-white/30 hover:bg-white/50 text-white w-full font-bold">
               DÉCOUVRIR
             </Button>
           </CardHeader>
@@ -47,11 +47,11 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ title, description, icon, lin
   }
   
   return (
-    <Link to={link} onClick={handleClick}>
+    <Link to={link} className="block mb-1" onClick={handleClick}>
       <Card className={cn(
-        "transition-colors", 
+        "transition-colors relative border-2", 
         highlight 
-          ? "bg-gradient-to-r from-[#b92b27] to-[#8B5CF6] text-white border-2 border-orange-300 animate-pulse shadow-lg" 
+          ? "bg-gradient-to-r from-[#b92b27] to-[#8B5CF6] text-white border-orange-300 shadow-lg" 
           : "hover:border-primary"
       )}>
         <CardHeader>
@@ -70,6 +70,14 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ title, description, icon, lin
 
 const featureCards = [
   {
+    title: "BOÎTE À OUTILS SEO & IA",
+    description: "Générateurs IA, méta-descriptions, vérificateur de liens et structures",
+    icon: <FileText className="h-8 w-8 text-white" />,
+    link: "/outils-seo",
+    highlight: false,
+    ultraHighlight: true
+  },
+  {
     title: "Analyse de Site Web",
     description: "Effectuez une analyse SEO complète de n'importe quel site web.",
     icon: <SparklesIcon className="h-6 w-6 text-primary" />,
@@ -84,14 +92,6 @@ const featureCards = [
     link: "/",
     highlight: false,
     ultraHighlight: false
-  },
-  {
-    title: "BOÎTE À OUTILS SEO & IA",
-    description: "Générateurs IA, méta-descriptions, vérificateur de liens et structures",
-    icon: <FileText className="h-8 w-8 text-white" />,
-    link: "/outils-seo",
-    highlight: false,
-    ultraHighlight: true
   },
   {
     title: "Recherche IA",
@@ -121,9 +121,11 @@ const featureCards = [
 
 const FeatureGrid: React.FC = () => {
   return (
-    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {featureCards.map((card, index) => (
-        <FeatureCard key={index} {...card} />
+        <div key={index} className="relative">
+          <FeatureCard {...card} />
+        </div>
       ))}
     </div>
   )
