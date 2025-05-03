@@ -1,5 +1,4 @@
-
-import React from "react"
+import React, { useEffect, useRef } from "react"
 import { SparklesIcon, FileText, LayoutDashboard, Zap, Search, BarChart } from "lucide-react"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -17,19 +16,73 @@ interface FeatureCardProps {
   ultraHighlight?: boolean
 }
 
+// Force elements to stay visible with a mutation observer
+const useVisibilityForcer = (selectors: string) => {
+  const intervalRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    // Function to force visibility of elements
+    const forceVisibility = () => {
+      const elements = document.querySelectorAll(selectors);
+      elements.forEach(el => {
+        if (el instanceof HTMLElement) {
+          el.style.display = "block";
+          el.style.visibility = "visible";
+          el.style.opacity = "1";
+          el.style.position = "relative";
+          el.style.zIndex = "9999";
+        }
+      });
+      console.log(`Forced visibility on ${elements.length} elements`);
+    };
+
+    // Run immediately
+    forceVisibility();
+
+    // Set up an interval to keep checking (every 500ms)
+    intervalRef.current = window.setInterval(forceVisibility, 500);
+
+    // Set up a mutation observer to watch for DOM changes
+    const observer = new MutationObserver(mutations => {
+      mutations.forEach(() => {
+        forceVisibility();
+      });
+    });
+
+    // Start observing the entire document
+    observer.observe(document.body, { 
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['style', 'class']
+    });
+
+    return () => {
+      // Clean up
+      if (intervalRef.current) window.clearInterval(intervalRef.current);
+      observer.disconnect();
+    };
+  }, [selectors]);
+};
+
 const FeatureCard: React.FC<FeatureCardProps> = ({ title, description, icon, link, highlight, ultraHighlight }) => {
   const handleClick = () => {
     toast.info(`Navigation vers ${title}...`);
   }
 
+  // Use a specific class for this card that will be targeted by the visibility forcer
+  const cardClassName = ultraHighlight ? "ultra-important-feature-card" : 
+                        highlight ? "important-feature-card" : 
+                        "regular-feature-card";
+
   if (ultraHighlight) {
     return (
-      <Link to={link} className="block mb-6 relative z-50" onClick={handleClick}>
-        <div className="fixed-feature-section top-4 left-1/2 -translate-x-1/2 z-50 md:relative md:top-auto md:left-auto md:transform-none">
-          <Card className="bg-gradient-to-r from-violet-600 via-fuchsia-500 to-pink-500 text-white border-4 border-purple-300 shadow-2xl overflow-hidden relative" style={{
-            boxShadow: "0 0 25px rgba(147, 51, 234, 0.7)",
-            zIndex: 9999
-          }}>
+      <Link to={link} className="block mb-6 relative z-50 always-visible" onClick={handleClick}
+        style={{display: 'block', visibility: 'visible', opacity: 1, zIndex: 9999, position: 'relative'}}>
+        <div className={`fixed-feature-section top-4 left-1/2 -translate-x-1/2 z-50 md:relative md:top-auto md:left-auto md:transform-none ${cardClassName} always-visible`}
+          style={{position: 'relative', zIndex: 9999, display: 'block', visibility: 'visible', opacity: 1}}>
+          <Card className="bg-gradient-to-r from-violet-600 via-fuchsia-500 to-pink-500 text-white border-4 border-white shadow-2xl overflow-hidden relative"
+            style={{boxShadow: "0 0 25px rgba(147, 51, 234, 0.7)", zIndex: 9999, position: 'relative', display: 'block', visibility: 'visible', opacity: 1}}>
             <div className="absolute inset-0 bg-grid-white/10 opacity-20"></div>
             <CardHeader className="relative z-10 pb-2">
               <div className="bg-white/20 p-3 w-fit rounded-full mb-2">
@@ -41,7 +94,8 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ title, description, icon, lin
               <CardDescription className="text-white/90 font-medium">
                 {description}
               </CardDescription>
-              <Button className="mt-4 bg-white/30 hover:bg-white/50 text-white w-full font-bold border-2 border-white">
+              <Button className="mt-4 bg-white/30 hover:bg-white/50 text-white w-full font-bold border-2 border-white"
+                style={{display: 'flex', visibility: 'visible', opacity: 1}}>
                 DÉCOUVRIR
               </Button>
             </CardHeader>
@@ -52,13 +106,14 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ title, description, icon, lin
   }
   
   return (
-    <Link to={link} className="block mb-1 relative" onClick={handleClick}>
+    <Link to={link} className={`block mb-1 relative ${cardClassName} always-visible`} onClick={handleClick}
+      style={{display: 'block', visibility: 'visible', opacity: 1, position: 'relative', zIndex: 50}}>
       <Card className={cn(
         "transition-none border-2 shadow-lg", 
         highlight 
           ? "bg-gradient-to-r from-[#b92b27] to-[#8B5CF6] text-white border-orange-300" 
           : "border-primary hover:border-primary-dark"
-      )} style={{ display: "block", visibility: "visible", opacity: 1 }}>
+      )} style={{ display: "block", visibility: "visible", opacity: 1, position: "relative", zIndex: 50 }}>
         <CardHeader>
           <CardTitle className="text-lg font-semibold flex items-center gap-2">
             {icon}
@@ -122,13 +177,18 @@ const featureCards = [
     highlight: false,
     ultraHighlight: false
   }
-]
+];
 
 const FeatureGrid: React.FC = () => {
+  // Force visibility on all important elements
+  useVisibilityForcer('.ultra-important-feature-card, .important-feature-card, .regular-feature-card');
+  
   return (
-    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 always-visible"
+      style={{display: 'grid', visibility: 'visible', opacity: 1, position: 'relative', zIndex: 50}}>
       {featureCards.map((card, index) => (
-        <div key={index} className={`relative ${card.ultraHighlight ? 'col-span-full mb-8' : ''}`}>
+        <div key={index} className={`relative ${card.ultraHighlight ? 'col-span-full mb-8 always-visible' : 'always-visible'}`}
+          style={{display: 'block', visibility: 'visible', opacity: 1, position: 'relative'}}>
           <FeatureCard {...card} />
         </div>
       ))}

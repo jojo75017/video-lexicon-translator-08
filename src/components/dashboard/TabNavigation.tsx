@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
@@ -8,6 +7,7 @@ import { ZapIcon } from "lucide-react";
 const TabNavigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const tabsContainerRef = useRef<HTMLDivElement>(null);
   
   // Comprehensive mapping of routes to tab IDs
   const routeToTabMap: Record<string, string> = {
@@ -68,23 +68,70 @@ const TabNavigation = () => {
     }
   };
   
+  // Keep forcing the SEO button to be visible
+  useEffect(() => {
+    const forceSeoButtonVisibility = () => {
+      const seoButtons = document.querySelectorAll('.seo-button');
+      seoButtons.forEach(button => {
+        if (button instanceof HTMLElement) {
+          button.style.display = "flex";
+          button.style.visibility = "visible";
+          button.style.opacity = "1";
+          button.style.position = "relative";
+          button.style.zIndex = "9999";
+        }
+      });
+    };
+    
+    // Run immediately and set interval
+    forceSeoButtonVisibility();
+    const intervalId = setInterval(forceSeoButtonVisibility, 300);
+    
+    // Use MutationObserver to detect DOM changes
+    const observer = new MutationObserver(() => {
+      forceSeoButtonVisibility();
+    });
+    
+    if (tabsContainerRef.current) {
+      observer.observe(tabsContainerRef.current, {
+        childList: true,
+        subtree: true,
+        attributes: true
+      });
+    }
+    
+    return () => {
+      clearInterval(intervalId);
+      observer.disconnect();
+    };
+  }, []);
+
   return (
-    <div className="mb-6" role="navigation" aria-label="Navigation du tableau de bord" style={{position: 'relative', zIndex: 40}}>
+    <div className="mb-6" role="navigation" aria-label="Navigation du tableau de bord" 
+      style={{position: 'relative', zIndex: 40}} ref={tabsContainerRef}>
       <h2 className="sr-only">Navigation principale</h2>
       <div className="relative">
         {/* Super gros bouton d'outils SEO au-dessus des tabs - Stabilisé */}
-        <div style={{position: 'absolute', top: '-20px', right: '20px', zIndex: 9999, display: 'block', visibility: 'visible', opacity: 1}}>
+        <div style={{
+          position: 'absolute', 
+          top: '-20px', 
+          right: '20px', 
+          zIndex: 9999, 
+          display: 'block !important', 
+          visibility: 'visible !important', 
+          opacity: 1
+        }} className="always-visible">
           <div 
             onClick={() => handleTabChange('outils-seo')}
-            className="cursor-pointer px-5 py-3 rounded-full text-white font-bold shadow-lg flex items-center gap-2 border-4 border-white"
+            className="cursor-pointer px-5 py-3 rounded-full text-white font-bold shadow-lg flex items-center gap-2 border-4 border-white seo-button always-visible"
             style={{
               background: 'linear-gradient(to right, #9333ea, #d946ef, #f97316)',
               boxShadow: '0 0 15px rgba(147, 51, 234, 0.6), 0 0 30px rgba(147, 51, 234, 0.3)',
               zIndex: 9999,
               position: 'relative',
-              display: 'flex',
-              visibility: 'visible', 
-              opacity: 1
+              display: 'flex !important',
+              visibility: 'visible !important', 
+              opacity: '1 !important'
             }}
           >
             <ZapIcon className="h-5 w-5" />
@@ -133,7 +180,7 @@ const TabNavigation = () => {
               </TabsTrigger>
               <TabsTrigger 
                 value="outils-seo"
-                className="bg-red-600 text-white font-bold shadow-lg border-2 border-white text-base px-4 py-1.5"
+                className="bg-red-600 text-white font-bold shadow-lg border-2 border-white text-base px-4 py-1.5 seo-button always-visible"
                 style={{
                   background: 'linear-gradient(to right, #9333ea, #d946ef, #f97316)',
                   boxShadow: '0 0 10px rgba(147, 51, 234, 0.5)',
