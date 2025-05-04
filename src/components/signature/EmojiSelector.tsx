@@ -24,7 +24,7 @@ const EmojiSelector: React.FC<EmojiSelectorProps> = ({
       <RadioGroup
         value={selectedEmoji}
         onValueChange={onSelect}
-        className="flex flex-wrap gap-4"
+        className="flex flex-wrap gap-3"
       >
         {emojis.map((emoji) => (
           <div key={emoji} className="flex items-center gap-1">
