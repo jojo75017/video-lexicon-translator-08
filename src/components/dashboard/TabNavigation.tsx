@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -117,8 +118,8 @@ const TabNavigation = () => {
           top: '-20px', 
           right: '20px', 
           zIndex: 9999, 
-          display: 'block !important', 
-          visibility: 'visible !important', 
+          display: 'block', 
+          visibility: 'visible', 
           opacity: 1
         }} className="always-visible">
           <div 
@@ -129,9 +130,9 @@ const TabNavigation = () => {
               boxShadow: '0 0 15px rgba(147, 51, 234, 0.6), 0 0 30px rgba(147, 51, 234, 0.3)',
               zIndex: 9999,
               position: 'relative',
-              display: 'flex !important',
-              visibility: 'visible !important', 
-              opacity: '1 !important'
+              display: 'flex',
+              visibility: 'visible', 
+              opacity: 1
             }}
           >
             <ZapIcon className="h-5 w-5" />

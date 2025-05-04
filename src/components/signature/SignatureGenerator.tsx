@@ -200,6 +200,34 @@ const SignatureGenerator = () => {
     }));
   };
 
+  // Added necessary component for AiAssistant tab
+  const AiAssistant = () => (
+    <div className="space-y-4">
+      <h3 className="font-medium text-lg">Assistant IA pour votre signature</h3>
+      <p className="text-gray-600 text-sm">
+        Notre assistant IA peut vous aider à créer une description professionnelle pour votre poste.
+        Entrez quelques informations sur votre rôle et laissez l'IA générer une description adaptée.
+      </p>
+      <Button
+        onClick={() => {
+          const aiResponse = "Expert en marketing digital et stratégie de contenu";
+          handleUseAiResponse(aiResponse);
+          toast.success("Description générée avec succès!");
+        }}
+        className="w-full"
+      >
+        Générer une description
+      </Button>
+    </div>
+  );
+
+  const emojiOptions = {
+    title: ['💼', '👔', '🖋️', '📊', '🚀'],
+    email: ['📧', '✉️', '📨', '📩', '📤'],
+    phone: ['📱', '☎️', '📞', '📲', '🤙'],
+    website: ['🌐', '💻', '🔗', '🖥️', '📱']
+  };
+
   return (
     <Card className="p-6">
       <div className="space-y-6">
@@ -581,30 +609,9 @@ const SignatureGenerator = () => {
                       </Popover>
                     </div>
                   </div>
-
-                  <div className="flex items-center gap-4">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={isItalic}
-                        onChange={(e) => setIsItalic(e.target.checked)}
-                        className="rounded border-gray-300"
-                      />
-                      <span>Italique</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={useStyleFont}
-                        onChange={(e) => setUseStyleFont(e.target.checked)}
-                        className="rounded border-gray-300"
-                      />
-                      <span>Police stylée</span>
-                    </label>
-                  </div>
                 </div>
 
-                <StyleSelector
+                <StyleSelector 
                   textColor={textColor}
                   setTextColor={setTextColor}
                   iconColor={iconColor}
@@ -613,74 +620,39 @@ const SignatureGenerator = () => {
                   setSeparatorColor={setSeparatorColor}
                   onSelectTemplate={handleTemplateSelect}
                 />
-              </div>
 
-              <div className="space-y-4">
-                <Label>Aperçu de la signature</Label>
-                <div 
-                  ref={signatureRef}
-                  className="p-6 bg-white rounded-lg border"
-                >
-                  <SignaturePreview 
-                    formData={formData}
-                    style={getSignatureStyle()}
-                    nameIcon={nameIcon}
-                    companyIcon={companyIcon}
-                    titleEmoji={titleEmoji}
-                    emailEmoji={emailEmoji}
-                    phoneEmoji={phoneEmoji}
-                    websiteEmoji={websiteEmoji}
-                    textColor={textColor}
-                    iconColor={iconColor}
-                    separatorColor={separatorColor}
-                    logo={logo}
-                  />
-                </div>
-
-                <Button
-                  className="w-full gap-2"
-                  onClick={downloadSignature}
-                >
-                  <Download className="h-4 w-4" />
-                  Télécharger la signature
+                <Button onClick={downloadSignature} className="w-full flex gap-2">
+                  <Download size={18} />
+                  Télécharger ma signature
                 </Button>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="border rounded-lg p-6 relative">
+                  <h3 className="font-medium mb-4">Aperçu de la signature</h3>
+                  <div ref={signatureRef}>
+                    <SignaturePreview 
+                      formData={formData}
+                      style={getSignatureStyle()}
+                      nameIcon={nameIcon}
+                      companyIcon={companyIcon}
+                      titleEmoji={titleEmoji}
+                      emailEmoji={emailEmoji}
+                      phoneEmoji={phoneEmoji}
+                      websiteEmoji={websiteEmoji}
+                      textColor={textColor}
+                      iconColor={iconColor}
+                      separatorColor={separatorColor}
+                      logo={logo}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </TabsContent>
           
           <TabsContent value="assistant" className="space-y-6">
-            <div className="grid gap-6 md:grid-cols-2">
-              <div>
-                <AiAssistant onUseResponse={handleUseAiResponse} />
-              </div>
-              
-              <div className="space-y-4">
-                <Label>Aperçu de la signature</Label>
-                <div className="p-6 bg-white rounded-lg border">
-                  <SignaturePreview 
-                    formData={formData}
-                    style={getSignatureStyle()}
-                    nameIcon={nameIcon}
-                    companyIcon={companyIcon}
-                    titleEmoji={titleEmoji}
-                    emailEmoji={emailEmoji}
-                    phoneEmoji={phoneEmoji}
-                    websiteEmoji={websiteEmoji}
-                    textColor={textColor}
-                    iconColor={iconColor}
-                    separatorColor={separatorColor}
-                    logo={logo}
-                  />
-                </div>
-
-                <Button
-                  className="w-full gap-2"
-                  onClick={() => setActiveTab("editeur")}
-                >
-                  Retourner à l'éditeur
-                </Button>
-              </div>
-            </div>
+            <AiAssistant />
           </TabsContent>
         </Tabs>
       </div>
