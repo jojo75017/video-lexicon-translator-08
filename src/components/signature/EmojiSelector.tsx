@@ -21,23 +21,20 @@ const EmojiSelector: React.FC<EmojiSelectorProps> = ({
       <Label className="text-xs text-muted-foreground mb-1 block">
         {label}
       </Label>
-      <RadioGroup
-        value={selectedEmoji}
-        onValueChange={onSelect}
-        className="flex flex-wrap gap-3"
-      >
+      <div className="flex flex-wrap gap-3">
         {emojis.map((emoji) => (
-          <div key={emoji} className="flex items-center gap-1">
-            <RadioGroupItem value={emoji} id={`emoji-${emoji}`} />
-            <Label 
-              htmlFor={`emoji-${emoji}`}
-              className="text-base cursor-pointer hover:bg-gray-100 rounded-full px-2 py-1"
-            >
-              {emoji}
-            </Label>
-          </div>
+          <button
+            key={emoji}
+            type="button"
+            onClick={() => onSelect(emoji)}
+            className={`text-xl cursor-pointer hover:bg-gray-100 rounded-full px-2 py-1 ${
+              selectedEmoji === emoji ? 'bg-blue-100 border-blue-300 border' : ''
+            }`}
+          >
+            {emoji}
+          </button>
         ))}
-      </RadioGroup>
+      </div>
     </div>
   );
 };
