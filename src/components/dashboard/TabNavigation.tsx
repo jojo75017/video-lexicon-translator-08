@@ -39,7 +39,7 @@ const TabNavigation = () => {
     
     // Mapping des onglets aux routes
     const tabToRouteMap: Record<string, string> = {
-      'hierarchy': '/hierarchy',
+      'hierarchy': '/',
       'wordcount': '/wordcount',
       'seo': '/seo',
       'structure': '/structure',
@@ -72,7 +72,7 @@ const TabNavigation = () => {
       <div className="relative">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           <Tabs defaultValue={currentTab} value={currentTab} onValueChange={handleTabChange}>
-            <TabsList className="w-full justify-start bg-white p-1">
+            <TabsList className="w-full justify-start bg-white p-1 overflow-x-auto flex-nowrap">
               <TabsTrigger value="hierarchy" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
                 Hiérarchie
               </TabsTrigger>

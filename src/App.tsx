@@ -7,6 +7,8 @@ import SeoPage from './pages/SeoPage';
 import OutilsSeoPage from './pages/OutilsSeoPage';
 import OutilsSeo from './pages/OutilsSeo';
 import PinterestPage from './pages/PinterestPage';
+import StructurePage from './pages/StructurePage';
+import SignaturePage from './pages/SignaturePage';
 
 function App() {
   return (
@@ -18,6 +20,8 @@ function App() {
         <Route path="/outils" element={<OutilsSeo />} />
         <Route path="/outils-seo" element={<OutilsSeoPage />} />
         <Route path="/pinterest" element={<PinterestPage />} />
+        <Route path="/structure" element={<StructurePage />} />
+        <Route path="/signature" element={<SignaturePage />} />
       </Routes>
     </Router>
   );

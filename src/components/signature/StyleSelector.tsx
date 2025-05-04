@@ -4,16 +4,6 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-interface StyleSelectorProps {
-  textColor: string;
-  setTextColor: (color: string) => void;
-  iconColor: string;
-  setIconColor: (color: string) => void;
-  separatorColor: string;
-  setSeparatorColor: (color: string) => void;
-  onSelectTemplate: (template: StyleTemplate) => void;
-}
-
 export interface StyleTemplate {
   name: string;
   textColor: string;
@@ -22,54 +12,17 @@ export interface StyleTemplate {
   font: string;
 }
 
-const templates: StyleTemplate[] = [
-  {
-    name: "Moderne",
-    textColor: "#2563eb",
-    iconColor: "#3b82f6",
-    separatorColor: "#e2e8f0",
-    font: "font-sans"
-  },
-  {
-    name: "Classique",
-    textColor: "#1e293b",
-    iconColor: "#475569",
-    separatorColor: "#94a3b8",
-    font: "font-serif"
-  },
-  {
-    name: "Créatif",
-    textColor: "#9333ea",
-    iconColor: "#a855f7",
-    separatorColor: "#f3e8ff",
-    font: "font-playfair"
-  },
-  {
-    name: "Minimaliste",
-    textColor: "#18181b",
-    iconColor: "#52525b",
-    separatorColor: "#e4e4e7",
-    font: "font-sans"
-  },
-  {
-    name: "Coloré",
-    textColor: "#f97316",
-    iconColor: "#f59e0b",
-    separatorColor: "#fef3c7",
-    font: "font-sans"
-  }
-];
+interface StyleSelectorProps {
+  textColor: string;
+  setTextColor: (value: string) => void;
+  iconColor: string;
+  setIconColor: (value: string) => void;
+  separatorColor: string;
+  setSeparatorColor: (value: string) => void;
+  onSelectTemplate: (template: StyleTemplate) => void;
+}
 
-// Définition des couleurs de fond pour chaque template
-const templateColors: Record<string, string> = {
-  "Moderne": "bg-blue-500 hover:bg-blue-600 text-white",
-  "Classique": "bg-slate-700 hover:bg-slate-800 text-white",
-  "Créatif": "bg-purple-500 hover:bg-purple-600 text-white",
-  "Minimaliste": "bg-zinc-800 hover:bg-zinc-900 text-white",
-  "Coloré": "bg-orange-500 hover:bg-orange-600 text-white",
-};
-
-const StyleSelector = ({
+const StyleSelector: React.FC<StyleSelectorProps> = ({
   textColor,
   setTextColor,
   iconColor,
@@ -77,69 +30,113 @@ const StyleSelector = ({
   separatorColor,
   setSeparatorColor,
   onSelectTemplate
-}: StyleSelectorProps) => {
+}) => {
+  // Templates prédéfinis
+  const templates: StyleTemplate[] = [
+    {
+      name: "Bleu professionnel",
+      textColor: "#1e293b",
+      iconColor: "#2563eb",
+      separatorColor: "#e2e8f0",
+      font: "default"
+    },
+    {
+      name: "Vert nature",
+      textColor: "#1e3a1e",
+      iconColor: "#16a34a",
+      separatorColor: "#dcfce7",
+      font: "default"
+    },
+    {
+      name: "Élégant sombre",
+      textColor: "#334155",
+      iconColor: "#6366f1",
+      separatorColor: "#f1f5f9",
+      font: "font-playfair"
+    },
+    {
+      name: "Orange créatif",
+      textColor: "#422006",
+      iconColor: "#f97316",
+      separatorColor: "#ffedd5",
+      font: "default"
+    }
+  ];
+
   return (
     <div className="space-y-4">
       <div>
-        <Label className="text-base font-semibold">Templates</Label>
-        <div className="grid grid-cols-2 gap-2 mt-2">
-          {templates.map((template) => (
+        <Label>Modèles de style</Label>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
+          {templates.map((template, index) => (
             <Button
-              key={template.name}
-              variant="default"
-              className={`h-auto py-3 shadow-md transition-all duration-200 ${templateColors[template.name]}`}
+              key={index}
+              variant="outline"
               onClick={() => onSelectTemplate(template)}
+              className="h-auto py-2 px-3 flex flex-col items-center justify-center text-center"
+              style={{ borderColor: template.iconColor }}
             >
-              <span className="font-medium">{template.name}</span>
+              <div 
+                className="w-4 h-4 rounded-full mb-1" 
+                style={{ backgroundColor: template.iconColor }}
+              ></div>
+              <span className="text-xs">{template.name}</span>
             </Button>
           ))}
         </div>
       </div>
 
-      <div className="space-y-2">
-        <Label className="text-base font-semibold">Couleurs personnalisées</Label>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="textColor" className="text-xs">Texte</Label>
-            <div className="flex items-center gap-2">
-              <Input
-                id="textColor"
-                type="color"
-                value={textColor}
-                onChange={(e) => setTextColor(e.target.value)}
-                className="w-12 h-8 p-0"
-              />
-              <span className="text-sm">{textColor}</span>
-            </div>
-          </div>
+      <div>
+        <Label>Couleur du texte</Label>
+        <div className="flex gap-2 items-center mt-2">
+          <Input
+            type="color"
+            value={textColor}
+            onChange={(e) => setTextColor(e.target.value)}
+            className="w-12 h-8 p-1"
+          />
+          <Input
+            type="text"
+            value={textColor}
+            onChange={(e) => setTextColor(e.target.value)}
+            className="flex-1"
+          />
+        </div>
+      </div>
 
-          <div>
-            <Label htmlFor="iconColor" className="text-xs">Icônes</Label>
-            <div className="flex items-center gap-2">
-              <Input
-                id="iconColor"
-                type="color"
-                value={iconColor}
-                onChange={(e) => setIconColor(e.target.value)}
-                className="w-12 h-8 p-0"
-              />
-              <span className="text-sm">{iconColor}</span>
-            </div>
-          </div>
+      <div>
+        <Label>Couleur des icônes</Label>
+        <div className="flex gap-2 items-center mt-2">
+          <Input
+            type="color"
+            value={iconColor}
+            onChange={(e) => setIconColor(e.target.value)}
+            className="w-12 h-8 p-1"
+          />
+          <Input
+            type="text"
+            value={iconColor}
+            onChange={(e) => setIconColor(e.target.value)}
+            className="flex-1"
+          />
+        </div>
+      </div>
 
-          <div>
-            <Label htmlFor="separatorColor" className="text-xs">Séparateur</Label>
-            <div className="flex items-center gap-2">
-              <Input
-                id="separatorColor"
-                type="color"
-                value={separatorColor}
-                onChange={(e) => setSeparatorColor(e.target.value)}
-                className="w-12 h-8 p-0"
-              />
-              <span className="text-sm">{separatorColor}</span>
-            </div>
-          </div>
+      <div>
+        <Label>Couleur du séparateur</Label>
+        <div className="flex gap-2 items-center mt-2">
+          <Input
+            type="color"
+            value={separatorColor}
+            onChange={(e) => setSeparatorColor(e.target.value)}
+            className="w-12 h-8 p-1"
+          />
+          <Input
+            type="text"
+            value={separatorColor}
+            onChange={(e) => setSeparatorColor(e.target.value)}
+            className="flex-1"
+          />
         </div>
       </div>
     </div>

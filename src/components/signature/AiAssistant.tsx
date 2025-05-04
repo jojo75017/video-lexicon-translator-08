@@ -2,113 +2,135 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Sparkles } from "lucide-react";
+import { Bot } from "lucide-react";
 
 interface AiAssistantProps {
-  onUseResponse?: (response: string) => void;
+  onUseResponse: (response: string) => void;
 }
 
 const AiAssistant: React.FC<AiAssistantProps> = ({ onUseResponse }) => {
-  const [query, setQuery] = useState("");
-  const [role, setRole] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState("");
+  const [prompt, setPrompt] = useState('');
+  const [industry, setIndustry] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [aiResponse, setAiResponse] = useState('');
 
-  const handleGenerateDescription = () => {
-    setLoading(true);
+  const generateDescription = () => {
+    setIsLoading(true);
     
-    // Simulate AI response
+    // Simulate AI generation with predefined responses based on industry
     setTimeout(() => {
-      let response = "";
+      let response = '';
       
-      if (role.toLowerCase().includes("marketing")) {
-        response = "Expert en marketing digital spécialisé dans l'optimisation SEO et les stratégies de contenu à fort impact.";
-      } else if (role.toLowerCase().includes("dev") || role.toLowerCase().includes("développeur")) {
-        response = "Développeur fullstack expérimenté avec une expertise en React, Node.js et architectures cloud modernes.";
-      } else if (role.toLowerCase().includes("design")) {
-        response = "Designer UX/UI créatif spécialisé dans la conception d'interfaces utilisateur intuitives et esthétiques.";
-      } else if (role.toLowerCase().includes("manag")) {
-        response = "Manager de projet agile avec une expertise dans la coordination d'équipes multidisciplinaires et l'optimisation des workflows.";
-      } else {
-        response = `Professionnel expérimenté en ${role || "technologie"} avec une expertise reconnue dans le développement de solutions innovantes.`;
+      switch(industry.toLowerCase()) {
+        case 'marketing':
+          response = 'Expert en stratégie marketing digital et optimisation de conversion';
+          break;
+        case 'technologie':
+          response = 'Spécialiste en développement de solutions technologiques et innovation';
+          break;
+        case 'finance':
+          response = 'Conseiller en gestion financière et stratégies d\'investissement';
+          break;
+        case 'santé':
+          response = 'Professionnel de santé spécialisé en bien-être et médecine préventive';
+          break;
+        default:
+          response = 'Professionnel spécialisé en ' + (industry || 'conseil et stratégie');
       }
       
-      setResult(response);
-      setLoading(false);
+      if (prompt) {
+        // Add personalization based on prompt if provided
+        const promptLower = prompt.toLowerCase();
+        if (promptLower.includes('créatif')) {
+          response += ' avec approche créative';
+        }
+        if (promptLower.includes('leader')) {
+          response += ' et leadership d\'équipe';
+        }
+        if (promptLower.includes('international')) {
+          response += ' à l\'échelle internationale';
+        }
+      }
+      
+      setAiResponse(response);
+      setIsLoading(false);
       toast.success("Description générée avec succès");
     }, 1500);
   };
 
   const handleUseResponse = () => {
-    if (onUseResponse && result) {
-      onUseResponse(result);
-      toast.success("Description ajoutée à votre signature");
-    }
+    onUseResponse(aiResponse);
+    toast.success("Description appliquée à votre signature");
   };
 
   return (
     <div className="space-y-6">
-      <div className="border rounded-md p-4 bg-blue-50 border-blue-200">
-        <h3 className="font-medium text-lg flex items-center gap-2 text-blue-700">
-          <Sparkles className="h-5 w-5" />
-          Assistant IA pour votre signature
-        </h3>
-        <p className="text-sm text-blue-600 mt-1">
-          Notre assistant IA peut vous aider à créer une description professionnelle pour votre poste.
+      <Card className="p-4 bg-blue-50 border border-blue-100">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="bg-blue-100 p-2 rounded-full">
+            <Bot className="h-5 w-5 text-blue-700" />
+          </div>
+          <h3 className="font-medium">Assistant de rédaction</h3>
+        </div>
+        <p className="text-sm text-gray-600">
+          Cet assistant vous aide à créer une description professionnelle pour votre poste.
+          Renseignez votre secteur d'activité et quelques mots-clés pour obtenir une proposition.
         </p>
-      </div>
+      </Card>
 
       <div className="space-y-4">
         <div>
-          <label htmlFor="role" className="block text-sm font-medium mb-1">
-            Votre rôle / poste
-          </label>
+          <Label htmlFor="industry">Secteur d'activité</Label>
           <Input
-            id="role"
-            placeholder="ex: Marketing Manager, Développeur Web, Designer UX..."
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
+            id="industry"
+            value={industry}
+            onChange={(e) => setIndustry(e.target.value)}
+            placeholder="Ex: Marketing, Technologie, Finance..."
+            className="mt-1"
           />
         </div>
 
         <div>
-          <label htmlFor="query" className="block text-sm font-medium mb-1">
-            Précisez vos compétences ou spécialités (optionnel)
-          </label>
+          <Label htmlFor="prompt">Mots-clés (optionnel)</Label>
           <Textarea
-            id="query"
-            placeholder="ex: SEO, React, design d'interface, management d'équipe..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            id="prompt"
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            placeholder="Ex: leadership, créatif, international..."
+            className="mt-1 resize-none"
             rows={3}
           />
         </div>
-        
-        <Button 
-          onClick={handleGenerateDescription}
-          disabled={loading || !role}
-          className="w-full"
-        >
-          {loading ? "Génération en cours..." : "Générer une description professionnelle"}
-        </Button>
-      </div>
 
-      {result && (
-        <div className="mt-6 border rounded-md p-4 bg-green-50 border-green-200">
-          <h4 className="font-medium text-green-700">Résultat</h4>
-          <p className="text-green-800 my-2">{result}</p>
-          <Button 
-            onClick={handleUseResponse}
-            variant="outline" 
-            size="sm"
-            className="mt-2"
-          >
-            Utiliser cette description
-          </Button>
-        </div>
-      )}
+        <Button 
+          onClick={generateDescription} 
+          className="w-full"
+          disabled={isLoading || !industry}
+        >
+          {isLoading ? 'Génération en cours...' : 'Générer une description'}
+        </Button>
+
+        {aiResponse && (
+          <div className="mt-4 space-y-3">
+            <div className="bg-green-50 border border-green-100 rounded-md p-3">
+              <Label className="text-xs text-green-800 mb-1 block">Suggestion:</Label>
+              <p className="font-medium">{aiResponse}</p>
+            </div>
+            
+            <Button 
+              variant="outline" 
+              className="w-full border-green-300 text-green-700 hover:bg-green-50"
+              onClick={handleUseResponse}
+            >
+              Utiliser cette suggestion
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
