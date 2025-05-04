@@ -6,6 +6,7 @@ import IndexPage from './pages/Index';
 import SeoPage from './pages/SeoPage';
 import OutilsSeoPage from './pages/OutilsSeoPage';
 import OutilsSeo from './pages/OutilsSeo';
+import PinterestPage from './pages/PinterestPage';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/analytics" element={<AnalyticsDashboard />} />
         <Route path="/outils" element={<OutilsSeo />} />
         <Route path="/outils-seo" element={<OutilsSeoPage />} />
+        <Route path="/pinterest" element={<PinterestPage />} />
       </Routes>
     </Router>
   );

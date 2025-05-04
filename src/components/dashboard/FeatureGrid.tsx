@@ -25,7 +25,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ title, description, icon, lin
       <Card className={cn(
         "transition-all hover:shadow-md", 
         highlight 
-          ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white" 
+          ? "border-indigo-200 bg-gradient-to-br from-indigo-50 to-purple-50" 
           : "hover:border-primary"
       )}>
         <CardHeader>
@@ -33,7 +33,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ title, description, icon, lin
             {icon}
             {title}
           </CardTitle>
-          <CardDescription className={highlight ? "text-sm text-white/90" : "text-sm text-muted-foreground"}>
+          <CardDescription className={highlight ? "text-sm text-indigo-700" : "text-sm text-muted-foreground"}>
             {description}
           </CardDescription>
         </CardHeader>
@@ -46,7 +46,7 @@ const featureCards = [
   {
     title: "Outils SEO & IA",
     description: "Générateurs IA, méta-descriptions, vérificateur de liens et structures",
-    icon: <FileText className="h-6 w-6 text-white" />,
+    icon: <FileText className="h-6 w-6 text-indigo-600" />,
     link: "/outils-seo",
     highlight: true,
   },
@@ -65,10 +65,10 @@ const featureCards = [
     highlight: false,
   },
   {
-    title: "Recherche IA",
-    description: "Analyse de mots-clés et concurrence avec intelligence artificielle.",
+    title: "Pinterest",
+    description: "Créez des images pour Pinterest et Instagram avec IA.",
     icon: <Search className="h-6 w-6 text-primary" />,
-    link: "/outils-seo",
+    link: "/pinterest",
     highlight: false,
   },
   {
