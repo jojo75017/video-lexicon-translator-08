@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import ContentHierarchy from '@/components/ContentHierarchy';
@@ -132,7 +131,8 @@ const HierarchyTabContent = () => {
       }
       
       // Générer des données factices pour démontrer l'interface
-      const mockData = generateMockHierarchyData(url);
+      // Utiliser le domaine pour personnaliser les données
+      const mockData = generateMockHierarchyData(formattedUrl);
       setAnalyzeResult(mockData);
       setAnalyzedUrl(formattedUrl);
     } finally {
@@ -140,49 +140,68 @@ const HierarchyTabContent = () => {
     }
   };
 
-  // Fonction pour générer des données de démonstration
+  // Fonction pour générer des données de démonstration basées sur l'URL
   const generateMockHierarchyData = (siteUrl: string) => {
     console.log("Generating mock data for:", siteUrl);
     const domain = siteUrl.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
     
+    // Adapter les données de démonstration au domaine
+    let pageTitle = `Bienvenue sur ${domain}`;
+    let sections = ["À propos de nous", "Nos services", "Contactez-nous"];
+    let subsections = ["Service premium", "Service standard"];
+    
+    // Détection du thème en fonction du nom de domaine
+    if (domain.includes("divaskin")) {
+      pageTitle = "DivaSkin - Soins de la peau";
+      sections = ["Nos produits", "Soins du visage", "Notre philosophie"];
+      subsections = ["Crèmes hydratantes", "Sérums anti-âge", "Masques"];
+    } else if (domain.includes("beauty") || domain.includes("beaute")) {
+      pageTitle = "Beauté et Bien-être";
+      sections = ["Soins du visage", "Soins du corps", "Nos conseils"];
+      subsections = ["Soins hydratants", "Anti-âge", "Nettoyant"];
+    } else if (domain.includes("tech") || domain.includes("dev")) {
+      pageTitle = "Solutions Technologiques";
+      sections = ["Nos services", "Technologies", "Portfolio"];
+      subsections = ["Développement web", "Applications mobiles", "Intelligence artificielle"];
+    }
+    
     return {
       h1Count: 1,
-      h2Count: 3,
-      h3Count: 5,
+      h2Count: sections.length,
+      h3Count: subsections.length + 2,
       headings: [
-        { text: `Bienvenue sur ${domain}`, level: 1, position: 0 },
-        { text: "À propos de nous", level: 2, position: 1 },
-        { text: "Nos services", level: 2, position: 2 },
-        { text: "Service premium", level: 3, position: 3 },
-        { text: "Service standard", level: 3, position: 4 },
-        { text: "Contactez-nous", level: 2, position: 5 },
+        { text: pageTitle, level: 1, position: 0 },
+        { text: sections[0], level: 2, position: 1 },
+        { text: sections[1], level: 2, position: 2 },
+        { text: subsections[0], level: 3, position: 3 },
+        { text: subsections[1], level: 3, position: 4 },
+        { text: sections[2], level: 2, position: 5 },
         { text: "Formulaire de contact", level: 3, position: 6 },
-        { text: "Nos bureaux", level: 3, position: 7 },
-        { text: "Support technique", level: 3, position: 8 }
+        { text: "Nos coordonnées", level: 3, position: 7 }
       ],
       paragraphs: [
-        { text: `Bienvenue sur ${domain}. Nous proposons des services de qualité pour tous vos besoins.`, position: 0.5 },
-        { text: "Notre entreprise a été fondée en 2010 avec une mission claire : fournir des solutions innovantes.", position: 1.5 },
-        { text: "Découvrez notre gamme complète de services conçus pour répondre à vos besoins spécifiques.", position: 2.5 },
-        { text: "Notre service premium offre des fonctionnalités avancées et un support prioritaire.", position: 3.5 },
-        { text: "Le service standard est idéal pour les petites entreprises et les projets de taille moyenne.", position: 4.5 },
-        { text: "N'hésitez pas à nous contacter pour toute question ou demande d'information.", position: 5.5 },
-        { text: "Utilisez notre formulaire de contact sécurisé pour nous envoyer un message.", position: 6.5 },
-        { text: "Visitez nos bureaux situés au centre-ville pour discuter de vos projets en personne.", position: 7.5 }
+        { text: `Bienvenue sur ${domain}. Nous vous proposons des produits de qualité.`, position: 0.5 },
+        { text: "Notre entreprise est spécialisée dans les produits de haute qualité.", position: 1.5 },
+        { text: "Découvrez notre gamme complète adaptée à vos besoins spécifiques.", position: 2.5 },
+        { text: `${subsections[0]}: Des formulations avancées pour des résultats optimaux.`, position: 3.5 },
+        { text: `${subsections[1]}: Une solution accessible pour tous les budgets.`, position: 4.5 },
+        { text: "N'hésitez pas à nous contacter pour toute question.", position: 5.5 },
+        { text: "Utilisez notre formulaire pour nous envoyer un message.", position: 6.5 },
+        { text: "Retrouvez nos boutiques et nos horaires d'ouverture.", position: 7.5 }
       ],
       hierarchy: [
         {
-          text: `Bienvenue sur ${domain}`,
+          text: pageTitle,
           tagName: "h1",
           position: 0,
           children: [
             {
-              text: "À propos de nous",
+              text: sections[0],
               tagName: "h2",
               position: 1,
               children: [
                 {
-                  text: "Notre entreprise a été fondée en 2010 avec une mission claire : fournir des solutions innovantes.",
+                  text: "Notre entreprise est spécialisée dans les produits de haute qualité.",
                   tagName: "p",
                   position: 1.5,
                   children: []
@@ -190,23 +209,23 @@ const HierarchyTabContent = () => {
               ]
             },
             {
-              text: "Nos services",
+              text: sections[1],
               tagName: "h2",
               position: 2,
               children: [
                 {
-                  text: "Découvrez notre gamme complète de services conçus pour répondre à vos besoins spécifiques.",
+                  text: "Découvrez notre gamme complète adaptée à vos besoins spécifiques.",
                   tagName: "p",
                   position: 2.5,
                   children: []
                 },
                 {
-                  text: "Service premium",
+                  text: subsections[0],
                   tagName: "h3",
                   position: 3,
                   children: [
                     {
-                      text: "Notre service premium offre des fonctionnalités avancées et un support prioritaire.",
+                      text: `${subsections[0]}: Des formulations avancées pour des résultats optimaux.`,
                       tagName: "p",
                       position: 3.5,
                       children: []
@@ -214,12 +233,12 @@ const HierarchyTabContent = () => {
                   ]
                 },
                 {
-                  text: "Service standard",
+                  text: subsections[1],
                   tagName: "h3",
                   position: 4,
                   children: [
                     {
-                      text: "Le service standard est idéal pour les petites entreprises et les projets de taille moyenne.",
+                      text: `${subsections[1]}: Une solution accessible pour tous les budgets.`,
                       tagName: "p",
                       position: 4.5,
                       children: []
@@ -229,12 +248,12 @@ const HierarchyTabContent = () => {
               ]
             },
             {
-              text: "Contactez-nous",
+              text: sections[2],
               tagName: "h2",
               position: 5,
               children: [
                 {
-                  text: "N'hésitez pas à nous contacter pour toute question ou demande d'information.",
+                  text: "N'hésitez pas à nous contacter pour toute question.",
                   tagName: "p",
                   position: 5.5,
                   children: []
@@ -245,7 +264,7 @@ const HierarchyTabContent = () => {
                   position: 6,
                   children: [
                     {
-                      text: "Utilisez notre formulaire de contact sécurisé pour nous envoyer un message.",
+                      text: "Utilisez notre formulaire pour nous envoyer un message.",
                       tagName: "p",
                       position: 6.5,
                       children: []
@@ -253,12 +272,12 @@ const HierarchyTabContent = () => {
                   ]
                 },
                 {
-                  text: "Nos bureaux",
+                  text: "Nos coordonnées",
                   tagName: "h3",
                   position: 7,
                   children: [
                     {
-                      text: "Visitez nos bureaux situés au centre-ville pour discuter de vos projets en personne.",
+                      text: "Retrouvez nos boutiques et nos horaires d'ouverture.",
                       tagName: "p",
                       position: 7.5,
                       children: []
@@ -277,67 +296,64 @@ const HierarchyTabContent = () => {
   const generateMockSiteStructure = (analyzedUrl: string) => {
     const domain = analyzedUrl.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
     
+    // Adapter la structure en fonction du domaine
+    let sections = ["À propos", "Services", "Contact", "Blog"];
+    
+    if (domain.includes("divaskin")) {
+      sections = ["Produits", "Soins", "Blog beauté", "À propos", "Contact"];
+    } else if (domain.includes("beauty") || domain.includes("beaute")) {
+      sections = ["Soins visage", "Soins corps", "Conseils beauté", "Boutique", "Contact"];
+    } else if (domain.includes("tech") || domain.includes("dev")) {
+      sections = ["Services", "Technologies", "Portfolio", "Équipe", "Contact"];
+    }
+    
     return {
       name: `Structure de ${domain}`,
       children: [
         {
           name: "Page d'accueil",
           path: analyzedUrl,
-          children: [
-            {
-              name: "À propos",
-              path: `${analyzedUrl}/about`,
-              children: [
+          children: sections.map(section => {
+            const sectionPath = section.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, "-");
+            return {
+              name: section,
+              path: `${analyzedUrl}/${sectionPath}`,
+              children: section === sections[0] ? [
                 {
                   name: "Notre histoire",
-                  path: `${analyzedUrl}/about/history`,
+                  path: `${analyzedUrl}/${sectionPath}/histoire`,
                   children: []
                 },
                 {
                   name: "L'équipe",
-                  path: `${analyzedUrl}/about/team`,
+                  path: `${analyzedUrl}/${sectionPath}/equipe`,
                   children: []
                 }
-              ]
-            },
-            {
-              name: "Services",
-              path: `${analyzedUrl}/services`,
-              children: [
+              ] : section === sections[1] ? [
                 {
                   name: "Service Premium",
-                  path: `${analyzedUrl}/services/premium`,
+                  path: `${analyzedUrl}/${sectionPath}/premium`,
                   children: []
                 },
                 {
                   name: "Service Standard",
-                  path: `${analyzedUrl}/services/standard`,
+                  path: `${analyzedUrl}/${sectionPath}/standard`,
                   children: []
                 }
-              ]
-            },
-            {
-              name: "Contact",
-              path: `${analyzedUrl}/contact`,
-              children: []
-            },
-            {
-              name: "Blog",
-              path: `${analyzedUrl}/blog`,
-              children: [
+              ] : section === "Blog" || section === "Blog beauté" ? [
                 {
                   name: "Article 1",
-                  path: `${analyzedUrl}/blog/article-1`,
+                  path: `${analyzedUrl}/${sectionPath}/article-1`,
                   children: []
                 },
                 {
                   name: "Article 2",
-                  path: `${analyzedUrl}/blog/article-2`,
+                  path: `${analyzedUrl}/${sectionPath}/article-2`,
                   children: []
                 }
-              ]
-            }
-          ]
+              ] : []
+            };
+          })
         }
       ]
     };

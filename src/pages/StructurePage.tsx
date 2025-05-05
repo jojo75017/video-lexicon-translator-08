@@ -59,39 +59,66 @@ const StructurePage = () => {
         
         // Générer la structure du site
         const domain = url.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+        
+        // Structure adaptée au domaine
+        let sections = ["À propos", "Services", "Contact", "Blog"];
+        let pageTitle = `Structure de ${domain}`;
+        
+        if (domain.includes("divaskin")) {
+          pageTitle = "Structure de DivaSkin";
+          sections = ["Produits", "Soins", "Blog beauté", "À propos", "Contact"];
+        } else if (domain.includes("beauty") || domain.includes("beaute")) {
+          pageTitle = "Structure Beauté";
+          sections = ["Soins visage", "Soins corps", "Conseils beauté", "Boutique", "Contact"];
+        }
+        
         const siteStructureData = {
-          name: `Structure de ${domain}`,
+          name: pageTitle,
           children: [
             {
               name: "Page d'accueil",
               path: url,
-              children: [
-                {
-                  name: "À propos",
-                  path: `${url}/about`,
-                  children: [
-                    { name: "Notre histoire", path: `${url}/about/history`, children: [] },
-                    { name: "L'équipe", path: `${url}/about/team`, children: [] }
-                  ]
-                },
-                {
-                  name: "Services",
-                  path: `${url}/services`,
-                  children: [
-                    { name: "Service Premium", path: `${url}/services/premium`, children: [] },
-                    { name: "Service Standard", path: `${url}/services/standard`, children: [] }
-                  ]
-                },
-                { name: "Contact", path: `${url}/contact`, children: [] },
-                {
-                  name: "Blog",
-                  path: `${url}/blog`,
-                  children: [
-                    { name: "Article 1", path: `${url}/blog/article-1`, children: [] },
-                    { name: "Article 2", path: `${url}/blog/article-2`, children: [] }
-                  ]
-                }
-              ]
+              children: sections.map(section => {
+                const sectionPath = section.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, "-");
+                return {
+                  name: section,
+                  path: `${url}/${sectionPath}`,
+                  children: section === sections[0] ? [
+                    {
+                      name: "Notre histoire",
+                      path: `${url}/${sectionPath}/histoire`,
+                      children: []
+                    },
+                    {
+                      name: "L'équipe",
+                      path: `${url}/${sectionPath}/equipe`,
+                      children: []
+                    }
+                  ] : section === sections[1] ? [
+                    {
+                      name: "Service Premium",
+                      path: `${url}/${sectionPath}/premium`,
+                      children: []
+                    },
+                    {
+                      name: "Service Standard",
+                      path: `${url}/${sectionPath}/standard`,
+                      children: []
+                    }
+                  ] : section === "Blog" || section === "Blog beauté" ? [
+                    {
+                      name: "Article 1",
+                      path: `${url}/${sectionPath}/article-1`,
+                      children: []
+                    },
+                    {
+                      name: "Article 2",
+                      path: `${url}/${sectionPath}/article-2`,
+                      children: []
+                    }
+                  ] : []
+                };
+              })
             }
           ]
         };
@@ -101,7 +128,7 @@ const StructurePage = () => {
           h1Count: headingStructure.h1Count || 0,
           h2Count: headingStructure.h2Count || 0,
           h3Count: headingStructure.h3Count || 0,
-          imgCount: doc.querySelectorAll('img').length || 0, // Correction de l'erreur
+          imgCount: doc.querySelectorAll('img').length || 0,
           wordCount: result.data.textContent ? result.data.textContent.split(/\s+/).filter(Boolean).length : 0,
           readabilityScore: 75,
           hierarchy: headingStructure.hierarchy || []
@@ -124,7 +151,22 @@ const StructurePage = () => {
         description: error instanceof Error ? error.message : "Une erreur s'est produite"
       });
       
-      // Générer des données factices pour démontrer l'interface
+      // Générer des données factices adaptées au site
+      const domain = url.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+      let pageTitle = "Démonstration";
+      let sections = ["À propos", "Services", "Contact"];
+      let subtitles = ["Notre équipe", "Nos valeurs"];
+      
+      if (domain.includes("divaskin")) {
+        pageTitle = "DivaSkin - Soins de la peau";
+        sections = ["Produits", "Soins visage", "Services beauté"];
+        subtitles = ["Crèmes hydratantes", "Sérums anti-âge"];
+      } else if (domain.includes("beauty") || domain.includes("beaute")) {
+        pageTitle = "Beauté et Bien-être";
+        sections = ["Soins", "Produits", "Conseils beauté"];
+        subtitles = ["Traitements spa", "Soins personnalisés"];
+      }
+      
       const mockData = {
         h1Count: 1,
         h2Count: 3,
@@ -134,22 +176,22 @@ const StructurePage = () => {
         readabilityScore: 70,
         hierarchy: [
           {
-            text: "Titre principal de la page",
+            text: pageTitle,
             tagName: "h1",
             position: 0,
             children: [
               {
-                text: "Section À propos",
+                text: sections[0],
                 tagName: "h2",
                 position: 1,
                 children: [
                   {
-                    text: "Notre Histoire",
+                    text: subtitles[0],
                     tagName: "h3",
                     position: 2,
                     children: [
                       {
-                        text: "Nous sommes une entreprise dédiée à l'amélioration de l'expérience web.",
+                        text: `Nous sommes une équipe dédiée à la qualité et l'excellence.`,
                         tagName: "p",
                         position: 3,
                         children: []
@@ -159,17 +201,17 @@ const StructurePage = () => {
                 ]
               },
               {
-                text: "Nos Services",
+                text: sections[1],
                 tagName: "h2",
                 position: 4,
                 children: [
                   {
-                    text: "Consultation SEO",
+                    text: subtitles[1],
                     tagName: "h3",
                     position: 5,
                     children: [
                       {
-                        text: "Nous offrons des services de consultation pour améliorer votre visibilité en ligne.",
+                        text: "Nous proposons des services adaptés à vos besoins spécifiques.",
                         tagName: "p",
                         position: 6,
                         children: []
@@ -184,16 +226,22 @@ const StructurePage = () => {
       };
       
       const mockStructure = {
-        name: "Structure de démonstration",
+        name: `Structure de ${domain}`,
         children: [
           {
             name: "Page d'accueil",
             path: url,
-            children: [
-              { name: "À propos", path: `${url}/about`, children: [] },
-              { name: "Services", path: `${url}/services`, children: [] },
-              { name: "Contact", path: `${url}/contact`, children: [] }
-            ]
+            children: sections.map((section, index) => {
+              const sectionPath = section.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, "-");
+              return {
+                name: section,
+                path: `${url}/${sectionPath}`,
+                children: index === 0 ? [
+                  { name: subtitles[0], path: `${url}/${sectionPath}/equipe`, children: [] },
+                  { name: subtitles[1], path: `${url}/${sectionPath}/valeurs`, children: [] }
+                ] : []
+              };
+            })
           }
         ]
       };
