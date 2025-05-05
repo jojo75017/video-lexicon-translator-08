@@ -1,53 +1,113 @@
+
 import React from 'react';
 import { Card } from "@/components/ui/card";
-import { Share2, Facebook, Twitter, Linkedin } from 'lucide-react';
-import { SocialMetrics as SocialMetricsType } from '@/types/seo';
+import { Facebook, MessageSquare, ThumbsUp, Twitter } from "lucide-react";
 
 interface SocialMetricsProps {
-  metrics: SocialMetricsType;
+  metrics: {
+    facebook: {
+      shares: number;
+      comments: number;
+      likes: number;
+    };
+    twitter: {
+      tweets: number;
+      retweets: number;
+      likes: number;
+    };
+    pinterest: {
+      pins: number;
+      saves: number;
+    };
+    linkedin: {
+      shares: number;
+    };
+  };
 }
 
 const SocialMetrics = ({ metrics }: SocialMetricsProps) => {
+  const totalFacebookEngagements = 
+    metrics.facebook.shares + 
+    metrics.facebook.comments + 
+    metrics.facebook.likes;
+  
+  const totalTwitterEngagements = 
+    metrics.twitter.tweets + 
+    metrics.twitter.retweets + 
+    metrics.twitter.likes;
+  
+  const totalPinterestEngagements = 
+    metrics.pinterest.pins + 
+    metrics.pinterest.saves;
+  
+  const totalLinkedInEngagements = metrics.linkedin.shares;
+
   return (
     <Card className="p-6">
-      <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-        <Share2 className="h-5 w-5 text-blue-500" />
-        Métriques Sociales
-      </h3>
-
-      <div className="grid gap-4 md:grid-cols-3">
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
+      <h3 className="text-lg font-semibold mb-4">Métriques sociales</h3>
+      
+      <div className="space-y-4">
+        <div className="flex items-center">
+          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
             <Facebook className="h-5 w-5 text-blue-600" />
-            <span className="font-medium">Facebook</span>
           </div>
-          <div className="text-sm space-y-1">
-            <p>Partages: {metrics.facebook.shares}</p>
-            <p>J'aimes: {metrics.facebook.likes}</p>
-            <p>Commentaires: {metrics.facebook.comments}</p>
+          <div className="flex-1">
+            <div className="flex justify-between">
+              <span className="text-sm font-medium">Facebook</span>
+              <span className="text-sm text-gray-500">
+                {totalFacebookEngagements} interactions
+              </span>
+            </div>
+            <div className="flex mt-1 items-center space-x-3 text-xs text-gray-500">
+              <span className="flex items-center">
+                <ThumbsUp className="h-3 w-3 mr-1" />
+                {metrics.facebook.likes}
+              </span>
+              <span className="flex items-center">
+                <MessageSquare className="h-3 w-3 mr-1" />
+                {metrics.facebook.comments}
+              </span>
+            </div>
           </div>
         </div>
-
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
+        
+        <div className="flex items-center">
+          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
             <Twitter className="h-5 w-5 text-blue-400" />
-            <span className="font-medium">Twitter</span>
           </div>
-          <div className="text-sm space-y-1">
-            <p>Partages: {metrics.twitter.shares}</p>
-            <p>J'aimes: {metrics.twitter.likes}</p>
-            <p>Réponses: {metrics.twitter.replies}</p>
+          <div className="flex-1">
+            <div className="flex justify-between">
+              <span className="text-sm font-medium">Twitter</span>
+              <span className="text-sm text-gray-500">
+                {totalTwitterEngagements} interactions
+              </span>
+            </div>
+            <div className="flex mt-1 items-center space-x-3 text-xs text-gray-500">
+              <span className="flex items-center">
+                <ThumbsUp className="h-3 w-3 mr-1" />
+                {metrics.twitter.likes}
+              </span>
+              <span className="flex items-center">
+                {metrics.twitter.retweets} retweets
+              </span>
+            </div>
           </div>
         </div>
-
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <Linkedin className="h-5 w-5 text-blue-700" />
-            <span className="font-medium">LinkedIn</span>
-          </div>
-          <div className="text-sm space-y-1">
-            <p>Partages: {metrics.linkedin.shares}</p>
-            <p>Engagements: {metrics.linkedin.engagements}</p>
+        
+        {/* Autres réseaux sociaux ici */}
+        
+        <div className="pt-2">
+          <div className="text-xs text-gray-500 mt-2">
+            <div className="flex justify-between mb-1">
+              <span>Engagement total</span>
+              <span>{totalFacebookEngagements + totalTwitterEngagements + totalPinterestEngagements + totalLinkedInEngagements}</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-1.5">
+              <div
+                className="bg-blue-600 h-1.5 rounded-full"
+                style={{ width: `75%` }}
+              ></div>
+            </div>
           </div>
         </div>
       </div>

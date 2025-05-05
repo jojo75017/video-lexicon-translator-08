@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { FileSearch, LineChart, Search, ZapIcon, FileSignature, Image } from 'lucide-react';
+import { FileSearch, LineChart, Search, ZapIcon, FileSignature, Image, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 
 const SeoActionButtons = () => {
@@ -47,7 +47,7 @@ const SeoActionButtons = () => {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-2">
         <Link to="/signature" onClick={() => handleButtonClick('Signature Email')}>
           <Button variant="outline" className="w-full h-12 flex gap-2 items-center justify-center">
             <FileSignature className="h-4 w-4 text-blue-600" />
@@ -59,6 +59,22 @@ const SeoActionButtons = () => {
           <Button variant="outline" className="w-full h-12 flex gap-2 items-center justify-center">
             <Image className="h-4 w-4 text-red-600" />
             <span>Images Pinterest</span>
+          </Button>
+        </Link>
+        
+        <Link to="/wordcount" onClick={() => handleButtonClick('Mots-clés')}>
+          <Button variant="outline" className="w-full h-12 flex gap-2 items-center justify-center">
+            <FileText className="h-4 w-4 text-purple-600" />
+            <span>Analyse des mots-clés</span>
+          </Button>
+        </Link>
+      </div>
+      
+      <div className="grid grid-cols-1 mt-2">
+        <Link to="/keyword-meta" onClick={() => handleButtonClick('Titles & Media')}>
+          <Button variant="outline" className="w-full h-12 flex gap-2 items-center justify-center">
+            <FileText className="h-4 w-4 text-indigo-600" />
+            <span>Titles & Meta Descriptions</span>
           </Button>
         </Link>
       </div>

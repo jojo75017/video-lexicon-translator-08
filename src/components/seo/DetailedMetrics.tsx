@@ -11,7 +11,7 @@ import BrokenLinks from './BrokenLinks';
 import KeywordSuggestions from './KeywordSuggestions';
 import BacklinksAnalysis from './BacklinksAnalysis';
 import ImageDetails from '../ImageDetails';
-import { SeoAnalysis } from '@/types/seo';
+import { BacklinkInfo, SeoAnalysis } from '@/types/seo';
 import { Button } from '@/components/ui/button';
 
 interface DetailedMetricsProps {
@@ -67,7 +67,7 @@ const DetailedMetrics = ({
         transition={{ delay: 1.2 }}
       >
         <BacklinksAnalysis
-          backlinks={seoAnalysis.backlinks}
+          backlinks={seoAnalysis.backlinks as BacklinkInfo[] | number}
           backlinkDetails={seoAnalysis.backlinkDetails}
           topBacklinkDomains={seoAnalysis.topBacklinkDomains}
           doFollowBacklinks={seoAnalysis.doFollowBacklinks}
@@ -120,7 +120,15 @@ const DetailedMetrics = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 2 }}
           >
-            <KeywordSuggestions suggestions={seoAnalysis.keywordSuggestions} />
+            <KeywordSuggestions 
+              suggestions={seoAnalysis.keywordSuggestions}
+              fieldValue=""
+              onInsert={() => {}}
+              maxLength={60}
+              descriptionValue=""
+              onInsertDescription={() => {}}
+              maxLengthDescription={155}
+            />
           </motion.div>
 
           <motion.div

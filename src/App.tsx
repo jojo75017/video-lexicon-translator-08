@@ -10,6 +10,7 @@ import PinterestPage from './pages/PinterestPage';
 import StructurePage from './pages/StructurePage';
 import SignaturePage from './pages/SignaturePage';
 import KeywordMetaPage from './pages/KeywordMetaPage';
+import KeywordPage from './pages/KeywordPage';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="/structure" element={<StructurePage />} />
         <Route path="/signature" element={<SignaturePage />} />
         <Route path="/keyword-meta" element={<KeywordMetaPage />} />
+        <Route path="/wordcount" element={<KeywordPage />} />
       </Routes>
     </Router>
   );

@@ -25,6 +25,7 @@ const TabNavigation = () => {
     '/signature': 'signature',
     '/pinterest': 'pinterest',
     '/outils-seo': 'outils-seo',
+    '/keyword-meta': 'keyword-meta',
   };
   
   // Obtention de l'onglet actif basé sur l'URL
@@ -52,6 +53,7 @@ const TabNavigation = () => {
       'backlinks': '/backlinks',
       'metrics': '/metrics',
       'outils-seo': '/outils-seo',
+      'keyword-meta': '/keyword-meta',
     };
     
     // Navigation vers la route correspondante
@@ -99,6 +101,9 @@ const TabNavigation = () => {
               </TabsTrigger>
               <TabsTrigger value="pinterest" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
                 Pinterest
+              </TabsTrigger>
+              <TabsTrigger value="keyword-meta" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+                Titles & Media
               </TabsTrigger>
             </TabsList>
           </Tabs>

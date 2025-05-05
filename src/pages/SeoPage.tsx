@@ -21,8 +21,7 @@ const SeoPage = () => {
     seoAnalysis, 
     analyzeSite, 
     error, 
-    handleActivateProxy,
-    proxyEnabled
+    handleActivateProxy
   } = useSiteAnalyzer();
 
   // Activer automatiquement le proxy au chargement de la page
