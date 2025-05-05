@@ -67,6 +67,11 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
   if (activeTab === 'signature') {
     return <Navigate to="/signature" replace />;
   }
+  
+  // Si l'onglet Keyword Meta (Titles & Media) est actif, rediriger vers la page KeywordMeta
+  if (activeTab === 'keyword-meta') {
+    return <Navigate to="/keyword-meta" replace />;
+  }
 
   return (
     <>
@@ -262,18 +267,6 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
         </div>
       </TabsContent>
       
-      {/* Keyword Meta Tab */}
-      <TabsContent value="keyword-meta" id="keyword-meta" data-section="keyword-meta" style={{
-        display: activeTab === "keyword-meta" ? "block" : "none",
-        position: "relative" as "relative",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "auto",
-      }}>
-        <KeywordTabContent />
-      </TabsContent>
-
       {/* Fallback for any other tab */}
       {contentTabs
         .filter(tab => !['hierarchy', 'wordcount', 'suggestions', 'seo', 'structure', 'backlinks', 'performance', 'metrics', 'analytics', 'keyword-meta'].includes(tab.id))
