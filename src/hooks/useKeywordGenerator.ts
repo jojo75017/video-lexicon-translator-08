@@ -36,65 +36,89 @@ export const useKeywordGenerator = () => {
 
       // Génération de suggestions adaptées au contexte du mot-clé
       setTimeout(() => {
-        // Génération de suggestions fictives pour la démo
+        // Utiliser le mot-clé original pour créer des suggestions contextuelles
+        const inputKeyword = keyword.trim();
+        
+        // Génération de suggestions adaptées
         const mockSuggestions: KeywordSuggestion[] = [
           {
-            keyword: keyword,
+            keyword: inputKeyword,
             searchVolume: Math.floor(Math.random() * 5000) + 1000,
             difficulty: Math.floor(Math.random() * 100),
             cpc: Math.random() * 5,
             competition: Math.random(),
             relevance: 90,
-            suggestedTitle: `${keyword} - Guide Complet et Conseils | Expert 2024`,
-            suggestedDescription: generateSeoDescription(keyword, 155),
-            suggestedShortDescription: generateSeoDescription(keyword, 120),
-            suggestedLongDescription: generateSeoDescription(keyword, 500)
+            suggestedTitle: `${inputKeyword} - Guide Complet et Conseils | Expert 2024`,
+            suggestedDescription: generateSeoDescription(inputKeyword, 155),
+            suggestedShortDescription: generateSeoDescription(inputKeyword, 120),
+            suggestedLongDescription: generateSeoDescription(inputKeyword, 500)
           },
           {
-            keyword: keyword.includes("à") ? 
-              `${keyword.split(" à ")[0]} à l'étranger` : 
-              `${keyword} en ligne`,
+            keyword: inputKeyword.includes("à") ? 
+              `${inputKeyword.split(" à ")[0]} à l'étranger` : 
+              `${inputKeyword} en ligne`,
             searchVolume: Math.floor(Math.random() * 3000) + 500,
             difficulty: Math.floor(Math.random() * 100),
             cpc: Math.random() * 4,
             competition: Math.random(),
             relevance: 75,
-            suggestedTitle: `${keyword.includes("à") ? 
-              `${keyword.split(" à ")[0]} à l'étranger` : 
-              `${keyword} en ligne`} - Solutions et Stratégies | Guide 2024`,
+            suggestedTitle: `${inputKeyword.includes("à") ? 
+              `${inputKeyword.split(" à ")[0]} à l'étranger` : 
+              `${inputKeyword} en ligne`} - Solutions et Stratégies | Guide 2024`,
             suggestedDescription: generateSeoDescription(
-              keyword.includes("à") ? 
-              `${keyword.split(" à ")[0]} à l'étranger` : 
-              `${keyword} en ligne`, 
+              inputKeyword.includes("à") ? 
+              `${inputKeyword.split(" à ")[0]} à l'étranger` : 
+              `${inputKeyword} en ligne`, 
               155),
             suggestedShortDescription: generateSeoDescription(
-              keyword.includes("à") ? 
-              `${keyword.split(" à ")[0]} à l'étranger` : 
-              `${keyword} en ligne`, 
+              inputKeyword.includes("à") ? 
+              `${inputKeyword.split(" à ")[0]} à l'étranger` : 
+              `${inputKeyword} en ligne`, 
               120),
             suggestedLongDescription: generateSeoDescription(
-              keyword.includes("à") ? 
-              `${keyword.split(" à ")[0]} à l'étranger` : 
-              `${keyword} en ligne`, 
+              inputKeyword.includes("à") ? 
+              `${inputKeyword.split(" à ")[0]} à l'étranger` : 
+              `${inputKeyword} en ligne`, 
               500)
           },
           {
-            keyword: `meilleur ${keyword}`,
+            keyword: inputKeyword.toLowerCase().startsWith("comment") || 
+                    inputKeyword.toLowerCase().startsWith("découvrez comment") ?
+              inputKeyword :
+              `meilleur ${inputKeyword}`,
             searchVolume: Math.floor(Math.random() * 2000) + 300,
             difficulty: Math.floor(Math.random() * 100),
             cpc: Math.random() * 6,
             competition: Math.random(),
             relevance: 85,
-            suggestedTitle: `Meilleur ${keyword} - Comparatif Complet | Choix 2024`,
-            suggestedDescription: generateSeoDescription(`meilleur ${keyword}`, 155),
-            suggestedShortDescription: generateSeoDescription(`meilleur ${keyword}`, 120),
-            suggestedLongDescription: generateSeoDescription(`meilleur ${keyword}`, 500)
+            suggestedTitle: inputKeyword.toLowerCase().startsWith("comment") || 
+                           inputKeyword.toLowerCase().startsWith("découvrez comment") ?
+              `${inputKeyword} - Guide Étape par Étape | Conseils 2024` :
+              `Meilleur ${inputKeyword} - Comparatif Complet | Choix 2024`,
+            suggestedDescription: generateSeoDescription(
+              inputKeyword.toLowerCase().startsWith("comment") || 
+              inputKeyword.toLowerCase().startsWith("découvrez comment") ?
+                inputKeyword :
+                `meilleur ${inputKeyword}`, 
+              155),
+            suggestedShortDescription: generateSeoDescription(
+              inputKeyword.toLowerCase().startsWith("comment") || 
+              inputKeyword.toLowerCase().startsWith("découvrez comment") ?
+                inputKeyword :
+                `meilleur ${inputKeyword}`, 
+              120),
+            suggestedLongDescription: generateSeoDescription(
+              inputKeyword.toLowerCase().startsWith("comment") || 
+              inputKeyword.toLowerCase().startsWith("découvrez comment") ?
+                inputKeyword :
+                `meilleur ${inputKeyword}`, 
+              500)
           }
         ];
 
         setGeneratedKeywords(mockSuggestions);
         
-        // Utiliser notre générateur amélioré pour le titre et la description initiale
+        // Utiliser le générateur amélioré pour le titre et la description
         setTitle(mockSuggestions[0].suggestedTitle || '');
         setDescription(mockSuggestions[0].suggestedDescription || '');
         setIsGenerating(false);
