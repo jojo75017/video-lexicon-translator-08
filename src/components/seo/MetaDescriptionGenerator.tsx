@@ -25,7 +25,7 @@ const MetaDescriptionGenerator = () => {
     toast.info("Génération de descriptions en cours...");
 
     try {
-      // Génération locale sans API
+      // Génération avec notre nouveau système amélioré
       const { short, long } = generateBothDescriptions(keyword);
       setShortDescription(short);
       setLongDescription(long);
@@ -60,7 +60,7 @@ const MetaDescriptionGenerator = () => {
           <div className="grid grid-cols-4 gap-4">
             <div className="col-span-3">
               <Input
-                placeholder="Entrez votre mot-clé principal (ex: marketing digital, voyage à Bali, etc.)"
+                placeholder="Entrez votre mot-clé principal (ex: digital nomad à Bali, voyage à Paris, etc.)"
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
                 className="w-full"
