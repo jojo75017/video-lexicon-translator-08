@@ -124,7 +124,7 @@ const BacklinksAnalysis = ({
                 <div className="flex items-start">
                   <LinkIcon className="h-4 w-4 mr-2 text-gray-500 mt-0.5" />
                   <div>
-                    <div className="truncate">{link.sourcePage || link.sourceUrl}</div>
+                    <div className="truncate">{link.url || link.domain || 'URL non disponible'}</div>
                     <div className="flex mt-1 items-center space-x-2 text-xs text-gray-500">
                       {link.isDofollow ? (
                         <span className="flex items-center text-green-600">

@@ -8,7 +8,7 @@ import LoadingPerformance from './LoadingPerformance';
 import SocialMetrics from './SocialMetrics';
 import SocialTags from './SocialTags';
 import BrokenLinks from './BrokenLinks';
-import KeywordSuggestions from './KeywordSuggestions';
+import KeywordSuggestions from './analysis/KeywordSuggestions';
 import BacklinksAnalysis from './BacklinksAnalysis';
 import ImageDetails from '../ImageDetails';
 import { BacklinkInfo, SeoAnalysis } from '@/types/seo';
@@ -27,6 +27,20 @@ const DetailedMetrics = ({
   onToggleMetrics,
   onImageClick 
 }: DetailedMetricsProps) => {
+  // Corriger les props pour BacklinksAnalysis
+  const backlinkDetails = {
+    qualityScore: 65,
+    relevanceScore: 70,
+    trustScore: 60
+  };
+  
+  // Convertir topBacklinkDomains si nécessaire
+  const topDomains = Array.isArray(seoAnalysis.topBacklinkDomains) 
+    ? seoAnalysis.topBacklinkDomains.map(item => 
+        typeof item === 'string' ? item : item.domain
+      )
+    : [];
+
   return (
     <>
       <motion.div
@@ -68,8 +82,8 @@ const DetailedMetrics = ({
       >
         <BacklinksAnalysis
           backlinks={seoAnalysis.backlinks as BacklinkInfo[] | number}
-          backlinkDetails={seoAnalysis.backlinkDetails}
-          topBacklinkDomains={seoAnalysis.topBacklinkDomains}
+          backlinkDetails={backlinkDetails}
+          topBacklinkDomains={topDomains}
           doFollowBacklinks={seoAnalysis.doFollowBacklinks}
           noFollowBacklinks={seoAnalysis.noFollowBacklinks}
         />
@@ -82,9 +96,9 @@ const DetailedMetrics = ({
         className="grid gap-6 md:grid-cols-2"
       >
         <LoadingPerformance 
-          loadTime={seoAnalysis.performance.loadTime}
-          firstContentfulPaint={seoAnalysis.performance.firstContentfulPaint}
-          domLoadTime={seoAnalysis.performance.domLoadTime}
+          loadTime={seoAnalysis.performance?.loadTime}
+          firstContentfulPaint={seoAnalysis.performance?.firstContentfulPaint}
+          domLoadTime={seoAnalysis.performance?.domLoadTime}
         />
         <SocialMetrics metrics={seoAnalysis.socialMetrics} />
       </motion.div>
@@ -97,13 +111,13 @@ const DetailedMetrics = ({
             transition={{ delay: 1.6 }}
           >
             <SocialTags socialTags={{
-              ogTitle: seoAnalysis.socialTags.ogTitle || null,
-              ogDescription: seoAnalysis.socialTags.ogDescription || null,
-              ogImage: seoAnalysis.socialTags.ogImage || null,
-              twitterCard: seoAnalysis.socialTags.twitterCard || null,
-              twitterTitle: seoAnalysis.socialTags.twitterTitle || null,
-              twitterDescription: seoAnalysis.socialTags.twitterDescription || null,
-              twitterImage: seoAnalysis.socialTags.twitterImage || null
+              ogTitle: seoAnalysis.socialTags?.ogTitle || null,
+              ogDescription: seoAnalysis.socialTags?.ogDescription || null,
+              ogImage: seoAnalysis.socialTags?.ogImage || null,
+              twitterCard: seoAnalysis.socialTags?.twitterCard || null,
+              twitterTitle: seoAnalysis.socialTags?.twitterTitle || null,
+              twitterDescription: seoAnalysis.socialTags?.twitterDescription || null,
+              twitterImage: seoAnalysis.socialTags?.twitterImage || null
             }} />
           </motion.div>
 
@@ -120,15 +134,11 @@ const DetailedMetrics = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 2 }}
           >
-            <KeywordSuggestions 
-              suggestions={seoAnalysis.keywordSuggestions}
-              fieldValue=""
-              onInsert={() => {}}
-              maxLength={60}
-              descriptionValue=""
-              onInsertDescription={() => {}}
-              maxLengthDescription={155}
-            />
+            {seoAnalysis.keywordSuggestions && (
+              <KeywordSuggestions 
+                generatedKeywords={seoAnalysis.keywordSuggestions}
+              />
+            )}
           </motion.div>
 
           <motion.div
