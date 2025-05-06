@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { toast } from "sonner";
 import { KeywordSuggestion } from '@/types/seo';
 import { OpenAIService } from '@/utils/seo/openaiService';
-import { generateSeoDescription } from '@/utils/seo/generators/descriptionGenerator';
+import { generateSeoDescription, generateBothDescriptions } from '@/utils/seo/generators/descriptionGenerator';
 
 export const useKeywordGenerator = () => {
   const [keyword, setKeyword] = useState<string>('');
@@ -39,7 +39,7 @@ export const useKeywordGenerator = () => {
         // Utiliser le mot-clé original pour créer des suggestions contextuelles
         const inputKeyword = keyword.trim();
         
-        // Génération de suggestions adaptées
+        // Génération de descriptions adaptées pour chaque suggestion
         const mockSuggestions: KeywordSuggestion[] = [
           {
             keyword: inputKeyword,

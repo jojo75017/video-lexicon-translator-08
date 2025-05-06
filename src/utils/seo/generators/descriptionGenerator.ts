@@ -6,12 +6,13 @@ export const generateSeoDescription = (keyword: string, maxLength: number = 155)
     keyword = "sujet";
   }
 
-  const keywordLowerCase = keyword.toLowerCase();
+  // Nettoyage et préparation du mot-clé
+  const keywordLowerCase = keyword.toLowerCase().trim();
   const isGeographic = detectGeographicKeyword(keyword);
   const containsMultipleEntities = keyword.includes(" et ") || keyword.includes(" & ") || 
                                   keyword.includes(" vs ") || keyword.includes(" ou ");
   
-  // Détection de mots-clés spécifiques
+  // Détection de mots-clés spécifiques et de patterns courants
   const hasBali = keywordLowerCase.includes("bali");
   const hasDigitalNomad = keywordLowerCase.includes("digital nomad") || 
                           keywordLowerCase.includes("nomade digital") || 
@@ -19,44 +20,80 @@ export const generateSeoDescription = (keyword: string, maxLength: number = 155)
                           keywordLowerCase.includes("travail à distance");
   const hasRizieres = keywordLowerCase.includes("rizière") || keywordLowerCase.includes("rizieres") || 
                      keywordLowerCase.includes("riziere");
+  const hasVoyage = keywordLowerCase.includes("voyage") || keywordLowerCase.includes("voyager") ||
+                    keywordLowerCase.includes("voyageur") || keywordLowerCase.includes("tourisme");
+  const hasSolo = keywordLowerCase.includes("solo") || keywordLowerCase.includes("seul");
+  
+  // Analyser le pattern "comment [faire quelque chose]"
+  const isHowTo = keywordLowerCase.startsWith("comment ") || 
+                  keywordLowerCase.startsWith("découvrez comment ") ||
+                  keywordLowerCase.includes("guide") || 
+                  keywordLowerCase.includes("tutoriel") ||
+                  keywordLowerCase.includes("conseil");
+  
+  // Extraire le sujet principal après "comment" si présent
+  let mainSubject = keyword;
+  if (keywordLowerCase.startsWith("comment ")) {
+    mainSubject = keyword.substring("comment ".length);
+  } else if (keywordLowerCase.startsWith("découvrez comment ")) {
+    mainSubject = keyword.substring("découvrez comment ".length);
+  }
   
   let description = "";
   
-  // Pour les descriptions longues (500 caractères), on génère un texte plus détaillé
+  // Pour les descriptions longues (plus de 155 caractères)
   if (maxLength > 155) {
     // Digital nomad à Bali
     if (hasDigitalNomad && hasBali) {
       const options = [
-        `Guide complet pour vivre en tant que digital nomad à Bali : découvrez les meilleures zones pour s'installer, les options de visa, le coût de la vie et les espaces de coworking. Notre article détaille les aspects pratiques comme la recherche de logement, les solutions internet fiables, la communauté d'expatriés et la vie quotidienne. Apprenez à gérer le décalage horaire avec vos clients, à vous intégrer dans la culture balinaise et à maintenir un équilibre entre productivité professionnelle et exploration de cette île paradisiaque.`,
-        `Vivre en tant que digital nomad à Bali : notre guide détaillé couvre tous les aspects essentiels pour réussir cette aventure. Trouvez les quartiers adaptés à votre style de vie entre Canggu, Ubud ou les zones moins fréquentées, comprenez les différentes options de visa et leurs contraintes, découvrez comment trouver un logement adapté au travail à distance. Nous partageons des conseils pratiques sur les meilleurs espaces de coworking, les cafés avec WiFi fiable, et comment créer des routines productives tout en profitant pleinement de la culture balinaise.`,
-        `Expatriation à Bali en tant que digital nomad : tout ce que vous devez savoir pour transformer ce rêve en réalité. Notre guide exhaustif aborde les questions administratives (visa, fiscalité, assurance santé), les aspects pratiques (recherche de logement, connexion internet, transports locaux) et les dimensions professionnelles (espaces de travail, networking, gestion des clients à distance). Découvrez également les meilleures zones selon vos priorités et les défis culturels à anticiper pour une transition en douceur vers cette nouvelle vie.`
+        `Guide complet pour vivre en tant que digital nomad à Bali : visa, logement, coût de la vie, espaces de coworking et intégration locale. Découvrez les meilleurs quartiers pour s'installer, comment trouver un appartement adapté au travail à distance, les solutions internet fiables et les aspects fiscaux à considérer. Apprenez à concilier productivité professionnelle et exploration de cette île paradisiaque.`,
+        `Vivre et travailler à Bali comme nomade digital : tout ce que vous devez savoir pour réussir votre expatriation. Notre guide détaille les différents types de visa, le budget mensuel nécessaire, où trouver une communauté d'expatriés et comment gérer les aspects pratiques du quotidien. Découvrez les cafés avec WiFi fiable, les espaces de coworking populaires et les astuces pour une transition en douceur.`,
+        `S'installer à Bali en tant que digital nomad : conseils pratiques d'expatriés expérimentés. Nous couvrons les démarches administratives, les options d'hébergement selon votre budget, les meilleures zones selon votre style de vie et comment créer des routines productives. Notre guide aborde également la santé, les assurances et les bonnes pratiques pour respecter la culture balinaise.`
+      ];
+      description = options[Math.floor(Math.random() * options.length)];
+    }
+    // Voyage en solo
+    else if (hasVoyage && hasSolo) {
+      const options = [
+        `Voyager en solo : guide complet avec conseils pratiques, astuces de sécurité et recommandations pour vivre une expérience enrichissante. Découvrez comment planifier votre itinéraire, rencontrer d'autres voyageurs, surmonter l'appréhension de partir seul et profiter pleinement de cette aventure transformatrice. Notre article partage des témoignages inspirants et des stratégies pour tous les profils de voyageurs solitaires.`,
+        `Explorer le monde en solo : notre guide détaillé vous accompagne à chaque étape de cette aventure personnelle. De la préparation psychologique aux aspects pratiques comme la sécurité et la gestion du budget, nous couvrons tout ce dont vous avez besoin pour voyager seul en toute confiance. Découvrez comment cette expérience peut transformer votre vie, développer votre autonomie et vous ouvrir à de nouvelles perspectives.`,
+        `Comment voyager seul et en profiter pleinement : conseils d'experts pour les voyageurs solitaires. Notre guide aborde les défis spécifiques du voyage en solo comme la solitude occasionnelle, la sécurité personnelle et l'organisation logistique. Nous partageons des techniques éprouvées pour faire des rencontres enrichissantes, négocier les meilleurs tarifs et créer des souvenirs inoubliables en toute indépendance.`
       ];
       description = options[Math.floor(Math.random() * options.length)];
     }
     // Rizières de Bali
     else if (hasRizieres && hasBali) {
       const options = [
-        `Explorez les magnifiques rizières en terrasses de Bali, véritables joyaux du patrimoine culturel indonésien. Notre guide détaille les meilleurs sites à visiter comme Tegallalang et Jatiluwih, inscrits au patrimoine mondial de l'UNESCO. Découvrez l'histoire fascinante de ces paysages sculptés par l'homme depuis des siècles, leur importance dans la culture balinaise et le système d'irrigation subak. Nous vous donnons tous les conseils pratiques : meilleure période pour visiter, comment s'y rendre, tarifs d'entrée, options de randonnées guidées et astuces pour des photos spectaculaires.`,
-        `Découvrez les spectaculaires rizières de Bali, véritables chefs-d'œuvre agricoles qui façonnent le paysage de l'île depuis des siècles. Notre guide complet vous emmène à travers les plus beaux sites de rizières en terrasses, du célèbre Tegallalang aux vastes étendues de Jatiluwih. Apprenez l'histoire et la signification spirituelle du système d'irrigation subak, reconnu par l'UNESCO comme témoignage du génie agricole balinais. Nous partageons nos conseils d'experts pour une expérience authentique : itinéraires recommandés, expériences immersives avec les communautés locales, et meilleures conditions pour la photographie.`,
-        `Guide complet des rizières de Bali : plongez dans la beauté époustouflante des paysages verdoyants qui ont rendu l'île célèbre. Des rizières emblématiques de Tegallalang aux vastes terrasses de Jatiluwih classées à l'UNESCO, découvrez l'art ancestral de la culture du riz à Bali. Notre article détaille l'ingénieux système d'irrigation subak, les pratiques agricoles traditionnelles, et l'importance culturelle et religieuse de ces sites. Nous vous proposons des itinéraires personnalisés pour différents profils de voyageurs et des conseils pour un tourisme responsable.`
+        `Explorez les magnifiques rizières en terrasses de Bali, véritables joyaux du patrimoine culturel indonésien. Notre guide détaille les meilleurs sites comme Tegallalang et Jatiluwih (UNESCO), leur histoire fascinante et l'ingénieux système d'irrigation subak. Découvrez quand visiter pour la plus belle lumière, comment s'y rendre depuis les principales zones touristiques, et comment interagir respectueusement avec les agriculteurs locaux.`,
+        `Les rizières de Bali : découvrez ces paysages emblématiques qui font la réputation de l'île. Notre guide vous emmène à travers les plus beaux sites, des célèbres terrasses de Tegallalang aux vastes étendues de Jatiluwih moins fréquentées des touristes. Apprenez l'importance spirituelle et culturelle de la culture du riz à Bali, participez à des randonnées guidées et capturez des photos spectaculaires à différentes heures de la journée.`,
+        `Guide complet des rizières balinaises : immergez-vous dans ces paysages verdoyants qui symbolisent l'âme de Bali. Nous détaillons chaque site majeur, les rituels agricoles traditionnels, et comment observer le processus complet de culture du riz. Notre article inclut des recommandations de circuits personnalisés selon votre temps disponible, ainsi que des conseils pour un tourisme responsable qui soutient les communautés locales.`
       ];
       description = options[Math.floor(Math.random() * options.length)];
     }
     // Digital nomad (général)
     else if (hasDigitalNomad) {
       const options = [
-        `Guide complet du digital nomad : découvrez comment transformer votre carrière pour travailler de n'importe où dans le monde. Notre article couvre toutes les étapes essentielles : créer une activité compatible avec le nomadisme digital, sélectionner les destinations idéales selon vos préférences, gérer les aspects administratifs (visa, fiscalité internationale, assurance), et maintenir productivité et équilibre personnel. Nous partageons des retours d'expérience de professionnels établis, des recommandations d'outils indispensables, et des conseils pour rejoindre des communautés de nomades digitaux.`,
-        `Tout savoir sur le mode de vie nomade digital : notre guide exhaustif vous accompagne dans chaque étape de cette transition professionnelle et personnelle. De la reconversion vers des métiers adaptés au travail à distance jusqu'à l'organisation quotidienne une fois installé, nous couvrons les aspects pratiques, psychologiques et stratégiques de cette aventure. Découvrez comment choisir vos destinations selon des critères objectifs (coût de la vie, climat, infrastructures internet, communauté) et développer les compétences essentielles à l'autonomie.`,
-        `Le guide définitif pour devenir digital nomad : une analyse approfondie de ce mode de vie combinant travail à distance et voyage. Nous abordons les fondamentaux comme les métiers les plus adaptés au nomadisme digital, la préparation nécessaire, la sélection d'équipement optimal pour la mobilité, et les destinations prisées avec leurs avantages comparatifs. Notre article explore également les défis moins discutés : adaptation culturelle, solitude et relations sociales, productivité en environnement changeant, et planification à long terme.`
+        `Devenir digital nomad : guide complet pour transformer votre carrière et travailler depuis n'importe où. Découvrez comment choisir un métier compatible avec le nomadisme, sélectionner vos destinations selon vos critères personnels, gérer les aspects administratifs et fiscaux, et maintenir une productivité optimale en déplacement. Notre guide partage des conseils d'experts pour une transition réussie vers ce style de vie libérateur.`,
+        `Le guide définitif du nomadisme digital : tout ce que vous devez savoir pour vivre et travailler en voyageant. Nous couvrons le choix des destinations idéales selon le coût de la vie et la qualité des infrastructures, les outils indispensables pour le travail à distance, les stratégies pour trouver des clients ou un emploi flexible, et comment créer une routine efficace malgré les changements d'environnement.`,
+        `Comment devenir nomade digital en 2024 : stratégies pratiques et conseils concrets pour réaliser ce projet de vie. Notre guide aborde les compétences demandées sur le marché du travail à distance, la gestion de l'équilibre vie professionnelle-personnelle en voyage, les communautés à rejoindre pour combattre l'isolement et les solutions pour résoudre les problèmes courants comme les décalages horaires et la connexion internet.`
       ];
       description = options[Math.floor(Math.random() * options.length)];
     }
     // Bali (général)
     else if (hasBali) {
       const options = [
-        `Découvrez Bali, l'île des dieux, à travers notre guide complet qui vous dévoile bien plus que ses plages paradisiaques. Explorez la richesse culturelle unique de cette destination indonésienne : temples majestueux, cérémonies traditionnelles, arts ancestraux et spiritualité omniprésente. Notre article vous guide à travers les régions incontournables et les joyaux cachés de l'île, des rizières en terrasses d'Ubud aux spots de surf de Kuta, en passant par les falaises de Uluwatu et les lagons secrets de Nusa Penida.`,
-        `Guide ultime pour voyager à Bali : tout ce que vous devez savoir pour organiser un séjour inoubliable sur l'île des dieux. Découvrez les multiples visages de cette destination entre temples séculaires, jungles luxuriantes, villages traditionnels et plages de rêve. Nous détaillons les itinéraires optimaux selon la durée de votre séjour, les activités incontournables et expériences authentiques pour chaque région, et les conseils pratiques pour naviguer comme un local.`,
-        `Explorez Bali, perle de l'Indonésie, grâce à notre guide détaillé couvrant tous les aspects de cette destination fascinante. De la spiritualité omniprésente dans les milliers de temples à la nature exubérante des rizières, volcans et plages, découvrez pourquoi Bali captive voyageurs et expatriés du monde entier. Notre article vous accompagne dans la planification de votre voyage avec des itinéraires personnalisés et une immersion dans la gastronomie locale.`
+        `Découvrez Bali, l'île des dieux : guide complet pour planifier votre séjour sur cette destination paradisiaque. Explorez ses plages idylliques, temples majestueux, rizières verdoyantes et villages authentiques. Notre guide détaille les régions à ne pas manquer, les activités incontournables, où séjourner selon votre budget et comment vous déplacer efficacement sur l'île pour une expérience authentique.`,
+        `Visiter Bali : guide pratique et conseils d'initiés pour découvrir le meilleur de l'île indonésienne. Nous vous guidons à travers les sites emblématiques et les joyaux cachés, de la spiritualité d'Ubud aux plages de surf de Canggu, en passant par les falaises spectaculaires d'Uluwatu. Profitez de nos recommandations pour la gastronomie locale, les hébergements de charme et les expériences culturelles immersives.`,
+        `Bali : itinéraires, conseils et bonnes adresses pour un voyage inoubliable sur l'île des dieux. Notre guide propose plusieurs circuits selon votre durée de séjour, des suggestions d'activités pour chaque profil de voyageur, et des recommandations authentiques loin des pièges à touristes. Découvrez comment vivre pleinement l'expérience balinaise, de ses traditions séculaires à sa scène artistique contemporaine.`
+      ];
+      description = options[Math.floor(Math.random() * options.length)];
+    }
+    // Voyage (général)
+    else if (hasVoyage) {
+      const options = [
+        `Guide complet pour préparer votre voyage et vivre une expérience inoubliable. Nous partageons nos meilleures astuces de planification, de la réservation de vols aux économies sur l'hébergement, en passant par la préparation d'un itinéraire équilibré. Découvrez comment voyager de façon plus authentique, respectueuse et enrichissante, avec des conseils pratiques adaptés à tous les styles de voyage.`,
+        `Voyager efficacement et sereinement : notre guide regorge de conseils pratiques pour optimiser chaque aspect de votre aventure. Apprenez à faire vos valises intelligemment, à naviguer dans les transports locaux, à surmonter la barrière de la langue et à gérer votre budget. Nous partageons également des recommandations pour découvrir la culture locale et créer des connexions significatives lors de vos déplacements.`,
+        `L'art du voyage : guide complet pour transformer vos déplacements en expériences transformatrices. De la préparation mentale aux astuces pratiques sur le terrain, notre article couvre tous les aspects essentiels pour voyager avec confiance et curiosité. Découvrez comment sortir des sentiers battus, capturer des souvenirs mémorables et revenir enrichi de chaque aventure.`
       ];
       description = options[Math.floor(Math.random() * options.length)];
     }
@@ -66,44 +103,36 @@ export const generateSeoDescription = (keyword: string, maxLength: number = 155)
         const entities = keyword.split(/ et | & | vs | ou /);
         if (entities.length >= 2) {
           const options = [
-            `Découvrez notre guide complet pour explorer ${entities[0]} et ${entities[1]}, deux destinations qui se complètent parfaitement pour un voyage inoubliable. Nous avons conçu plusieurs itinéraires optimisés selon votre durée de séjour, vos centres d'intérêt et votre style de voyage. Profitez de nos recommandations détaillées sur les hébergements adaptés à chaque ville, des options de transport entre les deux destinations, et des visites incontournables comme des expériences hors des sentiers battus.`,
-            `Guide détaillé pour visiter ${entities[0]} et ${entities[1]}, deux destinations complémentaires qui méritent votre attention. Notre article présente en profondeur les sites touristiques majeurs de chaque lieu, leur contexte historique et culturel, ainsi que les joyaux cachés connus uniquement des locaux. Explorez la gastronomie unique de chaque région, avec des adresses de restaurants authentiques, des marchés locaux et des spécialités à déguster absolument.`,
-            `Planifiez votre voyage entre ${entities[0]} et ${entities[1]} grâce à notre guide d'expert. Nous avons créé plusieurs circuits optimisés qui vous permettent de découvrir le meilleur de ces deux destinations sans perdre de temps. Chaque itinéraire est accompagné d'une sélection d'activités culturelles, sportives et de détente adaptées à différents types de voyageurs. Bénéficiez de nos conseils d'initiés sur les quartiers où séjourner et les meilleures façons de se déplacer.`
+            `Guide complet pour explorer ${entities[0]} et ${entities[1]} : découvrez les attraits uniques de ces deux destinations complémentaires. Notre itinéraire optimisé vous permet de profiter pleinement des sites incontournables comme des trésors cachés de chaque lieu. Nous partageons nos recommandations d'hébergements, restaurants authentiques et moyens de transport entre les deux destinations pour un voyage fluide et mémorable.`,
+            `Visiter ${entities[0]} et ${entities[1]} : notre guide détaillé pour combiner ces destinations dans un seul voyage. Découvrez l'histoire, la culture et les paysages distinctifs de chaque lieu, avec des itinéraires sur mesure selon votre durée de séjour. Nos conseils pratiques couvrent la logistique, les meilleures périodes pour visiter et comment maximiser votre expérience sans vous épuiser.`,
+            `${entities[0]} et ${entities[1]} : circuit idéal pour découvrir ces deux destinations fascinantes. Notre guide propose plusieurs itinéraires selon vos centres d'intérêt, que vous soyez passionné d'histoire, de gastronomie, de nature ou d'art. Profitez de nos conseils d'experts locaux pour éviter les foules, dénicher des expériences authentiques et créer des souvenirs inoubliables dans ces lieux emblématiques.`
           ];
           description = options[Math.floor(Math.random() * options.length)];
         }
       } else {
         const options = [
-          `Découvrez ${keyword} à travers notre guide local complet qui vous dévoile les multiples facettes de cette destination fascinante. Explorez les monuments historiques emblématiques qui témoignent du riche passé de la région, émerveillez-vous devant les sites naturels d'exception, et immergez-vous dans les traditions locales préservées depuis des générations. Notre guide vous fait découvrir la gastronomie authentique avec ses plats typiques et les meilleurs endroits pour les déguster.`,
-          `Visitez ${keyword} grâce à notre guide détaillé qui couvre tous les aspects de votre voyage. Nous avons sélectionné pour vous les lieux incontournables qui font la renommée de la destination, ainsi que des trésors cachés connus seulement des habitants. Découvrez nos recommandations d'activités variées pour tous les goûts et tous les âges, des suggestions de restaurants allant de la cuisine traditionnelle aux innovations gastronomiques locales.`,
-          `Guide complet pour explorer ${keyword}, destination aux multiples attraits qui satisfera tous les types de voyageurs. Notre article détaille les attractions principales à visiter absolument, des sites historiques majestueux aux merveilles naturelles époustouflantes. Suivez nos itinéraires recommandés, soigneusement conçus pour optimiser votre temps et vous permettre de découvrir l'essence du lieu. Profitez de nos conseils d'initiés pour découvrir des expériences authentiques loin des sentiers battus.`
+          `Découvrez ${keyword} : guide complet pour explorer cette destination fascinante aux multiples facettes. Notre article détaille les sites incontournables, les expériences authentiques et les conseils pratiques pour optimiser votre séjour. Profitez de nos recommandations d'hébergements, restaurants locaux et activités adaptées à tous les profils de voyageurs pour une immersion réussie.`,
+          `Visiter ${keyword} : tout ce que vous devez savoir pour préparer un voyage inoubliable dans cette destination exceptionnelle. Notre guide partage les meilleurs itinéraires, les périodes idéales pour s'y rendre, les moyens de transport sur place et les incontournables culturels. Découvrez également nos conseils pour sortir des sentiers battus et vivre des expériences uniques loin des foules.`,
+          `Guide de voyage à ${keyword} : conseils d'experts et bonnes adresses pour un séjour réussi. Nous vous guidons à travers les quartiers à explorer, les sites historiques majeurs, les merveilles naturelles et les traditions locales à découvrir. Notre article inclut des informations pratiques sur le budget nécessaire, les démarches administratives et les aspects culturels à respecter.`
         ];
         description = options[Math.floor(Math.random() * options.length)];
       }
     }
-    // Traiter le titre directement s'il contient "comment" ou "découvrez comment"
-    else if (keywordLowerCase.includes("comment") || keywordLowerCase.includes("découvrez comment")) {
-      // Extraction du vrai sujet après "comment" ou "découvrez comment"
-      let realSubject = keyword;
-      if (keywordLowerCase.includes("comment ")) {
-        realSubject = keyword.substring(keyword.toLowerCase().indexOf("comment ") + 8);
-      } else if (keywordLowerCase.includes("découvrez comment ")) {
-        realSubject = keyword.substring(keyword.toLowerCase().indexOf("découvrez comment ") + 18);
-      }
-      
+    // Guide pratique ou tutoriels (comment faire...)
+    else if (isHowTo) {
       const options = [
-        `${keyword} : guide pratique avec étapes détaillées, astuces et conseils d'experts pour réussir. Nous avons compilé les meilleures méthodes basées sur des expériences réelles et des recherches approfondies. Notre article vous accompagne pas à pas dans ce processus avec des explications claires et des exemples concrets pour faciliter votre apprentissage et obtenir des résultats optimaux.`,
-        `${keyword} : découvrez notre méthode complète pour y parvenir efficacement. Ce guide présente des stratégies éprouvées, des techniques accessibles et des recommandations personnalisées pour vous aider à atteindre votre objectif. Nous abordons les défis courants que vous pourriez rencontrer et proposons des solutions pratiques pour les surmonter, en vous guidant à chaque étape du processus.`,
-        `${realSubject} : instructions complètes et conseils pratiques dans notre guide détaillé. Notre approche méthodique vous permet de progresser étape par étape, en comprenant les principes fondamentaux et les subtilités importantes. Nous partageons également des retours d'expérience et des exemples de réussite pour vous inspirer et vous motiver dans votre propre parcours.`
+        `${keyword} : guide pratique étape par étape pour réussir facilement. Notre article détaille la méthode complète avec des instructions claires, des exemples concrets et des astuces d'experts. Vous découvrirez les techniques les plus efficaces, les erreurs courantes à éviter et des conseils personnalisés pour adapter ces connaissances à votre situation particulière.`,
+        `${keyword} : méthodes prouvées et conseils d'experts dans notre guide détaillé. Nous avons rassemblé les meilleures pratiques, techniques avancées et étapes progressives pour vous accompagner tout au long du processus. Notre approche pédagogique vous permet d'acquérir rapidement les compétences nécessaires et d'obtenir des résultats concrets et durables.`,
+        `Comment ${mainSubject} : instructions complètes et recommandations pratiques pour réussir à chaque étape. Notre guide méthodique vous présente les fondamentaux essentiels, les outils recommandés et des exemples de réussites inspirantes. Vous bénéficierez également de solutions aux défis fréquemment rencontrés et d'un suivi progressif pour atteindre vos objectifs.`
       ];
       description = options[Math.floor(Math.random() * options.length)];
     }
-    // Sujets généraux (non géographiques, non spécifiques)
+    // Sujets généraux (non spécifiques)
     else {
       const options = [
-        `Guide pratique sur ${keyword} : techniques éprouvées et solutions concrètes pour maîtriser ce sujet. Notre article explore les fondamentaux théoriques essentiels, puis développe des applications pratiques à travers des études de cas détaillées et des exemples concrets. Vous découvrirez également les dernières innovations dans ce domaine et des recommandations personnalisées pour adapter ces connaissances à votre situation spécifique.`,
-        `Tout savoir sur ${keyword} : notre guide combine expertise théorique et expérience pratique pour vous offrir une ressource complète sur ce sujet. Nous présentons des méthodes professionnelles éprouvées, illustrées par des exemples concrets qui démontrent leur efficacité dans différents contextes. Chaque concept est expliqué avec clarté, depuis les principes fondamentaux jusqu'aux stratégies avancées.`,
-        `Explorez notre guide détaillé sur ${keyword}, conçu pour vous fournir une compréhension complète de ce domaine. Nos experts ont rassemblé des conseils précieux issus de leur expérience, soutenus par des recherches récentes. À travers des études de cas variées, nous illustrons comment ces principes s'appliquent dans différentes situations. Ce guide présente également une analyse comparative des meilleures pratiques actuelles.`
+        `${keyword} : guide complet avec analyses approfondies et conseils pratiques pour maîtriser ce sujet. Notre article combine approche théorique et applications concrètes pour une compréhension globale. Découvrez les principes fondamentaux, les dernières tendances et des études de cas inspirantes qui illustrent comment appliquer ces concepts dans différents contextes.`,
+        `Tout savoir sur ${keyword} : ressource complète avec explications détaillées et méthodes applicables. Nous explorons les aspects essentiels de ce domaine, depuis les principes de base jusqu'aux stratégies avancées, en passant par des exemples réels qui démontrent l'impact de ces connaissances. Notre guide s'adapte à tous les niveaux, du débutant à l'expert.`,
+        `${keyword} : analyse approfondie et guide pratique pour développer votre expertise sur ce sujet. Notre article présente une vision complète avec des données récentes, des techniques éprouvées et des perspectives d'évolution. Vous y trouverez également des recommandations personnalisées et des ressources complémentaires pour approfondir vos connaissances.`
       ];
       description = options[Math.floor(Math.random() * options.length)];
     }
@@ -113,36 +142,54 @@ export const generateSeoDescription = (keyword: string, maxLength: number = 155)
     // Digital nomad à Bali
     if (hasDigitalNomad && hasBali) {
       const options = [
-        `Guide pour devenir digital nomad à Bali : visas, logement, espaces de coworking, vie quotidienne et intégration dans la culture locale. Conseils pour réussir votre installation.`,
-        `Vivre et travailler à Bali en tant que digital nomad : notre guide détaille tout ce qu'il faut savoir sur les visas, l'hébergement, les espaces de travail et la vie locale.`,
-        `S'installer à Bali en tant que digital nomad : démarches administratives, quartiers recommandés, adaptation culturelle et conseils pour une transition réussie.`
+        `Guide pour devenir digital nomad à Bali : visa, logement, coworking, coût de la vie et intégration culturelle. Conseils pratiques pour une installation réussie sur l'île des dieux.`,
+        `Vivre et travailler à Bali en tant que nomade numérique : notre guide couvre les visas, l'hébergement, les espaces de travail et la communauté d'expatriés.`,
+        `S'installer à Bali comme digital nomad : démarches administratives, quartiers recommandés, budget mensuel et conseils pour une transition en douceur.`
+      ];
+      description = options[Math.floor(Math.random() * options.length)];
+    }
+    // Voyage en solo
+    else if (hasVoyage && hasSolo) {
+      const options = [
+        `Guide du voyage en solo : conseils pratiques, astuces de sécurité et recommandations pour profiter pleinement de cette aventure enrichissante et transformatrice.`,
+        `Voyager seul : notre guide complet aborde les aspects pratiques, psychologiques et sociaux du voyage en solo pour une expérience inoubliable.`,
+        `Comment voyager seul en toute confiance : préparation, sécurité, rencontres et conseils pour surmonter l'appréhension et vivre une aventure épanouissante.`
       ];
       description = options[Math.floor(Math.random() * options.length)];
     }
     // Rizières de Bali
     else if (hasRizieres && hasBali) {
       const options = [
-        `Explorez les magnifiques rizières en terrasses de Bali. Notre guide détaille les meilleurs sites comme Tegallalang et Jatiluwih, quand y aller et comment s'y rendre.`,
-        `Découvrez les spectaculaires rizières de Bali, joyaux du patrimoine culturel indonésien. Histoire, culture locale et conseils pratiques pour une visite inoubliable.`,
-        `Guide des rizières de Bali : sites UNESCO, rencontre avec les agriculteurs locaux, randonnées panoramiques et photographie. Tout pour planifier votre visite.`
+        `Explorez les magnifiques rizières en terrasses de Bali. Guide complet des sites incontournables comme Tegallalang et Jatiluwih, histoire du système subak et conseils pratiques.`,
+        `Les rizières de Bali : sites UNESCO, traditions agricoles, meilleurs points de vue et conseils pour photographier ces paysages emblématiques de l'île des dieux.`,
+        `Guide des rizières balinaises : découvrez ces joyaux culturels, leur importance spirituelle, les meilleurs moments pour visiter et comment soutenir les agriculteurs locaux.`
       ];
       description = options[Math.floor(Math.random() * options.length)];
     }
     // Digital nomad (général)
     else if (hasDigitalNomad) {
       const options = [
-        `Guide du digital nomad : comment travailler depuis n'importe où dans le monde. Conseils pratiques, destinations recommandées et outils indispensables.`,
-        `Devenir nomade digital : notre guide pour réussir votre transition vers le travail à distance. Méthodes, destinations et stratégies d'experts.`,
-        `Mode de vie nomade digital : comment concilier voyage et carrière. Conseils pour trouver des missions, gérer votre activité à distance et choisir vos destinations.`
+        `Guide complet pour devenir digital nomad : métiers compatibles, destinations recommandées, aspects administratifs et conseils pour travailler efficacement en voyageant.`,
+        `Le nomadisme digital : notre guide pour travailler depuis n'importe où dans le monde. Stratégies, outils indispensables et communautés à rejoindre.`,
+        `Comment devenir nomade numérique : compétences requises, gestion du quotidien, équilibre vie-travail et astuces pour réussir ce mode de vie alternatif.`
       ];
       description = options[Math.floor(Math.random() * options.length)];
     }
     // Bali (général)
     else if (hasBali) {
       const options = [
-        `Découvrez Bali : guide de l'île des dieux avec ses temples, plages, rizières et culture unique. Conseils pratiques et itinéraires recommandés pour un séjour inoubliable.`,
-        `Guide de voyage à Bali : explorez les trésors de l'île entre plages paradisiaques, temples majestueux et villages authentiques. Conseils d'initiés pour votre séjour.`,
-        `Bali : l'essentiel à savoir pour visiter l'île des dieux. Notre guide couvre hébergements, transports, sites incontournables et expériences authentiques.`
+        `Découvrez Bali : guide complet de l'île des dieux avec ses plages, temples, rizières et villages traditionnels. Conseils pratiques pour un voyage inoubliable.`,
+        `Visiter Bali : itinéraires recommandés, hébergements, transports et activités incontournables pour profiter pleinement de cette destination paradisiaque.`,
+        `Guide de voyage à Bali : explorez cette île fascinante entre tradition et modernité. Sites à voir, expériences authentiques et astuces pour éviter les pièges à touristes.`
+      ];
+      description = options[Math.floor(Math.random() * options.length)];
+    }
+    // Voyage (général)
+    else if (hasVoyage) {
+      const options = [
+        `Guide pratique du voyage : préparation, astuces pour économiser, conseils de sécurité et recommandations pour vivre des expériences authentiques lors de vos déplacements.`,
+        `L'art de voyager : notre guide partage les techniques essentielles pour planifier, organiser et profiter pleinement de chaque aventure, quel que soit votre budget.`,
+        `Conseils de voyage : préparez-vous efficacement, découvrez des destinations authentiques et créez des souvenirs inoubliables avec nos recommandations d'experts.`
       ];
       description = options[Math.floor(Math.random() * options.length)];
     }
@@ -152,44 +199,36 @@ export const generateSeoDescription = (keyword: string, maxLength: number = 155)
         const entities = keyword.split(/ et | & | vs | ou /);
         if (entities.length >= 2) {
           const options = [
-            `Découvrez notre guide pour explorer ${entities[0]} et ${entities[1]}. Itinéraires recommandés, hébergements, transports et bons plans pour un voyage réussi.`,
-            `Guide détaillé pour visiter ${entities[0]} et ${entities[1]}. Sites touristiques, gastronomie locale et conseils pratiques pour profiter au maximum de votre séjour.`,
-            `Planifiez votre voyage entre ${entities[0]} et ${entities[1]}. Notre guide propose des circuits optimisés, activités et recommandations d'experts locaux.`
+            `Découvrez notre guide pour explorer ${entities[0]} et ${entities[1]}. Itinéraires optimisés, sites incontournables et conseils pratiques pour un circuit idéal.`,
+            `Visiter ${entities[0]} et ${entities[1]} : notre guide complet propose des circuits sur mesure, bonnes adresses et astuces pour combiner ces destinations.`,
+            `${entities[0]} et ${entities[1]} : comment organiser votre voyage entre ces deux destinations. Transports, hébergements et expériences authentiques recommandés.`
           ];
           description = options[Math.floor(Math.random() * options.length)];
         }
       } else {
         const options = [
-          `Découvrez ${keyword} avec notre guide local : monuments historiques, sites naturels, traditions et gastronomie. Conseils pratiques pour un séjour authentique.`,
-          `Visitez ${keyword} : notre guide détaille les lieux incontournables, activités, restaurants et hébergements. Tout pour réussir votre voyage !`,
-          `Guide complet pour explorer ${keyword}. Attractions principales, itinéraires recommandés et conseils d'initiés pour une expérience inoubliable.`
+          `Découvrez ${keyword} avec notre guide de voyage complet : sites incontournables, expériences locales et conseils pratiques pour un séjour mémorable.`,
+          `Visiter ${keyword} : itinéraires recommandés, meilleures périodes, hébergements et activités pour profiter pleinement de cette destination exceptionnelle.`,
+          `Guide de voyage à ${keyword} : tout ce que vous devez savoir pour préparer et réussir votre séjour. Bonnes adresses et astuces d'initiés incluses.`
         ];
         description = options[Math.floor(Math.random() * options.length)];
       }
     }
-    // Traiter le titre directement s'il contient "comment" ou "découvrez comment"
-    else if (keywordLowerCase.includes("comment") || keywordLowerCase.includes("découvrez comment")) {
-      // Extraction du vrai sujet après "comment" ou "découvrez comment"
-      let realSubject = keyword;
-      if (keywordLowerCase.includes("comment ")) {
-        realSubject = keyword.substring(keyword.toLowerCase().indexOf("comment ") + 8);
-      } else if (keywordLowerCase.includes("découvrez comment ")) {
-        realSubject = keyword.substring(keyword.toLowerCase().indexOf("découvrez comment ") + 18);
-      }
-      
+    // Guide pratique ou tutoriels (comment faire...)
+    else if (isHowTo) {
       const options = [
-        `${keyword} : guide pratique étape par étape avec conseils d'experts et astuces pour réussir facilement ce processus.`,
-        `${keyword} : méthodes efficaces et conseils pratiques pour atteindre votre objectif. Techniques éprouvées expliquées simplement.`,
-        `${realSubject} : instructions détaillées et conseils pratiques dans notre guide méthodique pour réussir à chaque étape.`
+        `${keyword} : guide pratique avec instructions détaillées et conseils d'experts pour réussir facilement. Techniques éprouvées et erreurs à éviter.`,
+        `${keyword} : méthode complète étape par étape pour atteindre vos objectifs. Astuces pratiques et solutions aux problèmes courants.`,
+        `Comment ${mainSubject} : instructions claires, outils recommandés et techniques efficaces pour des résultats garantis. Guide adapté à tous les niveaux.`
       ];
       description = options[Math.floor(Math.random() * options.length)];
     }
-    // Sujets généraux (non géographiques, non spécifiques)
+    // Sujets généraux (non spécifiques)
     else {
       const options = [
-        `Guide pratique sur ${keyword} : techniques éprouvées et conseils d'experts pour maîtriser ce sujet. Découvrez nos recommandations pour des résultats optimaux.`,
-        `Tout savoir sur ${keyword} : méthodes professionnelles et astuces pratiques. Guide complet pour comprendre et appliquer efficacement ces concepts.`,
-        `Explorez notre guide détaillé sur ${keyword}. Conseils d'experts, méthodes éprouvées et bonnes pratiques pour atteindre vos objectifs.`
+        `${keyword} : guide complet avec informations essentielles et conseils pratiques pour maîtriser ce sujet. Approche méthodique et recommandations d'experts.`,
+        `Tout savoir sur ${keyword} : analyse approfondie, méthodes éprouvées et applications concrètes pour développer vos compétences dans ce domaine.`,
+        `${keyword} : ressource complète combinant théorie et pratique pour une compréhension globale. Stratégies efficaces et exemples inspirants.`
       ];
       description = options[Math.floor(Math.random() * options.length)];
     }
