@@ -1,16 +1,16 @@
 
 /**
- * Adjusts the description length to match the target length without cutting words mid-sentence
+ * Ajuste la longueur de la description pour correspondre à la longueur cible sans couper les mots en milieu de phrase
  */
 export const adjustDescriptionLength = (description: string, maxLength: number): string => {
-  // If description exceeds max length, truncate it properly
+  // Si la description dépasse la longueur maximale, la tronquer correctement
   if (description.length > maxLength) {
-    // Find the last space before the limit
+    // Trouver le dernier espace avant la limite
     const lastSpace = description.lastIndexOf(' ', maxLength - 3);
     if (lastSpace !== -1) {
       return description.substring(0, lastSpace) + "...";
     } else {
-      // As last resort, cut strictly
+      // En dernier recours, couper strictement
       return description.substring(0, maxLength - 3) + "...";
     }
   }
@@ -18,7 +18,7 @@ export const adjustDescriptionLength = (description: string, maxLength: number):
 };
 
 /**
- * Extends a description that's too short to reach closer to the target length
+ * Étend une description trop courte pour atteindre une longueur plus proche de la cible
  */
 export const extendDescription = (description: string, maxLength: number): string => {
   if (description.length < maxLength - 5) {
@@ -40,22 +40,27 @@ export const extendDescription = (description: string, maxLength: number): strin
 };
 
 /**
- * Ensures the meta description has proper length for SEO (especially for standard 155 char limit)
+ * S'assure que la méta-description a une longueur appropriée pour le SEO (en particulier pour la limite standard de 155 caractères)
  */
 export const optimizeDescriptionLength = (description: string, maxLength: number): string => {
-  // First truncate if needed
+  // Vérifier que la description n'est pas vide ou null
+  if (!description || description.trim().length === 0) {
+    return "";
+  }
+
+  // D'abord tronquer si nécessaire
   let result = adjustDescriptionLength(description, maxLength);
   
-  // Then extend if too short
+  // Puis étendre si trop court
   result = extendDescription(result, maxLength);
   
-  // Special case for standard meta descriptions
+  // Cas spécial pour les méta-descriptions standard
   if (maxLength === 155 && result.length < 150) {
-    // Add extra content for short standard descriptions
+    // Ajouter du contenu supplémentaire pour les descriptions standard courtes
     result = result.replace("...", "") + 
       " Conseils d'experts et astuces exclusives pour optimiser votre expérience.";
     
-    // Recheck length after adding content
+    // Revérifier la longueur après ajout de contenu
     if (result.length > maxLength) {
       const lastSpace = result.lastIndexOf(' ', maxLength - 3);
       result = result.substring(0, lastSpace) + "...";

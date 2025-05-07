@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -43,6 +43,10 @@ const MetaDescriptionGenerator = () => {
     navigator.clipboard.writeText(text);
     toast.success(`${type} copiée dans le presse-papier`);
   };
+
+  // Calcul précis des longueurs de description
+  const shortLength = shortDescription ? shortDescription.length : 0;
+  const longLength = longDescription ? longDescription.length : 0;
 
   return (
     <Card className="w-full">
@@ -96,7 +100,7 @@ const MetaDescriptionGenerator = () => {
               <TabsContent value="short" className="mt-4">
                 <div className="space-y-2">
                   <div className="text-sm text-muted-foreground">
-                    {shortDescription.length} / 155 caractères
+                    {shortLength} / 155 caractères
                   </div>
                   <div className="relative">
                     <Textarea 
@@ -124,7 +128,7 @@ const MetaDescriptionGenerator = () => {
               <TabsContent value="long" className="mt-4">
                 <div className="space-y-2">
                   <div className="text-sm text-muted-foreground">
-                    {longDescription.length} / 500 caractères
+                    {longLength} / 500 caractères
                   </div>
                   <div className="relative">
                     <Textarea 

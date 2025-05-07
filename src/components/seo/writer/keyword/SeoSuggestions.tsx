@@ -15,13 +15,18 @@ const SeoSuggestions: React.FC<SeoSuggestionsProps> = ({
   onInsertTitle,
   onInsertDescription
 }) => {
+  // Calcul précis des longueurs
+  const titleLength = keywordData.suggestedTitle?.length || 0;
+  const descriptionLength = keywordData.suggestedDescription?.length || 0;
+  const longDescriptionLength = keywordData.suggestedLongDescription?.length || 0;
+  
   return (
     <div className="space-y-4">
       <div className="bg-white p-3 rounded-lg border border-gray-200">
         <div className="flex justify-between items-center">
           <h4 className="font-medium">Titre suggéré</h4>
           <div className="text-xs text-gray-500">
-            {keywordData.suggestedTitle?.length || 0}/60 caractères
+            {titleLength}/60 caractères
           </div>
         </div>
         <p className="my-2 text-sm">{keywordData.suggestedTitle}</p>
@@ -46,7 +51,7 @@ const SeoSuggestions: React.FC<SeoSuggestionsProps> = ({
               <div className="flex justify-between items-center">
                 <h4 className="font-medium">Description courte</h4>
                 <div className="text-xs text-gray-500">
-                  {keywordData.suggestedDescription?.length || 0}/155 caractères
+                  {descriptionLength}/155 caractères
                 </div>
               </div>
               <p className="my-2 text-sm">{keywordData.suggestedDescription}</p>
@@ -65,7 +70,7 @@ const SeoSuggestions: React.FC<SeoSuggestionsProps> = ({
               <div className="flex justify-between items-center">
                 <h4 className="font-medium">Description longue</h4>
                 <div className="text-xs text-gray-500">
-                  {keywordData.suggestedLongDescription?.length || 0}/500 caractères
+                  {longDescriptionLength}/500 caractères
                 </div>
               </div>
               <p className="my-2 text-sm line-clamp-3">{keywordData.suggestedLongDescription}</p>
