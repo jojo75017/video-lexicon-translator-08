@@ -8,6 +8,7 @@ import { Loader2, Copy, Wand } from "lucide-react";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { generateSeoDescription, generateBothDescriptions } from "@/utils/seo/generators/descriptionGenerator";
+import { getExactLength } from "@/utils/seo/generators/description/utils";
 
 const MetaDescriptionGenerator = () => {
   const [keyword, setKeyword] = useState<string>('');
@@ -18,11 +19,11 @@ const MetaDescriptionGenerator = () => {
   const [longLength, setLongLength] = useState(0);
 
   useEffect(() => {
-    setShortLength(shortDescription ? shortDescription.length : 0);
+    setShortLength(getExactLength(shortDescription));
   }, [shortDescription]);
 
   useEffect(() => {
-    setLongLength(longDescription ? longDescription.length : 0);
+    setLongLength(getExactLength(longDescription));
   }, [longDescription]);
 
   const handleGenerate = async () => {

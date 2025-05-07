@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { KeywordSuggestion } from "@/types/seo";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getExactLength } from "@/utils/seo/generators/description/utils";
 
 interface SeoSuggestionsProps {
   keywordData: KeywordSuggestion;
@@ -22,9 +23,9 @@ const SeoSuggestions: React.FC<SeoSuggestionsProps> = ({
   
   // Mettre à jour les longueurs quand les données changent
   useEffect(() => {
-    setTitleLength(keywordData.suggestedTitle?.length || 0);
-    setDescriptionLength(keywordData.suggestedDescription?.length || 0);
-    setLongDescriptionLength(keywordData.suggestedLongDescription?.length || 0);
+    setTitleLength(getExactLength(keywordData.suggestedTitle));
+    setDescriptionLength(getExactLength(keywordData.suggestedDescription));
+    setLongDescriptionLength(getExactLength(keywordData.suggestedLongDescription));
   }, [keywordData]);
   
   return (

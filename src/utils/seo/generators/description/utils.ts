@@ -4,6 +4,7 @@
  */
 export const getExactLength = (text: string): number => {
   if (!text || typeof text !== 'string') return 0;
+  // Retourne la longueur exacte sans aucune transformation
   return text.length;
 };
 

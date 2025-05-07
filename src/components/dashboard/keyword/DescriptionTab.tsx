@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import { getExactLength } from "@/utils/seo/generators/description/utils";
 
 interface DescriptionTabProps {
   description: string;
@@ -12,13 +13,13 @@ interface DescriptionTabProps {
 }
 
 const DescriptionTab = ({ description, setDescription, maxDescriptionLength, keyword }: DescriptionTabProps) => {
-  // État local pour suivre la longueur réelle sans espaces supplémentaires
+  // État local pour suivre la longueur exacte sans espaces supplémentaires
   const [descriptionLength, setDescriptionLength] = useState(0);
   
   // Mettre à jour la longueur à chaque changement de description
   useEffect(() => {
-    // Calculer la longueur exacte de la chaîne
-    const length = description ? description.length : 0;
+    // Calculer la longueur exacte de la chaîne avec notre utilitaire
+    const length = getExactLength(description);
     setDescriptionLength(length);
   }, [description]);
   
