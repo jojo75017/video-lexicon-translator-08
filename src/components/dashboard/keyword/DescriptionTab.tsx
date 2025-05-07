@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
@@ -12,8 +12,15 @@ interface DescriptionTabProps {
 }
 
 const DescriptionTab = ({ description, setDescription, maxDescriptionLength, keyword }: DescriptionTabProps) => {
-  // Calculer la longueur réelle avec un affichage plus précis
-  const descriptionLength = description ? description.length : 0;
+  // État local pour suivre la longueur réelle sans espaces supplémentaires
+  const [descriptionLength, setDescriptionLength] = useState(0);
+  
+  // Mettre à jour la longueur à chaque changement de description
+  useEffect(() => {
+    // Calculer la longueur exacte de la chaîne
+    const length = description ? description.length : 0;
+    setDescriptionLength(length);
+  }, [description]);
   
   return (
     <div className="space-y-4 pt-4">

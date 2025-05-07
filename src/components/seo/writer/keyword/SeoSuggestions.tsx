@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { KeywordSuggestion } from "@/types/seo";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,10 +15,17 @@ const SeoSuggestions: React.FC<SeoSuggestionsProps> = ({
   onInsertTitle,
   onInsertDescription
 }) => {
-  // Calcul précis des longueurs
-  const titleLength = keywordData.suggestedTitle?.length || 0;
-  const descriptionLength = keywordData.suggestedDescription?.length || 0;
-  const longDescriptionLength = keywordData.suggestedLongDescription?.length || 0;
+  // États pour stocker les longueurs exactes
+  const [titleLength, setTitleLength] = useState(0);
+  const [descriptionLength, setDescriptionLength] = useState(0);
+  const [longDescriptionLength, setLongDescriptionLength] = useState(0);
+  
+  // Mettre à jour les longueurs quand les données changent
+  useEffect(() => {
+    setTitleLength(keywordData.suggestedTitle?.length || 0);
+    setDescriptionLength(keywordData.suggestedDescription?.length || 0);
+    setLongDescriptionLength(keywordData.suggestedLongDescription?.length || 0);
+  }, [keywordData]);
   
   return (
     <div className="space-y-4">

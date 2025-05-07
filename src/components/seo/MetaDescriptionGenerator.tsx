@@ -14,6 +14,16 @@ const MetaDescriptionGenerator = () => {
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [shortDescription, setShortDescription] = useState<string>('');
   const [longDescription, setLongDescription] = useState<string>('');
+  const [shortLength, setShortLength] = useState(0);
+  const [longLength, setLongLength] = useState(0);
+
+  useEffect(() => {
+    setShortLength(shortDescription ? shortDescription.length : 0);
+  }, [shortDescription]);
+
+  useEffect(() => {
+    setLongLength(longDescription ? longDescription.length : 0);
+  }, [longDescription]);
 
   const handleGenerate = async () => {
     if (!keyword.trim()) {
@@ -43,10 +53,6 @@ const MetaDescriptionGenerator = () => {
     navigator.clipboard.writeText(text);
     toast.success(`${type} copiée dans le presse-papier`);
   };
-
-  // Calcul précis des longueurs de description
-  const shortLength = shortDescription ? shortDescription.length : 0;
-  const longLength = longDescription ? longDescription.length : 0;
 
   return (
     <Card className="w-full">

@@ -1,8 +1,18 @@
 
 /**
+ * Calcule précisément la longueur d'une chaîne de caractères
+ */
+export const getExactLength = (text: string): number => {
+  if (!text || typeof text !== 'string') return 0;
+  return text.length;
+};
+
+/**
  * Ajuste la longueur de la description pour correspondre à la longueur cible sans couper les mots en milieu de phrase
  */
 export const adjustDescriptionLength = (description: string, maxLength: number): string => {
+  if (!description) return "";
+  
   // Si la description dépasse la longueur maximale, la tronquer correctement
   if (description.length > maxLength) {
     // Trouver le dernier espace avant la limite
@@ -21,6 +31,8 @@ export const adjustDescriptionLength = (description: string, maxLength: number):
  * Étend une description trop courte pour atteindre une longueur plus proche de la cible
  */
 export const extendDescription = (description: string, maxLength: number): string => {
+  if (!description) return "";
+  
   if (description.length < maxLength - 5) {
     const extensions = [
       " Découvrez nos conseils exclusifs!",
@@ -55,7 +67,7 @@ export const optimizeDescriptionLength = (description: string, maxLength: number
   result = extendDescription(result, maxLength);
   
   // Cas spécial pour les méta-descriptions standard
-  if (maxLength === 155 && result.length < 150) {
+  if (maxLength === 155 && result.length < maxLength - 5) {
     // Ajouter du contenu supplémentaire pour les descriptions standard courtes
     result = result.replace("...", "") + 
       " Conseils d'experts et astuces exclusives pour optimiser votre expérience.";
