@@ -234,9 +234,43 @@ export const generateSeoDescription = (keyword: string, maxLength: number = 155)
     }
   }
   
-  // Ajustement de la longueur selon la limite maximale
+  // Optimiser la longueur de la description pour atteindre exactement la longueur maximale sans couper les mots
   if (description.length > maxLength) {
-    description = description.substring(0, maxLength - 3) + "...";
+    // Trouver l'espace le plus proche avant la limite
+    let lastSpace = description.lastIndexOf(' ', maxLength - 3);
+    if (lastSpace !== -1) {
+      description = description.substring(0, lastSpace) + "...";
+    } else {
+      // En dernier recours, couper strictement
+      description = description.substring(0, maxLength - 3) + "...";
+    }
+  } else if (description.length < maxLength - 5) {
+    // Si la description est trop courte, allonger avec des points inspirants mais sans dépasser la limite
+    const extensions = [
+      " Découvrez nos conseils exclusifs!",
+      " Informations à jour pour 2024.",
+      " Guide complet et détaillé.",
+      " Expertise reconnue dans le domaine.",
+      " Ressource indispensable pour réussir."
+    ];
+    
+    for (const extension of extensions) {
+      if (description.length + extension.length <= maxLength) {
+        description += extension;
+        break;
+      }
+    }
+  }
+  
+  // Vérifier que la longueur finale est bien dans les limites
+  if (maxLength === 155 && description.length < 150) {
+    // Si on est trop court pour une meta description standard, ajouter du contenu
+    description = description.replace("...", "") + " Conseils d'experts et astuces exclusives pour optimiser votre expérience.";
+    // Et recouper si nécessaire
+    if (description.length > maxLength) {
+      let lastSpace = description.lastIndexOf(' ', maxLength - 3);
+      description = description.substring(0, lastSpace) + "...";
+    }
   }
   
   return description;
