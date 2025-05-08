@@ -23,16 +23,16 @@ const SeoAuthorityMetrics: React.FC<SeoAuthorityMetricsProps> = ({ seoAnalysis }
     Math.floor(Math.random() * 40) + 5;
 
   return (
-    <Card className="p-6 mb-6">
-      <h3 className="text-xl font-bold mb-4 flex items-center">
+    <Card className="p-6 mb-6 bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
+      <h3 className="text-xl font-bold mb-4 flex items-center text-purple-800">
         <BarChart2 className="h-5 w-5 mr-2 text-purple-600" />
         Autorité du domaine et métriques clés
       </h3>
       
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-4 rounded-lg border border-gray-200">
+        <div className="bg-white p-4 rounded-lg border border-purple-200 shadow-sm">
           <div className="flex justify-between mb-2">
-            <p className="text-sm font-medium text-gray-700">Authority Score</p>
+            <p className="text-sm font-medium text-purple-800">Authority Score</p>
             <span className={`text-xs font-semibold px-2 py-0.5 rounded ${
               authorityScore >= 70 ? 'bg-green-100 text-green-800' :
               authorityScore >= 40 ? 'bg-amber-100 text-amber-800' : 
@@ -41,7 +41,14 @@ const SeoAuthorityMetrics: React.FC<SeoAuthorityMetricsProps> = ({ seoAnalysis }
               {authorityScore}/100
             </span>
           </div>
-          <Progress value={authorityScore} className="h-2 mb-2" />
+          <Progress value={authorityScore} className="h-2 mb-2" 
+            style={{
+              backgroundColor: "#e5e7eb", 
+              "--tw-progress-bar": authorityScore >= 70 ? "#22c55e" : 
+                                 authorityScore >= 40 ? "#f59e0b" : 
+                                 "#ef4444"
+            }} 
+          />
           <p className="text-xs text-gray-500">
             {authorityScore >= 70 ? 'Excellente autorité de domaine' :
              authorityScore >= 40 ? 'Autorité de domaine moyenne' :
@@ -49,13 +56,13 @@ const SeoAuthorityMetrics: React.FC<SeoAuthorityMetricsProps> = ({ seoAnalysis }
           </p>
         </div>
         
-        <div className="flex flex-col justify-between bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border border-blue-200">
+        <div className="flex flex-col justify-between bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border border-blue-200 shadow-sm">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <Search className="h-4 w-4 mr-2 text-blue-700" />
               <p className="text-sm font-medium text-blue-700">Mots clés organiques</p>
             </div>
-            <span className="text-xs font-semibold px-2 py-0.5 rounded bg-blue-200 text-blue-800">
+            <span className="text-xs font-semibold px-2 py-0.5 rounded bg-blue-200 text-blue-800 animate-pulse">
               {organicKeywords}
             </span>
           </div>
@@ -65,13 +72,13 @@ const SeoAuthorityMetrics: React.FC<SeoAuthorityMetricsProps> = ({ seoAnalysis }
           </div>
         </div>
         
-        <div className="flex flex-col justify-between bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border border-purple-200">
+        <div className="flex flex-col justify-between bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border border-purple-200 shadow-sm">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <TrendingUp className="h-4 w-4 mr-2 text-purple-700" />
               <p className="text-sm font-medium text-purple-700">Mots clés payants</p>
             </div>
-            <span className="text-xs font-semibold px-2 py-0.5 rounded bg-purple-200 text-purple-800">
+            <span className="text-xs font-semibold px-2 py-0.5 rounded bg-purple-200 text-purple-800 animate-pulse">
               {paidKeywords}
             </span>
           </div>
@@ -81,12 +88,15 @@ const SeoAuthorityMetrics: React.FC<SeoAuthorityMetricsProps> = ({ seoAnalysis }
           </div>
         </div>
         
-        <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border border-green-200 flex flex-col justify-between">
+        <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border border-green-200 shadow-sm flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <Link2 className="h-4 w-4 mr-2 text-green-700" />
               <p className="text-sm font-medium text-green-700">Domaines référents</p>
             </div>
+            <span className="text-xs font-semibold px-2 py-0.5 rounded bg-green-200 text-green-800 animate-pulse">
+              {referringDomains}
+            </span>
           </div>
           <div className="mt-3">
             <p className="text-lg font-bold text-green-800">{referringDomains}</p>
@@ -94,8 +104,8 @@ const SeoAuthorityMetrics: React.FC<SeoAuthorityMetricsProps> = ({ seoAnalysis }
           </div>
         </div>
         
-        <div className="bg-gradient-to-br from-amber-50 to-amber-100 p-4 rounded-lg border border-amber-200 col-span-1 md:col-span-2 flex items-center">
-          <div>
+        <div className="bg-gradient-to-br from-amber-50 to-amber-100 p-4 rounded-lg border border-amber-200 col-span-1 md:col-span-2 flex items-center shadow-sm">
+          <div className="w-full">
             <div className="flex items-center mb-2">
               <Database className="h-4 w-4 mr-2 text-amber-700" />
               <p className="text-sm font-medium text-amber-700">Répartition du trafic</p>
