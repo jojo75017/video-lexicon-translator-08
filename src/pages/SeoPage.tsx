@@ -11,6 +11,7 @@ import AnalysisSettings from '@/components/settings/AnalysisSettings';
 import SeoAnalysisForm from '@/components/seo/analysis/SeoAnalysisForm';
 import { toast } from "sonner";
 import { FirecrawlService } from '@/utils/FirecrawlService';
+import SeoRoiAnalyzer from '@/components/seo/SeoRoiAnalyzer';
 
 const SeoPage = () => {
   const { 
@@ -68,6 +69,7 @@ const SeoPage = () => {
         <Tabs defaultValue="analyse" className="w-full">
           <TabsList className="w-full mb-6">
             <TabsTrigger value="analyse" className="flex-1">Analyse SEO</TabsTrigger>
+            <TabsTrigger value="roi" className="flex-1">ROI SEO</TabsTrigger>
             <TabsTrigger value="parametres" className="flex-1">Paramètres</TabsTrigger>
           </TabsList>
           
@@ -105,6 +107,10 @@ const SeoPage = () => {
                 </div>
               )}
             </Card>
+          </TabsContent>
+          
+          <TabsContent value="roi">
+            <SeoRoiAnalyzer />
           </TabsContent>
           
           <TabsContent value="parametres">
