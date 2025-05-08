@@ -18,8 +18,9 @@ const DescriptionTab = ({ description, setDescription, maxDescriptionLength, key
   
   // Mettre à jour la longueur à chaque changement de description
   useEffect(() => {
-    // Calculer la longueur exacte de la chaîne avec notre utilitaire
+    // Calculer la longueur exacte de la chaîne avec notre utilitaire modifié
     const length = getExactLength(description);
+    console.log("Longueur calculée:", length, "Texte réel:", description.length);
     setDescriptionLength(length);
   }, [description]);
   
