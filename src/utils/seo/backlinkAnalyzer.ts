@@ -25,7 +25,7 @@ export const analyzeBacklinks = (domain: string): {
   
   for (let i = 0; i < Math.min(10, totalBacklinks); i++) {
     const randomDomain = referringDomains[Math.floor(Math.random() * referringDomains.length)];
-    const isDoFollow = Math.random() > 0.3; // 70% chance of being dofollow
+    const isDofollow = Math.random() > 0.3; // 70% chance of being dofollow
     
     if (!domainCounts[randomDomain]) {
       domainCounts[randomDomain] = 0;
@@ -36,10 +36,10 @@ export const analyzeBacklinks = (domain: string): {
       domain: randomDomain,
       url: `https://${randomDomain}/page-${i + 1}`,
       anchorText: `Sample anchor text ${i + 1}`,
-      followType: isDoFollow ? 'follow' : 'nofollow',
+      followType: isDofollow ? 'follow' : 'nofollow',
       authority: Math.floor(Math.random() * 90) + 10,
       date: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      isDoFollow: isDoFollow,
+      isDofollow: isDofollow,
       firstSeen: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
     });
   }

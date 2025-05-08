@@ -1,4 +1,3 @@
-
 export interface AnalysisResult {
   success: boolean;
   data?: any;
@@ -78,6 +77,11 @@ export interface SeoAnalysis {
   socialTags?: Record<string, string>;
   brokenLinks?: any[];
   backlinks?: BacklinkInfo[];
+  
+  // Métriques d'autorité et autres statistiques
+  authorityScore?: number;
+  paidKeywords?: number;
+  paidTraffic?: number;
 }
 
 export interface SeoAnalysisResult {
