@@ -22,6 +22,13 @@ const SeoAuthorityMetrics: React.FC<SeoAuthorityMetricsProps> = ({ seoAnalysis }
   const referringDomains = seoAnalysis.topBacklinkDomains?.length || 
     Math.floor(Math.random() * 40) + 5;
 
+  // Fonction pour déterminer la couleur de la barre de progression
+  const getProgressBarColor = (score: number) => {
+    if (score >= 70) return "#22c55e"; // vert
+    if (score >= 40) return "#f59e0b"; // ambre
+    return "#ef4444"; // rouge
+  };
+
   return (
     <Card className="p-6 mb-6 bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
       <h3 className="text-xl font-bold mb-4 flex items-center text-purple-800">
@@ -43,12 +50,17 @@ const SeoAuthorityMetrics: React.FC<SeoAuthorityMetricsProps> = ({ seoAnalysis }
           </div>
           <Progress value={authorityScore} className="h-2 mb-2" 
             style={{
-              backgroundColor: "#e5e7eb", 
-              "--tw-progress-bar": authorityScore >= 70 ? "#22c55e" : 
-                                 authorityScore >= 40 ? "#f59e0b" : 
-                                 "#ef4444"
+              backgroundColor: "#e5e7eb"
             }} 
-          />
+          >
+            <div
+              className="h-full transition-all" 
+              style={{
+                width: `${authorityScore}%`,
+                backgroundColor: getProgressBarColor(authorityScore)
+              }}
+            />
+          </Progress>
           <p className="text-xs text-gray-500">
             {authorityScore >= 70 ? 'Excellente autorité de domaine' :
              authorityScore >= 40 ? 'Autorité de domaine moyenne' :
