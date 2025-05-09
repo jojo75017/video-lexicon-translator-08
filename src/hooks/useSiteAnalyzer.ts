@@ -15,6 +15,7 @@ export interface SiteAnalyzerResult {
   analyzeSite: () => void;
   error: string | null;
   handleActivateProxy: () => void;
+  proxyEnabled: boolean;
 }
 
 export const useSiteAnalyzer = (): SiteAnalyzerResult => {
@@ -25,6 +26,7 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
   const [resources, setResources] = useState<any>(null);
   const [siteStructure, setSiteStructure] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [proxyEnabled, setProxyEnabled] = useState<boolean>(true);
   
   const analyzeSite = async () => {
     // Réinitialiser l'état
@@ -129,6 +131,7 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
   
   const handleActivateProxy = () => {
     SiteAnalysisService.enableProxy();
+    setProxyEnabled(true);
     toast.success("Proxy CORS activé", {
       description: "Vous pouvez maintenant analyser des sites externes"
     });
@@ -144,6 +147,7 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
     siteStructure,
     analyzeSite,
     error,
-    handleActivateProxy
+    handleActivateProxy,
+    proxyEnabled
   };
 };

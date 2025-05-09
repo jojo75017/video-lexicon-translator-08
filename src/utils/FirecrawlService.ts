@@ -93,6 +93,17 @@ export class FirecrawlService {
     }
   }
   
+  // Simuler des User-Agent pour les tests desktop et mobile
+  static getUserAgent(isMobile = false): string {
+    if (isMobile) {
+      // User agent pour smartphone
+      return 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Mobile/15E148 Safari/604.1';
+    } else {
+      // User agent desktop standard
+      return 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36';
+    }
+  }
+  
   // Analyser un site web
   static async crawlWebsite(url: string, forceProxy = true): Promise<SeoAnalysisResult> {
     const startTime = performance.now();
@@ -108,7 +119,7 @@ export class FirecrawlService {
       const response = await fetch(formattedUrl, {
         method: 'GET',
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+          'User-Agent': this.getUserAgent(false),
           'Accept': 'text/html',
           'X-Requested-With': 'XMLHttpRequest'
         }
@@ -211,7 +222,56 @@ export class FirecrawlService {
         imageCount: Math.floor(Math.random() * 30) + 10,
         totalSize: Math.random() * 5000000 + 1000000,
         responseTime: Math.random() * 200 + 50,
-        cacheLifetime: 3600
+        cacheLifetime: 3600,
+        // Ajout des données mobile et desktop spécifiques
+        mobilePerformance: {
+          loadTime: Math.random() * 4000 + 1500,
+          firstContentfulPaint: Math.random() * 1500 + 700,
+          largestContentfulPaint: Math.random() * 2500 + 1500,
+          speedIndex: Math.random() * 3500 + 2000,
+          timeToInteractive: Math.random() * 4500 + 2500,
+          domLoadTime: Math.random() * 2500 + 1200,
+          totalBlockingTime: Math.random() * 400 + 150,
+          cumulativeLayoutShift: Math.random() * 0.4,
+          performanceScore: Math.floor(Math.random() * 25) + 60,
+          resourceCount: Math.floor(Math.random() * 45) + 25,
+          scriptCount: Math.floor(Math.random() * 18) + 4,
+          imageCount: Math.floor(Math.random() * 25) + 8,
+          styleCount: Math.floor(Math.random() * 8) + 2,
+          resourceBreakdown: {
+            images: Math.random() * 1800000,
+            scripts: Math.random() * 900000,
+            styles: Math.random() * 450000,
+            fonts: Math.random() * 270000,
+            other: Math.random() * 180000
+          },
+          totalSize: Math.random() * 4500000,
+          responseTime: Math.random() * 350 + 70
+        },
+        desktopPerformance: {
+          loadTime: Math.random() * 2500 + 800,
+          firstContentfulPaint: Math.random() * 800 + 300,
+          largestContentfulPaint: Math.random() * 1500 + 700,
+          speedIndex: Math.random() * 2000 + 1000,
+          timeToInteractive: Math.random() * 2500 + 1200,
+          domLoadTime: Math.random() * 1500 + 600,
+          totalBlockingTime: Math.random() * 200 + 80,
+          cumulativeLayoutShift: Math.random() * 0.2,
+          performanceScore: Math.floor(Math.random() * 25) + 75,
+          resourceCount: Math.floor(Math.random() * 50) + 20,
+          scriptCount: Math.floor(Math.random() * 20) + 5,
+          imageCount: Math.floor(Math.random() * 30) + 10,
+          styleCount: Math.floor(Math.random() * 10) + 3,
+          resourceBreakdown: {
+            images: Math.random() * 2200000,
+            scripts: Math.random() * 1100000,
+            styles: Math.random() * 550000,
+            fonts: Math.random() * 330000,
+            other: Math.random() * 220000
+          },
+          totalSize: Math.random() * 5500000,
+          responseTime: Math.random() * 250 + 40
+        }
       },
       readabilityScore: Math.floor(Math.random() * 40) + 60,
       wordCount: Math.floor(Math.random() * 1000) + 500,

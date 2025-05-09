@@ -72,6 +72,40 @@ export class ProxyService {
     return this.getBestProxy() + encodeURIComponent(url);
   }
   
+  // Simuler des User-Agent pour les tests desktop et mobile
+  static getUserAgent(isMobile = false): string {
+    if (isMobile) {
+      // User agent pour smartphone
+      return 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Mobile/15E148 Safari/604.1';
+    } else {
+      // User agent desktop standard
+      return 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36';
+    }
+  }
+  
+  // Méthode pour effectuer une requête avec proxy et user-agent approprié
+  static async fetchWithProxies(url: string, options: RequestInit = {}, isMobile = false): Promise<Response> {
+    const finalUrl = this.applyProxy(url);
+    const userAgent = this.getUserAgent(isMobile);
+    
+    // Merger les options avec les headers par défaut
+    const finalOptions: RequestInit = {
+      ...options,
+      headers: {
+        ...options.headers,
+        'User-Agent': userAgent
+      }
+    };
+    
+    try {
+      const response = await fetch(finalUrl, finalOptions);
+      return response;
+    } catch (error) {
+      console.error(`Error fetching with proxy: ${error}`);
+      throw error;
+    }
+  }
+  
   // Teste tous les proxys
   static async testAllProxies(): Promise<{ proxy: string; working: boolean; latency?: number }[]> {
     const results = [];

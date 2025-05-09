@@ -98,7 +98,49 @@ const SeoPage = () => {
       imageCount: Math.floor(Math.random() * 30) + 10,
       totalSize: Math.random() * 5000000 + 1000000,
       responseTime: Math.random() * 200 + 50,
-      cacheLifetime: 3600
+      cacheLifetime: 3600,
+      mobilePerformance: {
+        loadTime: Math.random() * 4000 + 1500,
+        firstContentfulPaint: Math.random() * 1500 + 700,
+        largestContentfulPaint: Math.random() * 2500 + 1500,
+        speedIndex: Math.random() * 3500 + 2000,
+        timeToInteractive: Math.random() * 4500 + 2500,
+        domLoadTime: Math.random() * 2500 + 1200,
+        totalBlockingTime: Math.random() * 400 + 150,
+        cumulativeLayoutShift: Math.random() * 0.4,
+        performanceScore: Math.floor(Math.random() * 25) + 60,
+        resourceCount: Math.floor(Math.random() * 45) + 25,
+        resourceBreakdown: {
+          images: Math.random() * 1800000,
+          scripts: Math.random() * 900000,
+          styles: Math.random() * 450000,
+          fonts: Math.random() * 270000,
+          other: Math.random() * 180000
+        },
+        totalSize: Math.random() * 4500000,
+        responseTime: Math.random() * 350 + 70
+      },
+      desktopPerformance: {
+        loadTime: Math.random() * 2500 + 800,
+        firstContentfulPaint: Math.random() * 800 + 300,
+        largestContentfulPaint: Math.random() * 1500 + 700,
+        speedIndex: Math.random() * 2000 + 1000,
+        timeToInteractive: Math.random() * 2500 + 1200,
+        domLoadTime: Math.random() * 1500 + 600,
+        totalBlockingTime: Math.random() * 200 + 80,
+        cumulativeLayoutShift: Math.random() * 0.2,
+        performanceScore: Math.floor(Math.random() * 25) + 75,
+        resourceCount: Math.floor(Math.random() * 50) + 20,
+        resourceBreakdown: {
+          images: Math.random() * 2200000,
+          scripts: Math.random() * 1100000,
+          styles: Math.random() * 550000,
+          fonts: Math.random() * 330000,
+          other: Math.random() * 220000
+        },
+        totalSize: Math.random() * 5500000,
+        responseTime: Math.random() * 250 + 40
+      }
     };
     
     setSimulatedPerformance(mockPerformance);
@@ -223,7 +265,7 @@ const SeoPage = () => {
                   
                   <div className="mt-4 flex flex-wrap gap-2">
                     <Button 
-                      variant="amber"
+                      variant="outline"
                       size="sm"
                       onClick={activateProxyHandler}
                       className="bg-amber-100 text-amber-800 hover:bg-amber-200"
@@ -232,7 +274,7 @@ const SeoPage = () => {
                     </Button>
                     
                     <Button 
-                      variant="amber"
+                      variant="outline"
                       size="sm"
                       onClick={handleSimulatePerformance}
                       className="bg-amber-100 text-amber-800 hover:bg-amber-200"
@@ -252,8 +294,8 @@ const SeoPage = () => {
                 Test de performance
               </h2>
               <p className="text-gray-600 mb-6">
-                Évaluez la vitesse de chargement de votre site web et obtenez des recommandations
-                pour améliorer les performances.
+                Évaluez la vitesse de chargement de votre site web en version desktop et mobile,
+                et obtenez des recommandations pour améliorer les performances.
               </p>
               
               <SeoAnalysisForm
