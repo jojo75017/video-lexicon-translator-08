@@ -41,6 +41,7 @@ export interface MetricItemProps {
   maxValue: number;
   formatFunc: (value: number) => string;
   getColorClass: (value: number, type: 'text' | 'bg') => string;
+  tooltip?: string;
 }
 
 export interface ChartProps {
