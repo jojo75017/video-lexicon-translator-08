@@ -44,6 +44,7 @@ const LoadingSpeedAnalysis: React.FC<LoadingSpeedAnalysisProps> = ({ performance
 
   // Formater la taille en Ko ou Mo
   const formatSize = (bytes: number): string => {
+    if (!bytes) return "0 B";
     if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
@@ -290,6 +291,8 @@ const LoadingSpeedAnalysis: React.FC<LoadingSpeedAnalysisProps> = ({ performance
               {!performance.timeToInteractive && (
                 <li>Mesurez le temps d'interactivité pour identifier les problèmes potentiels</li>
               )}
+              <li>Utilisez un système de mise en cache efficace pour les ressources statiques</li>
+              <li>Implémentez le chargement différé (lazy loading) pour les images</li>
             </ul>
           </div>
         </div>

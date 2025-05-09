@@ -1,5 +1,5 @@
 
-// Corriger les erreurs de compilation en supprimant la propriété cssCount
+// Corriger les erreurs de compilation en ajoutant les propriétés manquantes
 
 import { Performance } from '@/types/seo';
 
@@ -38,7 +38,11 @@ export const analyzePerformance = (doc: Document, startTime: number): Performanc
     totalSize: Math.random() * 5000000,
     responseTime: Math.random() * 300 + 50,
     impressions: Math.floor(Math.random() * 10000),
-    clickThroughRate: Math.random() * 10
+    clickThroughRate: Math.random() * 10,
+    // Propriétés manquantes ajoutées pour corriger l'erreur de compilation
+    totalBlockingTime: Math.random() * 300 + 100,
+    cumulativeLayoutShift: Math.random() * 0.3,
+    performanceScore: Math.floor(Math.random() * 30) + 70
   };
   
   return mockPerformance;
