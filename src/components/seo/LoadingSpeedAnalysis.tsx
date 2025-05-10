@@ -8,6 +8,9 @@ import PerformanceBarChart from './performance/PerformanceBarChart';
 import ResourcesChart from './performance/ResourcesChart';
 import Recommendations from './performance/Recommendations';
 import PerformanceScore from './performance/PerformanceScore';
+import PerformanceComparisonChart from './performance/PerformanceComparisonChart';
+import PerformanceHighlights from './performance/PerformanceHighlights';
+import PerformanceTrends from './performance/PerformanceTrends';
 import { calculateSpeedScore, formatTime } from './performance/utils';
 
 interface LoadingSpeedAnalysisProps {
@@ -77,11 +80,26 @@ const LoadingSpeedAnalysis: React.FC<LoadingSpeedAnalysisProps> = ({ performance
           </TabsTrigger>
         </TabsList>
         
+        {/* Add Performance Highlights */}
+        <PerformanceHighlights 
+          deviceData={deviceData} 
+          activeDevice={activeDevice} 
+        />
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           <PerformanceMetricsSection deviceData={deviceData} activeDevice={activeDevice} />
           <PerformanceBarChart activeDevice={activeDevice} data={barData} />
         </div>
       </Tabs>
+      
+      {/* Add comparison chart between mobile and desktop */}
+      <PerformanceComparisonChart 
+        mobileData={performance.mobilePerformance} 
+        desktopData={performance.desktopPerformance} 
+      />
+      
+      {/* Add performance trends */}
+      <PerformanceTrends activeDevice={activeDevice} />
       
       {resourcesData.length > 0 && (
         <ResourcesChart activeDevice={activeDevice} resourcesData={resourcesData} />
