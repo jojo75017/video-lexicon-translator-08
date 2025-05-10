@@ -2,185 +2,192 @@
 import { HeadingStructure, HierarchyItem } from '@/types/seo';
 
 export const analyzeHeadings = (doc: Document): HeadingStructure => {
-  console.log("ANALYZING HEADINGS...");
+  console.log("Analyzing document headings structure");
   
+  // Initialize result
+  const result: HeadingStructure = {
+    h1: [],
+    h2: [],
+    h3: [],
+    h4: [],
+    h5: [],
+    h6: [],
+    h1Count: 0,
+    h2Count: 0,
+    h3Count: 0,
+    hierarchy: [],
+    paragraphs: [], // Added for compatibility
+    headings: [] // Added for compatibility
+  };
+
   try {
-    // Si le document est null ou invalide, retourne des données fictives
-    if (!doc || !doc.getElementsByTagName) {
-      console.log("WARNING: Invalid document for heading analysis, returning mock data");
-      return generateMockHeadingStructure();
-    }
+    // Extract all headings
+    const h1Elements = Array.from(doc.querySelectorAll('h1'));
+    const h2Elements = Array.from(doc.querySelectorAll('h2'));
+    const h3Elements = Array.from(doc.querySelectorAll('h3'));
+    const h4Elements = Array.from(doc.querySelectorAll('h4'));
+    const h5Elements = Array.from(doc.querySelectorAll('h5'));
+    const h6Elements = Array.from(doc.querySelectorAll('h6'));
+    const pElements = Array.from(doc.querySelectorAll('p'));
     
-    // Get all headings
-    const headings = Array.from(doc.querySelectorAll('h1, h2, h3, h4, h5, h6'));
-    console.log(`HEADINGS FOUND: ${headings.length}`);
-    headings.forEach((h, i) => {
-      console.log(`HEADING ${i+1}: ${h.tagName} - ${h.textContent?.substring(0, 50) || 'Empty heading'}`);
+    console.log(`Found: H1=${h1Elements.length}, H2=${h2Elements.length}, H3=${h3Elements.length}, p=${pElements.length}`);
+    
+    // Store heading content
+    result.h1 = h1Elements.map(el => el.textContent || '');
+    result.h2 = h2Elements.map(el => el.textContent || '');
+    result.h3 = h3Elements.map(el => el.textContent || '');
+    result.h4 = h4Elements.map(el => el.textContent || '');
+    result.h5 = h5Elements.map(el => el.textContent || '');
+    result.h6 = h6Elements.map(el => el.textContent || '');
+    
+    // Count headings
+    result.h1Count = h1Elements.length;
+    result.h2Count = h2Elements.length;
+    result.h3Count = h3Elements.length;
+    
+    // For compatibility with existing code
+    const allHeadings = [
+      ...h1Elements.map((el, idx) => ({ 
+        id: `h1-${idx}`,
+        name: el.textContent || '',
+        level: 1,
+        text: el.textContent || '', 
+        tagName: 'h1', 
+        position: idx,
+        children: []
+      } as HierarchyItem)),
+      ...h2Elements.map((el, idx) => ({ 
+        id: `h2-${idx}`,
+        name: el.textContent || '',
+        level: 2,
+        text: el.textContent || '', 
+        tagName: 'h2', 
+        position: idx,
+        children: []
+      } as HierarchyItem)),
+      ...h3Elements.map((el, idx) => ({ 
+        id: `h3-${idx}`,
+        name: el.textContent || '',
+        level: 3,
+        text: el.textContent || '', 
+        tagName: 'h3', 
+        position: idx,
+        children: []
+      } as HierarchyItem)),
+      ...h4Elements.map((el, idx) => ({ 
+        id: `h4-${idx}`,
+        name: el.textContent || '',
+        level: 4,
+        text: el.textContent || '', 
+        tagName: 'h4', 
+        position: idx,
+        children: []
+      } as HierarchyItem))
+    ];
+    
+    // Sort all headings by their position in the document
+    const sortedHeadings = allHeadings.sort((a, b) => {
+      return (a.position || 0) - (b.position || 0);
     });
     
-    // Get all paragraphs
-    const paragraphs = Array.from(doc.querySelectorAll('p'));
-    console.log(`PARAGRAPHS FOUND: ${paragraphs.length}`);
+    result.headings = sortedHeadings;
     
-    // If no headings are found, return mock data
-    if (headings.length === 0) {
-      console.log("NO HEADINGS FOUND: Creating sample data");
-      return generateMockHeadingStructure();
-    }
-    
-    // Create a combined array of headings and paragraphs to maintain document flow
-    const contentElements = [...headings, ...paragraphs].sort((a, b) => {
-      // Sort by position in the document
-      const posA = Array.from(doc.body.querySelectorAll('*')).indexOf(a);
-      const posB = Array.from(doc.body.querySelectorAll('*')).indexOf(b);
-      return posA - posB;
-    });
-    
-    // Build a hierarchical structure
+    // Build hierarchy
     const hierarchy: HierarchyItem[] = [];
     let currentH1: HierarchyItem | null = null;
     let currentH2: HierarchyItem | null = null;
     let currentH3: HierarchyItem | null = null;
     
-    console.log("BUILDING HIERARCHY...");
-    for (const element of contentElements) {
-      const tagName = element.tagName.toLowerCase();
-      const content = element.textContent?.trim() || '';
-      const position = Array.from(doc.body.querySelectorAll('*')).indexOf(element);
+    for (const heading of sortedHeadings) {
+      const level = heading.level;
       
-      if (tagName === 'h1') {
-        console.log(`ADDING H1: ${content}`);
-        currentH1 = { text: content, children: [], tagName, position };
+      if (level === 1) {
+        currentH1 = { ...heading, children: [] };
+        hierarchy.push(currentH1);
         currentH2 = null;
         currentH3 = null;
-        hierarchy.push(currentH1);
-      } else if (tagName === 'h2' && currentH1) {
-        console.log(`ADDING H2: ${content}`);
-        currentH2 = { text: content, children: [], tagName, position };
-        currentH3 = null;
-        currentH1.children.push(currentH2);
-      } else if (tagName === 'h3' && currentH2) {
-        console.log(`ADDING H3: ${content}`);
-        currentH3 = { text: content, children: [], tagName, position };
-        currentH2.children.push(currentH3);
-      } else if (tagName === 'p') {
-        const paragraph = { text: content, tagName, position, children: [] };
-        if (currentH3) {
-          currentH3.children.push(paragraph);
-        } else if (currentH2) {
-          currentH2.children.push(paragraph);
-        } else if (currentH1) {
-          currentH1.children.push(paragraph);
+      } 
+      else if (level === 2) {
+        currentH2 = { ...heading, children: [] };
+        if (currentH1) {
+          currentH1.children?.push(currentH2);
         } else {
-          hierarchy.push(paragraph);
+          hierarchy.push(currentH2);
+        }
+        currentH3 = null;
+      }
+      else if (level === 3) {
+        currentH3 = { ...heading, children: [] };
+        if (currentH2) {
+          currentH2.children?.push(currentH3);
+        } else if (currentH1) {
+          currentH1.children?.push(currentH3);
+        } else {
+          hierarchy.push(currentH3);
+        }
+      }
+      else if (level === 4) {
+        if (currentH3) {
+          currentH3.children?.push(heading);
+        } else if (currentH2) {
+          currentH2.children?.push(heading);
+        } else if (currentH1) {
+          currentH1.children?.push(heading);
+        } else {
+          hierarchy.push(heading);
         }
       }
     }
-
-    console.log(`HIERARCHY BUILT: ${hierarchy.length} top-level items`);
     
-    // If no proper hierarchy was built, return mock data
-    if (hierarchy.length === 0) {
-      console.log("NO HIERARCHY FOUND: Creating sample data");
-      return generateMockHeadingStructure();
-    }
+    result.hierarchy = hierarchy;
     
-    return {
-      h1Count: doc.getElementsByTagName('h1').length,
-      h2Count: doc.getElementsByTagName('h2').length,
-      h3Count: doc.getElementsByTagName('h3').length,
-      headings: headings.map((heading, index) => ({
-        text: heading.textContent?.trim() || 'Heading sans texte',
-        level: parseInt(heading.tagName.substring(1)),
-        position: index
-      })),
-      paragraphs: paragraphs.map((p, index) => ({
-        text: p.textContent?.trim() || 'Paragraphe sans texte',
-        position: index
-      })),
-      hierarchy
-    };
+    // Add paragraphs for compatibility
+    result.paragraphs = pElements.map((el, idx) => ({
+      text: el.textContent || '',
+      position: idx,
+    }));
+    
   } catch (error) {
-    console.error("ERROR in heading analysis:", error);
-    return generateMockHeadingStructure();
+    console.error("Error analyzing headings structure:", error);
   }
+
+  return result;
 };
 
-const generateMockHeadingStructure = (): HeadingStructure => {
-  console.log("GENERATING MOCK HEADING STRUCTURE");
+export const getHeadingIssues = (headingStructure: HeadingStructure): string[] => {
+  const issues: string[] = [];
   
-  const hierarchy: HierarchyItem[] = [
-    {
-      text: "Bienvenue chez AquariosLands",
-      tagName: 'h1',
-      position: 0,
-      children: [
-        {
-          text: "Guide complet pour débuter en aquariophilie",
-          tagName: 'h2',
-          position: 1,
-          children: [
-            {
-              text: "Choix du matériel",
-              tagName: 'h3',
-              position: 2,
-              children: [
-                {
-                  text: "L'aquariophilie d'eau douce est un hobby passionnant qui permet d'observer et maintenir un écosystème aquatique chez soi. Commencer avec le bon matériel est essentiel.",
-                  tagName: 'p',
-                  position: 3,
-                  children: []
-                }
-              ]
-            },
-            {
-              text: "Maintenance et entretien",
-              tagName: 'h3',
-              position: 4,
-              children: [
-                {
-                  text: "Un entretien régulier est nécessaire pour maintenir la qualité de l'eau et la santé des poissons. Apprenez les bases du cycle de l'azote.",
-                  tagName: 'p',
-                  position: 5,
-                  children: []
-                }
-              ]
-            }
-          ]
-        },
-        {
-          text: "Les espèces recommandées pour débutants",
-          tagName: 'h2',
-          position: 6,
-          children: [
-            {
-              text: "Certaines espèces de poissons sont plus adaptées aux débutants car elles sont robustes et faciles à maintenir. Découvrez notre sélection.",
-              tagName: 'p',
-              position: 7,
-              children: []
-            }
-          ]
-        }
-      ]
+  // Check if there's an H1
+  if (headingStructure.h1.length === 0) {
+    issues.push('La page ne contient pas de titre H1. Chaque page devrait avoir un titre H1 unique.');
+  }
+  
+  // Check if there are multiple H1s
+  if (headingStructure.h1.length > 1) {
+    issues.push('La page contient plusieurs titres H1. Pour une meilleure optimisation SEO, utilisez un seul titre H1 par page.');
+  }
+  
+  // Check if the hierarchy is logical (H2 comes after H1, H3 after H2, etc.)
+  let foundH1 = false;
+  let foundH2 = false;
+  let foundH3 = false;
+  
+  const allHeadings = headingStructure.headings || [];
+  
+  for (const heading of allHeadings) {
+    if (heading.level === 1) foundH1 = true;
+    else if (heading.level === 2) {
+      foundH2 = true;
+      if (!foundH1) issues.push('Un titre H2 apparaît avant tout titre H1. Respectez la hiérarchie des titres.');
     }
-  ];
+    else if (heading.level === 3) {
+      foundH3 = true;
+      if (!foundH2) issues.push('Un titre H3 apparaît avant tout titre H2. Respectez la hiérarchie des titres.');
+    }
+    else if (heading.level === 4) {
+      if (!foundH3) issues.push('Un titre H4 apparaît avant tout titre H3. Respectez la hiérarchie des titres.');
+    }
+  }
   
-  return {
-    h1Count: 1,
-    h2Count: 2,
-    h3Count: 2,
-    headings: [
-      { text: "Bienvenue chez AquariosLands", level: 1, position: 0 },
-      { text: "Guide complet pour débuter en aquariophilie", level: 2, position: 1 },
-      { text: "Choix du matériel", level: 3, position: 2 },
-      { text: "Maintenance et entretien", level: 3, position: 4 },
-      { text: "Les espèces recommandées pour débutants", level: 2, position: 6 }
-    ],
-    paragraphs: [
-      { text: "L'aquariophilie d'eau douce est un hobby passionnant qui permet d'observer et maintenir un écosystème aquatique chez soi. Commencer avec le bon matériel est essentiel.", position: 3 },
-      { text: "Un entretien régulier est nécessaire pour maintenir la qualité de l'eau et la santé des poissons. Apprenez les bases du cycle de l'azote.", position: 5 },
-      { text: "Certaines espèces de poissons sont plus adaptées aux débutants car elles sont robustes et faciles à maintenir. Découvrez notre sélection.", position: 7 }
-    ],
-    hierarchy
-  };
+  return issues;
 };

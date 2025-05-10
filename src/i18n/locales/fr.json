@@ -56,6 +56,12 @@
     "mobileAnalysis": "Analyse basée sur une simulation de connexion mobile 4G.",
     "desktopAnalysis": "Analyse basée sur une simulation de connexion fibre optique.",
     "resourceBreakdown": "Répartition des ressources",
+    "priority": {
+      "high": "Haute priorité",
+      "medium": "Priorité moyenne",
+      "low": "Priorité faible"
+    },
+    "impactScore": "Impact",
     "recommendations": {
       "title": "Recommandations d'optimisation",
       "optimizeImages": "Optimisez les images pour réduire leur taille",
@@ -66,7 +72,9 @@
       "improveServerResponse": "Améliorez le temps de réponse du serveur",
       "useCaching": "Utilisez la mise en cache du navigateur",
       "reduceRedirects": "Réduisez les redirections",
-      "useCDN": "Utilisez un CDN pour les ressources statiques"
+      "useCDN": "Utilisez un CDN pour les ressources statiques",
+      "optimizeLCP": "Optimisez le temps de chargement du plus grand élément visible",
+      "reduceCLS": "Réduisez les changements de mise en page pendant le chargement"
     }
   }
 }

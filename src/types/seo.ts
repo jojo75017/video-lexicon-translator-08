@@ -1,3 +1,4 @@
+
 export interface AnalysisResult {
   success: boolean;
   data?: any;
@@ -35,7 +36,6 @@ export interface OpenAIKeywordResponse {
   suggestedLongDescription?: string;   // Description longue
 }
 
-// Interfaces manquantes pour corriger les erreurs de compilation
 export interface SeoAnalysis {
   url: string;
   score: number;
@@ -60,10 +60,12 @@ export interface SeoAnalysis {
   contentQuality?: { readingTime: number; complexity: number };
   searchConsole?: { clicks: number; impressions: number; position?: number; keywords?: any[]; topPages?: any[] };
   keywordSuggestions?: KeywordSuggestion[];
+  sourceCode?: string;  // Ajouté pour corriger les erreurs
+  textContent?: string; // Ajouté pour corriger les erreurs
   
   // Ajouts pour compatibilité avec les composants
   backlinkDetails?: BacklinkInfo[];
-  topBacklinkDomains?: {domain: string; count: number}[];
+  topBacklinkDomains?: {domain: string; count: number}[] | string[];
   doFollowBacklinks?: number;
   noFollowBacklinks?: number;
   organicTraffic?: number;
@@ -129,6 +131,8 @@ export interface Performance {
   impressions?: number;
   clickThroughRate?: number;
   domLoadTime: number;
+  mobilePerformance?: any; // Ajout pour corriger les erreurs
+  desktopPerformance?: any; // Ajout pour corriger les erreurs
   
   // Propriétés supplémentaires
   score?: number;
@@ -166,15 +170,16 @@ export interface ImageDetails extends ImageAnalysis {
   size: number;
   format: string;
   hasAlt: boolean;
+  lazyLoaded?: boolean; // Ajouté pour corriger les erreurs
 }
 
 export interface BacklinkInfo {
   url: string;
   anchorText: string;
-  domainAuthority: number;
-  isDofollow: boolean; // correction de isDoFollow -> isDofollow
-  firstDetected: string;
-  lastDetected: string;
+  domainAuthority?: number;
+  isDofollow: boolean;
+  firstDetected?: string;
+  lastDetected?: string;
   domain?: string; // Ajouté pour compatibilité
   authority?: number; // Ajouté pour compatibilité
   firstSeen?: string; // Ajouté pour compatibilité
@@ -194,6 +199,7 @@ export interface HeadingStructure {
   h3Count?: number;
   hierarchy?: HierarchyItem[];
   headings?: any[]; // Ajouté pour compatibilité
+  paragraphs?: any[]; // Ajouté pour corriger les erreurs
 }
 
 export interface HierarchyItem {
@@ -208,42 +214,42 @@ export interface HierarchyItem {
 
 export interface KeywordData {
   keyword: string;
-  searchVolume: number;
-  competition: number;
-  cpc: number;
-  relevance: number;
+  searchVolume?: number;
+  competition?: number;
+  cpc?: number;
+  relevance?: number;
   count?: number; // Ajouté pour compatibilité
   density?: number; // Ajouté pour compatibilité
   position?: number; // Ajouté pour compatibilité
 }
 
 export interface SearchConsoleData {
-  queries: Array<{
+  queries?: Array<{
     query: string;
     clicks: number;
     impressions: number;
     ctr: number;
     position: number;
   }>;
-  pages: Array<{
+  pages?: Array<{
     page: string;
     clicks: number;
     impressions: number;
     ctr: number;
     position: number;
   }>;
-  devices: {
+  devices?: {
     desktop: number;
     mobile: number;
     tablet: number;
   };
-  countries: Record<string, number>;
+  countries?: Record<string, number>;
   position?: number; // Ajouté pour compatibilité
-  clicks?: number; // Ajouté pour compatibilité
-  impressions?: number; // Ajouté pour compatibilité
+  clicks?: Record<string, number> | any; // Ajouté pour corriger les erreurs
+  impressions?: Record<string, number> | any; // Ajouté pour corriger les erreurs
   keywords?: any[]; // Ajouté pour compatibilité
   topPages?: any[]; // Ajouté pour compatibilité
-  ctr?: number; // Ajouté pour compatibilité
+  ctr?: Record<string, number> | any; // Ajouté pour corriger les erreurs
   topQueries?: any[]; // Ajouté pour compatibilité
 }
 
@@ -288,4 +294,14 @@ export interface PerformanceData {
     fonts: number;
     other: number;
   };
+}
+
+// Nouveau type pour la structure de contenu
+export type StructureItemType = 'h1' | 'h2' | 'h3' | 'h4' | 'p' | 'list';
+
+export interface StructureItem {
+  id: string;
+  content: string;
+  type: StructureItemType;
+  items?: string[];
 }
