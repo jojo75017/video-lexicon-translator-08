@@ -1,69 +1,93 @@
 
 import React from 'react';
-import { Lightbulb } from 'lucide-react';
-import { RecommendationsProps } from './types';
+import { Card } from "@/components/ui/card";
+import { Check, AlertCircle } from 'lucide-react';
+import { PerformanceData } from './types';
+import { useTranslation } from 'react-i18next';
 
-const Recommendations: React.FC<RecommendationsProps> = ({ 
-  activeDevice, 
-  deviceData 
-}) => {
+interface RecommendationsProps {
+  activeDevice: 'mobile' | 'desktop';
+  deviceData: PerformanceData;
+}
+
+const Recommendations: React.FC<RecommendationsProps> = ({ activeDevice, deviceData }) => {
+  const { t } = useTranslation();
+  
+  // Determine which recommendations to show based on the performance data
+  const getRecommendations = () => {
+    const recommendations = [];
+    const { loadTime, firstContentfulPaint, largestContentfulPaint, totalBlockingTime, cumulativeLayoutShift } = deviceData;
+    
+    // Resource size related recommendations
+    if (deviceData.resourceBreakdown?.images > 500) {
+      recommendations.push({
+        id: 'optimizeImages',
+        text: t('performance.recommendations.optimizeImages')
+      });
+    }
+    
+    if (deviceData.resourceBreakdown?.styles > 200) {
+      recommendations.push({
+        id: 'minifyCSS',
+        text: t('performance.recommendations.minifyCSS')
+      });
+    }
+    
+    if (deviceData.resourceBreakdown?.scripts > 300) {
+      recommendations.push({
+        id: 'minifyJS',
+        text: t('performance.recommendations.minifyJS')
+      });
+    }
+    
+    // Performance metric based recommendations
+    if (totalBlockingTime > 300) {
+      recommendations.push({
+        id: 'reduceTBT',
+        text: t('performance.recommendations.reduceTBT')
+      });
+    }
+    
+    if (loadTime > (activeDevice === 'mobile' ? 3000 : 2000)) {
+      recommendations.push({
+        id: 'improveServerResponse',
+        text: t('performance.recommendations.improveServerResponse')
+      });
+    }
+    
+    // General best practice recommendations
+    recommendations.push({
+      id: 'useCaching',
+      text: t('performance.recommendations.useCaching')
+    });
+    
+    recommendations.push({
+      id: 'useCDN',
+      text: t('performance.recommendations.useCDN')
+    });
+    
+    return recommendations;
+  };
+  
+  const recommendations = getRecommendations();
+  
   return (
-    <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 mt-6">
-      <div className="flex items-start gap-2">
-        <Lightbulb className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-        <div>
-          <h4 className="font-medium text-blue-800">
-            {activeDevice === 'mobile' ? 'Recommandations d\'optimisation mobile' : 'Recommandations d\'optimisation desktop'}
-          </h4>
-          <ul className="text-sm text-blue-700 mt-2 space-y-1 list-disc pl-5">
-            {activeDevice === 'mobile' && (
-              <>
-                {deviceData.loadTime > 3500 && (
-                  <li>Optimisez spécifiquement pour les connexions mobiles plus lentes (3G/4G)</li>
-                )}
-                {deviceData.firstContentfulPaint > 1200 && (
-                  <li>Réduisez les CSS bloquants pour améliorer le rendu initial sur mobile</li>
-                )}
-                {deviceData.resourceBreakdown?.images && deviceData.resourceBreakdown.images > 400000 && (
-                  <li>Utilisez des images responsive avec srcset pour les appareils mobiles</li>
-                )}
-                {deviceData.cumulativeLayoutShift && deviceData.cumulativeLayoutShift > 0.25 && (
-                  <li>Corrigez les changements de mise en page inattendus sur mobile (CLS élevé)</li>
-                )}
-                <li>Utilisez AMP (Accelerated Mobile Pages) pour une expérience ultra-rapide</li>
-                <li>Testez l'interface tactile et assurez-vous que les éléments cliquables sont suffisamment grands</li>
-                <li>Évitez les redirections sur mobile qui ralentissent le chargement</li>
-              </>
-            )}
-                
-            {activeDevice === 'desktop' && (
-              <>
-                {deviceData.loadTime > 3000 && (
-                  <li>Réduisez le temps de chargement total, idéalement en dessous de 3 secondes</li>
-                )}
-                {deviceData.firstContentfulPaint > 1000 && (
-                  <li>Améliorez le premier affichage du contenu en optimisant le CSS critique</li>
-                )}
-                {deviceData.resourceBreakdown?.images && deviceData.resourceBreakdown.images > 500000 && (
-                  <li>Compressez et optimisez les images pour réduire leur taille</li>
-                )}
-                {deviceData.resourceBreakdown?.scripts && deviceData.resourceBreakdown.scripts > 400000 && (
-                  <li>Minifiez et divisez vos scripts JavaScript</li>
-                )}
-                {deviceData.timeToInteractive && deviceData.timeToInteractive > 3500 && (
-                  <li>Réduisez le JavaScript qui bloque l'interactivité</li>
-                )}
-                <li>Utilisez un système de mise en cache efficace pour les ressources statiques</li>
-                <li>Implémentez le chargement différé (lazy loading) pour les images</li>
-              </>
-            )}
-            
-            <li>Adoptez un CDN pour améliorer les temps de réponse globaux</li>
-            <li>Activez la compression GZIP/Brotli pour réduire la taille des transferts</li>
-          </ul>
-        </div>
+    <Card className="p-5">
+      <h3 className="text-lg font-medium mb-4">{t('performance.recommendations.title')}</h3>
+      
+      <div className="divide-y">
+        {recommendations.map((rec, index) => (
+          <div key={rec.id} className="py-3 flex items-start gap-3">
+            <div className="mt-0.5">
+              <Check className="h-5 w-5 text-green-500" />
+            </div>
+            <div>
+              <p className="text-gray-700">{rec.text}</p>
+            </div>
+          </div>
+        ))}
       </div>
-    </div>
+    </Card>
   );
 };
 

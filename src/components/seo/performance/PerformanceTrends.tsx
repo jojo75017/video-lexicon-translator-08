@@ -2,13 +2,15 @@
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { PerformanceData } from './types';
+import { useTranslation } from 'react-i18next';
 
 interface PerformanceTrendsProps {
   activeDevice: 'mobile' | 'desktop';
 }
 
 const PerformanceTrends: React.FC<PerformanceTrendsProps> = ({ activeDevice }) => {
+  const { t } = useTranslation();
+  
   // Generating mock historical data for the trends chart
   const generateHistoricalData = () => {
     const now = new Date();
@@ -53,10 +55,10 @@ const PerformanceTrends: React.FC<PerformanceTrendsProps> = ({ activeDevice }) =
       return (
         <div className="bg-white p-2 border rounded-md shadow-sm">
           <p className="text-sm font-medium">{`${label}`}</p>
-          <p className="text-xs text-blue-600">{`Temps de chargement: ${payload[0].value.toFixed(0)}ms`}</p>
-          <p className="text-xs text-green-600">{`LCP: ${payload[1].value.toFixed(0)}ms`}</p>
-          <p className="text-xs text-orange-600">{`TBT: ${payload[2].value.toFixed(0)}ms`}</p>
-          <p className="text-xs text-purple-600">{`Score: ${payload[3].value.toFixed(0)}/100`}</p>
+          <p className="text-xs text-blue-600">{`${t('performance.loadTime', 'Temps de chargement')}: ${payload[0].value.toFixed(0)}ms`}</p>
+          <p className="text-xs text-green-600">{`${t('performance.lcp', 'LCP')}: ${payload[1].value.toFixed(0)}ms`}</p>
+          <p className="text-xs text-orange-600">{`${t('performance.tbt', 'TBT')}: ${payload[2].value.toFixed(0)}ms`}</p>
+          <p className="text-xs text-purple-600">{`${t('performance.score', 'Score')}: ${payload[3].value.toFixed(0)}/100`}</p>
         </div>
       );
     }
@@ -65,7 +67,7 @@ const PerformanceTrends: React.FC<PerformanceTrendsProps> = ({ activeDevice }) =
   
   return (
     <div className="space-y-3 mt-8">
-      <h3 className="text-md font-medium">Tendances de performance sur 7 jours</h3>
+      <h3 className="text-md font-medium">{t('performance.trends', 'Tendances de performance sur 7 jours')}</h3>
       <Card className="p-4">
         <div className="h-[300px]">
           <ResponsiveContainer width="100%" height="100%">
@@ -88,7 +90,7 @@ const PerformanceTrends: React.FC<PerformanceTrendsProps> = ({ activeDevice }) =
                 yAxisId="time"
                 type="monotone" 
                 dataKey="loadTime" 
-                name="Temps de chargement" 
+                name={t('performance.loadTime', 'Temps de chargement')}
                 stroke="#3b82f6" 
                 activeDot={{ r: 8 }} 
                 strokeWidth={2}
@@ -97,7 +99,7 @@ const PerformanceTrends: React.FC<PerformanceTrendsProps> = ({ activeDevice }) =
                 yAxisId="time"
                 type="monotone" 
                 dataKey="lcp" 
-                name="LCP" 
+                name={t('performance.lcp', 'LCP')}
                 stroke="#10b981" 
                 activeDot={{ r: 6 }} 
                 strokeWidth={2}
@@ -106,7 +108,7 @@ const PerformanceTrends: React.FC<PerformanceTrendsProps> = ({ activeDevice }) =
                 yAxisId="time"
                 type="monotone" 
                 dataKey="tbt" 
-                name="TBT" 
+                name={t('performance.tbt', 'TBT')}
                 stroke="#f97316" 
                 activeDot={{ r: 6 }} 
                 strokeWidth={2}
@@ -115,7 +117,7 @@ const PerformanceTrends: React.FC<PerformanceTrendsProps> = ({ activeDevice }) =
                 yAxisId="score"
                 type="monotone" 
                 dataKey="score" 
-                name="Score" 
+                name={t('performance.score', 'Score')}
                 stroke="#8b5cf6" 
                 activeDot={{ r: 6 }} 
                 strokeWidth={2}
@@ -125,7 +127,7 @@ const PerformanceTrends: React.FC<PerformanceTrendsProps> = ({ activeDevice }) =
           </ResponsiveContainer>
         </div>
         <div className="text-xs text-gray-500 text-center mt-2">
-          Évolution des performances du site {activeDevice === 'mobile' ? 'mobile' : 'desktop'} sur les 7 derniers jours
+          {t('performance.evolutionDescription', 'Évolution des performances du site')} {activeDevice === 'mobile' ? t('performance.mobile', 'mobile') : t('performance.desktop', 'desktop')} {t('performance.lastDays', 'sur les 7 derniers jours')}
         </div>
       </Card>
     </div>

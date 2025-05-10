@@ -1,0 +1,72 @@
+
+{
+  "seo": {
+    "analysis": "SEO Analysis",
+    "score": "SEO Score",
+    "mainTags": "Main tags",
+    "title": "Title",
+    "description": "Description",
+    "keywords": "Keywords",
+    "structure": "Structure",
+    "content": "Content",
+    "wordCount": "Word count",
+    "internalLinks": "Internal links",
+    "externalLinks": "External links",
+    "imageCount": "Image count",
+    "notDefined": "Not defined",
+    "notDefined_female": "Not defined",
+    "noKeywords": "No keywords defined"
+  },
+  "map": {
+    "title": "Interactive SEO Map"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Information"
+  },
+  "performance": {
+    "loadingPerformance": "Loading Performance",
+    "trends": "Performance trends over 7 days",
+    "evolutionDescription": "Evolution of the site performance",
+    "lastDays": "over the last 7 days",
+    "desktop": "Desktop",
+    "mobile": "Mobile",
+    "firstContent": "Content",
+    "dom": "DOM",
+    "total": "Total",
+    "interactive": "Interactive",
+    "images": "Images",
+    "scripts": "Scripts",
+    "styles": "Styles",
+    "fonts": "Fonts",
+    "other": "Other",
+    "highlights": "Performance highlights",
+    "loadTime": "Load time",
+    "loadTimeTooltip": "Total time to load the complete page.",
+    "lcp": "LCP",
+    "lcpTooltip": "Largest Contentful Paint - time needed to display the largest visible element.",
+    "tbt": "Blocking time",
+    "tbtTooltip": "Total Blocking Time - measures the duration the main thread is blocked.",
+    "cls": "CLS",
+    "clsTooltip": "Cumulative Layout Shift - measures the visual stability of the page.",
+    "score": "Score",
+    "mobileAnalysis": "Analysis based on a 4G mobile connection simulation.",
+    "desktopAnalysis": "Analysis based on a fiber optic connection simulation.",
+    "resourceBreakdown": "Resource breakdown",
+    "recommendations": {
+      "title": "Optimization recommendations",
+      "optimizeImages": "Optimize images to reduce their size",
+      "minifyCSS": "Minify CSS files to reduce their size",
+      "minifyJS": "Minify and compress JavaScript files",
+      "removeUnusedCSS": "Remove unused CSS styles",
+      "reduceTBT": "Reduce total blocking time by optimizing JavaScript",
+      "improveServerResponse": "Improve server response time",
+      "useCaching": "Use browser caching",
+      "reduceRedirects": "Reduce redirections",
+      "useCDN": "Use a CDN for static resources"
+    }
+  }
+}

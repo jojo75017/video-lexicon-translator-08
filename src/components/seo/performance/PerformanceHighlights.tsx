@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { ArrowUp, ArrowDown, CheckCircle, Info } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { PerformanceData } from './types';
+import { useTranslation } from "react-i18next";
 
 interface PerformanceHighlightsProps {
   deviceData: PerformanceData;
@@ -14,6 +15,8 @@ const PerformanceHighlights: React.FC<PerformanceHighlightsProps> = ({
   deviceData,
   activeDevice 
 }) => {
+  const { t } = useTranslation();
+
   // Calculate if metrics are good, average, or concerning
   const getMetricStatus = (value: number, thresholds: { good: number; average: number }) => {
     if (value <= thresholds.good) return 'good';
@@ -93,42 +96,42 @@ const PerformanceHighlights: React.FC<PerformanceHighlightsProps> = ({
   
   return (
     <div className="space-y-3 mt-6">
-      <h3 className="text-md font-medium">Points clés de performance</h3>
+      <h3 className="text-md font-medium">{t('performance.highlights', 'Points clés de performance')}</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
         {renderMetricCard(
-          "Temps de chargement",
+          t('performance.loadTime', 'Temps de chargement'),
           formatMs(deviceData.loadTime),
           loadTimeStatus,
-          "Temps total pour charger la page complètement."
+          t('performance.loadTimeTooltip', 'Temps total pour charger la page complètement.')
         )}
         
         {renderMetricCard(
-          "LCP",
+          t('performance.lcp', 'LCP'),
           formatMs(deviceData.largestContentfulPaint || 0),
           lcpStatus,
-          "Largest Contentful Paint - temps nécessaire pour afficher le plus grand élément visible."
+          t('performance.lcpTooltip', 'Largest Contentful Paint - temps nécessaire pour afficher le plus grand élément visible.')
         )}
         
         {renderMetricCard(
-          "Temps de blocage",
+          t('performance.tbt', 'Temps de blocage'),
           formatMs(deviceData.totalBlockingTime || 0),
           tbtStatus,
-          "Total Blocking Time - mesure la durée pendant laquelle le thread principal est bloqué."
+          t('performance.tbtTooltip', 'Total Blocking Time - mesure la durée pendant laquelle le thread principal est bloqué.')
         )}
         
         {renderMetricCard(
-          "CLS",
+          t('performance.cls', 'CLS'),
           (deviceData.cumulativeLayoutShift || 0).toFixed(3),
           clsStatus,
-          "Cumulative Layout Shift - mesure l'instabilité visuelle de la page."
+          t('performance.clsTooltip', 'Cumulative Layout Shift - mesure l\'instabilité visuelle de la page.')
         )}
       </div>
       
       <div className="text-sm text-gray-500 mt-2">
         <p>
           {activeDevice === 'mobile' ? 
-            'Analyse basée sur une simulation de connexion mobile 4G.' : 
-            'Analyse basée sur une simulation de connexion fibre optique.'}
+            t('performance.mobileAnalysis', 'Analyse basée sur une simulation de connexion mobile 4G.') : 
+            t('performance.desktopAnalysis', 'Analyse basée sur une simulation de connexion fibre optique.')}
         </p>
       </div>
     </div>

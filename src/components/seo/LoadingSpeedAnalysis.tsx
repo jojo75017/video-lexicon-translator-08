@@ -11,7 +11,9 @@ import PerformanceScore from './performance/PerformanceScore';
 import PerformanceComparisonChart from './performance/PerformanceComparisonChart';
 import PerformanceHighlights from './performance/PerformanceHighlights';
 import PerformanceTrends from './performance/PerformanceTrends';
-import { calculateSpeedScore, formatTime } from './performance/utils';
+import { calculateSpeedScore } from './performance/utils';
+import { useTranslation } from 'react-i18next';
+import LanguageSelector from '../LanguageSelector';
 
 interface LoadingSpeedAnalysisProps {
   performance: PerformanceData;
@@ -19,6 +21,11 @@ interface LoadingSpeedAnalysisProps {
 
 const LoadingSpeedAnalysis: React.FC<LoadingSpeedAnalysisProps> = ({ performance }) => {
   const [activeDevice, setActiveDevice] = useState<'mobile' | 'desktop'>('desktop');
+  const { t, i18n } = useTranslation();
+  
+  const handleLanguageChange = (language: string) => {
+    i18n.changeLanguage(language);
+  };
 
   // Get device-specific performance data
   const getDevicePerformance = (): PerformanceData => {
@@ -41,10 +48,10 @@ const LoadingSpeedAnalysis: React.FC<LoadingSpeedAnalysisProps> = ({ performance
 
   // Data for the bar chart
   const barData = [
-    { name: 'Contenu', value: deviceData.firstContentfulPaint || 0 },
-    { name: 'DOM', value: deviceData.domLoadTime || 0 },
-    { name: 'Total', value: deviceData.loadTime || 0 },
-    { name: 'Interactif', value: deviceData.timeToInteractive || deviceData.loadTime * 1.1 || 0 },
+    { name: t('performance.firstContent', 'Contenu'), value: deviceData.firstContentfulPaint || 0 },
+    { name: t('performance.dom', 'DOM'), value: deviceData.domLoadTime || 0 },
+    { name: t('performance.total', 'Total'), value: deviceData.loadTime || 0 },
+    { name: t('performance.interactive', 'Interactif'), value: deviceData.timeToInteractive || deviceData.loadTime * 1.1 || 0 },
   ];
 
   // Data for the resources chart
@@ -53,30 +60,33 @@ const LoadingSpeedAnalysis: React.FC<LoadingSpeedAnalysisProps> = ({ performance
   if (deviceData.resourceBreakdown) {
     const { images, scripts, styles, fonts, other } = deviceData.resourceBreakdown;
     
-    if (images) resourcesData.push({ name: 'Images', value: images });
-    if (scripts) resourcesData.push({ name: 'Scripts', value: scripts });
-    if (styles) resourcesData.push({ name: 'Styles', value: styles });
-    if (fonts) resourcesData.push({ name: 'Polices', value: fonts });
-    if (other) resourcesData.push({ name: 'Autres', value: other });
+    if (images) resourcesData.push({ name: t('performance.images', 'Images'), value: images });
+    if (scripts) resourcesData.push({ name: t('performance.scripts', 'Scripts'), value: scripts });
+    if (styles) resourcesData.push({ name: t('performance.styles', 'Styles'), value: styles });
+    if (fonts) resourcesData.push({ name: t('performance.fonts', 'Polices'), value: fonts });
+    if (other) resourcesData.push({ name: t('performance.other', 'Autres'), value: other });
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center">
           <Zap className="w-5 h-5 mr-2 text-blue-600" />
-          <h3 className="text-lg font-medium">Performance de chargement</h3>
+          <h3 className="text-lg font-medium">{t('performance.loadingPerformance', 'Performance de chargement')}</h3>
         </div>
-        <PerformanceScore score={speedScore} />
+        <div className="flex items-center gap-4">
+          <LanguageSelector onLanguageChange={handleLanguageChange} />
+          <PerformanceScore score={speedScore} />
+        </div>
       </div>
       
       <Tabs defaultValue={activeDevice} onValueChange={(value) => setActiveDevice(value as 'mobile' | 'desktop')}>
         <TabsList className="grid grid-cols-2 mb-6">
           <TabsTrigger value="desktop" className="flex items-center gap-2">
-            <Monitor className="w-4 h-4" /> Desktop
+            <Monitor className="w-4 h-4" /> {t('performance.desktop', 'Desktop')}
           </TabsTrigger>
           <TabsTrigger value="mobile" className="flex items-center gap-2">
-            <Smartphone className="w-4 h-4" /> Mobile
+            <Smartphone className="w-4 h-4" /> {t('performance.mobile', 'Mobile')}
           </TabsTrigger>
         </TabsList>
         
