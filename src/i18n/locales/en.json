@@ -7,7 +7,11 @@
     "title": "Title",
     "description": "Description",
     "keywords": "Keywords",
-    "structure": "Structure",
+    "structure": {
+      "visualizer": "Structure Visualization",
+      "issues": "Detected issues",
+      "noHeadings": "No heading structure detected"
+    },
     "content": "Content",
     "wordCount": "Word count",
     "internalLinks": "Internal links",
@@ -15,7 +19,31 @@
     "imageCount": "Image count",
     "notDefined": "Not defined",
     "notDefined_female": "Not defined",
-    "noKeywords": "No keywords defined"
+    "noKeywords": "No keywords defined",
+    "optimizationRecommendations": "Optimization Recommendations",
+    "critical": "Critical",
+    "important": "Important",
+    "suggestion": "Suggestion",
+    "viewAllRecommendations": "View all recommendations",
+    "allGood": "Your site appears to be well optimized!",
+    "noSuggestions": "No improvement suggestions",
+    "healthCheck": "SEO Health Check",
+    "headingStructure": "Heading structure",
+    "imageAlt": "Image alt attributes",
+    "imagesWithoutAlt": "images without alt",
+    "allImagesHaveAlt": "All images have alt attributes",
+    "averageDensity": "Average density",
+    "addKeyword": "Add keyword",
+    "detectedKeywords": "Detected keywords",
+    "viewKeywordAnalysis": "View full keyword analysis",
+    "advice": {
+      "addTitle": "Add a descriptive page title that includes your main keyword",
+      "addDescription": "Add a meta description with your main keywords",
+      "extendDescription": "Make your description more detailed (aim for 120-155 characters)",
+      "fixH1": "Ensure your page has exactly one H1 heading",
+      "addAltTags": "Add descriptive alt attributes to all images",
+      "improveLoadTime": "Optimize page resources to improve loading time"
+    }
   },
   "map": {
     "title": "Interactive SEO Map"
@@ -25,7 +53,16 @@
     "error": "Error",
     "success": "Success",
     "warning": "Warning",
-    "info": "Information"
+    "info": "Information",
+    "advice": "Advice",
+    "impact": "Impact",
+    "add": "Add",
+    "analyze": "Analyze",
+    "priority": {
+      "high": "High priority",
+      "medium": "Medium priority",
+      "low": "Low priority"
+    }
   },
   "performance": {
     "loadingPerformance": "Loading Performance",

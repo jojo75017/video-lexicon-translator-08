@@ -57,7 +57,7 @@ const SeoStructureVisualizer: React.FC<SeoStructureVisualizerProps> = ({ heading
       </CardHeader>
       <CardContent>
         {hasIssues && (
-          <Alert variant="warning" className="mb-4">
+          <Alert className="mb-4" variant="destructive">
             <AlertTriangle className="h-4 w-4 mr-2" />
             <AlertDescription>
               <div className="font-medium mb-1">{t('seo.structure.issues', 'Problèmes détectés')}</div>

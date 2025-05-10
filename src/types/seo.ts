@@ -1,4 +1,3 @@
-
 export interface AnalysisResult {
   success: boolean;
   data?: any;
@@ -200,6 +199,7 @@ export interface HeadingStructure {
   hierarchy?: HierarchyItem[];
   headings?: any[]; // Ajouté pour compatibilité
   paragraphs?: any[]; // Ajouté pour corriger les erreurs
+  issues?: string[]; // Ajouté pour le support des problèmes de structure
 }
 
 export interface HierarchyItem {

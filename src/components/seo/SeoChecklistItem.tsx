@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { CheckCircle, XCircle, AlertCircle, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 
@@ -11,6 +11,8 @@ export interface SeoChecklistItemProps {
   advice?: string;
   value?: string | number | null;
   className?: string;
+  priority?: 'high' | 'medium' | 'low';
+  impact?: number;
 }
 
 const SeoChecklistItem: React.FC<SeoChecklistItemProps> = ({
@@ -19,7 +21,9 @@ const SeoChecklistItem: React.FC<SeoChecklistItemProps> = ({
   description,
   advice,
   value,
-  className
+  className,
+  priority,
+  impact
 }) => {
   const { t } = useTranslation();
   
@@ -32,7 +36,7 @@ const SeoChecklistItem: React.FC<SeoChecklistItemProps> = ({
       case 'warning':
         return <AlertCircle className="h-5 w-5 text-orange-500" />;
       default:
-        return <AlertCircle className="h-5 w-5 text-blue-500" />;
+        return <Info className="h-5 w-5 text-blue-500" />;
     }
   };
 
@@ -49,6 +53,22 @@ const SeoChecklistItem: React.FC<SeoChecklistItemProps> = ({
     }
   };
 
+  const getPriorityBadge = () => {
+    if (!priority) return null;
+    
+    const badgeClass = {
+      high: 'bg-red-100 text-red-800',
+      medium: 'bg-orange-100 text-orange-800',
+      low: 'bg-green-100 text-green-800',
+    }[priority] || 'bg-gray-100 text-gray-800';
+    
+    return (
+      <span className={`text-xs px-2 py-0.5 rounded-full ${badgeClass} inline-block ml-2`}>
+        {t(`common.priority.${priority}`, priority)}
+      </span>
+    );
+  };
+
   return (
     <div className={cn(
       "p-4 rounded-lg border",
@@ -57,11 +77,19 @@ const SeoChecklistItem: React.FC<SeoChecklistItemProps> = ({
     )}>
       <div className="flex items-start gap-3">
         <div className="mt-0.5">{getIcon()}</div>
-        <div>
-          <h4 className="font-medium mb-1 text-gray-800">{title}</h4>
+        <div className="flex-1">
+          <div className="flex items-center flex-wrap">
+            <h4 className="font-medium text-gray-800">{title}</h4>
+            {getPriorityBadge()}
+            {impact && (
+              <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-800">
+                {t('common.impact', 'Impact')}: {impact}%
+              </span>
+            )}
+          </div>
           
           {value && (
-            <div className="font-medium text-lg mb-1">
+            <div className="font-medium text-lg my-1">
               {value}
             </div>
           )}

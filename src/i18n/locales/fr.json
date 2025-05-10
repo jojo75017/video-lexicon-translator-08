@@ -7,7 +7,11 @@
     "title": "Titre",
     "description": "Description",
     "keywords": "Mots-clés",
-    "structure": "Structure",
+    "structure": {
+      "visualizer": "Visualisation de la structure",
+      "issues": "Problèmes détectés",
+      "noHeadings": "Aucune structure de titres détectée"
+    },
     "content": "Contenu",
     "wordCount": "Nombre de mots",
     "internalLinks": "Liens internes",
@@ -15,7 +19,31 @@
     "imageCount": "Nombre d'images",
     "notDefined": "Non défini",
     "notDefined_female": "Non définie",
-    "noKeywords": "Aucun mot-clé défini"
+    "noKeywords": "Aucun mot-clé défini",
+    "optimizationRecommendations": "Recommandations d'optimisation",
+    "critical": "Critique",
+    "important": "Important",
+    "suggestion": "Suggestion",
+    "viewAllRecommendations": "Voir toutes les recommandations",
+    "allGood": "Votre site semble être bien optimisé!",
+    "noSuggestions": "Pas de suggestions d'amélioration",
+    "healthCheck": "Vérification de santé SEO",
+    "headingStructure": "Structure des titres",
+    "imageAlt": "Attributs alt des images",
+    "imagesWithoutAlt": "images sans attribut alt",
+    "allImagesHaveAlt": "Toutes les images ont des attributs alt",
+    "averageDensity": "Densité moyenne",
+    "addKeyword": "Ajouter un mot-clé",
+    "detectedKeywords": "Mots-clés détectés",
+    "viewKeywordAnalysis": "Voir l'analyse complète des mots-clés",
+    "advice": {
+      "addTitle": "Ajoutez un titre de page descriptif qui inclut votre mot-clé principal",
+      "addDescription": "Ajoutez une méta-description avec vos mots-clés principaux",
+      "extendDescription": "Rendez votre description plus détaillée (visez 120-155 caractères)",
+      "fixH1": "Assurez-vous que votre page contient exactement une balise H1",
+      "addAltTags": "Ajoutez des attributs alt descriptifs à toutes les images",
+      "improveLoadTime": "Optimisez les ressources de la page pour améliorer le temps de chargement"
+    }
   },
   "map": {
     "title": "Carte Interactive SEO"
@@ -25,7 +53,16 @@
     "error": "Erreur",
     "success": "Succès",
     "warning": "Avertissement",
-    "info": "Information"
+    "info": "Information",
+    "advice": "Conseil",
+    "impact": "Impact",
+    "add": "Ajouter",
+    "analyze": "Analyser",
+    "priority": {
+      "high": "Haute priorité",
+      "medium": "Priorité moyenne",
+      "low": "Priorité faible"
+    }
   },
   "performance": {
     "loadingPerformance": "Performance de chargement",

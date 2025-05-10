@@ -76,7 +76,7 @@ const Recommendations: React.FC<RecommendationsProps> = ({ activeDevice, deviceD
     if (activeDevice === 'mobile' && largestContentfulPaint > 2500) {
       recommendations.push({
         id: 'optimizeLCP',
-        text: t('performance.recommendations.optimizeLCP', 'Optimisez le temps de chargement du plus grand élément visible'),
+        text: t('performance.recommendations.optimizeLCP'),
         priority: 'high',
         impact: 90
       });
@@ -86,7 +86,7 @@ const Recommendations: React.FC<RecommendationsProps> = ({ activeDevice, deviceD
     if (activeDevice === 'mobile' && cumulativeLayoutShift > 0.1) {
       recommendations.push({
         id: 'reduceCLS',
-        text: t('performance.recommendations.reduceCLS', 'Réduisez les changements de mise en page pendant le chargement'),
+        text: t('performance.recommendations.reduceCLS'),
         priority: 'medium',
         impact: 70
       });
@@ -151,11 +151,11 @@ const Recommendations: React.FC<RecommendationsProps> = ({ activeDevice, deviceD
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Badge variant="outline" className={getPriorityColor(rec.priority)}>
-                        {t(`performance.priority.${rec.priority}`, rec.priority)}
+                        {t(`performance.priority.${rec.priority}`)}
                       </Badge>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>{t('performance.impactScore', 'Impact')}: {rec.impact}%</p>
+                      <p>{t('performance.impactScore')}: {rec.impact}%</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
