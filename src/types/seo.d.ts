@@ -1,123 +1,192 @@
 
-export interface KeywordSuggestion {
-  keyword: string;
-  searchVolume: number;
-  difficulty: number;
-  suggestedTitle: string;
-  suggestedDescription: string;
-  suggestedShortDescription?: string;
-  suggestedLongDescription?: string;
-  relevance: number;
-  competition: number;
-  cpc: number;
-  volume: number;
-}
+// Types for SEO Analysis
 
-export interface KeywordData {
-  keyword: string;
-  count: number;
-  density: number;
-  searchVolume?: number; 
-  competition?: number;
-  cpc?: number;
-  relevance?: number;
-}
-
-export type BacklinkInfo = {
+export interface SeoAnalysis {
   url: string;
-  anchorText: string;
-  pageTitle?: string;
-  targetUrl?: string;
-  isDofollow: boolean;
-  domainAuthority?: number;
-  pageAuthority?: number;
-  firstSeen?: Date | string;
-  lastSeen?: Date | string;
-};
-
-export interface HierarchyItem {
-  id: string;
-  name: string;
-  level: number;
-  text?: string;
-  tagName?: string;
-  position?: number;
-  children?: HierarchyItem[];
-}
-
-export interface HeadingStructure {
-  headings: HierarchyItem[];
+  title: string;
+  description: string;
+  keywords: string;
   h1Count: number;
   h2Count: number;
   h3Count: number;
-  h4Count: number;
-  h5Count: number;
-  h6Count: number;
-  isEmpty: boolean;
-  isValid: boolean;
-  issues: string[];
+  internalLinks: number;
+  externalLinks: number;
+  imgCount: number;
+  imgWithoutAlt: number;
+  wordCount: number;
+  metaTagsAnalysis: MetaTagsAnalysis;
+  topKeywords: KeywordFrequency[];
+  backlinks: BacklinkInfo[] | number;
+  doFollowBacklinks: number;
+  noFollowBacklinks: number;
+  socialMetrics: SocialMetrics;
+  socialTags?: SocialTags;
+  imagesDetails: ImageDetails[];
+  performance?: PerformanceData;
+  mobileAnalysis?: MobileAnalysis;
+  technicalSuggestions: string[];
+  readabilityScore: number;
+  searchConsoleData: SearchConsoleData;
+  topBacklinkDomains: string[];
+  keywordSuggestions?: KeywordSuggestion[];
+  brokenLinks?: BrokenLink[];
+}
+
+export interface MetaTagsAnalysis {
+  hasTitleTag: boolean;
+  hasDescriptionTag: boolean;
+  hasCanonicalTag: boolean;
+  hasRobotsTag: boolean;
+  hasOpenGraphTags: boolean;
+  hasTwitterTags?: boolean;
+  titleLength: number;
+  descriptionLength: number;
+  canonicalUrl: string | null;
+  robotsContent: string | null;
+}
+
+export interface KeywordFrequency {
+  keyword: string;
+  count: number;
+  density: number;
+}
+
+export interface BacklinkInfo {
+  domain: string;
+  url: string;
+  anchor: string;
+  doFollow: boolean;
+}
+
+export interface SocialMetrics {
+  facebook: {
+    likes: number;
+    shares: number;
+    comments: number;
+  };
+  twitter: {
+    tweets: number;
+    retweets: number;
+    likes: number;
+    shares?: number;
+    replies?: number;
+  };
+  linkedin: {
+    shares: number;
+    engagements: number;
+  };
+  pinterest: {
+    pins: number;
+  };
+}
+
+export interface SocialTags {
+  ogTitle: string | null;
+  ogDescription: string | null;
+  ogImage: string | null;
+  twitterCard: string | null;
+  twitterTitle: string | null;
+  twitterDescription: string | null;
+  twitterImage: string | null;
 }
 
 export interface ImageDetails {
-  src: string;
+  url: string;
   alt: string;
-  width: number;
-  height: number;
-  fileSize?: number;
-  hasAltText: boolean;
-  isOptimized?: boolean;
-  optimizationScore?: number;
-  compressionPotential?: number;
+  hasAlt: boolean;
+  width: number | null;
+  height: number | null;
+  isDecorative?: boolean;
+  needsOptimization?: boolean;
+  estimatedSize?: string;
   lazyLoaded?: boolean;
+  index?: number;
 }
 
-export interface Performance {
+export interface PerformanceData {
   loadTime: number;
   firstContentfulPaint: number;
-  largestContentfulPaint: number;
-  speedIndex: number;
-  timeToInteractive: number;
-  totalBlockingTime: number;
-  cumulativeLayoutShift: number;
   domLoadTime: number;
   resourceCount: number;
-  scriptCount: number;
-  cssCount: number;
-  imageCount: number;
-  totalResourceSize: number;
-  performanceScore: number;
-  serverResponseTime: number;
-  redirectTime: number;
-  dnsLookupTime: number;
-  sslTime: number;
-  tcpTime: number;
-  bounceRate: number;
-  clickThroughRate: number;
+  score: number;
+}
+
+export interface MobileAnalysis {
+  score: number;
+  isMobileFriendly: boolean;
+  issues: string[];
 }
 
 export interface SearchConsoleData {
-  clicks: Record<string, number>;
-  impressions: Record<string, number>;
-  ctr: Record<string, number>;
-  position: Record<string, number>;
-  keywords: {
-    keyword: string;
-    position: number;
-    clicks: number;
-    impressions: number;
-  }[];
-  topQueries: any;
-  topPages: any;
-  devices: any;
-  countries: any;
+  clicks: number;
+  impressions: number;
+  ctr: number;
+  position: number;
+  keywords: Keyword[];
+  topPages: TopPage[];
+  trend: TrendData[];
+  countries: Record<string, number>;
+  topQueries?: TopQuery[];
 }
 
-export interface OpenAIKeywordResponse {
+export interface Keyword {
   keyword: string;
-  suggestions: string[];
-  relatedQueries: string[];
-  searchVolume: number;
-  competition: number;
-  cpc: number;
-  userIntent: string[];
+  position: number;
+  clicks: number;
+  impressions: number;
+}
+
+export interface TopPage {
+  url: string;
+  clicks: number;
+  impressions: number;
+  position: number;
+}
+
+export interface TrendData {
+  date: string;
+  clicks: number;
+  impressions: number;
+  position: number;
+}
+
+export interface TopQuery extends Keyword {
+  trend: {
+    date: string;
+    position: number;
+    clicks: number;
+  }[];
+}
+
+export interface KeywordSuggestion {
+  keyword: string;
+  volume: number;
+  difficulty: number;
+}
+
+export interface BrokenLink {
+  url: string;
+  anchor: string;
+  statusCode: number;
+}
+
+export interface HierarchyItem {
+  level: number;
+  tagName?: string;
+  text?: string;
+  name?: string;
+  children?: HierarchyItem[];
+  parentFound?: boolean;
+}
+
+export interface HeadingStructure {
+  hierarchy: HierarchyItem[];
+  issues?: string[];
+}
+
+export interface StructureItem {
+  id: string;
+  content: string;
+  type: "h1" | "h2" | "h3" | "h4" | "p" | "list";
+  items?: string[];
 }

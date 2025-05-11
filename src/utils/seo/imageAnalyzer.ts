@@ -1,81 +1,93 @@
 
-import { ImageAnalysis, ImageDetails } from '@/types/seo';
+import { ImageDetails } from '@/types/seo';
 
-export const analyzeImages = (doc: Document, baseUrl: string): { 
-  imgCount: number; 
-  imgWithoutAlt: number;
-  imagesDetails: ImageDetails[];
-} => {
+/**
+ * Analyzes images from HTML content
+ * @param htmlContent - The HTML content containing images
+ * @returns An array of ImageDetails objects
+ */
+export const analyzeImages = (htmlContent: string): ImageDetails[] => {
+  if (!htmlContent) return [];
+
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(htmlContent, 'text/html');
   const images = Array.from(doc.querySelectorAll('img'));
-  const imgCount = images.length;
-  
-  let imgWithoutAlt = 0;
-  const imagesDetails: ImageDetails[] = [];
-  
-  images.forEach(img => {
+
+  return images.map((img, index) => {
     const src = img.getAttribute('src') || '';
-    const alt = img.getAttribute('alt');
+    const alt = img.getAttribute('alt') || '';
+    const hasAlt = !!alt;
+    const width = img.getAttribute('width') || null;
+    const height = img.getAttribute('height') || null;
     
-    if (!alt) {
-      imgWithoutAlt++;
-    }
+    // Get parent element classes for context
+    const parentClasses = img.parentElement?.getAttribute('class') || '';
     
-    // Build full URL if it's a relative path
-    let fullUrl = src;
-    if (src && !src.startsWith('http') && !src.startsWith('data:')) {
-      if (src.startsWith('/')) {
-        try {
-          const baseUrlObj = new URL(baseUrl);
-          fullUrl = `${baseUrlObj.origin}${src}`;
-        } catch (e) {
-          fullUrl = src;
-        }
-      } else {
-        fullUrl = `${baseUrl}/${src}`;
-      }
-    }
+    // Check if it seems to be a decorative image
+    const isLikelyDecorative = 
+      src.includes('icon') || 
+      src.includes('logo') || 
+      parentClasses.includes('icon') || 
+      parentClasses.includes('logo') ||
+      img.width < 50 || 
+      img.height < 50;
     
-    // Create image details
-    imagesDetails.push({
-      url: fullUrl,
-      alt: alt || null,
-      dimensions: {
-        width: img.naturalWidth || 0,
-        height: img.naturalHeight || 0
-      },
-      size: 0, // Would require additional API calls to determine
-      format: getImageFormatFromSrc(src),
-      lazyLoaded: img.loading === 'lazy' || img.hasAttribute('data-src') || img.hasAttribute('data-lazyload'),
-      compressed: false // Would require additional analysis
-    });
+    // Calculate approximate file size based on dimensions (very rough estimate)
+    const estimatedSizeKB = img.naturalWidth && img.naturalHeight ? 
+      Math.round((img.naturalWidth * img.naturalHeight) / 1024) : 0;
+      
+    // Check if image might need optimization (large images)
+    const mightNeedOptimization = estimatedSizeKB > 100;
+    
+    return {
+      url: src,
+      alt,
+      hasAlt,
+      width: width ? parseInt(width) : null,
+      height: height ? parseInt(height) : null,
+      isDecorative: isLikelyDecorative,
+      needsOptimization: mightNeedOptimization,
+      estimatedSize: estimatedSizeKB > 0 ? `~${estimatedSizeKB} KB` : 'Unknown',
+      lazyLoaded: img.getAttribute('loading') === 'lazy',
+      index
+    };
   });
-  
-  return {
-    imgCount,
-    imgWithoutAlt,
-    imagesDetails
-  };
 };
 
-const getImageFormatFromSrc = (src: string): string => {
-  if (!src) return 'unknown';
-  if (src.startsWith('data:image/')) {
-    const format = src.substring(11, src.indexOf(';'));
-    return format || 'unknown';
+/**
+ * Checks if images are optimized for size and loading
+ */
+export const checkImageOptimization = (images: ImageDetails[]) => {
+  const totalImages = images.length;
+  
+  if (totalImages === 0) {
+    return {
+      score: 100,
+      optimizedImages: 0,
+      unoptimizedImages: 0,
+      totalSize: 0,
+      potentialSavings: 0,
+      missingAltCount: 0
+    };
   }
   
-  const extension = src.split('.').pop()?.toLowerCase();
-  if (!extension) return 'unknown';
+  const missingAlt = images.filter(img => !img.hasAlt && !img.isDecorative).length;
+  const unoptimized = images.filter(img => img.needsOptimization).length;
+  const notLazyLoaded = images.filter(img => !img.lazyLoaded).length;
   
-  const knownFormats: Record<string, string> = {
-    'jpg': 'jpeg',
-    'jpeg': 'jpeg',
-    'png': 'png',
-    'gif': 'gif',
-    'webp': 'webp',
-    'svg': 'svg',
-    'avif': 'avif'
+  // Calculate score based on optimization factors
+  const altFactor = totalImages > 0 ? (totalImages - missingAlt) / totalImages : 1;
+  const optimizationFactor = totalImages > 0 ? (totalImages - unoptimized) / totalImages : 1;
+  const lazyFactor = totalImages > 0 ? (totalImages - notLazyLoaded) / totalImages : 1;
+  
+  const score = Math.round((altFactor * 0.4 + optimizationFactor * 0.4 + lazyFactor * 0.2) * 100);
+  
+  return {
+    score,
+    optimizedImages: totalImages - unoptimized,
+    unoptimizedImages: unoptimized,
+    totalImages,
+    missingAltCount: missingAlt,
+    lazyLoadedCount: totalImages - notLazyLoaded
   };
-  
-  return knownFormats[extension] || 'unknown';
 };
