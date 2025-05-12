@@ -1,83 +1,46 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { FileSearch, LineChart, Search, ZapIcon, FileSignature, Image, FileText } from 'lucide-react';
-import { toast } from 'sonner';
+import { Search, Link2, BarChart, FileText, Gauge } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const SeoActionButtons = () => {
-  const handleButtonClick = (section: string) => {
-    toast.success(`Navigation vers ${section}`);
-  };
-
   return (
-    <div className="grid grid-cols-1 gap-4">
-      <div className="block w-full mb-4">
-        <Link to="/outils-seo" onClick={() => handleButtonClick('Outils SEO')}>
-          <Button 
-            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 p-4 text-white shadow-md"
-            size="lg"
-          >
-            <ZapIcon className="h-5 w-5 mr-2" />
-            <span>Accéder aux outils SEO</span>
-          </Button>
-        </Link>
-      </div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <Link to="/seo">
+        <Button variant="outline" className="w-full h-[70px] flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50 hover:from-gray-50 hover:to-gray-100 gap-2">
+          <Search className="h-5 w-5 text-indigo-600" />
+          <span className="text-sm">Analyse SEO</span>
+        </Button>
+      </Link>
       
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Link to="/seo" onClick={() => handleButtonClick('Analyse de site')}>
-          <Button variant="outline" className="w-full h-12 flex gap-2 items-center justify-center">
-            <Search className="h-4 w-4 text-blue-600" />
-            <span>Analyser un site web</span>
-          </Button>
-        </Link>
-        
-        <Link to="/structure" onClick={() => handleButtonClick('Structure')}>
-          <Button variant="outline" className="w-full h-12 flex gap-2 items-center justify-center">
-            <LineChart className="h-4 w-4 text-orange-600" />
-            <span>Structure du site</span>
-          </Button>
-        </Link>
-        
-        <Link to="/analytics" onClick={() => handleButtonClick('Analytics')}>
-          <Button variant="outline" className="w-full h-12 flex gap-2 items-center justify-center">
-            <FileSearch className="h-4 w-4 text-green-600" />
-            <span>Afficher les rapports</span>
-          </Button>
-        </Link>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-2">
-        <Link to="/signature" onClick={() => handleButtonClick('Signature Email')}>
-          <Button variant="outline" className="w-full h-12 flex gap-2 items-center justify-center">
-            <FileSignature className="h-4 w-4 text-blue-600" />
-            <span>Signature Email</span>
-          </Button>
-        </Link>
-        
-        <Link to="/pinterest" onClick={() => handleButtonClick('Pinterest')}>
-          <Button variant="outline" className="w-full h-12 flex gap-2 items-center justify-center">
-            <Image className="h-4 w-4 text-red-600" />
-            <span>Images Pinterest</span>
-          </Button>
-        </Link>
-        
-        <Link to="/wordcount" onClick={() => handleButtonClick('Mots-clés')}>
-          <Button variant="outline" className="w-full h-12 flex gap-2 items-center justify-center">
-            <FileText className="h-4 w-4 text-purple-600" />
-            <span>Analyse des mots-clés</span>
-          </Button>
-        </Link>
-      </div>
+      <Link to="/internal-linking">
+        <Button variant="outline" className="w-full h-[70px] flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50 hover:from-gray-50 hover:to-gray-100 gap-2">
+          <Link2 className="h-5 w-5 text-blue-600" />
+          <span className="text-sm">Liens internes</span>
+        </Button>
+      </Link>
       
-      <div className="grid grid-cols-1 mt-2">
-        <Link to="/keyword-meta" onClick={() => handleButtonClick('Titles & Media')}>
-          <Button variant="outline" className="w-full h-12 flex gap-2 items-center justify-center">
-            <FileText className="h-4 w-4 text-indigo-600" />
-            <span>Titles & Meta Descriptions</span>
-          </Button>
-        </Link>
-      </div>
+      <Link to="/keywords">
+        <Button variant="outline" className="w-full h-[70px] flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50 hover:from-gray-50 hover:to-gray-100 gap-2">
+          <FileText className="h-5 w-5 text-emerald-600" />
+          <span className="text-sm">Mots-clés</span>
+        </Button>
+      </Link>
+      
+      <Link to="/performance">
+        <Button variant="outline" className="w-full h-[70px] flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50 hover:from-gray-50 hover:to-gray-100 gap-2">
+          <Gauge className="h-5 w-5 text-amber-600" />
+          <span className="text-sm">Performance</span>
+        </Button>
+      </Link>
+      
+      <Link to="/tracking">
+        <Button variant="outline" className="w-full h-[70px] flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50 hover:from-gray-50 hover:to-gray-100 gap-2">
+          <BarChart className="h-5 w-5 text-purple-600" />
+          <span className="text-sm">Suivi des positions</span>
+        </Button>
+      </Link>
     </div>
   );
 };

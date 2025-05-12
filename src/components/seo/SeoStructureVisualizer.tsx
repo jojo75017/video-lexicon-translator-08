@@ -27,7 +27,7 @@ const SeoStructureVisualizer: React.FC<SeoStructureVisualizerProps> = ({ heading
           </Badge>
         );
       }
-      if (level > 1 && !heading.parentFound) {
+      if (level > 1 && heading.parentFound === false) {
         return (
           <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-200 ml-2">
             {t('seo.missingParent', 'Missing parent')}
@@ -108,7 +108,7 @@ const SeoStructureVisualizer: React.FC<SeoStructureVisualizerProps> = ({ heading
       </CardHeader>
       <CardContent>
         {hasIssues && (
-          <Alert className="mb-4" variant="destructive">
+          <Alert variant="destructive" className="mb-4">
             <AlertTriangle className="h-4 w-4 mr-2" />
             <AlertDescription>
               <div className="font-medium mb-1">{t('seo.structure.issues', 'Problèmes détectés')}</div>
@@ -122,7 +122,7 @@ const SeoStructureVisualizer: React.FC<SeoStructureVisualizerProps> = ({ heading
         )}
         
         {!hasH1 && (
-          <Alert className="mb-4" variant="warning">
+          <Alert className="mb-4">
             <Info className="h-4 w-4 mr-2" />
             <AlertDescription>
               {t('seo.recommendH1', 'Il est recommandé d\'avoir exactement une balise H1 sur votre page')}

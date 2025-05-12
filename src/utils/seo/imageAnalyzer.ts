@@ -49,7 +49,9 @@ export const analyzeImages = (htmlContent: string): ImageDetails[] => {
       needsOptimization: mightNeedOptimization,
       estimatedSize: estimatedSizeKB > 0 ? `~${estimatedSizeKB} KB` : 'Unknown',
       lazyLoaded: img.getAttribute('loading') === 'lazy',
-      index
+      index,
+      size: estimatedSizeKB, // Add size estimate in KB
+      format: src.split('.').pop()?.toLowerCase() || 'unknown' // Extract format from file extension
     };
   });
 };

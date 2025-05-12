@@ -30,12 +30,13 @@ export interface SeoAnalysis {
   topBacklinkDomains: string[];
   keywordSuggestions?: KeywordSuggestion[];
   brokenLinks?: BrokenLink[];
+  internalLinkAnalysis?: InternalLinkAnalysis; // New property for internal link analysis
 }
 
 export interface MetaTagsAnalysis {
   hasTitleTag: boolean;
   hasDescriptionTag: boolean;
-  hasCanonicalTag: boolean;
+  hasCanonicalTag: boolean; // Changed to match implementation
   hasRobotsTag: boolean;
   hasOpenGraphTags: boolean;
   hasTwitterTags?: boolean;
@@ -54,7 +55,7 @@ export interface KeywordFrequency {
 export interface BacklinkInfo {
   domain: string;
   url: string;
-  anchor: string;
+  anchor: string; // Added to match implementation
   doFollow: boolean;
 }
 
@@ -63,6 +64,7 @@ export interface SocialMetrics {
     likes: number;
     shares: number;
     comments: number;
+    engagements?: number; // Added to match implementation
   };
   twitter: {
     tweets: number;
@@ -77,6 +79,7 @@ export interface SocialMetrics {
   };
   pinterest: {
     pins: number;
+    saves?: number; // Made optional to match implementation
   };
 }
 
@@ -96,11 +99,13 @@ export interface ImageDetails {
   hasAlt: boolean;
   width: number | null;
   height: number | null;
-  isDecorative?: boolean;
-  needsOptimization?: boolean;
+  isDecorative?: boolean; // Added to match implementation
+  needsOptimization?: boolean; // Added to match implementation
   estimatedSize?: string;
   lazyLoaded?: boolean;
   index?: number;
+  size?: number; // Added to fix typings
+  format?: string; // Added to fix typings
 }
 
 export interface PerformanceData {
@@ -109,6 +114,11 @@ export interface PerformanceData {
   domLoadTime: number;
   resourceCount: number;
   score: number;
+  speedIndex?: number; // Added to match Performance interface
+  totalBlockingTime?: number; // Added to match Performance interface
+  largestContentfulPaint?: number; // Added to match Performance interface
+  cumulativeLayoutShift?: number; // Added to match Performance interface
+  performanceScore?: number; // Added to match Performance interface
 }
 
 export interface MobileAnalysis {
@@ -122,14 +132,14 @@ export interface SearchConsoleData {
   impressions: number;
   ctr: number;
   position: number;
-  keywords: Keyword[];
+  keywords: SearchKeyword[]; // Changed to match implementation
   topPages: TopPage[];
   trend: TrendData[];
   countries: Record<string, number>;
   topQueries?: TopQuery[];
 }
 
-export interface Keyword {
+export interface SearchKeyword { // Renamed from Keyword to avoid conflicts
   keyword: string;
   position: number;
   clicks: number;
@@ -150,7 +160,7 @@ export interface TrendData {
   position: number;
 }
 
-export interface TopQuery extends Keyword {
+export interface TopQuery extends SearchKeyword {
   trend: {
     date: string;
     position: number;
@@ -162,6 +172,7 @@ export interface KeywordSuggestion {
   keyword: string;
   volume: number;
   difficulty: number;
+  relevance: number; // Added to match implementation
 }
 
 export interface BrokenLink {
@@ -176,7 +187,7 @@ export interface HierarchyItem {
   text?: string;
   name?: string;
   children?: HierarchyItem[];
-  parentFound?: boolean;
+  parentFound?: boolean; // Added to match implementation
 }
 
 export interface HeadingStructure {
@@ -189,4 +200,58 @@ export interface StructureItem {
   content: string;
   type: "h1" | "h2" | "h3" | "h4" | "p" | "list";
   items?: string[];
+}
+
+// New interfaces for internal link analysis
+export interface InternalLinkAnalysis {
+  totalLinks: number;
+  uniquePages: number;
+  linkDistribution: LinkDistribution;
+  linkDepth: LinkDepth;
+  orphanPages: string[];
+  pageMetrics: PageLinkMetric[];
+  siloPagesFound: boolean;
+  siloStructure?: SiloStructure[];
+  recommendations: InternalLinkRecommendation[];
+}
+
+export interface LinkDistribution {
+  navigationLinks: number;
+  contentLinks: number;
+  footerLinks: number;
+  sidebarLinks: number;
+  otherLinks: number;
+}
+
+export interface LinkDepth {
+  averageDepth: number;
+  maxDepth: number;
+  depthDistribution: Record<number, number>;
+}
+
+export interface PageLinkMetric {
+  url: string;
+  title: string;
+  incomingLinks: number;
+  outgoingLinks: number;
+  uniqueIncomingPages: number;
+  uniqueOutgoingPages: number;
+  depth: number;
+  importance: number;
+}
+
+export interface SiloStructure {
+  name: string;
+  mainPage: string;
+  subPages: string[];
+}
+
+export interface InternalLinkRecommendation {
+  type: 'add' | 'remove' | 'modify' | 'info';
+  priority: 'high' | 'medium' | 'low';
+  impact: number;
+  source?: string;
+  target?: string;
+  description: string;
+  reason: string;
 }
