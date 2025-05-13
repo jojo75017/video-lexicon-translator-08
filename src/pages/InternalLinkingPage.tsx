@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { Network, AlertCircle, Search, ArrowRight } from 'lucide-react';
 import { useSiteAnalyzer } from '@/hooks/useSiteAnalyzer';
 import InternalLinkAnalyzer from '@/components/seo/InternalLinkAnalyzer';
-import { analyzeInternalLinks } from '@/utils/seo/internalLinkAnalyzer';
+import { analyzeInternalLinks } from '@/utils/seo/internal-link';
 import { toast } from 'sonner';
 
 const InternalLinkingPage = () => {
