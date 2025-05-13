@@ -29,7 +29,7 @@ export const analyzeInternalLinks = (htmlContent: string, url: string): Internal
           : new URL(href);
           
         // Check if the URL is from the same origin
-        return linkUrl.href.startsWith(baseUrl);
+        return linkUrl.toString().startsWith(baseUrl);
       } catch {
         return false;
       }

@@ -201,10 +201,10 @@ const InternalLinkAnalyzer: React.FC<InternalLinkAnalyzerProps> = ({ analysis, u
                 {Object.entries(analysis.linkDepth.depthDistribution).length > 0 ? (
                   <div className="space-y-4">
                     {Object.entries(analysis.linkDepth.depthDistribution)
-                      .sort(([a], [b]) => parseInt(a) - parseInt(b))
+                      .sort(([a], [b]) => Number(a) - Number(b))
                       .map(([depth, count]) => {
                         const total = analysis.uniquePages;
-                        const percentage = total > 0 ? (count / total) * 100 : 0;
+                        const percentage = total > 0 ? (Number(count) / total) * 100 : 0;
                         
                         return (
                           <div key={depth} className="space-y-1">
@@ -214,8 +214,8 @@ const InternalLinkAnalyzer: React.FC<InternalLinkAnalyzerProps> = ({ analysis, u
                             </div>
                             <Progress 
                               value={percentage} 
-                              className={`h-2 ${parseInt(depth) <= 2 ? 'bg-green-100' : 
-                                               parseInt(depth) <= 4 ? 'bg-amber-100' : 
+                              className={`h-2 ${Number(depth) <= 2 ? 'bg-green-100' : 
+                                               Number(depth) <= 4 ? 'bg-amber-100' : 
                                                'bg-red-100'}`} 
                             />
                           </div>
