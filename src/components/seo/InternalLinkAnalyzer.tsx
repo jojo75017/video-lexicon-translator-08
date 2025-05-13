@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTranslation } from 'react-i18next';
@@ -180,7 +181,7 @@ const InternalLinkAnalyzer: React.FC<InternalLinkAnalyzerProps> = ({ analysis, u
                 <div className="space-y-4">
                   {Object.entries(analysis.linkDistribution).map(([key, value]) => {
                     const total = analysis.totalLinks;
-                    const percentage = total > 0 ? (value / total) * 100 : 0;
+                    const percentage = total > 0 ? (Number(value) / total) * 100 : 0;
                     
                     return (
                       <div key={key} className="space-y-1">

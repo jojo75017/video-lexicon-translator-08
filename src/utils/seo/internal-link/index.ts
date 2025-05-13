@@ -82,7 +82,7 @@ export function analyzeInternalLinks(htmlContent: string, url: string): Internal
         if (!pageMap.has(fullUrl)) {
           pageMap.set(fullUrl, {
             url: fullUrl,
-            title: link.textContent?.trim() || link.getAttribute('title') || fullUrl,
+            title: link.textContent?.trim() || link.getAttribute('title') || null,
             incomingLinks: 1,
             outgoingLinks: 0,
             uniqueIncomingPages: new Set<string>([url]),

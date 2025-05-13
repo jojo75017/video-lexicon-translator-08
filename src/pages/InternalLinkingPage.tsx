@@ -5,10 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useTranslation } from 'react-i18next';
-import { Network, AlertCircle, Search, ArrowRight } from 'lucide-react';
+import { Network, AlertCircle, Search } from 'lucide-react';
 import { useSiteAnalyzer } from '@/hooks/useSiteAnalyzer';
 import InternalLinkAnalyzer from '@/components/seo/InternalLinkAnalyzer';
-import { analyzeInternalLinks } from '@/utils/seo/internal-link';
 import { toast } from 'sonner';
 
 const InternalLinkingPage = () => {
@@ -144,7 +143,7 @@ const InternalLinkingPage = () => {
           <CardContent className="pt-6">
             <h3 className="font-medium mb-2 flex items-center">
               <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-2">
-                <ArrowRight className="h-4 w-4 text-green-600" />
+                <Search className="h-4 w-4 text-green-600" />
               </div>
               {t('internalLinks.benefit2.title', 'Meilleure navigation')}
             </h3>

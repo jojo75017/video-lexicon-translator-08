@@ -12,7 +12,7 @@ export const analyzeMetaTags = (htmlContent: string): MetaTagsAnalysis => {
     return {
       hasTitleTag: false,
       hasDescriptionTag: false,
-      hasCanonicalTag: false,
+      hasCanonical: false,
       hasRobotsTag: false,
       hasOpenGraphTags: false,
       titleLength: 0,
@@ -39,7 +39,7 @@ export const analyzeMetaTags = (htmlContent: string): MetaTagsAnalysis => {
   
   // Canonical URL analysis
   const canonicalLink = doc.querySelector('link[rel="canonical"]');
-  const hasCanonicalTag = !!canonicalLink;
+  const hasCanonical = !!canonicalLink;
   const canonicalUrl = canonicalLink?.getAttribute('href') || null;
   
   // Robots tag analysis
@@ -63,7 +63,7 @@ export const analyzeMetaTags = (htmlContent: string): MetaTagsAnalysis => {
   return {
     hasTitleTag,
     hasDescriptionTag,
-    hasCanonicalTag,
+    hasCanonical,
     hasRobotsTag,
     hasOpenGraphTags,
     hasTwitterTags,
@@ -154,10 +154,10 @@ export const analyzeSeo = (htmlContent: string, url: string): SeoAnalysis => {
   
   // Mock data for social metrics (would come from social APIs)
   const socialMetrics: SocialMetrics = {
-    facebook: { likes: 245, shares: 123, comments: 45 },
+    facebook: { likes: 245, shares: 123, comments: 45, engagements: 413 },
     twitter: { tweets: 78, retweets: 34, likes: 156 },
     linkedin: { shares: 56, engagements: 89 },
-    pinterest: { pins: 23 }
+    pinterest: { pins: 23, saves: 15 }
   };
   
   // Mock data for social tags
@@ -180,7 +180,12 @@ export const analyzeSeo = (htmlContent: string, url: string): SeoAnalysis => {
     firstContentfulPaint: 900, // ms
     domLoadTime: 1200, // ms
     resourceCount: 45,
-    score: 82 // out of 100
+    score: 82, // out of 100
+    speedIndex: 1500,
+    totalBlockingTime: 350,
+    largestContentfulPaint: 1800,
+    cumulativeLayoutShift: 0.15,
+    performanceScore: 80
   };
   
   // Mobile analysis (mock)
@@ -230,10 +235,10 @@ export const analyzeSeo = (htmlContent: string, url: string): SeoAnalysis => {
   
   // Mock keyword suggestions
   const keywordSuggestions = [
-    { keyword: 'seo optimization tools', volume: 1200, difficulty: 65 },
-    { keyword: 'best seo practices', volume: 2300, difficulty: 72 },
-    { keyword: 'website analysis tools', volume: 890, difficulty: 58 },
-    { keyword: 'improve website seo', volume: 1500, difficulty: 62 }
+    { keyword: 'seo optimization tools', volume: 1200, difficulty: 65, relevance: 90 },
+    { keyword: 'best seo practices', volume: 2300, difficulty: 72, relevance: 85 },
+    { keyword: 'website analysis tools', volume: 890, difficulty: 58, relevance: 75 },
+    { keyword: 'improve website seo', volume: 1500, difficulty: 62, relevance: 80 }
   ];
   
   // Mock broken links

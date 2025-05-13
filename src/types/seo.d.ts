@@ -233,7 +233,7 @@ export interface LinkDepth {
 
 export interface PageLinkMetric {
   url: string;
-  title: string;
+  title: string | null;
   incomingLinks: number;
   outgoingLinks: number;
   uniqueIncomingPages: number;
