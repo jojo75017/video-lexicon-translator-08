@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Link2, BarChart, FileText, Gauge } from "lucide-react";
+import { Search, Link2, BarChart, FileText, Gauge, Network } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const SeoActionButtons = () => {
@@ -16,7 +16,7 @@ const SeoActionButtons = () => {
       
       <Link to="/internal-linking">
         <Button variant="outline" className="w-full h-[70px] flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50 hover:from-gray-50 hover:to-gray-100 gap-2">
-          <Link2 className="h-5 w-5 text-blue-600" />
+          <Network className="h-5 w-5 text-blue-600" />
           <span className="text-sm">Liens internes</span>
         </Button>
       </Link>

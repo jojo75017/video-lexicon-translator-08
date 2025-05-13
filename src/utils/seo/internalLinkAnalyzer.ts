@@ -10,10 +10,11 @@ export const analyzeInternalLinks = (htmlContent: string, url: string): Internal
     // Parse HTML content
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlContent, 'text/html');
-    const baseUrl = new URL(url).origin;
+    const currentUrl = new URL(url);
+    const baseUrl = currentUrl.origin;
     
     // Get all links
-    const allLinks = Array.from(doc.querySelectorAll('a[href]'));
+    const allLinks = Array.from(doc.querySelectorAll('a[href]')) as HTMLAnchorElement[];
     
     // Filter internal links (same origin)
     const internalLinks = allLinks.filter(link => {
@@ -279,7 +280,8 @@ function detectPotentialSilos(pageMetrics: any[]): any[] {
   
   pageMetrics.forEach(page => {
     try {
-      const path = new URL(page.url).pathname;
+      const pageUrl = new URL(page.url);
+      const path = pageUrl.pathname;
       const parts = path.split('/').filter(Boolean);
       
       if (parts.length > 0) {

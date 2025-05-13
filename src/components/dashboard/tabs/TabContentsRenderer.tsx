@@ -72,6 +72,11 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
   if (activeTab === 'keyword-meta') {
     return <Navigate to="/keyword-meta" replace />;
   }
+  
+  // Si l'onglet Liens Internes est actif, rediriger vers la page des liens internes
+  if (activeTab === 'internal-links') {
+    return <Navigate to="/internal-linking" replace />;
+  }
 
   return (
     <>
@@ -269,7 +274,7 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
       
       {/* Fallback for any other tab */}
       {contentTabs
-        .filter(tab => !['hierarchy', 'wordcount', 'suggestions', 'seo', 'structure', 'backlinks', 'performance', 'metrics', 'analytics', 'keyword-meta'].includes(tab.id))
+        .filter(tab => !['hierarchy', 'wordcount', 'suggestions', 'seo', 'structure', 'backlinks', 'performance', 'metrics', 'analytics', 'keyword-meta', 'internal-links'].includes(tab.id))
         .map(tab => (
           <TabsContent key={tab.id} value={tab.id} id={tab.id} data-section={tab.id} style={{
             display: activeTab === tab.id ? "block" : "none",

@@ -203,7 +203,7 @@ const InternalLinkAnalyzer: React.FC<InternalLinkAnalyzerProps> = ({ analysis, u
                     {Object.entries(analysis.linkDepth.depthDistribution)
                       .sort(([a], [b]) => parseInt(a) - parseInt(b))
                       .map(([depth, count]) => {
-                        const total = analysis.totalLinks;
+                        const total = analysis.uniquePages;
                         const percentage = total > 0 ? (count / total) * 100 : 0;
                         
                         return (

@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { 
   ArrowLeft, 
   Search, 
@@ -184,7 +185,6 @@ const InternalLinkingPage = () => {
                 analyzeSite={handleAnalyzeInternalLinks}
                 error={error}
                 handleActivateProxy={handleActivateProxy}
-                buttonText="Analyser les liens internes"
               />
               
               {internalLinkAnalysis && url && (

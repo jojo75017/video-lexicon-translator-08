@@ -30,13 +30,15 @@ export interface SeoAnalysis {
   topBacklinkDomains: string[];
   keywordSuggestions?: KeywordSuggestion[];
   brokenLinks?: BrokenLink[];
-  internalLinkAnalysis?: InternalLinkAnalysis; // New property for internal link analysis
+  internalLinkAnalysis?: InternalLinkAnalysis; // Property for internal link analysis
+  sourceCode?: string; // Added for internal link analyzer
+  textContent?: string; // Added for content analysis
 }
 
 export interface MetaTagsAnalysis {
   hasTitleTag: boolean;
   hasDescriptionTag: boolean;
-  hasCanonicalTag: boolean; // Changed to match implementation
+  hasCanonical: boolean; // Changed from hasCanonicalTag
   hasRobotsTag: boolean;
   hasOpenGraphTags: boolean;
   hasTwitterTags?: boolean;
@@ -79,7 +81,7 @@ export interface SocialMetrics {
   };
   pinterest: {
     pins: number;
-    saves?: number; // Made optional to match implementation
+    saves?: number; // Made optional
   };
 }
 
@@ -99,13 +101,13 @@ export interface ImageDetails {
   hasAlt: boolean;
   width: number | null;
   height: number | null;
-  isDecorative?: boolean; // Added to match implementation
-  needsOptimization?: boolean; // Added to match implementation
+  isDecorative?: boolean; // Added for image analyzer
+  needsOptimization?: boolean; // Added for image analyzer
   estimatedSize?: string;
   lazyLoaded?: boolean;
   index?: number;
-  size?: number; // Added to fix typings
-  format?: string; // Added to fix typings
+  size?: number; 
+  format?: string;
 }
 
 export interface PerformanceData {
@@ -114,11 +116,11 @@ export interface PerformanceData {
   domLoadTime: number;
   resourceCount: number;
   score: number;
-  speedIndex?: number; // Added to match Performance interface
-  totalBlockingTime?: number; // Added to match Performance interface
-  largestContentfulPaint?: number; // Added to match Performance interface
-  cumulativeLayoutShift?: number; // Added to match Performance interface
-  performanceScore?: number; // Added to match Performance interface
+  speedIndex: number;
+  totalBlockingTime: number;
+  largestContentfulPaint: number;
+  cumulativeLayoutShift: number;
+  performanceScore: number;
 }
 
 export interface MobileAnalysis {
@@ -132,14 +134,14 @@ export interface SearchConsoleData {
   impressions: number;
   ctr: number;
   position: number;
-  keywords: SearchKeyword[]; // Changed to match implementation
+  keywords: SearchKeyword[]; 
   topPages: TopPage[];
-  trend: TrendData[];
+  trend: TrendData[]; // Adding trend for internal links
   countries: Record<string, number>;
   topQueries?: TopQuery[];
 }
 
-export interface SearchKeyword { // Renamed from Keyword to avoid conflicts
+export interface SearchKeyword {
   keyword: string;
   position: number;
   clicks: number;
@@ -172,7 +174,7 @@ export interface KeywordSuggestion {
   keyword: string;
   volume: number;
   difficulty: number;
-  relevance: number; // Added to match implementation
+  relevance: number;
 }
 
 export interface BrokenLink {
@@ -187,7 +189,7 @@ export interface HierarchyItem {
   text?: string;
   name?: string;
   children?: HierarchyItem[];
-  parentFound?: boolean; // Added to match implementation
+  parentFound?: boolean; // Added for SeoStructureVisualizer
 }
 
 export interface HeadingStructure {
@@ -202,7 +204,7 @@ export interface StructureItem {
   items?: string[];
 }
 
-// New interfaces for internal link analysis
+// Types for internal link analysis
 export interface InternalLinkAnalysis {
   totalLinks: number;
   uniquePages: number;
