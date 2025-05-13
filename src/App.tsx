@@ -11,6 +11,7 @@ import StructurePage from './pages/StructurePage';
 import SignaturePage from './pages/SignaturePage';
 import KeywordMetaPage from './pages/KeywordMetaPage';
 import KeywordPage from './pages/KeywordPage';
+import InternalLinkingPage from './pages/InternalLinkingPage';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <Route path="/signature" element={<SignaturePage />} />
         <Route path="/keyword-meta" element={<KeywordMetaPage />} />
         <Route path="/wordcount" element={<KeywordPage />} />
+        <Route path="/internal-linking" element={<InternalLinkingPage />} />
       </Routes>
     </Router>
   );

@@ -34,15 +34,17 @@ export const useTabNavigation = () => {
       'quora': 'quora',
       'signature': 'signature',
       'pinterest': 'pinterest',
+      'internal-linking': 'internal-links',
       // Localized routes (French)
       'hierarchie': 'hierarchy',
       'nombre-mots': 'wordcount',
       'metriques': 'metrics',
+      'liens-internes': 'internal-links',
     };
     
     // Log pour le débogage
-    console.log('useTabNavigation Current Path:', path);
-    console.log('useTabNavigation Mapped Tab:', pathToTabMap[path] || 'hierarchy');
+    console.log('TabNavigation current path:', path);
+    console.log('TabNavigation mapped tab:', pathToTabMap[path] || 'hierarchy');
     
     return pathToTabMap[path] || 'hierarchy';
   };
@@ -89,7 +91,8 @@ export const useTabNavigation = () => {
       'analytics': '/analytics',
       'quora': '/quora',
       'signature': '/signature',
-      'pinterest': '/pinterest'
+      'pinterest': '/pinterest',
+      'internal-links': '/internal-linking'
     };
     
     // Forcer la navigation si nécessaire
@@ -111,7 +114,7 @@ export const useTabNavigation = () => {
     const getMainCategory = (tabId: string): string => {
       if (['hierarchy', 'wordcount', 'suggestions'].includes(tabId)) {
         return 'content';
-      } else if (['seo', 'structure', 'backlinks'].includes(tabId)) {
+      } else if (['seo', 'structure', 'backlinks', 'internal-links'].includes(tabId)) {
         return 'seo';
       } else if (['performance', 'metrics'].includes(tabId)) {
         return 'performance';
@@ -132,7 +135,7 @@ export const useTabNavigation = () => {
       return tabs.filter(tab => ['hierarchy', 'wordcount', 'suggestions'].includes(tab.id));
     } 
     else if (mainCategory === 'seo') {
-      return tabs.filter(tab => ['seo', 'structure', 'backlinks'].includes(tab.id));
+      return tabs.filter(tab => ['seo', 'structure', 'backlinks', 'internal-links'].includes(tab.id));
     } 
     else if (mainCategory === 'performance') {
       return tabs.filter(tab => ['performance', 'metrics'].includes(tab.id));

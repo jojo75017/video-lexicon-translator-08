@@ -1,4 +1,3 @@
-
 import { Tab } from './types';
 import { 
   BarChart2, 
@@ -19,7 +18,8 @@ import {
   Edit3,
   FileSignature,
   Languages,
-  Image
+  Image,
+  Network
 } from 'lucide-react';
 
 export const groupLabels: Record<string, string> = {
@@ -108,6 +108,18 @@ export const tabs: Tab[] = [
     group: 'metrics',
     color: 'text-emerald-600'
   },
+  // Nouvel onglet pour les liens internes
+  {
+    id: 'internal-links',
+    label: 'Liens Internes',
+    description: 'Analyse et optimisation des liens internes',
+    icon: <Network />,
+    group: 'seo',
+    color: 'text-blue-600',
+    isNew: true,
+    highlighted: true,
+    path: '/internal-linking' // Lien direct vers la page dédiée
+  },
   {
     id: 'advanced',
     label: 'Avancé',
@@ -175,7 +187,7 @@ export const tabs: Tab[] = [
     color: 'text-blue-600',
     isNew: true,
     highlighted: true,
-    path: '/keyword-meta'  // Ajout d'un chemin dédié
+    path: '/keyword-meta'
   },
   {
     id: 'quora',

@@ -28,7 +28,8 @@ export const analyzeInternalLinks = (htmlContent: string, url: string): Internal
           ? new URL(href, baseUrl).href
           : new URL(href);
           
-        return linkUrl.origin === baseUrl;
+        // Check if the URL is from the same origin
+        return linkUrl.href.startsWith(baseUrl);
       } catch {
         return false;
       }
@@ -49,7 +50,7 @@ export const analyzeInternalLinks = (htmlContent: string, url: string): Internal
       title: doc.title,
       incomingLinks: 0,
       outgoingLinks: internalLinks.length,
-      uniqueIncomingPages: 0,
+      uniqueIncomingPages: new Set(),
       uniqueOutgoingPages: new Set(),
       depth: 0,
       importance: 100 // Current page has max importance

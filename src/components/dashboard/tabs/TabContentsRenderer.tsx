@@ -8,9 +8,10 @@ import HierarchyTabContent from './HierarchyTabContent';
 import SeoResults from "@/components/SeoResults";
 import { CrawlForm } from "@/components/CrawlForm";
 import { useSiteAnalyzer } from "@/hooks/useSiteAnalyzer";
-import { Navigate, Link } from "react-router-dom";
+import { Navigate, Link, useNavigate } from "react-router-dom";
 import { activateSection } from '@/utils/navigationHelpers';
 import KeywordTabContent from './KeywordTabContent';
+import { toast } from "sonner";
 
 interface TabContentsRendererProps {
   contentTabs: any[];
@@ -20,6 +21,7 @@ interface TabContentsRendererProps {
 const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProps) => {
   const firstLoad = useRef(true);
   const { seoAnalysis } = useSiteAnalyzer();
+  const navigate = useNavigate();
 
   // Effect pour gérer l'affichage au premier chargement
   useEffect(() => {
@@ -58,6 +60,19 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
     );
   }
 
+  // Redirection vers les pages dédiées
+  if (activeTab === 'internal-links') {
+    console.log("Redirecting to /internal-linking");
+    toast.info("Navigation vers Liens Internes", {
+      description: "Chargement de la page...",
+      duration: 1500
+    });
+    setTimeout(() => {
+      navigate('/internal-linking');
+    }, 10);
+    return null;
+  }
+  
   // Si l'onglet Pinterest est actif, rediriger vers la page Pinterest
   if (activeTab === 'pinterest') {
     return <Navigate to="/pinterest" replace />;
@@ -71,11 +86,6 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
   // Si l'onglet Keyword Meta (Titles & Media) est actif, rediriger vers la page KeywordMeta
   if (activeTab === 'keyword-meta') {
     return <Navigate to="/keyword-meta" replace />;
-  }
-  
-  // Si l'onglet Liens Internes est actif, rediriger vers la page des liens internes
-  if (activeTab === 'internal-links') {
-    return <Navigate to="/internal-linking" replace />;
   }
 
   return (

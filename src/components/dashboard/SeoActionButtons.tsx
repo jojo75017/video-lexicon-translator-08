@@ -1,10 +1,22 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Search, Link2, BarChart, FileText, Gauge, Network } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const SeoActionButtons = () => {
+  const navigate = useNavigate();
+
+  const handleInternalLinkClick = () => {
+    console.log("Clicking internal-linking button");
+    navigate('/internal-linking');
+    toast.info("Navigation vers l'analyse des liens internes", {
+      description: "Chargement de la page...",
+      duration: 1500
+    });
+  };
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
       <Link to="/seo">
@@ -14,12 +26,14 @@ const SeoActionButtons = () => {
         </Button>
       </Link>
       
-      <Link to="/internal-linking">
-        <Button variant="outline" className="w-full h-[70px] flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50 hover:from-gray-50 hover:to-gray-100 gap-2">
-          <Network className="h-5 w-5 text-blue-600" />
-          <span className="text-sm">Liens internes</span>
-        </Button>
-      </Link>
+      <Button 
+        variant="outline" 
+        className="w-full h-[70px] flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50 hover:from-gray-50 hover:to-gray-100 gap-2"
+        onClick={handleInternalLinkClick}
+      >
+        <Network className="h-5 w-5 text-blue-600" />
+        <span className="text-sm">Liens internes</span>
+      </Button>
       
       <Link to="/keywords">
         <Button variant="outline" className="w-full h-[70px] flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50 hover:from-gray-50 hover:to-gray-100 gap-2">
