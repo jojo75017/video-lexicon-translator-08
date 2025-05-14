@@ -1,5 +1,5 @@
 
-import { InternalLinkAnalysis } from '@/types/seo';
+import type { InternalLinkAnalysis } from "@/types/seo";
 
 /**
  * Create an empty analysis result for when analysis fails or has no data

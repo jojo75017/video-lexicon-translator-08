@@ -1,5 +1,4 @@
-
-// Types for SEO Analysis
+// Types pour SEO Analysis
 
 export interface SeoAnalysis {
   url: string;
@@ -204,7 +203,7 @@ export interface StructureItem {
   items?: string[];
 }
 
-// Types for internal link analysis
+// Types pour l’analyse des liens internes
 export interface InternalLinkAnalysis {
   totalLinks: number;
   uniquePages: number;
@@ -231,6 +230,7 @@ export interface LinkDepth {
   depthDistribution: Record<number, number>;
 }
 
+// Adaptation : "uniqueIncomingPages" et "uniqueOutgoingPages" sont des nombres ici pour correspondre à l'affichage.
 export interface PageLinkMetric {
   url: string;
   title: string | null;

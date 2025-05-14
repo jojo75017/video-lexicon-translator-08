@@ -1,11 +1,13 @@
 
-import { InternalLinkAnalysis } from '@/types/seo';
-import { countLinksByContainer, calculateAverageDepth } from './helper-functions';
-import { processPageMetrics, calculateDepthDistribution, findOrphanedPages } from './page-metrics';
-import { detectPotentialSilos } from './silo-detector';
-import { generateRecommendations } from './recommendations';
-import { createEmptyAnalysis } from './empty-analysis';
-import { PageData } from './types';
+// Point d’entrée unique pour l’analyse des liens internes
+
+import type { InternalLinkAnalysis } from "@/types/seo";
+import { countLinksByContainer, calculateAverageDepth } from "./helper-functions";
+import { processPageMetrics, calculateDepthDistribution, findOrphanedPages } from "./page-metrics";
+import { detectPotentialSilos } from "./silo-detector";
+import { generateRecommendations } from "./recommendations";
+import { createEmptyAnalysis } from "./empty-analysis";
+import { PageData } from "./types";
 
 /**
  * Main function to analyze internal links from HTML content
@@ -110,15 +112,15 @@ export function analyzeInternalLinks(htmlContent: string, url: string): Internal
       }
     });
     
-    // Process page metrics
+    // Process page metrics (rendu au format PageLinkMetric, pas PageData)
     const pageMetrics = processPageMetrics(pageMap);
-    
+
     // Calculate depth distribution
     const depthDistribution = calculateDepthDistribution(pageMetrics);
-    
+
     // Find orphaned pages
     const orphanPages = findOrphanedPages(pageMetrics, url);
-    
+
     // Generate recommendations
     const recommendations = generateRecommendations(
       pageMetrics, 
@@ -127,11 +129,10 @@ export function analyzeInternalLinks(htmlContent: string, url: string): Internal
       contentLinks, 
       internalLinks.length
     );
-    
-    // Detect if there might be a silo structure
+
+    // Detect silo pages
     const potentialSilos = detectPotentialSilos(pageMetrics);
-    
-    // Return the full analysis
+
     return {
       totalLinks: internalLinks.length,
       uniquePages: pageMap.size,
@@ -159,10 +160,10 @@ export function analyzeInternalLinks(htmlContent: string, url: string): Internal
   }
 }
 
-// Re-export all the utility functions
-export * from './helper-functions';
-export * from './page-metrics';
-export * from './silo-detector';
-export * from './recommendations';
-export * from './empty-analysis';
-export * from './types';
+// Re-export de toutes les fonctions utiles
+export * from "./helper-functions";
+export * from "./page-metrics";
+export * from "./silo-detector";
+export * from "./recommendations";
+export * from "./empty-analysis";
+export * from "./types";
