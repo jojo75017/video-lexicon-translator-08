@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -45,10 +44,10 @@ const InternalLinkingPage = () => {
 
     // Set URL in the analyzer context
     setUrl(formattedUrl);
-    
-    // Start analysis
+
+    // Solution : Attendre que l'état soit réellement mis à jour (en lançant l'analyse via urlInput)
     try {
-      await analyzeSite();
+      await analyzeSite(formattedUrl);  // <--- ICI : utiliser explicitement l'URL à analyser
       toast.success("Analyse des liens internes terminée", {
         description: "Les données sont disponibles ci-dessous"
       });
