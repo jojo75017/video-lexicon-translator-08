@@ -1,200 +1,137 @@
-import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { useTranslation } from 'react-i18next';
-import { Network, AlertCircle, Search } from 'lucide-react';
-import { useSiteAnalyzer } from '@/hooks/useSiteAnalyzer';
-import InternalLinkAnalyzer from '@/components/seo/InternalLinkAnalyzer';
-import { toast } from 'sonner';
+
+import React, { useState } from 'react';
+import { ArrowLeft, FileText, Globe, Loader2, KeyRound } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
+import { KeywordSuggestion } from '@/types/seo/Keyword';
+import { analyzeWebsiteKeywords } from '@/utils/seo/keywordExtractor';
+import KeywordSuggestions from '@/components/seo/analysis/KeywordSuggestions';
 
 const InternalLinkingPage = () => {
-  const { t } = useTranslation();
-  const { 
-    url, 
-    setUrl, 
-    isLoading, 
-    analyzeSite, 
-    seoAnalysis, 
-    handleActivateProxy, 
-    showCorsWarning 
-  } = useSiteAnalyzer();
-  const [urlInput, setUrlInput] = useState(url || '');
+  const [urlInput, setUrlInput] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [keywords, setKeywords] = useState<KeywordSuggestion[]>([]);
 
-  // Activer automatiquement le proxy au chargement pour éviter les problèmes CORS
-  useEffect(() => {
-    console.log("Internal Linking Page: Initializing");
-    // Auto-enable proxy to avoid CORS issues
-    handleActivateProxy();
-  }, []);
-
-  const handleAnalyze = async () => {
-    if (!urlInput) {
-      toast.error('Veuillez entrer une URL');
+  const analyzeKeywords = async () => {
+    if (!urlInput.trim()) {
+      toast.error("Veuillez entrer une URL valide");
       return;
     }
 
-    // Format URL if needed
-    let formattedUrl = urlInput;
-    if (!urlInput.startsWith('http://') && !urlInput.startsWith('https://')) {
-      formattedUrl = 'https://' + urlInput;
-      setUrlInput(formattedUrl);
-    }
-
-    // Set URL in the analyzer context
-    setUrl(formattedUrl);
-
-    // Solution : Attendre que l'état soit réellement mis à jour (en lançant l'analyse via urlInput)
+    setIsAnalyzing(true);
     try {
-      await analyzeSite(formattedUrl);  // <--- ICI : utiliser explicitement l'URL à analyser
-      toast.success("Analyse des liens internes terminée", {
-        description: "Les données sont disponibles ci-dessous"
-      });
+      // Prétraiter l'URL pour s'assurer qu'elle a un protocole
+      let processedUrl = urlInput.trim();
+      if (!processedUrl.startsWith('http://') && !processedUrl.startsWith('https://')) {
+        processedUrl = `https://${processedUrl}`;
+      }
+
+      toast.info("Extraction des mots-clés en cours...");
+      const extractedKeywords = await analyzeWebsiteKeywords(processedUrl);
+      
+      if (extractedKeywords.length > 0) {
+        setKeywords(extractedKeywords);
+        toast.success(`${extractedKeywords.length} mots-clés extraits avec succès`);
+      } else {
+        toast.warning("Aucun mot-clé significatif trouvé");
+      }
     } catch (error) {
-      console.error("Error analyzing site:", error);
-      toast.error("Erreur lors de l'analyse", {
-        description: "Veuillez vérifier l'URL et réessayer"
+      console.error("Erreur lors de l'extraction des mots-clés:", error);
+      toast.error("L'extraction des mots-clés a échoué", {
+        description: "Vérifiez que l'URL est valide et accessible"
       });
+    } finally {
+      setIsAnalyzing(false);
     }
   };
 
   return (
-    <div className="container py-8">
-      <h1 className="text-3xl font-bold flex items-center mb-8">
-        <Network className="mr-2 h-6 w-6 text-blue-600" />
-        {t('internalLinks.pageTitle', 'Analyse des liens internes')}
-      </h1>
+    <div className="min-h-screen bg-gray-50 pb-10">
+      <header className="bg-white border-b p-4 mb-6">
+        <div className="container mx-auto flex items-center">
+          <Link to="/">
+            <Button variant="ghost" className="gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Retour au tableau de bord
+            </Button>
+          </Link>
+          <h1 className="ml-4 text-xl font-bold">Analyse de mots-clés</h1>
+        </div>
+      </header>
       
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle className="text-xl">
-            {t('internalLinks.analyzeTitle', 'Analyser les liens internes de votre site')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <p className="text-gray-600">
-              {t('internalLinks.description', 'Optimisez la structure des liens internes de votre site pour améliorer le référencement, la navigation et l\'expérience utilisateur.')}
-            </p>
-            
-            {showCorsWarning && (
-              <Alert variant="destructive" className="mb-4">
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle>{t('common.corsWarning', 'Attention CORS')}</AlertTitle>
-                <AlertDescription>
-                  {t('common.corsDescription', 'Le proxy est activé pour contourner les restrictions CORS.')}
-                </AlertDescription>
-              </Alert>
-            )}
-            
-            <div className="flex items-center space-x-2">
-              <Input
-                placeholder={t('common.enterUrl', 'Entrez l\'URL de votre site') as string}
-                value={urlInput}
-                onChange={e => setUrlInput(e.target.value)}
-                className="flex-grow"
-              />
-              <Button 
-                onClick={handleAnalyze}
-                disabled={isLoading || !urlInput}
-              >
-                {isLoading ? (
-                  <span className="flex items-center">
-                    <span className="animate-spin mr-2">◌</span>
-                    {t('common.analyzing', 'Analyse...')}
-                  </span>
-                ) : (
-                  <span className="flex items-center">
-                    <Search className="mr-2 h-4 w-4" />
-                    {t('common.analyze', 'Analyser')}
-                  </span>
-                )}
-              </Button>
+      <div className="container mx-auto">
+        <Card className="p-6">
+          <h2 className="text-2xl font-bold mb-4 flex items-center">
+            <KeyRound className="h-6 w-6 mr-2 text-blue-600" />
+            Extraire les mots-clés d'un site web
+          </h2>
+          <p className="text-gray-600 mb-6">
+            Analysez n'importe quel site web pour identifier ses mots-clés principaux et créer du contenu optimisé.
+          </p>
+          
+          <div className="space-y-4 mb-6">
+            <div className="flex flex-col space-y-2">
+              <label htmlFor="url-input" className="text-sm font-medium text-gray-700">
+                URL du site à analyser
+              </label>
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <Input
+                    id="url-input"
+                    type="url"
+                    value={urlInput}
+                    onChange={(e) => setUrlInput(e.target.value)}
+                    placeholder="https://exemple.com"
+                    className="pl-10"
+                    disabled={isAnalyzing}
+                  />
+                  <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                </div>
+                <Button
+                  onClick={analyzeKeywords}
+                  disabled={isAnalyzing || !urlInput.trim()}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  {isAnalyzing ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Analyse en cours...
+                    </>
+                  ) : (
+                    <>
+                      <FileText className="mr-2 h-4 w-4" />
+                      Extraire les mots-clés
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
-            
-            <Alert>
-              <AlertDescription className="text-sm text-gray-600">
-                {t('internalLinks.analysisTip', 'L\'analyse des liens internes peut prendre quelques minutes en fonction de la taille de votre site.')}
-              </AlertDescription>
-            </Alert>
           </div>
-        </CardContent>
-      </Card>
-      
-      {/* Key Benefits */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <Card>
-          <CardContent className="pt-6">
-            <h3 className="font-medium mb-2 flex items-center">
-              <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-2">
-                <Search className="h-4 w-4 text-blue-600" />
-              </div>
-              {t('internalLinks.benefit1.title', 'Amélioration du SEO')}
-            </h3>
-            <p className="text-sm text-gray-600">
-              {t('internalLinks.benefit1.description', 'Des liens internes optimisés permettent aux moteurs de recherche de mieux comprendre et indexer votre site.')}
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="pt-6">
-            <h3 className="font-medium mb-2 flex items-center">
-              <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-2">
-                <Search className="h-4 w-4 text-green-600" />
-              </div>
-              {t('internalLinks.benefit2.title', 'Meilleure navigation')}
-            </h3>
-            <p className="text-sm text-gray-600">
-              {t('internalLinks.benefit2.description', 'Créez un parcours utilisateur fluide en reliant logiquement les pages connexes de votre site.')}
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="pt-6">
-            <h3 className="font-medium mb-2 flex items-center">
-              <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center mr-2">
-                <Network className="h-4 w-4 text-purple-600" />
-              </div>
-              {t('internalLinks.benefit3.title', 'Structure optimisée')}
-            </h3>
-            <p className="text-sm text-gray-600">
-              {t('internalLinks.benefit3.description', 'Identifiez et corrigez les problèmes structurels comme les pages orphelines ou trop profondes.')}
-            </p>
-          </CardContent>
+
+          {keywords.length > 0 && (
+            <div className="mt-8">
+              <KeywordSuggestions 
+                generatedKeywords={keywords} 
+                onGenerateClick={analyzeKeywords} 
+              />
+            </div>
+          )}
+
+          {!keywords.length && !isAnalyzing && (
+            <div className="bg-blue-50 border border-blue-100 rounded-md p-4 text-blue-800 mt-6">
+              <p className="flex items-center">
+                <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clipRule="evenodd"></path>
+                </svg>
+                Entrez l'URL d'un site web pour extraire automatiquement ses mots-clés principaux.
+              </p>
+            </div>
+          )}
         </Card>
       </div>
-      
-      {/* Results Section */}
-      {seoAnalysis && (
-        <InternalLinkAnalyzer 
-          analysis={seoAnalysis.internalLinkAnalysis} 
-          url={seoAnalysis.url}
-        />
-      )}
-      
-      {/* Information Section if no results */}
-      {!seoAnalysis && !isLoading && (
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle>{t('internalLinks.infoTitle', 'Pourquoi les liens internes sont importants')}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p>
-              {t('internalLinks.infoDescription', 'Les liens internes sont essentiels pour une stratégie SEO efficace. Ils permettent de :')}
-            </p>
-            <ul className="list-disc pl-5 space-y-2">
-              <li>{t('internalLinks.infoBullet1', 'Établir une hiérarchie claire du contenu de votre site')}</li>
-              <li>{t('internalLinks.infoBullet2', 'Distribuer la puissance des pages à forte autorité vers d\'autres pages')}</li>
-              <li>{t('internalLinks.infoBullet3', 'Aider les moteurs de recherche à découvrir et indexer toutes vos pages')}</li>
-              <li>{t('internalLinks.infoBullet4', 'Réduire le taux de rebond en gardant les visiteurs plus longtemps sur votre site')}</li>
-              <li>{t('internalLinks.infoBullet5', 'Faciliter la navigation et améliorer l\'expérience utilisateur')}</li>
-            </ul>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 };
