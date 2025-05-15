@@ -17,6 +17,15 @@ const SeoActionButtons = () => {
     });
   };
 
+  const handleKeywordClick = () => {
+    console.log("Clicking keyword generator button");
+    navigate('/keyword-generator');
+    toast.info("Navigation vers le générateur de mots-clés", {
+      description: "Chargement de la page...",
+      duration: 1500
+    });
+  };
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
       <Link to="/seo">
@@ -35,12 +44,14 @@ const SeoActionButtons = () => {
         <span className="text-sm">Liens internes</span>
       </Button>
       
-      <Link to="/keywords">
-        <Button variant="outline" className="w-full h-[70px] flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50 hover:from-gray-50 hover:to-gray-100 gap-2">
-          <FileText className="h-5 w-5 text-emerald-600" />
-          <span className="text-sm">Mots-clés</span>
-        </Button>
-      </Link>
+      <Button
+        variant="outline"
+        className="w-full h-[70px] flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50 hover:from-gray-50 hover:to-gray-100 gap-2"
+        onClick={handleKeywordClick}
+      >
+        <FileText className="h-5 w-5 text-emerald-600" />
+        <span className="text-sm">Mots-clés</span>
+      </Button>
       
       <Link to="/performance">
         <Button variant="outline" className="w-full h-[70px] flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50 hover:from-gray-50 hover:to-gray-100 gap-2">

@@ -43,7 +43,7 @@ export const useKeywordGenerator = () => {
         const mockSuggestions: KeywordSuggestion[] = [
           {
             keyword: inputKeyword,
-            searchVolume: Math.floor(Math.random() * 5000) + 1000,
+            volume: Math.floor(Math.random() * 5000) + 1000,
             difficulty: Math.floor(Math.random() * 100),
             cpc: Math.random() * 5,
             competition: Math.random(),
@@ -57,7 +57,7 @@ export const useKeywordGenerator = () => {
             keyword: inputKeyword.includes("à") ? 
               `${inputKeyword.split(" à ")[0]} à l'étranger` : 
               `${inputKeyword} en ligne`,
-            searchVolume: Math.floor(Math.random() * 3000) + 500,
+            volume: Math.floor(Math.random() * 3000) + 500,
             difficulty: Math.floor(Math.random() * 100),
             cpc: Math.random() * 4,
             competition: Math.random(),
@@ -86,7 +86,7 @@ export const useKeywordGenerator = () => {
                     inputKeyword.toLowerCase().startsWith("découvrez comment") ?
               inputKeyword :
               `meilleur ${inputKeyword}`,
-            searchVolume: Math.floor(Math.random() * 2000) + 300,
+            volume: Math.floor(Math.random() * 2000) + 300,
             difficulty: Math.floor(Math.random() * 100),
             cpc: Math.random() * 6,
             competition: Math.random(),

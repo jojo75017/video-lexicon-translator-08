@@ -32,3 +32,15 @@ export interface KeywordSuggestion {
   suggestedShortDescription?: string;
   suggestedLongDescription?: string;
 }
+
+export interface KeywordGroup {
+  name: string;
+  keywords: KeywordSuggestion[];
+}
+
+export interface KeywordIntent {
+  informational: KeywordSuggestion[];
+  transactional: KeywordSuggestion[];
+  navigational: KeywordSuggestion[];
+}
+
