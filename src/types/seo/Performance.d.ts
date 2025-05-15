@@ -1,21 +1,33 @@
 
-// Types liés aux performances
-
 export interface PerformanceData {
-  loadTime: number;
-  firstContentfulPaint: number;
-  domLoadTime: number;
-  resourceCount: number;
-  score: number;
-  speedIndex: number;
-  totalBlockingTime: number;
-  largestContentfulPaint: number;
-  cumulativeLayoutShift: number;
-  performanceScore: number;
+  totalSize?: number;
+  scriptCount?: number;
+  styleCount?: number;
+  responseTime?: number;
+  timeToInteractive?: number;
+  impressions?: number;
+  clickThroughRate?: number;
+  coreWebVitals?: {
+    lcp: number; // Largest Contentful Paint
+    fid: number; // First Input Delay
+    cls: number; // Cumulative Layout Shift
+  };
+  resourceBreakdown?: {
+    js: number;
+    css: number;
+    images: number;
+    fonts: number;
+    other: number;
+  };
+  serverResponseTime?: number;
 }
 
 export interface MobileAnalysis {
-  score: number;
+  usabilityScore: number;
   isMobileFriendly: boolean;
-  issues: string[];
+  viewport: boolean;
+  fontSizesAdequate: boolean;
+  tapTargetsSized: boolean;
+  contentWidthFits: boolean;
+  issuesDetected?: string[];
 }

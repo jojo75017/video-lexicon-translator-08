@@ -1,165 +1,357 @@
 
 import { useState } from 'react';
 import { toast } from "sonner";
-import { KeywordSuggestion } from '@/types/seo';
-import { OpenAIService } from '@/utils/seo/openaiService';
-import { generateSeoDescription, generateBothDescriptions } from '@/utils/seo/generators/descriptionGenerator';
+import { KeywordSuggestion, KeywordIntent } from '@/types/seo';
+
+interface ContentIdea {
+  title: string;
+  type: string;
+}
+
+interface KeywordResults {
+  mainKeywords: KeywordSuggestion[];
+  longTail: KeywordSuggestion[];
+  questions: KeywordSuggestion[];
+  related: KeywordSuggestion[];
+  semantic: string[];
+  competitors: {name: string, url: string, strength: number}[];
+  byIntent: KeywordIntent;
+  contentIdeas: ContentIdea[];
+}
 
 export const useKeywordGenerator = () => {
+  // État pour les entrées du formulaire
   const [keyword, setKeyword] = useState<string>('');
-  const [isGenerating, setIsGenerating] = useState<boolean>(false);
-  const [title, setTitle] = useState<string>('');
-  const [description, setDescription] = useState<string>('');
-  const [generatedKeywords, setGeneratedKeywords] = useState<KeywordSuggestion[]>([]);
-  const [activeTab, setActiveTab] = useState<string>('title');
+  const [language, setLanguage] = useState<string>('fr');
+  const [niche, setNiche] = useState<string>('');
+  const [objective, setObjective] = useState<string>('blog');
+  const [region, setRegion] = useState<string>('FR');
+  
+  // État pour le chargement et les résultats
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [keywordResults, setKeywordResults] = useState<KeywordResults | null>(null);
+  const [activeTab, setActiveTab] = useState<string>('overview');
 
-  const generateSuggestions = async () => {
+  const generateKeywordResults = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
     if (!keyword.trim()) {
-      toast.error("Veuillez saisir un mot-clé");
+      toast.error("Veuillez saisir un mot-clé principal");
       return;
     }
-
-    setIsGenerating(true);
-
+    
+    setIsLoading(true);
+    
+    // Simuler un délai de chargement
     try {
-      // Vérifier si une clé API est disponible
-      const hasApiKey = localStorage.getItem('openaiKey');
-      
-      if (!hasApiKey) {
-        toast.warning("Clé API non configurée", {
-          description: "Les suggestions seront limitées. Configurez une clé API pour de meilleurs résultats."
-        });
-      }
-
-      // Activer le proxy CORS
-      OpenAIService.enableProxy();
-
-      // Génération de suggestions adaptées au contexte du mot-clé
       setTimeout(() => {
-        // Utiliser le mot-clé original pour créer des suggestions contextuelles
-        const inputKeyword = keyword.trim();
+        // Données simulées basées sur l'entrée
+        const baseVolume = Math.floor(Math.random() * 5000 + 1000);
         
-        // Génération de descriptions adaptées pour chaque suggestion
-        const mockSuggestions: KeywordSuggestion[] = [
+        // Générer les mots-clés principaux
+        const mainKeywords: KeywordSuggestion[] = [
           {
-            keyword: inputKeyword,
-            volume: Math.floor(Math.random() * 5000) + 1000,
-            difficulty: Math.floor(Math.random() * 100),
-            cpc: Math.random() * 5,
-            competition: Math.random(),
-            relevance: 90,
-            suggestedTitle: `${inputKeyword} - Guide Complet et Conseils | Expert 2024`,
-            suggestedDescription: generateSeoDescription(inputKeyword, 155),
-            suggestedShortDescription: generateSeoDescription(inputKeyword, 120),
-            suggestedLongDescription: generateSeoDescription(inputKeyword, 500)
+            keyword: keyword,
+            volume: baseVolume,
+            difficulty: Math.floor(Math.random() * 70 + 30),
+            cpc: parseFloat((Math.random() * 3 + 1).toFixed(2)),
+            competition: parseFloat(Math.random().toFixed(2)),
+            relevance: 100
           },
           {
-            keyword: inputKeyword.includes("à") ? 
-              `${inputKeyword.split(" à ")[0]} à l'étranger` : 
-              `${inputKeyword} en ligne`,
-            volume: Math.floor(Math.random() * 3000) + 500,
-            difficulty: Math.floor(Math.random() * 100),
-            cpc: Math.random() * 4,
-            competition: Math.random(),
-            relevance: 75,
-            suggestedTitle: `${inputKeyword.includes("à") ? 
-              `${inputKeyword.split(" à ")[0]} à l'étranger` : 
-              `${inputKeyword} en ligne`} - Solutions et Stratégies | Guide 2024`,
-            suggestedDescription: generateSeoDescription(
-              inputKeyword.includes("à") ? 
-              `${inputKeyword.split(" à ")[0]} à l'étranger` : 
-              `${inputKeyword} en ligne`, 
-              155),
-            suggestedShortDescription: generateSeoDescription(
-              inputKeyword.includes("à") ? 
-              `${inputKeyword.split(" à ")[0]} à l'étranger` : 
-              `${inputKeyword} en ligne`, 
-              120),
-            suggestedLongDescription: generateSeoDescription(
-              inputKeyword.includes("à") ? 
-              `${inputKeyword.split(" à ")[0]} à l'étranger` : 
-              `${inputKeyword} en ligne`, 
-              500)
+            keyword: `meilleur ${keyword}`,
+            volume: Math.floor(baseVolume * 0.7),
+            difficulty: Math.floor(Math.random() * 80 + 20),
+            cpc: parseFloat((Math.random() * 4 + 2).toFixed(2)),
+            competition: parseFloat(Math.random().toFixed(2)),
+            relevance: 90
           },
           {
-            keyword: inputKeyword.toLowerCase().startsWith("comment") || 
-                    inputKeyword.toLowerCase().startsWith("découvrez comment") ?
-              inputKeyword :
-              `meilleur ${inputKeyword}`,
-            volume: Math.floor(Math.random() * 2000) + 300,
-            difficulty: Math.floor(Math.random() * 100),
-            cpc: Math.random() * 6,
-            competition: Math.random(),
-            relevance: 85,
-            suggestedTitle: inputKeyword.toLowerCase().startsWith("comment") || 
-                           inputKeyword.toLowerCase().startsWith("découvrez comment") ?
-              `${inputKeyword} - Guide Étape par Étape | Conseils 2024` :
-              `Meilleur ${inputKeyword} - Comparatif Complet | Choix 2024`,
-            suggestedDescription: generateSeoDescription(
-              inputKeyword.toLowerCase().startsWith("comment") || 
-              inputKeyword.toLowerCase().startsWith("découvrez comment") ?
-                inputKeyword :
-                `meilleur ${inputKeyword}`, 
-              155),
-            suggestedShortDescription: generateSeoDescription(
-              inputKeyword.toLowerCase().startsWith("comment") || 
-              inputKeyword.toLowerCase().startsWith("découvrez comment") ?
-                inputKeyword :
-                `meilleur ${inputKeyword}`, 
-              120),
-            suggestedLongDescription: generateSeoDescription(
-              inputKeyword.toLowerCase().startsWith("comment") || 
-              inputKeyword.toLowerCase().startsWith("découvrez comment") ?
-                inputKeyword :
-                `meilleur ${inputKeyword}`, 
-              500)
+            keyword: `${keyword} pas cher`,
+            volume: Math.floor(baseVolume * 0.6),
+            difficulty: Math.floor(Math.random() * 60 + 20),
+            cpc: parseFloat((Math.random() * 3 + 1).toFixed(2)),
+            competition: parseFloat(Math.random().toFixed(2)),
+            relevance: 85
+          },
+          {
+            keyword: `${keyword} prix`,
+            volume: Math.floor(baseVolume * 0.5),
+            difficulty: Math.floor(Math.random() * 50 + 20),
+            cpc: parseFloat((Math.random() * 2 + 1).toFixed(2)),
+            competition: parseFloat(Math.random().toFixed(2)),
+            relevance: 80
+          },
+          {
+            keyword: `${keyword} avis`,
+            volume: Math.floor(baseVolume * 0.45),
+            difficulty: Math.floor(Math.random() * 40 + 20),
+            cpc: parseFloat((Math.random() * 1 + 0.5).toFixed(2)),
+            competition: parseFloat(Math.random().toFixed(2)),
+            relevance: 75
           }
         ];
-
-        setGeneratedKeywords(mockSuggestions);
         
-        // Utiliser le générateur amélioré pour le titre et la description
-        setTitle(mockSuggestions[0].suggestedTitle || '');
-        setDescription(mockSuggestions[0].suggestedDescription || '');
-        setIsGenerating(false);
-
-        toast.success("Suggestions générées", {
-          description: "Découvrez les titres et descriptions optimisés pour votre mot-clé"
+        // Générer des mots-clés longue traîne
+        const longTail: KeywordSuggestion[] = [
+          {
+            keyword: `${keyword} pour débutant`,
+            volume: Math.floor(baseVolume * 0.3),
+            difficulty: Math.floor(Math.random() * 40 + 10),
+            cpc: parseFloat((Math.random() * 1.5).toFixed(2)),
+            competition: parseFloat((Math.random() * 0.6).toFixed(2)),
+            relevance: 70
+          },
+          {
+            keyword: `${keyword} en famille`,
+            volume: Math.floor(baseVolume * 0.25),
+            difficulty: Math.floor(Math.random() * 35 + 10),
+            cpc: parseFloat((Math.random() * 1.5).toFixed(2)),
+            competition: parseFloat((Math.random() * 0.5).toFixed(2)),
+            relevance: 65
+          },
+          {
+            keyword: `${keyword} dernière minute`,
+            volume: Math.floor(baseVolume * 0.2),
+            difficulty: Math.floor(Math.random() * 30 + 10),
+            cpc: parseFloat((Math.random() * 2).toFixed(2)),
+            competition: parseFloat((Math.random() * 0.6).toFixed(2)),
+            relevance: 60
+          },
+          {
+            keyword: `${keyword} tout compris`,
+            volume: Math.floor(baseVolume * 0.18),
+            difficulty: Math.floor(Math.random() * 25 + 15),
+            cpc: parseFloat((Math.random() * 1.8).toFixed(2)),
+            competition: parseFloat((Math.random() * 0.5).toFixed(2)),
+            relevance: 55
+          }
+        ];
+        
+        // Générer des questions fréquentes
+        const questions: KeywordSuggestion[] = [
+          {
+            keyword: `comment organiser ${keyword}`,
+            volume: Math.floor(baseVolume * 0.15),
+            difficulty: Math.floor(Math.random() * 40),
+            cpc: parseFloat((Math.random() * 1).toFixed(2)),
+            competition: parseFloat((Math.random() * 0.4).toFixed(2)),
+            relevance: 80
+          },
+          {
+            keyword: `pourquoi choisir ${keyword}`,
+            volume: Math.floor(baseVolume * 0.12),
+            difficulty: Math.floor(Math.random() * 35),
+            cpc: parseFloat((Math.random() * 0.8).toFixed(2)),
+            competition: parseFloat((Math.random() * 0.3).toFixed(2)),
+            relevance: 75
+          },
+          {
+            keyword: `quand partir pour ${keyword}`,
+            volume: Math.floor(baseVolume * 0.14),
+            difficulty: Math.floor(Math.random() * 38),
+            cpc: parseFloat((Math.random() * 0.9).toFixed(2)),
+            competition: parseFloat((Math.random() * 0.35).toFixed(2)),
+            relevance: 85
+          },
+          {
+            keyword: `où loger pendant ${keyword}`,
+            volume: Math.floor(baseVolume * 0.1),
+            difficulty: Math.floor(Math.random() * 30),
+            cpc: parseFloat((Math.random() * 0.7).toFixed(2)),
+            competition: parseFloat((Math.random() * 0.25).toFixed(2)),
+            relevance: 70
+          }
+        ];
+        
+        // Générer des mots-clés liés
+        const related: KeywordSuggestion[] = [
+          {
+            keyword: keyword.includes("voyage") ? "circuit touristique" : `${keyword} guide`,
+            volume: Math.floor(baseVolume * 0.4),
+            difficulty: Math.floor(Math.random() * 50 + 20),
+            cpc: parseFloat((Math.random() * 2 + 0.5).toFixed(2)),
+            competition: parseFloat((Math.random() * 0.7).toFixed(2)),
+            relevance: 60
+          },
+          {
+            keyword: keyword.includes("voyage") ? "activités touristiques" : `alternatives à ${keyword}`,
+            volume: Math.floor(baseVolume * 0.35),
+            difficulty: Math.floor(Math.random() * 45 + 15),
+            cpc: parseFloat((Math.random() * 1.5 + 0.5).toFixed(2)),
+            competition: parseFloat((Math.random() * 0.65).toFixed(2)),
+            relevance: 55
+          },
+          {
+            keyword: keyword.includes("voyage") ? "hébergement" : `${keyword} comparatif`,
+            volume: Math.floor(baseVolume * 0.3),
+            difficulty: Math.floor(Math.random() * 40 + 15),
+            cpc: parseFloat((Math.random() * 1.2 + 0.5).toFixed(2)),
+            competition: parseFloat((Math.random() * 0.6).toFixed(2)),
+            relevance: 50
+          }
+        ];
+        
+        // Champ sémantique
+        const semantic = keyword.includes("voyage") ? 
+          ["séjour", "vacances", "tourisme", "excursion", "découverte", "circuit", "visite", "escapade"] :
+          ["guide", "comparatif", "avis", "test", "review", "tutoriel", "conseils", "astuces"];
+        
+        // Sites concurrents (simulés)
+        const competitors = [
+          {
+            name: `Top${keyword.split(' ')[0]}.com`,
+            url: `https://www.top${keyword.split(' ')[0].toLowerCase()}.com`,
+            strength: Math.floor(Math.random() * 40 + 60)
+          },
+          {
+            name: `Guide${keyword.split(' ')[0]}.fr`,
+            url: `https://www.guide${keyword.split(' ')[0].toLowerCase()}.fr`,
+            strength: Math.floor(Math.random() * 30 + 50)
+          },
+          {
+            name: `${keyword.split(' ')[0]}Expert.com`,
+            url: `https://www.${keyword.split(' ')[0].toLowerCase()}expert.com`,
+            strength: Math.floor(Math.random() * 30 + 40)
+          },
+          {
+            name: `Meilleur${keyword.split(' ')[0]}.fr`,
+            url: `https://www.meilleur${keyword.split(' ')[0].toLowerCase()}.fr`,
+            strength: Math.floor(Math.random() * 20 + 40)
+          }
+        ];
+        
+        // Regroupement par intention
+        const byIntent: KeywordIntent = {
+          informational: [...questions, {
+            keyword: `guide ${keyword}`,
+            volume: Math.floor(baseVolume * 0.22),
+            difficulty: Math.floor(Math.random() * 45),
+            cpc: parseFloat((Math.random() * 1.2).toFixed(2)),
+            competition: parseFloat((Math.random() * 0.5).toFixed(2)),
+            relevance: 75
+          }],
+          transactional: [{
+            keyword: `réserver ${keyword}`,
+            volume: Math.floor(baseVolume * 0.28),
+            difficulty: Math.floor(Math.random() * 60 + 20),
+            cpc: parseFloat((Math.random() * 3 + 1).toFixed(2)),
+            competition: parseFloat((Math.random() * 0.8).toFixed(2)),
+            relevance: 85
+          }, {
+            keyword: `acheter ${keyword}`,
+            volume: Math.floor(baseVolume * 0.25),
+            difficulty: Math.floor(Math.random() * 55 + 25),
+            cpc: parseFloat((Math.random() * 3.5 + 1.5).toFixed(2)),
+            competition: parseFloat((Math.random() * 0.85).toFixed(2)),
+            relevance: 80
+          }],
+          navigational: [{
+            keyword: `${keyword} site officiel`,
+            volume: Math.floor(baseVolume * 0.18),
+            difficulty: Math.floor(Math.random() * 30 + 10),
+            cpc: parseFloat((Math.random() * 1).toFixed(2)),
+            competition: parseFloat((Math.random() * 0.4).toFixed(2)),
+            relevance: 60
+          }]
+        };
+        
+        // Idées de contenu
+        const contentIdeas = [
+          { title: `Guide complet : tout savoir sur ${keyword}`, type: 'Article de fond' },
+          { title: `Les 10 erreurs à éviter lors de ${keyword}`, type: 'Liste' },
+          { title: `Comment planifier ${keyword} : le guide étape par étape`, type: 'Tutoriel' },
+          { title: `${keyword} vs alternatives : comparatif complet`, type: 'Comparatif' },
+          { title: `FAQ : vos questions sur ${keyword} répondues par des experts`, type: 'FAQ' }
+        ];
+        
+        setKeywordResults({
+          mainKeywords,
+          longTail,
+          questions,
+          related,
+          semantic,
+          competitors,
+          byIntent,
+          contentIdeas
+        });
+        
+        setIsLoading(false);
+        toast.success(`Analyse complète pour "${keyword}" générée avec succès`, {
+          description: `${mainKeywords.length + longTail.length + questions.length + related.length} mots-clés analysés`
         });
       }, 2000);
     } catch (error) {
       console.error("Erreur lors de la génération des suggestions:", error);
-      setIsGenerating(false);
+      setIsLoading(false);
       toast.error("Erreur de génération", {
         description: "Un problème est survenu. Veuillez réessayer plus tard."
       });
     }
   };
 
-  const handleInsertTitle = (newTitle: string) => {
-    setTitle(newTitle);
-    setActiveTab('title');
+  const handleExport = () => {
+    if (!keywordResults) return;
+    
+    let csvContent = "Mot-clé,Volume,Difficulté,CPC,Concurrence\n";
+    
+    // Ajouter tous les mots-clés au CSV
+    [
+      ...keywordResults.mainKeywords, 
+      ...keywordResults.longTail, 
+      ...keywordResults.questions, 
+      ...keywordResults.related
+    ].forEach(kw => {
+      csvContent += `${kw.keyword},${kw.volume},${kw.difficulty},${kw.cpc},${kw.competition}\n`;
+    });
+    
+    // Créer un blob et le télécharger
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('hidden', '');
+    a.setAttribute('href', url);
+    a.setAttribute('download', `keywords-${keyword.replace(/\s+/g, '-')}.csv`);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    
+    toast.success("Exportation CSV réussie");
   };
 
-  const handleInsertDescription = (newDescription: string) => {
-    setDescription(newDescription);
-    setActiveTab('description');
+  const getAllKeywords = (): KeywordSuggestion[] => {
+    if (!keywordResults) return [];
+    return [
+      ...keywordResults.mainKeywords,
+      ...keywordResults.longTail,
+      ...keywordResults.questions,
+      ...keywordResults.related
+    ];
   };
 
   return {
+    // État du formulaire
     keyword,
     setKeyword,
-    isGenerating,
-    title,
-    setTitle,
-    description,
-    setDescription,
-    generatedKeywords,
+    language,
+    setLanguage,
+    niche,
+    setNiche,
+    objective,
+    setObjective,
+    region,
+    setRegion,
+    
+    // État des résultats
+    isLoading,
+    keywordResults,
     activeTab,
     setActiveTab,
-    generateSuggestions,
-    handleInsertTitle,
-    handleInsertDescription
+    
+    // Actions
+    generateKeywordResults,
+    handleExport,
+    getAllKeywords
   };
 };
 

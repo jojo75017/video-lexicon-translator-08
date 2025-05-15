@@ -1,25 +1,32 @@
 
-// Types de hiérarchie de contenus
-
 export interface HierarchyItem {
+  title: string;
   level: number;
-  tagName?: string;
-  text?: string;
-  name?: string;
+  id: string;
+  content?: string;
   children?: HierarchyItem[];
-  parentFound?: boolean;
+  type?: string;
 }
 
 export interface HeadingStructure {
-  hierarchy: HierarchyItem[];
-  issues?: string[];
+  h1?: HierarchyItem[];
+  h2?: HierarchyItem[];
+  h3?: HierarchyItem[];
+  h4?: HierarchyItem[];
+  h5?: HierarchyItem[];
+  h6?: HierarchyItem[];
+  items?: HierarchyItem[];
+  h1Count?: number;
+  h2Count?: number;
+  h3Count?: number;
+  h4Count?: number;
+  h5Count?: number;
+  h6Count?: number;
 }
 
-export type StructureItemType = 'h1' | 'h2' | 'h3' | 'h4' | 'p' | 'list';
-
 export interface StructureItem {
-  id: string;
   content: string;
-  type: StructureItemType;
+  id: string;
+  type: "h1" | "h2" | "h3" | "h4" | "p" | "list";
   items?: string[];
 }
