@@ -2,6 +2,7 @@
 import { OpenAI } from "openai";
 import { toast } from "sonner";
 import { ProxyService } from "./proxyService";
+import { KeywordSuggestion } from "@/types/seo";
 
 export class OpenAIService {
   private static proxyEnabled = true;
@@ -212,6 +213,81 @@ export class OpenAIService {
       console.error("Error getting keyword suggestions:", error);
       toast.error("Erreur lors de la génération de suggestions", {
         id: "keyword-suggestions",
+        description: error instanceof Error ? error.message : "Erreur inconnue"
+      });
+      throw error;
+    }
+  }
+  
+  async generateComprehensiveKeywordStrategy(seedKeyword: string, language: string = 'fr', niche: string = '', objective: string = 'blog'): Promise<any> {
+    if (!this.apiKey || !this.openai) {
+      throw new Error("OpenAI API key not set");
+    }
+    
+    try {
+      toast.loading(`Génération de la stratégie pour "${seedKeyword}"...`, {
+        id: "keyword-strategy"
+      });
+      
+      const response = await this.openai.chat.completions.create({
+        model: "gpt-3.5-turbo",
+        messages: [
+          {
+            role: "system",
+            content: `You are an expert SEO keyword researcher. Generate a comprehensive keyword strategy based on a seed keyword. 
+            Format your response as a JSON object with these sections:
+            1. mainKeywords: array of objects with {keyword, volume (0-10000), difficulty (0-100), cpc (0-5€), competition (0-1), relevance (0-100), suggestedTitle, suggestedDescription}
+            2. longTail: array of longer keyword phrases with same structure
+            3. questions: array of question-based keywords with same structure
+            4. related: array of related terms with same structure
+            5. semantic: array of string semantic field terms
+            6. competitors: array of objects with {name, url, strength (0-100)}
+            7. byIntent: object with {informational: [...keywords], transactional: [...keywords], navigational: [...keywords]}
+            8. contentIdeas: array of objects with {title, type}
+            
+            Include realistic search volumes, competition levels, and accurate suggested titles/descriptions for each keyword.`
+          },
+          {
+            role: "user",
+            content: `Generate a complete keyword strategy for "${seedKeyword}" in ${language} language. 
+            Niche/Industry: ${niche || 'general'}
+            Content Objective: ${objective}
+            
+            Include main keywords, long-tail variations, questions, related terms, and content ideas.
+            For each keyword, provide realistic search volume, difficulty score, CPC, competition level, and relevance score.
+            Also include suggested titles and meta descriptions for the main keywords.`
+          }
+        ],
+        max_tokens: 2000,
+        temperature: 0.4,
+        response_format: { type: "json_object" }
+      });
+      
+      const result = response.choices[0]?.message?.content;
+      if (!result) {
+        toast.error("Aucune stratégie de mots-clés reçue", {
+          id: "keyword-strategy"
+        });
+        throw new Error("No keyword strategy received");
+      }
+      
+      toast.success(`Stratégie générée pour "${seedKeyword}"`, {
+        id: "keyword-strategy"
+      });
+      
+      try {
+        return JSON.parse(result);
+      } catch (e) {
+        console.error("Error parsing keyword strategy:", e);
+        toast.error("Format de réponse invalide", {
+          description: "Impossible d'analyser les données reçues"
+        });
+        throw new Error("Invalid response format");
+      }
+    } catch (error) {
+      console.error("Error generating keyword strategy:", error);
+      toast.error("Erreur lors de la génération de la stratégie", {
+        id: "keyword-strategy",
         description: error instanceof Error ? error.message : "Erreur inconnue"
       });
       throw error;

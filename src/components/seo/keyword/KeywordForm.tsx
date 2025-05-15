@@ -3,7 +3,9 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, RefreshCw } from 'lucide-react';
+import { Search, RefreshCw, Sparkles } from 'lucide-react';
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface KeywordFormProps {
   keyword: string;
@@ -18,6 +20,9 @@ interface KeywordFormProps {
   onRegionChange: (value: string) => void;
   isLoading: boolean;
   onSubmit: (e: React.FormEvent) => void;
+  useAI?: boolean;
+  onToggleAI?: (value: boolean) => void;
+  openaiKey?: string;
 }
 
 const KeywordForm: React.FC<KeywordFormProps> = ({
@@ -32,7 +37,10 @@ const KeywordForm: React.FC<KeywordFormProps> = ({
   region,
   onRegionChange,
   isLoading,
-  onSubmit
+  onSubmit,
+  useAI,
+  onToggleAI,
+  openaiKey
 }) => {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
@@ -116,9 +124,35 @@ const KeywordForm: React.FC<KeywordFormProps> = ({
         </div>
       </div>
       
+      {/* Option pour utiliser l'IA (OpenAI) */}
+      {onToggleAI && (
+        <div className="flex items-center space-x-2 bg-blue-50/50 p-3 rounded-md border border-blue-100">
+          <Switch 
+            id="use-ai"
+            checked={useAI}
+            onCheckedChange={onToggleAI}
+            disabled={!openaiKey}
+          />
+          <div>
+            <Label 
+              htmlFor="use-ai" 
+              className="flex items-center gap-1 cursor-pointer"
+            >
+              <Sparkles className="h-4 w-4 text-blue-600" />
+              <span>Utiliser l'IA pour des suggestions plus précises</span>
+            </Label>
+            <p className="text-xs text-gray-500 mt-1">
+              {openaiKey 
+                ? "Génère des mots-clés plus pertinents et précis avec OpenAI" 
+                : "Configuration d'une clé API OpenAI requise pour utiliser cette fonctionnalité"}
+            </p>
+          </div>
+        </div>
+      )}
+      
       <Button 
         type="submit" 
-        className="w-full md:w-auto bg-indigo-700 hover:bg-indigo-800"
+        className={`w-full md:w-auto ${useAI ? 'bg-blue-600 hover:bg-blue-700' : 'bg-indigo-700 hover:bg-indigo-800'}`}
         disabled={isLoading}
       >
         {isLoading ? (
@@ -128,8 +162,12 @@ const KeywordForm: React.FC<KeywordFormProps> = ({
           </>
         ) : (
           <>
-            <Search className="mr-2 h-4 w-4" />
-            Générer ma stratégie de mots-clés
+            {useAI ? (
+              <Sparkles className="mr-2 h-4 w-4" />
+            ) : (
+              <Search className="mr-2 h-4 w-4" />
+            )}
+            Générer ma stratégie de mots-clés {useAI ? "avec IA" : ""}
           </>
         )}
       </Button>

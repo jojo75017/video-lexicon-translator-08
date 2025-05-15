@@ -3,10 +3,11 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Search, RefreshCw, Map, FileBarChart, Download, Link2, ListFilter, MessageSquare } from 'lucide-react';
+import { Search, RefreshCw, Map, FileBarChart, Download, Link2, ListFilter, MessageSquare, Key } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
 import useKeywordGenerator from '@/hooks/useKeywordGenerator';
 import KeywordForm from './keyword/KeywordForm';
 import KeywordTable from './keyword/KeywordTable';
@@ -28,6 +29,12 @@ const KeywordGenerator = () => {
     setObjective,
     region,
     setRegion,
+    
+    // État de l'API OpenAI
+    openaiKey,
+    setOpenaiKey,
+    useAI,
+    setUseAI,
     
     // État des résultats
     isLoading,
@@ -54,6 +61,41 @@ const KeywordGenerator = () => {
           </p>
         </CardHeader>
         <CardContent>
+          {/* Configuration de la clé API OpenAI */}
+          <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-medium flex items-center gap-1">
+                <Key className="h-4 w-4 text-blue-600" />
+                Configuration OpenAI (optionnel)
+              </h3>
+            </div>
+            <div className="flex gap-2 items-center">
+              <Input
+                type="password"
+                value={openaiKey}
+                onChange={(e) => setOpenaiKey(e.target.value)}
+                placeholder="Clé API OpenAI (sk-...)"
+                className="flex-1"
+              />
+              <Button 
+                onClick={() => {
+                  localStorage.setItem('openaiKey', openaiKey);
+                  toast.success("Clé API OpenAI sauvegardée", {
+                    description: "Votre clé est enregistrée localement dans votre navigateur"
+                  });
+                  if (openaiKey) setUseAI(true);
+                }}
+                variant="outline"
+                className="whitespace-nowrap"
+              >
+                Enregistrer
+              </Button>
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              Une clé API OpenAI permet d'obtenir des suggestions de mots-clés plus pertinentes et précises.
+            </p>
+          </div>
+
           <KeywordForm 
             keyword={keyword}
             onKeywordChange={setKeyword}
@@ -67,6 +109,9 @@ const KeywordGenerator = () => {
             onRegionChange={setRegion}
             isLoading={isLoading}
             onSubmit={generateKeywordResults}
+            useAI={useAI}
+            onToggleAI={setUseAI}
+            openaiKey={openaiKey}
           />
         </CardContent>
       </Card>
