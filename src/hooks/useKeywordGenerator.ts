@@ -474,19 +474,30 @@ export const useKeywordGenerator = () => {
     }, 1000);
   };
 
+  const getAllKeywords = (): KeywordSuggestion[] => {
+    if (!keywordResults) return [];
+    
+    const mainKeywords = keywordResults.mainKeywords || [];
+    const longTail = keywordResults.longTail || [];
+    const questions = keywordResults.questions || [];
+    const related = keywordResults.related || [];
+    
+    return [
+      ...mainKeywords,
+      ...longTail,
+      ...questions,
+      ...related
+    ];
+  };
+
   const handleExport = () => {
     if (!keywordResults) return;
     
     let csvContent = "Mot-clé,Volume,Difficulté,CPC,Concurrence\n";
     
     // Ajouter tous les mots-clés au CSV
-    [
-      ...keywordResults.mainKeywords, 
-      ...keywordResults.longTail, 
-      ...keywordResults.questions, 
-      ...keywordResults.related
-    ].forEach(kw => {
-      csvContent += `${kw.keyword},${kw.volume},${kw.difficulty},${kw.cpc},${kw.competition}\n`;
+    getAllKeywords().forEach(kw => {
+      csvContent += `${kw.keyword},${kw.volume || 0},${kw.difficulty || 0},${kw.cpc || 0},${kw.competition || 0}\n`;
     });
     
     // Créer un blob et le télécharger
@@ -501,16 +512,6 @@ export const useKeywordGenerator = () => {
     document.body.removeChild(a);
     
     toast.success("Exportation CSV réussie");
-  };
-
-  const getAllKeywords = (): KeywordSuggestion[] => {
-    if (!keywordResults) return [];
-    return [
-      ...keywordResults.mainKeywords,
-      ...keywordResults.longTail,
-      ...keywordResults.questions,
-      ...keywordResults.related
-    ];
   };
 
   return {
@@ -540,8 +541,8 @@ export const useKeywordGenerator = () => {
     
     // Actions
     generateKeywordResults,
-    handleExport: () => {}, // Implémenter cette fonction si nécessaire
-    getAllKeywords: () => []  // Implémenter cette fonction si nécessaire
+    handleExport,
+    getAllKeywords
   };
 };
 

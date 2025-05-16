@@ -6,7 +6,7 @@ import { ExternalLink, TrendingUp, Users, FileText } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
 interface CompetitorAnalysisProps {
-  competitors: CompetitorData[];
+  competitors: CompetitorData[] | undefined;
 }
 
 const CompetitorAnalysis: React.FC<CompetitorAnalysisProps> = ({ competitors }) => {

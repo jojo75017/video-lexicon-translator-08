@@ -6,7 +6,7 @@ import { ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface SerpResultsProps {
-  serps: SerpsResult[];
+  serps: SerpsResult[] | undefined;
 }
 
 const SerpResults: React.FC<SerpResultsProps> = ({ serps }) => {

@@ -167,14 +167,14 @@ const KeywordGenerator = () => {
                 </CardHeader>
                 <CardContent>
                   <KeywordTable 
-                    keywords={keywordResults.mainKeywords} 
+                    keywords={keywordResults.mainKeywords || []} 
                     title="Mots-clés principaux"
                   />
 
                   <div className="mt-8">
                     <h3 className="text-md font-medium mb-4">Champ sémantique</h3>
                     <div className="flex flex-wrap gap-2">
-                      {keywordResults.semantic.map((word, i) => (
+                      {keywordResults.semantic && keywordResults.semantic.map((word, i) => (
                         <Badge key={i} variant="secondary" className="px-3 py-1 text-sm">
                           {word}
                         </Badge>
@@ -185,7 +185,7 @@ const KeywordGenerator = () => {
                   <div className="mt-8">
                     <h3 className="text-md font-medium mb-4">Sites concurrents</h3>
                     <div className="space-y-3">
-                      {keywordResults.competitors.map((competitor, i) => (
+                      {keywordResults.competitors && keywordResults.competitors.map((competitor, i) => (
                         <div key={i} className="flex justify-between items-center p-3 bg-gray-50 rounded-md">
                           <div>
                             <p className="font-medium">{competitor.name}</p>
@@ -224,7 +224,7 @@ const KeywordGenerator = () => {
                     <div>
                       <h3 className="text-md font-medium mb-3">Longue traîne</h3>
                       <div className="space-y-2">
-                        {keywordResults.longTail.map((kw, index) => (
+                        {keywordResults.longTail && keywordResults.longTail.map((kw, index) => (
                           <div key={index} className="p-3 bg-gray-50 rounded-md">
                             <div className="flex justify-between items-center">
                               <p className="font-medium">{kw.keyword}</p>
@@ -248,7 +248,7 @@ const KeywordGenerator = () => {
                     <div>
                       <h3 className="text-md font-medium mb-3">Questions fréquentes</h3>
                       <div className="space-y-2">
-                        {keywordResults.questions.map((kw, index) => (
+                        {keywordResults.questions && keywordResults.questions.map((kw, index) => (
                           <div key={index} className="p-3 bg-blue-50 rounded-md border border-blue-100">
                             <div className="flex justify-between items-center">
                               <p className="font-medium text-blue-800">{kw.keyword}</p>
@@ -273,7 +273,7 @@ const KeywordGenerator = () => {
                   <div className="mt-8">
                     <h3 className="text-md font-medium mb-3">Mots-clés liés</h3>
                     <div className="space-y-2">
-                      {keywordResults.related.map((kw, index) => (
+                      {keywordResults.related && keywordResults.related.map((kw, index) => (
                         <div key={index} className="p-3 bg-gray-50 rounded-md">
                           <div className="flex justify-between items-center">
                             <p className="font-medium">{kw.keyword}</p>
@@ -304,7 +304,7 @@ const KeywordGenerator = () => {
                   <CardTitle className="text-lg">Regroupement par intention de recherche</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <KeywordGroups byIntent={keywordResults.byIntent} />
+                  {keywordResults.byIntent && <KeywordGroups byIntent={keywordResults.byIntent} />}
                 </CardContent>
               </Card>
             </TabsContent>
@@ -316,15 +316,7 @@ const KeywordGenerator = () => {
                   <CardTitle className="text-lg">Résultats SERP pour "{keyword}"</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {keywordResults.serps ? (
-                    <SerpResults serps={keywordResults.serps} />
-                  ) : (
-                    <div className="bg-gray-50 p-8 rounded-md text-center">
-                      <p className="text-gray-500">
-                        Activez l'option IA pour obtenir des résultats SERP détaillés
-                      </p>
-                    </div>
-                  )}
+                  <SerpResults serps={keywordResults.serps} />
                 </CardContent>
               </Card>
             </TabsContent>
@@ -336,15 +328,7 @@ const KeywordGenerator = () => {
                   <CardTitle className="text-lg">Analyse de la concurrence</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {keywordResults.competitors && keywordResults.competitors.length > 0 ? (
-                    <CompetitorAnalysis competitors={keywordResults.competitors} />
-                  ) : (
-                    <div className="bg-gray-50 p-8 rounded-md text-center">
-                      <p className="text-gray-500">
-                        Aucune donnée concurrentielle disponible
-                      </p>
-                    </div>
-                  )}
+                  <CompetitorAnalysis competitors={keywordResults.competitors} />
                 </CardContent>
               </Card>
             </TabsContent>
@@ -357,7 +341,7 @@ const KeywordGenerator = () => {
                 </CardHeader>
                 <CardContent>
                   <KeywordVisualizations 
-                    mainKeywords={keywordResults.mainKeywords} 
+                    mainKeywords={keywordResults.mainKeywords || []} 
                     allKeywords={getAllKeywords()} 
                   />
                   
@@ -378,8 +362,8 @@ const KeywordGenerator = () => {
                 </CardHeader>
                 <CardContent>
                   <ContentIdeas 
-                    contentIdeas={keywordResults.contentIdeas}
-                    relatedKeywords={[...keywordResults.mainKeywords, ...keywordResults.related]
+                    contentIdeas={keywordResults.contentIdeas || []}
+                    relatedKeywords={[...(keywordResults.mainKeywords || []), ...(keywordResults.related || [])]
                       .map(kw => kw.keyword)}
                   />
                   
@@ -392,16 +376,16 @@ const KeywordGenerator = () => {
                         {keyword}
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-                        {keywordResults.mainKeywords.slice(0, 3).map((kw, i) => (
+                        {keywordResults.mainKeywords && keywordResults.mainKeywords.slice(0, 3).map((kw, i) => (
                           <div key={i} className="p-2 bg-blue-50 text-blue-700 rounded-md text-center">
                             {kw.keyword}
                           </div>
                         ))}
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
-                        {[
-                          ...keywordResults.longTail,
-                          ...keywordResults.questions
+                        {keywordResults.longTail && keywordResults.questions && [
+                          ...(keywordResults.longTail || []),
+                          ...(keywordResults.questions || [])
                         ].slice(0, 8).map((kw, i) => (
                           <div key={i} className="p-2 bg-gray-100 text-gray-700 rounded-md text-center text-sm">
                             {kw.keyword}
@@ -416,7 +400,7 @@ const KeywordGenerator = () => {
                   <div>
                     <h3 className="text-md font-medium mb-3">FAQ optimisée SEO</h3>
                     <div className="space-y-3">
-                      {keywordResults.questions.map((question, index) => (
+                      {keywordResults.questions && keywordResults.semantic && keywordResults.questions.map((question, index) => (
                         <div key={index} className="p-3 bg-gray-50 rounded-md">
                           <p className="font-medium">{question.keyword} ?</p>
                           <p className="text-sm text-gray-600 mt-2">
