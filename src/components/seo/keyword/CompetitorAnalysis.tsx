@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import { CompetitorData } from "@/types/seo";
-import { ExternalLink, TrendingUp, Users, FileText } from "lucide-react";
+import { CompetitorData } from "@/types/seo/Keyword";
+import { ExternalLink, TrendingUp, FileText } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
 interface CompetitorAnalysisProps {

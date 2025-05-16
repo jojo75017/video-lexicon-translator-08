@@ -1,12 +1,18 @@
 
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import { SerpsResult } from "@/types/seo";
-import { ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { ExternalLink } from "lucide-react";
+
+interface SerpResult {
+  title: string;
+  url: string;
+  description: string;
+  position: number;
+}
 
 interface SerpResultsProps {
-  serps: SerpsResult[] | undefined;
+  serps: SerpResult[] | undefined;
 }
 
 const SerpResults: React.FC<SerpResultsProps> = ({ serps }) => {

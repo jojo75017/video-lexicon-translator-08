@@ -54,3 +54,16 @@ export interface KeywordStrategyResponse {
     navigational: KeywordSuggestion[];
   };
 }
+
+export interface KeywordIntent {
+  informational: KeywordSuggestion[];
+  transactional: KeywordSuggestion[];
+  navigational: KeywordSuggestion[];
+}
+
+export interface SerpsResult {
+  title: string;
+  url: string;
+  description: string;
+  position: number;
+}

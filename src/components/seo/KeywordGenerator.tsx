@@ -1,116 +1,46 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { KeywordSuggestion } from "@/types/seo/Keyword";
-import { PerplexityService } from "@/services/perplexityService";
-import { Sparkles, BarChart3, Loader2, Search, Settings } from "lucide-react";
-import { toast } from "sonner";
+import { Sparkles, BarChart3, Loader2, Search, Settings, Globe, Zap, ExternalLink } from "lucide-react";
+import { usePerplexityKeywords } from '@/hooks/usePerplexityKeywords';
+import CompetitorAnalysis from './keyword/CompetitorAnalysis';
+import SerpResults from './keyword/SerpResults'; 
 
 const KeywordGenerator: React.FC = () => {
-  const [keyword, setKeyword] = useState<string>("");
-  const [apiKey, setApiKey] = useState<string>(() => localStorage.getItem("perplexityKey") || "");
-  const [isGenerating, setIsGenerating] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<string>("standard");
-  const [standardKeywords, setStandardKeywords] = useState<KeywordSuggestion[]>([]);
-  const [longTailKeywords, setLongTailKeywords] = useState<KeywordSuggestion[]>([]);
-  const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
+  const {
+    keyword,
+    setKeyword,
+    apiKey,
+    setApiKey,
+    isConfigured,
+    isGenerating,
+    standardKeywords,
+    longTailKeywords,
+    selectedKeywords,
+    competitors,
+    serpResults,
+    showCompetitors,
+    setShowCompetitors,
+    
+    validateApiKey,
+    generateKeywords,
+    toggleKeywordSelection,
+    exportSelectedKeywords,
+    toggleCompetitors,
+    
+    hasResults,
+    totalKeywords,
+    hasCompetitorData
+  } = usePerplexityKeywords();
+  
   const [showApiConfig, setShowApiConfig] = useState<boolean>(!localStorage.getItem("perplexityKey"));
-  
-  // Handle API key validation
-  const validateApiKey = async () => {
-    if (!apiKey) {
-      toast.error("Veuillez entrer une clé API Perplexity");
-      return false;
-    }
-    
-    const service = PerplexityService.createService(apiKey);
-    const isValid = await service.validateApiKey();
-    
-    if (isValid) {
-      localStorage.setItem("perplexityKey", apiKey);
-      setShowApiConfig(false);
-    }
-    
-    return isValid;
-  };
-  
-  // Generate keywords using Perplexity AI
-  const generateKeywords = async () => {
-    if (!keyword) {
-      toast.error("Veuillez entrer un mot-clé");
-      return;
-    }
-    
-    if (!localStorage.getItem("perplexityKey")) {
-      setShowApiConfig(true);
-      toast.error("Veuillez configurer votre clé API Perplexity");
-      return;
-    }
-    
-    setIsGenerating(true);
-    const service = PerplexityService.createService(apiKey || localStorage.getItem("perplexityKey") || "");
-    
-    try {
-      // Generate regular keywords
-      const standardResults = await service.getKeywordSuggestions(keyword);
-      setStandardKeywords(standardResults);
-      
-      // Generate long-tail keywords
-      const longTailResults = await service.getLongTailKeywords(keyword);
-      setLongTailKeywords(longTailResults);
-      
-      toast.success(`${standardResults.length + longTailResults.length} suggestions générées au total`);
-    } catch (error) {
-      console.error("Erreur lors de la génération de mots-clés:", error);
-      toast.error("Échec de la génération des mots-clés");
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-  
-  const toggleKeywordSelection = (keyword: string) => {
-    if (selectedKeywords.includes(keyword)) {
-      setSelectedKeywords(selectedKeywords.filter(k => k !== keyword));
-    } else {
-      setSelectedKeywords([...selectedKeywords, keyword]);
-    }
-  };
-  
-  const exportSelectedKeywords = () => {
-    if (selectedKeywords.length === 0) {
-      toast.error("Aucun mot-clé sélectionné pour l'export");
-      return;
-    }
-    
-    const keywordsToExport = [...standardKeywords, ...longTailKeywords]
-      .filter(k => selectedKeywords.includes(k.keyword));
-    
-    const csv = [
-      ["Mot-clé", "Volume", "Difficulté", "CPC", "Compétition"].join(","),
-      ...keywordsToExport.map(k => [
-        `"${k.keyword}"`,
-        k.volume,
-        k.difficulty,
-        k.cpc,
-        k.competition
-      ].join(","))
-    ].join("\n");
-    
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", `mots-cles-${keyword.replace(/\s+/g, "-")}.csv`);
-    link.click();
-    
-    toast.success(`${keywordsToExport.length} mots-clés exportés`);
-  };
+  const [activeTab, setActiveTab] = useState<string>("standard");
   
   // Render keyword card
-  const renderKeywordCard = (keywordData: KeywordSuggestion, index: number) => {
+  const renderKeywordCard = (keywordData: any, index: number) => {
     const isSelected = selectedKeywords.includes(keywordData.keyword);
     
     return (
@@ -224,16 +154,17 @@ const KeywordGenerator: React.FC = () => {
           Générateur de mots-clés
         </h2>
         
-        <div className="flex gap-3">
+        <div className="flex flex-col md:flex-row gap-3">
           <div className="flex-1">
             <Input
               placeholder="Entrez un mot-clé principal..."
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && generateKeywords()}
             />
           </div>
           <Button 
-            onClick={generateKeywords} 
+            onClick={() => generateKeywords()} 
             disabled={isGenerating || !keyword}
             className="flex items-center gap-2"
           >
@@ -243,17 +174,41 @@ const KeywordGenerator: React.FC = () => {
           <Button 
             variant="outline" 
             onClick={() => setShowApiConfig(true)}
+            title="Configuration de l'API"
           >
             <Settings className="w-4 h-4" />
           </Button>
+          {isConfigured && (
+            <Button 
+              variant={hasCompetitorData ? "default" : "secondary"}
+              onClick={toggleCompetitors}
+              title="Analyse concurrentielle"
+              className="gap-2"
+            >
+              <Globe className="w-4 h-4" />
+              {showCompetitors ? "Masquer" : "Concurrents"}
+            </Button>
+          )}
         </div>
+        
+        {isConfigured && (
+          <div className="mt-3 flex items-center">
+            <div className="flex-shrink-0 flex items-center text-sm text-green-600">
+              <Zap className="w-4 h-4 mr-1" />
+              <span>API connectée</span>
+            </div>
+            <div className="ml-auto text-xs text-gray-500">
+              Les données concurrentielles réelles sont disponibles
+            </div>
+          </div>
+        )}
       </Card>
       
       {/* Results */}
-      {(standardKeywords.length > 0 || longTailKeywords.length > 0) && (
+      {hasResults && (
         <Card className="p-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold">Résultats ({standardKeywords.length + longTailKeywords.length})</h2>
+            <h2 className="text-lg font-semibold">Résultats ({totalKeywords})</h2>
             <div className="flex gap-2">
               <Button
                 variant="outline"
@@ -283,6 +238,18 @@ const KeywordGenerator: React.FC = () => {
                 <BarChart3 className="w-4 h-4" />
                 Longue traîne <span className="ml-1 bg-blue-100 text-blue-700 text-xs px-1.5 rounded-full">{longTailKeywords.length}</span>
               </TabsTrigger>
+              {hasCompetitorData && (
+                <TabsTrigger value="competitors" className="flex items-center gap-1">
+                  <Globe className="w-4 h-4" />
+                  Concurrents
+                </TabsTrigger>
+              )}
+              {serpResults && serpResults.length > 0 && (
+                <TabsTrigger value="serps" className="flex items-center gap-1">
+                  <ExternalLink className="w-4 h-4" />
+                  SERP
+                </TabsTrigger>
+              )}
             </TabsList>
             
             <TabsContent value="standard" className="mt-0">
@@ -296,12 +263,24 @@ const KeywordGenerator: React.FC = () => {
                 {longTailKeywords.map((kw, idx) => renderKeywordCard(kw, idx))}
               </div>
             </TabsContent>
+            
+            {hasCompetitorData && (
+              <TabsContent value="competitors" className="mt-0">
+                <CompetitorAnalysis competitors={competitors} />
+              </TabsContent>
+            )}
+            
+            {serpResults && serpResults.length > 0 && (
+              <TabsContent value="serps" className="mt-0">
+                <SerpResults serps={serpResults} />
+              </TabsContent>
+            )}
           </Tabs>
         </Card>
       )}
       
       {/* Empty State */}
-      {standardKeywords.length === 0 && longTailKeywords.length === 0 && !isGenerating && (
+      {!hasResults && !isGenerating && (
         <Card className="p-8 text-center">
           <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <Sparkles className="w-8 h-8 text-blue-600" />

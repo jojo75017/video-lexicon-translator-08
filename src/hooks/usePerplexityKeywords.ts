@@ -24,6 +24,9 @@ export function usePerplexityKeywords({
   const [standardKeywords, setStandardKeywords] = useState<KeywordSuggestion[]>([]);
   const [longTailKeywords, setLongTailKeywords] = useState<KeywordSuggestion[]>([]);
   const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
+  const [competitors, setCompetitors] = useState<any[]>([]);
+  const [serpResults, setSerpResults] = useState<any[]>([]);
+  const [showCompetitors, setShowCompetitors] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
 
   // Initialize service
@@ -85,6 +88,19 @@ export function usePerplexityKeywords({
       const longTailResults = await service.getLongTailKeywords(searchKeyword);
       setLongTailKeywords(longTailResults);
 
+      // Generate competitor data and SERP results if we have a configured API
+      if (isConfigured) {
+        try {
+          const { competitors, serps } = await service.getCompetitorData(searchKeyword);
+          setCompetitors(competitors || []);
+          setSerpResults(serps || []);
+          setShowCompetitors(competitors && competitors.length > 0);
+        } catch (err) {
+          console.error('Erreur lors de la récupération des données concurrentielles:', err);
+          // We don't fail the entire operation if competitor data fails
+        }
+      }
+
       toast.success(
         `${standardResults.length + longTailResults.length} suggestions générées pour "${searchKeyword}"`
       );
@@ -141,6 +157,11 @@ export function usePerplexityKeywords({
     toast.success(`${keywordsToExport.length} mots-clés exportés`);
   };
 
+  // Toggle competitor section visibility
+  const toggleCompetitors = () => {
+    setShowCompetitors(!showCompetitors);
+  };
+
   // Auto-generate on first load if needed
   useEffect(() => {
     if (autoGenerate && defaultKeyword && isConfigured && !standardKeywords.length) {
@@ -157,22 +178,28 @@ export function usePerplexityKeywords({
     standardKeywords,
     longTailKeywords,
     selectedKeywords,
+    competitors,
+    serpResults,
+    showCompetitors,
     error,
 
     // Setters
     setKeyword,
     setApiKey,
     setSelectedKeywords,
+    setShowCompetitors,
 
     // Actions
     validateApiKey,
     generateKeywords,
     toggleKeywordSelection,
     exportSelectedKeywords,
+    toggleCompetitors,
 
     // Computed
     hasResults: standardKeywords.length > 0 || longTailKeywords.length > 0,
     totalKeywords: standardKeywords.length + longTailKeywords.length,
     allKeywords: [...standardKeywords, ...longTailKeywords],
+    hasCompetitorData: competitors.length > 0 || serpResults.length > 0
   };
 }

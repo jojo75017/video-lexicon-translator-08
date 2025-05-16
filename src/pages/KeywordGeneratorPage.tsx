@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ArrowLeft, Sparkles } from 'lucide-react';
+import { ArrowLeft, Sparkles, Globe } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import KeywordGenerator from '@/components/seo/KeywordGenerator';
@@ -24,6 +24,22 @@ const KeywordGeneratorPage = () => {
       </header>
       
       <div className="container mx-auto">
+        <div className="mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg shadow-sm border border-blue-100">
+          <div className="flex items-start gap-4">
+            <div className="bg-blue-100 p-3 rounded-full">
+              <Globe className="h-6 w-6 text-blue-600" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-blue-900">Analyse concurrentielle et SERP en temps réel</h2>
+              <p className="text-blue-700 mt-1">
+                En configurant votre clé API Perplexity, vous pouvez maintenant obtenir des données de concurrence réelles 
+                et voir les résultats actuels des moteurs de recherche pour vos mots-clés. Visualisez les principaux sites
+                concurrents, leur trafic estimé et leur force SEO.
+              </p>
+            </div>
+          </div>
+        </div>
+        
         <KeywordGenerator />
       </div>
     </div>
