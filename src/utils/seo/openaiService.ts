@@ -1,3 +1,4 @@
+
 import { OpenAI } from "openai";
 import { toast } from "sonner";
 import { ProxyService } from "./proxyService";
@@ -235,16 +236,17 @@ export class OpenAIService {
             role: "system",
             content: `You are an expert SEO keyword researcher. Generate a comprehensive keyword strategy based on a seed keyword. 
             Format your response as a JSON object with these sections:
-            1. mainKeywords: array of at least 10 objects with {keyword, volume (0-10000), difficulty (0-100), cpc (0-5€), competition (0-1), relevance (0-100), suggestedTitle, suggestedDescription, clicks (0-5000), position (1-100)}
-            2. longTail: array of at least 10 longer keyword phrases with same structure
-            3. questions: array of at least 10 question-based keywords with same structure
-            4. related: array of at least 10 related terms with same structure
-            5. semantic: array of at least 15 string semantic field terms
-            6. competitors: array of exactly 5 objects with {name, url, strength (0-100), organic_traffic (0-100000), keywords (0-10000)}
+            1. mainKeywords: array of EXACTLY 10 objects with {keyword, volume (0-10000), difficulty (0-100), cpc (0-5€), competition (0-1), relevance (0-100), suggestedTitle, suggestedDescription, clicks (0-5000), position (1-100)}
+            2. longTail: array of EXACTLY 10 longer keyword phrases with same structure
+            3. questions: array of EXACTLY 10 question-based keywords with same structure
+            4. related: array of EXACTLY 10 related terms with same structure
+            5. semantic: array of EXACTLY 15 string semantic field terms
+            6. competitors: array of EXACTLY 5 objects with {name, url, strength (0-100), organic_traffic (0-100000), keywords (0-10000)}
             7. byIntent: object with {informational: [...keywords], transactional: [...keywords], navigational: [...keywords]}
             8. contentIdeas: array of at least 5 objects with {title, type}
-            9. serps: array of exactly 10 search results with {title, url, description, position}
+            9. serps: array of EXACTLY 10 search results with {title, url, description, position}
             
+            You MUST provide EXACTLY the number of items specified for each array - no more, no less.
             Include realistic search volumes, competition levels, and accurate suggested titles/descriptions for each keyword.
             For the competitors, provide EXACT URLs of real websites, not fictional ones.`
           },
@@ -254,15 +256,21 @@ export class OpenAIService {
             Niche/Industry: ${niche || 'general'}
             Content Objective: ${objective}
             
-            Include at least 10 main keywords, 10 long-tail variations, 10 questions, and 10 related terms, and at least 5 content ideas.
+            Make sure to include EXACTLY:
+            - 10 main keywords
+            - 10 long-tail keyword variations
+            - 10 question-based keywords
+            - 10 related terms
+            - At least 5 content ideas
+            - 5 competitors with their exact URLs
+            - 10 SERP results with real URLs
+            
             For each keyword, provide realistic search volume, difficulty score, CPC, competition level, relevance score, number of clicks, and average position.
-            Also include suggested titles and meta descriptions for the main keywords.
-            Provide exactly 10 SERP results with real URLs and metadata.
-            Include exactly 5 competitors with their exact URLs and detailed metrics.`
+            Also include suggested titles and meta descriptions for the main keywords.`
           }
         ],
-        max_tokens: 4000, // Increased max tokens to accommodate the larger response
-        temperature: 0.3,
+        max_tokens: 4000,
+        temperature: 0.2, // Lower temperature for more deterministic outputs
         response_format: { type: "json_object" }
       });
       
@@ -274,12 +282,32 @@ export class OpenAIService {
         throw new Error("No keyword strategy received");
       }
       
-      toast.success(`Stratégie générée pour "${seedKeyword}"`, {
-        id: "keyword-strategy"
-      });
-      
       try {
-        return JSON.parse(result);
+        const parsedResult = JSON.parse(result);
+        
+        // Validate the result has the expected structure and count
+        const validateArrayLength = (arr: any[], name: string, expectedLength: number) => {
+          if (!arr || arr.length < expectedLength) {
+            console.warn(`Expected at least ${expectedLength} items in ${name}, but got ${arr?.length || 0}`);
+            toast.warning(`Données incomplètes pour ${name}`, {
+              description: `L'API a renvoyé moins de résultats que demandé`
+            });
+          }
+        };
+        
+        validateArrayLength(parsedResult.mainKeywords, "mots-clés principaux", 10);
+        validateArrayLength(parsedResult.longTail, "mots-clés longue traîne", 10);
+        validateArrayLength(parsedResult.questions, "questions", 10);
+        validateArrayLength(parsedResult.related, "termes liés", 10);
+        validateArrayLength(parsedResult.semantic, "champ sémantique", 15);
+        validateArrayLength(parsedResult.competitors, "concurrents", 5);
+        validateArrayLength(parsedResult.serps, "résultats SERP", 10);
+        
+        toast.success(`Stratégie générée pour "${seedKeyword}"`, {
+          id: "keyword-strategy"
+        });
+        
+        return parsedResult;
       } catch (e) {
         console.error("Error parsing keyword strategy:", e);
         toast.error("Format de réponse invalide", {

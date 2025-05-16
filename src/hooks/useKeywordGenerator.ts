@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { toast } from "sonner";
 import { KeywordSuggestion, KeywordIntent, SerpsResult, CompetitorData } from '@/types/seo';
@@ -95,8 +96,36 @@ export const useKeywordGenerator = () => {
         objective
       );
       
-      // Mettre à jour l'état avec les résultats de l'API
-      setKeywordResults(keywordStrategy);
+      // Vérification des données
+      console.log("Keywords strategy received:", keywordStrategy);
+      console.log("Main keywords count:", keywordStrategy.mainKeywords?.length);
+      console.log("Long tail keywords count:", keywordStrategy.longTail?.length);
+      console.log("Questions count:", keywordStrategy.questions?.length);
+      console.log("Related keywords count:", keywordStrategy.related?.length);
+      console.log("Competitors count:", keywordStrategy.competitors?.length);
+      
+      // Ensure all arrays have at least some elements
+      const ensureArray = (arr: any[] | undefined, name: string): any[] => {
+        if (!arr || arr.length === 0) {
+          console.warn(`No ${name} received, using empty array`);
+          return [];
+        }
+        return arr;
+      };
+      
+      // Mettre à jour l'état avec les résultats de l'API, en s'assurant que les tableaux ne sont pas vides
+      setKeywordResults({
+        mainKeywords: ensureArray(keywordStrategy.mainKeywords, "mainKeywords"),
+        longTail: ensureArray(keywordStrategy.longTail, "longTail"),
+        questions: ensureArray(keywordStrategy.questions, "questions"),
+        related: ensureArray(keywordStrategy.related, "related"),
+        semantic: ensureArray(keywordStrategy.semantic, "semantic"),
+        competitors: ensureArray(keywordStrategy.competitors, "competitors"),
+        byIntent: keywordStrategy.byIntent || { informational: [], transactional: [], navigational: [] },
+        contentIdeas: ensureArray(keywordStrategy.contentIdeas, "contentIdeas"),
+        serps: ensureArray(keywordStrategy.serps, "serps")
+      });
+      
       setIsLoading(false);
       toast.success(`Analyse complète pour "${keyword}" générée avec succès`, {
         description: `Données générées par IA`
