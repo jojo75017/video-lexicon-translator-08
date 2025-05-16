@@ -1,451 +1,330 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Search, RefreshCw, Map, FileBarChart, Download, Link2, ListFilter, MessageSquare, Key, ExternalLink } from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-import { Separator } from "@/components/ui/separator";
-import { Input } from "@/components/ui/input";
-import useKeywordGenerator from '@/hooks/useKeywordGenerator';
-import KeywordForm from './keyword/KeywordForm';
-import KeywordTable from './keyword/KeywordTable';
-import KeywordVisualizations from './keyword/KeywordVisualizations';
-import KeywordGroups from './keyword/KeywordGroups';
-import ContentIdeas from './keyword/ContentIdeas';
-import WordCloud from './keyword/WordCloud';
-import SerpResults from './keyword/SerpResults';
-import CompetitorAnalysis from './keyword/CompetitorAnalysis';
 
-const KeywordGenerator = () => {
-  const {
-    // État du formulaire
-    keyword,
-    setKeyword,
-    language,
-    setLanguage,
-    niche,
-    setNiche,
-    objective,
-    setObjective,
-    region,
-    setRegion,
+import React, { useState, useEffect } from 'react';
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { KeywordSuggestion } from "@/types/seo/Keyword";
+import { PerplexityService } from "@/services/perplexityService";
+import { Sparkles, BarChart3, Loader2, Search, Settings } from "lucide-react";
+import { toast } from "sonner";
+
+const KeywordGenerator: React.FC = () => {
+  const [keyword, setKeyword] = useState<string>("");
+  const [apiKey, setApiKey] = useState<string>(() => localStorage.getItem("perplexityKey") || "");
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<string>("standard");
+  const [standardKeywords, setStandardKeywords] = useState<KeywordSuggestion[]>([]);
+  const [longTailKeywords, setLongTailKeywords] = useState<KeywordSuggestion[]>([]);
+  const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
+  const [showApiConfig, setShowApiConfig] = useState<boolean>(!localStorage.getItem("perplexityKey"));
+  
+  // Handle API key validation
+  const validateApiKey = async () => {
+    if (!apiKey) {
+      toast.error("Veuillez entrer une clé API Perplexity");
+      return false;
+    }
     
-    // État de l'API OpenAI
-    openaiKey,
-    setOpenaiKey,
-    useAI,
-    setUseAI,
+    const service = PerplexityService.createService(apiKey);
+    const isValid = await service.validateApiKey();
     
-    // État des résultats
-    isLoading,
-    keywordResults,
-    activeTab,
-    setActiveTab,
+    if (isValid) {
+      localStorage.setItem("perplexityKey", apiKey);
+      setShowApiConfig(false);
+    }
     
-    // Actions
-    generateKeywordResults,
-    handleExport,
-    getAllKeywords
-  } = useKeywordGenerator();
+    return isValid;
+  };
+  
+  // Generate keywords using Perplexity AI
+  const generateKeywords = async () => {
+    if (!keyword) {
+      toast.error("Veuillez entrer un mot-clé");
+      return;
+    }
+    
+    if (!localStorage.getItem("perplexityKey")) {
+      setShowApiConfig(true);
+      toast.error("Veuillez configurer votre clé API Perplexity");
+      return;
+    }
+    
+    setIsGenerating(true);
+    const service = PerplexityService.createService(apiKey || localStorage.getItem("perplexityKey") || "");
+    
+    try {
+      // Generate regular keywords
+      const standardResults = await service.getKeywordSuggestions(keyword);
+      setStandardKeywords(standardResults);
+      
+      // Generate long-tail keywords
+      const longTailResults = await service.getLongTailKeywords(keyword);
+      setLongTailKeywords(longTailResults);
+      
+      toast.success(`${standardResults.length + longTailResults.length} suggestions générées au total`);
+    } catch (error) {
+      console.error("Erreur lors de la génération de mots-clés:", error);
+      toast.error("Échec de la génération des mots-clés");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+  
+  const toggleKeywordSelection = (keyword: string) => {
+    if (selectedKeywords.includes(keyword)) {
+      setSelectedKeywords(selectedKeywords.filter(k => k !== keyword));
+    } else {
+      setSelectedKeywords([...selectedKeywords, keyword]);
+    }
+  };
+  
+  const exportSelectedKeywords = () => {
+    if (selectedKeywords.length === 0) {
+      toast.error("Aucun mot-clé sélectionné pour l'export");
+      return;
+    }
+    
+    const keywordsToExport = [...standardKeywords, ...longTailKeywords]
+      .filter(k => selectedKeywords.includes(k.keyword));
+    
+    const csv = [
+      ["Mot-clé", "Volume", "Difficulté", "CPC", "Compétition"].join(","),
+      ...keywordsToExport.map(k => [
+        `"${k.keyword}"`,
+        k.volume,
+        k.difficulty,
+        k.cpc,
+        k.competition
+      ].join(","))
+    ].join("\n");
+    
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `mots-cles-${keyword.replace(/\s+/g, "-")}.csv`);
+    link.click();
+    
+    toast.success(`${keywordsToExport.length} mots-clés exportés`);
+  };
+  
+  // Render keyword card
+  const renderKeywordCard = (keywordData: KeywordSuggestion, index: number) => {
+    const isSelected = selectedKeywords.includes(keywordData.keyword);
+    
+    return (
+      <Card 
+        key={index}
+        className={`p-4 cursor-pointer transition-all ${
+          isSelected ? "border-blue-500 bg-blue-50" : "hover:border-gray-400"
+        }`}
+        onClick={() => toggleKeywordSelection(keywordData.keyword)}
+      >
+        <div className="flex justify-between items-center mb-2">
+          <h3 className="font-medium text-blue-900">{keywordData.keyword}</h3>
+          {isSelected && <div className="w-4 h-4 bg-blue-500 rounded-full"></div>}
+        </div>
+        
+        <div className="grid grid-cols-4 gap-2 text-xs">
+          <div>
+            <p className="text-gray-500">Volume</p>
+            <p className="font-semibold">{keywordData.volume}</p>
+          </div>
+          <div>
+            <p className="text-gray-500">Difficulté</p>
+            <div className="flex items-center gap-1">
+              <div className="w-10 bg-gray-200 h-1.5 rounded-full overflow-hidden">
+                <div 
+                  className={`h-full rounded-full ${
+                    keywordData.difficulty < 30 ? "bg-green-500" : 
+                    keywordData.difficulty < 60 ? "bg-yellow-500" : "bg-red-500"
+                  }`} 
+                  style={{width: `${keywordData.difficulty}%`}}
+                ></div>
+              </div>
+              <span>{keywordData.difficulty}</span>
+            </div>
+          </div>
+          <div>
+            <p className="text-gray-500">CPC</p>
+            <p className="font-semibold">{keywordData.cpc.toFixed(2)} €</p>
+          </div>
+          <div>
+            <p className="text-gray-500">Compétition</p>
+            <div className="flex items-center gap-1">
+              <div className="w-10 bg-gray-200 h-1.5 rounded-full overflow-hidden">
+                <div 
+                  className="bg-blue-500 h-full rounded-full" 
+                  style={{width: `${keywordData.competition * 100}%`}}
+                ></div>
+              </div>
+              <span>{Math.round(keywordData.competition * 100)}%</span>
+            </div>
+          </div>
+        </div>
+      </Card>
+    );
+  };
 
   return (
     <div className="space-y-6">
-      <Card className="bg-gradient-to-br from-indigo-50 to-blue-50 border-indigo-100">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-xl text-indigo-800 flex items-center gap-2">
-            <Search className="h-5 w-5 text-indigo-600" />
-            Générateur de Mots-Clés SEO
-          </CardTitle>
-          <p className="text-sm text-indigo-600">
-            Générez une stratégie de mots-clés complète et visuelle pour votre contenu
+      {/* API Configuration Section */}
+      {showApiConfig && (
+        <Card className="p-6 border-blue-100 bg-blue-50">
+          <h2 className="text-lg font-semibold text-blue-900 mb-4">Configuration de Perplexity AI</h2>
+          <p className="text-blue-800 mb-4">
+            Ce générateur de mots-clés utilise l'API Perplexity AI pour générer des suggestions de mots-clés précises et contextuelles.
+            Veuillez entrer votre clé API ci-dessous pour commencer.
           </p>
-        </CardHeader>
-        <CardContent>
-          {/* Configuration de la clé API OpenAI */}
-          <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-medium flex items-center gap-1">
-                <Key className="h-4 w-4 text-blue-600" />
-                Configuration OpenAI (optionnel)
-              </h3>
-            </div>
-            <div className="flex gap-2 items-center">
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-blue-900 mb-1">Clé API Perplexity</label>
               <Input
                 type="password"
-                value={openaiKey}
-                onChange={(e) => setOpenaiKey(e.target.value)}
-                placeholder="Clé API OpenAI (sk-...)"
-                className="flex-1"
+                placeholder="pplx-xxxxxxxxxxxxxxxxxxxxxxxx"
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+                className="w-full"
               />
+              <p className="text-xs text-blue-700 mt-1">
+                Obtenez votre clé sur{" "}
+                <a 
+                  href="https://www.perplexity.ai/settings/api"
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="underline hover:text-blue-900"
+                >
+                  perplexity.ai/settings/api
+                </a>
+              </p>
+            </div>
+            
+            <div className="flex gap-2">
+              <Button onClick={validateApiKey} className="flex-1">
+                Valider et enregistrer
+              </Button>
               <Button 
-                onClick={() => {
-                  localStorage.setItem('openaiKey', openaiKey);
-                  toast.success("Clé API OpenAI sauvegardée", {
-                    description: "Votre clé est enregistrée localement dans votre navigateur"
-                  });
-                  if (openaiKey) setUseAI(true);
-                }}
-                variant="outline"
-                className="whitespace-nowrap"
+                variant="outline" 
+                onClick={() => setShowApiConfig(false)}
+                className="flex-1"
               >
-                Enregistrer
+                Annuler
               </Button>
             </div>
-            <p className="text-xs text-gray-500 mt-1">
-              Une clé API OpenAI permet d'obtenir des suggestions de mots-clés plus pertinentes et précises avec données SERP et analyse concurrentielle.
-            </p>
           </div>
-
-          <KeywordForm 
-            keyword={keyword}
-            onKeywordChange={setKeyword}
-            language={language}
-            onLanguageChange={setLanguage}
-            niche={niche}
-            onNicheChange={setNiche}
-            objective={objective}
-            onObjectiveChange={setObjective}
-            region={region}
-            onRegionChange={setRegion}
-            isLoading={isLoading}
-            onSubmit={generateKeywordResults}
-            useAI={useAI}
-            onToggleAI={setUseAI}
-            openaiKey={openaiKey}
-          />
-        </CardContent>
+        </Card>
+      )}
+      
+      {/* Search Form */}
+      <Card className="p-6">
+        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+          <Sparkles className="w-5 h-5 text-blue-600" />
+          Générateur de mots-clés
+        </h2>
+        
+        <div className="flex gap-3">
+          <div className="flex-1">
+            <Input
+              placeholder="Entrez un mot-clé principal..."
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+            />
+          </div>
+          <Button 
+            onClick={generateKeywords} 
+            disabled={isGenerating || !keyword}
+            className="flex items-center gap-2"
+          >
+            {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+            Générer
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={() => setShowApiConfig(true)}
+          >
+            <Settings className="w-4 h-4" />
+          </Button>
+        </div>
       </Card>
-
-      {keywordResults && (
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-bold">Résultats pour "{keyword}"</h2>
-            <Button variant="outline" onClick={handleExport} className="flex items-center gap-2">
-              <Download className="h-4 w-4" />
-              Exporter CSV
-            </Button>
+      
+      {/* Results */}
+      {(standardKeywords.length > 0 || longTailKeywords.length > 0) && (
+        <Card className="p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold">Résultats ({standardKeywords.length + longTailKeywords.length})</h2>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSelectedKeywords([])}
+                disabled={selectedKeywords.length === 0}
+              >
+                Désélectionner tout ({selectedKeywords.length})
+              </Button>
+              <Button
+                size="sm"
+                onClick={exportSelectedKeywords}
+                disabled={selectedKeywords.length === 0}
+              >
+                Exporter la sélection
+              </Button>
+            </div>
           </div>
           
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7">
-              <TabsTrigger value="overview" className="flex items-center gap-1">
-                <FileBarChart className="h-4 w-4" />
-                <span className="hidden md:inline">Vue d'ensemble</span>
+            <TabsList className="mb-4">
+              <TabsTrigger value="standard" className="flex items-center gap-1">
+                <Sparkles className="w-4 h-4" />
+                Standards <span className="ml-1 bg-blue-100 text-blue-700 text-xs px-1.5 rounded-full">{standardKeywords.length}</span>
               </TabsTrigger>
-              <TabsTrigger value="longtail" className="flex items-center gap-1">
-                <ListFilter className="h-4 w-4" />
-                <span className="hidden md:inline">Longue traîne</span>
-              </TabsTrigger>
-              <TabsTrigger value="intent" className="flex items-center gap-1">
-                <MessageSquare className="h-4 w-4" />
-                <span className="hidden md:inline">Intentions</span>
-              </TabsTrigger>
-              <TabsTrigger value="serps" className="flex items-center gap-1">
-                <Search className="h-4 w-4" />
-                <span className="hidden md:inline">SERP</span>
-              </TabsTrigger>
-              <TabsTrigger value="competitors" className="flex items-center gap-1">
-                <ExternalLink className="h-4 w-4" />
-                <span className="hidden md:inline">Concurrents</span>
-              </TabsTrigger>
-              <TabsTrigger value="visualization" className="flex items-center gap-1">
-                <Map className="h-4 w-4" />
-                <span className="hidden md:inline">Visualisation</span>
-              </TabsTrigger>
-              <TabsTrigger value="content" className="flex items-center gap-1">
-                <Link2 className="h-4 w-4" />
-                <span className="hidden md:inline">Contenu</span>
+              <TabsTrigger value="longTail" className="flex items-center gap-1">
+                <BarChart3 className="w-4 h-4" />
+                Longue traîne <span className="ml-1 bg-blue-100 text-blue-700 text-xs px-1.5 rounded-full">{longTailKeywords.length}</span>
               </TabsTrigger>
             </TabsList>
             
-            {/* Onglet Vue d'ensemble */}
-            <TabsContent value="overview" className="mt-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Mots-clés principaux</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <KeywordTable 
-                    keywords={keywordResults.mainKeywords || []} 
-                    title="Mots-clés principaux"
-                  />
-
-                  <div className="mt-8">
-                    <h3 className="text-md font-medium mb-4">Champ sémantique</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {keywordResults.semantic && keywordResults.semantic.map((word, i) => (
-                        <Badge key={i} variant="secondary" className="px-3 py-1 text-sm">
-                          {word}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="mt-8">
-                    <h3 className="text-md font-medium mb-4">Sites concurrents</h3>
-                    <div className="space-y-3">
-                      {keywordResults.competitors && keywordResults.competitors.map((competitor, i) => (
-                        <div key={i} className="flex justify-between items-center p-3 bg-gray-50 rounded-md">
-                          <div>
-                            <p className="font-medium">{competitor.name}</p>
-                            <a href={competitor.url} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline">
-                              {competitor.url}
-                            </a>
-                          </div>
-                          <Badge 
-                            variant="outline" 
-                            className={
-                              competitor.strength > 75 
-                                ? "bg-red-100 text-red-800 border-red-200" 
-                                : competitor.strength > 50 
-                                ? "bg-yellow-100 text-yellow-800 border-yellow-200" 
-                                : "bg-green-100 text-green-800 border-green-200"
-                            }
-                          >
-                            Force {competitor.strength}/100
-                          </Badge>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+            <TabsContent value="standard" className="mt-0">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                {standardKeywords.map((kw, idx) => renderKeywordCard(kw, idx))}
+              </div>
             </TabsContent>
             
-            {/* Onglet Longue traîne */}
-            <TabsContent value="longtail" className="mt-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Mots-clés longue traîne et questions</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid gap-6 md:grid-cols-2">
-                    <div>
-                      <h3 className="text-md font-medium mb-3">Longue traîne</h3>
-                      <div className="space-y-2">
-                        {keywordResults.longTail && keywordResults.longTail.map((kw, index) => (
-                          <div key={index} className="p-3 bg-gray-50 rounded-md">
-                            <div className="flex justify-between items-center">
-                              <p className="font-medium">{kw.keyword}</p>
-                              <Badge variant="outline" className={
-                                kw.difficulty < 30 ? "bg-green-100 text-green-800 border-green-200" :
-                                kw.difficulty < 60 ? "bg-yellow-100 text-yellow-800 border-yellow-200" :
-                                "bg-red-100 text-red-800 border-red-200"
-                              }>
-                                {kw.difficulty < 30 ? "Facile" : kw.difficulty < 60 ? "Moyen" : "Difficile"}
-                              </Badge>
-                            </div>
-                            <div className="flex justify-between mt-2 text-sm text-gray-500">
-                              <span>{kw.volume?.toLocaleString()} recherches/mois</span>
-                              <span>CPC: {kw.cpc?.toLocaleString(undefined, {style: 'currency', currency: 'EUR', minimumFractionDigits: 2})}</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h3 className="text-md font-medium mb-3">Questions fréquentes</h3>
-                      <div className="space-y-2">
-                        {keywordResults.questions && keywordResults.questions.map((kw, index) => (
-                          <div key={index} className="p-3 bg-blue-50 rounded-md border border-blue-100">
-                            <div className="flex justify-between items-center">
-                              <p className="font-medium text-blue-800">{kw.keyword}</p>
-                              <Badge variant="outline" className={
-                                kw.difficulty < 30 ? "bg-green-100 text-green-800 border-green-200" :
-                                kw.difficulty < 60 ? "bg-yellow-100 text-yellow-800 border-yellow-200" :
-                                "bg-red-100 text-red-800 border-red-200"
-                              }>
-                                {kw.difficulty < 30 ? "Facile" : kw.difficulty < 60 ? "Moyen" : "Difficile"}
-                              </Badge>
-                            </div>
-                            <div className="flex justify-between mt-2 text-sm text-blue-600">
-                              <span>{kw.volume?.toLocaleString()} recherches/mois</span>
-                              <span>CPC: {kw.cpc?.toLocaleString(undefined, {style: 'currency', currency: 'EUR', minimumFractionDigits: 2})}</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-8">
-                    <h3 className="text-md font-medium mb-3">Mots-clés liés</h3>
-                    <div className="space-y-2">
-                      {keywordResults.related && keywordResults.related.map((kw, index) => (
-                        <div key={index} className="p-3 bg-gray-50 rounded-md">
-                          <div className="flex justify-between items-center">
-                            <p className="font-medium">{kw.keyword}</p>
-                            <Badge variant="outline" className={
-                              kw.difficulty < 30 ? "bg-green-100 text-green-800 border-green-200" :
-                              kw.difficulty < 60 ? "bg-yellow-100 text-yellow-800 border-yellow-200" :
-                              "bg-red-100 text-red-800 border-red-200"
-                            }>
-                              {kw.difficulty < 30 ? "Facile" : kw.difficulty < 60 ? "Moyen" : "Difficile"}
-                            </Badge>
-                          </div>
-                          <div className="flex justify-between mt-2 text-sm text-gray-500">
-                            <span>{kw.volume?.toLocaleString()} recherches/mois</span>
-                            <span>CPC: {kw.cpc?.toLocaleString(undefined, {style: 'currency', currency: 'EUR', minimumFractionDigits: 2})}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            {/* Onglet Intentions */}
-            <TabsContent value="intent" className="mt-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Regroupement par intention de recherche</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {keywordResults.byIntent && <KeywordGroups byIntent={keywordResults.byIntent} />}
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            {/* Nouvel onglet pour les résultats SERP */}
-            <TabsContent value="serps" className="mt-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Résultats SERP pour "{keyword}"</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <SerpResults serps={keywordResults.serps} />
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            {/* Nouvel onglet pour l'analyse des concurrents */}
-            <TabsContent value="competitors" className="mt-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Analyse de la concurrence</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CompetitorAnalysis competitors={keywordResults.competitors} />
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            {/* Onglet Visualisation */}
-            <TabsContent value="visualization" className="mt-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Visualisation des données</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <KeywordVisualizations 
-                    mainKeywords={keywordResults.mainKeywords || []} 
-                    allKeywords={getAllKeywords()} 
-                  />
-                  
-                  {/* Nuage de mots-clés */}
-                  <div className="mt-8">
-                    <h3 className="text-md font-medium mb-3">Nuage de mots-clés</h3>
-                    <WordCloud keywords={getAllKeywords()} />
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            {/* Onglet Idées de contenu */}
-            <TabsContent value="content" className="mt-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Idées de contenu</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ContentIdeas 
-                    contentIdeas={keywordResults.contentIdeas || []}
-                    relatedKeywords={[...(keywordResults.mainKeywords || []), ...(keywordResults.related || [])]
-                      .map(kw => kw.keyword)}
-                  />
-                  
-                  <Separator className="my-6" />
-                  
-                  <div>
-                    <h3 className="text-md font-medium mb-3">Architecture de cocon sémantique</h3>
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <div className="mb-4 p-3 bg-blue-100 text-blue-800 rounded-md font-medium text-center">
-                        {keyword}
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-                        {keywordResults.mainKeywords && keywordResults.mainKeywords.slice(0, 3).map((kw, i) => (
-                          <div key={i} className="p-2 bg-blue-50 text-blue-700 rounded-md text-center">
-                            {kw.keyword}
-                          </div>
-                        ))}
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
-                        {keywordResults.longTail && keywordResults.questions && [
-                          ...(keywordResults.longTail || []),
-                          ...(keywordResults.questions || [])
-                        ].slice(0, 8).map((kw, i) => (
-                          <div key={i} className="p-2 bg-gray-100 text-gray-700 rounded-md text-center text-sm">
-                            {kw.keyword}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <Separator className="my-6" />
-                  
-                  <div>
-                    <h3 className="text-md font-medium mb-3">FAQ optimisée SEO</h3>
-                    <div className="space-y-3">
-                      {keywordResults.questions && keywordResults.semantic && keywordResults.questions.map((question, index) => (
-                        <div key={index} className="p-3 bg-gray-50 rounded-md">
-                          <p className="font-medium">{question.keyword} ?</p>
-                          <p className="text-sm text-gray-600 mt-2">
-                            Répondez à cette question en utilisant les mots-clés suivants : {
-                              [
-                                keyword, 
-                                keywordResults.semantic[index % keywordResults.semantic.length]
-                              ].join(', ')
-                            }
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+            <TabsContent value="longTail" className="mt-0">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                {longTailKeywords.map((kw, idx) => renderKeywordCard(kw, idx))}
+              </div>
             </TabsContent>
           </Tabs>
-        </div>
+        </Card>
       )}
       
-      {!keywordResults && !isLoading && (
-        <Card className="bg-gray-50 border-dashed border-2 border-gray-200">
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <Search className="h-12 w-12 text-gray-300 mb-4" />
-            <h3 className="text-xl font-medium text-gray-600 mb-2">Générateur de stratégie de mots-clés</h3>
-            <p className="text-gray-500 text-center max-w-md mb-6">
-              Saisissez votre mot-clé principal ci-dessus pour générer une stratégie de mots-clés complète avec volume de recherche, difficulté, concurrence et suggestions de contenu.
-            </p>
-            <div className="flex flex-wrap justify-center gap-2">
-              {["voyage au Japon", "formation SEO", "acheter meuble design", "apprendre la guitare", "recette gâteau chocolat"].map((suggestion, i) => (
-                <Badge 
-                  key={i}
-                  variant="outline"
-                  className="cursor-pointer hover:bg-indigo-50"
-                  onClick={() => {
-                    setKeyword(suggestion);
-                    toast.info(`Mot-clé "${suggestion}" sélectionné. Cliquez sur Générer pour lancer l'analyse.`);
-                  }}
-                >
-                  {suggestion}
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
+      {/* Empty State */}
+      {standardKeywords.length === 0 && longTailKeywords.length === 0 && !isGenerating && (
+        <Card className="p-8 text-center">
+          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Sparkles className="w-8 h-8 text-blue-600" />
+          </div>
+          <h3 className="text-lg font-semibold mb-2">Aucun résultat</h3>
+          <p className="text-gray-500 max-w-md mx-auto mb-4">
+            Entrez un mot-clé principal et cliquez sur "Générer" pour obtenir des suggestions de mots-clés pertinents
+            pour votre contenu SEO.
+          </p>
+        </Card>
+      )}
+      
+      {/* Loading State */}
+      {isGenerating && (
+        <Card className="p-8 text-center">
+          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+          </div>
+          <h3 className="text-lg font-semibold mb-2">Génération en cours...</h3>
+          <p className="text-gray-500 max-w-md mx-auto mb-4">
+            Perplexity AI génère des suggestions de mots-clés pour "{keyword}".
+            Veuillez patienter un moment.
+          </p>
         </Card>
       )}
     </div>

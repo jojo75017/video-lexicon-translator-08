@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import KeywordGenerator from '@/components/seo/KeywordGenerator';
@@ -16,7 +16,10 @@ const KeywordGeneratorPage = () => {
               Retour au tableau de bord
             </Button>
           </Link>
-          <h1 className="ml-4 text-xl font-bold">Générateur de mots-clés SEO</h1>
+          <div className="flex items-center ml-4">
+            <Sparkles className="h-5 w-5 text-blue-500 mr-2" />
+            <h1 className="text-xl font-bold">Générateur de mots-clés SEO</h1>
+          </div>
         </div>
       </header>
       
