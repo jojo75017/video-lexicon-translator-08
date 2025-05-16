@@ -8,8 +8,6 @@ import { toast } from "sonner";
 import html2canvas from 'html2canvas';
 import SignaturePreview from './SignaturePreview';
 import StyleSelector from './StyleSelector';
-import AiAssistant from './AiAssistant';
-import type { StyleTemplate } from './StyleSelector';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -60,7 +58,7 @@ const SignatureGenerator = () => {
     }));
   };
 
-  const handleTemplateSelect = (template: StyleTemplate) => {
+  const handleTemplateSelect = (template: any) => {
     setTextColor(template.textColor);
     setIconColor(template.iconColor);
     setSeparatorColor(template.separatorColor);
@@ -200,8 +198,15 @@ const SignatureGenerator = () => {
     }));
   };
 
-  // Added necessary component for AiAssistant tab
-  const AiAssistant = () => (
+  const emojiOptions = {
+    title: ['💼', '👔', '🖋️', '📊', '🚀'],
+    email: ['📧', '✉️', '📨', '📩', '📤'],
+    phone: ['📱', '☎️', '📞', '📲', '🤙'],
+    website: ['🌐', '💻', '🔗', '🖥️', '📱']
+  };
+  
+  // Simple AI assistant component
+  const AiAssistantContent = () => (
     <div className="space-y-4">
       <h3 className="font-medium text-lg">Assistant IA pour votre signature</h3>
       <p className="text-gray-600 text-sm">
@@ -220,13 +225,6 @@ const SignatureGenerator = () => {
       </Button>
     </div>
   );
-
-  const emojiOptions = {
-    title: ['💼', '👔', '🖋️', '📊', '🚀'],
-    email: ['📧', '✉️', '📨', '📩', '📤'],
-    phone: ['📱', '☎️', '📞', '📲', '🤙'],
-    website: ['🌐', '💻', '🔗', '🖥️', '📱']
-  };
 
   return (
     <Card className="p-6">
@@ -453,10 +451,9 @@ const SignatureGenerator = () => {
                       <Input
                         id="email"
                         name="email"
-                        type="email"
                         value={formData.email}
                         onChange={handleInputChange}
-                        placeholder="jean.dupont@entreprise.com"
+                        placeholder="email@entreprise.com"
                         ref={emailInputRef}
                         onMouseUp={(e) => handleTextSelection('email', e)}
                         className="flex-1"
@@ -564,7 +561,7 @@ const SignatureGenerator = () => {
                         name="website"
                         value={formData.website}
                         onChange={handleInputChange}
-                        placeholder="www.monentreprise.com"
+                        placeholder="www.entreprise.com"
                         ref={websiteInputRef}
                         onMouseUp={(e) => handleTextSelection('website', e)}
                         className="flex-1"
@@ -610,49 +607,43 @@ const SignatureGenerator = () => {
                     </div>
                   </div>
                 </div>
-
-                <StyleSelector 
-                  textColor={textColor}
-                  setTextColor={setTextColor}
-                  iconColor={iconColor}
-                  setIconColor={setIconColor}
-                  separatorColor={separatorColor}
-                  setSeparatorColor={setSeparatorColor}
-                  onSelectTemplate={handleTemplateSelect}
-                />
-
-                <Button onClick={downloadSignature} className="w-full flex gap-2">
-                  <Download size={18} />
-                  Télécharger ma signature
-                </Button>
-              </div>
-              
-              <div className="space-y-4">
-                <div className="border rounded-lg p-6 relative">
-                  <h3 className="font-medium mb-4">Aperçu de la signature</h3>
-                  <div ref={signatureRef}>
-                    <SignaturePreview 
-                      formData={formData}
-                      style={getSignatureStyle()}
-                      nameIcon={nameIcon}
-                      companyIcon={companyIcon}
-                      titleEmoji={titleEmoji}
-                      emailEmoji={emailEmoji}
-                      phoneEmoji={phoneEmoji}
-                      websiteEmoji={websiteEmoji}
-                      textColor={textColor}
-                      iconColor={iconColor}
-                      separatorColor={separatorColor}
-                      logo={logo}
-                    />
-                  </div>
+                
+                <div>
+                  <StyleSelector onSelectTemplate={handleTemplateSelect} />
                 </div>
+              </div>
+
+              <div className="space-y-6">
+                <h3 className="font-medium">Aperçu de la signature</h3>
+                <div className="border rounded-md p-4 bg-white" ref={signatureRef}>
+                  <SignaturePreview
+                    formData={formData}
+                    style={getSignatureStyle()}
+                    nameIcon={nameIcon}
+                    companyIcon={companyIcon}
+                    titleEmoji={titleEmoji}
+                    emailEmoji={emailEmoji}
+                    phoneEmoji={phoneEmoji}
+                    websiteEmoji={websiteEmoji}
+                    textColor={textColor}
+                    iconColor={iconColor}
+                    separatorColor={separatorColor}
+                    logo={logo}
+                  />
+                </div>
+                <Button 
+                  onClick={downloadSignature} 
+                  className="w-full"
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Télécharger la signature
+                </Button>
               </div>
             </div>
           </TabsContent>
           
-          <TabsContent value="assistant" className="space-y-6">
-            <AiAssistant />
+          <TabsContent value="assistant">
+            <AiAssistantContent />
           </TabsContent>
         </Tabs>
       </div>

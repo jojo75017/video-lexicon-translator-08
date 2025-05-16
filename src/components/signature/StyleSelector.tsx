@@ -1,10 +1,13 @@
 
 import React from 'react';
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Check } from "lucide-react";
 
 export interface StyleTemplate {
+  id: string;
   name: string;
   textColor: string;
   iconColor: string;
@@ -12,133 +15,100 @@ export interface StyleTemplate {
   font: string;
 }
 
+const templates: StyleTemplate[] = [
+  {
+    id: "modern",
+    name: "Moderne",
+    textColor: "#1e293b",
+    iconColor: "#2563eb",
+    separatorColor: "#e2e8f0",
+    font: "font-sans"
+  },
+  {
+    id: "elegant",
+    name: "Élégant",
+    textColor: "#334155",
+    iconColor: "#6d28d9",
+    separatorColor: "#e2e8f0",
+    font: "font-playfair"
+  },
+  {
+    id: "minimal",
+    name: "Minimaliste",
+    textColor: "#111827",
+    iconColor: "#4b5563",
+    separatorColor: "#e5e7eb",
+    font: "font-sans"
+  },
+  {
+    id: "corporate",
+    name: "Corporate",
+    textColor: "#0f172a",
+    iconColor: "#0284c7",
+    separatorColor: "#cbd5e1",
+    font: "font-sans"
+  },
+  {
+    id: "creative",
+    name: "Créatif",
+    textColor: "#4b5563",
+    iconColor: "#ec4899",
+    separatorColor: "#f3e8ff",
+    font: "font-playfair"
+  }
+];
+
 interface StyleSelectorProps {
-  textColor: string;
-  setTextColor: (value: string) => void;
-  iconColor: string;
-  setIconColor: (value: string) => void;
-  separatorColor: string;
-  setSeparatorColor: (value: string) => void;
   onSelectTemplate: (template: StyleTemplate) => void;
 }
 
-const StyleSelector: React.FC<StyleSelectorProps> = ({
-  textColor,
-  setTextColor,
-  iconColor,
-  setIconColor,
-  separatorColor,
-  setSeparatorColor,
-  onSelectTemplate
-}) => {
-  // Templates prédéfinis
-  const templates: StyleTemplate[] = [
-    {
-      name: "Bleu professionnel",
-      textColor: "#1e293b",
-      iconColor: "#2563eb",
-      separatorColor: "#e2e8f0",
-      font: "default"
-    },
-    {
-      name: "Vert nature",
-      textColor: "#1e3a1e",
-      iconColor: "#16a34a",
-      separatorColor: "#dcfce7",
-      font: "default"
-    },
-    {
-      name: "Élégant sombre",
-      textColor: "#334155",
-      iconColor: "#6366f1",
-      separatorColor: "#f1f5f9",
-      font: "font-playfair"
-    },
-    {
-      name: "Orange créatif",
-      textColor: "#422006",
-      iconColor: "#f97316",
-      separatorColor: "#ffedd5",
-      font: "default"
+const StyleSelector: React.FC<StyleSelectorProps> = ({ onSelectTemplate }) => {
+  const [selectedTemplate, setSelectedTemplate] = React.useState("modern");
+
+  const handleTemplateChange = (templateId: string) => {
+    setSelectedTemplate(templateId);
+    const template = templates.find(t => t.id === templateId);
+    if (template) {
+      onSelectTemplate(template);
     }
-  ];
+  };
 
   return (
     <div className="space-y-4">
-      <div>
-        <Label>Modèles de style</Label>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2">
-          {templates.map((template, index) => (
-            <Button
-              key={index}
-              variant="outline"
-              onClick={() => onSelectTemplate(template)}
-              className="h-auto py-2 px-3 flex flex-col items-center justify-center text-center"
-              style={{ borderColor: template.iconColor }}
+      <h3 className="font-medium">Style de la signature</h3>
+      <RadioGroup
+        value={selectedTemplate}
+        onValueChange={handleTemplateChange}
+        className="grid grid-cols-2 gap-4"
+      >
+        {templates.map((template) => (
+          <div key={template.id} className="relative">
+            <RadioGroupItem
+              value={template.id}
+              id={template.id}
+              className="peer sr-only"
+            />
+            <Label
+              htmlFor={template.id}
+              className={`
+                flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4
+                hover:bg-accent hover:text-accent-foreground
+                peer-data-[state=checked]:border-primary
+                cursor-pointer
+              `}
             >
               <div 
-                className="w-4 h-4 rounded-full mb-1" 
+                className="w-full h-6 mb-2 rounded" 
                 style={{ backgroundColor: template.iconColor }}
-              ></div>
-              <span className="text-xs">{template.name}</span>
-            </Button>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <Label>Couleur du texte</Label>
-        <div className="flex gap-2 items-center mt-2">
-          <Input
-            type="color"
-            value={textColor}
-            onChange={(e) => setTextColor(e.target.value)}
-            className="w-12 h-8 p-1"
-          />
-          <Input
-            type="text"
-            value={textColor}
-            onChange={(e) => setTextColor(e.target.value)}
-            className="flex-1"
-          />
-        </div>
-      </div>
-
-      <div>
-        <Label>Couleur des icônes</Label>
-        <div className="flex gap-2 items-center mt-2">
-          <Input
-            type="color"
-            value={iconColor}
-            onChange={(e) => setIconColor(e.target.value)}
-            className="w-12 h-8 p-1"
-          />
-          <Input
-            type="text"
-            value={iconColor}
-            onChange={(e) => setIconColor(e.target.value)}
-            className="flex-1"
-          />
-        </div>
-      </div>
-
-      <div>
-        <Label>Couleur du séparateur</Label>
-        <div className="flex gap-2 items-center mt-2">
-          <Input
-            type="color"
-            value={separatorColor}
-            onChange={(e) => setSeparatorColor(e.target.value)}
-            className="w-12 h-8 p-1"
-          />
-          <Input
-            type="text"
-            value={separatorColor}
-            onChange={(e) => setSeparatorColor(e.target.value)}
-            className="flex-1"
-          />
-        </div>
-      </div>
+              />
+              <span>{template.name}</span>
+              <div className="absolute top-2 right-2 opacity-0 peer-data-[state=checked]:opacity-100">
+                <Check className="h-4 w-4" />
+              </div>
+            </Label>
+          </div>
+        ))}
+      </RadioGroup>
     </div>
   );
 };

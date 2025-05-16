@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Share2, Download, Copy } from "lucide-react";
@@ -18,7 +19,7 @@ Score: ${calculateScore()}%
 
 Title: ${seoAnalysis.title}
 Description: ${seoAnalysis.description}
-Keywords: ${seoAnalysis.keywords?.join(', ')}
+Keywords: ${Array.isArray(seoAnalysis.keywords) ? seoAnalysis.keywords.join(', ') : seoAnalysis.keywords || ''}
 
 Structure:
 - H1 tags: ${seoAnalysis.h1Count}
@@ -40,7 +41,7 @@ Word count: ${seoAnalysis.wordCount}
     let score = 100;
     if (!seoAnalysis.title) score -= 20;
     if (!seoAnalysis.description) score -= 20;
-    if (!seoAnalysis.keywords || seoAnalysis.keywords.length === 0) score -= 15;
+    if (!seoAnalysis.keywords || (Array.isArray(seoAnalysis.keywords) && seoAnalysis.keywords.length === 0)) score -= 15;
     if (seoAnalysis.h1Count !== 1) score -= 10;
     return Math.max(0, score);
   };
