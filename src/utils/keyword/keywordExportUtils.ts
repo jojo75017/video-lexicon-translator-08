@@ -11,7 +11,9 @@ export const exportKeywordsToCSV = (
   baseKeyword: string
 ): void => {
   try {
-    if (selectedKeywords.length === 0) {
+    console.log("Début de l'export avec:", { selectedKeywords, allKeywordsCount: allKeywords.length });
+    
+    if (!Array.isArray(selectedKeywords) || selectedKeywords.length === 0) {
       toast.error('Aucun mot-clé sélectionné pour l\'export');
       return;
     }
@@ -19,14 +21,12 @@ export const exportKeywordsToCSV = (
     // Filtrer les mots-clés sélectionnés parmi tous les mots-clés
     const keywordsToExport = allKeywords.filter(k => selectedKeywords.includes(k.keyword));
 
+    console.log("Mots-clés filtrés pour l'export:", keywordsToExport.length);
+
     if (keywordsToExport.length === 0) {
       toast.error('Aucun mot-clé trouvé pour l\'export');
       return;
     }
-
-    console.log('Exporting keywords:', keywordsToExport);
-    console.log('Selected keywords:', selectedKeywords);
-    console.log('All keywords count:', allKeywords.length);
 
     // Créer le contenu CSV
     const csv = [
@@ -57,4 +57,3 @@ export const exportKeywordsToCSV = (
     toast.error('Erreur lors de l\'exportation des mots-clés');
   }
 };
-

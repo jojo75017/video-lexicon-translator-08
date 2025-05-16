@@ -38,6 +38,9 @@ const KeywordResults: React.FC<KeywordResultsProps> = ({
   clearSelectedKeywords,
   exportSelectedKeywords
 }) => {
+  // Assurez-vous que selectedKeywords est un tableau non-null
+  const hasSelectedKeywords = Array.isArray(selectedKeywords) && selectedKeywords.length > 0;
+
   return (
     <Card className="p-6">
       <div className="flex justify-between items-center mb-4">
@@ -47,16 +50,16 @@ const KeywordResults: React.FC<KeywordResultsProps> = ({
             variant="outline"
             size="sm"
             onClick={clearSelectedKeywords}
-            disabled={selectedKeywords.length === 0}
+            disabled={!hasSelectedKeywords}
           >
-            Désélectionner tout ({selectedKeywords.length})
+            Désélectionner tout ({selectedKeywords?.length || 0})
           </Button>
           <Button
             size="sm"
             onClick={exportSelectedKeywords}
-            disabled={selectedKeywords.length === 0}
+            disabled={!hasSelectedKeywords}
           >
-            Exporter la sélection ({selectedKeywords.length})
+            Exporter la sélection ({selectedKeywords?.length || 0})
           </Button>
         </div>
       </div>

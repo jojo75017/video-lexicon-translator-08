@@ -72,6 +72,9 @@ export function useOpenAIKeywords({
       const longTailKeywordsData = generateLongTailKeywords(searchKeyword);
       setLongTailKeywords(longTailKeywordsData);
 
+      // Réinitialiser les mots-clés sélectionnés lors d'une nouvelle génération
+      setSelectedKeywords([]);
+
       // Generate competitor data and SERP results if we have a configured API
       if (isConfigured) {
         try {
@@ -102,6 +105,7 @@ export function useOpenAIKeywords({
 
   // Toggle keyword selection
   const toggleKeywordSelection = (keywordText: string) => {
+    console.log('Toggle keyword selection:', keywordText);
     setSelectedKeywords(prev => 
       prev.includes(keywordText)
         ? prev.filter(k => k !== keywordText)
@@ -113,6 +117,12 @@ export function useOpenAIKeywords({
   const exportSelectedKeywords = () => {
     console.log('Exporting selected keywords:', selectedKeywords);
     console.log('All keywords:', [...standardKeywords, ...longTailKeywords]);
+    
+    if (selectedKeywords.length === 0) {
+      toast.error('Aucun mot-clé sélectionné pour l\'export');
+      return;
+    }
+    
     exportKeywordsToCSV(selectedKeywords, [...standardKeywords, ...longTailKeywords], keyword);
   };
 
@@ -127,6 +137,13 @@ export function useOpenAIKeywords({
       generateKeywords(defaultKeyword);
     }
   }, [autoGenerate, defaultKeyword, isConfigured]);
+
+  // Vérification supplémentaire pour s'assurer que selectedKeywords est toujours un tableau
+  useEffect(() => {
+    if (!Array.isArray(selectedKeywords)) {
+      setSelectedKeywords([]);
+    }
+  }, [selectedKeywords]);
 
   return {
     // State

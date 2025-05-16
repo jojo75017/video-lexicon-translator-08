@@ -38,6 +38,7 @@ const KeywordGenerator: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>("standard");
   
   const clearSelectedKeywords = () => {
+    console.log("Clearing all selected keywords");
     setSelectedKeywords([]);
   };
 
