@@ -23,7 +23,7 @@ const CompetitorAnalysis: React.FC<CompetitorAnalysisProps> = ({ competitors }) 
       <div className="mb-4">
         <h3 className="text-lg font-medium mb-2">Analyse des concurrents</h3>
         <p className="text-sm text-gray-600">
-          Les 5 principaux concurrents sur ce mot-clé et leur performance
+          Les {competitors.length} principaux concurrents sur ce mot-clé et leur performance
         </p>
       </div>
 

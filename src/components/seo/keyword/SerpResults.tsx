@@ -23,7 +23,7 @@ const SerpResults: React.FC<SerpResultsProps> = ({ serps }) => {
       <div className="mb-4">
         <h3 className="text-lg font-medium mb-2">Résultats de la SERP</h3>
         <p className="text-sm text-gray-600">
-          Les 10 premiers résultats dans les moteurs de recherche pour ce mot-clé
+          Les {serps.length} premiers résultats dans les moteurs de recherche pour ce mot-clé
         </p>
       </div>
 

@@ -1,4 +1,3 @@
-
 import { OpenAI } from "openai";
 import { toast } from "sonner";
 import { ProxyService } from "./proxyService";
@@ -236,15 +235,15 @@ export class OpenAIService {
             role: "system",
             content: `You are an expert SEO keyword researcher. Generate a comprehensive keyword strategy based on a seed keyword. 
             Format your response as a JSON object with these sections:
-            1. mainKeywords: array of objects with {keyword, volume (0-10000), difficulty (0-100), cpc (0-5€), competition (0-1), relevance (0-100), suggestedTitle, suggestedDescription, clicks (0-5000), position (1-100)}
-            2. longTail: array of longer keyword phrases with same structure
-            3. questions: array of question-based keywords with same structure
-            4. related: array of related terms with same structure
-            5. semantic: array of string semantic field terms
-            6. competitors: array of objects with {name, url, strength (0-100), organic_traffic (0-100000), keywords (0-10000)}
+            1. mainKeywords: array of at least 10 objects with {keyword, volume (0-10000), difficulty (0-100), cpc (0-5€), competition (0-1), relevance (0-100), suggestedTitle, suggestedDescription, clicks (0-5000), position (1-100)}
+            2. longTail: array of at least 10 longer keyword phrases with same structure
+            3. questions: array of at least 10 question-based keywords with same structure
+            4. related: array of at least 10 related terms with same structure
+            5. semantic: array of at least 15 string semantic field terms
+            6. competitors: array of exactly 5 objects with {name, url, strength (0-100), organic_traffic (0-100000), keywords (0-10000)}
             7. byIntent: object with {informational: [...keywords], transactional: [...keywords], navigational: [...keywords]}
-            8. contentIdeas: array of objects with {title, type}
-            9. serps: array of top 10 search results with {title, url, description, position}
+            8. contentIdeas: array of at least 5 objects with {title, type}
+            9. serps: array of exactly 10 search results with {title, url, description, position}
             
             Include realistic search volumes, competition levels, and accurate suggested titles/descriptions for each keyword.
             For the competitors, provide EXACT URLs of real websites, not fictional ones.`
@@ -255,14 +254,14 @@ export class OpenAIService {
             Niche/Industry: ${niche || 'general'}
             Content Objective: ${objective}
             
-            Include main keywords, long-tail variations, questions, related terms, and content ideas.
+            Include at least 10 main keywords, 10 long-tail variations, 10 questions, and 10 related terms, and at least 5 content ideas.
             For each keyword, provide realistic search volume, difficulty score, CPC, competition level, relevance score, number of clicks, and average position.
             Also include suggested titles and meta descriptions for the main keywords.
             Provide exactly 10 SERP results with real URLs and metadata.
             Include exactly 5 competitors with their exact URLs and detailed metrics.`
           }
         ],
-        max_tokens: 3000,
+        max_tokens: 4000, // Increased max tokens to accommodate the larger response
         temperature: 0.3,
         response_format: { type: "json_object" }
       });
