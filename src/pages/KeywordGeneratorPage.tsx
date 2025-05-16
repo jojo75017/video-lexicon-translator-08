@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ArrowLeft, Sparkles, Globe } from 'lucide-react';
+import { ArrowLeft, Sparkles, Globe, MessageSquareQuestion } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import KeywordGenerator from '@/components/seo/KeywordGenerator';
@@ -36,6 +36,10 @@ const KeywordGeneratorPage = () => {
                 et voir les résultats actuels des moteurs de recherche pour vos mots-clés. Visualisez les principaux sites
                 concurrents, leur trafic estimé et leur force SEO.
               </p>
+              <div className="flex items-center mt-2 text-blue-600">
+                <MessageSquareQuestion className="h-4 w-4 mr-1" />
+                <span className="text-sm">Consultez notre FAQ en bas de page pour en savoir plus sur l'utilisation des mots-clés.</span>
+              </div>
             </div>
           </div>
         </div>

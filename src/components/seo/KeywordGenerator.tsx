@@ -6,6 +6,7 @@ import KeywordSearchForm from './keyword/KeywordSearchForm';
 import KeywordResults from './keyword/KeywordResults';
 import KeywordEmptyState from './keyword/KeywordEmptyState';
 import KeywordLoadingState from './keyword/KeywordLoadingState';
+import KeywordFAQ from './keyword/KeywordFAQ';
 
 const KeywordGenerator: React.FC = () => {
   const {
@@ -85,6 +86,9 @@ const KeywordGenerator: React.FC = () => {
       {!hasResults && !isGenerating && <KeywordEmptyState />}
       
       {isGenerating && <KeywordLoadingState keyword={keyword} />}
+      
+      {/* Section FAQ - Ajoutée à la fin de la page */}
+      <KeywordFAQ />
     </div>
   );
 };
