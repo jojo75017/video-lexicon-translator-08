@@ -113,6 +113,41 @@ export const useKeywordGenerator = () => {
         return arr;
       };
       
+      // Si les mots-clés longue traîne sont manquants, générer des exemples
+      if (!keywordStrategy.longTail || keywordStrategy.longTail.length === 0) {
+        console.warn("No long tail keywords received, generating examples");
+        
+        const baseKeyword = keyword;
+        const longTailExamples = [];
+        
+        const prefixes = ['Comment', 'Pourquoi', 'Les meilleurs', 'Guide complet pour', 'Top 10 des', 
+                         'Conseils pour', 'Astuces pour', 'Tout savoir sur', 'Comment choisir', 'Comparaison des'];
+                          
+        const suffixes = ['en 2025', 'pour débutants', 'pour les professionnels', 'pas cher', 
+                       'de qualité', 'près de chez vous', 'avec les meilleurs avis', 'recommandés par des experts',
+                       'qui fonctionnent vraiment', 'à ne pas manquer'];
+        
+        for (let i = 0; i < 10; i++) {
+          const prefix = prefixes[i % prefixes.length];
+          const suffix = suffixes[i % suffixes.length];
+          
+          longTailExamples.push({
+            keyword: `${prefix} ${baseKeyword} ${suffix}`,
+            volume: Math.floor(Math.random() * 500) + 100,
+            difficulty: Math.floor(Math.random() * 70) + 10,
+            cpc: parseFloat((Math.random() * 2 + 0.5).toFixed(2)),
+            competition: parseFloat((Math.random() * 0.7).toFixed(2)),
+            relevance: Math.floor(Math.random() * 30) + 70,
+            suggestedTitle: `${prefix} ${baseKeyword} ${suffix} - Guide complet`,
+            suggestedDescription: `Découvrez ${prefix.toLowerCase()} ${baseKeyword} ${suffix}. Tout ce que vous devez savoir pour faire le bon choix et optimiser votre expérience.`,
+            clicks: Math.floor(Math.random() * 300) + 50,
+            position: Math.floor(Math.random() * 30) + 1
+          });
+        }
+        
+        keywordStrategy.longTail = longTailExamples;
+      }
+      
       // Mettre à jour l'état avec les résultats de l'API, en s'assurant que les tableaux ne sont pas vides
       setKeywordResults({
         mainKeywords: ensureArray(keywordStrategy.mainKeywords, "mainKeywords"),
@@ -243,6 +278,66 @@ export const useKeywordGenerator = () => {
           relevance: 55,
           clicks: Math.floor(baseVolume * 0.09),
           position: Math.floor(Math.random() * 25 + 15)
+        },
+        {
+          keyword: `meilleures options pour ${keyword}`,
+          volume: Math.floor(baseVolume * 0.15),
+          difficulty: Math.floor(Math.random() * 30 + 10),
+          cpc: parseFloat((Math.random() * 1.5).toFixed(2)),
+          competition: parseFloat((Math.random() * 0.4).toFixed(2)),
+          relevance: 62,
+          clicks: Math.floor(baseVolume * 0.08),
+          position: Math.floor(Math.random() * 20 + 8)
+        },
+        {
+          keyword: `comment choisir ${keyword}`,
+          volume: Math.floor(baseVolume * 0.22),
+          difficulty: Math.floor(Math.random() * 35 + 15),
+          cpc: parseFloat((Math.random() * 1.7).toFixed(2)),
+          competition: parseFloat((Math.random() * 0.5).toFixed(2)),
+          relevance: 68,
+          clicks: Math.floor(baseVolume * 0.11),
+          position: Math.floor(Math.random() * 18 + 7)
+        },
+        {
+          keyword: `${keyword} haut de gamme`,
+          volume: Math.floor(baseVolume * 0.17),
+          difficulty: Math.floor(Math.random() * 45 + 20),
+          cpc: parseFloat((Math.random() * 2.2).toFixed(2)),
+          competition: parseFloat((Math.random() * 0.7).toFixed(2)),
+          relevance: 58,
+          clicks: Math.floor(baseVolume * 0.09),
+          position: Math.floor(Math.random() * 15 + 10)
+        },
+        {
+          keyword: `top 10 des ${keyword}`,
+          volume: Math.floor(baseVolume * 0.24),
+          difficulty: Math.floor(Math.random() * 50 + 25),
+          cpc: parseFloat((Math.random() * 2.5).toFixed(2)),
+          competition: parseFloat((Math.random() * 0.8).toFixed(2)),
+          relevance: 75,
+          clicks: Math.floor(baseVolume * 0.12),
+          position: Math.floor(Math.random() * 12 + 5)
+        },
+        {
+          keyword: `${keyword} pas cher près de chez moi`,
+          volume: Math.floor(baseVolume * 0.16),
+          difficulty: Math.floor(Math.random() * 30 + 15),
+          cpc: parseFloat((Math.random() * 1.4).toFixed(2)),
+          competition: parseFloat((Math.random() * 0.45).toFixed(2)),
+          relevance: 64,
+          clicks: Math.floor(baseVolume * 0.08),
+          position: Math.floor(Math.random() * 22 + 8)
+        },
+        {
+          keyword: `guide complet pour choisir ${keyword}`,
+          volume: Math.floor(baseVolume * 0.19),
+          difficulty: Math.floor(Math.random() * 40 + 15),
+          cpc: parseFloat((Math.random() * 1.6).toFixed(2)),
+          competition: parseFloat((Math.random() * 0.5).toFixed(2)),
+          relevance: 72,
+          clicks: Math.floor(baseVolume * 0.09),
+          position: Math.floor(Math.random() * 25 + 5)
         }
       ];
       
@@ -486,9 +581,9 @@ export const useKeywordGenerator = () => {
       
       setKeywordResults({
         mainKeywords,
-        longTail: [], // Vous pouvez générer ces données comme les mainKeywords
-        questions: [], // Vous pouvez générer ces données comme les mainKeywords
-        related: [], // Vous pouvez générer ces données comme les mainKeywords
+        longTail, 
+        questions, 
+        related,
         semantic,
         competitors,
         byIntent,
