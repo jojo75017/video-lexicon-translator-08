@@ -1,5 +1,5 @@
 
-import { OpenAICompetitorService } from '@/services/openaiCompetitorService';
+import { OpenAICompetitorService } from '@/services/openai/openaiCompetitorService';
 import { toast } from 'sonner';
 
 /**
