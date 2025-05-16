@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Sparkles, BarChart3, Loader2, Search, Settings, Globe, Zap, ExternalLink } from "lucide-react";
-import { usePerplexityKeywords } from '@/hooks/usePerplexityKeywords';
+import { useOpenAIKeywords } from '@/hooks/useOpenAIKeywords';
 import CompetitorAnalysis from './keyword/CompetitorAnalysis';
 import SerpResults from './keyword/SerpResults'; 
 
@@ -34,9 +34,9 @@ const KeywordGenerator: React.FC = () => {
     hasResults,
     totalKeywords,
     hasCompetitorData
-  } = usePerplexityKeywords();
+  } = useOpenAIKeywords();
   
-  const [showApiConfig, setShowApiConfig] = useState<boolean>(!localStorage.getItem("perplexityKey"));
+  const [showApiConfig, setShowApiConfig] = useState<boolean>(!localStorage.getItem("openaiKey"));
   const [activeTab, setActiveTab] = useState<string>("standard");
   
   // Render keyword card
@@ -102,18 +102,18 @@ const KeywordGenerator: React.FC = () => {
       {/* API Configuration Section */}
       {showApiConfig && (
         <Card className="p-6 border-blue-100 bg-blue-50">
-          <h2 className="text-lg font-semibold text-blue-900 mb-4">Configuration de Perplexity AI</h2>
+          <h2 className="text-lg font-semibold text-blue-900 mb-4">Configuration de OpenAI</h2>
           <p className="text-blue-800 mb-4">
-            Ce générateur de mots-clés utilise l'API Perplexity AI pour générer des suggestions de mots-clés précises et contextuelles.
+            Ce générateur de mots-clés utilise l'API OpenAI pour générer des suggestions de mots-clés précises et contextuelles.
             Veuillez entrer votre clé API ci-dessous pour commencer.
           </p>
           
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-blue-900 mb-1">Clé API Perplexity</label>
+              <label className="block text-sm font-medium text-blue-900 mb-1">Clé API OpenAI</label>
               <Input
                 type="password"
-                placeholder="pplx-xxxxxxxxxxxxxxxxxxxxxxxx"
+                placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxx"
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
                 className="w-full"
@@ -121,12 +121,12 @@ const KeywordGenerator: React.FC = () => {
               <p className="text-xs text-blue-700 mt-1">
                 Obtenez votre clé sur{" "}
                 <a 
-                  href="https://www.perplexity.ai/settings/api"
+                  href="https://platform.openai.com/api-keys"
                   target="_blank" 
                   rel="noopener noreferrer" 
                   className="underline hover:text-blue-900"
                 >
-                  perplexity.ai/settings/api
+                  platform.openai.com/api-keys
                 </a>
               </p>
             </div>
@@ -301,7 +301,7 @@ const KeywordGenerator: React.FC = () => {
           </div>
           <h3 className="text-lg font-semibold mb-2">Génération en cours...</h3>
           <p className="text-gray-500 max-w-md mx-auto mb-4">
-            Perplexity AI génère des suggestions de mots-clés pour "{keyword}".
+            OpenAI génère des suggestions de mots-clés pour "{keyword}".
             Veuillez patienter un moment.
           </p>
         </Card>

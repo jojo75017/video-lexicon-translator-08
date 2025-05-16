@@ -30,9 +30,9 @@ const KeywordGeneratorPage = () => {
               <Globe className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-blue-900">Analyse concurrentielle et SERP en temps réel</h2>
+              <h2 className="text-lg font-semibold text-blue-900">Analyse concurrentielle et SERP avec OpenAI</h2>
               <p className="text-blue-700 mt-1">
-                En configurant votre clé API Perplexity, vous pouvez maintenant obtenir des données de concurrence réelles 
+                En configurant votre clé API OpenAI, vous pouvez maintenant obtenir des données de concurrence réelles 
                 et voir les résultats actuels des moteurs de recherche pour vos mots-clés. Visualisez les principaux sites
                 concurrents, leur trafic estimé et leur force SEO.
               </p>
