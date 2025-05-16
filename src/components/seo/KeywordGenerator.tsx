@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Search, RefreshCw, Map, FileBarChart, Download, Link2, ListFilter, MessageSquare, Key } from 'lucide-react';
+import { Search, RefreshCw, Map, FileBarChart, Download, Link2, ListFilter, MessageSquare, Key, ExternalLink } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
@@ -15,6 +14,8 @@ import KeywordVisualizations from './keyword/KeywordVisualizations';
 import KeywordGroups from './keyword/KeywordGroups';
 import ContentIdeas from './keyword/ContentIdeas';
 import WordCloud from './keyword/WordCloud';
+import SerpResults from './keyword/SerpResults';
+import CompetitorAnalysis from './keyword/CompetitorAnalysis';
 
 const KeywordGenerator = () => {
   const {
@@ -92,7 +93,7 @@ const KeywordGenerator = () => {
               </Button>
             </div>
             <p className="text-xs text-gray-500 mt-1">
-              Une clé API OpenAI permet d'obtenir des suggestions de mots-clés plus pertinentes et précises.
+              Une clé API OpenAI permet d'obtenir des suggestions de mots-clés plus pertinentes et précises avec données SERP et analyse concurrentielle.
             </p>
           </div>
 
@@ -127,7 +128,7 @@ const KeywordGenerator = () => {
           </div>
           
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5">
+            <TabsList className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7">
               <TabsTrigger value="overview" className="flex items-center gap-1">
                 <FileBarChart className="h-4 w-4" />
                 <span className="hidden md:inline">Vue d'ensemble</span>
@@ -140,13 +141,21 @@ const KeywordGenerator = () => {
                 <MessageSquare className="h-4 w-4" />
                 <span className="hidden md:inline">Intentions</span>
               </TabsTrigger>
+              <TabsTrigger value="serps" className="flex items-center gap-1">
+                <Search className="h-4 w-4" />
+                <span className="hidden md:inline">SERP</span>
+              </TabsTrigger>
+              <TabsTrigger value="competitors" className="flex items-center gap-1">
+                <ExternalLink className="h-4 w-4" />
+                <span className="hidden md:inline">Concurrents</span>
+              </TabsTrigger>
               <TabsTrigger value="visualization" className="flex items-center gap-1">
                 <Map className="h-4 w-4" />
                 <span className="hidden md:inline">Visualisation</span>
               </TabsTrigger>
               <TabsTrigger value="content" className="flex items-center gap-1">
                 <Link2 className="h-4 w-4" />
-                <span className="hidden md:inline">Idées de contenu</span>
+                <span className="hidden md:inline">Contenu</span>
               </TabsTrigger>
             </TabsList>
             
@@ -296,6 +305,46 @@ const KeywordGenerator = () => {
                 </CardHeader>
                 <CardContent>
                   <KeywordGroups byIntent={keywordResults.byIntent} />
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            {/* Nouvel onglet pour les résultats SERP */}
+            <TabsContent value="serps" className="mt-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Résultats SERP pour "{keyword}"</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {keywordResults.serps ? (
+                    <SerpResults serps={keywordResults.serps} />
+                  ) : (
+                    <div className="bg-gray-50 p-8 rounded-md text-center">
+                      <p className="text-gray-500">
+                        Activez l'option IA pour obtenir des résultats SERP détaillés
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            {/* Nouvel onglet pour l'analyse des concurrents */}
+            <TabsContent value="competitors" className="mt-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Analyse de la concurrence</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {keywordResults.competitors && keywordResults.competitors.length > 0 ? (
+                    <CompetitorAnalysis competitors={keywordResults.competitors} />
+                  ) : (
+                    <div className="bg-gray-50 p-8 rounded-md text-center">
+                      <p className="text-gray-500">
+                        Aucune donnée concurrentielle disponible
+                      </p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>

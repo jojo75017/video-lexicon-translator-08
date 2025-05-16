@@ -2,7 +2,7 @@
 import { OpenAI } from "openai";
 import { toast } from "sonner";
 import { ProxyService } from "./proxyService";
-import { KeywordSuggestion } from "@/types/seo";
+import { KeywordSuggestion, SerpsResult, CompetitorData } from "@/types/seo";
 
 export class OpenAIService {
   private static proxyEnabled = true;
@@ -236,16 +236,18 @@ export class OpenAIService {
             role: "system",
             content: `You are an expert SEO keyword researcher. Generate a comprehensive keyword strategy based on a seed keyword. 
             Format your response as a JSON object with these sections:
-            1. mainKeywords: array of objects with {keyword, volume (0-10000), difficulty (0-100), cpc (0-5€), competition (0-1), relevance (0-100), suggestedTitle, suggestedDescription}
+            1. mainKeywords: array of objects with {keyword, volume (0-10000), difficulty (0-100), cpc (0-5€), competition (0-1), relevance (0-100), suggestedTitle, suggestedDescription, clicks (0-5000), position (1-100)}
             2. longTail: array of longer keyword phrases with same structure
             3. questions: array of question-based keywords with same structure
             4. related: array of related terms with same structure
             5. semantic: array of string semantic field terms
-            6. competitors: array of objects with {name, url, strength (0-100)}
+            6. competitors: array of objects with {name, url, strength (0-100), organic_traffic (0-100000), keywords (0-10000)}
             7. byIntent: object with {informational: [...keywords], transactional: [...keywords], navigational: [...keywords]}
             8. contentIdeas: array of objects with {title, type}
+            9. serps: array of top 10 search results with {title, url, description, position}
             
-            Include realistic search volumes, competition levels, and accurate suggested titles/descriptions for each keyword.`
+            Include realistic search volumes, competition levels, and accurate suggested titles/descriptions for each keyword.
+            For the competitors, provide EXACT URLs of real websites, not fictional ones.`
           },
           {
             role: "user",
@@ -254,12 +256,14 @@ export class OpenAIService {
             Content Objective: ${objective}
             
             Include main keywords, long-tail variations, questions, related terms, and content ideas.
-            For each keyword, provide realistic search volume, difficulty score, CPC, competition level, and relevance score.
-            Also include suggested titles and meta descriptions for the main keywords.`
+            For each keyword, provide realistic search volume, difficulty score, CPC, competition level, relevance score, number of clicks, and average position.
+            Also include suggested titles and meta descriptions for the main keywords.
+            Provide exactly 10 SERP results with real URLs and metadata.
+            Include exactly 5 competitors with their exact URLs and detailed metrics.`
           }
         ],
-        max_tokens: 2000,
-        temperature: 0.4,
+        max_tokens: 3000,
+        temperature: 0.3,
         response_format: { type: "json_object" }
       });
       

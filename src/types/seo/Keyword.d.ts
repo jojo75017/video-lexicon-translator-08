@@ -27,6 +27,8 @@ export interface KeywordSuggestion {
   searchVolume?: number;
   cpc?: number;
   competition?: number;
+  clicks?: number;
+  position?: number;
   suggestedTitle?: string;
   suggestedDescription?: string;
   suggestedShortDescription?: string;
@@ -44,3 +46,17 @@ export interface KeywordIntent {
   navigational: KeywordSuggestion[];
 }
 
+export interface SerpsResult {
+  title: string;
+  url: string;
+  description: string;
+  position: number;
+}
+
+export interface CompetitorData {
+  name: string;
+  url: string;
+  strength: number;
+  organic_traffic?: number;
+  keywords?: number;
+}

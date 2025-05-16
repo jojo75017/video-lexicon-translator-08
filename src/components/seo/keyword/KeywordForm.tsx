@@ -3,9 +3,10 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, RefreshCw, Sparkles } from 'lucide-react';
+import { Search, RefreshCw, Sparkles, Info } from 'lucide-react';
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface KeywordFormProps {
   keyword: string;
@@ -126,27 +127,38 @@ const KeywordForm: React.FC<KeywordFormProps> = ({
       
       {/* Option pour utiliser l'IA (OpenAI) */}
       {onToggleAI && (
-        <div className="flex items-center space-x-2 bg-blue-50/50 p-3 rounded-md border border-blue-100">
-          <Switch 
-            id="use-ai"
-            checked={useAI}
-            onCheckedChange={onToggleAI}
-            disabled={!openaiKey}
-          />
-          <div>
-            <Label 
-              htmlFor="use-ai" 
-              className="flex items-center gap-1 cursor-pointer"
-            >
-              <Sparkles className="h-4 w-4 text-blue-600" />
-              <span>Utiliser l'IA pour des suggestions plus précises</span>
-            </Label>
-            <p className="text-xs text-gray-500 mt-1">
-              {openaiKey 
-                ? "Génère des mots-clés plus pertinents et précis avec OpenAI" 
-                : "Configuration d'une clé API OpenAI requise pour utiliser cette fonctionnalité"}
-            </p>
+        <div className="flex flex-col space-y-2">
+          <div className="flex items-center space-x-2 bg-blue-50/50 p-3 rounded-md border border-blue-100">
+            <Switch 
+              id="use-ai"
+              checked={useAI}
+              onCheckedChange={onToggleAI}
+              disabled={!openaiKey}
+            />
+            <div>
+              <Label 
+                htmlFor="use-ai" 
+                className="flex items-center gap-1 cursor-pointer"
+              >
+                <Sparkles className="h-4 w-4 text-blue-600" />
+                <span>Utiliser l'IA pour des suggestions plus précises</span>
+              </Label>
+              <p className="text-xs text-gray-500 mt-1">
+                {openaiKey 
+                  ? "Génère des mots-clés plus pertinents et précis avec OpenAI" 
+                  : "Configuration d'une clé API OpenAI requise pour utiliser cette fonctionnalité"}
+              </p>
+            </div>
           </div>
+          
+          {useAI && openaiKey && (
+            <Alert className="bg-blue-50 border-blue-200">
+              <Info className="h-4 w-4 text-blue-600" />
+              <AlertDescription className="text-sm">
+                L'activation de l'IA fournira des données complètes : volume de recherche, CPC, données SERP (10 premiers résultats) et analyse des 5 principaux concurrents.
+              </AlertDescription>
+            </Alert>
+          )}
         </div>
       )}
       
