@@ -111,6 +111,8 @@ export function useOpenAIKeywords({
 
   // Export keywords to CSV
   const exportSelectedKeywords = () => {
+    console.log('Exporting selected keywords:', selectedKeywords);
+    console.log('All keywords:', [...standardKeywords, ...longTailKeywords]);
     exportKeywordsToCSV(selectedKeywords, [...standardKeywords, ...longTailKeywords], keyword);
   };
 

@@ -10,30 +10,51 @@ export const exportKeywordsToCSV = (
   allKeywords: KeywordSuggestion[],
   baseKeyword: string
 ): void => {
-  if (selectedKeywords.length === 0) {
-    toast.error('Aucun mot-clé sélectionné pour l\'export');
-    return;
+  try {
+    if (selectedKeywords.length === 0) {
+      toast.error('Aucun mot-clé sélectionné pour l\'export');
+      return;
+    }
+
+    // Filtrer les mots-clés sélectionnés parmi tous les mots-clés
+    const keywordsToExport = allKeywords.filter(k => selectedKeywords.includes(k.keyword));
+
+    if (keywordsToExport.length === 0) {
+      toast.error('Aucun mot-clé trouvé pour l\'export');
+      return;
+    }
+
+    console.log('Exporting keywords:', keywordsToExport);
+    console.log('Selected keywords:', selectedKeywords);
+    console.log('All keywords count:', allKeywords.length);
+
+    // Créer le contenu CSV
+    const csv = [
+      ['Mot-clé', 'Volume', 'Difficulté', 'CPC', 'Compétition'].join(','),
+      ...keywordsToExport.map(k => [
+        `"${k.keyword}"`,
+        k.volume || '0',
+        k.difficulty || '0',
+        k.cpc || '0',
+        k.competition || '0'
+      ].join(','))
+    ].join('\n');
+
+    // Créer et télécharger le fichier
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `mots-cles-${baseKeyword.replace(/\s+/g, '-')}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    toast.success(`${keywordsToExport.length} mots-clés exportés avec succès`);
+  } catch (error) {
+    console.error('Erreur lors de l\'exportation des mots-clés:', error);
+    toast.error('Erreur lors de l\'exportation des mots-clés');
   }
-
-  const keywordsToExport = allKeywords.filter(k => selectedKeywords.includes(k.keyword));
-
-  const csv = [
-    ['Mot-clé', 'Volume', 'Difficulté', 'CPC', 'Compétition'].join(','),
-    ...keywordsToExport.map(k => [
-      `"${k.keyword}"`,
-      k.volume,
-      k.difficulty,
-      k.cpc,
-      k.competition
-    ].join(','))
-  ].join('\n');
-
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.setAttribute('href', url);
-  link.setAttribute('download', `mots-cles-${baseKeyword.replace(/\s+/g, '-')}.csv`);
-  link.click();
-
-  toast.success(`${keywordsToExport.length} mots-clés exportés`);
 };
+

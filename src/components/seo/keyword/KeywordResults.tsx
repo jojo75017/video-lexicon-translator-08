@@ -56,7 +56,7 @@ const KeywordResults: React.FC<KeywordResultsProps> = ({
             onClick={exportSelectedKeywords}
             disabled={selectedKeywords.length === 0}
           >
-            Exporter la sélection
+            Exporter la sélection ({selectedKeywords.length})
           </Button>
         </div>
       </div>
