@@ -29,6 +29,9 @@ export interface SeoAnalysis {
   socialMetrics?: SocialMetrics;
   topBacklinkDomains?: BacklinkDomain[] | string[];
   keywordSuggestions?: KeywordSuggestion[];
+  metadata?: any;
+  headings?: any;
+  headingStructure?: any;
 }
 
 export interface PerformanceData {
@@ -36,6 +39,13 @@ export interface PerformanceData {
   loadTime?: number;
   firstContentfulPaint?: number;
   domLoadTime?: number;
+  timeToInteractive?: number;
+  totalSize?: number;
+  scriptCount?: number;
+  styleCount?: number;
+  responseTime?: number;
+  impressions?: number;
+  clickThroughRate?: number;
 }
 
 export interface SocialTags {
@@ -61,6 +71,7 @@ export interface ImageInfo {
 export interface BrokenLink {
   url: string;
   status?: number;
+  statusCode?: number;
   location?: string;
   text?: string;
   internal?: boolean;
@@ -96,6 +107,7 @@ export interface BacklinkInfo {
   anchorText?: string;
   pageRank?: number;
   followType?: string;
+  isDofollow?: boolean;
 }
 
 export interface BacklinkDomain {
@@ -113,4 +125,41 @@ export interface KeywordSuggestion {
   trend?: number[];
   type?: 'standard' | 'long-tail';
   selected?: boolean;
+  relevance?: number;
 }
+
+// Types exportés pour la compatibilité avec les composants existants
+export type ImageAnalysis = ImageInfo;
+export type Performance = PerformanceData;
+export type SeoAnalysisResult = SeoAnalysis;
+export interface InternalLinkAnalysis {
+  pages?: any[];
+  recommendations?: InternalLinkRecommendation[];
+}
+export interface PageLinkMetric {
+  url: string;
+  incomingLinks: number;
+  outgoingLinks: number;
+  pageRank?: number;
+}
+export interface InternalLinkRecommendation {
+  sourcePage: string;
+  targetPage: string;
+  reason: string;
+  relevanceScore?: number;
+}
+export interface KeywordData {
+  keyword: string;
+  volume?: number;
+  difficulty?: number;
+  cpc?: number;
+  trend?: number[];
+}
+
+// Pour compatibilité avec le composant ContentStructureTool
+export type StructureItem = {
+  content: string;
+  id: string;
+  type: "list" | "h3" | "p" | "h2" | "h1" | "h4";
+  items?: string[];
+};
