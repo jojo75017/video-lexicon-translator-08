@@ -19,8 +19,8 @@ const KeywordGeneratorPage: React.FC = () => {
           </p>
           
           <KeywordGenerator />
-        </div>
-      </Card>
+        </Card>
+      </div>
     </UnifiedDashboard>
   );
 };
