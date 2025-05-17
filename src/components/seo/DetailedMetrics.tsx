@@ -38,7 +38,8 @@ const DetailedMetrics = ({
   const topDomains = Array.isArray(seoAnalysis.topBacklinkDomains) 
     ? seoAnalysis.topBacklinkDomains.map(item => {
         if (typeof item === 'string') return item;
-        return 'domain' in item ? item.domain : item;
+        if (typeof item === 'object' && item !== null && 'domain' in item) return item.domain;
+        return '';
       })
     : [];
 
@@ -51,6 +52,13 @@ const DetailedMetrics = ({
   };
 
   const socialMetrics = seoAnalysis.socialMetrics || socialMetricsDefault;
+  
+  // S'assurer que keywords est toujours un tableau
+  const keywords = typeof seoAnalysis.keywords === 'string' 
+    ? [seoAnalysis.keywords]
+    : Array.isArray(seoAnalysis.keywords) 
+      ? seoAnalysis.keywords 
+      : [];
 
   return (
     <>
@@ -63,7 +71,7 @@ const DetailedMetrics = ({
         <SeoMainTags 
           title={seoAnalysis.title}
           description={seoAnalysis.description}
-          keywords={seoAnalysis.keywords}
+          keywords={keywords}
         />
         
         <SeoStructure 
@@ -86,91 +94,100 @@ const DetailedMetrics = ({
         />
       </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.2 }}
-      >
-        <BacklinksAnalysis
-          backlinks={seoAnalysis.backlinks as BacklinkInfo[] | number}
-          backlinkDetails={backlinkDetails}
-          topBacklinkDomains={topDomains}
-          doFollowBacklinks={seoAnalysis.doFollowBacklinks}
-          noFollowBacklinks={seoAnalysis.noFollowBacklinks}
-        />
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.4 }}
-        className="grid gap-6 md:grid-cols-2"
-      >
-        <LoadingPerformance 
-          loadTime={seoAnalysis.performance?.loadTime}
-          firstContentfulPaint={seoAnalysis.performance?.firstContentfulPaint}
-          domLoadTime={seoAnalysis.performance?.domLoadTime}
-        />
-        <SocialMetrics metrics={socialMetrics as any} />
-      </motion.div>
-
       {showAllMetrics && (
         <>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.6 }}
+            transition={{ delay: 1.2 }}
+            className="grid gap-6 md:grid-cols-2"
           >
-            <SocialTags socialTags={{
-              ogTitle: seoAnalysis.socialTags?.ogTitle || null,
-              ogDescription: seoAnalysis.socialTags?.ogDescription || null,
-              ogImage: seoAnalysis.socialTags?.ogImage || null,
-              twitterCard: seoAnalysis.socialTags?.twitterCard || null,
-              twitterTitle: seoAnalysis.socialTags?.twitterTitle || null,
-              twitterDescription: seoAnalysis.socialTags?.twitterDescription || null,
-              twitterImage: seoAnalysis.socialTags?.twitterImage || null
-            }} />
+            <SocialMetrics socialMetrics={socialMetrics} />
+            <SocialTags socialTags={seoAnalysis.socialTags} />
           </motion.div>
-
+          
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.8 }}
+            transition={{ delay: 1.4 }}
+            className="mt-6"
           >
-            <BrokenLinks brokenLinks={seoAnalysis.brokenLinks} />
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 2 }}
-          >
-            {seoAnalysis.keywordSuggestions && (
-              <KeywordSuggestions 
-                generatedKeywords={seoAnalysis.keywordSuggestions}
-              />
+            {seoAnalysis.performance && seoAnalysis.performance.loadTime && (
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-4">Performance</h3>
+                <LoadingPerformance 
+                  loadTime={seoAnalysis.performance.loadTime}
+                  firstContentfulPaint={seoAnalysis.performance.firstContentfulPaint || 0}
+                  domLoadTime={seoAnalysis.performance.domLoadTime || 0}
+                />
+              </div>
+            )}
+            
+            {seoAnalysis.brokenLinks && seoAnalysis.brokenLinks.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-4">Liens cassés</h3>
+                <BrokenLinks brokenLinks={seoAnalysis.brokenLinks} />
+              </div>
             )}
           </motion.div>
-
+          
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 2.2 }}
+            transition={{ delay: 1.6 }}
           >
-            <ImageDetails 
-              images={seoAnalysis.imagesDetails} 
-              onImageClick={onImageClick}
-            />
+            <div className="mt-6">
+              {seoAnalysis.backlinks && (
+                <BacklinksAnalysis 
+                  backlinks={typeof seoAnalysis.backlinks === 'number' 
+                    ? [] 
+                    : (seoAnalysis.backlinks as BacklinkInfo[])} 
+                  doFollowCount={seoAnalysis.doFollowBacklinks || 0}
+                  noFollowCount={seoAnalysis.noFollowBacklinks || 0}
+                  topDomains={topDomains}
+                  qualityScore={backlinkDetails.qualityScore}
+                  relevanceScore={backlinkDetails.relevanceScore}
+                  trustScore={backlinkDetails.trustScore}
+                />
+              )}
+            </div>
           </motion.div>
+          
+          {seoAnalysis.images && seoAnalysis.images.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.8 }}
+              className="mt-6"
+            >
+              <h3 className="text-lg font-semibold mb-4">Images</h3>
+              <ImageDetails 
+                images={seoAnalysis.images} 
+                onImageClick={onImageClick}
+              />
+            </motion.div>
+          )}
+          
+          {seoAnalysis.keywordSuggestions && seoAnalysis.keywordSuggestions.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 2 }}
+              className="mt-6"
+            >
+              <KeywordSuggestions generatedKeywords={seoAnalysis.keywordSuggestions} />
+            </motion.div>
+          )}
         </>
       )}
-
-      <div className="flex justify-center">
+      
+      <div className="flex justify-center mt-8">
         <Button 
-          variant="outline"
+          variant="outline" 
           onClick={onToggleMetrics}
+          className="px-6"
         >
-          {showAllMetrics ? 'Voir moins' : 'Voir plus de métriques'}
+          {showAllMetrics ? "Afficher moins" : "Afficher plus de métriques"}
         </Button>
       </div>
     </>

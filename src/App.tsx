@@ -16,6 +16,7 @@ import QuoraPage from './pages/QuoraPage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import StructurePage from './pages/StructurePage';
 import SuggestionsPage from './pages/SuggestionsPage';
+import TrackingPage from './pages/TrackingPage';
 import './App.css';
 import { Toaster } from 'sonner';
 
@@ -42,6 +43,7 @@ const App = () => {
         <Route path="/keyword-meta" element={<KeywordMetaPage />} />
         <Route path="/keyword-generator" element={<KeywordGeneratorPage />} />
         <Route path="/outils-seo" element={<OutilsSeo />} />
+        <Route path="/tracking" element={<TrackingPage />} />
         
         {/* Routes équivalentes localisées */}
         <Route path="/hierarchie" element={<Index />} />
@@ -53,6 +55,7 @@ const App = () => {
         <Route path="/performances" element={<PerformancePage />} />
         <Route path="/structure-site" element={<StructurePage />} />
         <Route path="/outils" element={<OutilsSeo />} />
+        <Route path="/suivi-positions" element={<TrackingPage />} />
       </Routes>
     </Router>
   );

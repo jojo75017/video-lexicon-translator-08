@@ -14,8 +14,8 @@ export interface InternalLinkAnalysis {
 }
 
 export interface InternalLinkRecommendation {
-  from: string;
-  to: string;
+  from?: string;
+  to?: string;
   reason: string;
   priority?: string;
   description?: string;
@@ -23,6 +23,9 @@ export interface InternalLinkRecommendation {
   impact?: string;
   source?: string;
   target?: string;
+  sourcePage?: string;
+  targetPage?: string;
+  relevanceScore?: number;
 }
 
 export interface PageMetric {

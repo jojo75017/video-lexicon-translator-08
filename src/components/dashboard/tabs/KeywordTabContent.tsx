@@ -34,10 +34,10 @@ const KeywordTabContent = () => {
     // Simuler l'appel à une API
     setTimeout(() => {
       const suggestions: KeywordSuggestion[] = [
-        { keyword: `${keyword} optimisé`, volume: 1200, difficulty: 32, cpc: 1.5 },
-        { keyword: `meilleur ${keyword}`, volume: 880, difficulty: 28, cpc: 2.2 },
-        { keyword: `comment trouver ${keyword}`, volume: 590, difficulty: 15, cpc: 0.8 },
-        { keyword: `${keyword} professionnel`, volume: 740, difficulty: 45, cpc: 3.1 },
+        { keyword: `${keyword} optimisé`, volume: 1200, difficulty: 32, cpc: 1.5, competition: 0.4, relevance: 95 },
+        { keyword: `meilleur ${keyword}`, volume: 880, difficulty: 28, cpc: 2.2, competition: 0.3, relevance: 90 },
+        { keyword: `comment trouver ${keyword}`, volume: 590, difficulty: 15, cpc: 0.8, competition: 0.2, relevance: 85 },
+        { keyword: `${keyword} professionnel`, volume: 740, difficulty: 45, cpc: 3.1, competition: 0.5, relevance: 93 },
       ];
       
       setGeneratedKeywords(suggestions);

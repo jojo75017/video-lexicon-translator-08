@@ -38,11 +38,11 @@ const PerformanceTabContent = () => {
       setWptData(wptResults);
       
       // Create resources data for chart
-      const resourceBreakdown = performanceResults.resourceBreakdown;
+      const resourceBreakdown = performanceResults.resourceBreakdown || { js: 0, css: 0, images: 0, fonts: 0, other: 0, scripts: 0, styles: 0 };
       const resourcesArray = [
         { name: 'Images', size: Math.round(resourceBreakdown.images / 1024) },
-        { name: 'Scripts', size: Math.round(resourceBreakdown.scripts / 1024) },
-        { name: 'Styles', size: Math.round(resourceBreakdown.styles / 1024) },
+        { name: 'Scripts', size: Math.round((resourceBreakdown.js || resourceBreakdown.scripts || 0) / 1024) },
+        { name: 'Styles', size: Math.round((resourceBreakdown.css || resourceBreakdown.styles || 0) / 1024) },
         { name: 'Fonts', size: Math.round(resourceBreakdown.fonts / 1024) },
         { name: 'Other', size: Math.round(resourceBreakdown.other / 1024) }
       ];
@@ -69,11 +69,11 @@ const PerformanceTabContent = () => {
       setWptData(wptResults);
       
       // Create resources data for chart
-      const resourceBreakdown = performanceResults.resourceBreakdown;
+      const resourceBreakdown = performanceResults.resourceBreakdown || { js: 0, css: 0, images: 0, fonts: 0, other: 0, scripts: 0, styles: 0 };
       const resourcesArray = [
         { name: 'Images', size: Math.round(resourceBreakdown.images / 1024) },
-        { name: 'Scripts', size: Math.round(resourceBreakdown.scripts / 1024) },
-        { name: 'Styles', size: Math.round(resourceBreakdown.styles / 1024) },
+        { name: 'Scripts', size: Math.round((resourceBreakdown.js || resourceBreakdown.scripts || 0) / 1024) },
+        { name: 'Styles', size: Math.round((resourceBreakdown.css || resourceBreakdown.styles || 0) / 1024) },
         { name: 'Fonts', size: Math.round(resourceBreakdown.fonts / 1024) },
         { name: 'Other', size: Math.round(resourceBreakdown.other / 1024) }
       ];
@@ -139,8 +139,8 @@ const PerformanceTabContent = () => {
               <div className="p-3 bg-gray-50 rounded-lg text-center">
                 <p className="text-xs text-gray-500">LCP</p>
                 <p className="text-base font-medium">
-                  {performanceData && performanceData.largestContentfulPaint ? 
-                    (performanceData.largestContentfulPaint / 1000).toFixed(2) + 's' : 'N/A'}
+                  {performanceData && (performanceData.largestContentfulPaint || performanceData.firstContentfulPaint) ? 
+                    ((performanceData.largestContentfulPaint || performanceData.firstContentfulPaint) / 1000).toFixed(2) + 's' : 'N/A'}
                 </p>
               </div>
               <div className="p-3 bg-gray-50 rounded-lg text-center">

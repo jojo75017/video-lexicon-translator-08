@@ -32,6 +32,10 @@ export interface SeoAnalysis {
   metadata?: any;
   headings?: any;
   headingStructure?: any;
+  authorityScore?: number;
+  topKeywords?: KeywordData[];
+  organicTraffic?: number;
+  imgWithoutAlt?: ImageInfo[];
   
   // Propriétés supplémentaires pour la compatibilité avec les services
   success?: boolean;
@@ -51,12 +55,15 @@ export interface PerformanceData {
   responseTime?: number;
   impressions?: number;
   clickThroughRate?: number;
+  largestContentfulPaint?: number;
   resourceBreakdown?: {
     js: number;
     css: number;
     images: number;
     fonts: number;
     other: number;
+    scripts?: number;  // Pour la compatibilité
+    styles?: number;   // Pour la compatibilité
   };
 }
 
@@ -154,6 +161,13 @@ export interface InternalLinkAnalysis {
   totalLinks?: number;
   uniquePages?: number;
   linkDepth?: number;
+  averageDepth?: number;
+  depthDistribution?: Record<string, number>;
+  orphanPages?: OrphanPage[];
+  siloPagesFound?: boolean;
+  siloStructure?: SiloStructure[];
+  pageMetrics?: PageMetric[];
+  linkDistribution?: LinkDistribution;
 }
 export interface PageLinkMetric {
   url: string;
@@ -167,13 +181,43 @@ export interface InternalLinkRecommendation {
   targetPage: string;
   reason: string;
   relevanceScore?: number;
+  priority?: string;
+  description?: string;
+  type?: string;
+  impact?: string;
+  source?: string;
+  target?: string;
 }
+
+export interface PageMetric {
+  url: string;
+  inLinks: number;
+  outLinks: number;
+  importance: string;
+}
+
+export interface LinkDistribution {
+  [key: string]: number;
+}
+
+export interface OrphanPage {
+  url: string;
+  title?: string;
+  suggestions?: string[];
+}
+
+export interface SiloStructure {
+  theme: string;
+  pages: string[];
+}
+
 export interface KeywordData {
   keyword: string;
   volume?: number;
   difficulty?: number;
   cpc?: number;
   trend?: number[];
+  density?: number;
 }
 
 // Pour compatibilité avec le composant ContentStructureTool
