@@ -90,7 +90,10 @@ export const useKeywordGenerator = () => {
         const suggestions = mockKeywordSuggestions(keyword);
         setKeywordSuggestions(suggestions);
         setLoading(false);
-        toast.success(`${suggestions.length} suggestions générées`);
+        toast.success(`${suggestions.length} suggestions générées`, {
+          description: `Basées sur: "${keyword}"`,
+          duration: 3000,
+        });
       }, 1000); // Shorter delay for better UX
     } catch (err) {
       setError('Une erreur est survenue lors de la génération des mots-clés');

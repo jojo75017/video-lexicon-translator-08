@@ -23,6 +23,8 @@ export interface PerformanceData {
     fonts: number;
     other: number;
   };
+  mobilePerformance?: any;
+  desktopPerformance?: any;
 }
 
 export interface MetricItemProps {

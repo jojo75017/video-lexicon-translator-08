@@ -44,67 +44,90 @@ const SeoPage = () => {
 
   // Get performance data from seoAnalysis if available, otherwise use default data
   const performanceData = seoAnalysis?.performance?.mobile || defaultPerformanceData;
+  const desktopPerformanceData = seoAnalysis?.performance?.desktop || {
+    ...defaultPerformanceData,
+    score: 82,
+    loadTime: 2000,
+    firstContentfulPaint: 900,
+    domLoadTime: 1500
+  };
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
-    toast.info(`Onglet ${value} activé`);
+    toast.info(`Onglet ${value} activé`, {
+      description: `Affichage des données ${value === 'performance' ? 'de performance' : 
+                     value === 'analytics' ? 'd\'analytics' : 
+                     value === 'keywords' ? 'de mots-clés' : 
+                     'de l\'aperçu'}`,
+      duration: 2000
+    });
   };
 
   return (
     <UnifiedDashboard>
-      <div className="space-y-6 bg-gradient-to-br from-indigo-50 to-purple-50 p-4 rounded-lg shadow-inner">
+      <div className="space-y-6 bg-gradient-to-br from-indigo-50 to-purple-100 p-4 md:p-6 rounded-lg shadow-inner animate-fade-in">
         {seoAnalysis ? (
           <Tabs defaultValue="overview" value={activeTab} onValueChange={handleTabChange} className="w-full">
-            <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 text-transparent bg-clip-text">Résultats de l'analyse SEO</h1>
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 text-transparent bg-clip-text">
+                Résultats de l'analyse SEO
+              </h1>
               
-              <TabsList className="bg-white/80 backdrop-blur-sm shadow-md">
+              <TabsList className="bg-white/90 backdrop-blur-sm shadow-md">
                 <TabsTrigger 
                   value="overview" 
-                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-600 data-[state=active]:text-white"
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-600 data-[state=active]:text-white transition-all hover:bg-gray-100"
                 >
                   Aperçu
                 </TabsTrigger>
                 <TabsTrigger 
                   value="performance"
-                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-600 data-[state=active]:to-emerald-600 data-[state=active]:text-white"
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-600 data-[state=active]:to-emerald-600 data-[state=active]:text-white transition-all hover:bg-gray-100"
                 >
                   Performance
                 </TabsTrigger>
                 <TabsTrigger 
                   value="analytics"
-                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-fuchsia-600 data-[state=active]:text-white"
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-fuchsia-600 data-[state=active]:text-white transition-all hover:bg-gray-100"
                 >
                   Analytics
                 </TabsTrigger>
                 <TabsTrigger 
                   value="keywords"
-                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-600 data-[state=active]:to-orange-600 data-[state=active]:text-white"
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-600 data-[state=active]:to-orange-600 data-[state=active]:text-white transition-all hover:bg-gray-100"
                 >
                   Mots-clés
                 </TabsTrigger>
               </TabsList>
             </div>
             
-            <TabsContent value="overview" className="mt-4 space-y-6">
-              <Card className="p-6 border-t-4 border-blue-600 shadow-lg hover:shadow-xl transition-shadow">
+            <TabsContent value="overview" className="mt-4 space-y-6 animate-fade-in">
+              <Card className="p-6 border-t-4 border-blue-600 shadow-lg hover:shadow-xl transition-all bg-white">
                 <SeoResults seoAnalysis={seoAnalysis} />
               </Card>
             </TabsContent>
             
-            <TabsContent value="performance" className="mt-4 space-y-6">
-              <Card className="p-6 border-t-4 border-green-600 shadow-lg hover:shadow-xl transition-shadow">
+            <TabsContent value="performance" className="mt-4 space-y-6 animate-fade-in">
+              <Card className="p-6 border-t-4 border-green-600 shadow-lg hover:shadow-xl transition-all bg-white">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-bold bg-gradient-to-r from-green-600 to-teal-600 text-transparent bg-clip-text">Performance</h2>
                   <div className="flex space-x-2">
                     <button 
-                      className={`px-4 py-2 rounded-md text-sm shadow-sm transition-all ${activeDevice === 'mobile' ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white font-medium' : 'bg-gray-200 hover:bg-gray-300'}`}
+                      className={`px-4 py-2 rounded-md text-sm shadow-sm transition-all ${
+                        activeDevice === 'mobile' 
+                          ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white font-medium' 
+                          : 'bg-gray-200 hover:bg-gray-300'
+                      }`}
                       onClick={() => setActiveDevice('mobile')}
                     >
                       Mobile
                     </button>
                     <button 
-                      className={`px-4 py-2 rounded-md text-sm shadow-sm transition-all ${activeDevice === 'desktop' ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white font-medium' : 'bg-gray-200 hover:bg-gray-300'}`}
+                      className={`px-4 py-2 rounded-md text-sm shadow-sm transition-all ${
+                        activeDevice === 'desktop' 
+                          ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white font-medium' 
+                          : 'bg-gray-200 hover:bg-gray-300'
+                      }`}
                       onClick={() => setActiveDevice('desktop')}
                     >
                       Desktop
@@ -112,20 +135,20 @@ const SeoPage = () => {
                   </div>
                 </div>
                 <PerformanceHighlights 
-                  deviceData={performanceData}
+                  deviceData={activeDevice === 'mobile' ? performanceData : desktopPerformanceData}
                   activeDevice={activeDevice}
                 />
                 <div className="mt-8">
                   <Recommendations 
-                    deviceData={performanceData}
+                    deviceData={activeDevice === 'mobile' ? performanceData : desktopPerformanceData}
                     activeDevice={activeDevice}
                   />
                 </div>
               </Card>
             </TabsContent>
             
-            <TabsContent value="analytics" className="mt-4 space-y-6">
-              <Card className="p-6 border-t-4 border-purple-600 shadow-lg hover:shadow-xl transition-shadow">
+            <TabsContent value="analytics" className="mt-4 space-y-6 animate-fade-in">
+              <Card className="p-6 border-t-4 border-purple-600 shadow-lg hover:shadow-xl transition-all bg-white">
                 <div className="mb-6">
                   <h2 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-fuchsia-600 text-transparent bg-clip-text">Analytics</h2>
                 </div>
@@ -133,8 +156,8 @@ const SeoPage = () => {
               </Card>
             </TabsContent>
             
-            <TabsContent value="keywords" className="mt-4 space-y-6">
-              <Card className="p-6 border-t-4 border-amber-600 shadow-lg hover:shadow-xl transition-shadow">
+            <TabsContent value="keywords" className="mt-4 space-y-6 animate-fade-in">
+              <Card className="p-6 border-t-4 border-amber-600 shadow-lg hover:shadow-xl transition-all bg-white">
                 <h2 className="text-xl font-bold mb-4 bg-gradient-to-r from-amber-600 to-orange-600 text-transparent bg-clip-text">Générateur de mots-clés</h2>
                 <KeywordGenerator />
               </Card>

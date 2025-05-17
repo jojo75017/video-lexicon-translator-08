@@ -1,170 +1,130 @@
 
 import React from 'react';
-import { Card } from "@/components/ui/card";
-import { Check, AlertCircle, Info } from 'lucide-react';
-import { PerformanceData } from './types';
-import { useTranslation } from 'react-i18next';
+import { PerformanceMetricsSectionProps } from './types';
+import { Lightbulb, Image, FileCode, FileJson, Server, Check, AlertCircle, X } from 'lucide-react';
+import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Separator } from '@/components/ui/separator';
 
-interface RecommendationsProps {
-  activeDevice: 'mobile' | 'desktop';
-  deviceData: PerformanceData;
-}
-
-const Recommendations: React.FC<RecommendationsProps> = ({ activeDevice, deviceData }) => {
-  const { t } = useTranslation();
-  
-  // Determine which recommendations to show based on the performance data
+const Recommendations: React.FC<PerformanceMetricsSectionProps> = ({ 
+  deviceData,
+  activeDevice
+}) => {
+  // Fonction pour déterminer les recommandations basées sur les métriques
   const getRecommendations = () => {
     const recommendations = [];
-    const { loadTime, firstContentfulPaint, largestContentfulPaint, totalBlockingTime, cumulativeLayoutShift } = deviceData;
     
-    // Resource size related recommendations
-    if (deviceData.resourceBreakdown?.images > 500) {
+    // Vérifier le temps de chargement
+    if (deviceData.loadTime > 3000) {
       recommendations.push({
-        id: 'optimizeImages',
-        text: t('performance.recommendations.optimizeImages'),
+        id: 'loadTime',
+        title: 'Optimisez le temps de chargement',
+        description: 'Le temps de chargement total dépasse 3 secondes, ce qui peut augmenter le taux de rebond.',
         priority: 'high',
-        impact: 75
+        icon: Server,
+        tips: ['Utilisez un CDN pour servir vos ressources statiques', 'Activez la mise en cache du navigateur', 'Optimisez votre serveur et base de données']
       });
     }
     
-    if (deviceData.resourceBreakdown?.styles > 200) {
+    // Vérifier LCP
+    if (deviceData.largestContentfulPaint && deviceData.largestContentfulPaint > 2500) {
       recommendations.push({
-        id: 'minifyCSS',
-        text: t('performance.recommendations.minifyCSS'),
+        id: 'lcp',
+        title: 'Améliorez le LCP (Largest Contentful Paint)',
+        description: 'Le plus grand contenu visible prend trop de temps à s\'afficher.',
+        priority: 'high',
+        icon: Image,
+        tips: ['Optimisez les images et assurez-vous qu\'elles ont des dimensions appropriées', 'Utilisez le lazy loading pour les images hors écran', 'Préchargez les ressources critiques']
+      });
+    }
+    
+    // Vérifier CLS
+    if (deviceData.cumulativeLayoutShift && deviceData.cumulativeLayoutShift > 0.25) {
+      recommendations.push({
+        id: 'cls',
+        title: 'Réduisez le décalage de mise en page (CLS)',
+        description: 'Le décalage cumulatif de mise en page est trop élevé, créant une expérience utilisateur frustrante.',
         priority: 'medium',
-        impact: 50
+        icon: FileJson,
+        tips: ['Définissez les dimensions des images et éléments média', 'Évitez d\'insérer du contenu dynamique au-dessus du contenu existant', 'Utilisez des placeholders pour le contenu qui se charge tardivement']
       });
     }
     
-    if (deviceData.resourceBreakdown?.scripts > 300) {
+    // Vérifier JavaScript
+    if (deviceData.resourceBreakdown && deviceData.resourceBreakdown.js > 400000) {
       recommendations.push({
-        id: 'minifyJS',
-        text: t('performance.recommendations.minifyJS'),
+        id: 'javascript',
+        title: 'Réduisez la taille de JavaScript',
+        description: 'La taille totale de JavaScript est excessive et ralentit le chargement de la page.',
         priority: 'high',
-        impact: 65
+        icon: FileCode,
+        tips: ['Divisez votre code en petits modules et utilisez le code splitting', 'Éliminez les dépendances inutilisées', 'Minifiez et compressez vos fichiers JavaScript']
       });
     }
     
-    // Performance metric based recommendations
-    if (totalBlockingTime > 300) {
-      recommendations.push({
-        id: 'reduceTBT',
-        text: t('performance.recommendations.reduceTBT'),
-        priority: 'high',
-        impact: 80
-      });
-    }
-    
-    if (loadTime > (activeDevice === 'mobile' ? 3000 : 2000)) {
-      recommendations.push({
-        id: 'improveServerResponse',
-        text: t('performance.recommendations.improveServerResponse'),
-        priority: 'high',
-        impact: 85
-      });
-    }
-    
-    // Specific mobile recommendations
-    if (activeDevice === 'mobile' && largestContentfulPaint > 2500) {
-      recommendations.push({
-        id: 'optimizeLCP',
-        text: t('performance.recommendations.optimizeLCP'),
-        priority: 'high',
-        impact: 90
-      });
-    }
-    
-    // Layout shift recommendations for mobile
-    if (activeDevice === 'mobile' && cumulativeLayoutShift > 0.1) {
-      recommendations.push({
-        id: 'reduceCLS',
-        text: t('performance.recommendations.reduceCLS'),
-        priority: 'medium',
-        impact: 70
-      });
-    }
-    
-    // General best practice recommendations
-    recommendations.push({
-      id: 'useCaching',
-      text: t('performance.recommendations.useCaching'),
-      priority: 'medium',
-      impact: 60
-    });
-    
-    if (deviceData.resourceBreakdown && 
-        (deviceData.resourceBreakdown.images > 300 || 
-         deviceData.resourceBreakdown.scripts > 200)) {
-      recommendations.push({
-        id: 'useCDN',
-        text: t('performance.recommendations.useCDN'),
-        priority: 'medium',
-        impact: 65
-      });
-    }
-    
-    // Sort recommendations by impact (highest first)
-    return recommendations.sort((a, b) => b.impact - a.impact);
+    return recommendations;
   };
   
   const recommendations = getRecommendations();
 
-  // Fonction pour obtenir la couleur de la badge de priorité
   const getPriorityColor = (priority: string) => {
-    switch(priority) {
-      case 'high': return 'bg-red-100 text-red-800 hover:bg-red-200';
-      case 'medium': return 'bg-orange-100 text-orange-800 hover:bg-orange-200';
-      default: return 'bg-blue-100 text-blue-800 hover:bg-blue-200';
+    switch (priority) {
+      case 'high':
+        return 'bg-red-100 text-red-700 border-red-200';
+      case 'medium':
+        return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+      case 'low':
+        return 'bg-green-100 text-green-700 border-green-200';
+      default:
+        return 'bg-blue-100 text-blue-700 border-blue-200';
     }
   };
-  
+
   return (
-    <Card className="p-5">
-      <h3 className="text-lg font-medium mb-4">{t('performance.recommendations.title')}</h3>
+    <div className="space-y-4">
+      <h3 className="text-xl font-semibold mb-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-transparent bg-clip-text">
+        <Lightbulb className="inline-block mr-2 h-5 w-5 text-indigo-500" />
+        Recommandations d'optimisation
+      </h3>
       
-      <div className="divide-y">
-        {recommendations.map((rec, index) => (
-          <div key={rec.id} className="py-3 flex items-start gap-3">
-            <div className="mt-0.5">
-              {rec.priority === 'high' ? (
-                <AlertCircle className="h-5 w-5 text-red-500" />
-              ) : (
-                rec.impact > 70 ? (
-                  <Info className="h-5 w-5 text-orange-500" />
-                ) : (
-                  <Check className="h-5 w-5 text-green-500" />
-                )
-              )}
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2 flex-wrap">
-                <p className="text-gray-700">{rec.text}</p>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Badge variant="outline" className={getPriorityColor(rec.priority)}>
-                        {t(`performance.priority.${rec.priority}`)}
-                      </Badge>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>{t('performance.impactScore')}: {rec.impact}%</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+      {recommendations.length === 0 ? (
+        <div className="bg-green-50 border border-green-100 rounded-lg p-4 flex items-center">
+          <Check className="h-5 w-5 text-green-500 mr-2" />
+          <p className="text-green-700">
+            Félicitations ! Votre site est bien optimisé pour la performance sur {activeDevice === 'mobile' ? 'mobile' : 'desktop'}.
+          </p>
+        </div>
+      ) : (
+        <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
+          {recommendations.map((rec, index) => (
+            <Card key={rec.id} className="border overflow-hidden hover:shadow-md transition-all">
+              <div className="p-4 bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-indigo-100 flex justify-between items-center">
+                <div className="flex items-center">
+                  <rec.icon className="h-5 w-5 text-indigo-600 mr-2" />
+                  <h4 className="font-medium text-indigo-900">{rec.title}</h4>
+                </div>
+                <Badge className={getPriorityColor(rec.priority)}>
+                  {rec.priority === 'high' ? 'Priorité haute' : rec.priority === 'medium' ? 'Priorité moyenne' : 'Priorité basse'}
+                </Badge>
               </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </Card>
+              <div className="p-4">
+                <p className="text-gray-600 mb-3">{rec.description}</p>
+                
+                <h5 className="text-sm font-medium text-gray-700 mb-2">Actions recommandées :</h5>
+                <ul className="space-y-1">
+                  {rec.tips.map((tip, tipIndex) => (
+                    <li key={tipIndex} className="text-sm text-gray-600 flex items-start">
+                      <span className="text-indigo-500 mr-2 inline-block mt-0.5">•</span>
+                      {tip}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 
