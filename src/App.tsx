@@ -39,11 +39,22 @@ const App = () => {
         <Route path="/quora" element={<Index />} />
         <Route path="/settings" element={<Index />} />
         
+        {/* Routes pour les outils et sections spécifiques */}
+        <Route path="/keyword-analysis" element={<SeoPage />} />
+        <Route path="/internal-links" element={<InternalLinkingPage />} />
+        <Route path="/titles-meta" element={<KeywordMetaPage />} />
+        <Route path="/content-generator" element={<KeywordGeneratorPage />} />
+        
         {/* Routes localisées (français) */}
         <Route path="/hierarchie" element={<Index />} />
         <Route path="/nombre-mots" element={<Index />} />
         <Route path="/liens-internes" element={<InternalLinkingPage />} />
         <Route path="/metriques" element={<SeoPage />} />
+        <Route path="/analyse-seo" element={<SeoPage />} />
+        <Route path="/mots-cles" element={<KeywordGeneratorPage />} />
+        <Route path="/performances" element={<SeoPage />} />
+        <Route path="/structure-site" element={<Index />} />
+        <Route path="/outils" element={<OutilsSeo />} />
       </Routes>
     </Router>
   );

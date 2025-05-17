@@ -2,6 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { RefreshCw, History } from 'lucide-react';
 
 interface PinterestActionsProps {
   resetPin: () => void;
@@ -33,14 +34,18 @@ const PinterestActions: React.FC<PinterestActionsProps> = ({
           variant="outline" 
           onClick={handleResetPin}
           type="button"
+          className="flex items-center gap-2"
         >
+          <RefreshCw className="h-4 w-4" />
           Réinitialiser
         </Button>
         <Button 
           variant="outline" 
           onClick={handleToggleHistory}
           type="button"
+          className="flex items-center gap-2"
         >
+          <History className="h-4 w-4" />
           {historyVisible ? 'Masquer l\'historique' : 'Voir l\'historique'}
         </Button>
       </div>

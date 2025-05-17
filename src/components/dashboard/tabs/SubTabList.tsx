@@ -27,36 +27,37 @@ const SubTabList: React.FC<SubTabListProps> = ({ tabs, activeTab, onTabChange })
         description: "Chargement de la page...",
         duration: 1500
       });
-    } else {
-      // Mapper les ID d'onglets aux chemins
-      const tabPaths: Record<string, string> = {
-        'hierarchy': '/',
-        'wordcount': '/wordcount',
-        'suggestions': '/suggestions',
-        'seo': '/seo',
-        'structure': '/structure',
-        'backlinks': '/backlinks',
-        'performance': '/performance',
-        'metrics': '/metrics',
-        'analytics': '/analytics',
-        'quora': '/quora',
-        'signature': '/signature',
-        'pinterest': '/pinterest',
-        'internal-links': '/internal-linking',
-        'keyword-meta': '/keyword-meta',
-        'keyword-generator': '/keyword-generator',
-        'outils-seo': '/outils-seo',
-      };
-      
-      const tabPath = tabPaths[tabId] || `/${tabId.toLowerCase()}`;
-      console.log('SubTabList navigating to path:', tabPath);
-      navigate(tabPath);
-      
-      toast.info(`Navigation vers ${tabId}`, {
-        description: "Chargement de la page...",
-        duration: 1500
-      });
+      return;
     }
+    
+    // Mapper les ID d'onglets aux chemins
+    const tabPaths: Record<string, string> = {
+      'hierarchy': '/',
+      'wordcount': '/wordcount',
+      'suggestions': '/suggestions',
+      'seo': '/seo',
+      'structure': '/structure',
+      'backlinks': '/backlinks',
+      'performance': '/performance',
+      'metrics': '/metrics',
+      'analytics': '/analytics',
+      'quora': '/quora',
+      'signature': '/signature',
+      'pinterest': '/pinterest',
+      'internal-links': '/internal-linking',
+      'keyword-meta': '/keyword-meta',
+      'keyword-generator': '/keyword-generator',
+      'outils-seo': '/outils-seo',
+    };
+    
+    const tabPath = tabPaths[tabId] || `/${tabId.toLowerCase()}`;
+    console.log('SubTabList navigating to path:', tabPath);
+    navigate(tabPath);
+    
+    toast.info(`Navigation vers ${tabId}`, {
+      description: "Chargement de la page...",
+      duration: 1500
+    });
   };
 
   // Si aucun onglet n'est disponible, ne rien afficher

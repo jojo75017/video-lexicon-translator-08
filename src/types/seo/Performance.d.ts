@@ -18,10 +18,13 @@ export interface PerformanceData {
     images: number;
     fonts: number;
     other: number;
+    scripts?: number; // Ajouté pour la compatibilité
+    styles?: number;  // Ajouté pour la compatibilité
   };
   serverResponseTime?: number;
   loadTime?: number;
   firstContentfulPaint?: number;
+  largestContentfulPaint?: number; // Ajouté pour la compatibilité
   domLoadTime?: number;
 }
 

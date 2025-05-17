@@ -30,9 +30,12 @@ const MainTabList: React.FC<MainTabProps> = ({ mainTabs, activeTab, onTabChange 
     // D'abord mettre à jour l'onglet actif
     onTabChange(tabId);
     
+    // S'assurer que le chemin est bien défini
+    const targetPath = path || '/';
+    
     // Puis naviguer vers le chemin correspondant
-    console.log('Navigating to:', path);
-    navigate(path);
+    console.log('Navigating to:', targetPath);
+    navigate(targetPath);
     
     // Notification visuelle
     toast.info(`Navigation vers ${tabId}`, {

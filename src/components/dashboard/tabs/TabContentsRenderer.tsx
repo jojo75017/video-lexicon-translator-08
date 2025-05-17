@@ -8,7 +8,7 @@ import HierarchyTabContent from './HierarchyTabContent';
 import SeoResults from "@/components/SeoResults";
 import { CrawlForm } from "@/components/CrawlForm";
 import { useSiteAnalyzer } from "@/hooks/useSiteAnalyzer";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { activateSection } from '@/utils/navigationHelpers';
 import { toast } from "sonner";
 
@@ -53,18 +53,28 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
         'quora': '/quora'
       };
       
-      // Ne rediriger que si l'onglet spécial est actif et que nous ne sommes pas déjà sur sa page
+      // Ne rediriger que si l'onglet spécial est actif et que nous sommes pas dans une boucle
       if (activeTab in specialTabs) {
         const redirectPath = specialTabs[activeTab as keyof typeof specialTabs];
         const currentPath = window.location.pathname;
         
-        if (currentPath !== redirectPath) {
+        if (currentPath !== redirectPath && !sessionStorage.getItem(`redirect_${activeTab}`)) {
           console.log(`Redirecting from ${currentPath} to ${redirectPath}`);
+          
+          // Marquer cette redirection pour éviter les boucles
+          sessionStorage.setItem(`redirect_${activeTab}`, 'true');
+          
           navigate(redirectPath);
+          
           toast.info(`Navigation vers ${activeTab}`, {
             description: "Chargement de la page...",
             duration: 1500
           });
+          
+          // Effacer le marqueur après un délai
+          setTimeout(() => {
+            sessionStorage.removeItem(`redirect_${activeTab}`);
+          }, 1000);
         }
       }
     }, 100);
@@ -83,23 +93,7 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
     );
   }
 
-  // Vérifier si l'onglet actuel doit rediriger vers une page dédiée
-  const specialTabs = {
-    'internal-links': '/internal-linking',
-    'pinterest': '/pinterest',
-    'signature': '/signature',
-    'keyword-meta': '/keyword-meta',
-    'keyword-generator': '/keyword-generator',
-    'quora': '/quora'
-  };
-  
-  // Éviter la redirection automatique qui causait des problèmes
-  if (activeTab in specialTabs && false) { // Désactivé pour éviter le problème de redirection en boucle
-    const redirectPath = specialTabs[activeTab as keyof typeof specialTabs];
-    console.log(`Redirecting to ${redirectPath}`);
-    return <Navigate to={redirectPath} replace />;
-  }
-
+  // Le reste du rendu des onglets
   return (
     <>
       {/* Hierarchy Tab */}

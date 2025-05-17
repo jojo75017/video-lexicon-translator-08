@@ -11,7 +11,7 @@ import BrokenLinks from './BrokenLinks';
 import KeywordSuggestions from './analysis/KeywordSuggestions';
 import BacklinksAnalysis from './BacklinksAnalysis';
 import ImageDetails from '../ImageDetails';
-import { BacklinkInfo, SeoAnalysis } from '@/types/seo';
+import { BacklinkInfo, SeoAnalysis, SocialMetrics as SocialMetricsType } from '@/types/seo';
 import { Button } from '@/components/ui/button';
 
 interface DetailedMetricsProps {
@@ -36,13 +36,14 @@ const DetailedMetrics = ({
   
   // Convertir topBacklinkDomains si nécessaire
   const topDomains = Array.isArray(seoAnalysis.topBacklinkDomains) 
-    ? seoAnalysis.topBacklinkDomains.map(item => 
-        typeof item === 'string' ? item : item.domain
-      )
+    ? seoAnalysis.topBacklinkDomains.map(item => {
+        if (typeof item === 'string') return item;
+        return 'domain' in item ? item.domain : item;
+      })
     : [];
 
   // Assurer que ces valeurs ne sont jamais undefined pour éviter des erreurs
-  const socialMetricsDefault = {
+  const socialMetricsDefault: SocialMetricsType = {
     facebook: { shares: 0, comments: 0, likes: 0 },
     twitter: { tweets: 0, retweets: 0, likes: 0, shares: 0, replies: 0 },
     pinterest: { pins: 0, saves: 0 },
@@ -110,7 +111,7 @@ const DetailedMetrics = ({
           firstContentfulPaint={seoAnalysis.performance?.firstContentfulPaint}
           domLoadTime={seoAnalysis.performance?.domLoadTime}
         />
-        <SocialMetrics metrics={socialMetrics} />
+        <SocialMetrics metrics={socialMetrics as any} />
       </motion.div>
 
       {showAllMetrics && (
