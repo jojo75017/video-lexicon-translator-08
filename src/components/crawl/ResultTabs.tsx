@@ -1,4 +1,3 @@
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Code, Search, ListTree, BarChart, Globe } from "lucide-react";
 import { SiteInfo } from "./SiteInfo";
@@ -202,17 +201,6 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
         className="mt-6 space-y-6 bg-white p-4 rounded-lg border border-gray-200"
       >
         <SiteInfo data={data} />
-        <div className="mt-6 border-t pt-4">
-          <SeoMainTags
-            title={title}
-            description={description}
-            keywords={keywords}
-            h1Count={h1Count}
-            h2Count={h2Count}
-            h3Count={h3Count}
-            imgCount={imgCount}
-          />
-        </div>
       </TabsContent>
 
       <TabsContent 
@@ -232,7 +220,36 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
           headings={formattedHeadings}
           paragraphs={paragraphs}
           hierarchy={hierarchyData}
+          url={data.url || "URL non spécifiée"}
           recommendations={recommendations}
+          optimizationStatus={data.optimizationStatus || {
+            h1: {
+              count: h1Count,
+              isOptimized: h1Count === 1,
+              message: h1Count === 0 ? "Aucune balise H1 trouvée" : 
+                      h1Count > 1 ? "Plusieurs balises H1 trouvées (1 seule recommandée)" : 
+                      "Bonne utilisation d'une seule balise H1"
+            },
+            h2: {
+              count: h2Count,
+              isOptimized: h2Count > 0,
+              message: h2Count === 0 ? "Aucune balise H2 trouvée" : 
+                      h2Count > 5 ? "Nombreuses balises H2 trouvées" : 
+                      "Bonne utilisation des balises H2"
+            },
+            h3: {
+              count: h3Count,
+              isOptimized: h3Count > 0,
+              message: h3Count === 0 ? "Aucune balise H3 trouvée" : 
+                      "Bonne structure avec balises H3"
+            },
+            structure: {
+              isOptimized: h1Count === 1 && h2Count > 0,
+              message: h1Count === 1 && h2Count > 0 ? 
+                      "Structure hiérarchique correcte" : 
+                      "Structure hiérarchique à améliorer"
+            }
+          }}
         />
       </TabsContent>
 
@@ -242,7 +259,26 @@ export const ResultTabs = ({ data }: ResultTabsProps) => {
       >
         <h3 className="font-medium mb-4 text-lg border-b pb-2">Analyse de performance</h3>
         {performanceData && (
-          <LoadingSpeedAnalysis performance={performanceData} />
+          <LoadingSpeedAnalysis performance={{
+            loadTime: performanceData.loadTime,
+            firstContentfulPaint: performanceData.firstContentfulPaint,
+            largestContentfulPaint: performanceData.largestContentfulPaint,
+            domLoadTime: performanceData.domLoadTime,
+            speedIndex: performanceData.speedIndex,
+            timeToInteractive: performanceData.timeToInteractive,
+            score: performanceData.score,
+            resourceCount: performanceData.resourceCount,
+            totalSize: performanceData.totalSize,
+            resourceBreakdown: {
+              js: performanceData.resourceBreakdown.scripts || 0,
+              css: performanceData.resourceBreakdown.styles || 0,
+              images: performanceData.resourceBreakdown.images,
+              fonts: performanceData.resourceBreakdown.fonts,
+              other: performanceData.resourceBreakdown.other,
+              scripts: performanceData.resourceBreakdown.scripts,
+              styles: performanceData.resourceBreakdown.styles
+            }
+          }} />
         )}
       </TabsContent>
 

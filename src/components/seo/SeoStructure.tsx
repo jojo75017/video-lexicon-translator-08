@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { AlertTriangle, Check, ChevronDown, ChevronRight, FileText, List } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { HierarchyItem } from '@/types/seo/Hierarchy';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface SeoStructureProps {
   h1Count: number;
@@ -115,18 +116,63 @@ const SeoStructure = ({
     if (!status) {
       // Si pas de statut d'optimisation disponible, utiliser le comptage simple
       return count === 0 ? (
-        <AlertTriangle className="h-4 w-4 text-red-500" />
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <AlertTriangle className="h-4 w-4 text-red-500" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{type === 'h1' ? "Aucune balise H1 trouvée" : `Aucune balise ${type} trouvée`}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       ) : count === 1 && type === 'h1' ? (
-        <Check className="h-4 w-4 text-green-500" />
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <Check className="h-4 w-4 text-green-500" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Une seule balise H1, comme recommandé</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       ) : (
-        <Check className="h-4 w-4 text-green-500" />
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <Check className="h-4 w-4 text-green-500" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{count} balises {type} trouvées</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       );
     }
     
     return status.isOptimized ? (
-      <Check className="h-4 w-4 text-green-500" title={status.message} />
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger>
+            <Check className="h-4 w-4 text-green-500" />
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{status.message}</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     ) : (
-      <AlertTriangle className={`h-4 w-4 ${status.count === 0 ? 'text-red-500' : 'text-amber-500'}`} title={status.message} />
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger>
+            <AlertTriangle className={`h-4 w-4 ${status.count === 0 ? 'text-red-500' : 'text-amber-500'}`} />
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{status.message}</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     );
   };
 
@@ -195,11 +241,20 @@ const SeoStructure = ({
                     <span className="text-sm">{imgCount} image(s)</span>
                   </span>
                   {optimizationStatus?.imgAlt ? (
-                    optimizationStatus.imgAlt.isOptimized ? (
-                      <Check className="h-4 w-4 text-green-500" title={optimizationStatus.imgAlt.message} />
-                    ) : (
-                      <AlertTriangle className="h-4 w-4 text-amber-500" title={optimizationStatus.imgAlt.message} />
-                    )
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          {optimizationStatus.imgAlt.isOptimized ? (
+                            <Check className="h-4 w-4 text-green-500" />
+                          ) : (
+                            <AlertTriangle className="h-4 w-4 text-amber-500" />
+                          )}
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{optimizationStatus.imgAlt.message}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   ) : (
                     imgCount > 0 ? (
                       <Check className="h-4 w-4 text-green-500" />
