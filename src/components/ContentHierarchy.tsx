@@ -51,25 +51,25 @@ const ContentHierarchy = ({
     return total + (p.text?.split(/\s+/).length || 0);
   }, 0) || 750;
   
-  // Generate mock keywords
+  // Generate mock keywords related to travel
   const mockKeywords = [
-    { keyword: "seo", volume: 10000, cpc: 2.5, difficulty: 65, score: 80 },
-    { keyword: "structure de site", volume: 1200, cpc: 1.8, difficulty: 45, score: 85 },
-    { keyword: "analyse seo", volume: 3300, cpc: 2.1, difficulty: 55, score: 75 },
-    { keyword: "optimisation web", volume: 2700, cpc: 1.9, difficulty: 60, score: 70 }
+    { keyword: "voyage", volume: 10000, cpc: 2.5, difficulty: 65, score: 80 },
+    { keyword: "destination", volume: 8500, cpc: 3.2, difficulty: 55, score: 85 },
+    { keyword: "hébergement", volume: 6500, cpc: 2.8, difficulty: 50, score: 78 },
+    { keyword: "aventure", volume: 4200, cpc: 1.5, difficulty: 40, score: 82 }
   ];
   
-  // Mock questions based on the headings
+  // Mock questions based on the headings for travel sites
   const mockQuestions = headings
     .filter(h => h.level > 1 && h.text.length > 10)
     .slice(0, 3)
     .map(h => `Comment ${h.text.toLowerCase()}?`);
   
-  // Add some standard questions
+  // Add some standard travel questions
   const standardQuestions = [
-    "Quelle est la structure idéale pour un site web?",
-    "Pourquoi la hiérarchie des balises HTML est importante pour le SEO?",
-    "Comment optimiser les titres de ma page web?"
+    "Quelles sont les meilleures destinations pour voyager en été?",
+    "Comment préparer un voyage à petit budget?",
+    "Quels documents sont nécessaires pour voyager à l'étranger?"
   ];
   
   const allQuestions = [...mockQuestions, ...standardQuestions].slice(0, 5);
@@ -387,7 +387,7 @@ const ContentHierarchy = ({
               <div>
                 <h3 className="font-medium text-blue-900 mb-2">Recommandations pour votre structure</h3>
                 <p className="text-blue-800 text-sm mb-3">
-                  Voici quelques conseils pour améliorer la structure SEO de votre page.
+                  Voici quelques conseils pour améliorer la structure SEO de votre page voyage.
                 </p>
                 
                 <ul className="space-y-2">
@@ -425,19 +425,19 @@ const ContentHierarchy = ({
             <div className="bg-green-50 p-4 rounded-lg border border-green-100">
               <h3 className="font-medium text-green-800 mb-2">Plan d'action</h3>
               <p className="text-green-700 text-sm mb-3">
-                Suivez ces étapes pour optimiser la structure de votre page:
+                Suivez ces étapes pour optimiser la structure de votre page de voyage:
               </p>
               <ol className="space-y-2 ml-5 list-decimal">
                 {h1Count !== 1 && (
                   <li className="text-sm">
                     <span className="font-medium">{h1Count === 0 ? "Ajoutez une balise H1" : "Gardez uniquement une balise H1"}</span> - 
-                    Elle doit contenir votre mot-clé principal et décrire le sujet de la page
+                    Elle doit contenir votre destination principale et décrire le sujet de la page
                   </li>
                 )}
                 {h2Count < 2 && (
                   <li className="text-sm">
                     <span className="font-medium">Structurez votre contenu avec des balises H2</span> - 
-                    Chaque section principale mérite un titre H2 descriptif
+                    Chaque section principale (activités, hébergement, transports) mérite un titre H2 descriptif
                   </li>
                 )}
                 <li className="text-sm">
@@ -445,12 +445,12 @@ const ContentHierarchy = ({
                   Les H1 doivent être suivis de H2, puis de H3, sans sauter de niveaux
                 </li>
                 <li className="text-sm">
-                  <span className="font-medium">Intégrez vos mots-clés naturellement</span> - 
-                  Placez vos termes importants dans les titres, mais gardez-les lisibles
+                  <span className="font-medium">Intégrez des mots-clés liés au voyage</span> - 
+                  Placez vos termes importants (destinations, activités) dans les titres, mais gardez-les lisibles
                 </li>
                 <li className="text-sm">
                   <span className="font-medium">Utilisez des H3 pour les sous-sections</span> - 
-                  Chaque section H2 devrait idéalement contenir des sous-sections H3
+                  Chaque section H2 (ex: Hébergement) devrait contenir des sous-sections H3 (ex: Hôtels, Appartements)
                 </li>
                 <li className="text-sm">
                   <span className="font-medium">Limitez la longueur des titres</span> - 

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ArrowLeft, FileSearch, Search, Loader2, AlertTriangle } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -237,18 +236,18 @@ const StructurePage = () => {
   
   const generateMockData = (analyzedUrl: string) => {
     const domain = analyzedUrl.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
-    let pageTitle = "Démonstration";
-    let sections = ["À propos", "Services", "Contact"];
-    let subtitles = ["Notre équipe", "Nos valeurs"];
+    let pageTitle = "Voyages et Découvertes";
+    let sections = ["Destinations", "Hébergements", "Informations pratiques"];
+    let subtitles = ["Europe", "Asie", "Amériques"];
     
-    if (domain.includes("divaskin")) {
-      pageTitle = "DivaSkin - Soins de la peau";
-      sections = ["Produits", "Soins visage", "Services beauté"];
-      subtitles = ["Crèmes hydratantes", "Sérums anti-âge"];
-    } else if (domain.includes("beauty") || domain.includes("beaute")) {
-      pageTitle = "Beauté et Bien-être";
-      sections = ["Soins", "Produits", "Conseils beauté"];
-      subtitles = ["Traitements spa", "Soins personnalisés"];
+    if (domain.includes("voyage") || domain.includes("trip")) {
+      pageTitle = "Destinations de rêve";
+      sections = ["Circuits", "Séjours", "Conseils voyage"];
+      subtitles = ["Circuits guidés", "Séjours balnéaires"];
+    } else if (domain.includes("aventure") || domain.includes("adventure")) {
+      pageTitle = "Aventures & Découvertes";
+      sections = ["Treks", "Tours guidés", "Expéditions"];
+      subtitles = ["Montagne", "Désert"];
     }
     
     // Mock structure data
@@ -262,53 +261,53 @@ const StructurePage = () => {
       headings: {
         h1: [pageTitle],
         h2: sections,
-        h3: ["Service 1", "Service 2", "Contactez-nous", "Notre équipe"],
-        h4: ["Sous-section 1", "Sous-section 2"]
+        h3: ["Hôtels recommandés", "Vols", "Visa et formalités", "Équipement"],
+        h4: ["Europe", "Asie"]
       },
       paragraphCount: 12,
       imageCount: 5,
       listCount: 3,
       wordCount: 1200,
       topPhrases: [
-        { phrase: "soins de la", count: 5 },
-        { phrase: "notre équipe", count: 4 },
-        { phrase: "produits de qualité", count: 3 },
-        { phrase: "services personnalisés", count: 3 },
-        { phrase: "peau sensible", count: 2 }
+        { phrase: "destinations de voyage", count: 5 },
+        { phrase: "conseils pratiques", count: 4 },
+        { phrase: "hôtels de charme", count: 3 },
+        { phrase: "circuits organisés", count: 3 },
+        { phrase: "sites touristiques", count: 2 }
       ],
       questions: [
-        "Comment prendre soin de sa peau ?",
-        "Quels produits sont adaptés aux peaux sensibles ?",
-        "Pourquoi choisir des produits naturels ?",
-        "Comment contacter notre équipe ?",
-        "Où trouver nos boutiques ?"
+        "Quelles sont les meilleures destinations pour voyager en été?",
+        "Comment préparer un voyage à petit budget?",
+        "Quels documents sont nécessaires pour voyager à l'étranger?",
+        "Comment choisir le meilleur hébergement?",
+        "Quelle est la meilleure période pour visiter l'Asie?"
       ],
       contentDensity: 0.42,
       textToHtmlRatio: 0.38
     };
     
     const mockKeywords = [
-      { keyword: "soin", volume: 1200, cpc: 1.35, difficulty: 65 },
-      { keyword: "peau", volume: 980, cpc: 1.22, difficulty: 58 },
-      { keyword: "hydratant", volume: 750, cpc: 0.95, difficulty: 42 },
-      { keyword: "naturel", volume: 650, cpc: 1.05, difficulty: 47 },
-      { keyword: "beauté", volume: 1500, cpc: 1.85, difficulty: 72 },
-      { keyword: "visage", volume: 1100, cpc: 1.15, difficulty: 54 },
-      { keyword: "produit", volume: 900, cpc: 0.98, difficulty: 49 },
-      { keyword: "crème", volume: 850, cpc: 1.12, difficulty: 51 },
-      { keyword: "traitement", volume: 520, cpc: 1.65, difficulty: 68 },
-      { keyword: "sérum", volume: 480, cpc: 1.75, difficulty: 63 }
+      { keyword: "voyage", volume: 1200, cpc: 1.35, difficulty: 65 },
+      { keyword: "destination", volume: 980, cpc: 1.22, difficulty: 58 },
+      { keyword: "circuit", volume: 750, cpc: 0.95, difficulty: 42 },
+      { keyword: "hôtel", volume: 650, cpc: 1.05, difficulty: 47 },
+      { keyword: "séjour", volume: 1500, cpc: 1.85, difficulty: 72 },
+      { keyword: "plage", volume: 1100, cpc: 1.15, difficulty: 54 },
+      { keyword: "excursion", volume: 900, cpc: 0.98, difficulty: 49 },
+      { keyword: "guide", volume: 850, cpc: 1.12, difficulty: 51 },
+      { keyword: "visite", volume: 520, cpc: 1.65, difficulty: 68 },
+      { keyword: "vacances", volume: 480, cpc: 1.75, difficulty: 63 }
     ];
     
     const mockQuestions = [
-      "Qu'est-ce qu'un soin hydratant pour le visage ?",
-      "Comment choisir la bonne crème pour ma peau ?",
-      "Quels sont les avantages des produits naturels pour la peau ?",
-      "Quand faut-il appliquer un sérum anti-âge ?",
-      "Pourquoi utiliser des produits spécifiques pour la nuit ?",
-      "Comment prendre soin d'une peau sensible ?",
-      "Quelle routine beauté adopter au quotidien ?",
-      "Comment traiter les imperfections cutanées naturellement ?"
+      "Quelles sont les destinations tendance pour 2023?",
+      "Comment économiser sur les frais d'hébergement?",
+      "Quelles sont les meilleures périodes pour visiter l'Europe?",
+      "Comment éviter les pièges à touristes?",
+      "Quelles vaccinations sont nécessaires pour l'Asie du Sud-Est?",
+      "Comment préparer un itinéraire de voyage efficace?",
+      "Quelles assurances voyage sont essentielles?",
+      "Comment voyager de façon écoresponsable?"
     ];
     
     const mockData = {
@@ -335,7 +334,7 @@ const StructurePage = () => {
                   position: 2,
                   children: [
                     {
-                      text: `Nous proposons une gamme complète de produits pour tous types de peau.`,
+                      text: `Découvrez nos circuits exceptionnels à travers l'Europe et ses joyaux culturels.`,
                       tagName: "p",
                       position: 3,
                       children: []
@@ -355,7 +354,7 @@ const StructurePage = () => {
                   position: 5,
                   children: [
                     {
-                      text: "Nous utilisons uniquement des ingrédients de haute qualité.",
+                      text: "Nos hébergements sélectionnés avec soin pour un confort optimal.",
                       tagName: "p",
                       position: 6,
                       children: []
@@ -373,7 +372,7 @@ const StructurePage = () => {
         { text: subtitles[0], level: 3, position: 2 },
         { text: sections[1], level: 2, position: 3 },
         { text: subtitles[1], level: 3, position: 4 },
-        { text: "Contact", level: 2, position: 5 }
+        { text: "Informations pratiques", level: 2, position: 5 }
       ],
       keywords: mockKeywords,
       phrases: mockStructureData.topPhrases,
@@ -392,8 +391,8 @@ const StructurePage = () => {
               name: section,
               path: `${analyzedUrl}/${sectionPath}`,
               children: index === 0 ? [
-                { name: subtitles[0], path: `${analyzedUrl}/${sectionPath}/equipe`, children: [] },
-                { name: subtitles[1], path: `${analyzedUrl}/${sectionPath}/valeurs`, children: [] }
+                { name: subtitles[0], path: `${analyzedUrl}/${sectionPath}/europe`, children: [] },
+                { name: subtitles[1], path: `${analyzedUrl}/${sectionPath}/asie`, children: [] }
               ] : []
             };
           })

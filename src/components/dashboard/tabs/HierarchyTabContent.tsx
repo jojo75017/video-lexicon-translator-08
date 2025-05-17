@@ -156,24 +156,24 @@ const HierarchyTabContent = () => {
     console.log("Generating mock data for:", siteUrl);
     const domain = siteUrl.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
     
-    // Adapter les données de démonstration au domaine
-    let pageTitle = `Bienvenue sur ${domain}`;
-    let sections = ["À propos de nous", "Nos services", "Contactez-nous"];
-    let subsections = ["Service premium", "Service standard"];
+    // Adapter les données de démonstration au domaine - THÈME VOYAGE
+    let pageTitle = `Voyages et Découvertes`;
+    let sections = ["Destinations", "Hébergements", "Activités"];
+    let subsections = ["Europe", "Asie", "Amériques"];
     
-    // Détection du thème en fonction du nom de domaine
-    if (domain.includes("divaskin")) {
-      pageTitle = "DivaSkin - Soins de la peau";
-      sections = ["Nos produits", "Soins du visage", "Notre philosophie"];
-      subsections = ["Crèmes hydratantes", "Sérums anti-âge", "Masques"];
-    } else if (domain.includes("beauty") || domain.includes("beaute")) {
-      pageTitle = "Beauté et Bien-être";
-      sections = ["Soins du visage", "Soins du corps", "Nos conseils"];
-      subsections = ["Soins hydratants", "Anti-âge", "Nettoyant"];
-    } else if (domain.includes("tech") || domain.includes("dev")) {
-      pageTitle = "Solutions Technologiques";
-      sections = ["Nos services", "Technologies", "Portfolio"];
-      subsections = ["Développement web", "Applications mobiles", "Intelligence artificielle"];
+    // Détection du thème en fonction du nom de domaine - toujours axé voyage
+    if (domain.includes("voyage") || domain.includes("travel")) {
+      pageTitle = "Destinations de rêve";
+      sections = ["Circuits", "Hotels", "Conseils voyage"];
+      subsections = ["Circuit Asie", "Circuit Europe", "Circuit Amérique"];
+    } else if (domain.includes("tour") || domain.includes("aventure")) {
+      pageTitle = "Aventures & Découvertes";
+      sections = ["Treks", "Tours guidés", "Expéditions"];
+      subsections = ["Haute montagne", "Safari", "Plongée"];
+    } else if (domain.includes("hotel") || domain.includes("resort")) {
+      pageTitle = "Hébergements de qualité";
+      sections = ["Hotels de luxe", "Maisons d'hôtes", "Locations"];
+      subsections = ["Vue mer", "Centre-ville", "Nature"];
     }
     
     // Ajouter l'état d'optimisation pour affichage
@@ -215,18 +215,18 @@ const HierarchyTabContent = () => {
         { text: subsections[0], level: 3, position: 3 },
         { text: subsections[1], level: 3, position: 4 },
         { text: sections[2], level: 2, position: 5 },
-        { text: "Formulaire de contact", level: 3, position: 6 },
-        { text: "Nos coordonnées", level: 3, position: 7 }
+        { text: "Conseils pratiques", level: 3, position: 6 },
+        { text: "Équipement recommandé", level: 3, position: 7 }
       ],
       paragraphs: [
-        { text: `Bienvenue sur ${domain}. Nous vous proposons des produits de qualité.`, position: 0.5 },
-        { text: "Notre entreprise est spécialisée dans les produits de haute qualité.", position: 1.5 },
-        { text: "Découvrez notre gamme complète adaptée à vos besoins spécifiques.", position: 2.5 },
-        { text: `${subsections[0]}: Des formulations avancées pour des résultats optimaux.`, position: 3.5 },
-        { text: `${subsections[1]}: Une solution accessible pour tous les budgets.`, position: 4.5 },
-        { text: "N'hésitez pas à nous contacter pour toute question.", position: 5.5 },
-        { text: "Utilisez notre formulaire pour nous envoyer un message.", position: 6.5 },
-        { text: "Retrouvez nos boutiques et nos horaires d'ouverture.", position: 7.5 }
+        { text: `Bienvenue sur ${domain}. Nous vous proposons les meilleures expériences de voyage.`, position: 0.5 },
+        { text: "Notre agence sélectionne pour vous les plus belles destinations à travers le monde.", position: 1.5 },
+        { text: "Découvrez nos hébergements de qualité adaptés à tous les budgets et styles de voyage.", position: 2.5 },
+        { text: `${subsections[0]}: Des voyages inoubliables dans les plus belles capitales et régions européennes.`, position: 3.5 },
+        { text: `${subsections[1]}: Partez à la découverte des cultures fascinantes de l'Asie.`, position: 4.5 },
+        { text: "Nos activités sont sélectionnées pour vous faire vivre des moments inoubliables.", position: 5.5 },
+        { text: "Consultez nos conseils pratiques pour préparer sereinement votre voyage.", position: 6.5 },
+        { text: "Notre guide d'équipement vous aide à ne rien oublier pour votre aventure.", position: 7.5 }
       ],
       optimizationStatus,
       hierarchy: [
@@ -241,7 +241,7 @@ const HierarchyTabContent = () => {
               position: 1,
               children: [
                 {
-                  text: "Notre entreprise est spécialisée dans les produits de haute qualité.",
+                  text: "Notre agence sélectionne pour vous les plus belles destinations à travers le monde.",
                   tagName: "p",
                   position: 1.5,
                   children: []
@@ -254,7 +254,7 @@ const HierarchyTabContent = () => {
               position: 2,
               children: [
                 {
-                  text: "Découvrez notre gamme complète adaptée à vos besoins spécifiques.",
+                  text: "Découvrez nos hébergements de qualité adaptés à tous les budgets et styles de voyage.",
                   tagName: "p",
                   position: 2.5,
                   children: []
@@ -265,7 +265,7 @@ const HierarchyTabContent = () => {
                   position: 3,
                   children: [
                     {
-                      text: `${subsections[0]}: Des formulations avancées pour des résultats optimaux.`,
+                      text: `${subsections[0]}: Des voyages inoubliables dans les plus belles capitales et régions européennes.`,
                       tagName: "p",
                       position: 3.5,
                       children: []
@@ -278,7 +278,7 @@ const HierarchyTabContent = () => {
                   position: 4,
                   children: [
                     {
-                      text: `${subsections[1]}: Une solution accessible pour tous les budgets.`,
+                      text: `${subsections[1]}: Partez à la découverte des cultures fascinantes de l'Asie.`,
                       tagName: "p",
                       position: 4.5,
                       children: []
@@ -293,18 +293,18 @@ const HierarchyTabContent = () => {
               position: 5,
               children: [
                 {
-                  text: "N'hésitez pas à nous contacter pour toute question.",
+                  text: "Nos activités sont sélectionnées pour vous faire vivre des moments inoubliables.",
                   tagName: "p",
                   position: 5.5,
                   children: []
                 },
                 {
-                  text: "Formulaire de contact",
+                  text: "Conseils pratiques",
                   tagName: "h3",
                   position: 6,
                   children: [
                     {
-                      text: "Utilisez notre formulaire pour nous envoyer un message.",
+                      text: "Consultez nos conseils pratiques pour préparer sereinement votre voyage.",
                       tagName: "p",
                       position: 6.5,
                       children: []
@@ -312,12 +312,12 @@ const HierarchyTabContent = () => {
                   ]
                 },
                 {
-                  text: "Nos coordonnées",
+                  text: "Équipement recommandé",
                   tagName: "h3",
                   position: 7,
                   children: [
                     {
-                      text: "Retrouvez nos boutiques et nos horaires d'ouverture.",
+                      text: "Notre guide d'équipement vous aide à ne rien oublier pour votre aventure.",
                       tagName: "p",
                       position: 7.5,
                       children: []
