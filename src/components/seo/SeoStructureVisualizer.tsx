@@ -1,18 +1,29 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useTranslation } from 'react-i18next';
-import { HierarchyItem, HeadingStructure } from '@/types/seo';
 import { AlertCircle, Layout } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+
+// Define simpler types to replace the missing ones
+interface HierarchyItem {
+  level: number;
+  tagName?: string;
+  text?: string;
+  name?: string;
+  parentFound?: boolean;
+  children?: HierarchyItem[];
+}
+
+interface HeadingStructure {
+  hierarchy?: HierarchyItem[];
+  issues?: string[];
+}
 
 interface SeoStructureVisualizerProps {
   headingStructure?: HeadingStructure;
 }
 
 const SeoStructureVisualizer: React.FC<SeoStructureVisualizerProps> = ({ headingStructure }) => {
-  const { t } = useTranslation();
-
   if (!headingStructure) {
     return null;
   }
@@ -41,7 +52,7 @@ const SeoStructureVisualizer: React.FC<SeoStructureVisualizerProps> = ({ heading
             {hasError && (
               <span className="ml-2 text-red-500 text-xs flex items-center">
                 <AlertCircle className="w-3 h-3 mr-1" />
-                {t('seo.missingParent', 'Parent manquant')}
+                Parent manquant
               </span>
             )}
           </div>
@@ -59,7 +70,7 @@ const SeoStructureVisualizer: React.FC<SeoStructureVisualizerProps> = ({ heading
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Layout className="h-5 w-5 text-blue-600" />
-          {t('seo.headingStructure', 'Structure des titres')}
+          Structure des titres
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -69,7 +80,7 @@ const SeoStructureVisualizer: React.FC<SeoStructureVisualizerProps> = ({ heading
           </div>
         ) : (
           <div className="text-center p-4 text-gray-500">
-            {t('seo.noHeadingStructure', 'Aucune structure de titres détectée')}
+            Aucune structure de titres détectée
           </div>
         )}
         
@@ -77,7 +88,7 @@ const SeoStructureVisualizer: React.FC<SeoStructureVisualizerProps> = ({ heading
           <Alert variant="destructive" className="mt-4">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              <div className="font-medium mb-2">{t('seo.structureIssues', 'Problèmes de structure')}:</div>
+              <div className="font-medium mb-2">Problèmes de structure:</div>
               <ul className="list-disc pl-5 space-y-1">
                 {headingStructure.issues.map((issue, index) => (
                   <li key={index} className="text-sm">{issue}</li>

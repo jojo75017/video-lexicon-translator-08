@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
 import { PinterestPin } from '@/types/pinterest';
 import { usePinHistory } from '@/hooks/usePinHistory';
 
@@ -15,8 +15,7 @@ interface PinHistoryPanelProps {
 
 const PinHistoryPanel: React.FC<PinHistoryPanelProps> = ({ selectedPin, onSelect }) => {
   const { history, addPin, removePin, clearHistory } = usePinHistory();
-  const { toast } = useToast();
-
+  
   // Sauvegarder le pin actuel dans l'historique
   useEffect(() => {
     // Cette fonction est appelée chaque fois que selectedPin change
@@ -25,27 +24,17 @@ const PinHistoryPanel: React.FC<PinHistoryPanelProps> = ({ selectedPin, onSelect
 
   const handleSaveCurrent = () => {
     if (!selectedPin.image && !selectedPin.uploadedImage) {
-      toast({
-        title: "Impossible de sauvegarder",
-        description: "Veuillez d'abord sélectionner une image pour ce pin",
-        variant: "destructive",
-      });
+      toast.error("Impossible de sauvegarder: Veuillez d'abord sélectionner une image pour ce pin");
       return;
     }
     
     addPin(selectedPin);
-    toast({
-      title: "Pin sauvegardé",
-      description: "Le pin a été ajouté à votre historique",
-    });
+    toast.success("Pin sauvegardé dans votre historique");
   };
 
   const handleClearHistory = () => {
     clearHistory();
-    toast({
-      title: "Historique effacé",
-      description: "Tous les pins ont été supprimés de l'historique",
-    });
+    toast.success("Tous les pins ont été supprimés de l'historique");
   };
 
   return (
@@ -106,10 +95,7 @@ const PinHistoryPanel: React.FC<PinHistoryPanelProps> = ({ selectedPin, onSelect
                     onClick={(e) => {
                       e.stopPropagation();
                       removePin(index);
-                      toast({
-                        title: "Pin supprimé",
-                        description: "Le pin a été retiré de l'historique",
-                      });
+                      toast.success("Le pin a été retiré de l'historique");
                     }}
                   >
                     Supprimer

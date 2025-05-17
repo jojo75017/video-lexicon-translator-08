@@ -3,7 +3,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Home, ArrowLeft } from 'lucide-react';
+import { Home, ArrowLeft, FileText, LinkIcon, LineChart, FilePenLine, LayoutGrid } from 'lucide-react';
 import { toast } from 'sonner';
 
 const UnifiedDashboard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -78,6 +78,33 @@ const UnifiedDashboard: React.FC<{ children: React.ReactNode }> = ({ children })
                   className={currentPath === '/tracking' ? "bg-blue-600 hover:bg-blue-700" : ""}
                 >
                   Suivi Positions
+                </Button>
+              </Link>
+              <Link to="/pinterest">
+                <Button 
+                  variant={currentPath === '/pinterest' ? "default" : "outline"} 
+                  size="sm"
+                  className={currentPath === '/pinterest' ? "bg-red-600 hover:bg-red-700" : ""}
+                >
+                  Pinterest
+                </Button>
+              </Link>
+              <Link to="/signature">
+                <Button 
+                  variant={currentPath === '/signature' ? "default" : "outline"} 
+                  size="sm"
+                  className={currentPath === '/signature' ? "bg-blue-600 hover:bg-blue-700" : ""}
+                >
+                  Signature Email
+                </Button>
+              </Link>
+              <Link to="/structure">
+                <Button 
+                  variant={currentPath === '/structure' ? "default" : "outline"} 
+                  size="sm"
+                  className={currentPath === '/structure' ? "bg-purple-600 hover:bg-purple-700" : ""}
+                >
+                  Structure Site
                 </Button>
               </Link>
             </nav>

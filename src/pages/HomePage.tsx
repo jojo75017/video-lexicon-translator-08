@@ -3,7 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card } from "@/components/ui/card";
 import UnifiedDashboard from '@/components/dashboard/UnifiedDashboard';
-import { FileText, LinkIcon, LineChart, BarChart2, Tag, Info } from 'lucide-react';
+import { FileText, LinkIcon, LineChart, BarChart2, Tag, Info, FilePenLine, LayoutGrid } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Button } from '@/components/ui/button';
 
@@ -73,6 +73,50 @@ const HomePage = () => {
                 <p className="text-gray-600 mb-4">
                   Suivez l'évolution de vos positions dans les moteurs de recherche et identifiez les opportunités 
                   d'amélioration.
+                </p>
+                <Button className="mt-auto" variant="outline">Accéder à l'outil</Button>
+              </Card>
+            </Link>
+          </div>
+        </section>
+        
+        <section>
+          <h2 className="text-2xl font-bold mb-4">Outils supplémentaires</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Link to="/pinterest" className="block">
+              <Card className="p-6 bg-white hover:bg-red-50 transition-colors h-full flex flex-col">
+                <div className="flex items-center mb-4">
+                  <FilePenLine className="h-8 w-8 mr-3 text-red-600" />
+                  <h3 className="text-xl font-bold">Pinterest</h3>
+                </div>
+                <p className="text-gray-600 mb-4">
+                  Générez des images Pinterest optimisées pour augmenter votre visibilité et attirer plus de trafic vers votre site.
+                </p>
+                <Button className="mt-auto" variant="outline">Accéder à l'outil</Button>
+              </Card>
+            </Link>
+            
+            <Link to="/signature" className="block">
+              <Card className="p-6 bg-white hover:bg-blue-50 transition-colors h-full flex flex-col">
+                <div className="flex items-center mb-4">
+                  <FileText className="h-8 w-8 mr-3 text-blue-600" />
+                  <h3 className="text-xl font-bold">Signature Email</h3>
+                </div>
+                <p className="text-gray-600 mb-4">
+                  Créez une signature email professionnelle pour renforcer votre image de marque et promouvoir votre site web.
+                </p>
+                <Button className="mt-auto" variant="outline">Accéder à l'outil</Button>
+              </Card>
+            </Link>
+            
+            <Link to="/structure" className="block">
+              <Card className="p-6 bg-white hover:bg-purple-50 transition-colors h-full flex flex-col">
+                <div className="flex items-center mb-4">
+                  <LayoutGrid className="h-8 w-8 mr-3 text-purple-600" />
+                  <h3 className="text-xl font-bold">Structure Site</h3>
+                </div>
+                <p className="text-gray-600 mb-4">
+                  Analysez et optimisez la structure de votre site web pour une meilleure expérience utilisateur et un meilleur référencement.
                 </p>
                 <Button className="mt-auto" variant="outline">Accéder à l'outil</Button>
               </Card>
