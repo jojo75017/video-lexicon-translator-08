@@ -1,257 +1,132 @@
-import { Tab } from './types';
-import { 
-  BarChart2, 
-  Clock, 
-  Code, 
-  ExternalLink, 
-  FileText, 
-  HardDrive, 
-  Layout, 
-  Link2, 
-  List, 
-  Maximize2, 
-  PieChart, 
-  Settings, 
-  SlidersHorizontal, 
-  Zap,
-  Tag,
-  Edit3,
-  FileSignature,
-  Languages,
-  Image,
-  Network
-} from 'lucide-react';
 
-export const groupLabels: Record<string, string> = {
-  'content': 'Contenu',
-  'seo': 'SEO',
-  'backlinks': 'Backlinks',
-  'performance': 'Performance',
-  'advanced': 'Avancé',
-  'external': 'Liens',
-  'tools': 'Outils',
-};
+import React from 'react';
+import { BarChart2, FileText, Zap, PieChart, Type, Pinterest, FilePenLine, LayoutGrid, ThumbsUp, Target, LinkIcon, Link2, LineChart, CheckCircle2, TicketCheck } from "lucide-react";
 
-export const tabs: Tab[] = [
-  {
-    id: 'wordcount',
-    label: 'Mots-clés',
-    description: 'Analyse de la densité des mots-clés',
-    icon: <List />,
-    group: 'content',
-    color: 'text-blue-600'
+export const tabs = [
+  { 
+    id: 'hierarchy', 
+    label: 'Structure',
+    icon: <FileText className="h-4 w-4" />,
+    description: "Analyser la structure de vos contenus",
+    color: "bg-blue-50 text-blue-700 border-blue-200",
+    link: null,
+    category: 'content'
   },
-  {
-    id: 'hierarchy',
-    label: 'Hiérarchie',
-    description: 'Structure des titres et contenu',
-    icon: <Layout />,
-    group: 'content',
-    color: 'text-green-600'
+  { 
+    id: 'wordcount', 
+    label: 'Audit de contenu',
+    icon: <BarChart2 className="h-4 w-4" />,
+    description: "Analyse du nombre de mots et de la lisibilité",
+    color: "bg-blue-50 text-blue-700 border-blue-200",
+    link: null,
+    category: 'content'
   },
-  // Nouvel onglet pour les suggestions de titre/meta description
-  {
-    id: 'suggestions',
-    label: 'Suggestions',
-    description: 'Suggestions de titres et meta descriptions',
-    icon: <Edit3 />,
-    group: 'content',
-    color: 'text-amber-600',
-    isNew: true,
-    highlighted: true
+  { 
+    id: 'suggestions', 
+    label: 'Suggestions', 
+    icon: <ThumbsUp className="h-4 w-4" />,
+    description: "Suggestions d'amélioration de contenu",
+    color: "bg-blue-50 text-blue-700 border-blue-200",
+    link: null,
+    category: 'content'
   },
-  {
-    id: 'seo',
+  { 
+    id: 'seo', 
     label: 'SEO',
-    description: 'Analyse du référencement',
-    icon: <Maximize2 />,
-    group: 'seo',
-    color: 'text-purple-600'
+    icon: <Target className="h-4 w-4" />,
+    description: "Analyse SEO complète",
+    color: "bg-purple-50 text-purple-700 border-purple-200",
+    link: null,
+    category: 'seo'
   },
   {
     id: 'structure',
-    label: 'Structure',
-    description: 'Structure du site et navigation',
-    icon: <HardDrive />,
-    group: 'seo',
-    color: 'text-yellow-600'
+    label: 'Structure du site',
+    icon: <LayoutGrid className="h-4 w-4" />,
+    description: "Analyser l'architecture du site",
+    color: "bg-purple-50 text-purple-700 border-purple-200",
+    link: null,
+    category: 'seo'
   },
-  {
-    id: 'backlinks',
+  { 
+    id: 'backlinks', 
     label: 'Backlinks',
-    description: 'Analyse des liens entrants',
-    icon: <Link2 />,
-    group: 'backlinks',
-    color: 'text-indigo-600'
+    icon: <LinkIcon className="h-4 w-4" />,
+    description: "Analyser les backlinks",
+    color: "bg-purple-50 text-purple-700 border-purple-200",
+    link: null,
+    category: 'seo'
+  },
+  { 
+    id: 'internal-links', 
+    label: 'Liens internes',
+    icon: <Link2 className="h-4 w-4" />,
+    description: "Optimiser les liens internes",
+    color: "bg-purple-50 text-purple-700 border-purple-200",
+    link: null,
+    category: 'seo'
   },
   {
-    id: 'analytics',
-    label: 'Analytics',
-    description: 'Données statistiques et analytiques',
-    icon: <BarChart2 />,
-    group: 'seo',
-    color: 'text-orange-600'
+    id: 'keyword-meta',
+    label: 'Titres & Meta',
+    icon: <Type className="h-4 w-4" />,
+    description: "Optimiser vos balises title et meta",
+    color: "bg-purple-50 text-purple-700 border-purple-200",
+    link: '/keyword-meta',
+    category: 'seo'
   },
-  {
-    id: 'performance',
+  { 
+    id: 'performance', 
     label: 'Performance',
-    description: 'Vitesse et optimisations',
-    icon: <Zap />,
-    group: 'performance',
-    color: 'text-amber-600'
+    icon: <Zap className="h-4 w-4" />,
+    description: "Analyse des performances",
+    color: "bg-amber-50 text-amber-700 border-amber-200",
+    link: null,
+    category: 'performance'
   },
-  {
-    id: 'metrics',
+  { 
+    id: 'metrics', 
     label: 'Métriques',
-    description: 'KPIs et statistiques',
-    icon: <PieChart />,
-    group: 'metrics',
-    color: 'text-emerald-600'
+    icon: <LineChart className="h-4 w-4" />,
+    description: "Métriques de performance détaillées",
+    color: "bg-amber-50 text-amber-700 border-amber-200",
+    link: null,
+    category: 'performance'
   },
-  // Nouvel onglet pour les liens internes
-  {
-    id: 'internal-links',
-    label: 'Liens Internes',
-    description: 'Analyse et optimisation des liens internes',
-    icon: <Network />,
-    group: 'seo',
-    color: 'text-blue-600',
-    isNew: true,
-    highlighted: true,
-    path: '/internal-linking' // Lien direct vers la page dédiée
+  { 
+    id: 'analytics', 
+    label: 'Analytics',
+    icon: <PieChart className="h-4 w-4" />,
+    description: "Données analytiques",
+    color: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    link: null,
+    category: 'analytics'
   },
   {
-    id: 'advanced',
-    label: 'Avancé',
-    description: 'Options et analyses avancées',
-    icon: <SlidersHorizontal />,
-    group: 'advanced',
-    color: 'text-gray-600'
+    id: 'pinterest',
+    label: 'Pinterest',
+    icon: <Pinterest className="h-4 w-4" />,
+    description: "Générateur d'images Pinterest",
+    color: "bg-red-50 text-red-700 border-red-200",
+    link: '/pinterest',
+    category: 'tools'
   },
-  {
-    id: 'code',
-    label: 'Code',
-    description: 'Analyse technique du code',
-    icon: <Code />,
-    group: 'advanced',
-    color: 'text-rose-600'
-  },
-  {
-    id: 'integrations',
-    label: 'Intégrations',
-    description: 'Connexion avec d\'autres outils',
-    icon: <Settings />,
-    group: 'advanced',
-    color: 'text-cyan-600'
-  },
-  // Add Signature tab with higher visibility
   {
     id: 'signature',
     label: 'Signature Email',
-    description: 'Créer une signature professionnelle',
-    icon: <FileSignature />,
-    group: 'tools',
-    color: 'text-blue-600',
-    highlighted: true
-  },
-  // Nouvel onglet pour la traduction vidéo
-  {
-    id: 'translation',
-    label: 'Traduction Vidéo',
-    description: 'Traduire vos vidéos de l\'anglais au français',
-    icon: <Languages />,
-    group: 'tools',
-    color: 'text-indigo-600',
-    isNew: true,
-    highlighted: true
-  },
-  // Nouvel onglet pour Pinterest
-  {
-    id: 'pinterest',
-    label: 'Images Pinterest',
-    description: 'Créer des visuels Pinterest (1000x1500)',
-    icon: <Image />,
-    group: 'tools',
-    color: 'text-red-600',
-    isNew: true,
-    highlighted: true,
-    path: '/pinterest'
-  },
-  // Title & Meta - modification pour le rendre plus visible et accessible
-  {
-    id: 'keyword-meta',
-    label: 'Title & Meta',
-    description: 'Optimisation des balises title et meta description',
-    icon: <Tag />,
-    group: 'seo',
-    color: 'text-blue-600',
-    isNew: true,
-    highlighted: true,
-    path: '/keyword-meta'
+    icon: <FilePenLine className="h-4 w-4" />,
+    description: "Créer une signature email professionnelle",
+    color: "bg-blue-50 text-blue-700 border-blue-200",
+    link: '/signature',
+    category: 'tools'
   },
   {
     id: 'quora',
-    label: 'Questions Quora',
-    description: 'Trouver et répondre aux questions pertinentes',
-    icon: <Tag />,
-    group: 'tools',
-    color: 'text-[#b92b27]'
-  },
-  {
-    id: 'local-business',
-    label: 'Entreprise Locale',
-    description: 'Optimisation pour les recherches locales',
-    icon: <Tag />,
-    group: 'tools',
-    color: 'text-indigo-600'
-  },
-  {
-    id: 'gsc',
-    label: 'Search Console',
-    description: 'Données de Google Search Console',
-    icon: <FileText />,
-    link: 'https://search.google.com/search-console',
-    group: 'external',
-    color: 'text-red-600'
-  },
-  {
-    id: 'ga',
-    label: 'Google Analytics',
-    description: 'Données de Google Analytics',
-    icon: <BarChart2 />,
-    link: 'https://analytics.google.com/',
-    group: 'external',
-    color: 'text-blue-600'
-  },
-  {
-    id: 'lighthouse',
-    label: 'Lighthouse',
-    description: 'Audit de performance',
-    icon: <Clock />,
-    link: 'https://developers.google.com/web/tools/lighthouse',
-    group: 'external',
-    color: 'text-yellow-600'
-  },
-  {
-    id: 'pagespeed',
-    label: 'PageSpeed',
-    description: 'Analyse de vitesse Google',
-    icon: <ExternalLink />,
-    link: 'https://developers.google.com/speed/pagespeed/insights/',
-    group: 'external',
-    color: 'text-green-600'
+    label: 'Quora & Forums',
+    icon: <CheckCircle2 className="h-4 w-4" />,
+    description: "Réponses optimisées pour forums",
+    color: "bg-red-50 text-red-700 border-red-200",
+    link: '/quora',
+    category: 'tools'
   }
 ];
-
-export const getGroupedTabs = (): Record<string, Tab[]> => {
-  const grouped: Record<string, Tab[]> = {};
-  
-  tabs.forEach(tab => {
-    if (!grouped[tab.group]) {
-      grouped[tab.group] = [];
-    }
-    grouped[tab.group].push(tab);
-  });
-  
-  return grouped;
-};

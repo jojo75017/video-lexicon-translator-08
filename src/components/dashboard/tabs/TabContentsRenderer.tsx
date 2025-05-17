@@ -67,24 +67,36 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
       description: "Chargement de la page...",
       duration: 1500
     });
-    setTimeout(() => {
-      navigate('/internal-linking');
-    }, 10);
-    return null;
+    return <Navigate to="/internal-linking" replace />;
   }
   
   // Si l'onglet Pinterest est actif, rediriger vers la page Pinterest
   if (activeTab === 'pinterest') {
+    console.log("Redirecting to /pinterest");
+    toast.info("Navigation vers Pinterest", {
+      description: "Chargement de la page...",
+      duration: 1500
+    });
     return <Navigate to="/pinterest" replace />;
   }
   
   // Si l'onglet Signature est actif, rediriger vers la page Signature
   if (activeTab === 'signature') {
+    console.log("Redirecting to /signature");
+    toast.info("Navigation vers Signature", {
+      description: "Chargement de la page...",
+      duration: 1500
+    });
     return <Navigate to="/signature" replace />;
   }
   
   // Si l'onglet Keyword Meta (Titles & Media) est actif, rediriger vers la page KeywordMeta
   if (activeTab === 'keyword-meta') {
+    console.log("Redirecting to /keyword-meta");
+    toast.info("Navigation vers Titres & Meta", {
+      description: "Chargement de la page...",
+      duration: 1500
+    });
     return <Navigate to="/keyword-meta" replace />;
   }
 

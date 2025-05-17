@@ -28,7 +28,7 @@ const MainTabList: React.FC<MainTabProps> = ({ mainTabs, activeTab, onTabChange 
     // Mettre à jour l'onglet actif
     onTabChange(tabId);
     
-    // Navigation directe - sans délai
+    // Navigation directe
     navigate(path);
   };
 
@@ -42,7 +42,7 @@ const MainTabList: React.FC<MainTabProps> = ({ mainTabs, activeTab, onTabChange 
             flex items-center px-4 py-2 rounded-lg transition-all
             ${activeTab === tab.id || 
               (tab.id === 'content' && ['hierarchy', 'wordcount', 'suggestions'].includes(activeTab)) ||
-              (tab.id === 'seo' && ['seo', 'structure', 'backlinks'].includes(activeTab)) ||
+              (tab.id === 'seo' && ['seo', 'structure', 'backlinks', 'keyword-meta'].includes(activeTab)) ||
               (tab.id === 'performance' && ['performance', 'metrics'].includes(activeTab)) ||
               (tab.id === 'analytics' && activeTab === 'analytics')
               ? 'bg-primary text-white shadow-sm' 
