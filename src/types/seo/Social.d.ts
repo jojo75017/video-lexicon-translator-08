@@ -1,36 +1,38 @@
 
-// Types liés aux réseaux sociaux
-
 export interface SocialMetrics {
   facebook: {
-    likes: number;
     shares: number;
     comments: number;
-    engagements?: number;
+    likes: number;
   };
   twitter: {
     tweets: number;
     retweets: number;
     likes: number;
-    shares?: number;
-    replies?: number;
+    shares: number;
+    replies: number;
+  };
+  pinterest: {
+    pins: number;
+    saves: number;
   };
   linkedin: {
     shares: number;
     engagements: number;
   };
-  pinterest: {
-    pins: number;
-    saves?: number;
-  };
 }
 
 export interface SocialTags {
-  ogTitle: string | null;
-  ogDescription: string | null;
-  ogImage: string | null;
-  twitterCard: string | null;
-  twitterTitle: string | null;
-  twitterDescription: string | null;
-  twitterImage: string | null;
+  ogTitle: string;
+  ogDescription: string;
+  ogImage: string;
+  ogUrl?: string;
+  ogType?: string;
+  ogSiteName?: string;
+  twitterCard: string;
+  twitterTitle: string;
+  twitterDescription: string;
+  twitterImage: string;
+  twitterCreator?: string;
+  twitterSite?: string;
 }

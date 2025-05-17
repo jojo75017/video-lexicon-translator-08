@@ -1,11 +1,14 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Home, Settings, ArrowLeft } from 'lucide-react';
 
 const UnifiedDashboard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const location = useLocation();
+  const currentPath = location.pathname;
+  
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200 shadow-sm">
@@ -36,16 +39,40 @@ const UnifiedDashboard: React.FC<{ children: React.ReactNode }> = ({ children })
         <Card className="p-4 bg-white shadow-sm border border-gray-200 mb-4">
           <nav className="flex flex-wrap gap-2">
             <Link to="/">
-              <Button variant="outline" size="sm">Accueil</Button>
+              <Button 
+                variant={currentPath === '/' ? "default" : "outline"} 
+                size="sm"
+                className={currentPath === '/' ? "bg-blue-600 hover:bg-blue-700" : ""}
+              >
+                Accueil
+              </Button>
             </Link>
             <Link to="/keyword-meta">
-              <Button variant="outline" size="sm">Title & Meta</Button>
+              <Button 
+                variant={currentPath === '/keyword-meta' ? "default" : "outline"} 
+                size="sm"
+                className={currentPath === '/keyword-meta' ? "bg-blue-600 hover:bg-blue-700" : ""}
+              >
+                Title & Meta
+              </Button>
             </Link>
             <Link to="/internal-linking">
-              <Button variant="outline" size="sm">Liens Internes</Button>
+              <Button 
+                variant={currentPath === '/internal-linking' ? "default" : "outline"} 
+                size="sm"
+                className={currentPath === '/internal-linking' ? "bg-blue-600 hover:bg-blue-700" : ""}
+              >
+                Liens Internes
+              </Button>
             </Link>
             <Link to="/tracking">
-              <Button variant="outline" size="sm">Suivi Positions</Button>
+              <Button 
+                variant={currentPath === '/tracking' ? "default" : "outline"} 
+                size="sm"
+                className={currentPath === '/tracking' ? "bg-blue-600 hover:bg-blue-700" : ""}
+              >
+                Suivi Positions
+              </Button>
             </Link>
           </nav>
         </Card>

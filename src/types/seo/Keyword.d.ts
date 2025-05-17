@@ -26,3 +26,15 @@ export interface KeywordData {
   density?: number;
   position?: number;
 }
+
+export interface KeywordGroup {
+  name: string;
+  keywords: KeywordData[];
+  score?: number;
+}
+
+export interface KeywordFrequency {
+  keyword: string;
+  count: number;
+  density: number;
+}

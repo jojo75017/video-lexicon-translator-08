@@ -21,6 +21,8 @@ import './App.css';
 import { Toaster } from 'sonner';
 
 const App = () => {
+  console.log('App rendering with updated routes');
+  
   return (
     <Router>
       <Toaster position="top-center" richColors />
