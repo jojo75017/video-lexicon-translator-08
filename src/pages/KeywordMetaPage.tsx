@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import UnifiedDashboard from '@/components/dashboard/UnifiedDashboard';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -7,12 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { FileText, Tag, Info } from 'lucide-react';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
 
 const KeywordMetaPage = () => {
-  const [keyword, setKeyword] = React.useState('');
-  const [title, setTitle] = React.useState('');
-  const [description, setDescription] = React.useState('');
+  const [keyword, setKeyword] = useState('');
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
   
   const handleGenerate = () => {
     if (!keyword) {
