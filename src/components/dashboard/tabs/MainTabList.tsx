@@ -25,10 +25,10 @@ const MainTabList: React.FC<MainTabProps> = ({ mainTabs, activeTab, onTabChange 
   const handleTabClick = (tabId: string, path: string = '/') => {
     console.log('MainTabList click:', tabId, 'path:', path);
     
-    // Update the active tab
+    // First update the active tab
     onTabChange(tabId);
     
-    // Navigate if path is provided
+    // Then navigate to the path
     if (path) {
       console.log('Navigating to:', path);
       navigate(path);

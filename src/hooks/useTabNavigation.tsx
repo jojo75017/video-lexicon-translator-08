@@ -82,7 +82,7 @@ export const useTabNavigation = () => {
     
     // Define paths for each tab
     const tabPaths: Record<string, string> = {
-      'hierarchy': '/hierarchy',
+      'hierarchy': '/',
       'wordcount': '/wordcount',
       'suggestions': '/suggestions',
       'seo': '/seo',

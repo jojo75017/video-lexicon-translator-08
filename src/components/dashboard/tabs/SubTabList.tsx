@@ -14,19 +14,22 @@ const SubTabList: React.FC<SubTabListProps> = ({ tabs, activeTab, onTabChange })
   const handleTabClick = (tabId: string, path?: string) => {
     console.log('SubTabList click:', tabId);
     
-    // Mettre à jour l'onglet actif
+    // Update the active tab
     onTabChange(tabId);
     
-    // Navigation directe vers le chemin correspondant si disponible
+    // Navigation to the corresponding path if available
     if (path) {
+      console.log('SubTabList navigating to:', path);
       navigate(path);
     } else {
-      // Fallback à la route de l'ID de l'onglet
-      navigate(`/${tabId}`);
+      // Fallback to the tab ID route
+      const tabPath = `/${tabId}`;
+      console.log('SubTabList navigating to fallback path:', tabPath);
+      navigate(tabPath);
     }
   };
 
-  // Si aucun onglet n'est disponible, ne rien afficher
+  // If no tabs are available, don't display anything
   if (!tabs || tabs.length === 0) {
     return null;
   }
@@ -36,7 +39,7 @@ const SubTabList: React.FC<SubTabListProps> = ({ tabs, activeTab, onTabChange })
       {tabs.map((tab) => (
         <button
           key={tab.id}
-          onClick={() => handleTabClick(tab.id, tab.path)}
+          onClick={() => handleTabClick(tab.id, tab.link)}
           data-tab-id={tab.id}
           className={`
             px-3 py-1.5 rounded-md text-sm font-medium transition-all

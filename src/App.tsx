@@ -25,15 +25,15 @@ const App = () => {
         <Route path="/keyword-meta" element={<KeywordMetaPage />} />
         <Route path="/seo" element={<SeoPage />} />
         <Route path="/outils-seo" element={<OutilsSeo />} />
-        <Route path="/performance" element={<SeoPage />} />  {/* Temporary redirect to SeoPage */}
-        <Route path="/analytics" element={<Index />} />      {/* Temporary redirect to Index */}
-        <Route path="/tracking" element={<Index />} />       {/* Temporary redirect to Index */}
-        <Route path="/wordcount" element={<Index />} />      {/* Temporary redirect to Index */}
-        <Route path="/suggestions" element={<Index />} />    {/* Temporary redirect to Index */}
-        <Route path="/structure" element={<Index />} />      {/* Temporary redirect to Index */}
-        <Route path="/backlinks" element={<Index />} />      {/* Temporary redirect to Index */}
-        <Route path="/metrics" element={<Index />} />        {/* Temporary redirect to Index */}
-        <Route path="/quora" element={<Index />} />          {/* Temporary redirect to Index */}
+        <Route path="/performance" element={<SeoPage />} />
+        <Route path="/analytics" element={<Index />} />
+        <Route path="/tracking" element={<Index />} />
+        <Route path="/wordcount" element={<Index />} />
+        <Route path="/suggestions" element={<Index />} />
+        <Route path="/structure" element={<Index />} />
+        <Route path="/backlinks" element={<Index />} />
+        <Route path="/metrics" element={<Index />} />
+        <Route path="/quora" element={<Index />} />
       </Routes>
     </Router>
   );

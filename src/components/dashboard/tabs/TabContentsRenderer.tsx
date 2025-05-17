@@ -8,7 +8,7 @@ import HierarchyTabContent from './HierarchyTabContent';
 import SeoResults from "@/components/SeoResults";
 import { CrawlForm } from "@/components/CrawlForm";
 import { useSiteAnalyzer } from "@/hooks/useSiteAnalyzer";
-import { Navigate, Link, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { activateSection } from '@/utils/navigationHelpers';
 import KeywordTabContent from './KeywordTabContent';
 import { toast } from "sonner";
@@ -38,7 +38,6 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
 
   useEffect(() => {
     console.log(`TabContentsRenderer: Active tab changed to ${activeTab}`);
-    console.log(`SEO Analysis availability:`, !!seoAnalysis);
     
     // Mise à jour de l'affichage quand l'onglet actif change
     setTimeout(() => {
@@ -60,44 +59,25 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
     );
   }
 
-  // Redirection vers les pages dédiées
-  if (activeTab === 'internal-links') {
-    console.log("Redirecting to /internal-linking");
-    toast.info("Navigation vers Liens Internes", {
-      description: "Chargement de la page...",
-      duration: 1500
-    });
-    return <Navigate to="/internal-linking" replace />;
-  }
+  // Handle special tabs that should navigate to dedicated pages
+  const specialTabs = {
+    'internal-links': '/internal-linking',
+    'pinterest': '/pinterest',
+    'signature': '/signature',
+    'keyword-meta': '/keyword-meta',
+    'keyword-generator': '/keyword-generator',
+    'quora': '/quora'
+  };
   
-  // Si l'onglet Pinterest est actif, rediriger vers la page Pinterest
-  if (activeTab === 'pinterest') {
-    console.log("Redirecting to /pinterest");
-    toast.info("Navigation vers Pinterest", {
+  // Check if current tab should redirect to a dedicated page
+  if (activeTab in specialTabs) {
+    const redirectPath = specialTabs[activeTab as keyof typeof specialTabs];
+    console.log(`Redirecting to ${redirectPath}`);
+    toast.info(`Navigation vers ${activeTab}`, {
       description: "Chargement de la page...",
       duration: 1500
     });
-    return <Navigate to="/pinterest" replace />;
-  }
-  
-  // Si l'onglet Signature est actif, rediriger vers la page Signature
-  if (activeTab === 'signature') {
-    console.log("Redirecting to /signature");
-    toast.info("Navigation vers Signature", {
-      description: "Chargement de la page...",
-      duration: 1500
-    });
-    return <Navigate to="/signature" replace />;
-  }
-  
-  // Si l'onglet Keyword Meta (Titles & Media) est actif, rediriger vers la page KeywordMeta
-  if (activeTab === 'keyword-meta') {
-    console.log("Redirecting to /keyword-meta");
-    toast.info("Navigation vers Titres & Meta", {
-      description: "Chargement de la page...",
-      duration: 1500
-    });
-    return <Navigate to="/keyword-meta" replace />;
+    return <Navigate to={redirectPath} replace />;
   }
 
   return (
