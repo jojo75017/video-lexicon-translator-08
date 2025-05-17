@@ -6,7 +6,9 @@ import KeywordTabContent from '@/components/dashboard/tabs/KeywordTabContent';
 const KeywordMetaPage = () => {
   return (
     <UnifiedDashboard>
-      <KeywordTabContent />
+      <div className="container mx-auto py-4">
+        <KeywordTabContent />
+      </div>
     </UnifiedDashboard>
   );
 };

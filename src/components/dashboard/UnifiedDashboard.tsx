@@ -1,171 +1,54 @@
 
-import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { tabs } from './tabs/TabData';
-import MainTabList from './tabs/MainTabList';
-import SubTabList from './tabs/SubTabList';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
-import { toast } from 'sonner';
-import PageHeader from './PageHeader';
-import SeoActionButtons from './SeoActionButtons';
+import { Button } from '@/components/ui/button';
+import { Home, Settings, ArrowLeft } from 'lucide-react';
 
 const UnifiedDashboard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  
-  // Déterminer l'onglet actif basé sur le chemin actuel
-  const determineActiveTab = (): string => {
-    const path = location.pathname.replace('/', '');
-    
-    const pathToTabMap: Record<string, string> = {
-      '': 'hierarchy',
-      'hierarchy': 'hierarchy',
-      'wordcount': 'wordcount',
-      'seo': 'seo',
-      'structure': 'structure',
-      'performance': 'performance',
-      'analytics': 'analytics',
-      'suggestions': 'suggestions',
-      'backlinks': 'backlinks',
-      'metrics': 'metrics',
-      'quora': 'quora',
-      'signature': 'signature',
-      'pinterest': 'pinterest',
-      'internal-linking': 'internal-links',
-      'keyword-meta': 'keyword-meta',
-      'keyword-generator': 'keyword-generator',
-      'outils-seo': 'outils-seo',
-      // Routes localisées (français)
-      'hierarchie': 'hierarchy',
-      'nombre-mots': 'wordcount',
-      'liens-internes': 'internal-links',
-      'metriques': 'metrics',
-      'analyse-seo': 'seo',
-      'mots-cles': 'keyword-generator',
-      'performances': 'performance',
-      'structure-site': 'structure',
-    };
-    
-    return pathToTabMap[path] || 'hierarchy';
-  };
-  
-  const [activeTab, setActiveTab] = useState<string>(determineActiveTab());
-  
-  // Mettre à jour l'onglet actif lorsque le chemin change
-  useEffect(() => {
-    setActiveTab(determineActiveTab());
-  }, [location.pathname]);
-  
-  // Définir les catégories principales avec les chemins de navigation
-  const mainTabs = [
-    {id: 'content', label: 'Contenu', color: 'border-blue-600', path: '/hierarchy', isNew: false},
-    {id: 'seo', label: 'SEO', color: 'border-purple-600', path: '/seo', isNew: false},
-    {id: 'performance', label: 'Performance', color: 'border-amber-600', path: '/performance', isNew: false},
-    {id: 'analytics', label: 'Analytics', color: 'border-emerald-600', path: '/analytics', isNew: false},
-    {id: 'keyword-meta', label: 'Title & Meta', color: 'border-blue-600', path: '/keyword-meta', isNew: true}
-  ];
-  
-  // Gérer la sélection d'onglet avec navigation vers les pages dédiées
-  const handleTabChange = (value: string) => {
-    if (value === activeTab) return;
-    
-    setActiveTab(value);
-    
-    // Définir les chemins pour chaque onglet
-    const tabPaths: Record<string, string> = {
-      'hierarchy': '/',
-      'wordcount': '/wordcount',
-      'suggestions': '/suggestions',
-      'seo': '/seo',
-      'structure': '/structure',
-      'backlinks': '/backlinks',
-      'performance': '/performance',
-      'metrics': '/metrics',
-      'analytics': '/analytics',
-      'quora': '/quora',
-      'signature': '/signature',
-      'pinterest': '/pinterest',
-      'internal-links': '/internal-linking',
-      'keyword-meta': '/keyword-meta',
-      'keyword-generator': '/keyword-generator',
-      'outils-seo': '/outils-seo',
-    };
-    
-    // Forcer la navigation si nécessaire
-    if (tabPaths[value]) {
-      navigate(tabPaths[value]);
-      
-      // Notification visuelle du changement d'onglet
-      toast.info(`Navigation vers ${value}`, {
-        description: "Chargement de la page...",
-        duration: 1500
-      });
-    }
-  };
-
-  // Obtenir les sous-onglets en fonction de l'onglet principal actif
-  const getSubTabs = () => {
-    // Déterminer la catégorie principale en fonction de l'onglet actif
-    const getMainCategory = (tabId: string): string => {
-      if (['hierarchy', 'wordcount', 'suggestions'].includes(tabId)) {
-        return 'content';
-      } else if (['seo', 'structure', 'backlinks', 'internal-links', 'keyword-meta'].includes(tabId)) {
-        return 'seo';
-      } else if (['performance', 'metrics'].includes(tabId)) {
-        return 'performance';
-      } else if (tabId === 'analytics') {
-        return 'analytics';
-      } else if (tabId === 'quora' || tabId === 'signature' || tabId === 'pinterest' || tabId === 'keyword-generator' || tabId === 'outils-seo') {
-        return tabId;
-      }
-      
-      return 'content';
-    };
-    
-    const mainCategory = getMainCategory(activeTab);
-    
-    if (mainCategory === 'content') {
-      return tabs.filter(tab => ['hierarchy', 'wordcount', 'suggestions'].includes(tab.id));
-    } 
-    else if (mainCategory === 'seo') {
-      return tabs.filter(tab => ['seo', 'structure', 'backlinks', 'internal-links', 'keyword-meta'].includes(tab.id));
-    } 
-    else if (mainCategory === 'performance') {
-      return tabs.filter(tab => ['performance', 'metrics'].includes(tab.id));
-    } 
-    else if (mainCategory === 'analytics') {
-      return tabs.filter(tab => ['analytics'].includes(tab.id));
-    }
-    else if (['quora', 'signature', 'pinterest', 'keyword-generator', 'outils-seo'].includes(mainCategory)) {
-      return tabs.filter(tab => [mainCategory].includes(tab.id));
-    }
-    
-    // Par défaut - afficher les onglets de contenu
-    return tabs.filter(tab => ['hierarchy', 'wordcount', 'suggestions'].includes(tab.id));
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
-      <PageHeader />
-      
-      <div className="container mx-auto py-4">
-        <SeoActionButtons />
-        
-        <div className="mb-6 mt-8">
-          <Card className="p-4">
-            <MainTabList 
-              mainTabs={mainTabs}
-              activeTab={activeTab}
-              onTabChange={handleTabChange}
-            />
-            
-            <SubTabList 
-              tabs={getSubTabs()}
-              activeTab={activeTab}
-              onTabChange={handleTabChange}
-            />
-          </Card>
+      <header className="bg-white border-b border-gray-200 shadow-sm">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Link to="/" className="text-primary hover:text-primary/80 flex items-center">
+              <Home className="h-5 w-5 mr-2" />
+              <span className="font-medium">Accueil</span>
+            </Link>
+            <h1 className="text-xl font-bold hidden sm:block">Dashboard SEO</h1>
+          </div>
+          <div className="flex items-center gap-2">
+            <Link to="/outils-seo">
+              <Button variant="outline" size="sm" className="hidden sm:flex">
+                <Settings className="h-4 w-4 mr-1" />
+                Outils SEO
+              </Button>
+            </Link>
+            <Button variant="outline" size="sm" onClick={() => window.history.back()}>
+              <ArrowLeft className="h-4 w-4 mr-1" />
+              Retour
+            </Button>
+          </div>
         </div>
+      </header>
+      
+      <div className="container mx-auto p-4 space-y-6 py-6">
+        <Card className="p-4 bg-white shadow-sm border border-gray-200 mb-4">
+          <nav className="flex flex-wrap gap-2">
+            <Link to="/">
+              <Button variant="outline" size="sm">Accueil</Button>
+            </Link>
+            <Link to="/keyword-meta">
+              <Button variant="outline" size="sm">Title & Meta</Button>
+            </Link>
+            <Link to="/internal-linking">
+              <Button variant="outline" size="sm">Liens Internes</Button>
+            </Link>
+            <Link to="/tracking">
+              <Button variant="outline" size="sm">Suivi Positions</Button>
+            </Link>
+          </nav>
+        </Card>
         
         {children}
       </div>

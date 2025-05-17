@@ -14,6 +14,7 @@ export interface KeywordSuggestion {
   searchVolume?: number;
   clicks?: number;
   density?: number;
+  position?: number;
 }
 
 export interface KeywordData {
@@ -23,4 +24,5 @@ export interface KeywordData {
   cpc?: number;
   trend?: number[];
   density?: number;
+  position?: number;
 }
