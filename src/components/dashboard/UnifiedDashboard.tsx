@@ -4,7 +4,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Home, Settings, ArrowLeft } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/use-toast';
 
 const UnifiedDashboard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
@@ -48,8 +48,7 @@ const UnifiedDashboard: React.FC<{ children: React.ReactNode }> = ({ children })
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={(e) => {
-                e.preventDefault();
+              onClick={() => {
                 handleNavigation('/outils-seo', 'Outils SEO');
               }}
               className="hidden sm:flex"

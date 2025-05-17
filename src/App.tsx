@@ -17,8 +17,8 @@ import AnalyticsPage from './pages/AnalyticsPage';
 import StructurePage from './pages/StructurePage';
 import SuggestionsPage from './pages/SuggestionsPage';
 import TrackingPage from './pages/TrackingPage';
-import './App.css';
 import { Toaster } from 'sonner';
+import './App.css';
 
 const App = () => {
   console.log('App rendering with updated routes');
