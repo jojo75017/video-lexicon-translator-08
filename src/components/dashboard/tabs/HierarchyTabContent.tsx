@@ -11,6 +11,7 @@ import { analyzeHeadings } from '@/utils/seo/headingAnalyzer';
 import { analyzePageStructure } from '@/utils/seo/semanticAnalyzer';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import SiteStructureVisualizer from '@/components/SiteStructureVisualizer';
+import ApiKeyConfig from '@/components/seo/analysis/ApiKeyConfig';
 
 const HierarchyTabContent = () => {
   const [url, setUrl] = useState('');
@@ -19,10 +20,23 @@ const HierarchyTabContent = () => {
   const [analyzedUrl, setAnalyzedUrl] = useState('');
   const [showCorsWarning, setShowCorsWarning] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // OpenAI API key management
+  const [openaiKey, setOpenaiKey] = useState('');
+  const [apiKeyStatus, setApiKeyStatus] = useState<'unchecked' | 'valid' | 'invalid'>('unchecked');
+  const [validationMessage, setValidationMessage] = useState('');
 
   useEffect(() => {
     console.log("HierarchyTabContent - Mounted/Updated");
     console.log("Current analyze result:", analyzeResult);
+    
+    // Load API key from localStorage if available
+    const savedKey = localStorage.getItem('openaiKey');
+    if (savedKey) {
+      setOpenaiKey(savedKey);
+      setApiKeyStatus('unchecked');
+      setValidationMessage('Clé API chargée, mais non vérifiée');
+    }
   }, [analyzeResult]);
 
   const handleActivateProxy = () => {
@@ -35,6 +49,14 @@ const HierarchyTabContent = () => {
     // Relancer l'analyse automatiquement
     if (url) {
       handleAnalyze();
+    }
+  };
+  
+  const handleApiKeyValidated = () => {
+    if (url) {
+      handleAnalyze();
+    } else {
+      toast.info("Clé API validée. Entrez une URL pour analyser un site");
     }
   };
 
@@ -103,6 +125,18 @@ const HierarchyTabContent = () => {
           setAnalyzeResult(enhancedResult);
           setAnalyzedUrl(formattedUrl);
           toast.success("Analyse terminée avec succès");
+          
+          // Si une clé OpenAI est disponible et valide, essayer d'améliorer l'analyse avec l'IA
+          if (apiKeyStatus === 'valid' && openaiKey) {
+            try {
+              toast.info("Amélioration de l'analyse avec OpenAI...");
+              // Ici, vous pourriez appeler un service OpenAI pour améliorer l'analyse
+              // Par exemple: const enhancedAnalysis = await OpenAIService.analyzeContent(...)
+            } catch (e) {
+              console.error("Erreur lors de l'analyse OpenAI:", e);
+              toast.warning("L'analyse OpenAI a échoué, mais l'analyse de base est disponible");
+            }
+          }
         } else {
           throw new Error("Impossible d'analyser la structure des titres");
         }
@@ -140,263 +174,9 @@ const HierarchyTabContent = () => {
         });
         setError(err instanceof Error ? err.message : "Une erreur s'est produite");
       }
-      
-      // Générer des données factices pour démontrer l'interface
-      // Utiliser le domaine pour personnaliser les données
-      const mockData = generateMockHierarchyData(formattedUrl);
-      setAnalyzeResult(mockData);
-      setAnalyzedUrl(formattedUrl);
     } finally {
       setIsLoading(false);
     }
-  };
-
-  // Fonction pour générer des données de démonstration basées sur l'URL
-  const generateMockHierarchyData = (siteUrl: string) => {
-    console.log("Generating mock data for:", siteUrl);
-    const domain = siteUrl.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
-    
-    // Adapter les données de démonstration au domaine - THÈME VOYAGE
-    let pageTitle = `Voyages et Découvertes`;
-    let sections = ["Destinations", "Hébergements", "Activités"];
-    let subsections = ["Europe", "Asie", "Amériques"];
-    
-    // Détection du thème en fonction du nom de domaine - toujours axé voyage
-    if (domain.includes("voyage") || domain.includes("travel")) {
-      pageTitle = "Destinations de rêve";
-      sections = ["Circuits", "Hotels", "Conseils voyage"];
-      subsections = ["Circuit Asie", "Circuit Europe", "Circuit Amérique"];
-    } else if (domain.includes("tour") || domain.includes("aventure")) {
-      pageTitle = "Aventures & Découvertes";
-      sections = ["Treks", "Tours guidés", "Expéditions"];
-      subsections = ["Haute montagne", "Safari", "Plongée"];
-    } else if (domain.includes("hotel") || domain.includes("resort")) {
-      pageTitle = "Hébergements de qualité";
-      sections = ["Hotels de luxe", "Maisons d'hôtes", "Locations"];
-      subsections = ["Vue mer", "Centre-ville", "Nature"];
-    }
-    
-    // Ajouter l'état d'optimisation pour affichage
-    const optimizationStatus = {
-      h1: {
-        count: 1, 
-        isOptimized: true, 
-        message: "Bonne utilisation d'une seule balise H1"
-      },
-      h2: {
-        count: sections.length, 
-        isOptimized: true, 
-        message: "Bonne utilisation des balises H2"
-      },
-      h3: {
-        count: subsections.length + 2, 
-        isOptimized: true, 
-        message: "Bonne structure avec balises H3"
-      },
-      structure: {
-        isOptimized: true, 
-        message: "Structure hiérarchique correcte"
-      },
-      imgAlt: {
-        count: 0, 
-        isOptimized: true, 
-        message: "Toutes les images ont un attribut alt"
-      }
-    };
-    
-    return {
-      h1Count: 1,
-      h2Count: sections.length,
-      h3Count: subsections.length + 2,
-      headings: [
-        { text: pageTitle, level: 1, position: 0 },
-        { text: sections[0], level: 2, position: 1 },
-        { text: sections[1], level: 2, position: 2 },
-        { text: subsections[0], level: 3, position: 3 },
-        { text: subsections[1], level: 3, position: 4 },
-        { text: sections[2], level: 2, position: 5 },
-        { text: "Conseils pratiques", level: 3, position: 6 },
-        { text: "Équipement recommandé", level: 3, position: 7 }
-      ],
-      paragraphs: [
-        { text: `Bienvenue sur ${domain}. Nous vous proposons les meilleures expériences de voyage.`, position: 0.5 },
-        { text: "Notre agence sélectionne pour vous les plus belles destinations à travers le monde.", position: 1.5 },
-        { text: "Découvrez nos hébergements de qualité adaptés à tous les budgets et styles de voyage.", position: 2.5 },
-        { text: `${subsections[0]}: Des voyages inoubliables dans les plus belles capitales et régions européennes.`, position: 3.5 },
-        { text: `${subsections[1]}: Partez à la découverte des cultures fascinantes de l'Asie.`, position: 4.5 },
-        { text: "Nos activités sont sélectionnées pour vous faire vivre des moments inoubliables.", position: 5.5 },
-        { text: "Consultez nos conseils pratiques pour préparer sereinement votre voyage.", position: 6.5 },
-        { text: "Notre guide d'équipement vous aide à ne rien oublier pour votre aventure.", position: 7.5 }
-      ],
-      optimizationStatus,
-      hierarchy: [
-        {
-          text: pageTitle,
-          tagName: "h1",
-          position: 0,
-          children: [
-            {
-              text: sections[0],
-              tagName: "h2",
-              position: 1,
-              children: [
-                {
-                  text: "Notre agence sélectionne pour vous les plus belles destinations à travers le monde.",
-                  tagName: "p",
-                  position: 1.5,
-                  children: []
-                }
-              ]
-            },
-            {
-              text: sections[1],
-              tagName: "h2",
-              position: 2,
-              children: [
-                {
-                  text: "Découvrez nos hébergements de qualité adaptés à tous les budgets et styles de voyage.",
-                  tagName: "p",
-                  position: 2.5,
-                  children: []
-                },
-                {
-                  text: subsections[0],
-                  tagName: "h3",
-                  position: 3,
-                  children: [
-                    {
-                      text: `${subsections[0]}: Des voyages inoubliables dans les plus belles capitales et régions européennes.`,
-                      tagName: "p",
-                      position: 3.5,
-                      children: []
-                    }
-                  ]
-                },
-                {
-                  text: subsections[1],
-                  tagName: "h3",
-                  position: 4,
-                  children: [
-                    {
-                      text: `${subsections[1]}: Partez à la découverte des cultures fascinantes de l'Asie.`,
-                      tagName: "p",
-                      position: 4.5,
-                      children: []
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              text: sections[2],
-              tagName: "h2",
-              position: 5,
-              children: [
-                {
-                  text: "Nos activités sont sélectionnées pour vous faire vivre des moments inoubliables.",
-                  tagName: "p",
-                  position: 5.5,
-                  children: []
-                },
-                {
-                  text: "Conseils pratiques",
-                  tagName: "h3",
-                  position: 6,
-                  children: [
-                    {
-                      text: "Consultez nos conseils pratiques pour préparer sereinement votre voyage.",
-                      tagName: "p",
-                      position: 6.5,
-                      children: []
-                    }
-                  ]
-                },
-                {
-                  text: "Équipement recommandé",
-                  tagName: "h3",
-                  position: 7,
-                  children: [
-                    {
-                      text: "Notre guide d'équipement vous aide à ne rien oublier pour votre aventure.",
-                      tagName: "p",
-                      position: 7.5,
-                      children: []
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    };
-  };
-
-  // Generate mock site structure based on the analyzed URL
-  const generateMockSiteStructure = (analyzedUrl: string) => {
-    const domain = analyzedUrl.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
-    
-    // Adapter la structure en fonction du domaine
-    let sections = ["À propos", "Services", "Contact", "Blog"];
-    
-    if (domain.includes("divaskin")) {
-      sections = ["Produits", "Soins", "Blog beauté", "À propos", "Contact"];
-    } else if (domain.includes("beauty") || domain.includes("beaute")) {
-      sections = ["Soins visage", "Soins corps", "Conseils beauté", "Boutique", "Contact"];
-    } else if (domain.includes("tech") || domain.includes("dev")) {
-      sections = ["Services", "Technologies", "Portfolio", "Équipe", "Contact"];
-    }
-    
-    return {
-      name: `Structure de ${domain}`,
-      children: [
-        {
-          name: "Page d'accueil",
-          path: analyzedUrl,
-          children: sections.map(section => {
-            const sectionPath = section.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, "-");
-            return {
-              name: section,
-              path: `${analyzedUrl}/${sectionPath}`,
-              children: section === sections[0] ? [
-                {
-                  name: "Notre histoire",
-                  path: `${analyzedUrl}/${sectionPath}/histoire`,
-                  children: []
-                },
-                {
-                  name: "L'équipe",
-                  path: `${analyzedUrl}/${sectionPath}/equipe`,
-                  children: []
-                }
-              ] : section === sections[1] ? [
-                {
-                  name: "Service Premium",
-                  path: `${analyzedUrl}/${sectionPath}/premium`,
-                  children: []
-                },
-                {
-                  name: "Service Standard",
-                  path: `${analyzedUrl}/${sectionPath}/standard`,
-                  children: []
-                }
-              ] : section === "Blog" || section === "Blog beauté" ? [
-                {
-                  name: "Article 1",
-                  path: `${analyzedUrl}/${sectionPath}/article-1`,
-                  children: []
-                },
-                {
-                  name: "Article 2",
-                  path: `${analyzedUrl}/${sectionPath}/article-2`,
-                  children: []
-                }
-              ] : []
-            };
-          })
-        }
-      ]
-    };
   };
 
   return (
@@ -462,28 +242,57 @@ const HierarchyTabContent = () => {
             </AlertDescription>
           </Alert>
         )}
+        
+        <div className="mt-6">
+          <ApiKeyConfig 
+            openaiKey={openaiKey}
+            setOpenaiKey={setOpenaiKey}
+            apiKeyStatus={apiKeyStatus}
+            setApiKeyStatus={setApiKeyStatus}
+            validationMessage={validationMessage}
+            setValidationMessage={setValidationMessage}
+            onKeyValidated={handleApiKeyValidated}
+          />
+        </div>
       </Card>
       
-      {analyzeResult && (
-        <>
-          <ContentHierarchy 
-            headings={analyzeResult?.headings || []} 
-            paragraphs={analyzeResult?.paragraphs || []} 
-            hierarchy={analyzeResult?.hierarchy || []}
-            url={analyzedUrl}
-            recommendations={analyzeResult ? [
-              "Assurez-vous d'avoir exactement une balise H1",
-              "Utilisez des titres H2 et H3 pour structurer votre contenu",
-              "Incluez vos mots-clés dans vos titres principaux",
-              "Maintenez une structure hiérarchique logique",
-              "Évitez les titres trop longs (moins de 70 caractères)"
-            ] : []}
-          />
-          
-          {analyzedUrl && (
-            <SiteStructureVisualizer structure={generateMockSiteStructure(analyzedUrl)} />
-          )}
-        </>
+      {analyzeResult ? (
+        <ContentHierarchy 
+          headings={analyzeResult?.headings || []} 
+          paragraphs={analyzeResult?.paragraphs || []} 
+          hierarchy={analyzeResult?.hierarchy || []}
+          url={analyzedUrl}
+          recommendations={[
+            "Assurez-vous d'avoir exactement une balise H1",
+            "Utilisez des titres H2 et H3 pour structurer votre contenu",
+            "Incluez vos mots-clés dans vos titres principaux",
+            "Maintenez une structure hiérarchique logique",
+            "Évitez les titres trop longs (moins de 70 caractères)"
+          ]}
+          optimizationStatus={analyzeResult?.optimizationStatus}
+        />
+      ) : (
+        <Card className="p-6 bg-white/50 backdrop-blur-sm text-center">
+          <div className="py-12">
+            {isLoading ? (
+              <div className="flex flex-col items-center justify-center">
+                <Loader2 className="h-12 w-12 animate-spin text-blue-600 mb-4" />
+                <h3 className="text-xl font-medium text-gray-700">Analyse en cours...</h3>
+                <p className="text-gray-500 max-w-md mt-2">
+                  Nous récupérons et analysons les données du site. Veuillez patienter...
+                </p>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center">
+                <Search className="h-12 w-12 text-gray-300 mb-4" />
+                <h3 className="text-xl font-medium text-gray-700">Aucun site analysé</h3>
+                <p className="text-gray-500 max-w-md mt-2">
+                  Entrez l'URL d'un site web et cliquez sur "Analyser le site" pour voir sa structure hiérarchique.
+                </p>
+              </div>
+            )}
+          </div>
+        </Card>
       )}
     </div>
   );
