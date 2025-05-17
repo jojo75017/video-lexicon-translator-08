@@ -2,50 +2,55 @@
 export interface InternalLinkAnalysis {
   totalLinks?: number;
   uniquePages?: number;
-  averageLinksPerPage?: number;
+  linkDistribution?: {
+    navigationLinks: number;
+    contentLinks: number;
+    footerLinks: number;
+    sidebarLinks: number;
+    otherLinks: number;
+  };
+  linkDepth?: {
+    averageDepth: number;
+    maxDepth: number;
+    depthDistribution: Record<string, number>;
+  };
+  pageMetrics?: PageLinkMetric[];
   recommendations?: InternalLinkRecommendation[];
-  pageMetrics?: PageMetric[];
-  linkDistribution?: LinkDistribution;
-  orphanPages?: OrphanPage[];
+  orphanPages: OrphanPage[];
   siloPagesFound?: boolean;
   siloStructure?: SiloStructure[];
   averageDepth?: number;
-  depthDistribution?: Record<string, number>;
 }
 
 export interface InternalLinkRecommendation {
-  from?: string;
-  to?: string;
-  reason: string;
-  priority?: string;
-  description?: string;
-  type?: string;
-  impact?: string;
+  type: string;
   source?: string;
   target?: string;
-  sourcePage?: string;
-  targetPage?: string;
-  relevanceScore?: number;
+  reason: string;
+  priority: "high" | "medium" | "low";
+  description?: string;
+  impact?: string;
 }
 
-export interface PageMetric {
+export interface PageLinkMetric {
   url: string;
-  inLinks: number;
-  outLinks: number;
-  importance: string;
-}
-
-export interface LinkDistribution {
-  [key: string]: number;
+  title?: string | null;
+  incomingLinks: number;
+  outgoingLinks: number;
+  depth: number;
+  importance: number;
 }
 
 export interface OrphanPage {
   url: string;
-  title?: string;
+  title?: string | null;
   suggestions?: string[];
 }
 
 export interface SiloStructure {
+  name: string;
+  mainPage: string;
+  subPages: string[];
   theme: string;
   pages: string[];
 }

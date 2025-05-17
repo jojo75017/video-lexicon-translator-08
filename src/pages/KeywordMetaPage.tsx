@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import UnifiedDashboard from '@/components/dashboard/UnifiedDashboard';
 import { Card } from '@/components/ui/card';
 import { KeywordMetaContent } from '@/components/seo/keyword/KeywordMetaContent';

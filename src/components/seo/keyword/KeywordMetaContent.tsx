@@ -44,17 +44,7 @@ const defaultSuggestions: KeywordSuggestion[] = [
     relevance: 85,
     suggestedTitle: "Stratégie de Contenu : Comment Créer du Contenu qui Convertit",
     suggestedDescription: "Apprenez à développer une stratégie de contenu efficace qui engage vos lecteurs et convertit vos visiteurs en clients. Guide étape par étape."
-  },
-  { 
-    keyword: "SEO local", 
-    volume: 740, 
-    difficulty: 45, 
-    cpc: 3.1, 
-    competition: 0.5, 
-    relevance: 93,
-    suggestedTitle: "SEO Local : Comment Dominer les Recherches dans votre Région",
-    suggestedDescription: "Optimisez votre référencement local et attirez plus de clients près de chez vous. Stratégies SEO local efficaces pour les entreprises de proximité."
-  },
+  }
 ];
 
 export const KeywordMetaContent: React.FC = () => {
