@@ -29,7 +29,10 @@ const MainTabList: React.FC<MainTabProps> = ({ mainTabs, activeTab, onTabChange 
     onTabChange(tabId);
     
     // Navigation directe
-    navigate(path);
+    if (path) {
+      navigate(path);
+      console.log('Navigation vers:', path);
+    }
   };
 
   return (

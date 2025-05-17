@@ -17,7 +17,6 @@ const KeywordTabContent = () => {
   const {
     keyword,
     setKeyword,
-    isGenerating,
     title,
     setTitle,
     description,
@@ -25,6 +24,7 @@ const KeywordTabContent = () => {
     generatedKeywords,
     activeTab,
     setActiveTab,
+    isGenerating,
     generateSuggestions,
     handleInsertTitle,
     handleInsertDescription

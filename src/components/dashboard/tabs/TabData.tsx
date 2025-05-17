@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BarChart2, FileText, Zap, PieChart, Type, Pinterest, FilePenLine, LayoutGrid, ThumbsUp, Target, LinkIcon, Link2, LineChart, CheckCircle2, TicketCheck } from "lucide-react";
+import { BarChart2, FileText, Zap, PieChart, Type, FilePenLine, LayoutGrid, ThumbsUp, Target, LinkIcon, Link2, LineChart, CheckCircle2, TicketCheck } from "lucide-react";
 
 export const tabs = [
   { 
@@ -105,7 +105,8 @@ export const tabs = [
   {
     id: 'pinterest',
     label: 'Pinterest',
-    icon: <Pinterest className="h-4 w-4" />,
+    // Remplacer l'icône Pinterest par FilePenLine
+    icon: <FilePenLine className="h-4 w-4" />,
     description: "Générateur d'images Pinterest",
     color: "bg-red-50 text-red-700 border-red-200",
     link: '/pinterest',
