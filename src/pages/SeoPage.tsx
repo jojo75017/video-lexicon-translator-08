@@ -24,6 +24,7 @@ const SeoPage = () => {
               <AlertTitle>Analysez un site web</AlertTitle>
               <AlertDescription>
                 Utilisez l'outil d'analyse ci-dessous pour évaluer les performances SEO d'un site.
+                Vous aurez accès aux métriques de performance et d'analytics une fois l'analyse terminée.
               </AlertDescription>
             </Alert>
             <CrawlForm />

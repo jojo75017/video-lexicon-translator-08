@@ -11,11 +11,11 @@ const useKeywordGenerator = () => {
   const [favorites, setFavorites] = useState<KeywordSuggestion[]>([]);
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>('title');
+  const [generatedKeywords, setGeneratedKeywords] = useState<KeywordSuggestion[]>([]);
   
   // États pour le title et la description
   const [title, setTitle] = useState<string>('');
   const [description, setDescription] = useState<string>('');
-  const [generatedKeywords, setGeneratedKeywords] = useState<KeywordSuggestion[]>([]);
 
   // Fonction pour générer des suggestions de mots-clés
   const generateSuggestions = async () => {
