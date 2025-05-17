@@ -65,30 +65,51 @@ const SeoActionButtons = () => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
       <Button 
-        variant="outline" 
-        className="w-full h-[70px] flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50 hover:from-gray-50 hover:to-gray-100 gap-2"
+        className="w-full h-[70px] flex flex-col items-center justify-center bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-md hover:shadow-lg transition-all gap-2"
         onClick={handleKeywordMetaClick}
       >
-        <FileText className="h-5 w-5 text-blue-600" />
+        <FileText className="h-5 w-5 text-white" />
         <span className="text-sm">Title & Meta</span>
       </Button>
       
       <Button 
-        variant="outline" 
-        className="w-full h-[70px] flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50 hover:from-gray-50 hover:to-gray-100 gap-2"
+        className="w-full h-[70px] flex flex-col items-center justify-center bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-md hover:shadow-lg transition-all gap-2"
         onClick={handleKeywordGeneratorClick}
       >
-        <Search className="h-5 w-5 text-green-600" />
+        <Search className="h-5 w-5 text-white" />
         <span className="text-sm">Générateur de mots-clés</span>
       </Button>
       
       <Button 
-        variant="outline" 
-        className="w-full h-[70px] flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50 hover:from-gray-50 hover:to-gray-100 gap-2"
+        className="w-full h-[70px] flex flex-col items-center justify-center bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white shadow-md hover:shadow-lg transition-all gap-2"
         onClick={handleInternalLinkClick}
       >
-        <Network className="h-5 w-5 text-purple-600" />
+        <Network className="h-5 w-5 text-white" />
         <span className="text-sm">Liens internes</span>
+      </Button>
+
+      <Button 
+        className="w-full h-[70px] flex flex-col items-center justify-center bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white shadow-md hover:shadow-lg transition-all gap-2"
+        onClick={handleSeoClick}
+      >
+        <BarChart className="h-5 w-5 text-white" />
+        <span className="text-sm">Analyse SEO</span>
+      </Button>
+
+      <Button 
+        className="w-full h-[70px] flex flex-col items-center justify-center bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white shadow-md hover:shadow-lg transition-all gap-2"
+        onClick={handlePerformanceClick}
+      >
+        <Gauge className="h-5 w-5 text-white" />
+        <span className="text-sm">Performance</span>
+      </Button>
+      
+      <Button 
+        className="w-full h-[70px] flex flex-col items-center justify-center bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white shadow-md hover:shadow-lg transition-all gap-2"
+        onClick={handleTrackingClick}
+      >
+        <BarChart className="h-5 w-5 text-white" />
+        <span className="text-sm">Suivi des positions</span>
       </Button>
     </div>
   );

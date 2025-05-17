@@ -1,6 +1,8 @@
 
+import { ReactNode } from 'react';
+
 export interface PerformanceData {
-  score?: number;
+  score: number;
   loadTime: number;
   firstContentfulPaint: number;
   domLoadTime: number;
@@ -12,6 +14,8 @@ export interface PerformanceData {
   scriptCount?: number;
   styleCount?: number;
   responseTime?: number;
+  resourceCount?: number;
+  imageCount?: number;
   resourceBreakdown?: {
     js: number;
     css: number;
@@ -21,20 +25,23 @@ export interface PerformanceData {
   };
 }
 
-export interface PerformanceMetricsSectionProps {
-  deviceData: PerformanceData;
-  activeDevice: 'mobile' | 'desktop';
-}
-
-export interface PerformanceHighlightsProps {
-  deviceData: PerformanceData;
-  activeDevice: 'mobile' | 'desktop';
-}
-
 export interface MetricItemProps {
   label: string;
   value: number;
   maxValue: number;
   formatFunc: (value: number) => string;
   getColorClass: (value: number, maxValue: number) => string;
+}
+
+export interface ChartProps {
+  activeDevice: 'mobile' | 'desktop';
+  data: Array<{
+    name: string;
+    value: number;
+  }>;
+}
+
+export interface PerformanceMetricsSectionProps {
+  deviceData: PerformanceData;
+  activeDevice: 'mobile' | 'desktop';
 }

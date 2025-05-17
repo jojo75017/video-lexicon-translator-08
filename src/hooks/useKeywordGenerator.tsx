@@ -91,7 +91,7 @@ export const useKeywordGenerator = () => {
         setKeywordSuggestions(suggestions);
         setLoading(false);
         toast.success(`${suggestions.length} suggestions générées`);
-      }, 1500); // Simulate API delay
+      }, 1000); // Shorter delay for better UX
     } catch (err) {
       setError('Une erreur est survenue lors de la génération des mots-clés');
       setLoading(false);
