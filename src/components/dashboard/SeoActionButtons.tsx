@@ -63,53 +63,95 @@ const SeoActionButtons = () => {
   };
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 animate-fade-in">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6 animate-fade-in">
       <Button 
-        className="w-full h-[80px] flex flex-col items-center justify-center bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-md hover:shadow-lg transition-all gap-2 transform hover:scale-[1.02] hover:translate-y-[-2px]"
+        className="w-full h-[100px] flex flex-col items-center justify-center relative overflow-hidden group shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1"
         onClick={handleKeywordMetaClick}
+        style={{
+          background: "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)"
+        }}
       >
-        <FileText className="h-6 w-6 text-white mb-1" />
-        <span className="text-sm">Title & Meta</span>
+        <div className="absolute inset-0 bg-white/10 group-hover:bg-white/20 transition-all duration-300 opacity-0 group-hover:opacity-100"></div>
+        <div className="relative z-10 flex flex-col items-center">
+          <FileText className="h-8 w-8 text-white mb-2 drop-shadow-md" />
+          <span className="text-base font-medium text-white drop-shadow-md">Title & Meta</span>
+        </div>
+        <div className="absolute -right-6 -bottom-6 w-20 h-20 rounded-full bg-white/10 blur-xl"></div>
       </Button>
       
       <Button 
-        className="w-full h-[80px] flex flex-col items-center justify-center bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-md hover:shadow-lg transition-all gap-2 transform hover:scale-[1.02] hover:translate-y-[-2px]"
+        className="w-full h-[100px] flex flex-col items-center justify-center relative overflow-hidden group shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1"
         onClick={handleKeywordGeneratorClick}
+        style={{
+          background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)"
+        }}
       >
-        <Search className="h-6 w-6 text-white mb-1" />
-        <span className="text-sm">Générateur de mots-clés</span>
+        <div className="absolute inset-0 bg-white/10 group-hover:bg-white/20 transition-all duration-300 opacity-0 group-hover:opacity-100"></div>
+        <div className="relative z-10 flex flex-col items-center">
+          <Search className="h-8 w-8 text-white mb-2 drop-shadow-md" />
+          <span className="text-base font-medium text-white drop-shadow-md">Générateur de mots-clés</span>
+        </div>
+        <div className="absolute -right-6 -bottom-6 w-20 h-20 rounded-full bg-white/10 blur-xl"></div>
       </Button>
       
       <Button 
-        className="w-full h-[80px] flex flex-col items-center justify-center bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white shadow-md hover:shadow-lg transition-all gap-2 transform hover:scale-[1.02] hover:translate-y-[-2px]"
+        className="w-full h-[100px] flex flex-col items-center justify-center relative overflow-hidden group shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1"
         onClick={handleInternalLinkClick}
+        style={{
+          background: "linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)"
+        }}
       >
-        <Network className="h-6 w-6 text-white mb-1" />
-        <span className="text-sm">Liens internes</span>
+        <div className="absolute inset-0 bg-white/10 group-hover:bg-white/20 transition-all duration-300 opacity-0 group-hover:opacity-100"></div>
+        <div className="relative z-10 flex flex-col items-center">
+          <Network className="h-8 w-8 text-white mb-2 drop-shadow-md" />
+          <span className="text-base font-medium text-white drop-shadow-md">Liens internes</span>
+        </div>
+        <div className="absolute -right-6 -bottom-6 w-20 h-20 rounded-full bg-white/10 blur-xl"></div>
       </Button>
 
       <Button 
-        className="w-full h-[80px] flex flex-col items-center justify-center bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white shadow-md hover:shadow-lg transition-all gap-2 transform hover:scale-[1.02] hover:translate-y-[-2px]"
+        className="w-full h-[100px] flex flex-col items-center justify-center relative overflow-hidden group shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1"
         onClick={handleSeoClick}
+        style={{
+          background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)"
+        }}
       >
-        <BarChart className="h-6 w-6 text-white mb-1" />
-        <span className="text-sm">Analyse SEO</span>
+        <div className="absolute inset-0 bg-white/10 group-hover:bg-white/20 transition-all duration-300 opacity-0 group-hover:opacity-100"></div>
+        <div className="relative z-10 flex flex-col items-center">
+          <BarChart className="h-8 w-8 text-white mb-2 drop-shadow-md" />
+          <span className="text-base font-medium text-white drop-shadow-md">Analyse SEO</span>
+        </div>
+        <div className="absolute -right-6 -bottom-6 w-20 h-20 rounded-full bg-white/10 blur-xl"></div>
       </Button>
 
       <Button 
-        className="w-full h-[80px] flex flex-col items-center justify-center bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white shadow-md hover:shadow-lg transition-all gap-2 transform hover:scale-[1.02] hover:translate-y-[-2px]"
+        className="w-full h-[100px] flex flex-col items-center justify-center relative overflow-hidden group shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1"
         onClick={handlePerformanceClick}
+        style={{
+          background: "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)"
+        }}
       >
-        <Gauge className="h-6 w-6 text-white mb-1" />
-        <span className="text-sm">Performance</span>
+        <div className="absolute inset-0 bg-white/10 group-hover:bg-white/20 transition-all duration-300 opacity-0 group-hover:opacity-100"></div>
+        <div className="relative z-10 flex flex-col items-center">
+          <Gauge className="h-8 w-8 text-white mb-2 drop-shadow-md" />
+          <span className="text-base font-medium text-white drop-shadow-md">Performance</span>
+        </div>
+        <div className="absolute -right-6 -bottom-6 w-20 h-20 rounded-full bg-white/10 blur-xl"></div>
       </Button>
       
       <Button 
-        className="w-full h-[80px] flex flex-col items-center justify-center bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white shadow-md hover:shadow-lg transition-all gap-2 transform hover:scale-[1.02] hover:translate-y-[-2px]"
+        className="w-full h-[100px] flex flex-col items-center justify-center relative overflow-hidden group shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1"
         onClick={handleTrackingClick}
+        style={{
+          background: "linear-gradient(135deg, #ec4899 0%, #be185d 100%)"
+        }}
       >
-        <BarChart className="h-6 w-6 text-white mb-1" />
-        <span className="text-sm">Suivi des positions</span>
+        <div className="absolute inset-0 bg-white/10 group-hover:bg-white/20 transition-all duration-300 opacity-0 group-hover:opacity-100"></div>
+        <div className="relative z-10 flex flex-col items-center">
+          <BarChart className="h-8 w-8 text-white mb-2 drop-shadow-md" />
+          <span className="text-base font-medium text-white drop-shadow-md">Suivi des positions</span>
+        </div>
+        <div className="absolute -right-6 -bottom-6 w-20 h-20 rounded-full bg-white/10 blur-xl"></div>
       </Button>
     </div>
   );

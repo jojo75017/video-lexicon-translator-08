@@ -3,11 +3,23 @@ import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { ChartProps } from './types';
 
-const COLORS = ['#4f46e5', '#0891b2', '#16a34a', '#9333ea', '#f59e0b', '#dc2626'];
+// Couleurs vives et vibrantes pour le graphique
+const COLORS = [
+  '#4338ca', // indigo-700
+  '#0ea5e9', // sky-500
+  '#10b981', // emerald-500
+  '#8b5cf6', // violet-500
+  '#f59e0b', // amber-500
+  '#ef4444'  // red-500
+];
 
 const ResourcePieChart: React.FC<ChartProps> = ({ data, activeDevice }) => {
   if (!data || data.length === 0) {
-    return <div className="flex items-center justify-center h-full text-gray-500">Données non disponibles</div>;
+    return (
+      <div className="flex items-center justify-center h-full text-gray-500 bg-gray-50 rounded-lg p-4 border border-gray-200">
+        <p>Données non disponibles</p>
+      </div>
+    );
   }
 
   return (
@@ -17,40 +29,58 @@ const ResourcePieChart: React.FC<ChartProps> = ({ data, activeDevice }) => {
           data={data}
           cx="50%"
           cy="50%"
-          innerRadius={30}
-          outerRadius={60}
-          paddingAngle={5}
+          innerRadius={40}
+          outerRadius={80}
+          paddingAngle={6}
           dataKey="value"
-          animationDuration={1000}
-          animationBegin={0}
+          animationDuration={800}
+          animationBegin={300}
           animationEasing="ease-out"
+          className="drop-shadow-xl"
         >
           {data.map((entry, index) => (
             <Cell 
               key={`cell-${index}`} 
               fill={COLORS[index % COLORS.length]} 
               stroke="#fff"
-              strokeWidth={2}
-              className="hover:opacity-80 transition-opacity"
+              strokeWidth={3}
+              className="hover:opacity-90 transition-all duration-300 hover:scale-105"
+              style={{ filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))' }}
             />
           ))}
         </Pie>
         <Tooltip 
           formatter={(value: number) => [`${(value/1000).toFixed(1)} KB`, '']}
           contentStyle={{
-            borderRadius: '8px',
-            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-            backgroundColor: 'rgba(255, 255, 255, 0.9)',
-            border: 'none',
-            padding: '8px 12px'
+            borderRadius: '10px',
+            boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            border: '1px solid rgba(209, 213, 219, 0.5)',
+            padding: '12px 16px'
           }}
-          itemStyle={{ color: '#4b5563' }}
+          itemStyle={{ 
+            color: '#4b5563',
+            fontWeight: '500',
+            fontSize: '14px'
+          }}
+          wrapperStyle={{
+            zIndex: 1000
+          }}
         />
         <Legend 
           layout="horizontal" 
           verticalAlign="bottom" 
           align="center"
-          wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }}
+          wrapperStyle={{ 
+            fontSize: '13px', 
+            fontWeight: '500',
+            paddingTop: '15px' 
+          }}
+          formatter={(value, entry) => (
+            <span style={{ color: entry.color, fontWeight: 'bold' }}>
+              {value}
+            </span>
+          )}
         />
       </PieChart>
     </ResponsiveContainer>

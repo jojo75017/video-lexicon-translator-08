@@ -43,6 +43,15 @@ export interface ChartProps {
   }>;
 }
 
+export interface ResourcesChartProps {
+  activeDevice: 'mobile' | 'desktop';
+  resourcesData: Array<{
+    name: string;
+    value: number;
+    color?: string;
+  }>;
+}
+
 export interface PerformanceMetricsSectionProps {
   deviceData: PerformanceData;
   activeDevice: 'mobile' | 'desktop';
