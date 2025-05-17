@@ -3,19 +3,14 @@ import React from 'react';
 import { Card } from "@/components/ui/card";
 import { AlertTriangle, ExternalLink } from 'lucide-react';
 import { Alert, AlertDescription } from "@/components/ui/alert";
-
-interface BrokenLink {
-  url: string;
-  statusCode: number;
-  location: string;
-}
+import { BrokenLink } from '@/types/seo';
 
 interface BrokenLinksProps {
-  brokenLinks: BrokenLink[];
+  brokenLinks?: BrokenLink[];
 }
 
-const BrokenLinks = ({ brokenLinks }: BrokenLinksProps) => {
-  if (brokenLinks.length === 0) return null;
+const BrokenLinks = ({ brokenLinks = [] }: BrokenLinksProps) => {
+  if (!brokenLinks || brokenLinks.length === 0) return null;
 
   return (
     <Card className="p-6">
@@ -35,11 +30,11 @@ const BrokenLinks = ({ brokenLinks }: BrokenLinksProps) => {
               </div>
               <div className="text-sm">
                 <span className="font-medium">Status: </span>
-                {link.statusCode}
+                {link.statusCode || link.status || 'Inconnu'}
               </div>
               <div className="text-sm">
                 <span className="font-medium">Trouvé dans: </span>
-                {link.location}
+                {link.location || link.text || 'Page principale'}
               </div>
             </AlertDescription>
           </Alert>
@@ -50,4 +45,3 @@ const BrokenLinks = ({ brokenLinks }: BrokenLinksProps) => {
 };
 
 export default BrokenLinks;
-

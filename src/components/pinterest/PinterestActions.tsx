@@ -14,26 +14,32 @@ const PinterestActions: React.FC<PinterestActionsProps> = ({
   historyVisible,
   setHistoryVisible
 }) => {
+  const handleResetPin = () => {
+    console.log("Réinitialisation du pin");
+    resetPin();
+    toast.success("Pin réinitialisé avec succès");
+  };
+
+  const handleToggleHistory = () => {
+    console.log("Toggle historique:", !historyVisible);
+    setHistoryVisible(!historyVisible);
+    toast.info(historyVisible ? "Historique masqué" : "Historique affiché");
+  };
+
   return (
     <div className="mt-6 space-y-4">
       <div className="flex justify-between">
         <Button 
           variant="outline" 
-          onClick={() => {
-            console.log("Réinitialisation du pin");
-            resetPin();
-            toast.success("Pin réinitialisé avec succès");
-          }}
+          onClick={handleResetPin}
+          type="button"
         >
           Réinitialiser
         </Button>
         <Button 
           variant="outline" 
-          onClick={() => {
-            console.log("Toggle historique:", !historyVisible);
-            setHistoryVisible(!historyVisible);
-            toast.info(historyVisible ? "Historique masqué" : "Historique affiché");
-          }}
+          onClick={handleToggleHistory}
+          type="button"
         >
           {historyVisible ? 'Masquer l\'historique' : 'Voir l\'historique'}
         </Button>

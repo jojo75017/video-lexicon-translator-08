@@ -17,6 +17,15 @@ const PerformanceMetrics: React.FC<PerformanceMetricsProps> = ({ performance }) 
 
   if (!performance) return null;
 
+  // Assurer que tous les champs existent
+  const resourceBreakdown = performance.resourceBreakdown || {
+    js: 0,
+    css: 0,
+    images: 0,
+    fonts: 0,
+    other: 0
+  };
+
   return (
     <Card className="p-6">
       <h3 className="text-xl font-semibold mb-4">Performances</h3>

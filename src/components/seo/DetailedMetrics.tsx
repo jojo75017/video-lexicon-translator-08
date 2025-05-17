@@ -41,6 +41,16 @@ const DetailedMetrics = ({
       )
     : [];
 
+  // Assurer que ces valeurs ne sont jamais undefined pour éviter des erreurs
+  const socialMetricsDefault = {
+    facebook: { shares: 0, comments: 0, likes: 0 },
+    twitter: { tweets: 0, retweets: 0, likes: 0, shares: 0, replies: 0 },
+    pinterest: { pins: 0, saves: 0 },
+    linkedin: { shares: 0, engagements: 0 }
+  };
+
+  const socialMetrics = seoAnalysis.socialMetrics || socialMetricsDefault;
+
   return (
     <>
       <motion.div
@@ -100,7 +110,7 @@ const DetailedMetrics = ({
           firstContentfulPaint={seoAnalysis.performance?.firstContentfulPaint}
           domLoadTime={seoAnalysis.performance?.domLoadTime}
         />
-        <SocialMetrics metrics={seoAnalysis.socialMetrics} />
+        <SocialMetrics metrics={socialMetrics} />
       </motion.div>
 
       {showAllMetrics && (

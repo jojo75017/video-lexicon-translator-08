@@ -5,7 +5,7 @@ export interface KeywordFrequency {
   keyword: string;
   count: number;
   density: number;
-  position?: number; // Position ajoutée pour compatibilité
+  position?: number;
 }
 
 export interface KeywordData {
@@ -33,6 +33,7 @@ export interface KeywordSuggestion {
   suggestedDescription?: string;
   suggestedShortDescription?: string;
   suggestedLongDescription?: string;
+  selected?: boolean;
 }
 
 export interface KeywordGroup {

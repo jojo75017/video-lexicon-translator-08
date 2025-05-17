@@ -32,6 +32,11 @@ export interface SeoAnalysis {
   metadata?: any;
   headings?: any;
   headingStructure?: any;
+  
+  // Propriétés supplémentaires pour la compatibilité avec les services
+  success?: boolean;
+  error?: string;
+  data?: any;
 }
 
 export interface PerformanceData {
@@ -46,6 +51,13 @@ export interface PerformanceData {
   responseTime?: number;
   impressions?: number;
   clickThroughRate?: number;
+  resourceBreakdown?: {
+    js: number;
+    css: number;
+    images: number;
+    fonts: number;
+    other: number;
+  };
 }
 
 export interface SocialTags {
@@ -126,6 +138,10 @@ export interface KeywordSuggestion {
   type?: 'standard' | 'long-tail';
   selected?: boolean;
   relevance?: number;
+  suggestedTitle?: string;
+  suggestedDescription?: string;
+  searchVolume?: number;
+  clicks?: number;
 }
 
 // Types exportés pour la compatibilité avec les composants existants
@@ -135,12 +151,16 @@ export type SeoAnalysisResult = SeoAnalysis;
 export interface InternalLinkAnalysis {
   pages?: any[];
   recommendations?: InternalLinkRecommendation[];
+  totalLinks?: number;
+  uniquePages?: number;
+  linkDepth?: number;
 }
 export interface PageLinkMetric {
   url: string;
   incomingLinks: number;
   outgoingLinks: number;
   pageRank?: number;
+  title?: string;
 }
 export interface InternalLinkRecommendation {
   sourcePage: string;
@@ -160,6 +180,6 @@ export interface KeywordData {
 export type StructureItem = {
   content: string;
   id: string;
-  type: "list" | "h3" | "p" | "h2" | "h1" | "h4";
+  type: "list" | "h3" | "p" | "h2" | "h1" | "h4" | string;
   items?: string[];
 };

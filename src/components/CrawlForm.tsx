@@ -23,13 +23,13 @@ export const CrawlForm: React.FC<CrawlFormProps> = ({
       
       const result = await FirecrawlService.crawlWebsite(url);
       
-      if (result.success) {
+      if (result && result.success) {
         toast.success("Analyse terminée", {
           description: "Les données ont été récupérées avec succès"
         });
       } else {
         toast.error("Erreur d'analyse", {
-          description: result.error || "Impossible d'analyser le site"
+          description: result && result.error ? result.error : "Impossible d'analyser le site"
         });
       }
     } catch (error) {

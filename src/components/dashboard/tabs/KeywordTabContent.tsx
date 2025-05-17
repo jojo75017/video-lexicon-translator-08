@@ -73,7 +73,7 @@ const KeywordTabContent = () => {
         </div>
       </Card>
 
-      {generatedKeywords.length > 0 && (
+      {generatedKeywords && generatedKeywords.length > 0 && (
         <KeywordSuggestions 
           generatedKeywords={generatedKeywords}
           onGenerateClick={generateSuggestions}
@@ -86,7 +86,7 @@ const KeywordTabContent = () => {
         />
       )}
 
-      {keyword && !generatedKeywords.length && !isGenerating && (
+      {keyword && (!generatedKeywords || generatedKeywords.length === 0) && !isGenerating && (
         <SuggestionsPlaceholder keyword={keyword} onGenerateClick={generateSuggestions} />
       )}
     </div>

@@ -1,58 +1,128 @@
 
 import { useState } from 'react';
-import { type KeywordSuggestion } from '@/types/seo';
+import { KeywordSuggestion } from '@/types/seo/Keyword';
+import { toast } from 'sonner';
 
 const useKeywordGenerator = () => {
   const [keyword, setKeyword] = useState<string>('');
-  const [title, setTitle] = useState<string>('');
-  const [description, setDescription] = useState<string>('');
   const [language, setLanguage] = useState<string>('fr');
-  const [generatedKeywords, setGeneratedKeywords] = useState<KeywordSuggestion[]>([]);
+  const [results, setResults] = useState<KeywordSuggestion[]>([]);
+  const [favorites, setFavorites] = useState<KeywordSuggestion[]>([]);
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>('title');
+  
+  // États pour le title et la description
+  const [title, setTitle] = useState<string>('');
+  const [description, setDescription] = useState<string>('');
+  const [generatedKeywords, setGeneratedKeywords] = useState<KeywordSuggestion[]>([]);
 
-  // Generate keyword suggestions
+  // Fonction pour générer des suggestions de mots-clés
   const generateSuggestions = async () => {
-    if (!keyword.trim()) return;
-    
+    if (!keyword || keyword.trim() === '') {
+      toast.error('Veuillez entrer un mot-clé');
+      return;
+    }
+
     setIsGenerating(true);
     
     try {
-      // This is a mockup function that would typically make an API call
-      // In a real application, this would call an actual API endpoint
-      setTimeout(() => {
-        const mockKeywords: KeywordSuggestion[] = [
-          { keyword: `${keyword} conseils`, score: 95, volume: 1200, cpc: 0.75, competition: 0.3 },
-          { keyword: `${keyword} tutoriel`, score: 87, volume: 880, cpc: 0.65, competition: 0.5 },
-          { keyword: `meilleur ${keyword}`, score: 82, volume: 1500, cpc: 1.2, competition: 0.7 },
-          { keyword: `${keyword} débutant`, score: 78, volume: 720, cpc: 0.55, competition: 0.4 },
-          { keyword: `${keyword} guide`, score: 76, volume: 950, cpc: 0.8, competition: 0.6 },
-          { keyword: `${keyword} professionnel`, score: 71, volume: 450, cpc: 1.5, competition: 0.8 },
-          { keyword: `${keyword} gratuit`, score: 69, volume: 2200, cpc: 0.4, competition: 0.65 },
-        ];
-        
-        setGeneratedKeywords(mockKeywords);
-        setIsGenerating(false);
-      }, 1500);
+      // Simule un appel API
+      await new Promise(resolve => setTimeout(resolve, 1200));
+      
+      // Génère des suggestions fictives
+      const mockKeywords: KeywordSuggestion[] = [
+        {
+          keyword: keyword,
+          volume: 8500,
+          difficulty: 62,
+          relevance: 95,
+          cpc: 1.25,
+          competition: 0.75,
+          suggestedTitle: `${keyword} - Guide complet et conseils`,
+          suggestedDescription: `Découvrez tout ce que vous devez savoir sur ${keyword}. Conseils d'experts, astuces et stratégies pour optimiser vos résultats.`
+        },
+        {
+          keyword: `meilleur ${keyword}`,
+          volume: 5200,
+          difficulty: 58,
+          relevance: 85,
+          cpc: 1.85,
+          competition: 0.82,
+          suggestedTitle: `Top 10 des meilleurs ${keyword} - Comparatif complet`,
+          suggestedDescription: `Notre comparatif des meilleurs ${keyword} pour vous aider à faire le bon choix. Analyses détaillées et avis d'experts.`
+        },
+        {
+          keyword: `comment ${keyword}`,
+          volume: 4800,
+          difficulty: 45,
+          relevance: 90,
+          cpc: 0.95,
+          competition: 0.65,
+          suggestedTitle: `Comment optimiser votre ${keyword} - Guide étape par étape`,
+          suggestedDescription: `Apprenez comment améliorer votre ${keyword} avec notre guide pratique. Techniques prouvées et stratégies efficaces.`
+        },
+        {
+          keyword: `${keyword} professionnel`,
+          volume: 3200,
+          difficulty: 55,
+          relevance: 80,
+          cpc: 2.15,
+          competition: 0.68,
+          suggestedTitle: `${keyword} professionnel - Secrets et stratégies avancées`,
+          suggestedDescription: `Élevez votre ${keyword} au niveau professionnel. Découvrez les techniques avancées utilisées par les experts du secteur.`
+        },
+        {
+          keyword: `tutoriel ${keyword}`,
+          volume: 2900,
+          difficulty: 42,
+          relevance: 85,
+          cpc: 0.85,
+          competition: 0.55,
+          suggestedTitle: `Tutoriel ${keyword} - De débutant à expert`,
+          suggestedDescription: `Notre tutoriel complet sur le ${keyword} vous guidera pas à pas. Parfait pour débutants et utilisateurs avancés.`
+        }
+      ];
+      
+      setGeneratedKeywords(mockKeywords);
+      setResults(mockKeywords);
+      
+      toast.success('Suggestions générées avec succès!');
     } catch (error) {
-      console.error('Error generating keyword suggestions:', error);
+      toast.error('Erreur lors de la génération des suggestions');
+      console.error(error);
+    } finally {
       setIsGenerating(false);
     }
   };
 
-  // Handle inserting title suggestion
-  const handleInsertTitle = (suggestion: string) => {
-    setTitle(suggestion);
+  const toggleFavorite = (keyword: KeywordSuggestion) => {
+    const isAlreadyFavorite = favorites.some(fav => fav.keyword === keyword.keyword);
+    
+    if (isAlreadyFavorite) {
+      setFavorites(favorites.filter(fav => fav.keyword !== keyword.keyword));
+      toast.info(`"${keyword.keyword}" retiré des favoris`);
+    } else {
+      setFavorites([...favorites, keyword]);
+      toast.success(`"${keyword.keyword}" ajouté aux favoris`);
+    }
   };
 
-  // Handle inserting description suggestion
-  const handleInsertDescription = (suggestion: string) => {
-    setDescription(suggestion);
+  const isFavorite = (keyword: string): boolean => {
+    return favorites.some(fav => fav.keyword === keyword);
   };
 
-  // Get all keywords for presentation
   const getAllKeywords = (): KeywordSuggestion[] => {
-    return generatedKeywords;
+    return [...results];
+  };
+
+  const handleInsertTitle = (value: string) => {
+    setTitle(value);
+    toast.success("Titre mis à jour!");
+  };
+  
+  const handleInsertDescription = (value: string) => {
+    setDescription(value);
+    toast.success("Description mise à jour!");
   };
 
   return {
@@ -60,15 +130,19 @@ const useKeywordGenerator = () => {
     setKeyword,
     language,
     setLanguage,
+    results,
+    favorites,
+    isGenerating,
+    generateSuggestions,
+    toggleFavorite,
+    isFavorite,
+    activeTab,
+    setActiveTab,
     title,
     setTitle,
     description,
     setDescription,
     generatedKeywords,
-    activeTab,
-    setActiveTab,
-    isGenerating,
-    generateSuggestions,
     handleInsertTitle,
     handleInsertDescription,
     getAllKeywords

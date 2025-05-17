@@ -20,6 +20,9 @@ export interface PerformanceData {
     other: number;
   };
   serverResponseTime?: number;
+  loadTime?: number;
+  firstContentfulPaint?: number;
+  domLoadTime?: number;
 }
 
 export interface MobileAnalysis {
