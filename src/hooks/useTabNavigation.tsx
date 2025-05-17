@@ -15,7 +15,7 @@ export const useTabNavigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // Déterminer l'onglet actif basé sur le chemin actuel avec plus de précision
+  // Determine the active tab based on the current path
   const determineActiveTab = (): string => {
     const path = location.pathname.replace('/', '');
     
@@ -44,7 +44,7 @@ export const useTabNavigation = () => {
       'liens-internes': 'internal-links',
     };
     
-    // Log pour le débogage
+    // Debug log
     console.log('TabNavigation current path:', path);
     console.log('TabNavigation mapped tab:', pathToTabMap[path] || 'hierarchy');
     
@@ -53,14 +53,14 @@ export const useTabNavigation = () => {
   
   const [activeTab, setActiveTab] = useState<string>(determineActiveTab());
   
-  // Mettre à jour l'onglet actif lorsque le chemin change
+  // Update active tab when path changes
   useEffect(() => {
     const newActiveTab = determineActiveTab();
     console.log('Updating active tab from', activeTab, 'to', newActiveTab);
     setActiveTab(newActiveTab);
   }, [location.pathname]);
   
-  // Définir les catégories principales avec les chemins de navigation
+  // Define main categories with navigation paths
   const mainTabs: MainTab[] = [
     {id: 'content', label: 'Contenu', color: 'border-blue-600', path: '/hierarchy'},
     {id: 'seo', label: 'SEO', color: 'border-purple-600', path: '/seo'},
@@ -68,19 +68,19 @@ export const useTabNavigation = () => {
     {id: 'analytics', label: 'Analytics', color: 'border-emerald-600', path: '/analytics'}
   ];
   
-  // Gérer la sélection d'onglet avec navigation vers les pages dédiées
+  // Handle tab selection with navigation to dedicated pages
   const handleTabChange = (value: string) => {
-    console.log(`useTabNavigation: Changement d'onglet vers: ${value}`);
+    console.log(`useTabNavigation: Tab change to: ${value}`);
     
-    // Ne pas continuer si c'est déjà l'onglet actif
+    // Don't continue if it's already the active tab
     if (value === activeTab) {
-      console.log('Onglet déjà actif, aucune action nécessaire');
+      console.log('Tab already active, no action needed');
       return;
     }
     
     setActiveTab(value);
     
-    // Définir les chemins pour chaque onglet
+    // Define paths for each tab
     const tabPaths: Record<string, string> = {
       'hierarchy': '/hierarchy',
       'wordcount': '/wordcount',
@@ -99,12 +99,12 @@ export const useTabNavigation = () => {
       'keyword-generator': '/keyword-generator'
     };
     
-    // Forcer la navigation si nécessaire
+    // Force navigation if necessary
     if (tabPaths[value]) {
       console.log(`useTabNavigation: Navigating to: ${tabPaths[value]}`);
       navigate(tabPaths[value]);
       
-      // Notification visuelle du changement d'onglet
+      // Visual notification of tab change
       toast.info(`Navigation vers ${value}`, {
         description: "Chargement de la page...",
         duration: 1500
@@ -112,9 +112,9 @@ export const useTabNavigation = () => {
     }
   };
 
-  // Obtenir les sous-onglets en fonction de l'onglet principal actif
+  // Get sub-tabs based on the active main tab
   const getSubTabs = () => {
-    // Déterminer la catégorie principale en fonction de l'onglet actif
+    // Determine main category based on active tab
     const getMainCategory = (tabId: string): string => {
       if (['hierarchy', 'wordcount', 'suggestions'].includes(tabId)) {
         return 'content';
@@ -128,13 +128,13 @@ export const useTabNavigation = () => {
         return tabId; // These are their own categories
       }
       
-      return 'content'; // Par défaut, retourner 'content'
+      return 'content'; // Default, return 'content'
     };
     
     const mainCategory = getMainCategory(activeTab);
     console.log('useTabNavigation: Main category for', activeTab, 'is', mainCategory);
     
-    // Filtrer les onglets en fonction de la catégorie principale
+    // Filter tabs based on main category
     if (mainCategory === 'content') {
       return tabs.filter(tab => ['hierarchy', 'wordcount', 'suggestions'].includes(tab.id));
     } 
@@ -151,7 +151,7 @@ export const useTabNavigation = () => {
       return tabs.filter(tab => [mainCategory].includes(tab.id));
     }
     
-    // Par défaut - afficher les onglets de contenu
+    // Default - show content tabs
     console.log('useTabNavigation: Using default content tabs');
     return tabs.filter(tab => ['hierarchy', 'wordcount', 'suggestions'].includes(tab.id));
   };

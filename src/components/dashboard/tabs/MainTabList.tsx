@@ -25,13 +25,13 @@ const MainTabList: React.FC<MainTabProps> = ({ mainTabs, activeTab, onTabChange 
   const handleTabClick = (tabId: string, path: string = '/') => {
     console.log('MainTabList click:', tabId, 'path:', path);
     
-    // Mettre à jour l'onglet actif
+    // Update the active tab
     onTabChange(tabId);
     
-    // Navigation directe
+    // Navigate if path is provided
     if (path) {
+      console.log('Navigating to:', path);
       navigate(path);
-      console.log('Navigation vers:', path);
     }
   };
 
@@ -45,7 +45,7 @@ const MainTabList: React.FC<MainTabProps> = ({ mainTabs, activeTab, onTabChange 
             flex items-center px-4 py-2 rounded-lg transition-all
             ${activeTab === tab.id || 
               (tab.id === 'content' && ['hierarchy', 'wordcount', 'suggestions'].includes(activeTab)) ||
-              (tab.id === 'seo' && ['seo', 'structure', 'backlinks', 'keyword-meta'].includes(activeTab)) ||
+              (tab.id === 'seo' && ['seo', 'structure', 'backlinks', 'keyword-meta', 'internal-links'].includes(activeTab)) ||
               (tab.id === 'performance' && ['performance', 'metrics'].includes(activeTab)) ||
               (tab.id === 'analytics' && activeTab === 'analytics')
               ? 'bg-primary text-white shadow-sm' 

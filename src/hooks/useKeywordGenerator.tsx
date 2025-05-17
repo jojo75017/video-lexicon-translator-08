@@ -1,87 +1,65 @@
 
 import { useState } from 'react';
-import { KeywordSuggestion } from '@/types/seo';
-import { toast } from 'sonner';
+import { type KeywordSuggestion } from '@/types/seo';
 
 const useKeywordGenerator = () => {
-  // État pour le mot-clé de recherche
-  const [keyword, setKeyword] = useState('');
-  // État pour le titre
-  const [title, setTitle] = useState('');
-  // État pour la description
-  const [description, setDescription] = useState('');
-  // État pour les suggestions générées
+  const [keyword, setKeyword] = useState<string>('');
+  const [title, setTitle] = useState<string>('');
+  const [description, setDescription] = useState<string>('');
+  const [language, setLanguage] = useState<string>('fr');
   const [generatedKeywords, setGeneratedKeywords] = useState<KeywordSuggestion[]>([]);
-  // État pour l'onglet actif
-  const [activeTab, setActiveTab] = useState('title');
-  // État pour indiquer si une génération est en cours
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<string>('title');
 
-  // Fonction pour générer des suggestions
+  // Generate keyword suggestions
   const generateSuggestions = async () => {
-    if (!keyword.trim()) {
-      toast.warning("Veuillez entrer un mot-clé");
-      return;
-    }
-
+    if (!keyword.trim()) return;
+    
     setIsGenerating(true);
-
+    
     try {
-      // Simulation d'une génération de suggestions
+      // This is a mockup function that would typically make an API call
+      // In a real application, this would call an actual API endpoint
       setTimeout(() => {
-        const mockSuggestions: KeywordSuggestion[] = [
-          {
-            keyword: `Meilleur ${keyword} pour débutants`,
-            volume: 2400,
-            difficulty: 45,
-            relevance: 95
-          },
-          {
-            keyword: `Comment choisir un ${keyword}`,
-            volume: 1800,
-            difficulty: 30,
-            relevance: 90
-          },
-          {
-            keyword: `${keyword} pas cher`,
-            volume: 3200,
-            difficulty: 60,
-            relevance: 85
-          },
-          {
-            keyword: `${keyword} professionnel`,
-            volume: 1200,
-            difficulty: 55,
-            relevance: 80
-          },
+        const mockKeywords: KeywordSuggestion[] = [
+          { keyword: `${keyword} conseils`, score: 95, volume: 1200, cpc: 0.75, competition: 0.3 },
+          { keyword: `${keyword} tutoriel`, score: 87, volume: 880, cpc: 0.65, competition: 0.5 },
+          { keyword: `meilleur ${keyword}`, score: 82, volume: 1500, cpc: 1.2, competition: 0.7 },
+          { keyword: `${keyword} débutant`, score: 78, volume: 720, cpc: 0.55, competition: 0.4 },
+          { keyword: `${keyword} guide`, score: 76, volume: 950, cpc: 0.8, competition: 0.6 },
+          { keyword: `${keyword} professionnel`, score: 71, volume: 450, cpc: 1.5, competition: 0.8 },
+          { keyword: `${keyword} gratuit`, score: 69, volume: 2200, cpc: 0.4, competition: 0.65 },
         ];
-
-        setGeneratedKeywords(mockSuggestions);
+        
+        setGeneratedKeywords(mockKeywords);
         setIsGenerating(false);
-        toast.success("Suggestions générées avec succès");
       }, 1500);
     } catch (error) {
-      console.error("Erreur lors de la génération des suggestions:", error);
-      toast.error("Erreur lors de la génération des suggestions");
+      console.error('Error generating keyword suggestions:', error);
       setIsGenerating(false);
     }
   };
 
-  // Fonction pour insérer une suggestion dans le titre
+  // Handle inserting title suggestion
   const handleInsertTitle = (suggestion: string) => {
     setTitle(suggestion);
-    toast.success("Titre mis à jour");
   };
 
-  // Fonction pour insérer une suggestion dans la description
+  // Handle inserting description suggestion
   const handleInsertDescription = (suggestion: string) => {
     setDescription(suggestion);
-    toast.success("Description mise à jour");
+  };
+
+  // Get all keywords for presentation
+  const getAllKeywords = (): KeywordSuggestion[] => {
+    return generatedKeywords;
   };
 
   return {
     keyword,
     setKeyword,
+    language,
+    setLanguage,
     title,
     setTitle,
     description,
@@ -92,7 +70,8 @@ const useKeywordGenerator = () => {
     isGenerating,
     generateSuggestions,
     handleInsertTitle,
-    handleInsertDescription
+    handleInsertDescription,
+    getAllKeywords
   };
 };
 
