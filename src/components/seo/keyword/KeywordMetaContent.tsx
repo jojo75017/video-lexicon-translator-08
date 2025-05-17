@@ -7,8 +7,19 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { KeywordSuggestion } from '@/types/seo/Keyword';
 import { toast } from 'sonner';
+
+// Define keyword suggestion type locally to avoid import errors
+interface KeywordSuggestion {
+  keyword: string;
+  volume: number;
+  difficulty: number;
+  cpc: number;
+  competition: number;
+  relevance: number;
+  suggestedTitle?: string;
+  suggestedDescription?: string;
+}
 
 const maxTitleLength = 60;
 const maxDescriptionLength = 155;
