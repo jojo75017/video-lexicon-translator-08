@@ -16,12 +16,21 @@ const PinterestActions: React.FC<PinterestActionsProps> = ({
   return (
     <div className="mt-6 space-y-4">
       <div className="flex justify-between">
-        <Button variant="outline" onClick={resetPin}>
+        <Button 
+          variant="outline" 
+          onClick={() => {
+            console.log("Réinitialisation du pin");
+            resetPin();
+          }}
+        >
           Réinitialiser
         </Button>
         <Button 
           variant="outline" 
-          onClick={() => setHistoryVisible(!historyVisible)}
+          onClick={() => {
+            console.log("Toggle historique:", !historyVisible);
+            setHistoryVisible(!historyVisible);
+          }}
         >
           {historyVisible ? 'Masquer l\'historique' : 'Voir l\'historique'}
         </Button>

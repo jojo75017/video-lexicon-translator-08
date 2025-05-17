@@ -23,7 +23,7 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
   const { seoAnalysis } = useSiteAnalyzer();
   const navigate = useNavigate();
 
-  // Effect pour gérer l'affichage au premier chargement
+  // Effet pour gérer l'affichage au premier chargement
   useEffect(() => {
     console.log(`TabContentsRenderer: Initialisation pour l'onglet actif ${activeTab}`);
     
@@ -43,8 +43,28 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
     setTimeout(() => {
       // Activer la section
       activateSection(activeTab);
+
+      // Rediriger vers les pages spéciales si nécessaire
+      const specialTabs = {
+        'internal-links': '/internal-linking',
+        'pinterest': '/pinterest',
+        'signature': '/signature',
+        'keyword-meta': '/keyword-meta',
+        'keyword-generator': '/keyword-generator',
+        'quora': '/quora'
+      };
+      
+      if (activeTab in specialTabs) {
+        const redirectPath = specialTabs[activeTab as keyof typeof specialTabs];
+        console.log(`Redirecting to ${redirectPath}`);
+        navigate(redirectPath);
+        toast.info(`Navigation vers ${activeTab}`, {
+          description: "Chargement de la page...",
+          duration: 1500
+        });
+      }
     }, 500);
-  }, [activeTab, seoAnalysis]);
+  }, [activeTab, navigate, seoAnalysis]);
 
   // Si aucun onglet n'est trouvé
   if (!contentTabs || contentTabs.length === 0) {
@@ -59,7 +79,7 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
     );
   }
 
-  // Handle special tabs that should navigate to dedicated pages
+  // Gérer les redirections vers des pages dédiées
   const specialTabs = {
     'internal-links': '/internal-linking',
     'pinterest': '/pinterest',
@@ -69,14 +89,10 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
     'quora': '/quora'
   };
   
-  // Check if current tab should redirect to a dedicated page
+  // Vérifier si l'onglet actuel doit rediriger vers une page dédiée
   if (activeTab in specialTabs) {
     const redirectPath = specialTabs[activeTab as keyof typeof specialTabs];
     console.log(`Redirecting to ${redirectPath}`);
-    toast.info(`Navigation vers ${activeTab}`, {
-      description: "Chargement de la page...",
-      duration: 1500
-    });
     return <Navigate to={redirectPath} replace />;
   }
 

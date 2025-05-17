@@ -12,24 +12,24 @@ const SubTabList: React.FC<SubTabListProps> = ({ tabs, activeTab, onTabChange })
   const navigate = useNavigate();
 
   const handleTabClick = (tabId: string, path?: string) => {
-    console.log('SubTabList click:', tabId);
+    console.log('SubTabList click:', tabId, 'path:', path);
     
-    // Update the active tab
+    // Mettre à jour l'onglet actif
     onTabChange(tabId);
     
-    // Navigation to the corresponding path if available
+    // Navigation vers le chemin correspondant si disponible
     if (path) {
       console.log('SubTabList navigating to:', path);
       navigate(path);
     } else {
-      // Fallback to the tab ID route
-      const tabPath = `/${tabId}`;
+      // Chemin par défaut basé sur l'ID de l'onglet
+      const tabPath = `/${tabId.toLowerCase()}`;
       console.log('SubTabList navigating to fallback path:', tabPath);
       navigate(tabPath);
     }
   };
 
-  // If no tabs are available, don't display anything
+  // Si aucun onglet n'est disponible, ne rien afficher
   if (!tabs || tabs.length === 0) {
     return null;
   }

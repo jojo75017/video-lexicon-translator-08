@@ -15,7 +15,7 @@ export const useTabNavigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // Determine the active tab based on the current path
+  // Déterminer l'onglet actif basé sur le chemin actuel
   const determineActiveTab = (): string => {
     const path = location.pathname.replace('/', '');
     
@@ -37,14 +37,15 @@ export const useTabNavigation = () => {
       'internal-linking': 'internal-links',
       'keyword-meta': 'keyword-meta',
       'keyword-generator': 'keyword-generator',
-      // Localized routes (French)
+      'outils-seo': 'outils-seo',
+      // Routes localisées (français)
       'hierarchie': 'hierarchy',
       'nombre-mots': 'wordcount',
       'metriques': 'metrics',
       'liens-internes': 'internal-links',
     };
     
-    // Debug log
+    // Log de débogage
     console.log('TabNavigation current path:', path);
     console.log('TabNavigation mapped tab:', pathToTabMap[path] || 'hierarchy');
     
@@ -53,14 +54,14 @@ export const useTabNavigation = () => {
   
   const [activeTab, setActiveTab] = useState<string>(determineActiveTab());
   
-  // Update active tab when path changes
+  // Mettre à jour l'onglet actif lorsque le chemin change
   useEffect(() => {
     const newActiveTab = determineActiveTab();
     console.log('Updating active tab from', activeTab, 'to', newActiveTab);
     setActiveTab(newActiveTab);
   }, [location.pathname]);
   
-  // Define main categories with navigation paths
+  // Définir les catégories principales avec les chemins de navigation
   const mainTabs: MainTab[] = [
     {id: 'content', label: 'Contenu', color: 'border-blue-600', path: '/hierarchy'},
     {id: 'seo', label: 'SEO', color: 'border-purple-600', path: '/seo'},
@@ -68,11 +69,11 @@ export const useTabNavigation = () => {
     {id: 'analytics', label: 'Analytics', color: 'border-emerald-600', path: '/analytics'}
   ];
   
-  // Handle tab selection with navigation to dedicated pages
+  // Gérer la sélection d'onglet avec navigation vers les pages dédiées
   const handleTabChange = (value: string) => {
     console.log(`useTabNavigation: Tab change to: ${value}`);
     
-    // Don't continue if it's already the active tab
+    // Ne pas continuer si c'est déjà l'onglet actif
     if (value === activeTab) {
       console.log('Tab already active, no action needed');
       return;
@@ -80,7 +81,7 @@ export const useTabNavigation = () => {
     
     setActiveTab(value);
     
-    // Define paths for each tab
+    // Définir les chemins pour chaque onglet
     const tabPaths: Record<string, string> = {
       'hierarchy': '/',
       'wordcount': '/wordcount',
@@ -96,15 +97,16 @@ export const useTabNavigation = () => {
       'pinterest': '/pinterest',
       'internal-links': '/internal-linking',
       'keyword-meta': '/keyword-meta',
-      'keyword-generator': '/keyword-generator'
+      'keyword-generator': '/keyword-generator',
+      'outils-seo': '/outils-seo',
     };
     
-    // Force navigation if necessary
+    // Forcer la navigation si nécessaire
     if (tabPaths[value]) {
       console.log(`useTabNavigation: Navigating to: ${tabPaths[value]}`);
       navigate(tabPaths[value]);
       
-      // Visual notification of tab change
+      // Notification visuelle du changement d'onglet
       toast.info(`Navigation vers ${value}`, {
         description: "Chargement de la page...",
         duration: 1500
@@ -112,9 +114,9 @@ export const useTabNavigation = () => {
     }
   };
 
-  // Get sub-tabs based on the active main tab
+  // Obtenir les sous-onglets en fonction de l'onglet principal actif
   const getSubTabs = () => {
-    // Determine main category based on active tab
+    // Déterminer la catégorie principale en fonction de l'onglet actif
     const getMainCategory = (tabId: string): string => {
       if (['hierarchy', 'wordcount', 'suggestions'].includes(tabId)) {
         return 'content';
@@ -125,16 +127,16 @@ export const useTabNavigation = () => {
       } else if (tabId === 'analytics') {
         return 'analytics';
       } else if (tabId === 'quora' || tabId === 'signature' || tabId === 'pinterest' || tabId === 'keyword-generator') {
-        return tabId; // These are their own categories
+        return tabId; // Ces catégories sont leurs propres catégories
       }
       
-      return 'content'; // Default, return 'content'
+      return 'content'; // Par défaut, retourner 'content'
     };
     
     const mainCategory = getMainCategory(activeTab);
     console.log('useTabNavigation: Main category for', activeTab, 'is', mainCategory);
     
-    // Filter tabs based on main category
+    // Filtrer les onglets en fonction de la catégorie principale
     if (mainCategory === 'content') {
       return tabs.filter(tab => ['hierarchy', 'wordcount', 'suggestions'].includes(tab.id));
     } 
@@ -151,7 +153,7 @@ export const useTabNavigation = () => {
       return tabs.filter(tab => [mainCategory].includes(tab.id));
     }
     
-    // Default - show content tabs
+    // Par défaut - afficher les onglets de contenu
     console.log('useTabNavigation: Using default content tabs');
     return tabs.filter(tab => ['hierarchy', 'wordcount', 'suggestions'].includes(tab.id));
   };

@@ -23,16 +23,15 @@ const MainTabList: React.FC<MainTabProps> = ({ mainTabs, activeTab, onTabChange 
   };
 
   const handleTabClick = (tabId: string, path: string = '/') => {
+    // Affichage des informations de débogage
     console.log('MainTabList click:', tabId, 'path:', path);
     
-    // First update the active tab
+    // D'abord mettre à jour l'onglet actif
     onTabChange(tabId);
     
-    // Then navigate to the path
-    if (path) {
-      console.log('Navigating to:', path);
-      navigate(path);
-    }
+    // Puis naviguer vers le chemin correspondant
+    console.log('Navigating to:', path);
+    navigate(path);
   };
 
   return (
@@ -40,7 +39,7 @@ const MainTabList: React.FC<MainTabProps> = ({ mainTabs, activeTab, onTabChange 
       {mainTabs.map((tab) => (
         <button
           key={tab.id}
-          onClick={() => handleTabClick(tab.id, tab.path)}
+          onClick={() => handleTabClick(tab.id, tab.path || '/')}
           className={`
             flex items-center px-4 py-2 rounded-lg transition-all
             ${activeTab === tab.id || 
