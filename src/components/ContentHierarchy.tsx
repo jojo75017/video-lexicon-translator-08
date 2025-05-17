@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StructureKeywordsSection from '@/components/seo/StructureKeywordsSection';
 import { Badge } from '@/components/ui/badge';
 import { BookOpen, CheckCircle, ExternalLink, AlertTriangle, Info } from 'lucide-react';
+import ContentStructureAnalyzer from '@/components/seo/ContentStructureAnalyzer';
 
 interface HeadingItem {
   text: string;
@@ -43,6 +44,12 @@ const ContentHierarchy = ({
   // Generate mock image count
   // In a real app, this would come from the actual page analysis
   const imgCount = 5;
+  const missingAltCount = 1;
+  
+  // Mock data for comprehensive analysis
+  const wordCount = paragraphs.reduce((total, p) => {
+    return total + (p.text?.split(/\s+/).length || 0);
+  }, 0) || 750;
   
   // Generate mock keywords
   const mockKeywords = [
@@ -192,12 +199,33 @@ const ContentHierarchy = ({
           </div>
         </div>
         
-        <Tabs defaultValue="structure" className="mt-2">
-          <TabsList className="grid w-full grid-cols-3 mb-6">
+        <Tabs defaultValue="analyzer" className="mt-2">
+          <TabsList className="grid w-full grid-cols-4 mb-6">
+            <TabsTrigger value="analyzer">Analyse complète</TabsTrigger>
             <TabsTrigger value="structure">Structure</TabsTrigger>
             <TabsTrigger value="keywords">Mots-clés</TabsTrigger>
             <TabsTrigger value="recommendations">Recommandations</TabsTrigger>
           </TabsList>
+          
+          <TabsContent value="analyzer">
+            <ContentStructureAnalyzer
+              h1Count={h1Count}
+              h2Count={h2Count}
+              h3Count={h3Count}
+              imgCount={imgCount}
+              missingAltCount={missingAltCount}
+              wordCount={wordCount}
+              contentLength={wordCount * 6}
+              paragraphCount={paragraphs.length || 10}
+              hierarchy={hierarchy}
+              pageUrl={url}
+              score={overallScore}
+              isSSR={false}
+              hasSchema={false}
+              hasCanonical={true}
+              keywordsInHeadings={2}
+            />
+          </TabsContent>
           
           <TabsContent value="structure" className="space-y-6">
             <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 mb-4">
