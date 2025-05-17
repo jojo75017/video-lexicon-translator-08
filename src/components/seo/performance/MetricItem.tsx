@@ -20,7 +20,7 @@ const MetricItem: React.FC<MetricItemProps> = ({
       </div>
       <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
         <div 
-          className={`h-2.5 rounded-full ${colorClass}`} 
+          className={`h-2.5 rounded-full ${colorClass} transition-all duration-500`} 
           style={{ width: `${widthPercentage}%` }}
         ></div>
       </div>

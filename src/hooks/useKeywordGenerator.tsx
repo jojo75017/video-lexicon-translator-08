@@ -1,82 +1,116 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { KeywordSuggestion } from '@/types/seo/Keyword';
 import { toast } from 'sonner';
-import { generateStandardKeywords, generateLongTailKeywords } from '@/utils/keyword/keywordGeneratorUtils';
 
-const useKeywordGenerator = () => {
+// Mock data for keyword suggestions
+const mockKeywordSuggestions = (baseKeyword: string): KeywordSuggestion[] => {
+  const prefixes = ['comment', 'pourquoi', 'meilleur', 'top', 'guide'];
+  const suffixes = ['gratuit', 'en ligne', 'pas cher', 'professionnel', 'rapide', 'facile'];
+  
+  const suggestions: KeywordSuggestion[] = [];
+  
+  // Add variations with prefixes
+  prefixes.forEach(prefix => {
+    suggestions.push({
+      keyword: `${prefix} ${baseKeyword}`,
+      volume: Math.floor(Math.random() * 10000),
+      competition: Math.random(),
+      cpc: Math.random() * 2,
+      difficulty: Math.floor(Math.random() * 100),
+      trend: Array(12).fill(0).map(() => Math.floor(Math.random() * 100)),
+      type: Math.random() > 0.5 ? 'standard' : 'long-tail'
+    });
+  });
+  
+  // Add variations with suffixes
+  suffixes.forEach(suffix => {
+    suggestions.push({
+      keyword: `${baseKeyword} ${suffix}`,
+      volume: Math.floor(Math.random() * 10000),
+      competition: Math.random(),
+      cpc: Math.random() * 2,
+      difficulty: Math.floor(Math.random() * 100),
+      trend: Array(12).fill(0).map(() => Math.floor(Math.random() * 100)),
+      type: Math.random() > 0.5 ? 'standard' : 'long-tail'
+    });
+  });
+  
+  // Add some related keywords
+  const relatedKeywords = [
+    'formation professionnelle',
+    'apprentissage',
+    'cours en ligne',
+    'tutoriel',
+    'certification'
+  ];
+  
+  relatedKeywords.forEach(related => {
+    if (!related.includes(baseKeyword) && !baseKeyword.includes(related)) {
+      suggestions.push({
+        keyword: related,
+        volume: Math.floor(Math.random() * 10000),
+        competition: Math.random(),
+        cpc: Math.random() * 2,
+        difficulty: Math.floor(Math.random() * 100),
+        trend: Array(12).fill(0).map(() => Math.floor(Math.random() * 100)),
+        type: Math.random() > 0.5 ? 'standard' : 'long-tail'
+      });
+    }
+  });
+  
+  // Sort by volume descending
+  return suggestions.sort((a, b) => (b.volume || 0) - (a.volume || 0));
+};
+
+export const useKeywordGenerator = () => {
   const [keyword, setKeyword] = useState<string>('');
   const [language, setLanguage] = useState<string>('fr');
-  const [results, setResults] = useState<KeywordSuggestion[]>([]);
-  const [favorites, setFavorites] = useState<KeywordSuggestion[]>([]);
-  const [isGenerating, setIsGenerating] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<string>('title');
-  const [generatedKeywords, setGeneratedKeywords] = useState<KeywordSuggestion[]>([]);
-  
-  // États pour le title et la description
-  const [title, setTitle] = useState<string>('');
-  const [description, setDescription] = useState<string>('');
+  const [searchVolume, setSearchVolume] = useState<string>('all');
+  const [competition, setCompetition] = useState<string>('all');
+  const [keywordSuggestions, setKeywordSuggestions] = useState<KeywordSuggestion[]>([]);
+  const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Fonction pour générer des suggestions de mots-clés
-  const generateSuggestions = async () => {
-    if (!keyword || keyword.trim() === '') {
-      toast.error('Veuillez entrer un mot-clé');
+  // Generate keywords based on input
+  const generateKeywords = async () => {
+    if (!keyword) {
+      setError('Veuillez entrer un mot-clé');
       return;
     }
-
-    setIsGenerating(true);
+    
+    setLoading(true);
+    setError(null);
     
     try {
-      // Simule un appel API
-      await new Promise(resolve => setTimeout(resolve, 1200));
-      
-      // Générer des mots-clés standards et longue traîne
-      const standardKeywords = generateStandardKeywords(keyword);
-      const longTailKeywords = generateLongTailKeywords(keyword);
-      
-      // Combine les deux types de mots-clés
-      const combinedKeywords = [...standardKeywords.slice(0, 5), ...longTailKeywords.slice(0, 3)];
-      
-      setGeneratedKeywords(combinedKeywords);
-      setResults(combinedKeywords);
-      
-      toast.success('Suggestions générées avec succès!');
-    } catch (error) {
-      toast.error('Erreur lors de la génération des suggestions');
-      console.error(error);
-    } finally {
-      setIsGenerating(false);
+      // In a real application, you would make an API call here
+      // For now, we'll use mock data
+      setTimeout(() => {
+        const suggestions = mockKeywordSuggestions(keyword);
+        setKeywordSuggestions(suggestions);
+        setLoading(false);
+        toast.success(`${suggestions.length} suggestions générées`);
+      }, 1500); // Simulate API delay
+    } catch (err) {
+      setError('Une erreur est survenue lors de la génération des mots-clés');
+      setLoading(false);
+      toast.error('Échec de la génération des mots-clés');
     }
   };
 
-  const toggleFavorite = (keyword: KeywordSuggestion) => {
-    const isAlreadyFavorite = favorites.some(fav => fav.keyword === keyword.keyword);
-    
-    if (isAlreadyFavorite) {
-      setFavorites(favorites.filter(fav => fav.keyword !== keyword.keyword));
-      toast.info(`"${keyword.keyword}" retiré des favoris`);
-    } else {
-      setFavorites([...favorites, keyword]);
-      toast.success(`"${keyword.keyword}" ajouté aux favoris`);
-    }
+  // Toggle selection of a keyword
+  const selectKeyword = (keywordToToggle: string) => {
+    setSelectedKeywords(prev => 
+      prev.includes(keywordToToggle)
+        ? prev.filter(k => k !== keywordToToggle)
+        : [...prev, keywordToToggle]
+    );
   };
 
-  const isFavorite = (keyword: string): boolean => {
-    return favorites.some(fav => fav.keyword === keyword);
-  };
-
+  // Get all keywords (for other components)
   const getAllKeywords = (): KeywordSuggestion[] => {
-    return [...results];
-  };
-
-  const handleInsertTitle = (value: string) => {
-    setTitle(value);
-    toast.success("Titre mis à jour!");
-  };
-  
-  const handleInsertDescription = (value: string) => {
-    setDescription(value);
-    toast.success("Description mise à jour!");
+    return keywordSuggestions;
   };
 
   return {
@@ -84,23 +118,16 @@ const useKeywordGenerator = () => {
     setKeyword,
     language,
     setLanguage,
-    results,
-    favorites,
-    isGenerating,
-    generateSuggestions,
-    toggleFavorite,
-    isFavorite,
-    activeTab,
-    setActiveTab,
-    title,
-    setTitle,
-    description,
-    setDescription,
-    generatedKeywords,
-    handleInsertTitle,
-    handleInsertDescription,
+    searchVolume,
+    setSearchVolume,
+    competition,
+    setCompetition,
+    keywordSuggestions,
+    selectedKeywords,
+    loading,
+    error,
+    generateKeywords,
+    selectKeyword,
     getAllKeywords
   };
 };
-
-export default useKeywordGenerator;
