@@ -18,8 +18,8 @@ export interface PerformanceData {
     images: number;
     fonts: number;
     other: number;
-    scripts?: number; // Ajouté pour la compatibilité
-    styles?: number;  // Ajouté pour la compatibilité
+    scripts?: number; // Pour la compatibilité
+    styles?: number;  // Pour la compatibilité
   };
   serverResponseTime?: number;
   loadTime?: number;

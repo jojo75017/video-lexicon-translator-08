@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileText } from "lucide-react";
@@ -8,27 +8,53 @@ import KeywordForm from '../keyword/KeywordForm';
 import TitleTab from '../keyword/TitleTab';
 import DescriptionTab from '../keyword/DescriptionTab';
 import SuggestionsPlaceholder from '../keyword/SuggestionsPlaceholder';
-import useKeywordGenerator from '@/hooks/useKeywordGenerator';
+import { KeywordSuggestion } from '@/types/seo/Keyword';
+import { toast } from 'sonner';
 
 const maxTitleLength = 60;
 const maxDescriptionLength = 155;
 
 const KeywordTabContent = () => {
-  const {
-    keyword,
-    setKeyword,
-    title,
-    setTitle,
-    description,
-    setDescription,
-    generatedKeywords,
-    activeTab,
-    setActiveTab,
-    isGenerating,
-    generateSuggestions,
-    handleInsertTitle,
-    handleInsertDescription
-  } = useKeywordGenerator();
+  // Définir les états localement plutôt que d'utiliser le hook incompatible
+  const [keyword, setKeyword] = useState('');
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [generatedKeywords, setGeneratedKeywords] = useState<KeywordSuggestion[]>([]);
+  const [activeTab, setActiveTab] = useState('title');
+  const [isGenerating, setIsGenerating] = useState(false);
+  
+  const generateSuggestions = () => {
+    if (!keyword.trim()) {
+      toast.error("Veuillez entrer un mot-clé");
+      return;
+    }
+    
+    setIsGenerating(true);
+    
+    // Simuler l'appel à une API
+    setTimeout(() => {
+      const suggestions: KeywordSuggestion[] = [
+        { keyword: `${keyword} optimisé`, volume: 1200, difficulty: 32, cpc: 1.5 },
+        { keyword: `meilleur ${keyword}`, volume: 880, difficulty: 28, cpc: 2.2 },
+        { keyword: `comment trouver ${keyword}`, volume: 590, difficulty: 15, cpc: 0.8 },
+        { keyword: `${keyword} professionnel`, volume: 740, difficulty: 45, cpc: 3.1 },
+      ];
+      
+      setGeneratedKeywords(suggestions);
+      setIsGenerating(false);
+      toast.success("Suggestions générées avec succès");
+    }, 1500);
+  };
+  
+  const handleInsertTitle = (suggestion: string) => {
+    setTitle(suggestion.substring(0, maxTitleLength));
+    toast.info(`Titre mis à jour avec "${suggestion.substring(0, 20)}..."`);
+  };
+  
+  const handleInsertDescription = (suggestion: string) => {
+    setDescription(suggestion.substring(0, maxDescriptionLength));
+    toast.info(`Description mise à jour avec "${suggestion.substring(0, 20)}..."`);
+  };
 
   return (
     <div className="space-y-6">
@@ -80,9 +106,6 @@ const KeywordTabContent = () => {
           fieldValue={activeTab === 'title' ? title : description}
           onInsert={activeTab === 'title' ? handleInsertTitle : handleInsertDescription}
           maxLength={activeTab === 'title' ? maxTitleLength : maxDescriptionLength}
-          descriptionValue={description}
-          onInsertDescription={handleInsertDescription}
-          maxLengthDescription={maxDescriptionLength}
         />
       )}
 

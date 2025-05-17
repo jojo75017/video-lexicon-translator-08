@@ -1,18 +1,15 @@
 
-import { useState, useEffect } from 'react';
-import { tabs } from '@/components/dashboard/tabs/TabData';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { toast } from "sonner";
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { tabs } from './tabs/TabData';
+import MainTabList from './tabs/MainTabList';
+import SubTabList from './tabs/SubTabList';
+import { Card } from '@/components/ui/card';
+import { toast } from 'sonner';
+import PageHeader from './PageHeader';
+import SeoActionButtons from './SeoActionButtons';
 
-export interface MainTab {
-  id: string;
-  label: string;
-  color: string;
-  path?: string;
-  isNew?: boolean;
-}
-
-export const useTabNavigation = () => {
+const UnifiedDashboard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -22,7 +19,6 @@ export const useTabNavigation = () => {
     
     const pathToTabMap: Record<string, string> = {
       '': 'hierarchy',
-      'index': 'hierarchy',
       'hierarchy': 'hierarchy',
       'wordcount': 'wordcount',
       'seo': 'seo',
@@ -42,8 +38,8 @@ export const useTabNavigation = () => {
       // Routes localisées (français)
       'hierarchie': 'hierarchy',
       'nombre-mots': 'wordcount',
-      'metriques': 'metrics',
       'liens-internes': 'internal-links',
+      'metriques': 'metrics',
       'analyse-seo': 'seo',
       'mots-cles': 'keyword-generator',
       'performances': 'performance',
@@ -57,24 +53,20 @@ export const useTabNavigation = () => {
   
   // Mettre à jour l'onglet actif lorsque le chemin change
   useEffect(() => {
-    const newActiveTab = determineActiveTab();
-    if (newActiveTab !== activeTab) {
-      setActiveTab(newActiveTab);
-    }
+    setActiveTab(determineActiveTab());
   }, [location.pathname]);
   
   // Définir les catégories principales avec les chemins de navigation
-  const mainTabs: MainTab[] = [
-    {id: 'content', label: 'Contenu', color: 'border-blue-600', path: '/hierarchy'},
-    {id: 'seo', label: 'SEO', color: 'border-purple-600', path: '/seo'},
-    {id: 'performance', label: 'Performance', color: 'border-amber-600', path: '/performance'},
-    {id: 'analytics', label: 'Analytics', color: 'border-emerald-600', path: '/analytics'},
+  const mainTabs = [
+    {id: 'content', label: 'Contenu', color: 'border-blue-600', path: '/hierarchy', isNew: false},
+    {id: 'seo', label: 'SEO', color: 'border-purple-600', path: '/seo', isNew: false},
+    {id: 'performance', label: 'Performance', color: 'border-amber-600', path: '/performance', isNew: false},
+    {id: 'analytics', label: 'Analytics', color: 'border-emerald-600', path: '/analytics', isNew: false},
     {id: 'keyword-meta', label: 'Title & Meta', color: 'border-blue-600', path: '/keyword-meta', isNew: true}
   ];
   
   // Gérer la sélection d'onglet avec navigation vers les pages dédiées
   const handleTabChange = (value: string) => {
-    // Ne pas continuer si c'est déjà l'onglet actif
     if (value === activeTab) return;
     
     setActiveTab(value);
@@ -123,7 +115,7 @@ export const useTabNavigation = () => {
         return 'performance';
       } else if (tabId === 'analytics') {
         return 'analytics';
-      } else if (['quora', 'signature', 'pinterest', 'keyword-generator', 'outils-seo'].includes(tabId)) {
+      } else if (tabId === 'quora' || tabId === 'signature' || tabId === 'pinterest' || tabId === 'keyword-generator' || tabId === 'outils-seo') {
         return tabId;
       }
       
@@ -151,13 +143,34 @@ export const useTabNavigation = () => {
     // Par défaut - afficher les onglets de contenu
     return tabs.filter(tab => ['hierarchy', 'wordcount', 'suggestions'].includes(tab.id));
   };
-  
-  return {
-    activeTab,
-    mainTabs,
-    subTabs: getSubTabs(),
-    handleTabChange
-  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <PageHeader />
+      
+      <div className="container mx-auto py-4">
+        <SeoActionButtons />
+        
+        <div className="mb-6 mt-8">
+          <Card className="p-4">
+            <MainTabList 
+              mainTabs={mainTabs}
+              activeTab={activeTab}
+              onTabChange={handleTabChange}
+            />
+            
+            <SubTabList 
+              tabs={getSubTabs()}
+              activeTab={activeTab}
+              onTabChange={handleTabChange}
+            />
+          </Card>
+        </div>
+        
+        {children}
+      </div>
+    </div>
+  );
 };
 
-export default useTabNavigation;
+export default UnifiedDashboard;

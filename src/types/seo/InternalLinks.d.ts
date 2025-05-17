@@ -1,56 +1,48 @@
 
-// Types pour l’analyse des liens internes
-
 export interface InternalLinkAnalysis {
-  totalLinks: number;
-  uniquePages: number;
-  linkDistribution: LinkDistribution;
-  linkDepth: LinkDepth;
-  orphanPages: string[];
-  pageMetrics: PageLinkMetric[];
-  siloPagesFound: boolean;
+  totalLinks?: number;
+  uniquePages?: number;
+  averageLinksPerPage?: number;
+  recommendations?: InternalLinkRecommendation[];
+  pageMetrics?: PageMetric[];
+  linkDistribution?: LinkDistribution;
+  orphanPages?: OrphanPage[];
+  siloPagesFound?: boolean;
   siloStructure?: SiloStructure[];
-  recommendations: InternalLinkRecommendation[];
-}
-
-export interface LinkDistribution {
-  navigationLinks: number;
-  contentLinks: number;
-  footerLinks: number;
-  sidebarLinks: number;
-  otherLinks: number;
-}
-
-export interface LinkDepth {
-  averageDepth: number;
-  maxDepth: number;
-  depthDistribution: Record<number, number>;
-}
-
-// "uniqueIncomingPages" et "uniqueOutgoingPages" sont des nombres ici pour l'affichage.
-export interface PageLinkMetric {
-  url: string;
-  title: string | null;
-  incomingLinks: number;
-  outgoingLinks: number;
-  uniqueIncomingPages: number;
-  uniqueOutgoingPages: number;
-  depth: number;
-  importance: number;
-}
-
-export interface SiloStructure {
-  name: string;
-  mainPage: string;
-  subPages: string[];
+  averageDepth?: number;
+  depthDistribution?: Record<string, number>;
 }
 
 export interface InternalLinkRecommendation {
-  type: 'add' | 'remove' | 'modify' | 'info';
-  priority: 'high' | 'medium' | 'low';
-  impact: number;
+  from: string;
+  to: string;
+  reason: string;
+  priority?: string;
+  description?: string;
+  type?: string;
+  impact?: string;
   source?: string;
   target?: string;
-  description: string;
-  reason: string;
+}
+
+export interface PageMetric {
+  url: string;
+  inLinks: number;
+  outLinks: number;
+  importance: string;
+}
+
+export interface LinkDistribution {
+  [key: string]: number;
+}
+
+export interface OrphanPage {
+  url: string;
+  title?: string;
+  suggestions?: string[];
+}
+
+export interface SiloStructure {
+  theme: string;
+  pages: string[];
 }

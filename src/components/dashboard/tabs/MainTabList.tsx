@@ -1,8 +1,9 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BarChart2, FileText, Zap, PieChart } from 'lucide-react';
+import { BarChart2, FileText, Zap, PieChart, Tag } from 'lucide-react';
 import { toast } from 'sonner';
+import { Badge } from '@/components/ui/badge';
 
 interface MainTabProps {
   mainTabs: any[];
@@ -19,12 +20,12 @@ const MainTabList: React.FC<MainTabProps> = ({ mainTabs, activeTab, onTabChange 
       case 'seo': return <BarChart2 className="w-4 h-4" />;
       case 'performance': return <Zap className="w-4 h-4" />;
       case 'analytics': return <PieChart className="w-4 h-4" />;
+      case 'keyword-meta': return <Tag className="w-4 h-4" />;
       default: return <FileText className="w-4 h-4" />;
     }
   };
 
   const handleTabClick = (tabId: string, path: string = '/') => {
-    // Affichage des informations de débogage
     console.log('MainTabList click:', tabId, 'path:', path);
     
     // D'abord mettre à jour l'onglet actif
@@ -45,13 +46,13 @@ const MainTabList: React.FC<MainTabProps> = ({ mainTabs, activeTab, onTabChange 
   };
 
   return (
-    <div className="flex flex-wrap space-x-2">
+    <div className="flex flex-wrap space-x-2 mb-4">
       {mainTabs.map((tab) => (
         <button
           key={tab.id}
           onClick={() => handleTabClick(tab.id, tab.path || '/')}
           className={`
-            flex items-center px-4 py-2 rounded-lg transition-all
+            flex items-center px-4 py-2 rounded-lg transition-all relative
             ${activeTab === tab.id || 
               (tab.id === 'content' && ['hierarchy', 'wordcount', 'suggestions'].includes(activeTab)) ||
               (tab.id === 'seo' && ['seo', 'structure', 'backlinks', 'keyword-meta', 'internal-links'].includes(activeTab)) ||
@@ -64,6 +65,11 @@ const MainTabList: React.FC<MainTabProps> = ({ mainTabs, activeTab, onTabChange 
         >
           {getTabIcon(tab.id)}
           <span className="ml-2 font-medium">{tab.label}</span>
+          {tab.isNew && (
+            <Badge variant="default" className="ml-2 h-5 text-xs bg-blue-600">
+              Nouveau
+            </Badge>
+          )}
         </button>
       ))}
     </div>

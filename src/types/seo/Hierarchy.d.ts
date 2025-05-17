@@ -1,32 +1,36 @@
 
-export interface HierarchyItem {
-  title: string;
-  level: number;
+export interface StructureItem {
+  type: "h1" | "h2" | "h3" | "h4" | "p" | "list" | string;
+  content: string;
   id: string;
-  content?: string;
-  children?: HierarchyItem[];
-  type?: string;
+  items?: string[];
+}
+
+export interface HierarchyData {
+  items: StructureItem[];
+  title?: string;
+  url?: string;
+}
+
+export interface TitleTag {
+  text: string;
+  length: number;
+  containsKeyword: boolean;
+  isTruncated: boolean;
+  recommendedLength: {
+    min: number;
+    max: number;
+  };
 }
 
 export interface HeadingStructure {
-  h1?: HierarchyItem[];
-  h2?: HierarchyItem[];
-  h3?: HierarchyItem[];
-  h4?: HierarchyItem[];
-  h5?: HierarchyItem[];
-  h6?: HierarchyItem[];
-  items?: HierarchyItem[];
-  h1Count?: number;
-  h2Count?: number;
-  h3Count?: number;
-  h4Count?: number;
-  h5Count?: number;
-  h6Count?: number;
-}
-
-export interface StructureItem {
-  content: string;
-  id: string;
-  type: "h1" | "h2" | "h3" | "h4" | "p" | "list";
-  items?: string[];
+  h1Count: number;
+  h2Count: number;
+  h3Count: number;
+  h4Count: number;
+  h5Count: number;
+  h6Count: number;
+  missingH1: boolean;
+  headingOrder: boolean;
+  structure: StructureItem[];
 }
