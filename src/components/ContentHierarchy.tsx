@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import SeoStructure from '@/components/seo/SeoStructure';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { StructureKeywordsSection } from '@/components/seo/StructureKeywordsSection';
+import StructureKeywordsSection from '@/components/seo/StructureKeywordsSection';
 import { Badge } from '@/components/ui/badge';
 import { BookOpen, CheckCircle, ExternalLink } from 'lucide-react';
 
@@ -85,6 +85,24 @@ const ContentHierarchy = ({
       .map(([phrase, count]) => ({ phrase, count }));
   };
 
+  // Badge variants pour les compteurs de balises H1, H2, H3
+  const getH1BadgeVariant = () => h1Count === 1 ? "default" : "destructive";
+  const getH2BadgeVariant = () => h2Count >= 1 ? "default" : "outline";
+  const getH3BadgeVariant = () => h3Count >= 1 ? "default" : "outline";
+  
+  // Messages sur l'état d'optimisation de la page
+  const getH1StatusMessage = () => {
+    if (h1Count === 0) return "Aucune balise H1 trouvée - à corriger absolument";
+    if (h1Count === 1) return "Parfait ! Une seule balise H1 présente";
+    return "Attention : plusieurs balises H1 trouvées - à corriger";
+  };
+  
+  const getH2StatusMessage = () => {
+    if (h2Count === 0) return "Aucune balise H2 trouvée - à ajouter";
+    if (h2Count >= 1 && h2Count <= 5) return "Bonne utilisation des balises H2";
+    return `${h2Count} balises H2 trouvées - structure correcte`;
+  };
+
   return (
     <Card className="border-0 shadow-md">
       <CardContent className="p-6">
@@ -98,13 +116,13 @@ const ContentHierarchy = ({
           </div>
           
           <div className="mt-2 sm:mt-0">
-            <Badge variant={h1Count === 1 ? "success" : "destructive"} className="mr-2">
+            <Badge variant={getH1BadgeVariant()} className="mr-2">
               {h1Count} H1
             </Badge>
-            <Badge variant={h2Count >= 1 ? "success" : "warning"} className="mr-2">
+            <Badge variant={getH2BadgeVariant()} className="mr-2">
               {h2Count} H2
             </Badge>
-            <Badge variant={h3Count >= 1 ? "success" : "warning"}>
+            <Badge variant={getH3BadgeVariant()}>
               {h3Count} H3
             </Badge>
           </div>
@@ -118,6 +136,31 @@ const ContentHierarchy = ({
           </TabsList>
           
           <TabsContent value="structure" className="space-y-6">
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 mb-4">
+              <h3 className="font-medium text-blue-800 mb-2">État de l'optimisation</h3>
+              <div className="space-y-2">
+                <div className="flex items-start">
+                  <div className={`h-5 w-5 rounded-full flex items-center justify-center mr-2 ${h1Count === 1 ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+                    {h1Count === 1 ? '✓' : '!'}
+                  </div>
+                  <div>
+                    <p className="font-medium">{getH1StatusMessage()}</p>
+                    <p className="text-sm text-gray-600">Une seule balise H1 est nécessaire pour définir le sujet principal de la page</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start">
+                  <div className={`h-5 w-5 rounded-full flex items-center justify-center mr-2 ${h2Count >= 1 ? 'bg-green-100 text-green-600' : 'bg-amber-100 text-amber-600'}`}>
+                    {h2Count >= 1 ? '✓' : '!'}
+                  </div>
+                  <div>
+                    <p className="font-medium">{getH2StatusMessage()}</p>
+                    <p className="text-sm text-gray-600">Les balises H2 structurent les sections principales de votre contenu</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
             <SeoStructure 
               h1Count={h1Count} 
               h2Count={h2Count} 
@@ -155,8 +198,58 @@ const ContentHierarchy = ({
                       <span className="text-sm">{rec}</span>
                     </li>
                   ))}
+                  
+                  {h1Count !== 1 && (
+                    <li className="flex items-start">
+                      <CheckCircle className="h-4 w-4 text-green-500 mr-2 mt-0.5" />
+                      <span className="text-sm font-medium">Ajoutez exactement une balise H1 à votre page</span>
+                    </li>
+                  )}
+                  
+                  {h2Count === 0 && (
+                    <li className="flex items-start">
+                      <CheckCircle className="h-4 w-4 text-green-500 mr-2 mt-0.5" />
+                      <span className="text-sm font-medium">Ajoutez des balises H2 pour structurer votre contenu</span>
+                    </li>
+                  )}
+                  
+                  {h3Count === 0 && h2Count > 0 && (
+                    <li className="flex items-start">
+                      <CheckCircle className="h-4 w-4 text-green-500 mr-2 mt-0.5" />
+                      <span className="text-sm">Envisagez d'ajouter des balises H3 sous vos sections H2</span>
+                    </li>
+                  )}
                 </ul>
               </div>
+            </div>
+            
+            <div className="bg-green-50 p-4 rounded-lg border border-green-100">
+              <h3 className="font-medium text-green-800 mb-2">Plan d'action</h3>
+              <p className="text-green-700 text-sm mb-3">
+                Suivez ces étapes pour optimiser la structure de votre page:
+              </p>
+              <ol className="space-y-2 ml-5 list-decimal">
+                {h1Count !== 1 && (
+                  <li className="text-sm">
+                    <span className="font-medium">{h1Count === 0 ? "Ajoutez une balise H1" : "Gardez uniquement une balise H1"}</span> - 
+                    Elle doit contenir votre mot-clé principal et décrire le sujet de la page
+                  </li>
+                )}
+                {h2Count < 2 && (
+                  <li className="text-sm">
+                    <span className="font-medium">Structurez votre contenu avec des balises H2</span> - 
+                    Chaque section principale mérite un titre H2 descriptif
+                  </li>
+                )}
+                <li className="text-sm">
+                  <span className="font-medium">Vérifiez que votre hiérarchie est logique</span> - 
+                  Les H1 doivent être suivis de H2, puis de H3, sans sauter de niveaux
+                </li>
+                <li className="text-sm">
+                  <span className="font-medium">Intégrez vos mots-clés naturellement</span> - 
+                  Placez vos termes importants dans les titres, mais gardez-les lisibles
+                </li>
+              </ol>
             </div>
           </TabsContent>
         </Tabs>
