@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 interface PinterestActionsProps {
   resetPin: () => void;
@@ -21,6 +22,7 @@ const PinterestActions: React.FC<PinterestActionsProps> = ({
           onClick={() => {
             console.log("Réinitialisation du pin");
             resetPin();
+            toast.success("Pin réinitialisé avec succès");
           }}
         >
           Réinitialiser
@@ -30,6 +32,7 @@ const PinterestActions: React.FC<PinterestActionsProps> = ({
           onClick={() => {
             console.log("Toggle historique:", !historyVisible);
             setHistoryVisible(!historyVisible);
+            toast.info(historyVisible ? "Historique masqué" : "Historique affiché");
           }}
         >
           {historyVisible ? 'Masquer l\'historique' : 'Voir l\'historique'}

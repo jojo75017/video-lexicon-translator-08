@@ -6,7 +6,7 @@ import KeywordGeneratorPage from './pages/KeywordGeneratorPage';
 import PinterestPage from './pages/PinterestPage';
 import SignaturePage from './pages/SignaturePage';
 import KeywordMetaPage from './pages/KeywordMetaPage';
-import SeoPage from './pages/SeoPage'; 
+import SeoPage from './pages/SeoPage';
 import OutilsSeo from './pages/OutilsSeo';
 import './App.css';
 import { Toaster } from 'sonner';
@@ -37,6 +37,7 @@ const App = () => {
         <Route path="/backlinks" element={<Index />} />
         <Route path="/metrics" element={<Index />} />
         <Route path="/quora" element={<Index />} />
+        <Route path="/settings" element={<Index />} />
         
         {/* Routes localisées (français) */}
         <Route path="/hierarchie" element={<Index />} />

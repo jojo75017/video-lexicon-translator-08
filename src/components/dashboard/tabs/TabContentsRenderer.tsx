@@ -10,7 +10,6 @@ import { CrawlForm } from "@/components/CrawlForm";
 import { useSiteAnalyzer } from "@/hooks/useSiteAnalyzer";
 import { Navigate, useNavigate } from "react-router-dom";
 import { activateSection } from '@/utils/navigationHelpers';
-import KeywordTabContent from './KeywordTabContent';
 import { toast } from "sonner";
 
 interface TabContentsRendererProps {
@@ -32,7 +31,7 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
       setTimeout(() => {
         // Activer la section appropriée
         activateSection(activeTab);
-      }, 800);
+      }, 100);
     }
   }, []);
 
@@ -44,7 +43,7 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
       // Activer la section
       activateSection(activeTab);
 
-      // Rediriger vers les pages spéciales si nécessaire
+      // Définir les redirections spéciales
       const specialTabs = {
         'internal-links': '/internal-linking',
         'pinterest': '/pinterest',
@@ -54,16 +53,21 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
         'quora': '/quora'
       };
       
+      // Ne rediriger que si l'onglet spécial est actif et que nous ne sommes pas déjà sur sa page
       if (activeTab in specialTabs) {
         const redirectPath = specialTabs[activeTab as keyof typeof specialTabs];
-        console.log(`Redirecting to ${redirectPath}`);
-        navigate(redirectPath);
-        toast.info(`Navigation vers ${activeTab}`, {
-          description: "Chargement de la page...",
-          duration: 1500
-        });
+        const currentPath = window.location.pathname;
+        
+        if (currentPath !== redirectPath) {
+          console.log(`Redirecting from ${currentPath} to ${redirectPath}`);
+          navigate(redirectPath);
+          toast.info(`Navigation vers ${activeTab}`, {
+            description: "Chargement de la page...",
+            duration: 1500
+          });
+        }
       }
-    }, 500);
+    }, 100);
   }, [activeTab, navigate, seoAnalysis]);
 
   // Si aucun onglet n'est trouvé
@@ -79,7 +83,7 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
     );
   }
 
-  // Gérer les redirections vers des pages dédiées
+  // Vérifier si l'onglet actuel doit rediriger vers une page dédiée
   const specialTabs = {
     'internal-links': '/internal-linking',
     'pinterest': '/pinterest',
@@ -89,8 +93,8 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
     'quora': '/quora'
   };
   
-  // Vérifier si l'onglet actuel doit rediriger vers une page dédiée
-  if (activeTab in specialTabs) {
+  // Éviter la redirection automatique qui causait des problèmes
+  if (activeTab in specialTabs && false) { // Désactivé pour éviter le problème de redirection en boucle
     const redirectPath = specialTabs[activeTab as keyof typeof specialTabs];
     console.log(`Redirecting to ${redirectPath}`);
     return <Navigate to={redirectPath} replace />;

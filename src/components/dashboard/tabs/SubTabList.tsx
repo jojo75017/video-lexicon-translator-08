@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 interface SubTabListProps {
   tabs: any[];
@@ -21,11 +22,40 @@ const SubTabList: React.FC<SubTabListProps> = ({ tabs, activeTab, onTabChange })
     if (path) {
       console.log('SubTabList navigating to:', path);
       navigate(path);
+      
+      toast.info(`Navigation vers ${tabId}`, {
+        description: "Chargement de la page...",
+        duration: 1500
+      });
     } else {
-      // Chemin par défaut basé sur l'ID de l'onglet
-      const tabPath = `/${tabId.toLowerCase()}`;
-      console.log('SubTabList navigating to fallback path:', tabPath);
+      // Mapper les ID d'onglets aux chemins
+      const tabPaths: Record<string, string> = {
+        'hierarchy': '/',
+        'wordcount': '/wordcount',
+        'suggestions': '/suggestions',
+        'seo': '/seo',
+        'structure': '/structure',
+        'backlinks': '/backlinks',
+        'performance': '/performance',
+        'metrics': '/metrics',
+        'analytics': '/analytics',
+        'quora': '/quora',
+        'signature': '/signature',
+        'pinterest': '/pinterest',
+        'internal-links': '/internal-linking',
+        'keyword-meta': '/keyword-meta',
+        'keyword-generator': '/keyword-generator',
+        'outils-seo': '/outils-seo',
+      };
+      
+      const tabPath = tabPaths[tabId] || `/${tabId.toLowerCase()}`;
+      console.log('SubTabList navigating to path:', tabPath);
       navigate(tabPath);
+      
+      toast.info(`Navigation vers ${tabId}`, {
+        description: "Chargement de la page...",
+        duration: 1500
+      });
     }
   };
 

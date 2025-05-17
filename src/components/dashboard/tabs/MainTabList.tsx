@@ -2,6 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BarChart2, FileText, Zap, PieChart } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface MainTabProps {
   mainTabs: any[];
@@ -32,6 +33,12 @@ const MainTabList: React.FC<MainTabProps> = ({ mainTabs, activeTab, onTabChange 
     // Puis naviguer vers le chemin correspondant
     console.log('Navigating to:', path);
     navigate(path);
+    
+    // Notification visuelle
+    toast.info(`Navigation vers ${tabId}`, {
+      description: "Chargement de la page...",
+      duration: 1500
+    });
   };
 
   return (

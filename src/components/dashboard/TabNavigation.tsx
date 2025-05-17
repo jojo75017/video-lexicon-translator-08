@@ -26,6 +26,13 @@ const TabNavigation = () => {
     '/pinterest': 'pinterest',
     '/outils-seo': 'outils-seo',
     '/keyword-meta': 'keyword-meta',
+    '/internal-linking': 'internal-links',
+    '/keyword-generator': 'keyword-generator',
+    // Routes localisées (français)
+    '/hierarchie': 'hierarchy',
+    '/nombre-mots': 'wordcount',
+    '/liens-internes': 'internal-links',
+    '/metriques': 'metrics',
   };
   
   // Obtention de l'onglet actif basé sur l'URL
@@ -54,6 +61,8 @@ const TabNavigation = () => {
       'metrics': '/metrics',
       'outils-seo': '/outils-seo',
       'keyword-meta': '/keyword-meta',
+      'internal-links': '/internal-linking',
+      'keyword-generator': '/keyword-generator',
     };
     
     // Navigation vers la route correspondante
@@ -93,6 +102,9 @@ const TabNavigation = () => {
               <TabsTrigger value="analytics" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
                 Analytics
               </TabsTrigger>
+              <TabsTrigger value="internal-links" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+                Liens Internes
+              </TabsTrigger>
               <TabsTrigger value="outils-seo" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white font-medium">
                 Outils SEO
               </TabsTrigger>
@@ -103,7 +115,10 @@ const TabNavigation = () => {
                 Pinterest
               </TabsTrigger>
               <TabsTrigger value="keyword-meta" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-                Titles & Media
+                Titles & Meta
+              </TabsTrigger>
+              <TabsTrigger value="keyword-generator" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+                Générateur de mots-clés
               </TabsTrigger>
             </TabsList>
           </Tabs>
