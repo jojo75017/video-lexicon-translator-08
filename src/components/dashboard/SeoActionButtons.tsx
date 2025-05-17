@@ -11,7 +11,7 @@ const SeoActionButtons = () => {
   const handleInternalLinkClick = () => {
     console.log("Clicking internal-linking button");
     navigate('/internal-linking');
-    toast.info("Navigation vers l'analyse des liens internes", {
+    toast.success("Navigation vers l'analyse des liens internes", {
       description: "Chargement de la page...",
       duration: 1500
     });
@@ -20,7 +20,7 @@ const SeoActionButtons = () => {
   const handleKeywordMetaClick = () => {
     console.log("Clicking keyword-meta button");
     navigate('/keyword-meta');
-    toast.info("Navigation vers les title & meta", {
+    toast.success("Navigation vers les title & meta", {
       description: "Chargement de la page...",
       duration: 1500
     });
@@ -29,7 +29,7 @@ const SeoActionButtons = () => {
   const handleKeywordGeneratorClick = () => {
     console.log("Clicking keyword generator button");
     navigate('/keyword-generator');
-    toast.info("Navigation vers le générateur de mots-clés", {
+    toast.success("Navigation vers le générateur de mots-clés", {
       description: "Chargement de la page...",
       duration: 1500
     });
@@ -38,7 +38,7 @@ const SeoActionButtons = () => {
   const handleSeoClick = () => {
     console.log("Clicking SEO button");
     navigate('/seo');
-    toast.info("Navigation vers l'analyse SEO", {
+    toast.success("Navigation vers l'analyse SEO", {
       description: "Chargement de la page...",
       duration: 1500
     });
@@ -47,7 +47,7 @@ const SeoActionButtons = () => {
   const handlePerformanceClick = () => {
     console.log("Clicking performance button");
     navigate('/performance');
-    toast.info("Navigation vers l'analyse de performance", {
+    toast.success("Navigation vers l'analyse de performance", {
       description: "Chargement de la page...",
       duration: 1500
     });
@@ -56,7 +56,7 @@ const SeoActionButtons = () => {
   const handleTrackingClick = () => {
     console.log("Clicking tracking button");
     navigate('/tracking');
-    toast.info("Navigation vers le suivi des positions", {
+    toast.success("Navigation vers le suivi des positions", {
       description: "Chargement de la page...",
       duration: 1500
     });
@@ -68,7 +68,8 @@ const SeoActionButtons = () => {
         className="w-full h-[100px] flex flex-col items-center justify-center relative overflow-hidden group shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1"
         onClick={handleKeywordMetaClick}
         style={{
-          background: "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)"
+          background: "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)",
+          border: "none"
         }}
       >
         <div className="absolute inset-0 bg-white/10 group-hover:bg-white/20 transition-all duration-300 opacity-0 group-hover:opacity-100"></div>
@@ -83,7 +84,8 @@ const SeoActionButtons = () => {
         className="w-full h-[100px] flex flex-col items-center justify-center relative overflow-hidden group shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1"
         onClick={handleKeywordGeneratorClick}
         style={{
-          background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)"
+          background: "linear-gradient(135deg, #22c55e 0%, #16a34a 100%)",
+          border: "none"
         }}
       >
         <div className="absolute inset-0 bg-white/10 group-hover:bg-white/20 transition-all duration-300 opacity-0 group-hover:opacity-100"></div>
@@ -98,7 +100,8 @@ const SeoActionButtons = () => {
         className="w-full h-[100px] flex flex-col items-center justify-center relative overflow-hidden group shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1"
         onClick={handleInternalLinkClick}
         style={{
-          background: "linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)"
+          background: "linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)",
+          border: "none"
         }}
       >
         <div className="absolute inset-0 bg-white/10 group-hover:bg-white/20 transition-all duration-300 opacity-0 group-hover:opacity-100"></div>
@@ -113,7 +116,8 @@ const SeoActionButtons = () => {
         className="w-full h-[100px] flex flex-col items-center justify-center relative overflow-hidden group shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1"
         onClick={handleSeoClick}
         style={{
-          background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)"
+          background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
+          border: "none"
         }}
       >
         <div className="absolute inset-0 bg-white/10 group-hover:bg-white/20 transition-all duration-300 opacity-0 group-hover:opacity-100"></div>
@@ -128,7 +132,8 @@ const SeoActionButtons = () => {
         className="w-full h-[100px] flex flex-col items-center justify-center relative overflow-hidden group shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1"
         onClick={handlePerformanceClick}
         style={{
-          background: "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)"
+          background: "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
+          border: "none"
         }}
       >
         <div className="absolute inset-0 bg-white/10 group-hover:bg-white/20 transition-all duration-300 opacity-0 group-hover:opacity-100"></div>
@@ -143,7 +148,8 @@ const SeoActionButtons = () => {
         className="w-full h-[100px] flex flex-col items-center justify-center relative overflow-hidden group shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1"
         onClick={handleTrackingClick}
         style={{
-          background: "linear-gradient(135deg, #ec4899 0%, #be185d 100%)"
+          background: "linear-gradient(135deg, #ec4899 0%, #be185d 100%)",
+          border: "none"
         }}
       >
         <div className="absolute inset-0 bg-white/10 group-hover:bg-white/20 transition-all duration-300 opacity-0 group-hover:opacity-100"></div>

@@ -16,12 +16,15 @@ export interface PerformanceData {
   responseTime?: number;
   resourceCount?: number;
   imageCount?: number;
+  speedIndex?: number;
   resourceBreakdown?: {
     js: number;
     css: number;
     images: number;
     fonts: number;
     other: number;
+    scripts?: number; // Pour la compatibilité
+    styles?: number;  // Pour la compatibilité
   };
   mobilePerformance?: any;
   desktopPerformance?: any;

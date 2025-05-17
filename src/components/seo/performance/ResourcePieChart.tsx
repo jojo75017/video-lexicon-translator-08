@@ -3,7 +3,7 @@ import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { ChartProps } from './types';
 
-// Couleurs vives et vibrantes pour le graphique
+// Couleurs vives et vibrantes pour le graphique en premier plan
 const COLORS = [
   '#4338ca', // indigo-700
   '#0ea5e9', // sky-500
@@ -77,7 +77,7 @@ const ResourcePieChart: React.FC<ChartProps> = ({ data, activeDevice }) => {
             paddingTop: '15px' 
           }}
           formatter={(value, entry) => (
-            <span style={{ color: entry.color, fontWeight: 'bold' }}>
+            <span style={{ color: entry.color, fontWeight: 'bold', textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>
               {value}
             </span>
           )}

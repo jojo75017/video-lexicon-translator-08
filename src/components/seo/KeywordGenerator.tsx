@@ -1,6 +1,5 @@
 
-import React from 'react';
-import { useKeywordGenerator } from '@/hooks/useKeywordGenerator';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -10,22 +9,95 @@ import { toast } from 'sonner';
 import { Card } from '@/components/ui/card';
 
 const KeywordGenerator = () => {
-  const {
-    keyword,
-    setKeyword,
-    language,
-    setLanguage,
-    searchVolume,
-    setSearchVolume,
-    competition,
-    setCompetition,
-    keywordSuggestions,
-    loading,
-    error,
-    generateKeywords,
-    selectKeyword,
-    selectedKeywords
-  } = useKeywordGenerator();
+  // États locaux pour gérer le composant
+  const [keyword, setKeyword] = useState('');
+  const [language, setLanguage] = useState('fr');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [keywordSuggestions, setKeywordSuggestions] = useState<KeywordSuggestion[]>([]);
+  const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
+
+  // Liste d'exemples de suggestions de mots-clés
+  const exampleSuggestions: KeywordSuggestion[] = [
+    {
+      keyword: "référencement seo",
+      volume: 4400,
+      competition: 0.82,
+      cpc: 2.45,
+      difficulty: 75,
+      relevance: 98
+    },
+    {
+      keyword: "optimisation site web",
+      volume: 2900,
+      competition: 0.75,
+      cpc: 1.95,
+      difficulty: 68,
+      relevance: 95
+    },
+    {
+      keyword: "mots clés seo",
+      volume: 1900,
+      competition: 0.65,
+      cpc: 1.75,
+      difficulty: 60,
+      relevance: 92
+    },
+    {
+      keyword: "analyse seo",
+      volume: 3200,
+      competition: 0.70,
+      cpc: 2.10,
+      difficulty: 65,
+      relevance: 90
+    },
+    {
+      keyword: "audit référencement",
+      volume: 1200,
+      competition: 0.55,
+      cpc: 1.50,
+      difficulty: 55,
+      relevance: 88
+    }
+  ];
+
+  const generateKeywords = () => {
+    if (!keyword) {
+      setError("Veuillez saisir un mot-clé");
+      return;
+    }
+    
+    setLoading(true);
+    setError(null);
+    
+    // Simuler une requête API avec une temporisation
+    setTimeout(() => {
+      try {
+        // Générer des suggestions basées sur le mot-clé saisi
+        const suggestions = [...exampleSuggestions].map(sugg => ({
+          ...sugg,
+          keyword: `${keyword} ${sugg.keyword.split(' ').slice(-1)[0]}`,
+          relevance: Math.floor(Math.random() * 30) + 70 // Pertinence entre 70 et 100
+        }));
+        
+        setKeywordSuggestions(suggestions);
+        toast.success(`${suggestions.length} mots-clés générés avec succès`);
+      } catch (err) {
+        setError("Erreur lors de la génération des mots-clés");
+        toast.error("Échec de la génération des mots-clés");
+      } finally {
+        setLoading(false);
+      }
+    }, 1500);
+  };
+
+  const selectKeyword = (keywordValue: string) => {
+    if (selectedKeywords.includes(keywordValue)) {
+      setSelectedKeywords(prev => prev.filter(k => k !== keywordValue));
+    } else {
+      setSelectedKeywords(prev => [...prev, keywordValue]);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,13 +110,14 @@ const KeywordGenerator = () => {
       return;
     }
     
-    // In a real app, we would implement a proper export
+    // Dans une application réelle, on implémenterait un export approprié
     toast.success(`${selectedKeywords.length} mots-clés exportés`);
     console.log("Exported keywords:", selectedKeywords);
   };
 
   const handleClearAll = () => {
     if (selectedKeywords.length > 0) {
+      setSelectedKeywords([]);
       toast.info("Tous les mots-clés ont été désélectionnés");
     }
   };
@@ -119,16 +192,13 @@ const KeywordGenerator = () => {
         </div>
       )}
       
-      {keywordSuggestions && keywordSuggestions.length > 0 ? (
+      {keywordSuggestions.length > 0 ? (
         <div className="bg-white p-4 rounded-lg shadow-lg border border-indigo-100 animate-fade-in">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-medium bg-gradient-to-r from-indigo-600 to-purple-600 text-transparent bg-clip-text">Suggestions de mots-clés</h3>
             <div className="flex space-x-2">
               <Button
-                onClick={() => {
-                  setSelectedKeywords([]);
-                  handleClearAll();
-                }}
+                onClick={handleClearAll}
                 variant="outline"
                 className="text-gray-600 border-gray-300 hover:bg-gray-100"
                 size="sm"

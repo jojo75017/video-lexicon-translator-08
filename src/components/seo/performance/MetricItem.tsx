@@ -18,7 +18,7 @@ const MetricItem: React.FC<MetricItemProps> = ({
     if (colorClass.includes('bg-yellow')) return 'text-yellow-700';
     if (colorClass.includes('bg-amber')) return 'text-amber-700';
     if (colorClass.includes('bg-green')) return 'text-green-700';
-    return 'text-gray-700';
+    return 'text-blue-700';
   };
   
   // Get gradient background based on the color
@@ -38,7 +38,7 @@ const MetricItem: React.FC<MetricItemProps> = ({
     <div className="space-y-2 group hover:bg-gray-50 rounded-md p-3 transition-all duration-300 border border-transparent hover:border-gray-200 hover:shadow-sm">
       <div className="flex justify-between items-center">
         <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">{label}</span>
-        <span className={`text-sm font-semibold ${getTextColorClass()} bg-opacity-15 px-3 py-1 rounded-full ${colorClass.includes('bg-green') ? 'bg-green-100' : colorClass.includes('bg-yellow') ? 'bg-yellow-100' : colorClass.includes('bg-amber') ? 'bg-amber-100' : 'bg-red-100'}`}>
+        <span className={`text-sm font-semibold ${getTextColorClass()} bg-opacity-15 px-3 py-1 rounded-full ${colorClass.includes('bg-green') ? 'bg-green-100' : colorClass.includes('bg-yellow') ? 'bg-yellow-100' : colorClass.includes('bg-amber') ? 'bg-amber-100' : colorClass.includes('bg-red') ? 'bg-red-100' : 'bg-blue-100'}`}>
           {formatFunc(value)}
         </span>
       </div>
@@ -50,6 +50,7 @@ const MetricItem: React.FC<MetricItemProps> = ({
             boxShadow: `0 0 10px ${colorClass.includes('bg-green') ? 'rgba(34, 197, 94, 0.5)' : 
                           colorClass.includes('bg-yellow') ? 'rgba(234, 179, 8, 0.5)' :
                           colorClass.includes('bg-amber') ? 'rgba(245, 158, 11, 0.5)' :
+                          colorClass.includes('bg-blue') ? 'rgba(59, 130, 246, 0.5)' :
                           'rgba(239, 68, 68, 0.5)'}` 
           }}
         >
@@ -64,6 +65,7 @@ const MetricItem: React.FC<MetricItemProps> = ({
             background: colorClass.includes('bg-green') ? 'rgba(34, 197, 94, 0.7)' : 
                         colorClass.includes('bg-yellow') ? 'rgba(234, 179, 8, 0.7)' :
                         colorClass.includes('bg-amber') ? 'rgba(245, 158, 11, 0.7)' :
+                        colorClass.includes('bg-blue') ? 'rgba(59, 130, 246, 0.7)' :
                         'rgba(239, 68, 68, 0.7)'
           }}
         ></div>
