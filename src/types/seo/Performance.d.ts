@@ -26,6 +26,8 @@ export interface PerformanceData {
   firstContentfulPaint?: number;
   largestContentfulPaint?: number; // Ajouté pour la compatibilité
   domLoadTime?: number;
+  score?: number;
+  speedIndex?: number;
 }
 
 export interface MobileAnalysis {

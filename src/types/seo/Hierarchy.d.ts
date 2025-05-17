@@ -1,11 +1,14 @@
 
 export interface HierarchyItem {
-  id: string;
-  content: string;
+  id?: string;
+  content?: string;
+  text?: string;
+  tagName?: string;
   children?: HierarchyItem[];
-  type: "h1" | "h2" | "h3" | "h4" | "p" | "list";
+  type?: "h1" | "h2" | "h3" | "h4" | "p" | "list" | string;
   depth?: number;
   parentId?: string;
+  position?: number;
 }
 
 export interface HeadingStructure {
@@ -18,6 +21,6 @@ export interface HeadingStructure {
 export interface StructureItem {
   content: string;
   id: string;
-  type: "h1" | "h2" | "h3" | "h4" | "p" | "list";
+  type: "list" | "h3" | "p" | "h1" | "h2" | "h4" | string;
   items?: string[];
 }

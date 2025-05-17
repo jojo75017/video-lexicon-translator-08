@@ -1,32 +1,55 @@
 
 import React, { useState } from 'react';
-import { ArrowLeft, FileSearch } from 'lucide-react';
+import { ArrowLeft, FileSearch, Search, Loader2, AlertTriangle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { CrawlForm } from "@/components/CrawlForm";
 import StructureSection from '@/components/seo/StructureSection';
 import HierarchySection from '@/components/seo/HierarchySection';
 import { FirecrawlService } from '@/utils/FirecrawlService';
 import { analyzeHeadings } from '@/utils/seo/headingAnalyzer';
+import { analyzePageStructure, extractQuestionsFromContent } from '@/utils/seo/semanticAnalyzer';
 import { toast } from 'sonner';
 import SiteStructureVisualizer from '@/components/SiteStructureVisualizer';
+import SeoStructure from '@/components/seo/SeoStructure';
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import StructureKeywordsSection from '@/components/seo/StructureKeywordsSection';
+import RoiAnalyticsSection from '@/components/seo/RoiAnalyticsSection';
 
 const StructurePage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [seoAnalysis, setSeoAnalysis] = useState<any>(null);
   const [siteStructure, setSiteStructure] = useState<any>(null);
+  const [structureData, setStructureData] = useState<any>(null);
+  const [questions, setQuestions] = useState<string[]>([]);
+  const [url, setUrl] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  
+  const handleAnalyze = async () => {
+    if (!url) {
+      toast.error("Veuillez entrer une URL valide");
+      return;
+    }
 
-  const handleCrawlSubmit = async (url: string) => {
-    setIsLoading(true);
-    setProgress(10);
-    setSeoAnalysis(null);
-    setSiteStructure(null);
-    
+    // Format URL if needed
+    let formattedUrl = url;
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      formattedUrl = 'https://' + url;
+    }
+
     try {
+      // Validate URL format
+      new URL(formattedUrl);
+      
+      setIsLoading(true);
+      setError(null);
+      setProgress(10);
+      
       toast.info("Analyse en cours", {
-        description: "Récupération des données du site..."
+        description: "Récupération des données de la page..."
       });
       
       // Activer le proxy pour éviter les problèmes CORS
@@ -34,8 +57,8 @@ const StructurePage = () => {
       setProgress(20);
       
       // Analyser le site
-      const result = await FirecrawlService.crawlWebsite(url, true);
-      console.log("StructurePage crawl result:", result);
+      const result = await FirecrawlService.crawlWebsite(formattedUrl, true);
+      console.log("Structure analysis result:", result);
       setProgress(60);
       
       if (result.success && result.data) {
@@ -55,7 +78,19 @@ const StructurePage = () => {
         // Analyse des titres et structure
         const headingStructure = analyzeHeadings(doc);
         console.log("Heading structure analyzed:", headingStructure);
+        
+        // Analyse de la structure de page
+        const pageStructure = analyzePageStructure(doc);
+        console.log("Page structure analyzed:", pageStructure);
+        
         setProgress(80);
+        
+        // Extraire les questions du contenu
+        const textContent = result.data.textContent || 
+          (doc.body ? doc.body.textContent || '' : '');
+        
+        const extractedQuestions = extractQuestionsFromContent(textContent);
+        setQuestions(extractedQuestions);
         
         // Générer la structure du site
         const domain = url.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
@@ -77,43 +112,43 @@ const StructurePage = () => {
           children: [
             {
               name: "Page d'accueil",
-              path: url,
+              path: formattedUrl,
               children: sections.map(section => {
                 const sectionPath = section.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, "-");
                 return {
                   name: section,
-                  path: `${url}/${sectionPath}`,
+                  path: `${formattedUrl}/${sectionPath}`,
                   children: section === sections[0] ? [
                     {
                       name: "Notre histoire",
-                      path: `${url}/${sectionPath}/histoire`,
+                      path: `${formattedUrl}/${sectionPath}/histoire`,
                       children: []
                     },
                     {
                       name: "L'équipe",
-                      path: `${url}/${sectionPath}/equipe`,
+                      path: `${formattedUrl}/${sectionPath}/equipe`,
                       children: []
                     }
                   ] : section === sections[1] ? [
                     {
                       name: "Service Premium",
-                      path: `${url}/${sectionPath}/premium`,
+                      path: `${formattedUrl}/${sectionPath}/premium`,
                       children: []
                     },
                     {
                       name: "Service Standard",
-                      path: `${url}/${sectionPath}/standard`,
+                      path: `${formattedUrl}/${sectionPath}/standard`,
                       children: []
                     }
                   ] : section === "Blog" || section === "Blog beauté" ? [
                     {
                       name: "Article 1",
-                      path: `${url}/${sectionPath}/article-1`,
+                      path: `${formattedUrl}/${sectionPath}/article-1`,
                       children: []
                     },
                     {
                       name: "Article 2",
-                      path: `${url}/${sectionPath}/article-2`,
+                      path: `${formattedUrl}/${sectionPath}/article-2`,
                       children: []
                     }
                   ] : []
@@ -123,6 +158,39 @@ const StructurePage = () => {
           ]
         };
         
+        // Extract keywords from text content
+        const words = textContent.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+        const wordFrequency: Record<string, number> = {};
+        
+        for (const word of words) {
+          if (!/^[a-z]+$/i.test(word)) continue; // Skip non-alphabetical words
+          wordFrequency[word] = (wordFrequency[word] || 0) + 1;
+        }
+        
+        const keywords = Object.entries(wordFrequency)
+          .filter(([_, count]) => count > 2)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 15)
+          .map(([word, count]) => ({
+            keyword: word,
+            volume: Math.floor(count * 110),
+            cpc: Math.random() * 2 + 0.5,
+            difficulty: Math.floor(Math.random() * 100)
+          }));
+        
+        // Extract phrases
+        const phrases: Record<string, number> = {};
+        for (let i = 0; i < words.length - 2; i++) {
+          const phrase = words.slice(i, i + 3).join(' ');
+          phrases[phrase] = (phrases[phrase] || 0) + 1;
+        }
+        
+        const topPhrases = Object.entries(phrases)
+          .filter(([_, count]) => count > 1)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 10)
+          .map(([phrase, count]) => ({ phrase, count }));
+        
         // Ajouter des données d'analyse
         const analysisResult = {
           h1Count: headingStructure.h1Count || 0,
@@ -131,12 +199,17 @@ const StructurePage = () => {
           imgCount: doc.querySelectorAll('img').length || 0,
           wordCount: result.data.textContent ? result.data.textContent.split(/\s+/).filter(Boolean).length : 0,
           readabilityScore: 75,
-          hierarchy: headingStructure.hierarchy || []
+          hierarchy: headingStructure.hierarchy || [],
+          headings: headingStructure.headings || [],
+          keywords,
+          phrases: topPhrases,
+          questions: extractedQuestions
         };
         
         setProgress(90);
         setSeoAnalysis(analysisResult);
         setSiteStructure(siteStructureData);
+        setStructureData(pageStructure);
         setProgress(100);
         
         toast.success("Analyse terminée avec succès");
@@ -145,6 +218,7 @@ const StructurePage = () => {
       }
     } catch (error) {
       console.error("Erreur d'analyse:", error);
+      setError(error instanceof Error ? error.message : "Une erreur s'est produite");
       setProgress(100);
       
       toast.error("Erreur d'analyse", {
@@ -152,112 +226,185 @@ const StructurePage = () => {
       });
       
       // Générer des données factices adaptées au site
-      const domain = url.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
-      let pageTitle = "Démonstration";
-      let sections = ["À propos", "Services", "Contact"];
-      let subtitles = ["Notre équipe", "Nos valeurs"];
-      
-      if (domain.includes("divaskin")) {
-        pageTitle = "DivaSkin - Soins de la peau";
-        sections = ["Produits", "Soins visage", "Services beauté"];
-        subtitles = ["Crèmes hydratantes", "Sérums anti-âge"];
-      } else if (domain.includes("beauty") || domain.includes("beaute")) {
-        pageTitle = "Beauté et Bien-être";
-        sections = ["Soins", "Produits", "Conseils beauté"];
-        subtitles = ["Traitements spa", "Soins personnalisés"];
-      }
-      
-      const mockData = {
-        h1Count: 1,
-        h2Count: 3,
-        h3Count: 4,
-        imgCount: 5,
-        wordCount: 1200,
-        readabilityScore: 70,
-        hierarchy: [
-          {
-            text: pageTitle,
-            tagName: "h1",
-            position: 0,
-            children: [
-              {
-                text: sections[0],
-                tagName: "h2",
-                position: 1,
-                children: [
-                  {
-                    text: subtitles[0],
-                    tagName: "h3",
-                    position: 2,
-                    children: [
-                      {
-                        text: `Nous sommes une équipe dédiée à la qualité et l'excellence.`,
-                        tagName: "p",
-                        position: 3,
-                        children: []
-                      }
-                    ]
-                  }
-                ]
-              },
-              {
-                text: sections[1],
-                tagName: "h2",
-                position: 4,
-                children: [
-                  {
-                    text: subtitles[1],
-                    tagName: "h3",
-                    position: 5,
-                    children: [
-                      {
-                        text: "Nous proposons des services adaptés à vos besoins spécifiques.",
-                        tagName: "p",
-                        position: 6,
-                        children: []
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      };
-      
-      const mockStructure = {
-        name: `Structure de ${domain}`,
-        children: [
-          {
-            name: "Page d'accueil",
-            path: url,
-            children: sections.map((section, index) => {
-              const sectionPath = section.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, "-");
-              return {
-                name: section,
-                path: `${url}/${sectionPath}`,
-                children: index === 0 ? [
-                  { name: subtitles[0], path: `${url}/${sectionPath}/equipe`, children: [] },
-                  { name: subtitles[1], path: `${url}/${sectionPath}/valeurs`, children: [] }
-                ] : []
-              };
-            })
-          }
-        ]
-      };
-      
-      setSeoAnalysis(mockData);
-      setSiteStructure(mockStructure);
+      generateMockData(formattedUrl);
     } finally {
       setTimeout(() => {
         setIsLoading(false);
         setProgress(0);
-      }, 1000);
+      }, 500);
     }
   };
-
-  const updateProgress = (newProgress: number) => {
-    setProgress(newProgress);
+  
+  const generateMockData = (analyzedUrl: string) => {
+    const domain = analyzedUrl.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+    let pageTitle = "Démonstration";
+    let sections = ["À propos", "Services", "Contact"];
+    let subtitles = ["Notre équipe", "Nos valeurs"];
+    
+    if (domain.includes("divaskin")) {
+      pageTitle = "DivaSkin - Soins de la peau";
+      sections = ["Produits", "Soins visage", "Services beauté"];
+      subtitles = ["Crèmes hydratantes", "Sérums anti-âge"];
+    } else if (domain.includes("beauty") || domain.includes("beaute")) {
+      pageTitle = "Beauté et Bien-être";
+      sections = ["Soins", "Produits", "Conseils beauté"];
+      subtitles = ["Traitements spa", "Soins personnalisés"];
+    }
+    
+    // Mock structure data
+    const mockStructureData = {
+      headingCounts: {
+        h1: 1,
+        h2: 3,
+        h3: 4,
+        h4: 2
+      },
+      headings: {
+        h1: [pageTitle],
+        h2: sections,
+        h3: ["Service 1", "Service 2", "Contactez-nous", "Notre équipe"],
+        h4: ["Sous-section 1", "Sous-section 2"]
+      },
+      paragraphCount: 12,
+      imageCount: 5,
+      listCount: 3,
+      wordCount: 1200,
+      topPhrases: [
+        { phrase: "soins de la", count: 5 },
+        { phrase: "notre équipe", count: 4 },
+        { phrase: "produits de qualité", count: 3 },
+        { phrase: "services personnalisés", count: 3 },
+        { phrase: "peau sensible", count: 2 }
+      ],
+      questions: [
+        "Comment prendre soin de sa peau ?",
+        "Quels produits sont adaptés aux peaux sensibles ?",
+        "Pourquoi choisir des produits naturels ?",
+        "Comment contacter notre équipe ?",
+        "Où trouver nos boutiques ?"
+      ],
+      contentDensity: 0.42,
+      textToHtmlRatio: 0.38
+    };
+    
+    const mockKeywords = [
+      { keyword: "soin", volume: 1200, cpc: 1.35, difficulty: 65 },
+      { keyword: "peau", volume: 980, cpc: 1.22, difficulty: 58 },
+      { keyword: "hydratant", volume: 750, cpc: 0.95, difficulty: 42 },
+      { keyword: "naturel", volume: 650, cpc: 1.05, difficulty: 47 },
+      { keyword: "beauté", volume: 1500, cpc: 1.85, difficulty: 72 },
+      { keyword: "visage", volume: 1100, cpc: 1.15, difficulty: 54 },
+      { keyword: "produit", volume: 900, cpc: 0.98, difficulty: 49 },
+      { keyword: "crème", volume: 850, cpc: 1.12, difficulty: 51 },
+      { keyword: "traitement", volume: 520, cpc: 1.65, difficulty: 68 },
+      { keyword: "sérum", volume: 480, cpc: 1.75, difficulty: 63 }
+    ];
+    
+    const mockQuestions = [
+      "Qu'est-ce qu'un soin hydratant pour le visage ?",
+      "Comment choisir la bonne crème pour ma peau ?",
+      "Quels sont les avantages des produits naturels pour la peau ?",
+      "Quand faut-il appliquer un sérum anti-âge ?",
+      "Pourquoi utiliser des produits spécifiques pour la nuit ?",
+      "Comment prendre soin d'une peau sensible ?",
+      "Quelle routine beauté adopter au quotidien ?",
+      "Comment traiter les imperfections cutanées naturellement ?"
+    ];
+    
+    const mockData = {
+      h1Count: 1,
+      h2Count: 3,
+      h3Count: 4,
+      imgCount: 5,
+      wordCount: 1200,
+      readabilityScore: 70,
+      hierarchy: [
+        {
+          text: pageTitle,
+          tagName: "h1",
+          position: 0,
+          children: [
+            {
+              text: sections[0],
+              tagName: "h2",
+              position: 1,
+              children: [
+                {
+                  text: subtitles[0],
+                  tagName: "h3",
+                  position: 2,
+                  children: [
+                    {
+                      text: `Nous proposons une gamme complète de produits pour tous types de peau.`,
+                      tagName: "p",
+                      position: 3,
+                      children: []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              text: sections[1],
+              tagName: "h2",
+              position: 4,
+              children: [
+                {
+                  text: subtitles[1],
+                  tagName: "h3",
+                  position: 5,
+                  children: [
+                    {
+                      text: "Nous utilisons uniquement des ingrédients de haute qualité.",
+                      tagName: "p",
+                      position: 6,
+                      children: []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      headings: [
+        { text: pageTitle, level: 1, position: 0 },
+        { text: sections[0], level: 2, position: 1 },
+        { text: subtitles[0], level: 3, position: 2 },
+        { text: sections[1], level: 2, position: 3 },
+        { text: subtitles[1], level: 3, position: 4 },
+        { text: "Contact", level: 2, position: 5 }
+      ],
+      keywords: mockKeywords,
+      phrases: mockStructureData.topPhrases,
+      questions: mockQuestions
+    };
+    
+    const mockStructure = {
+      name: `Structure de ${domain}`,
+      children: [
+        {
+          name: "Page d'accueil",
+          path: analyzedUrl,
+          children: sections.map((section, index) => {
+            const sectionPath = section.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, "-");
+            return {
+              name: section,
+              path: `${analyzedUrl}/${sectionPath}`,
+              children: index === 0 ? [
+                { name: subtitles[0], path: `${analyzedUrl}/${sectionPath}/equipe`, children: [] },
+                { name: subtitles[1], path: `${analyzedUrl}/${sectionPath}/valeurs`, children: [] }
+              ] : []
+            };
+          })
+        }
+      ]
+    };
+    
+    setSeoAnalysis(mockData);
+    setSiteStructure(mockStructure);
+    setStructureData(mockStructureData);
+    setQuestions(mockQuestions);
   };
 
   return (
@@ -285,42 +432,122 @@ const StructurePage = () => {
             Cette analyse vous aidera à optimiser la navigation et le maillage interne.
           </p>
           
-          <CrawlForm 
-            onSubmit={handleCrawlSubmit} 
-            isLoading={isLoading} 
-            progress={progress}
-            onProgressUpdate={updateProgress}
-          />
+          <div className="bg-blue-50 p-6 rounded-lg border border-blue-100 mb-6">
+            <h3 className="text-lg font-medium mb-4">Analysez un site web</h3>
+            <div className="flex gap-3">
+              <div className="relative flex-1">
+                <Input
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  placeholder="https://exemple.com"
+                  className="pl-10"
+                  disabled={isLoading}
+                />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              </div>
+              <Button
+                onClick={handleAnalyze}
+                className="min-w-[180px]"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Analyse en cours...
+                  </>
+                ) : (
+                  <>
+                    <Search className="mr-2 h-4 w-4" />
+                    Analyser le site
+                  </>
+                )}
+              </Button>
+            </div>
+            
+            {error && (
+              <Alert variant="destructive" className="mt-4">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>
+                  {error}. Essayez à nouveau ou utilisez une autre URL.
+                </AlertDescription>
+              </Alert>
+            )}
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Section Hiérarchie */}
+            <HierarchySection 
+              isLoading={isLoading}
+              seoAnalysis={seoAnalysis}
+              onAnalyze={() => document.querySelector('input[placeholder*="URL"]')?.scrollIntoView({ behavior: 'smooth' })}
+            />
+            
+            {/* Section Structure */}
+            <StructureSection 
+              isLoading={isLoading}
+              siteStructure={siteStructure}
+              onAnalyze={() => document.querySelector('input[placeholder*="URL"]')?.scrollIntoView({ behavior: 'smooth' })}
+            />
+          </div>
         </Card>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Section Hiérarchie */}
-          <HierarchySection 
+        {/* Section Mots-clés et Questions */}
+        {(seoAnalysis || isLoading) && (
+          <StructureKeywordsSection
             isLoading={isLoading}
-            seoAnalysis={seoAnalysis}
-            onAnalyze={() => document.querySelector('input[placeholder*="URL"]')?.scrollIntoView({ behavior: 'smooth' })}
+            keywords={seoAnalysis?.keywords || []}
+            phrases={seoAnalysis?.phrases || structureData?.topPhrases || []}
+            questions={questions}
           />
-          
-          {/* Section Structure */}
-          <StructureSection 
+        )}
+        
+        {/* Section Performance et ROI */}
+        {(seoAnalysis || isLoading) && (
+          <RoiAnalyticsSection
             isLoading={isLoading}
-            siteStructure={siteStructure}
-            onAnalyze={() => document.querySelector('input[placeholder*="URL"]')?.scrollIntoView({ behavior: 'smooth' })}
+            analytics={{
+              visitors: 1243,
+              pageViews: 3721,
+              bounceRate: 52.7,
+              conversions: 83,
+              conversionRate: 2.5
+            }}
+            performance={{
+              loadTime: 2.4,
+              firstContentfulPaint: 1.2,
+              largestContentfulPaint: 2.8,
+              score: 75,
+              resourceBreakdown: {
+                js: 235,
+                css: 56,
+                images: 845,
+                fonts: 124,
+                other: 38
+              }
+            }}
           />
-        </div>
+        )}
 
         {/* Section détaillée de la hiérarchie du contenu */}
         {seoAnalysis && seoAnalysis.hierarchy && (
           <Card className="p-6 mt-6">
-            <h3 className="text-xl font-semibold mb-4">Hiérarchie détaillée du contenu</h3>
+            <h3 className="text-xl font-semibold mb-4 flex items-center">
+              <FileSearch className="h-5 w-5 mr-2 text-blue-600" />
+              Hiérarchie détaillée du contenu
+            </h3>
             <p className="text-gray-600 mb-4">
               Cette section affiche tous les éléments de contenu de votre page, des titres H1 aux paragraphes.
             </p>
-            <div className="bg-white rounded-lg border border-gray-200 p-4 max-h-[600px] overflow-y-auto">
-              {seoAnalysis.hierarchy.map((item, index) => (
-                <HierarchyItemRenderer key={index} item={item} level={0} />
-              ))}
-            </div>
+            
+            <SeoStructure
+              h1Count={seoAnalysis.h1Count}
+              h2Count={seoAnalysis.h2Count}
+              h3Count={seoAnalysis.h3Count}
+              imgCount={seoAnalysis.imgCount}
+              headings={seoAnalysis.headings}
+              showHeadingsList={true}
+              hierarchy={seoAnalysis.hierarchy}
+            />
           </Card>
         )}
         
@@ -330,61 +557,6 @@ const StructurePage = () => {
             <SiteStructureVisualizer structure={siteStructure} />
           </Card>
         )}
-      </div>
-    </div>
-  );
-};
-
-// Composant pour l'affichage récursif de la hiérarchie
-const HierarchyItemRenderer = ({ item, level }: { item: any, level: number }) => {
-  const [isExpanded, setIsExpanded] = useState(true);
-  
-  const getTagColor = (tagName: string) => {
-    switch(tagName) {
-      case 'h1': return 'bg-blue-100 text-blue-800';
-      case 'h2': return 'bg-green-100 text-green-800';
-      case 'h3': return 'bg-amber-100 text-amber-800';
-      case 'h4': return 'bg-purple-100 text-purple-800';
-      case 'h5': return 'bg-pink-100 text-pink-800';
-      case 'h6': return 'bg-red-100 text-red-800';
-      case 'p': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  return (
-    <div className={`ml-${level * 4} mb-2`}>
-      <div className="flex items-start">
-        <button 
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="mr-2 p-1 rounded hover:bg-gray-100"
-          style={{ marginTop: '2px' }}
-        >
-          {item.children && item.children.length > 0 ? (
-            isExpanded ? (
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6"/></svg>
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-            )
-          ) : (
-            <div className="w-4"></div>
-          )}
-        </button>
-        <div className="flex-1">
-          <div className="flex items-center">
-            <span className={`px-2 py-1 rounded text-xs font-medium ${getTagColor(item.tagName)}`}>
-              {item.tagName}
-            </span>
-            <span className="ml-2">{item.text}</span>
-          </div>
-          {isExpanded && item.children && item.children.length > 0 && (
-            <div className="pl-6 border-l border-gray-200 mt-2">
-              {item.children.map((child: any, index: number) => (
-                <HierarchyItemRenderer key={index} item={child} level={level + 1} />
-              ))}
-            </div>
-          )}
-        </div>
       </div>
     </div>
   );
