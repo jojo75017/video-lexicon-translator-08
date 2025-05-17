@@ -1,68 +1,24 @@
 
-import { ReactNode } from 'react';
-
-export interface ResourceBreakdown {
-  images?: number;
-  scripts?: number;
-  styles?: number;
-  fonts?: number;
-  other?: number;
-}
-
 export interface PerformanceData {
+  score?: number;
   loadTime: number;
   firstContentfulPaint: number;
   domLoadTime: number;
-  speedIndex?: number;
-  largestContentfulPaint?: number;
   timeToInteractive?: number;
-  score?: number;
-  resourceBreakdown?: ResourceBreakdown;
-  performanceScore?: number;
   totalBlockingTime?: number;
+  largestContentfulPaint?: number;
   cumulativeLayoutShift?: number;
-  resourceCount?: number;
+  totalSize?: number;
   scriptCount?: number;
   styleCount?: number;
-  imageCount?: number;
-  totalSize?: number;
   responseTime?: number;
-  mobilePerformance?: PerformanceData;
-  desktopPerformance?: PerformanceData;
-}
-
-export interface LoadingSpeedAnalysisProps {
-  performance: PerformanceData;
-}
-
-export interface MetricItemProps {
-  label: string;
-  value: number;
-  maxValue: number;
-  formatFunc: (value: number) => string;
-  getColorClass: (value: number, type: 'text' | 'bg') => string;
-  tooltip?: string;
-}
-
-export interface ChartProps {
-  activeDevice: 'mobile' | 'desktop';
-  data: {
-    name: string;
-    value: number;
-  }[];
-}
-
-export interface ResourcesChartProps {
-  activeDevice: 'mobile' | 'desktop';
-  resourcesData: {
-    name: string;
-    value: number;
-  }[];
-}
-
-export interface RecommendationsProps {
-  activeDevice: 'mobile' | 'desktop';
-  deviceData: PerformanceData;
+  resourceBreakdown?: {
+    js: number;
+    css: number;
+    images: number;
+    fonts: number;
+    other: number;
+  };
 }
 
 export interface PerformanceMetricsSectionProps {
@@ -70,4 +26,15 @@ export interface PerformanceMetricsSectionProps {
   activeDevice: 'mobile' | 'desktop';
 }
 
-export type FormatFunction = (value: number) => string;
+export interface PerformanceHighlightsProps {
+  deviceData: PerformanceData;
+  activeDevice: 'mobile' | 'desktop';
+}
+
+export interface MetricItemProps {
+  label: string;
+  value: number;
+  maxValue: number;
+  formatFunc: (value: number) => string;
+  getColorClass: (value: number, maxValue: number) => string;
+}
