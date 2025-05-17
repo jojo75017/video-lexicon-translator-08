@@ -8,7 +8,9 @@ export const analyzeSemanticStructure = (doc: Document) => {
 };
 
 export const analyzeReadability = (textContent: string) => {
-  const sentences = textContent.split(/[.!?]+/);
+  const sentences = textContent.split(/[.!?]+/).filter(s => s.trim().length > 0);
+  if (sentences.length === 0) return 50; // valeur par défaut
+  
   return Math.min(100, Math.max(0, 100 - (
     sentences.reduce((acc, sentence) => acc + sentence.split(/\s+/).length, 0) / sentences.length - 15
   ) * 5));
@@ -87,6 +89,8 @@ export const analyzePageStructure = (doc: Document) => {
 };
 
 export const extractQuestionsFromContent = (text: string): string[] => {
+  if (!text || typeof text !== 'string') return [];
+  
   // Find sentences ending with question marks
   const questions = text
     .split(/(?<=[.!?])\s+/)

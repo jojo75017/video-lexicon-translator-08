@@ -24,10 +24,12 @@ export interface PerformanceData {
   serverResponseTime?: number;
   loadTime?: number;
   firstContentfulPaint?: number;
-  largestContentfulPaint?: number; // Ajouté pour la compatibilité
+  largestContentfulPaint?: number;
   domLoadTime?: number;
   score?: number;
   speedIndex?: number;
+  resourceCount?: number;
+  imageCount?: number;
 }
 
 export interface MobileAnalysis {
