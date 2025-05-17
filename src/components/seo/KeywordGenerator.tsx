@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import useKeywordGenerator from '@/hooks/useKeywordGenerator';
 import KeywordGeneratorForm from './keyword/KeywordGeneratorForm';
 import KeywordResultsList from './keyword/KeywordResultsList';

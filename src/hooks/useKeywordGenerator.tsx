@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { KeywordSuggestion } from '@/types/seo/Keyword';
 import { toast } from 'sonner';
+import { generateStandardKeywords, generateLongTailKeywords } from '@/utils/keyword/keywordGeneratorUtils';
 
 const useKeywordGenerator = () => {
   const [keyword, setKeyword] = useState<string>('');
@@ -29,62 +30,15 @@ const useKeywordGenerator = () => {
       // Simule un appel API
       await new Promise(resolve => setTimeout(resolve, 1200));
       
-      // Génère des suggestions fictives
-      const mockKeywords: KeywordSuggestion[] = [
-        {
-          keyword: keyword,
-          volume: 8500,
-          difficulty: 62,
-          relevance: 95,
-          cpc: 1.25,
-          competition: 0.75,
-          suggestedTitle: `${keyword} - Guide complet et conseils`,
-          suggestedDescription: `Découvrez tout ce que vous devez savoir sur ${keyword}. Conseils d'experts, astuces et stratégies pour optimiser vos résultats.`
-        },
-        {
-          keyword: `meilleur ${keyword}`,
-          volume: 5200,
-          difficulty: 58,
-          relevance: 85,
-          cpc: 1.85,
-          competition: 0.82,
-          suggestedTitle: `Top 10 des meilleurs ${keyword} - Comparatif complet`,
-          suggestedDescription: `Notre comparatif des meilleurs ${keyword} pour vous aider à faire le bon choix. Analyses détaillées et avis d'experts.`
-        },
-        {
-          keyword: `comment ${keyword}`,
-          volume: 4800,
-          difficulty: 45,
-          relevance: 90,
-          cpc: 0.95,
-          competition: 0.65,
-          suggestedTitle: `Comment optimiser votre ${keyword} - Guide étape par étape`,
-          suggestedDescription: `Apprenez comment améliorer votre ${keyword} avec notre guide pratique. Techniques prouvées et stratégies efficaces.`
-        },
-        {
-          keyword: `${keyword} professionnel`,
-          volume: 3200,
-          difficulty: 55,
-          relevance: 80,
-          cpc: 2.15,
-          competition: 0.68,
-          suggestedTitle: `${keyword} professionnel - Secrets et stratégies avancées`,
-          suggestedDescription: `Élevez votre ${keyword} au niveau professionnel. Découvrez les techniques avancées utilisées par les experts du secteur.`
-        },
-        {
-          keyword: `tutoriel ${keyword}`,
-          volume: 2900,
-          difficulty: 42,
-          relevance: 85,
-          cpc: 0.85,
-          competition: 0.55,
-          suggestedTitle: `Tutoriel ${keyword} - De débutant à expert`,
-          suggestedDescription: `Notre tutoriel complet sur le ${keyword} vous guidera pas à pas. Parfait pour débutants et utilisateurs avancés.`
-        }
-      ];
+      // Générer des mots-clés standards et longue traîne
+      const standardKeywords = generateStandardKeywords(keyword);
+      const longTailKeywords = generateLongTailKeywords(keyword);
       
-      setGeneratedKeywords(mockKeywords);
-      setResults(mockKeywords);
+      // Combine les deux types de mots-clés
+      const combinedKeywords = [...standardKeywords.slice(0, 5), ...longTailKeywords.slice(0, 3)];
+      
+      setGeneratedKeywords(combinedKeywords);
+      setResults(combinedKeywords);
       
       toast.success('Suggestions générées avec succès!');
     } catch (error) {
