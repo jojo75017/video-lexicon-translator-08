@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
 import ContentHierarchy from '@/components/ContentHierarchy';
@@ -7,6 +8,7 @@ import { Search, Loader2, Globe, AlertCircle } from 'lucide-react';
 import { toast } from "sonner";
 import { FirecrawlService } from '@/utils/FirecrawlService';
 import { analyzeHeadings } from '@/utils/seo/headingAnalyzer';
+import { analyzePageStructure } from '@/utils/seo/semanticAnalyzer';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import SiteStructureVisualizer from '@/components/SiteStructureVisualizer';
 
@@ -86,10 +88,19 @@ const HierarchyTabContent = () => {
         
         // Analyse des titres
         const headingStructure = analyzeHeadings(doc);
+        const pageStructure = analyzePageStructure(doc);
+        
         console.log("Heading structure analyzed:", headingStructure);
+        console.log("Page structure analyzed:", pageStructure);
         
         if (headingStructure) {
-          setAnalyzeResult(headingStructure);
+          // Merge the optimization status from pageStructure
+          const enhancedResult = {
+            ...headingStructure,
+            optimizationStatus: pageStructure.optimizationStatus
+          };
+          
+          setAnalyzeResult(enhancedResult);
           setAnalyzedUrl(formattedUrl);
           toast.success("Analyse terminée avec succès");
         } else {
@@ -165,6 +176,34 @@ const HierarchyTabContent = () => {
       subsections = ["Développement web", "Applications mobiles", "Intelligence artificielle"];
     }
     
+    // Ajouter l'état d'optimisation pour affichage
+    const optimizationStatus = {
+      h1: {
+        count: 1, 
+        isOptimized: true, 
+        message: "Bonne utilisation d'une seule balise H1"
+      },
+      h2: {
+        count: sections.length, 
+        isOptimized: true, 
+        message: "Bonne utilisation des balises H2"
+      },
+      h3: {
+        count: subsections.length + 2, 
+        isOptimized: true, 
+        message: "Bonne structure avec balises H3"
+      },
+      structure: {
+        isOptimized: true, 
+        message: "Structure hiérarchique correcte"
+      },
+      imgAlt: {
+        count: 0, 
+        isOptimized: true, 
+        message: "Toutes les images ont un attribut alt"
+      }
+    };
+    
     return {
       h1Count: 1,
       h2Count: sections.length,
@@ -189,6 +228,7 @@ const HierarchyTabContent = () => {
         { text: "Utilisez notre formulaire pour nous envoyer un message.", position: 6.5 },
         { text: "Retrouvez nos boutiques et nos horaires d'ouverture.", position: 7.5 }
       ],
+      optimizationStatus,
       hierarchy: [
         {
           text: pageTitle,

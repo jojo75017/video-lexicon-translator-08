@@ -1,483 +1,166 @@
 
-import React, { useState } from 'react';
-import { Card } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronRight, ChevronDown, Heading1, Heading2, Heading3, Type, AlertCircle, CheckCircle2, BarChart2, Lightbulb, FileQuestion, Search, ExternalLink } from 'lucide-react';
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import React from 'react';
+import { Card, CardContent } from "@/components/ui/card";
+import SeoStructure from '@/components/seo/SeoStructure';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { StructureKeywordsSection } from '@/components/seo/StructureKeywordsSection';
+import { Badge } from '@/components/ui/badge';
+import { BookOpen, CheckCircle, ExternalLink } from 'lucide-react';
 
-interface ContentItem {
-  type: 'h1' | 'h2' | 'h3' | 'text';
-  content: string;
+interface HeadingItem {
+  text: string;
+  level: number;
+  position: number;
+}
+
+interface ParagraphItem {
+  text: string;
   position: number;
 }
 
 interface ContentHierarchyProps {
-  headings?: {
-    text: string;
-    level: number;
-    position: number;
-  }[];
-  paragraphs?: {
-    text: string;
-    position: number;
-  }[];
+  headings: HeadingItem[];
+  paragraphs?: ParagraphItem[];
   hierarchy?: any[];
+  url: string;
   recommendations?: string[];
-  onAnalyze?: () => void;
-  url?: string;
+  optimizationStatus?: any;
 }
 
 const ContentHierarchy = ({ 
   headings = [], 
-  paragraphs = [], 
-  hierarchy = [],
+  paragraphs = [],
+  hierarchy = [], 
+  url,
   recommendations = [],
-  onAnalyze,
-  url
+  optimizationStatus
 }: ContentHierarchyProps) => {
-  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
-  const [expandedView, setExpandedView] = useState(false);
-  const [visualMode, setVisualMode] = useState<'tree' | 'list'>('tree');
+  // Extract counts
+  const h1Count = headings.filter(h => h.level === 1).length;
+  const h2Count = headings.filter(h => h.level === 2).length;
+  const h3Count = headings.filter(h => h.level === 3).length;
   
-  // Check if we have actual content to analyze - ensure arrays have elements with content
-  const hasHeadings = headings && headings.length > 0 && headings.some(h => h.text && h.text.trim() !== '');
-  const hasParagraphs = paragraphs && paragraphs.length > 0 && paragraphs.some(p => p.text && p.text.trim() !== '');
-  const hasContent = hasHeadings || hasParagraphs;
+  // Generate mock image count
+  // In a real app, this would come from the actual page analysis
+  const imgCount = 5;
+  
+  // Generate mock keywords
+  const mockKeywords = [
+    { keyword: "seo", volume: 10000, cpc: 2.5, difficulty: 65, score: 80 },
+    { keyword: "structure de site", volume: 1200, cpc: 1.8, difficulty: 45, score: 85 },
+    { keyword: "analyse seo", volume: 3300, cpc: 2.1, difficulty: 55, score: 75 },
+    { keyword: "optimisation web", volume: 2700, cpc: 1.9, difficulty: 60, score: 70 }
+  ];
+  
+  // Mock questions based on the headings
+  const mockQuestions = headings
+    .filter(h => h.level > 1 && h.text.length > 10)
+    .slice(0, 3)
+    .map(h => `Comment ${h.text.toLowerCase()}?`);
+  
+  // Add some standard questions
+  const standardQuestions = [
+    "Quelle est la structure idéale pour un site web?",
+    "Pourquoi la hiérarchie des balises HTML est importante pour le SEO?",
+    "Comment optimiser les titres de ma page web?"
+  ];
+  
+  const allQuestions = [...mockQuestions, ...standardQuestions].slice(0, 5);
 
-  const handleAnalyzeClick = () => {
-    if (onAnalyze) {
-      onAnalyze();
-    } else {
-      toast.info("Pour analyser un site, utilisez l'outil principal d'analyse SEO");
-    }
-  };
-
-  const toggleItem = (key: string) => {
-    setExpandedItems(prev => ({
-      ...prev,
-      [key]: !prev[key]
-    }));
-  };
-
-  const toggleExpandedView = () => {
-    setExpandedView(!expandedView);
-  };
-
-  const toggleVisualMode = () => {
-    setVisualMode(visualMode === 'tree' ? 'list' : 'tree');
-  };
-
-  const expandAll = () => {
-    const newExpandedItems: Record<string, boolean> = {};
+  // Extract top phrases from text content
+  const extractPhrases = () => {
+    const allText = paragraphs.map(p => p.text).join(' ');
+    const words = allText.toLowerCase().split(/\s+/).filter(w => w.length > 3);
     
-    const processItem = (items: any[], prefix = '') => {
-      items.forEach((item, index) => {
-        const key = `${prefix}-${index}`;
-        newExpandedItems[key] = true;
-        if (item.children && item.children.length > 0) {
-          processItem(item.children, key);
-        }
-      });
-    };
-    
-    if (hierarchy && hierarchy.length > 0) {
-      processItem(hierarchy);
+    const phrases: Record<string, number> = {};
+    for (let i = 0; i < words.length - 2; i++) {
+      const phrase = words.slice(i, i + 3).join(' ');
+      phrases[phrase] = (phrases[phrase] || 0) + 1;
     }
     
-    setExpandedItems(newExpandedItems);
-  };
-
-  const collapseAll = () => {
-    setExpandedItems({});
-  };
-
-  const getAllContent = (): ContentItem[] => {
-    if (!hasContent) return [];
-    
-    const content: ContentItem[] = [
-      ...headings.map(h => ({
-        type: `h${h.level}` as 'h1' | 'h2' | 'h3',
-        content: h.text,
-        position: h.position
-      })),
-      ...paragraphs.map(p => ({
-        type: 'text' as const,
-        content: p.text,
-        position: p.position
-      }))
-    ];
-
-    return content.sort((a, b) => a.position - b.position);
-  };
-
-  const getIcon = (type: string) => {
-    switch (type) {
-      case 'h1':
-        return <Heading1 className="h-4 w-4 text-blue-600" />;
-      case 'h2':
-        return <Heading2 className="h-4 w-4 text-green-600" />;
-      case 'h3':
-        return <Heading3 className="h-4 w-4 text-purple-600" />;
-      default:
-        return <Type className="h-4 w-4 text-gray-600" />;
-    }
-  };
-
-  const getIndentation = (type: string) => {
-    switch (type) {
-      case 'h1':
-        return 'ml-0';
-      case 'h2':
-        return 'ml-6';
-      case 'h3':
-        return 'ml-12';
-      default:
-        return 'ml-16';
-    }
-  };
-
-  const analyzeHierarchy = () => {
-    if (!hasContent) return ["Aucun contenu à analyser. Analysez d'abord un site web."];
-    
-    const h1Count = headings.filter(h => h.level === 1).length;
-    const issues = [];
-
-    if (h1Count === 0) {
-      issues.push("❌ Aucun titre H1 trouvé - chaque page devrait avoir un H1 unique");
-    } else if (h1Count > 1) {
-      issues.push("⚠️ Plusieurs titres H1 détectés - il ne devrait y en avoir qu'un seul");
-    }
-
-    const h2BeforeH1 = headings.some((h, i) => {
-      const prevH1 = headings.slice(0, i).find(prev => prev.level === 1);
-      return h.level === 2 && !prevH1;
-    });
-
-    if (h2BeforeH1) {
-      issues.push("⚠️ Des titres H2 apparaissent avant le premier H1");
-    }
-
-    const h3BeforeH2 = headings.some((h, i) => {
-      const prevH2 = headings.slice(0, i).find(prev => prev.level === 2);
-      return h.level === 3 && !prevH2;
-    });
-
-    if (h3BeforeH2) {
-      issues.push("⚠️ Des titres H3 apparaissent avant le premier H2");
-    }
-
-    return issues.length > 0 ? issues : ["La structure hiérarchique est bien organisée"];
-  };
-
-  const extractKeywords = () => {
-    if (!hasContent) return [];
-    
-    const allText = getAllContent().map(item => item.content).join(' ').toLowerCase();
-    const words = allText.split(/\s+/);
-    const wordCount: { [key: string]: number } = {};
-    
-    const stopWords = ['le', 'la', 'les', 'un', 'une', 'des', 'et', 'ou', 'mais', 'donc', 'car', 'de', 'à', 'en', 'dans', 'par', 'pour', 'avec', 'sur'];
-    
-    words.forEach(word => {
-      if (word.length > 3 && !stopWords.includes(word)) {
-        wordCount[word] = (wordCount[word] || 0) + 1;
-      }
-    });
-
-    return Object.entries(wordCount)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 5)
-      .map(([word, count]) => ({ word, count }));
-  };
-
-  const content = getAllContent();
-  const hierarchyIssues = analyzeHierarchy();
-  const keywords = extractKeywords();
-
-  // Empty state rendering
-  if (!hasContent) {
-    return (
-      <Card className="p-6 bg-white/50 backdrop-blur-sm shadow-lg border border-gray-100">
-        <div className="space-y-6">
-          <div>
-            <h2 className="text-2xl font-semibold mb-2 flex items-center gap-2">
-              <BarChart2 className="h-5 w-5 text-blue-600" />
-              Aperçu de la SERP et Structure
-            </h2>
-            <p className="text-gray-600 text-sm">
-              Analysez un site web pour voir sa structure SERP et hiérarchique
-            </p>
-          </div>
-          
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <FileQuestion className="h-16 w-16 text-gray-300 mb-4" />
-            <h3 className="text-xl font-medium text-gray-500 mb-2">Aucun site web analysé</h3>
-            <p className="text-gray-400 max-w-md mb-6">
-              Pour voir l'analyse de la structure SERP, commencez par analyser un site web en utilisant l'outil d'analyse SEO.
-            </p>
-            <Button 
-              variant="outline"
-              onClick={handleAnalyzeClick}
-              className="flex items-center gap-2"
-            >
-              <Search className="h-4 w-4" />
-              Analyser un site web
-            </Button>
-          </div>
-        </div>
-      </Card>
-    );
-  }
-
-  // Render hierarchical content with expand/collapse functionality
-  const renderHierarchicalItem = (item: any, index: number, level: number = 0, path: string = '') => {
-    const currentPath = `${path}-${index}`;
-    const hasChildren = item.children && item.children.length > 0;
-    const isExpanded = expandedItems[currentPath] !== false; // Default to expanded
-    
-    const getTagIcon = () => {
-      if (item.tagName === 'h1') return <Heading1 className="h-5 w-5 text-blue-600 flex-shrink-0" />;
-      if (item.tagName === 'h2') return <Heading2 className="h-5 w-5 text-green-600 flex-shrink-0" />;
-      if (item.tagName === 'h3') return <Heading3 className="h-5 w-5 text-purple-600 flex-shrink-0" />;
-      if (item.tagName === 'p') return <Type className="h-5 w-5 text-gray-500 flex-shrink-0" />;
-      return <div className="w-5 h-5 flex-shrink-0" />;
-    };
-    
-    return (
-      <div key={currentPath} className={`ml-${level * 6}`}>
-        <div 
-          className={`
-            flex items-start rounded-md p-2 mb-1 group transition-colors
-            ${item.tagName === 'h1' ? 'bg-blue-50 border border-blue-100' : ''}
-            ${item.tagName === 'h2' ? 'bg-green-50 border border-green-100' : ''}
-            ${item.tagName === 'h3' ? 'bg-purple-50 border border-purple-100' : ''}
-            ${item.tagName === 'p' ? 'pl-3 text-sm text-gray-600' : 'font-medium'}
-          `}
-        >
-          {hasChildren ? (
-            <button 
-              onClick={() => toggleItem(currentPath)} 
-              className="mr-1 text-gray-400 hover:text-gray-600 mt-0.5"
-            >
-              {isExpanded ? 
-                <ChevronDown className="h-4 w-4" /> : 
-                <ChevronRight className="h-4 w-4" />
-              }
-            </button>
-          ) : (
-            <div className="w-5 mr-1" />
-          )}
-          
-          {getTagIcon()}
-          
-          <span className="ml-2 overflow-hidden text-ellipsis">
-            {item.text}
-          </span>
-        </div>
-        
-        {hasChildren && isExpanded && (
-          <div className="pl-4 border-l border-gray-200 ml-2.5 mt-1 mb-2">
-            {item.children.map((child: any, childIndex: number) => 
-              renderHierarchicalItem(child, childIndex, level + 1, currentPath)
-            )}
-          </div>
-        )}
-      </div>
-    );
+    return Object.entries(phrases)
+      .filter(([_, count]) => count > 1)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 8)
+      .map(([phrase, count]) => ({ phrase, count }));
   };
 
   return (
-    <Card className="p-6 bg-white/50 backdrop-blur-sm shadow-lg border border-gray-100">
-      {url && (
-        <div className="bg-blue-50 p-4 rounded-lg mb-6 flex items-center justify-between">
-          <div className="flex items-center">
-            <ExternalLink className="h-5 w-5 text-blue-500 mr-2" />
-            <h3 className="font-medium text-blue-700">{url}</h3>
-          </div>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="text-blue-700 border-blue-200"
-            onClick={() => window.open(url, '_blank')}
-          >
-            Visiter le site
-          </Button>
-        </div>
-      )}
-
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-semibold flex items-center gap-2">
-            <BarChart2 className="h-5 w-5 text-blue-600" />
-            Aperçu de la SERP et Structure
-          </h2>
-          <div className="flex items-center gap-2">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={toggleVisualMode}
-              className="flex items-center gap-1"
-            >
-              {visualMode === 'tree' ? 'Vue Liste' : 'Vue Arbre'}
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={toggleExpandedView}
-              className="flex items-center gap-1"
-            >
-              {expandedView ? 'Vue Compacte' : 'Vue Détaillée'}
-            </Button>
-          </div>
-        </div>
-
-        <div className={`grid grid-cols-1 ${expandedView ? 'md:grid-cols-1' : 'md:grid-cols-2'} gap-6`}>
-          <div className="space-y-4">
-            <div className="bg-gray-50 rounded-lg p-4 shadow-sm">
-              <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                <Type className="h-4 w-4 text-blue-600" />
-                Mots-clés Principaux
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {keywords.map(({ word, count }, index) => (
-                  <Badge key={index} variant="secondary" className="px-2 py-1">
-                    {word} ({count})
-                  </Badge>
-                ))}
-              </div>
-            </div>
-
-            <div className="bg-gray-50 rounded-lg p-4 shadow-sm">
-              <h3 className="text-lg font-semibold mb-3">Structure du Document</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="flex items-center gap-2">
-                      <Heading1 className="h-4 w-4 text-blue-600" />
-                      <span>H1</span>
-                    </span>
-                    <Badge variant={headings.filter(h => h.level === 1).length === 1 ? "default" : "destructive"}>
-                      {headings.filter(h => h.level === 1).length}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="flex items-center gap-2">
-                      <Heading2 className="h-4 w-4 text-green-600" />
-                      <span>H2</span>
-                    </span>
-                    <Badge>{headings.filter(h => h.level === 2).length}</Badge>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="flex items-center gap-2">
-                      <Heading3 className="h-4 w-4 text-purple-600" />
-                      <span>H3</span>
-                    </span>
-                    <Badge>{headings.filter(h => h.level === 3).length}</Badge>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="flex items-center gap-2">
-                      <Type className="h-4 w-4 text-gray-600" />
-                      <span>Paragraphes</span>
-                    </span>
-                    <Badge>{paragraphs.length}</Badge>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <Alert className={hierarchyIssues.length === 1 && hierarchyIssues[0] === "La structure hiérarchique est bien organisée" 
-              ? "bg-green-50 border-green-200" 
-              : "bg-amber-50 border-amber-200"}>
-              {hierarchyIssues.length === 1 && hierarchyIssues[0] === "La structure hiérarchique est bien organisée" ? (
-                <CheckCircle2 className="h-4 w-4 text-green-500" />
-              ) : (
-                <AlertCircle className="h-4 w-4 text-amber-500" />
-              )}
-              <AlertDescription className={
-                hierarchyIssues.length === 1 && hierarchyIssues[0] === "La structure hiérarchique est bien organisée"
-                  ? "text-green-800"
-                  : "text-amber-800"
-              }>
-                <ul className="list-none space-y-2">
-                  {hierarchyIssues.map((issue, index) => (
-                    <li key={index}>{issue}</li>
-                  ))}
-                </ul>
-              </AlertDescription>
-            </Alert>
-
-            {recommendations && recommendations.length > 0 && (
-              <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 shadow-sm">
-                <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
-                  <Lightbulb className="h-4 w-4 text-blue-600" />
-                  Recommandations
-                </h3>
-                <ul className="list-disc pl-5 space-y-1.5 text-sm text-blue-800">
-                  {recommendations.map((rec, i) => (
-                    <li key={i}>{rec}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <Separator />
-
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-lg font-semibold flex items-center gap-2">
-              <BarChart2 className="h-4 w-4 text-blue-600" />
-              Hiérarchie du contenu
-            </h3>
-            <div className="flex items-center gap-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={expandAll}
-                className="text-xs"
-              >
-                Tout déplier
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={collapseAll}
-                className="text-xs"
-              >
-                Tout replier
-              </Button>
-            </div>
+    <Card className="border-0 shadow-md">
+      <CardContent className="p-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+          <div>
+            <h2 className="text-2xl font-bold mb-1">Structure du contenu</h2>
+            <p className="text-gray-500 text-sm flex items-center">
+              <ExternalLink className="h-3.5 w-3.5 mr-1" />
+              {url}
+            </p>
           </div>
           
-          <ScrollArea className="h-[600px] rounded-md border p-4 shadow-inner bg-white">
-            {visualMode === 'tree' && hierarchy && hierarchy.length > 0 ? (
-              hierarchy.map((item, index) => renderHierarchicalItem(item, index))
-            ) : content.length > 0 ? (
-              <div className="space-y-2">
-                {content.map((item, i) => (
-                  <div key={i} className={`flex items-center p-2 ${getIndentation(item.type)} ${i % 2 === 0 ? 'bg-gray-50' : ''} rounded`}>
-                    {getIcon(item.type)}
-                    <span className="ml-2 text-sm">{item.content}</span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center p-6 text-gray-500">
-                La structure hiérarchique n'est pas disponible pour ce contenu.
-              </div>
-            )}
-          </ScrollArea>
+          <div className="mt-2 sm:mt-0">
+            <Badge variant={h1Count === 1 ? "success" : "destructive"} className="mr-2">
+              {h1Count} H1
+            </Badge>
+            <Badge variant={h2Count >= 1 ? "success" : "warning"} className="mr-2">
+              {h2Count} H2
+            </Badge>
+            <Badge variant={h3Count >= 1 ? "success" : "warning"}>
+              {h3Count} H3
+            </Badge>
+          </div>
         </div>
-      </div>
+        
+        <Tabs defaultValue="structure" className="mt-2">
+          <TabsList className="grid w-full grid-cols-3 mb-6">
+            <TabsTrigger value="structure">Structure</TabsTrigger>
+            <TabsTrigger value="keywords">Mots-clés</TabsTrigger>
+            <TabsTrigger value="recommendations">Recommandations</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="structure" className="space-y-6">
+            <SeoStructure 
+              h1Count={h1Count} 
+              h2Count={h2Count} 
+              h3Count={h3Count} 
+              imgCount={imgCount}
+              headings={headings}
+              showHeadingsList={true}
+              hierarchy={hierarchy}
+              optimizationStatus={optimizationStatus}
+            />
+          </TabsContent>
+          
+          <TabsContent value="keywords">
+            <StructureKeywordsSection 
+              keywords={mockKeywords}
+              phrases={extractPhrases()}
+              questions={allQuestions}
+              isLoading={false}
+            />
+          </TabsContent>
+          
+          <TabsContent value="recommendations" className="space-y-4">
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 flex items-start">
+              <BookOpen className="h-5 w-5 text-blue-500 mr-3 mt-0.5" />
+              <div>
+                <h3 className="font-medium text-blue-900 mb-2">Recommandations pour votre structure</h3>
+                <p className="text-blue-800 text-sm mb-3">
+                  Voici quelques conseils pour améliorer la structure SEO de votre page.
+                </p>
+                
+                <ul className="space-y-2">
+                  {recommendations.map((rec, i) => (
+                    <li key={i} className="flex items-start">
+                      <CheckCircle className="h-4 w-4 text-green-500 mr-2 mt-0.5" />
+                      <span className="text-sm">{rec}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </CardContent>
     </Card>
   );
 };

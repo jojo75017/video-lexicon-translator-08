@@ -68,6 +68,43 @@ export const analyzePageStructure = (doc: Document) => {
     .flatMap(text => text.split(/[.!]/).filter(s => s.includes('?')))
     .map(q => q.trim())
     .filter(q => q.length > 10);
+
+  // Analyze optimization status
+  const optimizationStatus = {
+    h1: {
+      count: h1Elements.length,
+      isOptimized: h1Elements.length === 1,
+      message: h1Elements.length === 0 ? "Aucune balise H1 trouvée" : 
+              h1Elements.length > 1 ? "Plusieurs balises H1 trouvées (1 seule recommandée)" : 
+              "Bonne utilisation d'une seule balise H1"
+    },
+    h2: {
+      count: h2Elements.length,
+      isOptimized: h2Elements.length > 0,
+      message: h2Elements.length === 0 ? "Aucune balise H2 trouvée" : 
+              h2Elements.length > 5 ? "Nombreuses balises H2 trouvées" : 
+              "Bonne utilisation des balises H2"
+    },
+    h3: {
+      count: h3Elements.length,
+      isOptimized: h3Elements.length > 0,
+      message: h3Elements.length === 0 ? "Aucune balise H3 trouvée" : 
+              "Bonne structure avec balises H3"
+    },
+    structure: {
+      isOptimized: h1Elements.length === 1 && h2Elements.length > 0,
+      message: h1Elements.length === 1 && h2Elements.length > 0 ? 
+              "Structure hiérarchique correcte" : 
+              "Structure hiérarchique à améliorer"
+    },
+    imgAlt: {
+      count: Array.from(images).filter(img => !img.hasAttribute('alt') || img.getAttribute('alt') === '').length,
+      isOptimized: Array.from(images).every(img => img.hasAttribute('alt') && img.getAttribute('alt') !== ''),
+      message: Array.from(images).every(img => img.hasAttribute('alt') && img.getAttribute('alt') !== '') ?
+              "Toutes les images ont un attribut alt" :
+              `${Array.from(images).filter(img => !img.hasAttribute('alt') || img.getAttribute('alt') === '').length} image(s) sans attribut alt`
+    }
+  };
   
   return {
     headingCounts: {
@@ -84,7 +121,8 @@ export const analyzePageStructure = (doc: Document) => {
     topPhrases,
     questions: questions.slice(0, 10),
     contentDensity: wordCount / (doc.body.innerHTML.length || 1),
-    textToHtmlRatio: allText.length / (doc.body.innerHTML.length || 1)
+    textToHtmlRatio: allText.length / (doc.body.innerHTML.length || 1),
+    optimizationStatus
   };
 };
 
@@ -142,3 +180,4 @@ export const calculateSeoROI = (
     }
   };
 };
+

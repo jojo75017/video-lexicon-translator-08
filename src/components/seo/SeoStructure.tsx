@@ -13,6 +13,13 @@ interface SeoStructureProps {
   headings?: { text: string; level: number; position: number; }[];
   showHeadingsList?: boolean;
   hierarchy?: HierarchyItem[];
+  optimizationStatus?: {
+    h1?: { count: number; isOptimized: boolean; message: string };
+    h2?: { count: number; isOptimized: boolean; message: string };
+    h3?: { count: number; isOptimized: boolean; message: string };
+    structure?: { isOptimized: boolean; message: string };
+    imgAlt?: { count: number; isOptimized: boolean; message: string };
+  };
 }
 
 const SeoStructure = ({
@@ -22,12 +29,13 @@ const SeoStructure = ({
   imgCount,
   headings = [],
   showHeadingsList = false,
-  hierarchy = []
+  hierarchy = [],
+  optimizationStatus
 }: SeoStructureProps) => {
   const [expanded, setExpanded] = useState(true);
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
 
-  console.log("SeoStructure props:", { h1Count, h2Count, h3Count, imgCount, headings, hierarchy });
+  console.log("SeoStructure props:", { h1Count, h2Count, h3Count, imgCount, headings, hierarchy, optimizationStatus });
 
   // Automatically expand all hierarchy items on first render
   React.useEffect(() => {
@@ -101,6 +109,27 @@ const SeoStructure = ({
     );
   };
 
+  const renderOptimizationStatus = (type: 'h1' | 'h2' | 'h3', count: number) => {
+    const status = optimizationStatus?.[type];
+    
+    if (!status) {
+      // Si pas de statut d'optimisation disponible, utiliser le comptage simple
+      return count === 0 ? (
+        <AlertTriangle className="h-4 w-4 text-red-500" />
+      ) : count === 1 && type === 'h1' ? (
+        <Check className="h-4 w-4 text-green-500" />
+      ) : (
+        <Check className="h-4 w-4 text-green-500" />
+      );
+    }
+    
+    return status.isOptimized ? (
+      <Check className="h-4 w-4 text-green-500" title={status.message} />
+    ) : (
+      <AlertTriangle className={`h-4 w-4 ${status.count === 0 ? 'text-red-500' : 'text-amber-500'}`} title={status.message} />
+    );
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
@@ -128,13 +157,7 @@ const SeoStructure = ({
                     <Badge variant="outline" className="mr-2 font-mono">H1</Badge>
                     <span className="text-sm">{h1Count} balise(s)</span>
                   </span>
-                  {h1Count === 1 ? (
-                    <Check className="h-4 w-4 text-green-500" />
-                  ) : h1Count === 0 ? (
-                    <AlertTriangle className="h-4 w-4 text-red-500" />
-                  ) : (
-                    <AlertTriangle className="h-4 w-4 text-amber-500" />
-                  )}
+                  {renderOptimizationStatus('h1', h1Count)}
                 </div>
                 
                 <div className="flex justify-between items-center">
@@ -142,11 +165,7 @@ const SeoStructure = ({
                     <Badge variant="outline" className="mr-2 font-mono">H2</Badge>
                     <span className="text-sm">{h2Count} balise(s)</span>
                   </span>
-                  {h2Count > 0 ? (
-                    <Check className="h-4 w-4 text-green-500" />
-                  ) : (
-                    <AlertTriangle className="h-4 w-4 text-amber-500" />
-                  )}
+                  {renderOptimizationStatus('h2', h2Count)}
                 </div>
                 
                 <div className="flex justify-between items-center">
@@ -154,8 +173,16 @@ const SeoStructure = ({
                     <Badge variant="outline" className="mr-2 font-mono">H3</Badge>
                     <span className="text-sm">{h3Count} balise(s)</span>
                   </span>
-                  <Check className="h-4 w-4 text-green-500" />
+                  {renderOptimizationStatus('h3', h3Count)}
                 </div>
+
+                {optimizationStatus?.structure && (
+                  <div className={`mt-3 p-2 rounded-md text-sm ${
+                    optimizationStatus.structure.isOptimized ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'
+                  }`}>
+                    {optimizationStatus.structure.message}
+                  </div>
+                )}
               </div>
             </div>
             
@@ -167,12 +194,25 @@ const SeoStructure = ({
                     <Badge variant="outline" className="mr-2">IMG</Badge>
                     <span className="text-sm">{imgCount} image(s)</span>
                   </span>
-                  {imgCount > 0 ? (
-                    <Check className="h-4 w-4 text-green-500" />
+                  {optimizationStatus?.imgAlt ? (
+                    optimizationStatus.imgAlt.isOptimized ? (
+                      <Check className="h-4 w-4 text-green-500" title={optimizationStatus.imgAlt.message} />
+                    ) : (
+                      <AlertTriangle className="h-4 w-4 text-amber-500" title={optimizationStatus.imgAlt.message} />
+                    )
                   ) : (
-                    <AlertTriangle className="h-4 w-4 text-amber-500" />
+                    imgCount > 0 ? (
+                      <Check className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <AlertTriangle className="h-4 w-4 text-amber-500" />
+                    )
                   )}
                 </div>
+                {optimizationStatus?.imgAlt && optimizationStatus.imgAlt.count > 0 && (
+                  <div className="text-xs text-amber-600">
+                    {optimizationStatus.imgAlt.count} image(s) sans attribut alt
+                  </div>
+                )}
               </div>
             </div>
           </div>
