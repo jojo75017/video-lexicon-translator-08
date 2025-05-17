@@ -17,7 +17,16 @@ const SeoActionButtons = () => {
     });
   };
 
-  const handleKeywordClick = () => {
+  const handleKeywordMetaClick = () => {
+    console.log("Clicking keyword-meta button");
+    navigate('/keyword-meta');
+    toast.info("Navigation vers les title & meta", {
+      description: "Chargement de la page...",
+      duration: 1500
+    });
+  };
+
+  const handleKeywordGeneratorClick = () => {
     console.log("Clicking keyword generator button");
     navigate('/keyword-generator');
     toast.info("Navigation vers le générateur de mots-clés", {
@@ -54,14 +63,23 @@ const SeoActionButtons = () => {
   };
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
       <Button 
         variant="outline" 
         className="w-full h-[70px] flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50 hover:from-gray-50 hover:to-gray-100 gap-2"
-        onClick={handleSeoClick}
+        onClick={handleKeywordMetaClick}
       >
-        <Search className="h-5 w-5 text-indigo-600" />
-        <span className="text-sm">Analyse SEO</span>
+        <FileText className="h-5 w-5 text-blue-600" />
+        <span className="text-sm">Title & Meta</span>
+      </Button>
+      
+      <Button 
+        variant="outline" 
+        className="w-full h-[70px] flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50 hover:from-gray-50 hover:to-gray-100 gap-2"
+        onClick={handleKeywordGeneratorClick}
+      >
+        <Search className="h-5 w-5 text-green-600" />
+        <span className="text-sm">Générateur de mots-clés</span>
       </Button>
       
       <Button 
@@ -69,35 +87,8 @@ const SeoActionButtons = () => {
         className="w-full h-[70px] flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50 hover:from-gray-50 hover:to-gray-100 gap-2"
         onClick={handleInternalLinkClick}
       >
-        <Network className="h-5 w-5 text-blue-600" />
+        <Network className="h-5 w-5 text-purple-600" />
         <span className="text-sm">Liens internes</span>
-      </Button>
-      
-      <Button
-        variant="outline"
-        className="w-full h-[70px] flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50 hover:from-gray-50 hover:to-gray-100 gap-2"
-        onClick={handleKeywordClick}
-      >
-        <FileText className="h-5 w-5 text-emerald-600" />
-        <span className="text-sm">Mots-clés</span>
-      </Button>
-      
-      <Button 
-        variant="outline" 
-        className="w-full h-[70px] flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50 hover:from-gray-50 hover:to-gray-100 gap-2"
-        onClick={handlePerformanceClick}
-      >
-        <Gauge className="h-5 w-5 text-amber-600" />
-        <span className="text-sm">Performance</span>
-      </Button>
-      
-      <Button 
-        variant="outline" 
-        className="w-full h-[70px] flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50 hover:from-gray-50 hover:to-gray-100 gap-2"
-        onClick={handleTrackingClick}
-      >
-        <BarChart className="h-5 w-5 text-purple-600" />
-        <span className="text-sm">Suivi des positions</span>
       </Button>
     </div>
   );

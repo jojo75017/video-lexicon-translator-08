@@ -55,56 +55,65 @@ const UnifiedDashboard: React.FC<{ children: React.ReactNode }> = ({ children })
               </Link>
               <Link to="/keyword-meta">
                 <Button 
-                  variant={currentPath === '/keyword-meta' ? "default" : "outline"} 
+                  variant={currentPath.includes('/keyword-meta') ? "default" : "outline"} 
                   size="sm"
-                  className={currentPath === '/keyword-meta' ? "bg-blue-600 hover:bg-blue-700" : ""}
+                  className={currentPath.includes('/keyword-meta') ? "bg-blue-600 hover:bg-blue-700" : ""}
                 >
                   Title & Meta
                 </Button>
               </Link>
               <Link to="/internal-linking">
                 <Button 
-                  variant={currentPath === '/internal-linking' ? "default" : "outline"} 
+                  variant={currentPath.includes('/internal-linking') ? "default" : "outline"} 
                   size="sm"
-                  className={currentPath === '/internal-linking' ? "bg-blue-600 hover:bg-blue-700" : ""}
+                  className={currentPath.includes('/internal-linking') ? "bg-blue-600 hover:bg-blue-700" : ""}
                 >
                   Liens Internes
                 </Button>
               </Link>
               <Link to="/tracking">
                 <Button 
-                  variant={currentPath === '/tracking' ? "default" : "outline"} 
+                  variant={currentPath.includes('/tracking') ? "default" : "outline"} 
                   size="sm"
-                  className={currentPath === '/tracking' ? "bg-blue-600 hover:bg-blue-700" : ""}
+                  className={currentPath.includes('/tracking') ? "bg-blue-600 hover:bg-blue-700" : ""}
                 >
                   Suivi Positions
                 </Button>
               </Link>
               <Link to="/pinterest">
                 <Button 
-                  variant={currentPath === '/pinterest' ? "default" : "outline"} 
+                  variant={currentPath.includes('/pinterest') ? "default" : "outline"} 
                   size="sm"
-                  className={currentPath === '/pinterest' ? "bg-red-600 hover:bg-red-700" : ""}
+                  className={currentPath.includes('/pinterest') ? "bg-red-600 hover:bg-red-700" : ""}
                 >
                   Pinterest
                 </Button>
               </Link>
               <Link to="/signature">
                 <Button 
-                  variant={currentPath === '/signature' ? "default" : "outline"} 
+                  variant={currentPath.includes('/signature') ? "default" : "outline"} 
                   size="sm"
-                  className={currentPath === '/signature' ? "bg-blue-600 hover:bg-blue-700" : ""}
+                  className={currentPath.includes('/signature') ? "bg-blue-600 hover:bg-blue-700" : ""}
                 >
                   Signature Email
                 </Button>
               </Link>
               <Link to="/structure">
                 <Button 
-                  variant={currentPath === '/structure' ? "default" : "outline"} 
+                  variant={currentPath.includes('/structure') ? "default" : "outline"} 
                   size="sm"
-                  className={currentPath === '/structure' ? "bg-purple-600 hover:bg-purple-700" : ""}
+                  className={currentPath.includes('/structure') ? "bg-purple-600 hover:bg-purple-700" : ""}
                 >
                   Structure Site
+                </Button>
+              </Link>
+              <Link to="/keyword-generator">
+                <Button 
+                  variant={currentPath.includes('/keyword-generator') ? "default" : "outline"} 
+                  size="sm"
+                  className={currentPath.includes('/keyword-generator') ? "bg-green-600 hover:bg-green-700" : ""}
+                >
+                  Générateur de mots-clés
                 </Button>
               </Link>
             </nav>

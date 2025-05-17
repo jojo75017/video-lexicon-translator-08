@@ -7,11 +7,12 @@ import TrackingPage from './pages/TrackingPage';
 import PinterestPage from './pages/PinterestPage';
 import SignaturePage from './pages/SignaturePage';
 import StructurePage from './pages/StructurePage';
+import KeywordGeneratorPage from './pages/KeywordGeneratorPage';
 import { Toaster } from 'sonner';
 import './App.css';
 
 const App = () => {
-  console.log('App rendering with routes including Pinterest, Signature, and Structure');
+  console.log('App rendering with routes including Pinterest, Signature, Structure, and KeywordGenerator');
   
   return (
     <Router>
@@ -27,6 +28,7 @@ const App = () => {
         <Route path="/pinterest" element={<PinterestPage />} />
         <Route path="/signature" element={<SignaturePage />} />
         <Route path="/structure" element={<StructurePage />} />
+        <Route path="/keyword-generator" element={<KeywordGeneratorPage />} />
       </Routes>
     </Router>
   );

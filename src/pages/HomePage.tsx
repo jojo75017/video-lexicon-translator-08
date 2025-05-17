@@ -3,7 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card } from "@/components/ui/card";
 import UnifiedDashboard from '@/components/dashboard/UnifiedDashboard';
-import { FileText, LinkIcon, LineChart, BarChart2, Tag, Info, FilePenLine, LayoutGrid } from 'lucide-react';
+import { FileText, LinkIcon, LineChart, BarChart2, Tag, Info, FilePenLine, LayoutGrid, Search } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Button } from '@/components/ui/button';
 
@@ -20,11 +20,18 @@ const HomePage = () => {
                   Utilisez nos outils pour analyser et améliorer le référencement de votre site web. 
                   Accédez rapidement aux différentes fonctionnalités ci-dessous.
                 </p>
-                <Link to="/keyword-meta">
-                  <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
-                    Commencer maintenant
-                  </Button>
-                </Link>
+                <div className="flex flex-wrap gap-3">
+                  <Link to="/keyword-meta">
+                    <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
+                      Title & Meta
+                    </Button>
+                  </Link>
+                  <Link to="/keyword-generator">
+                    <Button size="lg" className="bg-green-600 hover:bg-green-700">
+                      Générateur de mots-clés
+                    </Button>
+                  </Link>
+                </div>
               </div>
               <div className="md:w-1/3">
                 <BarChart2 className="h-32 w-32 text-blue-500 mx-auto" />
@@ -34,7 +41,7 @@ const HomePage = () => {
         </section>
 
         <section>
-          <h2 className="text-2xl font-bold mb-4">Outils SEO disponibles</h2>
+          <h2 className="text-2xl font-bold mb-4">Outils SEO principaux</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Link to="/keyword-meta" className="block">
               <Card className="p-6 bg-white hover:bg-blue-50 transition-colors h-full flex flex-col">
@@ -50,6 +57,19 @@ const HomePage = () => {
               </Card>
             </Link>
             
+            <Link to="/keyword-generator" className="block">
+              <Card className="p-6 bg-white hover:bg-green-50 transition-colors h-full flex flex-col">
+                <div className="flex items-center mb-4">
+                  <Search className="h-8 w-8 mr-3 text-green-600" />
+                  <h3 className="text-xl font-bold">Générateur de mots-clés</h3>
+                </div>
+                <p className="text-gray-600 mb-4">
+                  Trouvez les mots-clés les plus pertinents pour votre contenu et améliorez votre visibilité dans les moteurs de recherche.
+                </p>
+                <Button className="mt-auto" variant="outline">Accéder à l'outil</Button>
+              </Card>
+            </Link>
+            
             <Link to="/internal-linking" className="block">
               <Card className="p-6 bg-white hover:bg-blue-50 transition-colors h-full flex flex-col">
                 <div className="flex items-center mb-4">
@@ -59,20 +79,6 @@ const HomePage = () => {
                 <p className="text-gray-600 mb-4">
                   Améliorez votre structure de liens internes pour optimiser le maillage de votre site et 
                   renforcer votre référencement.
-                </p>
-                <Button className="mt-auto" variant="outline">Accéder à l'outil</Button>
-              </Card>
-            </Link>
-            
-            <Link to="/tracking" className="block">
-              <Card className="p-6 bg-white hover:bg-blue-50 transition-colors h-full flex flex-col">
-                <div className="flex items-center mb-4">
-                  <LineChart className="h-8 w-8 mr-3 text-green-600" />
-                  <h3 className="text-xl font-bold">Suivi Positions</h3>
-                </div>
-                <p className="text-gray-600 mb-4">
-                  Suivez l'évolution de vos positions dans les moteurs de recherche et identifiez les opportunités 
-                  d'amélioration.
                 </p>
                 <Button className="mt-auto" variant="outline">Accéder à l'outil</Button>
               </Card>

@@ -1,94 +1,45 @@
 
 import React, { useState } from 'react';
-import { useOpenAIKeywords } from '@/hooks/useOpenAIKeywords';
-import ApiConfigSection from './keyword/ApiConfigSection';
-import KeywordSearchForm from './keyword/KeywordSearchForm';
-import KeywordResults from './keyword/KeywordResults';
-import KeywordEmptyState from './keyword/KeywordEmptyState';
-import KeywordLoadingState from './keyword/KeywordLoadingState';
-import KeywordFAQ from './keyword/KeywordFAQ';
+import useKeywordGenerator from '@/hooks/useKeywordGenerator';
+import KeywordGeneratorForm from './keyword/KeywordGeneratorForm';
+import KeywordResultsList from './keyword/KeywordResultsList';
+import { Card } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { FileText } from 'lucide-react';
 
 const KeywordGenerator: React.FC = () => {
   const {
     keyword,
     setKeyword,
-    apiKey,
-    setApiKey,
-    isConfigured,
     isGenerating,
-    standardKeywords,
-    longTailKeywords,
-    selectedKeywords,
-    competitors,
-    serpResults,
-    showCompetitors,
-    
-    validateApiKey,
-    generateKeywords,
-    toggleKeywordSelection,
-    exportSelectedKeywords,
-    toggleCompetitors,
-    
-    hasResults,
-    totalKeywords,
-    hasCompetitorData,
-    setSelectedKeywords
-  } = useOpenAIKeywords();
-  
-  const [showApiConfig, setShowApiConfig] = useState<boolean>(!localStorage.getItem("openaiKey"));
-  const [activeTab, setActiveTab] = useState<string>("standard");
-  
-  const clearSelectedKeywords = () => {
-    console.log("Clearing all selected keywords");
-    setSelectedKeywords([]);
-  };
+    generateSuggestions,
+    generatedKeywords
+  } = useKeywordGenerator();
 
   return (
     <div className="space-y-6">
-      {showApiConfig && (
-        <ApiConfigSection
-          apiKey={apiKey}
-          setApiKey={setApiKey}
-          validateApiKey={validateApiKey}
-          setShowApiConfig={setShowApiConfig}
-        />
-      )}
-      
-      <KeywordSearchForm
+      <KeywordGeneratorForm
         keyword={keyword}
         setKeyword={setKeyword}
-        isConfigured={isConfigured}
         isGenerating={isGenerating}
-        hasCompetitorData={hasCompetitorData}
-        showCompetitors={showCompetitors}
-        generateKeywords={generateKeywords}
-        setShowApiConfig={setShowApiConfig}
-        toggleCompetitors={toggleCompetitors}
+        onGenerate={generateSuggestions}
       />
       
-      {hasResults && (
-        <KeywordResults
-          standardKeywords={standardKeywords}
-          longTailKeywords={longTailKeywords}
-          selectedKeywords={selectedKeywords}
-          competitors={competitors}
-          serpResults={serpResults}
-          hasCompetitorData={hasCompetitorData}
-          totalKeywords={totalKeywords}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          toggleKeywordSelection={toggleKeywordSelection}
-          clearSelectedKeywords={clearSelectedKeywords}
-          exportSelectedKeywords={exportSelectedKeywords}
+      {generatedKeywords.length > 0 ? (
+        <KeywordResultsList
+          keywords={generatedKeywords}
+          isLoading={isGenerating}
         />
+      ) : !isGenerating && (
+        <Card className="p-6">
+          <Alert className="bg-blue-50">
+            <FileText className="h-4 w-4 text-blue-600" />
+            <AlertDescription className="text-blue-800">
+              Entrez un mot-clé ci-dessus pour générer des suggestions pertinentes pour votre contenu SEO.
+            </AlertDescription>
+          </Alert>
+        </Card>
       )}
-      
-      {!hasResults && !isGenerating && <KeywordEmptyState />}
-      
-      {isGenerating && <KeywordLoadingState keyword={keyword} />}
-      
-      {/* Section FAQ - Ajoutée à la fin de la page */}
-      <KeywordFAQ />
     </div>
   );
 };
