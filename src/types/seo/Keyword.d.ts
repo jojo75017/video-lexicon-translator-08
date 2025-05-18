@@ -1,4 +1,5 @@
 
+
 export interface KeywordData {
   keyword: string;
   count: number;
@@ -24,3 +25,4 @@ export interface KeywordSuggestion {
   serps?: any[];
   trend?: number[];
 }
+

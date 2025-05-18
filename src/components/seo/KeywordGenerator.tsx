@@ -21,7 +21,8 @@ import {
   generateQuestionKeywords, 
   enrichKeywords, 
   groupKeywordsByIntent,
-  calculateOpportunityScore
+  calculateOpportunityScore,
+  determineKeywordIntent
 } from '@/utils/keyword/keywordAnalyzer';
 
 // Fonction pour générer des suggestions basées sur le mot-clé de l'utilisateur
@@ -165,7 +166,7 @@ const generateKeywordSuggestions = (keyword: string): KeywordSuggestion[] => {
     ...suggestion,
     relevance: Math.floor(Math.random() * 30) + 70,
     opportunity: Math.floor(Math.random() * 60) + 30,
-    intent: ['informational', 'transactional', 'navigational', 'commercial'][Math.floor(Math.random() * 4)] as 'informational' | 'navigational' | 'transactional' | 'commercial'
+    intent: determineKeywordIntent(suggestion.keyword)
   }));
   
   // Générer aussi des questions liées au mot-clé
