@@ -1,40 +1,85 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import UnifiedDashboard from '@/components/dashboard/UnifiedDashboard';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { FileText, Tag, Info } from 'lucide-react';
+import { FileText, Tag, Info, Key } from 'lucide-react';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { generateSeoTitle } from '@/utils/seo/generators/titleGenerator';
-import { generateBothDescriptions } from '@/utils/seo/generators/descriptionGenerator';
+import { generateBothDescriptions, generateAIDescriptions } from '@/utils/seo/generators/description/generator';
 
 const KeywordMetaPage = () => {
   const [keyword, setKeyword] = useState('');
+  const [openaiKey, setOpenaiKey] = useState<string>(() => localStorage.getItem('openaiKey') || '');
   const [title, setTitle] = useState('');
   const [shortDescription, setShortDescription] = useState('');
   const [longDescription, setLongDescription] = useState('');
   const [activeTab, setActiveTab] = useState('short');
+  const [useAI, setUseAI] = useState<boolean>(false);
+  const [showApiKeyInput, setShowApiKeyInput] = useState<boolean>(false);
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
   
-  const handleGenerate = () => {
+  useEffect(() => {
+    // Si une clé API est enregistrée, activer l'option IA par défaut
+    if (openaiKey) {
+      setUseAI(true);
+    }
+  }, [openaiKey]);
+
+  const handleGenerate = async () => {
     if (!keyword) {
       toast.error("Veuillez entrer un mot-clé");
       return;
     }
     
-    // Génération du titre
-    const generatedTitle = generateSeoTitle(keyword);
-    setTitle(generatedTitle);
+    setIsGenerating(true);
+    toast.info("Génération en cours...");
     
-    // Génération des descriptions (courte et longue)
-    const { short, long } = generateBothDescriptions(keyword);
-    setShortDescription(short);
-    setLongDescription(long);
-    
-    toast.success("Suggestions générées avec succès");
+    try {
+      // Génération du titre
+      const generatedTitle = generateSeoTitle(keyword);
+      setTitle(generatedTitle);
+      
+      // Génération des descriptions (courte et longue)
+      if (useAI && openaiKey) {
+        // Utiliser l'API OpenAI pour générer des descriptions plus pertinentes
+        const aiResults = await generateAIDescriptions(keyword, openaiKey);
+        setShortDescription(aiResults.short);
+        setLongDescription(aiResults.long);
+      } else {
+        // Utiliser le générateur local amélioré
+        const { short, long } = generateBothDescriptions(keyword);
+        setShortDescription(short);
+        setLongDescription(long);
+      }
+      
+      toast.success("Suggestions générées avec succès");
+    } catch (error) {
+      console.error("Erreur lors de la génération:", error);
+      toast.error("Une erreur est survenue lors de la génération");
+      
+      // En cas d'erreur, utiliser la génération locale
+      const { short, long } = generateBothDescriptions(keyword);
+      setShortDescription(short);
+      setLongDescription(long);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const saveApiKey = () => {
+    if (openaiKey) {
+      localStorage.setItem('openaiKey', openaiKey);
+      setUseAI(true);
+      setShowApiKeyInput(false);
+      toast.success("Clé API OpenAI sauvegardée");
+    } else {
+      toast.error("Veuillez entrer une clé API valide");
+    }
   };
 
   return (
@@ -62,12 +107,68 @@ const KeywordMetaPage = () => {
                 />
                 <Button 
                   onClick={handleGenerate}
-                  disabled={!keyword.trim()}
+                  disabled={!keyword.trim() || isGenerating}
                   className="bg-blue-600 hover:bg-blue-700"
                 >
-                  Générer
+                  {isGenerating ? "Génération..." : "Générer"}
                 </Button>
               </div>
+              
+              <div className="flex items-center justify-between mt-2">
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="use-ai"
+                    checked={useAI}
+                    onChange={(e) => setUseAI(e.target.checked)}
+                    className="h-4 w-4 rounded border-gray-300"
+                  />
+                  <label htmlFor="use-ai" className="text-sm text-gray-700">
+                    Utiliser l'IA (OpenAI) pour des résultats plus pertinents
+                  </label>
+                </div>
+                
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setShowApiKeyInput(!showApiKeyInput)}
+                >
+                  <Key className="h-4 w-4 mr-2" />
+                  Configurer API
+                </Button>
+              </div>
+              
+              {showApiKeyInput && (
+                <div className="bg-gray-50 p-3 rounded-md border border-gray-200 mt-2">
+                  <div className="text-sm font-medium mb-2">Configurer l'API OpenAI</div>
+                  <div className="flex gap-2">
+                    <Input 
+                      type="password"
+                      placeholder="Entrez votre clé API OpenAI (commence par sk-...)"
+                      value={openaiKey}
+                      onChange={(e) => setOpenaiKey(e.target.value)}
+                      className="flex-1"
+                    />
+                    <Button onClick={saveApiKey}>
+                      Sauvegarder
+                    </Button>
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    Votre clé est stockée uniquement dans votre navigateur et n'est jamais envoyée à nos serveurs.
+                  </div>
+                </div>
+              )}
+              
+              {useAI && !openaiKey && !showApiKeyInput && (
+                <Alert variant="warning" className="bg-amber-50 border-amber-200 mt-2">
+                  <AlertDescription className="text-amber-800 text-sm">
+                    Vous avez activé l'IA, mais aucune clé API OpenAI n'est configurée. 
+                    <Button variant="link" className="p-0 h-auto text-amber-800 underline" onClick={() => setShowApiKeyInput(true)}>
+                      Configurer une clé
+                    </Button>
+                  </AlertDescription>
+                </Alert>
+              )}
             </div>
             
             {/* Title */}
