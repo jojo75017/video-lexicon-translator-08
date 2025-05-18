@@ -234,20 +234,30 @@ const KeywordGenerator = () => {
 
   // Fonction pour générer plus d'idées avec l'IA
   const handleGenerateMoreIdeas = () => {
+    // Debugging
+    console.log('handleGenerateMoreIdeas called, current showAiIdeas:', showAiIdeas);
+    
     if (openaiKey.trim() === '') {
       toast.error("Veuillez configurer votre clé API OpenAI d'abord");
       return;
     }
     
-    // Afficher/masquer le panneau d'idées IA
-    setShowAiIdeas(!showAiIdeas);
+    // Afficher/masquer le panneau d'idées IA en forçant l'état opposé
+    setShowAiIdeas(prevState => {
+      const newState = !prevState;
+      console.log('Setting showAiIdeas to:', newState);
+      return newState;
+    });
     
-    if (!showAiIdeas) {
-      toast.info("Panneau d'idées IA ouvert", {
-        description: "Explorez des suggestions générées par l'IA"
-      });
-    }
+    toast.info("Panneau d'idées IA", {
+      description: showAiIdeas ? "Panneau fermé" : "Explorez des suggestions générées par l'IA"
+    });
   };
+  
+  // Debug log for showAiIdeas state changes
+  useEffect(() => {
+    console.log('showAiIdeas state changed to:', showAiIdeas);
+  }, [showAiIdeas]);
   
   // Fonction appelée après validation de la clé API
   const handleKeyValidated = () => {
@@ -506,6 +516,7 @@ const KeywordGenerator = () => {
             
             <div className="flex justify-end">
               <Button 
+                id="generate-more-ideas-btn"
                 variant="outline" 
                 className="flex items-center gap-2"
                 onClick={handleGenerateMoreIdeas}
@@ -517,7 +528,7 @@ const KeywordGenerator = () => {
             
             {/* Panel d'idées générées par l'IA */}
             {showAiIdeas && (
-              <div className="mt-6 p-4 border border-blue-100 rounded-lg bg-blue-50">
+              <div className="mt-6 p-4 border border-blue-100 rounded-lg bg-blue-50" id="ai-ideas-panel">
                 <h3 className="font-medium text-blue-800 mb-3">Idées de contenu générées par l'IA</h3>
                 
                 <div className="space-y-3">
