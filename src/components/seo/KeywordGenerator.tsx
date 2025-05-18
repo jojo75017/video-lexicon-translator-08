@@ -35,6 +35,10 @@ import {
 import ApiKeyConfig from './analysis/ApiKeyConfig';
 import DynamicFAQ from './keyword/DynamicFAQ';
 import KeywordOpportunities from './keyword/KeywordOpportunities';
+import KeywordFAQ from './keyword/KeywordFAQ';
+import SearchConsoleDataViewer from './keyword/SearchConsoleData';
+import SiteStructureAnalyzer from './keyword/SiteStructureAnalyzer';
+import { RankingData } from '@/types/seo/Ranking';
 
 const KeywordGenerator = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -63,6 +67,10 @@ const KeywordGenerator = () => {
     localStorage.getItem('openaiKey') ? 'valid' : 'unchecked'
   );
   const [validationMessage, setValidationMessage] = useState('');
+  
+  // État pour les données de Search Console
+  const [searchConsoleData, setSearchConsoleData] = useState<RankingData | undefined>(undefined);
+  const [isLoadingSearchConsole, setIsLoadingSearchConsole] = useState<boolean>(false);
   
   // Fonction pour générer les mots-clés
   const handleGenerate = () => {
@@ -267,12 +275,62 @@ const KeywordGenerator = () => {
     }
   };
 
+  // Simulation de chargement des données Search Console
+  const fetchSearchConsoleData = () => {
+    if (!keyword.trim()) {
+      toast.error("Veuillez d'abord entrer un mot-clé");
+      return;
+    }
+    
+    setIsLoadingSearchConsole(true);
+    
+    // Simulation d'un appel API
+    setTimeout(() => {
+      // Données mockées de Search Console
+      const mockData: RankingData = {
+        totalImpressions: Math.floor(Math.random() * 10000) + 500,
+        totalClicks: Math.floor(Math.random() * 2000) + 100,
+        averageCTR: ((Math.random() * 5) + 1).toFixed(2),
+        averagePosition: Math.random() * 20 + 1,
+        impressions: Math.floor(Math.random() * 10000) + 1000,
+        clicks: Math.floor(Math.random() * 2000) + 100,
+        position: Math.random() * 10 + 1,
+        historicalData: Array.from({ length: 30 }, (_, i) => {
+          const date = new Date();
+          date.setDate(date.getDate() - (30 - i));
+          return {
+            date: date.toLocaleDateString('fr-FR', { month: 'short', day: 'numeric' }),
+            position: Math.random() * 30 + 1
+          };
+        }),
+        topQueries: [
+          { query: keyword, clicks: 120, impressions: 1500, ctr: 0.08, position: 3.2, change: -0.5 },
+          { query: `${keyword} gratuit`, clicks: 85, impressions: 980, ctr: 0.087, position: 4.8, change: 0 },
+          { query: `${keyword} en ligne`, clicks: 65, impressions: 750, ctr: 0.087, position: 5.3, change: 1.2 },
+          { query: `meilleur ${keyword}`, clicks: 45, impressions: 690, ctr: 0.065, position: 6.7, change: -0.8 },
+          { query: `tutoriel ${keyword}`, clicks: 38, impressions: 520, ctr: 0.073, position: 8.1, change: 0.4 },
+        ],
+        optimizationOpportunities: [
+          { query: `comment utiliser ${keyword}`, clicks: 15, impressions: 450, ctr: 0.033, position: 5.2, change: 0 },
+          { query: `comparatif ${keyword}`, clicks: 12, impressions: 380, ctr: 0.031, position: 4.8, change: 0 },
+          { query: `${keyword} vs concurrent`, clicks: 8, impressions: 290, ctr: 0.027, position: 6.3, change: 0 }
+        ]
+      };
+      
+      setSearchConsoleData(mockData);
+      setIsLoadingSearchConsole(false);
+      toast.success("Données Search Console chargées", {
+        description: `Analyse pour: "${keyword}"`
+      });
+    }, 2000);
+  };
+
   // Nombre total de mots-clés générés
   const totalKeywords = standardKeywords.length + longTailKeywords.length + questionKeywords.length;
   
   // Vérifier si des données de concurrents sont disponibles
   const hasCompetitorData = competitors.length > 0;
-
+  
   return (
     <div className="space-y-6">
       {/* Configuration de l'API OpenAI */}
@@ -408,9 +466,8 @@ const KeywordGenerator = () => {
         <Card className="p-6 text-center py-12">
           <Search className="h-10 w-10 text-gray-400 mx-auto mb-4" />
           <h2 className="text-xl font-medium mb-2">Commencez votre recherche de mots-clés</h2>
-          <p className="text-gray-500 max-w-md mx-auto mb-6">
-            Entrez un mot-clé ci-dessus pour découvrir des opportunités de contenu, 
-            analyser la concurrence et optimiser votre stratégie SEO.
+          <p className="text-gray-600 mb-6">
+            Analysez les mots-clés pour votre contenu, identifiez les meilleures opportunités et obtenez des insights sur la concurrence. Cet outil s'inspire des fonctionnalités de SEMrush et SISTRIX.
           </p>
         </Card>
       )}
@@ -444,6 +501,75 @@ const KeywordGenerator = () => {
             exportSelectedKeywords={exportSelectedKeywords}
             keyword={keyword}
           />
+          
+          {/* Nouvelle section: Onglets pour les données supplémentaires */}
+          <Tabs defaultValue="opportunities" className="mt-6">
+            <TabsList className="mb-4">
+              <TabsTrigger value="opportunities" className="flex items-center gap-1.5">
+                <Sparkles className="h-4 w-4" />
+                Opportunités
+              </TabsTrigger>
+              <TabsTrigger value="searchConsole" className="flex items-center gap-1.5">
+                <BarChart3 className="h-4 w-4" />
+                Search Console
+              </TabsTrigger>
+              <TabsTrigger value="structure" className="flex items-center gap-1.5">
+                <FolderTree className="h-4 w-4" />
+                Structure du site
+              </TabsTrigger>
+              <TabsTrigger value="faq" className="flex items-center gap-1.5">
+                <MessageSquare className="h-4 w-4" />
+                FAQ
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="opportunities">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <KeywordOpportunities 
+                  keywords={[...standardKeywords, ...longTailKeywords, ...questionKeywords]} 
+                  mainKeyword={keyword}
+                />
+                <DynamicFAQ keyword={keyword} />
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="searchConsole">
+              <div className="grid grid-cols-1 gap-6">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-semibold">Données Google Search Console</h3>
+                  <Button 
+                    variant="outline" 
+                    className="flex items-center gap-2"
+                    onClick={fetchSearchConsoleData}
+                    disabled={isLoadingSearchConsole}
+                  >
+                    {isLoadingSearchConsole ? (
+                      <span>Chargement...</span>
+                    ) : (
+                      <>
+                        <TrendingUp className="h-4 w-4" />
+                        <span>Charger les données</span>
+                      </>
+                    )}
+                  </Button>
+                </div>
+                
+                <SearchConsoleDataViewer 
+                  data={searchConsoleData}
+                  isLoading={isLoadingSearchConsole}
+                  keyword={keyword}
+                />
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="structure">
+              <SiteStructureAnalyzer />
+            </TabsContent>
+            
+            <TabsContent value="faq">
+              <KeywordFAQ />
+            </TabsContent>
+          </Tabs>
           
           {/* Nouvelle section d'opportunités de mots-clés */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
