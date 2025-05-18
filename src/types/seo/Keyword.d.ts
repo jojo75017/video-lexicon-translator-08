@@ -1,5 +1,4 @@
 
-
 export interface KeywordData {
   keyword: string;
   count: number;
@@ -24,5 +23,6 @@ export interface KeywordSuggestion {
   intent?: 'informational' | 'navigational' | 'transactional' | 'commercial';
   serps?: any[];
   trend?: number[];
+  searchVolume?: number;
+  clicks?: number;
 }
-

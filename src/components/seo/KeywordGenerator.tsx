@@ -1,678 +1,439 @@
-
 import React, { useState, useEffect } from 'react';
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Sparkles, Copy, AlertTriangle, ChartLine, Users, FileText, Link2 } from 'lucide-react';
-import { toast } from "sonner";
-import { Progress } from "@/components/ui/progress";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { KeywordSuggestion } from "@/types/seo/Keyword";
-import KeywordOpportunityChart from './keyword/KeywordOpportunityChart';
-import KeywordTrendChart from './keyword/KeywordTrendChart';
-import CompetitorAnalysis from './keyword/CompetitorAnalysis';
-import SerpAnalysis from './keyword/SerpAnalysis';
 import { 
-  generateQuestionKeywords, 
-  enrichKeywords, 
-  groupKeywordsByIntent,
-  calculateOpportunityScore,
-  determineKeywordIntent
-} from '@/utils/keyword/keywordAnalyzer';
+  Search, 
+  TrendingUp, 
+  BarChart3, 
+  Download, 
+  Sparkles, 
+  Globe, 
+  ExternalLink, 
+  ArrowRight, 
+  Info,
+  FileText,
+  MessageSquare,
+  Tag
+} from 'lucide-react';
+import { toast } from 'sonner';
+import { KeywordSuggestion } from '@/types/seo';
+import KeywordResults from './keyword/KeywordResults';
+import KeywordCard from './keyword/KeywordCard';
+import { 
+  generateStandardKeywords, 
+  generateLongTailKeywords, 
+  rankKeywordsByDifficulty, 
+  rankKeywordsByVolume,
+  generateTrendData,
+  sortKeywordsByScore
+} from '@/utils/keyword/keywordGeneratorUtils';
+import { determineKeywordIntent, enrichKeywords, generateQuestionKeywords } from '@/utils/keyword/keywordAnalyzer';
 
-// Fonction pour générer des suggestions basées sur le mot-clé de l'utilisateur
-const generateKeywordSuggestions = (keyword: string): KeywordSuggestion[] => {
-  // Bases des suggestions que nous allons personnaliser
-  let suggestions: KeywordSuggestion[] = [];
-  
-  // Adapter les suggestions en fonction du thème détecté
-  const keywordLowerCase = keyword.toLowerCase();
-  
-  // Mots-clés liés au voyage
-  if (keywordLowerCase.includes('voyage') || 
-      keywordLowerCase.includes('tourisme') || 
-      keywordLowerCase.includes('visiter') ||
-      keywordLowerCase.includes('destination') ||
-      keywordLowerCase.includes('vacances')) {
-    suggestions = [
-      { 
-        keyword: `${keyword} insolite`, 
-        volume: Math.floor(Math.random() * 500) + 500, 
-        competition: 0.3, 
-        cpc: 1.2 + Math.random(),
-        difficulty: Math.floor(Math.random() * 50) + 30
-      },
-      { 
-        keyword: `meilleur ${keyword}`, 
-        volume: Math.floor(Math.random() * 700) + 800, 
-        competition: 0.5, 
-        cpc: 1.8 + Math.random(),
-        difficulty: Math.floor(Math.random() * 65) + 25
-      },
-      { 
-        keyword: `${keyword} pas cher`, 
-        volume: Math.floor(Math.random() * 1000) + 1000, 
-        competition: 0.6, 
-        cpc: 2.0 + Math.random(),
-        difficulty: Math.floor(Math.random() * 70) + 20
-      },
-      { 
-        keyword: `${keyword} famille`,
-        volume: Math.floor(Math.random() * 600) + 400, 
-        competition: 0.4, 
-        cpc: 1.5 + Math.random(),
-        difficulty: Math.floor(Math.random() * 55) + 35
-      },
-      { 
-        keyword: `conseils ${keyword}`,
-        volume: Math.floor(Math.random() * 400) + 300, 
-        competition: 0.2, 
-        cpc: 1.0 + Math.random(),
-        difficulty: Math.floor(Math.random() * 40) + 25
-      }
-    ];
-  } 
-  // Mots-clés liés à l'aquariophilie
-  else if (keywordLowerCase.includes('aquari') || 
-           keywordLowerCase.includes('poisson') || 
-           keywordLowerCase.includes('betta') ||
-           keywordLowerCase.includes('aquatique')) {
-    suggestions = [
-      { 
-        keyword: `entretien ${keyword}`, 
-        volume: Math.floor(Math.random() * 400) + 300, 
-        competition: 0.2, 
-        cpc: 0.8 + Math.random(),
-        difficulty: Math.floor(Math.random() * 45) + 20
-      },
-      { 
-        keyword: `${keyword} débutant`, 
-        volume: Math.floor(Math.random() * 600) + 500, 
-        competition: 0.3, 
-        cpc: 0.9 + Math.random(),
-        difficulty: Math.floor(Math.random() * 35) + 15
-      },
-      { 
-        keyword: `meilleur ${keyword}`, 
-        volume: Math.floor(Math.random() * 300) + 200, 
-        competition: 0.4, 
-        cpc: 1.1 + Math.random(),
-        difficulty: Math.floor(Math.random() * 50) + 30
-      },
-      { 
-        keyword: `${keyword} prix`,
-        volume: Math.floor(Math.random() * 500) + 400, 
-        competition: 0.5, 
-        cpc: 1.3 + Math.random(),
-        difficulty: Math.floor(Math.random() * 60) + 25
-      },
-      { 
-        keyword: `alimentation ${keyword}`,
-        volume: Math.floor(Math.random() * 350) + 250, 
-        competition: 0.2, 
-        cpc: 0.7 + Math.random(),
-        difficulty: Math.floor(Math.random() * 40) + 20
-      }
-    ];
-  }
-  // Autres mots-clés plus génériques
-  else {
-    suggestions = [
-      { 
-        keyword: `${keyword} guide`, 
-        volume: Math.floor(Math.random() * 600) + 500, 
-        competition: 0.3, 
-        cpc: 1.0 + Math.random(),
-        difficulty: Math.floor(Math.random() * 55) + 25
-      },
-      { 
-        keyword: `meilleur ${keyword}`, 
-        volume: Math.floor(Math.random() * 800) + 700, 
-        competition: 0.5, 
-        cpc: 1.5 + Math.random(),
-        difficulty: Math.floor(Math.random() * 65) + 30
-      },
-      { 
-        keyword: `${keyword} comparatif`, 
-        volume: Math.floor(Math.random() * 500) + 400, 
-        competition: 0.4, 
-        cpc: 1.2 + Math.random(),
-        difficulty: Math.floor(Math.random() * 60) + 35
-      },
-      { 
-        keyword: `${keyword} tutoriel`,
-        volume: Math.floor(Math.random() * 400) + 300, 
-        competition: 0.2, 
-        cpc: 0.8 + Math.random(),
-        difficulty: Math.floor(Math.random() * 40) + 20
-      },
-      { 
-        keyword: `conseils ${keyword}`,
-        volume: Math.floor(Math.random() * 300) + 200, 
-        competition: 0.3, 
-        cpc: 0.9 + Math.random(),
-        difficulty: Math.floor(Math.random() * 45) + 15
-      }
-    ];
-  }
-  
-  // Ajouter des attributs manquants aux suggestions et enrichir avec des informations supplémentaires
-  const enrichedSuggestions = suggestions.map(suggestion => ({
-    ...suggestion,
-    relevance: Math.floor(Math.random() * 30) + 70,
-    opportunity: Math.floor(Math.random() * 60) + 30,
-    intent: determineKeywordIntent(suggestion.keyword)
-  }));
-  
-  // Générer aussi des questions liées au mot-clé
-  const questions = generateQuestionKeywords(keyword).map(question => ({
-    keyword: question,
-    volume: Math.floor(Math.random() * 300) + 50,
-    competition: Math.random() * 0.3,
-    cpc: Math.random() * 0.5 + 0.2,
-    difficulty: Math.floor(Math.random() * 50) + 10,
-    relevance: Math.floor(Math.random() * 20) + 70,
-    opportunity: Math.floor(Math.random() * 50) + 20,
-    type: 'question' as 'question' | 'standard' | 'long-tail' | 'related',
-    intent: 'informational' as 'informational' | 'navigational' | 'transactional' | 'commercial'
-  }));
-  
-  // Combiner suggestions et questions
-  return [...enrichedSuggestions, ...questions.slice(0, 3)];
-};
-
-interface KeywordGeneratorProps {
-  onGenerateClick?: () => void;
-  fieldValue?: string;
-  onInsert?: (value: string) => void;
-  maxLength?: number;
-  descriptionValue?: string;
-  onInsertDescription?: (value: string) => void;
-  maxLengthDescription?: number;
-}
-
-const KeywordGenerator: React.FC<KeywordGeneratorProps> = ({
-  onGenerateClick,
-  fieldValue = "",
-  onInsert,
-  maxLength = 60,
-  descriptionValue = "",
-  onInsertDescription,
-  maxLengthDescription = 155
-}) => {
+const KeywordGenerator = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const [keyword, setKeyword] = useState('');
-  const [generatedKeywords, setGeneratedKeywords] = useState<KeywordSuggestion[]>([]);
-  const [enrichedKeywords, setEnrichedKeywords] = useState<KeywordSuggestion[]>([]);
-  const [activeTab, setActiveTab] = useState("suggestions");
-  const [selectedKeyword, setSelectedKeyword] = useState<KeywordSuggestion | null>(null);
-  const [generationProgress, setGenerationProgress] = useState(0);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [apiKey, setApiKey] = useState('');
-  const [showApiConfig, setShowApiConfig] = useState(false);
-  const [title, setTitle] = useState(fieldValue);
-  const [description, setDescription] = useState(descriptionValue);
-  const [titleError, setTitleError] = useState<string | null>(null);
-  const [descriptionError, setDescriptionError] = useState<string | null>(null);
-
-  useEffect(() => {
-    setTitle(fieldValue);
-  }, [fieldValue]);
-
-  useEffect(() => {
-    setDescription(descriptionValue);
-  }, [descriptionValue]);
-
-  const handleGenerate = async () => {
-    if (!keyword) {
+  const [language, setLanguage] = useState('fr');
+  const [searchVolume, setSearchVolume] = useState('all');
+  const [competition, setCompetition] = useState('all');
+  const [activeTab, setActiveTab] = useState('standard');
+  const [hasSearched, setHasSearched] = useState(false);
+  const [hasGenerated, setHasGenerated] = useState(false);
+  
+  // États pour les résultats
+  const [standardKeywords, setStandardKeywords] = useState<KeywordSuggestion[]>([]);
+  const [longTailKeywords, setLongTailKeywords] = useState<KeywordSuggestion[]>([]);
+  const [questionKeywords, setQuestionKeywords] = useState<KeywordSuggestion[]>([]);
+  const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
+  
+  // États pour les données complémentaires
+  const [competitors, setCompetitors] = useState<any[]>([]);
+  const [serpResults, setSerpResults] = useState<any[]>([]);
+  
+  // Fonction pour générer les mots-clés
+  const handleGenerate = () => {
+    if (!keyword.trim()) {
       toast.error("Veuillez entrer un mot-clé");
       return;
     }
-
-    setIsGenerating(true);
-    setGenerationProgress(0);
-    setGeneratedKeywords([]);
-    setEnrichedKeywords([]);
-    setSelectedKeyword(null);
-
-    // Simulate generating keywords
-    const interval = setInterval(() => {
-      setGenerationProgress((prevProgress) => {
-        const newProgress = Math.min(prevProgress + 10, 100);
-        return newProgress;
-      });
-    }, 300);
-
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 3000));
-
-    clearInterval(interval);
-    setGenerationProgress(100);
-
-    // Utiliser notre fonction pour générer des suggestions pertinentes
-    const mockKeywords = generateKeywordSuggestions(keyword);
-    setGeneratedKeywords(mockKeywords);
     
-    // Enrichir les mots-clés avec des données supplémentaires
-    const enriched = enrichKeywords(mockKeywords);
-    setEnrichedKeywords(enriched);
+    setIsLoading(true);
+    setHasSearched(true);
     
-    setIsGenerating(false);
-    toast.success("Mots-clés générés avec succès!");
-    
-    if (onGenerateClick) {
-      onGenerateClick();
-    }
+    // Simuler un appel API avec un délai
+    setTimeout(() => {
+      try {
+        // Générer les mots-clés standards
+        const standards = generateStandardKeywords(keyword);
+        
+        // Générer les mots-clés longue traîne
+        const longTails = generateLongTailKeywords(keyword);
+        
+        // Générer les questions fréquentes
+        const questions = generateQuestionKeywords(keyword).map(q => ({
+          keyword: q,
+          volume: Math.floor(Math.random() * 500) + 10,
+          difficulty: Math.floor(Math.random() * 40) + 5,
+          cpc: parseFloat((Math.random() * 0.8).toFixed(2)),
+          competition: parseFloat((Math.random() * 0.5).toFixed(2)),
+          relevance: Math.floor(Math.random() * 30) + 65,
+          type: 'question' as 'question',
+          intent: 'informational' as 'informational',
+          opportunity: Math.floor(Math.random() * 30) + 60,
+          trend: generateTrendData(q)
+        }));
+        
+        // Enrichir les mots-clés avec des données supplémentaires
+        const enrichedStandards = enrichKeywords(standards);
+        const enrichedLongTails = enrichKeywords(longTails);
+        
+        // Genérer des données de concurrents fictives
+        const mockCompetitors = [
+          { 
+            name: "competitor1.com", 
+            url: "https://www.competitor1.com", 
+            strength: 85, 
+            organic_traffic: 45000, 
+            keywords: 1200 
+          },
+          { 
+            name: "competitor2.com", 
+            url: "https://www.competitor2.com", 
+            strength: 72, 
+            organic_traffic: 28000, 
+            keywords: 850 
+          },
+          { 
+            name: "competitor3.com", 
+            url: "https://www.competitor3.com", 
+            strength: 63, 
+            organic_traffic: 17500, 
+            keywords: 520 
+          }
+        ];
+        
+        // Mettre à jour les états
+        setStandardKeywords(enrichedStandards);
+        setLongTailKeywords(enrichedLongTails);
+        setQuestionKeywords(questions);
+        setCompetitors(mockCompetitors);
+        setSerpResults([]);
+        setHasGenerated(true);
+        
+        toast.success(`${enrichedStandards.length + enrichedLongTails.length + questions.length} mots-clés générés`);
+      } catch (error) {
+        console.error("Erreur lors de la génération des mots-clés:", error);
+        toast.error("Erreur lors de la génération des mots-clés");
+      } finally {
+        setIsLoading(false);
+      }
+    }, 1500);
   };
-
-  const handleCopyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    toast.success("Copié dans le presse-papiers!");
-  };
-
-  const handleInsertTitle = () => {
-    if (onInsert) {
-      onInsert(title);
-      toast.success("Titre inséré avec succès!");
-    }
-  };
-
-  const handleInsertDescription = () => {
-    if (onInsertDescription) {
-      onInsertDescription(description);
-      toast.success("Description insérée avec succès!");
-    }
-  };
-
-  const handleTitleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value;
-    setTitle(value);
-
-    if (value.length > maxLength) {
-      setTitleError(`Le titre ne doit pas dépasser ${maxLength} caractères.`);
-    } else {
-      setTitleError(null);
-    }
-  };
-
-  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value;
-    setDescription(value);
-
-    if (value.length > maxLengthDescription) {
-      setDescriptionError(`La description ne doit pas dépasser ${maxLengthDescription} caractères.`);
-    } else {
-      setDescriptionError(null);
+  
+  // Fonction pour trier les mots-clés
+  const sortKeywords = (type: string) => {
+    switch(type) {
+      case 'volume':
+        setStandardKeywords([...rankKeywordsByVolume(standardKeywords)]);
+        setLongTailKeywords([...rankKeywordsByVolume(longTailKeywords)]);
+        toast.info("Mots-clés triés par volume de recherche");
+        break;
+      case 'difficulty':
+        setStandardKeywords([...rankKeywordsByDifficulty(standardKeywords)]);
+        setLongTailKeywords([...rankKeywordsByDifficulty(longTailKeywords)]);
+        toast.info("Mots-clés triés par difficulté");
+        break;
+      case 'opportunity':
+        setStandardKeywords([...sortKeywordsByScore(standardKeywords)]);
+        setLongTailKeywords([...sortKeywordsByScore(longTailKeywords)]);
+        toast.info("Mots-clés triés par opportunité");
+        break;
+      default:
+        break;
     }
   };
   
-  const handleKeywordSelect = (kw: KeywordSuggestion) => {
-    setSelectedKeyword(kw);
-    setActiveTab("analysis");
+  // Fonction pour sélectionner/désélectionner un mot-clé
+  const toggleKeywordSelection = (keyword: string) => {
+    setSelectedKeywords(prev => {
+      if (prev.includes(keyword)) {
+        return prev.filter(k => k !== keyword);
+      } else {
+        return [...prev, keyword];
+      }
+    });
   };
+  
+  // Fonction pour effacer tous les mots-clés sélectionnés
+  const clearSelectedKeywords = () => {
+    setSelectedKeywords([]);
+    toast.info("Tous les mots-clés ont été désélectionnés");
+  };
+  
+  // Fonction pour exporter les mots-clés sélectionnés
+  const exportSelectedKeywords = () => {
+    if (selectedKeywords.length === 0) {
+      toast.error("Aucun mot-clé sélectionné");
+      return;
+    }
+    
+    const allKeywords = [...standardKeywords, ...longTailKeywords, ...questionKeywords];
+    const selected = allKeywords.filter(kw => selectedKeywords.includes(kw.keyword));
+    
+    // Créer un fichier CSV
+    let csv = "Mot-clé,Volume,Difficulté,CPC,Opportunité,Type,Intention\n";
+    selected.forEach(kw => {
+      csv += `"${kw.keyword}",${kw.volume || 'N/A'},${kw.difficulty || 'N/A'},${kw.cpc || 'N/A'},${kw.opportunity || 'N/A'},${kw.type || 'standard'},${kw.intent || 'N/A'}\n`;
+    });
+    
+    // Créer un blob et générer un lien de téléchargement
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `mots-cles-${keyword.replace(/\s+/g, '-')}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast.success(`${selectedKeywords.length} mots-clés exportés`);
+  };
+  
+  // Nombre total de mots-clés générés
+  const totalKeywords = standardKeywords.length + longTailKeywords.length + questionKeywords.length;
+  
+  // Vérifier si des données de concurrents sont disponibles
+  const hasCompetitorData = competitors.length > 0;
 
   return (
     <div className="space-y-6">
-      <Card className="p-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+      <Card className="p-6 border-t-4 border-t-blue-500">
+        <div className="flex items-center gap-2 mb-6">
+          <Search className="h-5 w-5 text-blue-500" />
+          <h2 className="text-xl font-bold">Recherche de mots-clés</h2>
+        </div>
+        
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-4">
           <div>
-            <h2 className="text-xl font-semibold flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-yellow-500" />
-              Générateur de Mots-clés
-            </h2>
-            <p className="text-gray-500 text-sm mt-1">
-              Analysez les mots-clés, leur difficulté et identifiez les meilleures opportunités
-            </p>
+            <Input 
+              placeholder="Entrez votre mot-clé principal"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              className="w-full"
+            />
           </div>
           
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => setShowApiConfig(!showApiConfig)}
-          >
-            {showApiConfig ? "Masquer la configuration" : "Configuration API"}
-          </Button>
+          <Select value={language} onValueChange={setLanguage}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Langue" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="fr">Français</SelectItem>
+              <SelectItem value="en">Anglais</SelectItem>
+              <SelectItem value="es">Espagnol</SelectItem>
+              <SelectItem value="de">Allemand</SelectItem>
+              <SelectItem value="it">Italien</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          <Select value={searchVolume} onValueChange={setSearchVolume}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Volume de recherche" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tous volumes</SelectItem>
+              <SelectItem value="high">Volume élevé</SelectItem>
+              <SelectItem value="medium">Volume moyen</SelectItem>
+              <SelectItem value="low">Volume faible</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          <Select value={competition} onValueChange={setCompetition}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Concurrence" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Toute concurrence</SelectItem>
+              <SelectItem value="high">Concurrence élevée</SelectItem>
+              <SelectItem value="medium">Concurrence moyenne</SelectItem>
+              <SelectItem value="low">Concurrence faible</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-
-        {showApiConfig && (
-          <div className="mb-4 p-3 bg-gray-50 rounded-md border">
-            <h3 className="text-sm font-medium mb-2">Paramètres de connexion</h3>
-            <div className="space-y-3">
-              <div>
-                <Label htmlFor="apikey" className="text-xs">Clé API</Label>
-                <Input
-                  id="apikey"
-                  type="password"
-                  placeholder="Entrez votre clé API SEMrush ou SISTRIX"
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                />
-              </div>
-              <p className="text-xs text-gray-500">
-                En l'absence de clé API, des données simulées seront utilisées à des fins de démonstration.
-              </p>
-            </div>
-          </div>
-        )}
-
-        <div className="flex items-center space-x-3">
-          <Input
-            type="text"
-            placeholder="Mot-clé principal"
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
+        
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Button 
+            onClick={handleGenerate}
+            disabled={isLoading || !keyword.trim()}
             className="flex-1"
-          />
-          <Button onClick={handleGenerate} disabled={isGenerating}>
-            {isGenerating ? (
-              <>
-                <Search className="h-4 w-4 mr-2 animate-spin" />
-                Génération...
-              </>
+          >
+            {isLoading ? (
+              <>Génération en cours...</>
             ) : (
               <>
-                <Search className="h-4 w-4 mr-2" />
-                Analyser
+                <Search className="mr-2 h-4 w-4" />
+                Générer des mots-clés
               </>
             )}
           </Button>
-        </div>
-
-        {generationProgress > 0 && generationProgress < 100 && (
-          <Progress 
-            value={generationProgress} 
-            className="h-2 mt-2"
-          />
-        )}
-      </Card>
-
-      {enrichedKeywords.length > 0 && (
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="w-full">
-            <TabsTrigger value="suggestions" className="flex-1">
-              <Search className="h-4 w-4 mr-2" />
-              Suggestions
-            </TabsTrigger>
-            <TabsTrigger value="analysis" className="flex-1">
-              <ChartLine className="h-4 w-4 mr-2" />
-              Analyse
-            </TabsTrigger>
-            <TabsTrigger value="seo-content" className="flex-1">
-              <FileText className="h-4 w-4 mr-2" />
-              Contenu SEO
-            </TabsTrigger>
-            <TabsTrigger value="competition" className="flex-1">
-              <Users className="h-4 w-4 mr-2" />
-              Concurrence
-            </TabsTrigger>
-          </TabsList>
           
-          <TabsContent value="suggestions" className="mt-6">
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">Suggestions de mots-clés</h3>
+          {hasGenerated && (
+            <div className="flex gap-2">
+              <Button 
+                variant="outline"
+                onClick={() => sortKeywords('volume')}
+                className="flex items-center gap-1"
+              >
+                <TrendingUp className="h-4 w-4" />
+                <span className="hidden sm:inline">Volume</span>
+              </Button>
               
-              <div className="mb-6">
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm font-medium">
-                    <span>Mot-clé</span>
-                    <div className="flex gap-8">
-                      <span>Volume</span>
-                      <span>Difficulté</span>
-                      <span>CPC (€)</span>
-                      <span>Opportunité</span>
-                      <span></span>
-                    </div>
-                  </div>
-                  <Separator />
-                </div>
-                
-                <div className="space-y-2 mt-2">
-                  {enrichedKeywords.map((kw, index) => (
-                    <div 
-                      key={index} 
-                      className="flex items-center justify-between p-3 rounded-md hover:bg-gray-50 transition-colors cursor-pointer"
-                      onClick={() => handleKeywordSelect(kw)}
-                    >
-                      <span className="font-medium">{kw.keyword}</span>
-                      <div className="flex items-center gap-8">
-                        <span className="text-gray-600 w-16 text-right">{kw.volume}</span>
-                        <div className="w-20 flex items-center gap-1">
-                          <Progress 
-                            value={kw.difficulty} 
-                            className={`h-2 ${
-                              kw.difficulty! > 70 ? "bg-red-500" :
-                              kw.difficulty! > 40 ? "bg-yellow-500" :
-                              "bg-green-500"
-                            }`}
-                          />
-                          <span className="text-xs text-gray-500">{kw.difficulty}</span>
-                        </div>
-                        <span className="text-gray-600 w-16 text-right">{kw.cpc?.toFixed(2)}</span>
-                        <span className="w-20 text-right">
-                          <Badge className={
-                            kw.opportunity! > 70 ? "bg-green-100 text-green-800" :
-                            kw.opportunity! > 40 ? "bg-yellow-100 text-yellow-800" :
-                            "bg-red-100 text-red-800"
-                          }>
-                            {kw.opportunity || calculateOpportunityScore(kw)}
-                          </Badge>
-                        </span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="ml-2"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleCopyToClipboard(kw.keyword);
-                          }}
-                        >
-                          <Copy className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+              <Button 
+                variant="outline"
+                onClick={() => sortKeywords('difficulty')}
+                className="flex items-center gap-1"
+              >
+                <BarChart3 className="h-4 w-4" />
+                <span className="hidden sm:inline">Difficulté</span>
+              </Button>
+              
+              <Button 
+                variant="outline"
+                onClick={() => sortKeywords('opportunity')}
+                className="flex items-center gap-1"
+              >
+                <Sparkles className="h-4 w-4" />
+                <span className="hidden sm:inline">Opportunité</span>
+              </Button>
+            </div>
+          )}
+        </div>
+      </Card>
+      
+      {/* État vide */}
+      {!hasSearched && (
+        <Card className="p-6 text-center py-12">
+          <Search className="h-10 w-10 text-gray-400 mx-auto mb-4" />
+          <h2 className="text-xl font-medium mb-2">Commencez votre recherche de mots-clés</h2>
+          <p className="text-gray-500 max-w-md mx-auto mb-6">
+            Entrez un mot-clé ci-dessus pour découvrir des opportunités de contenu, 
+            analyser la concurrence et optimiser votre stratégie SEO.
+          </p>
+        </Card>
+      )}
+      
+      {/* État de chargement */}
+      {isLoading && (
+        <Card className="p-6 text-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-700 mx-auto mb-4"></div>
+          <h2 className="text-xl font-medium mb-2">Recherche de mots-clés en cours...</h2>
+          <p className="text-gray-500 max-w-md mx-auto">
+            Nous analysons les données pour vous fournir les meilleures suggestions de mots-clés.
+          </p>
+        </Card>
+      )}
+      
+      {/* Résultats */}
+      {hasGenerated && !isLoading && (
+        <>
+          <KeywordResults 
+            standardKeywords={standardKeywords}
+            longTailKeywords={longTailKeywords}
+            selectedKeywords={selectedKeywords}
+            competitors={competitors}
+            serpResults={serpResults}
+            hasCompetitorData={hasCompetitorData}
+            totalKeywords={totalKeywords}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            toggleKeywordSelection={toggleKeywordSelection}
+            clearSelectedKeywords={clearSelectedKeywords}
+            exportSelectedKeywords={exportSelectedKeywords}
+          />
+          
+          {questionKeywords.length > 0 && (
+            <Card className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-semibold">Questions fréquentes (FAQ)</h2>
+                <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+                  {questionKeywords.length} questions
+                </Badge>
               </div>
               
-              <div className="mt-6">
-                <h4 className="text-sm font-medium mb-2">Questions associées</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                  {generateQuestionKeywords(keyword).map((question, idx) => (
-                    <div key={idx} className="border rounded-md p-2 text-sm">
-                      {question}
-                    </div>
-                  ))}
-                </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                {questionKeywords.map((question, idx) => (
+                  <KeywordCard 
+                    key={idx}
+                    keywordData={question}
+                    isSelected={selectedKeywords.includes(question.keyword)}
+                    onToggleSelection={toggleKeywordSelection}
+                  />
+                ))}
               </div>
             </Card>
-          </TabsContent>
+          )}
           
-          <TabsContent value="analysis" className="mt-6">
-            <div className="space-y-6">
-              {selectedKeyword ? (
-                <>
-                  <div className="bg-white p-4 rounded-lg border shadow-sm mb-4">
-                    <h3 className="text-xl font-semibold mb-1">{selectedKeyword.keyword}</h3>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      <Badge className="bg-blue-100 text-blue-800">
-                        Volume: {selectedKeyword.volume}
-                      </Badge>
-                      <Badge className={
-                        selectedKeyword.difficulty! > 70 ? "bg-red-100 text-red-800" :
-                        selectedKeyword.difficulty! > 40 ? "bg-yellow-100 text-yellow-800" :
-                        "bg-green-100 text-green-800"
-                      }>
-                        Difficulté: {selectedKeyword.difficulty}
-                      </Badge>
-                      <Badge className="bg-purple-100 text-purple-800">
-                        CPC: {selectedKeyword.cpc?.toFixed(2)}€
-                      </Badge>
-                      <Badge className="bg-gray-100 text-gray-800">
-                        Intent: {selectedKeyword.intent || 'informational'}
-                      </Badge>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <KeywordTrendChart keyword={selectedKeyword.keyword} />
-                    <SerpAnalysis keyword={selectedKeyword.keyword} serpData={selectedKeyword.serps} />
-                  </div>
-                </>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <KeywordOpportunityChart keywords={enrichedKeywords} />
-                  <KeywordTrendChart keyword={keyword} />
-                </div>
-              )}
+          <Card className="p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Tag className="h-5 w-5 text-blue-500" />
+              <h2 className="text-lg font-semibold">Champ sémantique et synonymes</h2>
             </div>
-          </TabsContent>
-          
-          <TabsContent value="seo-content" className="mt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="p-6 space-y-4">
-                <h3 className="text-lg font-semibold">Titre SEO ({title ? title.length : 0}/{maxLength})</h3>
-                <Textarea
-                  placeholder="Entrez votre titre SEO"
-                  value={title || ""}
-                  onChange={handleTitleChange}
-                  className="resize-none"
-                  maxLength={maxLength}
-                />
-                {titleError && (
-                  <Alert variant="destructive">
-                    <AlertTriangle className="h-4 w-4" />
-                    <AlertDescription>{titleError}</AlertDescription>
-                  </Alert>
-                )}
-                <Button size="sm" onClick={handleInsertTitle} disabled={!title || !!titleError}>
-                  Insérer le titre
-                </Button>
-                
-                {enrichedKeywords.length > 0 && (
-                  <div className="mt-4">
-                    <h4 className="text-sm font-medium mb-2">Suggestions de titres</h4>
-                    <div className="space-y-2">
-                      {enrichedKeywords.slice(0, 3).map((kw, idx) => (
-                        <div 
-                          key={idx}
-                          className="p-2 bg-gray-50 rounded border cursor-pointer hover:bg-gray-100"
-                          onClick={() => setTitle(`Guide complet sur ${kw.keyword}: Conseils et astuces ${new Date().getFullYear()}`)}
-                        >
-                          Guide complet sur {kw.keyword}: Conseils et astuces {new Date().getFullYear()}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </Card>
+            
+            <div className="flex flex-wrap gap-2 mb-6">
+              {[...standardKeywords, ...longTailKeywords]
+                .slice(0, 15)
+                .map((kw, idx) => (
+                  <Badge 
+                    key={idx} 
+                    variant="secondary"
+                    className="px-3 py-1 text-sm"
+                  >
+                    {kw.keyword}
+                  </Badge>
+                ))
+              }
+            </div>
+            
+            <Separator className="my-4" />
+            
+            <div className="flex items-center gap-2 mb-4">
+              <FileText className="h-5 w-5 text-emerald-500" />
+              <h2 className="text-lg font-semibold">Suggestions de contenu</h2>
+            </div>
+            
+            <ul className="space-y-2 mb-6">
+              {[...questionKeywords].slice(0, 3).map((q, idx) => (
+                <li key={idx} className="flex items-start gap-2">
+                  <ArrowRight className="h-5 w-5 text-emerald-500 mt-0.5" />
+                  <span>{q.keyword}</span>
+                </li>
+              ))}
               
-              <Card className="p-6 space-y-4">
-                <h3 className="text-lg font-semibold">Description SEO ({description ? description.length : 0}/{maxLengthDescription})</h3>
-                <Textarea
-                  placeholder="Entrez votre description SEO"
-                  value={description || ""}
-                  onChange={handleDescriptionChange}
-                  className="resize-none"
-                  maxLength={maxLengthDescription}
-                />
-                {descriptionError && (
-                  <Alert variant="destructive">
-                    <AlertTriangle className="h-4 w-4" />
-                    <AlertDescription>{descriptionError}</AlertDescription>
-                  </Alert>
-                )}
-                <Button size="sm" onClick={handleInsertDescription} disabled={!description || !!descriptionError}>
-                  Insérer la description
-                </Button>
-                
-                {enrichedKeywords.length > 0 && (
-                  <div className="mt-4">
-                    <h4 className="text-sm font-medium mb-2">Suggestions de descriptions</h4>
-                    <div className="space-y-2">
-                      {enrichedKeywords.slice(0, 2).map((kw, idx) => (
-                        <div 
-                          key={idx}
-                          className="p-2 bg-gray-50 rounded border cursor-pointer hover:bg-gray-100 text-sm"
-                          onClick={() => setDescription(`Découvrez notre guide complet sur ${kw.keyword}. Conseils d'experts, comparatif des meilleures options et astuces pour optimiser vos résultats. Tout ce que vous devez savoir sur ${kw.keyword} en ${new Date().getFullYear()}.`)}
-                        >
-                          Découvrez notre guide complet sur {kw.keyword}. Conseils d'experts, comparatif des meilleures options et astuces pour optimiser vos résultats. Tout ce que vous devez savoir sur {kw.keyword} en {new Date().getFullYear()}.
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </Card>
+              {[
+                `Guide complet sur ${keyword}`,
+                `Les 10 erreurs à éviter avec ${keyword}`,
+                `Comment optimiser votre ${keyword} en 2024`
+              ].map((title, idx) => (
+                <li key={idx} className="flex items-start gap-2">
+                  <ArrowRight className="h-5 w-5 text-emerald-500 mt-0.5" />
+                  <span>{title}</span>
+                </li>
+              ))}
+            </ul>
+            
+            <div className="flex justify-end">
+              <Button variant="outline" className="flex items-center gap-2">
+                <MessageSquare className="h-4 w-4" />
+                Générer plus d'idées avec l'IA
+              </Button>
             </div>
-          </TabsContent>
-          
-          <TabsContent value="competition" className="mt-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <CompetitorAnalysis keyword={keyword} />
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Stratégie de contenu recommandée</h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  Pour vous positionner sur "{keyword}", nous recommandons de créer les contenus suivants:
-                </p>
-                
-                <div className="space-y-3">
-                  <div className="p-3 bg-green-50 border border-green-100 rounded-md">
-                    <h4 className="font-medium flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-green-600" />
-                      Page pilier
-                    </h4>
-                    <p className="text-sm mt-1">
-                      Guide complet sur {keyword} (≥ 2000 mots)
-                    </p>
-                  </div>
-                  
-                  <div className="p-3 bg-blue-50 border border-blue-100 rounded-md">
-                    <h4 className="font-medium flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-blue-600" />
-                      Articles de cluster
-                    </h4>
-                    <ul className="text-sm mt-1 space-y-1">
-                      {enrichedKeywords.slice(0, 3).map((kw, idx) => (
-                        <li key={idx}>{kw.keyword} (≥ 1200 mots)</li>
-                      ))}
-                    </ul>
-                  </div>
-                  
-                  <div className="p-3 bg-purple-50 border border-purple-100 rounded-md">
-                    <h4 className="font-medium flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-purple-600" />
-                      Questions & Réponses
-                    </h4>
-                    <ul className="text-sm mt-1 space-y-1">
-                      {generateQuestionKeywords(keyword).slice(0, 3).map((question, idx) => (
-                        <li key={idx}>{question} (≥ 800 mots)</li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-                
-                <div className="mt-6">
-                  <h4 className="text-sm font-medium mb-2">Structure de maillage interne</h4>
-                  <div className="bg-gray-50 p-3 rounded-md border">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Link2 className="h-4 w-4 text-blue-600" />
-                      <span className="font-medium">Recommandations de liens:</span>
-                    </div>
-                    <ul className="text-sm space-y-2">
-                      <li>Toutes les pages cluster doivent pointer vers la page pilier</li>
-                      <li>La page pilier doit contenir des liens vers toutes les pages cluster</li>
-                      <li>Les pages Q&A doivent être liées depuis les articles pertinents</li>
-                      <li>Ajouter des liens entre les pages cluster traitant de sujets connexes</li>
-                    </ul>
-                  </div>
-                </div>
-              </Card>
-            </div>
-          </TabsContent>
-        </Tabs>
+          </Card>
+        </>
       )}
     </div>
   );
