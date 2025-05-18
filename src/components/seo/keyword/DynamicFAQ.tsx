@@ -18,7 +18,7 @@ const DynamicFAQ: React.FC<DynamicFAQProps> = ({ keyword }) => {
   const generateFAQs = (keyword: string): FAQItem[] => {
     const cleanKeyword = keyword.toLowerCase().trim();
     
-    // Questions de base adaptées à tous les mots-clés
+    // Questions de base adaptées à tous les mots-clés (maintenant 8 minimum)
     const basicQuestions: FAQItem[] = [
       {
         question: `Comment optimiser mon contenu pour le mot-clé "${keyword}" ?`,
@@ -31,6 +31,26 @@ const DynamicFAQ: React.FC<DynamicFAQProps> = ({ keyword }) => {
       {
         question: `Comment suivre mon positionnement pour "${keyword}" ?`,
         answer: `Pour suivre votre positionnement sur "${keyword}", utilisez des outils comme Google Search Console, SEMrush, Ahrefs, ou SISTRIX. Ces plateformes vous permettent de surveiller vos positions dans les résultats de recherche au fil du temps, d'analyser les tendances et d'identifier les opportunités d'amélioration. Établissez un suivi régulier (hebdomadaire ou mensuel) pour bien comprendre l'évolution de vos performances.`
+      },
+      {
+        question: `Quels sont les meilleurs outils pour rechercher des mots-clés similaires à "${keyword}" ?`,
+        answer: `Pour trouver des mots-clés similaires à "${keyword}", plusieurs outils performants sont disponibles : Google Keyword Planner (gratuit avec un compte Google Ads), SEMrush, Ahrefs, Ubersuggest, ou encore AnswerThePublic. Ces plateformes vous permettent d'identifier les variantes, les questions fréquentes et les termes associés avec leurs volumes de recherche respectifs. N'oubliez pas de consulter également les suggestions automatiques de Google et la section "Les internautes ont également cherché".`
+      },
+      {
+        question: `Comment mesurer le ROI de ma stratégie SEO pour "${keyword}" ?`,
+        answer: `Pour mesurer le ROI de votre stratégie SEO sur "${keyword}", commencez par configurer un suivi précis des conversions dans Google Analytics. Calculez ensuite le coût total de votre stratégie SEO (temps, ressources, outils), puis divisez vos revenus attribuables au SEO par ce coût. Utilisez également des KPIs complémentaires comme l'évolution du trafic organique, le taux de conversion des visiteurs venant de recherches organiques, et le classement moyen pour vos mots-clés cibles. Un suivi sur 6 à 12 mois est nécessaire pour obtenir des données fiables.`
+      },
+      {
+        question: `Quelle longueur de contenu est idéale pour se positionner sur "${keyword}" ?`,
+        answer: `La longueur idéale pour se positionner sur "${keyword}" dépend du type de requête et de l'intention de recherche. En général, les contenus approfondis de 1500 à 2500 mots se positionnent mieux pour des requêtes informatives. Analysez les pages qui se classent déjà dans le top 10 pour ce mot-clé : leur longueur moyenne peut servir de référence. Cependant, privilégiez toujours la qualité à la quantité - un contenu plus court mais plus pertinent et mieux structuré peut surpasser un contenu long mais de moindre qualité.`
+      },
+      {
+        question: `Comment créer une stratégie de netlinking efficace pour "${keyword}" ?`,
+        answer: `Pour une stratégie de netlinking efficace autour de "${keyword}", commencez par créer un contenu de qualité et original. Ensuite, identifiez des sites de qualité dans votre niche et proposez des collaborations : guest posting, interviews d'experts, ou participations à des études. Surveillez les mentions de votre marque pour transformer les citations non liées en backlinks. Utilisez des outils comme HARO pour répondre aux demandes des journalistes. Évitez l'achat de liens à grande échelle et privilégiez les liens naturels et contextuels. La qualité et la pertinence des backlinks sont bien plus importantes que leur quantité.`
+      },
+      {
+        question: `Comment cibler efficacement "${keyword}" sans sur-optimiser mon contenu ?`,
+        answer: `Pour cibler "${keyword}" sans sur-optimiser, adoptez une approche naturelle en utilisant des variantes et des synonymes. Structurez votre contenu autour de sujets connexes plutôt que de vous concentrer uniquement sur le mot-clé principal. Utilisez des mots-clés sémantiquement liés, créez un contenu qui répond réellement aux questions des utilisateurs, et respectez les principes d'écriture journalistique. L'optimisation moderne se concentre davantage sur l'intention de recherche et la satisfaction de l'utilisateur que sur la densité de mots-clés. Les contenus naturels et informatifs sont mieux classés que les textes sur-optimisés.`
       }
     ];
     
@@ -46,6 +66,10 @@ const DynamicFAQ: React.FC<DynamicFAQProps> = ({ keyword }) => {
         {
           question: `Comment calculer le ROI d'une campagne SEA pour "${keyword}" ?`,
           answer: `Pour calculer le ROI d'une campagne SEA sur "${keyword}", divisez les profits générés par vos dépenses publicitaires, puis multipliez par 100. Suivez attentivement les conversions, le coût par clic et le taux de conversion pour ajuster votre stratégie. Utilisez des outils comme Google Analytics et Google Ads pour collecter ces données de manière précise.`
+        },
+        {
+          question: `Quelle est la meilleure période pour lancer une campagne sur "${keyword}" ?`,
+          answer: `Pour déterminer la meilleure période pour une campagne sur "${keyword}", analysez les tendances saisonnières avec Google Trends. Identifiez les pics d'intérêt annuels et hebdomadaires. Pour les produits ou services liés à ce mot-clé, examinez également vos données historiques de ventes et de trafic. Planifiez votre campagne 2-4 semaines avant les pics de demande anticipés pour maximiser la visibilité pendant la période de recherche active des consommateurs.`
         }
       ];
     } else if (cleanKeyword.includes('comment') || cleanKeyword.includes('guide') || cleanKeyword.includes('tutoriel')) {
@@ -57,6 +81,10 @@ const DynamicFAQ: React.FC<DynamicFAQProps> = ({ keyword }) => {
         {
           question: `Comment structurer un article informatif sur "${keyword}" ?`,
           answer: `Un article informatif sur "${keyword}" devrait commencer par une introduction claire établissant le problème, puis présenter les solutions de façon logique et progressive. Utilisez des sous-titres H2 et H3, des listes à puces, des images explicatives, et des exemples concrets. Concluez avec un résumé des points clés et une invitation à l'action. Cette structure facilite la lecture et améliore votre référencement.`
+        },
+        {
+          question: `Quels formats de contenu sont les plus efficaces pour expliquer "${keyword}" ?`,
+          answer: `Les formats les plus efficaces pour expliquer "${keyword}" dépendent de la complexité du sujet. Pour des concepts techniques, les tutoriels vidéo, les infographies étape par étape et les guides illustrés sont particulièrement performants. Les webinaires interactifs et podcasts peuvent approfondir des aspects spécifiques. Pour un contenu exhaustif, combinez plusieurs formats: article détaillé comme contenu principal, complété par des vidéos explicatives courtes et des infographies partageables sur les réseaux sociaux.`
         }
       ];
     } else if (cleanKeyword.includes('vs') || cleanKeyword.includes('comparatif') || cleanKeyword.includes('meilleur')) {
@@ -68,6 +96,10 @@ const DynamicFAQ: React.FC<DynamicFAQProps> = ({ keyword }) => {
         {
           question: `Quels sont les formats de contenu les plus efficaces pour "${keyword}" ?`,
           answer: `Pour "${keyword}", les formats les plus efficaces incluent les tableaux comparatifs, les infographies, les vidéos de démonstration, et les examens détaillés avec captures d'écran. Les avis basés sur des tests réels et les guides d'achat sont également très appréciés. Diversifiez vos formats de contenu pour maximiser la visibilité et répondre aux différentes préférences de consommation de contenu.`
+        },
+        {
+          question: `Comment rester objectif dans un article comparatif sur "${keyword}" ?`,
+          answer: `Pour maintenir l'objectivité dans un comparatif sur "${keyword}", établissez des critères d'évaluation clairs et mesurables avant de commencer votre analyse. Utilisez des données vérifiables plutôt que des opinions subjectives. Présentez les avantages et inconvénients de chaque option de manière équilibrée. Mentionnez transparemment vos méthodes de test et sources d'information. Si possible, incluez des témoignages divers et des avis contradictoires pour offrir une perspective complète aux lecteurs.`
         }
       ];
     }
