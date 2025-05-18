@@ -12,6 +12,8 @@ export const generateStandardKeywords = (keyword: string): KeywordSuggestion[] =
       cpc: parseFloat((Math.random() * 2 + 0.5).toFixed(2)),
       competition: parseFloat((Math.random() * 0.7).toFixed(2)),
       relevance: 95,
+      type: 'standard',
+      intent: 'navigational',
     },
     {
       keyword: `meilleur ${keyword}`,
@@ -20,6 +22,8 @@ export const generateStandardKeywords = (keyword: string): KeywordSuggestion[] =
       cpc: parseFloat((Math.random() * 2.5 + 1).toFixed(2)),
       competition: parseFloat((Math.random() * 0.8).toFixed(2)),
       relevance: 85,
+      type: 'standard',
+      intent: 'commercial',
     },
     {
       keyword: `${keyword} pas cher`,
@@ -28,6 +32,8 @@ export const generateStandardKeywords = (keyword: string): KeywordSuggestion[] =
       cpc: parseFloat((Math.random() * 1.5 + 0.2).toFixed(2)),
       competition: parseFloat((Math.random() * 0.6).toFixed(2)),
       relevance: 80,
+      type: 'standard',
+      intent: 'transactional',
     },
     {
       keyword: `${keyword} en ligne`,
@@ -36,6 +42,8 @@ export const generateStandardKeywords = (keyword: string): KeywordSuggestion[] =
       cpc: parseFloat((Math.random() * 1.8 + 0.3).toFixed(2)),
       competition: parseFloat((Math.random() * 0.5).toFixed(2)),
       relevance: 75,
+      type: 'standard',
+      intent: 'navigational',
     },
     {
       keyword: `acheter ${keyword}`,
@@ -44,6 +52,8 @@ export const generateStandardKeywords = (keyword: string): KeywordSuggestion[] =
       cpc: parseFloat((Math.random() * 3 + 1).toFixed(2)),
       competition: parseFloat((Math.random() * 0.9).toFixed(2)),
       relevance: 90,
+      type: 'standard',
+      intent: 'transactional',
     }
   ];
 };
@@ -69,7 +79,9 @@ export const generateLongTailKeywords = (keyword: string): KeywordSuggestion[] =
       competition: parseFloat((Math.random() * 0.4).toFixed(2)),
       relevance: 70,
       type: 'long-tail',
-      intent: 'informational'
+      intent: 'informational',
+      opportunity: Math.floor(Math.random() * 40) + 60,
+      trend: generateTrendData(`${prefix} ${keyword}`)
     });
   }
   

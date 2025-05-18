@@ -1,118 +1,157 @@
 
 import React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { KeywordSuggestion } from '@/types/seo/Keyword';
-import { Button } from '@/components/ui/button';
-import { Check, PlusCircle, ChevronRight } from 'lucide-react';
-import { Progress } from '@/components/ui/progress';
+import { Info, TrendingUp, BarChart3, Target, MessageSquare } from 'lucide-react';
 
 interface KeywordCardProps {
   keywordData: KeywordSuggestion;
   isSelected?: boolean;
-  onToggleSelection?: (keyword: string) => void;
+  onToggleSelection: (keyword: string) => void;
+  showDetails?: boolean;
 }
 
-const KeywordCard: React.FC<KeywordCardProps> = ({
-  keywordData,
-  isSelected = false,
-  onToggleSelection
+const KeywordCard: React.FC<KeywordCardProps> = ({ 
+  keywordData, 
+  isSelected = false, 
+  onToggleSelection,
+  showDetails = false
 }) => {
-  const getDifficultyColor = (difficulty: number | undefined) => {
-    if (!difficulty) return "bg-gray-100";
-    return difficulty < 30 
-      ? "bg-green-500" 
-      : difficulty < 70 
-        ? "bg-yellow-500" 
-        : "bg-red-500";
+  // Fonction pour formater les nombres
+  const formatNumber = (num?: number) => {
+    if (num === undefined) return 'N/A';
+    return new Intl.NumberFormat().format(num);
   };
-
-  const getOpportunityLabel = (score: number | undefined) => {
-    if (!score) return "N/A";
-    return score > 70 
-      ? "Excellente" 
-      : score > 40 
-        ? "Moyenne" 
-        : "Faible";
+  
+  // Détermine la couleur de badge pour la difficulté
+  const getDifficultyBadge = () => {
+    const difficulty = keywordData.difficulty || 0;
+    if (difficulty < 30) return "bg-green-100 text-green-800 border-green-200";
+    if (difficulty < 60) return "bg-yellow-100 text-yellow-800 border-yellow-200";
+    return "bg-red-100 text-red-800 border-red-200";
   };
-
-  const handleToggle = () => {
-    if (onToggleSelection) {
-      onToggleSelection(keywordData.keyword);
-    }
+  
+  // Détermine le texte pour la difficulté
+  const getDifficultyText = () => {
+    const difficulty = keywordData.difficulty || 0;
+    if (difficulty < 30) return "Facile";
+    if (difficulty < 60) return "Modéré";
+    return "Difficile";
+  };
+  
+  // Détermine la couleur de badge pour le volume
+  const getVolumeBadge = () => {
+    const volume = keywordData.volume || 0;
+    if (volume < 500) return "bg-gray-100 text-gray-800 border-gray-200";
+    if (volume < 2000) return "bg-blue-100 text-blue-800 border-blue-200";
+    return "bg-indigo-100 text-indigo-800 border-indigo-200";
+  };
+  
+  // Détermine la couleur de badge pour le CPC
+  const getCpcBadge = () => {
+    const cpc = keywordData.cpc || 0;
+    if (cpc < 0.5) return "bg-gray-100 text-gray-800 border-gray-200";
+    if (cpc < 1.5) return "bg-emerald-100 text-emerald-800 border-emerald-200";
+    return "bg-purple-100 text-purple-800 border-purple-200";
   };
 
   return (
-    <Card className={`overflow-hidden transition-all ${isSelected ? 'border-blue-500 shadow-blue-100 shadow-md' : ''}`}>
-      <CardContent className="p-4">
-        <div className="flex justify-between items-start mb-3">
-          <h3 className="font-medium truncate pr-2">{keywordData.keyword}</h3>
-          {onToggleSelection && (
-            <Button 
-              variant={isSelected ? "secondary" : "ghost"} 
-              size="sm" 
-              onClick={handleToggle}
-              className="h-8 w-8 p-0"
-            >
-              {isSelected ? (
-                <Check className="h-4 w-4 text-blue-600" />
-              ) : (
-                <PlusCircle className="h-4 w-4 text-gray-500" />
-              )}
-            </Button>
+    <Card 
+      className={`p-3 transition-colors cursor-pointer hover:bg-slate-50 ${isSelected ? 'border-blue-400 bg-blue-50' : ''}`}
+      onClick={() => onToggleSelection(keywordData.keyword)}
+    >
+      <div className="flex justify-between items-start mb-2">
+        <h3 className={`font-medium text-sm ${isSelected ? 'text-blue-700' : 'text-gray-800'}`}>
+          {keywordData.keyword}
+        </h3>
+        <div className="flex gap-1">
+          {keywordData.difficulty !== undefined && (
+            <Badge variant="outline" className={getDifficultyBadge()}>
+              {getDifficultyText()}
+            </Badge>
           )}
         </div>
-
-        <div className="grid grid-cols-2 gap-2 text-sm mb-3">
-          <div>
-            <span className="text-gray-500 block text-xs">Volume</span>
-            <span className="font-medium">{keywordData.volume || 'N/A'}</span>
-          </div>
-          <div>
-            <span className="text-gray-500 block text-xs">CPC</span>
-            <span className="font-medium">{keywordData.cpc ? `${keywordData.cpc.toFixed(2)}€` : 'N/A'}</span>
-          </div>
-        </div>
-
-        <div className="mb-2">
-          <div className="flex justify-between items-center text-xs mb-1">
-            <span className="text-gray-500">Difficulté</span>
-            <span className="font-medium">{keywordData.difficulty || 'N/A'}</span>
-          </div>
-          <Progress 
-            value={keywordData.difficulty} 
-            className="h-1.5"
-            indicatorClassName={getDifficultyColor(keywordData.difficulty)}
-          />
-        </div>
-
-        <div className="mb-3">
-          <div className="flex justify-between items-center text-xs mb-1">
-            <span className="text-gray-500">Opportunité</span>
-            <span className="font-medium">{keywordData.opportunity || 'N/A'}</span>
-          </div>
-          <Progress 
-            value={keywordData.opportunity} 
-            className="h-1.5"
-            indicatorClassName="bg-blue-500"
-          />
-        </div>
-
-        {(keywordData.intent || keywordData.type) && (
-          <div className="flex flex-wrap gap-1 mt-2">
-            {keywordData.intent && (
-              <Badge variant="outline" className="text-xs px-1.5 py-0 h-5">
-                {keywordData.intent}
-              </Badge>
-            )}
-            {keywordData.type && (
-              <Badge variant="outline" className="text-xs px-1.5 py-0 h-5 bg-gray-50">
-                {keywordData.type}
-              </Badge>
-            )}
+      </div>
+      
+      <div className="grid grid-cols-2 gap-x-3 gap-y-1 mb-3 text-xs text-gray-600">
+        {keywordData.volume !== undefined && (
+          <div className="flex items-center gap-1">
+            <TrendingUp className="h-3 w-3" />
+            <span>Vol: {formatNumber(keywordData.volume)}</span>
           </div>
         )}
-      </CardContent>
+        
+        {keywordData.difficulty !== undefined && (
+          <div className="flex items-center gap-1">
+            <BarChart3 className="h-3 w-3" />
+            <span>Diff: {keywordData.difficulty}/100</span>
+          </div>
+        )}
+        
+        {keywordData.cpc !== undefined && (
+          <div className="flex items-center gap-1">
+            <Info className="h-3 w-3" />
+            <span>CPC: {keywordData.cpc.toFixed(2)}€</span>
+          </div>
+        )}
+        
+        {keywordData.competition !== undefined && (
+          <div className="flex items-center gap-1">
+            <Info className="h-3 w-3" />
+            <span>Comp: {Math.round(keywordData.competition * 100)}%</span>
+          </div>
+        )}
+      </div>
+      
+      {showDetails && (
+        <>
+          <div className="mb-2">
+            <div className="flex justify-between items-center text-xs mb-1">
+              <span>Difficulté</span>
+              <span className={keywordData.difficulty && keywordData.difficulty > 70 ? "text-red-600" : keywordData.difficulty && keywordData.difficulty > 40 ? "text-yellow-600" : "text-green-600"}>
+                {keywordData.difficulty}/100
+              </span>
+            </div>
+            <Progress 
+              value={keywordData.difficulty || 0} 
+              className="h-1.5 bg-gray-100"
+              aria-label="Difficulté du mot-clé"
+            />
+          </div>
+          
+          <div className="mb-3">
+            <div className="flex justify-between items-center text-xs mb-1">
+              <span>Opportunité</span>
+              <span className="text-blue-600">
+                {keywordData.opportunity || Math.floor(Math.random() * 30) + 50}/100
+              </span>
+            </div>
+            <Progress 
+              value={keywordData.opportunity || Math.floor(Math.random() * 30) + 50} 
+              className="h-1.5 bg-gray-100"
+              aria-label="Opportunité du mot-clé"
+            />
+          </div>
+          
+          {(keywordData.intent || keywordData.type) && (
+            <div className="flex gap-1 mt-2">
+              {keywordData.intent && (
+                <Badge variant="outline" className="text-[9px]">
+                  {keywordData.intent}
+                </Badge>
+              )}
+              
+              {keywordData.type && (
+                <Badge variant="outline" className="text-[9px]">
+                  {keywordData.type}
+                </Badge>
+              )}
+            </div>
+          )}
+        </>
+      )}
     </Card>
   );
 };

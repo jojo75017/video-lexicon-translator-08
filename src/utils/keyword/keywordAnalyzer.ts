@@ -24,7 +24,10 @@ export const enrichKeywords = (keywords: KeywordSuggestion[]): KeywordSuggestion
     ...kw,
     opportunity: calculateOpportunityScore(kw),
     serps: generateMockSerps(kw.keyword),
-    intent: kw.intent || determineKeywordIntent(kw.keyword)
+    intent: kw.intent || determineKeywordIntent(kw.keyword),
+    suggestedTitle: generateSuggestedTitle(kw.keyword),
+    suggestedDescription: generateSuggestedDescription(kw.keyword),
+    suggestedLongDescription: generateSuggestedLongDescription(kw.keyword)
   }));
 };
 
@@ -119,4 +122,77 @@ export const groupKeywordsByIntent = (keywords: KeywordSuggestion[]): Record<str
   });
   
   return groupedKeywords;
+};
+
+// Générer des données de tendance pour un mot-clé
+export const generateTrendData = (keyword: string): number[] => {
+  // Génère 12 points de données (un par mois)
+  return Array(12).fill(0).map(() => Math.floor(Math.random() * 100));
+};
+
+// Générer des compétiteurs fictifs pour un mot-clé
+export const generateCompetitors = (keyword: string): any[] => {
+  const competitors = [
+    { 
+      name: "competitor1.com", 
+      url: "https://www.competitor1.com", 
+      strength: 85, 
+      organic_traffic: 45000, 
+      keywords: 1200 
+    },
+    { 
+      name: "competitor2.com", 
+      url: "https://www.competitor2.com", 
+      strength: 72, 
+      organic_traffic: 28000, 
+      keywords: 850 
+    },
+    { 
+      name: "competitor3.com", 
+      url: "https://www.competitor3.com", 
+      strength: 63, 
+      organic_traffic: 17500, 
+      keywords: 520 
+    }
+  ];
+  
+  return competitors;
+};
+
+// Générer un titre suggéré pour un mot-clé
+export const generateSuggestedTitle = (keyword: string): string => {
+  const templates = [
+    `Guide Complet: ${keyword} - Tout Ce Que Vous Devez Savoir en ${new Date().getFullYear()}`,
+    `Les 10 Meilleurs Conseils pour ${keyword} [Guide Actualisé]`,
+    `Comment Optimiser Votre ${keyword} - Conseils d'Experts`,
+    `${keyword}: Stratégies Efficaces et Astuces Professionnelles`,
+    `Le Guide Ultime du ${keyword} pour les Débutants et Experts`
+  ];
+  
+  return templates[Math.floor(Math.random() * templates.length)];
+};
+
+// Générer une description suggérée pour un mot-clé
+export const generateSuggestedDescription = (keyword: string): string => {
+  const templates = [
+    `Découvrez nos conseils experts sur ${keyword}. Guide complet avec stratégies efficaces et méthodes éprouvées pour améliorer vos résultats.`,
+    `Tout ce que vous devez savoir sur ${keyword}. Astuces, bonnes pratiques et erreurs à éviter pour optimiser votre approche.`,
+    `Guide pratique sur ${keyword} avec exemples concrets et démarche pas à pas. Conseils actualisés pour ${new Date().getFullYear()}.`,
+    `Explorez nos ressources sur ${keyword} et améliorez vos performances grâce à nos techniques éprouvées et conseils d'experts.`
+  ];
+  
+  return templates[Math.floor(Math.random() * templates.length)];
+};
+
+// Générer une description longue pour un mot-clé
+export const generateSuggestedLongDescription = (keyword: string): string => {
+  const templates = [
+    `Bienvenue dans notre guide complet sur ${keyword}. Nous avons rassemblé pour vous les meilleures pratiques, conseils d'experts et stratégies éprouvées pour vous aider à maîtriser ce sujet. Que vous soyez débutant ou expert, vous trouverez des informations précieuses pour améliorer vos résultats et éviter les erreurs courantes. Notre équipe a analysé les dernières tendances et méthodes pour vous proposer un contenu actualisé et pertinent.`,
+    
+    `Découvrez comment optimiser votre approche de ${keyword} grâce à notre guide détaillé. Nous abordons tous les aspects essentiels avec une méthodologie claire et des exemples concrets. Apprenez à identifier les opportunités, surmonter les obstacles communs et mettre en place des stratégies efficaces. Ce guide s'appuie sur des années d'expérience et de recherche pour vous offrir les informations les plus pertinentes et actuelles.`,
+    
+    `Vous cherchez à améliorer vos connaissances sur ${keyword}? Notre guide exhaustif couvre tous les aspects importants que vous devez maîtriser. De la théorie fondamentale aux techniques avancées, nous explorons chaque facette avec des explications claires et des conseils pratiques. Restez à jour avec les meilleures pratiques et évitez les pièges courants grâce à nos recommandations basées sur l'expertise de professionnels du secteur.`
+  ];
+  
+  return templates[Math.floor(Math.random() * templates.length)];
 };

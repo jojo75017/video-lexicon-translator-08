@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -21,7 +22,7 @@ import {
   Tag
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { KeywordSuggestion } from '@/types/seo';
+import { KeywordSuggestion } from '@/types/seo/Keyword';
 import KeywordResults from './keyword/KeywordResults';
 import KeywordCard from './keyword/KeywordCard';
 import { 
@@ -32,7 +33,14 @@ import {
   generateTrendData,
   sortKeywordsByScore
 } from '@/utils/keyword/keywordGeneratorUtils';
-import { determineKeywordIntent, enrichKeywords, generateQuestionKeywords } from '@/utils/keyword/keywordAnalyzer';
+import { 
+  determineKeywordIntent, 
+  enrichKeywords, 
+  generateQuestionKeywords, 
+  generateSuggestedTitle, 
+  generateSuggestedDescription,
+  generateSuggestedLongDescription
+} from '@/utils/keyword/keywordAnalyzer';
 
 const KeywordGenerator = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -84,7 +92,10 @@ const KeywordGenerator = () => {
           type: 'question' as 'question',
           intent: 'informational' as 'informational',
           opportunity: Math.floor(Math.random() * 30) + 60,
-          trend: generateTrendData(q)
+          trend: generateTrendData(q),
+          suggestedTitle: generateSuggestedTitle(q),
+          suggestedDescription: generateSuggestedDescription(q),
+          suggestedLongDescription: generateSuggestedLongDescription(q)
         }));
         
         // Enrichir les mots-clés avec des données supplémentaires
