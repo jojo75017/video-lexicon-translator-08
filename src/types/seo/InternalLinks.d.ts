@@ -29,7 +29,7 @@ export interface InternalLinkRecommendation {
   reason: string;
   priority: "high" | "medium" | "low";
   description?: string;
-  impact?: string;
+  impact?: string | number;
 }
 
 export interface PageLinkMetric {

@@ -5,9 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { ArrowUpRight, Link2, Link2Off, Network, BarChart3, FilePlus, AlertTriangle, CheckCircle2 } from 'lucide-react';
-import { PageLinkMetric, OrphanPage } from '@/types/seo/PageLinkMetric';
+import { ArrowUpRight, Link2, Link2Off, Network, BarChart3, FilePlus, AlertTriangle, CheckCircle2, ArrowRight, Target, Layers } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { PageLinkMetric, OrphanPage, InternalLinkRecommendation } from '@/types/seo/InternalLinks';
 
 interface InternalLinkAnalyzerProps {
   pages?: PageLinkMetric[];
@@ -17,6 +17,7 @@ interface InternalLinkAnalyzerProps {
   averageOutgoing?: number;
   averageDepth?: number;
   depthDistribution?: Record<string, number>;
+  recommendations?: InternalLinkRecommendation[];
 }
 
 const InternalLinkAnalyzer: React.FC<InternalLinkAnalyzerProps> = ({
@@ -26,7 +27,8 @@ const InternalLinkAnalyzer: React.FC<InternalLinkAnalyzerProps> = ({
   totalLinks = 0,
   averageOutgoing = 0,
   averageDepth = 0,
-  depthDistribution = {}
+  depthDistribution = {},
+  recommendations = []
 }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [metrics, setMetrics] = useState({
@@ -157,6 +159,31 @@ const InternalLinkAnalyzer: React.FC<InternalLinkAnalyzerProps> = ({
       return `${domain}${path.substring(0, 12)}...`;
     } catch {
       return url.substring(0, 27) + "...";
+    }
+  };
+
+  // Group recommendations by priority
+  const groupedRecommendations = recommendations.reduce((acc, rec) => {
+    if (!acc[rec.priority]) {
+      acc[rec.priority] = [];
+    }
+    acc[rec.priority].push(rec);
+    return acc;
+  }, { high: [], medium: [], low: [] } as Record<string, InternalLinkRecommendation[]>);
+  
+  // Get recommendation icon based on type
+  const getRecommendationIcon = (type: string) => {
+    switch(type) {
+      case 'add':
+        return <FilePlus className="h-4 w-4 text-green-500" />;
+      case 'modify':
+        return <ArrowRight className="h-4 w-4 text-blue-500" />;
+      case 'content':
+        return <Link2 className="h-4 w-4 text-purple-500" />;
+      case 'pillar':
+        return <Layers className="h-4 w-4 text-amber-500" />;
+      default:
+        return <Target className="h-4 w-4 text-gray-500" />;
     }
   };
   
@@ -426,17 +453,90 @@ const InternalLinkAnalyzer: React.FC<InternalLinkAnalyzerProps> = ({
               </Alert>
             )}
             
-            {linkScore >= 80 && orphanedPages.length === 0 && metrics.maxDepth <= 3 && (
-              <Alert className="border-green-200 bg-green-50">
-                <CheckCircle2 className="h-4 w-4 text-green-500" />
-                <AlertTitle className="text-green-700">
-                  Excellent maillage interne
-                </AlertTitle>
-                <AlertDescription className="text-sm text-green-700">
-                  Votre maillage interne est bien structuré avec une bonne densité de liens et une profondeur optimale.
-                </AlertDescription>
-              </Alert>
-            )}
+            {/* Specific recommendations section */}
+            <div className="bg-white p-4 rounded-lg border border-gray-200 mb-4">
+              <h3 className="text-sm font-medium mb-3">Placement recommandé des liens</h3>
+              
+              {recommendations.length > 0 ? (
+                <div className="space-y-4">
+                  {groupedRecommendations.high.length > 0 && (
+                    <div className="space-y-2">
+                      <h4 className="text-xs font-medium text-red-700">Priorité haute</h4>
+                      {groupedRecommendations.high.map((rec, idx) => (
+                        <div key={`high-${idx}`} className="p-3 bg-red-50 rounded-md border border-red-100">
+                          <div className="flex items-start">
+                            {getRecommendationIcon(rec.type)}
+                            <div className="ml-2">
+                              <div className="text-sm font-medium">{rec.description}</div>
+                              <div className="text-xs text-gray-600 mt-1">{rec.reason}</div>
+                              {rec.source && rec.target && (
+                                <div className="text-xs text-blue-600 mt-2 flex items-center">
+                                  <span className="truncate max-w-[150px]">{getTruncatedUrl(rec.source)}</span>
+                                  <ArrowRight className="h-3 w-3 mx-1" />
+                                  <span className="truncate max-w-[150px]">{getTruncatedUrl(rec.target)}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {groupedRecommendations.medium.length > 0 && (
+                    <div className="space-y-2">
+                      <h4 className="text-xs font-medium text-amber-700">Priorité moyenne</h4>
+                      {groupedRecommendations.medium.map((rec, idx) => (
+                        <div key={`med-${idx}`} className="p-3 bg-amber-50 rounded-md border border-amber-100">
+                          <div className="flex items-start">
+                            {getRecommendationIcon(rec.type)}
+                            <div className="ml-2">
+                              <div className="text-sm font-medium">{rec.description}</div>
+                              <div className="text-xs text-gray-600 mt-1">{rec.reason}</div>
+                              {rec.source && rec.target && (
+                                <div className="text-xs text-blue-600 mt-2 flex items-center">
+                                  <span className="truncate max-w-[150px]">{getTruncatedUrl(rec.source)}</span>
+                                  <ArrowRight className="h-3 w-3 mx-1" />
+                                  <span className="truncate max-w-[150px]">{getTruncatedUrl(rec.target)}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {groupedRecommendations.low.length > 0 && (
+                    <div className="space-y-2">
+                      <h4 className="text-xs font-medium text-blue-700">Priorité faible</h4>
+                      {groupedRecommendations.low.map((rec, idx) => (
+                        <div key={`low-${idx}`} className="p-3 bg-blue-50 rounded-md border border-blue-100">
+                          <div className="flex items-start">
+                            {getRecommendationIcon(rec.type)}
+                            <div className="ml-2">
+                              <div className="text-sm font-medium">{rec.description}</div>
+                              <div className="text-xs text-gray-600 mt-1">{rec.reason}</div>
+                              {rec.source && rec.target && (
+                                <div className="text-xs text-blue-600 mt-2 flex items-center">
+                                  <span className="truncate max-w-[150px]">{getTruncatedUrl(rec.source)}</span>
+                                  <ArrowRight className="h-3 w-3 mx-1" />
+                                  <span className="truncate max-w-[150px]">{getTruncatedUrl(rec.target)}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-6 text-gray-500">
+                  Entrez une URL et lancez l'analyse pour obtenir des recommandations de placement de liens.
+                </div>
+              )}
+            </div>
             
             <div className="bg-blue-50 p-4 rounded-md">
               <h3 className="text-sm font-medium mb-3 text-blue-800">Améliorations prioritaires</h3>
@@ -481,4 +581,3 @@ const InternalLinkAnalyzer: React.FC<InternalLinkAnalyzerProps> = ({
 };
 
 export default InternalLinkAnalyzer;
-
