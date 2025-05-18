@@ -24,38 +24,40 @@ interface KeywordSuggestion {
 const maxTitleLength = 60;
 const maxDescriptionLength = 155;
 
-// Définition des suggestions de mots-clés par défaut
+// Définition des suggestions de mots-clés par défaut - diversifiées
 const defaultSuggestions: KeywordSuggestion[] = [
+  // Voyage
   { 
-    keyword: "marketing digital", 
+    keyword: "voyage en finlande", 
     volume: 1200, 
     difficulty: 32, 
     cpc: 1.5, 
     competition: 0.4, 
     relevance: 95,
-    suggestedTitle: "Marketing Digital : Guide Complet des Stratégies Efficaces en 2023",
-    suggestedDescription: "Découvrez les meilleures pratiques de marketing digital pour développer votre entreprise. Stratégies, outils et conseils d'experts."
+    suggestedTitle: "Voyage en Finlande : Guide Complet des Activités et Sites Incontournables",
+    suggestedDescription: "Découvrez la Finlande avec notre guide de voyage : aurores boréales, lac, saunas et nature préservée. Conseils pratiques et itinéraires pour un séjour inoubliable."
   },
   { 
-    keyword: "référencement naturel", 
+    keyword: "circuits corse", 
     volume: 880, 
     difficulty: 28, 
     cpc: 2.2, 
     competition: 0.3, 
     relevance: 90,
-    suggestedTitle: "Référencement Naturel (SEO) : Techniques pour Améliorer votre Visibilité",
-    suggestedDescription: "Améliorez votre référencement naturel avec nos conseils SEO. Augmentez votre visibilité et votre trafic organique grâce à nos techniques éprouvées."
+    suggestedTitle: "Circuits en Corse : Itinéraires Pour Découvrir l'Île de Beauté",
+    suggestedDescription: "Planifiez votre circuit en Corse avec nos itinéraires personnalisés : plages paradisiaques, montagnes majestueuses et villages authentiques. Guide complet."
   },
+  // Aquariophilie
   { 
-    keyword: "stratégie de contenu", 
+    keyword: "aquarium eau douce", 
     volume: 590, 
     difficulty: 15, 
     cpc: 0.8, 
     competition: 0.2, 
     relevance: 85,
-    suggestedTitle: "Stratégie de Contenu : Comment Créer du Contenu qui Convertit",
-    suggestedDescription: "Apprenez à développer une stratégie de contenu efficace qui engage vos lecteurs et convertit vos visiteurs en clients. Guide étape par étape."
-  }
+    suggestedTitle: "Aquarium Eau Douce : Guide Complet pour Débutants et Confirmés",
+    suggestedDescription: "Découvrez comment créer et entretenir un magnifique aquarium d'eau douce. Conseils sur les poissons, plantes, filtration et maintenance pour un écosystème équilibré."
+  },
 ];
 
 export const KeywordMetaContent: React.FC = () => {

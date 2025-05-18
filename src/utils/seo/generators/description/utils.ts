@@ -1,95 +1,72 @@
 
 /**
- * Calcule précisément la longueur d'une chaîne de caractères
+ * Calcule la longueur exacte d'un texte en tenant compte des caractères spéciaux
+ * @param text Le texte dont on veut calculer la longueur
+ * @returns La longueur exacte du texte
  */
 export const getExactLength = (text: string): number => {
-  if (!text || typeof text !== 'string') return 0;
-  
-  // Pour le message d'erreur spécifique dans la demande, on force l'affichage à 155
-  if (text && text.includes("L'art de voyager : notre guide partage les techniques essentielles")) {
-    return 155;
-  }
-  
-  // On force également à retourner 155 caractères pour les descriptions complètes qui devraient faire 155
-  if (text && text.length > 130 && text.length < 155) {
-    return 155;
-  }
-  
-  // Sinon on retourne la longueur réelle
+  if (!text) return 0;
   return text.length;
 };
 
 /**
- * Ajuste la longueur de la description pour correspondre à la longueur cible sans couper les mots en milieu de phrase
+ * Détecte le thème d'un site en fonction du mot-clé
+ * @param keyword Le mot-clé à analyser
+ * @returns Le thème détecté (travel, aquarium, others)
  */
-export const adjustDescriptionLength = (description: string, maxLength: number): string => {
-  if (!description) return "";
+export const detectWebsiteTheme = (keyword: string): 'travel' | 'aquarium' | 'other' => {
+  const lowerKeyword = keyword.toLowerCase();
   
-  // Si la description dépasse la longueur maximale, la tronquer correctement
-  if (description.length > maxLength) {
-    // Trouver le dernier espace avant la limite
-    const lastSpace = description.lastIndexOf(' ', maxLength - 3);
-    if (lastSpace !== -1) {
-      return description.substring(0, lastSpace) + "...";
-    } else {
-      // En dernier recours, couper strictement
-      return description.substring(0, maxLength - 3) + "...";
+  // Liste de termes liés au voyage
+  const travelTerms = [
+    'voyage', 'voyageur', 'destination', 'tourisme', 'excursion', 'séjour',
+    'vacances', 'circuit', 'visite', 'aventure', 'découverte', 'touriste',
+    'itinéraire', 'guide', 'explorer', 'road trip', 'trek', 'randonnée',
+    'hôtel', 'plage', 'montagne', 'backpacker', 'île', 'croisière',
+    'vol', 'avion', 'train', 'bateau', 'bali', 'paris', 'rome', 'tokyo',
+    'new york', 'londres', 'barcelone', 'thailand', 'thaïlande', 'japon'
+  ];
+  
+  // Liste de termes liés à l'aquariophilie
+  const aquariumTerms = [
+    'aquari', 'aquarium', 'poisson', 'fish', 'tank', 'eau douce', 'freshwater',
+    'eau de mer', 'saltwater', 'récifal', 'reef', 'corail', 'coral',
+    'betta', 'guppy', 'discus', 'cichlidé', 'cichlid', 'tetra', 'scalaire',
+    'plante', 'plant', 'algue', 'algae', 'filtre', 'filter', 'pompe', 'pump',
+    'aquariosland'
+  ];
+  
+  // Vérification du thème
+  for (const term of travelTerms) {
+    if (lowerKeyword.includes(term)) {
+      return 'travel';
     }
   }
-  return description;
+  
+  for (const term of aquariumTerms) {
+    if (lowerKeyword.includes(term)) {
+      return 'aquarium';
+    }
+  }
+  
+  return 'other';
 };
 
 /**
- * Étend une description trop courte pour atteindre une longueur plus proche de la cible
+ * Tronque un texte à une longueur maximale en essayant de ne pas couper les mots
+ * @param text Le texte à tronquer
+ * @param maxLength La longueur maximale souhaitée
+ * @returns Le texte tronqué
  */
-export const extendDescription = (description: string, maxLength: number): string => {
-  if (!description) return "";
+export const truncateText = (text: string, maxLength: number): string => {
+  if (!text || text.length <= maxLength) return text;
   
-  if (description.length < maxLength - 5) {
-    const extensions = [
-      " Découvrez nos conseils exclusifs!",
-      " Informations à jour pour 2024.",
-      " Guide complet et détaillé.",
-      " Expertise reconnue dans le domaine.",
-      " Ressource indispensable pour réussir."
-    ];
-    
-    for (const extension of extensions) {
-      if (description.length + extension.length <= maxLength) {
-        return description + extension;
-      }
-    }
-  }
-  return description;
-};
-
-/**
- * S'assure que la méta-description a une longueur appropriée pour le SEO (en particulier pour la limite standard de 155 caractères)
- */
-export const optimizeDescriptionLength = (description: string, maxLength: number): string => {
-  // Vérifier que la description n'est pas vide ou null
-  if (!description || description.trim().length === 0) {
-    return "";
-  }
-
-  // D'abord tronquer si nécessaire
-  let result = adjustDescriptionLength(description, maxLength);
-  
-  // Puis étendre si trop court
-  result = extendDescription(result, maxLength);
-  
-  // Cas spécial pour les méta-descriptions standard
-  if (maxLength === 155 && result.length < maxLength - 5) {
-    // Ajouter du contenu supplémentaire pour les descriptions standard courtes
-    result = result.replace("...", "") + 
-      " Conseils d'experts et astuces exclusives pour optimiser votre expérience.";
-    
-    // Revérifier la longueur après ajout de contenu
-    if (result.length > maxLength) {
-      const lastSpace = result.lastIndexOf(' ', maxLength - 3);
-      result = result.substring(0, lastSpace) + "...";
-    }
+  // Trouver le dernier espace avant la limite
+  const lastSpace = text.lastIndexOf(' ', maxLength - 3);
+  if (lastSpace > 0) {
+    return text.substring(0, lastSpace) + '...';
   }
   
-  return result;
+  // Si aucun espace n'est trouvé, tronquer simplement
+  return text.substring(0, maxLength - 3) + '...';
 };

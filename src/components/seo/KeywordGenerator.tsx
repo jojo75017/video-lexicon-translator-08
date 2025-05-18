@@ -27,6 +27,135 @@ interface KeywordSuggestion {
   clicks?: number;
 }
 
+// Nouvelle fonction pour générer des suggestions basées sur le mot-clé de l'utilisateur
+const generateKeywordSuggestions = (keyword: string): KeywordSuggestion[] => {
+  // Bases des suggestions que nous allons personnaliser
+  let suggestions: KeywordSuggestion[] = [];
+  
+  // Adapter les suggestions en fonction du thème détecté
+  const keywordLowerCase = keyword.toLowerCase();
+  
+  // Mots-clés liés au voyage
+  if (keywordLowerCase.includes('voyage') || 
+      keywordLowerCase.includes('tourisme') || 
+      keywordLowerCase.includes('visiter') ||
+      keywordLowerCase.includes('destination') ||
+      keywordLowerCase.includes('vacances')) {
+    suggestions = [
+      { 
+        keyword: `${keyword} insolite`, 
+        volume: Math.floor(Math.random() * 500) + 500, 
+        competition: 0.3, 
+        cpc: 1.2 + Math.random() 
+      },
+      { 
+        keyword: `meilleur ${keyword}`, 
+        volume: Math.floor(Math.random() * 700) + 800, 
+        competition: 0.5, 
+        cpc: 1.8 + Math.random() 
+      },
+      { 
+        keyword: `${keyword} pas cher`, 
+        volume: Math.floor(Math.random() * 1000) + 1000, 
+        competition: 0.6, 
+        cpc: 2.0 + Math.random() 
+      },
+      { 
+        keyword: `${keyword} famille`,
+        volume: Math.floor(Math.random() * 600) + 400, 
+        competition: 0.4, 
+        cpc: 1.5 + Math.random() 
+      },
+      { 
+        keyword: `conseils ${keyword}`,
+        volume: Math.floor(Math.random() * 400) + 300, 
+        competition: 0.2, 
+        cpc: 1.0 + Math.random() 
+      }
+    ];
+  } 
+  // Mots-clés liés à l'aquariophilie
+  else if (keywordLowerCase.includes('aquari') || 
+           keywordLowerCase.includes('poisson') || 
+           keywordLowerCase.includes('betta') ||
+           keywordLowerCase.includes('aquatique')) {
+    suggestions = [
+      { 
+        keyword: `entretien ${keyword}`, 
+        volume: Math.floor(Math.random() * 400) + 300, 
+        competition: 0.2, 
+        cpc: 0.8 + Math.random() 
+      },
+      { 
+        keyword: `${keyword} débutant`, 
+        volume: Math.floor(Math.random() * 600) + 500, 
+        competition: 0.3, 
+        cpc: 0.9 + Math.random() 
+      },
+      { 
+        keyword: `meilleur ${keyword}`, 
+        volume: Math.floor(Math.random() * 300) + 200, 
+        competition: 0.4, 
+        cpc: 1.1 + Math.random() 
+      },
+      { 
+        keyword: `${keyword} prix`,
+        volume: Math.floor(Math.random() * 500) + 400, 
+        competition: 0.5, 
+        cpc: 1.3 + Math.random() 
+      },
+      { 
+        keyword: `alimentation ${keyword}`,
+        volume: Math.floor(Math.random() * 350) + 250, 
+        competition: 0.2, 
+        cpc: 0.7 + Math.random() 
+      }
+    ];
+  }
+  // Autres mots-clés plus génériques
+  else {
+    suggestions = [
+      { 
+        keyword: `${keyword} guide`, 
+        volume: Math.floor(Math.random() * 600) + 500, 
+        competition: 0.3, 
+        cpc: 1.0 + Math.random() 
+      },
+      { 
+        keyword: `meilleur ${keyword}`, 
+        volume: Math.floor(Math.random() * 800) + 700, 
+        competition: 0.5, 
+        cpc: 1.5 + Math.random() 
+      },
+      { 
+        keyword: `${keyword} comparatif`, 
+        volume: Math.floor(Math.random() * 500) + 400, 
+        competition: 0.4, 
+        cpc: 1.2 + Math.random() 
+      },
+      { 
+        keyword: `${keyword} tutoriel`,
+        volume: Math.floor(Math.random() * 400) + 300, 
+        competition: 0.2, 
+        cpc: 0.8 + Math.random() 
+      },
+      { 
+        keyword: `conseils ${keyword}`,
+        volume: Math.floor(Math.random() * 300) + 200, 
+        competition: 0.3, 
+        cpc: 0.9 + Math.random() 
+      }
+    ];
+  }
+  
+  // Ajouter des attributs manquants aux suggestions
+  return suggestions.map(suggestion => ({
+    ...suggestion,
+    difficulty: Math.floor(Math.random() * 70) + 10,
+    relevance: Math.floor(Math.random() * 30) + 70,
+  }));
+};
+
 interface KeywordGeneratorProps {
   onGenerateClick?: () => void;
   fieldValue?: string;
@@ -87,13 +216,8 @@ const KeywordGenerator: React.FC<KeywordGeneratorProps> = ({
     clearInterval(interval);
     setGenerationProgress(100);
 
-    const mockKeywords: KeywordSuggestion[] = [
-      { keyword: `${keyword} tips`, volume: 1200, competition: 0.5, cpc: 1.2 },
-      { keyword: `best ${keyword}`, volume: 900, competition: 0.3, cpc: 1.5 },
-      { keyword: `${keyword} guide`, volume: 700, competition: 0.4, cpc: 1.0 },
-      { keyword: `how to ${keyword}`, volume: 1500, competition: 0.6, cpc: 1.8 },
-      { keyword: `${keyword} tutorial`, volume: 800, competition: 0.2, cpc: 0.9 },
-    ];
+    // Utiliser notre nouvelle fonction pour générer des suggestions pertinentes
+    const mockKeywords = generateKeywordSuggestions(keyword);
 
     setGeneratedKeywords(mockKeywords);
     setIsGenerating(false);

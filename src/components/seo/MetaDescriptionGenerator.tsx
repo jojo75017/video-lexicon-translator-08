@@ -71,7 +71,7 @@ const MetaDescriptionGenerator = () => {
           <div className="grid grid-cols-4 gap-4">
             <div className="col-span-3">
               <Input
-                placeholder="Entrez votre mot-clé principal (ex: digital nomad à Bali, voyage à Paris, etc.)"
+                placeholder="Entrez votre mot-clé principal (ex: aquariophilie, voyage à Paris, etc.)"
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
                 className="w-full"
