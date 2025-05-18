@@ -232,10 +232,11 @@ const ContentStructureAnalyzer: React.FC<ContentStructureAnalyzerProps> = ({
               <Progress 
                 className="h-2" 
                 value={overallScore} 
-                indicatorColor={
+                // Fixed: removed indicatorColor prop and used className for styling
+                className={`h-2 ${
                   overallScore >= 80 ? "bg-green-600" :
                   overallScore >= 60 ? "bg-amber-500" : "bg-red-500"
-                }
+                }`}
               />
             </div>
             
@@ -312,7 +313,7 @@ const ContentStructureAnalyzer: React.FC<ContentStructureAnalyzerProps> = ({
                     <Check className="h-4 w-4 text-green-600" /> :
                     <AlertTriangle className="h-4 w-4 text-red-600" />
                   }
-                  <span className="text-sm text-gray-500">{h1Count === 1 ? "Parfait" : h1Count === 0 ? "Manquant" : "Trop nombreux"}</span>
+                  <span className="text-sm text-gray-500">{h1Count === 1 ? "Parfait" : h1Count > 1 ? "Trop nombreux" : "Manquant"}</span>
                 </div>
                 
                 <div className="flex items-center space-x-2 bg-gray-50 p-3 rounded-md">
@@ -322,17 +323,13 @@ const ContentStructureAnalyzer: React.FC<ContentStructureAnalyzerProps> = ({
                     <Check className="h-4 w-4 text-green-600" /> :
                     <AlertTriangle className="h-4 w-4 text-amber-600" />
                   }
-                  <span className="text-sm text-gray-500">{h2Count > 0 ? "Bien" : "Manquant"}</span>
+                  <span className="text-sm text-gray-500">{h2Count > 0 ? "Présents" : "Manquants"}</span>
                 </div>
                 
                 <div className="flex items-center space-x-2 bg-gray-50 p-3 rounded-md">
-                  <Badge variant={h3Count > 0 ? "default" : "outline"}>H3</Badge>
+                  <Badge variant="outline">H3+</Badge>
                   <span>{h3Count}</span>
-                  {h3Count > 0 ? 
-                    <Check className="h-4 w-4 text-green-600" /> :
-                    <Info className="h-4 w-4 text-amber-600" />
-                  }
-                  <span className="text-sm text-gray-500">{h3Count > 0 ? "Bien" : "Recommandé"}</span>
+                  <span className="text-sm text-gray-500">Sous-titres</span>
                 </div>
               </div>
             </div>
@@ -340,243 +337,39 @@ const ContentStructureAnalyzer: React.FC<ContentStructureAnalyzerProps> = ({
             <Separator />
             
             <div>
-              <h3 className="text-base font-medium mb-2">Détail du contenu</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-gray-50 p-3 rounded-md">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm text-gray-500">Densité de mots</span>
-                    <span className={`text-sm ${wordCount >= 300 ? "text-green-600" : "text-amber-600"}`}>
-                      {wordCount >= 300 
-                        ? wordCount >= 1000 ? "Excellente" : "Bonne" 
-                        : wordCount >= 200 ? "Moyenne" : "Faible"}
-                    </span>
-                  </div>
-                  <Progress 
-                    className="h-1.5 mb-1" 
-                    value={Math.min(100, wordCount / 10)} 
-                  />
-                  <div className="flex justify-between text-xs text-gray-400">
-                    <span>0</span>
-                    <span>500</span>
-                    <span>1000</span>
-                  </div>
-                </div>
-                
-                <div className="bg-gray-50 p-3 rounded-md">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm text-gray-500">Paragraphes</span>
-                    <span className={`text-sm ${
-                      paragraphCount >= 5 ? "text-green-600" : "text-amber-600"
-                    }`}>
-                      {paragraphCount >= 10 ? "Nombreux" : 
-                       paragraphCount >= 5 ? "Bien" : "Peu"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs">Mots/paragraphe:</span>
-                    <span className="text-xs font-medium">
-                      {paragraphCount > 0 ? Math.round(wordCount / paragraphCount) : 0}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <Separator />
-            
-            <div>
-              <h3 className="text-base font-medium mb-2">Médias et ressources</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-gray-50 p-3 rounded-md">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm text-gray-500">Images</span>
-                    <span className={`text-sm ${
-                      imgCount > 0 ? "text-green-600" : "text-amber-600"
-                    }`}>
-                      {imgCount > 5 ? "Nombreuses" : 
-                       imgCount > 0 ? "Présentes" : "Aucune"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs">Attributs alt manquants:</span>
-                    <span className={`text-xs font-medium ${
-                      missingAltCount > 0 ? "text-red-600" : "text-green-600"
-                    }`}>
-                      {missingAltCount} / {imgCount}
-                    </span>
-                  </div>
-                </div>
-                
-                <div className="bg-gray-50 p-3 rounded-md">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm text-gray-500">Ratio texte/médias</span>
-                    <span className={`text-sm ${
-                      imgCount > 0 && paragraphCount / imgCount <= 5 
-                        ? "text-green-600" : "text-amber-600"
-                    }`}>
-                      {imgCount > 0
-                        ? paragraphCount / imgCount <= 3
-                          ? "Équilibré" 
-                          : paragraphCount / imgCount <= 5
-                            ? "Bon"
-                            : "Trop de texte"
-                        : "N/A"}
-                    </span>
-                  </div>
-                  <Progress 
-                    className="h-1.5" 
-                    value={imgCount > 0 ? Math.min(100, 100 - ((paragraphCount / imgCount - 3) * 10)) : 0} 
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-xl font-bold flex items-center">
-            <ArrowRight className="mr-2 h-5 w-5 text-green-600" />
-            Recommandations d'amélioration détaillées
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-6">
-            {/* Suggestions prioritaires */}
-            <div>
-              <h3 className="text-sm font-medium mb-3 flex items-center">
-                <AlertTriangle className="h-4 w-4 mr-2 text-red-500" />
-                Améliorations critiques
-              </h3>
-              
-              {suggestions.filter(s => s.priority === "high").length > 0 ? (
-                <div className="space-y-3">
-                  {suggestions
-                    .filter(s => s.priority === "high")
-                    .map((suggestion, index) => (
-                      <div key={`high-${index}`} className="bg-red-50 border border-red-100 rounded-md p-3">
-                        <div className="font-medium text-red-900">{suggestion.title}</div>
-                        <p className="text-sm text-red-700 mt-1">{suggestion.description}</p>
+              <h3 className="text-base font-medium mb-2">Suggestions d'amélioration</h3>
+              <div className="space-y-3">
+                {suggestions.map((suggestion, index) => (
+                  <div key={index} className={`p-3 rounded-md border ${
+                    suggestion.priority === "high" ? "border-red-200 bg-red-50" :
+                    suggestion.priority === "medium" ? "border-amber-200 bg-amber-50" :
+                    "border-blue-200 bg-blue-50"
+                  }`}>
+                    <div className="flex items-start gap-3">
+                      {suggestion.priority === "high" ? (
+                        <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5" />
+                      ) : suggestion.priority === "medium" ? (
+                        <Info className="h-5 w-5 text-amber-600 mt-0.5" />
+                      ) : (
+                        <ArrowRight className="h-5 w-5 text-blue-600 mt-0.5" />
+                      )}
+                      <div>
+                        <h4 className="text-sm font-medium">{suggestion.title}</h4>
+                        <p className="text-xs text-gray-600 mt-1">{suggestion.description}</p>
                       </div>
-                    ))
-                  }
-                </div>
-              ) : (
-                <div className="bg-green-50 border border-green-100 rounded-md p-3">
-                  <div className="flex items-center">
-                    <Check className="h-5 w-5 text-green-600 mr-2" />
-                    <div className="font-medium text-green-800">Aucun problème critique détecté</div>
-                  </div>
-                </div>
-              )}
-            </div>
-            
-            {/* Suggestions moyennes */}
-            <div>
-              <h3 className="text-sm font-medium mb-3 flex items-center">
-                <Info className="h-4 w-4 mr-2 text-amber-500" />
-                Améliorations recommandées
-              </h3>
-              
-              <div className="space-y-3">
-                {suggestions
-                  .filter(s => s.priority === "medium")
-                  .map((suggestion, index) => (
-                    <div key={`medium-${index}`} className="bg-amber-50 border border-amber-100 rounded-md p-3">
-                      <div className="font-medium text-amber-900">{suggestion.title}</div>
-                      <p className="text-sm text-amber-700 mt-1">{suggestion.description}</p>
-                    </div>
-                  ))
-                }
-                
-                {suggestions.filter(s => s.priority === "medium").length === 0 && (
-                  <div className="bg-green-50 border border-green-100 rounded-md p-3">
-                    <div className="flex items-center">
-                      <Check className="h-5 w-5 text-green-600 mr-2" />
-                      <div className="font-medium text-green-800">Pas d'améliorations recommandées</div>
                     </div>
                   </div>
-                )}
-              </div>
-            </div>
-            
-            {/* Suggestions secondaires */}
-            <div>
-              <h3 className="text-sm font-medium mb-3 flex items-center">
-                <Heart className="h-4 w-4 mr-2 text-blue-500" />
-                Améliorations optionnelles
-              </h3>
-              
-              <div className="space-y-3">
-                {suggestions
-                  .filter(s => s.priority === "low")
-                  .map((suggestion, index) => (
-                    <div key={`low-${index}`} className="bg-blue-50 border border-blue-100 rounded-md p-3">
-                      <div className="font-medium text-blue-900">{suggestion.title}</div>
-                      <p className="text-sm text-blue-700 mt-1">{suggestion.description}</p>
-                    </div>
-                  ))
-                }
-                
-                {suggestions.filter(s => s.priority === "low").length === 0 && (
-                  <div className="bg-gray-50 border border-gray-100 rounded-md p-3">
-                    <div className="text-sm text-gray-600">
-                      Pas d'améliorations optionnelles suggérées
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-            
-            {/* Plan d'amélioration */}
-            <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-              <h3 className="font-medium text-blue-800 mb-3">Plan d'action recommandé</h3>
-              <ol className="list-decimal pl-5 space-y-2">
-                {h1Count !== 1 && (
-                  <li className="text-blue-700">{h1Count === 0 ? "Ajoutez une balise H1 décrivant le sujet principal de la page" : "Gardez uniquement la balise H1 la plus importante et convertissez les autres en H2"}</li>
-                )}
-                
-                {h2Count === 0 && (
-                  <li className="text-blue-700">Structurez votre contenu avec des balises H2 pour les sections principales</li>
-                )}
-                
-                {missingAltCount > 0 && (
-                  <li className="text-blue-700">Ajoutez des attributs alt descriptifs aux {missingAltCount} images manquantes</li>
-                )}
-                
-                {wordCount < 300 && (
-                  <li className="text-blue-700">Augmentez le contenu textuel à au moins 300 mots pour un meilleur référencement</li>
-                )}
-                
-                {!hasSchema && (
-                  <li className="text-blue-700">Implémentez des données structurées Schema.org appropriées pour votre type de contenu</li>
-                )}
-                
-                {paragraphCount > 0 && wordCount / paragraphCount > 100 && (
-                  <li className="text-blue-700">Divisez les paragraphes trop longs pour améliorer la lisibilité</li>
-                )}
-                
-                {keywordsInHeadings < 3 && (
-                  <li className="text-blue-700">Intégrez vos mots-clés principaux dans les titres et sous-titres</li>
-                )}
-                
-                {!hasCanonical && (
-                  <li className="text-blue-700">Ajoutez une balise canonique pour éviter les problèmes de contenu dupliqué</li>
-                )}
-                
-                {imgCount === 0 && (
-                  <li className="text-blue-700">Ajoutez des images pertinentes pour améliorer l'engagement</li>
-                )}
-                
-                {h3Count === 0 && h2Count > 0 && (
-                  <li className="text-blue-700">Ajoutez des sous-titres H3 sous vos sections H2 pour une meilleure organisation</li>
-                )}
+                ))}
                 
                 {suggestions.length === 0 && (
-                  <li className="text-green-700">Votre page est bien optimisée! Continuez à maintenir cette qualité.</li>
+                  <div className="p-4 rounded-md bg-green-50 border border-green-200 flex items-center gap-3">
+                    <Heart className="h-5 w-5 text-green-600" />
+                    <div className="text-green-800">
+                      Excellent ! Votre structure de contenu est bien optimisée pour le SEO.
+                    </div>
+                  </div>
                 )}
-              </ol>
+              </div>
             </div>
           </div>
         </CardContent>
