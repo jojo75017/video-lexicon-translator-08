@@ -1,11 +1,28 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import UnifiedDashboard from '@/components/dashboard/UnifiedDashboard';
 import { Card } from '@/components/ui/card';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { LineChart, Info } from 'lucide-react';
+import { LineChart, Info, Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import RankingTracker from '@/components/seo/RankingTracker';
+import { toast } from 'sonner';
 
 const TrackingPage = () => {
+  const [url, setUrl] = useState('https://example.com');
+  const [isTracking, setIsTracking] = useState(false);
+  
+  const handleStartTracking = () => {
+    if (!url.trim()) {
+      toast.error("Veuillez entrer une URL à suivre");
+      return;
+    }
+    
+    setIsTracking(true);
+    toast.success(`Suivi des positions démarré pour ${url}`);
+  };
+  
   return (
     <UnifiedDashboard>
       <div className="container mx-auto py-4">
@@ -24,12 +41,29 @@ const TrackingPage = () => {
               </AlertDescription>
             </Alert>
             
-            <div className="p-8 text-center border border-dashed border-gray-300 rounded-lg">
-              <h3 className="text-lg font-medium text-gray-700 mb-2">Fonctionnalité en cours de développement</h3>
-              <p className="text-gray-600">
-                Le suivi des positions sera bientôt disponible. Vous pourrez suivre l'évolution de votre référencement au fil du temps.
-              </p>
+            <div className="flex gap-2 my-4">
+              <Input
+                placeholder="Entrez l'URL de votre site"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                className="flex-1"
+              />
+              <Button onClick={handleStartTracking} disabled={isTracking}>
+                <Search className="h-4 w-4 mr-2" />
+                {isTracking ? "Suivi en cours..." : "Démarrer le suivi"}
+              </Button>
             </div>
+            
+            {isTracking ? (
+              <RankingTracker url={url} />
+            ) : (
+              <div className="p-8 text-center border border-dashed border-gray-300 rounded-lg">
+                <h3 className="text-lg font-medium text-gray-700 mb-2">Entrez une URL pour commencer</h3>
+                <p className="text-gray-600">
+                  Démarrez le suivi pour voir l'évolution de vos positions dans les moteurs de recherche.
+                </p>
+              </div>
+            )}
           </div>
         </Card>
       </div>

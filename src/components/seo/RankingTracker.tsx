@@ -1,161 +1,231 @@
 
-import React from 'react';
-import { Card } from "@/components/ui/card";
-import SearchTrends from "@/components/seo/SearchTrends";
-import { motion } from "framer-motion";
-import { analyzeSearchConsole } from '@/utils/seo/searchConsoleAnalyzer';
-import { useQuery } from '@tanstack/react-query';
-import { AlertTriangle, Search, TrendingUp, Users, LineChart } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
-import { Badge } from '@/components/ui/badge';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { TrendingUp, TrendingDown, Minus, ArrowRight, Search, FileText } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { RankingData, SearchConsoleData } from '@/types/seo/Ranking';
 
 interface RankingTrackerProps {
   url: string;
 }
 
 const RankingTracker: React.FC<RankingTrackerProps> = ({ url }) => {
-  const { t } = useTranslation();
+  const [rankingData, setRankingData] = useState<RankingData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   
-  const { data: searchData, isLoading } = useQuery({
-    queryKey: ['searchConsole', url],
-    queryFn: () => analyzeSearchConsole(url),
-    enabled: !!url && url.length > 0,
-  });
+  useEffect(() => {
+    // Simule le chargement des données de classement
+    setTimeout(() => {
+      fetchRankingData();
+    }, 1000);
+  }, [url]);
+  
+  const fetchRankingData = () => {
+    // Simule une requête API
+    const mockData: RankingData = {
+      totalImpressions: 12500,
+      totalClicks: 850,
+      averageCTR: "6.8%",
+      averagePosition: 18.3,
+      position: 18.3, // Pour compatibilité
+      clicks: 850, // Pour compatibilité
+      impressions: 12500, // Pour compatibilité
+      keywords: [
+        { query: "référencement naturel", clicks: 180, impressions: 2400, ctr: 7.5, position: 4.2, change: -0.3 },
+        { query: "seo google", clicks: 145, impressions: 1800, ctr: 8.1, position: 6.5, change: 1.2 },
+        { query: "optimisation site web", clicks: 95, impressions: 1320, ctr: 7.2, position: 8.7, change: 0.5 }
+      ],
+      topPages: [
+        { query: "/blog/seo-techniques", clicks: 210, impressions: 2800, ctr: 7.5, position: 3.2, change: 0.8 },
+        { query: "/services/referencement", clicks: 175, impressions: 2300, ctr: 7.6, position: 5.1, change: -0.2 },
+        { query: "/outils-seo", clicks: 110, impressions: 1600, ctr: 6.9, position: 7.4, change: 2.1 }
+      ],
+      topQueries: [
+        { query: "référencement naturel", clicks: 180, impressions: 2400, ctr: 7.5, position: 4.2, change: -0.3 },
+        { query: "seo google", clicks: 145, impressions: 1800, ctr: 8.1, position: 6.5, change: 1.2 },
+        { query: "optimisation site web", clicks: 95, impressions: 1320, ctr: 7.2, position: 8.7, change: 0.5 }
+      ],
+      optimizationOpportunities: [
+        { query: "référencement local", clicks: 15, impressions: 980, ctr: 1.5, position: 25.3, change: 0 },
+        { query: "audit seo", clicks: 8, impressions: 720, ctr: 1.1, position: 31.2, change: -2.4 },
+        { query: "backlinks seo", clicks: 12, impressions: 850, ctr: 1.4, position: 28.7, change: 1.2 }
+      ]
+    };
+    
+    setRankingData(mockData);
+    setLoading(false);
+  };
+  
+  const renderChangeIndicator = (change: number | undefined) => {
+    if (!change) return <Minus className="h-4 w-4 text-gray-500" />;
+    if (change > 0) return <TrendingUp className="h-4 w-4 text-green-500" />;
+    return <TrendingDown className="h-4 w-4 text-red-500" />;
+  };
+  
+  const getChangeClass = (change: number | undefined) => {
+    if (!change) return "text-gray-500";
+    if (change > 0) return "text-green-500";
+    return "text-red-500";
+  };
 
-  // Show empty state if no URL is provided
-  if (!url) {
+  if (loading) {
     return (
-      <Card className="p-6">
-        <div className="flex flex-col items-center justify-center py-10 text-center">
-          <AlertTriangle className="h-12 w-12 text-amber-500 mb-4" />
-          <h3 className="text-lg font-medium text-gray-700 mb-2">{t('seo.noWebsiteToAnalyze')}</h3>
-          <p className="text-gray-500 max-w-md">
-            {t('seo.enterUrlToSeeRankingData')}
-          </p>
-        </div>
+      <Card>
+        <CardContent className="p-6 text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4">Chargement des données de classement...</p>
+        </CardContent>
       </Card>
     );
   }
 
-  if (isLoading) {
+  if (!rankingData) {
     return (
-      <Card className="p-6">
-        <div className="flex items-center justify-center py-10">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-        </div>
-      </Card>
-    );
-  }
-
-  if (!searchData) {
-    return (
-      <Card className="p-6">
-        <p className="text-center text-gray-500 py-10">{t('seo.noDataAvailable')}</p>
+      <Card>
+        <CardContent className="p-6 text-center">
+          <p>Aucune donnée de classement disponible pour cette URL.</p>
+        </CardContent>
       </Card>
     );
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
-    >
-      <Card className="p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-gray-800 flex items-center">
-            <LineChart className="h-5 w-5 mr-2 text-indigo-600" />
-            {t('seo.rankingTracker')}
-          </h2>
-          <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200">
-            {t('seo.last30Days')}
-          </Badge>
-        </div>
-        
+    <Card className="border-t-4 border-t-purple-500">
+      <CardContent className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 p-5 rounded-lg flex items-center gap-4">
-            <div className="bg-indigo-200 p-3 rounded-full">
-              <Search className="h-6 w-6 text-indigo-700" />
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <p className="text-sm text-gray-500 mb-1">Position moyenne</p>
+            <div className="flex items-center justify-between">
+              <p className="text-2xl font-bold">{rankingData.position.toFixed(1)}</p>
+              <Badge variant="outline" className="bg-purple-50 text-purple-700">
+                {rankingData.position < 10 ? "TOP 10" : rankingData.position < 20 ? "TOP 20" : "TOP 50"}
+              </Badge>
             </div>
-            <div>
-              <h3 className="text-lg font-semibold text-indigo-700">{t('seo.averagePosition')}</h3>
-              <p className="text-3xl font-bold text-indigo-900">{searchData.position.toFixed(1)}</p>
-            </div>
+            <Progress value={100 - Math.min(rankingData.position * 2, 100)} className="h-1.5 mt-2" />
           </div>
           
-          <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 p-5 rounded-lg flex items-center gap-4">
-            <div className="bg-emerald-200 p-3 rounded-full">
-              <TrendingUp className="h-6 w-6 text-emerald-700" />
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <p className="text-sm text-gray-500 mb-1">Clics</p>
+            <div className="flex items-center justify-between">
+              <p className="text-2xl font-bold">{rankingData.clicks.toLocaleString()}</p>
+              <Badge variant="outline" className="bg-blue-50 text-blue-700">
+                30 derniers jours
+              </Badge>
             </div>
-            <div>
-              <h3 className="text-lg font-semibold text-emerald-700">{t('seo.clicks')}</h3>
-              <p className="text-3xl font-bold text-emerald-900">{searchData.clicks.toLocaleString()}</p>
-            </div>
+            <Progress value={Math.min(rankingData.clicks / 100, 100)} className="h-1.5 mt-2" />
           </div>
           
-          <div className="bg-gradient-to-br from-violet-50 to-violet-100 p-5 rounded-lg flex items-center gap-4">
-            <div className="bg-violet-200 p-3 rounded-full">
-              <Users className="h-6 w-6 text-violet-700" />
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <p className="text-sm text-gray-500 mb-1">Impressions</p>
+            <div className="flex items-center justify-between">
+              <p className="text-2xl font-bold">{rankingData.impressions.toLocaleString()}</p>
+              <Badge variant="outline" className="bg-green-50 text-green-700">
+                CTR: {rankingData.averageCTR}
+              </Badge>
             </div>
-            <div>
-              <h3 className="text-lg font-semibold text-violet-700">{t('seo.impressions')}</h3>
-              <p className="text-3xl font-bold text-violet-900">{searchData.impressions.toLocaleString()}</p>
-            </div>
+            <Progress value={Math.min(rankingData.impressions / 200, 100)} className="h-1.5 mt-2" />
           </div>
         </div>
         
-        <SearchTrends 
-          clicks={searchData.clicks} 
-          impressions={searchData.impressions} 
-        />
-        
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <h3 className="font-semibold text-gray-700 mb-3">{t('seo.topKeywords')}</h3>
-            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-              {searchData.keywords.length > 0 ? (
-                <div className="space-y-3">
-                  {searchData.keywords.map((keyword, index) => (
-                    <div key={index} className="flex justify-between items-center p-2 bg-white rounded border border-gray-100">
-                      <span className="font-medium">{keyword.keyword}</span>
-                      <div className="flex items-center">
-                        <span className="text-xs bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full">
-                          Position: {keyword.position}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-gray-500 text-center py-4">{t('seo.noKeywordsFound')}</p>
-              )}
-            </div>
-          </div>
+        <Tabs defaultValue="keywords">
+          <TabsList className="mb-4">
+            <TabsTrigger value="keywords" className="flex items-center gap-1">
+              <Search className="h-4 w-4" />
+              Mots-clés
+            </TabsTrigger>
+            <TabsTrigger value="pages" className="flex items-center gap-1">
+              <FileText className="h-4 w-4" />
+              Pages
+            </TabsTrigger>
+          </TabsList>
           
-          <div>
-            <h3 className="font-semibold text-gray-700 mb-3">{t('seo.topPages')}</h3>
-            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-              {searchData.topPages.length > 0 ? (
-                <div className="space-y-3">
-                  {searchData.topPages.slice(0, 3).map((page, index) => (
-                    <div key={index} className="flex justify-between items-center p-2 bg-white rounded border border-gray-100">
-                      <span className="font-medium truncate max-w-[200px]">{page.url.replace(url, '')}</span>
-                      <div className="flex items-center">
-                        <span className="text-xs bg-emerald-100 text-emerald-800 px-2 py-1 rounded-full">
-                          {page.clicks} {t('seo.clicks')}
-                        </span>
+          <TabsContent value="keywords">
+            <h3 className="font-medium mb-3">Mots-clés les plus performants</h3>
+            <div className="space-y-3">
+              {rankingData.keywords && rankingData.keywords.map((keyword, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-white border rounded-lg hover:bg-gray-50 transition-colors">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">{keyword.query}</span>
+                      {keyword.position <= 10 && (
+                        <Badge className="bg-green-100 text-green-800">Top 10</Badge>
+                      )}
+                    </div>
+                    <div className="text-sm text-gray-500 mt-1">
+                      {keyword.clicks} clics · {keyword.impressions} impressions · CTR {keyword.ctr.toFixed(1)}%
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="text-right">
+                      <div className="font-medium">{keyword.position.toFixed(1)}</div>
+                      <div className={`text-xs flex items-center ${getChangeClass(keyword.change)}`}>
+                        {renderChangeIndicator(keyword.change)}
+                        <span>{keyword.change ? Math.abs(keyword.change).toFixed(1) : "0.0"}</span>
                       </div>
                     </div>
-                  ))}
+                  </div>
                 </div>
-              ) : (
-                <p className="text-gray-500 text-center py-4">{t('seo.noPagesFound')}</p>
-              )}
+              ))}
             </div>
-          </div>
-        </div>
-      </Card>
-    </motion.div>
+            
+            <h3 className="font-medium mb-3 mt-6">Opportunités d'optimisation</h3>
+            <div className="space-y-3">
+              {rankingData.optimizationOpportunities.map((keyword, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-white border border-yellow-100 rounded-lg hover:bg-yellow-50 transition-colors">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">{keyword.query}</span>
+                      <ArrowRight className="h-4 w-4 text-yellow-600" />
+                    </div>
+                    <div className="text-sm text-gray-500 mt-1">
+                      {keyword.impressions} impressions · seulement {keyword.clicks} clics
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="text-right">
+                      <div className="font-medium text-yellow-600">{keyword.position.toFixed(1)}</div>
+                      <div className={`text-xs flex items-center ${getChangeClass(keyword.change)}`}>
+                        {renderChangeIndicator(keyword.change)}
+                        <span>{keyword.change ? Math.abs(keyword.change).toFixed(1) : "0.0"}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="pages">
+            <h3 className="font-medium mb-3">Pages les plus performantes</h3>
+            <div className="space-y-3">
+              {rankingData.topPages && rankingData.topPages.map((page, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-white border rounded-lg hover:bg-gray-50 transition-colors">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">{page.query}</span>
+                    </div>
+                    <div className="text-sm text-gray-500 mt-1">
+                      {page.clicks} clics · {page.impressions} impressions · CTR {page.ctr.toFixed(1)}%
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="text-right">
+                      <div className="font-medium">{page.position.toFixed(1)}</div>
+                      <div className={`text-xs flex items-center ${getChangeClass(page.change)}`}>
+                        {renderChangeIndicator(page.change)}
+                        <span>{page.change ? Math.abs(page.change).toFixed(1) : "0.0"}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+    </Card>
   );
 };
 
