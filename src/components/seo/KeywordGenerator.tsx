@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -34,6 +33,8 @@ import {
   sortKeywordsByScore
 } from '@/utils/keyword/keywordGeneratorUtils';
 import ApiKeyConfig from './analysis/ApiKeyConfig';
+import DynamicFAQ from './keyword/DynamicFAQ';
+import KeywordOpportunities from './keyword/KeywordOpportunities';
 
 const KeywordGenerator = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -443,6 +444,17 @@ const KeywordGenerator = () => {
             exportSelectedKeywords={exportSelectedKeywords}
             keyword={keyword}
           />
+          
+          {/* Nouvelle section d'opportunités de mots-clés */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <KeywordOpportunities 
+              keywords={[...standardKeywords, ...longTailKeywords, ...questionKeywords]} 
+              mainKeyword={keyword}
+            />
+            
+            {/* FAQ dynamique basée sur le mot-clé */}
+            <DynamicFAQ keyword={keyword} />
+          </div>
           
           {questionKeywords.length > 0 && (
             <Card className="p-6">

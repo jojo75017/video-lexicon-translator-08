@@ -2,13 +2,13 @@
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { MessageSquareQuestion } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 
 const KeywordFAQ: React.FC = () => {
   return (
     <Card className="p-6">
       <h2 className="text-lg font-semibold mb-4 flex items-center">
-        <MessageSquareQuestion className="h-5 w-5 mr-2 text-blue-500" />
+        <MessageSquare className="h-5 w-5 mr-2 text-blue-500" />
         Questions fréquentes sur les mots-clés
       </h2>
 
@@ -42,54 +42,7 @@ const KeywordFAQ: React.FC = () => {
           <AccordionContent>
             L'analyse des concurrents vous permet d'identifier les sites qui se positionnent bien sur vos mots-clés cibles.
             Étudiez leur contenu, leur structure et leur stratégie de liaison pour comprendre ce qui fonctionne dans votre secteur.
-            Identifiez les opportunités de mots-clés qu'ils n'exploitent pas encore ou où leur présence est faible.
-          </AccordionContent>
-        </AccordionItem>
-
-        <AccordionItem value="item-4">
-          <AccordionTrigger className="text-left">
-            Comment interpréter le volume de recherche et la difficulté ?
-          </AccordionTrigger>
-          <AccordionContent>
-            Le volume de recherche indique combien de fois un mot-clé est recherché mensuellement. 
-            Un volume élevé signifie plus de trafic potentiel, mais aussi généralement plus de concurrence.
-            La difficulté (sur 100) estime la difficulté à se classer pour ce mot-clé. 
-            Une difficulté inférieure à 30 est considérée comme facile, entre 30 et 60 comme moyenne, et au-dessus de 60 comme difficile.
-          </AccordionContent>
-        </AccordionItem>
-
-        <AccordionItem value="item-5">
-          <AccordionTrigger className="text-left">
-            Combien de mots-clés devrais-je cibler par page ?
-          </AccordionTrigger>
-          <AccordionContent>
-            Il est recommandé de cibler un mot-clé principal et 2-3 mots-clés secondaires ou variantes par page.
-            Concentrez-vous sur un sujet principal par page pour maximiser la pertinence et éviter la cannibalisation de mots-clés entre vos pages.
-            L'important est de créer un contenu naturel et de qualité qui répond aux intentions de recherche, plutôt que de simplement accumuler des mots-clés.
-          </AccordionContent>
-        </AccordionItem>
-
-        <AccordionItem value="item-6">
-          <AccordionTrigger className="text-left">
-            Comment exporter et utiliser les mots-clés générés ?
-          </AccordionTrigger>
-          <AccordionContent>
-            Pour exporter vos mots-clés sélectionnés, cochez ceux qui vous intéressent puis cliquez sur le bouton "Exporter la sélection".
-            Un fichier CSV sera téléchargé avec les données complètes (mot-clé, volume, difficulté, CPC, compétition).
-            Vous pouvez ensuite utiliser ces données pour planifier votre stratégie de contenu, structurer votre site ou 
-            orienter vos campagnes publicitaires.
-          </AccordionContent>
-        </AccordionItem>
-
-        <AccordionItem value="item-7">
-          <AccordionTrigger className="text-left">
-            Pourquoi configurer une clé API OpenAI ?
-          </AccordionTrigger>
-          <AccordionContent>
-            La configuration d'une clé API OpenAI vous permet d'accéder à des fonctionnalités avancées comme l'analyse des concurrents 
-            et les données SERP en temps réel. Sans clé API, vous avez toujours accès aux suggestions de mots-clés standards et longue traîne,
-            mais les données concurrentielles ne seront pas disponibles. Votre clé API est stockée localement dans votre navigateur et 
-            n'est jamais partagée avec nos serveurs.
+            Identifiez les opportunités que vos concurrents n'exploitent pas encore pour vous démarquer.
           </AccordionContent>
         </AccordionItem>
       </Accordion>

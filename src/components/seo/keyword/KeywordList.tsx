@@ -3,7 +3,7 @@ import React from 'react';
 import { KeywordSuggestion } from '@/types/seo/Keyword';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, ArrowUp, ArrowDown } from 'lucide-react';
+import { TrendingUp, ArrowUp, ArrowDown, Zap, Star } from 'lucide-react';
 
 interface KeywordListProps {
   keywords: KeywordSuggestion[];
@@ -62,6 +62,54 @@ const KeywordList: React.FC<KeywordListProps> = ({
     );
   };
 
+  // Fonction pour afficher l'opportunité du mot-clé
+  const renderOpportunity = (opportunity?: number) => {
+    if (!opportunity) return null;
+    
+    const opportunityColor = opportunity >= 80 ? 'text-green-600' : 
+                            opportunity >= 60 ? 'text-blue-600' : 
+                            opportunity >= 40 ? 'text-amber-600' : 
+                            'text-gray-600';
+    
+    return (
+      <div className={`flex items-center ${opportunityColor} text-xs font-medium`}>
+        <Zap className="h-3 w-3 mr-1" />
+        <span>Opportunité: {opportunity}%</span>
+      </div>
+    );
+  };
+
+  // Fonction pour afficher l'intent du mot-clé avec un badge coloré
+  const renderIntent = (intent?: string) => {
+    if (!intent) return null;
+    
+    let bgColor = '';
+    let icon = null;
+    
+    switch(intent) {
+      case 'informational':
+        bgColor = 'bg-purple-100 text-purple-800';
+        break;
+      case 'navigational':
+        bgColor = 'bg-blue-100 text-blue-800';
+        break;
+      case 'transactional':
+        bgColor = 'bg-green-100 text-green-800';
+        break;
+      case 'commercial':
+        bgColor = 'bg-amber-100 text-amber-800';
+        break;
+      default:
+        bgColor = 'bg-gray-100 text-gray-800';
+    }
+    
+    return (
+      <Badge variant="outline" className={bgColor}>
+        {intent.charAt(0).toUpperCase() + intent.slice(1)}
+      </Badge>
+    );
+  };
+
   return (
     <div className="space-y-2">
       {keywords.map((keyword, index) => (
@@ -78,7 +126,13 @@ const KeywordList: React.FC<KeywordListProps> = ({
             htmlFor={`keyword-${index}`}
             className="ml-3 flex-1 cursor-pointer"
           >
-            <div className="font-medium">{keyword.keyword}</div>
+            <div className="font-medium flex items-center gap-2">
+              {keyword.keyword}
+              {keyword.opportunity && keyword.opportunity >= 75 && (
+                <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
+              )}
+              {keyword.intent && renderIntent(keyword.intent)}
+            </div>
             <div className="flex flex-wrap text-xs gap-2 mt-1">
               <span className={getVolumeColor(keyword.volume)}>
                 <TrendingUp className="h-3 w-3 inline mr-1" />
@@ -95,6 +149,7 @@ const KeywordList: React.FC<KeywordListProps> = ({
                 </span>
               )}
               {renderPosition(keyword.position)}
+              {renderOpportunity(keyword.opportunity)}
             </div>
           </label>
           <div>

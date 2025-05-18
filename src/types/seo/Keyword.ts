@@ -7,8 +7,9 @@ export interface KeywordSuggestion {
   cpc?: number;
   competition?: number; 
   relevance?: number; 
-  intent?: string;
-  type?: string;
+  position?: number;
+  intent?: 'informational' | 'navigational' | 'transactional' | 'commercial';
+  type?: 'question' | 'standard' | 'long-tail' | 'related';
   volume?: number;
   opportunity?: number;
   trend?: number[];
