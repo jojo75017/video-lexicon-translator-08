@@ -43,31 +43,36 @@ const generateKeywordSuggestions = (keyword: string): KeywordSuggestion[] => {
         keyword: `${keyword} insolite`, 
         volume: Math.floor(Math.random() * 500) + 500, 
         competition: 0.3, 
-        cpc: 1.2 + Math.random() 
+        cpc: 1.2 + Math.random(),
+        difficulty: Math.floor(Math.random() * 50) + 30
       },
       { 
         keyword: `meilleur ${keyword}`, 
         volume: Math.floor(Math.random() * 700) + 800, 
         competition: 0.5, 
-        cpc: 1.8 + Math.random() 
+        cpc: 1.8 + Math.random(),
+        difficulty: Math.floor(Math.random() * 65) + 25
       },
       { 
         keyword: `${keyword} pas cher`, 
         volume: Math.floor(Math.random() * 1000) + 1000, 
         competition: 0.6, 
-        cpc: 2.0 + Math.random() 
+        cpc: 2.0 + Math.random(),
+        difficulty: Math.floor(Math.random() * 70) + 20
       },
       { 
         keyword: `${keyword} famille`,
         volume: Math.floor(Math.random() * 600) + 400, 
         competition: 0.4, 
-        cpc: 1.5 + Math.random() 
+        cpc: 1.5 + Math.random(),
+        difficulty: Math.floor(Math.random() * 55) + 35
       },
       { 
         keyword: `conseils ${keyword}`,
         volume: Math.floor(Math.random() * 400) + 300, 
         competition: 0.2, 
-        cpc: 1.0 + Math.random() 
+        cpc: 1.0 + Math.random(),
+        difficulty: Math.floor(Math.random() * 40) + 25
       }
     ];
   } 
@@ -81,31 +86,36 @@ const generateKeywordSuggestions = (keyword: string): KeywordSuggestion[] => {
         keyword: `entretien ${keyword}`, 
         volume: Math.floor(Math.random() * 400) + 300, 
         competition: 0.2, 
-        cpc: 0.8 + Math.random() 
+        cpc: 0.8 + Math.random(),
+        difficulty: Math.floor(Math.random() * 45) + 20
       },
       { 
         keyword: `${keyword} débutant`, 
         volume: Math.floor(Math.random() * 600) + 500, 
         competition: 0.3, 
-        cpc: 0.9 + Math.random() 
+        cpc: 0.9 + Math.random(),
+        difficulty: Math.floor(Math.random() * 35) + 15
       },
       { 
         keyword: `meilleur ${keyword}`, 
         volume: Math.floor(Math.random() * 300) + 200, 
         competition: 0.4, 
-        cpc: 1.1 + Math.random() 
+        cpc: 1.1 + Math.random(),
+        difficulty: Math.floor(Math.random() * 50) + 30
       },
       { 
         keyword: `${keyword} prix`,
         volume: Math.floor(Math.random() * 500) + 400, 
         competition: 0.5, 
-        cpc: 1.3 + Math.random() 
+        cpc: 1.3 + Math.random(),
+        difficulty: Math.floor(Math.random() * 60) + 25
       },
       { 
         keyword: `alimentation ${keyword}`,
         volume: Math.floor(Math.random() * 350) + 250, 
         competition: 0.2, 
-        cpc: 0.7 + Math.random() 
+        cpc: 0.7 + Math.random(),
+        difficulty: Math.floor(Math.random() * 40) + 20
       }
     ];
   }
@@ -116,31 +126,36 @@ const generateKeywordSuggestions = (keyword: string): KeywordSuggestion[] => {
         keyword: `${keyword} guide`, 
         volume: Math.floor(Math.random() * 600) + 500, 
         competition: 0.3, 
-        cpc: 1.0 + Math.random() 
+        cpc: 1.0 + Math.random(),
+        difficulty: Math.floor(Math.random() * 55) + 25
       },
       { 
         keyword: `meilleur ${keyword}`, 
         volume: Math.floor(Math.random() * 800) + 700, 
         competition: 0.5, 
-        cpc: 1.5 + Math.random() 
+        cpc: 1.5 + Math.random(),
+        difficulty: Math.floor(Math.random() * 65) + 30
       },
       { 
         keyword: `${keyword} comparatif`, 
         volume: Math.floor(Math.random() * 500) + 400, 
         competition: 0.4, 
-        cpc: 1.2 + Math.random() 
+        cpc: 1.2 + Math.random(),
+        difficulty: Math.floor(Math.random() * 60) + 35
       },
       { 
         keyword: `${keyword} tutoriel`,
         volume: Math.floor(Math.random() * 400) + 300, 
         competition: 0.2, 
-        cpc: 0.8 + Math.random() 
+        cpc: 0.8 + Math.random(),
+        difficulty: Math.floor(Math.random() * 40) + 20
       },
       { 
         keyword: `conseils ${keyword}`,
         volume: Math.floor(Math.random() * 300) + 200, 
         competition: 0.3, 
-        cpc: 0.9 + Math.random() 
+        cpc: 0.9 + Math.random(),
+        difficulty: Math.floor(Math.random() * 45) + 15
       }
     ];
   }
@@ -148,8 +163,9 @@ const generateKeywordSuggestions = (keyword: string): KeywordSuggestion[] => {
   // Ajouter des attributs manquants aux suggestions et enrichir avec des informations supplémentaires
   const enrichedSuggestions = suggestions.map(suggestion => ({
     ...suggestion,
-    difficulty: Math.floor(Math.random() * 70) + 10,
     relevance: Math.floor(Math.random() * 30) + 70,
+    opportunity: Math.floor(Math.random() * 60) + 30,
+    intent: ['informational', 'transactional', 'navigational', 'commercial'][Math.floor(Math.random() * 4)] as 'informational' | 'navigational' | 'transactional' | 'commercial'
   }));
   
   // Générer aussi des questions liées au mot-clé
@@ -160,7 +176,9 @@ const generateKeywordSuggestions = (keyword: string): KeywordSuggestion[] => {
     cpc: Math.random() * 0.5 + 0.2,
     difficulty: Math.floor(Math.random() * 50) + 10,
     relevance: Math.floor(Math.random() * 20) + 70,
-    type: 'question' as 'question' | 'standard' | 'long-tail' | 'related'
+    opportunity: Math.floor(Math.random() * 50) + 20,
+    type: 'question' as 'question' | 'standard' | 'long-tail' | 'related',
+    intent: 'informational' as 'informational' | 'navigational' | 'transactional' | 'commercial'
   }));
   
   // Combiner suggestions et questions
@@ -424,12 +442,11 @@ const KeywordGenerator: React.FC<KeywordGeneratorProps> = ({
                         <div className="w-20 flex items-center gap-1">
                           <Progress 
                             value={kw.difficulty} 
-                            className="h-2" 
-                            indicatorColor={
+                            className={`h-2 ${
                               kw.difficulty! > 70 ? "bg-red-500" :
                               kw.difficulty! > 40 ? "bg-yellow-500" :
                               "bg-green-500"
-                            }
+                            }`}
                           />
                           <span className="text-xs text-gray-500">{kw.difficulty}</span>
                         </div>
@@ -494,7 +511,7 @@ const KeywordGenerator: React.FC<KeywordGeneratorProps> = ({
                         CPC: {selectedKeyword.cpc?.toFixed(2)}€
                       </Badge>
                       <Badge className="bg-gray-100 text-gray-800">
-                        Intent: {selectedKeyword.intent}
+                        Intent: {selectedKeyword.intent || 'informational'}
                       </Badge>
                     </div>
                   </div>

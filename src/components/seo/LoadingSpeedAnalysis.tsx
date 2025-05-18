@@ -1,255 +1,165 @@
 
 import React from 'react';
-import { BarChart, BarChart2, Clock, FileDown, TrendingUp, Zap } from 'lucide-react';
-import { Progress } from "@/components/ui/progress";
-import { Card } from "@/components/ui/card";
-import { PerformanceData } from '@/types/seo/Performance';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 
-interface LoadingSpeedAnalysisProps {
-  performance: PerformanceData;
-}
-
-const LoadingSpeedAnalysis: React.FC<LoadingSpeedAnalysisProps> = ({ performance }) => {
-  // Fonctions utilitaires
-  const formatFileSize = (bytes?: number) => {
-    if (!bytes) return '0 B';
-    const units = ['B', 'KB', 'MB', 'GB'];
-    let size = bytes;
-    let unitIndex = 0;
-    while (size >= 1024 && unitIndex < units.length - 1) {
-      size /= 1024;
-      unitIndex++;
+const LoadingSpeedAnalysis: React.FC = () => {
+  // Données simulées de performance de chargement
+  const performanceData = {
+    score: 85,
+    fcp: 1.5, // First Contentful Paint (secondes)
+    lcp: 2.3, // Largest Contentful Paint (secondes)
+    cls: 0.05, // Cumulative Layout Shift
+    fid: 95, // First Input Delay (ms)
+    ttfb: 0.28, // Time to First Byte (secondes)
+    resources: {
+      js: 450, // taille en KB
+      css: 80, // taille en KB
+      images: 320, // taille en KB
+      fonts: 50, // taille en KB
+      other: 20, // taille en KB
     }
-    return `${size.toFixed(1)} ${units[unitIndex]}`;
   };
-  
-  const formatTime = (ms?: number) => {
-    if (!ms) return '0ms';
-    return ms < 1000 ? `${ms}ms` : `${(ms / 1000).toFixed(1)}s`;
+
+  // Fonction pour déterminer la couleur en fonction du score
+  const getScoreColor = (score: number) => {
+    if (score >= 90) return { bg: 'bg-green-100', text: 'text-green-800' };
+    if (score >= 70) return { bg: 'bg-yellow-100', text: 'text-yellow-800' };
+    return { bg: 'bg-red-100', text: 'text-red-800' };
   };
-  
-  const getScoreColor = (score?: number) => {
-    if (!score) return 'text-gray-400';
-    if (score >= 90) return 'text-green-600';
-    if (score >= 70) return 'text-yellow-600';
-    if (score >= 50) return 'text-amber-600';
-    return 'text-red-600';
-  };
-  
-  const getScoreBackground = (score?: number) => {
-    if (!score) return 'bg-gray-100';
-    if (score >= 90) return 'bg-green-100';
-    if (score >= 70) return 'bg-yellow-100';
-    if (score >= 50) return 'bg-amber-100';
-    return 'bg-red-100';
+
+  // Fonction pour déterminer la couleur de progression
+  const getProgressColor = (score: number) => {
+    if (score >= 90) return 'bg-green-500';
+    if (score >= 70) return 'bg-yellow-500';
+    return 'bg-red-500';
   };
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className={`rounded-lg p-4 border ${getScoreBackground(performance.score)}`}>
-          <div className="flex justify-between items-start mb-2">
-            <h3 className="text-sm font-medium">Score de performance</h3>
-            <Zap className="h-5 w-5 text-blue-600" />
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <CardTitle>Vitesse de chargement</CardTitle>
+            <Badge className={`${getScoreColor(performanceData.score).bg} ${getScoreColor(performanceData.score).text}`}>
+              {performanceData.score}/100
+            </Badge>
           </div>
-          <div className={`text-3xl font-bold ${getScoreColor(performance.score)}`}>
-            {performance.score || 0}/100
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <div className="flex justify-between mb-2">
+              <span className="text-sm font-medium">Score de performance</span>
+              <span className="text-sm text-gray-500">{performanceData.score}/100</span>
+            </div>
+            <Progress value={performanceData.score} className={`h-2 ${getProgressColor(performanceData.score)}`} />
           </div>
-          <p className="text-xs text-gray-500 mt-1">
-            Basé sur les métriques Web Vitals
-          </p>
-        </div>
-        
-        <div className="bg-white rounded-lg p-4 border shadow-sm">
-          <div className="flex justify-between items-start mb-2">
-            <h3 className="text-sm font-medium">Temps de chargement</h3>
-            <Clock className="h-5 w-5 text-blue-600" />
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-sm font-medium">FCP</span>
+                <Badge variant="outline">{performanceData.fcp}s</Badge>
+              </div>
+              <Progress 
+                value={100 - Math.min(performanceData.fcp / 3 * 100, 100)} 
+                className={`h-2 ${getProgressColor(100 - Math.min(performanceData.fcp / 3 * 100, 100))}`} 
+              />
+              <p className="text-xs text-gray-500">First Contentful Paint</p>
+            </div>
+            
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-sm font-medium">LCP</span>
+                <Badge variant="outline">{performanceData.lcp}s</Badge>
+              </div>
+              <Progress 
+                value={100 - Math.min(performanceData.lcp / 4 * 100, 100)} 
+                className={`h-2 ${getProgressColor(100 - Math.min(performanceData.lcp / 4 * 100, 100))}`}
+              />
+              <p className="text-xs text-gray-500">Largest Contentful Paint</p>
+            </div>
+            
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-sm font-medium">CLS</span>
+                <Badge variant="outline">{performanceData.cls}</Badge>
+              </div>
+              <Progress 
+                value={100 - Math.min(performanceData.cls * 1000, 100)} 
+                className={`h-2 ${getProgressColor(100 - Math.min(performanceData.cls * 1000, 100))}`}
+              />
+              <p className="text-xs text-gray-500">Cumulative Layout Shift</p>
+            </div>
+            
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-sm font-medium">FID</span>
+                <Badge variant="outline">{performanceData.fid}ms</Badge>
+              </div>
+              <Progress 
+                value={100 - Math.min(performanceData.fid / 3, 100)} 
+                className={`h-2 ${getProgressColor(100 - Math.min(performanceData.fid / 3, 100))}`}
+              />
+              <p className="text-xs text-gray-500">First Input Delay</p>
+            </div>
           </div>
-          <div className="text-2xl font-bold">
-            {formatTime(performance.loadTime)}
-          </div>
-          <Progress 
-            className="h-1.5 mt-2 bg-gray-100"
-            value={Math.min(100, performance.loadTime ? (performance.loadTime / 3000 * 100) : 0)}
-          />
-          <p className="text-xs text-gray-500 mt-1">
-            {performance.loadTime && performance.loadTime < 2000 ? 'Bon' : 
-             performance.loadTime && performance.loadTime < 4000 ? 'Acceptable' : 'Lent'}
-          </p>
-        </div>
-        
-        <div className="bg-white rounded-lg p-4 border shadow-sm">
-          <div className="flex justify-between items-start mb-2">
-            <h3 className="text-sm font-medium">Taille totale</h3>
-            <FileDown className="h-5 w-5 text-blue-600" />
-          </div>
-          <div className="text-2xl font-bold">
-            {formatFileSize(performance.totalSize)}
-          </div>
-          <Progress 
-            className="h-1.5 mt-2 bg-gray-100"
-            value={Math.min(100, performance.totalSize ? (performance.totalSize / 2000000 * 100) : 0)}
-          />
-          <p className="text-xs text-gray-500 mt-1">
-            {performance.resourceCount || 0} ressources
-          </p>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="p-4">
-          <h3 className="text-sm font-medium mb-3 flex items-center">
-            <TrendingUp className="h-4 w-4 mr-2" />
-            Métriques principales
-          </h3>
+      <Card>
+        <CardHeader>
+          <CardTitle>Ressources de la page</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex justify-between text-sm mb-2">
+            <span>Type</span>
+            <span>Taille</span>
+          </div>
           
-          <div className="space-y-3">
-            <div>
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-sm text-gray-600">First Contentful Paint</span>
-                <span className="font-medium">{formatTime(performance.firstContentfulPaint)}</span>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-sm">JavaScript</span>
+                <Badge variant="outline">{performanceData.resources.js} KB</Badge>
               </div>
-              <Progress 
-                className="h-1.5 bg-gray-100"
-                value={Math.min(100, performance.firstContentfulPaint ? 100 - (performance.firstContentfulPaint / 2000 * 100) : 0)}
-              />
+              <Progress value={performanceData.resources.js / 10} className="h-2 bg-blue-500" />
             </div>
             
-            <div>
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-sm text-gray-600">Largest Contentful Paint</span>
-                <span className="font-medium">{formatTime(performance.largestContentfulPaint)}</span>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-sm">CSS</span>
+                <Badge variant="outline">{performanceData.resources.css} KB</Badge>
               </div>
-              <Progress 
-                className="h-1.5 bg-gray-100"
-                value={Math.min(100, performance.largestContentfulPaint ? 100 - (performance.largestContentfulPaint / 2500 * 100) : 0)}
-              />
+              <Progress value={performanceData.resources.css / 2} className="h-2 bg-purple-500" />
             </div>
             
-            <div>
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-sm text-gray-600">DOM Load</span>
-                <span className="font-medium">{formatTime(performance.domLoadTime)}</span>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-sm">Images</span>
+                <Badge variant="outline">{performanceData.resources.images} KB</Badge>
               </div>
-              <Progress 
-                className="h-1.5 bg-gray-100"
-                value={Math.min(100, performance.domLoadTime ? 100 - (performance.domLoadTime / 1500 * 100) : 0)}
-              />
+              <Progress value={performanceData.resources.images / 10} className="h-2 bg-green-500" />
             </div>
             
-            <div>
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-sm text-gray-600">Time to Interactive</span>
-                <span className="font-medium">{formatTime(performance.timeToInteractive)}</span>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-sm">Fonts</span>
+                <Badge variant="outline">{performanceData.resources.fonts} KB</Badge>
               </div>
-              <Progress 
-                className="h-1.5 bg-gray-100"
-                value={Math.min(100, performance.timeToInteractive ? 100 - (performance.timeToInteractive / 3500 * 100) : 0)}
-              />
+              <Progress value={performanceData.resources.fonts / 2} className="h-2 bg-amber-500" />
             </div>
           </div>
-        </Card>
-        
-        <Card className="p-4">
-          <h3 className="text-sm font-medium mb-3 flex items-center">
-            <BarChart2 className="h-4 w-4 mr-2" />
-            Répartition des ressources
-          </h3>
           
-          <div className="space-y-3">
-            {performance.resourceBreakdown && (
-              <>
-                <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-sm text-gray-600">JavaScript</span>
-                    <span className="font-medium">{formatFileSize(performance.resourceBreakdown.js || performance.resourceBreakdown.scripts)}</span>
-                  </div>
-                  <div className="w-full bg-gray-100 rounded-full h-1.5">
-                    <div className="bg-yellow-400 h-1.5 rounded-full" style={{ 
-                      width: `${Math.min(100, ((performance.resourceBreakdown.js || performance.resourceBreakdown.scripts || 0) / (performance.totalSize || 1) * 100).toFixed(0))}%` 
-                    }}></div>
-                  </div>
-                </div>
-                
-                <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-sm text-gray-600">CSS</span>
-                    <span className="font-medium">{formatFileSize(performance.resourceBreakdown.css || performance.resourceBreakdown.styles)}</span>
-                  </div>
-                  <div className="w-full bg-gray-100 rounded-full h-1.5">
-                    <div className="bg-blue-400 h-1.5 rounded-full" style={{ 
-                      width: `${Math.min(100, ((performance.resourceBreakdown.css || performance.resourceBreakdown.styles || 0) / (performance.totalSize || 1) * 100).toFixed(0))}%` 
-                    }}></div>
-                  </div>
-                </div>
-                
-                <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-sm text-gray-600">Images</span>
-                    <span className="font-medium">{formatFileSize(performance.resourceBreakdown.images)}</span>
-                  </div>
-                  <div className="w-full bg-gray-100 rounded-full h-1.5">
-                    <div className="bg-green-400 h-1.5 rounded-full" style={{ 
-                      width: `${Math.min(100, ((performance.resourceBreakdown.images || 0) / (performance.totalSize || 1) * 100).toFixed(0))}%` 
-                    }}></div>
-                  </div>
-                </div>
-                
-                <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-sm text-gray-600">Fonts</span>
-                    <span className="font-medium">{formatFileSize(performance.resourceBreakdown.fonts)}</span>
-                  </div>
-                  <div className="w-full bg-gray-100 rounded-full h-1.5">
-                    <div className="bg-purple-400 h-1.5 rounded-full" style={{ 
-                      width: `${Math.min(100, ((performance.resourceBreakdown.fonts || 0) / (performance.totalSize || 1) * 100).toFixed(0))}%` 
-                    }}></div>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-        </Card>
-      </div>
-      
-      <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-        <h3 className="text-sm font-medium mb-2 text-blue-800">Recommandations de performance</h3>
-        <ul className="space-y-2">
-          {performance.resourceBreakdown?.images && performance.resourceBreakdown.images > 500000 && (
-            <li className="flex items-start">
-              <div className="bg-blue-200 rounded-full p-0.5 mr-2 mt-0.5">
-                <BarChart className="h-3.5 w-3.5 text-blue-700" />
-              </div>
-              <span className="text-sm text-blue-800">Optimisez les images pour réduire leur taille</span>
-            </li>
-          )}
-          
-          {performance.resourceBreakdown?.js && performance.resourceBreakdown.js > 300000 && (
-            <li className="flex items-start">
-              <div className="bg-blue-200 rounded-full p-0.5 mr-2 mt-0.5">
-                <BarChart className="h-3.5 w-3.5 text-blue-700" />
-              </div>
-              <span className="text-sm text-blue-800">Réduisez la taille des scripts JavaScript</span>
-            </li>
-          )}
-          
-          {performance.loadTime && performance.loadTime > 3000 && (
-            <li className="flex items-start">
-              <div className="bg-blue-200 rounded-full p-0.5 mr-2 mt-0.5">
-                <BarChart className="h-3.5 w-3.5 text-blue-700" />
-              </div>
-              <span className="text-sm text-blue-800">Améliorez le temps de chargement global</span>
-            </li>
-          )}
-          
-          <li className="flex items-start">
-            <div className="bg-blue-200 rounded-full p-0.5 mr-2 mt-0.5">
-              <BarChart className="h-3.5 w-3.5 text-blue-700" />
+          <div className="pt-4 border-t mt-4">
+            <div className="flex justify-between font-medium">
+              <span>Total</span>
+              <span>{Object.values(performanceData.resources).reduce((a, b) => a + b, 0)} KB</span>
             </div>
-            <span className="text-sm text-blue-800">Utilisez la mise en cache du navigateur pour les ressources statiques</span>
-          </li>
-        </ul>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
