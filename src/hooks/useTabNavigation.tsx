@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { tabs } from '@/components/dashboard/tabs/TabData';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -38,7 +39,7 @@ export const useTabNavigation = () => {
       'keyword-meta': 'keyword-meta',
       'keyword-generator': 'keyword-generator',
       'outils-seo': 'outils-seo',
-      'tracking': 'rankings', // Ajout de la correspondance pour la page de tracking
+      'tracking': 'rankings', // Mapping explicite pour la page de tracking
       // Routes localisées (français)
       'hierarchie': 'hierarchy',
       'nombre-mots': 'wordcount',
@@ -51,6 +52,7 @@ export const useTabNavigation = () => {
       'suivi-positions': 'rankings', // Variante française
     };
     
+    console.log("Active tab determination from path:", path, "->", pathToTabMap[path] || 'hierarchy');
     return pathToTabMap[path] || 'hierarchy';
   };
   
@@ -105,6 +107,7 @@ export const useTabNavigation = () => {
     
     // Forcer la navigation si nécessaire
     if (tabPaths[value]) {
+      console.log("Navigation vers:", tabPaths[value]);
       navigate(tabPaths[value]);
       
       // Notification visuelle du changement d'onglet
@@ -121,7 +124,7 @@ export const useTabNavigation = () => {
     const getMainCategory = (tabId: string): string => {
       if (['hierarchy', 'wordcount', 'suggestions'].includes(tabId)) {
         return 'content';
-      } else if (['seo', 'structure', 'backlinks', 'internal-links', 'keyword-meta'].includes(tabId)) {
+      } else if (['seo', 'structure', 'backlinks', 'internal-links', 'keyword-meta', 'rankings'].includes(tabId)) {
         return 'seo';
       } else if (['performance', 'metrics'].includes(tabId)) {
         return 'performance';
@@ -135,12 +138,13 @@ export const useTabNavigation = () => {
     };
     
     const mainCategory = getMainCategory(activeTab);
+    console.log("Main category:", mainCategory, "for active tab:", activeTab);
     
     if (mainCategory === 'content') {
       return tabs.filter(tab => ['hierarchy', 'wordcount', 'suggestions'].includes(tab.id));
     } 
     else if (mainCategory === 'seo') {
-      return tabs.filter(tab => ['seo', 'structure', 'backlinks', 'internal-links', 'keyword-meta'].includes(tab.id));
+      return tabs.filter(tab => ['seo', 'structure', 'backlinks', 'internal-links', 'keyword-meta', 'rankings'].includes(tab.id));
     } 
     else if (mainCategory === 'performance') {
       return tabs.filter(tab => ['performance', 'metrics'].includes(tab.id));

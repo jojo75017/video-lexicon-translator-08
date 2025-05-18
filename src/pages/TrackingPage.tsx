@@ -13,11 +13,18 @@ const TrackingPage = () => {
   const [url, setUrl] = useState('https://example.com');
   const [isTracking, setIsTracking] = useState(false);
   
-  // Démarrer automatiquement le suivi au chargement de la page
+  // Démarrer automatiquement le suivi immédiatement au chargement de la page
   useEffect(() => {
-    if (!isTracking && url) {
-      handleStartTracking();
-    }
+    console.log("TrackingPage: Chargement initial");
+    // Démarrer le suivi après un court délai pour éviter les problèmes de rendu
+    const timer = setTimeout(() => {
+      if (!isTracking) {
+        console.log("TrackingPage: Démarrage automatique du suivi");
+        handleStartTracking();
+      }
+    }, 300);
+    
+    return () => clearTimeout(timer);
   }, []);
   
   const handleStartTracking = () => {
@@ -38,12 +45,12 @@ const TrackingPage = () => {
         <Card className="p-6 shadow-sm">
           <div className="space-y-4">
             <h2 className="text-2xl font-bold flex items-center gap-2">
-              <LineChart className="h-6 w-6 text-blue-600" />
+              <LineChart className="h-6 w-6 text-purple-600" />
               Suivi des Positions
             </h2>
             
-            <Alert className="bg-blue-50 border-blue-200">
-              <Info className="h-4 w-4 text-blue-600" />
+            <Alert className="bg-purple-50 border-purple-200">
+              <Info className="h-4 w-4 text-purple-600" />
               <AlertTitle>Suivi des positions dans les moteurs de recherche</AlertTitle>
               <AlertDescription>
                 Cette fonctionnalité vous permet de suivre l'évolution de vos positions pour vos mots-clés principaux et d'identifier les opportunités d'optimisation.
@@ -57,7 +64,11 @@ const TrackingPage = () => {
                 onChange={(e) => setUrl(e.target.value)}
                 className="flex-1"
               />
-              <Button onClick={handleStartTracking} disabled={isTracking}>
+              <Button 
+                onClick={handleStartTracking} 
+                disabled={isTracking}
+                className="bg-purple-600 hover:bg-purple-700"
+              >
                 <Search className="h-4 w-4 mr-2" />
                 {isTracking ? "Suivi en cours..." : "Démarrer le suivi"}
               </Button>
