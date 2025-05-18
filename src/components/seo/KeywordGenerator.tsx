@@ -18,7 +18,8 @@ import {
   Info,
   FileText,
   MessageSquare,
-  Tag
+  Tag,
+  FolderTree
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { KeywordSuggestion } from '@/types/seo/Keyword';
@@ -39,6 +40,7 @@ import KeywordFAQ from './keyword/KeywordFAQ';
 import SearchConsoleDataViewer from './keyword/SearchConsoleData';
 import SiteStructureAnalyzer from './keyword/SiteStructureAnalyzer';
 import { RankingData } from '@/types/seo/Ranking';
+import { FolderTree } from 'lucide-react';
 
 const KeywordGenerator = () => {
   const [isLoading, setIsLoading] = useState(false);
