@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from 'react';
 import { TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton"; 
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, Info } from "lucide-react";
+import { AlertCircle, Info, LineChart } from "lucide-react";
 import HierarchyTabContent from './HierarchyTabContent';
 import SeoResults from "@/components/SeoResults";
 import { CrawlForm } from "@/components/CrawlForm";
@@ -11,6 +11,8 @@ import { useSiteAnalyzer } from "@/hooks/useSiteAnalyzer";
 import { useNavigate } from "react-router-dom";
 import { activateSection } from '@/utils/navigationHelpers';
 import { toast } from "sonner";
+import RankingTracker from "@/components/seo/RankingTracker";
+import { Button } from "@/components/ui/button";
 
 interface TabContentsRendererProps {
   contentTabs: any[];
@@ -50,7 +52,8 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
         'signature': '/signature',
         'keyword-meta': '/keyword-meta',
         'keyword-generator': '/keyword-generator',
-        'quora': '/quora'
+        'quora': '/quora',
+        'rankings': '/tracking'
       };
       
       // Ne rediriger que si l'onglet spécial est actif et que nous sommes pas dans une boucle
@@ -149,6 +152,41 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
             </AlertDescription>
           </Alert>
           <CrawlForm />
+        </div>
+      </TabsContent>
+      
+      {/* Rankings Tab */}
+      <TabsContent value="rankings" id="rankings" data-section="rankings" style={{
+        display: activeTab === "rankings" ? "block" : "none",
+        position: "relative" as "relative",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "auto",
+      }}>
+        <div className="space-y-4">
+          <h2 className="text-xl font-bold flex items-center gap-2">
+            <LineChart className="h-5 w-5 text-purple-600" />
+            Suivi des positions
+          </h2>
+          <Alert>
+            <Info className="h-4 w-4" />
+            <AlertTitle>Suivez vos positions</AlertTitle>
+            <AlertDescription>
+              Suivez l'évolution de vos positions dans les moteurs de recherche pour vos mots-clés importants.
+            </AlertDescription>
+          </Alert>
+          
+          <div className="flex flex-col items-center justify-center p-8 border border-dashed border-gray-300 rounded-lg">
+            <LineChart className="h-12 w-12 text-purple-600 mb-4" />
+            <h3 className="text-lg font-medium mb-2">Suivez vos positions Google</h3>
+            <p className="text-gray-600 mb-4 text-center max-w-md">
+              Visualisez l'évolution de vos positions dans les moteurs de recherche pour vos mots-clés importants.
+            </p>
+            <Button onClick={() => navigate('/tracking')} className="bg-purple-600 hover:bg-purple-700">
+              Accéder au suivi des positions
+            </Button>
+          </div>
         </div>
       </TabsContent>
 
@@ -290,7 +328,7 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
       
       {/* Fallback for any other tab */}
       {contentTabs
-        .filter(tab => !['hierarchy', 'wordcount', 'suggestions', 'seo', 'structure', 'backlinks', 'performance', 'metrics', 'analytics', 'keyword-meta', 'internal-links'].includes(tab.id))
+        .filter(tab => !['hierarchy', 'wordcount', 'suggestions', 'seo', 'structure', 'backlinks', 'performance', 'metrics', 'analytics', 'keyword-meta', 'internal-links', 'rankings'].includes(tab.id))
         .map(tab => (
           <TabsContent key={tab.id} value={tab.id} id={tab.id} data-section={tab.id} style={{
             display: activeTab === tab.id ? "block" : "none",

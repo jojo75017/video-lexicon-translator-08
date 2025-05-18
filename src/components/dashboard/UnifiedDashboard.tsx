@@ -3,7 +3,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Home, ArrowLeft, FileText, LinkIcon, LineChart, FilePenLine, LayoutGrid } from 'lucide-react';
+import { Home, ArrowLeft, LineChart } from 'lucide-react';
 import { toast } from 'sonner';
 
 const UnifiedDashboard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -75,8 +75,9 @@ const UnifiedDashboard: React.FC<{ children: React.ReactNode }> = ({ children })
                 <Button 
                   variant={currentPath.includes('/tracking') ? "default" : "outline"} 
                   size="sm"
-                  className={currentPath.includes('/tracking') ? "bg-blue-600 hover:bg-blue-700" : ""}
+                  className={currentPath.includes('/tracking') ? "bg-purple-600 hover:bg-purple-700" : ""}
                 >
+                  <LineChart className="h-4 w-4 mr-1" />
                   Suivi Positions
                 </Button>
               </Link>

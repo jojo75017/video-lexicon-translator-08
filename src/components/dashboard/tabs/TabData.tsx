@@ -75,6 +75,15 @@ export const tabs = [
     link: '/keyword-meta',
     category: 'seo'
   },
+  {
+    id: 'rankings',
+    label: 'Suivi positions',
+    icon: <LineChart className="h-4 w-4" />,
+    description: "Suivre vos positions dans Google",
+    color: "bg-purple-50 text-purple-700 border-purple-200",
+    link: '/tracking',
+    category: 'seo'
+  },
   { 
     id: 'performance', 
     label: 'Performance',

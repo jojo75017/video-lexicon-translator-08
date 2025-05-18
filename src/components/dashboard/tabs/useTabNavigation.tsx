@@ -27,7 +27,8 @@ export const useTabNavigation = () => {
       '/performance': 'performance',
       '/analytics': 'analytics',
       '/quora': 'quora',
-      '/signature': 'signature'
+      '/signature': 'signature',
+      '/tracking': 'rankings'
     };
     
     return pathToTabMap[currentPath] || 'hierarchy';
@@ -75,7 +76,8 @@ export const useTabNavigation = () => {
       'metrics': '/performance',
       'analytics': '/analytics',
       'quora': '/quora',
-      'signature': '/signature'
+      'signature': '/signature',
+      'rankings': '/tracking'
     };
     
     if (tabPaths[value]) {
@@ -97,7 +99,7 @@ export const useTabNavigation = () => {
     const getMainCategory = (tabId: string): string => {
       if (['hierarchy', 'wordcount', 'suggestions'].includes(tabId)) {
         return 'content';
-      } else if (['seo', 'structure', 'backlinks'].includes(tabId)) {
+      } else if (['seo', 'structure', 'backlinks', 'rankings'].includes(tabId)) {
         return 'seo';
       } else if (['performance', 'metrics'].includes(tabId)) {
         return 'performance';
@@ -114,7 +116,7 @@ export const useTabNavigation = () => {
       return tabs.filter(tab => ['hierarchy', 'wordcount', 'suggestions'].includes(tab.id));
     } 
     else if (mainCategory === 'seo') {
-      return tabs.filter(tab => ['seo', 'structure', 'backlinks'].includes(tab.id));
+      return tabs.filter(tab => ['seo', 'structure', 'backlinks', 'rankings'].includes(tab.id));
     } 
     else if (mainCategory === 'performance') {
       return tabs.filter(tab => ['performance', 'metrics'].includes(tab.id));
