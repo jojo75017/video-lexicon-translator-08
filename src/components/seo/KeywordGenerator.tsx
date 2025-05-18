@@ -33,14 +33,7 @@ import {
   generateTrendData,
   sortKeywordsByScore
 } from '@/utils/keyword/keywordGeneratorUtils';
-import { 
-  determineKeywordIntent, 
-  enrichKeywords, 
-  generateQuestionKeywords, 
-  generateSuggestedTitle, 
-  generateSuggestedDescription,
-  generateSuggestedLongDescription
-} from '@/utils/keyword/keywordAnalyzer';
+import ApiKeyConfig from './analysis/ApiKeyConfig';
 
 const KeywordGenerator = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -62,6 +55,13 @@ const KeywordGenerator = () => {
   const [competitors, setCompetitors] = useState<any[]>([]);
   const [serpResults, setSerpResults] = useState<any[]>([]);
   
+  // État pour la gestion de la clé API
+  const [openaiKey, setOpenaiKey] = useState(() => localStorage.getItem('openaiKey') || '');
+  const [apiKeyStatus, setApiKeyStatus] = useState<'unchecked' | 'valid' | 'invalid'>(
+    localStorage.getItem('openaiKey') ? 'valid' : 'unchecked'
+  );
+  const [validationMessage, setValidationMessage] = useState('');
+  
   // Fonction pour générer les mots-clés
   const handleGenerate = () => {
     if (!keyword.trim()) {
@@ -81,26 +81,42 @@ const KeywordGenerator = () => {
         // Générer les mots-clés longue traîne
         const longTails = generateLongTailKeywords(keyword);
         
-        // Générer les questions fréquentes
-        const questions = generateQuestionKeywords(keyword).map(q => ({
+        // Générer les questions fréquentes en utilisant une fonction simplifiée
+        const generateSimpleQuestions = (keyword: string): string[] => {
+          return [
+            `Comment ${keyword} fonctionne?`,
+            `Quelle est la meilleure façon d'utiliser ${keyword}?`,
+            `Pourquoi ${keyword} est-il important?`,
+            `Quelles sont les alternatives à ${keyword}?`,
+            `Quels sont les avantages de ${keyword}?`
+          ];
+        };
+
+        const questions = generateSimpleQuestions(keyword).map(q => ({
           keyword: q,
           volume: Math.floor(Math.random() * 500) + 10,
           difficulty: Math.floor(Math.random() * 40) + 5,
           cpc: parseFloat((Math.random() * 0.8).toFixed(2)),
-          competition: parseFloat((Math.random() * 0.5).toFixed(2)),
-          relevance: Math.floor(Math.random() * 30) + 65,
           type: 'question' as 'question',
           intent: 'informational' as 'informational',
           opportunity: Math.floor(Math.random() * 30) + 60,
           trend: generateTrendData(q),
-          suggestedTitle: generateSuggestedTitle(q),
-          suggestedDescription: generateSuggestedDescription(q),
-          suggestedLongDescription: generateSuggestedLongDescription(q)
+          suggestedTitle: `Guide complet: ${q}`,
+          suggestedDescription: `Découvrez tout ce que vous devez savoir sur ${q}. Guide pratique, conseils d'experts et astuces pour optimiser votre utilisation.`
         }));
         
+        // Fonctions simplifiées pour enrichir les mots-clés
+        const enrichKeywordsSimple = (keywords: KeywordSuggestion[]): KeywordSuggestion[] => {
+          return keywords.map(kw => ({
+            ...kw,
+            suggestedTitle: `Guide complet sur ${kw.keyword}: Tout ce que vous devez savoir`,
+            suggestedDescription: `Découvrez les meilleures pratiques pour maîtriser ${kw.keyword}. Conseils d'experts, astuces et stratégies pour réussir.`
+          }));
+        };
+        
         // Enrichir les mots-clés avec des données supplémentaires
-        const enrichedStandards = enrichKeywords(standards);
-        const enrichedLongTails = enrichKeywords(longTails);
+        const enrichedStandards = enrichKeywordsSimple(standards);
+        const enrichedLongTails = enrichKeywordsSimple(longTails);
         
         // Genérer des données de concurrents fictives
         const mockCompetitors = [
@@ -215,6 +231,13 @@ const KeywordGenerator = () => {
     toast.success(`${selectedKeywords.length} mots-clés exportés`);
   };
   
+  // Fonction appelée après validation de la clé API
+  const handleKeyValidated = () => {
+    if (hasGenerated) {
+      toast.info("Vous pouvez regénérer les mots-clés pour utiliser l'API OpenAI");
+    }
+  };
+
   // Nombre total de mots-clés générés
   const totalKeywords = standardKeywords.length + longTailKeywords.length + questionKeywords.length;
   
@@ -223,6 +246,31 @@ const KeywordGenerator = () => {
 
   return (
     <div className="space-y-6">
+      {/* Configuration de l'API OpenAI */}
+      <Card className="p-6 border-t-4 border-t-purple-500">
+        <div className="flex items-center gap-2 mb-4">
+          <Sparkles className="h-5 w-5 text-purple-500" />
+          <h2 className="text-xl font-bold">Configuration API</h2>
+        </div>
+        
+        <ApiKeyConfig 
+          openaiKey={openaiKey}
+          setOpenaiKey={setOpenaiKey}
+          apiKeyStatus={apiKeyStatus}
+          setApiKeyStatus={setApiKeyStatus}
+          validationMessage={validationMessage}
+          setValidationMessage={setValidationMessage}
+          onKeyValidated={handleKeyValidated}
+        />
+        
+        <div className="mt-4 text-sm text-gray-600">
+          <p className="flex items-center gap-1">
+            <Info className="h-4 w-4" /> 
+            La clé API OpenAI permet d'obtenir des suggestions de mots-clés plus pertinentes et des analyses concurrentielles détaillées.
+          </p>
+        </div>
+      </Card>
+      
       <Card className="p-6 border-t-4 border-t-blue-500">
         <div className="flex items-center gap-2 mb-6">
           <Search className="h-5 w-5 text-blue-500" />
@@ -365,6 +413,7 @@ const KeywordGenerator = () => {
             toggleKeywordSelection={toggleKeywordSelection}
             clearSelectedKeywords={clearSelectedKeywords}
             exportSelectedKeywords={exportSelectedKeywords}
+            keyword={keyword}
           />
           
           {questionKeywords.length > 0 && (
