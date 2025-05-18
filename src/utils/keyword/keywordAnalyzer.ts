@@ -23,7 +23,8 @@ export const enrichKeywords = (keywords: KeywordSuggestion[]): KeywordSuggestion
   return keywords.map(kw => ({
     ...kw,
     opportunity: calculateOpportunityScore(kw),
-    serps: generateMockSerps(kw.keyword)
+    serps: generateMockSerps(kw.keyword),
+    intent: kw.intent || determineKeywordIntent(kw.keyword)
   }));
 };
 
@@ -39,6 +40,31 @@ export const calculateOpportunityScore = (keyword: KeywordSuggestion): number =>
   
   const opportunityScore = Math.floor((volumeScore + difficultyScore) / 2);
   return Math.min(Math.max(opportunityScore, 10), 99); // Garder entre 10 et 99
+};
+
+// Déterminer l'intention de recherche d'un mot-clé
+export const determineKeywordIntent = (keyword: string): 'informational' | 'navigational' | 'transactional' | 'commercial' => {
+  const keywordLower = keyword.toLowerCase();
+  
+  if (keywordLower.includes('comment') || 
+      keywordLower.includes('pourquoi') || 
+      keywordLower.includes('qu\'est-ce') || 
+      keywordLower.includes('guide') || 
+      keywordLower.includes('tutoriel')) {
+    return 'informational';
+  } else if (keywordLower.includes('acheter') || 
+             keywordLower.includes('prix') || 
+             keywordLower.includes('tarif') || 
+             keywordLower.includes('commander')) {
+    return 'transactional';
+  } else if (keywordLower.includes('vs') || 
+             keywordLower.includes('comparatif') || 
+             keywordLower.includes('meilleur') || 
+             keywordLower.includes('avis')) {
+    return 'commercial';
+  } else {
+    return 'navigational';
+  }
 };
 
 // Génération de résultats SERP fictifs pour un mot-clé

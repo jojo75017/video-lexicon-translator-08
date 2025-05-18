@@ -22,4 +22,5 @@ export interface KeywordSuggestion {
   type?: 'question' | 'standard' | 'long-tail' | 'related';
   intent?: 'informational' | 'navigational' | 'transactional' | 'commercial';
   serps?: any[];
+  trend?: number[];
 }

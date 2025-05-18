@@ -68,6 +68,8 @@ export const generateLongTailKeywords = (keyword: string): KeywordSuggestion[] =
       cpc: parseFloat((Math.random() * 1 + 0.1).toFixed(2)),
       competition: parseFloat((Math.random() * 0.4).toFixed(2)),
       relevance: 70,
+      type: 'long-tail',
+      intent: 'informational'
     });
   }
   
@@ -112,4 +114,10 @@ export const sortKeywordsByScore = (keywords: KeywordSuggestion[]): KeywordSugge
     const scoreB = calculateKeywordScore(b);
     return scoreB - scoreA; // Tri décroissant
   });
+};
+
+// Génère des tendances de recherche fictives pour un mot-clé
+export const generateTrendData = (keyword: string): number[] => {
+  // Génère 12 points de données (un par mois)
+  return Array(12).fill(0).map(() => Math.floor(Math.random() * 100));
 };
