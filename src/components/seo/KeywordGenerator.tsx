@@ -44,6 +44,7 @@ const KeywordGenerator = () => {
   const [activeTab, setActiveTab] = useState('standard');
   const [hasSearched, setHasSearched] = useState(false);
   const [hasGenerated, setHasGenerated] = useState(false);
+  const [showAiIdeas, setShowAiIdeas] = useState(false);
   
   // États pour les résultats
   const [standardKeywords, setStandardKeywords] = useState<KeywordSuggestion[]>([]);
@@ -229,6 +230,23 @@ const KeywordGenerator = () => {
     document.body.removeChild(link);
     
     toast.success(`${selectedKeywords.length} mots-clés exportés`);
+  };
+
+  // Fonction pour générer plus d'idées avec l'IA
+  const handleGenerateMoreIdeas = () => {
+    if (openaiKey.trim() === '') {
+      toast.error("Veuillez configurer votre clé API OpenAI d'abord");
+      return;
+    }
+    
+    // Afficher/masquer le panneau d'idées IA
+    setShowAiIdeas(!showAiIdeas);
+    
+    if (!showAiIdeas) {
+      toast.info("Panneau d'idées IA ouvert", {
+        description: "Explorez des suggestions générées par l'IA"
+      });
+    }
   };
   
   // Fonction appelée après validation de la clé API
@@ -487,11 +505,44 @@ const KeywordGenerator = () => {
             </ul>
             
             <div className="flex justify-end">
-              <Button variant="outline" className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                className="flex items-center gap-2"
+                onClick={handleGenerateMoreIdeas}
+              >
                 <MessageSquare className="h-4 w-4" />
                 Générer plus d'idées avec l'IA
               </Button>
             </div>
+            
+            {/* Panel d'idées générées par l'IA */}
+            {showAiIdeas && (
+              <div className="mt-6 p-4 border border-blue-100 rounded-lg bg-blue-50">
+                <h3 className="font-medium text-blue-800 mb-3">Idées de contenu générées par l'IA</h3>
+                
+                <div className="space-y-3">
+                  {[
+                    `Comparatif des meilleurs outils pour ${keyword} en 2024`,
+                    `Comment mesurer l'efficacité de votre stratégie ${keyword}`,
+                    `${keyword} pour débutants : guide pas à pas`,
+                    `Les tendances ${keyword} à surveiller cette année`,
+                    `Étude de cas : Comment augmenter son ROI avec ${keyword}`
+                  ].map((idea, idx) => (
+                    <div key={idx} className="p-3 bg-white rounded-lg border border-blue-100">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start gap-2">
+                          <MessageSquare className="h-4 w-4 text-blue-500 mt-1" />
+                          <span>{idea}</span>
+                        </div>
+                        <Button variant="ghost" size="sm" className="h-6 px-2">
+                          <ArrowRight className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </Card>
         </>
       )}

@@ -5,10 +5,16 @@ export interface KeywordSuggestion {
   searchVolume?: number;
   difficulty?: number;
   cpc?: number;
-  competition?: number; // Ajout de la propriété manquante
-  relevance?: number; // Ajout de la propriété manquante
+  competition?: number; 
+  relevance?: number; 
   intent?: string;
   type?: string;
+  volume?: number;
+  opportunity?: number;
+  trend?: number[];
+  suggestedTitle?: string;
+  suggestedDescription?: string;
+  suggestedLongDescription?: string;
 }
 
 export interface SerpResult {
@@ -49,6 +55,7 @@ export interface KeywordData {
   count?: number;
   density?: number;
   position?: number;
+  volume?: number;
 }
 
 export interface KeywordTrend {
