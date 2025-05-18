@@ -1,5 +1,4 @@
-
-import { KeywordSuggestion, SerpResult } from "@/types/seo/Keyword";
+import { KeywordSuggestion, SerpResult, CompetitorData } from "@/types/seo/Keyword";
 
 // Détermine l'intention de recherche du mot-clé
 export const determineKeywordIntent = (keyword: string): 'informational' | 'navigational' | 'transactional' => {
@@ -137,4 +136,65 @@ export const generateSerpData = (keyword: string): SerpResult[] => {
   }
   
   return results;
+};
+
+/**
+ * Génère des données sur les concurrents pour un mot-clé
+ * @param keyword Le mot-clé pour lequel générer des données de concurrents
+ * @returns Un tableau de données de concurrents
+ */
+export const generateCompetitors = (keyword: string): CompetitorData[] => {
+  console.log("Generating competitor data for:", keyword);
+  
+  // Liste d'exemples de noms de domaines et d'entreprises
+  const domains = [
+    { name: "Expert Guide", url: "expert-guide.com" },
+    { name: "Pro Solutions", url: "pro-solutions.fr" },
+    { name: "Info Hub", url: "info-hub.net" },
+    { name: "Best Practices", url: "best-practices.org" },
+    { name: "Conseils Premium", url: "conseils-premium.fr" }
+  ];
+  
+  // Générer des données aléatoires mais réalistes pour chaque concurrent
+  const competitors: CompetitorData[] = domains.map((domain, index) => {
+    // Plus l'index est petit, plus le concurrent est fort
+    const strength = Math.max(30, 95 - (index * 12) - Math.floor(Math.random() * 10));
+    
+    // Trafic organique - plus le concurrent est fort, plus il a de trafic
+    const baseTraffic = Math.floor(10000 + (100000 / (index + 1)));
+    const organicTraffic = baseTraffic - Math.floor(Math.random() * (baseTraffic * 0.3));
+    
+    // Nombre de mots-clés - corrélé au trafic organique
+    const keywords = Math.floor(organicTraffic / 10) + Math.floor(Math.random() * 500);
+    
+    // Liste de mots-clés communs
+    const commonKeywordsList = [
+      keyword,
+      `meilleur ${keyword}`,
+      `${keyword} guide`,
+      `comment utiliser ${keyword}`,
+      `${keyword} pro`,
+      `${keyword} prix`
+    ];
+    
+    // Sélectionner un sous-ensemble aléatoire de mots-clés communs
+    const commonKeywords = commonKeywordsList
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 3 + Math.floor(Math.random() * 3));
+    
+    // Créer une icône/logo pour ce concurrent (simulé par une URL)
+    const logo = `https://ui-avatars.com/api/?name=${encodeURIComponent(domain.name)}&background=random`;
+    
+    return {
+      name: domain.name,
+      url: domain.url,
+      strength,
+      organic_traffic: organicTraffic,
+      keywords,
+      commonKeywords,
+      logo
+    };
+  });
+  
+  return competitors;
 };

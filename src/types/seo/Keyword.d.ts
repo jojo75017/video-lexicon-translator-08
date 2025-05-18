@@ -49,6 +49,8 @@ export interface CompetitorData {
   strength: number;
   organic_traffic: number;
   keywords: number;
+  commonKeywords?: string[];
+  logo?: string;
 }
 
 export interface KeywordStrategyResponse {
