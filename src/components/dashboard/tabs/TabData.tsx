@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BarChart2, FileText, Zap, PieChart, Type, FilePenLine, LayoutGrid, ThumbsUp, Target, LinkIcon, Link2, LineChart, CheckCircle2, TicketCheck } from "lucide-react";
 

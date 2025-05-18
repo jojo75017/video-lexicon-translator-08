@@ -19,6 +19,8 @@ const TrackingPage = () => {
       return;
     }
     
+    // Démarrer le suivi des positions
+    console.log("Démarrage du suivi pour:", url);
     setIsTracking(true);
     toast.success(`Suivi des positions démarré pour ${url}`);
   };

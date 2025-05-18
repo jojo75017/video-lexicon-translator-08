@@ -12,6 +12,35 @@ interface RankingTrackerProps {
   url: string;
 }
 
+// Fonction utilitaire pour générer des données historiques
+function generateHistoricalData(period: '30j' | '90j') {
+  const numDays = period === '30j' ? 30 : 90;
+  const data = [];
+  
+  let position = Math.random() * 10 + 20; // Position de départ entre 20 et 30
+  
+  for (let i = numDays; i >= 0; i--) {
+    const date = new Date();
+    date.setDate(date.getDate() - i);
+    
+    // Simuler une amélioration progressive des positions
+    const improvement = (numDays - i) / numDays * 5; // Amélioration progressive
+    const randomFactor = (Math.random() - 0.5) * 4; // Fluctuation aléatoire
+    
+    position = Math.max(2, position - 0.2 + randomFactor);
+    if (i < numDays / 2) {
+      position = Math.max(2, position - 0.1); // Amélioration plus rapide sur la seconde moitié
+    }
+    
+    data.push({
+      date: date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }),
+      position: parseFloat(position.toFixed(1))
+    });
+  }
+  
+  return data;
+}
+
 const RankingTracker: React.FC<RankingTrackerProps> = ({ url }) => {
   const [rankingData, setRankingData] = useState<RankingData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -21,12 +50,14 @@ const RankingTracker: React.FC<RankingTrackerProps> = ({ url }) => {
   useEffect(() => {
     // Simule le chargement des données de classement
     setLoading(true);
+    console.log("Chargement des données pour", url, "période:", periodFilter);
     setTimeout(() => {
       fetchRankingData();
     }, 1000);
   }, [url, periodFilter]);
   
   const fetchRankingData = () => {
+    console.log("Récupération des données de classement");
     // Simule une requête API
     const mockData: RankingData = {
       totalImpressions: periodFilter === '30j' ? 12500 : 32800,
@@ -63,6 +94,7 @@ const RankingTracker: React.FC<RankingTrackerProps> = ({ url }) => {
     setRankingData(mockData);
     setChartData(mockData.historicalData || []);
     setLoading(false);
+    console.log("Données de classement chargées", mockData);
   };
   
   const renderChangeIndicator = (change: number | undefined) => {
@@ -293,34 +325,5 @@ const RankingTracker: React.FC<RankingTrackerProps> = ({ url }) => {
     </Card>
   );
 };
-
-// Fonction utilitaire pour générer des données historiques
-function generateHistoricalData(period: '30j' | '90j') {
-  const numDays = period === '30j' ? 30 : 90;
-  const data = [];
-  
-  let position = Math.random() * 10 + 20; // Position de départ entre 20 et 30
-  
-  for (let i = numDays; i >= 0; i--) {
-    const date = new Date();
-    date.setDate(date.getDate() - i);
-    
-    // Simuler une amélioration progressive des positions
-    const improvement = (numDays - i) / numDays * 5; // Amélioration progressive
-    const randomFactor = (Math.random() - 0.5) * 4; // Fluctuation aléatoire
-    
-    position = Math.max(2, position - 0.2 + randomFactor);
-    if (i < numDays / 2) {
-      position = Math.max(2, position - 0.1); // Amélioration plus rapide sur la seconde moitié
-    }
-    
-    data.push({
-      date: date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }),
-      position: parseFloat(position.toFixed(1))
-    });
-  }
-  
-  return data;
-}
 
 export default RankingTracker;
