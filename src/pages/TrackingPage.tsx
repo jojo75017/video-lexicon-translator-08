@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import UnifiedDashboard from '@/components/dashboard/UnifiedDashboard';
 import { Card } from '@/components/ui/card';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { LineChart, Info, Search } from 'lucide-react';
+import { LineChart, Info, Search, RefreshCw, Globe } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import RankingTracker from '@/components/seo/RankingTracker';
@@ -12,11 +12,12 @@ import { toast } from 'sonner';
 const TrackingPage = () => {
   const [url, setUrl] = useState('https://example.com');
   const [isTracking, setIsTracking] = useState(false);
+  const [inputUrl, setInputUrl] = useState('https://example.com');
   
-  // Démarrer automatiquement le suivi immédiatement au chargement de la page
+  // Démarrer le suivi au chargement de la page
   useEffect(() => {
     console.log("TrackingPage: Chargement initial");
-    // Démarrer le suivi après un court délai pour éviter les problèmes de rendu
+    // Démarrer le suivi après un court délai
     const timer = setTimeout(() => {
       if (!isTracking) {
         console.log("TrackingPage: Démarrage automatique du suivi");
@@ -28,15 +29,35 @@ const TrackingPage = () => {
   }, []);
   
   const handleStartTracking = () => {
-    if (!url.trim()) {
+    if (!inputUrl.trim()) {
       toast.error("Veuillez entrer une URL à suivre");
       return;
     }
     
+    // Formater l'URL si nécessaire
+    let formattedUrl = inputUrl.trim();
+    if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
+      formattedUrl = `https://${formattedUrl}`;
+      setInputUrl(formattedUrl);
+    }
+    
     // Démarrer le suivi des positions
-    console.log(`Démarrage du suivi pour: ${url}`);
+    console.log(`Démarrage du suivi pour: ${formattedUrl}`);
+    setUrl(formattedUrl);
     setIsTracking(true);
-    toast.success(`Suivi des positions démarré pour ${url}`);
+    toast.success(`Suivi des positions démarré pour ${formattedUrl}`);
+  };
+  
+  const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputUrl(e.target.value);
+  };
+  
+  const handleResetTracking = () => {
+    setIsTracking(false);
+    // Réinitialiser après un court délai pour permettre le rechargement des données
+    setTimeout(() => {
+      handleStartTracking();
+    }, 300);
   };
   
   return (
@@ -58,20 +79,31 @@ const TrackingPage = () => {
             </Alert>
             
             <div className="flex gap-2 my-4">
-              <Input
-                placeholder="Entrez l'URL de votre site"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                className="flex-1"
-              />
+              <div className="relative flex-1">
+                <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Entrez l'URL de votre site"
+                  value={inputUrl}
+                  onChange={handleUrlChange}
+                  className="pl-10"
+                />
+              </div>
               <Button 
-                onClick={handleStartTracking} 
-                disabled={isTracking}
+                onClick={handleStartTracking}
                 className="bg-purple-600 hover:bg-purple-700"
               >
                 <Search className="h-4 w-4 mr-2" />
-                {isTracking ? "Suivi en cours..." : "Démarrer le suivi"}
+                {!isTracking ? "Démarrer le suivi" : "Mettre à jour"}
               </Button>
+              {isTracking && (
+                <Button 
+                  onClick={handleResetTracking} 
+                  variant="outline"
+                >
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Actualiser
+                </Button>
+              )}
             </div>
             
             {isTracking && <RankingTracker url={url} />}

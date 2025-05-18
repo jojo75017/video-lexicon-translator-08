@@ -12,24 +12,33 @@ interface RankingTrackerProps {
   url: string;
 }
 
-// Fonction utilitaire pour générer des données historiques
-function generateHistoricalData(period: '30j' | '90j') {
+// Fonction utilitaire pour générer des données historiques basées sur l'URL
+function generateHistoricalData(period: '30j' | '90j', url: string) {
   const numDays = period === '30j' ? 30 : 90;
   const data = [];
   
-  let position = Math.random() * 10 + 20; // Position de départ entre 20 et 30
+  // Utiliser l'URL pour générer un seed pseudo-aléatoire cohérent
+  const urlSeed = url.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const seedFactor = (urlSeed % 100) / 100; // Entre 0 et 1
+  
+  // Position de départ basée sur l'URL (entre 15 et 35)
+  let position = 15 + seedFactor * 20;
   
   for (let i = numDays; i >= 0; i--) {
     const date = new Date();
     date.setDate(date.getDate() - i);
     
-    // Simuler une amélioration progressive des positions
-    const improvement = (numDays - i) / numDays * 5; // Amélioration progressive
-    const randomFactor = (Math.random() - 0.5) * 4; // Fluctuation aléatoire
+    // Tendance d'amélioration basée sur l'URL
+    const improvementRate = 0.1 + seedFactor * 0.2; // Entre 0.1 et 0.3
+    const improvement = (numDays - i) / numDays * 5 * improvementRate;
     
-    position = Math.max(2, position - 0.2 + randomFactor);
+    // Fluctuation aléatoire cohérente basée sur l'URL et le jour
+    const dailySeed = (urlSeed + i) % 100 / 100;
+    const randomFactor = (dailySeed - 0.5) * 4;
+    
+    position = Math.max(2, position - improvement/10 + randomFactor/10);
     if (i < numDays / 2) {
-      position = Math.max(2, position - 0.1); // Amélioration plus rapide sur la seconde moitié
+      position = Math.max(2, position - improvementRate); // Amélioration plus rapide sur la seconde moitié
     }
     
     data.push({
@@ -48,7 +57,7 @@ const RankingTracker: React.FC<RankingTrackerProps> = ({ url }) => {
   const [chartData, setChartData] = useState<any[]>([]);
   
   useEffect(() => {
-    // Simule le chargement des données de classement
+    // Réinitialise les données lors du changement d'URL ou de période
     setLoading(true);
     console.log("Chargement des données pour", url, "période:", periodFilter);
     setTimeout(() => {
@@ -57,38 +66,60 @@ const RankingTracker: React.FC<RankingTrackerProps> = ({ url }) => {
   }, [url, periodFilter]);
   
   const fetchRankingData = () => {
-    console.log("Récupération des données de classement");
-    // Simule une requête API
+    console.log("Récupération des données de classement pour", url);
+    
+    // Utilise l'URL pour générer un facteur de score entre 0 et 1
+    const urlFactor = url.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 100 / 100;
+    
+    // Créer des données simulées en fonction de l'URL
+    const position = 30 - urlFactor * 20; // Entre 10 et 30
+    const clicks = Math.floor(500 + urlFactor * 1000); // Entre 500 et 1500
+    const impressions = Math.floor(8000 + urlFactor * 10000); // Entre 8000 et 18000
+    const ctr = ((clicks / impressions) * 100).toFixed(1);
+    
+    // Simule une requête API avec des données basées sur l'URL
     const mockData: RankingData = {
-      totalImpressions: periodFilter === '30j' ? 12500 : 32800,
-      totalClicks: periodFilter === '30j' ? 850 : 2240,
-      averageCTR: periodFilter === '30j' ? "6.8%" : "6.5%",
-      averagePosition: periodFilter === '30j' ? 18.3 : 16.8,
-      position: periodFilter === '30j' ? 18.3 : 16.8, // Pour compatibilité
-      clicks: periodFilter === '30j' ? 850 : 2240, // Pour compatibilité
-      impressions: periodFilter === '30j' ? 12500 : 32800, // Pour compatibilité
-      topQueries: [
-        { query: "référencement naturel", clicks: 180, impressions: 2400, ctr: 7.5, position: 4.2, change: -0.3 },
-        { query: "seo google", clicks: 145, impressions: 1800, ctr: 8.1, position: 6.5, change: 1.2 },
-        { query: "optimisation site web", clicks: 95, impressions: 1320, ctr: 7.2, position: 8.7, change: 0.5 },
-        { query: "agence référencement", clicks: 85, impressions: 1200, ctr: 7.1, position: 9.4, change: 2.1 },
-        { query: "audit seo", clicks: 70, impressions: 980, ctr: 7.1, position: 10.2, change: -0.8 }
-      ],
+      totalImpressions: periodFilter === '30j' ? impressions : impressions * 2.8,
+      totalClicks: periodFilter === '30j' ? clicks : clicks * 2.6,
+      averageCTR: periodFilter === '30j' ? ctr + "%" : (parseFloat(ctr) - 0.3).toFixed(1) + "%",
+      averagePosition: position,
+      position: position,
+      clicks: periodFilter === '30j' ? clicks : clicks * 2.6,
+      impressions: periodFilter === '30j' ? impressions : impressions * 2.8,
+      
+      // Générer des mots-clés pertinents basés sur l'URL
+      topQueries: generateKeywords(url, 5).map((keyword, index) => {
+        const pos = position - 10 + index * 2;
+        return {
+          query: keyword,
+          clicks: Math.floor(clicks / (index + 2)),
+          impressions: Math.floor(impressions / (index + 2)),
+          ctr: parseFloat((Math.random() * 2 + 6).toFixed(1)),
+          position: parseFloat(Math.max(1, pos).toFixed(1)),
+          change: parseFloat((Math.random() * 4 - 2).toFixed(1))
+        };
+      }),
+      
+      // Générer des pages basées sur l'URL
       topPages: [
-        { query: "/blog/seo-techniques", clicks: 210, impressions: 2800, ctr: 7.5, position: 3.2, change: 0.8 },
-        { query: "/services/referencement", clicks: 175, impressions: 2300, ctr: 7.6, position: 5.1, change: -0.2 },
-        { query: "/outils-seo", clicks: 110, impressions: 1600, ctr: 6.9, position: 7.4, change: 2.1 },
-        { query: "/blog/marketing-digital", clicks: 95, impressions: 1450, ctr: 6.5, position: 8.3, change: 0.7 },
-        { query: "/contact", clicks: 85, impressions: 1300, ctr: 6.5, position: 9.5, change: -0.5 }
+        { query: url.includes("http") ? new URL(url).pathname || "/" : "/", clicks: Math.floor(clicks * 0.3), impressions: Math.floor(impressions * 0.25), ctr: parseFloat((Math.random() * 2 + 6).toFixed(1)), position: parseFloat((position - 5).toFixed(1)), change: 0.8 },
+        { query: "/blog/seo-techniques", clicks: Math.floor(clicks * 0.2), impressions: Math.floor(impressions * 0.2), ctr: parseFloat((Math.random() * 2 + 6).toFixed(1)), position: parseFloat((position - 3).toFixed(1)), change: -0.2 },
+        { query: "/services", clicks: Math.floor(clicks * 0.15), impressions: Math.floor(impressions * 0.15), ctr: parseFloat((Math.random() * 2 + 6).toFixed(1)), position: parseFloat((position - 1).toFixed(1)), change: 2.1 },
+        { query: "/contact", clicks: Math.floor(clicks * 0.1), impressions: Math.floor(impressions * 0.1), ctr: parseFloat((Math.random() * 2 + 6).toFixed(1)), position: parseFloat((position + 1).toFixed(1)), change: 0.7 },
+        { query: "/a-propos", clicks: Math.floor(clicks * 0.05), impressions: Math.floor(impressions * 0.05), ctr: parseFloat((Math.random() * 2 + 6).toFixed(1)), position: parseFloat((position + 3).toFixed(1)), change: -0.5 }
       ],
+      
+      // Suggérer des opportunités d'optimisation
       optimizationOpportunities: [
-        { query: "référencement local", clicks: 15, impressions: 980, ctr: 1.5, position: 25.3, change: 0 },
-        { query: "audit seo gratuit", clicks: 8, impressions: 720, ctr: 1.1, position: 31.2, change: -2.4 },
-        { query: "backlinks seo", clicks: 12, impressions: 850, ctr: 1.4, position: 28.7, change: 1.2 },
-        { query: "contenu seo", clicks: 10, impressions: 790, ctr: 1.3, position: 27.5, change: -1.8 },
-        { query: "netlinking", clicks: 9, impressions: 680, ctr: 1.3, position: 29.4, change: 0.5 }
+        { query: "optimisation " + getDomainKeyword(url), clicks: Math.floor(clicks * 0.02), impressions: Math.floor(impressions * 0.1), ctr: 1.5, position: position + 10, change: 0 },
+        { query: getDomainKeyword(url) + " avantages", clicks: Math.floor(clicks * 0.01), impressions: Math.floor(impressions * 0.08), ctr: 1.1, position: position + 15, change: -2.4 },
+        { query: "meilleur " + getDomainKeyword(url), clicks: Math.floor(clicks * 0.015), impressions: Math.floor(impressions * 0.09), ctr: 1.4, position: position + 12, change: 1.2 },
+        { query: getDomainKeyword(url) + " professionnel", clicks: Math.floor(clicks * 0.012), impressions: Math.floor(impressions * 0.085), ctr: 1.3, position: position + 11, change: -1.8 },
+        { query: getDomainKeyword(url) + " prix", clicks: Math.floor(clicks * 0.01), impressions: Math.floor(impressions * 0.07), ctr: 1.3, position: position + 13, change: 0.5 }
       ],
-      historicalData: generateHistoricalData(periodFilter)
+      
+      // Générer des données historiques basées sur l'URL
+      historicalData: generateHistoricalData(periodFilter, url)
     };
     
     setRankingData(mockData);
@@ -96,6 +127,47 @@ const RankingTracker: React.FC<RankingTrackerProps> = ({ url }) => {
     setLoading(false);
     console.log("Données de classement chargées", mockData);
   };
+  
+  // Fonction pour extraire un mot-clé principal du domaine
+  function getDomainKeyword(url: string): string {
+    try {
+      // Essayer d'extraire le domaine de l'URL
+      let domain = url;
+      if (url.includes('http')) {
+        const urlObj = new URL(url);
+        domain = urlObj.hostname;
+      }
+      
+      // Supprimer www. et l'extension
+      domain = domain.replace(/^www\./, '').split('.')[0];
+      
+      // Retourner le domaine ou un mot-clé par défaut
+      return domain.length > 3 ? domain : "site web";
+    } catch (e) {
+      return "site web";
+    }
+  }
+  
+  // Fonction pour générer des mots-clés pertinents basés sur l'URL
+  function generateKeywords(url: string, count: number): string[] {
+    const domainKeyword = getDomainKeyword(url);
+    
+    const keywordTemplates = [
+      `${domainKeyword}`,
+      `${domainKeyword} professionnel`,
+      `services ${domainKeyword}`,
+      `meilleur ${domainKeyword}`,
+      `${domainKeyword} entreprise`,
+      `${domainKeyword} en ligne`,
+      `${domainKeyword} expertises`,
+      `${domainKeyword} conseils`,
+      `${domainKeyword} formation`,
+      `${domainKeyword} prix`
+    ];
+    
+    // Assure que nous retournons le nombre demandé
+    return keywordTemplates.slice(0, count);
+  }
   
   const renderChangeIndicator = (change: number | undefined) => {
     if (!change) return <Minus className="h-4 w-4 text-gray-500" />;
