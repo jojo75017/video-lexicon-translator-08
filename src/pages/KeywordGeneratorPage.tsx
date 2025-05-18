@@ -15,7 +15,7 @@ const KeywordGeneratorPage: React.FC = () => {
             <h1 className="text-2xl font-bold">Générateur de mots-clés</h1>
           </div>
           <p className="text-gray-600 mb-6">
-            Utilisez notre générateur de mots-clés pour trouver les meilleurs termes pour votre contenu et améliorer votre référencement.
+            Analysez les mots-clés pour votre contenu, identifiez les meilleures opportunités et obtenez des insights sur la concurrence. Cet outil s'inspire des fonctionnalités de SEMrush et SISTRIX.
           </p>
           
           <KeywordGenerator />
