@@ -37,7 +37,7 @@ const TrackingPage = () => {
               <Info className="h-4 w-4 text-blue-600" />
               <AlertTitle>Suivi des positions dans les moteurs de recherche</AlertTitle>
               <AlertDescription>
-                Cette fonctionnalité vous permet de suivre l'évolution de vos positions pour vos mots-clés principaux.
+                Cette fonctionnalité vous permet de suivre l'évolution de vos positions pour vos mots-clés principaux et d'identifier les opportunités d'optimisation.
               </AlertDescription>
             </Alert>
             
@@ -61,6 +61,8 @@ const TrackingPage = () => {
                 <h3 className="text-lg font-medium text-gray-700 mb-2">Entrez une URL pour commencer</h3>
                 <p className="text-gray-600">
                   Démarrez le suivi pour voir l'évolution de vos positions dans les moteurs de recherche.
+                  Vous pourrez analyser les tendances, identifier les mots-clés performants et découvrir 
+                  des opportunités d'optimisation pour améliorer votre visibilité.
                 </p>
               </div>
             )}

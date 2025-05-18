@@ -10,3 +10,4 @@ export * from './seo/Performance';
 export * from './seo/InternalLinks';
 export * from './seo/Keyword';
 export * from './seo/Hierarchy';
+export * from './seo/Ranking';

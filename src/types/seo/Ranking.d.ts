@@ -20,4 +20,8 @@ export interface RankingData {
   clicks: number;
   impressions: number;
   position: number;
+  historicalData?: Array<{
+    date: string;
+    position: number;
+  }>;
 }

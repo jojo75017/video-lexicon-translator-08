@@ -32,7 +32,7 @@ export const RankingButton = () => {
           <span className="text-xs">Suivre les classements</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[800px]">
+      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Suivi des classements SEO</DialogTitle>
         </DialogHeader>
