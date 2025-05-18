@@ -12,7 +12,7 @@ import { Toaster } from 'sonner';
 import './App.css';
 
 const App = () => {
-  console.log('App rendering with routes including Pinterest, Signature, Structure, and KeywordGenerator');
+  console.log('App rendering with routes including Tracking');
   
   return (
     <Router>

@@ -9,11 +9,17 @@ export const RankingButton = () => {
   const navigate = useNavigate();
   
   const handleNavigateToRankings = () => {
-    // Ajout de logs pour déboguer
+    // Ajout de logs de débogage supplémentaires
     console.log("Bouton de suivi des positions cliqué");
-    // Navigation explicite avec une URL absolue
-    navigate('/tracking');
-    toast.success('Navigation vers le suivi des positions');
+    try {
+      // Navigation vers la page de tracking avec chemin absolu
+      console.log("Navigation vers /tracking");
+      navigate('/tracking');
+      toast.success('Navigation vers le suivi des positions');
+    } catch (error) {
+      console.error("Erreur lors de la navigation:", error);
+      toast.error('Erreur de navigation');
+    }
   };
 
   return (
@@ -21,6 +27,7 @@ export const RankingButton = () => {
       variant="purple"
       className="flex flex-col items-center gap-2 h-auto py-4 px-2 text-center hover:bg-purple-600"
       onClick={handleNavigateToRankings}
+      type="button"
     >
       <LineChart className="h-6 w-6 text-white" />
       <span className="text-xs">Suivre les classements</span>
