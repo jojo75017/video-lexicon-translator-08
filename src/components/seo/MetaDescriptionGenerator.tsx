@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -178,7 +177,7 @@ const MetaDescriptionGenerator = () => {
           )}
           
           {useAI && !openaiKey && !showApiKeyInput && (
-            <Alert variant="warning" className="bg-amber-50 border-amber-200">
+            <Alert variant="default" className="bg-amber-50 border-amber-200">
               <AlertDescription className="text-amber-800 text-sm">
                 Vous avez activé l'IA, mais aucune clé API OpenAI n'est configurée. 
                 <Button variant="link" className="p-0 h-auto text-amber-800 underline" onClick={() => setShowApiKeyInput(true)}>

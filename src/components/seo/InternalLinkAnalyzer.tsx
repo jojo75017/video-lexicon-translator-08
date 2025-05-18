@@ -1,11 +1,12 @@
+
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"; 
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { ArrowUpRight, Link2, LinkOff, Network, BarChart3, FilePlus, AlertTriangle, CheckCircle2 } from 'lucide-react';
-import { PageLinkMetric, OrphanPage } from '@/types/seo/Hierarchy';
+import { ArrowUpRight, Link2, Link2Off, Network, BarChart3, FilePlus, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { PageLinkMetric, OrphanPage } from '@/types/seo/PageLinkMetric';
 import { Button } from "@/components/ui/button";
 
 interface InternalLinkAnalyzerProps {
