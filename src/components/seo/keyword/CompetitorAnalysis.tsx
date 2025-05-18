@@ -1,7 +1,8 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { ExternalLink, TrendingUp, Search } from 'lucide-react';
+import ApiKeyConfig from '@/components/seo/ApiKeyConfig';
 
 interface CompetitorAnalysisProps {
   competitors: any[];
@@ -9,6 +10,25 @@ interface CompetitorAnalysisProps {
 }
 
 const CompetitorAnalysis: React.FC<CompetitorAnalysisProps> = ({ competitors, keyword }) => {
+  const [openaiKey, setOpenaiKey] = useState('');
+  const [apiKeyStatus, setApiKeyStatus] = useState<'unchecked' | 'valid' | 'invalid'>('unchecked');
+  const [validationMessage, setValidationMessage] = useState('');
+
+  // Charger la clé API depuis le localStorage au démarrage
+  useEffect(() => {
+    const savedKey = localStorage.getItem('openaiKey');
+    if (savedKey) {
+      setOpenaiKey(savedKey);
+      setApiKeyStatus('unchecked');
+      setValidationMessage('Clé API chargée, mais non vérifiée');
+    }
+  }, []);
+
+  const handleKeyValidated = () => {
+    // Vous pourriez rafraîchir les données des concurrents ici
+    console.log("Clé API validée, des données plus précises seront chargées");
+  };
+
   return (
     <div className="space-y-4">
       <p className="text-gray-600">
@@ -52,6 +72,19 @@ const CompetitorAnalysis: React.FC<CompetitorAnalysisProps> = ({ competitors, ke
             </div>
           </Card>
         ))}
+      </div>
+      
+      {/* Section de configuration de la clé API */}
+      <div className="mt-4">
+        <ApiKeyConfig 
+          openaiKey={openaiKey}
+          setOpenaiKey={setOpenaiKey}
+          apiKeyStatus={apiKeyStatus}
+          setApiKeyStatus={setApiKeyStatus}
+          validationMessage={validationMessage}
+          setValidationMessage={setValidationMessage}
+          onKeyValidated={handleKeyValidated}
+        />
       </div>
       
       <div className="p-4 bg-slate-50 rounded-md border border-slate-200">

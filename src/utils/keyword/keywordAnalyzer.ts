@@ -1,64 +1,52 @@
 
-import { KeywordSuggestion, KeywordTrend } from '@/types/seo/Keyword';
-
-export const calculateOpportunityScore = (keyword: KeywordSuggestion): number => {
-  // Volume / Difficulté * CPC = Score d'opportunité
-  if (!keyword.volume || !keyword.difficulty) {
-    return 0;
-  }
+/**
+ * Génère des données simulées pour les SERP (Search Engine Results Page)
+ * 
+ * @param keyword Le mot-clé à analyser
+ * @returns Les résultats de recherche simulés
+ */
+export const generateSerpData = (keyword: string) => {
+  // Cette fonction génère des données SERP simulées pour le mot-clé fourni
+  const domainNames = [
+    'wikipedia.org',
+    'amazon.fr',
+    'fnac.com',
+    'lemonde.fr',
+    'boulanger.com',
+    'darty.com',
+    'leparisien.fr',
+    'lepoint.fr',
+    'cdiscount.com',
+    'lefigaro.fr'
+  ];
   
-  // Éviter division par zéro
-  const difficulty = keyword.difficulty === 0 ? 1 : keyword.difficulty;
-  
-  // Score de base
-  let score = (keyword.volume / difficulty) * (keyword.cpc || 1);
-  
-  // Normaliser entre 0 et 100
-  score = Math.min(Math.max(score / 10, 0), 100);
-  
-  return Math.round(score);
+  return Array(10).fill(0).map((_, index) => {
+    const domain = domainNames[index % domainNames.length];
+    return {
+      position: index + 1,
+      title: `${keyword} - Tout savoir sur ${keyword} | ${domain}`,
+      url: `https://www.${domain}/article/${keyword.toLowerCase().replace(/\s+/g, '-')}`,
+      description: `Découvrez tout sur ${keyword}. Les meilleures informations, guides et conseils pour ${keyword} sur ${domain}.`
+    };
+  });
 };
 
-export const generateTrendData = (keyword: string, months: number = 12): KeywordTrend[] => {
-  // Fonction pour générer des données de tendance simulées
-  const trends: KeywordTrend[] = [];
-  const currentDate = new Date();
+/**
+ * Analyse un mot-clé et génère des métadonnées associées
+ * 
+ * @param keyword Le mot-clé à analyser
+ */
+export const analyzeKeyword = (keyword: string) => {
+  // Fonction simulée d'analyse de mot-clé
+  const wordCount = keyword.split(/\s+/).length;
   
-  // Utiliser le mot-clé comme seed pour la génération pseudo-aléatoire
-  const seed = keyword.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
-  
-  // Volume de base (entre 100 et 10000, basé sur le seed)
-  const baseVolume = 100 + (seed % 100) * 100;
-  
-  for (let i = months; i > 0; i--) {
-    const monthDate = new Date(currentDate);
-    monthDate.setMonth(currentDate.getMonth() - i);
-    
-    const monthName = monthDate.toLocaleDateString('fr-FR', { month: 'short' });
-    const year = monthDate.getFullYear().toString().substr(2, 2);
-    
-    // Variation aléatoire mais cohérente basée sur le seed et le mois
-    const monthSeed = seed + i;
-    const randomFactor = 0.8 + (monthSeed % 100) / 250; // Entre 0.8 et 1.2
-    
-    // Ajouter une saisonnalité (plus élevé en hiver et été)
-    const month = monthDate.getMonth();
-    const seasonality = 
-      (month >= 0 && month <= 1) || (month >= 6 && month <= 8) 
-        ? 1.2 // Hiver et été
-        : 1.0;
-    
-    // Ajouter une tendance générale à la hausse (5% par an)
-    const trend = 1 + (months - i) / (months * 20);
-    
-    // Calculer le volume final
-    const volume = Math.round(baseVolume * randomFactor * seasonality * trend);
-    
-    trends.push({
-      month: `${monthName} ${year}`,
-      volume: volume
-    });
-  }
-  
-  return trends;
+  // Génère des données en fonction du nombre de mots dans le mot-clé
+  return {
+    difficulty: Math.min(Math.floor(Math.random() * 30) + wordCount * 15, 100),
+    searchVolume: Math.floor(Math.random() * 10000) * (3 - Math.min(wordCount, 2)), // Plus de volume pour les mots-clés courts
+    cpc: (Math.random() * 2 + 0.5).toFixed(2),
+    competition: Math.random().toFixed(2),
+    trends: Array(12).fill(0).map(() => Math.floor(Math.random() * 100)),
+    intent: wordCount > 2 ? 'informational' : Math.random() > 0.5 ? 'transactional' : 'navigational'
+  };
 };
