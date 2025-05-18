@@ -40,7 +40,6 @@ import KeywordFAQ from './keyword/KeywordFAQ';
 import SearchConsoleDataViewer from './keyword/SearchConsoleData';
 import SiteStructureAnalyzer from './keyword/SiteStructureAnalyzer';
 import { RankingData } from '@/types/seo/Ranking';
-import { FolderTree } from 'lucide-react';
 
 const KeywordGenerator = () => {
   const [isLoading, setIsLoading] = useState(false);
