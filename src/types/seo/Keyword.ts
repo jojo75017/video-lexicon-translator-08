@@ -1,71 +1,36 @@
 
+export interface KeywordData {
+  keyword: string;
+  volume: number;
+  difficulty: number;
+  cpc: number;
+  intent: string;
+  serps: SerpResult[];
+}
+
 export interface KeywordSuggestion {
   keyword: string;
   volume: number;
   difficulty: number;
   cpc: number;
-  competition: number;
-  relevance?: number;
+  intent: string;
+  type: string;
+  opportunity: number;
+  parentKeyword?: string;
+  searchVolume?: number;
   suggestedTitle?: string;
   suggestedDescription?: string;
-  searchVolume?: number;
-  clicks?: number;
-  position?: number;
-}
-
-export interface KeywordAnalysis {
-  keyword: string;
-  frequency: number;
-  density: number;
-  count?: number;
-  position?: number;
+  suggestedLongDescription?: string;
 }
 
 export interface SerpResult {
-  title: string;
-  url: string;
-  description: string;
   position: number;
-}
-
-export interface CompetitorData {
-  name: string;
   url: string;
-  strength: number;
-  organic_traffic: number;
-  keywords: number;
-  commonKeywords?: string[];
-  logo?: string;
-}
-
-export interface KeywordStrategyResponse {
-  mainKeywords: KeywordSuggestion[];
-  longTail: KeywordSuggestion[];
-  questions: KeywordSuggestion[];
-  related: KeywordSuggestion[];
-  semantic: string[];
-  competitors: CompetitorData[];
-  serps: SerpResult[];
-  contentIdeas: {
-    title: string;
-    type: string;
-  }[];
-  byIntent: {
-    informational: KeywordSuggestion[];
-    transactional: KeywordSuggestion[];
-    navigational: KeywordSuggestion[];
-  };
-}
-
-export interface KeywordIntent {
-  informational: KeywordSuggestion[];
-  transactional: KeywordSuggestion[];
-  navigational: KeywordSuggestion[];
-}
-
-export interface SerpsResult {
   title: string;
-  url: string;
   description: string;
-  position: number;
+}
+
+export interface KeywordTrend {
+  month: string;
+  volume: number;
 }

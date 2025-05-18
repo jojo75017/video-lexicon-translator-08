@@ -21,7 +21,7 @@ const HierarchyTabContent = () => {
   const [showCorsWarning, setShowCorsWarning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  // OpenAI API key management
+  // OpenAI API key management - Mise en évidence pour faciliter la compréhension
   const [openaiKey, setOpenaiKey] = useState('');
   const [apiKeyStatus, setApiKeyStatus] = useState<'unchecked' | 'valid' | 'invalid'>('unchecked');
   const [validationMessage, setValidationMessage] = useState('');
@@ -30,7 +30,7 @@ const HierarchyTabContent = () => {
     console.log("HierarchyTabContent - Mounted/Updated");
     console.log("Current analyze result:", analyzeResult);
     
-    // Load API key from localStorage if available
+    // Chargement de la clé API depuis le localStorage si disponible
     const savedKey = localStorage.getItem('openaiKey');
     if (savedKey) {
       setOpenaiKey(savedKey);
@@ -244,15 +244,22 @@ const HierarchyTabContent = () => {
         )}
         
         <div className="mt-6">
-          <ApiKeyConfig 
-            openaiKey={openaiKey}
-            setOpenaiKey={setOpenaiKey}
-            apiKeyStatus={apiKeyStatus}
-            setApiKeyStatus={setApiKeyStatus}
-            validationMessage={validationMessage}
-            setValidationMessage={setValidationMessage}
-            onKeyValidated={handleApiKeyValidated}
-          />
+          {/* Section de configuration de la clé API - Mise en évidence avec un style distinctif */}
+          <div className="bg-blue-50 p-4 rounded-md border border-blue-100">
+            <h3 className="font-medium text-blue-900 mb-2">🔑 Configuration de la clé API OpenAI</h3>
+            <p className="text-sm text-blue-800 mb-3">
+              Entrez votre clé API OpenAI ci-dessous pour débloquer les fonctionnalités d'analyse avancées
+            </p>
+            <ApiKeyConfig 
+              openaiKey={openaiKey}
+              setOpenaiKey={setOpenaiKey}
+              apiKeyStatus={apiKeyStatus}
+              setApiKeyStatus={setApiKeyStatus}
+              validationMessage={validationMessage}
+              setValidationMessage={setValidationMessage}
+              onKeyValidated={handleApiKeyValidated}
+            />
+          </div>
         </div>
       </Card>
       
