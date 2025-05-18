@@ -1,5 +1,5 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { PinterestPin } from '@/types/pinterest';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -29,6 +29,14 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin, onGenerateConte
 
   // Ajout de la fonction de génération de titre
   const [locationInput, setLocationInput] = useState('');
+  
+  // Effect to sync description with title changes
+  useEffect(() => {
+    if (autoEmojis && pin.title) {
+      // Auto-add emojis when title changes if autoEmojis is enabled
+      addAutoEmojisToTitle();
+    }
+  }, [pin.title, autoEmojis]);
 
   const handleGenerateTitle = () => {
     if (!locationInput.trim()) {
@@ -62,7 +70,7 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin, onGenerateConte
     
     updatePin('description', newDescription);
     
-    toast.success('Titre généré avec succès');
+    toast.success('Titre et description générés avec succès');
   };
 
   // Fonction pour insérer un emoji à la position du curseur
@@ -135,8 +143,11 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin, onGenerateConte
       }
       
       updatePin('title', newTitle);
-      toast.success('Emojis ajoutés au titre');
-    } else {
+      
+      if (!autoEmojis) {
+        toast.success('Emojis ajoutés au titre');
+      }
+    } else if (!autoEmojis) {
       toast.info('Le titre contient déjà des emojis');
     }
   };
@@ -197,10 +208,19 @@ const ContentTab: React.FC<ContentTabProps> = ({ pin, updatePin, onGenerateConte
     return text.slice(0, maxLength);
   };
 
-  // Gestion du changement de titre avec limite
+  // Gestion du changement de titre avec limite et mise à jour automatique de la description
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = validateTextLength(e.target.value, 60);
     updatePin('title', newTitle);
+    
+    // Optionally update description based on title keywords
+    if (newTitle.toLowerCase().includes('finlande') && !pin.description.toLowerCase().includes('finlande')) {
+      updatePin('description', "La Finlande offre des paysages naturels époustouflants avec ses milliers de lacs, ses forêts de pins et ses aurores boréales magiques. Une destination parfaite pour les amoureux de nature et d'aventure.");
+    } else if (newTitle.toLowerCase().includes('corse') && !pin.description.toLowerCase().includes('corse')) {
+      updatePin('description', "La Corse, île de beauté, vous séduira par ses plages de sable fin, ses montagnes majestueuses et ses villages pittoresques. Une destination idéale pour les amoureux de nature et d'authenticité.");
+    } else if (newTitle.toLowerCase().includes('vietnam') && !pin.description.toLowerCase().includes('vietnam')) {
+      updatePin('description', "Le Vietnam séduit par ses paysages variés entre rizières en terrasses, baie d'Halong et villages traditionnels. Une culture riche et une gastronomie exceptionnelle vous attendent.");
+    }
   };
 
   // Gestion du changement de description avec limite

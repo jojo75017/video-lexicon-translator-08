@@ -119,7 +119,7 @@ const DesignTab: React.FC<DesignTabProps> = ({ pin, updatePin }) => {
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="primary-color">Couleur principale (boutons, bordures)</Label>
+          <Label htmlFor="primary-color">Couleur principale (bordures)</Label>
           <div className="flex gap-2 items-center">
             <Input 
               id="primary-color"
@@ -159,7 +159,7 @@ const DesignTab: React.FC<DesignTabProps> = ({ pin, updatePin }) => {
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="accent-color">Couleur d'accent (surlignage)</Label>
+          <Label htmlFor="accent-color">Couleur d'accent (boutons, surlignage)</Label>
           <div className="flex gap-2 items-center">
             <Input 
               id="accent-color"
@@ -176,6 +176,7 @@ const DesignTab: React.FC<DesignTabProps> = ({ pin, updatePin }) => {
               placeholder="#0000FF"
             />
           </div>
+          <p className="text-xs text-gray-500">Cette couleur est utilisée pour les boutons d'appel à l'action</p>
         </div>
         
         <div className="space-y-2">

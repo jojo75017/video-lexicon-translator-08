@@ -51,12 +51,12 @@ const PinterestPreview: React.FC<PinterestPreviewProps> = ({ pin }) => {
           <div className="absolute inset-0 border-8 border-solid" style={{ borderColor: pin.design.primaryColor }} />
         )}
         
-        {/* Call to action button - Now bigger */}
+        {/* Call to action button - Now using design.accentColor for button background */}
         <div className="absolute bottom-6 right-4 left-4">
           <button 
             className="w-full py-3 px-6 rounded-full text-base font-semibold shadow-lg"
             style={{
-              backgroundColor: pin.design.primaryColor,
+              backgroundColor: pin.design.accentColor || pin.design.primaryColor, // Use accent color as button background
               color: pin.design.textColor
             }}
           >
