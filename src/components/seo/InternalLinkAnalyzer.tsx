@@ -349,7 +349,7 @@ const InternalLinkAnalyzer: React.FC<InternalLinkAnalyzerProps> = ({
             
             <div>
               <h3 className="text-sm font-medium mb-3 flex items-center">
-                <LinkOff className="h-4 w-4 mr-1 text-red-500" />
+                <Link2Off className="h-4 w-4 mr-1 text-red-500" />
                 Pages orphelines ({orphanedPages.length})
               </h3>
               
@@ -481,3 +481,4 @@ const InternalLinkAnalyzer: React.FC<InternalLinkAnalyzerProps> = ({
 };
 
 export default InternalLinkAnalyzer;
+

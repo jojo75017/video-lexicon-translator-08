@@ -24,21 +24,6 @@ export type PageMetric = {
   importance?: number;
 };
 
-export type PageLinkMetric = {
-  url: string;
-  title?: string | null;
-  incomingLinks: number;
-  outgoingLinks: number;
-  depth: number;
-  importance?: number;
-};
-
-export type OrphanPage = {
-  url: string;
-  title?: string | null;
-  suggestions?: string[];
-};
-
 export type SocialTags = {
   ogTitle: string;
   ogDescription: string;

@@ -38,7 +38,7 @@ export interface PageLinkMetric {
   incomingLinks: number;
   outgoingLinks: number;
   depth: number;
-  importance: number;
+  importance?: number;
 }
 
 export interface OrphanPage {
