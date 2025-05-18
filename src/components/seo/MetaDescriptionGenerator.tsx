@@ -17,6 +17,7 @@ const MetaDescriptionGenerator = () => {
   const [longDescription, setLongDescription] = useState<string>('');
   const [shortLength, setShortLength] = useState(0);
   const [longLength, setLongLength] = useState(0);
+  const [activeTab, setActiveTab] = useState<string>('short');
 
   useEffect(() => {
     setShortLength(getExactLength(shortDescription));
@@ -98,7 +99,7 @@ const MetaDescriptionGenerator = () => {
           </div>
           
           {(shortDescription || longDescription) && (
-            <Tabs defaultValue="short" className="mt-6">
+            <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="mt-6">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="short">Courte (155 car.)</TabsTrigger>
                 <TabsTrigger value="long">Longue (500 car.)</TabsTrigger>

@@ -107,35 +107,39 @@ const KeywordMetaPage = () => {
                 </Tabs>
               </div>
               
-              <TabsContent value="short" className="mt-0 pt-0">
-                <div className="flex justify-end mb-1">
-                  <span className={`text-xs ${shortDescription.length > 155 ? 'text-red-500' : 'text-gray-500'}`}>
-                    {shortDescription.length}/155
-                  </span>
-                </div>
-                <Textarea
-                  id="short-description"
-                  value={shortDescription}
-                  onChange={(e) => setShortDescription(e.target.value)}
-                  placeholder="Entrez votre meta description courte ici"
-                  className="min-h-[100px]"
-                />
-              </TabsContent>
-              
-              <TabsContent value="long" className="mt-0 pt-0">
-                <div className="flex justify-end mb-1">
-                  <span className={`text-xs ${longDescription.length > 500 ? 'text-red-500' : 'text-gray-500'}`}>
-                    {longDescription.length}/500
-                  </span>
-                </div>
-                <Textarea
-                  id="long-description"
-                  value={longDescription}
-                  onChange={(e) => setLongDescription(e.target.value)}
-                  placeholder="Entrez votre meta description longue ici"
-                  className="min-h-[150px]"
-                />
-              </TabsContent>
+              <div className="mt-2">
+                <Tabs value={activeTab} onValueChange={setActiveTab}>
+                  <TabsContent value="short" className="mt-0 pt-0">
+                    <div className="flex justify-end mb-1">
+                      <span className={`text-xs ${shortDescription.length > 155 ? 'text-red-500' : 'text-gray-500'}`}>
+                        {shortDescription.length}/155
+                      </span>
+                    </div>
+                    <Textarea
+                      id="short-description"
+                      value={shortDescription}
+                      onChange={(e) => setShortDescription(e.target.value)}
+                      placeholder="Entrez votre meta description courte ici"
+                      className="min-h-[100px]"
+                    />
+                  </TabsContent>
+                  
+                  <TabsContent value="long" className="mt-0 pt-0">
+                    <div className="flex justify-end mb-1">
+                      <span className={`text-xs ${longDescription.length > 500 ? 'text-red-500' : 'text-gray-500'}`}>
+                        {longDescription.length}/500
+                      </span>
+                    </div>
+                    <Textarea
+                      id="long-description"
+                      value={longDescription}
+                      onChange={(e) => setLongDescription(e.target.value)}
+                      placeholder="Entrez votre meta description longue ici"
+                      className="min-h-[150px]"
+                    />
+                  </TabsContent>
+                </Tabs>
+              </div>
             </div>
             
             {/* Prévisualisation */}
