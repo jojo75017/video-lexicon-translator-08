@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import UnifiedDashboard from '@/components/dashboard/UnifiedDashboard';
 import { Card } from '@/components/ui/card';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
@@ -12,6 +12,13 @@ import { toast } from 'sonner';
 const TrackingPage = () => {
   const [url, setUrl] = useState('https://example.com');
   const [isTracking, setIsTracking] = useState(false);
+  
+  // Démarrer automatiquement le suivi au chargement de la page
+  useEffect(() => {
+    if (!isTracking && url) {
+      handleStartTracking();
+    }
+  }, []);
   
   const handleStartTracking = () => {
     if (!url.trim()) {
@@ -56,9 +63,9 @@ const TrackingPage = () => {
               </Button>
             </div>
             
-            {isTracking ? (
-              <RankingTracker url={url} />
-            ) : (
+            {isTracking && <RankingTracker url={url} />}
+            
+            {!isTracking && (
               <div className="p-8 text-center border border-dashed border-gray-300 rounded-lg">
                 <h3 className="text-lg font-medium text-gray-700 mb-2">Entrez une URL pour commencer</h3>
                 <p className="text-gray-600">

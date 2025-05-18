@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import { TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton"; 
@@ -11,7 +10,6 @@ import { useSiteAnalyzer } from "@/hooks/useSiteAnalyzer";
 import { useNavigate } from "react-router-dom";
 import { activateSection } from '@/utils/navigationHelpers';
 import { toast } from "sonner";
-import RankingTracker from "@/components/seo/RankingTracker";
 import { Button } from "@/components/ui/button";
 
 interface TabContentsRendererProps {
@@ -177,13 +175,13 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
             </AlertDescription>
           </Alert>
           
-          <div className="flex flex-col items-center justify-center p-8 border border-dashed border-gray-300 rounded-lg">
-            <LineChart className="h-12 w-12 text-purple-600 mb-4" />
-            <h3 className="text-lg font-medium mb-2">Suivez vos positions Google</h3>
-            <p className="text-gray-600 mb-4 text-center max-w-md">
-              Visualisez l'évolution de vos positions dans les moteurs de recherche pour vos mots-clés importants.
-            </p>
-            <Button onClick={() => navigate('/tracking')} className="bg-purple-600 hover:bg-purple-700">
+          <div className="flex justify-center mt-6">
+            <Button 
+              onClick={() => navigate('/tracking')} 
+              className="bg-purple-600 hover:bg-purple-700 text-white"
+              size="lg"
+            >
+              <LineChart className="h-5 w-5 mr-2" />
               Accéder au suivi des positions
             </Button>
           </div>

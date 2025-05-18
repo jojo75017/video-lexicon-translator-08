@@ -73,9 +73,9 @@ const UnifiedDashboard: React.FC<{ children: React.ReactNode }> = ({ children })
               </Link>
               <Link to="/tracking">
                 <Button 
-                  variant={currentPath.includes('/tracking') ? "default" : "outline"} 
+                  variant={currentPath.includes('/tracking') ? "purple" : "outline"} 
                   size="sm"
-                  className={currentPath.includes('/tracking') ? "bg-purple-600 hover:bg-purple-700" : ""}
+                  className={currentPath.includes('/tracking') ? "bg-purple-600 hover:bg-purple-700 text-white" : ""}
                 >
                   <LineChart className="h-4 w-4 mr-1" />
                   Suivi Positions

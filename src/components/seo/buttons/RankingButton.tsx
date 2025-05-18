@@ -10,6 +10,7 @@ export const RankingButton = () => {
   
   const handleNavigateToRankings = () => {
     // Navigation directe vers la page de suivi
+    console.log("Navigation vers la page de suivi des positions");
     navigate('/tracking');
     toast.success('Navigation vers le suivi des positions');
   };

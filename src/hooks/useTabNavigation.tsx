@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { tabs } from '@/components/dashboard/tabs/TabData';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -39,6 +38,7 @@ export const useTabNavigation = () => {
       'keyword-meta': 'keyword-meta',
       'keyword-generator': 'keyword-generator',
       'outils-seo': 'outils-seo',
+      'tracking': 'rankings', // Ajout de la correspondance pour la page de tracking
       // Routes localisées (français)
       'hierarchie': 'hierarchy',
       'nombre-mots': 'wordcount',
@@ -48,6 +48,7 @@ export const useTabNavigation = () => {
       'mots-cles': 'keyword-generator',
       'performances': 'performance',
       'structure-site': 'structure',
+      'suivi-positions': 'rankings', // Variante française
     };
     
     return pathToTabMap[path] || 'hierarchy';
@@ -60,6 +61,7 @@ export const useTabNavigation = () => {
     const newActiveTab = determineActiveTab();
     if (newActiveTab !== activeTab) {
       setActiveTab(newActiveTab);
+      console.log("Tab changed to:", newActiveTab);
     }
   }, [location.pathname]);
   
@@ -77,6 +79,7 @@ export const useTabNavigation = () => {
     // Ne pas continuer si c'est déjà l'onglet actif
     if (value === activeTab) return;
     
+    console.log("handleTabChange:", value);
     setActiveTab(value);
     
     // Définir les chemins pour chaque onglet
@@ -97,6 +100,7 @@ export const useTabNavigation = () => {
       'keyword-meta': '/keyword-meta',
       'keyword-generator': '/keyword-generator',
       'outils-seo': '/outils-seo',
+      'rankings': '/tracking', // S'assurer que le lien de l'onglet rankings pointe vers /tracking
     };
     
     // Forcer la navigation si nécessaire
