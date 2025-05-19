@@ -22,9 +22,9 @@ const WordCountPage = () => {
       </header>
       
       <div className="container mx-auto">
-        <Card className="p-6">
+        <Card className="p-6 border-green-300">
           <h2 className="text-2xl font-bold mb-4 flex items-center">
-            <FileText className="h-6 w-6 mr-2 text-blue-600" />
+            <FileText className="h-6 w-6 mr-2 text-green-600" />
             Outil de comptage de texte
           </h2>
           <p className="text-gray-600 mb-6">

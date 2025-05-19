@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { RocketIcon, LayoutDashboard, ListChecks, BarChart, Settings, ImagePlus, FileText } from 'lucide-react'; // Add this import if not already present
+import { RocketIcon, LayoutDashboard, ListChecks, BarChart, Settings, ImagePlus, FileText } from 'lucide-react';
 
 const Dashboard = () => {
   return (
@@ -126,10 +126,10 @@ const Dashboard = () => {
         </Link>
         
         <Link to="/word-count" className="group">
-          <Card className="h-full hover:shadow-md transition-shadow">
+          <Card className="h-full hover:shadow-md transition-shadow border-2 border-green-500">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-blue-600" />
+                <FileText className="h-5 w-5 text-green-600" />
                 <span>Compteur de mots</span>
               </CardTitle>
             </CardHeader>
@@ -139,7 +139,7 @@ const Dashboard = () => {
               </p>
             </CardContent>
             <CardFooter>
-              <div className="text-sm text-blue-600 group-hover:underline">Accéder à l'outil →</div>
+              <div className="text-sm text-green-600 group-hover:underline">Accéder à l'outil →</div>
             </CardFooter>
           </Card>
         </Link>

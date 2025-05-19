@@ -72,10 +72,10 @@ const WordCounter: React.FC<WordCounterProps> = ({
   };
 
   return (
-    <Card className={`${className}`}>
+    <Card className={`${className} border-green-200`}>
       <CardContent className="p-4 space-y-4">
         <div className="flex items-center gap-2 mb-2">
-          <FileText className="h-5 w-5 text-blue-600" />
+          <FileText className="h-5 w-5 text-green-600" />
           <h3 className="text-lg font-medium">{label}</h3>
         </div>
         
@@ -83,35 +83,35 @@ const WordCounter: React.FC<WordCounterProps> = ({
           placeholder={placeholder}
           value={text}
           onChange={handleChange}
-          className="min-h-[200px] font-mono text-sm"
+          className="min-h-[200px] font-mono text-sm border-green-200 focus-visible:ring-green-500"
         />
         
         <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-center">
-          <div className="bg-gray-50 p-2 rounded border">
-            <div className="text-lg font-bold">{stats.characters}</div>
-            <div className="text-xs text-gray-500">Caractères</div>
+          <div className="bg-green-50 p-2 rounded border border-green-200">
+            <div className="text-lg font-bold text-green-700">{stats.characters}</div>
+            <div className="text-xs text-green-600">Caractères</div>
           </div>
-          <div className="bg-gray-50 p-2 rounded border">
-            <div className="text-lg font-bold">{stats.charactersNoSpaces}</div>
-            <div className="text-xs text-gray-500">Sans espaces</div>
+          <div className="bg-green-50 p-2 rounded border border-green-200">
+            <div className="text-lg font-bold text-green-700">{stats.charactersNoSpaces}</div>
+            <div className="text-xs text-green-600">Sans espaces</div>
           </div>
-          <div className="bg-gray-50 p-2 rounded border">
-            <div className="text-lg font-bold">{stats.words}</div>
-            <div className="text-xs text-gray-500">Mots</div>
+          <div className="bg-green-50 p-2 rounded border border-green-200">
+            <div className="text-lg font-bold text-green-700">{stats.words}</div>
+            <div className="text-xs text-green-600">Mots</div>
           </div>
-          <div className="bg-gray-50 p-2 rounded border">
-            <div className="text-lg font-bold">{stats.sentences}</div>
-            <div className="text-xs text-gray-500">Phrases</div>
+          <div className="bg-green-50 p-2 rounded border border-green-200">
+            <div className="text-lg font-bold text-green-700">{stats.sentences}</div>
+            <div className="text-xs text-green-600">Phrases</div>
           </div>
-          <div className="bg-gray-50 p-2 rounded border">
-            <div className="text-lg font-bold">{stats.paragraphs}</div>
-            <div className="text-xs text-gray-500">Paragraphes</div>
+          <div className="bg-green-50 p-2 rounded border border-green-200">
+            <div className="text-lg font-bold text-green-700">{stats.paragraphs}</div>
+            <div className="text-xs text-green-600">Paragraphes</div>
           </div>
         </div>
         
         {maxLength && (
           <div className="text-right text-sm">
-            <span className={text.length > maxLength * 0.9 ? "text-amber-600" : "text-gray-500"}>
+            <span className={text.length > maxLength * 0.9 ? "text-amber-600" : "text-green-600"}>
               {text.length} / {maxLength}
             </span>
           </div>
