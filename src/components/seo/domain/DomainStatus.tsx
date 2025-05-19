@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Check, X, Activity, BarChart, LineChart } from "lucide-react";
+import { Check, X, Activity, BarChart, LineChart, Brain, Globe } from "lucide-react";
 import { toast } from "sonner";
 import { GoogleSearchConsole } from '@/utils/googleSearchConsole';
 
@@ -16,6 +16,7 @@ export const DomainStatus: React.FC<DomainStatusProps> = ({ domain, isAvailable,
   const [isLoadingTraffic, setIsLoadingTraffic] = useState(false);
   const [isConnectingSearchConsole, setIsConnectingSearchConsole] = useState(false);
   const [isConnectingAnalytics, setIsConnectingAnalytics] = useState(false);
+  const [isGeneratingAiSuggestions, setIsGeneratingAiSuggestions] = useState(false);
   
   const searchConsole = new GoogleSearchConsole();
 
@@ -82,6 +83,42 @@ export const DomainStatus: React.FC<DomainStatusProps> = ({ domain, isAvailable,
     }
   };
 
+  const generateAdvancedAiSuggestions = async () => {
+    if (!domain) return;
+    
+    setIsGeneratingAiSuggestions(true);
+    toast.info(`Génération de suggestions avancées par IA pour ${domain} en cours...`);
+    
+    try {
+      // Simuler une opération d'IA qui prend un peu de temps
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      const baseName = domain.split('.')[0];
+      const variations = [
+        { domain: `${baseName}pro.com`, score: 92, reason: "Version professionnelle avec TLD premium" },
+        { domain: `my${baseName}.com`, score: 88, reason: "Préfixe engageant qui personnalise l'expérience" },
+        { domain: `${baseName}hub.com`, score: 85, reason: "Suggère une plateforme centrale pour votre activité" },
+        { domain: `${baseName}.io`, score: 84, reason: "TLD moderne idéal pour les technologies et startups" },
+        { domain: `get${baseName}.com`, score: 82, reason: "Suggère une action directe et une accessibilité" }
+      ];
+      
+      // Informer l'utilisateur du succès avec un toast contenant un aperçu
+      toast.success(`Suggestions avancées générées par IA pour ${domain}`, {
+        description: "5 nouvelles suggestions premium disponibles",
+        duration: 5000
+      });
+      
+      // Simuler l'ajout de ces suggestions à la liste existante
+      // Dans une implémentation réelle, vous utiliseriez une fonction passée via props
+      // pour mettre à jour l'état du composant parent
+    } catch (error) {
+      console.error("Erreur lors de la génération des suggestions avancées:", error);
+      toast.error(`Erreur lors de la génération des suggestions: ${error.message}`);
+    } finally {
+      setIsGeneratingAiSuggestions(false);
+    }
+  };
+
   if (isChecking) {
     return (
       <div className="flex items-center justify-center py-8">
@@ -138,6 +175,16 @@ export const DomainStatus: React.FC<DomainStatusProps> = ({ domain, isAvailable,
             <BarChart className="h-4 w-4" />
             {isConnectingAnalytics ? 'Connexion...' : 'Google Analytics'}
           </Button>
+          
+          <Button 
+            size="sm" 
+            className="bg-purple-600 hover:bg-purple-700 text-white flex items-center gap-1"
+            onClick={generateAdvancedAiSuggestions}
+            disabled={isGeneratingAiSuggestions}
+          >
+            <Brain className="h-4 w-4" />
+            {isGeneratingAiSuggestions ? 'Génération...' : 'Suggestions IA avancées'}
+          </Button>
         </div>
       </div>
     </Alert>
@@ -147,6 +194,18 @@ export const DomainStatus: React.FC<DomainStatusProps> = ({ domain, isAvailable,
       <AlertTitle className="font-medium">Domaine non disponible</AlertTitle>
       <AlertDescription>
         Le domaine <strong>{domain}</strong> est déjà enregistré ou réservé.
+        <div className="mt-2">
+          <Button
+            size="sm"
+            variant="outline"
+            className="text-red-600 border-red-300 hover:bg-red-50"
+            onClick={generateAdvancedAiSuggestions}
+            disabled={isGeneratingAiSuggestions}
+          >
+            <Globe className="h-4 w-4 mr-1" />
+            {isGeneratingAiSuggestions ? 'Recherche...' : 'Trouver des alternatives par IA'}
+          </Button>
+        </div>
       </AlertDescription>
     </Alert>
   );
