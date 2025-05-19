@@ -8,6 +8,7 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Button } from '@/components/ui/button';
 import BrokenLinkButton from '@/components/seo/BrokenLinkButton';
 import BlogContentGenerator from '@/components/seo/BlogContentGenerator';
+import DomainAnalysis from '@/components/seo/DomainAnalysis';
 
 const HomePage = () => {
   return (
@@ -42,6 +43,12 @@ const HomePage = () => {
               </div>
             </div>
           </Card>
+        </section>
+
+        {/* Nouvelle section d'analyse de domaine */}
+        <section>
+          <h2 className="text-2xl font-bold mb-4">Analyse de Domaine</h2>
+          <DomainAnalysis />
         </section>
 
         <section>

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BarChart2, FileText, Zap, PieChart, Type, FilePenLine, LayoutGrid, ThumbsUp, Target, LinkIcon, Link2, LineChart, CheckCircle2, TicketCheck } from "lucide-react";
+import { BarChart2, FileText, Zap, PieChart, Type, FilePenLine, LayoutGrid, ThumbsUp, Target, LinkIcon, Link2, LineChart, CheckCircle2, TicketCheck, Globe, Search } from "lucide-react";
 
 export const tabs = [
   { 
@@ -84,6 +84,24 @@ export const tabs = [
     link: '/tracking',
     category: 'seo'
   },
+  {
+    id: 'domain-analysis',
+    label: 'Analyse de domaine',
+    icon: <Globe className="h-4 w-4" />,
+    description: "Analysez n'importe quel domaine",
+    color: "bg-green-50 text-green-700 border-green-200",
+    link: '/domain-analysis',
+    category: 'research'
+  },
+  {
+    id: 'organic-search',
+    label: 'Recherche organique',
+    icon: <Search className="h-4 w-4" />,
+    description: "Insights de trafic organique",
+    color: "bg-green-50 text-green-700 border-green-200",
+    link: '/organic-search',
+    category: 'research'
+  },
   { 
     id: 'performance', 
     label: 'Performance',
@@ -139,3 +157,4 @@ export const tabs = [
     category: 'tools'
   }
 ];
+

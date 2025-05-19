@@ -3,7 +3,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Home, ArrowLeft, LineChart } from 'lucide-react';
+import { Home, ArrowLeft, LineChart, Globe } from 'lucide-react';
 import { toast } from 'sonner';
 
 const UnifiedDashboard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -81,6 +81,16 @@ const UnifiedDashboard: React.FC<{ children: React.ReactNode }> = ({ children })
                   Suivi Positions
                 </Button>
               </Link>
+              <Link to="/domain-analysis">
+                <Button 
+                  variant={currentPath.includes('/domain-analysis') ? "default" : "outline"} 
+                  size="sm"
+                  className={currentPath.includes('/domain-analysis') ? "bg-green-600 hover:bg-green-700 text-white" : ""}
+                >
+                  <Globe className="h-4 w-4 mr-1" />
+                  Analyse de Domaine
+                </Button>
+              </Link>
               <Link to="/pinterest">
                 <Button 
                   variant={currentPath.includes('/pinterest') ? "default" : "outline"} 
@@ -128,3 +138,4 @@ const UnifiedDashboard: React.FC<{ children: React.ReactNode }> = ({ children })
 };
 
 export default UnifiedDashboard;
+
