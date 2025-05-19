@@ -2,7 +2,7 @@
 import React from 'react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Check, X, TrendingUp, Activity } from "lucide-react";
+import { Check, X, Activity, BarChart, LineChart } from "lucide-react";
 import { toast } from "sonner";
 
 interface DomainStatusProps {
@@ -18,6 +18,20 @@ export const DomainStatus: React.FC<DomainStatusProps> = ({ domain, isAvailable,
     setTimeout(() => {
       const estimatedVisits = Math.floor(Math.random() * 5000) + 1000;
       toast.success(`Trafic estimé pour ${domain}: ${estimatedVisits.toLocaleString()} visites/mois`);
+    }, 1500);
+  };
+
+  const connectSearchConsole = () => {
+    toast.info(`Connexion à Google Search Console pour ${domain} en cours...`);
+    setTimeout(() => {
+      toast.success(`Domaine ${domain} connecté à Google Search Console avec succès!`);
+    }, 1500);
+  };
+
+  const connectGoogleAnalytics = () => {
+    toast.info(`Connexion à Google Analytics pour ${domain} en cours...`);
+    setTimeout(() => {
+      toast.success(`Domaine ${domain} connecté à Google Analytics avec succès!`);
     }, 1500);
   };
 
@@ -47,7 +61,7 @@ export const DomainStatus: React.FC<DomainStatusProps> = ({ domain, isAvailable,
           </div>
         </div>
         
-        <div className="mt-4 flex justify-end">
+        <div className="mt-4 flex flex-wrap gap-2 justify-end">
           <Button 
             size="sm" 
             className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-1"
@@ -55,6 +69,24 @@ export const DomainStatus: React.FC<DomainStatusProps> = ({ domain, isAvailable,
           >
             <Activity className="h-4 w-4" />
             Estimer le trafic potentiel
+          </Button>
+          
+          <Button 
+            size="sm" 
+            className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-1"
+            onClick={connectSearchConsole}
+          >
+            <LineChart className="h-4 w-4" />
+            Search Console
+          </Button>
+          
+          <Button 
+            size="sm" 
+            className="bg-amber-600 hover:bg-amber-700 text-white flex items-center gap-1"
+            onClick={connectGoogleAnalytics}
+          >
+            <BarChart className="h-4 w-4" />
+            Google Analytics
           </Button>
         </div>
       </div>
