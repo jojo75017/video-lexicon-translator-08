@@ -1,12 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
-import { Button } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge"; 
 import { Card } from "@/components/ui/card";
-import { Check, X, Globe, Refresh } from "lucide-react";
+import { Check, X, Globe, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
-import ApiKeyConfig from './ApiKeyConfig';
+import ApiKeyConfig from './analysis/ApiKeyConfig';
 import { useCheckDomainAvailability } from '@/hooks/useCheckDomainAvailability';
 
 interface DomainAvailabilityProps {
@@ -75,6 +75,12 @@ const DomainAvailability: React.FC<DomainAvailabilityProps> = ({ domain }) => {
       // Generate AI suggestions
       const aiSuggestions = await generateAiSuggestions(domain, openaiKey);
       setSuggestions(aiSuggestions);
+      
+      if (aiSuggestions.length === 0) {
+        toast.warning("Aucune suggestion générée. Essayez avec un autre domaine.");
+      } else {
+        toast.success(`${aiSuggestions.length} suggestions générées avec succès`);
+      }
     } catch (error) {
       console.error("Erreur lors de la génération des suggestions:", error);
       toast.error("Impossible de générer des suggestions. Veuillez réessayer.");
@@ -152,7 +158,7 @@ const DomainAvailability: React.FC<DomainAvailabilityProps> = ({ domain }) => {
               >
                 {isGeneratingSuggestions ? (
                   <>
-                    <Refresh className="mr-2 h-4 w-4 animate-spin" />
+                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
                     Génération...
                   </>
                 ) : (
@@ -173,7 +179,7 @@ const DomainAvailability: React.FC<DomainAvailabilityProps> = ({ domain }) => {
                       <div>
                         <p className="font-medium">{suggestion.domain}</p>
                         <div className="flex items-center gap-2 mt-1">
-                          <Badge variant={suggestion.available ? "success" : "secondary"} className={suggestion.available ? "bg-green-100 text-green-800" : ""}>
+                          <Badge variant={suggestion.available ? "default" : "secondary"} className={suggestion.available ? "bg-green-100 text-green-800" : ""}>
                             {suggestion.available ? "Disponible" : "Indisponible"}
                           </Badge>
                           {suggestion.price && (

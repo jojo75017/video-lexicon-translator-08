@@ -24,14 +24,26 @@ export function useCheckDomainAvailability() {
       // En production, vous utiliseriez une véritable API comme GoDaddy, Namecheap, etc.
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Simuler des résultats différents pour différents TLDs
-      if (domain.endsWith('.xyz') || domain.endsWith('.io') || domain.includes('test')) {
-        return true; // Disponible
-      } else if (domain.endsWith('.com') || domain.endsWith('.fr')) {
-        return Math.random() > 0.5; // 50% de chance d'être disponible
-      } else {
-        return Math.random() > 0.3; // 70% de chance d'être disponible
+      // Pour des besoins de démo, tous les domaines sont considérés comme "disponibles"
+      // sauf quelques uns spécifiques, comme example.com, google.com, etc.
+      const commonTlds = ['.com', '.fr', '.org', '.net', '.io'];
+      const popularDomains = [
+        'google', 'facebook', 'amazon', 'apple', 'microsoft', 
+        'example', 'test', 'demo', 'yourdomain', 'mydomain'
+      ];
+      
+      // Extraire le nom de base du domaine sans le TLD
+      const domainLower = domain.toLowerCase();
+      const baseDomain = domainLower.split('.')[0];
+      
+      // Vérifier si c'est un domaine populaire avec un TLD commun
+      if (popularDomains.includes(baseDomain) && 
+          commonTlds.some(tld => domainLower.endsWith(tld))) {
+        return false; // Non disponible
       }
+      
+      // Simuler une petite variance pour d'autres domaines
+      return Math.random() > 0.2; // 80% de chance d'être disponible
     } catch (error) {
       console.error('Erreur lors de la vérification du domaine:', error);
       toast.error('Impossible de vérifier la disponibilité du domaine');
@@ -69,49 +81,49 @@ export function useCheckDomainAvailability() {
         },
         {
           domain: `my${baseName}.${tld}`,
-          available: Math.random() > 0.5,
+          available: true, // Toujours disponible pour la démo
           price: '14,99€',
           score: Math.floor(Math.random() * 20) + 60,
           reason: 'Préfixe personnel qui crée un lien direct avec les clients.'
         },
         {
           domain: `${baseName}pro.${tld}`,
-          available: Math.random() > 0.4,
+          available: true, // Toujours disponible pour la démo
           price: '13,99€',
           score: Math.floor(Math.random() * 20) + 75,
           reason: 'Ajoute une touche professionnelle à votre marque.'
         },
         {
           domain: `${baseName}.io`,
-          available: Math.random() > 0.7,
+          available: true, // Toujours disponible pour la démo
           price: '39,99€',
           score: Math.floor(Math.random() * 15) + 80,
           reason: 'Domaine moderne populaire dans la tech et les startups.'
         },
         {
           domain: `${baseName}media.${tld}`,
-          available: Math.random() > 0.6,
+          available: true, // Toujours disponible pour la démo
           price: '12,99€',
           score: Math.floor(Math.random() * 20) + 65,
           reason: 'Parfait pour les entreprises de médias et de contenu.'
         },
         {
           domain: `get${baseName}.${tld}`,
-          available: Math.random() > 0.6,
+          available: true, // Toujours disponible pour la démo
           price: '14,99€',
           score: Math.floor(Math.random() * 20) + 70,
           reason: 'Incite à l\'action, idéal pour les produits et services.'
         },
         {
           domain: `${baseName}.app`,
-          available: Math.random() > 0.8,
+          available: true, // Toujours disponible pour la démo
           price: '19,99€',
           score: Math.floor(Math.random() * 15) + 75,
           reason: 'Parfait pour les applications et services numériques.'
         },
         {
           domain: `${baseName}hub.${tld}`,
-          available: Math.random() > 0.5,
+          available: true, // Toujours disponible pour la démo
           price: '12,99€',
           score: Math.floor(Math.random() * 20) + 65,
           reason: 'Positionne votre marque comme une plateforme centrale.'

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,11 +9,13 @@ import { Check, Globe, Search, Shield } from "lucide-react";
 import DomainOverview from './DomainOverview';
 import OrganicSearch from './OrganicSearch';
 import DomainAvailability from './DomainAvailability';
+import { useCheckDomainAvailability } from '@/hooks/useCheckDomainAvailability';
 
 const DomainAnalysis = () => {
   const [activeTab, setActiveTab] = useState<'overview' | 'search' | 'availability'>('overview');
   const [domain, setDomain] = useState('');
-  const [isChecking, setIsChecking] = useState(false);
+  const [submittedDomain, setSubmittedDomain] = useState('');
+  const { isChecking } = useCheckDomainAvailability();
   
   const handleDomainChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDomain(e.target.value);
@@ -25,14 +27,29 @@ const DomainAnalysis = () => {
       return;
     }
     
-    setIsChecking(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsChecking(false);
-      setActiveTab('availability');
-      toast.success("Vérification du domaine terminée");
-    }, 1500);
+    // Format the domain if needed (add https:// if missing)
+    let formattedDomain = domain.trim();
+    if (formattedDomain.includes('://')) {
+      formattedDomain = formattedDomain.split('://')[1];
+    }
+    if (formattedDomain.startsWith('www.')) {
+      formattedDomain = formattedDomain.substring(4);
+    }
+    
+    // Update the submitted domain
+    setSubmittedDomain(formattedDomain);
+    
+    // Switch to availability tab
+    setActiveTab('availability');
+    toast.info(`Analyse du domaine ${formattedDomain} en cours...`);
   };
+  
+  // Effect to automatically check domain when switching to availability tab
+  useEffect(() => {
+    if (activeTab === 'availability' && submittedDomain) {
+      // The actual check is handled in the DomainAvailability component
+    }
+  }, [activeTab, submittedDomain]);
   
   return (
     <div className="space-y-6">
@@ -48,7 +65,7 @@ const DomainAnalysis = () => {
         </CardHeader>
         <CardContent className="p-0">
           <div className="bg-green-50 border-b border-green-100 p-4">
-            <div className="flex gap-3 mb-4">
+            <div className="flex gap-3 mb-4 overflow-x-auto scrollbar-hide">
               <Button 
                 variant={activeTab === 'overview' ? "default" : "outline"}
                 className={activeTab === 'overview' ? "bg-green-600 hover:bg-green-700 text-white" : "border-green-200 text-green-700"}
@@ -94,11 +111,11 @@ const DomainAnalysis = () => {
           
           <div className="p-4">
             {activeTab === 'overview' ? (
-              <DomainOverview domain={domain} />
+              <DomainOverview domain={submittedDomain || undefined} />
             ) : activeTab === 'search' ? (
-              <OrganicSearch domain={domain} />
+              <OrganicSearch domain={submittedDomain || undefined} />
             ) : (
-              <DomainAvailability domain={domain} />
+              <DomainAvailability domain={submittedDomain} />
             )}
           </div>
         </CardContent>
