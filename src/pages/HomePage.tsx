@@ -7,6 +7,7 @@ import { FileText, LinkIcon, LineChart, BarChart2, Tag, Info, FilePenLine, Layou
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Button } from '@/components/ui/button';
 import BrokenLinkButton from '@/components/seo/BrokenLinkButton';
+import BlogContentGenerator from '@/components/seo/BlogContentGenerator';
 
 const HomePage = () => {
   return (
@@ -33,6 +34,7 @@ const HomePage = () => {
                     </Button>
                   </Link>
                   <BrokenLinkButton className="bg-blue-600 hover:bg-blue-700 text-white" />
+                  <BlogContentGenerator />
                 </div>
               </div>
               <div className="md:w-1/3">

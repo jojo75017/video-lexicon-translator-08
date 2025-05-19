@@ -1,342 +1,165 @@
 
-export const generateContentWithWordCount = (keyword: string, targetWordCount: number, options = {
-  format: 'blog',
-  tone: 'professional',
-  includeStats: true,
-  includeFAQ: true,
-  includeCallToAction: true,
-  includeTestimonial: true,
-  useCustomIntro: false,
-  customIntro: '',
-  seoOptimized: true,
-  includeTableOfContents: true,
-  includeSources: true,
-  includeImages: true,
-  headerStyle: 'standard' // standard, numbered, decorative
-}) => {
-  const boldKeyword = `<strong>${keyword}</strong>`;
+// Utility for generating content based on keywords
+import { detectGeographicKeyword } from './generators/titleGenerator';
 
-  const introductoryPhrases = [
-    `Dans un marché en constante évolution, ${boldKeyword} représente un enjeu majeur.`,
-    `À l'heure où la compétitivité est cruciale, ${boldKeyword} fait la différence.`,
-    `L'expertise en ${boldKeyword} devient un atout indispensable.`,
-    `Les dernières avancées concernant ${boldKeyword} transforment notre secteur.`,
-    `Face aux défis actuels, la maîtrise de ${boldKeyword} est déterminante.`,
-    `L'impact grandissant de ${boldKeyword} ne peut plus être ignoré.`
-  ];
+type ContentSection = {
+  heading: string;
+  content: string;
+};
 
-  const bodyPhrases = [
-    `Les statistiques démontrent une <em>croissance significative</em> liée à ${boldKeyword}.`,
-    `Les professionnels reconnaissent l'<em>importance stratégique</em> de ${boldKeyword}.`,
-    `L'investissement dans ${boldKeyword} génère des <strong>résultats mesurables</strong>.`,
-    `Les organisations leaders misent sur ${boldKeyword} pour se démarquer.`,
-    `La recherche et développement autour de ${boldKeyword} s'intensifie.`,
-    `L'adoption de ${boldKeyword} s'accompagne d'<strong>avantages concurrentiels</strong>.`,
-    `Les retours d'expérience positifs sur ${boldKeyword} se multiplient.`,
-    `Les innovations liées à ${boldKeyword} ouvrent de <em>nouvelles perspectives</em>.`,
-    `L'intégration de ${boldKeyword} nécessite une approche méthodique.`,
-    `Le développement de ${boldKeyword} suit une progression constante.`
-  ];
+type GeneratedContent = {
+  title: string;
+  intro: string;
+  sections: ContentSection[];
+};
 
-  const contextPhrases = [
-    `Dans un contexte économique exigeant,`,
-    `Face aux enjeux actuels du marché,`,
-    `Dans une perspective d'innovation continue,`,
-    `Considérant les tendances émergentes,`,
-    `Au regard des évolutions technologiques,`
-  ];
+// Function to count words in a string
+const countWords = (text: string): number => {
+  return text.split(/\s+/).filter(word => word.length > 0).length;
+};
 
-  const transitionPhrases = [
-    `<strong>Par ailleurs</strong>,`,
-    `<em>En outre</em>,`,
-    `De plus,`,
-    `Il est important de noter que`,
-    `À cela s'ajoute que`
-  ];
+// Generate a geographic-focused article
+const generateGeographicContent = (keyword: string, targetWordCount: number): GeneratedContent => {
+  const title = `Guide Complet: ${keyword} - Tout ce que vous devez savoir`;
 
-  const bulletPoints = [
-    `Optimisation des processus grâce à ${boldKeyword}`,
-    `Impact mesurable de ${boldKeyword} sur la performance`,
-    `Solutions innovantes proposées par ${boldKeyword}`,
-    `Intégration stratégique de ${boldKeyword}`,
-    `Développement durable avec ${boldKeyword}`,
-    `Avantages compétitifs de ${boldKeyword}`,
-    `Perspectives d'évolution de ${boldKeyword}`,
-    `Bonnes pratiques pour ${boldKeyword}`,
-    `Retour sur investissement de ${boldKeyword}`,
-    `Facteurs clés de succès pour ${boldKeyword}`
-  ];
+  // Introduction section (about 100 words)
+  const intro = `Bienvenue dans notre guide complet sur ${keyword}. Que vous prévoyiez votre première visite ou que vous cherchiez à redécouvrir cette destination fascinante, ce guide vous fournira toutes les informations essentielles pour profiter au maximum de votre voyage. Vous découvrirez les meilleurs sites à visiter, les expériences incontournables, des conseils pratiques sur l'hébergement et la gastronomie locale, ainsi que des astuces pour voyager hors des sentiers battus. Notre équipe a exploré en profondeur ${keyword} pour vous offrir un contenu authentique et actualisé qui répondra à toutes vos questions. Suivez-nous dans cette aventure et préparez-vous à tomber amoureux de ${keyword}, une destination qui ne manquera pas de vous émerveiller par sa diversité et sa richesse culturelle.`;
 
-  const testimonials = [
-    `"L'adoption de ${keyword} a transformé notre approche et multiplié nos résultats par trois en seulement six mois." - Marie D., Directrice Marketing`,
-    `"Après avoir intégré ${keyword} dans notre stratégie, nous avons observé une amélioration significative de nos indicateurs de performance." - Thomas L., CEO`,
-    `"Le passage à ${keyword} représente l'une des décisions les plus impactantes que nous ayons prises ces dernières années." - Sophie M., Responsable Innovation`,
-    `"Grâce à ${keyword}, nous avons réussi à nous démarquer sur un marché pourtant saturé." - Jean R., Consultant Senior`
-  ];
-
-  const faqs = [
+  // Create sections
+  const sections: ContentSection[] = [
     {
-      question: `Quels sont les principaux avantages de ${keyword}?`,
-      answer: `${keyword} offre plusieurs avantages majeurs: une augmentation de la productivité, une meilleure visibilité sur le marché, une optimisation des coûts opérationnels et une expérience client améliorée. Ces bénéfices se traduisent par un retour sur investissement significatif et mesurable.`
+      heading: `Découvrir ${keyword}: Les sites incontournables`,
+      content: `${keyword} regorge de sites spectaculaires qui méritent votre attention. Parmi les attractions les plus prisées, vous trouverez des monuments historiques témoignant d'un riche passé culturel, des merveilles naturelles à couper le souffle, et des quartiers vibrants où l'on ressent l'âme véritable de la destination. Ne manquez pas de visiter les principaux musées qui abritent des collections remarquables relatant l'histoire et l'art local. Les places centrales et les marchés traditionnels constituent également des points d'intérêt majeurs où vous pourrez vous imprégner de l'atmosphère authentique. Pour les amoureux de la nature, les parcs et jardins offrent des havres de paix en plein cœur de l'agitation. Prévoyez au moins trois jours pour explorer ces sites essentiels, en commençant tôt le matin pour éviter les foules. Un conseil de professionnel: achetez vos billets en ligne à l'avance pour les attractions principales et envisagez des visites guidées pour enrichir votre expérience de détails historiques fascinants que vous pourriez manquer autrement.`
     },
     {
-      question: `Comment implémenter efficacement ${keyword} dans une stratégie existante?`,
-      answer: `L'implémentation de ${keyword} nécessite une approche méthodique: analyse de l'existant, définition des objectifs, formation des équipes, mise en place progressive et suivi des résultats. Un accompagnement par des experts peut considérablement faciliter cette transition.`
+      heading: `Comment se déplacer à ${keyword}`,
+      content: `Se déplacer efficacement à ${keyword} est essentiel pour maximiser votre temps et profiter pleinement de votre séjour. Le réseau de transport public est généralement bien développé, avec des options allant des métros et bus aux tramways, selon la taille de la destination. Procurez-vous une carte de transport multimodale qui vous permettra des économies substantielles si vous prévoyez plusieurs déplacements quotidiens. Les taxis et services de VTC sont également disponibles, mais comparez les tarifs avant de faire votre choix. Pour les plus aventureux, la location de vélo représente une alternative écologique et agréable, particulièrement dans les zones planes et bien aménagées. Si vous préférez explorer à votre rythme, la location de voiture peut être avantageuse, mais renseignez-vous sur les conditions de stationnement qui peuvent s'avérer complexes et coûteuses dans certaines zones. Un conseil d'expert: téléchargez l'application locale de transport public qui vous fournira des itinéraires en temps réel et des informations sur les perturbations éventuelles. Quelle que soit l'option choisie, planifiez vos déplacements en tenant compte des heures de pointe pour éviter les congestions.`
     },
     {
-      question: `Quelles sont les tendances futures concernant ${keyword}?`,
-      answer: `Les experts prévoient que ${keyword} va continuer d'évoluer vers plus d'automatisation, d'intégration IA et d'adaptation aux besoins spécifiques des industries. La personnalisation et l'analyse prédictive seront au cœur des développements futurs.`
+      heading: `Où manger et boire à ${keyword}`,
+      content: `La gastronomie est un aspect incontournable de l'expérience culturelle à ${keyword}. Des plats traditionnels aux innovations culinaires contemporaines, vous trouverez une gamme diversifiée d'options pour tous les budgets et toutes les préférences. Commencez votre journée dans les cafés locaux où vous pourrez savourer des pâtisseries fraîches accompagnées d'un café préparé selon la tradition locale. Pour le déjeuner, explorez les marchés alimentaires qui proposent des plats préparés sur place avec des ingrédients frais et locaux. Le soir, les quartiers gastronomiques s'animent avec des restaurants proposant aussi bien des menus dégustation sophistiqués que des options plus décontractées et abordables. Ne manquez pas d'essayer les spécialités régionales, souvent préparées selon des recettes transmises de génération en génération. Pour une expérience authentique, éloignez-vous des zones touristiques et recherchez les établissements fréquentés par les habitants. La dégustation de vins et spiritueux locaux complète parfaitement votre exploration culinaire. Réservez à l'avance pour les restaurants les plus réputés, particulièrement pendant la haute saison touristique. Un conseil de connaisseur: demandez aux habitants leurs recommandations, ils connaissent souvent des trésors cachés que les guides touristiques ne mentionnent pas.`
     },
     {
-      question: `Quel est le temps de déploiement moyen pour ${keyword}?`,
-      answer: `Le temps de déploiement de ${keyword} varie selon l'échelle du projet, mais une implémentation bien planifiée prend généralement entre 3 et 6 mois pour obtenir des résultats tangibles. Les premières améliorations peuvent être observées dès les premières semaines.`
+      heading: `Quand visiter ${keyword}: Saisons et événements`,
+      content: `Le choix de la période idéale pour visiter ${keyword} dépendra de vos préférences personnelles et des activités que vous souhaitez privilégier. La haute saison touristique, généralement en été, offre un temps optimal mais s'accompagne de foules plus importantes et de tarifs plus élevés. Si vous préférez un séjour plus tranquille et économique, envisagez les périodes d'épaule, au printemps et en automne, qui bénéficient encore d'un climat agréable avec moins d'affluence. Chaque saison présente ses avantages: l'été est parfait pour les activités extérieures et les festivals culturels, l'automne révèle des paysages colorés et des vendanges dans les régions viticoles, le printemps apporte un renouveau avec des jardins en fleurs, tandis que l'hiver peut offrir une atmosphère magique, particulièrement lors des marchés de Noël ou des sports d'hiver dans les régions montagneuses. Consultez le calendrier des événements locaux avant de planifier votre voyage - les festivals traditionnels, expositions artistiques ou événements sportifs peuvent considérablement enrichir votre expérience. Un conseil d'initié: réservez votre hébergement plusieurs mois à l'avance si votre visite coïncide avec un événement majeur, car les disponibilités se raréfient rapidement pendant ces périodes.`
+    },
+    {
+      heading: `Conseils pratiques pour votre séjour à ${keyword}`,
+      content: `Pour un séjour sans accroc à ${keyword}, quelques conseils pratiques s'imposent. Concernant la monnaie, renseignez-vous sur les options de paiement les plus courantes - certains endroits privilégient les espèces tandis que d'autres acceptent largement les cartes bancaires. Les prises électriques et adaptateurs varient selon la région, donc équipez-vous en conséquence. La connectivité internet est généralement bonne dans les zones urbaines, mais vérifiez les options de forfaits de données mobiles si vous prévoyez de voyager dans des zones rurales. En matière de sécurité, ${keyword} est globalement sûr pour les touristes, mais restez vigilant dans les zones très fréquentées où les pickpockets peuvent opérer. Familiarisez-vous avec les numéros d'urgence locaux et l'emplacement des services médicaux. Les pourboires et étiquettes sociales varient considérablement: informez-vous sur les pratiques locales pour éviter les faux pas culturels. Si vous voyagez avec des enfants ou avez des besoins spécifiques d'accessibilité, recherchez à l'avance les installations adaptées. Un dernier conseil d'expert: téléchargez des cartes hors ligne et des applications de traduction pour faciliter votre navigation et communication, même sans connexion internet.`
     }
   ];
 
-  const sources = [
+  return { title, intro, sections };
+};
+
+// Generate a product/service focused article
+const generateProductContent = (keyword: string, targetWordCount: number): GeneratedContent => {
+  const title = `Guide Complet: Tout ce que vous devez savoir sur ${keyword}`;
+
+  // Introduction section
+  const intro = `Bienvenue dans notre guide exhaustif sur ${keyword}. Que vous soyez novice ou que vous cherchiez à approfondir vos connaissances, cet article vous fournira toutes les informations essentielles pour comprendre et maîtriser ce sujet. Nous aborderons les fondamentaux, les critères de choix, les meilleures pratiques, ainsi que des conseils d'experts pour vous aider à prendre des décisions éclairées. Notre équipe a méticuleusement recherché et analysé ${keyword} pour vous offrir un contenu à jour et pertinent qui répond à toutes vos questions. Suivez ce guide pas à pas et découvrez comment tirer le meilleur parti de ${keyword} dans votre contexte spécifique.`;
+
+  // Create sections
+  const sections: ContentSection[] = [
     {
-      title: `Étude approfondie sur l'impact de ${keyword}`,
-      author: "Institut de Recherche Économique",
-      year: "2023",
-      link: "https://example.com/source1"
+      heading: `Qu'est-ce que ${keyword}? Définition et principes fondamentaux`,
+      content: `${keyword} désigne un concept ou produit qui joue un rôle significatif dans son domaine spécifique. Pour bien comprendre son importance, il est essentiel d'en saisir les principes fondamentaux et l'évolution historique. À l'origine développé pour répondre à des besoins précis, ${keyword} a considérablement évolué au fil du temps, intégrant des innovations technologiques et s'adaptant aux changements du marché. Les caractéristiques distinctives qui définissent ${keyword} incluent sa polyvalence, sa fiabilité et sa capacité à s'adapter à différents contextes d'utilisation. Dans l'écosystème actuel, ${keyword} occupe une position stratégique, se distinguant de solutions alternatives par ses spécificités uniques. Comprendre ces fondamentaux est crucial car ils constituent la base sur laquelle reposent toutes les applications et utilisations avancées que nous explorerons dans les sections suivantes. Cette compréhension vous permettra d'appréhender plus efficacement les critères de sélection et les meilleures pratiques associées à ${keyword}, vous aidant ainsi à maximiser sa valeur dans votre contexte personnel ou professionnel.`
     },
     {
-      title: `Analyse comparative des solutions de ${keyword}`,
-      author: "Journal of Business Strategy",
-      year: "2022",
-      link: "https://example.com/source2"
+      heading: `Les avantages et inconvénients de ${keyword}`,
+      content: `L'analyse objective des avantages et inconvénients de ${keyword} est essentielle pour évaluer sa pertinence dans votre situation spécifique. Parmi les bénéfices majeurs, on note généralement une amélioration significative de l'efficacité opérationnelle, une réduction des coûts à long terme et une adaptabilité remarquable à différents environnements d'utilisation. La facilité d'intégration avec d'autres systèmes existants représente également un atout considérable. De plus, ${keyword} offre souvent des fonctionnalités innovantes que les alternatives ne proposent pas encore. Cependant, il convient de reconnaître certaines limitations. L'investissement initial peut s'avérer conséquent, tant en termes financiers que de ressources nécessaires à l'implémentation. La courbe d'apprentissage peut être abrupte pour les nouveaux utilisateurs, nécessitant une période d'adaptation et de formation. Dans certains cas spécifiques, des problèmes de compatibilité avec des systèmes anciens ont été signalés. Il est également important de considérer les exigences en matière de maintenance régulière pour garantir des performances optimales. Cette évaluation équilibrée vous permettra de déterminer si ${keyword} correspond véritablement à vos besoins et contraintes, et d'anticiper les défis potentiels liés à son adoption ou à son utilisation.`
     },
     {
-      title: `Perspectives d'évolution pour ${keyword}`,
-      author: "Tech Innovation Review",
-      year: "2023",
-      link: "https://example.com/source3"
+      heading: `Comment choisir le bon ${keyword} pour vos besoins`,
+      content: `Sélectionner le ${keyword} idéal nécessite une approche méthodique basée sur une analyse approfondie de vos besoins spécifiques. Commencez par identifier clairement les objectifs que vous souhaitez atteindre et les fonctionnalités essentielles correspondant à votre utilisation prévue. Établissez une liste hiérarchisée de critères d'évaluation incluant des facteurs comme la performance, la fiabilité, l'évolutivité et les options de personnalisation. Le rapport qualité-prix doit être considéré dans une perspective à long terme, en tenant compte non seulement du coût d'acquisition initial mais également des frais de maintenance et de mise à niveau futurs. La compatibilité avec votre infrastructure existante ou vos autres outils représente également un critère décisif pour éviter des complications d'intégration. N'hésitez pas à consulter des évaluations indépendantes, des études de cas pertinentes et des témoignages d'utilisateurs partageant un profil similaire au vôtre. Si possible, testez différentes options avant de prendre une décision définitive, en utilisant des versions d'essai ou des démonstrations pour évaluer l'expérience utilisateur réelle. Enfin, examinez attentivement les services après-vente proposés, notamment le support technique, les garanties et la disponibilité des mises à jour, car ces éléments influenceront considérablement votre satisfaction à long terme.`
+    },
+    {
+      heading: `Les meilleures pratiques d'utilisation de ${keyword}`,
+      content: `Optimiser l'utilisation de ${keyword} requiert l'application de meilleures pratiques éprouvées, développées à partir d'expériences collectives dans le domaine. Une configuration initiale méticuleuse constitue le fondement d'une expérience réussie - prenez le temps de personnaliser les paramètres en fonction de vos besoins spécifiques plutôt que de vous contenter des options par défaut. Adoptez une approche systématique pour la formation des utilisateurs, en développant une documentation claire et en organisant des sessions pratiques qui accélèrent la maîtrise de l'outil. L'intégration progressive représente généralement une stratégie plus efficace qu'une implémentation immédiate à grande échelle, permettant d'identifier et de résoudre les problèmes potentiels avant un déploiement complet. Établissez des procédures de maintenance préventive régulière incluant des vérifications de performance, des mises à jour et l'optimisation des ressources. La sécurité doit demeurer une priorité constante, avec l'application rigoureuse des mises à jour de sécurité et l'adhésion aux protocoles recommandés. Mettez en place un système de suivi des performances avec des indicateurs clés pertinents pour évaluer objectivement les bénéfices obtenus et identifier les domaines d'amélioration potentielle. Restez informé des nouvelles fonctionnalités et des évolutions du produit en vous connectant à la communauté des utilisateurs et en suivant les ressources officielles. Ces pratiques vous permettront d'exploiter pleinement le potentiel de ${keyword} tout en minimisant les risques et les difficultés techniques.`
+    },
+    {
+      heading: `Tendances futures et évolutions de ${keyword}`,
+      content: `L'avenir de ${keyword} s'annonce particulièrement dynamique, avec plusieurs tendances émergentes qui façonneront son évolution dans les années à venir. L'intégration de technologies d'intelligence artificielle et d'apprentissage automatique transforme progressivement les capacités fondamentales de ${keyword}, permettant une personnalisation plus poussée et une prise de décision autonome. La connectivité améliorée, notamment via l'Internet des objets, étend considérablement les possibilités d'application et d'intégration dans des écosystèmes plus larges. Les préoccupations croissantes concernant la durabilité environnementale influencent également le développement, avec une attention accrue portée à l'optimisation énergétique et à la réduction de l'empreinte carbone. Sur le plan réglementaire, de nouvelles normes et exigences en matière de confidentialité des données et de sécurité impacteront certainement la conception et l'utilisation future de ${keyword}. Le modèle économique évolue également, avec une transition notable vers des solutions basées sur l'abonnement offrant une plus grande flexibilité aux utilisateurs. Pour rester à la pointe, il sera essentiel de surveiller ces développements et d'adapter votre stratégie d'utilisation ou d'implémentation en conséquence. Les organisations et individus capables d'anticiper ces changements et de s'y adapter rapidement bénéficieront d'un avantage compétitif significatif dans leur domaine respectif.`
     }
   ];
 
-  const callToActions = [
-    `<div class="bg-primary/10 border-l-4 border-primary p-4 my-6 rounded-md">
-      <h3 class="text-lg font-semibold mb-2">Prêt à optimiser votre approche avec ${keyword}?</h3>
-      <p class="mb-4">Découvrez comment nos solutions personnalisées peuvent transformer vos résultats.</p>
-      <button class="bg-primary text-white px-6 py-2 rounded-md hover:bg-primary/90 transition-colors">Demander une consultation</button>
-    </div>`,
-    `<div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 my-6 rounded-md border border-blue-100">
-      <h3 class="text-xl font-bold mb-3">Maximisez votre potentiel avec ${keyword}</h3>
-      <p class="mb-4">Nos experts sont disponibles pour vous accompagner dans votre démarche d'intégration.</p>
-      <div class="flex gap-4">
-        <button class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Nous contacter</button>
-        <button class="border border-blue-600 text-blue-600 px-4 py-2 rounded-md hover:bg-blue-50">En savoir plus</button>
-      </div>
-    </div>`
-  ];
+  return { title, intro, sections };
+};
 
-  const statistics = [
-    `<div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-6">
-      <div class="bg-white p-4 rounded-md shadow-sm border border-gray-100">
-        <p class="text-gray-500 text-sm">Augmentation moyenne</p>
-        <p class="text-3xl font-bold text-primary">+47%</p>
-        <p class="text-sm">de performance avec ${keyword}</p>
-      </div>
-      <div class="bg-white p-4 rounded-md shadow-sm border border-gray-100">
-        <p class="text-gray-500 text-sm">Réduction des coûts</p>
-        <p class="text-3xl font-bold text-green-600">-32%</p>
-        <p class="text-sm">après implémentation</p>
-      </div>
-      <div class="bg-white p-4 rounded-md shadow-sm border border-gray-100">
-        <p class="text-gray-500 text-sm">Satisfaction client</p>
-        <p class="text-3xl font-bold text-blue-600">92%</p>
-        <p class="text-sm">taux d'approbation</p>
-      </div>
-    </div>`
-  ];
-
-  const tableOfContents = [
-    `<div class="bg-gray-50 p-4 rounded-md my-6">
-      <h3 class="text-lg font-medium mb-3">Table des matières</h3>
-      <ul class="space-y-2">
-        <li class="hover:text-primary transition-colors">
-          <a href="#introduction">1. Introduction à ${keyword}</a>
-        </li>
-        <li class="hover:text-primary transition-colors">
-          <a href="#fundamentals">2. Les fondamentaux de ${keyword}</a>
-        </li>
-        <li class="hover:text-primary transition-colors">
-          <a href="#implementation">3. Mise en œuvre de ${keyword}</a>
-        </li>
-        <li class="hover:text-primary transition-colors">
-          <a href="#benefits">4. Avantages et impacts</a>
-        </li>
-        <li class="hover:text-primary transition-colors">
-          <a href="#case-studies">5. Études de cas</a>
-        </li>
-        <li class="hover:text-primary transition-colors">
-          <a href="#faq">6. Questions fréquentes</a>
-        </li>
-        <li class="hover:text-primary transition-colors">
-          <a href="#conclusion">7. Conclusion</a>
-        </li>
-      </ul>
-    </div>`
-  ];
-
-  const generateBulletPoints = (count: number) => {
-    const shuffled = [...bulletPoints].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, count).map(point => `<li>${point}</li>`).join('\n');
-  };
-
-  const selectRandomTestimonial = () => {
-    return testimonials[Math.floor(Math.random() * testimonials.length)];
-  };
-
-  const selectRandomCallToAction = () => {
-    return callToActions[Math.floor(Math.random() * callToActions.length)];
-  };
-
-  const generateFAQSection = () => {
-    let faqHtml = `<div class="space-y-4 my-6">
-      <h3 class="text-xl font-bold">Questions fréquentes sur ${keyword}</h3>`;
-    
-    faqs.forEach(faq => {
-      faqHtml += `
-        <div class="bg-white shadow-sm border border-gray-100 rounded-md overflow-hidden">
-          <div class="p-4 font-medium">${faq.question}</div>
-          <div class="p-4 bg-gray-50 border-t border-gray-100">${faq.answer}</div>
-        </div>`;
-    });
-    
-    faqHtml += `</div>`;
-    return faqHtml;
-  };
-
-  const generateSourcesSection = () => {
-    let sourcesHtml = `<div class="border-t border-gray-200 pt-6 mt-8">
-      <h3 class="text-lg font-semibold mb-4">Sources et références</h3>
-      <ul class="space-y-3 text-sm">`;
-    
-    sources.forEach(source => {
-      sourcesHtml += `
-        <li class="flex gap-2">
-          <span class="text-gray-500">[${source.year}]</span>
-          <span>${source.author}: <em>${source.title}</em> - <a href="${source.link}" class="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">Consulter</a></span>
-        </li>`;
-    });
-    
-    sourcesHtml += `</ul></div>`;
-    return sourcesHtml;
-  };
-
-  const generateParagraph = (phrases: string[], minWords: number, useContext = true) => {
-    let content = '';
-    const shuffledPhrases = [...phrases].sort(() => 0.5 - Math.random());
-    const shuffledContext = [...contextPhrases].sort(() => 0.5 - Math.random());
-    const shuffledTransitions = [...transitionPhrases].sort(() => 0.5 - Math.random());
-    
-    if (useContext && shuffledContext.length > 0) {
-      content = `<p>${shuffledContext[0]} `;
-    } else {
-      content = '<p>';
-    }
-    
-    let phraseIndex = 0;
-    while (content.split(/\s+/).length < minWords && (phraseIndex < shuffledPhrases.length)) {
-      if (phraseIndex > 0 && shuffledTransitions.length > 0) {
-        content += ' ' + shuffledTransitions[phraseIndex % shuffledTransitions.length] + ' ';
-      }
-      content += shuffledPhrases[phraseIndex];
-      phraseIndex++;
-    }
-    
-    return content + '</p>';
-  };
-
-  const formatSectionHeading = (headingText: string, level = 2, style = options.headerStyle) => {
-    if (style === 'numbered') {
-      return `<h${level} id="${headingText.toLowerCase().replace(/[^\w]+/g, '-')}" class="text-2xl font-bold mb-4 flex items-center gap-2">
-        <span class="flex items-center justify-center bg-primary/10 text-primary h-7 w-7 rounded-full text-sm font-semibold">${level-1}</span>
-        ${headingText}
-      </h${level}>`;
-    } else if (style === 'decorative') {
-      return `<h${level} id="${headingText.toLowerCase().replace(/[^\w]+/g, '-')}" class="text-2xl font-bold mb-4 border-b-2 border-primary/30 pb-2">
-        <span class="border-l-4 border-primary pl-3">${headingText}</span>
-      </h${level}>`;
-    } else {
-      return `<h${level} id="${headingText.toLowerCase().replace(/[^\w]+/g, '-')}" class="text-2xl font-bold mb-4">${headingText}</h${level}>`;
-    }
-  };
-
-  // Calcul de la répartition des mots
-  const introWords = Math.max(Math.floor(targetWordCount * 0.15), 30);
-  const sectionWords = Math.max(Math.floor((targetWordCount - introWords) / 4), 50);
-
-  // Construction du contenu
-  let sections = [];
-
-  // Section d'introduction
-  sections.push({
-    heading: `<h1 class="text-3xl font-bold mb-6">${keyword} : Guide Complet et Stratégies Efficaces</h1>`,
-    content: options.useCustomIntro && options.customIntro 
-      ? options.customIntro 
-      : generateParagraph(introductoryPhrases, introWords)
+// Main function to generate content based on keyword and target word count
+export const generateContentWithWordCount = (keyword: string, targetWordCount: number = 800): GeneratedContent => {
+  // Determine if the keyword is geographic or product-related
+  const isGeographic = detectGeographicKeyword(keyword);
+  
+  // Generate appropriate content based on keyword type
+  const content = isGeographic ? 
+    generateGeographicContent(keyword, targetWordCount) : 
+    generateProductContent(keyword, targetWordCount);
+  
+  // Calculate current word count
+  let currentWordCount = countWords(content.intro);
+  content.sections.forEach(section => {
+    currentWordCount += countWords(section.content);
   });
-
-  // Table des matières optionnelle
-  if (options.includeTableOfContents) {
-    sections[0].content += tableOfContents[0];
+  
+  // Adjust content length if needed
+  if (Math.abs(currentWordCount - targetWordCount) > targetWordCount * 0.1) {
+    // This is a simple approach - in a real implementation, you would have more
+    // sophisticated content expansion/reduction algorithms
+    const ratio = targetWordCount / currentWordCount;
+    
+    // Adjust intro and section content proportionally
+    content.sections = content.sections.map(section => ({
+      ...section,
+      content: adjustContentLength(section.content, ratio)
+    }));
   }
+  
+  return content;
+};
 
-  // Sections principales de contenu
-  sections.push({
-    heading: formatSectionHeading(`Les Fondamentaux de ${keyword}`, 2, options.headerStyle),
-    content: `${generateParagraph(bodyPhrases, sectionWords)}\n\n<ul class="list-disc pl-6 my-4">\n${generateBulletPoints(3)}\n</ul>`
-  });
-
-  // Statistiques optionnelles
-  if (options.includeStats) {
-    sections[1].content += statistics[0];
+// Helper function to adjust content length
+const adjustContentLength = (text: string, ratio: number): string => {
+  // This is a simplified approach
+  // In practice, you would use more sophisticated NLP techniques
+  if (ratio > 1.1) {
+    // Need to expand content
+    return text + " " + generateFillerContent(text, ratio);
+  } else if (ratio < 0.9) {
+    // Need to reduce content
+    const words = text.split(/\s+/);
+    const targetWords = Math.floor(words.length * ratio);
+    return words.slice(0, targetWords).join(" ");
   }
+  return text;
+};
 
-  sections.push({
-    heading: formatSectionHeading(`Optimisation et Mise en Œuvre de ${keyword}`, 2, options.headerStyle),
-    content: `${generateParagraph(bodyPhrases, sectionWords)}\n\n<ul class="list-disc pl-6 my-4">\n${generateBulletPoints(3)}\n</ul>`
-  });
-
-  // Témoignage optionnel
-  if (options.includeTestimonial) {
-    sections[2].content += `\n\n<blockquote class="border-l-4 border-primary pl-4 py-2 my-4 italic bg-primary/5">\n${selectRandomTestimonial()}\n</blockquote>`;
+// Generate filler content to reach target word count
+const generateFillerContent = (baseText: string, ratio: number): string => {
+  const fillerPhrases = [
+    "Il est important de noter que cette approche présente de nombreux avantages dans diverses situations.",
+    "Comme de nombreux experts le soulignent, cette méthode s'est avérée efficace dans la plupart des contextes.",
+    "Les recherches récentes confirment la validité de ces principes dans différents scénarios d'application.",
+    "En analysant les tendances actuelles, on constate une évolution significative des pratiques dans ce domaine.",
+    "Les témoignages d'utilisateurs expérimentés confirment la pertinence de ces recommandations.",
+    "En tenant compte des spécificités de chaque situation, ces conseils peuvent être adaptés selon vos besoins particuliers."
+  ];
+  
+  // Determine how much filler is needed
+  const baseWords = baseText.split(/\s+/).length;
+  const targetWords = Math.ceil(baseWords * ratio);
+  const wordsToAdd = targetWords - baseWords;
+  
+  if (wordsToAdd <= 0) return "";
+  
+  // Add filler phrases until we reach the target
+  let filler = "";
+  let i = 0;
+  while (filler.split(/\s+/).length < wordsToAdd && i < 10) {
+    // Avoid infinite loop by limiting iterations
+    filler += " " + fillerPhrases[Math.floor(Math.random() * fillerPhrases.length)];
+    i++;
   }
-
-  sections.push({
-    heading: formatSectionHeading(`Tendances et Innovations pour ${keyword}`, 2, options.headerStyle),
-    content: `${generateParagraph(bodyPhrases, sectionWords)}\n\n<blockquote class="border-l-4 border-primary pl-4 py-2 my-4 italic bg-primary/5">\nL'innovation continue dans le domaine de ${keyword} est un facteur clé pour maintenir un avantage compétitif sur le long terme.\n</blockquote>\n\n<ul class="list-disc pl-6 my-4">\n${generateBulletPoints(3)}\n</ul>`
-  });
-
-  // FAQ optionnelle
-  if (options.includeFAQ) {
-    sections.push({
-      heading: formatSectionHeading(`FAQ sur ${keyword}`, 2, options.headerStyle),
-      content: generateFAQSection()
-    });
-  }
-
-  // Appel à l'action optionnel
-  if (options.includeCallToAction) {
-    sections.push({
-      heading: '',
-      content: selectRandomCallToAction()
-    });
-  }
-
-  // Sources optionnelles
-  if (options.includeSources) {
-    sections.push({
-      heading: '',
-      content: generateSourcesSection()
-    });
-  }
-
-  return {
-    title: `${keyword} : Guide Complet et Stratégies Efficaces`,
-    intro: sections[0].content,
-    sections: sections.slice(1)
-  };
+  
+  return filler;
 };
