@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import BrokenLinkButton from '@/components/seo/BrokenLinkButton';
 import BlogContentGenerator from '@/components/seo/BlogContentGenerator';
 import DomainAnalysis from '@/components/seo/DomainAnalysis';
+import SitemapSubmission from '@/components/seo/SitemapSubmission';
 
 const HomePage = () => {
   return (
@@ -36,6 +37,7 @@ const HomePage = () => {
                   </Link>
                   <BrokenLinkButton className="bg-blue-600 hover:bg-blue-700 text-white" />
                   <BlogContentGenerator />
+                  <SitemapSubmission />
                 </div>
               </div>
               <div className="md:w-1/3">
