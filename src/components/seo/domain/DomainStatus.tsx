@@ -1,9 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Check, X, Activity, BarChart, LineChart } from "lucide-react";
 import { toast } from "sonner";
+import { GoogleSearchConsole } from '@/utils/googleSearchConsole';
 
 interface DomainStatusProps {
   domain: string;
@@ -12,27 +13,73 @@ interface DomainStatusProps {
 }
 
 export const DomainStatus: React.FC<DomainStatusProps> = ({ domain, isAvailable, isChecking }) => {
-  const estimateTraffic = () => {
-    // In a real application, this would call an API to get traffic data
+  const [isLoadingTraffic, setIsLoadingTraffic] = useState(false);
+  const [isConnectingSearchConsole, setIsConnectingSearchConsole] = useState(false);
+  const [isConnectingAnalytics, setIsConnectingAnalytics] = useState(false);
+  
+  const searchConsole = new GoogleSearchConsole();
+
+  const estimateTraffic = async () => {
+    if (!domain) return;
+    
+    setIsLoadingTraffic(true);
     toast.info(`Estimation du trafic pour ${domain} en cours...`);
-    setTimeout(() => {
+    
+    try {
+      // Utiliser l'API Search Console pour obtenir des données réelles
+      const searchData = await searchConsole.getSearchAnalytics(domain);
+      
+      toast.success(`Trafic estimé pour ${domain}: ${searchData.impressions.toLocaleString()} impressions, ${searchData.clicks.toLocaleString()} clics`);
+    } catch (error) {
+      console.error("Erreur lors de l'estimation du trafic:", error);
+      // Fallback vers des données simulées en cas d'erreur
       const estimatedVisits = Math.floor(Math.random() * 5000) + 1000;
-      toast.success(`Trafic estimé pour ${domain}: ${estimatedVisits.toLocaleString()} visites/mois`);
-    }, 1500);
+      toast.success(`Trafic estimé pour ${domain}: ${estimatedVisits.toLocaleString()} visites/mois (données simulées)`);
+    } finally {
+      setIsLoadingTraffic(false);
+    }
   };
 
-  const connectSearchConsole = () => {
+  const connectSearchConsole = async () => {
+    if (!domain) return;
+    
+    setIsConnectingSearchConsole(true);
     toast.info(`Connexion à Google Search Console pour ${domain} en cours...`);
-    setTimeout(() => {
+    
+    try {
+      // Ici, vous pourriez implémenter une vraie connexion à l'API Search Console
+      // Pour l'instant, nous simulons une réponse
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
       toast.success(`Domaine ${domain} connecté à Google Search Console avec succès!`);
-    }, 1500);
+      toast.info("Pour voir les vraies données, vous devez configurer l'API Google Search Console");
+    } catch (error) {
+      console.error("Erreur lors de la connexion à Search Console:", error);
+      toast.error(`Erreur lors de la connexion à Search Console: ${error.message}`);
+    } finally {
+      setIsConnectingSearchConsole(false);
+    }
   };
 
-  const connectGoogleAnalytics = () => {
+  const connectGoogleAnalytics = async () => {
+    if (!domain) return;
+    
+    setIsConnectingAnalytics(true);
     toast.info(`Connexion à Google Analytics pour ${domain} en cours...`);
-    setTimeout(() => {
+    
+    try {
+      // Ici, vous pourriez implémenter une vraie connexion à l'API Google Analytics
+      // Pour l'instant, nous simulons une réponse
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
       toast.success(`Domaine ${domain} connecté à Google Analytics avec succès!`);
-    }, 1500);
+      toast.info("Pour voir les vraies données, vous devez configurer l'API Google Analytics");
+    } catch (error) {
+      console.error("Erreur lors de la connexion à Google Analytics:", error);
+      toast.error(`Erreur lors de la connexion à Google Analytics: ${error.message}`);
+    } finally {
+      setIsConnectingAnalytics(false);
+    }
   };
 
   if (isChecking) {
@@ -66,27 +113,30 @@ export const DomainStatus: React.FC<DomainStatusProps> = ({ domain, isAvailable,
             size="sm" 
             className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-1"
             onClick={estimateTraffic}
+            disabled={isLoadingTraffic}
           >
             <Activity className="h-4 w-4" />
-            Estimer le trafic potentiel
+            {isLoadingTraffic ? 'Estimation...' : 'Estimer le trafic potentiel'}
           </Button>
           
           <Button 
             size="sm" 
             className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-1"
             onClick={connectSearchConsole}
+            disabled={isConnectingSearchConsole}
           >
             <LineChart className="h-4 w-4" />
-            Search Console
+            {isConnectingSearchConsole ? 'Connexion...' : 'Search Console'}
           </Button>
           
           <Button 
             size="sm" 
             className="bg-amber-600 hover:bg-amber-700 text-white flex items-center gap-1"
             onClick={connectGoogleAnalytics}
+            disabled={isConnectingAnalytics}
           >
             <BarChart className="h-4 w-4" />
-            Google Analytics
+            {isConnectingAnalytics ? 'Connexion...' : 'Google Analytics'}
           </Button>
         </div>
       </div>
