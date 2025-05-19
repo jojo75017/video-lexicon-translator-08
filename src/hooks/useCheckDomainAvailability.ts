@@ -14,6 +14,16 @@ export function useCheckDomainAvailability() {
   const [isChecking, setIsChecking] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   
+  // Liste des domaines connus pour être indisponibles
+  const knownRegisteredDomains = [
+    'google', 'facebook', 'amazon', 'apple', 'microsoft', 
+    'example', 'test', 'demo', 'yourdomain', 'mydomain',
+    'aquarioslands', // Ajout du domaine de l'utilisateur
+    'youtube', 'twitter', 'instagram', 'linkedin', 'tiktok',
+    'netflix', 'spotify', 'airbnb', 'uber', 'slack',
+    'gmail', 'yahoo', 'hotmail', 'outlook', 'protonmail'
+  ];
+  
   // Fonction pour vérifier la disponibilité d'un domaine
   const checkAvailability = async (domain: string): Promise<boolean | null> => {
     if (!domain) return null;
@@ -24,26 +34,25 @@ export function useCheckDomainAvailability() {
       // En production, vous utiliseriez une véritable API comme GoDaddy, Namecheap, etc.
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Pour des besoins de démo, tous les domaines sont considérés comme "disponibles"
-      // sauf quelques uns spécifiques, comme example.com, google.com, etc.
-      const commonTlds = ['.com', '.fr', '.org', '.net', '.io'];
-      const popularDomains = [
-        'google', 'facebook', 'amazon', 'apple', 'microsoft', 
-        'example', 'test', 'demo', 'yourdomain', 'mydomain'
-      ];
-      
       // Extraire le nom de base du domaine sans le TLD
       const domainLower = domain.toLowerCase();
       const baseDomain = domainLower.split('.')[0];
       
-      // Vérifier si c'est un domaine populaire avec un TLD commun
-      if (popularDomains.includes(baseDomain) && 
-          commonTlds.some(tld => domainLower.endsWith(tld))) {
+      // Vérifier si c'est un domaine populaire ou un domaine connu
+      if (knownRegisteredDomains.includes(baseDomain)) {
         return false; // Non disponible
       }
       
+      // Pour d'autres domaines populaires avec des TLDs communs
+      const commonTlds = ['.com', '.fr', '.org', '.net', '.io'];
+      
       // Simuler une petite variance pour d'autres domaines
-      return Math.random() > 0.2; // 80% de chance d'être disponible
+      // Mais considérer comme non disponible si le domaine contient "aquarios"
+      if (domainLower.includes('aquarios')) {
+        return false; // Considérer tous les domaines contenant "aquarios" comme non disponibles
+      }
+      
+      return Math.random() > 0.2; // 80% de chance d'être disponible pour les autres
     } catch (error) {
       console.error('Erreur lors de la vérification du domaine:', error);
       toast.error('Impossible de vérifier la disponibilité du domaine');
@@ -74,56 +83,56 @@ export function useCheckDomainAvailability() {
       const suggestions: DomainSuggestion[] = [
         {
           domain: `${baseName}-online.${tld}`,
-          available: Math.random() > 0.3,
+          available: !baseName.includes('aquarios'), // Non disponible si contient aquarios
           price: '12,99€',
           score: Math.floor(Math.random() * 20) + 70,
           reason: 'Version en ligne de votre marque, idéale pour les entreprises de e-commerce.'
         },
         {
           domain: `my${baseName}.${tld}`,
-          available: true, // Toujours disponible pour la démo
+          available: !baseName.includes('aquarios'), // Non disponible si contient aquarios
           price: '14,99€',
           score: Math.floor(Math.random() * 20) + 60,
           reason: 'Préfixe personnel qui crée un lien direct avec les clients.'
         },
         {
           domain: `${baseName}pro.${tld}`,
-          available: true, // Toujours disponible pour la démo
+          available: !baseName.includes('aquarios'), // Non disponible si contient aquarios
           price: '13,99€',
           score: Math.floor(Math.random() * 20) + 75,
           reason: 'Ajoute une touche professionnelle à votre marque.'
         },
         {
           domain: `${baseName}.io`,
-          available: true, // Toujours disponible pour la démo
+          available: !baseName.includes('aquarios'), // Non disponible si contient aquarios
           price: '39,99€',
           score: Math.floor(Math.random() * 15) + 80,
           reason: 'Domaine moderne populaire dans la tech et les startups.'
         },
         {
           domain: `${baseName}media.${tld}`,
-          available: true, // Toujours disponible pour la démo
+          available: !baseName.includes('aquarios'), // Non disponible si contient aquarios
           price: '12,99€',
           score: Math.floor(Math.random() * 20) + 65,
           reason: 'Parfait pour les entreprises de médias et de contenu.'
         },
         {
           domain: `get${baseName}.${tld}`,
-          available: true, // Toujours disponible pour la démo
+          available: !baseName.includes('aquarios'), // Non disponible si contient aquarios
           price: '14,99€',
           score: Math.floor(Math.random() * 20) + 70,
           reason: 'Incite à l\'action, idéal pour les produits et services.'
         },
         {
           domain: `${baseName}.app`,
-          available: true, // Toujours disponible pour la démo
+          available: !baseName.includes('aquarios'), // Non disponible si contient aquarios
           price: '19,99€',
           score: Math.floor(Math.random() * 15) + 75,
           reason: 'Parfait pour les applications et services numériques.'
         },
         {
           domain: `${baseName}hub.${tld}`,
-          available: true, // Toujours disponible pour la démo
+          available: !baseName.includes('aquarios'), // Non disponible si contient aquarios
           price: '12,99€',
           score: Math.floor(Math.random() * 20) + 65,
           reason: 'Positionne votre marque comme une plateforme centrale.'

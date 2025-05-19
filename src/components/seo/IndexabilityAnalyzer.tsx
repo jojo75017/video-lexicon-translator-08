@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Search, AlertCircle, CheckCircle2, AlertTriangle, Globe } from "lucide-react";
+import { Search, AlertCircle, CheckCircle2, AlertTriangle, Globe, ExternalLink } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { analyzeIndexability } from '@/utils/seo/indexabilityAnalyzer';
 
@@ -48,7 +48,25 @@ export const IndexabilityAnalyzer = () => {
     setCorsError(false);
     
     try {
-      // Charger la page via un proxy ou fetch
+      // Essayer d'abord sans le proxy CORS pour les sites qui le permettent
+      try {
+        const directResponse = await fetch(formattedUrl);
+        const html = await directResponse.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        
+        // Analyser l'indexabilité
+        const indexabilityResults = analyzeIndexability(doc);
+        setResults(indexabilityResults);
+        
+        toast.success("Analyse d'indexabilité terminée");
+        setIsAnalyzing(false);
+        return;
+      } catch (directError) {
+        console.log("Accès direct échoué, tentative via proxy CORS:", directError);
+      }
+      
+      // Si l'accès direct échoue, essayer via le proxy CORS
       const response = await fetch(`https://cors-anywhere.herokuapp.com/${formattedUrl}`);
       
       if (response.status === 403 && response.statusText === "Forbidden") {
@@ -125,13 +143,13 @@ export const IndexabilityAnalyzer = () => {
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      className="bg-amber-100 border-amber-300 text-amber-800 hover:bg-amber-200"
+                      className="bg-amber-100 border-amber-300 text-amber-800 hover:bg-amber-200 mb-2"
                       onClick={handleOpenCorsDemo}
                     >
                       <Globe className="mr-2 h-4 w-4" />
                       Activer CORS Demo
                     </Button>
-                    <p className="mt-2 text-xs">
+                    <p className="text-xs">
                       Sur la page qui s'ouvrira, cliquez sur "Request temporary access to the demo server", 
                       puis revenez et essayez à nouveau.
                     </p>
@@ -215,6 +233,18 @@ export const IndexabilityAnalyzer = () => {
                     </ul>
                   </div>
                 )}
+                
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <a 
+                    href={`https://search.google.com/test/rich-results?url=${encodeURIComponent(url)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center text-blue-600 hover:text-blue-800 text-sm"
+                  >
+                    <ExternalLink className="h-4 w-4 mr-1" />
+                    Tester cette URL avec l'outil Google Rich Results
+                  </a>
+                </div>
               </div>
             )}
           </CardContent>
