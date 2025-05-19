@@ -2,7 +2,7 @@
 import React from 'react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Check, X, TrendingUp } from "lucide-react";
+import { Check, X, TrendingUp, Activity } from "lucide-react";
 import { toast } from "sonner";
 
 interface DomainStatusProps {
@@ -53,7 +53,7 @@ export const DomainStatus: React.FC<DomainStatusProps> = ({ domain, isAvailable,
             className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-1"
             onClick={estimateTraffic}
           >
-            <TrendingUp className="h-4 w-4" />
+            <Activity className="h-4 w-4" />
             Estimer le trafic potentiel
           </Button>
         </div>
