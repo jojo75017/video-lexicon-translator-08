@@ -30,11 +30,11 @@ const BrokenLinks = ({ brokenLinks = [] }: BrokenLinksProps) => {
               </div>
               <div className="text-sm">
                 <span className="font-medium">Status: </span>
-                {link.statusCode || link.status || 'Inconnu'}
+                {link.statusCode || 'Inconnu'}
               </div>
               <div className="text-sm">
                 <span className="font-medium">Trouvé dans: </span>
-                {link.location || link.text || 'Page principale'}
+                {link.anchor || 'Page principale'}
               </div>
             </AlertDescription>
           </Alert>

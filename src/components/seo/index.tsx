@@ -4,11 +4,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, BarChart, ListTree } from "lucide-react";
 import MetaContentGenerator from './MetaContentGenerator';
 import SerpStructureAnalyzer from './SerpStructureAnalyzer';
+import BrokenLinkButton from './BrokenLinkButton';
 
 const SeoTools = () => {
   return (
     <div className="container mx-auto p-4 space-y-8">
-      <h1 className="text-2xl font-bold">Outils SEO</h1>
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">Outils SEO</h1>
+        <BrokenLinkButton />
+      </div>
       
       <Tabs defaultValue="meta" className="w-full">
         <TabsList className="mb-4">

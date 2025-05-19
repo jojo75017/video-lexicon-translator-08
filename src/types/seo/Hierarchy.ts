@@ -42,6 +42,8 @@ export interface StructureAnalysisResult {
 export interface HierarchyItem {
   title: string;
   id: string;
+  tagName?: string;
+  text?: string;
   children?: HierarchyItem[];
 }
 
@@ -61,10 +63,20 @@ export interface StructureItem {
 
 export interface SocialMetricsProps {
   metrics: any;
+  facebook?: any;
+  twitter?: any;
+  pinterest?: any;
+  linkedin?: any;
 }
 
 export interface BacklinksAnalysisProps {
   backlinks: any[];
+  doFollowCount?: number;
+  noFollowCount?: number;
+  topDomains?: any[];
+  qualityScore?: number;
+  relevanceScore?: number;
+  trustScore?: number;
 }
 
 export interface SocialTags {
@@ -75,4 +87,10 @@ export interface SocialTags {
   twitterTitle: string | null;
   twitterDescription: string | null;
   twitterImage: string | null;
+}
+
+export interface BrokenLink {
+  url: string;
+  statusCode?: number;
+  anchor?: string;
 }
