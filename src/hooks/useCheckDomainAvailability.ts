@@ -1,14 +1,7 @@
 
 import { useState } from 'react';
 import { toast } from 'sonner';
-
-interface DomainSuggestion {
-  domain: string;
-  available: boolean;
-  price?: string;
-  score: number;
-  reason?: string;
-}
+import { DomainSuggestion } from '@/types/domain';
 
 export function useCheckDomainAvailability() {
   const [isChecking, setIsChecking] = useState(false);
