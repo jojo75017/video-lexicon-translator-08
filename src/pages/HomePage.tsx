@@ -6,6 +6,7 @@ import UnifiedDashboard from '@/components/dashboard/UnifiedDashboard';
 import { FileText, LinkIcon, LineChart, BarChart2, Tag, Info, FilePenLine, LayoutGrid, Search } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Button } from '@/components/ui/button';
+import BrokenLinkButton from '@/components/seo/BrokenLinkButton';
 
 const HomePage = () => {
   return (
@@ -31,6 +32,7 @@ const HomePage = () => {
                       Générateur de mots-clés
                     </Button>
                   </Link>
+                  <BrokenLinkButton className="bg-blue-600 hover:bg-blue-700 text-white" />
                 </div>
               </div>
               <div className="md:w-1/3">
