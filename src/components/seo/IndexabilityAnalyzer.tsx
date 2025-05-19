@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Search, AlertCircle, CheckCircle2, AlertTriangle } from "lucide-react";
+import { Search, AlertCircle, CheckCircle2, AlertTriangle, Globe } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { analyzeIndexability } from '@/utils/seo/indexabilityAnalyzer';
 
@@ -12,6 +12,7 @@ export const IndexabilityAnalyzer = () => {
   const [showForm, setShowForm] = useState(false);
   const [url, setUrl] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [corsError, setCorsError] = useState(false);
   const [results, setResults] = useState<{
     canIndex: boolean;
     indexablePages: number;
@@ -22,6 +23,7 @@ export const IndexabilityAnalyzer = () => {
   const handleButtonClick = () => {
     setShowForm(prev => !prev);
     setResults(null);
+    setCorsError(false);
   };
 
   const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,15 +38,23 @@ export const IndexabilityAnalyzer = () => {
       return;
     }
     
+    let formattedUrl = url;
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      setUrl(`https://${url}`);
+      formattedUrl = `https://${url}`;
+      setUrl(formattedUrl);
     }
     
     setIsAnalyzing(true);
+    setCorsError(false);
     
     try {
       // Charger la page via un proxy ou fetch
-      const response = await fetch(`https://cors-anywhere.herokuapp.com/${url}`);
+      const response = await fetch(`https://cors-anywhere.herokuapp.com/${formattedUrl}`);
+      
+      if (response.status === 403 && response.statusText === "Forbidden") {
+        throw new Error("CORS error: Access to the resource is forbidden. Please activate CORS demo first.");
+      }
+      
       const html = await response.text();
       
       // Créer un DOM à partir du HTML
@@ -58,10 +68,25 @@ export const IndexabilityAnalyzer = () => {
       toast.success("Analyse d'indexabilité terminée");
     } catch (error) {
       console.error("Erreur lors de l'analyse:", error);
-      toast.error("Erreur lors de l'analyse. Vérifiez l'URL et réessayez.");
+      
+      // Vérifier si c'est une erreur CORS
+      if (error instanceof Error && 
+          (error.message.includes("CORS") || error.message.includes("cors") || 
+           error.message.includes("Forbidden") || error.message.includes("403"))) {
+        setCorsError(true);
+        toast.error("Erreur d'accès CORS", {
+          description: "Le proxy CORS est bloqué. Veuillez activer le démo CORS d'abord."
+        });
+      } else {
+        toast.error("Erreur lors de l'analyse. Vérifiez l'URL et réessayez.");
+      }
     } finally {
       setIsAnalyzing(false);
     }
+  };
+  
+  const handleOpenCorsDemo = () => {
+    window.open("https://cors-anywhere.herokuapp.com/corsdemo", "_blank");
   };
   
   return (
@@ -88,6 +113,31 @@ export const IndexabilityAnalyzer = () => {
                   Vérifiez si votre site est correctement indexable par les moteurs de recherche.
                 </AlertDescription>
               </Alert>
+              
+              {corsError && (
+                <Alert className="mb-4 border-amber-300 bg-amber-50">
+                  <AlertTriangle className="h-5 w-5 text-amber-600" />
+                  <AlertTitle className="text-amber-800">Activation CORS requise</AlertTitle>
+                  <AlertDescription className="text-amber-700">
+                    <p className="mb-2">
+                      Pour analyser des sites externes, vous devez activer temporairement le proxy CORS.
+                    </p>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="bg-amber-100 border-amber-300 text-amber-800 hover:bg-amber-200"
+                      onClick={handleOpenCorsDemo}
+                    >
+                      <Globe className="mr-2 h-4 w-4" />
+                      Activer CORS Demo
+                    </Button>
+                    <p className="mt-2 text-xs">
+                      Sur la page qui s'ouvrira, cliquez sur "Request temporary access to the demo server", 
+                      puis revenez et essayez à nouveau.
+                    </p>
+                  </AlertDescription>
+                </Alert>
+              )}
               
               <div className="space-y-4">
                 <div>

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Loader2, FileText, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Loader2, FileText, AlertCircle, Globe, AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { analyzeResources, Resource } from '@/utils/resourceAnalyzer';
 
@@ -12,11 +12,13 @@ export const ResourceAnalyzer = () => {
   const [showForm, setShowForm] = useState(false);
   const [url, setUrl] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [corsError, setCorsError] = useState(false);
   const [resources, setResources] = useState<Resource[]>([]);
 
   const handleButtonClick = () => {
     setShowForm(prev => !prev);
     setResources([]);
+    setCorsError(false);
   };
 
   const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -31,15 +33,23 @@ export const ResourceAnalyzer = () => {
       return;
     }
     
+    let formattedUrl = url;
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      setUrl(`https://${url}`);
+      formattedUrl = `https://${url}`;
+      setUrl(formattedUrl);
     }
     
     setIsAnalyzing(true);
+    setCorsError(false);
     
     try {
       // Charger la page via un proxy ou fetch
-      const response = await fetch(`https://cors-anywhere.herokuapp.com/${url}`);
+      const response = await fetch(`https://cors-anywhere.herokuapp.com/${formattedUrl}`);
+      
+      if (response.status === 403 && response.statusText === "Forbidden") {
+        throw new Error("CORS error: Access to the resource is forbidden. Please activate CORS demo first.");
+      }
+      
       const html = await response.text();
       
       // Créer un DOM à partir du HTML
@@ -47,16 +57,31 @@ export const ResourceAnalyzer = () => {
       const doc = parser.parseFromString(html, 'text/html');
       
       // Analyser les ressources
-      const resourcesData = await analyzeResources(doc, url);
+      const resourcesData = await analyzeResources(doc, formattedUrl);
       setResources(resourcesData);
       
       toast.success(`${resourcesData.length} ressources analysées`);
     } catch (error) {
       console.error("Erreur lors de l'analyse:", error);
-      toast.error("Erreur lors de l'analyse. Vérifiez l'URL et réessayez.");
+      
+      // Vérifier si c'est une erreur CORS
+      if (error instanceof Error && 
+          (error.message.includes("CORS") || error.message.includes("cors") || 
+           error.message.includes("Forbidden") || error.message.includes("403"))) {
+        setCorsError(true);
+        toast.error("Erreur d'accès CORS", {
+          description: "Le proxy CORS est bloqué. Veuillez activer le démo CORS d'abord."
+        });
+      } else {
+        toast.error("Erreur lors de l'analyse. Vérifiez l'URL et réessayez.");
+      }
     } finally {
       setIsAnalyzing(false);
     }
+  };
+  
+  const handleOpenCorsDemo = () => {
+    window.open("https://cors-anywhere.herokuapp.com/corsdemo", "_blank");
   };
   
   // Calculer des statistiques sur les ressources
@@ -107,6 +132,31 @@ export const ResourceAnalyzer = () => {
                   Analysez les images, scripts et feuilles de style utilisés par votre site pour optimiser les performances.
                 </AlertDescription>
               </Alert>
+              
+              {corsError && (
+                <Alert className="mb-4 border-amber-300 bg-amber-50">
+                  <AlertTriangle className="h-5 w-5 text-amber-600" />
+                  <AlertTitle className="text-amber-800">Activation CORS requise</AlertTitle>
+                  <AlertDescription className="text-amber-700">
+                    <p className="mb-2">
+                      Pour analyser des sites externes, vous devez activer temporairement le proxy CORS.
+                    </p>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="bg-amber-100 border-amber-300 text-amber-800 hover:bg-amber-200"
+                      onClick={handleOpenCorsDemo}
+                    >
+                      <Globe className="mr-2 h-4 w-4" />
+                      Activer CORS Demo
+                    </Button>
+                    <p className="mt-2 text-xs">
+                      Sur la page qui s'ouvrira, cliquez sur "Request temporary access to the demo server", 
+                      puis revenez et essayez à nouveau.
+                    </p>
+                  </AlertDescription>
+                </Alert>
+              )}
               
               <div className="space-y-4">
                 <div>
