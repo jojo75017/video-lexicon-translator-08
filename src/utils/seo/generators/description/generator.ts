@@ -82,7 +82,7 @@ export const generateBothDescriptions = (keyword: string): { short: string; long
   return { short, long };
 };
 
-// Fonction pour générer des descriptions via l'API (gardée pour compatibilité)
+// Fonction pour générer des descriptions via l'API OpenAI
 export const generateAIDescriptions = async (keyword: string, apiKey: string): Promise<{ short: string, long: string }> => {
   try {
     // Si pas de clé API, utiliser le générateur local
