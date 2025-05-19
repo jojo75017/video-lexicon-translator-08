@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card } from "@/components/ui/card";
@@ -10,6 +9,8 @@ import BrokenLinkButton from '@/components/seo/BrokenLinkButton';
 import BlogContentGenerator from '@/components/seo/BlogContentGenerator';
 import DomainAnalysis from '@/components/seo/DomainAnalysis';
 import SitemapSubmission from '@/components/seo/SitemapSubmission';
+import IndexabilityAnalyzer from '@/components/seo/IndexabilityAnalyzer';
+import ResourceAnalyzer from '@/components/seo/ResourceAnalyzer';
 
 const HomePage = () => {
   return (
@@ -38,6 +39,8 @@ const HomePage = () => {
                   <BrokenLinkButton className="bg-blue-600 hover:bg-blue-700 text-white" />
                   <BlogContentGenerator />
                   <SitemapSubmission />
+                  <IndexabilityAnalyzer />
+                  <ResourceAnalyzer />
                 </div>
               </div>
               <div className="md:w-1/3">
