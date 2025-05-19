@@ -1,247 +1,140 @@
 
-import React, { useState } from 'react';
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { toast } from "sonner";
-import { Link2, LineChart, Award, Search, Globe } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Search, TrendingUp, TrendingDown, ArrowRight } from "lucide-react";
 
-interface OrganicMetrics {
-  serpRanking: number;
-  topKeywords: {
-    keyword: string;
-    position: number;
-    volume: number;
-  }[];
-  organicVisibility: number;
-  competitorGap: {
-    competitor: string;
-    gap: number;
-  }[];
+interface OrganicSearchProps {
+  domain?: string;
 }
 
-const OrganicSearch = () => {
-  const [domain, setDomain] = useState('');
+interface KeywordData {
+  keyword: string;
+  position: number;
+  volume: number;
+  difficulty: number;
+  change: number;
+}
+
+const OrganicSearch: React.FC<OrganicSearchProps> = ({ domain }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [metrics, setMetrics] = useState<OrganicMetrics | null>(null);
-
-  const exampleDomains = [
-    'worldwildlife.org',
-    'unicef.org/stories',
-    'edition.cnn.com'
-  ];
-
-  const analyzeDomain = async (domainToAnalyze: string) => {
-    setIsLoading(true);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      const mockMetrics: OrganicMetrics = {
-        serpRanking: Math.floor(Math.random() * 20) + 1,
-        topKeywords: [
-          {
-            keyword: "boutique en ligne",
-            position: Math.floor(Math.random() * 10) + 1,
-            volume: Math.floor(Math.random() * 10000) + 1000
-          },
-          {
-            keyword: "e-commerce solution",
-            position: Math.floor(Math.random() * 10) + 1,
-            volume: Math.floor(Math.random() * 8000) + 1000
-          },
-          {
-            keyword: "acheter en ligne",
-            position: Math.floor(Math.random() * 10) + 1,
-            volume: Math.floor(Math.random() * 6000) + 1000
-          }
-        ],
-        organicVisibility: Math.floor(Math.random() * 50) + 50,
-        competitorGap: [
-          {
-            competitor: "concurrent-1.com",
-            gap: Math.floor(Math.random() * 30) - 15
-          },
-          {
-            competitor: "concurrent-2.com",
-            gap: Math.floor(Math.random() * 30) - 15
-          },
-          {
-            competitor: "concurrent-3.com",
-            gap: Math.floor(Math.random() * 30) - 15
-          }
-        ]
-      };
-      
-      setMetrics(mockMetrics);
-      toast.success(`Analyse du trafic organique de ${domainToAnalyze} terminée`);
-    } catch (error) {
-      toast.error("Erreur lors de l'analyse du domaine");
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const [keywords, setKeywords] = useState<KeywordData[]>([]);
+  
+  useEffect(() => {
     if (domain) {
-      analyzeDomain(domain);
+      setIsLoading(true);
+      // Simulation d'un appel API
+      setTimeout(() => {
+        const generatedKeywords: KeywordData[] = [];
+        
+        if (domain.includes('voyage') || domain.includes('travel')) {
+          generatedKeywords.push(
+            { keyword: 'voyage paris', position: Math.floor(Math.random() * 10) + 1, volume: 12500, difficulty: 65, change: 2 },
+            { keyword: 'séjour all inclusive', position: Math.floor(Math.random() * 10) + 1, volume: 8700, difficulty: 72, change: -1 },
+            { keyword: 'hotel pas cher', position: Math.floor(Math.random() * 10) + 1, volume: 15400, difficulty: 80, change: 3 },
+            { keyword: 'billet avion promotion', position: Math.floor(Math.random() * 10) + 1, volume: 6200, difficulty: 70, change: 0 },
+            { keyword: 'destinations vacances été', position: Math.floor(Math.random() * 10) + 1, volume: 5100, difficulty: 62, change: -2 }
+          );
+        } else if (domain.includes('tech') || domain.includes('digital')) {
+          generatedKeywords.push(
+            { keyword: 'smartphone comparatif', position: Math.floor(Math.random() * 10) + 1, volume: 9400, difficulty: 75, change: 1 },
+            { keyword: 'meilleur ordinateur portable', position: Math.floor(Math.random() * 10) + 1, volume: 11200, difficulty: 82, change: -1 },
+            { keyword: 'tablette pas cher', position: Math.floor(Math.random() * 10) + 1, volume: 7800, difficulty: 68, change: 3 },
+            { keyword: 'casque audio bluetooth', position: Math.floor(Math.random() * 10) + 1, volume: 5600, difficulty: 63, change: 2 },
+            { keyword: 'écouteurs sans fil', position: Math.floor(Math.random() * 10) + 1, volume: 8300, difficulty: 70, change: -2 }
+          );
+        } else {
+          // Domaine générique
+          generatedKeywords.push(
+            { keyword: domain.split('.')[0] + ' avis', position: Math.floor(Math.random() * 10) + 1, volume: Math.floor(Math.random() * 10000) + 1000, difficulty: Math.floor(Math.random() * 20) + 60, change: Math.floor(Math.random() * 5) - 2 },
+            { keyword: 'acheter ' + domain.split('.')[0], position: Math.floor(Math.random() * 10) + 1, volume: Math.floor(Math.random() * 10000) + 1000, difficulty: Math.floor(Math.random() * 20) + 60, change: Math.floor(Math.random() * 5) - 2 },
+            { keyword: domain.split('.')[0] + ' comparatif', position: Math.floor(Math.random() * 10) + 1, volume: Math.floor(Math.random() * 10000) + 1000, difficulty: Math.floor(Math.random() * 20) + 60, change: Math.floor(Math.random() * 5) - 2 },
+            { keyword: domain.split('.')[0] + ' prix', position: Math.floor(Math.random() * 10) + 1, volume: Math.floor(Math.random() * 10000) + 1000, difficulty: Math.floor(Math.random() * 20) + 60, change: Math.floor(Math.random() * 5) - 2 },
+            { keyword: domain.split('.')[0] + ' meilleur', position: Math.floor(Math.random() * 10) + 1, volume: Math.floor(Math.random() * 10000) + 1000, difficulty: Math.floor(Math.random() * 20) + 60, change: Math.floor(Math.random() * 5) - 2 }
+          );
+        }
+        
+        setKeywords(generatedKeywords);
+        setIsLoading(false);
+      }, 1500);
+    } else {
+      setKeywords([]);
     }
-  };
-
-  return (
-    <Card className="p-6 space-y-6">
-      <div className="space-y-2">
-        <h2 className="text-2xl font-bold">Insights de Trafic Organique</h2>
-        <p className="text-gray-600">
-          Solution facile pour les mots clés « not provided » qui combine les données de Google Analytics, 
-          de Search Console et de Semrush. Découvrez les véritables moteurs de votre trafic organique.
+  }, [domain]);
+  
+  if (!domain) {
+    return (
+      <div className="bg-green-50 p-6 rounded-lg text-center">
+        <Search className="h-12 w-12 mx-auto text-green-600 mb-3" />
+        <h3 className="text-lg font-medium text-green-800">Recherche organique</h3>
+        <p className="text-green-700 mt-2">
+          Entrez un nom de domaine ci-dessus pour analyser ses performances en recherche organique.
         </p>
       </div>
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="domain-input" className="block text-sm font-medium text-gray-700 mb-2">
-            Saisissez un domaine, sous-domaine ou URL
-          </label>
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <Input
-                id="domain-input"
-                value={domain}
-                onChange={(e) => setDomain(e.target.value)}
-                placeholder="exemple.com"
-                className="pl-10"
-              />
-              <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+    );
+  }
+  
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Search className="h-5 w-5 text-green-600" />
+            Mots-clés organiques pour {domain}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="space-y-4">
+              {[1, 2, 3, 4, 5].map((item) => (
+                <div key={item} className="flex justify-between items-center border-b pb-3">
+                  <Skeleton className="h-6 w-[200px]" />
+                  <Skeleton className="h-6 w-[100px]" />
+                </div>
+              ))}
             </div>
-            <Button 
-              type="submit" 
-              disabled={isLoading}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white min-w-[120px]"
-            >
-              {isLoading ? (
-                <>Analyse...</>
-              ) : (
-                <>
-                  <Search className="mr-2 h-4 w-4" />
-                  Analyser
-                </>
-              )}
-            </Button>
-          </div>
-        </div>
-      </form>
-
-      <div className="mb-6">
-        <p className="text-sm text-gray-500 mb-2">Exemples de domaines :</p>
-        <div className="flex flex-wrap gap-2">
-          {exampleDomains.map((example) => (
-            <Button
-              key={example}
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setDomain(example);
-                analyzeDomain(example);
-              }}
-              className="text-xs"
-            >
-              {example}
-            </Button>
-          ))}
-        </div>
-      </div>
-
-      {isLoading ? (
-        <div className="space-y-4">
-          <Skeleton className="h-4 w-2/3" />
-          <Skeleton className="h-4 w-3/4" />
-          <Skeleton className="h-4 w-1/2" />
-        </div>
-      ) : metrics ? (
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="p-4 bg-gradient-to-br from-green-50 to-emerald-50">
-              <div className="flex items-start justify-between">
-                <div>
-                  <div className="font-semibold text-gray-600">Position SERP moyenne</div>
-                  <div className="text-2xl font-bold text-green-600">#{metrics.serpRanking}</div>
-                </div>
-                <Award className="h-6 w-6 text-green-500" />
+          ) : (
+            <div className="space-y-1">
+              <div className="grid grid-cols-12 gap-2 py-2 px-2 bg-gray-50 text-xs font-medium text-gray-500 rounded">
+                <div className="col-span-5">Mot-clé</div>
+                <div className="col-span-2 text-center">Position</div>
+                <div className="col-span-2 text-center">Volume</div>
+                <div className="col-span-2 text-center">Difficulté</div>
+                <div className="col-span-1 text-right">Évolution</div>
               </div>
-            </Card>
-
-            <Card className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50">
-              <div className="flex items-start justify-between">
-                <div>
-                  <div className="font-semibold text-gray-600">Visibilité organique</div>
-                  <div className="text-2xl font-bold text-blue-600">{metrics.organicVisibility}%</div>
-                </div>
-                <LineChart className="h-6 w-6 text-blue-500" />
-              </div>
-            </Card>
-
-            <Card className="p-4 bg-gradient-to-br from-purple-50 to-pink-50">
-              <div className="flex items-start justify-between">
-                <div>
-                  <div className="font-semibold text-gray-600">Backlinks qualifiés</div>
-                  <div className="text-2xl font-bold text-purple-600">{Math.floor(Math.random() * 1000) + 100}</div>
-                </div>
-                <Link2 className="h-6 w-6 text-purple-500" />
-              </div>
-            </Card>
-          </div>
-
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Mots-clés principaux (sans « not provided »)</h3>
-            <div className="space-y-2">
-              {metrics.topKeywords.map((keyword, index) => (
-                <div
-                  key={index}
-                  className="p-3 border rounded-lg bg-white flex justify-between items-center"
-                >
-                  <div>
-                    <div className="font-medium">{keyword.keyword}</div>
-                    <div className="text-sm text-gray-500">Position: #{keyword.position}</div>
+              
+              {keywords.map((kw, idx) => (
+                <div key={idx} className="grid grid-cols-12 gap-2 py-3 px-2 border-b items-center hover:bg-gray-50">
+                  <div className="col-span-5 font-medium">{kw.keyword}</div>
+                  <div className="col-span-2 text-center">
+                    <Badge variant={kw.position <= 3 ? "success" : kw.position <= 10 ? "default" : "secondary"} className={kw.position <= 3 ? "bg-green-100 text-green-800" : ""}>
+                      {kw.position}
+                    </Badge>
                   </div>
-                  <div className="text-right">
-                    <div className="text-sm text-gray-600">{keyword.volume.toLocaleString()}</div>
-                    <div className="text-xs text-gray-500">recherches/mois</div>
+                  <div className="col-span-2 text-center">{kw.volume.toLocaleString()}</div>
+                  <div className="col-span-2 text-center">
+                    <Badge variant="outline" className={kw.difficulty >= 75 ? "text-red-700" : kw.difficulty >= 50 ? "text-amber-700" : "text-green-700"}>
+                      {kw.difficulty}/100
+                    </Badge>
+                  </div>
+                  <div className="col-span-1 text-right">
+                    {kw.change > 0 ? (
+                      <TrendingUp className="h-4 w-4 text-green-600 inline" />
+                    ) : kw.change < 0 ? (
+                      <TrendingDown className="h-4 w-4 text-red-600 inline" />
+                    ) : (
+                      <ArrowRight className="h-4 w-4 text-gray-600 inline" />
+                    )}
                   </div>
                 </div>
               ))}
             </div>
-          </div>
-
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Écart avec les concurrents</h3>
-            <div className="space-y-2">
-              {metrics.competitorGap.map((competitor, index) => (
-                <div
-                  key={index}
-                  className="p-3 border rounded-lg bg-white flex justify-between items-center"
-                >
-                  <div className="font-medium">{competitor.competitor}</div>
-                  <div className={`font-semibold ${
-                    competitor.gap > 0 
-                      ? 'text-green-600' 
-                      : competitor.gap < 0 
-                      ? 'text-red-600' 
-                      : 'text-gray-600'
-                  }`}>
-                    {competitor.gap > 0 ? '+' : ''}{competitor.gap}%
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      ) : null}
-    </Card>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
 export default OrganicSearch;
-

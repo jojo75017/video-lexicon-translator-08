@@ -8,9 +8,31 @@ import { toast } from "sonner";
 import { Check, Globe, Search, Shield } from "lucide-react";
 import DomainOverview from './DomainOverview';
 import OrganicSearch from './OrganicSearch';
+import DomainAvailability from './DomainAvailability';
 
 const DomainAnalysis = () => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'search'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'search' | 'availability'>('overview');
+  const [domain, setDomain] = useState('');
+  const [isChecking, setIsChecking] = useState(false);
+  
+  const handleDomainChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDomain(e.target.value);
+  };
+  
+  const checkDomain = () => {
+    if (!domain) {
+      toast.error("Veuillez entrer un nom de domaine");
+      return;
+    }
+    
+    setIsChecking(true);
+    // Simulate API call
+    setTimeout(() => {
+      setIsChecking(false);
+      setActiveTab('availability');
+      toast.success("Vérification du domaine terminée");
+    }, 1500);
+  };
   
   return (
     <div className="space-y-6">
@@ -26,7 +48,7 @@ const DomainAnalysis = () => {
         </CardHeader>
         <CardContent className="p-0">
           <div className="bg-green-50 border-b border-green-100 p-4">
-            <div className="flex gap-3">
+            <div className="flex gap-3 mb-4">
               <Button 
                 variant={activeTab === 'overview' ? "default" : "outline"}
                 className={activeTab === 'overview' ? "bg-green-600 hover:bg-green-700 text-white" : "border-green-200 text-green-700"}
@@ -43,14 +65,40 @@ const DomainAnalysis = () => {
                 <Search className="mr-2 h-4 w-4" />
                 Recherche organique
               </Button>
+              <Button 
+                variant={activeTab === 'availability' ? "default" : "outline"}
+                className={activeTab === 'availability' ? "bg-green-600 hover:bg-green-700 text-white" : "border-green-200 text-green-700"}
+                onClick={() => setActiveTab('availability')}
+              >
+                <Check className="mr-2 h-4 w-4" />
+                Disponibilité
+              </Button>
+            </div>
+            
+            <div className="flex gap-2">
+              <Input 
+                placeholder="Entrez un nom de domaine (ex: mondomaine.com)" 
+                value={domain}
+                onChange={handleDomainChange}
+                className="flex-1"
+              />
+              <Button 
+                onClick={checkDomain} 
+                disabled={isChecking}
+                className="bg-green-600 hover:bg-green-700 text-white"
+              >
+                {isChecking ? 'Vérification...' : 'Vérifier'}
+              </Button>
             </div>
           </div>
           
           <div className="p-4">
             {activeTab === 'overview' ? (
-              <DomainOverview />
+              <DomainOverview domain={domain} />
+            ) : activeTab === 'search' ? (
+              <OrganicSearch domain={domain} />
             ) : (
-              <OrganicSearch />
+              <DomainAvailability domain={domain} />
             )}
           </div>
         </CardContent>

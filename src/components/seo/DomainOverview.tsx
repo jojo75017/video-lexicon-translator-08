@@ -1,162 +1,164 @@
 
-import React, { useState } from 'react';
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { toast } from "sonner";
+import { Globe, Users, ExternalLink, TrendingUp, Clock, Zap } from "lucide-react";
 
-interface DomainMetrics {
-  authority: number;
-  totalPages: number;
-  backlinks: number;
-  organicTraffic: number;
-  performance: number;
-  security: number;
+interface DomainOverviewProps {
+  domain?: string;
 }
 
-const DomainOverview = () => {
-  const [domain, setDomain] = useState('');
+interface DomainData {
+  age: number;
+  visitors: number;
+  pages: number;
+  backlinks: number;
+  authority: number;
+  loadTime: string;
+}
+
+const DomainOverview: React.FC<DomainOverviewProps> = ({ domain }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [metrics, setMetrics] = useState<DomainMetrics | null>(null);
-
-  const exampleDomains = [
-    'worldwildlife.org',
-    'unicef.org/stories',
-    'edition.cnn.com'
-  ];
-
-  const analyzeDomain = async (domainToAnalyze: string) => {
-    setIsLoading(true);
-    try {
-      // Simulation de l'analyse pour la démo
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      const mockMetrics: DomainMetrics = {
-        authority: Math.floor(Math.random() * 40) + 60,
-        totalPages: Math.floor(Math.random() * 50000) + 10000,
-        backlinks: Math.floor(Math.random() * 100000) + 5000,
-        organicTraffic: Math.floor(Math.random() * 1000000) + 50000,
-        performance: Math.floor(Math.random() * 30) + 70,
-        security: Math.floor(Math.random() * 20) + 80
-      };
-      
-      setMetrics(mockMetrics);
-      toast.success(`Analyse de ${domainToAnalyze} terminée`);
-    } catch (error) {
-      toast.error("Erreur lors de l'analyse du domaine");
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const [domainData, setDomainData] = useState<DomainData | null>(null);
+  
+  useEffect(() => {
     if (domain) {
-      analyzeDomain(domain);
+      setIsLoading(true);
+      // Simulation d'un appel API
+      setTimeout(() => {
+        setDomainData({
+          age: Math.floor(Math.random() * 10) + 3,
+          visitors: Math.floor(Math.random() * 50000) + 10000,
+          pages: Math.floor(Math.random() * 5000) + 100,
+          backlinks: Math.floor(Math.random() * 20000) + 1000,
+          authority: Math.floor(Math.random() * 50) + 30,
+          loadTime: (Math.random() * 2 + 0.5).toFixed(1)
+        });
+        setIsLoading(false);
+      }, 1500);
+    } else {
+      setDomainData(null);
     }
-  };
-
-  return (
-    <Card className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Vue d'ensemble du domaine</h2>
-      <p className="text-gray-600 mb-6">
-        Identifiez facilement les atouts et les points faibles de votre concurrent ou client potentiel.
-      </p>
-
-      <form onSubmit={handleSubmit} className="space-y-4 mb-6">
-        <div>
-          <label htmlFor="domain-input" className="block text-sm font-medium text-gray-700 mb-2">
-            Entrez le domaine, le sous-domaine ou l'URL
-          </label>
-          <div className="flex gap-2">
-            <Input
-              id="domain-input"
-              value={domain}
-              onChange={(e) => setDomain(e.target.value)}
-              placeholder="exemple.com"
-              className="flex-1"
-            />
-            <Button 
-              type="submit" 
-              disabled={isLoading}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white"
-            >
-              Analyser
-            </Button>
-          </div>
-        </div>
-      </form>
-
-      <div className="mb-6">
-        <p className="text-sm text-gray-500 mb-2">Exemples :</p>
-        <div className="flex flex-wrap gap-2">
-          {exampleDomains.map((example) => (
-            <Button
-              key={example}
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setDomain(example);
-                analyzeDomain(example);
-              }}
-              className="text-xs"
-            >
-              {example}
-            </Button>
-          ))}
-        </div>
+  }, [domain]);
+  
+  if (!domain) {
+    return (
+      <div className="bg-green-50 p-6 rounded-lg text-center">
+        <Globe className="h-12 w-12 mx-auto text-green-600 mb-3" />
+        <h3 className="text-lg font-medium text-green-800">Analyse de domaine</h3>
+        <p className="text-green-700 mt-2">
+          Entrez un nom de domaine ci-dessus pour obtenir une analyse complète de son autorité, trafic et performances.
+        </p>
       </div>
-
-      {isLoading ? (
-        <div className="space-y-4">
-          <Skeleton className="h-4 w-2/3" />
-          <Skeleton className="h-4 w-3/4" />
-          <Skeleton className="h-4 w-1/2" />
+    );
+  }
+  
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-lg flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Globe className="h-5 w-5 text-green-600" />
+              Vue d'ensemble de {domain}
+            </div>
+            {!isLoading && (
+              <a href={`https://${domain}`} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:text-blue-800 flex items-center">
+                Visiter <ExternalLink className="h-4 w-4 ml-1" />
+              </a>
+            )}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Âge du domaine */}
+            <div className="bg-green-50 rounded-md p-4 flex justify-between items-center">
+              <div>
+                <p className="text-xs text-green-700">Âge du domaine</p>
+                {isLoading ? (
+                  <Skeleton className="h-6 w-16 mt-1" />
+                ) : (
+                  <p className="text-lg font-semibold">{domainData?.age} ans</p>
+                )}
+              </div>
+              <Clock className="h-8 w-8 text-green-500" />
+            </div>
+            
+            {/* Visiteurs mensuels */}
+            <div className="bg-blue-50 rounded-md p-4 flex justify-between items-center">
+              <div>
+                <p className="text-xs text-blue-700">Visiteurs mensuels</p>
+                {isLoading ? (
+                  <Skeleton className="h-6 w-20 mt-1" />
+                ) : (
+                  <p className="text-lg font-semibold">{domainData?.visitors.toLocaleString()}</p>
+                )}
+              </div>
+              <Users className="h-8 w-8 text-blue-500" />
+            </div>
+            
+            {/* Pages indexées */}
+            <div className="bg-amber-50 rounded-md p-4 flex justify-between items-center">
+              <div>
+                <p className="text-xs text-amber-700">Pages indexées</p>
+                {isLoading ? (
+                  <Skeleton className="h-6 w-16 mt-1" />
+                ) : (
+                  <p className="text-lg font-semibold">{domainData?.pages.toLocaleString()}</p>
+                )}
+              </div>
+              <Globe className="h-8 w-8 text-amber-500" />
+            </div>
+            
+            {/* Backlinks */}
+            <div className="bg-purple-50 rounded-md p-4 flex justify-between items-center">
+              <div>
+                <p className="text-xs text-purple-700">Backlinks</p>
+                {isLoading ? (
+                  <Skeleton className="h-6 w-20 mt-1" />
+                ) : (
+                  <p className="text-lg font-semibold">{domainData?.backlinks.toLocaleString()}</p>
+                )}
+              </div>
+              <ExternalLink className="h-8 w-8 text-purple-500" />
+            </div>
+            
+            {/* Autorité du domaine */}
+            <div className="bg-indigo-50 rounded-md p-4 flex justify-between items-center">
+              <div>
+                <p className="text-xs text-indigo-700">Autorité du domaine</p>
+                {isLoading ? (
+                  <Skeleton className="h-6 w-16 mt-1" />
+                ) : (
+                  <p className="text-lg font-semibold">{domainData?.authority}/100</p>
+                )}
+              </div>
+              <TrendingUp className="h-8 w-8 text-indigo-500" />
+            </div>
+            
+            {/* Temps de chargement */}
+            <div className="bg-emerald-50 rounded-md p-4 flex justify-between items-center">
+              <div>
+                <p className="text-xs text-emerald-700">Temps de chargement</p>
+                {isLoading ? (
+                  <Skeleton className="h-6 w-16 mt-1" />
+                ) : (
+                  <p className="text-lg font-semibold">{domainData?.loadTime}s</p>
+                )}
+              </div>
+              <Zap className="h-8 w-8 text-emerald-500" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+      
+      {isLoading && (
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-700"></div>
+          <span className="ml-3 text-green-700">Chargement des données...</span>
         </div>
-      ) : metrics ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <Card className="p-4 bg-gradient-to-br from-green-50 to-teal-50">
-            <div className="font-semibold text-gray-600">Autorité du domaine</div>
-            <div className="text-2xl font-bold text-green-600">{metrics.authority}/100</div>
-          </Card>
-          
-          <Card className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50">
-            <div className="font-semibold text-gray-600">Pages indexées</div>
-            <div className="text-2xl font-bold text-blue-600">
-              {metrics.totalPages.toLocaleString()}
-            </div>
-          </Card>
-          
-          <Card className="p-4 bg-gradient-to-br from-purple-50 to-pink-50">
-            <div className="font-semibold text-gray-600">Backlinks</div>
-            <div className="text-2xl font-bold text-purple-600">
-              {metrics.backlinks.toLocaleString()}
-            </div>
-          </Card>
-          
-          <Card className="p-4 bg-gradient-to-br from-orange-50 to-yellow-50">
-            <div className="font-semibold text-gray-600">Trafic organique mensuel</div>
-            <div className="text-2xl font-bold text-orange-600">
-              {metrics.organicTraffic.toLocaleString()}
-            </div>
-          </Card>
-          
-          <Card className="p-4 bg-gradient-to-br from-teal-50 to-cyan-50">
-            <div className="font-semibold text-gray-600">Performance</div>
-            <div className="text-2xl font-bold text-teal-600">{metrics.performance}/100</div>
-          </Card>
-          
-          <Card className="p-4 bg-gradient-to-br from-red-50 to-rose-50">
-            <div className="font-semibold text-gray-600">Sécurité</div>
-            <div className="text-2xl font-bold text-red-600">{metrics.security}/100</div>
-          </Card>
-        </div>
-      ) : null}
-    </Card>
+      )}
+    </div>
   );
 };
 
