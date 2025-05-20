@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -41,6 +42,26 @@ const Dashboard = () => {
             <CardContent>
               <p className="text-gray-600">
                 Découvrez les meilleurs mots-clés pour booster votre visibilité en ligne.
+              </p>
+            </CardContent>
+            <CardFooter>
+              <div className="text-sm text-green-600 group-hover:underline">Accéder à l'outil →</div>
+            </CardFooter>
+          </Card>
+        </Link>
+
+        {/* Compteur de mots placé ici, à côté de "Ressources" */}
+        <Link to="/word-count" className="group">
+          <Card className="h-full hover:shadow-md transition-shadow border-2 border-green-500">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5 text-green-600" />
+                <span>Compteur de mots</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600">
+                Analysez et comptez les mots, caractères et paragraphes de votre contenu.
               </p>
             </CardContent>
             <CardFooter>
@@ -121,25 +142,6 @@ const Dashboard = () => {
             </CardContent>
             <CardFooter>
               <div className="text-sm text-gray-600 group-hover:underline">Accéder aux paramètres →</div>
-            </CardFooter>
-          </Card>
-        </Link>
-        
-        <Link to="/word-count" className="group">
-          <Card className="h-full hover:shadow-md transition-shadow border-2 border-green-500">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-green-600" />
-                <span>Compteur de mots</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">
-                Analysez et comptez les mots, caractères et paragraphes de votre contenu.
-              </p>
-            </CardContent>
-            <CardFooter>
-              <div className="text-sm text-green-600 group-hover:underline">Accéder à l'outil →</div>
             </CardFooter>
           </Card>
         </Link>
