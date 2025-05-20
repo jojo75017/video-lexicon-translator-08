@@ -12,6 +12,26 @@ const Dashboard = () => {
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
         
+        {/* COMPTEUR DE MOTS - MAINTENANT EN PREMIÈRE POSITION DE LA GRILLE */}
+        <Link to="/word-count" className="group block">
+          <Card className="h-full hover:shadow-md transition-shadow border-4 border-green-500 shadow-lg animate-pulse">
+            <CardHeader className="bg-green-100">
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-8 w-8 text-green-600" />
+                <span className="text-green-800 font-bold text-xl">Compteur de mots</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600 font-medium">
+                Analysez et comptez les mots, caractères et paragraphes de votre contenu.
+              </p>
+            </CardContent>
+            <CardFooter className="bg-green-50">
+              <div className="text-base text-green-700 font-bold group-hover:underline">Accéder à l'outil →</div>
+            </CardFooter>
+          </Card>
+        </Link>
+
         <Link to="/pinterest-generator" className="group">
           <Card className="h-full hover:shadow-md transition-shadow">
             <CardHeader>
@@ -46,26 +66,6 @@ const Dashboard = () => {
             </CardContent>
             <CardFooter>
               <div className="text-sm text-green-600 group-hover:underline">Accéder à l'outil →</div>
-            </CardFooter>
-          </Card>
-        </Link>
-
-        {/* Compteur de mots placé ici, à côté de "Ressources" avec une bordure verte très visible */}
-        <Link to="/word-count" className="group">
-          <Card className="h-full hover:shadow-md transition-shadow border-4 border-green-500 shadow-lg">
-            <CardHeader className="bg-green-50">
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-6 w-6 text-green-600" />
-                <span className="text-green-700 font-bold">Compteur de mots</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">
-                Analysez et comptez les mots, caractères et paragraphes de votre contenu.
-              </p>
-            </CardContent>
-            <CardFooter>
-              <div className="text-sm text-green-600 font-bold group-hover:underline">Accéder à l'outil →</div>
             </CardFooter>
           </Card>
         </Link>
