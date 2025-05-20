@@ -1,158 +1,63 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { RocketIcon, LayoutDashboard, ListChecks, BarChart, Settings, ImagePlus, FileText } from 'lucide-react';
+import { FileText, FileEdit, Link2, ListChecks, FileSpreadsheet, Search } from 'lucide-react';
 
 const Dashboard = () => {
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6">Tableau de bord</h1>
+    <div className="container mx-auto p-4 max-w-4xl">
+      <h1 className="text-3xl font-bold mb-2 text-center">Bienvenue sur votre Dashboard SEO</h1>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
-        
-        {/* COMPTEUR DE MOTS - MAINTENANT EN PREMIÈRE POSITION DE LA GRILLE */}
-        <Link to="/word-count" className="group block">
-          <Card className="h-full hover:shadow-md transition-shadow border-4 border-green-500 shadow-lg animate-pulse">
-            <CardHeader className="bg-green-100">
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-8 w-8 text-green-600" />
-                <span className="text-green-800 font-bold text-xl">Compteur de mots</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600 font-medium">
-                Analysez et comptez les mots, caractères et paragraphes de votre contenu.
-              </p>
-            </CardContent>
-            <CardFooter className="bg-green-50">
-              <div className="text-base text-green-700 font-bold group-hover:underline">Accéder à l'outil →</div>
-            </CardFooter>
-          </Card>
-        </Link>
-
-        <Link to="/pinterest-generator" className="group">
-          <Card className="h-full hover:shadow-md transition-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ImagePlus className="h-5 w-5 text-pink-600" />
-                <span>Pinterest Generator</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">
-                Créez des visuels percutants pour Pinterest et attirez l'attention de votre audience.
-              </p>
-            </CardContent>
-            <CardFooter>
-              <div className="text-sm text-pink-600 group-hover:underline">Accéder à l'outil →</div>
-            </CardFooter>
-          </Card>
-        </Link>
-
-        <Link to="/seo-keyword-strategy" className="group">
-          <Card className="h-full hover:shadow-md transition-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <RocketIcon className="h-5 w-5 text-green-600" />
-                <span>Stratégie de Mots-clés SEO</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">
-                Découvrez les meilleurs mots-clés pour booster votre visibilité en ligne.
-              </p>
-            </CardContent>
-            <CardFooter>
-              <div className="text-sm text-green-600 group-hover:underline">Accéder à l'outil →</div>
-            </CardFooter>
-          </Card>
+      <p className="text-center mb-8 text-gray-600">
+        Utilisez nos outils pour analyser et améliorer le référencement de votre site web. Accédez rapidement aux
+        différentes fonctionnalités ci-dessous.
+      </p>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+        <Link to="/keyword-meta" className="bg-[#11b7cd] text-white rounded-md p-4 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+          <FileEdit size={20} />
+          <span>Title & Meta</span>
         </Link>
         
-        <Link to="/seo-content-generator" className="group">
-          <Card className="h-full hover:shadow-md transition-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <LayoutDashboard className="h-5 w-5 text-orange-600" />
-                <span>Générateur de contenu SEO</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">
-                Créez du contenu optimisé pour le SEO en quelques clics.
-              </p>
-            </CardContent>
-            <CardFooter>
-              <div className="text-sm text-orange-600 group-hover:underline">Accéder à l'outil →</div>
-            </CardFooter>
-          </Card>
+        <Link to="/keyword-generator" className="bg-[#11b7cd] text-white rounded-md p-4 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+          <FileEdit size={20} />
+          <span>Générateur de mots-clés</span>
         </Link>
         
-        <Link to="/signature-generator" className="group">
-          <Card className="h-full hover:shadow-md transition-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ListChecks className="h-5 w-5 text-purple-600" />
-                <span>Générateur de Signature Email</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">
-                Créez une signature email professionnelle et personnalisée.
-              </p>
-            </CardContent>
-            <CardFooter>
-              <div className="text-sm text-purple-600 group-hover:underline">Accéder à l'outil →</div>
-            </CardFooter>
-          </Card>
+        <Link to="/internal-linking" className="bg-[#4361ee] text-white rounded-md p-4 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+          <Link2 size={20} />
+          <span>Vérifier les liens cassés</span>
         </Link>
         
-        <Link to="/seo-analyzer" className="group">
-          <Card className="h-full hover:shadow-md transition-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart className="h-5 w-5 text-teal-600" />
-                <span>Analyse SEO</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">
-                Analysez votre site web et obtenez des recommandations pour l'améliorer.
-              </p>
-            </CardContent>
-            <CardFooter>
-              <div className="text-sm text-teal-600 group-hover:underline">Accéder à l'outil →</div>
-            </CardFooter>
-          </Card>
-        </Link>
-        
-        <Link to="/settings" className="group">
-          <Card className="h-full hover:shadow-md transition-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Settings className="h-5 w-5 text-gray-600" />
-                <span>Paramètres</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">
-                Modifiez les paramètres de votre compte et préférences.
-              </p>
-            </CardContent>
-            <CardFooter>
-              <div className="text-sm text-gray-600 group-hover:underline">Accéder aux paramètres →</div>
-            </CardFooter>
-          </Card>
+        <Link to="/content" className="bg-[#11b7cd] text-white rounded-md p-4 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+          <FileText size={20} />
+          <span>Contenu</span>
         </Link>
       </div>
       
-      <div className="mt-8">
-        <Button variant="outline">
-          <a href="https://github.com/sadmann7/skateshop" target="_blank" rel="noopener noreferrer">
-            Voir le code source sur GitHub
-          </a>
-        </Button>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Link to="/sitemap" className="bg-[#3db5e6] text-white rounded-md p-4 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+          <FileSpreadsheet size={20} />
+          <span>Soumettre un Sitemap</span>
+        </Link>
+        
+        <Link to="/indexability" className="bg-[#3db5e6] text-white rounded-md p-4 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+          <Search size={20} />
+          <span>Indexabilité</span>
+        </Link>
+        
+        <Link to="/resources" className="bg-[#3db5e6] text-white rounded-md p-4 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+          <ListChecks size={20} />
+          <span>Ressources</span>
+        </Link>
+      </div>
+      
+      {/* Ajout du bouton Compteur de mots juste après la ligne des 3 boutons existants */}
+      <div className="mt-4 grid grid-cols-1">
+        <Link to="/word-count" className="bg-[#ff5722] text-white rounded-md p-4 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+          <FileText size={20} />
+          <span className="font-bold">Compteur de mots</span>
+        </Link>
       </div>
     </div>
   );

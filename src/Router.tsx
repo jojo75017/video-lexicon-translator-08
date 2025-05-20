@@ -7,6 +7,9 @@ import ImageGeneratorPage from './pages/ImageGeneratorPage';
 import PinterestPage from './pages/PinterestPage';
 import SignaturePage from './pages/SignaturePage';
 import WordCountPage from './pages/WordCountPage';
+import KeywordMetaPage from './pages/KeywordMetaPage';
+import InternalLinkingPage from './pages/InternalLinkingPage';
+import TrackingPage from './pages/TrackingPage';
 
 const router = createBrowserRouter([
   {
@@ -16,6 +19,10 @@ const router = createBrowserRouter([
   {
     path: '/keyword',
     element: <KeywordPage />,
+  },
+  {
+    path: '/keyword-meta',
+    element: <KeywordMetaPage />,
   },
   {
     path: '/image-generator',
@@ -32,6 +39,14 @@ const router = createBrowserRouter([
   {
     path: '/word-count',
     element: <WordCountPage />,
+  },
+  {
+    path: '/internal-linking',
+    element: <InternalLinkingPage />,
+  },
+  {
+    path: '/tracking',
+    element: <TrackingPage />,
   },
 ]);
 
