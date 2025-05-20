@@ -50,13 +50,13 @@ const Dashboard = () => {
           </Card>
         </Link>
 
-        {/* Compteur de mots placé ici, à côté de "Ressources" */}
+        {/* Compteur de mots placé ici, à côté de "Ressources" avec une bordure verte très visible */}
         <Link to="/word-count" className="group">
-          <Card className="h-full hover:shadow-md transition-shadow border-2 border-green-500">
-            <CardHeader>
+          <Card className="h-full hover:shadow-md transition-shadow border-4 border-green-500 shadow-lg">
+            <CardHeader className="bg-green-50">
               <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-green-600" />
-                <span>Compteur de mots</span>
+                <FileText className="h-6 w-6 text-green-600" />
+                <span className="text-green-700 font-bold">Compteur de mots</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -65,7 +65,7 @@ const Dashboard = () => {
               </p>
             </CardContent>
             <CardFooter>
-              <div className="text-sm text-green-600 group-hover:underline">Accéder à l'outil →</div>
+              <div className="text-sm text-green-600 font-bold group-hover:underline">Accéder à l'outil →</div>
             </CardFooter>
           </Card>
         </Link>
