@@ -13,13 +13,15 @@ const Dashboard = () => {
         différentes fonctionnalités ci-dessous.
       </p>
       
-      {/* Ajout du bouton Compteur de mots en premier avec un style bien visible */}
-      <div className="grid grid-cols-1 mb-4">
-        <Link to="/word-count" className="bg-[#ff5722] text-white rounded-md p-4 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity shadow-md">
-          <FileText size={24} />
-          <span className="font-bold text-xl">Compteur de mots</span>
+      {/* Ajout du bouton Compteur de mots en premier avec un style très visible */}
+      <div className="grid grid-cols-1 mb-6">
+        <Link to="/word-count" className="bg-[#ff5722] text-white rounded-lg p-6 flex items-center justify-center gap-3 hover:opacity-90 transition-opacity shadow-lg border-2 border-[#ff7043] animate-pulse">
+          <FileText size={32} />
+          <span className="font-bold text-2xl">Compteur de mots</span>
         </Link>
       </div>
+      
+      <h2 className="text-xl font-bold mb-3 text-gray-700">Autres outils SEO</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
         <Link to="/keyword-meta" className="bg-[#11b7cd] text-white rounded-md p-4 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
@@ -58,6 +60,10 @@ const Dashboard = () => {
           <ListChecks size={20} />
           <span>Ressources</span>
         </Link>
+      </div>
+      
+      <div className="mt-8 p-4 bg-gray-100 rounded-lg text-center">
+        <p className="text-gray-600">Cliquez sur le bouton orange animé en haut pour accéder au compteur de mots</p>
       </div>
     </div>
   );
