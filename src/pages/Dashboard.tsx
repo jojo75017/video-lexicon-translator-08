@@ -1,82 +1,155 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { FileText, FileEdit, Link2, ListChecks, FileSpreadsheet, Search } from 'lucide-react';
-import { toast } from 'sonner';
+import { FileText, Link2, FileSpreadsheet, Search, Globe, CheckCircle2 } from 'lucide-react';
 
 const Dashboard = () => {
-  useEffect(() => {
-    // Notification pour guider l'utilisateur
-    toast.info("Bienvenue sur le tableau de bord", {
-      description: "Cliquez sur le bouton orange pour accéder au compteur de mots",
-      duration: 5000
-    });
-  }, []);
-
   return (
-    <div className="container mx-auto p-4 max-w-4xl">
-      <h1 className="text-3xl font-bold mb-2 text-center">Bienvenue sur votre Dashboard SEO</h1>
+    <div className="container mx-auto p-4 max-w-5xl">
+      <div className="flex items-center gap-2 mb-4">
+        <Link to="/" className="text-teal-500 font-medium text-sm flex items-center">
+          <Globe className="h-4 w-4 mr-1" />
+          Accueil
+        </Link>
+        <span className="text-gray-500 font-bold">Dashboard SEO</span>
+      </div>
       
-      <p className="text-center mb-8 text-gray-600">
-        Utilisez nos outils pour analyser et améliorer le référencement de votre site web. Accédez rapidement aux
-        différentes fonctionnalités ci-dessous.
-      </p>
-      
-      {/* Bouton Compteur de mots très visible et grand en haut */}
-      <div className="grid grid-cols-1 mb-8">
-        <Link 
-          to="/word-count" 
-          className="bg-[#F97316] text-white rounded-lg p-8 flex items-center justify-center gap-4 hover:bg-[#F97316]/90 transition-all shadow-xl border-4 border-[#F97316]/30 animate-pulse"
-          onClick={() => toast.success("Accès au compteur de mots")}
-        >
-          <FileText size={40} />
-          <span className="font-bold text-3xl">COMPTEUR DE MOTS</span>
+      {/* Navigation buttons */}
+      <div className="flex flex-wrap gap-2 mb-8 p-4 bg-white rounded-lg shadow-sm">
+        <Link to="/" className="bg-blue-500 text-white px-4 py-2 rounded-md text-sm">
+          Accueil
+        </Link>
+        <Link to="/keyword-meta" className="hover:bg-gray-100 px-4 py-2 rounded-md text-sm">
+          Title & Meta
+        </Link>
+        <Link to="/internal-linking" className="hover:bg-gray-100 px-4 py-2 rounded-md text-sm">
+          Liens Internes
+        </Link>
+        <Link to="/tracking" className="hover:bg-gray-100 px-4 py-2 rounded-md text-sm flex items-center">
+          <span className="mr-1">Suivi Positions</span>
+        </Link>
+        <Link to="/domain-analysis" className="hover:bg-gray-100 px-4 py-2 rounded-md text-sm flex items-center">
+          <span className="mr-1">Analyse de Domaine</span>
+        </Link>
+        <Link to="/pinterest" className="hover:bg-gray-100 px-4 py-2 rounded-md text-sm">
+          Pinterest
+        </Link>
+        <Link to="/signature" className="hover:bg-gray-100 px-4 py-2 rounded-md text-sm">
+          Signature Email
+        </Link>
+        <Link to="/structure" className="hover:bg-gray-100 px-4 py-2 rounded-md text-sm">
+          Structure Site
+        </Link>
+        <Link to="/keyword-generator" className="hover:bg-gray-100 px-4 py-2 rounded-md text-sm">
+          Générateur de mots-clés
         </Link>
       </div>
       
-      <h2 className="text-xl font-bold mb-3 text-gray-700">Autres outils SEO</h2>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-        <Link to="/keyword-meta" className="bg-[#11b7cd] text-white rounded-md p-4 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
-          <FileEdit size={20} />
-          <span>Title & Meta</span>
-        </Link>
+      <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <h1 className="text-3xl font-bold mb-2 text-center">Bienvenue sur votre Dashboard SEO</h1>
         
-        <Link to="/keyword-generator" className="bg-[#11b7cd] text-white rounded-md p-4 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
-          <FileEdit size={20} />
-          <span>Générateur de mots-clés</span>
-        </Link>
+        <p className="text-center mb-8 text-gray-600">
+          Utilisez nos outils pour analyser et améliorer le référencement de votre site web. Accédez rapidement aux
+          différentes fonctionnalités ci-dessous.
+        </p>
         
-        <Link to="/internal-linking" className="bg-[#4361ee] text-white rounded-md p-4 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
-          <Link2 size={20} />
-          <span>Vérifier les liens cassés</span>
-        </Link>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+          <Link 
+            to="/keyword-meta" 
+            className="bg-[#0EA5E9] text-white rounded-md p-4 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+          >
+            <FileText className="h-4 w-4" />
+            <span>Title & Meta</span>
+          </Link>
+          
+          <Link 
+            to="/keyword-generator" 
+            className="bg-[#0EA5E9] text-white rounded-md p-4 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+          >
+            <FileText className="h-4 w-4" />
+            <span>Générateur de mots-clés</span>
+          </Link>
+          
+          <Link 
+            to="/internal-linking" 
+            className="bg-[#4F46E5] text-white rounded-md p-4 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+          >
+            <Link2 className="h-4 w-4" />
+            <span>Vérifier les liens cassés</span>
+          </Link>
+          
+          <Link 
+            to="/content" 
+            className="bg-[#0EA5E9] text-white rounded-md p-4 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+          >
+            <FileText className="h-4 w-4" />
+            <span>Contenu</span>
+          </Link>
+        </div>
         
-        <Link to="/content" className="bg-[#11b7cd] text-white rounded-md p-4 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
-          <FileText size={20} />
-          <span>Contenu</span>
-        </Link>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <Link 
+            to="/sitemap" 
+            className="bg-[#38BDF8] text-white rounded-md p-4 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+          >
+            <FileSpreadsheet className="h-4 w-4" />
+            <span>Soumettre un Sitemap</span>
+          </Link>
+          
+          <Link 
+            to="/indexability" 
+            className="bg-[#38BDF8] text-white rounded-md p-4 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+          >
+            <Search className="h-4 w-4" />
+            <span>Indexabilité</span>
+          </Link>
+          
+          <Link 
+            to="/resources" 
+            className="bg-[#38BDF8] text-white rounded-md p-4 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+          >
+            <CheckCircle2 className="h-4 w-4" />
+            <span>Ressources</span>
+          </Link>
+        </div>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Link to="/sitemap" className="bg-[#3db5e6] text-white rounded-md p-4 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
-          <FileSpreadsheet size={20} />
-          <span>Soumettre un Sitemap</span>
-        </Link>
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <h2 className="text-2xl font-bold mb-4 text-center">Analyse de Domaine</h2>
         
-        <Link to="/indexability" className="bg-[#3db5e6] text-white rounded-md p-4 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
-          <Search size={20} />
-          <span>Indexabilité</span>
-        </Link>
-        
-        <Link to="/resources" className="bg-[#3db5e6] text-white rounded-md p-4 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
-          <ListChecks size={20} />
-          <span>Ressources</span>
-        </Link>
-      </div>
-      
-      <div className="mt-8 p-6 bg-orange-50 rounded-lg text-center border-2 border-orange-200">
-        <p className="text-orange-800 font-medium text-lg">⬆️ Cliquez sur le GRAND BOUTON ORANGE en haut pour accéder au compteur de mots ⬆️</p>
+        <div className="bg-green-50 p-6 rounded-lg">
+          <div className="mb-4">
+            <CheckCircle2 className="h-6 w-6 text-green-600 mx-auto mb-2" />
+            <h3 className="text-lg font-medium text-center">Analyse de Domaine</h3>
+          </div>
+          
+          <p className="text-center mb-6">
+            Analysez n'importe quel domaine pour obtenir des insights concurrentiels complets
+          </p>
+          
+          <div className="flex flex-col md:flex-row gap-3 mb-4">
+            <Link to="/domain-analysis?view=overview" className="bg-blue-500 text-white px-4 py-2 rounded-md text-center flex-1">
+              Vue d'ensemble
+            </Link>
+            <Link to="/domain-analysis?view=organic" className="bg-white border border-gray-300 px-4 py-2 rounded-md text-center flex-1">
+              Recherche organique
+            </Link>
+            <Link to="/domain-analysis?view=availability" className="bg-white border border-gray-300 px-4 py-2 rounded-md text-center flex-1">
+              Disponibilité
+            </Link>
+          </div>
+          
+          <div className="relative">
+            <input 
+              type="text" 
+              placeholder="Entrez un nom de domaine (ex: mondomaine.com)" 
+              className="w-full border border-gray-300 rounded-md px-4 py-3 pr-20"
+            />
+            <button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-500 text-white px-4 py-2 rounded-md">
+              Vérifier
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
