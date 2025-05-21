@@ -10,6 +10,10 @@ import WordCountPage from './pages/WordCountPage';
 import KeywordMetaPage from './pages/KeywordMetaPage';
 import InternalLinkingPage from './pages/InternalLinkingPage';
 import TrackingPage from './pages/TrackingPage';
+import QuoraPage from './pages/QuoraPage'; 
+import StructurePage from './pages/StructurePage';
+import KeywordGeneratorPage from './pages/KeywordGeneratorPage';
+import ContentPage from './pages/ContentPage';
 
 const router = createBrowserRouter([
   {
@@ -25,6 +29,10 @@ const router = createBrowserRouter([
     element: <KeywordMetaPage />,
   },
   {
+    path: '/keyword-generator',
+    element: <KeywordGeneratorPage />,
+  },
+  {
     path: '/image-generator',
     element: <ImageGeneratorPage />,
   },
@@ -33,7 +41,15 @@ const router = createBrowserRouter([
     element: <PinterestPage />,
   },
   {
+    path: '/pinterest',
+    element: <PinterestPage />,
+  },
+  {
     path: '/signature-generator',
+    element: <SignaturePage />,
+  },
+  {
+    path: '/signature',
     element: <SignaturePage />,
   },
   {
@@ -47,6 +63,18 @@ const router = createBrowserRouter([
   {
     path: '/tracking',
     element: <TrackingPage />,
+  },
+  {
+    path: '/quora',
+    element: <QuoraPage />,
+  },
+  {
+    path: '/structure',
+    element: <StructurePage />,
+  },
+  {
+    path: '/content',
+    element: <ContentPage />,
   },
 ]);
 

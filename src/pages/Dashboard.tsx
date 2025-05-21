@@ -1,9 +1,18 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FileText, FileEdit, Link2, ListChecks, FileSpreadsheet, Search } from 'lucide-react';
+import { toast } from 'sonner';
 
 const Dashboard = () => {
+  useEffect(() => {
+    // Notification pour guider l'utilisateur
+    toast.info("Bienvenue sur le tableau de bord", {
+      description: "Cliquez sur le bouton orange pour accéder au compteur de mots",
+      duration: 5000
+    });
+  }, []);
+
   return (
     <div className="container mx-auto p-4 max-w-4xl">
       <h1 className="text-3xl font-bold mb-2 text-center">Bienvenue sur votre Dashboard SEO</h1>
@@ -13,11 +22,15 @@ const Dashboard = () => {
         différentes fonctionnalités ci-dessous.
       </p>
       
-      {/* Ajout du bouton Compteur de mots en premier avec un style très visible */}
-      <div className="grid grid-cols-1 mb-6">
-        <Link to="/word-count" className="bg-[#ff5722] text-white rounded-lg p-6 flex items-center justify-center gap-3 hover:opacity-90 transition-opacity shadow-lg border-2 border-[#ff7043] animate-pulse">
-          <FileText size={32} />
-          <span className="font-bold text-2xl">Compteur de mots</span>
+      {/* Bouton Compteur de mots très visible et grand en haut */}
+      <div className="grid grid-cols-1 mb-8">
+        <Link 
+          to="/word-count" 
+          className="bg-[#F97316] text-white rounded-lg p-8 flex items-center justify-center gap-4 hover:bg-[#F97316]/90 transition-all shadow-xl border-4 border-[#F97316]/30 animate-pulse"
+          onClick={() => toast.success("Accès au compteur de mots")}
+        >
+          <FileText size={40} />
+          <span className="font-bold text-3xl">COMPTEUR DE MOTS</span>
         </Link>
       </div>
       
@@ -62,8 +75,8 @@ const Dashboard = () => {
         </Link>
       </div>
       
-      <div className="mt-8 p-4 bg-gray-100 rounded-lg text-center">
-        <p className="text-gray-600">Cliquez sur le bouton orange animé en haut pour accéder au compteur de mots</p>
+      <div className="mt-8 p-6 bg-orange-50 rounded-lg text-center border-2 border-orange-200">
+        <p className="text-orange-800 font-medium text-lg">⬆️ Cliquez sur le GRAND BOUTON ORANGE en haut pour accéder au compteur de mots ⬆️</p>
       </div>
     </div>
   );
