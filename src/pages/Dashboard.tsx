@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FileText, Link2, FileSpreadsheet, Search, Globe, CheckCircle2 } from 'lucide-react';
+import { FileText, Link2, FileSpreadsheet, Search, Globe, CheckCircle2, Text } from 'lucide-react';
 
 const Dashboard = () => {
   return (
@@ -12,6 +12,15 @@ const Dashboard = () => {
           Accueil
         </Link>
         <span className="text-gray-500 font-bold">Dashboard SEO</span>
+      </div>
+      
+      {/* Compteur de mots - BOUTON TRÈS VISIBLE */}
+      <div className="mb-6 bg-orange-100 p-4 rounded-lg border-2 border-orange-400 shadow-md animate-pulse">
+        <Link to="/word-count" className="flex flex-col items-center justify-center">
+          <Text className="h-12 w-12 text-orange-500 mb-2" />
+          <span className="text-xl font-bold text-orange-600 uppercase">COMPTEUR DE MOTS</span>
+          <span className="text-sm text-orange-500 mt-1">Cliquez ici pour accéder à l'outil</span>
+        </Link>
       </div>
       
       {/* Navigation buttons */}
@@ -79,11 +88,27 @@ const Dashboard = () => {
           </Link>
           
           <Link 
+            to="/word-count" 
+            className="bg-[#F97316] text-white rounded-md p-4 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+          >
+            <Text className="h-4 w-4" />
+            <span>Compteur de mots</span>
+          </Link>
+          
+          <Link 
             to="/content" 
             className="bg-[#0EA5E9] text-white rounded-md p-4 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
           >
             <FileText className="h-4 w-4" />
             <span>Contenu</span>
+          </Link>
+          
+          <Link 
+            to="/quora" 
+            className="bg-[#b92b27] text-white rounded-md p-4 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+          >
+            <FileText className="h-4 w-4" />
+            <span>Quora & Forums</span>
           </Link>
         </div>
         
