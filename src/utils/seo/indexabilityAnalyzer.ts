@@ -1,56 +1,91 @@
 
+/**
+ * Analyser l'indexabilité d'un site web
+ */
 export const analyzeIndexability = (doc: Document) => {
-  // Vérifier si le document contient du contenu réel
-  if (!doc.body || doc.body.textContent?.trim().length === 0) {
-    return {
-      canIndex: false,
-      indexablePages: 0,
-      reasons: ['Document vide ou inaccessible'],
-      recommendations: ['Vérifiez les erreurs CORS ou l\'accessibilité de l\'URL']
-    };
+  const results = {
+    canIndex: true,
+    indexablePages: 0,
+    reasons: [] as string[],
+    recommendations: [] as string[],
+  };
+
+  // Vérifier si robots noindex est présent
+  const robotsTag = doc.querySelector('meta[name="robots"]');
+  if (robotsTag) {
+    const robotsContent = robotsTag.getAttribute('content');
+    if (robotsContent && robotsContent.includes('noindex')) {
+      results.canIndex = false;
+      results.reasons.push('La balise meta robots contient "noindex".');
+      results.recommendations.push('Supprimez "noindex" de la balise meta robots si vous souhaitez que cette page soit indexée.');
+    }
   }
 
-  const robotsMeta = doc.querySelector('meta[name="robots"]')?.getAttribute('content');
-  const noindexPresent = robotsMeta?.includes('noindex');
+  // Vérifier si X-Robots-Tag HTTP header est présent (simulé car nous ne pouvons pas le vérifier côté client)
   
-  // Recherche des éléments qui pourraient indiquer que la page ne doit pas être indexée
-  const xRobotsTag = doc.querySelector('meta[name="x-robots-tag"]')?.getAttribute('content');
-  const canonicalLink = doc.querySelector('link[rel="canonical"]')?.getAttribute('href');
-  const robotsTxt = false; // En réalité, cela nécessiterait de vérifier le fichier robots.txt
+  // Vérifier les balises canoniques
+  const canonicalTag = doc.querySelector('link[rel="canonical"]');
+  if (canonicalTag) {
+    const canonicalUrl = canonicalTag.getAttribute('href');
+    const currentUrl = window.location.href;
+    if (canonicalUrl && canonicalUrl !== currentUrl) {
+      results.reasons.push(`La balise canonique pointe vers une URL différente: ${canonicalUrl}`);
+      results.recommendations.push('Assurez-vous que la balise canonique pointe vers l\'URL correcte.');
+    }
+  } else {
+    results.recommendations.push('Ajoutez une balise canonique pour aider les moteurs de recherche à comprendre l\'URL principale.');
+  }
+
+  // Vérifier le sitemap
+  const sitemaps = Array.from(doc.querySelectorAll('a')).filter(a => 
+    a.href.includes('sitemap.xml') || 
+    a.textContent?.toLowerCase().includes('sitemap')
+  );
   
-  // Compte le nombre de pages indexables
-  const links = Array.from(doc.querySelectorAll('a[href]'));
-  const internalLinks = links.filter(link => {
-    const href = link.getAttribute('href');
-    return href && !href.startsWith('http') && !href.startsWith('#') && !href.startsWith('mailto:');
+  if (sitemaps.length === 0) {
+    results.recommendations.push('Aucun lien vers un sitemap n\'a été trouvé. Assurez-vous d\'avoir un sitemap.xml.');
+  }
+
+  // Vérifier le fichier robots.txt (simulé)
+  results.recommendations.push('Vérifiez que votre fichier robots.txt est correctement configuré.');
+
+  // Vérifier les codes de statut HTTP (simulé car nous ne pouvons pas le faire côté client)
+  
+  // Estimer le nombre de pages indexables
+  const allLinks = Array.from(doc.querySelectorAll('a[href]'));
+  const internalLinks = allLinks.filter(a => {
+    const href = a.getAttribute('href');
+    if (!href) return false;
+    if (href.startsWith('/')) return true;
+    try {
+      const url = new URL(href);
+      return url.hostname === window.location.hostname;
+    } catch (e) {
+      return false;
+    }
   });
   
-  const reasons: string[] = [];
-  const recommendations: string[] = [];
+  // Estimation très approximative
+  results.indexablePages = Math.max(1, new Set(internalLinks.map(a => a.getAttribute('href'))).size);
+
+  // Vérifier les redirections (simulé)
   
-  if (noindexPresent) {
-    reasons.push('La balise meta robots contient noindex');
-    recommendations.push('Retirez noindex si vous souhaitez que la page soit indexée');
+  // Vérifier la structure des URL
+  const complexURLs = allLinks.filter(a => {
+    const href = a.getAttribute('href');
+    if (!href) return false;
+    return href.includes('?') && href.split('?')[1].length > 20;
+  });
+  
+  if (complexURLs.length > 0) {
+    results.recommendations.push('Certaines URL sont complexes avec beaucoup de paramètres. Simplifiez vos URL pour une meilleure indexation.');
   }
-  
-  if (xRobotsTag && xRobotsTag.includes('noindex')) {
-    reasons.push('La balise x-robots-tag contient noindex');
-    recommendations.push('Vérifiez les en-têtes HTTP pour la présence de x-robots-tag: noindex');
+
+  // Vérifier si JavaScript est requis pour le contenu principal
+  const mainContent = doc.querySelector('main') || doc.querySelector('article') || doc.body;
+  if (mainContent && mainContent.querySelectorAll('*').length < 10) {
+    results.recommendations.push('Le contenu principal semble minime. Vérifiez que votre contenu n\'est pas entièrement généré par JavaScript, ce qui pourrait poser des problèmes d\'indexation.');
   }
-  
-  if (canonicalLink && !canonicalLink.includes(window.location.hostname)) {
-    reasons.push('La balise canonique pointe vers un autre domaine');
-    recommendations.push('Assurez-vous que la balise canonique pointe vers votre propre domaine');
-  }
-  
-  if (internalLinks.length < 5) {
-    recommendations.push('Ajoutez plus de liens internes pour améliorer la découvrabilité');
-  }
-  
-  return {
-    canIndex: !noindexPresent && !(xRobotsTag && xRobotsTag.includes('noindex')),
-    indexablePages: internalLinks.length,
-    reasons,
-    recommendations,
-  };
+
+  return results;
 };

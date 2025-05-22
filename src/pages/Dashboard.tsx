@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FileText, Link2, FileSpreadsheet, Search, Globe, CheckCircle2, Text } from 'lucide-react';
@@ -12,6 +11,15 @@ const Dashboard = () => {
           Accueil
         </Link>
         <span className="text-gray-500 font-bold">Dashboard SEO</span>
+      </div>
+      
+      {/* URL et Indexabilité - BOUTON TRÈS VISIBLE */}
+      <div className="mb-6 bg-pink-100 p-4 rounded-lg border-2 border-pink-400 shadow-md">
+        <Link to="/indexability" className="flex flex-col items-center justify-center">
+          <Search className="h-12 w-12 text-pink-500 mb-2" />
+          <span className="text-xl font-bold text-pink-600 uppercase">VÉRIFIER VOTRE URL ET INDEXABILITÉ</span>
+          <span className="text-sm text-pink-500 mt-1">Cliquez ici pour tester l'accessibilité de votre site</span>
+        </Link>
       </div>
       
       {/* Compteur de mots - BOUTON TRÈS VISIBLE */}
@@ -51,6 +59,9 @@ const Dashboard = () => {
         </Link>
         <Link to="/keyword-generator" className="hover:bg-gray-100 px-4 py-2 rounded-md text-sm">
           Générateur de mots-clés
+        </Link>
+        <Link to="/indexability" className="bg-pink-500 text-white px-4 py-2 rounded-md text-sm">
+          Vérifier URL
         </Link>
       </div>
       

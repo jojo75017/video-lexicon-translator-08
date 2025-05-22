@@ -14,6 +14,7 @@ import QuoraPage from './pages/QuoraPage';
 import StructurePage from './pages/StructurePage';
 import KeywordGeneratorPage from './pages/KeywordGeneratorPage';
 import ContentPage from './pages/ContentPage';
+import IndexabilityPage from './pages/IndexabilityPage';
 
 // Ajout des routes manquantes
 const router = createBrowserRouter([
@@ -77,13 +78,13 @@ const router = createBrowserRouter([
     path: '/content',
     element: <ContentPage />,
   },
+  {
+    path: '/indexability',
+    element: <IndexabilityPage />,
+  },
   // Routes supplémentaires pour correspondre à la capture d'écran
   {
     path: '/sitemap',
-    element: <ContentPage />, // Utilisez un composant existant temporairement
-  },
-  {
-    path: '/indexability',
     element: <ContentPage />, // Utilisez un composant existant temporairement
   },
   {
