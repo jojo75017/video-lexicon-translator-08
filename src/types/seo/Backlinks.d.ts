@@ -1,22 +1,17 @@
 
-// Types liés aux backlinks
-
 export interface BacklinkInfo {
-  domain: string;
   url: string;
+  domain: string;
   anchor: string;
-  doFollow: boolean;
-  isDofollow?: boolean;
-  domainAuthority?: number;
+  anchorText?: string;
+  dofollow: boolean;
   authority?: number;
-  firstSeen?: string;
-  lastDetected?: string;
-  followType?: string;
-  date?: string;
 }
 
 export interface BrokenLink {
   url: string;
-  anchor: string;
-  statusCode: number;
+  statusCode?: number;
+  status?: string;
+  location?: string;
+  text?: string;
 }

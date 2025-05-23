@@ -1,14 +1,9 @@
 
 import { useState } from 'react';
 import { toast } from "sonner";
-import { analyzeIndexability } from '@/utils/seo/indexabilityAnalyzer';
+import { analyzeIndexability, generateDownloadableReport, type IndexabilityReport } from '@/utils/seo/indexabilityAnalyzer';
 
-export type IndexabilityResults = {
-  canIndex: boolean;
-  indexablePages: number;
-  reasons: string[];
-  recommendations: string[];
-};
+export type IndexabilityResults = IndexabilityReport;
 
 export const useIndexabilityAnalysis = () => {
   const [url, setUrl] = useState('');
@@ -45,11 +40,11 @@ export const useIndexabilityAnalysis = () => {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
         
-        // Analyser l'indexabilité
+        // Analyser l'indexabilité avec la nouvelle fonction améliorée
         const indexabilityResults = analyzeIndexability(doc);
         setResults(indexabilityResults);
         
-        toast.success("Analyse d'indexabilité terminée");
+        toast.success("Analyse d'indexabilité terminée avec succès");
         setIsAnalyzing(false);
         return;
       } catch (directError) {
@@ -69,11 +64,11 @@ export const useIndexabilityAnalysis = () => {
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
       
-      // Analyser l'indexabilité
+      // Analyser l'indexabilité avec la nouvelle fonction améliorée
       const indexabilityResults = analyzeIndexability(doc);
       setResults(indexabilityResults);
       
-      toast.success("Analyse d'indexabilité terminée");
+      toast.success("Analyse d'indexabilité terminée avec succès");
     } catch (error) {
       console.error("Erreur lors de l'analyse:", error);
       
@@ -97,6 +92,23 @@ export const useIndexabilityAnalysis = () => {
     window.open("https://cors-anywhere.herokuapp.com/corsdemo", "_blank");
   };
 
+  const downloadReport = () => {
+    if (!results) return;
+    
+    const reportContent = generateDownloadableReport(results, url);
+    const blob = new Blob([reportContent], { type: 'text/plain; charset=utf-8' });
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = downloadUrl;
+    a.download = `rapport-indexabilite-${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(downloadUrl);
+    document.body.removeChild(a);
+    
+    toast.success("Rapport téléchargé avec succès");
+  };
+
   return {
     url,
     isAnalyzing,
@@ -106,6 +118,7 @@ export const useIndexabilityAnalysis = () => {
     handleUrlChange,
     handleSubmit,
     handleOpenCorsDemo,
+    downloadReport,
     resetResults: () => {
       setResults(null);
       setCorsError(false);

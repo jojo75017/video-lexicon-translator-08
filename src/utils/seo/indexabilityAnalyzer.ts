@@ -1,16 +1,103 @@
 
 /**
+ * Analyser l'indexabilité d'un site web avec des analyses avancées
+ */
+
+export interface DetailedLinkStats {
+  totalLinks: number;
+  internalLinks: number;
+  externalLinks: number;
+  noFollowLinks: number;
+  doFollowLinks: number;
+  brokenLinksEstimate: number;
+  averageLinksPerPage: number;
+  linkDistribution: {
+    navigation: number;
+    content: number;
+    footer: number;
+    sidebar: number;
+  };
+}
+
+export interface SchemaAnalysis {
+  hasSchema: boolean;
+  schemaTypes: string[];
+  errors: string[];
+  warnings: string[];
+  recommendations: string[];
+}
+
+export interface IndexabilityReport {
+  canIndex: boolean;
+  indexablePages: number;
+  reasons: string[];
+  recommendations: string[];
+  linkStats: DetailedLinkStats;
+  schemaAnalysis: SchemaAnalysis;
+  mobileScore: number;
+  performanceIssues: string[];
+  securityIssues: string[];
+  technicalSeo: {
+    hasRobotsTxt: boolean;
+    hasSitemap: boolean;
+    hasSSL: boolean;
+    pageSpeed: number;
+    coreWebVitals: {
+      lcp: string;
+      fid: string;
+      cls: string;
+    };
+  };
+}
+
+/**
  * Analyser l'indexabilité d'un site web
  */
-export const analyzeIndexability = (doc: Document) => {
-  const results = {
+export const analyzeIndexability = (doc: Document): IndexabilityReport => {
+  const results: IndexabilityReport = {
     canIndex: true,
     indexablePages: 0,
-    reasons: [] as string[],
-    recommendations: [] as string[],
+    reasons: [],
+    recommendations: [],
+    linkStats: {
+      totalLinks: 0,
+      internalLinks: 0,
+      externalLinks: 0,
+      noFollowLinks: 0,
+      doFollowLinks: 0,
+      brokenLinksEstimate: 0,
+      averageLinksPerPage: 0,
+      linkDistribution: {
+        navigation: 0,
+        content: 0,
+        footer: 0,
+        sidebar: 0
+      }
+    },
+    schemaAnalysis: {
+      hasSchema: false,
+      schemaTypes: [],
+      errors: [],
+      warnings: [],
+      recommendations: []
+    },
+    mobileScore: 0,
+    performanceIssues: [],
+    securityIssues: [],
+    technicalSeo: {
+      hasRobotsTxt: false,
+      hasSitemap: false,
+      hasSSL: false,
+      pageSpeed: 0,
+      coreWebVitals: {
+        lcp: 'unknown',
+        fid: 'unknown',
+        cls: 'unknown'
+      }
+    }
   };
 
-  // Vérifier si robots noindex est présent
+  // Analyser les balises robots
   const robotsTag = doc.querySelector('meta[name="robots"]');
   if (robotsTag) {
     const robotsContent = robotsTag.getAttribute('content');
@@ -20,22 +107,129 @@ export const analyzeIndexability = (doc: Document) => {
       results.recommendations.push('Supprimez "noindex" de la balise meta robots si vous souhaitez que cette page soit indexée.');
     }
     
-    // Vérifier les directives follow/nofollow
     if (robotsContent && robotsContent.includes('nofollow')) {
       results.reasons.push('La balise meta robots contient "nofollow", ce qui limite l\'exploration des liens.');
       results.recommendations.push('Envisagez de supprimer "nofollow" pour permettre aux moteurs de recherche de suivre les liens de cette page.');
     }
   }
 
-  // Vérifier aussi la balise X-Robots-Tag spécifique à Google (simulé car on ne peut pas accéder aux en-têtes HTTP côté client)
-  const googleBotTag = doc.querySelector('meta[name="googlebot"]');
-  if (googleBotTag) {
-    const googleBotContent = googleBotTag.getAttribute('content');
-    if (googleBotContent && googleBotContent.includes('noindex')) {
-      results.canIndex = false;
-      results.reasons.push('La balise meta googlebot contient "noindex".');
-      results.recommendations.push('Supprimez "noindex" de la balise meta googlebot si vous souhaitez que cette page soit indexée par Google.');
+  // Analyser les liens en détail
+  const allLinks = Array.from(doc.querySelectorAll('a[href]'));
+  const internalLinks = allLinks.filter(a => {
+    const href = a.getAttribute('href');
+    if (!href) return false;
+    if (href.startsWith('/')) return true;
+    try {
+      const url = new URL(href);
+      return url.hostname === window.location.hostname;
+    } catch (e) {
+      return false;
     }
+  });
+
+  results.linkStats.totalLinks = allLinks.length;
+  results.linkStats.internalLinks = internalLinks.length;
+  results.linkStats.externalLinks = allLinks.length - internalLinks.length;
+  results.linkStats.noFollowLinks = allLinks.filter(a => a.rel && a.rel.includes('nofollow')).length;
+  results.linkStats.doFollowLinks = allLinks.length - results.linkStats.noFollowLinks;
+
+  // Distribution des liens
+  results.linkStats.linkDistribution.navigation = allLinks.filter(a => 
+    a.closest('nav') || a.closest('header')
+  ).length;
+  results.linkStats.linkDistribution.footer = allLinks.filter(a => 
+    a.closest('footer')
+  ).length;
+  results.linkStats.linkDistribution.sidebar = allLinks.filter(a => 
+    a.closest('aside') || a.closest('.sidebar')
+  ).length;
+  results.linkStats.linkDistribution.content = allLinks.length - 
+    results.linkStats.linkDistribution.navigation - 
+    results.linkStats.linkDistribution.footer - 
+    results.linkStats.linkDistribution.sidebar;
+
+  // Analyser les schémas JSON-LD
+  const schemaScripts = Array.from(doc.querySelectorAll('script[type="application/ld+json"]'));
+  results.schemaAnalysis.hasSchema = schemaScripts.length > 0;
+  
+  if (schemaScripts.length > 0) {
+    schemaScripts.forEach(script => {
+      try {
+        const schemaData = JSON.parse(script.textContent || '');
+        if (schemaData['@type']) {
+          results.schemaAnalysis.schemaTypes.push(schemaData['@type']);
+        }
+      } catch (e) {
+        results.schemaAnalysis.errors.push('Erreur de parsing JSON-LD détectée');
+      }
+    });
+  } else {
+    results.schemaAnalysis.recommendations.push('Ajoutez des données structurées JSON-LD pour améliorer la compréhension par les moteurs de recherche');
+  }
+
+  // Analyser la compatibilité mobile
+  const viewportTag = doc.querySelector('meta[name="viewport"]');
+  let mobileScore = 0;
+  
+  if (viewportTag) {
+    const viewportContent = viewportTag.getAttribute('content');
+    if (viewportContent && viewportContent.includes('width=device-width')) {
+      mobileScore += 25;
+    }
+  } else {
+    results.reasons.push('Pas de balise viewport trouvée');
+    results.recommendations.push('Ajoutez une balise meta viewport pour l\'optimisation mobile');
+  }
+
+  // Vérifier les images responsives
+  const images = Array.from(doc.querySelectorAll('img'));
+  const responsiveImages = images.filter(img => 
+    img.hasAttribute('srcset') || 
+    img.style.maxWidth === '100%' ||
+    img.style.width === '100%'
+  );
+  
+  if (responsiveImages.length > images.length * 0.7) {
+    mobileScore += 25;
+  } else {
+    results.recommendations.push('Optimisez vos images pour les appareils mobiles avec srcset ou CSS responsive');
+  }
+
+  // Vérifier la taille des zones tactiles
+  const buttons = Array.from(doc.querySelectorAll('button, a, input[type="button"], input[type="submit"]'));
+  let touchTargetScore = 0;
+  buttons.forEach(button => {
+    const rect = button.getBoundingClientRect();
+    if (rect.width >= 44 && rect.height >= 44) {
+      touchTargetScore++;
+    }
+  });
+  
+  if (buttons.length > 0 && touchTargetScore / buttons.length > 0.8) {
+    mobileScore += 25;
+  } else {
+    results.recommendations.push('Assurez-vous que les zones tactiles font au moins 44x44px');
+  }
+
+  // Vérifier les polices
+  const hasFlexibleFonts = !doc.querySelector('*[style*="font-size"][style*="px"]');
+  if (hasFlexibleFonts) {
+    mobileScore += 25;
+  } else {
+    results.recommendations.push('Utilisez des unités relatives (em, rem) pour les tailles de police');
+  }
+
+  results.mobileScore = mobileScore;
+
+  // Analyser les performances
+  const hasLargeImages = images.some(img => {
+    const src = img.getAttribute('src');
+    return src && (src.includes('.jpg') || src.includes('.png')) && !src.includes('optimized');
+  });
+  
+  if (hasLargeImages) {
+    results.performanceIssues.push('Images non optimisées détectées');
+    results.recommendations.push('Optimisez vos images avec des formats modernes (WebP, AVIF)');
   }
 
   // Vérifier les balises canoniques
@@ -51,99 +245,28 @@ export const analyzeIndexability = (doc: Document) => {
     results.recommendations.push('Ajoutez une balise canonique pour aider les moteurs de recherche à comprendre l\'URL principale.');
   }
 
-  // Vérifier la présence d'un sitemap
+  // Vérifier HTTPS
+  results.technicalSeo.hasSSL = window.location.protocol === 'https:';
+  if (!results.technicalSeo.hasSSL) {
+    results.securityIssues.push('Le site n\'utilise pas HTTPS');
+    results.recommendations.push('Migrez vers HTTPS pour améliorer la sécurité et le SEO');
+  }
+
+  // Estimer le nombre de pages indexables
+  results.indexablePages = Math.max(1, new Set(internalLinks.map(a => a.getAttribute('href'))).size);
+
+  // Vérifier la présence d'un sitemap et robots.txt
   const sitemaps = Array.from(doc.querySelectorAll('a')).filter(a => 
     a.href.includes('sitemap.xml') || 
     a.textContent?.toLowerCase().includes('sitemap')
   );
   
-  if (sitemaps.length === 0) {
-    results.recommendations.push('Aucun lien vers un sitemap n\'a été trouvé. Assurez-vous d\'avoir un sitemap.xml et de le référencer dans robots.txt.');
+  results.technicalSeo.hasSitemap = sitemaps.length > 0;
+  if (!results.technicalSeo.hasSitemap) {
+    results.recommendations.push('Ajoutez un sitemap.xml et référencez-le dans robots.txt');
   }
 
-  // Vérifier les références au fichier robots.txt
-  const robotsTxtLinks = Array.from(doc.querySelectorAll('a')).filter(a => 
-    a.href.includes('robots.txt') || 
-    a.textContent?.toLowerCase().includes('robots.txt')
-  );
-  
-  if (robotsTxtLinks.length === 0) {
-    results.recommendations.push('Vérifiez que votre fichier robots.txt est correctement configuré et accessible.');
-  }
-  
-  // Vérifier la compatibilité mobile (simulation basique)
-  const viewportTag = doc.querySelector('meta[name="viewport"]');
-  if (!viewportTag) {
-    results.reasons.push('Pas de balise viewport trouvée, ce qui peut indiquer une mauvaise optimisation mobile.');
-    results.recommendations.push('Ajoutez une balise meta viewport pour optimiser l\'affichage sur les appareils mobiles: <meta name="viewport" content="width=device-width, initial-scale=1">');
-  } else {
-    const viewportContent = viewportTag.getAttribute('content');
-    if (!viewportContent || !viewportContent.includes('width=device-width')) {
-      results.reasons.push('La balise viewport n\'est pas correctement configurée pour les appareils mobiles.');
-      results.recommendations.push('Configurez correctement la balise viewport: <meta name="viewport" content="width=device-width, initial-scale=1">');
-    }
-  }
-
-  // Vérifier les codes de statut HTTP (simulé car nous ne pouvons pas le faire côté client)
-  
-  // Estimer le nombre de pages indexables
-  const allLinks = Array.from(doc.querySelectorAll('a[href]'));
-  const internalLinks = allLinks.filter(a => {
-    const href = a.getAttribute('href');
-    if (!href) return false;
-    if (href.startsWith('/')) return true;
-    try {
-      const url = new URL(href);
-      return url.hostname === window.location.hostname;
-    } catch (e) {
-      return false;
-    }
-  });
-  
-  // Estimation très approximative
-  results.indexablePages = Math.max(1, new Set(internalLinks.map(a => a.getAttribute('href'))).size);
-
-  // Vérifier les redirections (simulé)
-  
-  // Vérifier la structure des URL
-  const complexURLs = allLinks.filter(a => {
-    const href = a.getAttribute('href');
-    if (!href) return false;
-    return href.includes('?') && href.split('?')[1].length > 20;
-  });
-  
-  if (complexURLs.length > 0) {
-    results.recommendations.push('Certaines URL sont complexes avec beaucoup de paramètres. Simplifiez vos URL pour une meilleure indexation.');
-  }
-
-  // Vérifier si JavaScript est requis pour le contenu principal
-  const mainContent = doc.querySelector('main') || doc.querySelector('article') || doc.body;
-  if (mainContent && mainContent.querySelectorAll('*').length < 10) {
-    results.recommendations.push('Le contenu principal semble minime. Vérifiez que votre contenu n\'est pas entièrement généré par JavaScript, ce qui pourrait poser des problèmes d\'indexation.');
-  }
-
-  // Vérifier la présence de contenu dupliqué (simulation basique)
-  const headings = Array.from(doc.querySelectorAll('h1, h2, h3, h4, h5, h6'));
-  const headingTexts = headings.map(h => h.textContent?.trim().toLowerCase());
-  const uniqueHeadings = new Set(headingTexts);
-  if (headingTexts.length > uniqueHeadings.size + 2) { // Une tolérance de 2 titres dupliqués
-    results.recommendations.push('Plusieurs titres identiques détectés. Évitez le contenu dupliqué pour une meilleure indexation.');
-  }
-
-  // Vérifier la crawlabilité des liens importants (navigation)
-  const navLinks = Array.from(doc.querySelectorAll('nav a, header a, footer a'));
-  const uncrawlableNavLinks = navLinks.filter(a => {
-    const hasOnClick = a.hasAttribute('onclick') || a.hasAttribute('ng-click') || a.hasAttribute('v-on:click');
-    const hasHashOnly = a.getAttribute('href') === '#' || a.getAttribute('href') === 'javascript:void(0)';
-    return hasOnClick || hasHashOnly;
-  });
-  
-  if (uncrawlableNavLinks.length > 0) {
-    results.reasons.push('Certains liens de navigation ne sont pas crawlables (utilisation de onclick/javascript).');
-    results.recommendations.push('Remplacez les liens basés sur JavaScript par de vrais liens href pour améliorer la crawlabilité.');
-  }
-
-  // Vérifier la présence de contenus cachés qui pourraient être considérés comme du cloaking
+  // Vérifier les contenus cachés (cloaking potentiel)
   const hiddenElements = Array.from(doc.querySelectorAll('*')).filter(el => {
     const style = window.getComputedStyle(el as Element);
     return style.display === 'none' || style.visibility === 'hidden' || 
@@ -151,21 +274,73 @@ export const analyzeIndexability = (doc: Document) => {
            parseFloat(style.opacity) === 0;
   });
   
-  if (hiddenElements.length > 10) { // Seuil arbitraire
+  if (hiddenElements.length > 10) {
     results.recommendations.push('Nombreux éléments cachés détectés. Assurez-vous de ne pas masquer de contenu important aux moteurs de recherche.');
   }
 
-  // Vérifier la présence de Schema.org markup
-  const schemaScript = Array.from(doc.querySelectorAll('script[type="application/ld+json"]'));
-  if (schemaScript.length === 0) {
-    results.recommendations.push('Aucun balisage Schema.org détecté. Ajoutez des données structurées pour améliorer la compréhension de votre contenu par les moteurs de recherche.');
-  }
-
-  // Vérifier la vitesse de chargement (simulation)
-  // Dans une vraie implémentation, on utiliserait l'API Performance ou des métriques réelles
-  results.recommendations.push('Vérifiez la vitesse de chargement de votre page. Les pages lentes peuvent être moins bien indexées.');
-
   return results;
+};
+
+/**
+ * Générer un rapport téléchargeable
+ */
+export const generateDownloadableReport = (results: IndexabilityReport, url: string): string => {
+  const report = `
+RAPPORT D'ANALYSE D'INDEXABILITÉ
+================================
+
+URL analysée: ${url}
+Date d'analyse: ${new Date().toLocaleDateString('fr-FR')}
+
+RÉSUMÉ EXÉCUTIF
+===============
+Statut d'indexabilité: ${results.canIndex ? 'INDEXABLE' : 'NON INDEXABLE'}
+Pages indexables estimées: ${results.indexablePages}
+Score mobile: ${results.mobileScore}/100
+
+ANALYSE DES LIENS
+=================
+Total des liens: ${results.linkStats.totalLinks}
+Liens internes: ${results.linkStats.internalLinks}
+Liens externes: ${results.linkStats.externalLinks}
+Liens nofollow: ${results.linkStats.noFollowLinks}
+Liens dofollow: ${results.linkStats.doFollowLinks}
+
+Distribution:
+- Navigation: ${results.linkStats.linkDistribution.navigation}
+- Contenu: ${results.linkStats.linkDistribution.content}
+- Pied de page: ${results.linkStats.linkDistribution.footer}
+- Barre latérale: ${results.linkStats.linkDistribution.sidebar}
+
+ANALYSE DES SCHÉMAS STRUCTURÉS
+==============================
+Présence de Schema.org: ${results.schemaAnalysis.hasSchema ? 'OUI' : 'NON'}
+Types de schémas détectés: ${results.schemaAnalysis.schemaTypes.join(', ') || 'Aucun'}
+
+SEO TECHNIQUE
+=============
+Robots.txt: ${results.technicalSeo.hasRobotsTxt ? 'Détecté' : 'Non détecté'}
+Sitemap: ${results.technicalSeo.hasSitemap ? 'Détecté' : 'Non détecté'}
+HTTPS: ${results.technicalSeo.hasSSL ? 'Activé' : 'Non activé'}
+
+PROBLÈMES IDENTIFIÉS
+====================
+${results.reasons.map(reason => `- ${reason}`).join('\n')}
+
+RECOMMANDATIONS
+===============
+${results.recommendations.map(rec => `- ${rec}`).join('\n')}
+
+PROBLÈMES DE PERFORMANCE
+========================
+${results.performanceIssues.map(issue => `- ${issue}`).join('\n')}
+
+PROBLÈMES DE SÉCURITÉ
+=====================
+${results.securityIssues.map(issue => `- ${issue}`).join('\n')}
+`;
+
+  return report;
 };
 
 /**
@@ -185,7 +360,7 @@ export const analyzeLinkStructure = (doc: Document) => {
     }
   });
 
-  // Analyse de la profondeur des liens (pour estimer la profondeur de crawl)
+  // Analyse de la profondeur des liens
   const linkDepths = internalLinks.map(a => {
     const href = a.getAttribute('href') || '';
     return href.split('/').filter(Boolean).length;

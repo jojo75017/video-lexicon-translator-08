@@ -42,5 +42,26 @@ export interface SeoAnalysis {
   internalLinkAnalysis?: InternalLinkAnalysis;
   sourceCode?: string;
   textContent?: string;
+  // Add missing properties
+  metadata?: {
+    title: string;
+    description: string;
+    robots: string;
+  };
+  headings?: {
+    h1: string[];
+    h2: string[];
+    h3: string[];
+    h4: string[];
+  };
+  headingStructure?: any[];
+  authorityScore?: number;
+  organicTraffic?: number;
 }
 
+export interface SeoAnalysisResult {
+  score: number;
+  issues: string[];
+  recommendations: string[];
+  details: Record<string, any>;
+}
