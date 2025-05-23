@@ -42,13 +42,23 @@ export interface SeoAnalysis {
   internalLinkAnalysis?: InternalLinkAnalysis;
   sourceCode?: string;
   textContent?: string;
-  // Add missing properties
+  // Propriétés spécifiques au contexte européen
+  region?: string;
+  country?: string;
+  language?: string;
+  gdprCompliant?: boolean;
+  euTrafficPercentage?: number;
+  // Autres propriétés existantes
   metadata?: {
     title: string;
     description: string;
     robots: string;
     hasTitleTag?: boolean;
     hasDescriptionTag?: boolean;
+    lang?: string;
+    charset?: string;
+    viewport?: string;
+    locale?: string;
   };
   headings?: {
     h1: string[];
