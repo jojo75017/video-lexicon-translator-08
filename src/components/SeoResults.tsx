@@ -18,13 +18,13 @@ const calculateSeoScore = (analysis: SeoAnalysis) => {
   
   // Check if metadata exists and has properties
   if (analysis.metadata) {
-    if (!analysis.metadata.hasTitleTag) score -= 15;
-    if (!analysis.metadata.hasDescriptionTag) score -= 10;
+    if (analysis.metadata.hasTitleTag === false) score -= 15;
+    if (analysis.metadata.hasDescriptionTag === false) score -= 10;
   }
   if (!analysis.title) score -= 15;
 
   // Penalties for performance
-  if (analysis.performance?.firstContentfulPaint > 2.5) score -= 10;
+  if (analysis.performance?.firstContentfulPaint && analysis.performance.firstContentfulPaint > 2.5) score -= 10;
   if (analysis.performance?.timeToInteractive && analysis.performance.timeToInteractive > 3.8) score -= 10;
 
   return Math.max(0, Math.min(100, score));
@@ -45,7 +45,7 @@ const getSeoSuggestions = (analysis: SeoAnalysis) => {
   if (analysis.imgCount === 0) {
     suggestions.push("Ajoutez des images pertinentes");
   }
-  if (analysis.performance?.firstContentfulPaint > 2.5) {
+  if (analysis.performance?.firstContentfulPaint && analysis.performance.firstContentfulPaint > 2.5) {
     suggestions.push("Améliorez le temps de chargement initial");
   }
 
@@ -58,11 +58,11 @@ const SeoResults = ({ seoAnalysis }: SeoResultsProps) => {
   useEffect(() => {
     console.log("SeoResults rendering with data:", {
       title: seoAnalysis.title,
-      headings: seoAnalysis.headings?.length || 0,
+      headings: seoAnalysis.headings || {},
       h1Count: seoAnalysis.h1Count,
       h2Count: seoAnalysis.h2Count,
       h3Count: seoAnalysis.h3Count,
-      hierarchy: seoAnalysis.headingStructure?.hierarchy?.length || 0,
+      hierarchy: seoAnalysis.headingStructure?.length || 0,
       keywordSuggestions: seoAnalysis.keywordSuggestions?.length || 0
     });
   }, [seoAnalysis]);

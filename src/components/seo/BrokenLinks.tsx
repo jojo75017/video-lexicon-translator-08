@@ -1,45 +1,101 @@
 
 import React from 'react';
-import { Card } from "@/components/ui/card";
-import { AlertTriangle, ExternalLink } from 'lucide-react';
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { BrokenLink } from '@/types/seo';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { AlertTriangle, ExternalLink, Link } from "lucide-react";
+import { BrokenLink } from '@/types/seo/Backlinks';
 
 interface BrokenLinksProps {
-  brokenLinks?: BrokenLink[];
+  brokenLinks: BrokenLink[];
 }
 
-const BrokenLinks = ({ brokenLinks = [] }: BrokenLinksProps) => {
-  if (!brokenLinks || brokenLinks.length === 0) return null;
+const BrokenLinks: React.FC<BrokenLinksProps> = ({ brokenLinks }) => {
+  const getStatusColor = (statusCode?: number) => {
+    if (!statusCode) return 'bg-gray-100 text-gray-800';
+    if (statusCode >= 400 && statusCode < 500) return 'bg-red-100 text-red-800';
+    if (statusCode >= 500) return 'bg-orange-100 text-orange-800';
+    return 'bg-gray-100 text-gray-800';
+  };
+
+  if (!brokenLinks || brokenLinks.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-green-600">
+            <Link className="h-5 w-5" />
+            Liens cassés
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-6">
+            <div className="text-green-600 mb-2">
+              <Link className="h-12 w-12 mx-auto" />
+            </div>
+            <p className="text-green-700 font-medium">Aucun lien cassé détecté</p>
+            <p className="text-green-600 text-sm">Tous vos liens semblent fonctionner correctement</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
-    <Card className="p-6">
-      <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-        <AlertTriangle className="h-5 w-5 text-red-500" />
-        Liens Cassés ({brokenLinks.length})
-      </h3>
-
-      <div className="space-y-3">
-        {brokenLinks.map((link, index) => (
-          <Alert key={index} variant="destructive">
-            <AlertTriangle className="h-4 w-4" />
-            <AlertDescription className="flex flex-col gap-1">
-              <div className="flex items-center gap-2">
-                <ExternalLink className="h-4 w-4" />
-                <span className="font-medium">{link.url}</span>
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-red-600">
+          <AlertTriangle className="h-5 w-5" />
+          Liens cassés ({brokenLinks.length})
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {brokenLinks.map((link, index) => (
+            <div key={index} className="border border-red-200 rounded-lg p-4 bg-red-50">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <ExternalLink className="h-4 w-4 text-red-500" />
+                    <span className="font-medium text-red-700">{link.url}</span>
+                    <Badge className={getStatusColor(link.statusCode)}>
+                      {link.statusCode || link.status || "Erreur"}
+                    </Badge>
+                  </div>
+                  
+                  {(link.text || link.anchor) && (
+                    <div className="text-sm text-gray-600 mb-1">
+                      <strong>Texte du lien:</strong> {link.text || link.anchor}
+                    </div>
+                  )}
+                  
+                  {link.location && (
+                    <div className="text-sm text-gray-600">
+                      <strong>Emplacement:</strong> {link.location}
+                    </div>
+                  )}
+                  
+                  <div className="text-xs text-gray-500 mt-2">
+                    Recommandation: Vérifiez et corrigez ce lien pour améliorer l'expérience utilisateur
+                  </div>
+                </div>
+                <AlertTriangle className="h-5 w-5 text-red-500 ml-4" />
               </div>
-              <div className="text-sm">
-                <span className="font-medium">Status: </span>
-                {link.statusCode || 'Inconnu'}
-              </div>
-              <div className="text-sm">
-                <span className="font-medium">Trouvé dans: </span>
-                {link.anchor || 'Page principale'}
-              </div>
-            </AlertDescription>
-          </Alert>
-        ))}
-      </div>
+            </div>
+          ))}
+          
+          {brokenLinks.length > 0 && (
+            <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <h4 className="font-medium text-blue-800 mb-2">Recommandations pour corriger les liens cassés:</h4>
+              <ul className="text-sm text-blue-700 space-y-1">
+                <li>• Vérifiez si les URLs de destination existent toujours</li>
+                <li>• Mettez à jour les liens vers les nouvelles URLs si les pages ont été déplacées</li>
+                <li>• Supprimez les liens vers des ressources qui n'existent plus</li>
+                <li>• Utilisez des redirections 301 pour maintenir la valeur SEO</li>
+                <li>• Vérifiez régulièrement vos liens avec des outils de monitoring</li>
+              </ul>
+            </div>
+          )}
+        </div>
+      </CardContent>
     </Card>
   );
 };

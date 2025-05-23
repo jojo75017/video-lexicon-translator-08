@@ -47,12 +47,16 @@ export interface SeoAnalysis {
     title: string;
     description: string;
     robots: string;
+    hasTitleTag?: boolean;
+    hasDescriptionTag?: boolean;
   };
   headings?: {
     h1: string[];
     h2: string[];
     h3: string[];
     h4: string[];
+    length?: number;
+    hierarchy?: any[];
   };
   headingStructure?: any[];
   authorityScore?: number;
@@ -64,4 +68,7 @@ export interface SeoAnalysisResult {
   issues: string[];
   recommendations: string[];
   details: Record<string, any>;
+  success?: boolean;
+  error?: string;
+  data?: SeoAnalysis;
 }

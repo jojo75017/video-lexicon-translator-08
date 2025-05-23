@@ -5,6 +5,7 @@ export interface BacklinkInfo {
   anchor: string;
   anchorText?: string;
   dofollow: boolean;
+  isDofollow?: boolean; // Alias pour compatibilité
   authority?: number;
 }
 
@@ -14,4 +15,5 @@ export interface BrokenLink {
   status?: string;
   location?: string;
   text?: string;
+  anchor?: string; // Ajout pour compatibilité
 }
