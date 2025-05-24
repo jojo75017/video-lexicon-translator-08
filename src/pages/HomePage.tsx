@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card } from "@/components/ui/card";
@@ -174,6 +175,25 @@ const HomePage = () => {
                 <h3 className="font-bold mb-2">3. Appliquez les recommandations</h3>
                 <p className="text-gray-600">Suivez nos conseils pour améliorer votre référencement et augmenter votre visibilité.</p>
               </div>
+            </div>
+          </Card>
+        </section>
+
+        {/* Section compteur de mots */}
+        <section>
+          <Card className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+            <h2 className="text-2xl font-bold mb-4 text-blue-800">Outil de comptage de mots</h2>
+            <p className="text-blue-700 mb-6">
+              Analysez votre contenu avec précision : comptez les mots, caractères, phrases et paragraphes
+              pour optimiser vos textes SEO.
+            </p>
+            <div className="flex justify-center">
+              <Link to="/word-count">
+                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white">
+                  <FileText className="h-5 w-5 mr-2" />
+                  Accéder au compteur de mots
+                </Button>
+              </Link>
             </div>
           </Card>
         </section>

@@ -8,6 +8,8 @@ import PinterestPage from './pages/PinterestPage';
 import SignaturePage from './pages/SignaturePage';
 import StructurePage from './pages/StructurePage';
 import KeywordGeneratorPage from './pages/KeywordGeneratorPage';
+import WordCountPage from './pages/WordCountPage';
+import DomainAnalysisPage from './pages/DomainAnalysisPage';
 import { Toaster } from 'sonner';
 import './App.css';
 
@@ -23,6 +25,8 @@ const App = () => {
         <Route path="/keyword-meta" element={<KeywordMetaPage />} />
         <Route path="/internal-linking" element={<InternalLinkingPage />} />
         <Route path="/tracking" element={<TrackingPage />} />
+        <Route path="/word-count" element={<WordCountPage />} />
+        <Route path="/domain-analysis" element={<DomainAnalysisPage />} />
         
         {/* Additional tool routes */}
         <Route path="/pinterest" element={<PinterestPage />} />
