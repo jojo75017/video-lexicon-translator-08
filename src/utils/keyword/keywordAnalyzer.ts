@@ -1,52 +1,22 @@
 
-/**
- * Génère des données simulées pour les SERP (Search Engine Results Page)
- * 
- * @param keyword Le mot-clé à analyser
- * @returns Les résultats de recherche simulés
- */
-export const generateSerpData = (keyword: string) => {
-  // Cette fonction génère des données SERP simulées pour le mot-clé fourni
-  const domainNames = [
-    'wikipedia.org',
-    'amazon.fr',
-    'fnac.com',
-    'lemonde.fr',
-    'boulanger.com',
-    'darty.com',
-    'leparisien.fr',
-    'lepoint.fr',
-    'cdiscount.com',
-    'lefigaro.fr'
-  ];
+export const calculateOpportunityScore = (keyword: any): number => {
+  // Calcul simplifié du score d'opportunité
+  const difficulty = keyword.difficulty || 50;
+  const volume = keyword.volume || 100;
   
-  return Array(10).fill(0).map((_, index) => {
-    const domain = domainNames[index % domainNames.length];
-    return {
-      position: index + 1,
-      title: `${keyword} - Tout savoir sur ${keyword} | ${domain}`,
-      url: `https://www.${domain}/article/${keyword.toLowerCase().replace(/\s+/g, '-')}`,
-      description: `Découvrez tout sur ${keyword}. Les meilleures informations, guides et conseils pour ${keyword} sur ${domain}.`
-    };
-  });
+  // Plus le volume est haut et la difficulté basse, meilleur est le score
+  return Math.round(((volume / 1000) * (100 - difficulty)) / 100);
 };
 
-/**
- * Analyse un mot-clé et génère des métadonnées associées
- * 
- * @param keyword Le mot-clé à analyser
- */
-export const analyzeKeyword = (keyword: string) => {
-  // Fonction simulée d'analyse de mot-clé
-  const wordCount = keyword.split(/\s+/).length;
-  
-  // Génère des données en fonction du nombre de mots dans le mot-clé
+export const generateTrendData = (keyword: any) => {
+  // Génération de données de tendance simulées
   return {
-    difficulty: Math.min(Math.floor(Math.random() * 30) + wordCount * 15, 100),
-    searchVolume: Math.floor(Math.random() * 10000) * (3 - Math.min(wordCount, 2)), // Plus de volume pour les mots-clés courts
-    cpc: (Math.random() * 2 + 0.5).toFixed(2),
-    competition: Math.random().toFixed(2),
-    trends: Array(12).fill(0).map(() => Math.floor(Math.random() * 100)),
-    intent: wordCount > 2 ? 'informational' : Math.random() > 0.5 ? 'transactional' : 'navigational'
+    labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin'],
+    datasets: [{
+      label: 'Volume de recherche',
+      data: [65, 59, 80, 81, 56, 55],
+      borderColor: 'rgb(75, 192, 192)',
+      tension: 0.1
+    }]
   };
 };

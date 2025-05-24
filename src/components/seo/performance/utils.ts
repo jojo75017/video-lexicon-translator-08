@@ -1,59 +1,38 @@
 
-/**
- * Formate les octets en une chaîne lisible (KB, MB, etc.)
- * 
- * @param bytes Le nombre d'octets à formater
- * @returns Une chaîne de caractères formatée avec l'unité appropriée
- */
-export const formatBytes = (bytes: number): string => {
-  if (bytes === 0) return '0 Bytes';
-  
-  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(1024));
-  
-  return parseFloat((bytes / Math.pow(1024, i)).toFixed(2)) + ' ' + sizes[i];
+export const formatTime = (time: number): string => {
+  if (time < 1000) {
+    return `${Math.round(time)}ms`;
+  }
+  return `${(time / 1000).toFixed(1)}s`;
 };
 
-/**
- * Obtient la couleur appropriée en fonction du niveau de performance
- * 
- * @param value Valeur de la métrique
- * @param invert Si true, les valeurs plus basses sont meilleures
- * @returns La classe de couleur CSS
- */
-export const getLevelColor = (value: number, invert = false): string => {
-  // Pour certaines métriques, les valeurs plus basses sont meilleures (comme le temps de chargement)
-  const normalizedValue = invert ? 100 - value : value;
-  
-  if (normalizedValue >= 90) return 'bg-green-500';
-  if (normalizedValue >= 70) return 'bg-green-400';
-  if (normalizedValue >= 50) return 'bg-yellow-400';
-  if (normalizedValue >= 30) return 'bg-orange-400';
-  return 'bg-red-500';
+export const formatSize = (size: number): string => {
+  if (size < 1024) {
+    return `${size}B`;
+  } else if (size < 1024 * 1024) {
+    return `${(size / 1024).toFixed(1)}KB`;
+  }
+  return `${(size / (1024 * 1024)).toFixed(1)}MB`;
 };
 
-/**
- * Obtient la couleur du texte appropriée en fonction du niveau de performance
- */
-export const getLevelTextColor = (value: number, invert = false): string => {
-  const normalizedValue = invert ? 100 - value : value;
-  
-  if (normalizedValue >= 90) return 'text-green-700';
-  if (normalizedValue >= 70) return 'text-green-600';
-  if (normalizedValue >= 50) return 'text-yellow-700';
-  if (normalizedValue >= 30) return 'text-orange-700';
-  return 'text-red-700';
+export const getSpeedColorClass = (score: number): string => {
+  if (score >= 90) return 'text-green-600';
+  if (score >= 50) return 'text-yellow-600';
+  return 'text-red-600';
 };
 
-/**
- * Obtient le libellé approprié en fonction du niveau de performance
- */
-export const getLevelLabel = (value: number, invert = false): string => {
-  const normalizedValue = invert ? 100 - value : value;
-  
-  if (normalizedValue >= 90) return 'Excellent';
-  if (normalizedValue >= 70) return 'Bon';
-  if (normalizedValue >= 50) return 'Moyen';
-  if (normalizedValue >= 30) return 'À améliorer';
-  return 'Critique';
+export const getClsColorClass = (cls: number): string => {
+  if (cls <= 0.1) return 'text-green-600';
+  if (cls <= 0.25) return 'text-yellow-600';
+  return 'text-red-600';
+};
+
+export const CHART_COLORS = {
+  js: '#f59e0b',
+  css: '#3b82f6',
+  images: '#10b981',
+  fonts: '#8b5cf6',
+  other: '#6b7280',
+  scripts: '#f59e0b',
+  styles: '#3b82f6'
 };

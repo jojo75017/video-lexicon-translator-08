@@ -71,6 +71,7 @@ export interface SeoAnalysis {
   headingStructure?: any[];
   authorityScore?: number;
   organicTraffic?: number;
+  searchConsole?: any; // Ajout pour compatibilité
 }
 
 export interface SeoAnalysisResult {
