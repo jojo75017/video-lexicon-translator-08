@@ -9,7 +9,7 @@ interface PageLayoutProps {
   currentTab?: string;
 }
 
-export const PageLayout: React.FC<PageLayoutProps> = ({ 
+const PageLayout: React.FC<PageLayoutProps> = ({ 
   children,
   title,
   description,
@@ -60,3 +60,6 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
     </div>
   );
 };
+
+export default PageLayout;
+export { PageLayout };

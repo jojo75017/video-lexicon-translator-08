@@ -23,7 +23,7 @@ export interface KeywordSuggestion {
   competition?: number;
   intent?: KeywordIntent;
   trends?: number[];
-  clicks?: number; // Ajout de la propriété manquante
+  clicks?: number;
 }
 
 export type KeywordIntent = 'informational' | 'navigational' | 'transactional' | 'commercial';
@@ -33,4 +33,10 @@ export interface SerpResult {
   url: string;
   description: string;
   position: number;
+}
+
+export interface KeywordTrend {
+  data: number[];
+  growth: number;
+  seasonal: boolean;
 }

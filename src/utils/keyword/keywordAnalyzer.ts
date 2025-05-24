@@ -20,3 +20,21 @@ export const generateTrendData = (keyword: any) => {
     }]
   };
 };
+
+export const generateSerpData = (keyword: string) => {
+  // Génération de données SERP simulées
+  return [
+    {
+      title: `Résultat 1 pour ${keyword}`,
+      url: 'https://example1.com',
+      description: `Description pour ${keyword} - résultat 1`,
+      position: 1
+    },
+    {
+      title: `Résultat 2 pour ${keyword}`,
+      url: 'https://example2.com', 
+      description: `Description pour ${keyword} - résultat 2`,
+      position: 2
+    }
+  ];
+};
