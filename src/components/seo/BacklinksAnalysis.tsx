@@ -5,7 +5,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Link, TrendingUp, TrendingDown, Globe, Flag } from "lucide-react";
 import { BacklinkInfo } from '@/types/seo/Backlinks';
-import { eu } from 'react-world-flags/types';
 
 interface BacklinksAnalysisProps {
   backlinks: BacklinkInfo[];

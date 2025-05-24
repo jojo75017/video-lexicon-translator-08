@@ -15,8 +15,8 @@ import StructurePage from './pages/StructurePage';
 import KeywordGeneratorPage from './pages/KeywordGeneratorPage';
 import ContentPage from './pages/ContentPage';
 import IndexabilityPage from './pages/IndexabilityPage';
+import DomainAnalysisPage from './pages/DomainAnalysisPage';
 
-// Ajout des routes manquantes
 const router = createBrowserRouter([
   {
     path: '/',
@@ -82,18 +82,9 @@ const router = createBrowserRouter([
     path: '/indexability',
     element: <IndexabilityPage />,
   },
-  // Routes supplémentaires pour correspondre à la capture d'écran
-  {
-    path: '/sitemap',
-    element: <ContentPage />, // Utilisez un composant existant temporairement
-  },
-  {
-    path: '/resources',
-    element: <ContentPage />, // Utilisez un composant existant temporairement
-  },
   {
     path: '/domain-analysis',
-    element: <ContentPage />, // Utilisez un composant existant temporairement
+    element: <DomainAnalysisPage />,
   },
 ]);
 
