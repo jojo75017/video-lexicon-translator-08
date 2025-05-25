@@ -1,8 +1,12 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
-import { FolderTree, Link2, ListTree, Search } from 'lucide-react';
+import { FolderTree, Link2, ListTree, Search, Sparkles, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import { OpenAIService } from '@/utils/openaiService';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface SiteStructureChild {
   name: string;
@@ -13,7 +17,8 @@ interface SiteStructureChild {
 interface SiteStructure {
   name?: string;
   children?: SiteStructureChild[];
-  // Autres propriétés possibles
+  textContent?: string;
+  url?: string;
   [key: string]: any;
 }
 
@@ -28,40 +33,66 @@ const StructureSection: React.FC<StructureSectionProps> = ({
   siteStructure,
   onAnalyze
 }) => {
-  // Vérification et prétraitement des données pour s'assurer qu'elles sont dans le bon format
-  const processedStructure = React.useMemo(() => {
-    if (!siteStructure) return null;
-    
-    // Si la structure n'a pas de propriété children ou n'est pas dans le format attendu,
-    // on essaie de créer une structure compatible
-    if (!siteStructure.children || !Array.isArray(siteStructure.children)) {
-      console.log("Converting structure format:", siteStructure);
-      
-      // Créer une structure compatible avec des données factices si nécessaire
-      return {
-        name: siteStructure.title || siteStructure.url || "Site analysé",
-        children: [
-          {
-            name: "Page d'accueil",
-            path: siteStructure.url || "/",
-            children: siteStructure.headings ? 
-              siteStructure.headings.slice(0, 5).map((h: any) => ({
-                name: h.text || `Heading ${h.level}`,
-                path: "#" + (h.text || "").toLowerCase().replace(/\s+/g, '-'),
-                children: []
-              })) : 
-              [
-                { name: "Contenu principal", path: "#main", children: [] },
-                { name: "À propos", path: "#about", children: [] },
-                { name: "Contact", path: "#contact", children: [] },
-              ]
-          }
-        ]
-      };
+  const [aiAnalysis, setAiAnalysis] = useState<any>(null);
+  const [isAnalyzingWithAI, setIsAnalyzingWithAI] = useState(false);
+  const [hasOpenAIKey, setHasOpenAIKey] = useState(false);
+
+  useEffect(() => {
+    // Vérifier si une clé OpenAI est disponible
+    const apiKey = localStorage.getItem('openaiKey');
+    setHasOpenAIKey(!!apiKey);
+  }, []);
+
+  useEffect(() => {
+    // Analyser automatiquement avec OpenAI si des données sont disponibles
+    if (siteStructure && siteStructure.textContent && hasOpenAIKey && !aiAnalysis) {
+      handleAIAnalysis();
     }
-    
-    return siteStructure;
-  }, [siteStructure]);
+  }, [siteStructure, hasOpenAIKey]);
+
+  const handleAIAnalysis = async () => {
+    if (!siteStructure || !siteStructure.textContent) {
+      toast.error("Aucun contenu à analyser");
+      return;
+    }
+
+    if (!hasOpenAIKey) {
+      toast.error("Clé API OpenAI non configurée", {
+        description: "Configurez votre clé API dans les paramètres"
+      });
+      return;
+    }
+
+    setIsAnalyzingWithAI(true);
+    try {
+      toast.info("Analyse IA en cours...", {
+        description: "Extraction des mots-clés et analyse de la structure"
+      });
+
+      const analysis = await OpenAIService.analyzeWebsiteStructure(
+        siteStructure.textContent,
+        siteStructure.url || 'Site analysé'
+      );
+
+      setAiAnalysis(analysis);
+      toast.success("Analyse IA terminée", {
+        description: "Structure et mots-clés extraits avec succès"
+      });
+    } catch (error) {
+      console.error('Erreur analyse IA:', error);
+      toast.error("Erreur lors de l'analyse IA", {
+        description: error instanceof Error ? error.message : "Erreur inconnue"
+      });
+    } finally {
+      setIsAnalyzingWithAI(false);
+    }
+  };
+
+  // Utiliser l'analyse IA si disponible, sinon les données de base
+  const displayData = aiAnalysis || siteStructure;
+  const keywords = aiAnalysis?.keywords || [];
+  const recommendations = aiAnalysis?.recommendations || [];
+  const mainTopic = aiAnalysis?.structure?.mainTopic || siteStructure?.name || "Site analysé";
 
   const handleAnalyzeClick = () => {
     if (onAnalyze) {
@@ -71,15 +102,41 @@ const StructureSection: React.FC<StructureSectionProps> = ({
 
   return (
     <Card className="p-6 border-0 shadow-md bg-gradient-to-br from-white to-slate-50">
-      <div className="flex items-center mb-4">
-        <div className="w-1 h-6 bg-emerald-500 rounded-full mr-3"></div>
-        <h2 className="text-xl font-bold text-gray-800 flex items-center">
-          <FolderTree className="h-5 w-5 mr-2" />
-          Structure du site
-        </h2>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center">
+          <div className="w-1 h-6 bg-emerald-500 rounded-full mr-3"></div>
+          <h2 className="text-xl font-bold text-gray-800 flex items-center">
+            <FolderTree className="h-5 w-5 mr-2" />
+            Structure du site
+          </h2>
+        </div>
+        
+        {siteStructure && hasOpenAIKey && (
+          <Button
+            onClick={handleAIAnalysis}
+            disabled={isAnalyzingWithAI}
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            <Sparkles className="h-4 w-4" />
+            {isAnalyzingWithAI ? "Analyse IA..." : "Analyser avec IA"}
+          </Button>
+        )}
       </div>
+
+      {!hasOpenAIKey && siteStructure && (
+        <Alert className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Configurez votre clé API OpenAI dans les paramètres pour obtenir une analyse intelligente des mots-clés et de la structure.
+          </AlertDescription>
+        </Alert>
+      )}
+      
       <p className="text-gray-600 mb-6">
         Visualisez l'architecture et l'organisation des pages de votre site web
+        {aiAnalysis && " avec une analyse IA avancée"}
       </p>
       
       {isLoading ? (
@@ -88,51 +145,100 @@ const StructureSection: React.FC<StructureSectionProps> = ({
         </div>
       ) : (
         <div>
-          {processedStructure ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {displayData ? (
+            <div className="space-y-6">
+              {/* Sujet principal */}
               <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm">
                 <div className="flex items-center mb-3">
                   <ListTree className="h-5 w-5 text-emerald-500" />
-                  <h3 className="text-sm font-medium text-gray-700 ml-2">Hiérarchie des pages</h3>
+                  <h3 className="text-lg font-medium text-gray-700 ml-2">{mainTopic}</h3>
+                  {aiAnalysis && (
+                    <Badge variant="secondary" className="ml-2">
+                      <Sparkles className="h-3 w-3 mr-1" />
+                      IA
+                    </Badge>
+                  )}
                 </div>
+                
+                {/* Mots-clés principaux */}
+                {keywords.length > 0 && (
+                  <div className="mb-4">
+                    <h4 className="text-sm font-medium text-gray-600 mb-2">Mots-clés principaux détectés</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {keywords.slice(0, 8).map((keyword, index) => (
+                        <Badge key={index} variant="outline" className="text-xs">
+                          {keyword}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Structure hiérarchique */}
                 <div className="pl-4 border-l-2 border-emerald-100 space-y-2">
-                  <div className="font-medium text-emerald-700">{processedStructure.name || "Accueil"}</div>
-                  {processedStructure.children && processedStructure.children[0]?.children && (
+                  <div className="font-medium text-emerald-700">
+                    {siteStructure?.name || mainTopic}
+                  </div>
+                  {aiAnalysis?.structure?.sections ? (
                     <div className="pl-4 text-sm text-gray-600">
-                      {processedStructure.children[0].children.slice(0, 5).map((node, index) => (
+                      {aiAnalysis.structure.sections.map((section: string, index: number) => (
+                        <div key={index} className="mb-1">{section}</div>
+                      ))}
+                    </div>
+                  ) : siteStructure?.children && siteStructure.children[0]?.children ? (
+                    <div className="pl-4 text-sm text-gray-600">
+                      {siteStructure.children[0].children.slice(0, 5).map((node, index) => (
                         <div key={index} className="mb-1">{node.name}</div>
                       ))}
-                      {processedStructure.children[0].children.length > 5 && (
+                      {siteStructure.children[0].children.length > 5 && (
                         <div className="text-gray-400 italic">
-                          + {processedStructure.children[0].children.length - 5} autres pages
+                          + {siteStructure.children[0].children.length - 5} autres pages
                         </div>
                       )}
                     </div>
-                  )}
+                  ) : null}
                 </div>
               </div>
               
-              <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm">
-                <div className="flex items-center mb-3">
-                  <Link2 className="h-5 w-5 text-blue-500" />
-                  <h3 className="text-sm font-medium text-gray-700 ml-2">Analyse des liens</h3>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-gray-50 p-3 rounded-md">
-                    <div className="text-xs text-gray-500">Liens internes</div>
-                    <div className="text-lg font-semibold text-gray-800">
-                      {processedStructure.children && processedStructure.children[0]?.children 
-                        ? processedStructure.children[0].children.length 
-                        : 0}
+              {/* Métriques */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm">
+                  <div className="flex items-center mb-3">
+                    <Link2 className="h-5 w-5 text-blue-500" />
+                    <h3 className="text-sm font-medium text-gray-700 ml-2">Analyse des liens</h3>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-gray-50 p-3 rounded-md">
+                      <div className="text-xs text-gray-500">Pages trouvées</div>
+                      <div className="text-lg font-semibold text-gray-800">
+                        {siteStructure?.children?.[0]?.children?.length || 0}
+                      </div>
+                    </div>
+                    <div className="bg-gray-50 p-3 rounded-md">
+                      <div className="text-xs text-gray-500">Profondeur</div>
+                      <div className="text-lg font-semibold text-gray-800">
+                        {siteStructure?.depth || 1} niveau
+                      </div>
                     </div>
                   </div>
-                  <div className="bg-gray-50 p-3 rounded-md">
-                    <div className="text-xs text-gray-500">Profondeur</div>
-                    <div className="text-lg font-semibold text-gray-800">
-                      1 niveau
+                </div>
+
+                {/* Recommandations IA */}
+                {recommendations.length > 0 && (
+                  <div className="bg-white p-4 rounded-lg border border-gray-100 shadow-sm">
+                    <div className="flex items-center mb-3">
+                      <Sparkles className="h-5 w-5 text-purple-500" />
+                      <h3 className="text-sm font-medium text-gray-700 ml-2">Recommandations IA</h3>
+                    </div>
+                    <div className="space-y-2">
+                      {recommendations.slice(0, 3).map((rec, index) => (
+                        <div key={index} className="text-xs text-gray-600 bg-purple-50 p-2 rounded">
+                          {rec}
+                        </div>
+                      ))}
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           ) : (

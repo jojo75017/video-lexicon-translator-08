@@ -3,6 +3,7 @@ export interface KeywordFrequency {
   keyword: string;
   frequency: number;
   density?: number;
+  count?: number;
 }
 
 export interface KeywordData {
@@ -13,6 +14,9 @@ export interface KeywordData {
   competition?: number;
   intent?: KeywordIntent;
   trends?: number[];
+  density?: number;
+  count?: number;
+  position?: number;
 }
 
 export interface KeywordSuggestion {
@@ -33,6 +37,8 @@ export interface KeywordSuggestion {
   suggestedTitle?: string;
   suggestedDescription?: string;
   suggestedLongDescription?: string;
+  density?: number;
+  count?: number;
 }
 
 export type KeywordIntent = 'informational' | 'navigational' | 'transactional' | 'commercial';
