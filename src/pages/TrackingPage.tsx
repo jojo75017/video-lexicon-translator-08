@@ -24,20 +24,6 @@ const TrackingPage = () => {
         : window.location.origin;
       setInputUrl(defaultUrl);
     }
-  }, [inputUrl, url]);
-  
-  // Démarrer le suivi au chargement de la page
-  useEffect(() => {
-    console.log("TrackingPage: Chargement initial");
-    // Démarrer le suivi après un court délai
-    const timer = setTimeout(() => {
-      if (!isTracking && inputUrl) {
-        console.log("TrackingPage: Démarrage automatique du suivi");
-        handleStartTracking();
-      }
-    }, 300);
-    
-    return () => clearTimeout(timer);
   }, []);
   
   const handleStartTracking = () => {
@@ -46,26 +32,44 @@ const TrackingPage = () => {
       return;
     }
     
-    // Formater l'URL si nécessaire
-    let formattedUrl = inputUrl.trim();
-    if (!formattedUrl.startsWith('http://') && !formattedUrl.startsWith('https://')) {
-      formattedUrl = `https://${formattedUrl}`;
-      setInputUrl(formattedUrl);
+    try {
+      // Nettoyer l'URL et s'assurer qu'elle a un protocole
+      let cleanUrl = inputUrl.trim();
+      if (!cleanUrl.startsWith('http://') && !cleanUrl.startsWith('https://')) {
+        cleanUrl = `https://${cleanUrl}`;
+      }
+      
+      // Vérifie si l'URL est valide
+      new URL(cleanUrl);
+      console.log("URL is valid, triggering analysis:", cleanUrl);
+      
+      // Mettre à jour l'URL avec la version propre et formatée
+      setUrl(cleanUrl);
+      setIsTracking(true);
+      
+      toast.success(`Suivi des positions démarré pour ${cleanUrl}`);
+    } catch (error) {
+      console.error("Invalid URL:", inputUrl, error);
+      toast.error("URL invalide", {
+        description: "Veuillez entrer une URL valide (ex: https://exemple.com)"
+      });
     }
-    
-    // Démarrer le suivi des positions
-    console.log(`Démarrage du suivi pour: ${formattedUrl}`);
-    setUrl(formattedUrl);
-    setIsTracking(true);
-    toast.success(`Suivi des positions démarré pour ${formattedUrl}`);
   };
   
   const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputUrl(e.target.value);
+    const newUrl = e.target.value;
+    console.log("URL input changed to:", newUrl);
+    setInputUrl(newUrl);
+    // Reset tracking when URL changes
+    if (isTracking) {
+      setIsTracking(false);
+      setUrl('');
+    }
   };
   
   const handleResetTracking = () => {
     setIsTracking(false);
+    setUrl('');
     // Réinitialiser après un court délai pour permettre le rechargement des données
     setTimeout(() => {
       handleStartTracking();
@@ -117,6 +121,7 @@ const TrackingPage = () => {
               <Button 
                 onClick={handleStartTracking}
                 className="bg-purple-600 hover:bg-purple-700"
+                disabled={!inputUrl.trim()}
               >
                 <Search className="h-4 w-4 mr-2" />
                 {!isTracking ? "Démarrer le suivi" : "Mettre à jour"}
@@ -161,7 +166,7 @@ const TrackingPage = () => {
               </div>
             )}
             
-            {isTracking && <RankingTracker url={url} apiKey={apiKey} />}
+            {isTracking && url && <RankingTracker url={url} apiKey={apiKey} />}
             
             {!isTracking && (
               <div className="p-8 text-center border border-dashed border-gray-300 rounded-lg">
