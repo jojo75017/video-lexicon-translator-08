@@ -35,6 +35,13 @@ export interface SerpResult {
   position: number;
 }
 
+export interface SerpsResult {
+  title: string;
+  url: string;
+  description: string;
+  position: number;
+}
+
 export interface KeywordTrend {
   data: number[];
   growth: number;

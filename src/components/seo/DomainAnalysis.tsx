@@ -5,22 +5,43 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Check, Globe, Search, Shield } from "lucide-react";
+import DomainOverview from './DomainOverview';
+import DomainSearchAnalysis from './DomainSearchAnalysis';
+import DomainAvailabilityChecker from './DomainAvailabilityChecker';
+import { useSiteAnalyzer } from '@/hooks/useSiteAnalyzer';
 
 const DomainAnalysis = () => {
   const [activeTab, setActiveTab] = useState<'overview' | 'search' | 'availability'>('overview');
   const [domain, setDomain] = useState('');
+  const { analyzeSite, seoAnalysis, isLoading, error } = useSiteAnalyzer();
   
   const handleDomainChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDomain(e.target.value);
   };
   
-  const checkDomain = () => {
+  const checkDomain = async () => {
     if (!domain) {
       toast.error("Veuillez entrer un nom de domaine");
       return;
     }
     
-    toast.info(`Analyse du domaine ${domain} en cours...`);
+    // Nettoyer le domaine et s'assurer qu'il a un protocole
+    let cleanDomain = domain.trim();
+    if (!cleanDomain.startsWith('http://') && !cleanDomain.startsWith('https://')) {
+      cleanDomain = `https://${cleanDomain}`;
+    }
+    
+    try {
+      new URL(cleanDomain);
+      toast.info(`Analyse du domaine ${cleanDomain} en cours...`);
+      
+      // Utiliser le hook d'analyse de site
+      await analyzeSite();
+    } catch (error) {
+      toast.error("URL invalide", {
+        description: "Veuillez entrer un domaine valide (ex: exemple.com)"
+      });
+    }
   };
   
   return (
@@ -72,20 +93,24 @@ const DomainAnalysis = () => {
             />
             <Button 
               onClick={checkDomain} 
+              disabled={isLoading}
               className="bg-green-600 hover:bg-green-700 text-white"
             >
-              Analyser
+              {isLoading ? "Analyse..." : "Analyser"}
             </Button>
           </div>
           
-          <div className="bg-gray-50 p-6 rounded-lg text-center">
-            <Globe className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-            <p className="text-gray-600">
-              {activeTab === 'overview' && "Entrez un domaine pour voir sa vue d'ensemble"}
-              {activeTab === 'search' && "Entrez un domaine pour analyser sa recherche organique"}
-              {activeTab === 'availability' && "Entrez un domaine pour vérifier sa disponibilité"}
-            </p>
-          </div>
+          {activeTab === 'overview' && (
+            <DomainOverview domain={domain} seoData={seoAnalysis} isLoading={isLoading} error={error} />
+          )}
+          
+          {activeTab === 'search' && (
+            <DomainSearchAnalysis domain={domain} seoData={seoAnalysis} isLoading={isLoading} />
+          )}
+          
+          {activeTab === 'availability' && (
+            <DomainAvailabilityChecker domain={domain} />
+          )}
         </CardContent>
       </Card>
     </div>
