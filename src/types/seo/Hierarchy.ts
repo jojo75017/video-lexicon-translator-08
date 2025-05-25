@@ -38,13 +38,16 @@ export interface StructureAnalysisResult {
   analysisDate: string;
 }
 
-// Additional types needed by components
 export interface HierarchyItem {
-  title: string;
-  id: string;
+  title?: string;
+  id?: string;
   tagName?: string;
   text?: string;
   children?: HierarchyItem[];
+  level?: number;
+  position?: number;
+  name?: string;
+  parentFound?: boolean;
 }
 
 export interface HeadingStructure {
@@ -62,7 +65,13 @@ export interface StructureItem {
 }
 
 export interface SocialMetricsProps {
-  metrics: any;
+  metrics: {
+    facebook?: number;
+    twitter?: number;
+    pinterest?: number;
+    linkedin?: number;
+    [key: string]: any;
+  };
   facebook?: any;
   twitter?: any;
   pinterest?: any;

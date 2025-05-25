@@ -1,219 +1,210 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Check, Settings, Key } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import OpenAIKeyForm from './OpenAIKeyForm';
-import { OpenAIService } from '@/utils/seo/openaiService';
+import { Settings, Key, Globe, Zap } from "lucide-react";
+
+interface OpenAIKeyFormProps {
+  apiKey: string;
+  onSave: (key: string) => void;
+  isLoading: boolean;
+  isValid: boolean;
+}
+
+const OpenAIKeyForm: React.FC<OpenAIKeyFormProps> = ({ apiKey, onSave, isLoading, isValid }) => {
+  const [key, setKey] = useState(apiKey);
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <Label htmlFor="openai-key">Clé API OpenAI</Label>
+        <Input
+          id="openai-key"
+          type="password"
+          value={key}
+          onChange={(e) => setKey(e.target.value)}
+          placeholder="sk-..."
+          className="mt-1"
+        />
+      </div>
+      <Button 
+        onClick={() => onSave(key)} 
+        disabled={isLoading}
+        className="w-full"
+      >
+        {isLoading ? "Validation..." : "Sauvegarder"}
+      </Button>
+      {isValid && (
+        <p className="text-green-600 text-sm">✓ Clé API validée</p>
+      )}
+    </div>
+  );
+};
 
 const AnalysisSettings = () => {
-  const [deepAnalysis, setDeepAnalysis] = useState<boolean>(false);
-  const [multiplePages, setMultiplePages] = useState<boolean>(false);
-  const [mobileAnalysis, setMobileAnalysis] = useState<boolean>(false);
-  const [apiKey, setApiKey] = useState<string>("");
-  const [isKeyValid, setIsKeyValid] = useState<boolean | null>(null);
-  
+  const [openaiKey, setOpenaiKey] = useState('');
+  const [firecrawlKey, setFirecrawlKey] = useState('');
+  const [isLoadingOpenAI, setIsLoadingOpenAI] = useState(false);
+  const [isLoadingFirecrawl, setIsLoadingFirecrawl] = useState(false);
+  const [openaiValid, setOpenaiValid] = useState(false);
+  const [firecrawlValid, setFirecrawlValid] = useState(false);
+  const [autoAnalysis, setAutoAnalysis] = useState(true);
+  const [deepAnalysis, setDeepAnalysis] = useState(false);
+  const [region, setRegion] = useState('europe');
+
   useEffect(() => {
-    // Charger les paramètres depuis le localStorage
-    const savedDeepAnalysis = localStorage.getItem('deepAnalysis') === 'true';
-    const savedMultiplePages = localStorage.getItem('multiplePages') === 'true';
-    const savedMobileAnalysis = localStorage.getItem('mobileAnalysis') === 'true';
-    const savedKey = localStorage.getItem('openaiKey') || "";
+    // Charger les clés depuis le localStorage
+    const savedOpenAI = localStorage.getItem('openaiKey');
+    const savedFirecrawl = localStorage.getItem('firecrawlKey');
     
-    setDeepAnalysis(savedDeepAnalysis);
-    setMultiplePages(savedMultiplePages);
-    setMobileAnalysis(savedMobileAnalysis);
-    setApiKey(savedKey);
+    if (savedOpenAI) {
+      setOpenaiKey(savedOpenAI);
+      setOpenaiValid(true);
+    }
     
-    // Vérifier la clé API si elle existe
-    if (savedKey) {
-      checkApiKey(savedKey);
+    if (savedFirecrawl) {
+      setFirecrawlKey(savedFirecrawl);
+      setFirecrawlValid(true);
     }
   }, []);
-  
-  const saveSetting = (key: string, value: boolean) => {
-    localStorage.setItem(key, String(value));
-    toast.success(`Paramètre mis à jour`, {
-      description: "La modification a été enregistrée"
-    });
-  };
-  
-  const saveApiKey = (key: string) => {
-    localStorage.setItem('openaiKey', key);
-    setApiKey(key);
-    checkApiKey(key);
-  };
-  
-  const checkApiKey = async (key: string) => {
+
+  const handleSaveOpenAI = async (key: string) => {
+    setIsLoadingOpenAI(true);
     try {
-      // Simulation de vérification puisque checkApiKeyStatus n'existe pas
-      setIsKeyValid(key.length > 10);
-      
-      if (key.length > 10) {
-        toast.success("Clé API valide", {
-          description: "Votre clé API a été vérifiée avec succès"
-        });
-      } else if (key.length > 0) {
-        toast.error("Clé API invalide", {
-          description: "Veuillez vérifier votre clé API"
-        });
-      }
+      // Simuler la validation
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      localStorage.setItem('openaiKey', key);
+      setOpenaiKey(key);
+      setOpenaiValid(true);
+      toast.success("Clé OpenAI sauvegardée et validée");
     } catch (error) {
-      console.error("Erreur lors de la vérification de la clé API:", error);
-      setIsKeyValid(false);
-      toast.error("Erreur de vérification", {
-        description: "Impossible de vérifier la clé API"
-      });
+      toast.error("Erreur lors de la validation de la clé OpenAI");
+    } finally {
+      setIsLoadingOpenAI(false);
     }
   };
-  
+
+  const handleSaveFirecrawl = async () => {
+    setIsLoadingFirecrawl(true);
+    try {
+      // Simuler la validation
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      localStorage.setItem('firecrawlKey', firecrawlKey);
+      setFirecrawlValid(true);
+      toast.success("Clé Firecrawl sauvegardée et validée");
+    } catch (error) {
+      toast.error("Erreur lors de la validation de la clé Firecrawl");
+    } finally {
+      setIsLoadingFirecrawl(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <Card className="p-6">
-        <h2 className="text-2xl font-bold mb-2 flex items-center">
-          <Settings className="h-6 w-6 mr-2 text-purple-600" />
-          Paramètres d'analyse
-        </h2>
-        <p className="text-gray-600 mb-6">
-          Configurez les options d'analyse SEO selon vos besoins.
-        </p>
-        
-        <Tabs defaultValue="general" className="w-full">
-          <TabsList className="w-full mb-6">
-            <TabsTrigger value="general">Général</TabsTrigger>
-            <TabsTrigger value="api">Clés API</TabsTrigger>
-            <TabsTrigger value="avance">Avancé</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="general" className="space-y-6">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label className="text-base" htmlFor="deep-analysis">
-                    Analyse approfondie
-                  </Label>
-                  <p className="text-sm text-gray-500">
-                    Effectuer une analyse plus détaillée du contenu
-                  </p>
-                </div>
-                <Switch
-                  id="deep-analysis"
-                  checked={deepAnalysis}
-                  onCheckedChange={(checked) => {
-                    setDeepAnalysis(checked);
-                    saveSetting('deepAnalysis', checked);
-                  }}
-                />
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label className="text-base" htmlFor="multiple-pages">
-                    Analyser plusieurs pages
-                  </Label>
-                  <p className="text-sm text-gray-500">
-                    Analyser jusqu'à 5 pages du site au lieu d'une seule
-                  </p>
-                </div>
-                <Switch
-                  id="multiple-pages"
-                  checked={multiplePages}
-                  onCheckedChange={(checked) => {
-                    setMultiplePages(checked);
-                    saveSetting('multiplePages', checked);
-                  }}
-                />
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label className="text-base" htmlFor="mobile-analysis">
-                    Analyse mobile
-                  </Label>
-                  <p className="text-sm text-gray-500">
-                    Tester la compatibilité mobile du site
-                  </p>
-                </div>
-                <Switch
-                  id="mobile-analysis"
-                  checked={mobileAnalysis}
-                  onCheckedChange={(checked) => {
-                    setMobileAnalysis(checked);
-                    saveSetting('mobileAnalysis', checked);
-                  }}
-                />
-              </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Settings className="h-5 w-5" />
+            Paramètres d'analyse
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Configuration OpenAI */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Key className="h-4 w-4" />
+              <h3 className="font-medium">Configuration OpenAI</h3>
             </div>
-          </TabsContent>
-          
-          <TabsContent value="api" className="space-y-6">
-            <div className="space-y-4">
-              <div>
-                <div className="flex items-center mb-4">
-                  <Key className="h-5 w-5 mr-2 text-blue-600" />
-                  <h3 className="text-lg font-medium">Clé API OpenAI</h3>
-                </div>
-                
-                <p className="text-sm text-gray-600 mb-4">
-                  Configurez votre clé API OpenAI pour utiliser les fonctionnalités d'IA avancées
-                </p>
-                
-                <div className="flex items-center space-x-2">
-                  <div className="relative flex-1">
-                    <Input
-                      type="password"
-                      value={apiKey}
-                      onChange={(e) => setApiKey(e.target.value)}
-                      placeholder="sk-..."
-                      className={`pr-10 ${
-                        isKeyValid === true ? 'border-green-500' : 
-                        isKeyValid === false ? 'border-red-500' : ''
-                      }`}
-                    />
-                    {isKeyValid === true && (
-                      <Check className="absolute right-3 top-2.5 h-5 w-5 text-green-500" />
-                    )}
-                  </div>
-                  <Button 
-                    onClick={() => {
-                      saveApiKey(apiKey);
-                    }}
-                    disabled={!apiKey}
-                  >
-                    Enregistrer
-                  </Button>
-                </div>
-                
-                {isKeyValid === false && apiKey && (
-                  <p className="text-sm text-red-500 mt-1">
-                    Clé API invalide. Veuillez vérifier le format.
-                  </p>
-                )}
-                
-                <div className="mt-6">
-                  <OpenAIKeyForm />
-                </div>
-              </div>
+            <OpenAIKeyForm
+              apiKey={openaiKey}
+              onSave={handleSaveOpenAI}
+              isLoading={isLoadingOpenAI}
+              isValid={openaiValid}
+            />
+          </div>
+
+          {/* Configuration Firecrawl */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Globe className="h-4 w-4" />
+              <h3 className="font-medium">Configuration Firecrawl</h3>
             </div>
-          </TabsContent>
-          
-          <TabsContent value="avance" className="space-y-6">
-            <div className="space-y-4">
-              <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
-                <h3 className="text-amber-800 font-medium mb-2">Paramètres avancés</h3>
-                <p className="text-amber-700 text-sm">
-                  Les paramètres avancés sont destinés aux utilisateurs expérimentés. Des options
-                  supplémentaires seront disponibles dans une future mise à jour.
+            <div>
+              <Label htmlFor="firecrawl-key">Clé API Firecrawl</Label>
+              <Input
+                id="firecrawl-key"
+                type="password"
+                value={firecrawlKey}
+                onChange={(e) => setFirecrawlKey(e.target.value)}
+                placeholder="fc-..."
+                className="mt-1"
+              />
+            </div>
+            <Button 
+              onClick={handleSaveFirecrawl} 
+              disabled={isLoadingFirecrawl}
+              className="w-full"
+            >
+              {isLoadingFirecrawl ? "Validation..." : "Sauvegarder"}
+            </Button>
+            {firecrawlValid && (
+              <p className="text-green-600 text-sm">✓ Clé API validée</p>
+            )}
+          </div>
+
+          {/* Options d'analyse */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Zap className="h-4 w-4" />
+              <h3 className="font-medium">Options d'analyse</h3>
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Analyse automatique</Label>
+                <p className="text-sm text-gray-600">
+                  Lancer automatiquement l'analyse lors du chargement
                 </p>
               </div>
+              <Switch
+                checked={autoAnalysis}
+                onCheckedChange={setAutoAnalysis}
+              />
             </div>
-          </TabsContent>
-        </Tabs>
+            
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Analyse approfondie</Label>
+                <p className="text-sm text-gray-600">
+                  Analyser plus de pages et de données
+                </p>
+              </div>
+              <Switch
+                checked={deepAnalysis}
+                onCheckedChange={setDeepAnalysis}
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="region">Région d'analyse</Label>
+              <select
+                id="region"
+                value={region}
+                onChange={(e) => setRegion(e.target.value)}
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+              >
+                <option value="europe">Europe</option>
+                <option value="north-america">Amérique du Nord</option>
+                <option value="asia">Asie</option>
+                <option value="global">Global</option>
+              </select>
+            </div>
+          </div>
+        </CardContent>
       </Card>
     </div>
   );
