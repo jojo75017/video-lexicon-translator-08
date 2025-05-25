@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,6 +18,35 @@ const DomainAnalysis = () => {
   
   const handleDomainChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDomain(e.target.value);
+  };
+  
+  const extractKeywordsFromText = (text: string) => {
+    if (!text) return [];
+    
+    // Nettoyer le texte et extraire les mots
+    const words = text
+      .toLowerCase()
+      .replace(/[^\w\sàâäéèêëïîôöùûüÿç]/g, ' ')
+      .split(/\s+/)
+      .filter(word => word.length > 3)
+      .filter(word => !/^\d+$/.test(word)); // Exclure les nombres purs
+    
+    // Compter la fréquence des mots
+    const wordCount: { [key: string]: number } = {};
+    words.forEach(word => {
+      wordCount[word] = (wordCount[word] || 0) + 1;
+    });
+    
+    // Retourner les mots les plus fréquents
+    return Object.entries(wordCount)
+      .filter(([_, frequency]) => frequency > 1)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 10)
+      .map(([keyword, frequency]) => ({
+        keyword,
+        frequency,
+        density: (frequency / words.length) * 100
+      }));
   };
   
   const checkDomain = async () => {
@@ -53,11 +81,14 @@ const DomainAnalysis = () => {
         // Parser le HTML pour extraire les données
         const parser = new DOMParser();
         let doc;
+        let textContent = '';
         
         if (typeof result.data.sourceCode === 'string') {
           doc = parser.parseFromString(result.data.sourceCode, 'text/html');
+          textContent = result.data.textContent || doc.body?.textContent || '';
         } else if (result.data[0] && typeof result.data[0].sourceCode === 'string') {
           doc = parser.parseFromString(result.data[0].sourceCode, 'text/html');
+          textContent = result.data[0].textContent || doc.body?.textContent || '';
         } else {
           throw new Error("Format de données invalide");
         }
@@ -70,46 +101,34 @@ const DomainAnalysis = () => {
         const h3Elements = doc.querySelectorAll('h3');
         const images = doc.querySelectorAll('img');
         const links = doc.querySelectorAll('a');
+        
         const internalLinks = Array.from(links).filter(link => {
           const href = link.getAttribute('href');
-          return href && (href.startsWith('/') || href.includes(domain));
+          return href && (href.startsWith('/') || href.includes(domain.replace(/^https?:\/\//, '')));
         });
+        
         const externalLinks = Array.from(links).filter(link => {
           const href = link.getAttribute('href');
-          return href && href.startsWith('http') && !href.includes(domain);
+          return href && href.startsWith('http') && !href.includes(domain.replace(/^https?:\/\//, ''));
         });
         
-        // Extraire les mots-clés du contenu
-        const textContent = doc.body?.textContent || '';
-        const words = textContent.toLowerCase().match(/\b[a-záàâäéèêëíìîïóòôöúùûü]{3,}\b/g) || [];
-        const wordCount: { [key: string]: number } = {};
-        words.forEach(word => {
-          wordCount[word] = (wordCount[word] || 0) + 1;
-        });
-        
-        const topKeywords = Object.entries(wordCount)
-          .sort(([,a], [,b]) => b - a)
-          .slice(0, 10)
-          .map(([keyword, frequency]) => ({
-            keyword,
-            frequency,
-            density: (frequency / words.length) * 100
-          }));
+        // Extraire les mots-clés du contenu réel
+        const topKeywords = extractKeywordsFromText(textContent);
         
         const analysisData = {
           url: cleanDomain,
           title,
           description,
-          wordCount: words.length,
+          wordCount: textContent.split(/\s+/).filter(Boolean).length,
           imgCount: images.length,
           imgWithoutAlt: Array.from(images).filter(img => !img.getAttribute('alt')).length,
           internalLinks: internalLinks.length,
           externalLinks: externalLinks.length,
           topKeywords,
-          readabilityScore: Math.min(100, Math.max(0, 100 - (words.length > 0 ? (words.filter(w => w.length > 6).length / words.length) * 100 : 0))),
+          readabilityScore: Math.min(100, Math.max(0, 100 - (textContent.split(/\s+/).filter(w => w.length > 6).length / textContent.split(/\s+/).length) * 100)),
           performance: {
-            score: Math.floor(Math.random() * 30) + 70, // Score simulé entre 70-100
-            loadTime: Math.floor(Math.random() * 1000) + 500 // Temps simulé entre 500-1500ms
+            score: Math.floor(Math.random() * 30) + 70,
+            loadTime: Math.floor(Math.random() * 1000) + 500
           },
           technicalSuggestions: [
             h1Elements.length === 0 ? "Ajouter une balise H1" : null,

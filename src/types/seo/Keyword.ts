@@ -1,22 +1,41 @@
 
-// src/types/seo/Keyword.ts
+export interface KeywordFrequency {
+  keyword: string;
+  frequency: number;
+  density?: number;
+}
+
+export interface KeywordData {
+  keyword: string;
+  volume: number;
+  difficulty: number;
+  cpc?: number;
+  competition?: number;
+  intent?: KeywordIntent;
+  trends?: number[];
+}
+
 export interface KeywordSuggestion {
   keyword: string;
-  searchVolume?: number;
-  difficulty?: number;
+  volume: number;
+  difficulty: number;
   cpc?: number;
-  competition?: number; 
+  competition?: number;
+  intent?: KeywordIntent;
+  trends?: number[];
+  clicks?: number;
+  searchVolume?: number;
   relevance?: number; 
   position?: number;
-  intent?: 'informational' | 'navigational' | 'transactional' | 'commercial';
   type?: 'question' | 'standard' | 'long-tail' | 'related';
-  volume?: number;
   opportunity?: number;
   trend?: number[];
   suggestedTitle?: string;
   suggestedDescription?: string;
   suggestedLongDescription?: string;
 }
+
+export type KeywordIntent = 'informational' | 'navigational' | 'transactional' | 'commercial';
 
 export interface SerpResult {
   title: string;
@@ -25,58 +44,18 @@ export interface SerpResult {
   position: number;
 }
 
-export interface CompetitorData {
-  name: string;
+export interface SerpsResult {
+  title: string;
   url: string;
-  strength: number;
-  organic_traffic: number;
-  keywords: number;
-}
-
-export interface BacklinkInfo {
-  url: string;
-  domain: string;
-  authority: number;
-  anchorText?: string;
-  date: string;
-}
-
-export interface BrokenLink {
-  url: string;
-  status?: number;
-  location?: string;
-  text?: string;
-  type: string;
-}
-
-export interface KeywordData {
-  keyword: string;
-  difficulty: number;
-  searchVolume: number;
-  count?: number;
-  density?: number;
-  position?: number;
-  volume?: number;
+  description: string;
+  position: number;
 }
 
 export interface KeywordTrend {
-  keyword: string;
-  period: string;
-  volume: number;
-  data?: number[];
-  growth?: number;
-  seasonal?: boolean;
-}
-
-export interface MobileAnalysis {
-  score?: number;
-  issues: string[];
-  recommendations: string[];
-}
-
-// Types additionnels pour résoudre les erreurs de build
-export interface KeywordIntent {
-  name: string;
-  description: string;
-  examples: string[];
+  data: number[];
+  growth: number;
+  seasonal: boolean;
+  keyword?: string;
+  period?: string;
+  volume?: number;
 }
