@@ -38,14 +38,15 @@ const StructureSection: React.FC<StructureSectionProps> = ({
   const [hasOpenAIKey, setHasOpenAIKey] = useState(false);
 
   useEffect(() => {
-    // Vérifier si une clé OpenAI est disponible
     const apiKey = localStorage.getItem('openaiKey');
     setHasOpenAIKey(!!apiKey);
+    console.log('OpenAI key status:', !!apiKey);
   }, []);
 
   useEffect(() => {
     // Analyser automatiquement avec OpenAI si des données sont disponibles
     if (siteStructure && siteStructure.textContent && hasOpenAIKey && !aiAnalysis) {
+      console.log('Auto-starting AI analysis...');
       handleAIAnalysis();
     }
   }, [siteStructure, hasOpenAIKey]);
@@ -65,8 +66,9 @@ const StructureSection: React.FC<StructureSectionProps> = ({
 
     setIsAnalyzingWithAI(true);
     try {
+      console.log('Starting AI analysis for:', siteStructure.url);
       toast.info("Analyse IA en cours...", {
-        description: "Extraction des mots-clés et analyse de la structure"
+        description: "Extraction des mots-clés et analyse de la structure réelle"
       });
 
       const analysis = await OpenAIService.analyzeWebsiteStructure(
@@ -74,9 +76,10 @@ const StructureSection: React.FC<StructureSectionProps> = ({
         siteStructure.url || 'Site analysé'
       );
 
+      console.log('AI analysis completed:', analysis);
       setAiAnalysis(analysis);
       toast.success("Analyse IA terminée", {
-        description: "Structure et mots-clés extraits avec succès"
+        description: `Mots-clés extraits: ${analysis.keywords.slice(0, 3).join(', ')}`
       });
     } catch (error) {
       console.error('Erreur analyse IA:', error);
@@ -120,7 +123,7 @@ const StructureSection: React.FC<StructureSectionProps> = ({
             className="flex items-center gap-2"
           >
             <Sparkles className="h-4 w-4" />
-            {isAnalyzingWithAI ? "Analyse IA..." : "Analyser avec IA"}
+            {isAnalyzingWithAI ? "Analyse IA..." : "Réanalyser avec IA"}
           </Button>
         )}
       </div>
@@ -129,14 +132,14 @@ const StructureSection: React.FC<StructureSectionProps> = ({
         <Alert className="mb-4">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            Configurez votre clé API OpenAI dans les paramètres pour obtenir une analyse intelligente des mots-clés et de la structure.
+            Configurez votre clé API OpenAI dans les paramètres pour obtenir une analyse intelligente des mots-clés réels du site.
           </AlertDescription>
         </Alert>
       )}
       
       <p className="text-gray-600 mb-6">
         Visualisez l'architecture et l'organisation des pages de votre site web
-        {aiAnalysis && " avec une analyse IA avancée"}
+        {aiAnalysis && " avec une analyse IA des mots-clés réels"}
       </p>
       
       {isLoading ? (
@@ -155,18 +158,20 @@ const StructureSection: React.FC<StructureSectionProps> = ({
                   {aiAnalysis && (
                     <Badge variant="secondary" className="ml-2">
                       <Sparkles className="h-3 w-3 mr-1" />
-                      IA
+                      IA - Contenu réel
                     </Badge>
                   )}
                 </div>
                 
-                {/* Mots-clés principaux */}
+                {/* Mots-clés principaux du contenu réel */}
                 {keywords.length > 0 && (
                   <div className="mb-4">
-                    <h4 className="text-sm font-medium text-gray-600 mb-2">Mots-clés principaux détectés</h4>
+                    <h4 className="text-sm font-medium text-gray-600 mb-2">
+                      Mots-clés extraits du contenu réel
+                    </h4>
                     <div className="flex flex-wrap gap-2">
                       {keywords.slice(0, 8).map((keyword, index) => (
-                        <Badge key={index} variant="outline" className="text-xs">
+                        <Badge key={index} variant="outline" className="text-xs bg-emerald-50 text-emerald-700">
                           {keyword}
                         </Badge>
                       ))}
@@ -181,8 +186,11 @@ const StructureSection: React.FC<StructureSectionProps> = ({
                   </div>
                   {aiAnalysis?.structure?.sections ? (
                     <div className="pl-4 text-sm text-gray-600">
+                      <div className="text-xs text-gray-500 mb-1">Sections identifiées:</div>
                       {aiAnalysis.structure.sections.map((section: string, index: number) => (
-                        <div key={index} className="mb-1">{section}</div>
+                        <div key={index} className="mb-1 bg-gray-50 px-2 py-1 rounded text-xs">
+                          {section}
+                        </div>
                       ))}
                     </div>
                   ) : siteStructure?.children && siteStructure.children[0]?.children ? (
@@ -215,9 +223,9 @@ const StructureSection: React.FC<StructureSectionProps> = ({
                       </div>
                     </div>
                     <div className="bg-gray-50 p-3 rounded-md">
-                      <div className="text-xs text-gray-500">Profondeur</div>
+                      <div className="text-xs text-gray-500">Mots-clés</div>
                       <div className="text-lg font-semibold text-gray-800">
-                        {siteStructure?.depth || 1} niveau
+                        {keywords.length}
                       </div>
                     </div>
                   </div>

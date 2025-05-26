@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { CrawlForm } from "@/components/CrawlForm";
 import StructureSection from '@/components/seo/StructureSection';
 import HierarchySection from '@/components/seo/HierarchySection';
 import { FirecrawlService } from '@/utils/FirecrawlService';
@@ -13,11 +12,9 @@ import { analyzeHeadings } from '@/utils/seo/headingAnalyzer';
 import { analyzePageStructure, extractQuestionsFromContent } from '@/utils/seo/semanticAnalyzer';
 import { OpenAIService } from '@/utils/openaiService';
 import { toast } from 'sonner';
-import SiteStructureVisualizer from '@/components/SiteStructureVisualizer';
-import SeoStructure from '@/components/seo/SeoStructure';
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import StructureKeywordsSection from '@/components/seo/StructureKeywordsSection';
 import RoiAnalyticsSection from '@/components/seo/RoiAnalyticsSection';
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const StructurePage = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -66,12 +63,15 @@ const StructurePage = () => {
         // Traitement des données
         const parser = new DOMParser();
         let doc;
+        let textContent = '';
         setProgress(70);
         
         if (typeof result.data.sourceCode === 'string') {
           doc = parser.parseFromString(result.data.sourceCode, 'text/html');
+          textContent = result.data.textContent || doc.body?.textContent || '';
         } else if (result.data[0] && typeof result.data[0].sourceCode === 'string') {
           doc = parser.parseFromString(result.data[0].sourceCode, 'text/html');
+          textContent = result.data[0].textContent || doc.body?.textContent || '';
         } else {
           throw new Error("Format de données invalide");
         }
@@ -87,50 +87,26 @@ const StructurePage = () => {
         setProgress(80);
         
         // Extraire les questions du contenu
-        const textContent = result.data.textContent || 
-          (doc.body ? doc.body.textContent || '' : '');
-        
         const extractedQuestions = extractQuestionsFromContent(textContent);
         setQuestions(extractedQuestions);
-        
-        // Analyse intelligente avec OpenAI si disponible
-        let aiAnalysis = null;
-        try {
-          const hasOpenAIKey = localStorage.getItem('openaiKey');
-          if (hasOpenAIKey && textContent) {
-            aiAnalysis = await OpenAIService.analyzeWebsiteStructure(textContent, formattedUrl);
-            console.log("AI analysis result:", aiAnalysis);
-          }
-        } catch (aiError) {
-          console.log('Analyse IA non disponible:', aiError);
-        }
         
         // Générer la structure du site basée sur le contenu réel
         const domain = formattedUrl.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
         const title = doc.querySelector('title')?.textContent || domain;
         
-        // Utiliser l'analyse IA si disponible, sinon analyser le DOM
-        let sections: string[] = [];
-        let pageTitle = title;
+        // Analyser les liens de navigation pour déduire la structure
+        const navLinks = doc.querySelectorAll('nav a, header a, .menu a, .navigation a');
+        const menuItems = Array.from(navLinks)
+          .map(link => (link as HTMLAnchorElement).textContent?.trim())
+          .filter(text => text && text.length > 1 && text.length < 50)
+          .slice(0, 8);
         
-        if (aiAnalysis && aiAnalysis.structure && aiAnalysis.structure.sections) {
-          sections = aiAnalysis.structure.sections;
-          pageTitle = aiAnalysis.structure.mainTopic || title;
-        } else {
-          // Analyser les liens de navigation pour déduire la structure
-          const navLinks = doc.querySelectorAll('nav a, header a, .menu a, .navigation a');
-          const menuItems = Array.from(navLinks)
-            .map(link => (link as HTMLAnchorElement).textContent?.trim())
-            .filter(text => text && text.length > 1 && text.length < 50)
-            .slice(0, 8);
-          
-          sections = menuItems.length > 0 ? menuItems : ["Accueil", "À propos", "Services", "Contact"];
-        }
+        const sections = menuItems.length > 0 ? menuItems : ["Accueil", "À propos", "Services", "Contact"];
         
         const siteStructureData = {
-          name: pageTitle,
+          name: title,
           url: formattedUrl,
-          textContent, // Ajouter le contenu textuel pour l'analyse IA
+          textContent, // Important: inclure le contenu textuel pour l'analyse IA
           children: [
             {
               name: "Page d'accueil",
@@ -158,7 +134,9 @@ const StructurePage = () => {
           ]
         };
         
-        // Extract keywords from text content
+        console.log("Site structure created with textContent:", !!textContent);
+        
+        // Extract keywords from text content pour analyse de base
         const words = textContent.toLowerCase().split(/\s+/).filter(w => w.length > 3);
         const wordFrequency: Record<string, number> = {};
         
@@ -167,13 +145,7 @@ const StructurePage = () => {
           wordFrequency[word] = (wordFrequency[word] || 0) + 1;
         }
         
-        // Utiliser les mots-clés de l'IA si disponibles
-        const keywords = aiAnalysis?.keywords?.map((keyword: string) => ({
-          keyword,
-          volume: Math.floor(Math.random() * 500) + 100,
-          cpc: Math.random() * 2 + 0.5,
-          difficulty: Math.floor(Math.random() * 100)
-        })) || Object.entries(wordFrequency)
+        const keywords = Object.entries(wordFrequency)
           .filter(([_, count]) => count > 2)
           .sort((a, b) => b[1] - a[1])
           .slice(0, 15)
@@ -183,19 +155,6 @@ const StructurePage = () => {
             cpc: Math.random() * 2 + 0.5,
             difficulty: Math.floor(Math.random() * 100)
           }));
-        
-        // Extract phrases
-        const phrases: Record<string, number> = {};
-        for (let i = 0; i < words.length - 2; i++) {
-          const phrase = words.slice(i, i + 3).join(' ');
-          phrases[phrase] = (phrases[phrase] || 0) + 1;
-        }
-        
-        const topPhrases = Object.entries(phrases)
-          .filter(([_, count]) => count > 1)
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 10)
-          .map(([phrase, count]) => ({ phrase, count }));
         
         // Ajouter des données d'analyse
         const analysisResult = {
@@ -208,9 +167,7 @@ const StructurePage = () => {
           hierarchy: headingStructure.hierarchy || [],
           headings: headingStructure.headings || [],
           keywords,
-          phrases: topPhrases,
-          questions: aiAnalysis?.recommendations || extractedQuestions,
-          aiAnalysis // Inclure l'analyse IA complète
+          questions: extractedQuestions
         };
         
         setProgress(90);
@@ -220,7 +177,7 @@ const StructurePage = () => {
         setProgress(100);
         
         toast.success("Analyse terminée avec succès", {
-          description: aiAnalysis ? "Analyse IA incluse" : "Analyse de base terminée"
+          description: "Analyse IA automatique en cours..."
         });
       } else {
         throw new Error(result.error || "Échec de l'analyse du site");
@@ -331,8 +288,8 @@ const StructurePage = () => {
         {seoAnalysis && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <HierarchySection 
-              headings={seoAnalysis.headings || []} 
-              hierarchy={seoAnalysis.hierarchy || []}
+              isLoading={isLoading}
+              seoAnalysis={seoAnalysis}
             />
             
             <RoiAnalyticsSection 
