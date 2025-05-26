@@ -8,7 +8,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Link2, Network, Info, Key, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import InternalLinkAnalyzer from '@/components/seo/InternalLinkAnalyzer';
-import { FirecrawlService } from '@/utils/FirecrawlService';
 import { analyzeInternalLinks } from '@/utils/seo/internal-link';
 import { PageLinkMetric, OrphanPage, InternalLinkRecommendation, LinkSuggestion } from '@/types/seo/InternalLinks';
 
@@ -46,43 +45,45 @@ const InternalLinkingPage = () => {
       // Valider l'URL
       new URL(formattedUrl);
       
-      // Activer le proxy pour éviter les problèmes CORS
-      FirecrawlService.enableProxy();
+      console.log("Starting internal link analysis for:", formattedUrl);
       
-      // Analyser le site avec Firecrawl
-      const result = await FirecrawlService.crawlWebsite(formattedUrl, true);
-      
-      if (result.success && result.data) {
-        let htmlContent = '';
-        
-        // Extraire le contenu HTML
-        if (result.data.sourceCode) {
-          htmlContent = result.data.sourceCode;
-        } else if (Array.isArray(result.data) && result.data[0] && result.data[0].sourceCode) {
-          htmlContent = result.data[0].sourceCode;
-        } else {
-          throw new Error("Aucun contenu HTML trouvé");
+      // Utiliser fetch direct avec proxy pour récupérer le HTML
+      const proxyUrl = 'https://api.allorigins.win/raw?url=';
+      const response = await fetch(proxyUrl + encodeURIComponent(formattedUrl), {
+        method: 'GET',
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         }
-        
-        // Analyser les liens internes
-        const analysis = analyzeInternalLinks(htmlContent, formattedUrl);
-        
-        setAnalysisData({
-          pages: analysis.pageMetrics || [],
-          orphanedPages: analysis.orphanPages || [],
-          totalLinks: analysis.totalLinks || 0,
-          averageDepth: analysis.linkDepth?.averageDepth || 0,
-          depthDistribution: analysis.linkDepth?.depthDistribution || {},
-          recommendations: analysis.recommendations || [],
-          linkSuggestions: analysis.linkSuggestions || []
-        });
-        
-        toast.success("Analyse terminée avec succès", {
-          description: `${analysis.pageMetrics?.length || 0} pages analysées, ${analysis.linkSuggestions?.length || 0} suggestions de liens`
-        });
-      } else {
-        throw new Error(result.error || "Échec de l'analyse du site");
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
       }
+      
+      const htmlContent = await response.text();
+      console.log("HTML content retrieved, length:", htmlContent.length);
+      
+      if (!htmlContent || htmlContent.length < 100) {
+        throw new Error("Contenu HTML insuffisant ou invalide");
+      }
+      
+      // Analyser les liens internes avec le contenu HTML récupéré
+      const analysis = analyzeInternalLinks(htmlContent, formattedUrl);
+      console.log("Internal link analysis result:", analysis);
+      
+      setAnalysisData({
+        pages: analysis.pageMetrics || [],
+        orphanedPages: analysis.orphanPages || [],
+        totalLinks: analysis.totalLinks || 0,
+        averageDepth: analysis.linkDepth?.averageDepth || 0,
+        depthDistribution: analysis.linkDepth?.depthDistribution || {},
+        recommendations: analysis.recommendations || [],
+        linkSuggestions: analysis.linkSuggestions || []
+      });
+      
+      toast.success("Analyse terminée avec succès", {
+        description: `${analysis.pageMetrics?.length || 0} pages analysées, ${analysis.linkSuggestions?.length || 0} suggestions de liens`
+      });
     } catch (error) {
       console.error("Erreur lors de l'analyse:", error);
       toast.error("Une erreur est survenue lors de l'analyse", {
@@ -192,41 +193,16 @@ const InternalLinkingPage = () => {
                         </Button>
                       </div>
                       <p className="text-xs text-gray-500 mt-1">
-                        Une clé API est nécessaire pour l'analyse complète. La clé est stockée uniquement dans votre navigateur.
+                        Une clé API est optionnelle pour l'analyse de base. La clé est stockée uniquement dans votre navigateur.
                       </p>
                     </div>
                     
                     <Alert className="bg-amber-50 border-amber-200">
                       <AlertDescription className="text-amber-700 text-sm">
-                        L'analyse des liens internes nécessite un accès à votre site web.
-                        Assurez-vous que votre site est accessible publiquement ou que vous avez autorisé notre crawler.
+                        L'analyse des liens internes fonctionne directement avec l'URL de votre site.
+                        Aucune configuration supplémentaire n'est requise.
                       </AlertDescription>
                     </Alert>
-
-                    <div className="mt-4">
-                      <h3 className="text-sm font-medium mb-2">Options d'analyse</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="p-4 bg-gray-50 rounded-lg">
-                          <h4 className="text-sm font-medium mb-2">Profondeur d'analyse</h4>
-                          <select className="w-full p-2 border border-gray-300 rounded">
-                            <option value="3">3 niveaux (Rapide)</option>
-                            <option value="5">5 niveaux (Standard)</option>
-                            <option value="0">Site entier (Approfondi)</option>
-                          </select>
-                          <p className="text-xs text-gray-500 mt-1">
-                            Définit la profondeur maximale de l'analyse des liens.
-                          </p>
-                        </div>
-                        
-                        <div className="p-4 bg-gray-50 rounded-lg">
-                          <h4 className="text-sm font-medium mb-2">Exclusions</h4>
-                          <Input placeholder="/admin/*, /wp-login.php" className="mb-2" />
-                          <p className="text-xs text-gray-500">
-                            Pages à exclure de l'analyse (séparées par des virgules).
-                          </p>
-                        </div>
-                      </div>
-                    </div>
                   </div>
                 </TabsContent>
 
