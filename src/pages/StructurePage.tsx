@@ -60,21 +60,61 @@ const StructurePage = () => {
       setProgress(60);
       
       if (result.success && result.data) {
-        // Traitement des données
-        const parser = new DOMParser();
-        let doc;
+        let doc: Document;
         let textContent = '';
-        setProgress(70);
+        let title = '';
+        let description = '';
         
-        if (typeof result.data.sourceCode === 'string') {
-          doc = parser.parseFromString(result.data.sourceCode, 'text/html');
-          textContent = result.data.textContent || doc.body?.textContent || '';
-        } else if (result.data[0] && typeof result.data[0].sourceCode === 'string') {
-          doc = parser.parseFromString(result.data[0].sourceCode, 'text/html');
-          textContent = result.data[0].textContent || doc.body?.textContent || '';
-        } else {
-          throw new Error("Format de données invalide");
+        try {
+          // Traitement des données - gérer différents formats
+          const parser = new DOMParser();
+          
+          // Cas 1: result.data contient directement les données
+          if (result.data.sourceCode) {
+            console.log("Format 1: sourceCode direct");
+            doc = parser.parseFromString(result.data.sourceCode, 'text/html');
+            textContent = result.data.textContent || doc.body?.textContent || '';
+            title = result.data.title || doc.querySelector('title')?.textContent || '';
+            description = result.data.description || doc.querySelector('meta[name="description"]')?.getAttribute('content') || '';
+          }
+          // Cas 2: result.data est un tableau avec les données
+          else if (Array.isArray(result.data) && result.data[0] && result.data[0].sourceCode) {
+            console.log("Format 2: tableau avec sourceCode");
+            doc = parser.parseFromString(result.data[0].sourceCode, 'text/html');
+            textContent = result.data[0].textContent || doc.body?.textContent || '';
+            title = result.data[0].title || doc.querySelector('title')?.textContent || '';
+            description = result.data[0].description || doc.querySelector('meta[name="description"]')?.getAttribute('content') || '';
+          }
+          // Cas 3: result.data contient directement title, description, etc.
+          else if (result.data.title || result.data.textContent) {
+            console.log("Format 3: données directes sans sourceCode");
+            title = result.data.title || '';
+            description = result.data.description || '';
+            textContent = result.data.textContent || '';
+            
+            // Créer un document fictif pour les analyses
+            doc = parser.parseFromString(`
+              <html>
+                <head>
+                  <title>${title}</title>
+                  <meta name="description" content="${description}">
+                </head>
+                <body>${textContent}</body>
+              </html>
+            `, 'text/html');
+          }
+          else {
+            throw new Error("Format de données non reconnu");
+          }
+          
+          console.log("Données extraites:", { title, description, textContentLength: textContent.length });
+          
+        } catch (parseError) {
+          console.error("Erreur lors du parsing:", parseError);
+          throw new Error("Impossible de traiter les données reçues");
         }
+        
+        setProgress(70);
         
         // Analyse des titres et structure
         const headingStructure = analyzeHeadings(doc);
@@ -92,7 +132,7 @@ const StructurePage = () => {
         
         // Générer la structure du site basée sur le contenu réel
         const domain = formattedUrl.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
-        const title = doc.querySelector('title')?.textContent || domain;
+        const siteTitle = title || domain;
         
         // Analyser les liens de navigation pour déduire la structure
         const navLinks = doc.querySelectorAll('nav a, header a, .menu a, .navigation a');
@@ -104,7 +144,7 @@ const StructurePage = () => {
         const sections = menuItems.length > 0 ? menuItems : ["Accueil", "À propos", "Services", "Contact"];
         
         const siteStructureData = {
-          name: title,
+          name: siteTitle,
           url: formattedUrl,
           textContent, // Important: inclure le contenu textuel pour l'analyse IA
           children: [
@@ -141,7 +181,7 @@ const StructurePage = () => {
         const wordFrequency: Record<string, number> = {};
         
         for (const word of words) {
-          if (!/^[a-z]+$/i.test(word)) continue; // Skip non-alphabetical words
+          if (!/^[a-zA-ZÀ-ÿ]+$/i.test(word)) continue; // Skip non-alphabetical words
           wordFrequency[word] = (wordFrequency[word] || 0) + 1;
         }
         
