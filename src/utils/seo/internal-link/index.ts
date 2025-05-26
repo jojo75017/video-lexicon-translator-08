@@ -1,11 +1,12 @@
 
-// Point d’entrée unique pour l’analyse des liens internes
+// Point d'entrée unique pour l'analyse des liens internes
 
-import type { InternalLinkAnalysis } from "@/types/seo";
+import type { InternalLinkAnalysis } from "@/types/seo/InternalLinks";
 import { countLinksByContainer, calculateAverageDepth } from "./helper-functions";
 import { processPageMetrics, calculateDepthDistribution, findOrphanedPages } from "./page-metrics";
 import { detectPotentialSilos } from "./silo-detector";
 import { generateRecommendations } from "./recommendations";
+import { generateLinkSuggestions } from "./linkSuggestionGenerator";
 import { createEmptyAnalysis } from "./empty-analysis";
 import { PageData } from "./types";
 
@@ -112,7 +113,7 @@ export function analyzeInternalLinks(htmlContent: string, url: string): Internal
       }
     });
     
-    // Process page metrics (rendu au format PageLinkMetric, pas PageData)
+    // Process page metrics
     const pageMetrics = processPageMetrics(pageMap);
 
     // Calculate depth distribution
@@ -129,6 +130,9 @@ export function analyzeInternalLinks(htmlContent: string, url: string): Internal
       contentLinks, 
       internalLinks.length
     );
+
+    // Generate link suggestions
+    const linkSuggestions = generateLinkSuggestions(pageMetrics, url);
 
     // Detect silo pages
     const potentialSilos = detectPotentialSilos(pageMetrics);
@@ -152,7 +156,8 @@ export function analyzeInternalLinks(htmlContent: string, url: string): Internal
       pageMetrics,
       siloPagesFound: potentialSilos.length > 0,
       siloStructure: potentialSilos,
-      recommendations
+      recommendations,
+      linkSuggestions
     };
   } catch (error) {
     console.error("Error analyzing internal links:", error);
@@ -165,5 +170,6 @@ export * from "./helper-functions";
 export * from "./page-metrics";
 export * from "./silo-detector";
 export * from "./recommendations";
+export * from "./linkSuggestionGenerator";
 export * from "./empty-analysis";
 export * from "./types";

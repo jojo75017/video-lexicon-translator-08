@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"; 
 import { Badge } from "@/components/ui/badge";
@@ -7,7 +6,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { ArrowUpRight, Link2, Link2Off, Network, BarChart3, FilePlus, AlertTriangle, CheckCircle2, ArrowRight, Target, Layers } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { PageLinkMetric, OrphanPage, InternalLinkRecommendation } from '@/types/seo/InternalLinks';
+import { PageLinkMetric, OrphanPage, InternalLinkRecommendation, LinkSuggestion } from '@/types/seo/InternalLinks';
+import LinkSuggestionsSection from './LinkSuggestionsSection';
 
 interface InternalLinkAnalyzerProps {
   pages?: PageLinkMetric[];
@@ -18,6 +18,7 @@ interface InternalLinkAnalyzerProps {
   averageDepth?: number;
   depthDistribution?: Record<string, number>;
   recommendations?: InternalLinkRecommendation[];
+  linkSuggestions?: LinkSuggestion[];
 }
 
 const InternalLinkAnalyzer: React.FC<InternalLinkAnalyzerProps> = ({
@@ -28,7 +29,8 @@ const InternalLinkAnalyzer: React.FC<InternalLinkAnalyzerProps> = ({
   averageOutgoing = 0,
   averageDepth = 0,
   depthDistribution = {},
-  recommendations = []
+  recommendations = [],
+  linkSuggestions = []
 }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [metrics, setMetrics] = useState({
@@ -197,9 +199,10 @@ const InternalLinkAnalyzer: React.FC<InternalLinkAnalyzerProps> = ({
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-3 mb-6">
+          <TabsList className="grid grid-cols-4 mb-6">
             <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
             <TabsTrigger value="pages">Pages clés</TabsTrigger>
+            <TabsTrigger value="suggestions">Suggestions de liens</TabsTrigger>
             <TabsTrigger value="recommendations">Recommandations</TabsTrigger>
           </TabsList>
           
@@ -401,6 +404,13 @@ const InternalLinkAnalyzer: React.FC<InternalLinkAnalyzerProps> = ({
                 </div>
               )}
             </div>
+          </TabsContent>
+          
+          <TabsContent value="suggestions" className="space-y-6">
+            <LinkSuggestionsSection 
+              suggestions={linkSuggestions} 
+              siteUrl={siteUrl}
+            />
           </TabsContent>
           
           <TabsContent value="recommendations" className="space-y-4">

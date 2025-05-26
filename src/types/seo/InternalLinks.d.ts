@@ -20,6 +20,20 @@ export interface InternalLinkAnalysis {
   siloPagesFound?: boolean;
   siloStructure?: SiloStructure[];
   averageDepth?: number;
+  linkSuggestions?: LinkSuggestion[];
+}
+
+export interface LinkSuggestion {
+  sourceUrl: string;
+  sourceTitle: string;
+  targetUrl: string;
+  targetTitle: string;
+  anchorText: string;
+  reason: string;
+  priority: "high" | "medium" | "low";
+  contextualRelevance: number;
+  seoValue: number;
+  placement: "header" | "content" | "sidebar" | "footer";
 }
 
 export interface InternalLinkRecommendation {
@@ -30,6 +44,8 @@ export interface InternalLinkRecommendation {
   priority: "high" | "medium" | "low";
   description?: string;
   impact?: string | number;
+  anchorText?: string;
+  placement?: string;
 }
 
 export interface PageLinkMetric {

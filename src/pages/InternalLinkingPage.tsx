@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import UnifiedDashboard from '@/components/dashboard/UnifiedDashboard';
 import { Card } from '@/components/ui/card';
@@ -9,7 +8,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Link2, Network, Info, Key, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import InternalLinkAnalyzer from '@/components/seo/InternalLinkAnalyzer';
-import { PageLinkMetric, OrphanPage, InternalLinkRecommendation } from '@/types/seo/InternalLinks';
+import { FirecrawlService } from '@/utils/FirecrawlService';
+import { analyzeInternalLinks } from '@/utils/seo/internal-link';
+import { PageLinkMetric, OrphanPage, InternalLinkRecommendation, LinkSuggestion } from '@/types/seo/InternalLinks';
 
 const InternalLinkingPage = () => {
   const [siteUrl, setSiteUrl] = useState<string>('');
@@ -23,6 +24,7 @@ const InternalLinkingPage = () => {
     averageDepth: number;
     depthDistribution: Record<string, number>;
     recommendations: InternalLinkRecommendation[];
+    linkSuggestions: LinkSuggestion[];
   } | null>(null);
 
   const handleAnalyze = async () => {
@@ -31,95 +33,61 @@ const InternalLinkingPage = () => {
       return;
     }
 
+    // Format URL if needed
+    let formattedUrl = siteUrl;
+    if (!siteUrl.startsWith('http://') && !siteUrl.startsWith('https://')) {
+      formattedUrl = 'https://' + siteUrl;
+    }
+
     setIsAnalyzing(true);
     toast.info("Analyse du maillage interne en cours...");
     
-    // For demonstration, we're using mock data
-    // In production, this would be a real API call
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Valider l'URL
+      new URL(formattedUrl);
       
-      // Generate more comprehensive mock data
-      const mockData = {
-        pages: [
-          { url: `${siteUrl}/`, title: "Page d'accueil", incomingLinks: 15, outgoingLinks: 24, depth: 0, importance: 100 },
-          { url: `${siteUrl}/about`, title: "À propos", incomingLinks: 8, outgoingLinks: 6, depth: 1, importance: 75 },
-          { url: `${siteUrl}/services`, title: "Services", incomingLinks: 10, outgoingLinks: 12, depth: 1, importance: 80 },
-          { url: `${siteUrl}/blog`, title: "Blog", incomingLinks: 12, outgoingLinks: 35, depth: 1, importance: 85 },
-          { url: `${siteUrl}/contact`, title: "Contact", incomingLinks: 7, outgoingLinks: 2, depth: 1, importance: 60 },
-          { url: `${siteUrl}/blog/post-1`, title: "Article de Blog 1", incomingLinks: 3, outgoingLinks: 8, depth: 2, importance: 50 },
-          { url: `${siteUrl}/blog/post-2`, title: "Article de Blog 2", incomingLinks: 2, outgoingLinks: 7, depth: 2, importance: 45 },
-          { url: `${siteUrl}/services/service-1`, title: "Service 1", incomingLinks: 3, outgoingLinks: 4, depth: 2, importance: 55 },
-          { url: `${siteUrl}/blog/post-3`, title: "Article de Blog 3", incomingLinks: 1, outgoingLinks: 5, depth: 3, importance: 35 },
-          { url: `${siteUrl}/blog/post-4`, title: "Article de Blog 4", incomingLinks: 1, outgoingLinks: 4, depth: 3, importance: 30 },
-          { url: `${siteUrl}/services/service-2`, title: "Service 2", incomingLinks: 2, outgoingLinks: 2, depth: 2, importance: 40 }
-        ],
-        orphanedPages: [
-          { url: `${siteUrl}/old-page`, title: "Ancienne Page", suggestions: [`${siteUrl}/about`, `${siteUrl}/blog`] },
-          { url: `${siteUrl}/resources/download`, title: "Téléchargements", suggestions: [`${siteUrl}/services`, `${siteUrl}/blog`] },
-          { url: `${siteUrl}/faq`, title: "Questions fréquentes", suggestions: [`${siteUrl}/services/service-1`, `${siteUrl}/contact`] }
-        ],
-        recommendations: [
-          {
-            type: 'add',
-            priority: 'high',
-            source: `${siteUrl}/blog`,
-            target: `${siteUrl}/old-page`,
-            description: `Ajouter un lien depuis "Blog" vers la page orpheline "Ancienne Page"`,
-            reason: "Cette page orpheline ne peut pas être indexée car aucune page ne pointe vers elle."
-          },
-          {
-            type: 'add',
-            priority: 'high',
-            source: `${siteUrl}/services`,
-            target: `${siteUrl}/resources/download`,
-            description: `Ajouter un lien depuis "Services" vers la page orpheline "Téléchargements"`,
-            reason: "Cette page contient des ressources importantes mais n'est pas accessible."
-          },
-          {
-            type: 'modify',
-            priority: 'medium',
-            source: `${siteUrl}/`,
-            target: `${siteUrl}/blog/post-3`,
-            description: `Améliorer l'accessibilité de "Article de Blog 3"`,
-            reason: `Cette page est profondément enfouie (niveau 3). Ajoutez un lien direct depuis la page d'accueil.`
-          },
-          {
-            type: 'content',
-            priority: 'medium',
-            source: `${siteUrl}/blog/post-1`,
-            target: `${siteUrl}/blog/post-2`,
-            description: `Ajouter des liens contextuels depuis "Article de Blog 1" vers "Article de Blog 2"`,
-            reason: "Ces articles sont thématiquement liés et gagneraient à être interconnectés."
-          },
-          {
-            type: 'content',
-            priority: 'medium',
-            source: `${siteUrl}/services/service-1`,
-            target: `${siteUrl}/services/service-2`,
-            description: `Ajouter des liens contextuels depuis "Service 1" vers "Service 2"`,
-            reason: "Ces services sont complémentaires et devraient être interconnectés."
-          },
-          {
-            type: 'pillar',
-            priority: 'low',
-            source: `${siteUrl}/blog`,
-            target: '',
-            description: `Utilisez "Blog" comme contenu pilier pour votre stratégie éditoriale`,
-            reason: "Cette page a une autorité élevée et pourrait servir de contenu pilier pour structurer votre maillage thématique."
-          }
-        ],
-        totalLinks: 109,
-        averageDepth: 1.55,
-        depthDistribution: { "0": 1, "1": 4, "2": 4, "3": 2 }
-      };
+      // Activer le proxy pour éviter les problèmes CORS
+      FirecrawlService.enableProxy();
       
-      setAnalysisData(mockData);
-      toast.success("Analyse terminée avec succès");
+      // Analyser le site avec Firecrawl
+      const result = await FirecrawlService.crawlWebsite(formattedUrl, true);
+      
+      if (result.success && result.data) {
+        let htmlContent = '';
+        
+        // Extraire le contenu HTML
+        if (result.data.sourceCode) {
+          htmlContent = result.data.sourceCode;
+        } else if (Array.isArray(result.data) && result.data[0] && result.data[0].sourceCode) {
+          htmlContent = result.data[0].sourceCode;
+        } else {
+          throw new Error("Aucun contenu HTML trouvé");
+        }
+        
+        // Analyser les liens internes
+        const analysis = analyzeInternalLinks(htmlContent, formattedUrl);
+        
+        setAnalysisData({
+          pages: analysis.pageMetrics || [],
+          orphanedPages: analysis.orphanPages || [],
+          totalLinks: analysis.totalLinks || 0,
+          averageDepth: analysis.linkDepth?.averageDepth || 0,
+          depthDistribution: analysis.linkDepth?.depthDistribution || {},
+          recommendations: analysis.recommendations || [],
+          linkSuggestions: analysis.linkSuggestions || []
+        });
+        
+        toast.success("Analyse terminée avec succès", {
+          description: `${analysis.pageMetrics?.length || 0} pages analysées, ${analysis.linkSuggestions?.length || 0} suggestions de liens`
+        });
+      } else {
+        throw new Error(result.error || "Échec de l'analyse du site");
+      }
     } catch (error) {
       console.error("Erreur lors de l'analyse:", error);
-      toast.error("Une erreur est survenue lors de l'analyse");
+      toast.error("Une erreur est survenue lors de l'analyse", {
+        description: error instanceof Error ? error.message : "Erreur inconnue"
+      });
     } finally {
       setIsAnalyzing(false);
     }
@@ -149,7 +117,7 @@ const InternalLinkingPage = () => {
               <Info className="h-4 w-4 text-blue-600" />
               <AlertTitle>Optimisez votre maillage interne</AlertTitle>
               <AlertDescription>
-                Analysez et améliorez la structure des liens internes de votre site pour renforcer votre référencement.
+                Analysez et obtenez des suggestions concrètes de liens à ajouter dans vos articles pour améliorer votre référencement.
               </AlertDescription>
             </Alert>
             
@@ -189,7 +157,7 @@ const InternalLinkingPage = () => {
                       <Network className="h-16 w-16 text-gray-400 mx-auto mb-4" />
                       <h3 className="text-lg font-medium text-gray-700 mb-2">Entrez l'URL de votre site pour lancer l'analyse</h3>
                       <p className="text-gray-600">
-                        L'outil analysera la structure de liens internes et vous fournira des recommandations d'optimisation.
+                        L'outil analysera la structure de liens internes et vous fournira des suggestions concrètes de liens à ajouter dans vos articles.
                       </p>
                     </div>
                   )}
@@ -340,6 +308,7 @@ const InternalLinkingPage = () => {
               depthDistribution={analysisData.depthDistribution}
               siteUrl={siteUrl}
               recommendations={analysisData.recommendations}
+              linkSuggestions={analysisData.linkSuggestions}
             />
           </div>
         )}
