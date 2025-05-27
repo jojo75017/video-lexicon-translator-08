@@ -1,93 +1,71 @@
 
 import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { KeywordSuggestion, KeywordIntent } from '@/types/seo';
-import { MessageSquare, Search, Link2 } from 'lucide-react';
+import { KeywordSuggestion } from "@/types/seo/Keyword";
+import { Info, Target, Search, ShoppingCart } from 'lucide-react';
 
 interface KeywordGroupsProps {
-  byIntent: KeywordIntent;
+  keywords: KeywordSuggestion[];
 }
 
-const KeywordGroups: React.FC<KeywordGroupsProps> = ({ byIntent }) => {
-  const getDifficultyColor = (difficulty: number) => {
-    if (difficulty < 30) return "bg-green-100 text-green-800 border-green-200";
-    if (difficulty < 60) return "bg-yellow-100 text-yellow-800 border-yellow-200";
-    return "bg-red-100 text-red-800 border-red-200";
+const KeywordGroups: React.FC<KeywordGroupsProps> = ({ keywords }) => {
+  const groupKeywordsByIntent = (keywords: KeywordSuggestion[]) => {
+    return {
+      informational: keywords.filter(k => k.intent === 'informational'),
+      transactional: keywords.filter(k => k.intent === 'transactional'),
+      navigational: keywords.filter(k => k.intent === 'navigational'),
+      commercial: keywords.filter(k => k.intent === 'commercial')
+    };
   };
-  
-  const getDifficultyLabel = (difficulty: number) => {
-    if (difficulty < 30) return "Facile";
-    if (difficulty < 60) return "Moyen";
-    return "Difficile";
+
+  const grouped = groupKeywordsByIntent(keywords);
+
+  const getIntentIcon = (intent: string) => {
+    switch (intent) {
+      case 'informational': return <Info className="h-4 w-4" />;
+      case 'transactional': return <ShoppingCart className="h-4 w-4" />;
+      case 'navigational': return <Search className="h-4 w-4" />;
+      case 'commercial': return <Target className="h-4 w-4" />;
+      default: return <Info className="h-4 w-4" />;
+    }
+  };
+
+  const getIntentColor = (intent: string) => {
+    switch (intent) {
+      case 'informational': return 'bg-blue-100 text-blue-800';
+      case 'transactional': return 'bg-green-100 text-green-800';
+      case 'navigational': return 'bg-purple-100 text-purple-800';
+      case 'commercial': return 'bg-orange-100 text-orange-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
   };
 
   return (
-    <div className="grid gap-6 md:grid-cols-3">
-      <div>
-        <div className="flex items-center gap-2 mb-3">
-          <div className="bg-blue-100 text-blue-800 p-1 rounded">
-            <MessageSquare className="h-4 w-4" />
-          </div>
-          <h3 className="text-md font-medium">Informationnelle</h3>
-        </div>
-        <div className="space-y-2">
-          {byIntent.informational.map((kw, index) => (
-            <div key={index} className="p-3 bg-blue-50 rounded-md border border-blue-100">
-              <p className="font-medium text-blue-800">{kw.keyword}</p>
-              <div className="flex justify-between mt-2 text-sm text-blue-600">
-                <span>{(kw.volume || kw.searchVolume || 0).toLocaleString()}</span>
-                <Badge variant="outline" className={getDifficultyColor(kw.difficulty)}>
-                  {getDifficultyLabel(kw.difficulty)}
+    <div className="space-y-4">
+      {Object.entries(grouped).map(([intent, intentKeywords]) => (
+        <Card key={intent} className="p-4">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm flex items-center gap-2">
+              {getIntentIcon(intent)}
+              {intent.charAt(0).toUpperCase() + intent.slice(1)} ({intentKeywords.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="flex flex-wrap gap-2">
+              {intentKeywords.slice(0, 8).map((keyword, index) => (
+                <Badge 
+                  key={index} 
+                  className={getIntentColor(intent)}
+                  variant="secondary"
+                >
+                  {keyword.keyword}
                 </Badge>
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </div>
-      
-      <div>
-        <div className="flex items-center gap-2 mb-3">
-          <div className="bg-green-100 text-green-800 p-1 rounded">
-            <Search className="h-4 w-4" />
-          </div>
-          <h3 className="text-md font-medium">Transactionnelle</h3>
-        </div>
-        <div className="space-y-2">
-          {byIntent.transactional.map((kw, index) => (
-            <div key={index} className="p-3 bg-green-50 rounded-md border border-green-100">
-              <p className="font-medium text-green-800">{kw.keyword}</p>
-              <div className="flex justify-between mt-2 text-sm text-green-600">
-                <span>{(kw.volume || kw.searchVolume || 0).toLocaleString()}</span>
-                <Badge variant="outline" className={getDifficultyColor(kw.difficulty)}>
-                  {getDifficultyLabel(kw.difficulty)}
-                </Badge>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-      
-      <div>
-        <div className="flex items-center gap-2 mb-3">
-          <div className="bg-purple-100 text-purple-800 p-1 rounded">
-            <Link2 className="h-4 w-4" />
-          </div>
-          <h3 className="text-md font-medium">Navigationnelle</h3>
-        </div>
-        <div className="space-y-2">
-          {byIntent.navigational.map((kw, index) => (
-            <div key={index} className="p-3 bg-purple-50 rounded-md border border-purple-100">
-              <p className="font-medium text-purple-800">{kw.keyword}</p>
-              <div className="flex justify-between mt-2 text-sm text-purple-600">
-                <span>{(kw.volume || kw.searchVolume || 0).toLocaleString()}</span>
-                <Badge variant="outline" className={getDifficultyColor(kw.difficulty)}>
-                  {getDifficultyLabel(kw.difficulty)}
-                </Badge>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 };

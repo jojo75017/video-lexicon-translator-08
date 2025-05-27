@@ -1,110 +1,81 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { KeywordSuggestion } from '@/types/seo/Keyword';
-import { calculateOpportunityScore } from '@/utils/keyword/keywordAnalyzer';
-import {
-  Chart as ChartJS,
-  LinearScale,
-  PointElement,
-  Tooltip,
-  Legend,
-} from 'chart.js';
-import { Scatter } from 'react-chartjs-2';
-
-// Enregistrement des composants ChartJS nécessaires
-ChartJS.register(
-  LinearScale,
-  PointElement,
-  Tooltip,
-  Legend
-);
+import { Badge } from "@/components/ui/badge";
+import { KeywordSuggestion } from "@/types/seo/Keyword";
+import { Target, TrendingUp } from 'lucide-react';
 
 interface KeywordOpportunityChartProps {
   keywords: KeywordSuggestion[];
 }
 
 const KeywordOpportunityChart: React.FC<KeywordOpportunityChartProps> = ({ keywords }) => {
-  // Calculer l'opportunité pour chaque mot-clé s'il n'est pas déjà calculé
-  const keywordsWithOpportunity = keywords.map(keyword => ({
-    ...keyword,
-    opportunity: keyword.opportunity || calculateOpportunityScore(keyword)
-  }));
-
-  const chartData = {
-    datasets: [
-      {
-        label: 'Opportunités de mots-clés',
-        data: keywordsWithOpportunity.map(keyword => ({
-          x: keyword.difficulty || 50,
-          y: keyword.volume || 0,
-          r: (keyword.opportunity || 0) / 5 + 5, // Taille du point basée sur l'opportunité
-          keyword: keyword.keyword,
-          opportunity: keyword.opportunity || 0
-        })),
-        backgroundColor: keywordsWithOpportunity.map(keyword => {
-          const opp = keyword.opportunity || 0;
-          if (opp > 70) return 'rgba(52, 211, 153, 0.8)'; // vert pour les bonnes opportunités
-          if (opp > 40) return 'rgba(251, 191, 36, 0.8)'; // jaune pour les opportunités moyennes
-          return 'rgba(239, 68, 68, 0.8)'; // rouge pour les faibles opportunités
-        }),
-        borderColor: 'rgba(255, 255, 255, 0.6)',
-        borderWidth: 2,
-      },
-    ],
+  // Calculer le score d'opportunité pour chaque mot-clé
+  const calculateOpportunityScore = (keyword: KeywordSuggestion): number => {
+    const volume = keyword.volume || 0;
+    const difficulty = keyword.difficulty || 100;
+    const cpc = keyword.cpc || 0;
+    
+    // Score basé sur volume élevé, difficulté faible, et CPC élevé
+    return Math.round(((volume / 1000) + (100 - difficulty) + (cpc * 10)) / 3);
   };
 
-  const chartOptions = {
-    scales: {
-      x: {
-        title: {
-          display: true,
-          text: 'Difficulté',
-        },
-        min: 0,
-        max: 100,
-      },
-      y: {
-        title: {
-          display: true,
-          text: 'Volume de recherche',
-        },
-        min: 0,
-      }
-    },
-    plugins: {
-      tooltip: {
-        callbacks: {
-          label: (context: any) => {
-            const point = context.raw;
-            return [
-              `Mot-clé: ${point.keyword}`,
-              `Difficulté: ${point.x}`,
-              `Volume: ${point.y}`,
-              `Opportunité: ${point.opportunity}/100`
-            ];
-          }
-        }
-      },
-      legend: {
-        display: true
-      }
-    },
-    maintainAspectRatio: false
+  const opportunityKeywords = keywords
+    .map(keyword => ({
+      ...keyword,
+      opportunityScore: calculateOpportunityScore(keyword)
+    }))
+    .sort((a, b) => b.opportunityScore - a.opportunityScore)
+    .slice(0, 10);
+
+  const getScoreColor = (score: number) => {
+    if (score >= 70) return 'bg-green-100 text-green-800';
+    if (score >= 50) return 'bg-yellow-100 text-yellow-800';
+    return 'bg-red-100 text-red-800';
   };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Opportunités de mots-clés</CardTitle>
+        <CardTitle className="text-lg flex items-center gap-2">
+          <Target className="h-5 w-5 text-orange-600" />
+          Opportunités de mots-clés
+        </CardTitle>
+        <p className="text-sm text-gray-600">
+          Mots-clés avec le meilleur potentiel ROI
+        </p>
       </CardHeader>
       <CardContent>
-        <p className="text-sm text-gray-500 mb-4">
-          Ce graphique montre le potentiel des mots-clés en fonction de leur volume de recherche, 
-          leur difficulté et leur score d'opportunité (taille du cercle).
-        </p>
-        <div className="h-[400px]">
-          <Scatter data={chartData} options={chartOptions} />
+        <div className="space-y-3">
+          {opportunityKeywords.map((keyword, index) => (
+            <div 
+              key={index}
+              className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+            >
+              <div className="flex-1">
+                <div className="font-medium text-gray-900">{keyword.keyword}</div>
+                <div className="flex items-center gap-4 text-xs text-gray-500 mt-1">
+                  <span>Vol: {keyword.volume?.toLocaleString() || 0}</span>
+                  <span>Diff: {keyword.difficulty || 0}</span>
+                  <span>CPC: {keyword.cpc?.toFixed(2) || '0.00'}€</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge className={getScoreColor(keyword.opportunityScore)}>
+                  {keyword.opportunityScore}/100
+                </Badge>
+                <TrendingUp className="h-4 w-4 text-green-500" />
+              </div>
+            </div>
+          ))}
+          
+          {opportunityKeywords.length === 0 && (
+            <div className="text-center py-8 text-gray-500">
+              <Target className="h-12 w-12 mx-auto mb-2 text-gray-300" />
+              <p>Aucune opportunité détectée</p>
+              <p className="text-xs">Ajoutez des mots-clés pour voir les opportunités</p>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
