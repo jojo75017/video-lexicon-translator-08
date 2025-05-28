@@ -12,6 +12,10 @@ export interface CompetitorData {
   ranking: number;
   traffic: number;
   authority: number;
+  name: string;
+  url: string;
+  strength: number;
+  organic_traffic: number;
 }
 
 export interface SocialMetricsProps {
