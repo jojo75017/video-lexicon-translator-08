@@ -27,27 +27,6 @@ export interface AnalysisOptions {
   depth?: number;
 }
 
-export interface PerformanceData {
-  loadTime: number;
-  firstContentfulPaint: number;
-  largestContentfulPaint: number;
-  domLoadTime: number;
-  speedIndex: number;
-  timeToInteractive: number;
-  score: number;
-  resourceCount: number;
-  totalSize: number;
-  resourceBreakdown: {
-    js?: number;
-    css?: number;
-    images?: number;
-    fonts?: number;
-    other?: number;
-    scripts?: number;
-    styles?: number;
-  };
-}
-
 export interface PageStructure {
   title: string;
   headings: Array<{
@@ -71,4 +50,25 @@ export interface PageStructure {
     canonical?: string;
   };
   optimizationStatus?: string;
+}
+
+export interface PerformanceData {
+  loadTime: number;
+  firstContentfulPaint: number;
+  largestContentfulPaint: number;
+  domLoadTime: number;
+  speedIndex: number;
+  timeToInteractive: number;
+  score: number;
+  resourceCount: number;
+  totalSize: number;
+  resourceBreakdown: {
+    js?: number;
+    css?: number;
+    images?: number;
+    fonts?: number;
+    other?: number;
+    scripts?: number;
+    styles?: number;
+  };
 }

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -166,7 +167,7 @@ const ContentOpportunities: React.FC<ContentOpportunitiesProps> = ({ keywords })
                 <div className="grid grid-cols-3 gap-4 text-sm">
                   <div>
                     <span className="text-gray-500">Difficulté :</span>
-                    <Badge className={getDifficultyColor(idea.difficulty)} size="sm">
+                    <Badge className={getDifficultyColor(idea.difficulty)}>
                       {idea.difficulty}
                     </Badge>
                   </div>

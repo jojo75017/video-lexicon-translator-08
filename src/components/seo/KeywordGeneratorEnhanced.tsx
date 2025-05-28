@@ -11,7 +11,9 @@ import CompetitorKeywords from './keyword/CompetitorKeywords';
 import SearchVolumePredictor from './keyword/SearchVolumePredictor';
 import ContentOpportunities from './keyword/ContentOpportunities';
 import KeywordOpportunityChart from './keyword/KeywordOpportunityChart';
-import { Brain, TrendingUp, Users, FileText, Target, BarChart3 } from 'lucide-react';
+import InternalLinkSuggestions from './keyword/InternalLinkSuggestions';
+import SerpAnalysis from './keyword/SerpAnalysis';
+import { Brain, TrendingUp, Users, FileText, Target, BarChart3, Link, Search } from 'lucide-react';
 
 const KeywordGeneratorEnhanced: React.FC = () => {
   const [keyword, setKeyword] = useState('');
@@ -151,7 +153,7 @@ const KeywordGeneratorEnhanced: React.FC = () => {
       />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid grid-cols-3 md:grid-cols-6 gap-1">
+        <TabsList className="grid grid-cols-4 md:grid-cols-8 gap-1">
           <TabsTrigger value="generator" className="flex items-center gap-1">
             <Target className="h-4 w-4" />
             <span className="hidden sm:inline">Standard</span>
@@ -175,6 +177,14 @@ const KeywordGeneratorEnhanced: React.FC = () => {
           <TabsTrigger value="predictions" className="flex items-center gap-1">
             <BarChart3 className="h-4 w-4" />
             <span className="hidden sm:inline">Prédictions</span>
+          </TabsTrigger>
+          <TabsTrigger value="links" className="flex items-center gap-1">
+            <Link className="h-4 w-4" />
+            <span className="hidden sm:inline">Liens</span>
+          </TabsTrigger>
+          <TabsTrigger value="serp" className="flex items-center gap-1">
+            <Search className="h-4 w-4" />
+            <span className="hidden sm:inline">SERP</span>
           </TabsTrigger>
         </TabsList>
 
@@ -221,6 +231,14 @@ const KeywordGeneratorEnhanced: React.FC = () => {
 
         <TabsContent value="predictions" className="space-y-4">
           <SearchVolumePredictor keywords={allKeywords} />
+        </TabsContent>
+
+        <TabsContent value="links" className="space-y-4">
+          <InternalLinkSuggestions keywords={allKeywords} />
+        </TabsContent>
+
+        <TabsContent value="serp" className="space-y-4">
+          <SerpAnalysis keywords={allKeywords} />
         </TabsContent>
       </Tabs>
     </div>
