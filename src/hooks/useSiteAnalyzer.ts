@@ -1,8 +1,8 @@
 import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
-import { AnalysisOptions } from '@/types/seo';
+import { AnalysisOptions, PerformanceData, PageStructure } from '@/types/seo';
 
-interface AnalysisData {
+export interface AnalysisData {
   title: string;
   description: string;
   url: string;
@@ -21,6 +21,8 @@ interface AnalysisData {
     averagePosition: number;
     visibility: number;
   };
+  performance?: PerformanceData;
+  structure?: PageStructure;
 }
 
 const mockAnalysis: AnalysisData = {
@@ -82,6 +84,15 @@ export const useSiteAnalyzer = () => {
   const [progress, setProgress] = useState(0);
   const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [url, setUrl] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [showCorsWarning, setShowCorsWarning] = useState(false);
+  const [seoAnalysis, setSeoAnalysis] = useState<any>(null);
+
+  const handleActivateProxy = useCallback(() => {
+    setShowCorsWarning(false);
+    toast.success('Proxy activé');
+  }, []);
 
   const analyzeSite = useCallback(async (url: string, options: AnalysisOptions = {}) => {
     setIsAnalyzing(true);
@@ -130,5 +141,44 @@ export const useSiteAnalyzer = () => {
     analysisData,
     error,
     analyzeSite,
+    url,
+    setUrl,
+    isLoading,
+    showCorsWarning,
+    seoAnalysis,
+    handleActivateProxy
   };
 };
+
+async function fetchPageContent(url: string): Promise<string | null> {
+  try {
+    const response = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return await response.text();
+  } catch (error) {
+    console.error("Failed to fetch page content:", error);
+    return null;
+  }
+}
+
+function analyzePageContent(htmlContent: string, url: string): any {
+  // Basic analysis logic (replace with actual analysis)
+  const titleMatch = htmlContent.match(/<title>(.*?)<\/title>/i);
+  const title = titleMatch ? titleMatch[1] : 'No Title Found';
+  const descriptionMatch = htmlContent.match(/<meta name="description" content="(.*?)"/i);
+  const description = descriptionMatch ? descriptionMatch[1] : 'No Description Found';
+  const keywords = ['example', 'keywords']; // Replace with actual keyword extraction
+
+  return {
+    title,
+    description,
+    url,
+    keywords,
+    competitors: [],
+    backlinks: 0,
+    socialMetrics: { facebook: 0, twitter: 0, pinterest: 0, linkedin: 0 },
+    organicSearch: { keywords: [], totalKeywords: 0, averagePosition: 0, visibility: 0 },
+  };
+}
