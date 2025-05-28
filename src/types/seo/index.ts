@@ -4,20 +4,6 @@ export * from './InternalLinks';
 export * from './Backlinks';
 export * from './Social';
 
-export interface CompetitorData {
-  domain: string;
-  title: string;
-  description: string;
-  keywords: string[];
-  ranking: number;
-  traffic: number;
-  authority: number;
-  name: string;
-  url: string;
-  strength: number;
-  organic_traffic: number;
-}
-
 export interface SocialMetricsProps {
   metrics: {
     facebook: number;

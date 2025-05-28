@@ -31,7 +31,7 @@ export interface KeywordSuggestion {
   searchVolume?: number;
   relevance?: number; 
   position?: number;
-  type?: 'question' | 'standard' | 'long-tail' | 'related';
+  type?: 'question' | 'standard' | 'long-tail' | 'related' | 'semantic' | 'intent-based' | 'competitor';
   opportunity?: number;
   trend?: number[];
   suggestedTitle?: string;
@@ -64,4 +64,18 @@ export interface KeywordTrend {
   keyword?: string;
   period?: string;
   volume?: number;
+}
+
+export interface CompetitorData {
+  domain: string;
+  title: string;
+  description: string;
+  keywords: string[];
+  ranking: number;
+  traffic: number;
+  authority: number;
+  name: string;
+  url: string;
+  strength: number;
+  organic_traffic: number;
 }
