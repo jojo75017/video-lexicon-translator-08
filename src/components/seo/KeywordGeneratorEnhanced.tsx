@@ -13,7 +13,10 @@ import ContentOpportunities from './keyword/ContentOpportunities';
 import KeywordOpportunityChart from './keyword/KeywordOpportunityChart';
 import InternalLinkSuggestions from './keyword/InternalLinkSuggestions';
 import SerpAnalysis from './keyword/SerpAnalysis';
-import { Brain, TrendingUp, Users, FileText, Target, BarChart3, Link, Search } from 'lucide-react';
+import KeywordGrouping from './keyword/KeywordGrouping';
+import RankingTracker from './keyword/RankingTracker';
+import CompetitorGapAnalysis from './keyword/CompetitorGapAnalysis';
+import { Brain, TrendingUp, Users, FileText, Target, BarChart3, Link, Search, Network, Trophy, AlertTriangle } from 'lucide-react';
 
 const KeywordGeneratorEnhanced: React.FC = () => {
   const [keyword, setKeyword] = useState('');
@@ -153,7 +156,7 @@ const KeywordGeneratorEnhanced: React.FC = () => {
       />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid grid-cols-4 md:grid-cols-8 gap-1">
+        <TabsList className="grid grid-cols-4 md:grid-cols-11 gap-1">
           <TabsTrigger value="generator" className="flex items-center gap-1">
             <Target className="h-4 w-4" />
             <span className="hidden sm:inline">Standard</span>
@@ -185,6 +188,18 @@ const KeywordGeneratorEnhanced: React.FC = () => {
           <TabsTrigger value="serp" className="flex items-center gap-1">
             <Search className="h-4 w-4" />
             <span className="hidden sm:inline">SERP</span>
+          </TabsTrigger>
+          <TabsTrigger value="grouping" className="flex items-center gap-1">
+            <Network className="h-4 w-4" />
+            <span className="hidden sm:inline">Groupes</span>
+          </TabsTrigger>
+          <TabsTrigger value="ranking" className="flex items-center gap-1">
+            <Trophy className="h-4 w-4" />
+            <span className="hidden sm:inline">Positions</span>
+          </TabsTrigger>
+          <TabsTrigger value="gaps" className="flex items-center gap-1">
+            <AlertTriangle className="h-4 w-4" />
+            <span className="hidden sm:inline">Gaps</span>
           </TabsTrigger>
         </TabsList>
 
@@ -239,6 +254,18 @@ const KeywordGeneratorEnhanced: React.FC = () => {
 
         <TabsContent value="serp" className="space-y-4">
           <SerpAnalysis keywords={allKeywords} />
+        </TabsContent>
+
+        <TabsContent value="grouping" className="space-y-4">
+          <KeywordGrouping keywords={allKeywords} />
+        </TabsContent>
+
+        <TabsContent value="ranking" className="space-y-4">
+          <RankingTracker keywords={allKeywords} />
+        </TabsContent>
+
+        <TabsContent value="gaps" className="space-y-4">
+          <CompetitorGapAnalysis keywords={allKeywords} />
         </TabsContent>
       </Tabs>
     </div>
