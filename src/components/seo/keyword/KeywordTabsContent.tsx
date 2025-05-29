@@ -18,6 +18,8 @@ import RoiCalculator from './RoiCalculator';
 import MultiLanguageSupport from './MultiLanguageSupport';
 import VoiceSearchAnalysis from './VoiceSearchAnalysis';
 import MobileOptimization from './MobileOptimization';
+import KeywordInsightsAnalyzer from './KeywordInsightsAnalyzer';
+import KeywordClusteringTool from './KeywordClusteringTool';
 
 interface KeywordTabsContentProps {
   standardKeywords: KeywordSuggestion[];
@@ -71,6 +73,7 @@ const KeywordTabsContent: React.FC<KeywordTabsContentProps> = ({
           keyword={keyword}
           onKeywordsGenerated={handleIntelligentKeywords}
         />
+        <KeywordInsightsAnalyzer keywords={allKeywords} />
       </TabsContent>
 
       <TabsContent value="trends" className="space-y-4">
@@ -101,6 +104,7 @@ const KeywordTabsContent: React.FC<KeywordTabsContentProps> = ({
 
       <TabsContent value="grouping" className="space-y-4">
         <KeywordGrouping keywords={allKeywords} />
+        <KeywordClusteringTool keywords={allKeywords} />
       </TabsContent>
 
       <TabsContent value="ranking" className="space-y-4">
