@@ -73,7 +73,7 @@ export interface PerformanceData {
   };
 }
 
-// Nouveaux types pour le calculateur de ROI
+// Types pour le calculateur de ROI
 export interface RoiParameters {
   seoInvestment: number;
   acquisitionCost: number;
@@ -98,4 +98,44 @@ export interface RoiResults {
     cumulativeInvestment: number;
     monthlyRoi: number;
   }>;
+}
+
+// Types pour le support multi-langues
+export interface LocalizationConfig {
+  language: string;
+  country: string;
+  searchEngine: 'google' | 'bing' | 'yandex' | 'baidu';
+  currency: string;
+}
+
+export interface LocalizedKeyword {
+  keyword: string;
+  language: string;
+  country: string;
+  volume: number;
+  difficulty: number;
+  cpc: number;
+  localCompetition: number;
+  culturalRelevance: number;
+}
+
+// Types pour la recherche vocale
+export interface VoiceSearchData {
+  keyword: string;
+  isVoiceOptimized: boolean;
+  questionFormat: string;
+  conversationalVariants: string[];
+  avgQuestionLength: number;
+  featuredSnippetChance: number;
+}
+
+// Types pour l'optimisation mobile
+export interface MobileOptimization {
+  keyword: string;
+  mobileVolume: number;
+  mobilevsDesktop: number;
+  localSearchIntent: boolean;
+  voiceSearchCompatible: boolean;
+  mobileCompetition: number;
+  quickAnswerFormat: string;
 }

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -15,8 +16,11 @@ import SerpAnalysis from './keyword/SerpAnalysis';
 import KeywordGrouping from './keyword/KeywordGrouping';
 import RankingTracker from './keyword/RankingTracker';
 import CompetitorGapAnalysis from './keyword/CompetitorGapAnalysis';
-import { Brain, TrendingUp, Users, FileText, Target, BarChart3, Link, Search, Network, Trophy, AlertTriangle, DollarSign } from 'lucide-react';
 import RoiCalculator from './keyword/RoiCalculator';
+import MultiLanguageSupport from './keyword/MultiLanguageSupport';
+import VoiceSearchAnalysis from './keyword/VoiceSearchAnalysis';
+import MobileOptimization from './keyword/MobileOptimization';
+import { Brain, TrendingUp, Users, FileText, Target, BarChart3, Link, Search, Network, Trophy, AlertTriangle, DollarSign, Globe, Mic, Smartphone } from 'lucide-react';
 
 const KeywordGeneratorEnhanced: React.FC = () => {
   const [keyword, setKeyword] = useState('');
@@ -156,7 +160,7 @@ const KeywordGeneratorEnhanced: React.FC = () => {
       />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid grid-cols-4 md:grid-cols-11 gap-1">
+        <TabsList className="grid grid-cols-5 md:grid-cols-15 gap-1">
           <TabsTrigger value="generator" className="flex items-center gap-1">
             <Target className="h-4 w-4" />
             <span className="hidden sm:inline">Standard</span>
@@ -204,6 +208,18 @@ const KeywordGeneratorEnhanced: React.FC = () => {
           <TabsTrigger value="roi" className="flex items-center gap-1">
             <DollarSign className="h-4 w-4" />
             <span className="hidden sm:inline">ROI</span>
+          </TabsTrigger>
+          <TabsTrigger value="multilang" className="flex items-center gap-1">
+            <Globe className="h-4 w-4" />
+            <span className="hidden sm:inline">Multi-langues</span>
+          </TabsTrigger>
+          <TabsTrigger value="voice" className="flex items-center gap-1">
+            <Mic className="h-4 w-4" />
+            <span className="hidden sm:inline">Vocal</span>
+          </TabsTrigger>
+          <TabsTrigger value="mobile" className="flex items-center gap-1">
+            <Smartphone className="h-4 w-4" />
+            <span className="hidden sm:inline">Mobile</span>
           </TabsTrigger>
         </TabsList>
 
@@ -274,6 +290,18 @@ const KeywordGeneratorEnhanced: React.FC = () => {
 
         <TabsContent value="roi" className="space-y-4">
           <RoiCalculator keywords={allKeywords} />
+        </TabsContent>
+
+        <TabsContent value="multilang" className="space-y-4">
+          <MultiLanguageSupport keywords={allKeywords} />
+        </TabsContent>
+
+        <TabsContent value="voice" className="space-y-4">
+          <VoiceSearchAnalysis keywords={allKeywords} />
+        </TabsContent>
+
+        <TabsContent value="mobile" className="space-y-4">
+          <MobileOptimization keywords={allKeywords} />
         </TabsContent>
       </Tabs>
     </div>
