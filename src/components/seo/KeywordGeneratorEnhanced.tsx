@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -16,7 +15,8 @@ import SerpAnalysis from './keyword/SerpAnalysis';
 import KeywordGrouping from './keyword/KeywordGrouping';
 import RankingTracker from './keyword/RankingTracker';
 import CompetitorGapAnalysis from './keyword/CompetitorGapAnalysis';
-import { Brain, TrendingUp, Users, FileText, Target, BarChart3, Link, Search, Network, Trophy, AlertTriangle } from 'lucide-react';
+import { Brain, TrendingUp, Users, FileText, Target, BarChart3, Link, Search, Network, Trophy, AlertTriangle, DollarSign } from 'lucide-react';
+import RoiCalculator from './keyword/RoiCalculator';
 
 const KeywordGeneratorEnhanced: React.FC = () => {
   const [keyword, setKeyword] = useState('');
@@ -201,6 +201,10 @@ const KeywordGeneratorEnhanced: React.FC = () => {
             <AlertTriangle className="h-4 w-4" />
             <span className="hidden sm:inline">Gaps</span>
           </TabsTrigger>
+          <TabsTrigger value="roi" className="flex items-center gap-1">
+            <DollarSign className="h-4 w-4" />
+            <span className="hidden sm:inline">ROI</span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="generator" className="space-y-4">
@@ -266,6 +270,10 @@ const KeywordGeneratorEnhanced: React.FC = () => {
 
         <TabsContent value="gaps" className="space-y-4">
           <CompetitorGapAnalysis keywords={allKeywords} />
+        </TabsContent>
+
+        <TabsContent value="roi" className="space-y-4">
+          <RoiCalculator keywords={allKeywords} />
         </TabsContent>
       </Tabs>
     </div>

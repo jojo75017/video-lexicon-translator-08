@@ -72,3 +72,30 @@ export interface PerformanceData {
     styles?: number;
   };
 }
+
+// Nouveaux types pour le calculateur de ROI
+export interface RoiParameters {
+  seoInvestment: number;
+  acquisitionCost: number;
+  conversionRate: number;
+  averageOrderValue: number;
+  organicTraffic: number;
+  timeFrame: number;
+}
+
+export interface RoiResults {
+  roi: number;
+  totalRevenue: number;
+  totalConversions: number;
+  costSaved: number;
+  breakEvenMonth: number | null;
+  monthlyResults: Array<{
+    month: number;
+    traffic: number;
+    conversions: number;
+    revenue: number;
+    cumulativeRevenue: number;
+    cumulativeInvestment: number;
+    monthlyRoi: number;
+  }>;
+}
