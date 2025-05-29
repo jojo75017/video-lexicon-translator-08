@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Brain, TrendingUp, Users, FileText, Target, BarChart3, Link, Search, Network, Trophy, AlertTriangle, DollarSign, Globe, Mic, Smartphone } from 'lucide-react';
+import { Brain, TrendingUp, Users, FileText, Target, BarChart3, Link, Search, Network, Trophy, AlertTriangle, DollarSign, Globe, Mic, Smartphone, Calendar, Eye, PenTool } from 'lucide-react';
 
 interface KeywordTabsNavigationProps {
   activeTab: string;
@@ -13,8 +13,11 @@ const KeywordTabsNavigation: React.FC<KeywordTabsNavigationProps> = ({ activeTab
     { value: 'generator', icon: Target, label: 'Standard' },
     { value: 'intelligent', icon: Brain, label: 'IA' },
     { value: 'trends', icon: TrendingUp, label: 'Tendances' },
+    { value: 'trend-analyzer', icon: Calendar, label: 'Analyse Trends' },
     { value: 'competitors', icon: Users, label: 'Concurrents' },
+    { value: 'competitive-intel', icon: Eye, label: 'Intelligence' },
     { value: 'content', icon: FileText, label: 'Contenu' },
+    { value: 'content-strategy', icon: PenTool, label: 'Stratégie' },
     { value: 'predictions', icon: BarChart3, label: 'Prédictions' },
     { value: 'links', icon: Link, label: 'Liens' },
     { value: 'serp', icon: Search, label: 'SERP' },
@@ -28,7 +31,7 @@ const KeywordTabsNavigation: React.FC<KeywordTabsNavigationProps> = ({ activeTab
   ];
 
   return (
-    <TabsList className="grid grid-cols-5 md:grid-cols-15 gap-1">
+    <TabsList className="grid grid-cols-6 md:grid-cols-18 gap-1">
       {tabs.map((tab) => {
         const Icon = tab.icon;
         return (

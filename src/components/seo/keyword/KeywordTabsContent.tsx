@@ -20,6 +20,9 @@ import VoiceSearchAnalysis from './VoiceSearchAnalysis';
 import MobileOptimization from './MobileOptimization';
 import KeywordInsightsAnalyzer from './KeywordInsightsAnalyzer';
 import KeywordClusteringTool from './KeywordClusteringTool';
+import KeywordTrendAnalyzer from './KeywordTrendAnalyzer';
+import CompetitiveIntelligence from './CompetitiveIntelligence';
+import ContentStrategyPlanner from './ContentStrategyPlanner';
 
 interface KeywordTabsContentProps {
   standardKeywords: KeywordSuggestion[];
@@ -81,13 +84,25 @@ const KeywordTabsContent: React.FC<KeywordTabsContentProps> = ({
         <SearchVolumePredictor keywords={allKeywords} />
       </TabsContent>
 
+      <TabsContent value="trend-analyzer" className="space-y-4">
+        <KeywordTrendAnalyzer keywords={allKeywords} />
+      </TabsContent>
+
       <TabsContent value="competitors" className="space-y-4">
         <CompetitorKeywords onKeywordsFound={handleCompetitorKeywords} />
+      </TabsContent>
+
+      <TabsContent value="competitive-intel" className="space-y-4">
+        <CompetitiveIntelligence keywords={allKeywords} />
       </TabsContent>
 
       <TabsContent value="content" className="space-y-4">
         <ContentOpportunities keywords={allKeywords} />
         <KeywordOpportunityChart keywords={allKeywords} />
+      </TabsContent>
+
+      <TabsContent value="content-strategy" className="space-y-4">
+        <ContentStrategyPlanner keywords={allKeywords} />
       </TabsContent>
 
       <TabsContent value="predictions" className="space-y-4">
