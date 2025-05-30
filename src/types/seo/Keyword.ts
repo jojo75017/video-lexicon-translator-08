@@ -17,6 +17,7 @@ export interface KeywordData {
   density?: number;
   count?: number;
   position?: number;
+  frequency?: number;
 }
 
 export interface KeywordSuggestion {
@@ -39,6 +40,7 @@ export interface KeywordSuggestion {
   suggestedLongDescription?: string;
   density?: number;
   count?: number;
+  frequency?: number;
 }
 
 export type KeywordIntent = 'informational' | 'navigational' | 'transactional' | 'commercial';

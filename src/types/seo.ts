@@ -6,11 +6,14 @@ export type { MetaTagsAnalysis } from './seo/MetaTags';
 export type { BacklinkInfo } from './seo/Backlinks';
 export type { SocialMetrics, SocialTags } from './seo/Social';
 export type { ImageDetails } from './seo/Image';
-export type { PerformanceData, MobileAnalysis } from './seo/Performance';
+export type { PerformanceData, Performance, MobileAnalysis } from './seo/Performance';
 export type { InternalLinkAnalysis } from './seo/InternalLinks';
 export type { KeywordData, KeywordSuggestion } from './seo/Keyword';
 export type { HierarchyItem, HeadingStructure, StructureItem } from './seo/Hierarchy';
 export type { RankingData } from './seo/Ranking';
+export type { ImageAnalysis, ImageDetail } from './seo/ImageAnalysis';
+export type { SeoAnalysisResult } from './seo/SeoAnalysisResult';
+export type { SearchConsoleData } from './seo/SearchConsole';
 
 // Réexporter tous les types de l'index
 export * from './seo/index';

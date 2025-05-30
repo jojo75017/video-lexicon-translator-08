@@ -1,23 +1,30 @@
 
-export interface Performance {
+export interface PerformanceData {
   loadTime: number;
   firstContentfulPaint: number;
-  largestContentfulPaint?: number;
+  largestContentfulPaint: number;
   domLoadTime: number;
-  speedIndex?: number;
-  timeToInteractive?: number;
-  score?: number;
+  speedIndex: number;
+  timeToInteractive: number;
+  score: number;
   resourceCount: number;
-  scriptCount?: number;
-  imageCount?: number;
-  totalSize?: number;
-  resourceBreakdown?: {
+  totalSize: number;
+  resourceBreakdown: {
     js?: number;
     css?: number;
     images?: number;
     fonts?: number;
     other?: number;
+    scripts?: number;
+    styles?: number;
   };
-  clickThroughRate?: number;
-  impressions: number;
+}
+
+export interface Performance extends PerformanceData {}
+
+export interface MobileAnalysis {
+  isMobileFriendly: boolean;
+  mobileScore: number;
+  issues: string[];
+  recommendations: string[];
 }

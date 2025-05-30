@@ -3,6 +3,10 @@ export * from './Keyword';
 export * from './InternalLinks';
 export * from './Backlinks';
 export * from './Social';
+export * from './Performance';
+export * from './ImageAnalysis';
+export * from './SeoAnalysisResult';
+export * from './SearchConsole';
 
 export interface SocialMetricsProps {
   metrics: {
@@ -50,27 +54,6 @@ export interface PageStructure {
     canonical?: string;
   };
   optimizationStatus?: string;
-}
-
-export interface PerformanceData {
-  loadTime: number;
-  firstContentfulPaint: number;
-  largestContentfulPaint: number;
-  domLoadTime: number;
-  speedIndex: number;
-  timeToInteractive: number;
-  score: number;
-  resourceCount: number;
-  totalSize: number;
-  resourceBreakdown: {
-    js?: number;
-    css?: number;
-    images?: number;
-    fonts?: number;
-    other?: number;
-    scripts?: number;
-    styles?: number;
-  };
 }
 
 // Types pour le calculateur de ROI
