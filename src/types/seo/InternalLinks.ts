@@ -65,4 +65,7 @@ export interface LinkSuggestion {
   priority?: string;
   placement?: string;
   sourceTitle?: string;
+  sourceUrl?: string;
+  contextualRelevance?: number;
+  seoValue?: number;
 }

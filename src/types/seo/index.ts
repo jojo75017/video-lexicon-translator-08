@@ -1,4 +1,3 @@
-
 export * from './Keyword';
 export * from './InternalLinks';
 export * from './Backlinks';
@@ -132,6 +131,7 @@ export interface BrokenLink {
   anchor?: string;
 }
 
+// Types pour l'analyse SEO globale
 export interface SeoAnalysis {
   url?: string;
   title?: string;
@@ -180,6 +180,22 @@ export interface SeoAnalysis {
     hierarchy?: any[];
   };
   headingStructure?: any[];
+  imgWithoutAlt?: number;
+  authorityScore?: number;
+  topKeywords?: KeywordSuggestion[];
+  organicTraffic?: number;
+  mobileAnalysis?: {
+    isMobileFriendly: boolean;
+    mobileScore: number;
+    issues: string[];
+  };
+  readabilityScore?: number;
+  metaTagsAnalysis?: {
+    hasTitle: boolean;
+    hasDescription: boolean;
+  };
+  technicalSuggestions?: string[];
+  searchConsole?: any;
 }
 
 export interface ImageDetail {
@@ -301,4 +317,7 @@ export interface LinkSuggestion {
   priority?: string;
   placement?: string;
   sourceTitle?: string;
+  sourceUrl?: string;
+  contextualRelevance?: number;
+  seoValue?: number;
 }

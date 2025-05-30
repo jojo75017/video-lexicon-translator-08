@@ -1,4 +1,13 @@
 
+export interface SearchConsoleData {
+  query: string;
+  clicks: number;
+  impressions: number;
+  ctr: number;
+  position: number;
+  change?: number;
+}
+
 export interface RankingData {
   totalImpressions?: number;
   totalClicks?: number;
@@ -11,20 +20,7 @@ export interface RankingData {
     date: string;
     position: number;
   }>;
-  topQueries?: Array<{
-    query: string;
-    clicks: number;
-    impressions: number;
-    ctr: number;
-    position: number;
-    change: number;
-  }>;
-  optimizationOpportunities?: Array<{
-    query: string;
-    clicks: number;
-    impressions: number;
-    ctr: number;
-    position: number;
-    change: number;
-  }>;
+  topQueries?: SearchConsoleData[];
+  topPages?: SearchConsoleData[];
+  optimizationOpportunities?: SearchConsoleData[];
 }

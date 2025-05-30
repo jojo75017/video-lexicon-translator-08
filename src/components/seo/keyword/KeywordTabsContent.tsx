@@ -30,6 +30,8 @@ interface KeywordTabsContentProps {
   allKeywords: KeywordSuggestion[];
   selectedKeywords: string[];
   keyword: string;
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
   toggleKeywordSelection: (kw: string) => void;
   clearSelectedKeywords: () => void;
   exportSelectedKeywords: () => void;
@@ -43,12 +45,18 @@ const KeywordTabsContent: React.FC<KeywordTabsContentProps> = ({
   allKeywords,
   selectedKeywords,
   keyword,
+  activeTab,
+  setActiveTab,
   toggleKeywordSelection,
   clearSelectedKeywords,
   exportSelectedKeywords,
   handleIntelligentKeywords,
   handleCompetitorKeywords
 }) => {
+  console.log('KeywordTabsContent - activeTab:', activeTab);
+  console.log('KeywordTabsContent - standardKeywords:', standardKeywords.length);
+  console.log('KeywordTabsContent - longTailKeywords:', longTailKeywords.length);
+
   return (
     <>
       <TabsContent value="generator" className="space-y-4">
@@ -61,8 +69,8 @@ const KeywordTabsContent: React.FC<KeywordTabsContentProps> = ({
             serpResults={[]}
             hasCompetitorData={false}
             totalKeywords={standardKeywords.length + longTailKeywords.length}
-            activeTab="standard"
-            setActiveTab={() => {}}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
             toggleKeywordSelection={toggleKeywordSelection}
             clearSelectedKeywords={clearSelectedKeywords}
             exportSelectedKeywords={exportSelectedKeywords}

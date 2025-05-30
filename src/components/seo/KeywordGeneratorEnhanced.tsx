@@ -7,7 +7,7 @@ import KeywordTabsNavigation from './keyword/KeywordTabsNavigation';
 import KeywordTabsContent from './keyword/KeywordTabsContent';
 
 const KeywordGeneratorEnhanced: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('generator');
+  const [activeMainTab, setActiveMainTab] = useState('generator');
 
   return (
     <div className="space-y-6">
@@ -21,6 +21,8 @@ const KeywordGeneratorEnhanced: React.FC = () => {
           competitorKeywords,
           selectedKeywords,
           allKeywords,
+          activeTab,
+          setActiveTab,
           generateStandardKeywords,
           handleIntelligentKeywords,
           handleCompetitorKeywords,
@@ -37,10 +39,10 @@ const KeywordGeneratorEnhanced: React.FC = () => {
               onGenerate={generateStandardKeywords}
             />
 
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+            <Tabs value={activeMainTab} onValueChange={setActiveMainTab} className="space-y-4">
               <KeywordTabsNavigation 
-                activeTab={activeTab} 
-                setActiveTab={setActiveTab} 
+                activeTab={activeMainTab} 
+                setActiveTab={setActiveMainTab} 
               />
 
               <KeywordTabsContent
@@ -49,6 +51,8 @@ const KeywordGeneratorEnhanced: React.FC = () => {
                 allKeywords={allKeywords}
                 selectedKeywords={selectedKeywords}
                 keyword={keyword}
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
                 toggleKeywordSelection={toggleKeywordSelection}
                 clearSelectedKeywords={clearSelectedKeywords}
                 exportSelectedKeywords={exportSelectedKeywords}

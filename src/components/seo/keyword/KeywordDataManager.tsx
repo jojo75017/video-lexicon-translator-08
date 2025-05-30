@@ -12,6 +12,8 @@ interface KeywordDataManagerProps {
     competitorKeywords: KeywordSuggestion[];
     selectedKeywords: string[];
     allKeywords: KeywordSuggestion[];
+    activeTab: string;
+    setActiveTab: (tab: string) => void;
     generateStandardKeywords: () => void;
     handleIntelligentKeywords: (keywords: KeywordSuggestion[]) => void;
     handleCompetitorKeywords: (keywords: string[]) => void;
@@ -30,11 +32,13 @@ const KeywordDataManager: React.FC<KeywordDataManagerProps> = ({ children }) => 
   const [intelligentKeywords, setIntelligentKeywords] = useState<KeywordSuggestion[]>([]);
   const [competitorKeywords, setCompetitorKeywords] = useState<KeywordSuggestion[]>([]);
   const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
+  const [activeTab, setActiveTab] = useState('standard');
 
   const generateStandardKeywords = () => {
     if (!keyword.trim()) return;
     
     setIsGenerating(true);
+    console.log('Generating keywords for:', keyword);
     
     setTimeout(() => {
       const mockStandard: KeywordSuggestion[] = [
@@ -90,11 +94,25 @@ const KeywordDataManager: React.FC<KeywordDataManagerProps> = ({ children }) => 
           intent: 'transactional',
           type: 'long-tail',
           relevance: 75
+        },
+        {
+          keyword: `guide complet ${keyword} étape par étape`,
+          volume: Math.floor(Math.random() * 400) + 50,
+          difficulty: Math.floor(Math.random() * 20) + 5,
+          cpc: parseFloat((Math.random() * 0.6 + 0.1).toFixed(2)),
+          competition: parseFloat((Math.random() * 0.3).toFixed(2)),
+          intent: 'informational',
+          type: 'long-tail',
+          relevance: 85
         }
       ];
 
+      console.log('Generated standard keywords:', mockStandard.length);
+      console.log('Generated long-tail keywords:', mockLongTail.length);
+
       setStandardKeywords(mockStandard);
       setLongTailKeywords(mockLongTail);
+      setActiveTab('standard'); // Reset to standard tab
       setIsGenerating(false);
     }, 2000);
   };
@@ -118,6 +136,7 @@ const KeywordDataManager: React.FC<KeywordDataManagerProps> = ({ children }) => 
   };
 
   const toggleKeywordSelection = (kw: string) => {
+    console.log('Toggling keyword selection:', kw);
     setSelectedKeywords(prev => 
       prev.includes(kw) 
         ? prev.filter(k => k !== kw)
@@ -159,6 +178,8 @@ const KeywordDataManager: React.FC<KeywordDataManagerProps> = ({ children }) => 
         competitorKeywords,
         selectedKeywords,
         allKeywords,
+        activeTab,
+        setActiveTab,
         generateStandardKeywords,
         handleIntelligentKeywords,
         handleCompetitorKeywords,

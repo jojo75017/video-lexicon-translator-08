@@ -53,6 +53,22 @@ export interface SeoAnalysis {
     hierarchy?: any[];
   };
   headingStructure?: any[];
+  imgWithoutAlt?: number;
+  authorityScore?: number;
+  topKeywords?: KeywordSuggestion[];
+  organicTraffic?: number;
+  mobileAnalysis?: {
+    isMobileFriendly: boolean;
+    mobileScore: number;
+    issues: string[];
+  };
+  readabilityScore?: number;
+  metaTagsAnalysis?: {
+    hasTitle: boolean;
+    hasDescription: boolean;
+  };
+  technicalSuggestions?: string[];
+  searchConsole?: any;
 }
 
 export interface BrokenLink {

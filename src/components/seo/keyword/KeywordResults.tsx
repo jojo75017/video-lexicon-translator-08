@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -33,7 +34,7 @@ interface KeywordResultsProps {
   toggleKeywordSelection: (keyword: string) => void;
   clearSelectedKeywords: () => void;
   exportSelectedKeywords: () => void;
-  keyword: string; // Ajout du mot-clé principal
+  keyword: string;
 }
 
 const KeywordResults: React.FC<KeywordResultsProps> = ({
@@ -51,35 +52,9 @@ const KeywordResults: React.FC<KeywordResultsProps> = ({
   exportSelectedKeywords,
   keyword
 }) => {
-  // Fonction pour afficher le type de mot-clé
-  const getKeywordTypeDisplay = (type: string) => {
-    switch (type) {
-      case 'standard':
-        return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Standard</Badge>;
-      case 'long-tail':
-        return <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">Longue traîne</Badge>;
-      default:
-        return <Badge variant="outline">{type}</Badge>;
-    }
-  };
-  
-  // Fonction pour afficher l'intention du mot-clé
-  const getKeywordIntentDisplay = (intent: string | undefined) => {
-    if (!intent) return null;
-    
-    switch (intent) {
-      case 'informational':
-        return <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">Informationnel</Badge>;
-      case 'navigational':
-        return <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">Navigationnel</Badge>;
-      case 'transactional':
-        return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Transactionnel</Badge>;
-      case 'commercial':
-        return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">Commercial</Badge>;
-      default:
-        return null;
-    }
-  };
+  console.log('KeywordResults - activeTab:', activeTab);
+  console.log('KeywordResults - standardKeywords length:', standardKeywords.length);
+  console.log('KeywordResults - longTailKeywords length:', longTailKeywords.length);
   
   return (
     <Card className="p-6">
@@ -116,22 +91,50 @@ const KeywordResults: React.FC<KeywordResultsProps> = ({
         </div>
       </div>
       
-      <Tabs className="space-y-5" value={activeTab} onValueChange={setActiveTab}>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-5">
         <TabsList className="grid grid-cols-2 md:grid-cols-4 gap-2">
-          <TabsTrigger value="standard" className="flex items-center gap-1">
+          <TabsTrigger 
+            value="standard" 
+            className="flex items-center gap-1"
+            onClick={() => {
+              console.log('Clicking standard tab');
+              setActiveTab('standard');
+            }}
+          >
             <Sparkles className="h-4 w-4" />
             <span>Standards</span>
           </TabsTrigger>
-          <TabsTrigger value="long-tail" className="flex items-center gap-1">
+          <TabsTrigger 
+            value="long-tail" 
+            className="flex items-center gap-1"
+            onClick={() => {
+              console.log('Clicking long-tail tab');
+              setActiveTab('long-tail');
+            }}
+          >
             <TrendingUp className="h-4 w-4" />
             <span>Longue traîne</span>
           </TabsTrigger>
-          <TabsTrigger value="view" className="flex items-center gap-1">
+          <TabsTrigger 
+            value="view" 
+            className="flex items-center gap-1"
+            onClick={() => {
+              console.log('Clicking view tab');
+              setActiveTab('view');
+            }}
+          >
             <Table2 className="h-4 w-4" />
             <span>Vue tableau</span>
           </TabsTrigger>
           {hasCompetitorData && (
-            <TabsTrigger value="competitors" className="flex items-center gap-1">
+            <TabsTrigger 
+              value="competitors" 
+              className="flex items-center gap-1"
+              onClick={() => {
+                console.log('Clicking competitors tab');
+                setActiveTab('competitors');
+              }}
+            >
               <Building2 className="h-4 w-4" />
               <span>Concurrents</span>
             </TabsTrigger>

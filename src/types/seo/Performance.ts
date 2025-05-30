@@ -14,6 +14,7 @@ export interface PerformanceData {
   responseTime?: number;
   impressions?: number;
   clickThroughRate?: number;
+  imageCount?: number;
   resourceBreakdown: {
     js?: number;
     css?: number;

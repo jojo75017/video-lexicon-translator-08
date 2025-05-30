@@ -3,6 +3,9 @@ export interface HierarchyItem {
   level: number;
   text: string;
   id?: string;
+  tagName?: string;
+  position?: number;
+  children?: HierarchyItem[];
 }
 
 export interface HeadingStructure {
