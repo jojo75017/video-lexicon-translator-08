@@ -1,5 +1,5 @@
 
-export interface ImageAnalysis {
+export interface ImageDetails {
   url: string;
   alt?: string;
   title?: string;
@@ -11,5 +11,3 @@ export interface ImageAnalysis {
   loading?: 'lazy' | 'eager';
   hasAlt?: boolean;
 }
-
-export interface ImageDetail extends ImageAnalysis {}

@@ -9,6 +9,11 @@ export interface PerformanceData {
   score: number;
   resourceCount: number;
   totalSize: number;
+  scriptCount?: number;
+  styleCount?: number;
+  responseTime?: number;
+  impressions?: number;
+  clickThroughRate?: number;
   resourceBreakdown: {
     js?: number;
     css?: number;

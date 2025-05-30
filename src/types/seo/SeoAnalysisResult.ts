@@ -6,4 +6,7 @@ export interface SeoAnalysisResult extends SeoAnalysis {
   timestamp: Date;
   status: 'success' | 'error' | 'partial';
   errors?: string[];
+  success?: boolean;
+  data?: SeoAnalysis;
+  error?: string;
 }

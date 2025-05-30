@@ -26,6 +26,8 @@ export interface PageMetric {
   importance: string;
 }
 
+export interface PageLinkMetric extends PageMetric {}
+
 export interface LinkDistribution {
   [key: string]: number;
 }
@@ -39,4 +41,11 @@ export interface OrphanPage {
 export interface SiloStructure {
   theme: string;
   pages: string[];
+}
+
+export interface LinkSuggestion {
+  from: string;
+  to: string;
+  anchor: string;
+  reason: string;
 }
