@@ -17,6 +17,10 @@ export interface InternalLinkRecommendation {
   to: string;
   reason: string;
   priority?: string;
+  type?: string;
+  description?: string;
+  source?: string;
+  target?: string;
 }
 
 export interface PageMetric {
@@ -24,9 +28,16 @@ export interface PageMetric {
   inLinks: number;
   outLinks: number;
   importance: string;
+  incomingLinks?: number;
+  outgoingLinks?: number;
+  depth?: number;
 }
 
-export interface PageLinkMetric extends PageMetric {}
+export interface PageLinkMetric extends PageMetric {
+  incomingLinks: number;
+  outgoingLinks: number;
+  depth: number;
+}
 
 export interface LinkDistribution {
   [key: string]: number;
@@ -48,4 +59,10 @@ export interface LinkSuggestion {
   to: string;
   anchor: string;
   reason: string;
+  targetUrl?: string;
+  targetTitle?: string;
+  anchorText?: string;
+  priority?: string;
+  placement?: string;
+  sourceTitle?: string;
 }

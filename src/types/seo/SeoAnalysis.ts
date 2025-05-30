@@ -6,6 +6,7 @@ import { ImageDetail } from './ImageAnalysis';
 import { KeywordSuggestion } from './Keyword';
 
 export interface SeoAnalysis {
+  url?: string;
   title?: string;
   description?: string;
   keywords?: string[];
@@ -26,6 +27,32 @@ export interface SeoAnalysis {
   imagesDetails?: ImageDetail[];
   keywordSuggestions?: KeywordSuggestion[];
   socialMetrics?: SocialMetrics;
+  sourceCode?: string;
+  textContent?: string;
+  region?: string;
+  country?: string;
+  language?: string;
+  gdprCompliant?: boolean;
+  metadata?: {
+    title?: string;
+    description?: string;
+    robots?: string;
+    hasTitleTag?: boolean;
+    hasDescriptionTag?: boolean;
+    lang?: string;
+    charset?: string;
+    viewport?: string;
+    locale?: string;
+  };
+  headings?: {
+    h1?: string[];
+    h2?: string[];
+    h3?: string[];
+    h4?: string[];
+    length?: number;
+    hierarchy?: any[];
+  };
+  headingStructure?: any[];
 }
 
 export interface BrokenLink {
@@ -34,4 +61,5 @@ export interface BrokenLink {
   status?: string;
   location?: string;
   text?: string;
+  anchor?: string;
 }

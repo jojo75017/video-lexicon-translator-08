@@ -129,9 +129,11 @@ export interface BrokenLink {
   status?: string;
   location?: string;
   text?: string;
+  anchor?: string;
 }
 
 export interface SeoAnalysis {
+  url?: string;
   title?: string;
   description?: string;
   keywords?: string[];
@@ -152,6 +154,32 @@ export interface SeoAnalysis {
   imagesDetails?: ImageDetail[];
   keywordSuggestions?: KeywordSuggestion[];
   socialMetrics?: SocialMetrics;
+  sourceCode?: string;
+  textContent?: string;
+  region?: string;
+  country?: string;
+  language?: string;
+  gdprCompliant?: boolean;
+  metadata?: {
+    title?: string;
+    description?: string;
+    robots?: string;
+    hasTitleTag?: boolean;
+    hasDescriptionTag?: boolean;
+    lang?: string;
+    charset?: string;
+    viewport?: string;
+    locale?: string;
+  };
+  headings?: {
+    h1?: string[];
+    h2?: string[];
+    h3?: string[];
+    h4?: string[];
+    length?: number;
+    hierarchy?: any[];
+  };
+  headingStructure?: any[];
 }
 
 export interface ImageDetail {
@@ -231,6 +259,10 @@ export interface InternalLinkRecommendation {
   to: string;
   reason: string;
   priority?: string;
+  type?: string;
+  description?: string;
+  source?: string;
+  target?: string;
 }
 
 export interface PageMetric {
@@ -238,6 +270,9 @@ export interface PageMetric {
   inLinks: number;
   outLinks: number;
   importance: string;
+  incomingLinks?: number;
+  outgoingLinks?: number;
+  depth?: number;
 }
 
 export interface LinkDistribution {
@@ -253,4 +288,17 @@ export interface OrphanPage {
 export interface SiloStructure {
   theme: string;
   pages: string[];
+}
+
+export interface LinkSuggestion {
+  from: string;
+  to: string;
+  anchor: string;
+  reason: string;
+  targetUrl?: string;
+  targetTitle?: string;
+  anchorText?: string;
+  priority?: string;
+  placement?: string;
+  sourceTitle?: string;
 }

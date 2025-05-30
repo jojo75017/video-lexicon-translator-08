@@ -15,4 +15,5 @@ export interface BrokenLink {
   status?: string;
   location?: string;
   text?: string;
+  anchor?: string;
 }
