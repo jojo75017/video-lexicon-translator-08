@@ -5,5 +5,5 @@ export interface SearchConsoleData {
   impressions: number;
   ctr: number;
   position: number;
-  date?: string;
+  change?: number;
 }

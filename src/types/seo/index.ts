@@ -1,323 +1,87 @@
-export * from './Keyword';
-export * from './InternalLinks';
-export * from './Backlinks';
-export * from './Social';
-export * from './Performance';
-export * from './ImageAnalysis';
-export * from './SeoAnalysisResult';
-export * from './SearchConsole';
 
-export interface SocialMetricsProps {
-  metrics: {
-    facebook: number;
-    twitter: number;
-    pinterest: number;
-    linkedin: number;
-  };
-}
+// Point d'entrée centralisé pour les types SEO
 
+export type { SeoAnalysis, BrokenLink } from './SeoAnalysis';
+export type { MetaTagsAnalysis } from './MetaTags';
+export type { BacklinkInfo } from './Backlinks';
+export type { SocialMetrics, SocialTags } from './Social';
+export type { ImageDetails } from './Image';
+export type { PerformanceData, Performance, MobileAnalysis } from './Performance';
+export type { InternalLinkAnalysis, PageLinkMetric, LinkSuggestion, PageMetric, InternalLinkRecommendation, LinkDistribution, OrphanPage, SiloStructure } from './InternalLinks';
+export type { KeywordData, KeywordSuggestion } from './Keyword';
+export type { HierarchyItem, HeadingStructure, StructureItem } from './Hierarchy';
+export type { RankingData, SearchConsoleData } from './Ranking';
+export type { ImageAnalysis, ImageDetail } from './ImageAnalysis';
+export type { SeoAnalysisResult } from './SeoAnalysisResult';
+
+// Types supplémentaires pour la compatibilité
 export interface OrganicSearchProps {
-  keywords: string[];
-  totalKeywords: number;
-  averagePosition: number;
-  visibility: number;
+  keyword: string;
+  data?: any[];
 }
 
 export interface AnalysisOptions {
-  includeKeywords?: boolean;
-  includeCompetitors?: boolean;
+  includeImages?: boolean;
+  includePerformance?: boolean;
   includeBacklinks?: boolean;
-  depth?: number;
 }
 
 export interface PageStructure {
   title: string;
-  headings: Array<{
-    level: number;
-    text: string;
-    id?: string;
-  }>;
-  links: Array<{
-    text: string;
-    href: string;
-    internal: boolean;
-  }>;
-  images: Array<{
-    src: string;
-    alt: string;
-    title?: string;
-  }>;
-  meta: {
-    description?: string;
-    keywords?: string;
-    canonical?: string;
-  };
-  optimizationStatus?: string;
+  url: string;
+  level: number;
+  children?: PageStructure[];
 }
 
-// Types pour le calculateur de ROI
 export interface RoiParameters {
-  seoInvestment: number;
-  acquisitionCost: number;
+  investment: number;
+  traffic: number;
   conversionRate: number;
   averageOrderValue: number;
-  organicTraffic: number;
+  customerAcquisitionCost: number;
   timeFrame: number;
 }
 
 export interface RoiResults {
+  revenue: number;
+  profit: number;
   roi: number;
-  totalRevenue: number;
-  totalConversions: number;
-  costSaved: number;
-  breakEvenMonth: number | null;
-  monthlyResults: Array<{
-    month: number;
-    traffic: number;
-    conversions: number;
-    revenue: number;
-    cumulativeRevenue: number;
-    cumulativeInvestment: number;
-    monthlyRoi: number;
-  }>;
+  paybackPeriod: number;
 }
 
-// Types pour le support multi-langues
 export interface LocalizationConfig {
   language: string;
-  country: string;
-  searchEngine: 'google' | 'bing' | 'yandex' | 'baidu';
+  region: string;
   currency: string;
 }
 
 export interface LocalizedKeyword {
   keyword: string;
   language: string;
-  country: string;
   volume: number;
   difficulty: number;
   cpc: number;
-  localCompetition: number;
-  culturalRelevance: number;
 }
 
-// Types pour la recherche vocale
 export interface VoiceSearchData {
-  keyword: string;
+  query: string;
   isVoiceOptimized: boolean;
-  questionFormat: string;
-  conversationalVariants: string[];
-  avgQuestionLength: number;
-  featuredSnippetChance: number;
+  conversationalScore: number;
+  questionType?: string;
 }
 
-// Types pour l'optimisation mobile
 export interface MobileOptimization {
-  keyword: string;
-  mobileVolume: number;
-  mobilevsDesktop: number;
-  localSearchIntent: boolean;
-  voiceSearchCompatible: boolean;
-  mobileCompetition: number;
-  quickAnswerFormat: string;
+  isMobileFriendly: boolean;
+  mobileScore: number;
+  issues: string[];
+  recommendations: string[];
 }
 
-export interface BrokenLink {
-  url: string;
-  statusCode?: number;
-  status?: string;
-  location?: string;
-  text?: string;
-  anchor?: string;
-}
-
-// Types pour l'analyse SEO globale
-export interface SeoAnalysis {
-  url?: string;
-  title?: string;
-  description?: string;
-  keywords?: string[];
-  h1Count?: number;
-  h2Count?: number;
-  h3Count?: number;
-  imgCount?: number;
-  wordCount?: number;
-  internalLinks?: number;
-  externalLinks?: number;
-  backlinks?: number | BacklinkInfo[];
-  doFollowBacklinks?: number;
-  noFollowBacklinks?: number;
-  performance?: PerformanceData;
-  topBacklinkDomains?: string[] | {domain: string}[];
-  brokenLinks?: BrokenLink[];
-  socialTags?: SocialTags;
-  imagesDetails?: ImageDetail[];
-  keywordSuggestions?: KeywordSuggestion[];
-  socialMetrics?: SocialMetrics;
-  sourceCode?: string;
-  textContent?: string;
-  region?: string;
-  country?: string;
-  language?: string;
-  gdprCompliant?: boolean;
-  metadata?: {
-    title?: string;
-    description?: string;
-    robots?: string;
-    hasTitleTag?: boolean;
-    hasDescriptionTag?: boolean;
-    lang?: string;
-    charset?: string;
-    viewport?: string;
-    locale?: string;
-  };
-  headings?: {
-    h1?: string[];
-    h2?: string[];
-    h3?: string[];
-    h4?: string[];
-    length?: number;
-    hierarchy?: any[];
-  };
-  headingStructure?: any[];
-  imgWithoutAlt?: number;
-  authorityScore?: number;
-  topKeywords?: KeywordSuggestion[];
-  organicTraffic?: number;
-  mobileAnalysis?: {
-    isMobileFriendly: boolean;
-    mobileScore: number;
-    issues: string[];
-  };
-  readabilityScore?: number;
-  metaTagsAnalysis?: {
-    hasTitle: boolean;
-    hasDescription: boolean;
-  };
-  technicalSuggestions?: string[];
-  searchConsole?: any;
-}
-
-export interface ImageDetail {
-  url: string;
-  alt?: string;
-  size?: string;
-  width?: number;
-  height?: number;
-  hasAlt?: boolean;
-}
-
-export interface BacklinkInfo {
-  url: string;
+export interface CompetitorData {
   domain: string;
-  anchor: string;
-  dofollow: boolean;
-  authority?: number;
-  isDofollow?: boolean;
-  anchorText?: string;
-}
-
-export interface StructureItem {
-  type: "h1" | "h2" | "h3" | "h4" | "p" | "list";
-  content: string;
-  id: string;
-  items?: string[];
-}
-
-export interface SocialTags {
-  ogTitle: string | null;
-  ogDescription: string | null;
-  ogImage: string | null;
-  twitterCard: string | null;
-  twitterTitle: string | null;
-  twitterDescription: string | null;
-  twitterImage: string | null;
-}
-
-export interface SocialMetrics {
-  facebook?: {
-    shares?: number;
-    comments?: number;
-    likes?: number;
-  };
-  twitter?: {
-    tweets?: number;
-    retweets?: number;
-    likes: number;
-    shares?: number;
-    replies?: number;
-  };
-  pinterest?: {
-    pins?: number;
-    saves?: number;
-  };
-  linkedin?: {
-    shares?: number;
-    engagements?: number;
-  };
-}
-
-// Interface pour l'analyse des liens internes
-export interface InternalLinkAnalysis {
-  totalLinks?: number;
-  uniquePages?: number;
-  averageLinksPerPage?: number;
-  recommendations?: InternalLinkRecommendation[];
-  pageMetrics?: PageMetric[];
-  linkDistribution?: LinkDistribution;
-  orphanPages?: OrphanPage[];
-  siloPagesFound?: boolean;
-  siloStructure?: SiloStructure[];
-}
-
-export interface InternalLinkRecommendation {
-  from: string;
-  to: string;
-  reason: string;
-  priority?: string;
-  type?: string;
-  description?: string;
-  source?: string;
-  target?: string;
-}
-
-export interface PageMetric {
-  url: string;
-  inLinks: number;
-  outLinks: number;
-  importance: string;
-  incomingLinks?: number;
-  outgoingLinks?: number;
-  depth?: number;
-}
-
-export interface LinkDistribution {
-  [key: string]: number;
-}
-
-export interface OrphanPage {
-  url: string;
-  title?: string;
-  suggestions?: string[];
-}
-
-export interface SiloStructure {
-  theme: string;
-  pages: string[];
-}
-
-export interface LinkSuggestion {
-  from: string;
-  to: string;
-  anchor: string;
-  reason: string;
-  targetUrl?: string;
-  targetTitle?: string;
-  anchorText?: string;
-  priority?: string;
-  placement?: string;
-  sourceTitle?: string;
-  sourceUrl?: string;
-  contextualRelevance?: number;
-  seoValue?: number;
+  title: string;
+  description: string;
+  ranking: number;
+  traffic: number;
+  keywords: number;
 }

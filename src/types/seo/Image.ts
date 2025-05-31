@@ -1,13 +1,11 @@
 
 export interface ImageDetails {
   url: string;
-  alt?: string;
-  title?: string;
-  size?: string;
+  alt: string;
+  hasAlt: boolean;
   width?: number;
   height?: number;
+  size: string;
   format?: string;
-  optimized?: boolean;
-  loading?: 'lazy' | 'eager';
-  hasAlt?: boolean;
+  index?: number;
 }

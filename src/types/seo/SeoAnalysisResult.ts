@@ -1,12 +1,9 @@
 
-import { SeoAnalysis } from './SeoAnalysis';
-
-export interface SeoAnalysisResult extends SeoAnalysis {
+export interface SeoAnalysisResult {
   url: string;
-  timestamp: Date;
-  status: 'success' | 'error' | 'partial';
-  errors?: string[];
-  success?: boolean;
-  data?: SeoAnalysis;
+  timestamp: string;
+  status: 'success' | 'error' | 'pending';
+  success: boolean;
+  data?: any;
   error?: string;
 }

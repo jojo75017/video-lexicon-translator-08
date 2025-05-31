@@ -1,33 +1,18 @@
 
 export interface SocialTags {
-  ogTitle: string | null;
-  ogDescription: string | null;
-  ogImage: string | null;
-  twitterCard: string | null;
-  twitterTitle: string | null;
-  twitterDescription: string | null;
-  twitterImage: string | null;
+  hasOpenGraph: boolean;
+  hasTwitterCard: boolean;
+  ogTitle?: string;
+  ogDescription?: string;
+  ogImage?: string;
+  twitterTitle?: string;
+  twitterDescription?: string;
+  twitterImage?: string;
 }
 
 export interface SocialMetrics {
-  facebook?: {
-    shares?: number;
-    comments?: number;
-    likes?: number;
-  };
-  twitter?: {
-    tweets?: number;
-    retweets?: number;
-    likes: number;
-    shares?: number;
-    replies?: number;
-  };
-  pinterest?: {
-    pins?: number;
-    saves?: number;
-  };
-  linkedin?: {
-    shares?: number;
-    engagements?: number;
-  };
+  shares?: number;
+  likes?: number;
+  comments?: number;
+  platform?: string;
 }
