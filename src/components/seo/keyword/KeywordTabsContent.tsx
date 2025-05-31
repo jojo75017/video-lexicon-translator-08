@@ -23,6 +23,9 @@ import KeywordClusteringTool from './KeywordClusteringTool';
 import KeywordTrendAnalyzer from './KeywordTrendAnalyzer';
 import CompetitiveIntelligence from './CompetitiveIntelligence';
 import ContentStrategyPlanner from './ContentStrategyPlanner';
+import KeywordDifficultyAnalyzer from './KeywordDifficultyAnalyzer';
+import SeasonalAnalysis from './SeasonalAnalysis';
+import KeywordPerformancePredictor from './KeywordPerformancePredictor';
 
 interface KeywordTabsContentProps {
   standardKeywords: KeywordSuggestion[];
@@ -61,21 +64,26 @@ const KeywordTabsContent: React.FC<KeywordTabsContentProps> = ({
     <>
       <TabsContent value="generator" className="space-y-4">
         {(standardKeywords.length > 0 || longTailKeywords.length > 0) && (
-          <KeywordResults
-            standardKeywords={standardKeywords}
-            longTailKeywords={longTailKeywords}
-            selectedKeywords={selectedKeywords}
-            competitors={[]}
-            serpResults={[]}
-            hasCompetitorData={false}
-            totalKeywords={standardKeywords.length + longTailKeywords.length}
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            toggleKeywordSelection={toggleKeywordSelection}
-            clearSelectedKeywords={clearSelectedKeywords}
-            exportSelectedKeywords={exportSelectedKeywords}
-            keyword={keyword}
-          />
+          <>
+            <KeywordResults
+              standardKeywords={standardKeywords}
+              longTailKeywords={longTailKeywords}
+              selectedKeywords={selectedKeywords}
+              competitors={[]}
+              serpResults={[]}
+              hasCompetitorData={false}
+              totalKeywords={standardKeywords.length + longTailKeywords.length}
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              toggleKeywordSelection={toggleKeywordSelection}
+              clearSelectedKeywords={clearSelectedKeywords}
+              exportSelectedKeywords={exportSelectedKeywords}
+              keyword={keyword}
+            />
+            <KeywordDifficultyAnalyzer keywords={allKeywords} />
+            <SeasonalAnalysis keywords={allKeywords} />
+            <KeywordPerformancePredictor keywords={allKeywords} />
+          </>
         )}
       </TabsContent>
 
@@ -85,15 +93,18 @@ const KeywordTabsContent: React.FC<KeywordTabsContentProps> = ({
           onKeywordsGenerated={handleIntelligentKeywords}
         />
         <KeywordInsightsAnalyzer keywords={allKeywords} />
+        <KeywordDifficultyAnalyzer keywords={allKeywords} />
       </TabsContent>
 
       <TabsContent value="trends" className="space-y-4">
         <SeasonalTrends keyword={keyword} />
         <SearchVolumePredictor keywords={allKeywords} />
+        <SeasonalAnalysis keywords={allKeywords} />
       </TabsContent>
 
       <TabsContent value="trend-analyzer" className="space-y-4">
         <KeywordTrendAnalyzer keywords={allKeywords} />
+        <SeasonalAnalysis keywords={allKeywords} />
       </TabsContent>
 
       <TabsContent value="competitors" className="space-y-4">
@@ -115,6 +126,7 @@ const KeywordTabsContent: React.FC<KeywordTabsContentProps> = ({
 
       <TabsContent value="predictions" className="space-y-4">
         <SearchVolumePredictor keywords={allKeywords} />
+        <KeywordPerformancePredictor keywords={allKeywords} />
       </TabsContent>
 
       <TabsContent value="links" className="space-y-4">
@@ -140,6 +152,7 @@ const KeywordTabsContent: React.FC<KeywordTabsContentProps> = ({
 
       <TabsContent value="roi" className="space-y-4">
         <RoiCalculator keywords={allKeywords} />
+        <KeywordPerformancePredictor keywords={allKeywords} />
       </TabsContent>
 
       <TabsContent value="multilang" className="space-y-4">

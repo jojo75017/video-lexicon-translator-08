@@ -8,3 +8,11 @@ export interface BacklinkInfo {
   isSpam?: boolean;
   dateFound?: string;
 }
+
+export interface BrokenLink {
+  url: string;
+  statusCode?: number;
+  status?: string;
+  location?: string;
+  text?: string;
+}

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -29,7 +28,10 @@ import {
   Lightbulb,
   PlayCircle,
   CheckCircle,
-  Info
+  Info,
+  Calculator,
+  Snowflake,
+  Sun
 } from 'lucide-react';
 
 const KeywordGeneratorGuide: React.FC = () => {
@@ -61,6 +63,12 @@ const KeywordGeneratorGuide: React.FC = () => {
       description: 'Utilisation pas à pas de chaque fonctionnalité'
     },
     {
+      id: 'advanced-features',
+      title: 'Fonctionnalités avancées',
+      icon: Calculator,
+      description: 'Analyse de difficulté, prédictions et saisonnalité'
+    },
+    {
       id: 'best-practices',
       title: 'Bonnes pratiques',
       icon: CheckCircle,
@@ -69,24 +77,45 @@ const KeywordGeneratorGuide: React.FC = () => {
   ];
 
   const tabs = [
-    { id: 'generator', name: 'Standard', icon: Target, description: 'Générateur de base de mots-clés' },
-    { id: 'intelligent', name: 'IA', icon: Brain, description: 'Suggestions intelligentes par IA' },
-    { id: 'trends', name: 'Tendances', icon: TrendingUp, description: 'Analyse des tendances de recherche' },
+    { id: 'generator', name: 'Standard', icon: Target, description: 'Générateur de base + analyses avancées' },
+    { id: 'intelligent', name: 'IA', icon: Brain, description: 'Suggestions intelligentes par IA + analyse difficulté' },
+    { id: 'trends', name: 'Tendances', icon: TrendingUp, description: 'Analyse des tendances + saisonnalité' },
     { id: 'trend-analyzer', name: 'Analyse Trends', icon: Calendar, description: 'Analyse avancée des tendances' },
     { id: 'competitors', name: 'Concurrents', icon: Users, description: 'Analyse concurrentielle' },
     { id: 'competitive-intel', name: 'Intelligence', icon: Eye, description: 'Intelligence concurrentielle' },
     { id: 'content', name: 'Contenu', icon: FileText, description: 'Opportunités de contenu' },
     { id: 'content-strategy', name: 'Stratégie', icon: PenTool, description: 'Planification de contenu' },
-    { id: 'predictions', name: 'Prédictions', icon: BarChart3, description: 'Prédictions de volume' },
+    { id: 'predictions', name: 'Prédictions', icon: BarChart3, description: 'Prédictions de volume + performance' },
     { id: 'links', name: 'Liens', icon: Link, description: 'Suggestions de liens internes' },
     { id: 'serp', name: 'SERP', icon: Search, description: 'Analyse des résultats de recherche' },
     { id: 'grouping', name: 'Groupes', icon: Network, description: 'Groupement de mots-clés' },
     { id: 'ranking', name: 'Positions', icon: Trophy, description: 'Suivi des positions' },
     { id: 'gaps', name: 'Gaps', icon: AlertTriangle, description: 'Analyse des lacunes' },
-    { id: 'roi', name: 'ROI', icon: DollarSign, description: 'Calculateur de ROI' },
+    { id: 'roi', name: 'ROI', icon: DollarSign, description: 'Calculateur de ROI + prédicteur performance' },
     { id: 'multilang', name: 'Multi-langues', icon: Globe, description: 'Support multi-langues' },
     { id: 'voice', name: 'Vocal', icon: Mic, description: 'Optimisation recherche vocale' },
     { id: 'mobile', name: 'Mobile', icon: Smartphone, description: 'Optimisation mobile' }
+  ];
+
+  const newFeatures = [
+    {
+      name: 'Analyseur de difficulté',
+      description: 'Analyse automatique de la difficulté avec score d\'opportunité',
+      icon: Target,
+      location: 'Onglets Standard et IA'
+    },
+    {
+      name: 'Analyse saisonnière',
+      description: 'Détection automatique des mots-clés saisonniers avec graphiques',
+      icon: Snowflake,
+      location: 'Onglets Standard et Tendances'
+    },
+    {
+      name: 'Prédicteur de performance',
+      description: 'Calcul ROI, clics, conversions estimés selon votre budget',
+      icon: Calculator,
+      location: 'Onglets Prédictions et ROI'
+    }
   ];
 
   return (
@@ -95,10 +124,11 @@ const KeywordGeneratorGuide: React.FC = () => {
         <div className="flex items-center gap-3 mb-4">
           <BookOpen className="h-6 w-6 text-blue-600" />
           <h1 className="text-2xl font-bold">Guide complet du Générateur de Mots-clés</h1>
+          <Badge className="bg-green-100 text-green-800">Version améliorée</Badge>
         </div>
         <p className="text-gray-700">
           Ce guide vous accompagne étape par étape dans l'utilisation complète du générateur de mots-clés. 
-          Apprenez à maîtriser chaque fonctionnalité pour optimiser votre stratégie SEO.
+          Nouvelles fonctionnalités : analyse de difficulté automatique, détection saisonnière, et prédicteur de performance !
         </p>
       </Card>
 
@@ -146,7 +176,19 @@ const KeywordGeneratorGuide: React.FC = () => {
                   <ul className="space-y-2">
                     <li className="flex items-start gap-2">
                       <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
-                      <span>Génération de mots-clés standards et longue traîne</span>
+                      <span>Génération de 12+ mots-clés standards et longue traîne</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
+                      <span>Analyse automatique de difficulté avec scores d'opportunité</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
+                      <span>Détection automatique des tendances saisonnières</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
+                      <span>Prédicteur de performance avec calculs ROI</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
@@ -154,15 +196,7 @@ const KeywordGeneratorGuide: React.FC = () => {
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
-                      <span>Prédictions de tendances et saisonnalité</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
                       <span>Suggestions de contenu et stratégie</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
-                      <span>Calculateur de ROI intégré</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
@@ -185,7 +219,7 @@ const KeywordGeneratorGuide: React.FC = () => {
                     <h3 className="font-semibold text-blue-800 mb-2">Étape 1 : Saisie du mot-clé principal</h3>
                     <p className="text-blue-700">
                       Commencez par entrer votre mot-clé principal dans le champ de recherche en haut de la page. 
-                      Ce sera la base de toutes vos recherches.
+                      Ce sera la base de toutes vos recherches et analyses.
                     </p>
                   </div>
                   
@@ -193,17 +227,60 @@ const KeywordGeneratorGuide: React.FC = () => {
                     <h3 className="font-semibold text-green-800 mb-2">Étape 2 : Cliquez sur "Générer"</h3>
                     <p className="text-green-700">
                       Une fois votre mot-clé saisi, cliquez sur le bouton "Générer" pour lancer l'analyse. 
-                      L'outil va créer automatiquement 12 mots-clés standards et 12 mots-clés longue traîne.
+                      L'outil va créer automatiquement 12 mots-clés standards et 12 mots-clés longue traîne avec analyse complète.
                     </p>
                   </div>
                   
                   <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
-                    <h3 className="font-semibold text-purple-800 mb-2">Étape 3 : Explorez les résultats</h3>
+                    <h3 className="font-semibold text-purple-800 mb-2">Étape 3 : Explorez les analyses</h3>
                     <p className="text-purple-700">
-                      Les résultats apparaissent dans l'onglet "Standard". Vous pouvez naviguer entre les différents onglets 
-                      pour explorer toutes les fonctionnalités disponibles.
+                      Les résultats apparaissent dans l'onglet "Standard" avec trois nouvelles analyses automatiques : 
+                      difficulté des mots-clés, détection saisonnière, et prédicteur de performance.
                     </p>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {activeSection === 'advanced-features' && (
+              <div className="space-y-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <Calculator className="h-5 w-5 text-purple-600" />
+                  <h2 className="text-xl font-bold">Nouvelles fonctionnalités avancées</h2>
+                </div>
+                
+                <div className="grid grid-cols-1 gap-4">
+                  {newFeatures.map((feature, index) => {
+                    const Icon = feature.icon;
+                    return (
+                      <Card key={index} className="p-4 border-l-4 border-l-purple-500">
+                        <div className="flex items-start gap-3">
+                          <Icon className="h-6 w-6 text-purple-600 mt-1" />
+                          <div>
+                            <h3 className="font-semibold text-lg">{feature.name}</h3>
+                            <p className="text-gray-700 mb-2">{feature.description}</p>
+                            <Badge variant="outline" className="text-xs">
+                              Disponible dans : {feature.location}
+                            </Badge>
+                          </div>
+                        </div>
+                      </Card>
+                    );
+                  })}
+                </div>
+
+                <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Lightbulb className="h-5 w-5 text-yellow-600" />
+                    <h3 className="font-semibold text-yellow-800">Nouveau workflow recommandé</h3>
+                  </div>
+                  <ol className="list-decimal list-inside space-y-2 text-yellow-700">
+                    <li>Générez vos mots-clés dans l'onglet Standard</li>
+                    <li>Consultez l'analyse de difficulté pour identifier les opportunités</li>
+                    <li>Vérifiez la saisonnalité pour planifier votre calendrier</li>
+                    <li>Utilisez le prédicteur de performance pour estimer le ROI</li>
+                    <li>Exportez vos sélections et planifiez votre stratégie</li>
+                  </ol>
                 </div>
               </div>
             )}
@@ -212,7 +289,7 @@ const KeywordGeneratorGuide: React.FC = () => {
               <div className="space-y-6">
                 <div className="flex items-center gap-2 mb-4">
                   <Eye className="h-5 w-5 text-purple-600" />
-                  <h2 className="text-xl font-bold">Navigation par onglets</h2>
+                  <h2 className="text-xl font-bold">Navigation par onglets (18 onglets disponibles)</h2>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -245,21 +322,87 @@ const KeywordGeneratorGuide: React.FC = () => {
                   <AccordionItem value="standard">
                     <AccordionTrigger className="flex items-center gap-2">
                       <Target className="h-4 w-4" />
-                      Onglet Standard - Générateur de base
+                      Onglet Standard - Générateur + Analyses avancées
                     </AccordionTrigger>
                     <AccordionContent className="space-y-3">
-                      <p><strong>Objectif :</strong> Générer des mots-clés principaux liés à votre terme de recherche.</p>
+                      <p><strong>Objectif :</strong> Générer des mots-clés principaux avec analyses automatiques complètes.</p>
                       <div className="space-y-2">
                         <p><strong>Actions :</strong></p>
                         <ul className="list-disc pl-6 space-y-1">
                           <li>Entrez votre mot-clé dans le champ de recherche</li>
-                          <li>Cliquez sur "Générer"</li>
-                          <li>Consultez les 12 mots-clés standards générés</li>
-                          <li>Cliquez sur les mots-clés pour les sélectionner</li>
-                          <li>Utilisez les boutons "Effacer" et "Exporter" pour gérer vos sélections</li>
+                          <li>Cliquez sur "Générer" pour obtenir 24 mots-clés (12 standards + 12 longue traîne)</li>
+                          <li>Consultez automatiquement l'analyse de difficulté avec scores d'opportunité</li>
+                          <li>Vérifiez la détection saisonnière pour planifier votre contenu</li>
+                          <li>Utilisez le prédicteur de performance pour estimer clics, conversions et ROI</li>
+                          <li>Sélectionnez vos mots-clés en cliquant dessus</li>
+                          <li>Exportez votre sélection avec le bouton "Exporter"</li>
                         </ul>
                       </div>
-                      <Badge variant="outline" className="mt-2">💡 Conseil : Ces mots-clés sont optimaux pour le contenu principal</Badge>
+                      <Badge variant="outline" className="mt-2">✨ Nouveau : 3 analyses automatiques intégrées</Badge>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  <AccordionItem value="difficulty">
+                    <AccordionTrigger className="flex items-center gap-2">
+                      <Calculator className="h-4 w-4" />
+                      Analyseur de difficulté automatique
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-3">
+                      <p><strong>Objectif :</strong> Évaluer automatiquement la difficulté et identifier les meilleures opportunités.</p>
+                      <div className="space-y-2">
+                        <p><strong>Fonctionnalités :</strong></p>
+                        <ul className="list-disc pl-6 space-y-1">
+                          <li>Classification automatique : Facile (≤20), Moyen (21-40), Difficile (41-60), Très difficile (>60)</li>
+                          <li>Score d'opportunité calculé selon volume vs difficulté</li>
+                          <li>Top 5 des meilleures opportunités mis en avant</li>
+                          <li>Statistiques globales : mots-clés faciles, fort volume, meilleures opportunités</li>
+                          <li>Barres de progression visuelles pour chaque mot-clé</li>
+                        </ul>
+                      </div>
+                      <Badge variant="outline" className="mt-2">🎯 Disponible dans Standard et IA</Badge>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  <AccordionItem value="seasonal">
+                    <AccordionTrigger className="flex items-center gap-2">
+                      <Snowflake className="h-4 w-4" />
+                      Analyse saisonnière automatique
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-3">
+                      <p><strong>Objectif :</strong> Détecter automatiquement les mots-clés saisonniers et leurs tendances.</p>
+                      <div className="space-y-2">
+                        <p><strong>Détection automatique :</strong></p>
+                        <ul className="list-disc pl-6 space-y-1">
+                          <li>Mots-clés d'été, hiver, printemps, automne</li>
+                          <li>Événements spéciaux : Noël, vacances, rentrée</li>
+                          <li>Graphiques de tendances mensuelles</li>
+                          <li>Code couleur par saison avec icônes dédiées</li>
+                          <li>Recommandations de planification de contenu</li>
+                        </ul>
+                      </div>
+                      <Badge variant="outline" className="mt-2">📅 Disponible dans Standard et Tendances</Badge>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  <AccordionItem value="predictor">
+                    <AccordionTrigger className="flex items-center gap-2">
+                      <BarChart3 className="h-4 w-4" />
+                      Prédicteur de performance
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-3">
+                      <p><strong>Objectif :</strong> Calculer les performances estimées selon votre budget et période.</p>
+                      <div className="space-y-2">
+                        <p><strong>Calculs automatiques :</strong></p>
+                        <ul className="list-disc pl-6 space-y-1">
+                          <li>Définissez votre budget mensuel et période (en mois)</li>
+                          <li>Estimation automatique des clics par mot-clé</li>
+                          <li>Calcul des conversions avec taux de conversion réaliste</li>
+                          <li>ROI estimé par mot-clé et global</li>
+                          <li>Position moyenne estimée selon l'investissement</li>
+                          <li>Classement par meilleur ROI potentiel</li>
+                        </ul>
+                      </div>
+                      <Badge variant="outline" className="mt-2">💰 Disponible dans Prédictions et ROI</Badge>
                     </AccordionContent>
                   </AccordionItem>
 
@@ -391,31 +534,31 @@ const KeywordGeneratorGuide: React.FC = () => {
               <div className="space-y-6">
                 <div className="flex items-center gap-2 mb-4">
                   <CheckCircle className="h-5 w-5 text-green-600" />
-                  <h2 className="text-xl font-bold">Bonnes pratiques</h2>
+                  <h2 className="text-xl font-bold">Bonnes pratiques mises à jour</h2>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <Card className="p-4 border-l-4 border-l-green-500">
-                    <h3 className="font-semibold text-green-800 mb-3">✅ À faire</h3>
+                    <h3 className="font-semibold text-green-800 mb-3">✅ Nouvelles pratiques recommandées</h3>
                     <ul className="space-y-2 text-sm">
-                      <li>• Commencez toujours par un mot-clé principal clair</li>
-                      <li>• Explorez tous les onglets pour une analyse complète</li>
-                      <li>• Sélectionnez 5-10 mots-clés maximum par contenu</li>
-                      <li>• Vérifiez les tendances avant de planifier</li>
-                      <li>• Analysez vos concurrents régulièrement</li>
-                      <li>• Calculez le ROI pour prioriser vos efforts</li>
+                      <li>• Utilisez l'analyse de difficulté pour prioriser vos efforts</li>
+                      <li>• Consultez systématiquement la saisonnalité détectée</li>
+                      <li>• Définissez un budget réaliste dans le prédicteur</li>
+                      <li>• Focalisez-vous sur les scores d'opportunité élevés</li>
+                      <li>• Planifiez selon les tendances saisonnières</li>
+                      <li>• Vérifiez le ROI estimé avant de lancer une campagne</li>
                     </ul>
                   </Card>
                   
                   <Card className="p-4 border-l-4 border-l-red-500">
-                    <h3 className="font-semibold text-red-800 mb-3">❌ À éviter</h3>
+                    <h3 className="font-semibold text-red-800 mb-3">❌ Nouveaux pièges à éviter</h3>
                     <ul className="space-y-2 text-sm">
-                      <li>• Ne pas vérifier la difficulté des mots-clés</li>
-                      <li>• Ignorer les mots-clés longue traîne</li>
-                      <li>• Choisir uniquement des mots-clés à fort volume</li>
-                      <li>• Négliger l'analyse concurrentielle</li>
-                      <li>• Ne pas planifier selon les tendances</li>
-                      <li>• Oublier d'exporter vos sélections</li>
+                      <li>• Ignorer les scores d'opportunité dans l'analyse</li>
+                      <li>• Ne pas tenir compte de la saisonnalité détectée</li>
+                      <li>• Définir un budget irréaliste dans les prédictions</li>
+                      <li>• Choisir uniquement selon le volume sans difficulté</li>
+                      <li>• Oublier de vérifier le ROI estimé</li>
+                      <li>• Ne pas exporter les analyses avancées</li>
                     </ul>
                   </Card>
                 </div>
@@ -423,12 +566,12 @@ const KeywordGeneratorGuide: React.FC = () => {
                 <Card className="p-6 bg-gradient-to-r from-blue-50 to-purple-50">
                   <div className="flex items-center gap-2 mb-4">
                     <Lightbulb className="h-5 w-5 text-yellow-600" />
-                    <h3 className="font-semibold">Conseil d'expert</h3>
+                    <h3 className="font-semibold">Workflow expert amélioré</h3>
                   </div>
                   <p className="text-gray-700">
-                    Utilisez une approche en entonnoir : commencez par les mots-clés génériques dans l'onglet Standard, 
-                    affinez avec la Longue traîne, validez avec l'analyse Concurrents, et optimisez votre ROI avec le calculateur. 
-                    Cette méthode garantit une stratégie SEO complète et rentable.
+                    Nouveau workflow en 6 étapes : <strong>1)</strong> Générez vos mots-clés, <strong>2)</strong> Analysez la difficulté automatique, 
+                    <strong>3)</strong> Identifiez la saisonnalité, <strong>4)</strong> Calculez les performances estimées, 
+                    <strong>5)</strong> Sélectionnez selon les scores d'opportunité, <strong>6)</strong> Exportez et planifiez votre stratégie.
                   </p>
                 </Card>
               </div>

@@ -13,11 +13,20 @@ export type { HierarchyItem, HeadingStructure, StructureItem } from './Hierarchy
 export type { RankingData, SearchConsoleData } from './Ranking';
 export type { ImageAnalysis, ImageDetail } from './ImageAnalysis';
 export type { SeoAnalysisResult } from './SeoAnalysisResult';
+export type { BrokenLink } from './Backlinks';
 
 // Types supplémentaires pour la compatibilité
 export interface OrganicSearchProps {
   keyword: string;
   data?: any[];
+  keywords?: string[];
+  totalKeywords?: number;
+  averagePosition?: number;
+  visibility?: number;
+}
+
+export interface SocialMetricsProps {
+  socialMetrics?: SocialMetrics;
 }
 
 export interface AnalysisOptions {
@@ -31,6 +40,7 @@ export interface PageStructure {
   url: string;
   level: number;
   children?: PageStructure[];
+  optimizationStatus?: string;
 }
 
 export interface RoiParameters {
@@ -40,6 +50,7 @@ export interface RoiParameters {
   averageOrderValue: number;
   customerAcquisitionCost: number;
   timeFrame: number;
+  seoInvestment?: number;
 }
 
 export interface RoiResults {
@@ -75,6 +86,7 @@ export interface MobileOptimization {
   mobileScore: number;
   issues: string[];
   recommendations: string[];
+  score?: number;
 }
 
 export interface CompetitorData {
