@@ -1,254 +1,191 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Network, Search, Filter, Download } from "lucide-react";
-import { toast } from "sonner";
-import { KeywordSuggestion } from "@/types/seo/Keyword";
+import React, { useState, useMemo } from 'react';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { KeywordSuggestion } from '@/types/seo/Keyword';
+import { FolderTree, Target, TrendingUp, Download } from 'lucide-react';
 
 interface KeywordClusteringToolProps {
   keywords: KeywordSuggestion[];
 }
 
 interface KeywordCluster {
-  id: string;
   name: string;
   keywords: KeywordSuggestion[];
-  totalVolume: number;
+  avgVolume: number;
   avgDifficulty: number;
-  priority: 'haute' | 'moyenne' | 'basse';
-  contentType: 'pillar' | 'cluster' | 'support';
+  totalVolume: number;
+  intent: string;
 }
 
 const KeywordClusteringTool: React.FC<KeywordClusteringToolProps> = ({ keywords }) => {
-  const [clusters, setClusters] = useState<KeywordCluster[]>([]);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedPriority, setSelectedPriority] = useState<'all' | 'haute' | 'moyenne' | 'basse'>('all');
+  const [selectedCluster, setSelectedCluster] = useState<string | null>(null);
 
-  const generateClusters = async () => {
-    if (keywords.length === 0) {
-      toast.error("Aucun mot-clé à analyser");
-      return;
-    }
+  const clusters = useMemo(() => {
+    if (keywords.length === 0) return [];
 
-    setIsGenerating(true);
-
-    setTimeout(() => {
-      // Simulation de clustering intelligent
-      const clustersData: KeywordCluster[] = [];
+    // Algorithme de clustering simple basé sur les mots communs
+    const clusterMap = new Map<string, KeywordSuggestion[]>();
+    
+    keywords.forEach(kw => {
+      const words = kw.keyword.toLowerCase().split(' ');
+      let clusterFound = false;
       
-      // Grouper les mots-clés par thème
-      const themes = ['achat', 'guide', 'comparaison', 'prix', 'avis'];
-      
-      themes.forEach((theme, index) => {
-        const relatedKeywords = keywords.filter(kw => 
-          kw.keyword.toLowerCase().includes(theme) || 
-          Math.random() > 0.6
-        ).slice(0, Math.floor(Math.random() * 5) + 3);
-
-        if (relatedKeywords.length > 0) {
-          const totalVolume = relatedKeywords.reduce((sum, kw) => sum + (kw.volume || 0), 0);
-          const avgDifficulty = relatedKeywords.reduce((sum, kw) => sum + (kw.difficulty || 50), 0) / relatedKeywords.length;
-          
-          const priorities: KeywordCluster['priority'][] = ['haute', 'moyenne', 'basse'];
-          const contentTypes: KeywordCluster['contentType'][] = ['pillar', 'cluster', 'support'];
-          
-          clustersData.push({
-            id: `cluster-${index}`,
-            name: `Cluster ${theme.charAt(0).toUpperCase() + theme.slice(1)}`,
-            keywords: relatedKeywords,
-            totalVolume,
-            avgDifficulty: Math.round(avgDifficulty),
-            priority: priorities[Math.floor(Math.random() * priorities.length)],
-            contentType: contentTypes[Math.floor(Math.random() * contentTypes.length)]
-          });
+      // Chercher un cluster existant avec des mots communs
+      for (const [clusterName, clusterKeywords] of clusterMap.entries()) {
+        const clusterWords = clusterName.toLowerCase().split(' ');
+        const commonWords = words.filter(word => clusterWords.includes(word));
+        
+        if (commonWords.length > 0 || words.length === 1) {
+          clusterKeywords.push(kw);
+          clusterFound = true;
+          break;
         }
-      });
+      }
+      
+      // Si aucun cluster trouvé, créer un nouveau
+      if (!clusterFound) {
+        const mainWord = words[0] || kw.keyword;
+        clusterMap.set(mainWord, [kw]);
+      }
+    });
 
-      setClusters(clustersData);
-      setIsGenerating(false);
-      toast.success(`${clustersData.length} clusters générés`);
-    }, 3000);
-  };
+    // Convertir en format de cluster avec statistiques
+    return Array.from(clusterMap.entries()).map(([name, kwList]): KeywordCluster => {
+      const totalVolume = kwList.reduce((sum, kw) => sum + (kw.volume || 0), 0);
+      const avgVolume = Math.round(totalVolume / kwList.length);
+      const avgDifficulty = Math.round(kwList.reduce((sum, kw) => sum + (kw.difficulty || 0), 0) / kwList.length);
+      
+      // Déterminer l'intention dominante
+      const intentCounts = kwList.reduce((acc, kw) => {
+        const intent = kw.intent || 'informational';
+        acc[intent] = (acc[intent] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+      
+      const dominantIntent = Object.entries(intentCounts).sort(([,a], [,b]) => b - a)[0]?.[0] || 'informational';
 
-  const getPriorityColor = (priority: KeywordCluster['priority']) => {
-    switch (priority) {
-      case 'haute': return 'bg-red-100 text-red-800';
-      case 'moyenne': return 'bg-yellow-100 text-yellow-800';
-      case 'basse': return 'bg-gray-100 text-gray-800';
+      return {
+        name: name.charAt(0).toUpperCase() + name.slice(1),
+        keywords: kwList,
+        avgVolume,
+        avgDifficulty,
+        totalVolume,
+        intent: dominantIntent
+      };
+    }).sort((a, b) => b.totalVolume - a.totalVolume);
+  }, [keywords]);
+
+  const getIntentColor = (intent: string) => {
+    switch (intent) {
+      case 'commercial': return 'bg-blue-100 text-blue-800';
+      case 'transactional': return 'bg-green-100 text-green-800';
+      case 'navigational': return 'bg-purple-100 text-purple-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
-  const getContentTypeIcon = (type: KeywordCluster['contentType']) => {
-    switch (type) {
-      case 'pillar': return '🏛️';
-      case 'cluster': return '🌐';
-      case 'support': return '🔧';
-    }
-  };
-
-  const getContentTypeLabel = (type: KeywordCluster['contentType']) => {
-    switch (type) {
-      case 'pillar': return 'Page Pilier';
-      case 'cluster': return 'Cluster Principal';
-      case 'support': return 'Contenu Support';
-    }
-  };
-
-  const exportClusters = () => {
-    if (clusters.length === 0) return;
-    
-    const exportData = clusters.map(cluster => ({
-      'Nom du Cluster': cluster.name,
-      'Mots-clés': cluster.keywords.map(kw => kw.keyword).join(', '),
-      'Volume Total': cluster.totalVolume,
-      'Difficulté Moyenne': cluster.avgDifficulty,
-      'Priorité': cluster.priority,
-      'Type de Contenu': getContentTypeLabel(cluster.contentType)
-    }));
-    
+  const exportCluster = (cluster: KeywordCluster) => {
     const csv = [
-      Object.keys(exportData[0]).join(','),
-      ...exportData.map(row => Object.values(row).join(','))
+      'Mot-clé,Volume,Difficulté,CPC,Intention',
+      ...cluster.keywords.map(kw => 
+        `"${kw.keyword}",${kw.volume || 'N/A'},${kw.difficulty || 'N/A'},${kw.cpc || 'N/A'},${kw.intent || 'N/A'}`
+      )
     ].join('\n');
     
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'clusters-mots-cles.csv';
+    link.download = `cluster-${cluster.name.toLowerCase()}.csv`;
     link.click();
-    
-    toast.success('Clusters exportés en CSV');
+    URL.revokeObjectURL(url);
   };
 
-  const filteredClusters = clusters.filter(cluster => {
-    const matchesSearch = cluster.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         cluster.keywords.some(kw => kw.keyword.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesPriority = selectedPriority === 'all' || cluster.priority === selectedPriority;
-    return matchesSearch && matchesPriority;
-  });
+  if (keywords.length === 0) {
+    return (
+      <Card className="p-6 text-center">
+        <FolderTree className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+        <p className="text-gray-500">Aucun mot-clé à analyser</p>
+      </Card>
+    );
+  }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Network className="h-5 w-5 text-blue-500" />
-          Clustering de mots-clés
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex gap-2">
-          <Button 
-            onClick={generateClusters}
-            disabled={isGenerating || keywords.length === 0}
-            className="gap-2"
+    <Card className="p-6">
+      <div className="flex items-center gap-2 mb-4">
+        <FolderTree className="h-5 w-5 text-purple-600" />
+        <h3 className="text-lg font-semibold">Clustering de mots-clés</h3>
+        <Badge variant="outline">{clusters.length} clusters</Badge>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {clusters.map((cluster, index) => (
+          <Card 
+            key={index}
+            className={`p-4 cursor-pointer transition-all ${
+              selectedCluster === cluster.name ? 'ring-2 ring-purple-500' : 'hover:shadow-md'
+            }`}
+            onClick={() => setSelectedCluster(selectedCluster === cluster.name ? null : cluster.name)}
           >
-            {isGenerating ? (
-              <>Génération en cours...</>
-            ) : (
-              <>
-                <Network className="h-4 w-4" />
-                Générer les clusters
-              </>
-            )}
-          </Button>
-          
-          {clusters.length > 0 && (
-            <Button variant="outline" onClick={exportClusters} className="gap-2">
-              <Download className="h-4 w-4" />
-              Exporter CSV
-            </Button>
-          )}
-        </div>
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="font-medium">{cluster.name}</h4>
+              <Badge className={getIntentColor(cluster.intent)}>
+                {cluster.intent}
+              </Badge>
+            </div>
+            
+            <div className="text-sm text-gray-600 space-y-1">
+              <div className="flex justify-between">
+                <span>Mots-clés:</span>
+                <span className="font-medium">{cluster.keywords.length}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Volume total:</span>
+                <span className="font-medium">{cluster.totalVolume.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Difficulté moy.:</span>
+                <span className="font-medium">{cluster.avgDifficulty}</span>
+              </div>
+            </div>
 
-        {clusters.length > 0 && (
-          <>
-            <div className="flex gap-2">
-              <Input
-                placeholder="Rechercher dans les clusters..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+            <div className="mt-3 flex gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  exportCluster(cluster);
+                }}
                 className="flex-1"
-              />
-              <select
-                value={selectedPriority}
-                onChange={(e) => setSelectedPriority(e.target.value as any)}
-                className="px-3 py-2 border rounded-md"
               >
-                <option value="all">Toutes priorités</option>
-                <option value="haute">Haute priorité</option>
-                <option value="moyenne">Moyenne priorité</option>
-                <option value="basse">Basse priorité</option>
-              </select>
+                <Download className="h-3 w-3 mr-1" />
+                Export
+              </Button>
             </div>
+          </Card>
+        ))}
+      </div>
 
-            <div className="space-y-4">
-              {filteredClusters.map((cluster) => (
-                <div key={cluster.id} className="p-4 border rounded-lg space-y-3">
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <span>{getContentTypeIcon(cluster.contentType)}</span>
-                      <h4 className="font-medium">{cluster.name}</h4>
-                    </div>
-                    <div className="flex gap-2">
-                      <Badge className={getPriorityColor(cluster.priority)}>
-                        {cluster.priority}
-                      </Badge>
-                      <Badge variant="outline">
-                        {getContentTypeLabel(cluster.contentType)}
-                      </Badge>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-4 text-sm">
-                    <div>
-                      <span className="text-gray-500">Mots-clés:</span>
-                      <div className="font-medium">{cluster.keywords.length}</div>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Volume total:</span>
-                      <div className="font-medium">{cluster.totalVolume.toLocaleString()}</div>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Difficulté moy.:</span>
-                      <div className="font-medium">{cluster.avgDifficulty}/100</div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <span className="text-sm text-gray-500 block mb-2">Mots-clés du cluster:</span>
-                    <div className="flex flex-wrap gap-1">
-                      {cluster.keywords.slice(0, 6).map((keyword, idx) => (
-                        <Badge key={idx} variant="secondary" className="text-xs">
-                          {keyword.keyword}
-                        </Badge>
-                      ))}
-                      {cluster.keywords.length > 6 && (
-                        <Badge variant="secondary" className="text-xs">
-                          +{cluster.keywords.length - 6} autres
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2 pt-2 border-t">
-                    <Button size="sm" variant="outline">
-                      Voir détails
-                    </Button>
-                    <Button size="sm">
-                      Créer contenu
-                    </Button>
-                  </div>
+      {selectedCluster && (
+        <div className="mt-6 border-t pt-4">
+          <h4 className="font-medium mb-3">Détails du cluster: {selectedCluster}</h4>
+          {clusters
+            .find(c => c.name === selectedCluster)
+            ?.keywords.map((kw, idx) => (
+              <div key={idx} className="flex items-center justify-between p-2 border rounded mb-2">
+                <span>{kw.keyword}</span>
+                <div className="flex gap-2 text-sm text-gray-600">
+                  <span>Vol: {kw.volume?.toLocaleString()}</span>
+                  <span>Diff: {kw.difficulty}</span>
+                  {kw.cpc && <span>CPC: {kw.cpc}€</span>}
                 </div>
-              ))}
-            </div>
-          </>
-        )}
-      </CardContent>
+              </div>
+            ))}
+        </div>
+      )}
     </Card>
   );
 };

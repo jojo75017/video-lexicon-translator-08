@@ -1,258 +1,209 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Brain, TrendingUp, Eye, Target, AlertCircle } from "lucide-react";
-import { toast } from "sonner";
-import { KeywordSuggestion } from "@/types/seo/Keyword";
+import React, { useMemo } from 'react';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { KeywordSuggestion } from '@/types/seo/Keyword';
+import { Lightbulb, TrendingUp, Target, AlertTriangle, CheckCircle } from 'lucide-react';
 
 interface KeywordInsightsAnalyzerProps {
   keywords: KeywordSuggestion[];
 }
 
-interface KeywordInsight {
-  keyword: string;
-  opportunity: number;
-  competition: number;
-  seasonality: 'stable' | 'seasonal' | 'trending';
-  intent: 'informational' | 'navigational' | 'transactional' | 'commercial';
-  difficulty: 'facile' | 'moyen' | 'difficile';
-  recommendations: string[];
-  timeToRank: number; // en mois
-  contentGaps: string[];
+interface Insight {
+  type: 'opportunity' | 'warning' | 'success' | 'info';
+  title: string;
+  description: string;
+  keywords: string[];
+  action: string;
+  impact: 'Élevé' | 'Moyen' | 'Faible';
 }
 
 const KeywordInsightsAnalyzer: React.FC<KeywordInsightsAnalyzerProps> = ({ keywords }) => {
-  const [insights, setInsights] = useState<KeywordInsight[]>([]);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const insights = useMemo(() => {
+    if (keywords.length === 0) return [];
 
-  const analyzeKeywordInsights = async () => {
-    if (keywords.length === 0) {
-      toast.error("Aucun mot-clé à analyser");
-      return;
-    }
+    const analysisInsights: Insight[] = [];
 
-    setIsAnalyzing(true);
-
-    setTimeout(() => {
-      const keywordInsights: KeywordInsight[] = keywords.slice(0, 8).map((keyword) => {
-        const difficulty = keyword.difficulty || 50;
-        const volume = keyword.volume || 1000;
-        
-        // Calcul de l'opportunité basé sur volume/difficulté
-        const opportunity = Math.max(10, Math.min(100, (volume / 100) - difficulty + Math.random() * 30));
-        
-        const seasonalities: KeywordInsight['seasonality'][] = ['stable', 'seasonal', 'trending'];
-        const difficulties: KeywordInsight['difficulty'][] = ['facile', 'moyen', 'difficile'];
-        
-        const getDifficultyLevel = (diff: number): KeywordInsight['difficulty'] => {
-          if (diff < 30) return 'facile';
-          if (diff < 60) return 'moyen';
-          return 'difficile';
-        };
-
-        const getTimeToRank = (diff: number): number => {
-          if (diff < 30) return Math.floor(Math.random() * 3) + 1; // 1-3 mois
-          if (diff < 60) return Math.floor(Math.random() * 6) + 3; // 3-8 mois
-          return Math.floor(Math.random() * 12) + 6; // 6-17 mois
-        };
-
-        const recommendations = [
-          `Créer du contenu long-form (2000+ mots) pour "${keyword.keyword}"`,
-          `Optimiser pour les featured snippets avec des listes`,
-          `Développer des pages piliers autour de "${keyword.keyword}"`,
-          `Créer des FAQ détaillées sur le sujet`,
-          `Optimiser les images avec alt-text pertinent`
-        ];
-
-        const contentGaps = [
-          'Guide complet manquant',
-          'Comparaisons produits absentes',
-          'Témoignages clients insuffisants',
-          'Contenu vidéo inexistant',
-          'FAQ détaillées manquantes'
-        ];
-
-        return {
-          keyword: keyword.keyword,
-          opportunity: Math.round(opportunity),
-          competition: keyword.competition || Math.random(),
-          seasonality: seasonalities[Math.floor(Math.random() * seasonalities.length)],
-          intent: keyword.intent || 'informational',
-          difficulty: getDifficultyLevel(difficulty),
-          recommendations: recommendations.slice(0, Math.floor(Math.random() * 3) + 2),
-          timeToRank: getTimeToRank(difficulty),
-          contentGaps: contentGaps.slice(0, Math.floor(Math.random() * 3) + 2)
-        };
+    // Analyse 1: Mots-clés à faible concurrence
+    const lowCompetitionKeywords = keywords.filter(kw => (kw.difficulty || 0) < 30 && (kw.volume || 0) > 500);
+    if (lowCompetitionKeywords.length > 0) {
+      analysisInsights.push({
+        type: 'opportunity',
+        title: 'Opportunités à faible concurrence détectées',
+        description: `${lowCompetitionKeywords.length} mots-clés avec un bon volume et une faible difficulté`,
+        keywords: lowCompetitionKeywords.slice(0, 3).map(kw => kw.keyword),
+        action: 'Créez du contenu prioritaire sur ces mots-clés',
+        impact: 'Élevé'
       });
+    }
 
-      setInsights(keywordInsights);
-      setIsAnalyzing(false);
-      toast.success(`${keywordInsights.length} analyses d'insights générées`);
-    }, 3000);
-  };
+    // Analyse 2: Mots-clés à fort volume mais haute difficulté
+    const highVolumeHighDifficulty = keywords.filter(kw => (kw.volume || 0) > 2000 && (kw.difficulty || 0) > 70);
+    if (highVolumeHighDifficulty.length > 0) {
+      analysisInsights.push({
+        type: 'warning',
+        title: 'Mots-clés très concurrentiels identifiés',
+        description: `${highVolumeHighDifficulty.length} mots-clés à fort volume mais très difficiles à positionner`,
+        keywords: highVolumeHighDifficulty.slice(0, 3).map(kw => kw.keyword),
+        action: 'Concentrez-vous sur des variantes longue traîne',
+        impact: 'Moyen'
+      });
+    }
 
-  const getOpportunityColor = (opportunity: number) => {
-    if (opportunity >= 80) return 'bg-green-100 text-green-800';
-    if (opportunity >= 60) return 'bg-yellow-100 text-yellow-800';
-    if (opportunity >= 40) return 'bg-orange-100 text-orange-800';
-    return 'bg-red-100 text-red-800';
-  };
+    // Analyse 3: Équilibre des intentions de recherche
+    const intentDistribution = keywords.reduce((acc, kw) => {
+      const intent = kw.intent || 'informational';
+      acc[intent] = (acc[intent] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
 
-  const getDifficultyColor = (difficulty: KeywordInsight['difficulty']) => {
-    switch (difficulty) {
-      case 'facile': return 'bg-green-100 text-green-800';
-      case 'moyen': return 'bg-yellow-100 text-yellow-800';
-      case 'difficile': return 'bg-red-100 text-red-800';
+    const totalKeywords = keywords.length;
+    const informationalPercentage = (intentDistribution.informational || 0) / totalKeywords * 100;
+
+    if (informationalPercentage > 80) {
+      analysisInsights.push({
+        type: 'info',
+        title: 'Stratégie orientée contenu informatif',
+        description: `${informationalPercentage.toFixed(0)}% de vos mots-clés sont informationnels`,
+        keywords: [],
+        action: 'Équilibrez avec des mots-clés commerciaux et transactionnels',
+        impact: 'Moyen'
+      });
+    }
+
+    // Analyse 4: Mots-clés saisonniers
+    const seasonalKeywords = keywords.filter(kw => 
+      kw.keyword.toLowerCase().includes('noël') ||
+      kw.keyword.toLowerCase().includes('été') ||
+      kw.keyword.toLowerCase().includes('vacances') ||
+      kw.keyword.toLowerCase().includes('rentrée')
+    );
+
+    if (seasonalKeywords.length > 0) {
+      analysisInsights.push({
+        type: 'info',
+        title: 'Mots-clés saisonniers détectés',
+        description: `${seasonalKeywords.length} mots-clés avec des pics saisonniers identifiés`,
+        keywords: seasonalKeywords.slice(0, 3).map(kw => kw.keyword),
+        action: 'Planifiez votre contenu en fonction des saisons',
+        impact: 'Moyen'
+      });
+    }
+
+    // Analyse 5: Mots-clés longue traîne
+    const longTailKeywords = keywords.filter(kw => kw.keyword.split(' ').length >= 4);
+    if (longTailKeywords.length > keywords.length * 0.4) {
+      analysisInsights.push({
+        type: 'success',
+        title: 'Bonne stratégie longue traîne',
+        description: `${longTailKeywords.length} mots-clés longue traîne identifiés (${(longTailKeywords.length/keywords.length*100).toFixed(0)}%)`,
+        keywords: longTailKeywords.slice(0, 3).map(kw => kw.keyword),
+        action: 'Continuez à développer des variantes spécifiques',
+        impact: 'Élevé'
+      });
+    }
+
+    // Analyse 6: Potentiel de trafic
+    const totalPotentialTraffic = keywords.reduce((sum, kw) => sum + (kw.volume || 0) * 0.1, 0); // 10% du volume
+    if (totalPotentialTraffic > 5000) {
+      analysisInsights.push({
+        type: 'opportunity',
+        title: 'Fort potentiel de trafic identifié',
+        description: `Potentiel estimé de ${Math.round(totalPotentialTraffic).toLocaleString()} visiteurs/mois`,
+        keywords: [],
+        action: 'Optimisez votre stratégie de contenu pour maximiser ce potentiel',
+        impact: 'Élevé'
+      });
+    }
+
+    return analysisInsights;
+  }, [keywords]);
+
+  const getInsightIcon = (type: string) => {
+    switch (type) {
+      case 'opportunity': return <TrendingUp className="h-5 w-5 text-green-600" />;
+      case 'warning': return <AlertTriangle className="h-5 w-5 text-orange-600" />;
+      case 'success': return <CheckCircle className="h-5 w-5 text-blue-600" />;
+      default: return <Lightbulb className="h-5 w-5 text-purple-600" />;
     }
   };
 
-  const getSeasonalityIcon = (seasonality: KeywordInsight['seasonality']) => {
-    switch (seasonality) {
-      case 'stable': return '📊';
-      case 'seasonal': return '🌊';
-      case 'trending': return '🚀';
+  const getInsightColor = (type: string) => {
+    switch (type) {
+      case 'opportunity': return 'border-l-green-500 bg-green-50';
+      case 'warning': return 'border-l-orange-500 bg-orange-50';
+      case 'success': return 'border-l-blue-500 bg-blue-50';
+      default: return 'border-l-purple-500 bg-purple-50';
     }
   };
 
-  const getIntentIcon = (intent: KeywordInsight['intent']) => {
-    switch (intent) {
-      case 'informational': return '🔍';
-      case 'navigational': return '🧭';
-      case 'transactional': return '💳';
-      case 'commercial': return '🛒';
+  const getImpactColor = (impact: string) => {
+    switch (impact) {
+      case 'Élevé': return 'bg-red-100 text-red-800';
+      case 'Moyen': return 'bg-orange-100 text-orange-800';
+      case 'Faible': return 'bg-green-100 text-green-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
+
+  if (keywords.length === 0) {
+    return (
+      <Card className="p-6 text-center">
+        <Lightbulb className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+        <p className="text-gray-500">Aucune analyse disponible</p>
+      </Card>
+    );
+  }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Brain className="h-5 w-5 text-purple-500" />
-          Analyse d'insights des mots-clés
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <Button 
-          onClick={analyzeKeywordInsights}
-          disabled={isAnalyzing || keywords.length === 0}
-          className="w-full gap-2"
-        >
-          {isAnalyzing ? (
-            <>Analyse des insights en cours...</>
-          ) : (
-            <>
-              <Eye className="h-4 w-4" />
-              Analyser les insights
-            </>
-          )}
-        </Button>
+    <Card className="p-6">
+      <div className="flex items-center gap-2 mb-4">
+        <Lightbulb className="h-5 w-5 text-yellow-600" />
+        <h3 className="text-lg font-semibold">Insights et recommandations</h3>
+        <Badge variant="outline">{insights.length} analyses</Badge>
+      </div>
 
-        {insights.length > 0 && (
-          <Tabs defaultValue="insights" className="space-y-4">
-            <TabsList className="grid grid-cols-3 w-full">
-              <TabsTrigger value="insights">Insights</TabsTrigger>
-              <TabsTrigger value="opportunities">Opportunités</TabsTrigger>
-              <TabsTrigger value="recommendations">Recommandations</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="insights" className="space-y-3">
-              {insights.map((insight, index) => (
-                <div key={index} className="p-4 border rounded-lg space-y-3">
-                  <div className="flex justify-between items-center">
-                    <h4 className="font-medium">{insight.keyword}</h4>
-                    <div className="flex gap-2">
-                      <Badge className={getOpportunityColor(insight.opportunity)}>
-                        {insight.opportunity}% opportunité
-                      </Badge>
-                      <Badge className={getDifficultyColor(insight.difficulty)}>
-                        {insight.difficulty}
-                      </Badge>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                    <div className="flex items-center gap-1">
-                      <span>{getSeasonalityIcon(insight.seasonality)}</span>
-                      <span className="capitalize">{insight.seasonality}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <span>{getIntentIcon(insight.intent)}</span>
-                      <span className="capitalize">{insight.intent}</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Temps estimé:</span>
-                      <div className="font-medium">{insight.timeToRank} mois</div>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Compétition:</span>
-                      <div className="font-medium">{(insight.competition * 100).toFixed(0)}%</div>
-                    </div>
-                  </div>
+      <div className="space-y-4">
+        {insights.map((insight, index) => (
+          <Card key={index} className={`p-4 border-l-4 ${getInsightColor(insight.type)}`}>
+            <div className="flex items-start gap-3">
+              {getInsightIcon(insight.type)}
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <h4 className="font-medium">{insight.title}</h4>
+                  <Badge className={getImpactColor(insight.impact)} variant="outline">
+                    Impact {insight.impact}
+                  </Badge>
                 </div>
-              ))}
-            </TabsContent>
-
-            <TabsContent value="opportunities" className="space-y-3">
-              {insights
-                .filter(insight => insight.opportunity >= 60)
-                .sort((a, b) => b.opportunity - a.opportunity)
-                .map((insight, index) => (
-                  <div key={index} className="p-4 border-l-4 border-l-green-500 bg-green-50 rounded-lg">
-                    <div className="flex justify-between items-center mb-2">
-                      <h4 className="font-medium text-green-800">{insight.keyword}</h4>
-                      <Badge className="bg-green-100 text-green-800">
-                        🎯 {insight.opportunity}% opportunité
-                      </Badge>
-                    </div>
-                    <div className="space-y-2 text-sm">
-                      <div>
-                        <span className="font-medium text-green-700">Gaps de contenu identifiés:</span>
-                        <ul className="mt-1 space-y-1">
-                          {insight.contentGaps.map((gap, idx) => (
-                            <li key={idx} className="flex items-start gap-1">
-                              <AlertCircle className="h-3 w-3 text-orange-500 mt-0.5 flex-shrink-0" />
-                              <span>{gap}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-            </TabsContent>
-
-            <TabsContent value="recommendations" className="space-y-3">
-              {insights.map((insight, index) => (
-                <div key={index} className="p-4 border rounded-lg space-y-3">
-                  <h4 className="font-medium flex items-center gap-2">
-                    <Target className="h-4 w-4 text-blue-500" />
-                    {insight.keyword}
-                  </h4>
-                  <div className="space-y-2">
-                    <span className="text-sm font-medium text-blue-700">Actions recommandées:</span>
-                    <ul className="space-y-1">
-                      {insight.recommendations.map((rec, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm">
-                          <span className="text-blue-500 mt-1">•</span>
-                          <span>{rec}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div className="pt-2 border-t">
-                    <span className="text-xs text-gray-500">
-                      Temps estimé pour voir des résultats: {insight.timeToRank} mois
+                
+                <p className="text-sm text-gray-600 mb-2">{insight.description}</p>
+                
+                {insight.keywords.length > 0 && (
+                  <div className="mb-2">
+                    <span className="text-xs font-medium text-gray-500">Exemples: </span>
+                    <span className="text-xs text-gray-600">
+                      {insight.keywords.join(', ')}
                     </span>
                   </div>
+                )}
+                
+                <div className="bg-white p-2 rounded border text-sm">
+                  <span className="font-medium text-blue-600">💡 Action recommandée: </span>
+                  {insight.action}
                 </div>
-              ))}
-            </TabsContent>
-          </Tabs>
-        )}
-      </CardContent>
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+
+      {insights.length === 0 && (
+        <div className="text-center py-8 text-gray-500">
+          <Lightbulb className="h-8 w-8 mx-auto mb-2 opacity-50" />
+          <p>Aucun insight spécifique détecté</p>
+          <p className="text-sm">Générez plus de mots-clés pour obtenir des analyses détaillées</p>
+        </div>
+      )}
     </Card>
   );
 };

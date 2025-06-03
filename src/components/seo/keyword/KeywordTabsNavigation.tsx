@@ -1,51 +1,74 @@
 
 import React from 'react';
 import { TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Brain, TrendingUp, Users, FileText, Target, BarChart3, Link, Search, Network, Trophy, AlertTriangle, DollarSign, Globe, Mic, Smartphone, Calendar, Eye, PenTool } from 'lucide-react';
+import { 
+  Sparkles, 
+  Brain, 
+  TrendingUp, 
+  Building2, 
+  FileText, 
+  DollarSign,
+  Globe,
+  Mic,
+  Smartphone,
+  BarChart3,
+  FolderTree,
+  Target,
+  Lightbulb,
+  Calendar,
+  Users,
+  PieChart
+} from 'lucide-react';
 
 interface KeywordTabsNavigationProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
 }
 
-const KeywordTabsNavigation: React.FC<KeywordTabsNavigationProps> = ({ activeTab, setActiveTab }) => {
+const KeywordTabsNavigation: React.FC<KeywordTabsNavigationProps> = ({ 
+  activeTab, 
+  setActiveTab 
+}) => {
   const tabs = [
-    { value: 'generator', icon: Target, label: 'Standard' },
-    { value: 'intelligent', icon: Brain, label: 'IA' },
-    { value: 'trends', icon: TrendingUp, label: 'Tendances' },
-    { value: 'trend-analyzer', icon: Calendar, label: 'Analyse Trends' },
-    { value: 'competitors', icon: Users, label: 'Concurrents' },
-    { value: 'competitive-intel', icon: Eye, label: 'Intelligence' },
-    { value: 'content', icon: FileText, label: 'Contenu' },
-    { value: 'content-strategy', icon: PenTool, label: 'Stratégie' },
-    { value: 'predictions', icon: BarChart3, label: 'Prédictions' },
-    { value: 'links', icon: Link, label: 'Liens' },
-    { value: 'serp', icon: Search, label: 'SERP' },
-    { value: 'grouping', icon: Network, label: 'Groupes' },
-    { value: 'ranking', icon: Trophy, label: 'Positions' },
-    { value: 'gaps', icon: AlertTriangle, label: 'Gaps' },
-    { value: 'roi', icon: DollarSign, label: 'ROI' },
-    { value: 'multilang', icon: Globe, label: 'Multi-langues' },
-    { value: 'voice', icon: Mic, label: 'Vocal' },
-    { value: 'mobile', icon: Smartphone, label: 'Mobile' }
+    { id: 'generator', label: 'Générateur', icon: Sparkles },
+    { id: 'intelligent', label: 'IA', icon: Brain },
+    { id: 'trends', label: 'Tendances', icon: TrendingUp },
+    { id: 'trend-analyzer', label: 'Analyseur de tendances', icon: BarChart3 },
+    { id: 'competitors', label: 'Concurrents', icon: Building2 },
+    { id: 'competitive-intel', label: 'Intelligence concurrentielle', icon: Target },
+    { id: 'content', label: 'Contenu', icon: FileText },
+    { id: 'content-strategy', label: 'Stratégie de contenu', icon: Calendar },
+    { id: 'predictions', label: 'Prédictions', icon: PieChart },
+    { id: 'links', label: 'Liens internes', icon: Globe },
+    { id: 'serp', label: 'SERP', icon: Target },
+    { id: 'grouping', label: 'Groupement', icon: FolderTree },
+    { id: 'ranking', label: 'Ranking', icon: TrendingUp },
+    { id: 'gaps', label: 'Gaps', icon: Users },
+    { id: 'roi', label: 'ROI', icon: DollarSign },
+    { id: 'multilang', label: 'Multi-langue', icon: Globe },
+    { id: 'voice', label: 'Recherche vocale', icon: Mic },
+    { id: 'mobile', label: 'Mobile', icon: Smartphone }
   ];
 
   return (
-    <TabsList className="grid grid-cols-6 md:grid-cols-18 gap-1">
-      {tabs.map((tab) => {
-        const Icon = tab.icon;
-        return (
-          <TabsTrigger 
-            key={tab.value} 
-            value={tab.value} 
-            className="flex items-center gap-1"
-          >
-            <Icon className="h-4 w-4" />
-            <span className="hidden sm:inline">{tab.label}</span>
-          </TabsTrigger>
-        );
-      })}
-    </TabsList>
+    <div className="overflow-x-auto">
+      <TabsList className="grid grid-flow-col auto-cols-max gap-1 w-max">
+        {tabs.map((tab) => {
+          const IconComponent = tab.icon;
+          return (
+            <TabsTrigger 
+              key={tab.id}
+              value={tab.id} 
+              className="flex items-center gap-1.5 whitespace-nowrap px-3"
+              onClick={() => setActiveTab(tab.id)}
+            >
+              <IconComponent className="h-4 w-4" />
+              <span className="hidden sm:inline">{tab.label}</span>
+            </TabsTrigger>
+          );
+        })}
+      </TabsList>
+    </div>
   );
 };
 

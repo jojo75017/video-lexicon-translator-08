@@ -1,281 +1,139 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TrendingUp, TrendingDown, Calendar, BarChart3, AlertTriangle } from "lucide-react";
-import { toast } from "sonner";
-import { KeywordSuggestion } from "@/types/seo/Keyword";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import React, { useMemo } from 'react';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { KeywordSuggestion } from '@/types/seo/Keyword';
+import { TrendingUp, TrendingDown, BarChart3, Calendar } from 'lucide-react';
 
 interface KeywordTrendAnalyzerProps {
   keywords: KeywordSuggestion[];
 }
 
-interface TrendData {
-  month: string;
-  volume: number;
-  competition: number;
-  cpc: number;
-  trend: 'up' | 'down' | 'stable';
-}
-
-interface KeywordTrend {
-  keyword: string;
-  currentVolume: number;
-  yearOverYearGrowth: number;
-  seasonality: 'high' | 'medium' | 'low';
-  trendDirection: 'growing' | 'declining' | 'stable';
-  peakMonths: string[];
-  lowMonths: string[];
-  volatility: number;
-  historicalData: TrendData[];
-  forecast: TrendData[];
-}
-
 const KeywordTrendAnalyzer: React.FC<KeywordTrendAnalyzerProps> = ({ keywords }) => {
-  const [trends, setTrends] = useState<KeywordTrend[]>([]);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [selectedKeyword, setSelectedKeyword] = useState<string>('');
+  const trendAnalysis = useMemo(() => {
+    if (keywords.length === 0) return null;
 
-  const generateTrendAnalysis = async () => {
-    if (keywords.length === 0) {
-      toast.error("Aucun mot-clé à analyser");
-      return;
-    }
+    // Générer des données de tendance fictives mais réalistes
+    const trendsData = keywords.map(kw => {
+      const trend = Array.from({ length: 12 }, () => Math.random() * 100);
+      const avgTrend = trend.reduce((a, b) => a + b, 0) / trend.length;
+      const lastMonthTrend = trend.slice(-3).reduce((a, b) => a + b, 0) / 3;
+      const growth = ((lastMonthTrend - avgTrend) / avgTrend) * 100;
+      
+      return {
+        ...kw,
+        trend,
+        growth: growth.toFixed(1),
+        isGrowing: growth > 5,
+        isStable: Math.abs(growth) <= 5,
+        isDecreasing: growth < -5
+      };
+    });
 
-    setIsAnalyzing(true);
+    const growingKeywords = trendsData.filter(kw => kw.isGrowing);
+    const stableKeywords = trendsData.filter(kw => kw.isStable);
+    const decreasingKeywords = trendsData.filter(kw => kw.isDecreasing);
 
-    setTimeout(() => {
-      const trendAnalysis: KeywordTrend[] = keywords.slice(0, 6).map((keyword) => {
-        const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
-        
-        // Génération de données historiques
-        const historicalData: TrendData[] = months.map((month, index) => {
-          const baseVolume = keyword.volume || 1000;
-          const seasonalFactor = 1 + Math.sin((index / 12) * 2 * Math.PI) * 0.3;
-          const randomFactor = 0.8 + Math.random() * 0.4;
-          
-          return {
-            month,
-            volume: Math.round(baseVolume * seasonalFactor * randomFactor),
-            competition: Math.random() * 100,
-            cpc: (keyword.cpc || 1) * (0.8 + Math.random() * 0.4),
-            trend: Math.random() > 0.5 ? 'up' : (Math.random() > 0.5 ? 'down' : 'stable') as 'up' | 'down' | 'stable'
-          };
-        });
+    return {
+      trendsData,
+      growingKeywords,
+      stableKeywords,
+      decreasingKeywords,
+      totalGrowthRate: (growingKeywords.reduce((sum, kw) => sum + parseFloat(kw.growth), 0) / growingKeywords.length).toFixed(1)
+    };
+  }, [keywords]);
 
-        // Génération de prévisions
-        const forecast: TrendData[] = ['Jan+1', 'Fév+1', 'Mar+1'].map((month) => {
-          const lastVolume = historicalData[historicalData.length - 1].volume;
-          const trendFactor = 0.95 + Math.random() * 0.1;
-          
-          return {
-            month,
-            volume: Math.round(lastVolume * trendFactor),
-            competition: Math.random() * 100,
-            cpc: (keyword.cpc || 1) * (0.9 + Math.random() * 0.2),
-            trend: Math.random() > 0.6 ? 'up' : 'stable' as 'up' | 'down' | 'stable'
-          };
-        });
+  if (!trendAnalysis || keywords.length === 0) {
+    return (
+      <Card className="p-6 text-center">
+        <BarChart3 className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+        <p className="text-gray-500">Aucune donnée de tendance disponible</p>
+      </Card>
+    );
+  }
 
-        const yearOverYearGrowth = (Math.random() - 0.5) * 100; // -50% à +50%
-        const volatility = Math.random() * 40; // 0-40%
-        
-        const seasonalities: KeywordTrend['seasonality'][] = ['high', 'medium', 'low'];
-        const directions: KeywordTrend['trendDirection'][] = ['growing', 'declining', 'stable'];
-
-        return {
-          keyword: keyword.keyword,
-          currentVolume: keyword.volume || 1000,
-          yearOverYearGrowth,
-          seasonality: seasonalities[Math.floor(Math.random() * seasonalities.length)],
-          trendDirection: directions[Math.floor(Math.random() * directions.length)],
-          peakMonths: ['Déc', 'Jan', 'Nov'],
-          lowMonths: ['Fév', 'Aoû'],
-          volatility,
-          historicalData,
-          forecast
-        };
-      });
-
-      setTrends(trendAnalysis);
-      setSelectedKeyword(trendAnalysis[0]?.keyword || '');
-      setIsAnalyzing(false);
-      toast.success(`${trendAnalysis.length} analyses de tendances générées`);
-    }, 3000);
-  };
-
-  const getTrendIcon = (direction: KeywordTrend['trendDirection']) => {
-    switch (direction) {
-      case 'growing': return <TrendingUp className="h-4 w-4 text-green-500" />;
-      case 'declining': return <TrendingDown className="h-4 w-4 text-red-500" />;
-      case 'stable': return <BarChart3 className="h-4 w-4 text-gray-500" />;
-    }
-  };
-
-  const getGrowthColor = (growth: number) => {
-    if (growth > 20) return 'bg-green-100 text-green-800';
-    if (growth > 0) return 'bg-blue-100 text-blue-800';
-    if (growth > -20) return 'bg-yellow-100 text-yellow-800';
-    return 'bg-red-100 text-red-800';
-  };
-
-  const selectedTrend = trends.find(t => t.keyword === selectedKeyword);
+  const { trendsData, growingKeywords, stableKeywords, decreasingKeywords } = trendAnalysis;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <TrendingUp className="h-5 w-5 text-green-500" />
-          Analyseur de tendances des mots-clés
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <Button 
-          onClick={generateTrendAnalysis}
-          disabled={isAnalyzing || keywords.length === 0}
-          className="w-full gap-2"
-        >
-          {isAnalyzing ? (
-            <>Analyse des tendances en cours...</>
-          ) : (
-            <>
-              <Calendar className="h-4 w-4" />
-              Analyser les tendances
-            </>
-          )}
-        </Button>
+    <div className="space-y-6">
+      <Card className="p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <BarChart3 className="h-5 w-5 text-blue-600" />
+          <h3 className="text-lg font-semibold">Analyse des tendances</h3>
+        </div>
 
-        {trends.length > 0 && (
-          <Tabs defaultValue="overview" className="space-y-4">
-            <TabsList className="grid grid-cols-3 w-full">
-              <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
-              <TabsTrigger value="details">Détails</TabsTrigger>
-              <TabsTrigger value="forecast">Prévisions</TabsTrigger>
-            </TabsList>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="text-center p-4 bg-green-50 rounded-lg">
+            <TrendingUp className="h-6 w-6 text-green-600 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-green-600">{growingKeywords.length}</div>
+            <div className="text-sm text-green-700">En croissance</div>
+          </div>
+          
+          <div className="text-center p-4 bg-blue-50 rounded-lg">
+            <BarChart3 className="h-6 w-6 text-blue-600 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-blue-600">{stableKeywords.length}</div>
+            <div className="text-sm text-blue-700">Stables</div>
+          </div>
+          
+          <div className="text-center p-4 bg-red-50 rounded-lg">
+            <TrendingDown className="h-6 w-6 text-red-600 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-red-600">{decreasingKeywords.length}</div>
+            <div className="text-sm text-red-700">En baisse</div>
+          </div>
+        </div>
 
-            <TabsContent value="overview" className="space-y-4">
-              <div className="grid gap-3">
-                {trends.map((trend, index) => (
-                  <div 
-                    key={index} 
-                    className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                      selectedKeyword === trend.keyword ? 'bg-blue-50 border-blue-200' : 'hover:bg-gray-50'
-                    }`}
-                    onClick={() => setSelectedKeyword(trend.keyword)}
-                  >
-                    <div className="flex justify-between items-center mb-2">
-                      <h4 className="font-medium">{trend.keyword}</h4>
-                      <div className="flex items-center gap-2">
-                        {getTrendIcon(trend.trendDirection)}
-                        <Badge className={getGrowthColor(trend.yearOverYearGrowth)}>
-                          {trend.yearOverYearGrowth > 0 ? '+' : ''}{trend.yearOverYearGrowth.toFixed(1)}%
-                        </Badge>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-3 gap-4 text-sm">
-                      <div>
-                        <span className="text-gray-500">Volume actuel:</span>
-                        <div className="font-medium">{trend.currentVolume.toLocaleString()}</div>
-                      </div>
-                      <div>
-                        <span className="text-gray-500">Saisonnalité:</span>
-                        <div className="font-medium capitalize">{trend.seasonality}</div>
-                      </div>
-                      <div>
-                        <span className="text-gray-500">Volatilité:</span>
-                        <div className="font-medium">{trend.volatility.toFixed(1)}%</div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+        <div className="space-y-4">
+          <h4 className="font-medium">Mots-clés en forte croissance</h4>
+          {growingKeywords.slice(0, 5).map((kw, index) => (
+            <div key={index} className="flex items-center justify-between p-3 border rounded-lg bg-green-50">
+              <div>
+                <div className="font-medium">{kw.keyword}</div>
+                <div className="text-sm text-gray-600">
+                  Volume: {kw.volume?.toLocaleString()} • Difficulté: {kw.difficulty}
+                </div>
               </div>
-            </TabsContent>
+              <div className="text-right">
+                <Badge className="bg-green-100 text-green-800">
+                  <TrendingUp className="h-3 w-3 mr-1" />
+                  +{kw.growth}%
+                </Badge>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Card>
 
-            <TabsContent value="details" className="space-y-4">
-              {selectedTrend && (
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <h4 className="text-lg font-medium">{selectedTrend.keyword}</h4>
-                    {getTrendIcon(selectedTrend.trendDirection)}
-                  </div>
+      <Card className="p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Calendar className="h-5 w-5 text-purple-600" />
+          <h3 className="text-lg font-semibold">Prédictions saisonnières</h3>
+        </div>
 
-                  <div className="h-64">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={selectedTrend.historicalData}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="month" />
-                        <YAxis />
-                        <Tooltip />
-                        <Line type="monotone" dataKey="volume" stroke="#3b82f6" strokeWidth={2} />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {['Hiver', 'Printemps', 'Été', 'Automne'].map((saison, index) => {
+            const seasonalKeywords = trendsData.filter(kw => 
+              kw.keyword.toLowerCase().includes(saison.toLowerCase()) ||
+              (index === 0 && kw.keyword.toLowerCase().includes('noël')) ||
+              (index === 1 && kw.keyword.toLowerCase().includes('jardin')) ||
+              (index === 2 && kw.keyword.toLowerCase().includes('vacances')) ||
+              (index === 3 && kw.keyword.toLowerCase().includes('rentrée'))
+            );
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 bg-green-50 rounded-lg">
-                      <h5 className="font-medium text-green-800 mb-2">Mois de pic</h5>
-                      <div className="flex flex-wrap gap-1">
-                        {selectedTrend.peakMonths.map((month, idx) => (
-                          <Badge key={idx} className="bg-green-100 text-green-800">
-                            {month}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="p-4 bg-red-50 rounded-lg">
-                      <h5 className="font-medium text-red-800 mb-2">Mois creux</h5>
-                      <div className="flex flex-wrap gap-1">
-                        {selectedTrend.lowMonths.map((month, idx) => (
-                          <Badge key={idx} className="bg-red-100 text-red-800">
-                            {month}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
+            return (
+              <div key={saison} className="text-center p-4 border rounded-lg">
+                <div className="text-lg font-semibold">{saison}</div>
+                <div className="text-sm text-gray-600">{seasonalKeywords.length} mots-clés</div>
+                {seasonalKeywords.length > 0 && (
+                  <div className="text-xs text-blue-600 mt-1">
+                    Opportunité détectée
                   </div>
-                </div>
-              )}
-            </TabsContent>
-
-            <TabsContent value="forecast" className="space-y-4">
-              {selectedTrend && (
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <h4 className="text-lg font-medium">Prévisions pour {selectedTrend.keyword}</h4>
-                    <AlertTriangle className="h-4 w-4 text-orange-500" />
-                  </div>
-
-                  <div className="h-64">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={[...selectedTrend.historicalData.slice(-6), ...selectedTrend.forecast]}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="month" />
-                        <YAxis />
-                        <Tooltip />
-                        <Area type="monotone" dataKey="volume" stroke="#8884d8" fill="#8884d8" fillOpacity={0.3} />
-                      </AreaChart>
-                    </ResponsiveContainer>
-                  </div>
-
-                  <div className="p-4 bg-blue-50 rounded-lg">
-                    <h5 className="font-medium text-blue-800 mb-2">Recommandations stratégiques</h5>
-                    <ul className="space-y-1 text-sm text-blue-700">
-                      <li>• Augmenter les investissements pendant les mois de pic</li>
-                      <li>• Préparer du contenu saisonnier à l'avance</li>
-                      <li>• Diversifier avec des mots-clés complémentaires</li>
-                      <li>• Surveiller la volatilité du marché</li>
-                    </ul>
-                  </div>
-                </div>
-              )}
-            </TabsContent>
-          </Tabs>
-        )}
-      </CardContent>
-    </Card>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </Card>
+    </div>
   );
 };
 
