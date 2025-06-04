@@ -1,99 +1,82 @@
-
-// Point d'entrée centralisé pour les types SEO
-
-export type { SeoAnalysis, BrokenLink } from './SeoAnalysis';
-export type { MetaTagsAnalysis } from './MetaTags';
-export type { BacklinkInfo } from './Backlinks';
-export type { SocialMetrics, SocialTags } from './Social';
-export type { ImageDetails } from './Image';
-export type { PerformanceData, Performance, MobileAnalysis } from './Performance';
-export type { InternalLinkAnalysis, PageLinkMetric, LinkSuggestion, PageMetric, InternalLinkRecommendation, LinkDistribution, OrphanPage, SiloStructure } from './InternalLinks';
-export type { KeywordData, KeywordSuggestion } from './Keyword';
-export type { HierarchyItem, HeadingStructure, StructureItem } from './Hierarchy';
-export type { RankingData, SearchConsoleData } from './Ranking';
-export type { ImageAnalysis, ImageDetail } from './ImageAnalysis';
-export type { SeoAnalysisResult } from './SeoAnalysisResult';
-export type { BrokenLink } from './Backlinks';
-
-// Types supplémentaires pour la compatibilité
-export interface OrganicSearchProps {
-  keyword: string;
-  data?: any[];
-  keywords?: string[];
-  totalKeywords?: number;
-  averagePosition?: number;
-  visibility?: number;
-}
-
-export interface SocialMetricsProps {
-  socialMetrics?: SocialMetrics;
-}
-
-export interface AnalysisOptions {
-  includeImages?: boolean;
-  includePerformance?: boolean;
-  includeBacklinks?: boolean;
+export interface PerformanceMetrics {
+  loadTime: number;
+  firstContentfulPaint: number;
+  largestContentfulPaint: number;
+  domLoadTime: number;
+  speedIndex: number;
+  timeToInteractive: number;
+  score: number;
+  resourceCount: number;
+  totalSize: number;
+  resourceBreakdown: {
+    images: number;
+    scripts: number;
+    styles: number;
+    fonts: number;
+    other: number;
+  };
 }
 
 export interface PageStructure {
   title: string;
-  url: string;
-  level: number;
-  children?: PageStructure[];
-  optimizationStatus?: string;
+  h1: string[];
+  h2: string[];
+  h3: string[];
+  images: number;
+  links: number;
+  optimizationStatus: 'good' | 'warning' | 'error';
+}
+
+export interface MobileAnalysis {
+  isMobileFriendly: boolean;
+  mobileScore: number;
+  score: number;
+  issues: string[];
+}
+
+export interface MetaTags {
+  hasTitle: boolean;
+  hasDescription: boolean;
+  hasDescriptionTag: boolean;
+  hasOpenGraphTags: boolean;
+}
+
+export interface SocialMetrics {
+  facebook: number;
+  twitter: number;
+  pinterest: number;
+  linkedin: number;
+}
+
+export interface SocialMetricsProps {
+  metrics: SocialMetrics;
+}
+
+export interface OrganicSearchProps {
+  keyword: string;
+  keywords: string[];
+  totalKeywords: number;
+  averagePosition: number;
+  visibility: number;
 }
 
 export interface RoiParameters {
-  investment: number;
-  traffic: number;
+  targetKeywords: number;
+  averagePosition: number;
+  clickThroughRate: number;
   conversionRate: number;
   averageOrderValue: number;
-  customerAcquisitionCost: number;
-  timeFrame: number;
-  seoInvestment?: number;
-}
-
-export interface RoiResults {
-  revenue: number;
-  profit: number;
-  roi: number;
-  paybackPeriod: number;
-}
-
-export interface LocalizationConfig {
-  language: string;
-  region: string;
-  currency: string;
-}
-
-export interface LocalizedKeyword {
-  keyword: string;
-  language: string;
-  volume: number;
-  difficulty: number;
-  cpc: number;
-}
-
-export interface VoiceSearchData {
-  query: string;
-  isVoiceOptimized: boolean;
-  conversationalScore: number;
-  questionType?: string;
-}
-
-export interface MobileOptimization {
-  isMobileFriendly: boolean;
-  mobileScore: number;
-  issues: string[];
-  recommendations: string[];
-  score?: number;
+  acquisitionCost: number;
+  contentCost: number;
+  linkBuildingCost: number;
+  timeInvestment: number;
 }
 
 export interface CompetitorData {
   domain: string;
-  title: string;
-  description: string;
-  ranking: number;
-  traffic: number;
-  keywords: number;
+  strength: number;
+  keywords: string[];
+  estimatedTraffic: number;
+  topKeywords: { keyword: string; position: number; volume: number; }[];
+  gaps: string[];
 }
