@@ -13,12 +13,24 @@ export interface BacklinkData {
   isEuropean: boolean;
 }
 
+export interface BacklinkInfo {
+  url: string;
+  domain: string;
+  anchor: string;
+  authority: number;
+  isDoFollow: boolean;
+  dateFound?: string;
+}
+
 export interface BrokenLink {
   url: string;
   anchor: string;
   statusCode: number;
   lastChecked: string;
   pageUrl: string;
+  status: number;
+  text: string;
+  location: string;
 }
 
 export interface BacklinkAnalysis {

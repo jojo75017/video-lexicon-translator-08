@@ -1,3 +1,4 @@
+
 export interface PerformanceMetrics {
   loadTime: number;
   firstContentfulPaint: number;
@@ -70,6 +71,7 @@ export interface RoiParameters {
   contentCost: number;
   linkBuildingCost: number;
   timeInvestment: number;
+  seoInvestment: number;
 }
 
 export interface CompetitorData {
@@ -79,4 +81,5 @@ export interface CompetitorData {
   estimatedTraffic: number;
   topKeywords: { keyword: string; position: number; volume: number; }[];
   gaps: string[];
+  title?: string;
 }

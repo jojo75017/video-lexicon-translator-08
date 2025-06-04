@@ -10,6 +10,12 @@ export interface KeywordSuggestion {
   trend?: number[];
   seasonality?: 'high' | 'medium' | 'low';
   longTail?: boolean;
+  opportunity?: number;
+  type?: 'standard' | 'long-tail' | 'question' | 'competitor' | 'semantic' | 'intent-based';
+  suggestedTitle?: string;
+  suggestedDescription?: string;
+  searchVolume?: number;
+  count?: number;
 }
 
 export interface KeywordTrend {
@@ -69,4 +75,13 @@ export interface KeywordExpansion {
   type: ExpansionType;
   keywords: string[];
   description: string;
+}
+
+export interface KeywordData {
+  keyword: string;
+  volume: number;
+  difficulty: number;
+  competition: number;
+  cpc: number;
+  trend: number[];
 }
