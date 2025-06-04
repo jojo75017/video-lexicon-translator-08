@@ -14,8 +14,10 @@ export interface KeywordSuggestion {
   type?: 'standard' | 'long-tail' | 'question' | 'competitor' | 'semantic' | 'intent-based';
   suggestedTitle?: string;
   suggestedDescription?: string;
+  suggestedLongDescription?: string;
   searchVolume?: number;
   count?: number;
+  position?: number;
 }
 
 export interface KeywordTrend {
@@ -23,6 +25,7 @@ export interface KeywordTrend {
   data: number[];
   period: string;
   growth: number;
+  seasonal?: boolean;
 }
 
 export interface LocalizedKeyword {
@@ -84,4 +87,7 @@ export interface KeywordData {
   competition: number;
   cpc: number;
   trend: number[];
+  density?: number;
+  count?: number;
+  position?: number;
 }

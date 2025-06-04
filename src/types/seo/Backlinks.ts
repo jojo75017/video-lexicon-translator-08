@@ -17,8 +17,11 @@ export interface BacklinkInfo {
   url: string;
   domain: string;
   anchor: string;
+  anchorText?: string;
   authority: number;
   isDoFollow: boolean;
+  dofollow?: boolean;
+  isDofollow?: boolean;
   dateFound?: string;
 }
 

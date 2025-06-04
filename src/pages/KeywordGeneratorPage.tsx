@@ -1,26 +1,21 @@
 
 import React from 'react';
-import { Card } from '@/components/ui/card';
 import UnifiedDashboard from '@/components/dashboard/UnifiedDashboard';
 import KeywordGeneratorEnhanced from '@/components/seo/KeywordGeneratorEnhanced';
-import { Sparkles } from 'lucide-react';
 
-const KeywordGeneratorPage: React.FC = () => {
+const KeywordGeneratorPage = () => {
   return (
     <UnifiedDashboard>
       <div className="space-y-6">
-        <Card className="p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Sparkles className="h-6 w-6 text-purple-600" />
-            <h1 className="text-2xl font-bold">Générateur de mots-clés avancé</h1>
-          </div>
-          <p className="text-gray-600 mb-6">
-            Outil complet pour la recherche et l'analyse de mots-clés avec IA, analyse concurrentielle, 
-            prédictions de volume et suggestions de contenu. Fonctionnalités inspirées de SEMrush, Ahrefs et SISTRIX.
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold mb-4">Générateur de mots-clés IA</h1>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Utilisez l'intelligence artificielle pour générer des mots-clés pertinents et optimiser votre contenu SEO. 
+            Configurez votre clé API OpenAI pour des suggestions encore plus précises.
           </p>
-          
-          <KeywordGeneratorEnhanced />
-        </Card>
+        </div>
+        
+        <KeywordGeneratorEnhanced />
       </div>
     </UnifiedDashboard>
   );

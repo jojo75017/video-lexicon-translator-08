@@ -15,6 +15,8 @@ export interface PerformanceMetrics {
     styles: number;
     fonts: number;
     other: number;
+    js: string;
+    css: string;
   };
 }
 
@@ -72,6 +74,8 @@ export interface RoiParameters {
   linkBuildingCost: number;
   timeInvestment: number;
   seoInvestment: number;
+  organicTraffic?: number;
+  timeFrame?: number;
 }
 
 export interface CompetitorData {
@@ -82,4 +86,20 @@ export interface CompetitorData {
   topKeywords: { keyword: string; position: number; volume: number; }[];
   gaps: string[];
   title?: string;
+}
+
+export interface PageLinkMetric {
+  url: string;
+  title: string;
+  incomingLinks: number;
+  outgoingLinks: number;
+  linkStrength: number;
+}
+
+export interface PageMetric {
+  url: string;
+  title: string;
+  incomingLinks?: number;
+  outgoingLinks?: number;
+  linkStrength?: number;
 }
