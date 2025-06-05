@@ -103,3 +103,53 @@ export interface PageMetric {
   outgoingLinks?: number;
   linkStrength?: number;
 }
+
+export interface AnalysisOptions {
+  includeBacklinks: boolean;
+  includePerformance: boolean;
+  includeMobile: boolean;
+}
+
+export interface RoiResults {
+  monthlyRevenue: number;
+  yearlyRevenue: number;
+  roi: number;
+  breakEvenTime: number;
+}
+
+export interface LocalizationConfig {
+  language: string;
+  country: string;
+  timezone: string;
+}
+
+export interface LocalizedKeyword {
+  keyword: string;
+  language: string;
+  country: string;
+  volume: number;
+  difficulty: number;
+  culturalRelevance: number;
+  localCompetition: number;
+}
+
+export interface VoiceSearchData {
+  isVoiceOptimized: boolean;
+  voiceScore: number;
+  naturalLanguageQueries: string[];
+  conversationalKeywords: string[];
+}
+
+export interface MobileOptimization {
+  keyword: string;
+  isMobileFriendly: boolean;
+  mobileScore: number;
+  mobileVolume: number;
+  mobilevsDesktop: number;
+  localSearchIntent: boolean;
+  voiceSearchCompatible: boolean;
+  mobileCompetition: number;
+  quickAnswerFormat: string;
+  issues: string[];
+  recommendations: string[];
+}
