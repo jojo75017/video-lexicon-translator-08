@@ -3,18 +3,24 @@ import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Tabs } from '@/components/ui/tabs';
 import ApiKeyConfig from './ApiKeyConfig';
+import KeywordTabsNavigation from './keyword/KeywordTabsNavigation';
+import KeywordTabsContent from './keyword/KeywordTabsContent';
 import { Sparkles, Settings, Loader2, Key } from 'lucide-react';
 import { toast } from 'sonner';
+import { KeywordSuggestion } from '@/types/seo/Keyword';
 
 const KeywordGeneratorEnhanced: React.FC = () => {
+  const [activeMainTab, setActiveMainTab] = useState('generator');
   const [keyword, setKeyword] = useState('');
   const [showApiConfig, setShowApiConfig] = useState(false);
   const [openaiKey, setOpenaiKey] = useState(() => localStorage.getItem('openaiKey') || '');
   const [apiKeyStatus, setApiKeyStatus] = useState<'unchecked' | 'valid' | 'invalid'>('unchecked');
   const [validationMessage, setValidationMessage] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
-  const [standardKeywords, setStandardKeywords] = useState([]);
+  const [standardKeywords, setStandardKeywords] = useState<KeywordSuggestion[]>([]);
+  const [longTailKeywords, setLongTailKeywords] = useState<KeywordSuggestion[]>([]);
   const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
 
   const handleKeyValidated = () => {
@@ -31,15 +37,71 @@ const KeywordGeneratorEnhanced: React.FC = () => {
 
     setIsGenerating(true);
     setTimeout(() => {
-      const mockKeywords = [
-        { keyword: `${keyword} guide`, volume: 1200, difficulty: 45, cpc: 1.25 },
-        { keyword: `${keyword} tips`, volume: 800, difficulty: 35, cpc: 0.95 },
-        { keyword: `${keyword} best practices`, volume: 600, difficulty: 55, cpc: 1.50 },
+      const mockStandardKeywords: KeywordSuggestion[] = [
+        { keyword: `${keyword} guide`, volume: 1200, difficulty: 45, cpc: 1.25, type: 'standard' },
+        { keyword: `${keyword} tips`, volume: 800, difficulty: 35, cpc: 0.95, type: 'standard' },
+        { keyword: `${keyword} best practices`, volume: 600, difficulty: 55, cpc: 1.50, type: 'standard' },
       ];
-      setStandardKeywords(mockKeywords as any);
+      
+      const mockLongTailKeywords: KeywordSuggestion[] = [
+        { keyword: `how to ${keyword} for beginners`, volume: 300, difficulty: 25, cpc: 0.85, type: 'long-tail' },
+        { keyword: `best ${keyword} tools 2024`, volume: 250, difficulty: 30, cpc: 1.10, type: 'long-tail' },
+        { keyword: `${keyword} vs alternatives comparison`, volume: 180, difficulty: 40, cpc: 1.35, type: 'long-tail' },
+      ];
+      
+      setStandardKeywords(mockStandardKeywords);
+      setLongTailKeywords(mockLongTailKeywords);
       setIsGenerating(false);
-      toast.success(`${mockKeywords.length} mots-clés générés`);
+      toast.success(`${mockStandardKeywords.length + mockLongTailKeywords.length} mots-clés générés`);
     }, 2000);
+  };
+
+  const toggleKeywordSelection = (keywordText: string) => {
+    setSelectedKeywords(prev => 
+      prev.includes(keywordText)
+        ? prev.filter(k => k !== keywordText)
+        : [...prev, keywordText]
+    );
+  };
+
+  const clearSelectedKeywords = () => {
+    setSelectedKeywords([]);
+    toast.info('Sélection effacée');
+  };
+
+  const exportSelectedKeywords = () => {
+    if (selectedKeywords.length === 0) {
+      toast.error('Aucun mot-clé sélectionné');
+      return;
+    }
+    
+    const csvContent = selectedKeywords.join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'keywords.csv';
+    link.click();
+    window.URL.revokeObjectURL(url);
+    toast.success(`${selectedKeywords.length} mots-clés exportés`);
+  };
+
+  const handleIntelligentKeywords = (keywords: KeywordSuggestion[]) => {
+    setStandardKeywords(prev => [...prev, ...keywords]);
+    toast.success(`${keywords.length} nouveaux mots-clés ajoutés`);
+  };
+
+  const handleCompetitorKeywords = (keywords: string[]) => {
+    const competitorKeywords: KeywordSuggestion[] = keywords.map(kw => ({
+      keyword: kw,
+      volume: Math.floor(Math.random() * 1000) + 100,
+      difficulty: Math.floor(Math.random() * 80) + 20,
+      cpc: Math.random() * 2 + 0.5,
+      type: 'competitor' as const
+    }));
+    
+    setStandardKeywords(prev => [...prev, ...competitorKeywords]);
+    toast.success(`${keywords.length} mots-clés concurrents ajoutés`);
   };
 
   if (showApiConfig) {
@@ -55,6 +117,8 @@ const KeywordGeneratorEnhanced: React.FC = () => {
       />
     );
   }
+
+  const allKeywords = [...standardKeywords, ...longTailKeywords];
 
   return (
     <div className="space-y-6">
@@ -134,24 +198,29 @@ const KeywordGeneratorEnhanced: React.FC = () => {
         </div>
       </Card>
 
-      {/* Résultats */}
-      {standardKeywords.length > 0 && (
-        <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">Résultats</h3>
-          <div className="space-y-2">
-            {standardKeywords.map((kw: any, index) => (
-              <div key={index} className="flex items-center justify-between p-3 border rounded">
-                <span>{kw.keyword}</span>
-                <div className="flex gap-2 text-sm text-gray-600">
-                  <span>Vol: {kw.volume}</span>
-                  <span>Diff: {kw.difficulty}</span>
-                  <span>CPC: {kw.cpc}€</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-      )}
+      {/* Navigation et contenu des onglets avancés */}
+      <Tabs value={activeMainTab} onValueChange={setActiveMainTab} className="space-y-4">
+        <KeywordTabsNavigation 
+          activeTab={activeMainTab}
+          setActiveTab={setActiveMainTab}
+          hasResults={allKeywords.length > 0}
+        />
+        
+        <KeywordTabsContent
+          standardKeywords={standardKeywords}
+          longTailKeywords={longTailKeywords}
+          allKeywords={allKeywords}
+          selectedKeywords={selectedKeywords}
+          keyword={keyword}
+          activeTab={activeMainTab}
+          setActiveTab={setActiveMainTab}
+          toggleKeywordSelection={toggleKeywordSelection}
+          clearSelectedKeywords={clearSelectedKeywords}
+          exportSelectedKeywords={exportSelectedKeywords}
+          handleIntelligentKeywords={handleIntelligentKeywords}
+          handleCompetitorKeywords={handleCompetitorKeywords}
+        />
+      </Tabs>
     </div>
   );
 };
