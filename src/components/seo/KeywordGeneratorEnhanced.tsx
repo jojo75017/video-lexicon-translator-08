@@ -7,7 +7,7 @@ import { Tabs } from '@/components/ui/tabs';
 import ApiKeyConfig from './ApiKeyConfig';
 import KeywordTabsNavigation from './keyword/KeywordTabsNavigation';
 import KeywordTabsContent from './keyword/KeywordTabsContent';
-import { Sparkles, Settings, Loader2 } from 'lucide-react';
+import { Sparkles, Settings, Loader2, Key } from 'lucide-react';
 import { toast } from 'sonner';
 
 const KeywordGeneratorEnhanced: React.FC = () => {
@@ -73,27 +73,51 @@ const KeywordGeneratorEnhanced: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Section de configuration API - Carte bleue */}
-      <Card className="p-6 border-blue-200 bg-blue-50">
+      {/* Section de configuration API - Carte bleue avec bordure et fond bleu */}
+      <Card className="p-6 border-2 border-blue-300 bg-gradient-to-br from-blue-50 to-blue-100 shadow-lg">
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-blue-600" />
-            <h2 className="text-lg font-semibold text-blue-900">Configuration API OpenAI</h2>
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-blue-600 rounded-lg">
+              <Key className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-blue-900">Configuration API OpenAI</h2>
+              <p className="text-sm text-blue-700">Activez l'IA pour des suggestions avancées</p>
+            </div>
           </div>
           <Button 
             onClick={() => setShowApiConfig(true)}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-blue-600 hover:bg-blue-700 text-white shadow-md"
+            size="lg"
           >
-            <Settings className="h-4 w-4 mr-2" />
+            <Settings className="h-5 w-5 mr-2" />
             Configurer API
           </Button>
         </div>
-        <p className="text-blue-800 text-sm">
-          Configurez votre clé API OpenAI pour des suggestions de mots-clés plus intelligentes et précises.
-        </p>
+        
+        <div className="bg-white/70 p-4 rounded-lg border border-blue-200">
+          <p className="text-blue-800 text-sm mb-2">
+            <strong>Pourquoi configurer OpenAI ?</strong>
+          </p>
+          <ul className="text-blue-700 text-sm space-y-1">
+            <li>• Suggestions de mots-clés plus intelligentes et contextuelles</li>
+            <li>• Analyse sémantique avancée</li>
+            <li>• Génération de contenu SEO optimisé</li>
+            <li>• Recommandations personnalisées</li>
+          </ul>
+        </div>
+        
         {apiKeyStatus === 'valid' && (
-          <div className="mt-2 text-sm text-green-700 font-medium">
-            ✅ API OpenAI configurée et validée
+          <div className="mt-4 flex items-center gap-2 text-green-700 bg-green-50 p-3 rounded-lg border border-green-200">
+            <Sparkles className="h-5 w-5" />
+            <span className="font-medium">✅ API OpenAI configurée et validée - IA activée !</span>
+          </div>
+        )}
+        
+        {apiKeyStatus === 'invalid' && (
+          <div className="mt-4 flex items-center gap-2 text-red-700 bg-red-50 p-3 rounded-lg border border-red-200">
+            <Settings className="h-5 w-5" />
+            <span className="font-medium">❌ Configuration API requise pour utiliser l'IA</span>
           </div>
         )}
       </Card>

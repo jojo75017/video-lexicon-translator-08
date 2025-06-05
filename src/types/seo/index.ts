@@ -115,6 +115,11 @@ export interface RoiResults {
   yearlyRevenue: number;
   roi: number;
   breakEvenTime: number;
+  totalRevenue?: number;
+  totalConversions?: number;
+  costSaved?: number;
+  breakEvenMonth?: number;
+  monthlyResults?: any[];
 }
 
 export interface LocalizationConfig {
@@ -131,6 +136,7 @@ export interface LocalizedKeyword {
   difficulty: number;
   culturalRelevance: number;
   localCompetition: number;
+  cpc?: number;
 }
 
 export interface VoiceSearchData {
@@ -138,6 +144,11 @@ export interface VoiceSearchData {
   voiceScore: number;
   naturalLanguageQueries: string[];
   conversationalKeywords: string[];
+  keyword?: string;
+  questionFormat?: string;
+  conversationalVariants?: string[];
+  avgQuestionLength?: number;
+  featuredSnippetChance?: number;
 }
 
 export interface MobileOptimization {
@@ -152,4 +163,14 @@ export interface MobileOptimization {
   quickAnswerFormat: string;
   issues: string[];
   recommendations: string[];
+}
+
+export interface InternalLinkAnalysis {
+  totalPages: number;
+  totalInternalLinks: number;
+  averageLinksPerPage: number;
+  topLinkedPages: PageLinkMetric[];
+  orphanedPages: string[];
+  recommendations: string[];
+  linkDepth?: number;
 }
