@@ -3,15 +3,11 @@ import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Tabs } from '@/components/ui/tabs';
 import ApiKeyConfig from './ApiKeyConfig';
-import KeywordTabsNavigation from './keyword/KeywordTabsNavigation';
-import KeywordTabsContent from './keyword/KeywordTabsContent';
 import { Sparkles, Settings, Loader2, Key } from 'lucide-react';
 import { toast } from 'sonner';
 
 const KeywordGeneratorEnhanced: React.FC = () => {
-  const [activeMainTab, setActiveMainTab] = useState('generator');
   const [keyword, setKeyword] = useState('');
   const [showApiConfig, setShowApiConfig] = useState(false);
   const [openaiKey, setOpenaiKey] = useState(() => localStorage.getItem('openaiKey') || '');
@@ -19,11 +15,9 @@ const KeywordGeneratorEnhanced: React.FC = () => {
   const [validationMessage, setValidationMessage] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [standardKeywords, setStandardKeywords] = useState([]);
-  const [longTailKeywords, setLongTailKeywords] = useState([]);
   const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
 
   const handleKeyValidated = () => {
-    // Generate initial keywords when API key is validated
     if (keyword) {
       generateKeywords();
     }
@@ -36,7 +30,6 @@ const KeywordGeneratorEnhanced: React.FC = () => {
     }
 
     setIsGenerating(true);
-    // Simulate keyword generation
     setTimeout(() => {
       const mockKeywords = [
         { keyword: `${keyword} guide`, volume: 1200, difficulty: 45, cpc: 1.25 },
@@ -47,14 +40,6 @@ const KeywordGeneratorEnhanced: React.FC = () => {
       setIsGenerating(false);
       toast.success(`${mockKeywords.length} mots-clés générés`);
     }, 2000);
-  };
-
-  const toggleKeywordSelection = (keywordText: string) => {
-    setSelectedKeywords(prev => 
-      prev.includes(keywordText)
-        ? prev.filter(k => k !== keywordText)
-        : [...prev, keywordText]
-    );
   };
 
   if (showApiConfig) {

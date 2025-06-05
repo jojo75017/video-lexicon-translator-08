@@ -20,6 +20,28 @@ export interface PerformanceMetrics {
   };
 }
 
+export interface PerformanceData {
+  loadTime: number;
+  firstContentfulPaint: number;
+  largestContentfulPaint: number;
+  totalBlockingTime: number;
+  domLoadTime: number;
+  speedIndex: number;
+  timeToInteractive: number;
+  score: number;
+  resourceCount: number;
+  totalSize: number;
+  resourceBreakdown: {
+    images: number;
+    scripts: number;
+    styles: number;
+    fonts: number;
+    other: number;
+    js: string;
+    css: string;
+  };
+}
+
 export interface PageStructure {
   title: string;
   h1: string[];
@@ -99,9 +121,9 @@ export interface PageLinkMetric {
 export interface PageMetric {
   url: string;
   title: string;
-  incomingLinks?: number;
-  outgoingLinks?: number;
-  linkStrength?: number;
+  incomingLinks: number;
+  outgoingLinks: number;
+  linkStrength: number;
 }
 
 export interface AnalysisOptions {
@@ -172,5 +194,11 @@ export interface InternalLinkAnalysis {
   topLinkedPages: PageLinkMetric[];
   orphanedPages: string[];
   recommendations: string[];
-  linkDepth?: number;
+  linkDepth: number;
+  linkSuggestions: Array<{
+    fromPage: string;
+    toPage: string;
+    anchorText: string;
+    relevanceScore: number;
+  }>;
 }
