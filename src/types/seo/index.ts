@@ -121,9 +121,9 @@ export interface PageLinkMetric {
 export interface PageMetric {
   url: string;
   title: string;
-  incomingLinks: number;
-  outgoingLinks: number;
-  linkStrength: number;
+  incomingLinks?: number;
+  outgoingLinks?: number;
+  linkStrength?: number;
 }
 
 export interface AnalysisOptions {

@@ -198,7 +198,7 @@ const KeywordGeneratorEnhanced: React.FC = () => {
         </div>
       </Card>
 
-      {/* Navigation et contenu des onglets avancés */}
+      {/* Navigation et contenu des onglets */}
       <Tabs value={activeMainTab} onValueChange={setActiveMainTab} className="space-y-4">
         <KeywordTabsNavigation 
           activeTab={activeMainTab}

@@ -2,30 +2,21 @@
 import React from 'react';
 import { TabsContent } from '@/components/ui/tabs';
 import { KeywordSuggestion } from '@/types/seo/Keyword';
-import KeywordResults from './KeywordResults';
-import IntelligentExpansion from './IntelligentExpansion';
-import SeasonalTrends from './SeasonalTrends';
-import CompetitorKeywords from './CompetitorKeywords';
-import SearchVolumePredictor from './SearchVolumePredictor';
-import ContentOpportunities from './ContentOpportunities';
-import KeywordOpportunityChart from './KeywordOpportunityChart';
-import InternalLinkSuggestions from './InternalLinkSuggestions';
-import SerpAnalysis from './SerpAnalysis';
-import KeywordGrouping from './KeywordGrouping';
-import RankingTracker from './RankingTracker';
-import CompetitorGapAnalysis from './CompetitorGapAnalysis';
-import RoiCalculator from './RoiCalculator';
-import MultiLanguageSupport from './MultiLanguageSupport';
-import VoiceSearchAnalysis from './VoiceSearchAnalysis';
-import MobileOptimization from './MobileOptimization';
-import KeywordInsightsAnalyzer from './KeywordInsightsAnalyzer';
-import KeywordClusteringTool from './KeywordClusteringTool';
+import KeywordList from './KeywordList';
 import KeywordTrendAnalyzer from './KeywordTrendAnalyzer';
-import CompetitiveIntelligence from './CompetitiveIntelligence';
-import ContentStrategyPlanner from './ContentStrategyPlanner';
-import KeywordDifficultyAnalyzer from './KeywordDifficultyAnalyzer';
+import CompetitorAnalysis from './CompetitorAnalysis';
+import IntelligentExpansion from './IntelligentExpansion';
+import MobileOptimization from './MobileOptimization';
+import VoiceSearchAnalysis from './VoiceSearchAnalysis';
 import SeasonalAnalysis from './SeasonalAnalysis';
-import KeywordPerformancePredictor from './KeywordPerformancePredictor';
+import KeywordOpportunities from './KeywordOpportunities';
+import InternalLinkSuggestions from './InternalLinkSuggestions';
+import KeywordDifficultyAnalyzer from './KeywordDifficultyAnalyzer';
+import RoiCalculator from './RoiCalculator';
+import KeywordFAQ from './KeywordFAQ';
+import KeywordClusteringTool from './KeywordClusteringTool';
+import { Button } from '@/components/ui/button';
+import { Download, Trash2 } from 'lucide-react';
 
 interface KeywordTabsContentProps {
   standardKeywords: KeywordSuggestion[];
@@ -35,7 +26,7 @@ interface KeywordTabsContentProps {
   keyword: string;
   activeTab: string;
   setActiveTab: (tab: string) => void;
-  toggleKeywordSelection: (kw: string) => void;
+  toggleKeywordSelection: (keyword: string) => void;
   clearSelectedKeywords: () => void;
   exportSelectedKeywords: () => void;
   handleIntelligentKeywords: (keywords: KeywordSuggestion[]) => void;
@@ -56,115 +47,120 @@ const KeywordTabsContent: React.FC<KeywordTabsContentProps> = ({
   handleIntelligentKeywords,
   handleCompetitorKeywords
 }) => {
-  console.log('KeywordTabsContent - activeTab:', activeTab);
-  console.log('KeywordTabsContent - standardKeywords:', standardKeywords.length);
-  console.log('KeywordTabsContent - longTailKeywords:', longTailKeywords.length);
-
   return (
     <>
       <TabsContent value="generator" className="space-y-4">
-        {(standardKeywords.length > 0 || longTailKeywords.length > 0) && (
-          <>
-            <KeywordResults
-              standardKeywords={standardKeywords}
-              longTailKeywords={longTailKeywords}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div>
+            <h3 className="text-lg font-semibold mb-3">Mots-clés standards ({standardKeywords.length})</h3>
+            <KeywordList 
+              keywords={standardKeywords}
               selectedKeywords={selectedKeywords}
-              competitors={[]}
-              serpResults={[]}
-              hasCompetitorData={false}
-              totalKeywords={standardKeywords.length + longTailKeywords.length}
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-              toggleKeywordSelection={toggleKeywordSelection}
-              clearSelectedKeywords={clearSelectedKeywords}
-              exportSelectedKeywords={exportSelectedKeywords}
-              keyword={keyword}
+              onToggleSelection={toggleKeywordSelection}
             />
-            <KeywordDifficultyAnalyzer keywords={allKeywords} />
-            <SeasonalAnalysis keywords={allKeywords} />
-            <KeywordPerformancePredictor keywords={allKeywords} />
-          </>
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold mb-3">Mots-clés longue traîne ({longTailKeywords.length})</h3>
+            <KeywordList 
+              keywords={longTailKeywords}
+              selectedKeywords={selectedKeywords}
+              onToggleSelection={toggleKeywordSelection}
+            />
+          </div>
+        </div>
+        
+        {selectedKeywords.length > 0 && (
+          <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <span className="text-sm text-blue-800">
+              {selectedKeywords.length} mot{selectedKeywords.length > 1 ? 's' : ''}-clé{selectedKeywords.length > 1 ? 's' : ''} sélectionné{selectedKeywords.length > 1 ? 's' : ''}
+            </span>
+            <div className="flex gap-2 ml-auto">
+              <Button variant="outline" size="sm" onClick={clearSelectedKeywords}>
+                <Trash2 className="w-4 h-4 mr-1" />
+                Effacer
+              </Button>
+              <Button size="sm" onClick={exportSelectedKeywords}>
+                <Download className="w-4 h-4 mr-1" />
+                Exporter
+              </Button>
+            </div>
+          </div>
         )}
       </TabsContent>
 
-      <TabsContent value="intelligent" className="space-y-4">
-        <IntelligentExpansion
+      <TabsContent value="suggestions">
+        <KeywordList 
+          keywords={allKeywords}
+          selectedKeywords={selectedKeywords}
+          onToggleSelection={toggleKeywordSelection}
+        />
+      </TabsContent>
+
+      <TabsContent value="trends">
+        <KeywordTrendAnalyzer keyword={keyword} />
+      </TabsContent>
+
+      <TabsContent value="competitive">
+        <CompetitorAnalysis 
+          keyword={keyword}
+          onKeywordsFound={handleCompetitorKeywords}
+        />
+      </TabsContent>
+
+      <TabsContent value="intelligent">
+        <IntelligentExpansion 
           keyword={keyword}
           onKeywordsGenerated={handleIntelligentKeywords}
         />
-        <KeywordInsightsAnalyzer keywords={allKeywords} />
+      </TabsContent>
+
+      <TabsContent value="mobile">
+        <MobileOptimization keyword={keyword} />
+      </TabsContent>
+
+      <TabsContent value="voice">
+        <VoiceSearchAnalysis keyword={keyword} />
+      </TabsContent>
+
+      <TabsContent value="seasonal">
+        <SeasonalAnalysis keyword={keyword} />
+      </TabsContent>
+
+      <TabsContent value="opportunities">
+        <KeywordOpportunities keyword={keyword} />
+      </TabsContent>
+
+      <TabsContent value="internal-links">
+        <InternalLinkSuggestions keyword={keyword} />
+      </TabsContent>
+
+      <TabsContent value="difficulty">
         <KeywordDifficultyAnalyzer keywords={allKeywords} />
       </TabsContent>
 
-      <TabsContent value="trends" className="space-y-4">
-        <SeasonalTrends keyword={keyword} />
-        <SearchVolumePredictor keywords={allKeywords} />
-        <SeasonalAnalysis keywords={allKeywords} />
+      <TabsContent value="roi">
+        <RoiCalculator keyword={keyword} />
       </TabsContent>
 
-      <TabsContent value="trend-analyzer" className="space-y-4">
-        <KeywordTrendAnalyzer keywords={allKeywords} />
-        <SeasonalAnalysis keywords={allKeywords} />
+      <TabsContent value="faq">
+        <KeywordFAQ keyword={keyword} />
       </TabsContent>
 
-      <TabsContent value="competitors" className="space-y-4">
-        <CompetitorKeywords onKeywordsFound={handleCompetitorKeywords} />
-      </TabsContent>
-
-      <TabsContent value="competitive-intel" className="space-y-4">
-        <CompetitiveIntelligence keywords={allKeywords} />
-      </TabsContent>
-
-      <TabsContent value="content" className="space-y-4">
-        <ContentOpportunities keywords={allKeywords} />
-        <KeywordOpportunityChart keywords={allKeywords} />
-      </TabsContent>
-
-      <TabsContent value="content-strategy" className="space-y-4">
-        <ContentStrategyPlanner keywords={allKeywords} />
-      </TabsContent>
-
-      <TabsContent value="predictions" className="space-y-4">
-        <SearchVolumePredictor keywords={allKeywords} />
-        <KeywordPerformancePredictor keywords={allKeywords} />
-      </TabsContent>
-
-      <TabsContent value="links" className="space-y-4">
-        <InternalLinkSuggestions keywords={allKeywords} />
-      </TabsContent>
-
-      <TabsContent value="serp" className="space-y-4">
-        <SerpAnalysis keywords={allKeywords} />
-      </TabsContent>
-
-      <TabsContent value="grouping" className="space-y-4">
-        <KeywordGrouping keywords={allKeywords} />
+      <TabsContent value="clustering">
         <KeywordClusteringTool keywords={allKeywords} />
       </TabsContent>
 
-      <TabsContent value="ranking" className="space-y-4">
-        <RankingTracker keywords={allKeywords} />
-      </TabsContent>
-
-      <TabsContent value="gaps" className="space-y-4">
-        <CompetitorGapAnalysis keywords={allKeywords} />
-      </TabsContent>
-
-      <TabsContent value="roi" className="space-y-4">
-        <RoiCalculator keywords={allKeywords} />
-        <KeywordPerformancePredictor keywords={allKeywords} />
-      </TabsContent>
-
-      <TabsContent value="multilang" className="space-y-4">
-        <MultiLanguageSupport keywords={allKeywords} />
-      </TabsContent>
-
-      <TabsContent value="voice" className="space-y-4">
-        <VoiceSearchAnalysis keywords={allKeywords} />
-      </TabsContent>
-
-      <TabsContent value="mobile" className="space-y-4">
-        <MobileOptimization keywords={allKeywords} />
+      <TabsContent value="export">
+        <div className="text-center py-8">
+          <Download className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+          <h3 className="text-lg font-semibold mb-2">Exporter vos mots-clés</h3>
+          <p className="text-gray-600 mb-4">
+            Sélectionnez les mots-clés dans l'onglet "Générateur" puis exportez-les au format CSV.
+          </p>
+          <Button onClick={() => setActiveTab('generator')}>
+            Retour au générateur
+          </Button>
+        </div>
       </TabsContent>
     </>
   );
