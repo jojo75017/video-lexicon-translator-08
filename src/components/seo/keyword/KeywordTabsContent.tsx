@@ -97,13 +97,12 @@ const KeywordTabsContent: React.FC<KeywordTabsContentProps> = ({
       </TabsContent>
 
       <TabsContent value="trends">
-        <KeywordTrendAnalyzer keyword={keyword} />
+        <KeywordTrendAnalyzer keywords={[keyword]} />
       </TabsContent>
 
       <TabsContent value="competitive">
         <CompetitorAnalysis 
           keyword={keyword}
-          onKeywordsFound={handleCompetitorKeywords}
         />
       </TabsContent>
 
@@ -115,23 +114,23 @@ const KeywordTabsContent: React.FC<KeywordTabsContentProps> = ({
       </TabsContent>
 
       <TabsContent value="mobile">
-        <MobileOptimization keyword={keyword} />
+        <MobileOptimization keywords={[keyword]} />
       </TabsContent>
 
       <TabsContent value="voice">
-        <VoiceSearchAnalysis keyword={keyword} />
+        <VoiceSearchAnalysis keywords={[keyword]} />
       </TabsContent>
 
       <TabsContent value="seasonal">
-        <SeasonalAnalysis keyword={keyword} />
+        <SeasonalAnalysis keywords={[keyword]} />
       </TabsContent>
 
       <TabsContent value="opportunities">
-        <KeywordOpportunities keyword={keyword} />
+        <KeywordOpportunities keywords={[keyword]} />
       </TabsContent>
 
       <TabsContent value="internal-links">
-        <InternalLinkSuggestions keyword={keyword} />
+        <InternalLinkSuggestions keywords={[keyword]} />
       </TabsContent>
 
       <TabsContent value="difficulty">
@@ -139,11 +138,14 @@ const KeywordTabsContent: React.FC<KeywordTabsContentProps> = ({
       </TabsContent>
 
       <TabsContent value="roi">
-        <RoiCalculator keyword={keyword} />
+        <RoiCalculator keywords={[keyword]} />
       </TabsContent>
 
       <TabsContent value="faq">
-        <KeywordFAQ keyword={keyword} />
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">FAQ pour "{keyword}"</h3>
+          <p className="text-gray-600">Génération automatique de questions-réponses optimisées SEO.</p>
+        </div>
       </TabsContent>
 
       <TabsContent value="clustering">
