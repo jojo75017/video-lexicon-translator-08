@@ -97,13 +97,17 @@ const KeywordTabsContent: React.FC<KeywordTabsContentProps> = ({
       </TabsContent>
 
       <TabsContent value="trends">
-        <KeywordTrendAnalyzer keywords={[keyword]} />
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Analyse des tendances pour "{keyword}"</h3>
+          <p className="text-gray-600">Évolution des volumes de recherche et prédictions.</p>
+        </div>
       </TabsContent>
 
       <TabsContent value="competitive">
-        <CompetitorAnalysis 
-          keyword={keyword}
-        />
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Analyse concurrentielle pour "{keyword}"</h3>
+          <p className="text-gray-600">Découverte des concurrents et de leurs stratégies SEO.</p>
+        </div>
       </TabsContent>
 
       <TabsContent value="intelligent">
@@ -113,24 +117,67 @@ const KeywordTabsContent: React.FC<KeywordTabsContentProps> = ({
         />
       </TabsContent>
 
+      <TabsContent value="audience">
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Analyse d'audience pour "{keyword}"</h3>
+          <p className="text-gray-600">Données démographiques et comportementales des utilisateurs.</p>
+        </div>
+      </TabsContent>
+
+      <TabsContent value="content">
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Suggestions de contenu pour "{keyword}"</h3>
+          <p className="text-gray-600">Idées d'articles et de pages optimisées SEO.</p>
+        </div>
+      </TabsContent>
+
+      <TabsContent value="analytics">
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Analytics pour "{keyword}"</h3>
+          <p className="text-gray-600">Métriques détaillées et tableaux de bord.</p>
+        </div>
+      </TabsContent>
+
+      <TabsContent value="serp">
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Analyse SERP pour "{keyword}"</h3>
+          <p className="text-gray-600">Structure des résultats de recherche et opportunités.</p>
+        </div>
+      </TabsContent>
+
       <TabsContent value="mobile">
-        <MobileOptimization keywords={[keyword]} />
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Optimisation mobile pour "{keyword}"</h3>
+          <p className="text-gray-600">Adaptation aux recherches sur appareils mobiles.</p>
+        </div>
       </TabsContent>
 
       <TabsContent value="voice">
-        <VoiceSearchAnalysis keywords={[keyword]} />
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Recherche vocale pour "{keyword}"</h3>
+          <p className="text-gray-600">Optimisation pour les assistants vocaux.</p>
+        </div>
       </TabsContent>
 
       <TabsContent value="seasonal">
-        <SeasonalAnalysis keywords={[keyword]} />
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Analyse saisonnière pour "{keyword}"</h3>
+          <p className="text-gray-600">Variations selon les périodes de l'année.</p>
+        </div>
       </TabsContent>
 
       <TabsContent value="opportunities">
-        <KeywordOpportunities keywords={[keyword]} />
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Opportunités pour "{keyword}"</h3>
+          <p className="text-gray-600">Niches peu exploitées et nouveaux créneaux.</p>
+        </div>
       </TabsContent>
 
       <TabsContent value="internal-links">
-        <InternalLinkSuggestions keywords={[keyword]} />
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Liens internes pour "{keyword}"</h3>
+          <p className="text-gray-600">Suggestions de maillage interne optimisé.</p>
+        </div>
       </TabsContent>
 
       <TabsContent value="difficulty">
@@ -138,7 +185,10 @@ const KeywordTabsContent: React.FC<KeywordTabsContentProps> = ({
       </TabsContent>
 
       <TabsContent value="roi">
-        <RoiCalculator keywords={[keyword]} />
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Calculateur ROI pour "{keyword}"</h3>
+          <p className="text-gray-600">Estimation du retour sur investissement.</p>
+        </div>
       </TabsContent>
 
       <TabsContent value="faq">
