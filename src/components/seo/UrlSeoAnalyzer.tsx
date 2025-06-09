@@ -32,16 +32,61 @@ const UrlSeoAnalyzer: React.FC = () => {
     }
 
     try {
-      // Récupérer le contenu de la page
-      const response = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`);
+      // Récupérer le contenu de la page avec un proxy CORS
+      console.log(`Récupération du contenu pour: ${targetUrl}`);
+      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+      const response = await fetch(proxyUrl);
+      
       if (!response.ok) {
-        throw new Error('Impossible de récupérer le contenu de la page');
+        throw new Error(`Impossible de récupérer le contenu: ${response.status}`);
       }
       
-      const htmlContent = await response.text();
-      const textContent = htmlContent.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+      const data = await response.json();
+      const htmlContent = data.contents;
       
-      // Analyser avec OpenAI
+      if (!htmlContent) {
+        throw new Error('Contenu HTML vide');
+      }
+      
+      console.log(`Contenu récupéré, taille: ${htmlContent.length} caractères`);
+      
+      // Extraire des informations basiques du HTML
+      const titleMatch = htmlContent.match(/<title[^>]*>([^<]+)<\/title>/i);
+      const metaDescMatch = htmlContent.match(/<meta[^>]*name="description"[^>]*content="([^"]*)"[^>]*>/i);
+      const h1Matches = htmlContent.match(/<h1[^>]*>([^<]+)<\/h1>/gi);
+      const imgMatches = htmlContent.match(/<img[^>]*>/gi);
+      const imgWithoutAlt = imgMatches ? imgMatches.filter(img => !img.includes('alt=')).length : 0;
+      
+      // Créer un prompt d'analyse détaillé
+      const prompt = `Analysez ce site web et donnez un score SEO précis basé sur l'analyse réelle du contenu.
+
+URL: ${targetUrl}
+Title: ${titleMatch ? titleMatch[1] : 'Aucun'}
+Meta description: ${metaDescMatch ? metaDescMatch[1] : 'Aucune'}
+Nombre de H1: ${h1Matches ? h1Matches.length : 0}
+Images sans alt: ${imgWithoutAlt}
+
+Contenu HTML (extrait): ${htmlContent.substring(0, 2000)}
+
+Analysez et donnez un score SEO réaliste entre 0 et 100 basé sur:
+- Présence et qualité du title (15 points)
+- Meta description (10 points)
+- Structure des titres H1-H6 (15 points)
+- Optimisation des images (10 points)
+- Contenu et mots-clés (20 points)
+- Performance technique visible (15 points)
+- Structure générale (15 points)
+
+Répondez UNIQUEMENT en JSON valide:
+{
+  "score": number (score réel entre 0-100),
+  "issues": [{"type": "error|warning|success", "category": string, "message": string, "impact": "high|medium|low"}],
+  "recommendations": [string],
+  "strengths": [string]
+}`;
+
+      // Appel à OpenAI
+      console.log('Envoi de la requête à OpenAI...');
       const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -53,46 +98,135 @@ const UrlSeoAnalyzer: React.FC = () => {
           messages: [
             {
               role: 'system',
-              content: `Tu es un expert SEO. Analyse ce contenu HTML et donne un score SEO sur 100 avec des recommandations précises. Réponds uniquement en JSON avec cette structure exacte:
-              {
-                "score": number,
-                "issues": [{"type": "error|warning|success", "category": string, "message": string, "impact": "high|medium|low"}],
-                "recommendations": [string],
-                "strengths": [string]
-              }`
+              content: 'Tu es un expert SEO qui analyse précisément les sites web. Donne des scores réalistes basés sur l\'analyse réelle du contenu. Sois critique et précis. Réponds uniquement en JSON valide.'
             },
             {
               role: 'user',
-              content: `Analyse SEO pour ${targetUrl}:\n\n${htmlContent.substring(0, 3000)}...`
+              content: prompt
             }
           ],
-          temperature: 0.3,
+          temperature: 0.1,
           max_tokens: 1500
         }),
       });
 
       if (!openAIResponse.ok) {
+        const errorText = await openAIResponse.text();
+        console.error('Erreur OpenAI:', openAIResponse.status, errorText);
         throw new Error(`Erreur OpenAI: ${openAIResponse.status}`);
       }
 
-      const data = await openAIResponse.json();
-      const content = data.choices[0].message.content;
+      const openAIData = await openAIResponse.json();
+      const content = openAIData.choices[0].message.content;
+      
+      console.log('Réponse OpenAI reçue:', content);
       
       try {
-        return JSON.parse(content);
-      } catch (e) {
-        // Fallback si le JSON n'est pas valide
+        const parsedResult = JSON.parse(content);
+        console.log('Analyse parsed:', parsedResult);
+        return parsedResult;
+      } catch (parseError) {
+        console.error('Erreur de parsing JSON:', content);
+        
+        // Fallback intelligent basé sur l'analyse réelle du contenu
+        let score = 50; // Score de base
+        const issues: any[] = [];
+        const recommendations: string[] = [];
+        const strengths: string[] = [];
+        
+        // Analyse du title
+        if (!titleMatch) {
+          score -= 15;
+          issues.push({
+            type: 'error',
+            category: 'Title',
+            message: 'Balise title manquante',
+            impact: 'high'
+          });
+          recommendations.push('Ajoutez une balise title descriptive');
+        } else {
+          strengths.push('Balise title présente');
+          if (titleMatch[1].length > 60) {
+            score -= 5;
+            issues.push({
+              type: 'warning',
+              category: 'Title',
+              message: 'Title trop long (>60 caractères)',
+              impact: 'medium'
+            });
+          }
+        }
+        
+        // Analyse meta description
+        if (!metaDescMatch) {
+          score -= 10;
+          issues.push({
+            type: 'error',
+            category: 'Meta Description',
+            message: 'Meta description manquante',
+            impact: 'high'
+          });
+          recommendations.push('Ajoutez une meta description de 150-160 caractères');
+        } else {
+          strengths.push('Meta description présente');
+        }
+        
+        // Analyse H1
+        if (!h1Matches || h1Matches.length === 0) {
+          score -= 10;
+          issues.push({
+            type: 'error',
+            category: 'Structure',
+            message: 'Aucune balise H1 trouvée',
+            impact: 'high'
+          });
+        } else if (h1Matches.length > 1) {
+          score -= 5;
+          issues.push({
+            type: 'warning',
+            category: 'Structure',
+            message: `${h1Matches.length} balises H1 trouvées (recommandé: 1 seule)`,
+            impact: 'medium'
+          });
+        } else {
+          strengths.push('Structure H1 correcte');
+        }
+        
+        // Analyse images
+        if (imgWithoutAlt > 0) {
+          score -= Math.min(imgWithoutAlt * 2, 10);
+          issues.push({
+            type: 'warning',
+            category: 'Images',
+            message: `${imgWithoutAlt} image(s) sans attribut alt`,
+            impact: 'medium'
+          });
+          recommendations.push('Ajoutez des attributs alt à toutes les images');
+        }
+        
+        // Vérifier la longueur du contenu
+        const textContent = htmlContent.replace(/<[^>]*>/g, ' ').trim();
+        if (textContent.length < 300) {
+          score -= 10;
+          issues.push({
+            type: 'warning',
+            category: 'Contenu',
+            message: 'Contenu textuel insuffisant',
+            impact: 'medium'
+          });
+          recommendations.push('Ajoutez plus de contenu textuel (minimum 300 mots)');
+        } else {
+          strengths.push('Contenu textuel suffisant');
+        }
+        
+        // S'assurer que le score reste dans les limites
+        score = Math.max(0, Math.min(100, score));
+        
         return {
-          score: 65,
-          issues: [
-            { type: 'warning', category: 'Analyse', message: 'Analyse automatique générée', impact: 'medium' }
-          ],
-          recommendations: [
-            'Optimiser les balises meta',
-            'Améliorer la structure des titres',
-            'Ajouter du contenu de qualité'
-          ],
-          strengths: ['Page accessible', 'Contenu présent']
+          score,
+          issues,
+          recommendations,
+          strengths
         };
       }
     } catch (error) {
@@ -109,7 +243,7 @@ const UrlSeoAnalyzer: React.FC = () => {
 
     const openaiKey = localStorage.getItem('openaiKey');
     if (!openaiKey) {
-      toast.error('Veuillez configurer votre clé API OpenAI');
+      toast.error('Veuillez configurer votre clé API OpenAI dans les paramètres');
       return;
     }
 
@@ -119,18 +253,38 @@ const UrlSeoAnalyzer: React.FC = () => {
         formattedUrl = `https://${url}`;
       }
 
-      new URL(formattedUrl); // Validation URL
+      // Validation URL
+      new URL(formattedUrl);
 
       setIsAnalyzing(true);
       setResult(null);
 
+      toast.info(`Analyse de ${formattedUrl} en cours...`);
+      
       const analysisResult = await analyzeSeoWithOpenAI(formattedUrl);
       setResult(analysisResult);
       
       toast.success(`Analyse terminée - Score SEO: ${analysisResult.score}/100`);
     } catch (error) {
       console.error('Erreur lors de l\'analyse:', error);
-      toast.error(error instanceof Error ? error.message : 'Erreur lors de l\'analyse SEO');
+      
+      if (error instanceof Error) {
+        if (error.message.includes('OpenAI')) {
+          toast.error('Erreur API OpenAI', {
+            description: 'Vérifiez votre clé API OpenAI'
+          });
+        } else if (error.message.includes('récupérer')) {
+          toast.error('Impossible d\'accéder à l\'URL', {
+            description: 'Vérifiez que l\'URL est accessible publiquement'
+          });
+        } else {
+          toast.error('Erreur d\'analyse', {
+            description: error.message
+          });
+        }
+      } else {
+        toast.error('Erreur inconnue lors de l\'analyse');
+      }
     } finally {
       setIsAnalyzing(false);
     }
