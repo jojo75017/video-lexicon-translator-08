@@ -81,7 +81,7 @@ const KeywordList: React.FC<KeywordListProps> = ({
                 <div className="flex flex-wrap gap-2 text-sm text-gray-600">
                   {keyword.volume && (
                     <span className="bg-blue-50 px-2 py-1 rounded text-blue-700">
-                      Vol: {keyword.volume.toLocaleString()}
+                      Vol: {typeof keyword.volume === 'number' ? keyword.volume.toLocaleString() : keyword.volume}
                     </span>
                   )}
                   
@@ -93,13 +93,13 @@ const KeywordList: React.FC<KeywordListProps> = ({
                   
                   {keyword.cpc && (
                     <span className="bg-green-50 px-2 py-1 rounded text-green-700">
-                      CPC: {keyword.cpc}
+                      CPC: {typeof keyword.cpc === 'number' ? keyword.cpc.toFixed(2) : keyword.cpc}
                     </span>
                   )}
                   
                   {keyword.competition && (
                     <span className="bg-purple-50 px-2 py-1 rounded text-purple-700">
-                      Concurrence: {keyword.competition}
+                      Concurrence: {typeof keyword.competition === 'number' ? (keyword.competition * 100).toFixed(0) + '%' : keyword.competition}
                     </span>
                   )}
                 </div>
