@@ -1,170 +1,121 @@
 
 import React from 'react';
-import { KeywordSuggestion } from '@/types/seo/Keyword';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, ArrowUp, ArrowDown, Zap, Star } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { KeywordSuggestion } from '@/types/seo/Keyword';
 
 interface KeywordListProps {
   keywords: KeywordSuggestion[];
   selectedKeywords: string[];
-  toggleKeywordSelection: (keyword: string) => void;
+  onToggleSelection: (keyword: string) => void;
 }
 
-const KeywordList: React.FC<KeywordListProps> = ({
-  keywords,
-  selectedKeywords,
-  toggleKeywordSelection
+const KeywordList: React.FC<KeywordListProps> = ({ 
+  keywords, 
+  selectedKeywords, 
+  onToggleSelection 
 }) => {
-  // Fonction pour formater le volume de recherche
-  const formatVolume = (volume?: number) => {
-    if (!volume) return 'N/A';
-    if (volume >= 1000) {
-      return `${(volume / 1000).toFixed(1)}k`;
-    }
-    return volume.toString();
-  };
-
-  // Fonction pour obtenir la couleur selon la difficulté
-  const getDifficultyColor = (difficulty?: number) => {
-    if (!difficulty) return 'bg-gray-100 text-gray-600';
-    if (difficulty < 30) return 'bg-green-100 text-green-800';
-    if (difficulty < 70) return 'bg-yellow-100 text-yellow-800';
-    return 'bg-red-100 text-red-800';
-  };
-  
-  // Fonction pour obtenir la couleur selon le volume
-  const getVolumeColor = (volume?: number) => {
-    if (!volume) return 'text-gray-500';
-    if (volume >= 5000) return 'text-green-600 font-semibold';
-    if (volume >= 1000) return 'text-blue-600';
-    if (volume >= 500) return 'text-amber-600';
-    return 'text-gray-600';
-  };
-  
-  // Fonction pour afficher la position du mot-clé
-  const renderPosition = (position?: number) => {
-    if (!position) return null;
-    
-    const positionColor = position <= 10 ? 'text-green-600' : 
-                          position <= 30 ? 'text-amber-600' : 
-                          'text-gray-600';
-    
+  if (!keywords || keywords.length === 0) {
     return (
-      <div className={`flex items-center ${positionColor} text-xs font-medium`}>
-        {position <= 10 ? (
-          <ArrowUp className="h-3 w-3 mr-1" />
-        ) : position > 30 ? (
-          <ArrowDown className="h-3 w-3 mr-1" />
-        ) : null}
-        <span>Position: {position}</span>
-      </div>
+      <Card className="p-6 text-center">
+        <p className="text-gray-500">Aucun mot-clé trouvé</p>
+      </Card>
     );
-  };
+  }
 
-  // Fonction pour afficher l'opportunité du mot-clé
-  const renderOpportunity = (opportunity?: number) => {
-    if (!opportunity) return null;
-    
-    const opportunityColor = opportunity >= 80 ? 'text-green-600' : 
-                            opportunity >= 60 ? 'text-blue-600' : 
-                            opportunity >= 40 ? 'text-amber-600' : 
-                            'text-gray-600';
-    
-    return (
-      <div className={`flex items-center ${opportunityColor} text-xs font-medium`}>
-        <Zap className="h-3 w-3 mr-1" />
-        <span>Opportunité: {opportunity}%</span>
-      </div>
-    );
-  };
-
-  // Fonction pour afficher l'intent du mot-clé avec un badge coloré
-  const renderIntent = (intent?: string) => {
-    if (!intent) return null;
-    
-    let bgColor = '';
-    let icon = null;
-    
-    switch(intent) {
-      case 'informational':
-        bgColor = 'bg-purple-100 text-purple-800';
-        break;
-      case 'navigational':
-        bgColor = 'bg-blue-100 text-blue-800';
-        break;
-      case 'transactional':
-        bgColor = 'bg-green-100 text-green-800';
-        break;
-      case 'commercial':
-        bgColor = 'bg-amber-100 text-amber-800';
-        break;
+  const getTrendIcon = (trend: string) => {
+    switch (trend?.toLowerCase()) {
+      case 'up':
+      case 'increasing':
+        return <TrendingUp className="w-4 h-4 text-green-500" />;
+      case 'down':
+      case 'decreasing':
+        return <TrendingDown className="w-4 h-4 text-red-500" />;
       default:
-        bgColor = 'bg-gray-100 text-gray-800';
+        return <Minus className="w-4 h-4 text-gray-400" />;
     }
-    
-    return (
-      <Badge variant="outline" className={bgColor}>
-        {intent.charAt(0).toUpperCase() + intent.slice(1)}
-      </Badge>
-    );
+  };
+
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty?.toLowerCase()) {
+      case 'easy':
+      case 'facile':
+        return 'bg-green-100 text-green-800';
+      case 'medium':
+      case 'moyen':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'hard':
+      case 'difficile':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
   };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3 max-h-96 overflow-y-auto">
       {keywords.map((keyword, index) => (
-        <div 
-          key={index}
-          className="flex items-center p-3 border rounded-md hover:bg-gray-50 transition-colors"
-        >
-          <Checkbox 
-            id={`keyword-${index}`}
-            checked={selectedKeywords.includes(keyword.keyword)}
-            onCheckedChange={() => toggleKeywordSelection(keyword.keyword)}
-          />
-          <label 
-            htmlFor={`keyword-${index}`}
-            className="ml-3 flex-1 cursor-pointer"
-          >
-            <div className="font-medium flex items-center gap-2">
-              {keyword.keyword}
-              {keyword.opportunity && keyword.opportunity >= 75 && (
-                <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
-              )}
-              {keyword.intent && renderIntent(keyword.intent)}
+        <Card key={index} className="p-4 hover:shadow-md transition-shadow">
+          <div className="flex items-start justify-between">
+            <div className="flex items-start space-x-3 flex-1">
+              <Checkbox
+                id={`keyword-${index}`}
+                checked={selectedKeywords.includes(keyword.keyword)}
+                onCheckedChange={() => onToggleSelection(keyword.keyword)}
+                className="mt-1"
+              />
+              
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center space-x-2 mb-2">
+                  <label 
+                    htmlFor={`keyword-${index}`}
+                    className="font-medium text-gray-900 cursor-pointer truncate"
+                  >
+                    {keyword.keyword}
+                  </label>
+                  {keyword.trend && getTrendIcon(keyword.trend)}
+                </div>
+                
+                <div className="flex flex-wrap gap-2 text-sm text-gray-600">
+                  {keyword.volume && (
+                    <span className="bg-blue-50 px-2 py-1 rounded text-blue-700">
+                      Vol: {keyword.volume.toLocaleString()}
+                    </span>
+                  )}
+                  
+                  {keyword.difficulty && (
+                    <Badge className={getDifficultyColor(keyword.difficulty)}>
+                      {keyword.difficulty}
+                    </Badge>
+                  )}
+                  
+                  {keyword.cpc && (
+                    <span className="bg-green-50 px-2 py-1 rounded text-green-700">
+                      CPC: {keyword.cpc}
+                    </span>
+                  )}
+                  
+                  {keyword.competition && (
+                    <span className="bg-purple-50 px-2 py-1 rounded text-purple-700">
+                      Concurrence: {keyword.competition}
+                    </span>
+                  )}
+                </div>
+                
+                {keyword.intent && (
+                  <div className="mt-2">
+                    <Badge variant="outline" className="text-xs">
+                      {keyword.intent}
+                    </Badge>
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="flex flex-wrap text-xs gap-2 mt-1">
-              <span className={getVolumeColor(keyword.volume)}>
-                <TrendingUp className="h-3 w-3 inline mr-1" />
-                Volume: {formatVolume(keyword.volume)}
-              </span>
-              {keyword.cpc !== undefined && (
-                <span className="text-gray-600">
-                  CPC: {keyword.cpc.toFixed(2)}€
-                </span>
-              )}
-              {keyword.relevance !== undefined && (
-                <span className="text-gray-600">
-                  Pertinence: {keyword.relevance}%
-                </span>
-              )}
-              {renderPosition(keyword.position)}
-              {renderOpportunity(keyword.opportunity)}
-            </div>
-          </label>
-          <div>
-            <Badge className={getDifficultyColor(keyword.difficulty)}>
-              {keyword.difficulty || 'N/A'}
-            </Badge>
           </div>
-        </div>
+        </Card>
       ))}
-      
-      {keywords.length === 0 && (
-        <div className="text-center text-gray-500 py-4">
-          Aucun mot-clé disponible.
-        </div>
-      )}
     </div>
   );
 };
