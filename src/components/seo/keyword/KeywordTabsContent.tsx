@@ -15,6 +15,7 @@ import KeywordDifficultyAnalyzer from './KeywordDifficultyAnalyzer';
 import RoiCalculator from './RoiCalculator';
 import KeywordFAQ from './KeywordFAQ';
 import KeywordClusteringTool from './KeywordClusteringTool';
+import UrlSeoAnalyzer from '../UrlSeoAnalyzer';
 import { Button } from '@/components/ui/button';
 import { Download, Trash2 } from 'lucide-react';
 
@@ -86,6 +87,9 @@ const KeywordTabsContent: React.FC<KeywordTabsContentProps> = ({
             </div>
           </div>
         )}
+
+        {/* Nouveau: Analyseur SEO par URL */}
+        <UrlSeoAnalyzer />
       </TabsContent>
 
       <TabsContent value="suggestions">
