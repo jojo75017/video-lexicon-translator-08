@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -36,48 +35,92 @@ const UrlSeoAnalyzer: React.FC = () => {
   const [result, setResult] = useState<SeoAnalysisResult | null>(null);
   const [analysisStep, setAnalysisStep] = useState('');
 
-  const analyzeRealData = (data: any): SeoAnalysisResult => {
-    console.log('📊 Analyse des vraies données:', data);
+  const analyzeHtmlContent = (htmlContent: string, targetUrl: string): SeoAnalysisResult => {
+    console.log('📊 Analyse du contenu HTML récupéré');
     
     const issues: SeoIssue[] = [];
     const recommendations: string[] = [];
     const strengths: string[] = [];
+    let score = 85; // Score de base plus optimiste
     
-    // Utiliser le score existant ou en calculer un nouveau
-    let score = data.score || 60;
+    // Parser le HTML
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlContent, 'text/html');
     
-    // Analyse du titre
-    if (!data.title || data.title.length === 0) {
+    // Analyse du titre - méthodes multiples pour le détecter
+    let title = '';
+    const titleElement = doc.querySelector('title');
+    if (titleElement) {
+      title = titleElement.textContent?.trim() || '';
+    }
+    
+    // Fallback: chercher dans les meta tags
+    if (!title) {
+      const ogTitle = doc.querySelector('meta[property="og:title"]');
+      if (ogTitle) {
+        title = ogTitle.getAttribute('content')?.trim() || '';
+      }
+    }
+    
+    // Fallback: chercher le H1 principal
+    if (!title) {
+      const h1 = doc.querySelector('h1');
+      if (h1) {
+        title = h1.textContent?.trim() || '';
+      }
+    }
+    
+    console.log('🔍 Titre détecté:', title);
+    
+    if (!title || title.length === 0) {
       score -= 20;
       issues.push({
         type: 'error',
         category: 'Title',
-        message: 'Balise title manquante',
+        message: 'Balise title manquante ou vide',
         impact: 'high'
       });
-      recommendations.push('Ajoutez une balise title descriptive');
-    } else if (data.title.length < 30) {
+      recommendations.push('Ajoutez une balise <title> descriptive et unique');
+    } else if (title.length < 30) {
       score -= 10;
       issues.push({
         type: 'warning',
         category: 'Title',
-        message: `Title trop court (${data.title.length} caractères)`,
+        message: `Title trop court (${title.length} caractères) - optimal: 50-60`,
         impact: 'medium'
       });
-    } else if (data.title.length > 60) {
+      recommendations.push('Allongez votre titre pour atteindre 50-60 caractères');
+    } else if (title.length > 70) {
       score -= 5;
       issues.push({
         type: 'warning',
         category: 'Title',
-        message: `Title trop long (${data.title.length} caractères)`,
+        message: `Title trop long (${title.length} caractères) - optimal: 50-60`,
         impact: 'medium'
       });
+      recommendations.push('Raccourcissez votre titre pour qu\'il soit visible entièrement dans les résultats');
     } else {
-      strengths.push(`Title optimisé (${data.title.length} caractères)`);
+      strengths.push(`Title bien optimisé (${title.length} caractères)`);
     }
 
     // Analyse de la meta description
-    if (!data.description || data.description.length === 0) {
+    let metaDescription = '';
+    const metaDescElement = doc.querySelector('meta[name="description"]');
+    if (metaDescElement) {
+      metaDescription = metaDescElement.getAttribute('content')?.trim() || '';
+    }
+    
+    // Fallback: Open Graph description
+    if (!metaDescription) {
+      const ogDesc = doc.querySelector('meta[property="og:description"]');
+      if (ogDesc) {
+        metaDescription = ogDesc.getAttribute('content')?.trim() || '';
+      }
+    }
+    
+    console.log('🔍 Meta description détectée:', metaDescription);
+    
+    if (!metaDescription || metaDescription.length === 0) {
       score -= 15;
       issues.push({
         type: 'error',
@@ -86,71 +129,101 @@ const UrlSeoAnalyzer: React.FC = () => {
         impact: 'high'
       });
       recommendations.push('Ajoutez une meta description de 150-160 caractères');
-    } else if (data.description.length < 120) {
+    } else if (metaDescription.length < 120) {
       score -= 8;
       issues.push({
         type: 'warning',
         category: 'Meta Description',
-        message: `Meta description trop courte (${data.description.length} caractères)`,
+        message: `Meta description trop courte (${metaDescription.length} caractères)`,
         impact: 'medium'
       });
-    } else if (data.description.length > 160) {
+      recommendations.push('Allongez votre meta description jusqu\'à 150-160 caractères');
+    } else if (metaDescription.length > 160) {
       score -= 5;
       issues.push({
         type: 'warning',
         category: 'Meta Description',
-        message: `Meta description trop longue (${data.description.length} caractères)`,
+        message: `Meta description trop longue (${metaDescription.length} caractères)`,
         impact: 'medium'
       });
+      recommendations.push('Raccourcissez votre meta description à 150-160 caractères');
     } else {
-      strengths.push(`Meta description optimisée (${data.description.length} caractères)`);
+      strengths.push(`Meta description optimisée (${metaDescription.length} caractères)`);
     }
 
-    // Analyse du contenu
-    if (data.wordCount && data.wordCount < 300) {
+    // Analyse des titres H1-H6
+    const h1Elements = doc.querySelectorAll('h1');
+    const h2Elements = doc.querySelectorAll('h2');
+    const h3Elements = doc.querySelectorAll('h3');
+    
+    if (h1Elements.length === 0) {
+      score -= 15;
+      issues.push({
+        type: 'error',
+        category: 'Structure',
+        message: 'Aucun titre H1 trouvé',
+        impact: 'high'
+      });
+      recommendations.push('Ajoutez un titre H1 principal à votre page');
+    } else if (h1Elements.length > 1) {
+      score -= 8;
+      issues.push({
+        type: 'warning',
+        category: 'Structure',
+        message: `Plusieurs H1 détectés (${h1Elements.length}) - recommandé: 1 seul`,
+        impact: 'medium'
+      });
+      recommendations.push('Utilisez un seul H1 par page et des H2-H6 pour la hiérarchie');
+    } else {
+      strengths.push('Structure H1 correcte (1 seul H1)');
+    }
+
+    // Analyse du contenu textuel
+    const textContent = doc.body?.textContent || '';
+    const wordCount = textContent.split(/\s+/).filter(word => word.length > 0).length;
+    
+    console.log('🔍 Nombre de mots détecté:', wordCount);
+    
+    if (wordCount < 300) {
       score -= 12;
       issues.push({
         type: 'warning',
         category: 'Contenu',
-        message: `Contenu insuffisant (${data.wordCount} mots)`,
+        message: `Contenu textuel insuffisant (${wordCount} mots) - minimum recommandé: 300`,
         impact: 'medium'
       });
-      recommendations.push('Ajoutez plus de contenu textuel de qualité');
-    } else if (data.wordCount && data.wordCount >= 300) {
-      strengths.push(`Contenu substantiel (${data.wordCount} mots)`);
+      recommendations.push('Ajoutez plus de contenu textuel de qualité (300+ mots)');
+    } else if (wordCount >= 500) {
+      strengths.push(`Contenu substantiel (${wordCount} mots)`);
     }
 
-    // Analyse des performances
-    if (data.performance) {
-      const perf = data.performance;
-      if (perf.loadTime && perf.loadTime > 3000) {
-        score -= 10;
-        issues.push({
-          type: 'warning',
-          category: 'Performance',
-          message: `Temps de chargement élevé (${(perf.loadTime/1000).toFixed(1)}s)`,
-          impact: 'high'
-        });
-        recommendations.push('Optimisez la vitesse de chargement');
-      } else if (perf.loadTime && perf.loadTime <= 2000) {
-        strengths.push(`Temps de chargement correct (${(perf.loadTime/1000).toFixed(1)}s)`);
+    // Analyse des images
+    const images = doc.querySelectorAll('img');
+    let imagesWithoutAlt = 0;
+    images.forEach(img => {
+      const alt = img.getAttribute('alt');
+      if (!alt || alt.trim() === '') {
+        imagesWithoutAlt++;
       }
+    });
 
-      if (perf.performanceScore && perf.performanceScore < 70) {
-        score -= 8;
-        issues.push({
-          type: 'warning',
-          category: 'Performance',
-          message: `Score de performance faible (${perf.performanceScore}/100)`,
-          impact: 'medium'
-        });
-      } else if (perf.performanceScore && perf.performanceScore >= 80) {
-        strengths.push(`Bon score de performance (${perf.performanceScore}/100)`);
-      }
+    if (imagesWithoutAlt > 0) {
+      score -= Math.min(10, imagesWithoutAlt * 2);
+      issues.push({
+        type: 'warning',
+        category: 'Accessibilité',
+        message: `${imagesWithoutAlt} image(s) sans attribut alt`,
+        impact: 'medium'
+      });
+      recommendations.push('Ajoutez des attributs alt descriptifs à toutes vos images');
+    } else if (images.length > 0) {
+      strengths.push(`Toutes les images ont un attribut alt (${images.length} images)`);
     }
 
     // Vérification HTTPS
-    if (data.url && !data.url.startsWith('https://')) {
+    if (targetUrl.startsWith('https://')) {
+      strengths.push('Site sécurisé (HTTPS)');
+    } else {
       score -= 10;
       issues.push({
         type: 'error',
@@ -158,26 +231,28 @@ const UrlSeoAnalyzer: React.FC = () => {
         message: 'Site non sécurisé (HTTP au lieu de HTTPS)',
         impact: 'high'
       });
-      recommendations.push('Migrez vers HTTPS');
-    } else {
-      strengths.push('Site sécurisé (HTTPS)');
+      recommendations.push('Migrez vers HTTPS pour la sécurité');
     }
 
-    // Score de lisibilité
-    if (data.readabilityScore && data.readabilityScore < 60) {
+    // Vérification des meta tags Open Graph
+    const ogTitle = doc.querySelector('meta[property="og:title"]');
+    const ogDescription = doc.querySelector('meta[property="og:description"]');
+    const ogImage = doc.querySelector('meta[property="og:image"]');
+    
+    if (ogTitle && ogDescription && ogImage) {
+      strengths.push('Meta tags Open Graph présents');
+    } else {
       score -= 5;
       issues.push({
         type: 'warning',
-        category: 'Lisibilité',
-        message: `Score de lisibilité faible (${data.readabilityScore}/100)`,
-        impact: 'medium'
+        category: 'Réseaux sociaux',
+        message: 'Meta tags Open Graph incomplets',
+        impact: 'low'
       });
-      recommendations.push('Améliorez la lisibilité du contenu');
-    } else if (data.readabilityScore && data.readabilityScore >= 80) {
-      strengths.push(`Excellente lisibilité (${data.readabilityScore}/100)`);
+      recommendations.push('Ajoutez les meta tags Open Graph pour les réseaux sociaux');
     }
 
-    // Assurer que le score reste dans les limites
+    // S'assurer que le score reste dans les limites
     score = Math.max(20, Math.min(100, score));
 
     return {
@@ -186,23 +261,23 @@ const UrlSeoAnalyzer: React.FC = () => {
       recommendations,
       strengths,
       analysisDetails: {
-        title: data.title || null,
-        metaDescription: data.description || null,
-        h1Count: data.h1Count || 0,
-        imagesWithoutAlt: 0,
-        contentLength: data.wordCount || 0,
-        hasRobots: true
+        title,
+        metaDescription,
+        h1Count: h1Elements.length,
+        imagesWithoutAlt,
+        contentLength: wordCount,
+        hasRobots: !!doc.querySelector('meta[name="robots"]')
       }
     };
   };
 
   const analyzeUrlDirectly = async (targetUrl: string): Promise<SeoAnalysisResult> => {
     console.log(`🔍 Analyse de: ${targetUrl}`);
-    setAnalysisStep('Récupération du contenu...');
+    setAnalysisStep('Récupération du contenu de la page...');
     
     try {
-      // Utiliser le service existant qui fonctionne déjà
-      const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`, {
+      // Essayer d'abord avec allorigins (plus fiable)
+      let response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`, {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
@@ -220,56 +295,31 @@ const UrlSeoAnalyzer: React.FC = () => {
       }
 
       setAnalysisStep('Analyse du contenu HTML...');
+      const analysis = analyzeHtmlContent(data.contents, targetUrl);
       
-      // Parser le HTML
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(data.contents, 'text/html');
-      
-      // Extraire les informations
-      const title = doc.title || '';
-      const metaDesc = doc.querySelector('meta[name="description"]')?.getAttribute('content') || '';
-      const textContent = doc.body?.textContent || '';
-      const wordCount = textContent.split(/\s+/).filter(word => word.length > 0).length;
-      
-      const analysisData = {
-        url: targetUrl,
-        title,
-        description: metaDesc,
-        wordCount,
-        score: 70, // Score de base
-        performance: {
-          loadTime: 2000 + Math.random() * 3000,
-          performanceScore: 60 + Math.random() * 40
-        },
-        readabilityScore: 60 + Math.random() * 40
-      };
-
-      console.log('📊 Données extraites:', analysisData);
-      const analysis = analyzeRealData(analysisData);
       console.log('📊 Analyse terminée:', analysis);
-      
       return analysis;
       
     } catch (error) {
       console.error('❌ Erreur lors de l\'analyse:', error);
       setAnalysisStep('Erreur lors de l\'analyse');
       
-      // Analyse basée sur l'URL uniquement en cas d'erreur
+      // Retourner une analyse basique en cas d'erreur
       return {
         score: 45,
         issues: [
           {
             type: 'error',
             category: 'Accès',
-            message: 'Impossible d\'accéder au contenu de la page',
+            message: 'Impossible d\'accéder au contenu de la page pour analyse',
             impact: 'high'
           }
         ],
         recommendations: [
-          'Vérifiez que l\'URL est accessible',
+          'Vérifiez que l\'URL est accessible publiquement',
           'Assurez-vous que le site n\'a pas de restrictions d\'accès'
         ],
-        strengths: url.startsWith('https://') ? ['Site sécurisé (HTTPS)'] : [],
+        strengths: targetUrl.startsWith('https://') ? ['Site sécurisé (HTTPS)'] : [],
         analysisDetails: {
           title: null,
           metaDescription: null,
@@ -420,13 +470,18 @@ const UrlSeoAnalyzer: React.FC = () => {
                 <div>
                   <span className="text-gray-600">Title:</span>
                   <span className="ml-2 font-medium">
-                    {result.analysisDetails.title ? '✅ Present' : '❌ Manquant'}
+                    {result.analysisDetails.title ? '✅ Présent' : '❌ Manquant'}
                   </span>
+                  {result.analysisDetails.title && (
+                    <div className="text-xs text-gray-500 mt-1 truncate">
+                      "{result.analysisDetails.title}"
+                    </div>
+                  )}
                 </div>
                 <div>
                   <span className="text-gray-600">Meta desc:</span>
                   <span className="ml-2 font-medium">
-                    {result.analysisDetails.metaDescription ? '✅ Present' : '❌ Manquant'}
+                    {result.analysisDetails.metaDescription ? '✅ Présent' : '❌ Manquant'}
                   </span>
                 </div>
                 <div>

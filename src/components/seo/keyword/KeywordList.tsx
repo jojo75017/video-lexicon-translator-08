@@ -59,6 +59,9 @@ const KeywordList: React.FC<KeywordListProps> = ({
     if (typeof value === 'number') {
       return value.toLocaleString();
     }
+    if (Array.isArray(value)) {
+      return value.join(', ');
+    }
     return String(value);
   };
 
