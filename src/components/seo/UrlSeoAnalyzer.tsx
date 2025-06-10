@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -41,36 +42,45 @@ const UrlSeoAnalyzer: React.FC = () => {
     const issues: SeoIssue[] = [];
     const recommendations: string[] = [];
     const strengths: string[] = [];
-    let score = 85; // Score de base plus optimiste
+    let score = 85;
     
-    // Parser le HTML
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlContent, 'text/html');
     
-    // Analyse du titre - méthodes multiples pour le détecter
+    // Analyse du titre avec méthodes multiples
     let title = '';
+    
+    // Méthode 1: Balise title
     const titleElement = doc.querySelector('title');
-    if (titleElement) {
-      title = titleElement.textContent?.trim() || '';
+    if (titleElement?.textContent) {
+      title = titleElement.textContent.trim();
     }
     
-    // Fallback: chercher dans les meta tags
+    // Méthode 2: Open Graph title
     if (!title) {
       const ogTitle = doc.querySelector('meta[property="og:title"]');
-      if (ogTitle) {
-        title = ogTitle.getAttribute('content')?.trim() || '';
+      if (ogTitle?.getAttribute('content')) {
+        title = ogTitle.getAttribute('content')!.trim();
       }
     }
     
-    // Fallback: chercher le H1 principal
+    // Méthode 3: H1 principal
     if (!title) {
       const h1 = doc.querySelector('h1');
-      if (h1) {
-        title = h1.textContent?.trim() || '';
+      if (h1?.textContent) {
+        title = h1.textContent.trim();
       }
     }
     
-    console.log('🔍 Titre détecté:', title);
+    // Méthode 4: Recherche dans le contenu HTML brut
+    if (!title && htmlContent) {
+      const titleMatch = htmlContent.match(/<title[^>]*>(.*?)<\/title>/i);
+      if (titleMatch && titleMatch[1]) {
+        title = titleMatch[1].replace(/&[^;]+;/g, '').trim();
+      }
+    }
+    
+    console.log('🔍 Titre final détecté:', title);
     
     if (!title || title.length === 0) {
       score -= 20;
@@ -105,16 +115,26 @@ const UrlSeoAnalyzer: React.FC = () => {
 
     // Analyse de la meta description
     let metaDescription = '';
+    
+    // Recherche dans le DOM parsé
     const metaDescElement = doc.querySelector('meta[name="description"]');
-    if (metaDescElement) {
-      metaDescription = metaDescElement.getAttribute('content')?.trim() || '';
+    if (metaDescElement?.getAttribute('content')) {
+      metaDescription = metaDescElement.getAttribute('content')!.trim();
+    }
+    
+    // Recherche dans le contenu HTML brut
+    if (!metaDescription && htmlContent) {
+      const metaMatch = htmlContent.match(/<meta[^>]*name=["\']description["\'][^>]*content=["\']([^"\']*)["\'][^>]*>/i);
+      if (metaMatch && metaMatch[1]) {
+        metaDescription = metaMatch[1].trim();
+      }
     }
     
     // Fallback: Open Graph description
     if (!metaDescription) {
       const ogDesc = doc.querySelector('meta[property="og:description"]');
-      if (ogDesc) {
-        metaDescription = ogDesc.getAttribute('content')?.trim() || '';
+      if (ogDesc?.getAttribute('content')) {
+        metaDescription = ogDesc.getAttribute('content')!.trim();
       }
     }
     
@@ -154,7 +174,6 @@ const UrlSeoAnalyzer: React.FC = () => {
     // Analyse des titres H1-H6
     const h1Elements = doc.querySelectorAll('h1');
     const h2Elements = doc.querySelectorAll('h2');
-    const h3Elements = doc.querySelectorAll('h3');
     
     if (h1Elements.length === 0) {
       score -= 15;
@@ -234,24 +253,6 @@ const UrlSeoAnalyzer: React.FC = () => {
       recommendations.push('Migrez vers HTTPS pour la sécurité');
     }
 
-    // Vérification des meta tags Open Graph
-    const ogTitle = doc.querySelector('meta[property="og:title"]');
-    const ogDescription = doc.querySelector('meta[property="og:description"]');
-    const ogImage = doc.querySelector('meta[property="og:image"]');
-    
-    if (ogTitle && ogDescription && ogImage) {
-      strengths.push('Meta tags Open Graph présents');
-    } else {
-      score -= 5;
-      issues.push({
-        type: 'warning',
-        category: 'Réseaux sociaux',
-        message: 'Meta tags Open Graph incomplets',
-        impact: 'low'
-      });
-      recommendations.push('Ajoutez les meta tags Open Graph pour les réseaux sociaux');
-    }
-
     // S'assurer que le score reste dans les limites
     score = Math.max(20, Math.min(100, score));
 
@@ -275,61 +276,82 @@ const UrlSeoAnalyzer: React.FC = () => {
     console.log(`🔍 Analyse de: ${targetUrl}`);
     setAnalysisStep('Récupération du contenu de la page...');
     
-    try {
-      // Essayer d'abord avec allorigins (plus fiable)
-      let response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`Erreur HTTP: ${response.status}`);
-      }
-
-      const data = await response.json();
-      if (!data.contents) {
-        throw new Error('Aucun contenu récupéré');
-      }
-
-      setAnalysisStep('Analyse du contenu HTML...');
-      const analysis = analyzeHtmlContent(data.contents, targetUrl);
-      
-      console.log('📊 Analyse terminée:', analysis);
-      return analysis;
-      
-    } catch (error) {
-      console.error('❌ Erreur lors de l\'analyse:', error);
-      setAnalysisStep('Erreur lors de l\'analyse');
-      
-      // Retourner une analyse basique en cas d'erreur
-      return {
-        score: 45,
-        issues: [
-          {
-            type: 'error',
-            category: 'Accès',
-            message: 'Impossible d\'accéder au contenu de la page pour analyse',
-            impact: 'high'
+    const proxies = [
+      'https://api.allorigins.win/get?url=',
+      'https://corsproxy.io/?',
+      'https://thingproxy.freeboard.io/fetch/'
+    ];
+    
+    for (let i = 0; i < proxies.length; i++) {
+      try {
+        const proxy = proxies[i];
+        console.log(`Tentative avec proxy ${i + 1}: ${proxy}`);
+        
+        const response = await fetch(`${proxy}${encodeURIComponent(targetUrl)}`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
           }
-        ],
-        recommendations: [
-          'Vérifiez que l\'URL est accessible publiquement',
-          'Assurez-vous que le site n\'a pas de restrictions d\'accès'
-        ],
-        strengths: targetUrl.startsWith('https://') ? ['Site sécurisé (HTTPS)'] : [],
-        analysisDetails: {
-          title: null,
-          metaDescription: null,
-          h1Count: 0,
-          imagesWithoutAlt: 0,
-          contentLength: 0,
-          hasRobots: false
+        });
+
+        if (!response.ok) {
+          throw new Error(`Erreur HTTP: ${response.status}`);
         }
-      };
+
+        let htmlContent = '';
+        if (proxy.includes('allorigins')) {
+          const data = await response.json();
+          htmlContent = data.contents;
+        } else {
+          htmlContent = await response.text();
+        }
+
+        if (!htmlContent) {
+          throw new Error('Contenu vide récupéré');
+        }
+
+        setAnalysisStep('Analyse du contenu HTML...');
+        const analysis = analyzeHtmlContent(htmlContent, targetUrl);
+        
+        console.log('📊 Analyse terminée:', analysis);
+        return analysis;
+        
+      } catch (error) {
+        console.error(`❌ Proxy ${i + 1} échoué:`, error);
+        if (i === proxies.length - 1) {
+          // Dernier proxy, retourner une analyse basique
+          console.log('Tous les proxies ont échoué, analyse basique');
+          return {
+            score: 45,
+            issues: [
+              {
+                type: 'error',
+                category: 'Accès',
+                message: 'Impossible d\'accéder au contenu de la page pour analyse complète',
+                impact: 'high'
+              }
+            ],
+            recommendations: [
+              'Vérifiez que l\'URL est accessible publiquement',
+              'Le site peut avoir des restrictions d\'accès qui empêchent l\'analyse'
+            ],
+            strengths: targetUrl.startsWith('https://') ? ['Site sécurisé (HTTPS)'] : [],
+            analysisDetails: {
+              title: null,
+              metaDescription: null,
+              h1Count: 0,
+              imagesWithoutAlt: 0,
+              contentLength: 0,
+              hasRobots: false
+            }
+          };
+        }
+      }
     }
+
+    // Fallback (ne devrait jamais être atteint)
+    throw new Error('Analyse impossible');
   };
 
   const handleAnalyze = async () => {

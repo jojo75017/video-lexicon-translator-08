@@ -54,7 +54,7 @@ const KeywordList: React.FC<KeywordListProps> = ({
     }
   };
 
-  const formatValue = (value: number | string | undefined): string => {
+  const formatValue = (value: number | string | undefined | string[]): string => {
     if (value === undefined || value === null) return '-';
     if (typeof value === 'number') {
       return value.toLocaleString();
