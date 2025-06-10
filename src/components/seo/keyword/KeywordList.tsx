@@ -102,7 +102,7 @@ const KeywordList: React.FC<KeywordListProps> = ({
                   >
                     {keyword.keyword}
                   </label>
-                  {keyword.trend && getTrendIcon(keyword.trend)}
+                  {keyword.trends && Array.isArray(keyword.trends) && getTrendIcon('up')}
                 </div>
                 
                 <div className="flex flex-wrap gap-2 text-sm text-gray-600">
@@ -113,7 +113,7 @@ const KeywordList: React.FC<KeywordListProps> = ({
                   )}
                   
                   {keyword.difficulty && (
-                    <Badge className={getDifficultyColor(keyword.difficulty)}>
+                    <Badge className={getDifficultyColor(String(keyword.difficulty))}>
                       {keyword.difficulty}
                     </Badge>
                   )}

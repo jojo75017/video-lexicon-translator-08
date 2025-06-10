@@ -1,12 +1,12 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Globe, Loader2, CheckCircle, XCircle, AlertTriangle, Shield, RefreshCw } from 'lucide-react';
+import { Globe, Loader2, CheckCircle, XCircle, AlertTriangle, Shield, RefreshCw, Key, Zap } from 'lucide-react';
 import { toast } from 'sonner';
+import { OpenAIService } from '@/utils/seo/openaiService';
 
 interface SeoIssue {
   type: 'error' | 'warning' | 'success';
@@ -28,6 +28,7 @@ interface SeoAnalysisResult {
     contentLength: number;
     hasRobots: boolean;
   };
+  aiEnhanced?: boolean;
 }
 
 const UrlSeoAnalyzer: React.FC = () => {
@@ -35,8 +36,48 @@ const UrlSeoAnalyzer: React.FC = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<SeoAnalysisResult | null>(null);
   const [analysisStep, setAnalysisStep] = useState('');
+  const [openaiKey, setOpenaiKey] = useState('');
+  const [showApiConfig, setShowApiConfig] = useState(false);
+  const [apiKeyStatus, setApiKeyStatus] = useState<'unchecked' | 'valid' | 'invalid'>('unchecked');
 
-  const analyzeHtmlContent = (htmlContent: string, targetUrl: string): SeoAnalysisResult => {
+  // Charger la clé OpenAI depuis localStorage
+  useEffect(() => {
+    const savedKey = localStorage.getItem('openaiKey');
+    if (savedKey) {
+      setOpenaiKey(savedKey);
+      setApiKeyStatus('valid');
+    }
+  }, []);
+
+  const validateAndSaveApiKey = async () => {
+    if (!openaiKey) {
+      toast.error('Veuillez entrer une clé API OpenAI');
+      return;
+    }
+
+    try {
+      setApiKeyStatus('unchecked');
+      toast.info('Validation de la clé API...');
+      
+      const openAIService = new OpenAIService(openaiKey);
+      const isValid = await openAIService.validateApiKey();
+      
+      if (isValid) {
+        localStorage.setItem('openaiKey', openaiKey);
+        setApiKeyStatus('valid');
+        setShowApiConfig(false);
+        toast.success('Clé API OpenAI validée et sauvegardée');
+      } else {
+        setApiKeyStatus('invalid');
+        toast.error('Clé API OpenAI invalide');
+      }
+    } catch (error) {
+      setApiKeyStatus('invalid');
+      toast.error('Erreur lors de la validation de la clé API');
+    }
+  };
+
+  const analyzeHtmlContent = async (htmlContent: string, targetUrl: string): Promise<SeoAnalysisResult> => {
     console.log('📊 Analyse du contenu HTML récupéré');
     
     const issues: SeoIssue[] = [];
@@ -82,6 +123,37 @@ const UrlSeoAnalyzer: React.FC = () => {
     
     console.log('🔍 Titre final détecté:', title);
     
+    // Si on a une clé OpenAI valide, utiliser l'IA pour une analyse plus poussée
+    let aiEnhanced = false;
+    if (apiKeyStatus === 'valid' && openaiKey) {
+      try {
+        setAnalysisStep('Analyse IA en cours...');
+        const openAIService = new OpenAIService(openaiKey);
+        const aiAnalysis = await openAIService.analyzeSeoContent(targetUrl, htmlContent.substring(0, 4000));
+        
+        if (aiAnalysis) {
+          aiEnhanced = true;
+          // Améliorer l'analyse avec les données IA
+          if (aiAnalysis.title && !title) {
+            title = aiAnalysis.title;
+          }
+          
+          // Ajouter les recommandations IA
+          if (aiAnalysis.recommendations) {
+            recommendations.push(...aiAnalysis.recommendations);
+          }
+          
+          // Ajuster le score avec l'analyse IA
+          if (aiAnalysis.score) {
+            score = Math.round((score + aiAnalysis.score) / 2);
+          }
+        }
+      } catch (error) {
+        console.error('Erreur analyse IA:', error);
+        // Continuer avec l'analyse standard
+      }
+    }
+    
     if (!title || title.length === 0) {
       score -= 20;
       issues.push({
@@ -116,25 +188,15 @@ const UrlSeoAnalyzer: React.FC = () => {
     // Analyse de la meta description
     let metaDescription = '';
     
-    // Recherche dans le DOM parsé
     const metaDescElement = doc.querySelector('meta[name="description"]');
     if (metaDescElement?.getAttribute('content')) {
       metaDescription = metaDescElement.getAttribute('content')!.trim();
     }
     
-    // Recherche dans le contenu HTML brut
     if (!metaDescription && htmlContent) {
       const metaMatch = htmlContent.match(/<meta[^>]*name=["\']description["\'][^>]*content=["\']([^"\']*)["\'][^>]*>/i);
       if (metaMatch && metaMatch[1]) {
         metaDescription = metaMatch[1].trim();
-      }
-    }
-    
-    // Fallback: Open Graph description
-    if (!metaDescription) {
-      const ogDesc = doc.querySelector('meta[property="og:description"]');
-      if (ogDesc?.getAttribute('content')) {
-        metaDescription = ogDesc.getAttribute('content')!.trim();
       }
     }
     
@@ -264,11 +326,12 @@ const UrlSeoAnalyzer: React.FC = () => {
       analysisDetails: {
         title,
         metaDescription,
-        h1Count: h1Elements.length,
-        imagesWithoutAlt,
-        contentLength: wordCount,
+        h1Count: doc.querySelectorAll('h1').length,
+        imagesWithoutAlt: Array.from(doc.querySelectorAll('img')).filter(img => !img.getAttribute('alt')).length,
+        contentLength: doc.body?.textContent?.split(/\s+/).filter(word => word.length > 0).length || 0,
         hasRobots: !!doc.querySelector('meta[name="robots"]')
-      }
+      },
+      aiEnhanced
     };
   };
 
@@ -312,7 +375,7 @@ const UrlSeoAnalyzer: React.FC = () => {
         }
 
         setAnalysisStep('Analyse du contenu HTML...');
-        const analysis = analyzeHtmlContent(htmlContent, targetUrl);
+        const analysis = await analyzeHtmlContent(htmlContent, targetUrl);
         
         console.log('📊 Analyse terminée:', analysis);
         return analysis;
@@ -320,7 +383,6 @@ const UrlSeoAnalyzer: React.FC = () => {
       } catch (error) {
         console.error(`❌ Proxy ${i + 1} échoué:`, error);
         if (i === proxies.length - 1) {
-          // Dernier proxy, retourner une analyse basique
           console.log('Tous les proxies ont échoué, analyse basique');
           return {
             score: 45,
@@ -350,7 +412,6 @@ const UrlSeoAnalyzer: React.FC = () => {
       }
     }
 
-    // Fallback (ne devrait jamais être atteint)
     throw new Error('Analyse impossible');
   };
 
@@ -366,7 +427,6 @@ const UrlSeoAnalyzer: React.FC = () => {
         formattedUrl = `https://${formattedUrl}`;
       }
 
-      // Validation URL
       new URL(formattedUrl);
 
       setIsAnalyzing(true);
@@ -379,7 +439,7 @@ const UrlSeoAnalyzer: React.FC = () => {
       const analysisResult = await analyzeUrlDirectly(formattedUrl);
       setResult(analysisResult);
       
-      toast.success(`✅ Analyse terminée - Score SEO: ${analysisResult.score}/100`);
+      toast.success(`✅ Analyse terminée - Score SEO: ${analysisResult.score}/100${analysisResult.aiEnhanced ? ' (IA)' : ''}`);
       
     } catch (error) {
       console.error('❌ Erreur lors de l\'analyse:', error);
@@ -425,11 +485,45 @@ const UrlSeoAnalyzer: React.FC = () => {
           <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
             <Globe className="w-5 h-5 text-blue-600" />
             Analyseur SEO d'URL
+            {apiKeyStatus === 'valid' && (
+              <Badge className="bg-green-100 text-green-800 text-xs">
+                <Zap className="w-3 h-3 mr-1" />
+                IA activée
+              </Badge>
+            )}
           </h3>
           <p className="text-gray-600 text-sm">
-            Analysez le SEO de n'importe quelle URL et obtenez un score détaillé avec les problèmes identifiés.
+            Analysez le SEO de n'importe quelle URL. 
+            {apiKeyStatus !== 'valid' && (
+              <span className="text-blue-600 font-medium"> Configurez OpenAI pour une analyse plus précise.</span>
+            )}
           </p>
         </div>
+
+        {/* Configuration OpenAI */}
+        {(showApiConfig || apiKeyStatus !== 'valid') && (
+          <Card className="p-4 bg-blue-50 border-blue-200">
+            <h4 className="font-medium mb-3 flex items-center gap-2">
+              <Key className="w-4 h-4" />
+              Configuration OpenAI (optionnelle)
+            </h4>
+            <div className="flex gap-2 mb-2">
+              <Input
+                type="password"
+                placeholder="sk-..."
+                value={openaiKey}
+                onChange={(e) => setOpenaiKey(e.target.value)}
+                className="flex-1"
+              />
+              <Button onClick={validateAndSaveApiKey} disabled={!openaiKey}>
+                Valider
+              </Button>
+            </div>
+            <p className="text-xs text-blue-600">
+              Avec OpenAI, obtenez une analyse plus précise du contenu et des recommandations personnalisées.
+            </p>
+          </Card>
+        )}
 
         <div className="flex gap-3">
           <div className="flex-1">
@@ -458,6 +552,14 @@ const UrlSeoAnalyzer: React.FC = () => {
               </>
             )}
           </Button>
+          {apiKeyStatus !== 'valid' && (
+            <Button 
+              variant="outline"
+              onClick={() => setShowApiConfig(!showApiConfig)}
+            >
+              <Key className="w-4 h-4" />
+            </Button>
+          )}
         </div>
 
         {isAnalyzing && analysisStep && (
