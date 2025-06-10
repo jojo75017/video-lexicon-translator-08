@@ -25,32 +25,41 @@ const KeywordList: React.FC<KeywordListProps> = ({
     );
   }
 
-  const getTrendIcon = (trend: string) => {
-    switch (trend?.toLowerCase()) {
-      case 'up':
-      case 'increasing':
+  const getTrendIcon = (trend: string | number[] | undefined) => {
+    if (Array.isArray(trend)) {
+      const average = trend.reduce((sum, val) => sum + val, 0) / trend.length;
+      if (average > 50) {
         return <TrendingUp className="w-4 h-4 text-green-500" />;
-      case 'down':
-      case 'decreasing':
+      } else if (average < 30) {
         return <TrendingDown className="w-4 h-4 text-red-500" />;
-      default:
-        return <Minus className="w-4 h-4 text-gray-400" />;
+      }
     }
+    
+    if (typeof trend === 'string') {
+      switch (trend.toLowerCase()) {
+        case 'up':
+        case 'increasing':
+          return <TrendingUp className="w-4 h-4 text-green-500" />;
+        case 'down':
+        case 'decreasing':
+          return <TrendingDown className="w-4 h-4 text-red-500" />;
+        default:
+          return <Minus className="w-4 h-4 text-gray-400" />;
+      }
+    }
+    
+    return <Minus className="w-4 h-4 text-gray-400" />;
   };
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty?.toLowerCase()) {
-      case 'easy':
-      case 'facile':
-        return 'bg-green-100 text-green-800';
-      case 'medium':
-      case 'moyen':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'hard':
-      case 'difficile':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+  const getDifficultyColor = (difficulty: string | number | undefined) => {
+    const difficultyValue = typeof difficulty === 'string' ? parseInt(difficulty) : difficulty || 0;
+    
+    if (difficultyValue <= 30) {
+      return 'bg-green-100 text-green-800';
+    } else if (difficultyValue <= 60) {
+      return 'bg-yellow-100 text-yellow-800';
+    } else {
+      return 'bg-red-100 text-red-800';
     }
   };
 
@@ -68,7 +77,7 @@ const KeywordList: React.FC<KeywordListProps> = ({
   const formatCpc = (cpc: number | string | undefined): string => {
     if (cpc === undefined || cpc === null) return '-';
     if (typeof cpc === 'number') {
-      return cpc.toFixed(2);
+      return cpc.toFixed(2) + '€';
     }
     return String(cpc);
   };
@@ -102,7 +111,7 @@ const KeywordList: React.FC<KeywordListProps> = ({
                   >
                     {keyword.keyword}
                   </label>
-                  {keyword.trends && Array.isArray(keyword.trends) && getTrendIcon('up')}
+                  {keyword.trend && getTrendIcon(keyword.trend)}
                 </div>
                 
                 <div className="flex flex-wrap gap-2 text-sm text-gray-600">
@@ -113,8 +122,8 @@ const KeywordList: React.FC<KeywordListProps> = ({
                   )}
                   
                   {keyword.difficulty && (
-                    <Badge className={getDifficultyColor(String(keyword.difficulty))}>
-                      {keyword.difficulty}
+                    <Badge className={getDifficultyColor(keyword.difficulty)}>
+                      Difficulté: {keyword.difficulty}
                     </Badge>
                   )}
                   

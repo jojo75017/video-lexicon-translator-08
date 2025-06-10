@@ -1,25 +1,12 @@
 
 import React from 'react';
-import { Card } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { BarChart3, Target, Users, Globe, Download, X } from 'lucide-react';
 import { KeywordSuggestion } from '@/types/seo/Keyword';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { 
-  TrendingUp, 
-  Download, 
-  Trash2, 
-  Filter, 
-  Sparkles,
-  List,
-  Table2,
-  BarChart3,
-  Building2,
-  Lightbulb
-} from 'lucide-react';
-import KeywordTable from './KeywordTable';
 import KeywordList from './KeywordList';
-import CompetitorAnalysis from './CompetitorAnalysis';
 
 interface KeywordResultsProps {
   standardKeywords: KeywordSuggestion[];
@@ -52,143 +39,165 @@ const KeywordResults: React.FC<KeywordResultsProps> = ({
   exportSelectedKeywords,
   keyword
 }) => {
-  console.log('KeywordResults - activeTab:', activeTab);
-  console.log('KeywordResults - standardKeywords length:', standardKeywords.length);
-  console.log('KeywordResults - longTailKeywords length:', longTailKeywords.length);
-  
+  // Calculer les métriques moyennes
+  const calculateAverageMetrics = () => {
+    const allKeywords = [...standardKeywords, ...longTailKeywords];
+    if (allKeywords.length === 0) return { avgVolume: 0, avgDifficulty: 0, avgCpc: 0 };
+    
+    const avgVolume = Math.round(allKeywords.reduce((sum, kw) => sum + (kw.volume || 0), 0) / allKeywords.length);
+    const avgDifficulty = Math.round(allKeywords.reduce((sum, kw) => sum + (kw.difficulty || 0), 0) / allKeywords.length);
+    const avgCpc = (allKeywords.reduce((sum, kw) => sum + (kw.cpc || 0), 0) / allKeywords.length).toFixed(2);
+    
+    return { avgVolume, avgDifficulty, avgCpc };
+  };
+
+  const { avgVolume, avgDifficulty, avgCpc } = calculateAverageMetrics();
+
   return (
     <Card className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex gap-2 items-center">
-          <h2 className="text-xl font-bold">Résultats ({totalKeywords})</h2>
-          <Badge variant="secondary" className="ml-2">
-            {selectedKeywords.length} sélectionné{selectedKeywords.length > 1 ? 's' : ''}
+      {/* En-tête avec statistiques */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold">Résultats pour "{keyword}"</h2>
+          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+            {totalKeywords} mots-clés trouvés
           </Badge>
         </div>
         
-        <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="flex items-center gap-1"
-            onClick={clearSelectedKeywords}
-            disabled={selectedKeywords.length === 0}
-          >
-            <Trash2 className="h-4 w-4" />
-            <span className="hidden sm:inline">Effacer</span>
-          </Button>
+        {/* Métriques moyennes */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
+            <div className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4 text-blue-600" />
+              <span className="text-sm font-medium text-blue-700">Volume moyen</span>
+            </div>
+            <p className="text-lg font-bold text-blue-800">{avgVolume.toLocaleString()}</p>
+          </div>
           
-          <Button 
-            variant="secondary" 
-            size="sm" 
-            className="flex items-center gap-1"
-            onClick={exportSelectedKeywords}
-            disabled={selectedKeywords.length === 0}
-          >
-            <Download className="h-4 w-4" />
-            <span className="hidden sm:inline">Exporter</span>
-          </Button>
+          <div className="bg-yellow-50 p-3 rounded-lg border border-yellow-100">
+            <div className="flex items-center gap-2">
+              <Target className="h-4 w-4 text-yellow-600" />
+              <span className="text-sm font-medium text-yellow-700">Difficulté moy.</span>
+            </div>
+            <p className="text-lg font-bold text-yellow-800">{avgDifficulty}/100</p>
+          </div>
+          
+          <div className="bg-green-50 p-3 rounded-lg border border-green-100">
+            <div className="flex items-center gap-2">
+              <Users className="h-4 w-4 text-green-600" />
+              <span className="text-sm font-medium text-green-700">CPC moyen</span>
+            </div>
+            <p className="text-lg font-bold text-green-800">{avgCpc}€</p>
+          </div>
+          
+          <div className="bg-purple-50 p-3 rounded-lg border border-purple-100">
+            <div className="flex items-center gap-2">
+              <Globe className="h-4 w-4 text-purple-600" />
+              <span className="text-sm font-medium text-purple-700">Sélectionnés</span>
+            </div>
+            <p className="text-lg font-bold text-purple-800">{selectedKeywords.length}</p>
+          </div>
         </div>
+        
+        {/* Actions */}
+        {selectedKeywords.length > 0 && (
+          <div className="flex flex-wrap gap-2 p-3 bg-gray-50 rounded-lg border">
+            <span className="text-sm font-medium text-gray-700">
+              {selectedKeywords.length} mot(s)-clé(s) sélectionné(s):
+            </span>
+            <div className="flex flex-wrap gap-1">
+              {selectedKeywords.slice(0, 3).map((kw, idx) => (
+                <Badge key={idx} variant="secondary" className="text-xs">
+                  {kw.length > 20 ? `${kw.substring(0, 20)}...` : kw}
+                </Badge>
+              ))}
+              {selectedKeywords.length > 3 && (
+                <Badge variant="secondary" className="text-xs">
+                  +{selectedKeywords.length - 3} autres
+                </Badge>
+              )}
+            </div>
+            <div className="ml-auto flex gap-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={exportSelectedKeywords}
+                className="flex items-center gap-1"
+              >
+                <Download className="h-3 w-3" />
+                Exporter
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={clearSelectedKeywords}
+                className="flex items-center gap-1"
+              >
+                <X className="h-3 w-3" />
+                Effacer
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
-      
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-5">
-        <TabsList className="grid grid-cols-2 md:grid-cols-4 gap-2">
-          <TabsTrigger 
-            value="standard" 
-            className="flex items-center gap-1"
-            onClick={() => {
-              console.log('Clicking standard tab');
-              setActiveTab('standard');
-            }}
-          >
-            <Sparkles className="h-4 w-4" />
-            <span>Standards</span>
+
+      {/* Onglets des résultats */}
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="mb-4">
+          <TabsTrigger value="standard" className="flex items-center gap-2">
+            <Target className="h-4 w-4" />
+            Mots-clés standards ({standardKeywords.length})
           </TabsTrigger>
-          <TabsTrigger 
-            value="long-tail" 
-            className="flex items-center gap-1"
-            onClick={() => {
-              console.log('Clicking long-tail tab');
-              setActiveTab('long-tail');
-            }}
-          >
-            <TrendingUp className="h-4 w-4" />
-            <span>Longue traîne</span>
-          </TabsTrigger>
-          <TabsTrigger 
-            value="view" 
-            className="flex items-center gap-1"
-            onClick={() => {
-              console.log('Clicking view tab');
-              setActiveTab('view');
-            }}
-          >
-            <Table2 className="h-4 w-4" />
-            <span>Vue tableau</span>
+          <TabsTrigger value="longtail" className="flex items-center gap-2">
+            <BarChart3 className="h-4 w-4" />
+            Longue traîne ({longTailKeywords.length})
           </TabsTrigger>
           {hasCompetitorData && (
-            <TabsTrigger 
-              value="competitors" 
-              className="flex items-center gap-1"
-              onClick={() => {
-                console.log('Clicking competitors tab');
-                setActiveTab('competitors');
-              }}
-            >
-              <Building2 className="h-4 w-4" />
-              <span>Concurrents</span>
+            <TabsTrigger value="competitors" className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              Concurrents ({competitors.length})
             </TabsTrigger>
           )}
         </TabsList>
         
-        <TabsContent value="standard" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h3 className="font-semibold text-lg">Mots-clés standards ({standardKeywords.length})</h3>
-          </div>
-          
+        <TabsContent value="standard">
           <KeywordList 
-            keywords={standardKeywords} 
+            keywords={standardKeywords}
             selectedKeywords={selectedKeywords}
-            toggleKeywordSelection={toggleKeywordSelection}
+            onToggleSelection={toggleKeywordSelection}
           />
         </TabsContent>
         
-        <TabsContent value="long-tail" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h3 className="font-semibold text-lg">Mots-clés longue traîne ({longTailKeywords.length})</h3>
-          </div>
-          
+        <TabsContent value="longtail">
           <KeywordList 
-            keywords={longTailKeywords} 
+            keywords={longTailKeywords}
             selectedKeywords={selectedKeywords}
-            toggleKeywordSelection={toggleKeywordSelection}
+            onToggleSelection={toggleKeywordSelection}
           />
-        </TabsContent>
-        
-        <TabsContent value="view" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h3 className="font-semibold text-lg">Vue d'ensemble</h3>
-          </div>
-          
-          <div className="overflow-x-auto">
-            <KeywordTable 
-              keywords={[...standardKeywords, ...longTailKeywords]} 
-              selectedKeywords={selectedKeywords}
-              toggleKeywordSelection={toggleKeywordSelection}
-            />
-          </div>
         </TabsContent>
         
         {hasCompetitorData && (
-          <TabsContent value="competitors" className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h3 className="font-semibold text-lg">Analyse concurrentielle</h3>
+          <TabsContent value="competitors">
+            <div className="space-y-4">
+              {competitors.map((competitor, idx) => (
+                <Card key={idx} className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-medium">{competitor.name}</h3>
+                      <p className="text-sm text-gray-600">{competitor.url}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm">
+                        <span className="font-medium">Force:</span> {competitor.strength}/100
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        {competitor.organic_traffic?.toLocaleString()} visites/mois
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+              ))}
             </div>
-            
-            <CompetitorAnalysis 
-              competitors={competitors} 
-              keyword={keyword}
-            />
           </TabsContent>
         )}
       </Tabs>

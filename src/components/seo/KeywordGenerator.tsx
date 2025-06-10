@@ -19,7 +19,9 @@ import {
   FileText,
   MessageSquare,
   Tag,
-  FolderTree
+  FolderTree,
+  Key,
+  Zap
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { KeywordSuggestion } from '@/types/seo/Keyword';
@@ -33,13 +35,13 @@ import {
   generateTrendData,
   sortKeywordsByScore
 } from '@/utils/keyword/keywordGeneratorUtils';
-import ApiKeyConfig from './analysis/ApiKeyConfig';
 import DynamicFAQ from './keyword/DynamicFAQ';
 import KeywordOpportunities from './keyword/KeywordOpportunities';
 import KeywordFAQ from './keyword/KeywordFAQ';
 import SearchConsoleDataViewer from './keyword/SearchConsoleData';
 import SiteStructureAnalyzer from './keyword/SiteStructureAnalyzer';
 import { RankingData } from '@/types/seo/Ranking';
+import { OpenAIService } from '@/utils/seo/openaiService';
 
 const KeywordGenerator = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -62,19 +64,48 @@ const KeywordGenerator = () => {
   const [competitors, setCompetitors] = useState<any[]>([]);
   const [serpResults, setSerpResults] = useState<any[]>([]);
   
-  // État pour la gestion de la clé API
+  // Configuration OpenAI
   const [openaiKey, setOpenaiKey] = useState(() => localStorage.getItem('openaiKey') || '');
   const [apiKeyStatus, setApiKeyStatus] = useState<'unchecked' | 'valid' | 'invalid'>(
     localStorage.getItem('openaiKey') ? 'valid' : 'unchecked'
   );
-  const [validationMessage, setValidationMessage] = useState('');
+  const [showApiConfig, setShowApiConfig] = useState(false);
   
   // État pour les données de Search Console
   const [searchConsoleData, setSearchConsoleData] = useState<RankingData | undefined>(undefined);
   const [isLoadingSearchConsole, setIsLoadingSearchConsole] = useState<boolean>(false);
+
+  // Validation de la clé API OpenAI
+  const validateAndSaveApiKey = async () => {
+    if (!openaiKey) {
+      toast.error('Veuillez entrer une clé API OpenAI');
+      return;
+    }
+
+    try {
+      setApiKeyStatus('unchecked');
+      toast.info('Validation de la clé API...');
+      
+      const openAIService = new OpenAIService(openaiKey);
+      const isValid = await openAIService.validateApiKey();
+      
+      if (isValid) {
+        localStorage.setItem('openaiKey', openaiKey);
+        setApiKeyStatus('valid');
+        setShowApiConfig(false);
+        toast.success('Clé API OpenAI validée et sauvegardée');
+      } else {
+        setApiKeyStatus('invalid');
+        toast.error('Clé API OpenAI invalide');
+      }
+    } catch (error) {
+      setApiKeyStatus('invalid');
+      toast.error('Erreur lors de la validation de la clé API');
+    }
+  };
   
   // Fonction pour générer les mots-clés
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (!keyword.trim()) {
       toast.error("Veuillez entrer un mot-clé");
       return;
@@ -83,93 +114,121 @@ const KeywordGenerator = () => {
     setIsLoading(true);
     setHasSearched(true);
     
-    // Simuler un appel API avec un délai
-    setTimeout(() => {
-      try {
-        // Générer les mots-clés standards
-        const standards = generateStandardKeywords(keyword);
-        
-        // Générer les mots-clés longue traîne
-        const longTails = generateLongTailKeywords(keyword);
-        
-        // Générer les questions fréquentes en utilisant une fonction simplifiée
-        const generateSimpleQuestions = (keyword: string): string[] => {
-          return [
-            `Comment ${keyword} fonctionne?`,
-            `Quelle est la meilleure façon d'utiliser ${keyword}?`,
-            `Pourquoi ${keyword} est-il important?`,
-            `Quelles sont les alternatives à ${keyword}?`,
-            `Quels sont les avantages de ${keyword}?`
-          ];
-        };
-
-        const questions = generateSimpleQuestions(keyword).map(q => ({
-          keyword: q,
-          volume: Math.floor(Math.random() * 500) + 10,
-          difficulty: Math.floor(Math.random() * 40) + 5,
-          cpc: parseFloat((Math.random() * 0.8).toFixed(2)),
-          type: 'question' as 'question',
-          intent: 'informational' as 'informational',
-          opportunity: Math.floor(Math.random() * 30) + 60,
-          trend: generateTrendData(q),
-          suggestedTitle: `Guide complet: ${q}`,
-          suggestedDescription: `Découvrez tout ce que vous devez savoir sur ${q}. Guide pratique, conseils d'experts et astuces pour optimiser votre utilisation.`
-        }));
-        
-        // Fonctions simplifiées pour enrichir les mots-clés
-        const enrichKeywordsSimple = (keywords: KeywordSuggestion[]): KeywordSuggestion[] => {
-          return keywords.map(kw => ({
-            ...kw,
-            suggestedTitle: `Guide complet sur ${kw.keyword}: Tout ce que vous devez savoir`,
-            suggestedDescription: `Découvrez les meilleures pratiques pour maîtriser ${kw.keyword}. Conseils d'experts, astuces et stratégies pour réussir.`
-          }));
-        };
-        
-        // Enrichir les mots-clés avec des données supplémentaires
-        const enrichedStandards = enrichKeywordsSimple(standards);
-        const enrichedLongTails = enrichKeywordsSimple(longTails);
-        
-        // Genérer des données de concurrents fictives
-        const mockCompetitors = [
-          { 
-            name: "competitor1.com", 
-            url: "https://www.competitor1.com", 
-            strength: 85, 
-            organic_traffic: 45000, 
-            keywords: 1200 
-          },
-          { 
-            name: "competitor2.com", 
-            url: "https://www.competitor2.com", 
-            strength: 72, 
-            organic_traffic: 28000, 
-            keywords: 850 
-          },
-          { 
-            name: "competitor3.com", 
-            url: "https://www.competitor3.com", 
-            strength: 63, 
-            organic_traffic: 17500, 
-            keywords: 520 
+    try {
+      // Générer les mots-clés standards
+      let standards = generateStandardKeywords(keyword);
+      
+      // Générer les mots-clés longue traîne
+      let longTails = generateLongTailKeywords(keyword);
+      
+      // Si on a une clé OpenAI valide, enrichir avec l'IA
+      if (apiKeyStatus === 'valid' && openaiKey) {
+        try {
+          const openAIService = new OpenAIService(openaiKey);
+          const aiKeywords = await openAIService.generateKeywords(keyword);
+          
+          if (aiKeywords.length > 0) {
+            // Enrichir les mots-clés avec les suggestions IA
+            const aiEnrichedKeywords = aiKeywords.map(kw => ({
+              keyword: kw,
+              volume: Math.floor(Math.random() * 2000) + 100,
+              difficulty: Math.floor(Math.random() * 80) + 10,
+              cpc: parseFloat((Math.random() * 3).toFixed(2)),
+              type: 'ai-generated' as 'ai-generated',
+              intent: 'mixed' as 'mixed',
+              opportunity: Math.floor(Math.random() * 40) + 50,
+              trend: generateTrendData(kw)
+            }));
+            
+            // Mélanger avec les mots-clés existants
+            standards = [...standards, ...aiEnrichedKeywords.slice(0, 5)];
+            longTails = [...longTails, ...aiEnrichedKeywords.slice(5, 10)];
+            
+            toast.success(`Mots-clés enrichis avec l'IA OpenAI`);
           }
-        ];
-        
-        // Mettre à jour les états
-        setStandardKeywords(enrichedStandards);
-        setLongTailKeywords(enrichedLongTails);
-        setQuestionKeywords(questions);
-        setCompetitors(mockCompetitors);
-        setSerpResults([]);
-        setHasGenerated(true);
-        
-        toast.success(`${enrichedStandards.length + enrichedLongTails.length + questions.length} mots-clés générés`);
-      } catch (error) {
-        console.error("Erreur lors de la génération des mots-clés:", error);
-        toast.error("Erreur lors de la génération des mots-clés");
-      } finally {
-        setIsLoading(false);
+        } catch (error) {
+          console.error('Erreur OpenAI:', error);
+          toast.warning('Génération standard utilisée (erreur IA)');
+        }
       }
-    }, 1500);
+      
+      // Générer les questions fréquentes
+      const generateSimpleQuestions = (keyword: string): string[] => {
+        return [
+          `Comment ${keyword} fonctionne?`,
+          `Quelle est la meilleure façon d'utiliser ${keyword}?`,
+          `Pourquoi ${keyword} est-il important?`,
+          `Quelles sont les alternatives à ${keyword}?`,
+          `Quels sont les avantages de ${keyword}?`
+        ];
+      };
+
+      const questions = generateSimpleQuestions(keyword).map(q => ({
+        keyword: q,
+        volume: Math.floor(Math.random() * 500) + 10,
+        difficulty: Math.floor(Math.random() * 40) + 5,
+        cpc: parseFloat((Math.random() * 0.8).toFixed(2)),
+        type: 'question' as 'question',
+        intent: 'informational' as 'informational',
+        opportunity: Math.floor(Math.random() * 30) + 60,
+        trend: generateTrendData(q),
+        suggestedTitle: `Guide complet: ${q}`,
+        suggestedDescription: `Découvrez tout ce que vous devez savoir sur ${q}. Guide pratique, conseils d'experts et astuces pour optimiser votre utilisation.`
+      }));
+      
+      // Enrichir les mots-clés avec des données supplémentaires
+      const enrichKeywordsSimple = (keywords: KeywordSuggestion[]): KeywordSuggestion[] => {
+        return keywords.map(kw => ({
+          ...kw,
+          suggestedTitle: `Guide complet sur ${kw.keyword}: Tout ce que vous devez savoir`,
+          suggestedDescription: `Découvrez les meilleures pratiques pour maîtriser ${kw.keyword}. Conseils d'experts, astuces et stratégies pour réussir.`
+        }));
+      };
+      
+      const enrichedStandards = enrichKeywordsSimple(standards);
+      const enrichedLongTails = enrichKeywordsSimple(longTails);
+      
+      // Genérer des données de concurrents fictives
+      const mockCompetitors = [
+        { 
+          name: "competitor1.com", 
+          url: "https://www.competitor1.com", 
+          strength: 85, 
+          organic_traffic: 45000, 
+          keywords: 1200 
+        },
+        { 
+          name: "competitor2.com", 
+          url: "https://www.competitor2.com", 
+          strength: 72, 
+          organic_traffic: 28000, 
+          keywords: 850 
+        },
+        { 
+          name: "competitor3.com", 
+          url: "https://www.competitor3.com", 
+          strength: 63, 
+          organic_traffic: 17500, 
+          keywords: 520 
+        }
+      ];
+      
+      // Mettre à jour les états
+      setStandardKeywords(enrichedStandards);
+      setLongTailKeywords(enrichedLongTails);
+      setQuestionKeywords(questions);
+      setCompetitors(mockCompetitors);
+      setSerpResults([]);
+      setHasGenerated(true);
+      
+      const totalGenerated = enrichedStandards.length + enrichedLongTails.length + questions.length;
+      toast.success(`${totalGenerated} mots-clés générés${apiKeyStatus === 'valid' ? ' (IA activée)' : ''}`);
+    } catch (error) {
+      console.error("Erreur lors de la génération des mots-clés:", error);
+      toast.error("Erreur lors de la génération des mots-clés");
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   // Fonction pour trier les mots-clés
@@ -195,7 +254,6 @@ const KeywordGenerator = () => {
     }
   };
   
-  // Fonction pour sélectionner/désélectionner un mot-clé
   const toggleKeywordSelection = (keyword: string) => {
     setSelectedKeywords(prev => {
       if (prev.includes(keyword)) {
@@ -206,13 +264,11 @@ const KeywordGenerator = () => {
     });
   };
   
-  // Fonction pour effacer tous les mots-clés sélectionnés
   const clearSelectedKeywords = () => {
     setSelectedKeywords([]);
     toast.info("Tous les mots-clés ont été désélectionnés");
   };
   
-  // Fonction pour exporter les mots-clés sélectionnés
   const exportSelectedKeywords = () => {
     if (selectedKeywords.length === 0) {
       toast.error("Aucun mot-clé sélectionné");
@@ -222,13 +278,11 @@ const KeywordGenerator = () => {
     const allKeywords = [...standardKeywords, ...longTailKeywords, ...questionKeywords];
     const selected = allKeywords.filter(kw => selectedKeywords.includes(kw.keyword));
     
-    // Créer un fichier CSV
     let csv = "Mot-clé,Volume,Difficulté,CPC,Opportunité,Type,Intention\n";
     selected.forEach(kw => {
       csv += `"${kw.keyword}",${kw.volume || 'N/A'},${kw.difficulty || 'N/A'},${kw.cpc || 'N/A'},${kw.opportunity || 'N/A'},${kw.type || 'standard'},${kw.intent || 'N/A'}\n`;
     });
     
-    // Créer un blob et générer un lien de téléchargement
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -242,20 +296,14 @@ const KeywordGenerator = () => {
     toast.success(`${selectedKeywords.length} mots-clés exportés`);
   };
 
-  // Fonction pour générer plus d'idées avec l'IA
   const handleGenerateMoreIdeas = () => {
-    // Debugging
-    console.log('handleGenerateMoreIdeas called, current showAiIdeas:', showAiIdeas);
-    
     if (openaiKey.trim() === '') {
       toast.error("Veuillez configurer votre clé API OpenAI d'abord");
       return;
     }
     
-    // Afficher/masquer le panneau d'idées IA en forçant l'état opposé
     setShowAiIdeas(prevState => {
       const newState = !prevState;
-      console.log('Setting showAiIdeas to:', newState);
       return newState;
     });
     
@@ -263,20 +311,7 @@ const KeywordGenerator = () => {
       description: showAiIdeas ? "Panneau fermé" : "Explorez des suggestions générées par l'IA"
     });
   };
-  
-  // Debug log for showAiIdeas state changes
-  useEffect(() => {
-    console.log('showAiIdeas state changed to:', showAiIdeas);
-  }, [showAiIdeas]);
-  
-  // Fonction appelée après validation de la clé API
-  const handleKeyValidated = () => {
-    if (hasGenerated) {
-      toast.info("Vous pouvez regénérer les mots-clés pour utiliser l'API OpenAI");
-    }
-  };
 
-  // Simulation de chargement des données Search Console
   const fetchSearchConsoleData = () => {
     if (!keyword.trim()) {
       toast.error("Veuillez d'abord entrer un mot-clé");
@@ -285,9 +320,7 @@ const KeywordGenerator = () => {
     
     setIsLoadingSearchConsole(true);
     
-    // Simulation d'un appel API
     setTimeout(() => {
-      // Données mockées de Search Console
       const mockData: RankingData = {
         totalImpressions: Math.floor(Math.random() * 10000) + 500,
         totalClicks: Math.floor(Math.random() * 2000) + 100,
@@ -338,18 +371,45 @@ const KeywordGenerator = () => {
       <Card className="p-6 border-t-4 border-t-purple-500">
         <div className="flex items-center gap-2 mb-4">
           <Sparkles className="h-5 w-5 text-purple-500" />
-          <h2 className="text-xl font-bold">Configuration API</h2>
+          <h2 className="text-xl font-bold">Configuration OpenAI</h2>
+          {apiKeyStatus === 'valid' && (
+            <Badge className="bg-green-100 text-green-800 text-xs">
+              <Zap className="w-3 h-3 mr-1" />
+              IA activée
+            </Badge>
+          )}
         </div>
-        
-        <ApiKeyConfig 
-          openaiKey={openaiKey}
-          setOpenaiKey={setOpenaiKey}
-          apiKeyStatus={apiKeyStatus}
-          setApiKeyStatus={setApiKeyStatus}
-          validationMessage={validationMessage}
-          setValidationMessage={setValidationMessage}
-          onKeyValidated={handleKeyValidated}
-        />
+
+        {(showApiConfig || apiKeyStatus !== 'valid') && (
+          <div className="mb-4">
+            <div className="flex gap-2 mb-2">
+              <Input
+                type="password"
+                placeholder="sk-..."
+                value={openaiKey}
+                onChange={(e) => setOpenaiKey(e.target.value)}
+                className="flex-1"
+              />
+              <Button onClick={validateAndSaveApiKey} disabled={!openaiKey}>
+                Valider
+              </Button>
+            </div>
+            <p className="text-xs text-purple-600">
+              Avec OpenAI, obtenez des suggestions de mots-clés plus pertinentes et personnalisées.
+            </p>
+          </div>
+        )}
+
+        {apiKeyStatus !== 'valid' && (
+          <Button 
+            variant="outline"
+            onClick={() => setShowApiConfig(!showApiConfig)}
+            className="flex items-center gap-2"
+          >
+            <Key className="w-4 h-4" />
+            Configurer OpenAI
+          </Button>
+        )}
         
         <div className="mt-4 text-sm text-gray-600">
           <p className="flex items-center gap-1">
@@ -468,7 +528,8 @@ const KeywordGenerator = () => {
           <Search className="h-10 w-10 text-gray-400 mx-auto mb-4" />
           <h2 className="text-xl font-medium mb-2">Commencez votre recherche de mots-clés</h2>
           <p className="text-gray-600 mb-6">
-            Analysez les mots-clés pour votre contenu, identifiez les meilleures opportunités et obtenez des insights sur la concurrence. Cet outil s'inspire des fonctionnalités de SEMrush et SISTRIX.
+            Analysez les mots-clés pour votre contenu, identifiez les meilleures opportunités et obtenez des insights sur la concurrence. 
+            {apiKeyStatus === 'valid' ? ' IA OpenAI activée pour des suggestions personnalisées.' : ' Configurez OpenAI pour des suggestions plus précises.'}
           </p>
         </Card>
       )}
@@ -477,7 +538,10 @@ const KeywordGenerator = () => {
       {isLoading && (
         <Card className="p-6 text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-700 mx-auto mb-4"></div>
-          <h2 className="text-xl font-medium mb-2">Recherche de mots-clés en cours...</h2>
+          <h2 className="text-xl font-medium mb-2">
+            Recherche de mots-clés en cours...
+            {apiKeyStatus === 'valid' && <Badge className="ml-2 bg-purple-100 text-purple-800">IA</Badge>}
+          </h2>
           <p className="text-gray-500 max-w-md mx-auto">
             Nous analysons les données pour vous fournir les meilleures suggestions de mots-clés.
           </p>
@@ -503,7 +567,6 @@ const KeywordGenerator = () => {
             keyword={keyword}
           />
           
-          {/* Nouvelle section: Onglets pour les données supplémentaires */}
           <Tabs defaultValue="opportunities" className="mt-6">
             <TabsList className="mb-4">
               <TabsTrigger value="opportunities" className="flex items-center gap-1.5">
@@ -572,14 +635,12 @@ const KeywordGenerator = () => {
             </TabsContent>
           </Tabs>
           
-          {/* Nouvelle section d'opportunités de mots-clés */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <KeywordOpportunities 
               keywords={[...standardKeywords, ...longTailKeywords, ...questionKeywords]} 
               mainKeyword={keyword}
             />
             
-            {/* FAQ dynamique basée sur le mot-clé */}
             <DynamicFAQ keyword={keyword} />
           </div>
           
@@ -655,7 +716,6 @@ const KeywordGenerator = () => {
             
             <div className="flex justify-end">
               <Button 
-                id="generate-more-ideas-btn"
                 variant="outline" 
                 className="flex items-center gap-2"
                 onClick={handleGenerateMoreIdeas}
@@ -665,9 +725,8 @@ const KeywordGenerator = () => {
               </Button>
             </div>
             
-            {/* Panel d'idées générées par l'IA */}
             {showAiIdeas && (
-              <div className="mt-6 p-4 border border-blue-100 rounded-lg bg-blue-50" id="ai-ideas-panel">
+              <div className="mt-6 p-4 border border-blue-100 rounded-lg bg-blue-50">
                 <h3 className="font-medium text-blue-800 mb-3">Idées de contenu générées par l'IA</h3>
                 
                 <div className="space-y-3">
