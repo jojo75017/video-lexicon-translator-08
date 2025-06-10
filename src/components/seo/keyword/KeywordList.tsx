@@ -54,6 +54,30 @@ const KeywordList: React.FC<KeywordListProps> = ({
     }
   };
 
+  const formatValue = (value: number | string | undefined): string => {
+    if (value === undefined || value === null) return '-';
+    if (typeof value === 'number') {
+      return value.toLocaleString();
+    }
+    return String(value);
+  };
+
+  const formatCpc = (cpc: number | string | undefined): string => {
+    if (cpc === undefined || cpc === null) return '-';
+    if (typeof cpc === 'number') {
+      return cpc.toFixed(2);
+    }
+    return String(cpc);
+  };
+
+  const formatCompetition = (competition: number | string | undefined): string => {
+    if (competition === undefined || competition === null) return '-';
+    if (typeof competition === 'number') {
+      return (competition * 100).toFixed(0) + '%';
+    }
+    return String(competition);
+  };
+
   return (
     <div className="space-y-3 max-h-96 overflow-y-auto">
       {keywords.map((keyword, index) => (
@@ -81,7 +105,7 @@ const KeywordList: React.FC<KeywordListProps> = ({
                 <div className="flex flex-wrap gap-2 text-sm text-gray-600">
                   {keyword.volume && (
                     <span className="bg-blue-50 px-2 py-1 rounded text-blue-700">
-                      Vol: {typeof keyword.volume === 'number' ? keyword.volume.toLocaleString() : keyword.volume}
+                      Vol: {formatValue(keyword.volume)}
                     </span>
                   )}
                   
@@ -93,13 +117,13 @@ const KeywordList: React.FC<KeywordListProps> = ({
                   
                   {keyword.cpc && (
                     <span className="bg-green-50 px-2 py-1 rounded text-green-700">
-                      CPC: {typeof keyword.cpc === 'number' ? keyword.cpc.toFixed(2) : keyword.cpc}
+                      CPC: {formatCpc(keyword.cpc)}
                     </span>
                   )}
                   
                   {keyword.competition && (
                     <span className="bg-purple-50 px-2 py-1 rounded text-purple-700">
-                      Concurrence: {typeof keyword.competition === 'number' ? (keyword.competition * 100).toFixed(0) + '%' : keyword.competition}
+                      Concurrence: {formatCompetition(keyword.competition)}
                     </span>
                   )}
                 </div>
