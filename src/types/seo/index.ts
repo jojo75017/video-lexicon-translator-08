@@ -15,8 +15,8 @@ export interface PerformanceMetrics {
     styles: number;
     fonts: number;
     other: number;
-    js: string;
-    css: string;
+    js: number;
+    css: number;
   };
 }
 
@@ -37,8 +37,8 @@ export interface PerformanceData {
     styles: number;
     fonts: number;
     other: number;
-    js: string;
-    css: string;
+    js: number;
+    css: number;
   };
 }
 

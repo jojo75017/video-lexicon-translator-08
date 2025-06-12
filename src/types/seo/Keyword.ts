@@ -13,6 +13,7 @@ export interface KeywordSuggestion {
   trend?: number[] | string;
   suggestedTitle?: string;
   suggestedDescription?: string;
+  suggestedLongDescription?: string;
   count?: number;
   density?: number;
   position?: number;
@@ -26,4 +27,10 @@ export interface KeywordData {
   difficulty?: number;
   position?: number;
   cpc?: number;
+}
+
+export interface KeywordTrend {
+  data: number[];
+  growth: number;
+  seasonal: boolean;
 }

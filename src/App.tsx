@@ -19,7 +19,7 @@ const App = () => (
           {navItems.map(({ to, page }) => (
             <Route key={to} path={to} element={page} />
           ))}
-          <Route path="*" element={<UnifiedDashboard><div /></UnifiedDashboard>} />
+          <Route path="*" element={<UnifiedDashboard><div className="text-center p-8"><h2 className="text-2xl font-bold mb-4">Bienvenue sur votre Dashboard SEO</h2><p>Sélectionnez un outil dans la navigation ci-dessus.</p></div></UnifiedDashboard>} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
