@@ -16,12 +16,13 @@ const KeywordList: React.FC<KeywordListProps> = ({
   toggleKeywordSelection
 }) => {
   // Fonction pour formater le volume de recherche
-  const formatVolume = (volume?: number) => {
-    if (!volume) return 'N/A';
-    if (volume >= 1000) {
-      return `${(volume / 1000).toFixed(1)}k`;
+  const formatVolume = (volume?: number, searchVolume?: number) => {
+    const vol = volume || searchVolume;
+    if (!vol) return 'N/A';
+    if (vol >= 1000) {
+      return `${(vol / 1000).toFixed(1)}k`;
     }
-    return volume.toString();
+    return vol.toString();
   };
 
   // Fonction pour obtenir la couleur selon la difficulté
@@ -50,7 +51,7 @@ const KeywordList: React.FC<KeywordListProps> = ({
           >
             <div className="font-medium">{keyword.keyword}</div>
             <div className="flex text-xs text-gray-500 gap-2 mt-1">
-              <span>Volume: {formatVolume(keyword.searchVolume)}</span>
+              <span>Volume: {formatVolume(keyword.volume, keyword.searchVolume)}</span>
               {keyword.cpc !== undefined && <span>CPC: {keyword.cpc.toFixed(2)}€</span>}
               {keyword.relevance !== undefined && <span>Pertinence: {keyword.relevance}%</span>}
             </div>

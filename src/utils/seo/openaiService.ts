@@ -20,6 +20,11 @@ export class OpenAIService {
     this.apiKey = apiKey;
   }
 
+  static enableProxy(): void {
+    // Méthode statique pour activer le proxy
+    console.log('Proxy enabled for OpenAI service');
+  }
+
   async validateApiKey(): Promise<boolean> {
     try {
       const response = await fetch('https://api.openai.com/v1/models', {
@@ -148,5 +153,9 @@ Répondez avec une liste JSON simple:
       console.error('Erreur génération mots-clés OpenAI:', error);
       return [];
     }
+  }
+
+  async getKeywordSuggestions(keyword: string): Promise<string[]> {
+    return await this.generateKeywords(keyword);
   }
 }

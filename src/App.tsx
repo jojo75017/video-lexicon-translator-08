@@ -19,7 +19,7 @@ const App = () => (
           {navItems.map(({ to, page }) => (
             <Route key={to} path={to} element={page} />
           ))}
-          <Route path="*" element={<UnifiedDashboard />} />
+          <Route path="*" element={<UnifiedDashboard><div /></UnifiedDashboard>} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
