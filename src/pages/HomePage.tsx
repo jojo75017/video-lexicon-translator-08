@@ -3,6 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card } from "@/components/ui/card";
 import UnifiedDashboard from '@/components/dashboard/UnifiedDashboard';
+import NewsletterHero from '@/components/newsletter/NewsletterHero';
 import { FileText, LinkIcon, LineChart, BarChart2, Tag, Info, FilePenLine, LayoutGrid, Search } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Button } from '@/components/ui/button';
@@ -17,11 +18,14 @@ const HomePage = () => {
   return (
     <UnifiedDashboard>
       <div className="space-y-8">
+        {/* Hero Newsletter Section */}
+        <NewsletterHero />
+
         <section>
           <Card className="p-6 shadow-sm">
             <div className="flex flex-col md:flex-row gap-6 items-center">
               <div className="md:w-2/3">
-                <h1 className="text-3xl font-bold mb-4">Bienvenue sur votre Dashboard SEO</h1>
+                <h2 className="text-3xl font-bold mb-4">Bienvenue sur votre Dashboard SEO</h2>
                 <p className="text-gray-600 mb-6">
                   Utilisez nos outils pour analyser et améliorer le référencement de votre site web. 
                   Accédez rapidement aux différentes fonctionnalités ci-dessous.
