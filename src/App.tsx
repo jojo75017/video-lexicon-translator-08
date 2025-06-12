@@ -1,41 +1,29 @@
 
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import HomePage from './pages/HomePage';
-import KeywordMetaPage from './pages/KeywordMetaPage';
-import InternalLinkingPage from './pages/InternalLinkingPage';
-import TrackingPage from './pages/TrackingPage';
-import PinterestPage from './pages/PinterestPage';
-import SignaturePage from './pages/SignaturePage';
-import StructurePage from './pages/StructurePage';
-import KeywordGeneratorPage from './pages/KeywordGeneratorPage';
-import WordCountPage from './pages/WordCountPage';
-import DomainAnalysisPage from './pages/DomainAnalysisPage';
-import { Toaster } from 'sonner';
-import './App.css';
+import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { navItems } from "./nav-items";
+import UnifiedDashboard from "./components/dashboard/UnifiedDashboard";
+import NewsletterPage from "./pages/NewsletterPage";
 
-const App = () => {
-  console.log('App rendering with routes including Tracking');
-  
-  return (
-    <Router>
-      <Toaster position="top-center" richColors />
-      <Routes>
-        {/* Main routes */}
-        <Route path="/" element={<HomePage />} />
-        <Route path="/keyword-meta" element={<KeywordMetaPage />} />
-        <Route path="/internal-linking" element={<InternalLinkingPage />} />
-        <Route path="/tracking" element={<TrackingPage />} />
-        <Route path="/word-count" element={<WordCountPage />} />
-        <Route path="/domain-analysis" element={<DomainAnalysisPage />} />
-        
-        {/* Additional tool routes */}
-        <Route path="/pinterest" element={<PinterestPage />} />
-        <Route path="/signature" element={<SignaturePage />} />
-        <Route path="/structure" element={<StructurePage />} />
-        <Route path="/keyword-generator" element={<KeywordGeneratorPage />} />
-      </Routes>
-    </Router>
-  );
-};
+const queryClient = new QueryClient();
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <Toaster />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/newsletter" element={<NewsletterPage />} />
+          {navItems.map(({ to, page }) => (
+            <Route key={to} path={to} element={page} />
+          ))}
+          <Route path="*" element={<UnifiedDashboard />} />
+        </Routes>
+      </BrowserRouter>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
 
 export default App;
