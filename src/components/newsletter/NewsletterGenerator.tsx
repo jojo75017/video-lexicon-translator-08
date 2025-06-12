@@ -258,7 +258,7 @@ Call-to-Action: ${newsletter.cta}`;
             </>
           )}
         </Button>
-      </div>
+      </Card>
 
       {newsletter && (
         <Card className="p-6">
