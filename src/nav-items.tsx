@@ -1,4 +1,5 @@
-import { Home, BarChart3, FileText, MessageSquare, Settings, Mail } from "lucide-react";
+
+import { Home, BarChart3, FileText, MessageSquare, Settings, Mail, LineChart } from "lucide-react";
 import Index from "./pages/Index";
 import AnalyticsDashboard from "./pages/AnalyticsDashboard";
 import SeoDashboard from "./pages/SeoDashboard";
@@ -10,6 +11,7 @@ import AiWriterPage from "./pages/AiWriterPage";
 import PinterestPage from "./pages/PinterestPage";
 import KeywordGuideComplete from "./pages/KeywordGuideComplete";
 import NewsletterPage from "./pages/NewsletterPage";
+import TrackingPage from "./pages/TrackingPage";
 
 export const navItems = [
   {
@@ -35,6 +37,12 @@ export const navItems = [
     to: "/seo",
     icon: <FileText className="h-4 w-4" />,
     page: <SeoDashboard />,
+  },
+  {
+    title: "Suivi Positions",
+    to: "/tracking",
+    icon: <LineChart className="h-4 w-4" />,
+    page: <TrackingPage />,
   },
   {
     title: "Idées de contenu",

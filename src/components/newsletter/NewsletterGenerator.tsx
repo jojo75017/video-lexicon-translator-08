@@ -15,6 +15,7 @@ interface NewsletterTemplate {
   preview: string;
   content: string;
   cta: string;
+  wordCount: number;
 }
 
 const NewsletterGenerator = () => {
@@ -51,6 +52,107 @@ const NewsletterGenerator = () => {
     { value: 'motivant', label: 'Motivant' }
   ];
 
+  const getWordTarget = (lengthParam: string) => {
+    switch (lengthParam) {
+      case 'court': return 300;
+      case 'moyen': return 500;
+      case 'long': return 800;
+      default: return 500;
+    }
+  };
+
+  const generateContentByLength = (niche: string, topics: string[], tone: string, targetWords: number) => {
+    const baseContent = `Bonjour,
+
+Bienvenue dans votre newsletter ${niche} !
+
+## 📚 Sujets de la semaine
+
+${topics.map(topic => `• **${topic.trim()}**: Analyse approfondie et conseils pratiques`).join('\n')}
+
+## 💡 Conseil de la semaine
+
+Restez toujours informé des dernières tendances dans votre domaine pour garder une longueur d'avance sur vos concurrents.`;
+
+    if (targetWords <= 300) {
+      return baseContent + `
+
+## 📈 Point clé
+
+Les professionnels qui se forment régulièrement ont 47% plus de chances de réussir.
+
+À bientôt pour la prochaine édition !`;
+    }
+
+    if (targetWords <= 500) {
+      return baseContent + `
+
+## 🎯 Stratégies recommandées
+
+1. **Veille concurrentielle**: Analysez ce que font vos concurrents pour identifier les opportunités
+2. **Formation continue**: Investissez dans votre développement professionnel
+3. **Networking**: Développez votre réseau professionnel dans votre secteur
+
+## 📈 Statistiques intéressantes
+
+- Les professionnels qui se forment régulièrement ont 47% plus de chances de réussir
+- La veille informationnelle améliore les performances de 23%
+- Le networking génère 85% des opportunités d'affaires
+
+À bientôt pour la prochaine édition !`;
+    }
+
+    // Long format (800 mots)
+    return baseContent + `
+
+## 🎯 Analyse approfondie
+
+### Tendances actuelles en ${niche}
+
+Le secteur du ${niche} connaît une évolution rapide. Les dernières études montrent que les entreprises qui s'adaptent rapidement aux nouvelles tendances augmentent leur chiffre d'affaires de 35% en moyenne.
+
+### Stratégies gagnantes
+
+1. **Innovation constante**: Les leaders du marché investissent 15% de leur chiffre d'affaires en R&D
+2. **Expérience client**: 73% des consommateurs privilégient les marques qui offrent une expérience personnalisée
+3. **Transformation digitale**: Les entreprises digitalisées croissent 26% plus vite que leurs concurrents
+
+### Étude de cas
+
+Prenons l'exemple d'une entreprise qui a réussi sa transformation. En intégrant l'intelligence artificielle dans ses processus, elle a :
+- Réduit ses coûts opérationnels de 30%
+- Amélioré sa productivité de 45%
+- Augmenté la satisfaction client de 60%
+
+## 🔍 Focus sur ${topics[0] || 'l\'innovation'}
+
+L'importance de ${topics[0] || 'l\'innovation'} ne peut être sous-estimée dans le contexte actuel. Les entreprises qui négligent cet aspect risquent de perdre leur avantage concurrentiel.
+
+### Actions concrètes à mettre en place
+
+- **Audit régulier**: Évaluez vos performances mensuellement
+- **Benchmarking**: Comparez-vous aux leaders du marché
+- **Formation d'équipe**: Investissez dans le développement de vos collaborateurs
+- **Technologie**: Adoptez les outils qui optimisent vos processus
+
+## 📈 Métriques à suivre
+
+- Taux de conversion: +15% visé pour le trimestre
+- Satisfaction client: Objectif 90%
+- Productivité: Amélioration de 20% attendue
+- ROI marketing: Optimisation continue nécessaire
+
+## 🚀 Plan d'action pour la semaine
+
+1. **Lundi**: Analyse des performances de la semaine précédente
+2. **Mercredi**: Mise en place des nouvelles stratégies
+3. **Vendredi**: Évaluation des premiers résultats
+
+L'excellence n'est pas un accident, c'est le résultat d'un travail constant et méthodique.
+
+À bientôt pour la prochaine édition !`;
+  };
+
   const generateNewsletter = () => {
     if (!niche || !topics) {
       toast.error('Veuillez remplir tous les champs obligatoires');
@@ -60,94 +162,43 @@ const NewsletterGenerator = () => {
     setIsGenerating(true);
     toast.info('Génération de votre newsletter...');
 
-    // Simulation de génération
+    const targetWords = getWordTarget(length);
+    const topicsArray = topics.split(',').filter(t => t.trim());
+
+    // Simulation de génération avec délai réaliste
     setTimeout(() => {
-      const templates = {
-        'Marketing Digital': {
-          subject: `🚀 Les dernières tendances ${new Date().getFullYear()} en Marketing Digital`,
-          preview: `Découvrez les stratégies qui font la différence cette semaine`,
-          content: `Bonjour,
+      const generatedContent = generateContentByLength(niche, topicsArray, tone, targetWords);
+      const wordCount = generatedContent.split(' ').length;
 
-Cette semaine, nous explorons les dernières innovations en marketing digital qui transforment l'industrie.
-
-## 📊 Tendances de la semaine
-
-• **IA Générative**: Comment l'intelligence artificielle révolutionne la création de contenu
-• **Marketing d'Influence**: Les micro-influenceurs génèrent 60% plus d'engagement
-• **Personnalisation**: L'hyperpersonnalisation augmente les conversions de 19%
-
-## 🎯 Conseils pratiques
-
-1. **Optimisez vos campagnes**: Utilisez les données de première partie pour améliorer vos ciblages
-2. **Contenu vidéo**: Les vidéos courtes génèrent 200% plus d'engagement
-3. **Automatisation**: Intégrez des chatbots pour améliorer l'expérience client
-
-## 📈 Chiffres clés
-
-- 73% des consommateurs préfèrent les marques qui personnalisent leur expérience
-- Les emails personnalisés ont un taux d'ouverture 26% plus élevé
-- Le ROI du marketing de contenu est 3x supérieur aux méthodes traditionnelles
-
-Bonne semaine marketing !`,
-          cta: 'Découvrir nos formations marketing'
-        },
-        'E-commerce': {
-          subject: `💰 Boostez vos ventes e-commerce - Stratégies qui marchent`,
-          preview: `Les techniques secrètes des top vendeurs en ligne`,
-          content: `Salut entrepreneur,
-
-Cette semaine, focus sur les stratégies e-commerce qui génèrent vraiment des résultats.
-
-## 🛒 Optimisation des conversions
-
-• **Abandon de panier**: Récupérez 70% de ventes avec ces emails automatisés
-• **Reviews clients**: Les avis augmentent les conversions de 31%
-• **Cross-selling**: Augmentez votre panier moyen de 35%
-
-## 💡 Techniques avancées
-
-1. **Remarketing intelligent**: Ciblez les visiteurs selon leur comportement
-2. **Urgence et rareté**: Créez l'urgence sans paraître désespéré
-3. **Social proof**: Utilisez les notifications d'achat en temps réel
-
-## 📱 Mobile-first
-
-- 54% des achats se font sur mobile
-- Optimisez votre checkout en 3 étapes maximum
-- Intégrez Apple Pay et Google Pay
-
-À vos ventes !`,
-          cta: 'Accéder à notre masterclass e-commerce'
-        }
+      const subjects = {
+        'court': `📰 ${niche} - Flash Info`,
+        'moyen': `🎯 ${niche} - Édition ${new Date().toLocaleDateString('fr-FR')}`,
+        'long': `📊 ${niche} - Analyse Complète de la Semaine`
       };
 
-      const selectedTemplate = templates[niche as keyof typeof templates] || {
-        subject: `🎯 Newsletter ${niche} - Édition du ${new Date().toLocaleDateString('fr-FR')}`,
-        preview: `Votre dose hebdomadaire d'expertise en ${niche}`,
-        content: `Bonjour,
+      const previews = {
+        'court': 'L\'essentiel en quelques minutes',
+        'moyen': `Votre dose hebdomadaire d'expertise en ${niche}`,
+        'long': `Analyse détaillée et stratégies avancées pour ${niche}`
+      };
 
-Bienvenue dans votre newsletter ${niche} !
+      const ctas = {
+        'court': `Découvrir ${niche}`,
+        'moyen': `En savoir plus sur ${niche}`,
+        'long': `Accéder à notre formation ${niche}`
+      };
 
-## 📚 Sujets de la semaine
-
-${topics.split(',').map(topic => `• **${topic.trim()}**: Analyse approfondie et conseils pratiques`).join('\n')}
-
-## 💡 Conseil de la semaine
-
-Restez toujours informé des dernières tendances dans votre domaine pour garder une longueur d'avance sur vos concurrents.
-
-## 📈 Statistiques intéressantes
-
-- Les professionnels qui se forment régulièrement ont 47% plus de chances de réussir
-- La veille informationnelle améliore les performances de 23%
-
-À bientôt pour la prochaine édition !`,
-        cta: `En savoir plus sur ${niche}`
+      const selectedTemplate: NewsletterTemplate = {
+        subject: subjects[length as keyof typeof subjects],
+        preview: previews[length as keyof typeof previews],
+        content: generatedContent,
+        cta: ctas[length as keyof typeof ctas],
+        wordCount: wordCount
       };
 
       setNewsletter(selectedTemplate);
       setIsGenerating(false);
-      toast.success('Newsletter générée avec succès !');
+      toast.success(`Newsletter générée ! (${wordCount} mots)`);
     }, 2000);
   };
 
@@ -161,6 +212,7 @@ Restez toujours informé des dernières tendances dans votre domaine pour garder
     
     const content = `Sujet: ${newsletter.subject}
 Aperçu: ${newsletter.preview}
+Nombre de mots: ${newsletter.wordCount}
 
 ${newsletter.content}
 
@@ -170,7 +222,7 @@ Call-to-Action: ${newsletter.cta}`;
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `newsletter-${niche.toLowerCase().replace(/\s+/g, '-')}.txt`;
+    a.download = `newsletter-${niche.toLowerCase().replace(/\s+/g, '-')}-${length}.txt`;
     a.click();
     
     toast.success('Newsletter exportée !');
@@ -224,9 +276,9 @@ Call-to-Action: ${newsletter.cta}`;
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="court">Court (300 mots)</SelectItem>
-                <SelectItem value="moyen">Moyen (500 mots)</SelectItem>
-                <SelectItem value="long">Long (800 mots)</SelectItem>
+                <SelectItem value="court">Court (~300 mots)</SelectItem>
+                <SelectItem value="moyen">Moyen (~500 mots)</SelectItem>
+                <SelectItem value="long">Long (~800 mots)</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -263,7 +315,12 @@ Call-to-Action: ${newsletter.cta}`;
       {newsletter && (
         <Card className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold">Votre Newsletter</h2>
+            <div>
+              <h2 className="text-xl font-semibold">Votre Newsletter</h2>
+              <p className="text-sm text-gray-600">
+                {newsletter.wordCount} mots • Cible: {getWordTarget(length)} mots
+              </p>
+            </div>
             <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={() => copyToClipboard(newsletter.content)}>
                 <Copy className="h-4 w-4 mr-1" />
@@ -337,6 +394,10 @@ Call-to-Action: ${newsletter.cta}`;
         ${newsletter.cta}
       </a>
     </div>
+    
+    <footer style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #666;">
+      <p>Nombre de mots: ${newsletter.wordCount}</p>
+    </footer>
   </div>
 </body>
 </html>`}</pre>
