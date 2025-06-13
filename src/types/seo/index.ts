@@ -73,6 +73,10 @@ export interface SocialMetrics {
   linkedin: number;
 }
 
+export interface SocialMetricsProps {
+  metrics: SocialMetrics;
+}
+
 export interface OrganicSearchProps {
   keyword: string;
   keywords: string[];
@@ -248,4 +252,5 @@ export interface SeoAnalysis {
   mobile: any;
   accessibility: any;
   seo: any;
+  score?: number;
 }
