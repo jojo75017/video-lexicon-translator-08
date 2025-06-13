@@ -110,6 +110,13 @@ export interface CompetitorData {
   title?: string;
 }
 
+export interface SerpResult {
+  title: string;
+  url: string;
+  description: string;
+  position: number;
+}
+
 export interface PageLinkMetric {
   url: string;
   title: string;
@@ -201,4 +208,48 @@ export interface InternalLinkAnalysis {
     anchorText: string;
     relevanceScore: number;
   }>;
+}
+
+export interface SearchConsoleData {
+  impressions: number;
+  clicks: number;
+  ctr: number;
+  position: number;
+  topQueries: Array<{
+    query: string;
+    impressions: number;
+    clicks: number;
+    ctr: number;
+    position: number;
+  }>;
+  topPages: Array<{
+    url: string;
+    impressions: number;
+    clicks: number;
+    ctr: number;
+    position: number;
+  }>;
+}
+
+export interface SeoAnalysisResult {
+  url: string;
+  timestamp: string;
+  status: 'success' | 'error';
+  success: boolean;
+  data?: any;
+  error?: string;
+}
+
+export interface SeoAnalysis {
+  title: string;
+  description: string;
+  keywords: string[];
+  headings: any[];
+  images: any[];
+  links: any[];
+  meta: any;
+  performance: any;
+  mobile: any;
+  accessibility: any;
+  seo: any;
 }

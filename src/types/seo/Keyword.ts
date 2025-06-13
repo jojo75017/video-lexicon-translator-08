@@ -34,3 +34,20 @@ export interface KeywordTrend {
   growth: number;
   seasonal: boolean;
 }
+
+export interface CompetitorData {
+  domain: string;
+  strength: number;
+  keywords: string[];
+  estimatedTraffic: number;
+  topKeywords: { keyword: string; position: number; volume: number; }[];
+  gaps: string[];
+  title?: string;
+}
+
+export interface SerpResult {
+  title: string;
+  url: string;
+  description: string;
+  position: number;
+}

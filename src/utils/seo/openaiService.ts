@@ -21,8 +21,12 @@ export class OpenAIService {
   }
 
   static enableProxy(): void {
-    // Méthode statique pour activer le proxy
     console.log('Proxy enabled for OpenAI service');
+  }
+
+  static setApiKey(apiKey: string): void {
+    // Méthode statique pour définir la clé API
+    localStorage.setItem('openaiKey', apiKey);
   }
 
   async validateApiKey(): Promise<boolean> {
@@ -157,5 +161,15 @@ Répondez avec une liste JSON simple:
 
   async getKeywordSuggestions(keyword: string): Promise<string[]> {
     return await this.generateKeywords(keyword);
+  }
+
+  async generateSocialContent(keyword: string): Promise<any> {
+    // Placeholder pour la génération de contenu social
+    return {
+      facebook: `Post Facebook pour ${keyword}`,
+      twitter: `Tweet pour ${keyword}`,
+      linkedin: `Post LinkedIn pour ${keyword}`,
+      instagram: `Post Instagram pour ${keyword}`
+    };
   }
 }
