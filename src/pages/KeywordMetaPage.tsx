@@ -24,7 +24,6 @@ const KeywordMetaPage = () => {
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   
   useEffect(() => {
-    // Si une clé API est enregistrée, activer l'option IA par défaut
     if (openaiKey) {
       setUseAI(true);
     }
@@ -40,18 +39,14 @@ const KeywordMetaPage = () => {
     toast.info("Génération en cours...");
     
     try {
-      // Génération du titre
       const generatedTitle = generateSeoTitle(keyword);
       setTitle(generatedTitle);
       
-      // Génération des descriptions (courte et longue)
       if (useAI && openaiKey) {
-        // Utiliser l'API OpenAI pour générer des descriptions plus pertinentes
         const aiResults = await generateAIDescriptions(keyword, openaiKey);
         setShortDescription(aiResults.short);
         setLongDescription(aiResults.long);
       } else {
-        // Utiliser le générateur local amélioré
         const { short, long } = generateBothDescriptions(keyword);
         setShortDescription(short);
         setLongDescription(long);
@@ -62,7 +57,6 @@ const KeywordMetaPage = () => {
       console.error("Erreur lors de la génération:", error);
       toast.error("Une erreur est survenue lors de la génération");
       
-      // En cas d'erreur, utiliser la génération locale
       const { short, long } = generateBothDescriptions(keyword);
       setShortDescription(short);
       setLongDescription(long);
@@ -92,7 +86,6 @@ const KeywordMetaPage = () => {
           </h2>
           
           <div className="space-y-6">
-            {/* Input pour le mot-clé */}
             <div>
               <label htmlFor="keyword" className="block text-sm font-medium text-gray-700 mb-1">
                 Mot-clé principal
@@ -160,7 +153,7 @@ const KeywordMetaPage = () => {
               )}
               
               {useAI && !openaiKey && !showApiKeyInput && (
-                <Alert variant="warning" className="bg-amber-50 border-amber-200 mt-2">
+                <Alert variant="default" className="bg-amber-50 border-amber-200 mt-2">
                   <AlertDescription className="text-amber-800 text-sm">
                     Vous avez activé l'IA, mais aucune clé API OpenAI n'est configurée. 
                     <Button variant="link" className="p-0 h-auto text-amber-800 underline" onClick={() => setShowApiKeyInput(true)}>
@@ -171,7 +164,6 @@ const KeywordMetaPage = () => {
               )}
             </div>
             
-            {/* Title */}
             <div>
               <div className="flex justify-between items-center mb-1">
                 <label htmlFor="title" className="block text-sm font-medium text-gray-700">
@@ -190,7 +182,6 @@ const KeywordMetaPage = () => {
               />
             </div>
             
-            {/* Description avec onglets pour courte/longue */}
             <div>
               <div className="flex justify-between items-center mb-1">
                 <label className="block text-sm font-medium text-gray-700">
@@ -243,7 +234,6 @@ const KeywordMetaPage = () => {
               </div>
             </div>
             
-            {/* Prévisualisation */}
             {(title || shortDescription || longDescription) && (
               <div className="mt-4">
                 <h3 className="text-sm font-medium text-gray-700 mb-2">Prévisualisation dans Google:</h3>
@@ -258,7 +248,6 @@ const KeywordMetaPage = () => {
               </div>
             )}
             
-            {/* Conseils */}
             <Alert variant="default" className="bg-blue-50 border-blue-100">
               <Info className="h-4 w-4 text-blue-600" />
               <AlertDescription className="text-blue-800">
