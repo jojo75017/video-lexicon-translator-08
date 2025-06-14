@@ -24,6 +24,66 @@ const ContentIdeas = () => {
   const [ideas, setIdeas] = useState<ContentIdea[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
 
+  const generateIdeasForKeyword = (searchKeyword: string): ContentIdea[] => {
+    return [
+      {
+        title: `Guide complet sur ${searchKeyword} pour débutants`,
+        url: `https://example.com/guide-${searchKeyword.toLowerCase().replace(/\s+/g, '-')}`,
+        visits: Math.floor(Math.random() * 10000) + 5000,
+        backlinks: Math.floor(Math.random() * 50) + 20,
+        socialShares: { 
+          facebook: Math.floor(Math.random() * 300) + 100, 
+          pinterest: Math.floor(Math.random() * 200) + 50, 
+          reddit: Math.floor(Math.random() * 150) + 30 
+        }
+      },
+      {
+        title: `Les 10 meilleures stratégies de ${searchKeyword}`,
+        url: `https://example.com/strategies-${searchKeyword.toLowerCase().replace(/\s+/g, '-')}`,
+        visits: Math.floor(Math.random() * 8000) + 3000,
+        backlinks: Math.floor(Math.random() * 40) + 15,
+        socialShares: { 
+          facebook: Math.floor(Math.random() * 250) + 80, 
+          pinterest: Math.floor(Math.random() * 180) + 40, 
+          reddit: Math.floor(Math.random() * 120) + 25 
+        }
+      },
+      {
+        title: `Comment optimiser ${searchKeyword} en 2024`,
+        url: `https://example.com/optimiser-${searchKeyword.toLowerCase().replace(/\s+/g, '-')}`,
+        visits: Math.floor(Math.random() * 12000) + 6000,
+        backlinks: Math.floor(Math.random() * 60) + 25,
+        socialShares: { 
+          facebook: Math.floor(Math.random() * 400) + 150, 
+          pinterest: Math.floor(Math.random() * 250) + 80, 
+          reddit: Math.floor(Math.random() * 180) + 50 
+        }
+      },
+      {
+        title: `${searchKeyword} : Tendances et prévisions 2024`,
+        url: `https://example.com/tendances-${searchKeyword.toLowerCase().replace(/\s+/g, '-')}`,
+        visits: Math.floor(Math.random() * 9000) + 4000,
+        backlinks: Math.floor(Math.random() * 35) + 12,
+        socialShares: { 
+          facebook: Math.floor(Math.random() * 220) + 70, 
+          pinterest: Math.floor(Math.random() * 160) + 45, 
+          reddit: Math.floor(Math.random() * 100) + 20 
+        }
+      },
+      {
+        title: `Étude de cas : Réussir avec ${searchKeyword}`,
+        url: `https://example.com/etude-cas-${searchKeyword.toLowerCase().replace(/\s+/g, '-')}`,
+        visits: Math.floor(Math.random() * 7000) + 2500,
+        backlinks: Math.floor(Math.random() * 45) + 18,
+        socialShares: { 
+          facebook: Math.floor(Math.random() * 190) + 60, 
+          pinterest: Math.floor(Math.random() * 140) + 35, 
+          reddit: Math.floor(Math.random() * 90) + 15 
+        }
+      }
+    ];
+  };
+
   const handleGenerateIdeas = () => {
     if (!keyword.trim()) {
       toast.error("Veuillez entrer un mot-clé");
@@ -33,50 +93,13 @@ const ContentIdeas = () => {
     setIsGenerating(true);
     toast.info("Génération d'idées en cours...");
 
-    // Simulation d'un appel API
+    // Simulation d'un appel API avec génération basée sur le mot-clé
     setTimeout(() => {
-      const generatedIdeas: ContentIdea[] = [
-        {
-          title: `Guide complet sur ${keyword} pour débutants`,
-          url: `https://example.com/guide-${keyword.toLowerCase().replace(/\s+/g, '-')}`,
-          visits: 12500,
-          backlinks: 45,
-          socialShares: { facebook: 230, pinterest: 180, reddit: 95 }
-        },
-        {
-          title: `Les 10 meilleures stratégies de ${keyword}`,
-          url: `https://example.com/strategies-${keyword.toLowerCase().replace(/\s+/g, '-')}`,
-          visits: 8200,
-          backlinks: 32,
-          socialShares: { facebook: 150, pinterest: 120, reddit: 68 }
-        },
-        {
-          title: `Comment optimiser ${keyword} en 2024`,
-          url: `https://example.com/optimiser-${keyword.toLowerCase().replace(/\s+/g, '-')}`,
-          visits: 15600,
-          backlinks: 58,
-          socialShares: { facebook: 340, pinterest: 220, reddit: 125 }
-        },
-        {
-          title: `${keyword} : Tendances et prévisions 2024`,
-          url: `https://example.com/tendances-${keyword.toLowerCase().replace(/\s+/g, '-')}`,
-          visits: 9800,
-          backlinks: 28,
-          socialShares: { facebook: 190, pinterest: 140, reddit: 85 }
-        },
-        {
-          title: `Étude de cas : Réussir avec ${keyword}`,
-          url: `https://example.com/etude-cas-${keyword.toLowerCase().replace(/\s+/g, '-')}`,
-          visits: 7400,
-          backlinks: 35,
-          socialShares: { facebook: 160, pinterest: 110, reddit: 70 }
-        }
-      ];
-
+      const generatedIdeas = generateIdeasForKeyword(keyword);
       setIdeas(generatedIdeas);
       setIsGenerating(false);
-      toast.success("Idées générées avec succès !");
-    }, 2000);
+      toast.success(`${generatedIdeas.length} idées générées avec succès !`);
+    }, 1500);
   };
 
   const copyUrl = (url: string) => {
@@ -103,6 +126,7 @@ const ContentIdeas = () => {
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
                 className="flex-1"
+                onKeyPress={(e) => e.key === 'Enter' && handleGenerateIdeas()}
               />
               <Button 
                 onClick={handleGenerateIdeas}
@@ -128,6 +152,15 @@ const ContentIdeas = () => {
 
             {ideas.length > 0 && (
               <div className="grid gap-4 mt-6">
+                <div className="mb-4">
+                  <h2 className="text-lg font-semibold text-gray-800">
+                    {ideas.length} idées d'articles trouvées pour "{keyword}"
+                  </h2>
+                  <p className="text-gray-600">
+                    Cliquez sur les articles pour les consulter ou copiez leurs URLs
+                  </p>
+                </div>
+                
                 {ideas.map((idea, index) => (
                   <Card key={index} className="p-4 hover:shadow-lg transition-all duration-300">
                     <div className="flex flex-col space-y-4">
@@ -155,7 +188,7 @@ const ContentIdeas = () => {
                       
                       <div className="flex flex-wrap gap-4 text-sm text-gray-600">
                         <div className="flex items-center gap-2">
-                          <span>{idea.visits.toLocaleString()} visites</span>
+                          <span>{idea.visits.toLocaleString()} visites/mois</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <span>{idea.backlinks.toLocaleString()} backlinks</span>
@@ -192,8 +225,10 @@ const ContentIdeas = () => {
             )}
 
             {!ideas.length && !isGenerating && (
-              <div className="text-center py-8 text-gray-500">
-                Entrez un mot-clé et cliquez sur "Générer des idées" pour commencer.
+              <div className="text-center py-12 text-gray-500">
+                <MessageSquare className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                <h3 className="text-lg font-medium mb-2">Aucune idée générée</h3>
+                <p>Entrez un mot-clé et cliquez sur "Générer des idées" pour commencer.</p>
               </div>
             )}
           </div>
