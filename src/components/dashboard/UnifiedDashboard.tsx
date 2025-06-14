@@ -1,136 +1,16 @@
 
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Home, ArrowLeft, LineChart, Globe } from 'lucide-react';
-import { toast } from 'sonner';
+import React, { ReactNode } from 'react';
+import DashboardNavigation from './DashboardNavigation';
 
-const UnifiedDashboard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const location = useLocation();
-  const currentPath = location.pathname;
-  
-  const handleBackButton = () => {
-    window.history.back();
-    toast.info("Retour à la page précédente");
-  };
-  
+interface UnifiedDashboardProps {
+  children: ReactNode;
+}
+
+const UnifiedDashboard: React.FC<UnifiedDashboardProps> = ({ children }) => {
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Link to="/" className="text-primary hover:text-primary/80 flex items-center">
-              <Home className="h-5 w-5 mr-2" />
-              <span className="font-medium">Accueil</span>
-            </Link>
-            <h1 className="text-xl font-bold hidden sm:block">Dashboard SEO</h1>
-          </div>
-          {currentPath !== '/' && (
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleBackButton}
-              className="flex items-center gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Retour
-            </Button>
-          )}
-        </div>
-      </header>
-      
-      <div className="container mx-auto p-4 space-y-6 py-6">
-        {currentPath === '/' && (
-          <Card className="p-4 bg-white shadow-sm border border-gray-200 mb-4">
-            <nav className="flex flex-wrap gap-2">
-              <Link to="/">
-                <Button 
-                  variant={currentPath === '/' ? "default" : "outline"} 
-                  size="sm"
-                  className={currentPath === '/' ? "bg-blue-600 hover:bg-blue-700" : ""}
-                >
-                  Accueil
-                </Button>
-              </Link>
-              <Link to="/keyword-meta">
-                <Button 
-                  variant={currentPath.includes('/keyword-meta') ? "default" : "outline"} 
-                  size="sm"
-                  className={currentPath.includes('/keyword-meta') ? "bg-blue-600 hover:bg-blue-700" : ""}
-                >
-                  Title & Meta
-                </Button>
-              </Link>
-              <Link to="/internal-linking">
-                <Button 
-                  variant={currentPath.includes('/internal-linking') ? "default" : "outline"} 
-                  size="sm"
-                  className={currentPath.includes('/internal-linking') ? "bg-blue-600 hover:bg-blue-700" : ""}
-                >
-                  Liens Internes
-                </Button>
-              </Link>
-              <Link to="/tracking">
-                <Button 
-                  variant={currentPath.includes('/tracking') ? "purple" : "outline"} 
-                  size="sm"
-                  className={currentPath.includes('/tracking') ? "bg-purple-600 hover:bg-purple-700 text-white" : ""}
-                >
-                  <LineChart className="h-4 w-4 mr-1" />
-                  Suivi Positions
-                </Button>
-              </Link>
-              <Link to="/domain-analysis">
-                <Button 
-                  variant={currentPath.includes('/domain-analysis') ? "default" : "outline"} 
-                  size="sm"
-                  className={currentPath.includes('/domain-analysis') ? "bg-green-600 hover:bg-green-700 text-white" : ""}
-                >
-                  <Globe className="h-4 w-4 mr-1" />
-                  Analyse de Domaine
-                </Button>
-              </Link>
-              <Link to="/pinterest">
-                <Button 
-                  variant={currentPath.includes('/pinterest') ? "default" : "outline"} 
-                  size="sm"
-                  className={currentPath.includes('/pinterest') ? "bg-red-600 hover:bg-red-700" : ""}
-                >
-                  Pinterest
-                </Button>
-              </Link>
-              <Link to="/signature">
-                <Button 
-                  variant={currentPath.includes('/signature') ? "default" : "outline"} 
-                  size="sm"
-                  className={currentPath.includes('/signature') ? "bg-blue-600 hover:bg-blue-700" : ""}
-                >
-                  Signature Email
-                </Button>
-              </Link>
-              <Link to="/structure">
-                <Button 
-                  variant={currentPath.includes('/structure') ? "default" : "outline"} 
-                  size="sm"
-                  className={currentPath.includes('/structure') ? "bg-purple-600 hover:bg-purple-700" : ""}
-                >
-                  Structure Site
-                </Button>
-              </Link>
-              <Link to="/keyword-generator">
-                <Button 
-                  variant={currentPath.includes('/keyword-generator') ? "default" : "outline"} 
-                  size="sm"
-                  className={currentPath.includes('/keyword-generator') ? "bg-green-600 hover:bg-green-700" : ""}
-                >
-                  Générateur de mots-clés
-                </Button>
-              </Link>
-            </nav>
-          </Card>
-        )}
-        
+      <DashboardNavigation />
+      <div className="container mx-auto p-4">
         {children}
       </div>
     </div>
@@ -138,4 +18,3 @@ const UnifiedDashboard: React.FC<{ children: React.ReactNode }> = ({ children })
 };
 
 export default UnifiedDashboard;
-

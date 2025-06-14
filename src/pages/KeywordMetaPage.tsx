@@ -153,7 +153,7 @@ const KeywordMetaPage = () => {
               )}
               
               {useAI && !openaiKey && !showApiKeyInput && (
-                <Alert variant="default" className="bg-amber-50 border-amber-200 mt-2">
+                <Alert className="bg-amber-50 border-amber-200 mt-2">
                   <AlertDescription className="text-amber-800 text-sm">
                     Vous avez activé l'IA, mais aucune clé API OpenAI n'est configurée. 
                     <Button variant="link" className="p-0 h-auto text-amber-800 underline" onClick={() => setShowApiKeyInput(true)}>
@@ -248,7 +248,7 @@ const KeywordMetaPage = () => {
               </div>
             )}
             
-            <Alert variant="default" className="bg-blue-50 border-blue-100">
+            <Alert className="bg-blue-50 border-blue-100">
               <Info className="h-4 w-4 text-blue-600" />
               <AlertDescription className="text-blue-800">
                 <strong>Conseils:</strong> Utilisez votre mot-clé principal en début de titre et gardez une longueur entre 50-60 caractères. Pour la description courte, maintenez 120-155 caractères. La description longue (500 caractères) est utile pour les réseaux sociaux et certaines plateformes.

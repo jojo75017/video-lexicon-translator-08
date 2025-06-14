@@ -256,3 +256,15 @@ export interface SeoAnalysis {
   seo: any;
   score?: number;
 }
+
+export interface KeywordSuggestion {
+  keyword: string;
+  volume: number;
+  difficulty: number;
+  cpc: number;
+  competition: number;
+  relevance: number;
+  suggestedTitle?: string;
+  suggestedDescription?: string;
+  suggestedLongDescription?: string;
+}
