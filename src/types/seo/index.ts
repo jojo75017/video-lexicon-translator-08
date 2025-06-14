@@ -92,6 +92,8 @@ export interface MetaTagsAnalysis {
   descriptionLength: number;
   canonicalUrl: string | null;
   robotsContent: string | null;
+  hasTitle: boolean;
+  hasDescription: boolean;
 }
 
 export interface SocialMetrics {
