@@ -1,219 +1,150 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Card } from "@/components/ui/card";
-import UnifiedDashboard from '@/components/dashboard/UnifiedDashboard';
-import NewsletterHero from '@/components/newsletter/NewsletterHero';
-import { FileText, LinkIcon, LineChart, BarChart2, Tag, Info, FilePenLine, LayoutGrid, Search } from 'lucide-react';
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { Button } from '@/components/ui/button';
-import BrokenLinkButton from '@/components/seo/BrokenLinkButton';
-import BlogContentGenerator from '@/components/seo/BlogContentGenerator';
-import DomainAnalysis from '@/components/seo/DomainAnalysis';
-import SitemapSubmission from '@/components/seo/SitemapSubmission';
-import IndexabilityAnalyzer from '@/components/seo/IndexabilityAnalyzer';
-import ResourceAnalyzer from '@/components/seo/ResourceAnalyzer';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { 
+  FileText, 
+  TreePine, 
+  Link as LinkIcon, 
+  Mail, 
+  LineChart,
+  Home,
+  BarChart3,
+  MessageSquare,
+  Settings
+} from 'lucide-react';
 
 const HomePage = () => {
+  const features = [
+    {
+      title: "Titres et Meta",
+      description: "Générez des titres et meta descriptions optimisés SEO",
+      icon: <FileText className="h-6 w-6" />,
+      link: "/keyword-meta",
+      color: "bg-blue-50 border-blue-200 hover:bg-blue-100"
+    },
+    {
+      title: "Structure du Site",
+      description: "Analysez et optimisez la structure de votre site",
+      icon: <TreePine className="h-6 w-6" />,
+      link: "/structure",
+      color: "bg-green-50 border-green-200 hover:bg-green-100"
+    },
+    {
+      title: "Liens Internes",
+      description: "Optimisez votre maillage interne",
+      icon: <LinkIcon className="h-6 w-6" />,
+      link: "/internal-links",
+      color: "bg-purple-50 border-purple-200 hover:bg-purple-100"
+    },
+    {
+      title: "Signature Email",
+      description: "Créez des signatures email professionnelles",
+      icon: <Mail className="h-6 w-6" />,
+      link: "/signature",
+      color: "bg-amber-50 border-amber-200 hover:bg-amber-100"
+    },
+    {
+      title: "Suivi des Positions",
+      description: "Suivez vos positions dans les moteurs de recherche",
+      icon: <LineChart className="h-6 w-6" />,
+      link: "/tracking",
+      color: "bg-indigo-50 border-indigo-200 hover:bg-indigo-100"
+    },
+    {
+      title: "Newsletter",
+      description: "Générez du contenu pour vos newsletters",
+      icon: <Mail className="h-6 w-6" />,
+      link: "/newsletter",
+      color: "bg-pink-50 border-pink-200 hover:bg-pink-100"
+    },
+    {
+      title: "Analytics",
+      description: "Analysez les performances de votre site",
+      icon: <BarChart3 className="h-6 w-6" />,
+      link: "/analytics",
+      color: "bg-emerald-50 border-emerald-200 hover:bg-emerald-100"
+    },
+    {
+      title: "SEO Dashboard",
+      description: "Tableau de bord SEO complet",
+      icon: <FileText className="h-6 w-6" />,
+      link: "/seo",
+      color: "bg-violet-50 border-violet-200 hover:bg-violet-100"
+    }
+  ];
+
   return (
-    <UnifiedDashboard>
-      <div className="space-y-8">
-        {/* Hero Newsletter Section */}
-        <NewsletterHero />
-
-        <section>
-          <Card className="p-6 shadow-sm">
-            <div className="flex flex-col md:flex-row gap-6 items-center">
-              <div className="md:w-2/3">
-                <h2 className="text-3xl font-bold mb-4">Bienvenue sur votre Dashboard SEO</h2>
-                <p className="text-gray-600 mb-6">
-                  Utilisez nos outils pour analyser et améliorer le référencement de votre site web. 
-                  Accédez rapidement aux différentes fonctionnalités ci-dessous.
-                </p>
-                <div className="flex flex-wrap gap-3">
-                  <Link to="/keyword-meta">
-                    <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
-                      Title & Meta
-                    </Button>
-                  </Link>
-                  <Link to="/keyword-generator">
-                    <Button size="lg" className="bg-green-600 hover:bg-green-700">
-                      Générateur de mots-clés
-                    </Button>
-                  </Link>
-                  <BrokenLinkButton className="bg-blue-600 hover:bg-blue-700 text-white" />
-                  <BlogContentGenerator />
-                  <SitemapSubmission />
-                  <IndexabilityAnalyzer />
-                  <ResourceAnalyzer />
-                </div>
-              </div>
-              <div className="md:w-1/3">
-                <BarChart2 className="h-32 w-32 text-blue-500 mx-auto" />
-              </div>
-            </div>
-          </Card>
-        </section>
-
-        {/* Nouvelle section d'analyse de domaine */}
-        <section>
-          <h2 className="text-2xl font-bold mb-4">Analyse de Domaine</h2>
-          <DomainAnalysis />
-        </section>
-
-        <section>
-          <h2 className="text-2xl font-bold mb-4">Outils SEO principaux</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Link to="/keyword-meta" className="block">
-              <Card className="p-6 bg-white hover:bg-blue-50 transition-colors h-full flex flex-col">
-                <div className="flex items-center mb-4">
-                  <Tag className="h-8 w-8 mr-3 text-blue-600" />
-                  <h3 className="text-xl font-bold">Title & Meta</h3>
-                </div>
-                <p className="text-gray-600 mb-4">
-                  Optimisez vos balises title et meta pour un meilleur référencement. Générez des méta-descriptions 
-                  optimisées pour améliorer votre CTR.
-                </p>
-                <Button className="mt-auto" variant="outline">Accéder à l'outil</Button>
-              </Card>
-            </Link>
-            
-            <Link to="/keyword-generator" className="block">
-              <Card className="p-6 bg-white hover:bg-green-50 transition-colors h-full flex flex-col">
-                <div className="flex items-center mb-4">
-                  <Search className="h-8 w-8 mr-3 text-green-600" />
-                  <h3 className="text-xl font-bold">Générateur de mots-clés</h3>
-                </div>
-                <p className="text-gray-600 mb-4">
-                  Trouvez les mots-clés les plus pertinents pour votre contenu et améliorez votre visibilité dans les moteurs de recherche.
-                </p>
-                <Button className="mt-auto" variant="outline">Accéder à l'outil</Button>
-              </Card>
-            </Link>
-            
-            <Link to="/internal-linking" className="block">
-              <Card className="p-6 bg-white hover:bg-blue-50 transition-colors h-full flex flex-col">
-                <div className="flex items-center mb-4">
-                  <LinkIcon className="h-8 w-8 mr-3 text-purple-600" />
-                  <h3 className="text-xl font-bold">Liens Internes</h3>
-                </div>
-                <p className="text-gray-600 mb-4">
-                  Améliorez votre structure de liens internes pour optimiser le maillage de votre site et 
-                  renforcer votre référencement.
-                </p>
-                <Button className="mt-auto" variant="outline">Accéder à l'outil</Button>
-              </Card>
-            </Link>
+    <div className="min-h-screen bg-gray-50">
+      <header className="bg-white border-b border-gray-200 p-6">
+        <div className="container mx-auto">
+          <div className="flex items-center gap-3 mb-2">
+            <Home className="h-8 w-8 text-blue-600" />
+            <h1 className="text-3xl font-bold text-gray-900">Tableau de Bord SEO</h1>
           </div>
-        </section>
-        
-        <section>
-          <h2 className="text-2xl font-bold mb-4">Outils supplémentaires</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Link to="/pinterest" className="block">
-              <Card className="p-6 bg-white hover:bg-red-50 transition-colors h-full flex flex-col">
-                <div className="flex items-center mb-4">
-                  <FilePenLine className="h-8 w-8 mr-3 text-red-600" />
-                  <h3 className="text-xl font-bold">Pinterest</h3>
-                </div>
-                <p className="text-gray-600 mb-4">
-                  Générez des images Pinterest optimisées pour augmenter votre visibilité et attirer plus de trafic vers votre site.
-                </p>
-                <Button className="mt-auto" variant="outline">Accéder à l'outil</Button>
-              </Card>
-            </Link>
-            
-            <Link to="/signature" className="block">
-              <Card className="p-6 bg-white hover:bg-blue-50 transition-colors h-full flex flex-col">
-                <div className="flex items-center mb-4">
-                  <FileText className="h-8 w-8 mr-3 text-blue-600" />
-                  <h3 className="text-xl font-bold">Signature Email</h3>
-                </div>
-                <p className="text-gray-600 mb-4">
-                  Créez une signature email professionnelle pour renforcer votre image de marque et promouvoir votre site web.
-                </p>
-                <Button className="mt-auto" variant="outline">Accéder à l'outil</Button>
-              </Card>
-            </Link>
-            
-            <Link to="/structure" className="block">
-              <Card className="p-6 bg-white hover:bg-purple-50 transition-colors h-full flex flex-col">
-                <div className="flex items-center mb-4">
-                  <LayoutGrid className="h-8 w-8 mr-3 text-purple-600" />
-                  <h3 className="text-xl font-bold">Structure Site</h3>
-                </div>
-                <p className="text-gray-600 mb-4">
-                  Analysez et optimisez la structure de votre site web pour une meilleure expérience utilisateur et un meilleur référencement.
-                </p>
-                <Button className="mt-auto" variant="outline">Accéder à l'outil</Button>
-              </Card>
-            </Link>
-          </div>
-        </section>
-        
-        <section>
-          <Card className="p-6">
-            <h2 className="text-2xl font-bold mb-4">Comment ça marche</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-              <div className="flex flex-col items-center text-center">
-                <div className="bg-blue-100 rounded-full p-4 mb-4">
-                  <FileText className="h-8 w-8 text-blue-600" />
-                </div>
-                <h3 className="font-bold mb-2">1. Choisissez un outil</h3>
-                <p className="text-gray-600">Sélectionnez l'outil SEO qui correspond à vos besoins actuels.</p>
-              </div>
-              
-              <div className="flex flex-col items-center text-center">
-                <div className="bg-purple-100 rounded-full p-4 mb-4">
-                  <BarChart2 className="h-8 w-8 text-purple-600" />
-                </div>
-                <h3 className="font-bold mb-2">2. Analysez vos données</h3>
-                <p className="text-gray-600">Entrez votre URL ou vos mots-clés pour obtenir une analyse détaillée.</p>
-              </div>
-              
-              <div className="flex flex-col items-center text-center">
-                <div className="bg-green-100 rounded-full p-4 mb-4">
-                  <Info className="h-8 w-8 text-green-600" />
-                </div>
-                <h3 className="font-bold mb-2">3. Appliquez les recommandations</h3>
-                <p className="text-gray-600">Suivez nos conseils pour améliorer votre référencement et augmenter votre visibilité.</p>
-              </div>
-            </div>
-          </Card>
-        </section>
+          <p className="text-gray-600">
+            Accédez à tous vos outils SEO depuis cette page principale
+          </p>
+        </div>
+      </header>
 
-        {/* Section compteur de mots */}
-        <section>
-          <Card className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
-            <h2 className="text-2xl font-bold mb-4 text-blue-800">Outil de comptage de mots</h2>
-            <p className="text-blue-700 mb-6">
-              Analysez votre contenu avec précision : comptez les mots, caractères, phrases et paragraphes
-              pour optimiser vos textes SEO.
-            </p>
-            <div className="flex justify-center">
-              <Link to="/word-count">
-                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white">
-                  <FileText className="h-5 w-5 mr-2" />
-                  Accéder au compteur de mots
-                </Button>
-              </Link>
-            </div>
+      <main className="container mx-auto p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {features.map((feature, index) => (
+            <Link key={index} to={feature.link}>
+              <Card className={`h-full transition-all duration-200 cursor-pointer ${feature.color}`}>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-white rounded-lg shadow-sm">
+                      {feature.icon}
+                    </div>
+                    <CardTitle className="text-lg font-semibold">
+                      {feature.title}
+                    </CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600 mb-4">
+                    {feature.description}
+                  </p>
+                  <Button variant="outline" className="w-full" size="sm">
+                    Accéder
+                  </Button>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
+
+        <div className="mt-12 text-center">
+          <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+            <CardContent className="p-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                Bienvenue sur votre plateforme SEO
+              </h2>
+              <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
+                Utilisez les outils ci-dessus pour optimiser votre référencement naturel, 
+                analyser vos performances et améliorer votre visibilité en ligne.
+              </p>
+              <div className="flex flex-wrap justify-center gap-4">
+                <Link to="/seo">
+                  <Button className="bg-blue-600 hover:bg-blue-700">
+                    Commencer l'analyse SEO
+                  </Button>
+                </Link>
+                <Link to="/settings">
+                  <Button variant="outline">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Paramètres
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
           </Card>
-        </section>
-        
-        <section>
-          <Alert className="bg-blue-50 border-blue-200">
-            <Info className="h-5 w-5 text-blue-600" />
-            <AlertTitle>Besoin d'aide ?</AlertTitle>
-            <AlertDescription>
-              Notre équipe est disponible pour vous aider à optimiser votre référencement. N'hésitez pas à nous contacter
-              pour obtenir des conseils personnalisés.
-            </AlertDescription>
-          </Alert>
-        </section>
-      </div>
-    </UnifiedDashboard>
+        </div>
+      </main>
+    </div>
   );
 };
 

@@ -29,7 +29,7 @@ export interface PerformanceData {
   loadTime: number;
   firstContentfulPaint: number;
   largestContentfulPaint: number;
-  totalBlockingTime: number;
+  totalBlockingTime?: number;
   domLoadTime: number;
   speedIndex: number;
   timeToInteractive: number;
@@ -231,8 +231,8 @@ export interface InternalLinkAnalysis {
   topLinkedPages: PageLinkMetric[];
   orphanedPages: string[];
   recommendations: string[];
-  linkDepth: number;
-  linkSuggestions: Array<{
+  linkDepth?: number;
+  linkSuggestions?: Array<{
     fromPage: string;
     toPage: string;
     anchorText: string;
