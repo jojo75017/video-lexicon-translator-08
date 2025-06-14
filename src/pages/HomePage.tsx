@@ -72,6 +72,34 @@ const HomePage = () => {
       icon: <FileText className="h-6 w-6" />,
       link: "/seo",
       color: "bg-violet-50 border-violet-200 hover:bg-violet-100"
+    },
+    {
+      title: "Générateur de mots-clés",
+      description: "Générez des mots-clés avec l'IA",
+      icon: <MessageSquare className="h-6 w-6" />,
+      link: "/keyword-generator",
+      color: "bg-orange-50 border-orange-200 hover:bg-orange-100"
+    },
+    {
+      title: "Idées de contenu",
+      description: "Trouvez des idées de contenu",
+      icon: <MessageSquare className="h-6 w-6" />,
+      link: "/content-ideas",
+      color: "bg-teal-50 border-teal-200 hover:bg-teal-100"
+    },
+    {
+      title: "Pinterest",
+      description: "Outils pour Pinterest",
+      icon: <FileText className="h-6 w-6" />,
+      link: "/pinterest",
+      color: "bg-red-50 border-red-200 hover:bg-red-100"
+    },
+    {
+      title: "Rédacteur IA",
+      description: "Rédigez du contenu avec l'IA",
+      icon: <FileText className="h-6 w-6" />,
+      link: "/ai-writer",
+      color: "bg-cyan-50 border-cyan-200 hover:bg-cyan-100"
     }
   ];
 
