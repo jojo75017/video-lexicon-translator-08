@@ -30,6 +30,10 @@ const DashboardNavigation = () => {
         return 'Liens Internes';
       case '/signature':
         return 'Signature Email';
+      case '/content-ideas':
+        return 'Idées de Contenu';
+      case '/ai-writer':
+        return 'Rédacteur IA';
       case '/':
         return 'Dashboard';
       default:

@@ -4,7 +4,7 @@ import UnifiedDashboard from '@/components/dashboard/UnifiedDashboard';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { MessageSquare, Search, Lightbulb, ExternalLink, Copy, Bookmark, ThumbsUp } from 'lucide-react';
+import { MessageSquare, Search, ExternalLink, Copy, Bookmark, ThumbsUp } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface ContentIdea {
@@ -38,24 +38,38 @@ const ContentIdeas = () => {
       const generatedIdeas: ContentIdea[] = [
         {
           title: `Guide complet sur ${keyword} pour débutants`,
-          url: `https://example.com/guide-${keyword.toLowerCase()}`,
+          url: `https://example.com/guide-${keyword.toLowerCase().replace(/\s+/g, '-')}`,
           visits: 12500,
           backlinks: 45,
           socialShares: { facebook: 230, pinterest: 180, reddit: 95 }
         },
         {
           title: `Les 10 meilleures stratégies de ${keyword}`,
-          url: `https://example.com/strategies-${keyword.toLowerCase()}`,
+          url: `https://example.com/strategies-${keyword.toLowerCase().replace(/\s+/g, '-')}`,
           visits: 8200,
           backlinks: 32,
           socialShares: { facebook: 150, pinterest: 120, reddit: 68 }
         },
         {
           title: `Comment optimiser ${keyword} en 2024`,
-          url: `https://example.com/optimiser-${keyword.toLowerCase()}`,
+          url: `https://example.com/optimiser-${keyword.toLowerCase().replace(/\s+/g, '-')}`,
           visits: 15600,
           backlinks: 58,
           socialShares: { facebook: 340, pinterest: 220, reddit: 125 }
+        },
+        {
+          title: `${keyword} : Tendances et prévisions 2024`,
+          url: `https://example.com/tendances-${keyword.toLowerCase().replace(/\s+/g, '-')}`,
+          visits: 9800,
+          backlinks: 28,
+          socialShares: { facebook: 190, pinterest: 140, reddit: 85 }
+        },
+        {
+          title: `Étude de cas : Réussir avec ${keyword}`,
+          url: `https://example.com/etude-cas-${keyword.toLowerCase().replace(/\s+/g, '-')}`,
+          visits: 7400,
+          backlinks: 35,
+          socialShares: { facebook: 160, pinterest: 110, reddit: 70 }
         }
       ];
 
