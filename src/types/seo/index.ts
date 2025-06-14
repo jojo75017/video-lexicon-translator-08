@@ -1,4 +1,6 @@
 
+import { Home, BarChart3, FileText, MessageSquare, Settings, Mail, LineChart } from "lucide-react";
+
 export interface PerformanceMetrics {
   loadTime: number;
   firstContentfulPaint: number;

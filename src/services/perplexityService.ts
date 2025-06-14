@@ -1,26 +1,17 @@
 
 export class PerplexityService {
-  private static API_KEY_STORAGE_KEY = 'perplexity_api_key';
+  private apiKey: string;
 
-  static saveApiKey(apiKey: string): void {
-    localStorage.setItem(this.API_KEY_STORAGE_KEY, apiKey);
+  constructor(apiKey: string) {
+    this.apiKey = apiKey;
   }
 
-  static getApiKey(): string | null {
-    return localStorage.getItem(this.API_KEY_STORAGE_KEY);
-  }
-
-  static async generateKeywords(query: string): Promise<string[]> {
-    const apiKey = this.getApiKey();
-    if (!apiKey) {
-      throw new Error('API key not found');
-    }
-
+  async generateContent(prompt: string): Promise<string> {
     try {
       const response = await fetch('https://api.perplexity.ai/chat/completions', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${apiKey}`,
+          'Authorization': `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -28,29 +19,31 @@ export class PerplexityService {
           messages: [
             {
               role: 'system',
-              content: 'Generate relevant keywords for SEO purposes. Return only a simple list of keywords.'
+              content: 'Be precise and concise.'
             },
             {
               role: 'user',
-              content: `Generate SEO keywords for: ${query}`
+              content: prompt
             }
           ],
           temperature: 0.2,
-          top_p: 0.9,
-          max_tokens: 1000,
+          max_tokens: 1000
         }),
       });
 
+      if (!response.ok) {
+        throw new Error(`Erreur API: ${response.status}`);
+      }
+
       const data = await response.json();
-      const content = data.choices[0]?.message?.content || '';
-      
-      return content.split('\n')
-        .map((line: string) => line.trim())
-        .filter((line: string) => line.length > 0)
-        .slice(0, 10);
+      return data.choices[0].message.content;
     } catch (error) {
-      console.error('Error generating keywords:', error);
-      return [];
+      console.error('Erreur Perplexity:', error);
+      throw error;
     }
   }
 }
+
+export const createPerplexityService = (apiKey: string) => {
+  return new PerplexityService(apiKey);
+};

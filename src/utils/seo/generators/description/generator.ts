@@ -21,6 +21,11 @@ export const generateBothDescriptions = (keyword: string) => {
   };
 };
 
+export const generateSeoDescription = (keyword: string): string => {
+  const { short } = generateBothDescriptions(keyword);
+  return short;
+};
+
 export const generateAIDescriptions = async (keyword: string, apiKey: string) => {
   // Simulation de l'API OpenAI pour la démo
   await new Promise(resolve => setTimeout(resolve, 1500));

@@ -12,6 +12,7 @@ import PinterestPage from "./pages/PinterestPage";
 import KeywordGuideComplete from "./pages/KeywordGuideComplete";
 import NewsletterPage from "./pages/NewsletterPage";
 import TrackingPage from "./pages/TrackingPage";
+import KeywordMetaPage from "./pages/KeywordMetaPage";
 
 export const navItems = [
   {
@@ -43,6 +44,12 @@ export const navItems = [
     to: "/tracking",
     icon: <LineChart className="h-4 w-4" />,
     page: <TrackingPage />,
+  },
+  {
+    title: "Titres et Meta",
+    to: "/keyword-meta",
+    icon: <FileText className="h-4 w-4" />,
+    page: <KeywordMetaPage />,
   },
   {
     title: "Idées de contenu",
