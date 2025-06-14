@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FilePenLine, FileText, RefreshCw, Copy } from 'lucide-react';
+import { FilePenLine, FileText, RefreshCw, Copy, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { generateContentWithWordCount } from '@/utils/seo/contentGenerator';
 
@@ -17,8 +17,39 @@ const AiWriterPage = () => {
   const [wordCount, setWordCount] = useState(500);
   const [generatedContent, setGeneratedContent] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [apiKey, setApiKey] = useState(() => localStorage.getItem('openaiKey') || '');
+  const [apiKeyStatus, setApiKeyStatus] = useState<'unchecked' | 'valid' | 'invalid'>('unchecked');
 
-  const handleGenerateContent = () => {
+  const validateApiKey = async () => {
+    if (!apiKey) {
+      toast.error("Veuillez entrer une clé API");
+      return;
+    }
+
+    try {
+      const response = await fetch('https://api.openai.com/v1/models', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        localStorage.setItem('openaiKey', apiKey);
+        setApiKeyStatus('valid');
+        toast.success("Clé API validée avec succès");
+      } else {
+        setApiKeyStatus('invalid');
+        toast.error("Clé API invalide");
+      }
+    } catch (error) {
+      setApiKeyStatus('invalid');
+      toast.error("Erreur lors de la validation de la clé API");
+    }
+  };
+
+  const handleGenerateContent = async () => {
     if (!keyword.trim()) {
       toast.error("Veuillez entrer un mot-clé");
       return;
@@ -27,9 +58,8 @@ const AiWriterPage = () => {
     setIsGenerating(true);
     toast.info("Génération du contenu en cours...");
 
-    // Utiliser le nouveau générateur de contenu intelligent
-    setTimeout(() => {
-      const generatedData = generateContentWithWordCount(keyword, wordCount);
+    try {
+      const generatedData = await generateContentWithWordCount(keyword, wordCount);
       
       // Formater le contenu en Markdown
       let formattedContent = `# ${generatedData.title}\n\n`;
@@ -40,9 +70,12 @@ const AiWriterPage = () => {
       });
 
       setGeneratedContent(formattedContent);
-      setIsGenerating(false);
       toast.success("Contenu généré avec succès !");
-    }, 1500);
+    } catch (error) {
+      toast.error("Erreur lors de la génération du contenu");
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const copyContent = () => {
@@ -53,6 +86,40 @@ const AiWriterPage = () => {
   return (
     <UnifiedDashboard>
       <div className="space-y-6">
+        {/* Section clé API OpenAI */}
+        <Card className="p-4 border border-blue-100">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="font-medium text-blue-800">Configuration OpenAI (Recommandé)</h3>
+            {apiKeyStatus === 'valid' && (
+              <div className="flex items-center text-green-600 gap-1 text-sm">
+                <ShieldCheck className="h-4 w-4" />
+                <span>Clé API validée</span>
+              </div>
+            )}
+            {apiKeyStatus === 'invalid' && (
+              <div className="flex items-center text-red-600 gap-1 text-sm">
+                <AlertTriangle className="h-4 w-4" />
+                <span>Clé API invalide</span>
+              </div>
+            )}
+          </div>
+          <p className="text-sm text-gray-600 mb-3">
+            Pour du contenu personnalisé et cohérent, ajoutez votre clé API OpenAI. Sans clé API, des templates génériques seront utilisés.
+          </p>
+          <div className="flex gap-2">
+            <Input
+              type="password"
+              placeholder="Entrez votre clé API OpenAI (sk-...)"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              className={`flex-1 ${apiKeyStatus === 'valid' ? 'border-green-500' : apiKeyStatus === 'invalid' ? 'border-red-500' : ''}`}
+            />
+            <Button onClick={validateApiKey} variant="outline" className="whitespace-nowrap">
+              Valider
+            </Button>
+          </div>
+        </Card>
+
         <Card className="p-6">
           <div className="flex items-center gap-2 mb-4">
             <FilePenLine className="h-6 w-6 text-blue-500" />
@@ -65,7 +132,7 @@ const AiWriterPage = () => {
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input 
-                placeholder="Mot-clé principal (ex: SEO, marketing digital, référencement)" 
+                placeholder="Mot-clé principal (ex: SEO, marketing digital, référencement, voyage Rome)" 
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
               />
