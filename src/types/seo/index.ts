@@ -267,4 +267,5 @@ export interface KeywordSuggestion {
   suggestedTitle?: string;
   suggestedDescription?: string;
   suggestedLongDescription?: string;
+  searchVolume?: number;
 }
