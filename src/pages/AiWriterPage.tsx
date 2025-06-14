@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FilePenLine, FileText, RefreshCw, Copy } from 'lucide-react';
 import { toast } from 'sonner';
+import { generateContentWithWordCount } from '@/utils/seo/contentGenerator';
 
 const AiWriterPage = () => {
   const [keyword, setKeyword] = useState('');
@@ -26,53 +27,22 @@ const AiWriterPage = () => {
     setIsGenerating(true);
     toast.info("Génération du contenu en cours...");
 
-    // Simulation d'un appel API
+    // Utiliser le nouveau générateur de contenu intelligent
     setTimeout(() => {
-      const content = `# Guide Complet sur ${keyword}
+      const generatedData = generateContentWithWordCount(keyword, wordCount);
+      
+      // Formater le contenu en Markdown
+      let formattedContent = `# ${generatedData.title}\n\n`;
+      formattedContent += `## Introduction\n\n${generatedData.intro}\n\n`;
+      
+      generatedData.sections.forEach((section, index) => {
+        formattedContent += `## ${section.heading}\n\n${section.content}\n\n`;
+      });
 
-## Introduction
-
-${keyword} est un sujet fascinant qui mérite une attention particulière dans le contexte actuel. Dans ce guide complet, nous allons explorer tous les aspects importants de ${keyword} pour vous aider à mieux comprendre ce domaine.
-
-## Qu'est-ce que ${keyword} ?
-
-${keyword} représente un ensemble de concepts et de pratiques qui ont évolué au fil du temps. Il est essentiel de comprendre les fondamentaux avant de se lancer dans des stratégies plus avancées.
-
-### Points clés à retenir :
-
-- Comprendre les bases de ${keyword}
-- Identifier les meilleures pratiques
-- Éviter les erreurs courantes
-- Optimiser pour les résultats
-
-## Comment démarrer avec ${keyword}
-
-Pour bien commencer avec ${keyword}, voici les étapes essentielles :
-
-1. **Recherche préliminaire** : Effectuez une recherche approfondie sur votre niche
-2. **Planification stratégique** : Développez un plan d'action clair
-3. **Mise en œuvre** : Appliquez les techniques apprises
-4. **Suivi et optimisation** : Mesurez vos résultats et ajustez votre approche
-
-## Stratégies avancées pour ${keyword}
-
-Une fois les bases maîtrisées, vous pouvez explorer des techniques plus sophistiquées :
-
-- Analyse de la concurrence
-- Optimisation continue
-- Automatisation des processus
-- Mesure de la performance
-
-## Conclusion
-
-${keyword} offre de nombreuses opportunités pour ceux qui sont prêts à investir du temps et des efforts. En suivant les conseils de ce guide, vous devriez être en mesure de développer une approche efficace et durable.
-
-N'hésitez pas à expérimenter et à adapter ces stratégies à votre situation particulière. Le succès dans ${keyword} dépend souvent de la persistance et de l'adaptation continue.`;
-
-      setGeneratedContent(content);
+      setGeneratedContent(formattedContent);
       setIsGenerating(false);
       toast.success("Contenu généré avec succès !");
-    }, 3000);
+    }, 1500);
   };
 
   const copyContent = () => {
@@ -95,7 +65,7 @@ N'hésitez pas à expérimenter et à adapter ces stratégies à votre situation
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input 
-                placeholder="Mot-clé principal" 
+                placeholder="Mot-clé principal (ex: SEO, marketing digital, référencement)" 
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
               />
