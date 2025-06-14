@@ -98,7 +98,7 @@ const ContentIdeas = () => {
     ];
   };
 
-  const handleGenerateIdeas = () => {
+  const handleGenerateIdeas = async () => {
     if (!keyword.trim()) {
       toast.error("Veuillez entrer un mot-clé");
       return;
@@ -107,13 +107,19 @@ const ContentIdeas = () => {
     setIsGenerating(true);
     toast.info("Génération d'idées en cours...");
 
-    // Simulation d'un appel API
-    setTimeout(() => {
+    try {
+      // Simulation d'un appel API avec délai
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
       const generatedIdeas = generateIdeasForKeyword(keyword);
       setIdeas(generatedIdeas);
-      setIsGenerating(false);
       toast.success(`${generatedIdeas.length} idées générées avec succès !`);
-    }, 1500);
+    } catch (error) {
+      console.error('Erreur lors de la génération:', error);
+      toast.error("Erreur lors de la génération des idées");
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const copyUrl = (url: string) => {
