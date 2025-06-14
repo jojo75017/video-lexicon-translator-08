@@ -1,5 +1,5 @@
 
-import { Home, BarChart3, FileText, MessageSquare, Settings, Mail, LineChart } from "lucide-react";
+import { Home, BarChart3, FileText, MessageSquare, Settings, Mail, LineChart, TreePine, Link } from "lucide-react";
 import Index from "./pages/Index";
 import AnalyticsDashboard from "./pages/AnalyticsDashboard";
 import SeoDashboard from "./pages/SeoDashboard";
@@ -13,6 +13,9 @@ import KeywordGuideComplete from "./pages/KeywordGuideComplete";
 import NewsletterPage from "./pages/NewsletterPage";
 import TrackingPage from "./pages/TrackingPage";
 import KeywordMetaPage from "./pages/KeywordMetaPage";
+import StructurePage from "./pages/StructurePage";
+import InternalLinksPage from "./pages/InternalLinksPage";
+import SignaturePage from "./pages/SignaturePage";
 
 export const navItems = [
   {
@@ -50,6 +53,24 @@ export const navItems = [
     to: "/keyword-meta",
     icon: <FileText className="h-4 w-4" />,
     page: <KeywordMetaPage />,
+  },
+  {
+    title: "Structure Site",
+    to: "/structure",
+    icon: <TreePine className="h-4 w-4" />,
+    page: <StructurePage />,
+  },
+  {
+    title: "Liens Internes",
+    to: "/internal-links",
+    icon: <Link className="h-4 w-4" />,
+    page: <InternalLinksPage />,
+  },
+  {
+    title: "Signature Email",
+    to: "/signature",
+    icon: <Mail className="h-4 w-4" />,
+    page: <SignaturePage />,
   },
   {
     title: "Idées de contenu",

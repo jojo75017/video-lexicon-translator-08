@@ -11,6 +11,9 @@ export interface PerformanceMetrics {
   score: number;
   resourceCount: number;
   totalSize: number;
+  totalBlockingTime?: number;
+  cumulativeLayoutShift?: number;
+  performanceScore?: number;
   resourceBreakdown: {
     images: number;
     scripts: number;
@@ -33,6 +36,8 @@ export interface PerformanceData {
   score: number;
   resourceCount: number;
   totalSize: number;
+  cumulativeLayoutShift?: number;
+  performanceScore?: number;
   resourceBreakdown: {
     images: number;
     scripts: number;
@@ -66,6 +71,27 @@ export interface MetaTags {
   hasDescription: boolean;
   hasDescriptionTag: boolean;
   hasOpenGraphTags: boolean;
+  hasTwitterTags?: boolean;
+  titleLength?: number;
+  descriptionLength?: number;
+  canonicalUrl?: string | null;
+  robotsContent?: string | null;
+  hasTitleTag?: boolean;
+  hasCanonical?: boolean;
+  hasRobotsTag?: boolean;
+}
+
+export interface MetaTagsAnalysis {
+  hasTitleTag: boolean;
+  hasDescriptionTag: boolean;
+  hasCanonical: boolean;
+  hasRobotsTag: boolean;
+  hasOpenGraphTags: boolean;
+  hasTwitterTags?: boolean;
+  titleLength: number;
+  descriptionLength: number;
+  canonicalUrl: string | null;
+  robotsContent: string | null;
 }
 
 export interface SocialMetrics {
@@ -243,6 +269,7 @@ export interface SeoAnalysisResult {
 }
 
 export interface SeoAnalysis {
+  url?: string;
   title: string;
   description: string;
   keywords: string[];
@@ -255,6 +282,29 @@ export interface SeoAnalysis {
   accessibility: any;
   seo: any;
   score?: number;
+  h1Count?: number;
+  h2Count?: number;
+  h3Count?: number;
+  imgCount?: number;
+  wordCount?: number;
+  internalLinks?: number;
+  externalLinks?: number;
+  backlinks?: number | BacklinkInfo[];
+  doFollowBacklinks?: number;
+  noFollowBacklinks?: number;
+  topBacklinkDomains?: string[] | {domain: string}[];
+  brokenLinks?: BrokenLink[];
+  socialTags?: SocialTags;
+  imagesDetails?: ImageDetail[];
+  keywordSuggestions?: KeywordSuggestion[];
+  socialMetrics?: SocialMetrics;
+  metaTagsAnalysis?: MetaTagsAnalysis;
+  topKeywords?: any[];
+  technicalSuggestions?: string[];
+  readabilityScore?: number;
+  searchConsoleData?: SearchConsoleData;
+  mobileAnalysis?: MobileAnalysis;
+  imgWithoutAlt?: number;
 }
 
 export interface KeywordSuggestion {
@@ -268,4 +318,46 @@ export interface KeywordSuggestion {
   suggestedDescription?: string;
   suggestedLongDescription?: string;
   searchVolume?: number;
+}
+
+export interface BrokenLink {
+  url: string;
+  statusCode?: number;
+  status?: string;
+  location?: string;
+  text?: string;
+  anchor?: string;
+}
+
+export interface ImageDetail {
+  url: string;
+  alt?: string;
+  size?: string;
+  width?: number;
+  height?: number;
+}
+
+export interface BacklinkInfo {
+  url: string;
+  domain: string;
+  anchor: string;
+  dofollow: boolean;
+  authority?: number;
+}
+
+export interface StructureItem {
+  type: "h1" | "h2" | "h3" | "h4" | "p" | "list";
+  content: string;
+  id: string;
+  items?: string[];
+}
+
+export interface SocialTags {
+  ogTitle: string | null;
+  ogDescription: string | null;
+  ogImage: string | null;
+  twitterCard: string | null;
+  twitterTitle: string | null;
+  twitterDescription: string | null;
+  twitterImage: string | null;
 }

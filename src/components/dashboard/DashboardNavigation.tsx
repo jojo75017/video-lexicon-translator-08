@@ -16,6 +16,27 @@ const DashboardNavigation = () => {
     navigate('/');
   };
 
+  const getPageTitle = () => {
+    switch (location.pathname) {
+      case '/keyword-meta':
+        return 'Titres et Meta';
+      case '/newsletter':
+        return 'Newsletter';
+      case '/tracking':
+        return 'Suivi des Positions';
+      case '/structure':
+        return 'Structure du Site';
+      case '/internal-links':
+        return 'Liens Internes';
+      case '/signature':
+        return 'Signature Email';
+      case '/':
+        return 'Dashboard';
+      default:
+        return 'Dashboard';
+    }
+  };
+
   return (
     <div className="flex items-center gap-2 mb-4 p-4 bg-white border-b">
       <Button 
@@ -39,10 +60,7 @@ const DashboardNavigation = () => {
       </Button>
       
       <div className="ml-4 text-sm text-gray-600">
-        {location.pathname === '/keyword-meta' && 'Titres et Meta'}
-        {location.pathname === '/newsletter' && 'Newsletter'}
-        {location.pathname === '/tracking' && 'Suivi des Positions'}
-        {location.pathname === '/' && 'Dashboard'}
+        {getPageTitle()}
       </div>
     </div>
   );
