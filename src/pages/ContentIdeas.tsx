@@ -25,10 +25,13 @@ const ContentIdeas = () => {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const generateIdeasForKeyword = (searchKeyword: string): ContentIdea[] => {
+    const baseUrl = 'https://example.com';
+    const slug = searchKeyword.toLowerCase().replace(/\s+/g, '-');
+    
     return [
       {
-        title: `Guide complet sur ${searchKeyword} pour débutants`,
-        url: `https://example.com/guide-${searchKeyword.toLowerCase().replace(/\s+/g, '-')}`,
+        title: `Guide complet : ${searchKeyword} pour débutants`,
+        url: `${baseUrl}/guide-${slug}-debutants`,
         visits: Math.floor(Math.random() * 10000) + 5000,
         backlinks: Math.floor(Math.random() * 50) + 20,
         socialShares: { 
@@ -39,7 +42,7 @@ const ContentIdeas = () => {
       },
       {
         title: `Les 10 meilleures stratégies de ${searchKeyword}`,
-        url: `https://example.com/strategies-${searchKeyword.toLowerCase().replace(/\s+/g, '-')}`,
+        url: `${baseUrl}/10-strategies-${slug}`,
         visits: Math.floor(Math.random() * 8000) + 3000,
         backlinks: Math.floor(Math.random() * 40) + 15,
         socialShares: { 
@@ -50,7 +53,7 @@ const ContentIdeas = () => {
       },
       {
         title: `Comment optimiser ${searchKeyword} en 2024`,
-        url: `https://example.com/optimiser-${searchKeyword.toLowerCase().replace(/\s+/g, '-')}`,
+        url: `${baseUrl}/optimiser-${slug}-2024`,
         visits: Math.floor(Math.random() * 12000) + 6000,
         backlinks: Math.floor(Math.random() * 60) + 25,
         socialShares: { 
@@ -61,7 +64,7 @@ const ContentIdeas = () => {
       },
       {
         title: `${searchKeyword} : Tendances et prévisions 2024`,
-        url: `https://example.com/tendances-${searchKeyword.toLowerCase().replace(/\s+/g, '-')}`,
+        url: `${baseUrl}/tendances-${slug}-2024`,
         visits: Math.floor(Math.random() * 9000) + 4000,
         backlinks: Math.floor(Math.random() * 35) + 12,
         socialShares: { 
@@ -72,13 +75,24 @@ const ContentIdeas = () => {
       },
       {
         title: `Étude de cas : Réussir avec ${searchKeyword}`,
-        url: `https://example.com/etude-cas-${searchKeyword.toLowerCase().replace(/\s+/g, '-')}`,
+        url: `${baseUrl}/etude-cas-${slug}`,
         visits: Math.floor(Math.random() * 7000) + 2500,
         backlinks: Math.floor(Math.random() * 45) + 18,
         socialShares: { 
           facebook: Math.floor(Math.random() * 190) + 60, 
           pinterest: Math.floor(Math.random() * 140) + 35, 
           reddit: Math.floor(Math.random() * 90) + 15 
+        }
+      },
+      {
+        title: `${searchKeyword} : Erreurs à éviter absolument`,
+        url: `${baseUrl}/erreurs-${slug}`,
+        visits: Math.floor(Math.random() * 6000) + 2000,
+        backlinks: Math.floor(Math.random() * 30) + 10,
+        socialShares: { 
+          facebook: Math.floor(Math.random() * 150) + 50, 
+          pinterest: Math.floor(Math.random() * 100) + 30, 
+          reddit: Math.floor(Math.random() * 80) + 10 
         }
       }
     ];
@@ -93,7 +107,7 @@ const ContentIdeas = () => {
     setIsGenerating(true);
     toast.info("Génération d'idées en cours...");
 
-    // Simulation d'un appel API avec génération basée sur le mot-clé
+    // Simulation d'un appel API
     setTimeout(() => {
       const generatedIdeas = generateIdeasForKeyword(keyword);
       setIdeas(generatedIdeas);
@@ -107,6 +121,12 @@ const ContentIdeas = () => {
     toast.success("URL copiée dans le presse-papier");
   };
 
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleGenerateIdeas();
+    }
+  };
+
   return (
     <UnifiedDashboard>
       <div className="space-y-6">
@@ -116,29 +136,26 @@ const ContentIdeas = () => {
             <h1 className="text-2xl font-bold">Idées de Contenu</h1>
           </div>
           <p className="text-gray-600 mb-6">
-            Générez des idées de contenu créatives pour votre stratégie marketing.
+            Générez des idées de contenu créatives et populaires pour votre stratégie marketing.
           </p>
 
           <div className="space-y-4">
             <div className="flex gap-2">
               <Input
-                placeholder="Entrez un mot-clé pour générer des idées..."
+                placeholder="Entrez un mot-clé pour générer des idées (ex: SEO, marketing digital, voyage Rome)..."
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
+                onKeyPress={handleKeyPress}
                 className="flex-1"
-                onKeyPress={(e) => e.key === 'Enter' && handleGenerateIdeas()}
               />
               <Button 
                 onClick={handleGenerateIdeas}
                 disabled={isGenerating}
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-blue-600 hover:bg-blue-700 whitespace-nowrap"
               >
                 {isGenerating ? (
                   <>
-                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
+                    <div className="animate-spin -ml-1 mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
                     Génération...
                   </>
                 ) : (
@@ -162,25 +179,19 @@ const ContentIdeas = () => {
                 </div>
                 
                 {ideas.map((idea, index) => (
-                  <Card key={index} className="p-4 hover:shadow-lg transition-all duration-300">
+                  <Card key={index} className="p-4 hover:shadow-lg transition-all duration-300 hover:border-blue-200">
                     <div className="flex flex-col space-y-4">
                       <div className="flex justify-between items-start">
-                        <h3 className="text-lg font-medium flex-1">
-                          <a 
-                            href={idea.url} 
-                            target="_blank" 
-                            rel="noopener noreferrer" 
-                            className="hover:text-blue-600 transition-colors inline-flex items-center gap-2"
-                          >
+                        <h3 className="text-lg font-medium flex-1 pr-4">
+                          <span className="hover:text-blue-600 transition-colors cursor-pointer">
                             {idea.title}
-                            <ExternalLink className="h-4 w-4" />
-                          </a>
+                          </span>
                         </h3>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 flex-shrink-0">
                           <Button variant="ghost" size="sm" className="hover:text-blue-600">
                             <ThumbsUp className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="sm" className="hover:text-blue-600">
+                          <Button variant="ghost" size="sm" className="hover:text-yellow-600">
                             <Bookmark className="h-4 w-4" />
                           </Button>
                         </div>
@@ -188,17 +199,22 @@ const ContentIdeas = () => {
                       
                       <div className="flex flex-wrap gap-4 text-sm text-gray-600">
                         <div className="flex items-center gap-2">
-                          <span>{idea.visits.toLocaleString()} visites/mois</span>
+                          <span className="font-medium">{idea.visits.toLocaleString()}</span>
+                          <span>visites/mois</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span>{idea.backlinks.toLocaleString()} backlinks</span>
+                          <span className="font-medium">{idea.backlinks.toLocaleString()}</span>
+                          <span>backlinks</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span>{Object.values(idea.socialShares).reduce((a, b) => a + b, 0).toLocaleString()} partages</span>
+                          <span className="font-medium">
+                            {Object.values(idea.socialShares).reduce((a, b) => a + b, 0).toLocaleString()}
+                          </span>
+                          <span>partages sociaux</span>
                         </div>
                       </div>
 
-                      <div className="flex justify-end gap-2">
+                      <div className="flex justify-end gap-2 pt-2">
                         <Button
                           variant="outline"
                           size="sm"
@@ -212,7 +228,7 @@ const ContentIdeas = () => {
                           variant="default"
                           size="sm"
                           onClick={() => window.open(idea.url, '_blank')}
-                          className="gap-2"
+                          className="gap-2 bg-blue-600 hover:bg-blue-700"
                         >
                           <ExternalLink className="h-4 w-4" />
                           Voir l'article
@@ -225,10 +241,13 @@ const ContentIdeas = () => {
             )}
 
             {!ideas.length && !isGenerating && (
-              <div className="text-center py-12 text-gray-500">
+              <div className="text-center py-12 text-gray-500 bg-gray-50 rounded-lg">
                 <MessageSquare className="h-12 w-12 mx-auto mb-4 text-gray-300" />
                 <h3 className="text-lg font-medium mb-2">Aucune idée générée</h3>
                 <p>Entrez un mot-clé et cliquez sur "Générer des idées" pour commencer.</p>
+                <div className="mt-4 text-sm text-gray-400">
+                  <p>Exemples : "SEO", "marketing digital", "voyage Rome", "cuisine italienne"</p>
+                </div>
               </div>
             )}
           </div>
