@@ -13,7 +13,8 @@ const DashboardNavigation = () => {
   };
 
   const handleHome = () => {
-    navigate('/');
+    // Naviguer vers le vrai dashboard au lieu de /
+    navigate('/dashboard');
   };
 
   const getPageTitle = () => {
@@ -34,8 +35,10 @@ const DashboardNavigation = () => {
         return 'Idées de Contenu';
       case '/ai-writer':
         return 'Rédacteur IA';
-      case '/':
+      case '/dashboard':
         return 'Dashboard';
+      case '/':
+        return 'Accueil';
       default:
         return 'Dashboard';
     }
@@ -60,7 +63,7 @@ const DashboardNavigation = () => {
         className="flex items-center gap-2"
       >
         <Home className="h-4 w-4" />
-        Accueil
+        Dashboard
       </Button>
       
       <div className="ml-4 text-sm text-gray-600">

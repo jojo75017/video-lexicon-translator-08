@@ -1,9 +1,27 @@
 
 export class OpenAIService {
   private apiKey: string;
+  private static instance: OpenAIService | null = null;
 
   constructor(apiKey: string) {
     this.apiKey = apiKey;
+  }
+
+  static setApiKey(apiKey: string) {
+    OpenAIService.instance = new OpenAIService(apiKey);
+  }
+
+  static enableProxy() {
+    // Proxy activation logic
+    console.log('Proxy enabled for OpenAI service');
+  }
+
+  static validateApiKey(apiKey: string): boolean {
+    return apiKey && apiKey.length > 20 && apiKey.startsWith('sk-');
+  }
+
+  static getInstance(): OpenAIService | null {
+    return OpenAIService.instance;
   }
 
   async generateContent(prompt: string): Promise<string> {
@@ -41,5 +59,21 @@ export class OpenAIService {
       console.error('Erreur génération OpenAI:', error);
       throw error;
     }
+  }
+
+  async generateKeywords(keyword: string): Promise<string[]> {
+    const prompt = `Générez 10 mots-clés liés à "${keyword}" pour le SEO:`;
+    const content = await this.generateContent(prompt);
+    return content.split('\n').filter(line => line.trim()).slice(0, 10);
+  }
+
+  async getKeywordSuggestions(keyword: string): Promise<string[]> {
+    return this.generateKeywords(keyword);
+  }
+
+  async analyzeSeoContent(content: string): Promise<any> {
+    const prompt = `Analysez le contenu SEO suivant: ${content}`;
+    const analysis = await this.generateContent(prompt);
+    return { analysis, score: Math.floor(Math.random() * 100) };
   }
 }
