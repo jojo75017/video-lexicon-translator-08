@@ -76,4 +76,9 @@ export class OpenAIService {
     const analysis = await this.generateContent(prompt);
     return { analysis, score: Math.floor(Math.random() * 100) };
   }
+
+  // Instance method for validation
+  validateApiKey(apiKey: string): boolean {
+    return OpenAIService.validateApiKey(apiKey);
+  }
 }

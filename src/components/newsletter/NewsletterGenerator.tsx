@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -61,14 +60,14 @@ const NewsletterGenerator = () => {
     }
   };
 
-  const generateContentByLength = (niche: string, topics: string[], tone: string, targetWords: number) => {
+  const generateContentByLength = (selectedNiche: string, topicsArray: string[], selectedTone: string, targetWords: number) => {
     const baseContent = `Bonjour,
 
-Bienvenue dans votre newsletter ${niche} !
+Bienvenue dans votre newsletter ${selectedNiche} !
 
 ## 📚 Sujets de la semaine
 
-${topics.map(topic => `• **${topic.trim()}**: Analyse approfondie et conseils pratiques`).join('\n')}
+${topicsArray.map(topic => `• **${topic.trim()}**: Analyse approfondie et conseils pratiques`).join('\n')}
 
 ## 💡 Conseil de la semaine
 
@@ -102,14 +101,13 @@ Les professionnels qui se forment régulièrement ont 47% plus de chances de ré
 À bientôt pour la prochaine édition !`;
     }
 
-    // Long format (800 mots)
     return baseContent + `
 
 ## 🎯 Analyse approfondie
 
-### Tendances actuelles en ${niche}
+### Tendances actuelles en ${selectedNiche}
 
-Le secteur du ${niche} connaît une évolution rapide. Les dernières études montrent que les entreprises qui s'adaptent rapidement aux nouvelles tendances augmentent leur chiffre d'affaires de 35% en moyenne.
+Le secteur du ${selectedNiche} connaît une évolution rapide. Les dernières études montrent que les entreprises qui s'adaptent rapidement aux nouvelles tendances augmentent leur chiffre d'affaires de 35% en moyenne.
 
 ### Stratégies gagnantes
 
@@ -124,9 +122,9 @@ Prenons l'exemple d'une entreprise qui a réussi sa transformation. En intégran
 - Amélioré sa productivité de 45%
 - Augmenté la satisfaction client de 60%
 
-## 🔍 Focus sur ${topics[0] || 'l\'innovation'}
+## 🔍 Focus sur ${topicsArray[0] || 'l\'innovation'}
 
-L'importance de ${topics[0] || 'l\'innovation'} ne peut être sous-estimée dans le contexte actuel. Les entreprises qui négligent cet aspect risquent de perdre leur avantage concurrentiel.
+L'importance de ${topicsArray[0] || 'l\'innovation'} ne peut être sous-estimée dans le contexte actuel. Les entreprises qui négligent cet aspect risquent de perdre leur avantage concurrentiel.
 
 ### Actions concrètes à mettre en place
 
@@ -165,7 +163,6 @@ L'excellence n'est pas un accident, c'est le résultat d'un travail constant et 
     const targetWords = getWordTarget(length);
     const topicsArray = topics.split(',').filter(t => t.trim());
 
-    // Simulation de génération avec délai réaliste
     setTimeout(() => {
       const generatedContent = generateContentByLength(niche, topicsArray, tone, targetWords);
       const wordCount = generatedContent.split(' ').length;
