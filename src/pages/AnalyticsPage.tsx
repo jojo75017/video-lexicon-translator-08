@@ -3,12 +3,31 @@ import React from 'react';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CrawlForm } from '@/components/CrawlForm';
+import UrlInput from '@/components/UrlInput';
 import EnhancedAnalytics from '@/components/seo/EnhancedAnalytics';
 import DashboardNavigation from '@/components/dashboard/DashboardNavigation';
 import { BarChart2, TrendingUp, Users, Globe } from 'lucide-react';
+import { useState } from 'react';
 
 const AnalyticsPage = () => {
+  const [url, setUrl] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [showCorsWarning, setShowCorsWarning] = useState(false);
+
+  const handleAnalyze = () => {
+    setIsLoading(true);
+    setShowCorsWarning(false);
+    
+    // Simuler une analyse
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 3000);
+  };
+
+  const handleActivateProxy = () => {
+    setShowCorsWarning(false);
+  };
+
   return (
     <div>
       <DashboardNavigation />
@@ -43,7 +62,15 @@ const AnalyticsPage = () => {
                   Entrez l'URL d'un site web pour obtenir une analyse complète de ses performances, 
                   de son SEO et de son audience.
                 </p>
-                <CrawlForm />
+                
+                <UrlInput
+                  url={url}
+                  setUrl={setUrl}
+                  onAnalyze={handleAnalyze}
+                  isLoading={isLoading}
+                  showCorsWarning={showCorsWarning}
+                  handleActivateProxy={handleActivateProxy}
+                />
               </Card>
             </TabsContent>
 
