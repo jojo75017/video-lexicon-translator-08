@@ -226,7 +226,7 @@ Call-to-Action: ${newsletter.cta}`;
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-4">
       <Card className="p-6">
         <div className="flex items-center gap-2 mb-6">
           <Mail className="h-6 w-6 text-blue-500" />
@@ -293,7 +293,7 @@ Call-to-Action: ${newsletter.cta}`;
         <Button 
           onClick={generateNewsletter}
           disabled={isGenerating}
-          className="w-full md:w-auto"
+          className="w-full md:w-auto bg-blue-500 hover:bg-blue-600 text-white px-6 py-2"
         >
           {isGenerating ? (
             <>
