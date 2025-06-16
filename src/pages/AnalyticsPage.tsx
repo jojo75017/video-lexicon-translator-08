@@ -262,48 +262,6 @@ const AnalyticsPage = () => {
                   <div className="text-sm text-red-600">-5% vs mois précédent</div>
                 </Card>
               </div>
-
-              <Card className="p-6 mt-6">
-                <h3 className="text-lg font-semibold mb-4">Sources de trafic</h3>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span>Recherche organique</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-32 bg-gray-200 rounded-full h-2">
-                        <div className="bg-blue-600 h-2 rounded-full" style={{ width: '65%' }}></div>
-                      </div>
-                      <span className="text-sm font-medium">65%</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>Trafic direct</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-32 bg-gray-200 rounded-full h-2">
-                        <div className="bg-green-600 h-2 rounded-full" style={{ width: '20%' }}></div>
-                      </div>
-                      <span className="text-sm font-medium">20%</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>Réseaux sociaux</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-32 bg-gray-200 rounded-full h-2">
-                        <div className="bg-purple-600 h-2 rounded-full" style={{ width: '10%' }}></div>
-                      </div>
-                      <span className="text-sm font-medium">10%</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>Autres sources</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-32 bg-gray-200 rounded-full h-2">
-                        <div className="bg-gray-600 h-2 rounded-full" style={{ width: '5%' }}></div>
-                      </div>
-                      <span className="text-sm font-medium">5%</span>
-                    </div>
-                  </div>
-                </div>
-              </Card>
             </TabsContent>
           </Tabs>
         </div>
