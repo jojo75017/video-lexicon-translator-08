@@ -8,10 +8,18 @@ import { Link2, Globe, Search, Loader2, Network, AlertTriangle } from 'lucide-re
 import { toast } from 'sonner';
 import DashboardNavigation from '@/components/dashboard/DashboardNavigation';
 
+interface AnalysisResults {
+  totalPages: number;
+  totalLinks: number;
+  orphanedPages: number;
+  averageDepth: number;
+  recommendations: string[];
+}
+
 const InternalLinkingPage = () => {
   const [url, setUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [results, setResults] = useState<any>(null);
+  const [results, setResults] = useState<AnalysisResults | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +34,7 @@ const InternalLinkingPage = () => {
 
     // Simulation d'une analyse
     setTimeout(() => {
-      const mockData = {
+      const mockData: AnalysisResults = {
         totalPages: 25,
         totalLinks: 156,
         orphanedPages: 3,
