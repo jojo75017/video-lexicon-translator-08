@@ -1,5 +1,5 @@
 
-import type { InternalLinkAnalysis } from "@/types/seo";
+import type { InternalLinkAnalysis } from "@/types/seo/InternalLinks";
 
 /**
  * Create an empty analysis result for when analysis fails or has no data
@@ -24,6 +24,7 @@ export function createEmptyAnalysis(): InternalLinkAnalysis {
     pageMetrics: [],
     siloPagesFound: false,
     recommendations: [],
-    siloStructure: []
+    siloStructure: [],
+    linkSuggestions: []
   };
 }

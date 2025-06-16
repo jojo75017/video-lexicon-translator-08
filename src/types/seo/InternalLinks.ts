@@ -3,24 +3,28 @@
 export interface InternalLinkAnalysis {
   totalLinks?: number;
   uniquePages?: number;
-  averageLinksPerPage?: number;
+  averageLin ksPerPage?: number;
   recommendations?: InternalLinkRecommendation[];
-  pageMetrics?: PageMetric[];
+  pageMetrics?: PageLinkMetric[];
   linkDistribution?: LinkDistribution;
   orphanPages?: OrphanPage[];
   siloPagesFound?: boolean;
   siloStructure?: SiloStructure[];
+  linkDepth?: {
+    averageDepth: number;
+    maxDepth: number;
+    depthDistribution: Record<string, number>;
+  };
+  linkSuggestions?: LinkSuggestion[];
 }
 
 export interface InternalLinkRecommendation {
-  from: string;
-  to: string;
-  reason: string;
-  priority?: string;
-  type?: string;
-  description?: string;
+  type: 'add' | 'modify' | 'content' | 'pillar';
+  priority: 'high' | 'medium' | 'low';
   source?: string;
   target?: string;
+  description?: string;
+  reason: string;
 }
 
 export interface PageMetric {
@@ -33,39 +37,46 @@ export interface PageMetric {
   depth?: number;
 }
 
-export interface PageLinkMetric extends PageMetric {
+export interface PageLinkMetric {
+  url: string;
+  title?: string | null;
   incomingLinks: number;
   outgoingLinks: number;
   depth: number;
+  importance?: number;
 }
 
 export interface LinkDistribution {
-  [key: string]: number;
+  navigationLinks: number;
+  contentLinks: number;
+  footerLinks: number;
+  sidebarLinks: number;
+  otherLinks: number;
 }
 
 export interface OrphanPage {
   url: string;
-  title?: string;
+  title?: string | null;
   suggestions?: string[];
 }
 
 export interface SiloStructure {
+  name: string;
+  mainPage: string;
+  subPages: string[];
   theme: string;
   pages: string[];
 }
 
 export interface LinkSuggestion {
-  from: string;
-  to: string;
-  anchor: string;
+  sourceUrl: string;
+  sourceTitle: string;
+  targetUrl: string;
+  targetTitle: string;
+  anchorText: string;
   reason: string;
-  targetUrl?: string;
-  targetTitle?: string;
-  anchorText?: string;
-  priority?: string;
-  placement?: string;
-  sourceTitle?: string;
-  sourceUrl?: string;
-  contextualRelevance?: number;
-  seoValue?: number;
+  priority: 'high' | 'medium' | 'low';
+  contextualRelevance: number;
+  seoValue: number;
+  placement: 'header' | 'content' | 'sidebar' | 'footer';
 }
