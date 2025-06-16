@@ -1,5 +1,5 @@
 
-import { InternalLinkRecommendation, PageLinkMetric } from '@/types/seo/InternalLinks';
+import { InternalLinkRecommendation, PageLinkMetric, OrphanPage } from '@/types/seo/InternalLinks';
 
 /**
  * Generate recommendations based on the analysis
@@ -32,7 +32,7 @@ export function generateRecommendations(
 
   // Recommend improving deep pages
   pageMetrics
-    .filter(page => page.depth > 3 && page.importance > 50)
+    .filter(page => page.depth > 3 && (page.importance || 0) > 50)
     .forEach(deepPage => {
       recommendations.push({
         type: 'modify',
@@ -48,7 +48,7 @@ export function generateRecommendations(
   if (contentLinks < totalLinks * 0.3) {
     // Find pages with high importance but few outgoing links
     const highImportanceLowLinks = pageMetrics
-      .filter(p => p.importance > 70 && p.outgoingLinks < 5)
+      .filter(p => (p.importance || 0) > 70 && p.outgoingLinks < 5)
       .slice(0, 3);
       
     highImportanceLowLinks.forEach(page => {
@@ -69,7 +69,7 @@ export function generateRecommendations(
   }
 
   // Add pillar content recommendations if we have high authority pages
-  const pillarPages = pageMetrics.filter(p => p.importance > 85);
+  const pillarPages = pageMetrics.filter(p => (p.importance || 0) > 85);
   if (pillarPages.length > 0) {
     pillarPages.forEach(pillar => {
       recommendations.push({
@@ -93,7 +93,7 @@ export function generateRecommendations(
 function findRelevantSourcePages(pageMetrics: PageLinkMetric[], orphanPage: OrphanPage): PageLinkMetric[] {
   // For demo, return a couple of pages with high importance
   return pageMetrics
-    .filter(page => page.importance > 60 && page.url !== orphanPage.url)
+    .filter(page => (page.importance || 0) > 60 && page.url !== orphanPage.url)
     .slice(0, 2);
 }
 
@@ -103,7 +103,7 @@ function findRelevantSourcePages(pageMetrics: PageLinkMetric[], orphanPage: Orph
 function findShallowPage(pageMetrics: PageLinkMetric[]): PageLinkMetric {
   // Find the shallowest page with decent importance
   const shallowPages = pageMetrics
-    .filter(page => page.importance > 50)
+    .filter(page => (page.importance || 0) > 50)
     .sort((a, b) => a.depth - b.depth);
   
   return shallowPages[0] || pageMetrics[0];
@@ -117,7 +117,7 @@ function findGoodTargets(pageMetrics: PageLinkMetric[], sourcePage: PageLinkMetr
   return pageMetrics
     .filter(page => 
       page.url !== sourcePage.url &&
-      page.importance > 40 &&
+      (page.importance || 0) > 40 &&
       page.incomingLinks < 5
     )
     .slice(0, 2);
@@ -129,11 +129,4 @@ function findGoodTargets(pageMetrics: PageLinkMetric[], sourcePage: PageLinkMetr
 function truncateTitle(title: string): string {
   if (title.length <= 40) return title;
   return title.substring(0, 37) + '...';
-}
-
-// For TypeScript compatibility with existing imports
-interface OrphanPage {
-  url: string;
-  title?: string | null;
-  suggestions?: string[];
 }

@@ -24,7 +24,7 @@ const InternalLinkingPage = () => {
     setIsLoading(true);
     toast.info("Analyse du maillage interne en cours...");
 
-    // Simuler une analyse
+    // Simulation d'une analyse
     setTimeout(() => {
       const mockData = {
         totalPages: 25,
