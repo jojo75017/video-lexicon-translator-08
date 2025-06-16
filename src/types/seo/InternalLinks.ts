@@ -3,7 +3,7 @@
 export interface InternalLinkAnalysis {
   totalLinks?: number;
   uniquePages?: number;
-  averageLin ksPerPage?: number;
+  averageLinksPerPage?: number;
   recommendations?: InternalLinkRecommendation[];
   pageMetrics?: PageLinkMetric[];
   linkDistribution?: LinkDistribution;
