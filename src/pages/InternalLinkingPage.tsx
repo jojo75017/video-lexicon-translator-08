@@ -16,13 +16,13 @@ const InternalLinkingPage = () => {
   const [analysisData, setAnalysisData] = useState<any>(null);
 
   const handleAnalyze = async () => {
-    if (!siteUrl) {
+    if (!siteUrl.trim()) {
       toast.error("Veuillez entrer une URL valide");
       return;
     }
 
     // Format URL if needed
-    let formattedUrl = siteUrl;
+    let formattedUrl = siteUrl.trim();
     if (!siteUrl.startsWith('http://') && !siteUrl.startsWith('https://')) {
       formattedUrl = 'https://' + siteUrl;
     }
@@ -57,9 +57,7 @@ const InternalLinkingPage = () => {
       
     } catch (error) {
       console.error("Erreur lors de l'analyse:", error);
-      toast.error("Une erreur est survenue lors de l'analyse", {
-        description: error instanceof Error ? error.message : "Erreur inconnue"
-      });
+      toast.error("Une erreur est survenue lors de l'analyse");
       setIsAnalyzing(false);
     }
   };
@@ -112,7 +110,7 @@ const InternalLinkingPage = () => {
                         </div>
                         <Button 
                           type="submit"
-                          disabled={isAnalyzing || !siteUrl}
+                          disabled={isAnalyzing || !siteUrl.trim()}
                           className="min-w-[140px] bg-blue-600 hover:bg-blue-700"
                         >
                           {isAnalyzing ? (

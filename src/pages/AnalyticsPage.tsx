@@ -16,7 +16,7 @@ const AnalyticsPage = () => {
   const [analysisData, setAnalysisData] = useState<any>(null);
 
   const handleAnalyze = async () => {
-    if (!url) {
+    if (!url.trim()) {
       toast.error("Veuillez entrer une URL valide");
       return;
     }
@@ -79,7 +79,7 @@ const AnalyticsPage = () => {
       >
         <div className="space-y-6">
           <Tabs defaultValue="analyze" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="analyze" className="flex items-center gap-2">
                 <Globe className="h-4 w-4" />
                 Analyser un site
@@ -87,10 +87,6 @@ const AnalyticsPage = () => {
               <TabsTrigger value="performance" className="flex items-center gap-2">
                 <BarChart2 className="h-4 w-4" />
                 Performance
-              </TabsTrigger>
-              <TabsTrigger value="audience" className="flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                Audience
               </TabsTrigger>
             </TabsList>
 
@@ -123,7 +119,7 @@ const AnalyticsPage = () => {
                       </div>
                       <Button 
                         type="submit"
-                        disabled={isLoading || !url}
+                        disabled={isLoading || !url.trim()}
                         className="min-w-[140px] bg-blue-600 hover:bg-blue-700"
                       >
                         {isLoading ? (
@@ -225,43 +221,6 @@ const AnalyticsPage = () => {
                   </Card>
                 </div>
               </Card>
-            </TabsContent>
-
-            <TabsContent value="audience" className="mt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <Card className="p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Users className="h-8 w-8 text-blue-600" />
-                    <div>
-                      <h3 className="font-semibold">Visiteurs uniques</h3>
-                      <p className="text-2xl font-bold">12,458</p>
-                    </div>
-                  </div>
-                  <div className="text-sm text-green-600">+15% vs mois précédent</div>
-                </Card>
-
-                <Card className="p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <TrendingUp className="h-8 w-8 text-green-600" />
-                    <div>
-                      <h3 className="font-semibold">Pages vues</h3>
-                      <p className="text-2xl font-bold">45,231</p>
-                    </div>
-                  </div>
-                  <div className="text-sm text-green-600">+8% vs mois précédent</div>
-                </Card>
-
-                <Card className="p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <BarChart2 className="h-8 w-8 text-purple-600" />
-                    <div>
-                      <h3 className="font-semibold">Taux de rebond</h3>
-                      <p className="text-2xl font-bold">42%</p>
-                    </div>
-                  </div>
-                  <div className="text-sm text-red-600">-5% vs mois précédent</div>
-                </Card>
-              </div>
             </TabsContent>
           </Tabs>
         </div>
