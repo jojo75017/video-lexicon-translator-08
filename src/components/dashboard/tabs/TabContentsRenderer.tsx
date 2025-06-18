@@ -1,15 +1,13 @@
-import React, { useEffect, useRef } from 'react';
+
+import React from 'react';
 import { TabsContent } from "@/components/ui/tabs";
-import { Skeleton } from "@/components/ui/skeleton"; 
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, Info, LineChart } from "lucide-react";
+import { AlertCircle, Info, LineChart, Link2, Target, BarChart2, Zap, PieChart, Search, FilePenLine, CheckCircle2 } from "lucide-react";
 import HierarchyTabContent from './HierarchyTabContent';
 import SeoResults from "@/components/SeoResults";
 import { CrawlForm } from "@/components/CrawlForm";
 import { useSiteAnalyzer } from "@/hooks/useSiteAnalyzer";
 import { useNavigate } from "react-router-dom";
-import { activateSection } from '@/utils/navigationHelpers';
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
 interface TabContentsRendererProps {
@@ -18,108 +16,23 @@ interface TabContentsRendererProps {
 }
 
 const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProps) => {
-  const firstLoad = useRef(true);
   const { seoAnalysis } = useSiteAnalyzer();
   const navigate = useNavigate();
 
-  // Effet pour gérer l'affichage au premier chargement
-  useEffect(() => {
-    console.log(`TabContentsRenderer: Initialisation pour l'onglet actif ${activeTab}`);
-    
-    if (firstLoad.current) {
-      firstLoad.current = false;
-      setTimeout(() => {
-        // Activer la section appropriée
-        activateSection(activeTab);
-      }, 100);
-    }
-  }, []);
-
-  useEffect(() => {
-    console.log(`TabContentsRenderer: Active tab changed to ${activeTab}`);
-    
-    // Mise à jour de l'affichage quand l'onglet actif change
-    setTimeout(() => {
-      // Activer la section
-      activateSection(activeTab);
-
-      // Définir les redirections spéciales
-      const specialTabs = {
-        'internal-links': '/internal-linking',
-        'pinterest': '/pinterest',
-        'signature': '/signature',
-        'keyword-meta': '/keyword-meta',
-        'keyword-generator': '/keyword-generator',
-        'quora': '/quora',
-        'rankings': '/tracking'
-      };
-      
-      // Ne rediriger que si l'onglet spécial est actif et que nous sommes pas dans une boucle
-      if (activeTab in specialTabs) {
-        const redirectPath = specialTabs[activeTab as keyof typeof specialTabs];
-        const currentPath = window.location.pathname;
-        
-        if (currentPath !== redirectPath && !sessionStorage.getItem(`redirect_${activeTab}`)) {
-          console.log(`Redirecting from ${currentPath} to ${redirectPath}`);
-          
-          // Marquer cette redirection pour éviter les boucles
-          sessionStorage.setItem(`redirect_${activeTab}`, 'true');
-          
-          navigate(redirectPath);
-          
-          toast.info(`Navigation vers ${activeTab}`, {
-            description: "Chargement de la page...",
-            duration: 1500
-          });
-          
-          // Effacer le marqueur après un délai
-          setTimeout(() => {
-            sessionStorage.removeItem(`redirect_${activeTab}`);
-          }, 1000);
-        }
-      }
-    }, 100);
-  }, [activeTab, navigate, seoAnalysis]);
-
-  // Si aucun onglet n'est trouvé
-  if (!contentTabs || contentTabs.length === 0) {
-    return (
-      <Alert variant="destructive">
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Erreur</AlertTitle>
-        <AlertDescription>
-          Aucun onglet disponible. Veuillez vérifier la configuration.
-        </AlertDescription>
-      </Alert>
-    );
-  }
-
-  // Le reste du rendu des onglets
   return (
     <>
       {/* Hierarchy Tab */}
-      <TabsContent value="hierarchy" id="hierarchy" data-section="hierarchy" style={{
-        display: activeTab === "hierarchy" || window.location.pathname === '/' ? "block" : "none",
-        position: "relative" as "relative",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "auto",
-      }}>
+      <TabsContent value="hierarchy" className="space-y-4">
         <HierarchyTabContent />
       </TabsContent>
 
       {/* Word Count Tab */}
-      <TabsContent value="wordcount" id="wordcount" data-section="wordcount" style={{
-        display: activeTab === "wordcount" ? "block" : "none",
-        position: "relative" as "relative",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "auto",
-      }}>
+      <TabsContent value="wordcount" className="space-y-4">
         <div className="space-y-4">
-          <h2 className="text-xl font-bold">Analyse du nombre de mots</h2>
+          <div className="flex items-center gap-2 mb-4">
+            <BarChart2 className="h-6 w-6 text-green-600" />
+            <h2 className="text-xl font-bold">Audit de contenu</h2>
+          </div>
           <Alert>
             <Info className="h-4 w-4" />
             <AlertTitle>Analysez un site web</AlertTitle>
@@ -132,16 +45,12 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
       </TabsContent>
 
       {/* Suggestions Tab */}
-      <TabsContent value="suggestions" id="suggestions" data-section="suggestions" style={{
-        display: activeTab === "suggestions" ? "block" : "none",
-        position: "relative" as "relative",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "auto",
-      }}>
+      <TabsContent value="suggestions" className="space-y-4">
         <div className="space-y-4">
-          <h2 className="text-xl font-bold">Suggestions d'amélioration</h2>
+          <div className="flex items-center gap-2 mb-4">
+            <Search className="h-6 w-6 text-blue-600" />
+            <h2 className="text-xl font-bold">Suggestions d'amélioration</h2>
+          </div>
           <Alert>
             <Info className="h-4 w-4" />
             <AlertTitle>Analysez un site web</AlertTitle>
@@ -152,56 +61,17 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
           <CrawlForm />
         </div>
       </TabsContent>
-      
-      {/* Rankings Tab */}
-      <TabsContent value="rankings" id="rankings" data-section="rankings" style={{
-        display: activeTab === "rankings" ? "block" : "none",
-        position: "relative" as "relative",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "auto",
-      }}>
-        <div className="space-y-4">
-          <h2 className="text-xl font-bold flex items-center gap-2">
-            <LineChart className="h-5 w-5 text-purple-600" />
-            Suivi des positions
-          </h2>
-          <Alert>
-            <Info className="h-4 w-4" />
-            <AlertTitle>Suivez vos positions</AlertTitle>
-            <AlertDescription>
-              Suivez l'évolution de vos positions dans les moteurs de recherche pour vos mots-clés importants.
-            </AlertDescription>
-          </Alert>
-          
-          <div className="flex justify-center mt-6">
-            <Button 
-              onClick={() => navigate('/tracking')} 
-              className="bg-purple-600 hover:bg-purple-700 text-white"
-              size="lg"
-            >
-              <LineChart className="h-5 w-5 mr-2" />
-              Accéder au suivi des positions
-            </Button>
-          </div>
-        </div>
-      </TabsContent>
 
       {/* SEO Tab */}
-      <TabsContent value="seo" id="seo" data-section="seo" style={{
-        display: activeTab === "seo" ? "block" : "none",
-        position: "relative" as "relative",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "auto",
-      }}>
+      <TabsContent value="seo" className="space-y-4">
+        <div className="flex items-center gap-2 mb-4">
+          <Target className="h-6 w-6 text-purple-600" />
+          <h2 className="text-xl font-bold">Analyse SEO</h2>
+        </div>
         {seoAnalysis ? (
           <SeoResults seoAnalysis={seoAnalysis} />
         ) : (
           <div className="space-y-4">
-            <h2 className="text-xl font-bold">Analyse SEO</h2>
             <Alert>
               <Info className="h-4 w-4" />
               <AlertTitle>Analysez un site web</AlertTitle>
@@ -215,16 +85,12 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
       </TabsContent>
 
       {/* Structure Tab */}
-      <TabsContent value="structure" id="structure" data-section="structure" style={{
-        display: activeTab === "structure" ? "block" : "none",
-        position: "relative" as "relative",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "auto",
-      }}>
+      <TabsContent value="structure" className="space-y-4">
         <div className="space-y-4">
-          <h2 className="text-xl font-bold">Structure du site</h2>
+          <div className="flex items-center gap-2 mb-4">
+            <BarChart2 className="h-6 w-6 text-amber-600" />
+            <h2 className="text-xl font-bold">Structure du site</h2>
+          </div>
           <Alert>
             <Info className="h-4 w-4" />
             <AlertTitle>Analysez un site web</AlertTitle>
@@ -237,16 +103,12 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
       </TabsContent>
 
       {/* Backlinks Tab */}
-      <TabsContent value="backlinks" id="backlinks" data-section="backlinks" style={{
-        display: activeTab === "backlinks" ? "block" : "none",
-        position: "relative" as "relative",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "auto",
-      }}>
+      <TabsContent value="backlinks" className="space-y-4">
         <div className="space-y-4">
-          <h2 className="text-xl font-bold">Analyse des backlinks</h2>
+          <div className="flex items-center gap-2 mb-4">
+            <Link2 className="h-6 w-6 text-purple-600" />
+            <h2 className="text-xl font-bold">Analyse des backlinks</h2>
+          </div>
           <Alert>
             <Info className="h-4 w-4" />
             <AlertTitle>Analysez un site web</AlertTitle>
@@ -259,16 +121,12 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
       </TabsContent>
 
       {/* Performance Tab */}
-      <TabsContent value="performance" id="performance" data-section="performance" style={{
-        display: activeTab === "performance" ? "block" : "none",
-        position: "relative" as "relative",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "auto",
-      }}>
+      <TabsContent value="performance" className="space-y-4">
         <div className="space-y-4">
-          <h2 className="text-xl font-bold">Performance</h2>
+          <div className="flex items-center gap-2 mb-4">
+            <Zap className="h-6 w-6 text-amber-600" />
+            <h2 className="text-xl font-bold">Performance</h2>
+          </div>
           <Alert>
             <Info className="h-4 w-4" />
             <AlertTitle>Analysez un site web</AlertTitle>
@@ -281,16 +139,12 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
       </TabsContent>
 
       {/* Metrics Tab */}
-      <TabsContent value="metrics" id="metrics" data-section="metrics" style={{
-        display: activeTab === "metrics" ? "block" : "none",
-        position: "relative" as "relative",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "auto",
-      }}>
+      <TabsContent value="metrics" className="space-y-4">
         <div className="space-y-4">
-          <h2 className="text-xl font-bold">Métriques</h2>
+          <div className="flex items-center gap-2 mb-4">
+            <LineChart className="h-6 w-6 text-amber-600" />
+            <h2 className="text-xl font-bold">Métriques</h2>
+          </div>
           <Alert>
             <Info className="h-4 w-4" />
             <AlertTitle>Analysez un site web</AlertTitle>
@@ -303,16 +157,12 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
       </TabsContent>
 
       {/* Analytics Tab */}
-      <TabsContent value="analytics" id="analytics" data-section="analytics" style={{
-        display: activeTab === "analytics" ? "block" : "none",
-        position: "relative" as "relative",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "auto",
-      }}>
+      <TabsContent value="analytics" className="space-y-4">
         <div className="space-y-4">
-          <h2 className="text-xl font-bold">Analytics</h2>
+          <div className="flex items-center gap-2 mb-4">
+            <PieChart className="h-6 w-6 text-emerald-600" />
+            <h2 className="text-xl font-bold">Analytics</h2>
+          </div>
           <Alert>
             <Info className="h-4 w-4" />
             <AlertTitle>Analysez un site web</AlertTitle>
@@ -323,22 +173,174 @@ const TabContentsRenderer = ({ contentTabs, activeTab }: TabContentsRendererProp
           <CrawlForm />
         </div>
       </TabsContent>
-      
-      {/* Fallback for any other tab */}
-      {contentTabs
-        .filter(tab => !['hierarchy', 'wordcount', 'suggestions', 'seo', 'structure', 'backlinks', 'performance', 'metrics', 'analytics', 'keyword-meta', 'internal-links', 'rankings'].includes(tab.id))
-        .map(tab => (
-          <TabsContent key={tab.id} value={tab.id} id={tab.id} data-section={tab.id} style={{
-            display: activeTab === tab.id ? "block" : "none",
-            position: "relative" as "relative",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "auto",
-          }}>
-            <Skeleton className="h-[200px] w-full rounded-md" />
-          </TabsContent>
-        ))}
+
+      {/* Internal Links Tab */}
+      <TabsContent value="internal-links" className="space-y-4">
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-4">
+            <Link2 className="h-6 w-6 text-orange-600" />
+            <h2 className="text-xl font-bold">Liens internes</h2>
+          </div>
+          <Alert>
+            <Info className="h-4 w-4" />
+            <AlertTitle>Optimisez votre maillage interne</AlertTitle>
+            <AlertDescription>
+              Analysez et améliorez la structure de liens internes de votre site web.
+            </AlertDescription>
+          </Alert>
+          
+          <div className="flex justify-center mt-6">
+            <Button 
+              onClick={() => navigate('/internal-linking')} 
+              className="bg-orange-600 hover:bg-orange-700 text-white"
+              size="lg"
+            >
+              <Link2 className="h-5 w-5 mr-2" />
+              Accéder à l'analyse des liens internes
+            </Button>
+          </div>
+        </div>
+      </TabsContent>
+
+      {/* Keyword Meta Tab */}
+      <TabsContent value="keyword-meta" className="space-y-4">
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-4">
+            <Target className="h-6 w-6 text-cyan-600" />
+            <h2 className="text-xl font-bold">Titles & Meta</h2>
+          </div>
+          <Alert>
+            <Info className="h-4 w-4" />
+            <AlertTitle>Optimisez vos balises</AlertTitle>
+            <AlertDescription>
+              Optimisez vos balises title et meta descriptions pour améliorer votre SEO.
+            </AlertDescription>
+          </Alert>
+          
+          <div className="flex justify-center mt-6">
+            <Button 
+              onClick={() => navigate('/keyword-meta')} 
+              className="bg-cyan-600 hover:bg-cyan-700 text-white"
+              size="lg"
+            >
+              <Target className="h-5 w-5 mr-2" />
+              Accéder à l'optimisation des balises
+            </Button>
+          </div>
+        </div>
+      </TabsContent>
+
+      {/* Keyword Generator Tab */}
+      <TabsContent value="keyword-generator" className="space-y-4">
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-4">
+            <Search className="h-6 w-6 text-emerald-600" />
+            <h2 className="text-xl font-bold">Générateur de mots-clés</h2>
+          </div>
+          <Alert>
+            <Info className="h-4 w-4" />
+            <AlertTitle>Découvrez de nouveaux mots-clés</AlertTitle>
+            <AlertDescription>
+              Générez des mots-clés pertinents pour améliorer votre stratégie SEO.
+            </AlertDescription>
+          </Alert>
+          
+          <div className="flex justify-center mt-6">
+            <Button 
+              onClick={() => navigate('/keyword-generator')} 
+              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+              size="lg"
+            >
+              <Search className="h-5 w-5 mr-2" />
+              Accéder au générateur de mots-clés
+            </Button>
+          </div>
+        </div>
+      </TabsContent>
+
+      {/* Quora Tab */}
+      <TabsContent value="quora" className="space-y-4">
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-4">
+            <CheckCircle2 className="h-6 w-6 text-red-600" />
+            <h2 className="text-xl font-bold">Quora & Forums</h2>
+          </div>
+          <Alert>
+            <Info className="h-4 w-4" />
+            <AlertTitle>Réponses optimisées</AlertTitle>
+            <AlertDescription>
+              Générez des réponses optimisées pour Quora et autres forums.
+            </AlertDescription>
+          </Alert>
+          
+          <div className="flex justify-center mt-6">
+            <Button 
+              onClick={() => navigate('/quora')} 
+              className="bg-red-600 hover:bg-red-700 text-white"
+              size="lg"
+            >
+              <CheckCircle2 className="h-5 w-5 mr-2" />
+              Accéder à l'outil Quora
+            </Button>
+          </div>
+        </div>
+      </TabsContent>
+
+      {/* Signature Tab */}
+      <TabsContent value="signature" className="space-y-4">
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-4">
+            <FilePenLine className="h-6 w-6 text-blue-600" />
+            <h2 className="text-xl font-bold">Signature Email</h2>
+          </div>
+          <Alert>
+            <Info className="h-4 w-4" />
+            <AlertTitle>Créez votre signature</AlertTitle>
+            <AlertDescription>
+              Créez une signature email professionnelle et personnalisée.
+            </AlertDescription>
+          </Alert>
+          
+          <div className="flex justify-center mt-6">
+            <Button 
+              onClick={() => navigate('/signature')} 
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+              size="lg"
+            >
+              <FilePenLine className="h-5 w-5 mr-2" />
+              Accéder au générateur de signature
+            </Button>
+          </div>
+        </div>
+      </TabsContent>
+
+      {/* Pinterest Tab */}
+      <TabsContent value="pinterest" className="space-y-4">
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-4">
+            <FilePenLine className="h-6 w-6 text-red-600" />
+            <h2 className="text-xl font-bold">Pinterest</h2>
+          </div>
+          <Alert>
+            <Info className="h-4 w-4" />
+            <AlertTitle>Générateur Pinterest</AlertTitle>
+            <AlertDescription>
+              Créez des images optimisées pour Pinterest avec des descriptions engageantes.
+            </AlertDescription>
+          </Alert>
+          
+          <div className="flex justify-center mt-6">
+            <Button 
+              onClick={() => navigate('/pinterest')} 
+              className="bg-red-600 hover:bg-red-700 text-white"
+              size="lg"
+            >
+              <FilePenLine className="h-5 w-5 mr-2" />
+              Accéder au générateur Pinterest
+            </Button>
+          </div>
+        </div>
+      </TabsContent>
     </>
   );
 };

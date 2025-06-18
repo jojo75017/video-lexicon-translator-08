@@ -31,6 +31,22 @@ export interface Performance extends PerformanceData {}
 export interface MobileAnalysis {
   isMobileFriendly: boolean;
   mobileScore: number;
+  score: number; // Ajout du score manquant
   issues: string[];
   recommendations: string[];
+}
+
+export interface RoiParameters {
+  seoInvestment: number;
+  acquisitionCost: number;
+  conversionRate: number;
+  averageOrderValue: number;
+  organicTraffic: number;
+  timeFrame: number;
+  targetKeywords: string[];
+  averagePosition: number;
+  clickThroughRate: number;
+  contentCost: number;
+  linkBuildingCost: number;
+  technicalSeoHours: number;
 }
