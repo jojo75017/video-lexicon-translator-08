@@ -9,7 +9,8 @@ import {
   BarChart, 
   Link,
   Settings,
-  PieChart
+  PieChart,
+  Monitor
 } from 'lucide-react';
 
 const HomePage = () => {
@@ -17,9 +18,9 @@ const HomePage = () => {
 
   const features = [
     {
-      title: 'Dashboard',
-      description: 'Accédez au tableau de bord principal',
-      icon: BarChart,
+      title: 'Dashboard Principal',
+      description: 'Accédez au tableau de bord complet',
+      icon: Monitor,
       path: '/dashboard',
       color: 'text-blue-600'
     },
@@ -57,7 +58,7 @@ const HomePage = () => {
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow-sm border-b">
         <div className="container mx-auto px-6 py-4">
-          <h1 className="text-2xl font-bold text-gray-900">SEO Dashboard</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Plateforme SEO</h1>
         </div>
       </header>
       
