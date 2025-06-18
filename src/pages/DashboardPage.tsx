@@ -4,6 +4,7 @@ import { Tabs } from "@/components/ui/tabs";
 import TabNavigation from '@/components/dashboard/TabNavigation';
 import TabContentsRenderer from '@/components/dashboard/tabs/TabContentsRenderer';
 import { useTabNavigation } from '@/hooks/useTabNavigation';
+import DashboardHeader from '@/components/dashboard/DashboardHeader';
 
 const DashboardPage = () => {
   const { activeTab, contentTabs, handleTabChange } = useTabNavigation();
@@ -17,6 +18,8 @@ const DashboardPage = () => {
       </header>
       
       <div className="container mx-auto p-6">
+        <DashboardHeader />
+        
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           <TabNavigation />
           <TabContentsRenderer 

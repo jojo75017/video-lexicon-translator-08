@@ -31,9 +31,31 @@ export interface Performance extends PerformanceData {}
 export interface MobileAnalysis {
   isMobileFriendly: boolean;
   mobileScore: number;
-  score: number; // Ajout du score manquant
+  score: number;
   issues: string[];
   recommendations: string[];
+}
+
+export interface VoiceSearchData {
+  keyword: string;
+  isVoiceOptimized: boolean;
+  questionFormat: string;
+  conversationalVariants: string[];
+  avgQuestionLength: number;
+  featuredSnippetChance: number;
+  voiceScore: number;
+  naturalLanguageQueries: string[];
+  conversationalKeywords: string[];
+}
+
+export interface MobileOptimization extends MobileAnalysis {
+  keyword: string;
+  mobileVolume: number;
+  mobilevsDesktop: number;
+  localSearchIntent: boolean;
+  voiceSearchCompatible: boolean;
+  mobileCompetition: number;
+  quickAnswerFormat: string;
 }
 
 export interface RoiParameters {
