@@ -8,6 +8,10 @@ import KeywordGuideComplete from '@/pages/KeywordGuideComplete';
 import FreshInternalLinksPage from '@/pages/FreshInternalLinksPage';
 import AnalyticsPage from '@/pages/AnalyticsPage';
 import DashboardPage from '@/pages/DashboardPage';
+import PinterestPage from '@/pages/PinterestPage';
+import SignaturePage from '@/pages/SignaturePage';
+import QuoraPage from '@/pages/QuoraPage';
+import KeywordMetaPage from '@/pages/KeywordMetaPage';
 
 const AppRouter: React.FC = () => {
   return (
@@ -21,6 +25,10 @@ const AppRouter: React.FC = () => {
         <Route path="/keyword-analysis" element={<KeywordPage />} />
         <Route path="/keyword-generator" element={<KeywordGeneratorPage />} />
         <Route path="/keyword-guide-complete" element={<KeywordGuideComplete />} />
+        <Route path="/pinterest" element={<PinterestPage />} />
+        <Route path="/signature" element={<SignaturePage />} />
+        <Route path="/quora" element={<QuoraPage />} />
+        <Route path="/keyword-meta" element={<KeywordMetaPage />} />
         <Route path="*" element={<HomePage />} />
       </Routes>
     </Router>

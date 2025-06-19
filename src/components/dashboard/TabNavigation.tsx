@@ -37,37 +37,35 @@ const TabNavigation = () => {
   const handleTabChange = (value: string) => {
     console.log(`Tab changed to: ${value}`);
     
-    // Mapping des onglets aux routes - navigation interne au dashboard
-    const tabActions: Record<string, () => void> = {
-      'hierarchy': () => {/* Affichage du contenu hiérarchie dans le dashboard */},
-      'wordcount': () => {/* Affichage du contenu audit dans le dashboard */},
-      'seo': () => {/* Affichage du contenu SEO dans le dashboard */},
-      'structure': () => {/* Affichage du contenu structure dans le dashboard */},
-      'performance': () => {/* Affichage du contenu performance dans le dashboard */},
-      'analytics': () => {/* Affichage du contenu analytics dans le dashboard */},
-      'suggestions': () => {/* Affichage du contenu suggestions dans le dashboard */},
-      'backlinks': () => {/* Affichage du contenu backlinks dans le dashboard */},
-      'metrics': () => {/* Affichage du contenu métriques dans le dashboard */},
-      'quora': () => navigate('/quora'),
-      'signature': () => navigate('/signature'),
-      'pinterest': () => navigate('/pinterest'),
-      'keyword-meta': () => navigate('/keyword-meta'),
-      'internal-links': () => navigate('/internal-linking'),
-      'keyword-generator': () => navigate('/keyword-generator'),
-      'keyword-analysis': () => navigate('/keyword-analysis')
+    // Mapping des onglets aux routes
+    const tabToRouteMap: Record<string, string> = {
+      'hierarchy': '/dashboard',
+      'wordcount': '/wordcount',
+      'seo': '/seo',
+      'structure': '/structure',
+      'performance': '/performance',
+      'analytics': '/analytics',
+      'suggestions': '/suggestions',
+      'backlinks': '/backlinks',
+      'metrics': '/metrics',
+      'quora': '/quora',
+      'signature': '/signature',
+      'pinterest': '/pinterest',
+      'keyword-meta': '/keyword-meta',
+      'internal-links': '/internal-linking',
+      'keyword-generator': '/keyword-generator',
+      'keyword-analysis': '/keyword-analysis'
     };
     
-    // Exécuter l'action correspondante
-    if (tabActions[value]) {
-      tabActions[value]();
+    // Navigation vers la route correspondante
+    if (tabToRouteMap[value]) {
+      navigate(tabToRouteMap[value]);
       
-      // Notification pour les navigations externes
-      if (['quora', 'signature', 'pinterest', 'keyword-meta', 'internal-links', 'keyword-generator', 'keyword-analysis'].includes(value)) {
-        toast.info(`Navigation vers ${value}`, {
-          description: "Chargement de la page...",
-          duration: 1500
-        });
-      }
+      // Notification visuelle du changement d'onglet
+      toast.info(`Navigation vers ${value}`, {
+        description: "Chargement de la page...",
+        duration: 1500
+      });
     }
   };
 
