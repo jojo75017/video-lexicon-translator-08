@@ -12,6 +12,14 @@ import PinterestPage from '@/pages/PinterestPage';
 import SignaturePage from '@/pages/SignaturePage';
 import QuoraPage from '@/pages/QuoraPage';
 import KeywordMetaPage from '@/pages/KeywordMetaPage';
+import StructurePage from '@/pages/StructurePage';
+import PerformancePage from '@/pages/PerformancePage';
+import MetricsPage from '@/pages/MetricsPage';
+import SuggestionsPage from '@/pages/SuggestionsPage';
+import WordCountPage from '@/pages/WordCountPage';
+import SeoPage from '@/pages/SeoPage';
+import HierarchyPage from '@/pages/HierarchyPage';
+import OutilsSeoPage from '@/pages/OutilsSeoPage';
 
 const AppRouter: React.FC = () => {
   return (
@@ -19,6 +27,13 @@ const AppRouter: React.FC = () => {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/hierarchy" element={<HierarchyPage />} />
+        <Route path="/wordcount" element={<WordCountPage />} />
+        <Route path="/suggestions" element={<SuggestionsPage />} />
+        <Route path="/seo" element={<SeoPage />} />
+        <Route path="/structure" element={<StructurePage />} />
+        <Route path="/performance" element={<PerformancePage />} />
+        <Route path="/metrics" element={<MetricsPage />} />
         <Route path="/analytics" element={<AnalyticsPage />} />
         <Route path="/internal-linking" element={<FreshInternalLinksPage />} />
         <Route path="/internal-links" element={<FreshInternalLinksPage />} />
@@ -29,6 +44,7 @@ const AppRouter: React.FC = () => {
         <Route path="/signature" element={<SignaturePage />} />
         <Route path="/quora" element={<QuoraPage />} />
         <Route path="/keyword-meta" element={<KeywordMetaPage />} />
+        <Route path="/outils-seo" element={<OutilsSeoPage />} />
         <Route path="*" element={<HomePage />} />
       </Routes>
     </Router>

@@ -14,13 +14,13 @@ const TabNavigation = () => {
     '/dashboard': 'hierarchy',
     '/hierarchy': 'hierarchy',
     '/wordcount': 'wordcount',
+    '/suggestions': 'suggestions',
     '/seo': 'seo',
     '/structure': 'structure',
     '/performance': 'performance',
-    '/analytics': 'analytics',
-    '/suggestions': 'suggestions',
-    '/backlinks': 'backlinks',
     '/metrics': 'metrics',
+    '/analytics': 'analytics',
+    '/backlinks': 'backlinks',
     '/quora': 'quora',
     '/signature': 'signature',
     '/pinterest': 'pinterest',
@@ -41,13 +41,13 @@ const TabNavigation = () => {
     const tabToRouteMap: Record<string, string> = {
       'hierarchy': '/dashboard',
       'wordcount': '/wordcount',
+      'suggestions': '/suggestions',
       'seo': '/seo',
       'structure': '/structure',
       'performance': '/performance',
-      'analytics': '/analytics',
-      'suggestions': '/suggestions',
-      'backlinks': '/backlinks',
       'metrics': '/metrics',
+      'analytics': '/analytics',
+      'backlinks': '/seo',
       'quora': '/quora',
       'signature': '/signature',
       'pinterest': '/pinterest',
@@ -109,7 +109,10 @@ const TabNavigation = () => {
                 Titles & Meta
               </TabsTrigger>
               <TabsTrigger value="keyword-generator" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white hover:bg-gray-100">
-                Générateur
+                Générateur KW
+              </TabsTrigger>
+              <TabsTrigger value="keyword-analysis" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white hover:bg-gray-100">
+                Analyse KW
               </TabsTrigger>
               <TabsTrigger value="quora" className="data-[state=active]:bg-red-600 data-[state=active]:text-white hover:bg-gray-100">
                 Quora

@@ -72,3 +72,11 @@ export interface RoiParameters {
   linkBuildingCost: number;
   technicalSeoHours: number;
 }
+
+export interface RoiResults {
+  roi: number;
+  totalRevenue: number;
+  totalCost: number;
+  monthlyRevenue: number;
+  paybackPeriod: number;
+}
