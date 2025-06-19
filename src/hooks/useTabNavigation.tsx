@@ -14,7 +14,6 @@ export const useTabNavigation = () => {
   const location = useLocation();
   const currentPath = location.pathname;
   
-  // Mapping des routes vers les onglets
   const pathToTabMap: Record<string, string> = {
     '/': 'hierarchy',
     '/dashboard': 'hierarchy',
@@ -37,7 +36,6 @@ export const useTabNavigation = () => {
   
   const [activeTab, setActiveTab] = useState<string>(pathToTabMap[currentPath] || 'hierarchy');
   
-  // Mettre à jour l'onglet actif quand l'URL change
   useEffect(() => {
     const newTab = pathToTabMap[currentPath] || 'hierarchy';
     setActiveTab(newTab);

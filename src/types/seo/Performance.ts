@@ -80,3 +80,36 @@ export interface RoiResults {
   monthlyRevenue: number;
   paybackPeriod: number;
 }
+
+export interface KeywordSuggestion {
+  keyword: string;
+  volume?: number;
+  difficulty?: number;
+  cpc?: number;
+}
+
+export interface GeneratedContent {
+  title: string;
+  intro: string;
+  sections: Array<{
+    heading: string;
+    content: string;
+  }>;
+}
+
+export interface PageStructure {
+  title: string;
+  h1: string[];
+  h2: string[];
+  h3: string[];
+  images: number;
+  links: number;
+  optimizationStatus?: string;
+}
+
+export interface MetaTagsAnalysis {
+  hasTitle: boolean;
+  hasDescription: boolean;
+  hasDescriptionTag: boolean;
+  hasOpenGraphTags: boolean;
+}
