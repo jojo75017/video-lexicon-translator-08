@@ -14,53 +14,35 @@ export const useTabNavigation = () => {
   const location = useLocation();
   const currentPath = location.pathname;
   
-  // Déterminer l'onglet actif basé sur le chemin actuel
-  const determineActiveTab = (): string => {
-    console.log("Navigation: chemin actuel:", currentPath);
-    
-    const pathToTabMap: Record<string, string> = {
-      '/': 'hierarchy',
-      '/dashboard': 'hierarchy',
-      '/hierarchy': 'hierarchy',
-      '/wordcount': 'wordcount',
-      '/suggestions': 'suggestions',
-      '/seo': 'seo',
-      '/structure': 'structure',
-      '/performance': 'performance',
-      '/metrics': 'metrics',
-      '/analytics': 'analytics',
-      '/quora': 'quora',
-      '/signature': 'signature',
-      '/pinterest': 'pinterest',
-      '/keyword-generator': 'keyword-generator',
-      '/keyword-meta': 'keyword-meta',
-      '/keyword-analysis': 'keyword-analysis',
-      '/internal-linking': 'internal-links'
-    };
-    
-    const activeTab = pathToTabMap[currentPath] || 'hierarchy';
-    console.log("Navigation: onglet actif déterminé:", activeTab);
-    return activeTab;
+  // Mapping des routes vers les onglets
+  const pathToTabMap: Record<string, string> = {
+    '/': 'hierarchy',
+    '/dashboard': 'hierarchy',
+    '/hierarchy': 'hierarchy',
+    '/wordcount': 'wordcount',
+    '/suggestions': 'suggestions',
+    '/seo': 'seo',
+    '/structure': 'structure',
+    '/performance': 'performance',
+    '/metrics': 'metrics',
+    '/analytics': 'analytics',
+    '/quora': 'quora',
+    '/signature': 'signature',
+    '/pinterest': 'pinterest',
+    '/keyword-generator': 'keyword-generator',
+    '/keyword-meta': 'keyword-meta',
+    '/keyword-analysis': 'keyword-analysis',
+    '/internal-linking': 'internal-links'
   };
   
-  const [activeTab, setActiveTab] = useState<string>(determineActiveTab());
+  const [activeTab, setActiveTab] = useState<string>(pathToTabMap[currentPath] || 'hierarchy');
   
-  // Mettre à jour l'onglet actif lorsque le chemin change
+  // Mettre à jour l'onglet actif quand l'URL change
   useEffect(() => {
-    const newActiveTab = determineActiveTab();
-    console.log("Navigation: mise à jour de l'onglet actif:", newActiveTab);
-    setActiveTab(newActiveTab);
+    const newTab = pathToTabMap[currentPath] || 'hierarchy';
+    setActiveTab(newTab);
   }, [currentPath]);
   
-  // Définir les catégories principales avec les chemins de navigation
-  const mainTabs: MainTab[] = [
-    {id: 'content', label: 'Contenu', color: 'border-blue-600', path: '/dashboard'},
-    {id: 'seo', label: 'SEO', color: 'border-purple-600', path: '/seo'},
-    {id: 'performance', label: 'Performance', color: 'border-amber-600', path: '/performance'},
-    {id: 'analytics', label: 'Analytics', color: 'border-emerald-600', path: '/analytics'}
-  ];
-  
-  // Tous les onglets disponibles
   const contentTabs = [
     {id: 'hierarchy', label: 'Hiérarchie'},
     {id: 'wordcount', label: 'Audit contenu'},
@@ -74,19 +56,11 @@ export const useTabNavigation = () => {
     {id: 'quora', label: 'Quora'}
   ];
   
-  // Gérer la sélection d'onglet avec navigation vers les pages dédiées
   const handleTabChange = (value: string) => {
-    console.log(`Changement d'onglet vers: ${value}`);
-    
-    // Ne pas continuer si c'est déjà l'onglet actif
-    if (value === activeTab) {
-      console.log('Onglet déjà actif, aucune action nécessaire');
-      return;
-    }
+    if (value === activeTab) return;
     
     setActiveTab(value);
     
-    // Navigation vers les pages dédiées
     const tabPaths: Record<string, string> = {
       'hierarchy': '/dashboard',
       'wordcount': '/wordcount',
@@ -106,9 +80,7 @@ export const useTabNavigation = () => {
     };
     
     if (tabPaths[value]) {
-      console.log(`Navigation vers le chemin: ${tabPaths[value]}`);
       navigate(tabPaths[value]);
-      return;
     }
   };
 
