@@ -25,7 +25,7 @@ const AppRouter: React.FC = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route path="/" element={<DashboardPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/hierarchy" element={<HierarchyPage />} />
         <Route path="/wordcount" element={<WordCountPage />} />
@@ -45,7 +45,8 @@ const AppRouter: React.FC = () => {
         <Route path="/quora" element={<QuoraPage />} />
         <Route path="/keyword-meta" element={<KeywordMetaPage />} />
         <Route path="/outils-seo" element={<OutilsSeoPage />} />
-        <Route path="*" element={<HomePage />} />
+        <Route path="/home" element={<HomePage />} />
+        <Route path="*" element={<DashboardPage />} />
       </Routes>
     </Router>
   );
