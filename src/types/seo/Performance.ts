@@ -15,6 +15,9 @@ export interface PerformanceData {
   impressions?: number;
   clickThroughRate?: number;
   imageCount?: number;
+  cls?: number;
+  fid?: number;
+  recommendations?: string[];
   resourceBreakdown: {
     js?: number;
     css?: number;
@@ -34,6 +37,13 @@ export interface MobileAnalysis {
   score: number;
   issues: string[];
   recommendations: string[];
+}
+
+export interface MetaTagsAnalysis {
+  hasTitle: boolean;
+  hasDescription: boolean;
+  hasDescriptionTag: boolean;
+  hasOpenGraphTags: boolean;
 }
 
 export interface VoiceSearchData {
@@ -105,11 +115,4 @@ export interface PageStructure {
   images: number;
   links: number;
   optimizationStatus?: string;
-}
-
-export interface MetaTagsAnalysis {
-  hasTitle: boolean;
-  hasDescription: boolean;
-  hasDescriptionTag: boolean;
-  hasOpenGraphTags: boolean;
 }

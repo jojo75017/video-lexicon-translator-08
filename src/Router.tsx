@@ -20,12 +20,13 @@ import WordCountPage from '@/pages/WordCountPage';
 import SeoPage from '@/pages/SeoPage';
 import HierarchyPage from '@/pages/HierarchyPage';
 import OutilsSeoPage from '@/pages/OutilsSeoPage';
+import VideoLexiconTranslatorPage from '@/pages/VideoLexiconTranslatorPage';
 
 const AppRouter: React.FC = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<DashboardPage />} />
+        <Route path="/" element={<VideoLexiconTranslatorPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/hierarchy" element={<HierarchyPage />} />
         <Route path="/wordcount" element={<WordCountPage />} />
@@ -46,7 +47,7 @@ const AppRouter: React.FC = () => {
         <Route path="/keyword-meta" element={<KeywordMetaPage />} />
         <Route path="/outils-seo" element={<OutilsSeoPage />} />
         <Route path="/home" element={<HomePage />} />
-        <Route path="*" element={<DashboardPage />} />
+        <Route path="*" element={<VideoLexiconTranslatorPage />} />
       </Routes>
     </Router>
   );
