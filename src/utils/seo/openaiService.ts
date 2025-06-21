@@ -1,30 +1,25 @@
 
 export class OpenAIService {
   private apiKey: string;
-  private static instance: OpenAIService | null = null;
-
+  
   constructor(apiKey: string) {
     this.apiKey = apiKey;
   }
-
-  static setApiKey(apiKey: string) {
-    OpenAIService.instance = new OpenAIService(apiKey);
+  
+  async validateApiKey(): Promise<boolean> {
+    try {
+      const response = await fetch('https://api.openai.com/v1/models', {
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+        },
+      });
+      return response.ok;
+    } catch (error) {
+      return false;
+    }
   }
-
-  static enableProxy() {
-    // Proxy activation logic
-    console.log('Proxy enabled for OpenAI service');
-  }
-
-  static validateApiKey(apiKey: string): boolean {
-    return apiKey && apiKey.length > 20 && apiKey.startsWith('sk-');
-  }
-
-  static getInstance(): OpenAIService | null {
-    return OpenAIService.instance;
-  }
-
-  async generateContent(prompt: string): Promise<string> {
+  
+  async generateKeywords(baseKeyword: string): Promise<string[]> {
     try {
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -33,52 +28,36 @@ export class OpenAIService {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-4.1-2025-04-14',
           messages: [
             {
               role: 'system',
-              content: 'Vous êtes un rédacteur expert. Rédigez toujours du contenu cohérent et pertinent par rapport au sujet demandé.'
+              content: 'Tu es un expert SEO. Génère une liste de mots-clés pertinents et variés en français basés sur le mot-clé principal fourni.'
             },
             {
               role: 'user',
-              content: prompt
+              content: `Génère 15 mots-clés pertinents en français pour "${baseKeyword}". Inclus des variations longue traîne, des questions, et des termes commerciaux. Retourne uniquement la liste séparée par des virgules.`
             }
           ],
+          max_tokens: 500,
           temperature: 0.7,
-          max_tokens: 2000
         }),
       });
 
       if (!response.ok) {
-        throw new Error(`Erreur OpenAI: ${response.status}`);
+        throw new Error('Erreur API OpenAI');
       }
 
       const data = await response.json();
-      return data.choices[0].message.content;
+      const content = data.choices[0]?.message?.content || '';
+      
+      return content
+        .split(',')
+        .map((kw: string) => kw.trim())
+        .filter((kw: string) => kw.length > 0);
     } catch (error) {
-      console.error('Erreur génération OpenAI:', error);
-      throw error;
+      console.error('Erreur lors de la génération de mots-clés:', error);
+      return [];
     }
-  }
-
-  async generateKeywords(keyword: string): Promise<string[]> {
-    const prompt = `Générez 10 mots-clés liés à "${keyword}" pour le SEO:`;
-    const content = await this.generateContent(prompt);
-    return content.split('\n').filter(line => line.trim()).slice(0, 10);
-  }
-
-  async getKeywordSuggestions(keyword: string): Promise<string[]> {
-    return this.generateKeywords(keyword);
-  }
-
-  async analyzeSeoContent(content: string): Promise<any> {
-    const prompt = `Analysez le contenu SEO suivant: ${content}`;
-    const analysis = await this.generateContent(prompt);
-    return { analysis, score: Math.floor(Math.random() * 100) };
-  }
-
-  // Instance method for validation
-  validateApiKey(apiKey: string): boolean {
-    return OpenAIService.validateApiKey(apiKey);
   }
 }
