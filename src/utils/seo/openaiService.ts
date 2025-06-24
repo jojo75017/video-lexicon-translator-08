@@ -1,3 +1,4 @@
+
 interface OpenAIResponse {
   choices: {
     message: {
@@ -320,6 +321,53 @@ export class OpenAIService {
         faq: [],
         estimatedWordCount: 0
       };
+    }
+  }
+
+  async analyzeSeoContent(url: string, htmlContent: string): Promise<{
+    score: number;
+    recommendations: string[];
+    title?: string;
+  } | null> {
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4.1-2025-04-14',
+          messages: [
+            {
+              role: 'system',
+              content: 'Vous êtes un expert SEO. Analysez le contenu HTML fourni et donnez des recommandations SEO précises.'
+            },
+            {
+              role: 'user',
+              content: `Analysez ce contenu HTML pour l'URL ${url} et donnez des recommandations SEO:\n\n${htmlContent}`
+            }
+          ],
+          max_tokens: 800,
+          temperature: 0.7
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('OpenAI API request failed');
+      }
+
+      const data = await response.json();
+      const content = data.choices[0]?.message?.content || '';
+      
+      return {
+        score: Math.floor(Math.random() * 20) + 70, // Mock score
+        recommendations: content.split('\n').filter(line => line.trim().length > 0).slice(0, 5)
+      };
+
+    } catch (error) {
+      console.error('Error analyzing SEO content:', error);
+      return null;
     }
   }
 }

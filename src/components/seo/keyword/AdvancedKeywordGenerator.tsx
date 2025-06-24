@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Target, BarChart3, MessageSquare, FileText, HelpCircle, 
   TrendingUp, Users, Network, AlertTriangle, Search, PenTool,
-  MapPin, Activity, Lightbulb, Key, BookOpen
+  MapPin, Activity, Lightbulb, Key, BookOpen, Globe
 } from "lucide-react";
 import { toast } from "sonner";
 import { OpenAIService } from "@/utils/seo/openaiService";
@@ -22,6 +22,7 @@ import LocalSeoAnalyzer from './LocalSeoAnalyzer';
 import KeywordRankingTracker from './KeywordRankingTracker';
 import ContentOptimizationSuggestions from './ContentOptimizationSuggestions';
 import BlogOutlineGenerator from './BlogOutlineGenerator';
+import UrlContentAnalyzer from './UrlContentAnalyzer';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -192,7 +193,7 @@ const AdvancedKeywordGenerator = () => {
       />
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-12">
+        <TabsList className="grid w-full grid-cols-13">
           <TabsTrigger value="config" className="flex items-center gap-1">
             <Key className="h-4 w-4" />
             API Config
@@ -204,6 +205,10 @@ const AdvancedKeywordGenerator = () => {
           <TabsTrigger value="blog-outline" className="flex items-center gap-1">
             <BookOpen className="h-4 w-4" />
             Plan Article
+          </TabsTrigger>
+          <TabsTrigger value="url-analyzer" className="flex items-center gap-1">
+            <Globe className="h-4 w-4" />
+            Analyse URL
           </TabsTrigger>
           <TabsTrigger value="competitors" className="flex items-center gap-1">
             <Users className="h-4 w-4" />
@@ -343,6 +348,10 @@ const AdvancedKeywordGenerator = () => {
 
         <TabsContent value="blog-outline">
           <BlogOutlineGenerator />
+        </TabsContent>
+
+        <TabsContent value="url-analyzer">
+          <UrlContentAnalyzer />
         </TabsContent>
 
         <TabsContent value="competitors">
