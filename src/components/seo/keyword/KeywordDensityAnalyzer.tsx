@@ -200,7 +200,7 @@ const KeywordDensityAnalyzer = () => {
               <p className="text-sm text-yellow-800">
                 <strong>Recommandations SEO:</strong>
                 <br />• Densité optimale : 1-3% pour le mot-clé principal
-                <br />• Évitez le keyword stuffing (> 5%)
+                <br />• Évitez le keyword stuffing (&gt; 5%)
                 <br />• Utilisez des synonymes et variantes
                 <br />• Répartissez les mots-clés naturellement dans le texte
               </p>
