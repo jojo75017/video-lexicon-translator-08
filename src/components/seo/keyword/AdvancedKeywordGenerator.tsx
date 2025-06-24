@@ -1,10 +1,9 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Target, BarChart3, MessageSquare, FileText, HelpCircle, 
   TrendingUp, Users, Network, AlertTriangle, Search, PenTool,
-  MapPin, Activity, Lightbulb
+  MapPin, Activity, Lightbulb, Key
 } from "lucide-react";
 import { toast } from "sonner";
 import { OpenAIService } from "@/utils/seo/openaiService";
@@ -45,7 +44,7 @@ const AdvancedKeywordGenerator = () => {
 
     if (!isConfigured) {
       toast.error("Veuillez configurer votre clé API OpenAI d'abord");
-      setShowApiConfig(true);
+      setActiveTab('config');
       return;
     }
 
@@ -53,7 +52,6 @@ const AdvancedKeywordGenerator = () => {
     try {
       const openAIService = new OpenAIService(openaiKey);
       
-      // Générer différents types de mots-clés avec l'IA
       const [standardKws, longTailKws, semanticKws, questionKws] = await Promise.all([
         openAIService.generateKeywords(keyword),
         openAIService.generateLongTailKeywords(keyword),
@@ -61,7 +59,6 @@ const AdvancedKeywordGenerator = () => {
         openAIService.generateQuestions(keyword)
       ]);
 
-      // Créer des objets KeywordSuggestion complets avec toutes les données
       const allKeywords: KeywordSuggestion[] = [
         ...standardKws.map((kw, index) => ({
           keyword: kw,
@@ -113,7 +110,6 @@ const AdvancedKeywordGenerator = () => {
         }))
       ];
 
-      // Générer des suggestions de contenu avec l'IA
       const contentSugg: ContentSuggestion = {
         title: `${keyword} : Guide Complet 2024 - Tout Ce Que Vous Devez Savoir`,
         description: `Découvrez tout sur ${keyword} avec notre guide expert complet. Conseils, stratégies et astuces pour réussir.`,
@@ -160,19 +156,10 @@ const AdvancedKeywordGenerator = () => {
     );
   };
 
-  if (showApiConfig) {
-    return (
-      <ApiConfiguration
-        openaiKey={openaiKey}
-        setOpenaiKey={setOpenaiKey}
-        onConfigured={() => {
-          setIsConfigured(true);
-          setShowApiConfig(false);
-        }}
-        onCancel={() => setShowApiConfig(false)}
-      />
-    );
-  }
+  const handleApiConfigured = () => {
+    setIsConfigured(true);
+    setActiveTab('generator');
+  };
 
   return (
     <div className="space-y-6">
@@ -182,11 +169,15 @@ const AdvancedKeywordGenerator = () => {
         isGenerating={isGenerating}
         isConfigured={isConfigured}
         onGenerate={generateAdvancedKeywords}
-        onShowConfig={() => setShowApiConfig(true)}
+        onShowConfig={() => setActiveTab('config')}
       />
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-12">
+          <TabsTrigger value="config" className="flex items-center gap-1">
+            <Key className="h-4 w-4" />
+            API Config
+          </TabsTrigger>
           <TabsTrigger value="generator" className="flex items-center gap-1">
             <Target className="h-4 w-4" />
             Générateur
@@ -235,7 +226,74 @@ const AdvancedKeywordGenerator = () => {
             <TrendingUp className="h-4 w-4" />
             Tendances
           </TabsTrigger>
+          <TabsTrigger value="questions" className="flex items-center gap-1">
+            <MessageSquare className="h-4 w-4" />
+            Questions
+          </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="config">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Key className="h-5 w-5 text-blue-600" />
+                Configuration OpenAI API
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h3 className="font-medium text-blue-900 mb-2">
+                  Pourquoi configurer une clé API OpenAI ?
+                </h3>
+                <p className="text-blue-800 text-sm mb-3">
+                  Ce générateur de mots-clés utilise l'intelligence artificielle d'OpenAI pour créer des suggestions de mots-clés pertinentes, 
+                  du contenu optimisé SEO et des analyses sémantiques avancées. Votre clé API permet d'accéder à ces fonctionnalités premium.
+                </p>
+                <div className="space-y-2 text-sm text-blue-700">
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 bg-blue-600 rounded-full"></div>
+                    <span>Génération intelligente de mots-clés longue traîne</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 bg-blue-600 rounded-full"></div>
+                    <span>Analyse sémantique et clustering automatique</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 bg-blue-600 rounded-full"></div>
+                    <span>Suggestions de contenu et FAQ personnalisées</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 bg-blue-600 rounded-full"></div>
+                    <span>Génération de titres et descriptions SEO optimisés</span>
+                  </div>
+                </div>
+              </div>
+
+              <ApiConfiguration
+                openaiKey={openaiKey}
+                setOpenaiKey={setOpenaiKey}
+                onConfigured={handleApiConfigured}
+                onCancel={() => setActiveTab('generator')}
+              />
+
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                <h4 className="font-medium text-gray-900 mb-2">
+                  Comment obtenir votre clé API OpenAI ?
+                </h4>
+                <ol className="list-decimal list-inside space-y-1 text-sm text-gray-700">
+                  <li>Visitez <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">platform.openai.com/api-keys</a></li>
+                  <li>Connectez-vous à votre compte OpenAI (ou créez-en un)</li>
+                  <li>Cliquez sur "Create new secret key"</li>
+                  <li>Copiez la clé générée (elle commence par "sk-")</li>
+                  <li>Collez-la dans le champ ci-dessus</li>
+                </ol>
+                <p className="text-xs text-gray-500 mt-2">
+                  💡 Votre clé est stockée localement dans votre navigateur et n'est jamais partagée.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="generator">
           <KeywordResultsDisplay
