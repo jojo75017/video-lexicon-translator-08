@@ -1,10 +1,9 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Target, BarChart3, MessageSquare, FileText, HelpCircle, 
   TrendingUp, Users, Network, AlertTriangle, Search, PenTool,
-  MapPin, Activity, Lightbulb, Key
+  MapPin, Activity, Lightbulb, Key, BookOpen
 } from "lucide-react";
 import { toast } from "sonner";
 import { OpenAIService } from "@/utils/seo/openaiService";
@@ -22,6 +21,7 @@ import ContentGapAnalyzer from './ContentGapAnalyzer';
 import LocalSeoAnalyzer from './LocalSeoAnalyzer';
 import KeywordRankingTracker from './KeywordRankingTracker';
 import ContentOptimizationSuggestions from './ContentOptimizationSuggestions';
+import BlogOutlineGenerator from './BlogOutlineGenerator';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -201,6 +201,10 @@ const AdvancedKeywordGenerator = () => {
             <Target className="h-4 w-4" />
             Générateur
           </TabsTrigger>
+          <TabsTrigger value="blog-outline" className="flex items-center gap-1">
+            <BookOpen className="h-4 w-4" />
+            Plan Article
+          </TabsTrigger>
           <TabsTrigger value="competitors" className="flex items-center gap-1">
             <Users className="h-4 w-4" />
             Concurrents
@@ -335,6 +339,10 @@ const AdvancedKeywordGenerator = () => {
             onClearSelection={() => setSelectedKeywords([])}
             keyword={keyword}
           />
+        </TabsContent>
+
+        <TabsContent value="blog-outline">
+          <BlogOutlineGenerator />
         </TabsContent>
 
         <TabsContent value="competitors">
