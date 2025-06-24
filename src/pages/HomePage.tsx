@@ -1,16 +1,14 @@
 
 import React from 'react';
-import { Card } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { 
-  FileText, 
+  LayoutDashboard, 
   Search, 
   BarChart, 
-  Link,
   Settings,
-  PieChart,
-  Monitor
+  FileText
 } from 'lucide-react';
 
 const HomePage = () => {
@@ -19,38 +17,24 @@ const HomePage = () => {
   const features = [
     {
       title: 'Dashboard Principal',
-      description: 'Accédez au tableau de bord complet',
-      icon: Monitor,
+      description: 'Accédez au tableau de bord complet avec tous vos outils SEO',
+      icon: LayoutDashboard,
       path: '/dashboard',
       color: 'text-blue-600'
     },
     {
-      title: 'Analytics',
-      description: 'Analysez vos performances',
-      icon: PieChart,
-      path: '/analytics',
+      title: 'Générateur de Mots-clés',
+      description: 'Générez et analysez des mots-clés pour votre contenu',
+      icon: Search,
+      path: '/keyword-generator',
       color: 'text-green-600'
     },
     {
-      title: 'Liens Internes',
-      description: 'Optimisez votre maillage interne',
-      icon: Link,
-      path: '/internal-linking',
+      title: 'Analytics SEO',
+      description: 'Analysez vos performances SEO en détail',
+      icon: BarChart,
+      path: '/dashboard',
       color: 'text-purple-600'
-    },
-    {
-      title: 'Analyse des Mots-clés',
-      description: 'Analysez vos mots-clés',
-      icon: Search,
-      path: '/keyword-analysis',
-      color: 'text-red-600'
-    },
-    {
-      title: 'Générateur de Mots-clés',
-      description: 'Générez des mots-clés',
-      icon: FileText,
-      path: '/keyword-generator',
-      color: 'text-yellow-600'
     }
   ];
 
@@ -74,23 +58,25 @@ const HomePage = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((feature) => (
-            <Card key={feature.path} className="p-6 hover:shadow-lg transition-shadow duration-300">
-              <div className="flex items-center gap-4 mb-4">
-                <div className={`p-3 rounded-lg bg-gray-50 ${feature.color}`}>
-                  <feature.icon className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-lg">{feature.title}</h3>
-                </div>
-              </div>
-              <p className="text-gray-600 mb-4">{feature.description}</p>
-              <Button 
-                onClick={() => navigate(feature.path)}
-                className="w-full"
-                variant="outline"
-              >
-                Accéder
-              </Button>
+            <Card key={feature.path} className="hover:shadow-lg transition-shadow duration-300">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-3">
+                  <div className={`p-2 rounded-lg bg-gray-50 ${feature.color}`}>
+                    <feature.icon className="h-6 w-6" />
+                  </div>
+                  {feature.title}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 mb-4">{feature.description}</p>
+                <Button 
+                  onClick={() => navigate(feature.path)}
+                  className="w-full"
+                  variant="outline"
+                >
+                  Accéder
+                </Button>
+              </CardContent>
             </Card>
           ))}
         </div>
