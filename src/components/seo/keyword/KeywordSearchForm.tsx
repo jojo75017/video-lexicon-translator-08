@@ -1,88 +1,75 @@
 
 import React from 'react';
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Sparkles, Loader2, Search, Settings, Globe, Zap } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Brain, Search, Settings, Key, Loader2 } from "lucide-react";
 
 interface KeywordSearchFormProps {
   keyword: string;
-  setKeyword: (value: string) => void;
-  isConfigured: boolean;
+  setKeyword: (keyword: string) => void;
   isGenerating: boolean;
-  hasCompetitorData: boolean;
-  showCompetitors: boolean;
-  generateKeywords: () => void;
-  setShowApiConfig: (show: boolean) => void;
-  toggleCompetitors: () => void;
+  isConfigured: boolean;
+  onGenerate: () => void;
+  onShowConfig: () => void;
 }
 
 const KeywordSearchForm: React.FC<KeywordSearchFormProps> = ({
   keyword,
   setKeyword,
-  isConfigured,
   isGenerating,
-  hasCompetitorData,
-  showCompetitors,
-  generateKeywords,
-  setShowApiConfig,
-  toggleCompetitors
+  isConfigured,
+  onGenerate,
+  onShowConfig
 }) => {
   return (
-    <Card className="p-6">
-      <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-        <Sparkles className="w-5 h-5 text-blue-600" />
-        Générateur de mots-clés
-      </h2>
-      
-      <div className="flex flex-col md:flex-row gap-3">
-        <div className="flex-1">
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Brain className="h-5 w-5 text-blue-600" />
+          Générateur de Mots-Clés IA Avancé
+          {isConfigured && (
+            <Badge className="bg-green-100 text-green-800">
+              ✓ OpenAI connecté
+            </Badge>
+          )}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex gap-2">
           <Input
-            placeholder="Entrez un mot-clé principal..."
+            placeholder="Entrez votre mot-clé principal..."
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && generateKeywords()}
+            onKeyPress={(e) => e.key === 'Enter' && onGenerate()}
+            className="flex-1"
           />
-        </div>
-        <Button 
-          onClick={() => generateKeywords()} 
-          disabled={isGenerating || !keyword}
-          className="flex items-center gap-2"
-        >
-          {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-          Générer
-        </Button>
-        <Button 
-          variant="outline" 
-          onClick={() => setShowApiConfig(true)}
-          title="Configuration de l'API"
-        >
-          <Settings className="w-4 h-4" />
-        </Button>
-        {isConfigured && (
-          <Button 
-            variant={hasCompetitorData ? "default" : "secondary"}
-            onClick={toggleCompetitors}
-            title="Analyse concurrentielle"
-            className="gap-2"
-          >
-            <Globe className="w-4 h-4" />
-            {showCompetitors ? "Masquer" : "Concurrents"}
+          <Button onClick={onGenerate} disabled={isGenerating}>
+            {isGenerating ? (
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            ) : (
+              <Search className="h-4 w-4 mr-2" />
+            )}
+            Générer avec IA
           </Button>
-        )}
-      </div>
-      
-      {isConfigured && (
-        <div className="mt-3 flex items-center">
-          <div className="flex-shrink-0 flex items-center text-sm text-green-600">
-            <Zap className="w-4 h-4 mr-1" />
-            <span>API connectée</span>
-          </div>
-          <div className="ml-auto text-xs text-gray-500">
-            Les données concurrentielles réelles sont disponibles
-          </div>
+          <Button 
+            variant="outline" 
+            onClick={onShowConfig}
+          >
+            <Settings className="h-4 w-4" />
+          </Button>
         </div>
-      )}
+        
+        {!isConfigured && (
+          <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <p className="text-sm text-yellow-800">
+              <Key className="h-4 w-4 inline mr-1" />
+              Configurez votre clé OpenAI pour débloquer toutes les fonctionnalités IA
+            </p>
+          </div>
+        )}
+      </CardContent>
     </Card>
   );
 };
