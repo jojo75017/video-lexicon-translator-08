@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, Download, Copy, Sparkles, TrendingUp, Users, DollarSign, Key, Settings, CheckCircle, AlertCircle, Target, Brain, MessageSquare, BarChart3, Globe, Zap, Filter, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { OpenAIService } from '../utils/seo/openaiService';
+import KeywordDensityAnalyzer from '../components/seo/KeywordDensityAnalyzer';
 
 interface Keyword {
   keyword: string;
@@ -46,6 +46,8 @@ const KeywordGeneratorPage = () => {
   const [difficultyFilter, setDifficultyFilter] = useState('all');
   const [intentFilter, setIntentFilter] = useState('all');
   const [volumeFilter, setVolumeFilter] = useState('all');
+
+  const [showDensityAnalyzer, setShowDensityAnalyzer] = useState(false);
 
   const validateApiKey = async () => {
     if (!openaiKey.trim()) {
@@ -364,6 +366,37 @@ const KeywordGeneratorPage = () => {
   const avgDifficulty = getAllKeywords().length > 0 ? Math.round(getAllKeywords().reduce((sum, kw) => sum + kw.difficulty, 0) / getAllKeywords().length) : 0;
   const avgCpc = getAllKeywords().length > 0 ? (getAllKeywords().reduce((sum, kw) => sum + kw.cpc, 0) / getAllKeywords().length).toFixed(2) : '0.00';
 
+  if (showDensityAnalyzer) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        <div className="container mx-auto p-6">
+          {/* Header avec bouton retour */}
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <Button
+                variant="outline"
+                onClick={() => setShowDensityAnalyzer(false)}
+                className="flex items-center gap-2"
+              >
+                ← Retour au générateur
+              </Button>
+              <h1 className="text-4xl font-bold text-gray-900 flex items-center justify-center gap-3">
+                <Target className="h-10 w-10 text-blue-600" />
+                Analyseur de Densité de Mots-Clés
+              </h1>
+              <div></div>
+            </div>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Analysez la densité des mots-clés de votre site web comme 1.fr
+            </p>
+          </div>
+
+          <KeywordDensityAnalyzer />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       <div className="container mx-auto p-6">
@@ -450,6 +483,17 @@ const KeywordGeneratorPage = () => {
             </CardContent>
           )}
         </Card>
+
+        {/* Boutons d'action supplémentaires */}
+        <div className="flex flex-wrap gap-4 mb-8 justify-center">
+          <Button
+            onClick={() => setShowDensityAnalyzer(true)}
+            className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white"
+          >
+            <Target className="h-4 w-4 mr-2" />
+            Analyser la Densité de Mots-Clés
+          </Button>
+        </div>
 
         {/* Formulaire de recherche */}
         <Card className="mb-8 shadow-lg">
