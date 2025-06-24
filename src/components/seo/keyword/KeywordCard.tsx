@@ -1,157 +1,90 @@
 
 import React from 'react';
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import { TrendingUp, BarChart3, DollarSign, Check } from "lucide-react";
 import { KeywordSuggestion } from '@/types/seo/Keyword';
-import { Info, TrendingUp, BarChart3, Target, MessageSquare } from 'lucide-react';
 
 interface KeywordCardProps {
   keywordData: KeywordSuggestion;
-  isSelected?: boolean;
+  isSelected: boolean;
   onToggleSelection: (keyword: string) => void;
-  showDetails?: boolean;
 }
 
-const KeywordCard: React.FC<KeywordCardProps> = ({ 
-  keywordData, 
-  isSelected = false, 
-  onToggleSelection,
-  showDetails = false
+const KeywordCard: React.FC<KeywordCardProps> = ({
+  keywordData,
+  isSelected,
+  onToggleSelection
 }) => {
-  // Fonction pour formater les nombres
-  const formatNumber = (num?: number) => {
-    if (num === undefined) return 'N/A';
-    return new Intl.NumberFormat().format(num);
+  const getDifficultyColor = (difficulty: number) => {
+    if (difficulty < 30) return 'text-green-600';
+    if (difficulty < 60) return 'text-yellow-600';
+    return 'text-red-600';
   };
-  
-  // Détermine la couleur de badge pour la difficulté
-  const getDifficultyBadge = () => {
-    const difficulty = keywordData.difficulty || 0;
-    if (difficulty < 30) return "bg-green-100 text-green-800 border-green-200";
-    if (difficulty < 60) return "bg-yellow-100 text-yellow-800 border-yellow-200";
-    return "bg-red-100 text-red-800 border-red-200";
-  };
-  
-  // Détermine le texte pour la difficulté
-  const getDifficultyText = () => {
-    const difficulty = keywordData.difficulty || 0;
-    if (difficulty < 30) return "Facile";
-    if (difficulty < 60) return "Modéré";
-    return "Difficile";
-  };
-  
-  // Détermine la couleur de badge pour le volume
-  const getVolumeBadge = () => {
-    const volume = keywordData.volume || 0;
-    if (volume < 500) return "bg-gray-100 text-gray-800 border-gray-200";
-    if (volume < 2000) return "bg-blue-100 text-blue-800 border-blue-200";
-    return "bg-indigo-100 text-indigo-800 border-indigo-200";
-  };
-  
-  // Détermine la couleur de badge pour le CPC
-  const getCpcBadge = () => {
-    const cpc = keywordData.cpc || 0;
-    if (cpc < 0.5) return "bg-gray-100 text-gray-800 border-gray-200";
-    if (cpc < 1.5) return "bg-emerald-100 text-emerald-800 border-emerald-200";
-    return "bg-purple-100 text-purple-800 border-purple-200";
+
+  const getTypeColor = (type: string) => {
+    switch (type) {
+      case 'ai-generated': return 'bg-purple-100 text-purple-800';
+      case 'long-tail': return 'bg-blue-100 text-blue-800';
+      case 'question': return 'bg-green-100 text-green-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
   };
 
   return (
-    <Card 
-      className={`p-3 transition-colors cursor-pointer hover:bg-slate-50 ${isSelected ? 'border-blue-400 bg-blue-50' : ''}`}
-      onClick={() => onToggleSelection(keywordData.keyword)}
-    >
-      <div className="flex justify-between items-start mb-2">
-        <h3 className={`font-medium text-sm ${isSelected ? 'text-blue-700' : 'text-gray-800'}`}>
-          {keywordData.keyword}
-        </h3>
-        <div className="flex gap-1">
-          {keywordData.difficulty !== undefined && (
-            <Badge variant="outline" className={getDifficultyBadge()}>
-              {getDifficultyText()}
+    <Card className={`cursor-pointer transition-all hover:shadow-md ${isSelected ? 'ring-2 ring-blue-500' : ''}`}>
+      <CardContent className="p-4">
+        <div className="flex items-start justify-between mb-3">
+          <h3 className="font-medium text-sm flex-1 pr-2">
+            {keywordData.keyword}
+          </h3>
+          <Button
+            variant={isSelected ? "default" : "outline"}
+            size="sm"
+            onClick={() => onToggleSelection(keywordData.keyword)}
+            className="h-6 w-6 p-0"
+          >
+            {isSelected && <Check className="h-3 w-3" />}
+          </Button>
+        </div>
+        
+        <div className="flex items-center gap-2 mb-3">
+          {keywordData.type && (
+            <Badge className={getTypeColor(keywordData.type)} variant="secondary">
+              {keywordData.type}
+            </Badge>
+          )}
+          {keywordData.intent && (
+            <Badge variant="outline" className="text-xs">
+              {keywordData.intent}
             </Badge>
           )}
         </div>
-      </div>
-      
-      <div className="grid grid-cols-2 gap-x-3 gap-y-1 mb-3 text-xs text-gray-600">
-        {keywordData.volume !== undefined && (
-          <div className="flex items-center gap-1">
-            <TrendingUp className="h-3 w-3" />
-            <span>Vol: {formatNumber(keywordData.volume)}</span>
-          </div>
-        )}
         
-        {keywordData.difficulty !== undefined && (
+        <div className="grid grid-cols-2 gap-3 text-xs">
           <div className="flex items-center gap-1">
+            <TrendingUp className="h-3 w-3 text-blue-500" />
+            <span>{keywordData.volume?.toLocaleString() || 'N/A'}</span>
+          </div>
+          <div className={`flex items-center gap-1 ${getDifficultyColor(keywordData.difficulty || 0)}`}>
             <BarChart3 className="h-3 w-3" />
-            <span>Diff: {keywordData.difficulty}/100</span>
+            <span>{keywordData.difficulty || 'N/A'}/100</span>
           </div>
-        )}
-        
-        {keywordData.cpc !== undefined && (
-          <div className="flex items-center gap-1">
-            <Info className="h-3 w-3" />
-            <span>CPC: {keywordData.cpc.toFixed(2)}€</span>
-          </div>
-        )}
-        
-        {keywordData.competition !== undefined && (
-          <div className="flex items-center gap-1">
-            <Info className="h-3 w-3" />
-            <span>Comp: {Math.round(keywordData.competition * 100)}%</span>
-          </div>
-        )}
-      </div>
-      
-      {showDetails && (
-        <>
-          <div className="mb-2">
-            <div className="flex justify-between items-center text-xs mb-1">
-              <span>Difficulté</span>
-              <span className={keywordData.difficulty && keywordData.difficulty > 70 ? "text-red-600" : keywordData.difficulty && keywordData.difficulty > 40 ? "text-yellow-600" : "text-green-600"}>
-                {keywordData.difficulty}/100
-              </span>
-            </div>
-            <Progress 
-              value={keywordData.difficulty || 0} 
-              className="h-1.5 bg-gray-100"
-              aria-label="Difficulté du mot-clé"
-            />
-          </div>
-          
-          <div className="mb-3">
-            <div className="flex justify-between items-center text-xs mb-1">
-              <span>Opportunité</span>
-              <span className="text-blue-600">
-                {keywordData.opportunity || Math.floor(Math.random() * 30) + 50}/100
-              </span>
-            </div>
-            <Progress 
-              value={keywordData.opportunity || Math.floor(Math.random() * 30) + 50} 
-              className="h-1.5 bg-gray-100"
-              aria-label="Opportunité du mot-clé"
-            />
-          </div>
-          
-          {(keywordData.intent || keywordData.type) && (
-            <div className="flex gap-1 mt-2">
-              {keywordData.intent && (
-                <Badge variant="outline" className="text-[9px]">
-                  {keywordData.intent}
-                </Badge>
-              )}
-              
-              {keywordData.type && (
-                <Badge variant="outline" className="text-[9px]">
-                  {keywordData.type}
-                </Badge>
-              )}
+          {keywordData.cpc && (
+            <div className="flex items-center gap-1 text-green-600">
+              <DollarSign className="h-3 w-3" />
+              <span>{keywordData.cpc}€</span>
             </div>
           )}
-        </>
-      )}
+          {keywordData.opportunity && (
+            <div className="flex items-center gap-1 text-purple-600">
+              <span className="font-medium">{keywordData.opportunity}%</span>
+              <span className="text-gray-500">opp.</span>
+            </div>
+          )}
+        </div>
+      </CardContent>
     </Card>
   );
 };

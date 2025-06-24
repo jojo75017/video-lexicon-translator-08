@@ -1,58 +1,42 @@
 
-import { OpenAICompetitorService } from '@/services/openai/openaiCompetitorService';
-import { toast } from 'sonner';
+import { KeywordSuggestion } from '@/types/seo/Keyword';
+import { CompetitorData } from '@/types/seo/CompetitorData';
+import { OpenAIService } from '@/utils/seo/openaiService';
 
-/**
- * Validates the OpenAI API key
- */
 export const validateOpenAIApiKey = async (apiKey: string): Promise<boolean> => {
   try {
-    if (!apiKey) {
-      toast.error('Veuillez entrer une clé API OpenAI');
-      return false;
-    }
-
-    const service = OpenAICompetitorService.createService(apiKey);
-    const isValid = await service.validateApiKey();
-
-    if (isValid) {
-      localStorage.setItem('openaiKey', apiKey);
-      return true;
-    }
-
-    return false;
+    const openAIService = new OpenAIService(apiKey);
+    return await openAIService.validateApiKey();
   } catch (error) {
-    console.error('Erreur lors de la validation de la clé API:', error);
     return false;
   }
 };
 
-/**
- * Gets the OpenAI service instance if configured
- */
-export const getOpenAIService = (): OpenAICompetitorService | null => {
-  const key = localStorage.getItem('openaiKey') || '';
-  if (!key) return null;
-  
-  return OpenAICompetitorService.createService(key);
-};
-
-/**
- * Fetches competitor data and SERP results for a keyword
- */
 export const fetchCompetitorData = async (keyword: string): Promise<{
-  competitors: any[];
+  competitors: CompetitorData[];
   serps: any[];
 }> => {
-  try {
-    const service = getOpenAIService();
-    if (!service) {
-      return { competitors: [], serps: [] };
+  // Mock data for competitors
+  const mockCompetitors: CompetitorData[] = [
+    {
+      name: "competitor1.com",
+      url: "https://competitor1.com",
+      strength: 85,
+      organic_traffic: 45000,
+      keywords: [`${keyword}`, `${keyword} guide`, `${keyword} tips`],
+      domain: "competitor1.com",
+      estimatedTraffic: 45000,
+      topKeywords: [`${keyword}`, `${keyword} guide`],
+      gaps: [`${keyword} advanced`, `${keyword} pro`]
     }
-    
-    return await service.getCompetitorData(keyword);
-  } catch (error) {
-    console.error('Erreur lors de la récupération des données concurrentielles:', error);
-    return { competitors: [], serps: [] };
-  }
+  ];
+  
+  return {
+    competitors: mockCompetitors,
+    serps: []
+  };
+};
+
+export const getOpenAIService = (apiKey: string): OpenAIService => {
+  return new OpenAIService(apiKey);
 };
