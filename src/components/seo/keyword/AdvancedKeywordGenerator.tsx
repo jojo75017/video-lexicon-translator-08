@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,7 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Brain, Search, TrendingUp, Lightbulb, Settings, Key, Loader2, 
   Target, BarChart3, MessageSquare, FileText, HelpCircle, 
-  Globe, Zap, Download, Trash2, Eye, PenTool, Hash, Users
+  Globe, Zap, Download, Trash2, Eye, PenTool, Hash, Users,
+  Network, AlertTriangle, Layers
 } from "lucide-react";
 import { toast } from "sonner";
 import { OpenAIService } from "@/utils/seo/openaiService";
@@ -17,6 +17,9 @@ import KeywordDensityAnalyzer from './KeywordDensityAnalyzer';
 import KeywordQuestions from './KeywordQuestions';
 import { KeywordMetaContent } from './KeywordMetaContent';
 import CompetitorAnalysis from './CompetitorAnalysis';
+import SemanticAnalysis from './SemanticAnalysis';
+import SerpFeaturesAnalyzer from './SerpFeaturesAnalyzer';
+import ContentGapAnalyzer from './ContentGapAnalyzer';
 
 const AdvancedKeywordGenerator = () => {
   const [keyword, setKeyword] = useState('');
@@ -311,9 +314,9 @@ const AdvancedKeywordGenerator = () => {
         </CardContent>
       </Card>
 
-      {/* Onglets principaux */}
+      {/* Onglets principaux avec nouvelles fonctionnalités */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid w-full grid-cols-10">
           <TabsTrigger value="generator" className="flex items-center gap-1">
             <Target className="h-4 w-4" />
             Générateur
@@ -321,6 +324,18 @@ const AdvancedKeywordGenerator = () => {
           <TabsTrigger value="competitors" className="flex items-center gap-1">
             <Users className="h-4 w-4" />
             Concurrents
+          </TabsTrigger>
+          <TabsTrigger value="semantic" className="flex items-center gap-1">
+            <Network className="h-4 w-4" />
+            Sémantique
+          </TabsTrigger>
+          <TabsTrigger value="serp" className="flex items-center gap-1">
+            <Search className="h-4 w-4" />
+            SERP Features
+          </TabsTrigger>
+          <TabsTrigger value="gaps" className="flex items-center gap-1">
+            <AlertTriangle className="h-4 w-4" />
+            Content Gaps
           </TabsTrigger>
           <TabsTrigger value="content" className="flex items-center gap-1">
             <FileText className="h-4 w-4" />
@@ -590,6 +605,19 @@ const AdvancedKeywordGenerator = () => {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Nouveaux onglets */}
+        <TabsContent value="semantic">
+          <SemanticAnalysis keyword={keyword} />
+        </TabsContent>
+
+        <TabsContent value="serp">
+          <SerpFeaturesAnalyzer />
+        </TabsContent>
+
+        <TabsContent value="gaps">
+          <ContentGapAnalyzer />
         </TabsContent>
       </Tabs>
     </div>
