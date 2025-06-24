@@ -14,7 +14,7 @@ const KeywordGeneratorPage = () => {
       <div className="space-y-6">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            Suite d'Outils SEO
+            Générateur de Mots-Clés
           </h1>
           <p className="text-gray-600 max-w-2xl mx-auto">
             Analysez vos mots-clés, optimisez votre contenu et générez des idées pour améliorer votre référencement.

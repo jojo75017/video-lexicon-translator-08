@@ -4,20 +4,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { HelpCircle, Copy, Loader2, Users, Lightbulb } from "lucide-react";
+import { HelpCircle, MessageSquare, Loader2, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import { OpenAIService } from '../../../utils/seo/openaiService';
 
-interface Question {
+interface QuestionData {
   question: string;
-  searchVolume: number;
+  volume: number;
   difficulty: number;
-  contentType: string;
+  intent: 'informational' | 'commercial' | 'transactional';
+  answerLength: 'Court' | 'Moyen' | 'Long';
 }
 
 const KeywordQuestions = () => {
   const [keyword, setKeyword] = useState('');
-  const [questions, setQuestions] = useState<Question[]>([]);
+  const [questions, setQuestions] = useState<QuestionData[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [apiKey] = useState(() => localStorage.getItem('openaiKey') || '');
 
@@ -31,20 +32,60 @@ const KeywordQuestions = () => {
     try {
       if (apiKey) {
         const openAIService = new OpenAIService(apiKey);
-        const questionsResult = await openAIService.generateQuestions(keyword);
+        const aiQuestions = await openAIService.generateQuestions(keyword);
         
-        const questionData: Question[] = questionsResult.map(q => ({
+        const questionsData: QuestionData[] = aiQuestions.map(q => ({
           question: q,
-          searchVolume: Math.floor(Math.random() * 2000) + 100,
+          volume: Math.floor(Math.random() * 1000) + 50,
           difficulty: Math.floor(Math.random() * 60) + 20,
-          contentType: getContentType(q)
+          intent: ['informational', 'commercial', 'transactional'][Math.floor(Math.random() * 3)] as 'informational' | 'commercial' | 'transactional',
+          answerLength: ['Court', 'Moyen', 'Long'][Math.floor(Math.random() * 3)] as 'Court' | 'Moyen' | 'Long'
         }));
-
-        setQuestions(questionData);
-        toast.success('Questions générées avec succès !');
+        
+        setQuestions(questionsData);
+        toast.success('Questions générées avec l\'IA !');
       } else {
-        generateBasicQuestions();
-        toast.info('Questions basiques générées');
+        // Questions basiques sans IA
+        const basicQuestions: QuestionData[] = [
+          {
+            question: `Qu'est-ce que ${keyword} ?`,
+            volume: 850,
+            difficulty: 25,
+            intent: 'informational',
+            answerLength: 'Moyen'
+          },
+          {
+            question: `Comment utiliser ${keyword} ?`,
+            volume: 650,
+            difficulty: 30,
+            intent: 'informational',
+            answerLength: 'Long'
+          },
+          {
+            question: `Où acheter ${keyword} ?`,
+            volume: 420,
+            difficulty: 45,
+            intent: 'commercial',
+            answerLength: 'Court'
+          },
+          {
+            question: `Combien coûte ${keyword} ?`,
+            volume: 380,
+            difficulty: 40,
+            intent: 'commercial',
+            answerLength: 'Court'
+          },
+          {
+            question: `${keyword} vs alternatives ?`,
+            volume: 290,
+            difficulty: 55,
+            intent: 'commercial',
+            answerLength: 'Long'
+          }
+        ];
+        
+        setQuestions(basicQuestions);
+        toast.info('Questions de base générées (configurez OpenAI pour plus d\'options)');
       }
     } catch (error) {
       toast.error('Erreur lors de la génération des questions');
@@ -53,60 +94,19 @@ const KeywordQuestions = () => {
     }
   };
 
-  const getContentType = (question: string): string => {
-    if (question.toLowerCase().includes('comment')) return 'Guide pratique';
-    if (question.toLowerCase().includes('pourquoi')) return 'Article explicatif';
-    if (question.toLowerCase().includes('combien')) return 'Comparatif';
-    if (question.toLowerCase().includes('où')) return 'Guide local';
-    if (question.toLowerCase().includes('quand')) return 'Guide temporel';
-    return 'FAQ';
-  };
-
-  const generateBasicQuestions = () => {
-    const questionTemplates = [
-      `Qu'est-ce que ${keyword} ?`,
-      `Comment utiliser ${keyword} ?`,
-      `Pourquoi choisir ${keyword} ?`,
-      `Combien coûte ${keyword} ?`,
-      `Où acheter ${keyword} ?`,
-      `${keyword} vs alternatives ?`,
-      `Meilleur ${keyword} 2024 ?`,
-      `Comment fonctionne ${keyword} ?`,
-      `${keyword} pour débutants ?`,
-      `Avantages de ${keyword} ?`
-    ];
-
-    const questionData: Question[] = questionTemplates.map(q => ({
-      question: q,
-      searchVolume: Math.floor(Math.random() * 1500) + 50,
-      difficulty: Math.floor(Math.random() * 50) + 10,
-      contentType: getContentType(q)
-    }));
-
-    setQuestions(questionData);
-  };
-
-  const copyQuestion = (question: string) => {
-    navigator.clipboard.writeText(question);
-    toast.success('Question copiée !');
+  const getIntentColor = (intent: string) => {
+    switch (intent) {
+      case 'informational': return 'bg-blue-100 text-blue-800';
+      case 'commercial': return 'bg-green-100 text-green-800';
+      case 'transactional': return 'bg-purple-100 text-purple-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
   };
 
   const getDifficultyColor = (difficulty: number) => {
-    if (difficulty < 30) return 'bg-green-100 text-green-800';
-    if (difficulty < 60) return 'bg-yellow-100 text-yellow-800';
-    return 'bg-red-100 text-red-800';
-  };
-
-  const getContentTypeColor = (type: string) => {
-    const colors: Record<string, string> = {
-      'Guide pratique': 'bg-blue-100 text-blue-800',
-      'Article explicatif': 'bg-purple-100 text-purple-800',
-      'Comparatif': 'bg-orange-100 text-orange-800',
-      'Guide local': 'bg-green-100 text-green-800',
-      'Guide temporel': 'bg-pink-100 text-pink-800',
-      'FAQ': 'bg-gray-100 text-gray-800'
-    };
-    return colors[type] || 'bg-gray-100 text-gray-800';
+    if (difficulty < 30) return 'text-green-600';
+    if (difficulty < 60) return 'text-yellow-600';
+    return 'text-red-600';
   };
 
   return (
@@ -114,8 +114,8 @@ const KeywordQuestions = () => {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <HelpCircle className="h-5 w-5 text-green-600" />
-            Générateur de Questions FAQ
+            <HelpCircle className="h-5 w-5 text-orange-600" />
+            Générateur de Questions SEO
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -134,7 +134,7 @@ const KeywordQuestions = () => {
               {isGenerating ? (
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
               ) : (
-                <Lightbulb className="h-4 w-4 mr-2" />
+                <MessageSquare className="h-4 w-4 mr-2" />
               )}
               Générer
             </Button>
@@ -143,54 +143,37 @@ const KeywordQuestions = () => {
       </Card>
 
       {questions.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Questions fréquemment posées ({questions.length})</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {questions.map((item, index) => (
-                <div key={index} className="p-4 border rounded-lg hover:bg-gray-50">
-                  <div className="flex items-start justify-between mb-3">
-                    <h4 className="font-semibold text-lg flex-1 pr-4">
-                      {item.question}
-                    </h4>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => copyQuestion(item.question)}
-                      className="hover:bg-blue-50"
-                    >
-                      <Copy className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  
-                  <div className="flex flex-wrap gap-3 text-sm">
-                    <div className="flex items-center gap-1">
-                      <Users className="h-4 w-4 text-blue-600" />
-                      <span className="text-gray-600">Volume:</span>
-                      <span className="font-semibold">{item.searchVolume.toLocaleString()}/mois</span>
-                    </div>
-                    
-                    <div className="flex items-center gap-1">
-                      <span className="text-gray-600">Difficulté:</span>
-                      <Badge className={getDifficultyColor(item.difficulty)}>
-                        {item.difficulty}/100
-                      </Badge>
-                    </div>
-                    
-                    <div className="flex items-center gap-1">
-                      <span className="text-gray-600">Type:</span>
-                      <Badge className={getContentTypeColor(item.contentType)}>
-                        {item.contentType}
-                      </Badge>
-                    </div>
+        <div className="space-y-4">
+          {questions.map((q, index) => (
+            <Card key={index} className="hover:shadow-md transition-shadow">
+              <CardContent className="p-4">
+                <div className="flex items-start justify-between mb-3">
+                  <h3 className="font-medium text-sm flex-1 pr-4">
+                    {q.question}
+                  </h3>
+                  <div className="flex gap-1 flex-shrink-0">
+                    <Badge className={getIntentColor(q.intent)} variant="secondary">
+                      {q.intent}
+                    </Badge>
+                    <Badge variant="outline">
+                      {q.answerLength}
+                    </Badge>
                   </div>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                
+                <div className="flex items-center gap-4 text-xs text-gray-600">
+                  <div className="flex items-center gap-1">
+                    <TrendingUp className="h-3 w-3" />
+                    <span>{q.volume.toLocaleString()} recherches/mois</span>
+                  </div>
+                  <div className={`flex items-center gap-1 ${getDifficultyColor(q.difficulty)}`}>
+                    <span>Difficulté: {q.difficulty}/100</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       )}
     </div>
   );
