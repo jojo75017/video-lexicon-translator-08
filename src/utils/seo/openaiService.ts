@@ -1,202 +1,201 @@
 
-import OpenAI from 'openai';
-
 export class OpenAIService {
-  private openai: OpenAI;
+  private apiKey: string;
+  private static useProxy = false;
 
   constructor(apiKey: string) {
-    this.openai = new OpenAI({
-      apiKey: apiKey,
-      dangerouslyAllowBrowser: true
-    });
+    this.apiKey = apiKey;
+  }
+
+  static enableProxy() {
+    OpenAIService.useProxy = true;
   }
 
   async validateApiKey(): Promise<boolean> {
     try {
-      await this.openai.models.list();
-      return true;
+      const response = await fetch('https://api.openai.com/v1/models', {
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      return response.ok;
     } catch (error) {
+      console.error('API Key validation failed:', error);
       return false;
     }
   }
 
-  async generateKeywords(baseKeyword: string): Promise<string[]> {
+  async generateKeywords(keyword: string): Promise<string[]> {
     try {
-      const response = await this.openai.chat.completions.create({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: 'Tu es un expert SEO. Génère une liste de mots-clés pertinents basés sur le mot-clé principal fourni. Réponds uniquement avec une liste de mots-clés séparés par des virgules.'
-          },
-          {
-            role: 'user',
-            content: `Génère 15 mots-clés SEO pertinents pour: ${baseKeyword}`
-          }
-        ],
-        temperature: 0.7,
-        max_tokens: 500
-      });
-
-      const content = response.choices[0]?.message?.content || '';
-      return content.split(',').map(kw => kw.trim()).filter(kw => kw.length > 0);
-    } catch (error) {
-      console.error('Erreur génération mots-clés:', error);
-      return [];
-    }
-  }
-
-  async generateLongTailKeywords(baseKeyword: string): Promise<string[]> {
-    try {
-      const response = await this.openai.chat.completions.create({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: 'Tu es un expert SEO. Génère des mots-clés de longue traîne (3+ mots) basés sur le mot-clé principal. Réponds uniquement avec une liste séparée par des virgules.'
-          },
-          {
-            role: 'user',
-            content: `Génère 12 mots-clés de longue traîne pour: ${baseKeyword}`
-          }
-        ],
-        temperature: 0.7,
-        max_tokens: 500
-      });
-
-      const content = response.choices[0]?.message?.content || '';
-      return content.split(',').map(kw => kw.trim()).filter(kw => kw.length > 0);
-    } catch (error) {
-      console.error('Erreur génération longue traîne:', error);
-      return [];
-    }
-  }
-
-  async generateSemanticKeywords(baseKeyword: string): Promise<string[]> {
-    try {
-      const response = await this.openai.chat.completions.create({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: 'Tu es un expert SEO. Génère des mots-clés sémantiquement liés et des synonymes du mot-clé principal. Réponds uniquement avec une liste séparée par des virgules.'
-          },
-          {
-            role: 'user',
-            content: `Génère 10 mots-clés sémantiques et synonymes pour: ${baseKeyword}`
-          }
-        ],
-        temperature: 0.7,
-        max_tokens: 400
-      });
-
-      const content = response.choices[0]?.message?.content || '';
-      return content.split(',').map(kw => kw.trim()).filter(kw => kw.length > 0);
-    } catch (error) {
-      console.error('Erreur génération sémantique:', error);
-      return [];
-    }
-  }
-
-  async generateQuestions(baseKeyword: string): Promise<string[]> {
-    try {
-      const response = await this.openai.chat.completions.create({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: 'Tu es un expert SEO. Génère des questions que les gens posent sur le sujet donné. Réponds uniquement avec une liste de questions séparées par des virgules.'
-          },
-          {
-            role: 'user',
-            content: `Génère 8 questions courantes sur: ${baseKeyword}`
-          }
-        ],
-        temperature: 0.7,
-        max_tokens: 400
-      });
-
-      const content = response.choices[0]?.message?.content || '';
-      return content.split(',').map(q => q.trim()).filter(q => q.length > 0);
-    } catch (error) {
-      console.error('Erreur génération questions:', error);
-      return [];
-    }
-  }
-
-  async generateContent(prompt: string): Promise<string> {
-    try {
-      const response = await this.openai.chat.completions.create({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: 'Tu es un expert en rédaction SEO. Génère du contenu optimisé et structuré.'
-          },
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
-        temperature: 0.7,
-        max_tokens: 800
-      });
-
-      return response.choices[0]?.message?.content || '';
-    } catch (error) {
-      console.error('Erreur génération contenu:', error);
-      return '';
-    }
-  }
-
-  async analyzeSeoContent(content: string, targetKeyword: string): Promise<any> {
-    try {
-      const response = await this.openai.chat.completions.create({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: 'Tu es un expert SEO. Analyse le contenu et donne des suggestions d\'amélioration pour le mot-clé cible. Réponds en JSON avec keywordDensity (nombre), suggestions (array), et score (nombre sur 100).'
-          },
-          {
-            role: 'user',
-            content: `Analyse ce contenu pour le mot-clé "${targetKeyword}":\n\n${content}`
-          }
-        ],
-        temperature: 0.3,
-        max_tokens: 600
-      });
-
-      const content_response = response.choices[0]?.message?.content || '';
-      try {
-        return JSON.parse(content_response);
-      } catch {
-        // Fallback si JSON parsing échoue
-        const words = content.toLowerCase().split(/\s+/);
-        const keywordOccurrences = words.filter(word => 
-          word.includes(targetKeyword.toLowerCase())
-        ).length;
-        const density = (keywordOccurrences / words.length) * 100;
-        
-        return {
-          keywordDensity: Math.round(density * 100) / 100,
-          suggestions: [
-            'Optimiser la densité de mots-clés (2-3% recommandé)',
-            'Ajouter des variations du mot-clé principal',
-            'Améliorer la structure du contenu avec des titres H2/H3',
-            'Utiliser des synonymes et mots-clés connexes',
-            'Ajouter des liens internes pertinents'
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4.1-2025-04-14',
+          messages: [
+            {
+              role: 'system',
+              content: 'Vous êtes un expert SEO. Générez une liste de 10 mots-clés pertinents liés au mot-clé donné.'
+            },
+            {
+              role: 'user',
+              content: `Générez des mots-clés pour: ${keyword}`
+            }
           ],
-          score: Math.min(density * 25, 100)
-        };
+          max_tokens: 500,
+          temperature: 0.7
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('OpenAI API request failed');
       }
+
+      const data = await response.json();
+      const content = data.choices[0]?.message?.content || '';
+      
+      // Parse the response to extract keywords
+      return content.split('\n')
+        .map((line: string) => line.replace(/^\d+\.\s*/, '').trim())
+        .filter((kw: string) => kw.length > 0)
+        .slice(0, 10);
+
     } catch (error) {
-      console.error('Erreur analyse SEO:', error);
-      return {
-        keywordDensity: 0,
-        suggestions: ['Erreur lors de l\'analyse'],
-        score: 0
-      };
+      console.error('Error generating keywords:', error);
+      return [];
+    }
+  }
+
+  async generateLongTailKeywords(keyword: string): Promise<string[]> {
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4.1-2025-04-14',
+          messages: [
+            {
+              role: 'system',
+              content: 'Générez des mots-clés de longue traîne (3-5 mots) spécifiques et détaillés.'
+            },
+            {
+              role: 'user',
+              content: `Générez des mots-clés longue traîne pour: ${keyword}`
+            }
+          ],
+          max_tokens: 500,
+          temperature: 0.7
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('OpenAI API request failed');
+      }
+
+      const data = await response.json();
+      const content = data.choices[0]?.message?.content || '';
+      
+      return content.split('\n')
+        .map((line: string) => line.replace(/^\d+\.\s*/, '').trim())
+        .filter((kw: string) => kw.length > 0)
+        .slice(0, 8);
+
+    } catch (error) {
+      console.error('Error generating long tail keywords:', error);
+      return [];
+    }
+  }
+
+  async generateSemanticKeywords(keyword: string): Promise<string[]> {
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4.1-2025-04-14',
+          messages: [
+            {
+              role: 'system',
+              content: 'Générez des mots-clés sémantiquement liés et des synonymes.'
+            },
+            {
+              role: 'user',
+              content: `Générez des mots-clés sémantiques pour: ${keyword}`
+            }
+          ],
+          max_tokens: 500,
+          temperature: 0.7
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('OpenAI API request failed');
+      }
+
+      const data = await response.json();
+      const content = data.choices[0]?.message?.content || '';
+      
+      return content.split('\n')
+        .map((line: string) => line.replace(/^\d+\.\s*/, '').trim())
+        .filter((kw: string) => kw.length > 0)
+        .slice(0, 8);
+
+    } catch (error) {
+      console.error('Error generating semantic keywords:', error);
+      return [];
+    }
+  }
+
+  async generateQuestions(keyword: string): Promise<string[]> {
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4.1-2025-04-14',
+          messages: [
+            {
+              role: 'system',
+              content: 'Générez des questions fréquemment posées liées au sujet.'
+            },
+            {
+              role: 'user',
+              content: `Générez des questions sur: ${keyword}`
+            }
+          ],
+          max_tokens: 500,
+          temperature: 0.7
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('OpenAI API request failed');
+      }
+
+      const data = await response.json();
+      const content = data.choices[0]?.message?.content || '';
+      
+      return content.split('\n')
+        .map((line: string) => line.replace(/^\d+\.\s*/, '').trim())
+        .filter((kw: string) => kw.length > 0 && kw.includes('?'))
+        .slice(0, 8);
+
+    } catch (error) {
+      console.error('Error generating questions:', error);
+      return [];
     }
   }
 }

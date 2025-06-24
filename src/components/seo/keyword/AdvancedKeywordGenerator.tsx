@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
@@ -8,7 +9,6 @@ import {
 import { toast } from "sonner";
 import { OpenAIService } from "@/utils/seo/openaiService";
 import { KeywordSuggestion, ContentSuggestion } from "@/types/seo/Keyword";
-import ApiConfiguration from './ApiConfiguration';
 import KeywordSearchForm from './KeywordSearchForm';
 import KeywordResultsDisplay from './KeywordResultsDisplay';
 import KeywordStatistics from './KeywordStatistics';
@@ -23,18 +23,42 @@ import LocalSeoAnalyzer from './LocalSeoAnalyzer';
 import KeywordRankingTracker from './KeywordRankingTracker';
 import ContentOptimizationSuggestions from './ContentOptimizationSuggestions';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Hash } from "lucide-react";
 
 const AdvancedKeywordGenerator = () => {
   const [keyword, setKeyword] = useState('');
   const [openaiKey, setOpenaiKey] = useState(() => localStorage.getItem('openaiKey') || '');
   const [isConfigured, setIsConfigured] = useState(() => !!localStorage.getItem('openaiKey'));
-  const [showApiConfig, setShowApiConfig] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [keywords, setKeywords] = useState<KeywordSuggestion[]>([]);
   const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
   const [contentSuggestions, setContentSuggestions] = useState<ContentSuggestion | null>(null);
-  const [activeTab, setActiveTab] = useState('generator');
+  const [activeTab, setActiveTab] = useState('config');
+
+  const validateAndSaveApiKey = async () => {
+    if (!openaiKey.trim()) {
+      toast.error("Veuillez entrer une clé API OpenAI");
+      return;
+    }
+
+    try {
+      const openAIService = new OpenAIService(openaiKey);
+      const isValid = await openAIService.validateApiKey();
+      
+      if (isValid) {
+        localStorage.setItem('openaiKey', openaiKey);
+        setIsConfigured(true);
+        setActiveTab('generator');
+        toast.success("Clé API OpenAI configurée avec succès !");
+      } else {
+        toast.error("Clé API OpenAI invalide");
+      }
+    } catch (error) {
+      toast.error("Erreur lors de la validation de la clé API");
+    }
+  };
 
   const generateAdvancedKeywords = async () => {
     if (!keyword.trim()) {
@@ -156,11 +180,6 @@ const AdvancedKeywordGenerator = () => {
     );
   };
 
-  const handleApiConfigured = () => {
-    setIsConfigured(true);
-    setActiveTab('generator');
-  };
-
   return (
     <div className="space-y-6">
       <KeywordSearchForm
@@ -222,14 +241,6 @@ const AdvancedKeywordGenerator = () => {
             <BarChart3 className="h-4 w-4" />
             Densité
           </TabsTrigger>
-          <TabsTrigger value="trends" className="flex items-center gap-1">
-            <TrendingUp className="h-4 w-4" />
-            Tendances
-          </TabsTrigger>
-          <TabsTrigger value="questions" className="flex items-center gap-1">
-            <MessageSquare className="h-4 w-4" />
-            Questions
-          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="config">
@@ -269,12 +280,33 @@ const AdvancedKeywordGenerator = () => {
                 </div>
               </div>
 
-              <ApiConfiguration
-                openaiKey={openaiKey}
-                setOpenaiKey={setOpenaiKey}
-                onConfigured={handleApiConfigured}
-                onCancel={() => setActiveTab('generator')}
-              />
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Clé API OpenAI
+                  </label>
+                  <Input
+                    type="password"
+                    placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxx"
+                    value={openaiKey}
+                    onChange={(e) => setOpenaiKey(e.target.value)}
+                    className="w-full"
+                  />
+                </div>
+
+                <div className="flex gap-2">
+                  <Button onClick={validateAndSaveApiKey} className="flex-1">
+                    Valider et sauvegarder
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setActiveTab('generator')}
+                    className="flex-1"
+                  >
+                    Passer cette étape
+                  </Button>
+                </div>
+              </div>
 
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                 <h4 className="font-medium text-gray-900 mb-2">
@@ -390,37 +422,6 @@ const AdvancedKeywordGenerator = () => {
 
         <TabsContent value="density">
           <KeywordDensityAnalyzer />
-        </TabsContent>
-
-        <TabsContent value="questions">
-          {contentSuggestions ? (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <HelpCircle className="h-5 w-5 text-green-600" />
-                  Questions FAQ générées par IA
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {contentSuggestions.faqQuestions.map((question, index) => (
-                    <Card key={index} className="p-4">
-                      <h4 className="font-medium text-sm mb-2">{question}</h4>
-                      <p className="text-xs text-gray-600">
-                        Réponse suggérée à développer pour optimiser le SEO
-                      </p>
-                    </Card>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <KeywordQuestions />
-          )}
-        </TabsContent>
-
-        <TabsContent value="trends">
-          <KeywordStatistics keywords={keywords} />
         </TabsContent>
       </Tabs>
     </div>
