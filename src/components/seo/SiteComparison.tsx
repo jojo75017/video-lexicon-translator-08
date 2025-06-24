@@ -1,226 +1,145 @@
 
 import React, { useState } from 'react';
-import { Card } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { SeoAnalysis } from '@/types/seo';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Loader2, BarChart3, Globe } from "lucide-react";
+import { KeywordSuggestion } from '../../types/seo/KeywordSuggestion';
 import { toast } from "sonner";
-import { createDataForSEOService } from '@/services/dataForSeoService';
-import { OpenAIService } from '@/utils/seo/openaiService';
-import ComparisonChart from './comparison/ComparisonChart';
-import KeywordSuggestionsTab from './comparison/KeywordSuggestionsTab';
-import ComparisonHeader from './comparison/ComparisonHeader';
 
-interface KeywordSuggestion {
-  keyword: string;
-  volume: number;
-  difficulty: number;
-  cpc: number;
-  competition: number;
-}
+const SiteComparison = () => {
+  const [url1, setUrl1] = useState('');
+  const [url2, setUrl2] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [keywords1, setKeywords1] = useState<KeywordSuggestion[]>([]);
+  const [keywords2, setKeywords2] = useState<KeywordSuggestion[]>([]);
 
-interface SiteComparisonProps {
-  site1: {
-    url: string;
-    analysis: SeoAnalysis;
-  };
-  site2?: {
-    url: string;
-    analysis: SeoAnalysis;
-  };
-  onCompare: (url: string) => void;
-}
-
-const SiteComparison = ({ site1, site2, onCompare }: SiteComparisonProps) => {
-  const [competitorUrl, setCompetitorUrl] = useState('');
-  const [keywordSuggestions, setKeywordSuggestions] = useState<KeywordSuggestion[]>([]);
-  const [isLoadingKeywords, setIsLoadingKeywords] = useState(false);
-  const [useRealData, setUseRealData] = useState(false);
-  const [apiCredentials, setApiCredentials] = useState({
-    login: '',
-    password: ''
-  });
-  const [useOpenAI, setUseOpenAI] = useState(false);
-
-  const fetchKeywordData = async (keyword: string): Promise<KeywordSuggestion> => {
-    if (useRealData && apiCredentials.login && apiCredentials.password) {
-      const service = createDataForSEOService(apiCredentials.login, apiCredentials.password);
-      return service.getKeywordData(keyword);
-    }
-    
-    // Utiliser OpenAI si activé
-    if (useOpenAI) {
-      const openaiKey = localStorage.getItem('openaiKey');
-      if (openaiKey) {
-        try {
-          const openaiService = new OpenAIService(openaiKey);
-          const suggestions = await openaiService.getKeywordSuggestions(keyword);
-          // Retourner la première suggestion (pour cette fonction spécifique)
-          if (suggestions.length > 0) {
-            return suggestions[0];
-          }
-        } catch (error) {
-          console.error("Erreur OpenAI:", error);
-          toast.error("Erreur lors de la récupération des données OpenAI");
-        }
-      }
+  const compareKeywords = async () => {
+    if (!url1.trim() || !url2.trim()) {
+      toast.error('Veuillez entrer les deux URLs');
+      return;
     }
 
-    // Fallback vers des données simulées
-    await new Promise(resolve => setTimeout(resolve, 500));
-    return {
-      keyword,
-      volume: Math.floor(Math.random() * 10000),
-      difficulty: Math.floor(Math.random() * 100),
-      cpc: parseFloat((Math.random() * 5).toFixed(2)),
-      competition: Math.random()
-    };
-  };
-
-  const getKeywordSuggestions = async () => {
-    setIsLoadingKeywords(true);
+    setIsAnalyzing(true);
     try {
-      const baseKeywords = site1.analysis.keywords || [];
-      const keywords = baseKeywords.slice(0, 5);
-      
-      // Vérifier si on utilise OpenAI
-      const openaiKey = localStorage.getItem('openaiKey');
-      if (openaiKey && keywords.length > 0) {
-        setUseOpenAI(true);
-        try {
-          const openaiService = new OpenAIService(openaiKey);
-          const mainKeyword = typeof keywords[0] === 'string' 
-            ? keywords[0] 
-            : (keywords[0] && typeof keywords[0] === 'object' && 'keyword' in keywords[0]) 
-              ? String((keywords[0] as { keyword: string }).keyword)
-              : String(keywords[0]);
-              
-          const openaiSuggestions = await openaiService.getKeywordSuggestions(mainKeyword);
-          setKeywordSuggestions(openaiSuggestions);
-          toast.success("Suggestions générées avec OpenAI");
-          setIsLoadingKeywords(false);
-          return;
-        } catch (error) {
-          console.error("Erreur OpenAI:", error);
-          toast.error("Erreur OpenAI, utilisation des données alternatives");
-        }
-      }
-      
-      // Fallback vers l'ancienne méthode
-      const suggestions = await Promise.all(
-        keywords.map(kw => {
-          const keyword = typeof kw === 'string' 
-            ? kw 
-            : (kw && typeof kw === 'object' && 'keyword' in kw) 
-              ? String((kw as { keyword: string }).keyword)
-              : String(kw);
-              
-          return fetchKeywordData(keyword);
-        })
-      );
-      
-      setKeywordSuggestions(suggestions);
+      // Simulation de données pour la comparaison
+      const mockKeywords1: KeywordSuggestion[] = [
+        { keyword: 'seo analysis', volume: 1200, difficulty: 45 },
+        { keyword: 'website optimization', volume: 800, difficulty: 35 },
+        { keyword: 'digital marketing', volume: 2000, difficulty: 60 }
+      ];
+
+      const mockKeywords2: KeywordSuggestion[] = [
+        { keyword: 'seo tools', volume: 1500, difficulty: 50 },
+        { keyword: 'keyword research', volume: 900, difficulty: 40 },
+        { keyword: 'content marketing', volume: 1800, difficulty: 55 }
+      ];
+
+      setKeywords1(mockKeywords1);
+      setKeywords2(mockKeywords2);
+      toast.success('Comparaison terminée !');
     } catch (error) {
-      console.error('Erreur lors de la récupération des données de mots-clés:', error);
-      toast.error("Erreur lors de la récupération des suggestions de mots-clés");
+      toast.error('Erreur lors de la comparaison');
     } finally {
-      setIsLoadingKeywords(false);
+      setIsAnalyzing(false);
     }
   };
-
-  React.useEffect(() => {
-    if (site1.analysis.keywords?.length) {
-      getKeywordSuggestions();
-    }
-  }, [site1.analysis.keywords]);
-
-  const handleApiCredentialsSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (apiCredentials.login && apiCredentials.password) {
-      setUseRealData(true);
-      toast.success("Identifiants DataForSEO enregistrés");
-      getKeywordSuggestions();
-    }
-  };
-
-  const handleCompare = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (competitorUrl) {
-      onCompare(competitorUrl);
-      setCompetitorUrl('');
-    }
-  };
-
-  if (!site2) {
-    return (
-      <Card className="p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">Comparaison de pages</h2>
-        </div>
-
-        <form onSubmit={handleCompare} className="space-y-4">
-          <div className="flex flex-col space-y-2">
-            <label htmlFor="competitor-url" className="text-sm font-medium text-gray-700">
-              URL de la page à comparer
-            </label>
-            <div className="flex gap-2">
-              <Input
-                id="competitor-url"
-                type="url"
-                value={competitorUrl}
-                onChange={(e) => setCompetitorUrl(e.target.value)}
-                placeholder="https://monsite.com/autre-page"
-                className="flex-1"
-              />
-              <Button type="submit" className="bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:opacity-90">
-                Comparer
-              </Button>
-            </div>
-          </div>
-        </form>
-      </Card>
-    );
-  }
 
   return (
-    <Card className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Comparaison de pages</h2>
-      </div>
-
-      <Tabs defaultValue="comparison" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="comparison">Comparaison</TabsTrigger>
-          <TabsTrigger value="keywords">Suggestions de mots-clés</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="comparison">
-          <div className="space-y-6">
-            <div className="mb-6">
-              <ComparisonHeader
-                site1Url={site1.url}
-                site2Url={site2.url}
-                onChangeSite={() => onCompare('')}
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BarChart3 className="h-5 w-5 text-purple-600" />
+            Comparaison de Sites
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Site 1</label>
+              <Input
+                placeholder="https://site1.com"
+                value={url1}
+                onChange={(e) => setUrl1(e.target.value)}
               />
             </div>
-
-            <ComparisonChart site1={site1} site2={site2} />
+            <div>
+              <label className="text-sm font-medium mb-2 block">Site 2</label>
+              <Input
+                placeholder="https://site2.com"
+                value={url2}
+                onChange={(e) => setUrl2(e.target.value)}
+              />
+            </div>
           </div>
-        </TabsContent>
+          
+          <Button
+            onClick={compareKeywords}
+            disabled={isAnalyzing || !url1.trim() || !url2.trim()}
+            className="w-full"
+          >
+            {isAnalyzing ? (
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            ) : (
+              <Globe className="h-4 w-4 mr-2" />
+            )}
+            Comparer les Sites
+          </Button>
+        </CardContent>
+      </Card>
 
-        <TabsContent value="keywords">
-          <KeywordSuggestionsTab
-            keywordSuggestions={keywordSuggestions}
-            isLoadingKeywords={isLoadingKeywords}
-            useRealData={useRealData || useOpenAI}
-            apiCredentials={apiCredentials}
-            onApiCredentialsChange={setApiCredentials}
-            onApiCredentialsSubmit={handleApiCredentialsSubmit}
-          />
-        </TabsContent>
-      </Tabs>
-    </Card>
+      {(keywords1.length > 0 || keywords2.length > 0) && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Site 1 - Mots-clés</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {keywords1.map((kw, index) => (
+                  <div key={index} className="flex items-center justify-between p-2 border rounded">
+                    <span className="text-sm font-medium">{kw.keyword}</span>
+                    <div className="flex gap-2">
+                      <Badge variant="outline" className="text-xs">
+                        {kw.volume?.toLocaleString()}
+                      </Badge>
+                      <Badge variant="outline" className="text-xs">
+                        {kw.difficulty}/100
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Site 2 - Mots-clés</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {keywords2.map((kw, index) => (
+                  <div key={index} className="flex items-center justify-between p-2 border rounded">
+                    <span className="text-sm font-medium">{kw.keyword}</span>
+                    <div className="flex gap-2">
+                      <Badge variant="outline" className="text-xs">
+                        {kw.volume?.toLocaleString()}
+                      </Badge>
+                      <Badge variant="outline" className="text-xs">
+                        {kw.difficulty}/100
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+    </div>
   );
 };
 
