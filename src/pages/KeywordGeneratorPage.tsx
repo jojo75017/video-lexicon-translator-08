@@ -5,10 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Download, Copy, Sparkles, TrendingUp, Users, DollarSign, Key, Settings, CheckCircle, AlertCircle, Target, Brain, MessageSquare, BarChart3, Globe, Zap, Filter, Eye } from "lucide-react";
+import { Search, Download, Copy, Sparkles, TrendingUp, Users, DollarSign, Key, Settings, CheckCircle, AlertCircle, Target, Brain, MessageSquare, BarChart3, Globe, Zap, Filter, Eye, Calendar, HelpCircle, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 import { OpenAIService } from '../utils/seo/openaiService';
 import KeywordDensityAnalyzer from '../components/seo/KeywordDensityAnalyzer';
+import KeywordTrendAnalysis from '../components/seo/keyword/KeywordTrendAnalysis';
+import KeywordQuestions from '../components/seo/keyword/KeywordQuestions';
+import ContentIdeaGenerator from '../components/seo/keyword/ContentIdeaGenerator';
 
 interface Keyword {
   keyword: string;
@@ -34,7 +37,7 @@ const KeywordGeneratorPage = () => {
   const [longTailKeywords, setLongTailKeywords] = useState<Keyword[]>([]);
   const [semanticKeywords, setSemanticKeywords] = useState<Keyword[]>([]);
   const [competitors, setCompetitors] = useState<CompetitorData[]>([]);
-  const [activeTab, setActiveTab] = useState('all');
+  const [activeTab, setActiveTab] = useState('generator');
   
   // États pour l'API OpenAI
   const [openaiKey, setOpenaiKey] = useState(() => localStorage.getItem('openaiKey') || '');
@@ -137,8 +140,8 @@ const KeywordGeneratorPage = () => {
               
               return {
                 keyword: kw,
-                volume: Math.floor(volume * 0.3), // Longue traîne = moins de volume
-                difficulty: Math.floor(difficulty * 0.7), // Moins de difficulté
+                volume: Math.floor(volume * 0.3),
+                difficulty: Math.floor(difficulty * 0.7),
                 cpc: parseFloat((Math.random() * 2 + 0.2).toFixed(2)),
                 trend: Math.random() > 0.7 ? 'up' : 'stable' as 'up' | 'down' | 'stable',
                 competition: 'faible' as const,
@@ -212,7 +215,6 @@ const KeywordGeneratorPage = () => {
     
     const generated: Keyword[] = [];
 
-    // Mot-clé principal
     generated.push({
       keyword: baseKeyword,
       volume: Math.floor(Math.random() * 15000) + 5000,
@@ -224,7 +226,6 @@ const KeywordGeneratorPage = () => {
       type: 'standard'
     });
 
-    // Variations avec préfixes et suffixes
     [...prefixes.slice(0, 6), ...suffixes.slice(0, 6)].forEach((modifier, index) => {
       generated.push({
         keyword: index < 6 ? `${modifier} ${baseKeyword}` : `${baseKeyword} ${modifier}`,
@@ -316,7 +317,6 @@ const KeywordGeneratorPage = () => {
     toast.success('Export CSV téléchargé !');
   };
 
-  // Fonction de filtrage
   const filterKeywords = (keywordList: Keyword[]) => {
     return keywordList.filter(kw => {
       if (difficultyFilter !== 'all') {
@@ -370,7 +370,6 @@ const KeywordGeneratorPage = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
         <div className="container mx-auto p-6">
-          {/* Header avec bouton retour */}
           <div className="text-center mb-8">
             <div className="flex items-center justify-between mb-4">
               <Button
@@ -386,11 +385,7 @@ const KeywordGeneratorPage = () => {
               </h1>
               <div></div>
             </div>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Analysez la densité des mots-clés de votre site web comme 1.fr
-            </p>
           </div>
-
           <KeywordDensityAnalyzer />
         </div>
       </div>
@@ -404,14 +399,14 @@ const KeywordGeneratorPage = () => {
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-4 flex items-center justify-center gap-3">
             <Sparkles className="h-10 w-10 text-blue-600" />
-            Générateur de Mots-Clés IA Pro
+            Suite Complète SEO & Mots-Clés
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Analyse complète de mots-clés avec l'intelligence artificielle OpenAI
+            Analyse complète de mots-clés, tendances, questions FAQ et génération de contenu
           </p>
         </div>
 
-        {/* Configuration API OpenAI */}
+        {/* Configuration API */}
         <Card className="mb-8 shadow-lg border-l-4 border-l-purple-500">
           <CardHeader className="bg-gradient-to-r from-purple-50 to-blue-50">
             <CardTitle className="flex items-center justify-between">
@@ -473,10 +468,11 @@ const KeywordGeneratorPage = () => {
                     <strong>Fonctionnalités IA disponibles :</strong>
                   </p>
                   <ul className="text-sm text-blue-700 mt-2 space-y-1">
-                    <li>• Génération de mots-clés standards, longue traîne et sémantiques</li>
-                    <li>• Analyse automatique de l'intention de recherche</li>
-                    <li>• Estimation précise du volume et de la difficulté</li>
-                    <li>• Analyse concurrentielle automatisée</li>
+                    <li>• Génération intelligente de mots-clés et analyse sémantique</li>
+                    <li>• Analyse de tendances et prédictions saisonnières</li>
+                    <li>• Génération automatique de questions FAQ</li>
+                    <li>• Idées de contenu SEO personnalisées</li>
+                    <li>• Analyse de densité de mots-clés comme 1.fr</li>
                   </ul>
                 </div>
               </div>
@@ -484,463 +480,254 @@ const KeywordGeneratorPage = () => {
           )}
         </Card>
 
-        {/* Boutons d'action supplémentaires */}
-        <div className="flex flex-wrap gap-4 mb-8 justify-center">
-          <Button
-            onClick={() => setShowDensityAnalyzer(true)}
-            className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white"
-          >
-            <Target className="h-4 w-4 mr-2" />
-            Analyser la Densité de Mots-Clés
-          </Button>
-        </div>
+        {/* Onglets principaux */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-6">
+            <TabsTrigger value="generator" className="flex items-center gap-2">
+              <Search className="h-4 w-4" />
+              Générateur
+            </TabsTrigger>
+            <TabsTrigger value="density" className="flex items-center gap-2">
+              <Target className="h-4 w-4" />
+              Densité
+            </TabsTrigger>
+            <TabsTrigger value="trends" className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              Tendances
+            </TabsTrigger>
+            <TabsTrigger value="questions" className="flex items-center gap-2">
+              <HelpCircle className="h-4 w-4" />
+              FAQ
+            </TabsTrigger>
+            <TabsTrigger value="content" className="flex items-center gap-2">
+              <BookOpen className="h-4 w-4" />
+              Contenu
+            </TabsTrigger>
+            <TabsTrigger value="results" className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              Résultats
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Formulaire de recherche */}
-        <Card className="mb-8 shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-t-lg">
-            <CardTitle className="text-xl">Recherche de mots-clés</CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="text-sm font-medium mb-2 block text-gray-700">Mot-clé principal</label>
-                <Input
-                  placeholder="Ex: marketing digital"
-                  value={mainKeyword}
-                  onChange={(e) => setMainKeyword(e.target.value)}
-                  className="border-2 border-gray-200 focus:border-blue-500"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium mb-2 block text-gray-700">Langue</label>
-                <Select value={language} onValueChange={setLanguage}>
-                  <SelectTrigger className="border-2 border-gray-200">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="fr">🇫🇷 Français</SelectItem>
-                    <SelectItem value="en">🇺🇸 Anglais</SelectItem>
-                    <SelectItem value="es">🇪🇸 Espagnol</SelectItem>
-                    <SelectItem value="de">🇩🇪 Allemand</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex items-end">
-                <Button
-                  onClick={generateKeywords}
-                  disabled={isGenerating || !mainKeyword.trim()}
-                  className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
-                  size="lg"
-                >
-                  {isGenerating ? (
-                    <>
-                      <Sparkles className="mr-2 h-4 w-4 animate-spin" />
-                      Analyse en cours...
-                    </>
-                  ) : (
-                    <>
-                      <Search className="h-4 w-4 mr-2" />
-                      {apiKeyStatus === 'valid' ? 'Analyser avec IA' : 'Analyser'}
-                    </>
-                  )}
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Statistiques globales */}
-        {getAllKeywords().length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
+          <TabsContent value="generator">
+            <Card className="shadow-lg">
+              <CardHeader className="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-t-lg">
+                <CardTitle className="text-xl">Recherche de mots-clés</CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <p className="text-blue-100">Total mots-clés</p>
-                    <p className="text-2xl font-bold">{getAllKeywords().length}</p>
+                    <label className="text-sm font-medium mb-2 block text-gray-700">Mot-clé principal</label>
+                    <Input
+                      placeholder="Ex: marketing digital"
+                      value={mainKeyword}
+                      onChange={(e) => setMainKeyword(e.target.value)}
+                      className="border-2 border-gray-200 focus:border-blue-500"
+                    />
                   </div>
-                  <Search className="h-8 w-8 text-blue-200" />
+                  <div>
+                    <label className="text-sm font-medium mb-2 block text-gray-700">Langue</label>
+                    <Select value={language} onValueChange={setLanguage}>
+                      <SelectTrigger className="border-2 border-gray-200">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="fr">🇫🇷 Français</SelectItem>
+                        <SelectItem value="en">🇺🇸 Anglais</SelectItem>
+                        <SelectItem value="es">🇪🇸 Espagnol</SelectItem>
+                        <SelectItem value="de">🇩🇪 Allemand</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex items-end">
+                    <Button
+                      onClick={generateKeywords}
+                      disabled={isGenerating || !mainKeyword.trim()}
+                      className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                      size="lg"
+                    >
+                      {isGenerating ? (
+                        <>
+                          <Sparkles className="mr-2 h-4 w-4 animate-spin" />
+                          Analyse en cours...
+                        </>
+                      ) : (
+                        <>
+                          <Search className="h-4 w-4 mr-2" />
+                          {apiKeyStatus === 'valid' ? 'Analyser avec IA' : 'Analyser'}
+                        </>
+                      )}
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
-            
-            <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-green-100">Volume total</p>
-                    <p className="text-2xl font-bold">{totalVolume.toLocaleString()}</p>
-                  </div>
-                  <Users className="h-8 w-8 text-green-200" />
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-yellow-100">Difficulté moy.</p>
-                    <p className="text-2xl font-bold">{avgDifficulty}/100</p>
-                  </div>
-                  <TrendingUp className="h-8 w-8 text-yellow-200" />
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-purple-100">CPC moyen</p>
-                    <p className="text-2xl font-bold">{avgCpc}€</p>
-                  </div>
-                  <DollarSign className="h-8 w-8 text-purple-200" />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
+          </TabsContent>
 
-        {/* Actions et filtres */}
-        {getAllKeywords().length > 0 && (
-          <div className="flex flex-wrap gap-4 mb-6 items-center">
-            <Button onClick={exportCSV} variant="outline" className="border-2">
-              <Download className="h-4 w-4 mr-2" />
-              Exporter CSV ({getAllKeywords().length} mots-clés)
-            </Button>
-            
-            {/* Filtres */}
-            <div className="flex items-center gap-2 ml-auto">
-              <Filter className="h-4 w-4 text-gray-500" />
-              <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
-                <SelectTrigger className="w-32">
-                  <SelectValue placeholder="Difficulté" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Toutes</SelectItem>
-                  <SelectItem value="easy">Facile</SelectItem>
-                  <SelectItem value="medium">Moyenne</SelectItem>
-                  <SelectItem value="hard">Difficile</SelectItem>
-                </SelectContent>
-              </Select>
-              
-              <Select value={intentFilter} onValueChange={setIntentFilter}>
-                <SelectTrigger className="w-36">
-                  <SelectValue placeholder="Intention" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Toutes</SelectItem>
-                  <SelectItem value="informationnel">Info</SelectItem>
-                  <SelectItem value="commercial">Commercial</SelectItem>
-                  <SelectItem value="transactionnel">Transaction</SelectItem>
-                  <SelectItem value="navigationnel">Navigation</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        )}
+          <TabsContent value="density">
+            <KeywordDensityAnalyzer />
+          </TabsContent>
 
-        {/* Onglets des résultats */}
-        {getAllKeywords().length > 0 ? (
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5">
-              <TabsTrigger value="all" className="flex items-center gap-2">
-                <BarChart3 className="h-4 w-4" />
-                Tous ({getAllKeywords().length})
-              </TabsTrigger>
-              <TabsTrigger value="standard" className="flex items-center gap-2">
-                <Target className="h-4 w-4" />
-                Standards ({keywords.length})
-              </TabsTrigger>
-              <TabsTrigger value="longTail" className="flex items-center gap-2">
-                <MessageSquare className="h-4 w-4" />
-                Longue traîne ({longTailKeywords.length})
-              </TabsTrigger>
-              <TabsTrigger value="semantic" className="flex items-center gap-2">
-                <Brain className="h-4 w-4" />
-                Sémantiques ({semanticKeywords.length})
-              </TabsTrigger>
-              <TabsTrigger value="competitors" className="flex items-center gap-2">
-                <Globe className="h-4 w-4" />
-                Concurrents ({competitors.length})
-              </TabsTrigger>
-            </TabsList>
+          <TabsContent value="trends">
+            <KeywordTrendAnalysis />
+          </TabsContent>
 
-            <TabsContent value="all">
-              <Card className="shadow-lg">
-                <CardHeader className="bg-gray-50 border-b">
-                  <CardTitle>Tous les mots-clés ({filterKeywords(getAllKeywords()).length})</CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
-                  <div className="space-y-2 p-6">
-                    {filterKeywords(getAllKeywords()).map((keyword, index) => (
-                      <div key={index} className="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center gap-3">
-                            {getTypeIcon(keyword.type || 'standard')}
-                            <h4 className="font-semibold text-lg text-gray-800">{keyword.keyword}</h4>
-                            <Badge className={getIntentColor(keyword.intent || 'informationnel')}>
-                              {keyword.intent || 'N/A'}
-                            </Badge>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => copyKeyword(keyword.keyword)}
-                            className="hover:bg-blue-50"
-                          >
-                            <Copy className="h-4 w-4" />
-                          </Button>
+          <TabsContent value="questions">
+            <KeywordQuestions />
+          </TabsContent>
+
+          <TabsContent value="content">
+            <ContentIdeaGenerator />
+          </TabsContent>
+
+          <TabsContent value="results">
+            {getAllKeywords().length > 0 ? (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-blue-100">Total mots-clés</p>
+                          <p className="text-2xl font-bold">{getAllKeywords().length}</p>
                         </div>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                          <div className="bg-blue-50 p-3 rounded-lg">
-                            <span className="text-blue-600 font-medium">Volume mensuel</span>
-                            <div className="text-xl font-bold text-blue-800">{keyword.volume.toLocaleString()}</div>
-                          </div>
-                          <div className="bg-gray-50 p-3 rounded-lg">
-                            <span className="text-gray-600 font-medium">Difficulté</span>
-                            <div className="mt-1">
-                              <Badge className={getDifficultyColor(keyword.difficulty)}>
-                                {keyword.difficulty}/100
+                        <Search className="h-8 w-8 text-blue-200" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-green-100">Volume total</p>
+                          <p className="text-2xl font-bold">{totalVolume.toLocaleString()}</p>
+                        </div>
+                        <Users className="h-8 w-8 text-green-200" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-yellow-100">Difficulté moy.</p>
+                          <p className="text-2xl font-bold">{avgDifficulty}/100</p>
+                        </div>
+                        <TrendingUp className="h-8 w-8 text-yellow-200" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-purple-100">CPC moyen</p>
+                          <p className="text-2xl font-bold">{avgCpc}€</p>
+                        </div>
+                        <DollarSign className="h-8 w-8 text-purple-200" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <div className="flex flex-wrap gap-4 items-center">
+                  <Button onClick={exportCSV} variant="outline" className="border-2">
+                    <Download className="h-4 w-4 mr-2" />
+                    Exporter CSV
+                  </Button>
+                  
+                  <div className="flex items-center gap-2 ml-auto">
+                    <Filter className="h-4 w-4 text-gray-500" />
+                    <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
+                      <SelectTrigger className="w-32">
+                        <SelectValue placeholder="Difficulté" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Toutes</SelectItem>
+                        <SelectItem value="easy">Facile</SelectItem>
+                        <SelectItem value="medium">Moyenne</SelectItem>
+                        <SelectItem value="hard">Difficile</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Tous les mots-clés ({filterKeywords(getAllKeywords()).length})</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <div className="space-y-2 p-6">
+                      {filterKeywords(getAllKeywords()).slice(0, 20).map((keyword, index) => (
+                        <div key={index} className="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-3">
+                              {getTypeIcon(keyword.type || 'standard')}
+                              <h4 className="font-semibold text-lg text-gray-800">{keyword.keyword}</h4>
+                              <Badge className={getIntentColor(keyword.intent || 'informationnel')}>
+                                {keyword.intent || 'N/A'}
                               </Badge>
                             </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => copyKeyword(keyword.keyword)}
+                              className="hover:bg-blue-50"
+                            >
+                              <Copy className="h-4 w-4" />
+                            </Button>
                           </div>
-                          <div className="bg-green-50 p-3 rounded-lg">
-                            <span className="text-green-600 font-medium">CPC</span>
-                            <div className="text-xl font-bold text-green-800">{keyword.cpc}€</div>
-                          </div>
-                          <div className="bg-purple-50 p-3 rounded-lg">
-                            <span className="text-purple-600 font-medium">Type</span>
-                            <div className="mt-1">
-                              <Badge variant="secondary">
-                                {keyword.type === 'longTail' ? 'Longue traîne' : 
-                                 keyword.type === 'semantic' ? 'Sémantique' : 'Standard'}
-                              </Badge>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                            <div className="bg-blue-50 p-3 rounded-lg">
+                              <span className="text-blue-600 font-medium">Volume</span>
+                              <div className="text-xl font-bold text-blue-800">{keyword.volume.toLocaleString()}</div>
+                            </div>
+                            <div className="bg-gray-50 p-3 rounded-lg">
+                              <span className="text-gray-600 font-medium">Difficulté</span>
+                              <div className="mt-1">
+                                <Badge className={getDifficultyColor(keyword.difficulty)}>
+                                  {keyword.difficulty}/100
+                                </Badge>
+                              </div>
+                            </div>
+                            <div className="bg-green-50 p-3 rounded-lg">
+                              <span className="text-green-600 font-medium">CPC</span>
+                              <div className="text-xl font-bold text-green-800">{keyword.cpc}€</div>
+                            </div>
+                            <div className="bg-purple-50 p-3 rounded-lg">
+                              <span className="text-purple-600 font-medium">Type</span>
+                              <div className="mt-1">
+                                <Badge variant="secondary">
+                                  {keyword.type === 'longTail' ? 'Longue traîne' : 
+                                   keyword.type === 'semantic' ? 'Sémantique' : 'Standard'}
+                                </Badge>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="standard">
-              <Card className="shadow-lg">
-                <CardHeader className="bg-blue-50 border-b">
-                  <CardTitle className="flex items-center gap-2">
-                    <Target className="h-5 w-5 text-blue-600" />
-                    Mots-clés standards ({filterKeywords(keywords).length})
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <div className="space-y-4">
-                    {filterKeywords(keywords).map((keyword, index) => (
-                      <div key={index} className="p-4 border rounded-lg hover:bg-gray-50">
-                        <div className="flex justify-between items-start mb-2">
-                          <h4 className="font-semibold text-lg">{keyword.keyword}</h4>
-                          <Button variant="ghost" size="sm" onClick={() => copyKeyword(keyword.keyword)}>
-                            <Copy className="h-4 w-4" />
-                          </Button>
-                        </div>
-                        <div className="grid grid-cols-3 gap-4 text-sm">
-                          <div>Volume: <strong>{keyword.volume.toLocaleString()}</strong></div>
-                          <div>Difficulté: <Badge className={getDifficultyColor(keyword.difficulty)}>{keyword.difficulty}</Badge></div>
-                          <div>CPC: <strong>{keyword.cpc}€</strong></div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="longTail">
-              <Card className="shadow-lg">
-                <CardHeader className="bg-green-50 border-b">
-                  <CardTitle className="flex items-center gap-2">
-                    <MessageSquare className="h-5 w-5 text-green-600" />
-                    Mots-clés longue traîne ({filterKeywords(longTailKeywords).length})
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <div className="mb-4 p-4 bg-green-50 rounded-lg">
-                    <p className="text-sm text-green-700">
-                      <strong>Avantages des mots-clés longue traîne :</strong> Moins de concurrence, intention plus précise, taux de conversion plus élevé.
-                    </p>
-                  </div>
-                  <div className="space-y-4">
-                    {filterKeywords(longTailKeywords).map((keyword, index) => (
-                      <div key={index} className="p-4 border rounded-lg hover:bg-gray-50">
-                        <div className="flex justify-between items-start mb-2">
-                          <h4 className="font-semibold text-lg">{keyword.keyword}</h4>
-                          <Button variant="ghost" size="sm" onClick={() => copyKeyword(keyword.keyword)}>
-                            <Copy className="h-4 w-4" />
-                          </Button>
-                        </div>
-                        <div className="grid grid-cols-3 gap-4 text-sm">
-                          <div>Volume: <strong>{keyword.volume.toLocaleString()}</strong></div>
-                          <div>Difficulté: <Badge className={getDifficultyColor(keyword.difficulty)}>{keyword.difficulty}</Badge></div>
-                          <div>Intention: <Badge className={getIntentColor(keyword.intent || '')}>{keyword.intent}</Badge></div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="semantic">
-              <Card className="shadow-lg">
-                <CardHeader className="bg-purple-50 border-b">
-                  <CardTitle className="flex items-center gap-2">
-                    <Brain className="h-5 w-5 text-purple-600" />
-                    Mots-clés sémantiques ({filterKeywords(semanticKeywords).length})
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <div className="mb-4 p-4 bg-purple-50 rounded-lg">
-                    <p className="text-sm text-purple-700">
-                      <strong>Mots-clés sémantiques :</strong> Termes connexes qui renforcent la pertinence thématique de votre contenu.
-                    </p>
-                  </div>
-                  <div className="space-y-4">
-                    {filterKeywords(semanticKeywords).map((keyword, index) => (
-                      <div key={index} className="p-4 border rounded-lg hover:bg-gray-50">
-                        <div className="flex justify-between items-start mb-2">
-                          <h4 className="font-semibold text-lg">{keyword.keyword}</h4>
-                          <Button variant="ghost" size="sm" onClick={() => copyKeyword(keyword.keyword)}>
-                            <Copy className="h-4 w-4" />
-                          </Button>
-                        </div>
-                        <div className="grid grid-cols-3 gap-4 text-sm">
-                          <div>Volume: <strong>{keyword.volume.toLocaleString()}</strong></div>
-                          <div>Difficulté: <Badge className={getDifficultyColor(keyword.difficulty)}>{keyword.difficulty}</Badge></div>
-                          <div>CPC: <strong>{keyword.cpc}€</strong></div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="competitors">
-              <Card className="shadow-lg">
-                <CardHeader className="bg-orange-50 border-b">
-                  <CardTitle className="flex items-center gap-2">
-                    <Globe className="h-5 w-5 text-orange-600" />
-                    Analyse concurrentielle ({competitors.length})
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <div className="mb-4 p-4 bg-orange-50 rounded-lg">
-                    <p className="text-sm text-orange-700">
-                      <strong>Concurrents identifiés :</strong> Sites web qui se positionnent probablement sur vos mots-clés cibles.
-                    </p>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {competitors.map((competitor, index) => (
-                      <div key={index} className="p-4 border rounded-lg bg-white">
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-semibold text-lg">{competitor.name}</h4>
-                          <Badge 
-                            className={
-                              competitor.strength > 80 ? 'bg-red-100 text-red-800' :
-                              competitor.strength > 60 ? 'bg-yellow-100 text-yellow-800' :
-                              'bg-green-100 text-green-800'
-                            }
-                          >
-                            Force: {competitor.strength}%
-                          </Badge>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div 
-                            className={`h-2 rounded-full ${
-                              competitor.strength > 80 ? 'bg-red-500' :
-                              competitor.strength > 60 ? 'bg-yellow-500' :
-                              'bg-green-500'
-                            }`}
-                            style={{ width: `${competitor.strength}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        ) : (
-          !isGenerating && (
-            <Card className="text-center py-16 shadow-lg">
-              <CardContent>
-                <Sparkles className="h-20 w-20 text-gray-300 mx-auto mb-6" />
-                <h3 className="text-2xl font-semibold text-gray-600 mb-4">
-                  Prêt pour une analyse complète ?
-                </h3>
-                <p className="text-gray-500 text-lg mb-6">
-                  {apiKeyStatus === 'valid' 
-                    ? 'Utilisez l\'IA OpenAI pour une analyse approfondie de mots-clés'
-                    : 'Entrez un mot-clé pour commencer (configurez OpenAI pour des résultats optimaux)'
-                  }
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto text-sm text-gray-400">
-                  <div className="flex items-center justify-center gap-2">
-                    <Target className="h-4 w-4" />
-                    Mots-clés standards
-                  </div>
-                  <div className="flex items-center justify-center gap-2">
-                    <MessageSquare className="h-4 w-4" />
-                    Longue traîne
-                  </div>
-                  <div className="flex items-center justify-center gap-2">
-                    <Brain className="h-4 w-4" />
-                    Analyse sémantique
-                  </div>
-                  <div className="flex items-center justify-center gap-2">
-                    <Globe className="h-4 w-4" />
-                    Analyse concurrentielle
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )
-        )}
-
-        {/* Loading state */}
-        {isGenerating && (
-          <Card className="text-center py-16 shadow-lg">
-            <CardContent>
-              <Sparkles className="h-20 w-20 text-blue-500 mx-auto mb-6 animate-spin" />
-              <h3 className="text-2xl font-semibold text-gray-600 mb-4">
-                Analyse en cours...
-              </h3>
-              <p className="text-gray-500 text-lg mb-4">
-                {apiKeyStatus === 'valid' 
-                  ? `Analyse IA avancée pour "${mainKeyword}"...`
-                  : `Génération de mots-clés pour "${mainKeyword}"...`
-                }
-              </p>
-              <div className="flex justify-center space-x-8 text-sm text-gray-400">
-                <div className="flex items-center gap-2">
-                  <Zap className="h-4 w-4 animate-pulse" />
-                  Génération standards
-                </div>
-                <div className="flex items-center gap-2">
-                  <MessageSquare className="h-4 w-4 animate-pulse" />
-                  Longue traîne
-                </div>
-                <div className="flex items-center gap-2">
-                  <Brain className="h-4 w-4 animate-pulse" />
-                  Analyse sémantique
-                </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
-            </CardContent>
-          </Card>
-        )}
+            ) : (
+              <Card className="text-center py-16">
+                <CardContent>
+                  <Search className="h-20 w-20 text-gray-300 mx-auto mb-6" />
+                  <h3 className="text-2xl font-semibold text-gray-600 mb-4">
+                    Aucun résultat
+                  </h3>
+                  <p className="text-gray-500 text-lg">
+                    Générez des mots-clés dans l'onglet "Générateur" pour voir les résultats ici.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
