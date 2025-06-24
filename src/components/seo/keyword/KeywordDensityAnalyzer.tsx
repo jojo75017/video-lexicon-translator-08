@@ -2,153 +2,213 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, BarChart3, Loader2 } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { BarChart3, Search } from "lucide-react";
 import { toast } from "sonner";
-import { OpenAIService } from '../../../utils/seo/openaiService';
+
+interface KeywordAnalysis {
+  keyword: string;
+  count: number;
+  density: number;
+  positions: number[];
+}
 
 const KeywordDensityAnalyzer = () => {
   const [content, setContent] = useState('');
   const [targetKeyword, setTargetKeyword] = useState('');
-  const [analysis, setAnalysis] = useState<any>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [apiKey] = useState(() => localStorage.getItem('openaiKey') || '');
+  const [analysis, setAnalysis] = useState<KeywordAnalysis[]>([]);
+  const [totalWords, setTotalWords] = useState(0);
 
-  const analyzeContent = async () => {
-    if (!content.trim() || !targetKeyword.trim()) {
-      toast.error('Veuillez entrer le contenu et le mot-clé cible');
+  const analyzeContent = () => {
+    if (!content.trim()) {
+      toast.error("Veuillez entrer du contenu à analyser");
       return;
     }
 
-    setIsAnalyzing(true);
-    try {
-      if (apiKey) {
-        const openAIService = new OpenAIService(apiKey);
-        const result = await openAIService.analyzeSeoContent(content, targetKeyword);
-        setAnalysis(result);
-        toast.success('Analyse terminée avec l\'IA !');
-      } else {
-        // Analyse basique sans IA
-        const words = content.toLowerCase().split(/\s+/);
-        const keywordOccurrences = words.filter(word => 
-          word.includes(targetKeyword.toLowerCase())
-        ).length;
-        const density = (keywordOccurrences / words.length) * 100;
-        
-        const basicAnalysis = {
-          keywordDensity: Math.round(density * 100) / 100,
-          suggestions: [
-            'Optimiser la densité de mots-clés (2-3% recommandé)',
-            'Ajouter des variations du mot-clé principal',
-            'Améliorer la structure du contenu',
-            'Utiliser des synonymes et mots-clés connexes'
-          ],
-          score: Math.min(density * 20, 100)
-        };
-        
-        setAnalysis(basicAnalysis);
-        toast.info('Analyse de base effectuée (configurez OpenAI pour plus d\'options)');
+    const words = content.toLowerCase().split(/\s+/).filter(word => word.length > 2);
+    const wordCount = words.length;
+    setTotalWords(wordCount);
+
+    // Compter les occurrences des mots-clés
+    const keywordCounts: { [key: string]: { count: number; positions: number[] } } = {};
+    
+    words.forEach((word, index) => {
+      // Nettoyer le mot (enlever la ponctuation)
+      const cleanWord = word.replace(/[^\w]/g, '');
+      if (cleanWord.length > 2) {
+        if (!keywordCounts[cleanWord]) {
+          keywordCounts[cleanWord] = { count: 0, positions: [] };
+        }
+        keywordCounts[cleanWord].count++;
+        keywordCounts[cleanWord].positions.push(index);
       }
-    } catch (error) {
-      toast.error('Erreur lors de l\'analyse');
-    } finally {
-      setIsAnalyzing(false);
-    }
+    });
+
+    // Créer l'analyse
+    const keywordAnalysis: KeywordAnalysis[] = Object.entries(keywordCounts)
+      .map(([keyword, data]) => ({
+        keyword,
+        count: data.count,
+        density: (data.count / wordCount) * 100,
+        positions: data.positions
+      }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 20); // Top 20 mots-clés
+
+    setAnalysis(keywordAnalysis);
+    toast.success(`Analyse terminée - ${wordCount} mots analysés`);
   };
 
   const getDensityColor = (density: number) => {
-    if (density < 1) return 'text-yellow-600';
-    if (density <= 3) return 'text-green-600';
+    if (density < 1) return 'text-red-600';
+    if (density >= 1 && density <= 3) return 'text-green-600';
+    if (density > 3 && density <= 5) return 'text-yellow-600';
     return 'text-red-600';
   };
 
+  const getDensityBadge = (density: number) => {
+    if (density < 1) return { color: 'bg-red-100 text-red-800', text: 'Faible' };
+    if (density >= 1 && density <= 3) return { color: 'bg-green-100 text-green-800', text: 'Optimal' };
+    if (density > 3 && density <= 5) return { color: 'bg-yellow-100 text-yellow-800', text: 'Élevé' };
+    return { color: 'bg-red-100 text-red-800', text: 'Trop élevé' };
+  };
+
+  const targetKeywordAnalysis = analysis.find(a => 
+    targetKeyword && a.keyword.toLowerCase().includes(targetKeyword.toLowerCase())
+  );
+
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Search className="h-5 w-5 text-blue-600" />
-            Analyseur de Densité de Mots-Clés
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <BarChart3 className="h-5 w-5 text-purple-600" />
+          Analyseur de Densité de Mots-Clés
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="text-sm font-medium mb-2 block">Mot-clé cible</label>
+            <label className="text-sm font-medium mb-2 block">Mot-clé cible (optionnel)</label>
             <Input
-              placeholder="Entrez votre mot-clé principal..."
+              placeholder="Ex: formation professionnelle"
               value={targetKeyword}
               onChange={(e) => setTargetKeyword(e.target.value)}
             />
           </div>
-          
-          <div>
-            <label className="text-sm font-medium mb-2 block">Contenu à analyser</label>
-            <Textarea
-              placeholder="Collez votre contenu ici..."
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              rows={8}
-            />
+          <div className="flex items-end">
+            <Button onClick={analyzeContent} className="w-full gap-2">
+              <Search className="h-4 w-4" />
+              Analyser la densité
+            </Button>
           </div>
-          
-          <Button
-            onClick={analyzeContent}
-            disabled={isAnalyzing || !content.trim() || !targetKeyword.trim()}
-            className="w-full"
-          >
-            {isAnalyzing ? (
-              <Loader2 className="h-4 w-4 animate-spin mr-2" />
-            ) : (
-              <BarChart3 className="h-4 w-4 mr-2" />
-            )}
-            Analyser le contenu
-          </Button>
-        </CardContent>
-      </Card>
+        </div>
 
-      {analysis && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Résultats de l'analyse</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-              <div>
-                <div className={`text-2xl font-bold ${getDensityColor(analysis.keywordDensity)}`}>
-                  {analysis.keywordDensity}%
+        <div>
+          <label className="text-sm font-medium mb-2 block">Contenu à analyser</label>
+          <Textarea
+            placeholder="Collez votre contenu ici pour analyser la densité des mots-clés..."
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            rows={8}
+            className="resize-none"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            {content.split(/\s+/).filter(w => w.length > 0).length} mots
+          </p>
+        </div>
+
+        {analysis.length > 0 && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card className="p-3 text-center">
+                <div className="text-lg font-bold text-blue-600">{totalWords}</div>
+                <div className="text-xs text-gray-600">Mots totaux</div>
+              </Card>
+              <Card className="p-3 text-center">
+                <div className="text-lg font-bold text-green-600">
+                  {analysis.filter(a => a.density >= 1 && a.density <= 3).length}
                 </div>
-                <div className="text-sm text-gray-600">Densité</div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-blue-600">
-                  {Math.round(analysis.score || 0)}
-                </div>
-                <div className="text-sm text-gray-600">Score SEO</div>
-              </div>
-              <div>
-                <Badge className={analysis.keywordDensity >= 1 && analysis.keywordDensity <= 3 ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}>
-                  {analysis.keywordDensity >= 1 && analysis.keywordDensity <= 3 ? 'Optimal' : 'À optimiser'}
-                </Badge>
-              </div>
+                <div className="text-xs text-gray-600">Densité optimale</div>
+              </Card>
+              <Card className="p-3 text-center">
+                <div className="text-lg font-bold text-purple-600">{analysis.length}</div>
+                <div className="text-xs text-gray-600">Mots-clés analysés</div>
+              </Card>
             </div>
-            
+
+            {targetKeywordAnalysis && (
+              <Card className="p-4 bg-blue-50 border-blue-200">
+                <h4 className="font-medium text-blue-800 mb-2">
+                  Analyse du mot-clé cible : "{targetKeyword}"
+                </h4>
+                <div className="grid grid-cols-3 gap-4 text-sm">
+                  <div>
+                    <span className="text-gray-600">Occurrences:</span>
+                    <span className="font-medium ml-2">{targetKeywordAnalysis.count}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Densité:</span>
+                    <span className={`font-medium ml-2 ${getDensityColor(targetKeywordAnalysis.density)}`}>
+                      {targetKeywordAnalysis.density.toFixed(2)}%
+                    </span>
+                  </div>
+                  <div>
+                    <Badge className={getDensityBadge(targetKeywordAnalysis.density).color}>
+                      {getDensityBadge(targetKeywordAnalysis.density).text}
+                    </Badge>
+                  </div>
+                </div>
+                <Progress 
+                  value={Math.min(targetKeywordAnalysis.density * 20, 100)} 
+                  className="mt-3"
+                />
+              </Card>
+            )}
+
             <div>
-              <h3 className="font-medium mb-3">Suggestions d'amélioration</h3>
-              <ul className="space-y-2">
-                {analysis.suggestions.map((suggestion: string, index: number) => (
-                  <li key={index} className="flex items-start gap-2">
-                    <span className="text-blue-500 mt-1">•</span>
-                    <span className="text-sm">{suggestion}</span>
-                  </li>
+              <h4 className="font-medium mb-3">Top mots-clés par fréquence</h4>
+              <div className="space-y-2 max-h-96 overflow-y-auto">
+                {analysis.map((item, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="flex-1">
+                      <div className="font-medium">{item.keyword}</div>
+                      <div className="text-xs text-gray-500">
+                        {item.count} occurrences • Positions: {item.positions.slice(0, 5).join(', ')}
+                        {item.positions.length > 5 && '...'}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className={`font-bold ${getDensityColor(item.density)}`}>
+                        {item.density.toFixed(2)}%
+                      </div>
+                      <Badge 
+                        size="sm" 
+                        className={getDensityBadge(item.density).color}
+                      >
+                        {getDensityBadge(item.density).text}
+                      </Badge>
+                    </div>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
-          </CardContent>
-        </Card>
-      )}
-    </div>
+
+            <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="text-sm text-yellow-800">
+                <strong>Recommandations SEO:</strong>
+                <br />• Densité optimale : 1-3% pour le mot-clé principal
+                <br />• Évitez le keyword stuffing (> 5%)
+                <br />• Utilisez des synonymes et variantes
+                <br />• Répartissez les mots-clés naturellement dans le texte
+              </p>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

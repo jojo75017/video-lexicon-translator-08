@@ -47,3 +47,22 @@ export interface ContentSuggestion {
   headings: string[];
   type: 'blog' | 'landing' | 'product' | 'service';
 }
+
+export interface CompetitorData {
+  name: string;
+  url: string;
+  strength: number;
+  organic_traffic: number;
+  keywords: string[];
+  domain: string;
+  estimatedTraffic: number;
+  topKeywords: string[];
+  gaps: string[];
+}
+
+export interface SerpResult {
+  title: string;
+  url: string;
+  description: string;
+  position: number;
+}

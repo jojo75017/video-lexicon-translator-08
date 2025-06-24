@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Brain, Search, TrendingUp, Lightbulb, Settings, Key, Loader2, 
   Target, BarChart3, MessageSquare, FileText, HelpCircle, 
-  Globe, Zap, Download, Trash2, Eye, PenTool, Hash
+  Globe, Zap, Download, Trash2, Eye, PenTool, Hash, Users
 } from "lucide-react";
 import { toast } from "sonner";
 import { OpenAIService } from "@/utils/seo/openaiService";
@@ -16,6 +16,7 @@ import { KeywordSuggestion, ContentSuggestion } from "@/types/seo/Keyword";
 import KeywordDensityAnalyzer from './KeywordDensityAnalyzer';
 import KeywordQuestions from './KeywordQuestions';
 import { KeywordMetaContent } from './KeywordMetaContent';
+import CompetitorAnalysis from './CompetitorAnalysis';
 
 const AdvancedKeywordGenerator = () => {
   const [keyword, setKeyword] = useState('');
@@ -83,7 +84,7 @@ const AdvancedKeywordGenerator = () => {
           difficulty: Math.floor(Math.random() * 70) + 15,
           cpc: parseFloat((Math.random() * 4).toFixed(2)),
           type: 'ai-generated' as const,
-          intent: ['mixed', 'commercial', 'informational'][Math.floor(Math.random() * 3)] as const,
+          intent: (['mixed', 'commercial', 'informational'] as const)[Math.floor(Math.random() * 3)],
           opportunity: Math.floor(Math.random() * 40) + 60,
           suggestedTitle: `${kw} : Guide Complet 2024 - Tout Savoir en ${Math.floor(Math.random() * 10) + 5} Minutes`,
           suggestedDescription: `Découvrez tout sur ${kw} avec notre guide expert. Conseils pratiques, astuces et stratégies pour réussir. Gratuit et complet.`,
@@ -128,9 +129,6 @@ const AdvancedKeywordGenerator = () => {
       ];
 
       // Générer des suggestions de contenu avec l'IA
-      const contentPrompt = `Génère des suggestions de contenu SEO pour le mot-clé "${keyword}" incluant des titres H2/H3 et des questions FAQ`;
-      const contentResponse = await openAIService.generateContent(contentPrompt);
-      
       const contentSugg: ContentSuggestion = {
         title: `${keyword} : Guide Complet 2024 - Tout Ce Que Vous Devez Savoir`,
         description: `Découvrez tout sur ${keyword} avec notre guide expert complet. Conseils, stratégies et astuces pour réussir.`,
@@ -315,10 +313,14 @@ const AdvancedKeywordGenerator = () => {
 
       {/* Onglets principaux */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="generator" className="flex items-center gap-1">
             <Target className="h-4 w-4" />
             Générateur
+          </TabsTrigger>
+          <TabsTrigger value="competitors" className="flex items-center gap-1">
+            <Users className="h-4 w-4" />
+            Concurrents
           </TabsTrigger>
           <TabsTrigger value="content" className="flex items-center gap-1">
             <FileText className="h-4 w-4" />
@@ -434,6 +436,11 @@ const AdvancedKeywordGenerator = () => {
               </CardContent>
             </Card>
           )}
+        </TabsContent>
+
+        {/* Onglet Concurrents */}
+        <TabsContent value="competitors">
+          <CompetitorAnalysis keyword={keyword} />
         </TabsContent>
 
         {/* Onglet Contenu */}
