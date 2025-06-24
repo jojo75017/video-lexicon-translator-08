@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { 
   Globe, Loader2, Hash, AlertTriangle, CheckCircle, 
-  XCircle, FileText, Eye, Lightbulb, Shield
+  XCircle, FileText, Eye, Lightbulb, Shield, AlertCircle
 } from "lucide-react";
 import { toast } from "sonner";
 import { analyzeHeadings, HeadingStructure } from '@/utils/seo/headingAnalyzer';
@@ -51,62 +51,85 @@ const UrlContentAnalyzer = () => {
     try {
       console.log(`🔍 Analyse de: ${cleanUrl}`);
       
-      // Liste de proxies CORS améliorée
+      // Liste étendue de proxies CORS avec de meilleures alternatives
       const proxies = [
+        'https://api.codetabs.com/v1/proxy?quest=',
+        'https://cors-proxy.fringe.zone/',
+        'https://yacdn.org/proxy/',
         'https://api.allorigins.win/get?url=',
         'https://corsproxy.io/?',
-        'https://cors-anywhere.herokuapp.com/',
-        'https://thingproxy.freeboard.io/fetch/'
+        // Fallback vers des proxies moins fiables
+        'https://thingproxy.freeboard.io/fetch/',
+        'https://crossorigin.me/'
       ];
       
       let htmlContent = '';
       let proxyUsed = '';
+      let lastError = '';
       
-      // Essayer chaque proxy
+      // Essayer chaque proxy avec un timeout plus court
       for (let i = 0; i < proxies.length; i++) {
         const proxy = proxies[i];
         console.log(`Tentative avec proxy ${i + 1}: ${proxy}`);
         
         try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 secondes max
+          
           const response = await fetch(`${proxy}${encodeURIComponent(cleanUrl)}`, {
             method: 'GET',
             headers: {
               'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
             },
-            signal: AbortSignal.timeout(10000) // Timeout de 10 secondes
+            signal: controller.signal
           });
+
+          clearTimeout(timeoutId);
 
           if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
           }
 
+          // Traiter différents types de réponses selon le proxy
           if (proxy.includes('allorigins')) {
             const data = await response.json();
-            htmlContent = data.contents;
+            htmlContent = data.contents || '';
+          } else if (proxy.includes('codetabs')) {
+            htmlContent = await response.text();
           } else {
             htmlContent = await response.text();
           }
 
-          if (htmlContent && htmlContent.length > 100) {
+          // Vérifier si le contenu est valide
+          if (htmlContent && htmlContent.length > 200 && htmlContent.includes('<')) {
             proxyUsed = proxy;
             console.log(`✅ Succès avec proxy: ${proxy}`);
             break;
+          } else {
+            throw new Error('Contenu invalide ou trop court');
           }
           
         } catch (proxyError) {
-          console.error(`❌ Proxy ${i + 1} échoué:`, proxyError);
+          const errorMsg = proxyError instanceof Error ? proxyError.message : 'Erreur inconnue';
+          lastError = errorMsg;
+          console.error(`❌ Proxy ${i + 1} échoué:`, errorMsg);
           continue;
         }
       }
 
-      if (!htmlContent || htmlContent.length < 100) {
-        throw new Error('Impossible de récupérer le contenu de la page');
+      if (!htmlContent || htmlContent.length < 200) {
+        throw new Error(`Impossible de récupérer le contenu de la page. Dernière erreur: ${lastError}`);
       }
 
       // Parser le HTML
       const parser = new DOMParser();
       const doc = parser.parseFromString(htmlContent, 'text/html');
+
+      // Vérifier si le parsing a réussi
+      if (!doc.body) {
+        throw new Error('Impossible de parser le contenu HTML');
+      }
 
       // Analyser la structure des titres
       const headingStructure = analyzeHeadings(doc);
@@ -212,13 +235,19 @@ const UrlContentAnalyzer = () => {
       };
 
       setAnalysis(analysisResult);
-      toast.success(`Analyse terminée - Score SEO: ${seoScore}/100`);
+      toast.success(`Analyse terminée - Score SEO: ${seoScore}/100`, {
+        description: `Analysé via ${proxyUsed}`
+      });
 
     } catch (error) {
       console.error('Erreur lors de l\'analyse:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
+      
       toast.error('Impossible d\'analyser cette URL', {
-        description: 'Vérifiez que l\'URL est accessible et essayez une autre page'
+        description: errorMessage
       });
+      
+      setAnalysis(null);
     } finally {
       setIsAnalyzing(false);
     }
@@ -262,6 +291,22 @@ const UrlContentAnalyzer = () => {
             Analysez la structure H1-H6 d'une page web, vérifiez l'optimisation SEO 
             et obtenez des recommandations pour améliorer votre contenu.
           </p>
+        </div>
+
+        {/* Avertissement sur les limitations */}
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div className="flex items-start gap-2">
+            <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5" />
+            <div>
+              <h4 className="font-medium text-yellow-900 mb-1">
+                Limitations techniques
+              </h4>
+              <p className="text-yellow-800 text-sm">
+                L'analyse utilise des proxies CORS qui peuvent être limités. Si une URL ne fonctionne pas, 
+                essayez avec une autre page du même site ou attendez quelques minutes.
+              </p>
+            </div>
+          </div>
         </div>
 
         <div className="flex gap-2">
