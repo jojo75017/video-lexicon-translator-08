@@ -1,8 +1,10 @@
+
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Target, BarChart3, MessageSquare, FileText, HelpCircle, 
-  TrendingUp, Users, Network, AlertTriangle, Search, PenTool
+  TrendingUp, Users, Network, AlertTriangle, Search, PenTool,
+  MapPin, Activity, Lightbulb
 } from "lucide-react";
 import { toast } from "sonner";
 import { OpenAIService } from "@/utils/seo/openaiService";
@@ -18,14 +20,11 @@ import CompetitorAnalysis from './CompetitorAnalysis';
 import SemanticAnalysis from './SemanticAnalysis';
 import SerpFeaturesAnalyzer from './SerpFeaturesAnalyzer';
 import ContentGapAnalyzer from './ContentGapAnalyzer';
+import LocalSeoAnalyzer from './LocalSeoAnalyzer';
+import KeywordRankingTracker from './KeywordRankingTracker';
+import ContentOptimizationSuggestions from './ContentOptimizationSuggestions';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { 
-  Brain, Settings, Key, Loader2, 
-  Hash, Globe, Zap, Download, Trash2, Eye, Layers
-} from "lucide-react";
+import { Hash } from "lucide-react";
 
 const AdvancedKeywordGenerator = () => {
   const [keyword, setKeyword] = useState('');
@@ -187,7 +186,7 @@ const AdvancedKeywordGenerator = () => {
       />
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-10">
+        <TabsList className="grid w-full grid-cols-12">
           <TabsTrigger value="generator" className="flex items-center gap-1">
             <Target className="h-4 w-4" />
             Générateur
@@ -202,11 +201,23 @@ const AdvancedKeywordGenerator = () => {
           </TabsTrigger>
           <TabsTrigger value="serp" className="flex items-center gap-1">
             <Search className="h-4 w-4" />
-            SERP Features
+            SERP
           </TabsTrigger>
           <TabsTrigger value="gaps" className="flex items-center gap-1">
             <AlertTriangle className="h-4 w-4" />
-            Content Gaps
+            Gaps
+          </TabsTrigger>
+          <TabsTrigger value="local" className="flex items-center gap-1">
+            <MapPin className="h-4 w-4" />
+            Local
+          </TabsTrigger>
+          <TabsTrigger value="ranking" className="flex items-center gap-1">
+            <Activity className="h-4 w-4" />
+            Positions
+          </TabsTrigger>
+          <TabsTrigger value="optimize" className="flex items-center gap-1">
+            <Lightbulb className="h-4 w-4" />
+            Optimiser
           </TabsTrigger>
           <TabsTrigger value="content" className="flex items-center gap-1">
             <FileText className="h-4 w-4" />
@@ -214,15 +225,11 @@ const AdvancedKeywordGenerator = () => {
           </TabsTrigger>
           <TabsTrigger value="meta" className="flex items-center gap-1">
             <PenTool className="h-4 w-4" />
-            Title & Meta
+            Meta
           </TabsTrigger>
           <TabsTrigger value="density" className="flex items-center gap-1">
             <BarChart3 className="h-4 w-4" />
             Densité
-          </TabsTrigger>
-          <TabsTrigger value="questions" className="flex items-center gap-1">
-            <HelpCircle className="h-4 w-4" />
-            FAQ
           </TabsTrigger>
           <TabsTrigger value="trends" className="flex items-center gap-1">
             <TrendingUp className="h-4 w-4" />
@@ -254,6 +261,18 @@ const AdvancedKeywordGenerator = () => {
 
         <TabsContent value="gaps">
           <ContentGapAnalyzer />
+        </TabsContent>
+
+        <TabsContent value="local">
+          <LocalSeoAnalyzer />
+        </TabsContent>
+
+        <TabsContent value="ranking">
+          <KeywordRankingTracker />
+        </TabsContent>
+
+        <TabsContent value="optimize">
+          <ContentOptimizationSuggestions />
         </TabsContent>
 
         <TabsContent value="content">

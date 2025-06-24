@@ -4,7 +4,7 @@ export interface KeywordSuggestion {
   volume: number;
   difficulty: number;
   cpc?: number;
-  competition?: string;
+  competition?: string; // Changé de number à string pour compatibilité
   trend?: string;
   type?: 'standard' | 'long-tail' | 'question' | 'ai-generated' | 'semantic' | 'intent-based' | 'competitor';
   intent?: 'informational' | 'commercial' | 'transactional' | 'mixed' | 'navigational';
@@ -16,7 +16,7 @@ export interface KeywordSuggestion {
   relevance?: number;
   count?: number;
   density?: number;
-  position?: number;
+  position?: number;  
   clicks?: number;
   impressions?: number;
   ctr?: number;
