@@ -36,10 +36,10 @@ export class OpenAIService {
             },
             {
               role: 'user',
-              content: `Génère 15 mots-clés pertinents en français pour "${baseKeyword}". Inclus des variations longue traîne, des questions, et des termes commerciaux. Retourne uniquement la liste séparée par des virgules.`
+              content: `Génère 20 mots-clés pertinents en français pour "${baseKeyword}". Inclus des variations longue traîne, des questions, des termes commerciaux, et des variantes sémantiques. Retourne uniquement la liste séparée par des virgules.`
             }
           ],
-          max_tokens: 500,
+          max_tokens: 800,
           temperature: 0.7,
         }),
       });
@@ -136,6 +136,173 @@ export class OpenAIService {
       return isNaN(volume) ? Math.floor(Math.random() * 5000) + 100 : Math.max(10, volume);
     } catch (error) {
       return Math.floor(Math.random() * 5000) + 100;
+    }
+  }
+
+  async analyzeSearchIntent(keyword: string): Promise<string> {
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            {
+              role: 'system',
+              content: 'Tu es un expert SEO. Détermine l\'intention de recherche d\'un mot-clé.'
+            },
+            {
+              role: 'user',
+              content: `Analyse l'intention de recherche pour "${keyword}". Réponds uniquement par: informationnel, commercial, transactionnel, ou navigationnel.`
+            }
+          ],
+          max_tokens: 20,
+          temperature: 0.2,
+        }),
+      });
+
+      if (!response.ok) {
+        const intents = ['informationnel', 'commercial', 'transactionnel', 'navigationnel'];
+        return intents[Math.floor(Math.random() * intents.length)];
+      }
+
+      const data = await response.json();
+      const intent = data.choices[0]?.message?.content?.trim().toLowerCase() || '';
+      
+      const validIntents = ['informationnel', 'commercial', 'transactionnel', 'navigationnel'];
+      return validIntents.includes(intent) ? intent : 'informationnel';
+    } catch (error) {
+      const intents = ['informationnel', 'commercial', 'transactionnel', 'navigationnel'];
+      return intents[Math.floor(Math.random() * intents.length)];
+    }
+  }
+
+  async generateLongTailKeywords(baseKeyword: string): Promise<string[]> {
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            {
+              role: 'system',
+              content: 'Tu es un expert SEO spécialisé dans les mots-clés longue traîne.'
+            },
+            {
+              role: 'user',
+              content: `Génère 15 mots-clés longue traîne (3+ mots) basés sur "${baseKeyword}". Inclus des questions, des phrases locales, et des termes spécifiques. Liste séparée par des virgules.`
+            }
+          ],
+          max_tokens: 600,
+          temperature: 0.8,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur API OpenAI');
+      }
+
+      const data = await response.json();
+      const content = data.choices[0]?.message?.content || '';
+      
+      return content
+        .split(',')
+        .map((kw: string) => kw.trim())
+        .filter((kw: string) => kw.length > 0 && kw.split(' ').length >= 3);
+    } catch (error) {
+      console.error('Erreur génération longue traîne:', error);
+      return [];
+    }
+  }
+
+  async generateSemanticKeywords(baseKeyword: string): Promise<string[]> {
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            {
+              role: 'system',
+              content: 'Tu es un expert SEO spécialisé dans les mots-clés sémantiques et LSI.'
+            },
+            {
+              role: 'user',
+              content: `Génère 12 mots-clés sémantiquement liés à "${baseKeyword}". Inclus des synonymes, termes connexes, et concepts associés. Liste séparée par des virgules.`
+            }
+          ],
+          max_tokens: 500,
+          temperature: 0.6,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur API OpenAI');
+      }
+
+      const data = await response.json();
+      const content = data.choices[0]?.message?.content || '';
+      
+      return content
+        .split(',')
+        .map((kw: string) => kw.trim())
+        .filter((kw: string) => kw.length > 0);
+    } catch (error) {
+      console.error('Erreur génération sémantique:', error);
+      return [];
+    }
+  }
+
+  async analyzeCompetitors(keyword: string): Promise<string[]> {
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            {
+              role: 'system',
+              content: 'Tu es un analyste SEO expert en analyse concurrentielle.'
+            },
+            {
+              role: 'user',
+              content: `Liste 8 sites web ou marques qui sont probablement des concurrents pour le mot-clé "${keyword}" en France. Donne uniquement les noms, séparés par des virgules.`
+            }
+          ],
+          max_tokens: 300,
+          temperature: 0.4,
+        }),
+      });
+
+      if (!response.ok) {
+        return ['Amazon', 'Google', 'Wikipedia', 'Facebook', 'YouTube'];
+      }
+
+      const data = await response.json();
+      const content = data.choices[0]?.message?.content || '';
+      
+      return content
+        .split(',')
+        .map((comp: string) => comp.trim())
+        .filter((comp: string) => comp.length > 0)
+        .slice(0, 8);
+    } catch (error) {
+      return ['Amazon', 'Google', 'Wikipedia', 'Facebook', 'YouTube'];
     }
   }
 }
