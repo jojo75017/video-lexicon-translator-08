@@ -27,4 +27,18 @@ export interface RankingData {
     position: number;
     change: number;
   }>;
+  topPages?: Array<{
+    page: string;
+    clicks: number;
+    impressions: number;
+    ctr: number;
+    position: number;
+  }>;
+}
+
+export interface SearchConsoleData {
+  totalImpressions: number;
+  totalClicks: number;
+  averageCTR: number;
+  averagePosition: number;
 }
