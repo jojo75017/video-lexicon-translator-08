@@ -93,7 +93,7 @@ const KeywordDensityAnalyzer = () => {
           <div>
             <label className="text-sm font-medium mb-2 block">Mot-clé cible (optionnel)</label>
             <Input
-              placeholder="Ex: formation professionnelle"
+              placeholder="Ex: aquarium tropical"
               value={targetKeyword}
               onChange={(e) => setTargetKeyword(e.target.value)}
             />
@@ -185,7 +185,6 @@ const KeywordDensityAnalyzer = () => {
                         {item.density.toFixed(2)}%
                       </div>
                       <Badge 
-                        size="sm" 
                         className={getDensityBadge(item.density).color}
                       >
                         {getDensityBadge(item.density).text}

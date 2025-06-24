@@ -29,95 +29,95 @@ const CompetitorAnalysis: React.FC<CompetitorAnalysisProps> = ({ keyword = '' })
 
     setIsAnalyzing(true);
     
-    // Simulation d'analyse concurrentielle avec plus de données
+    // Simulation d'analyse concurrentielle avec données réalistes aquariophilie
     setTimeout(() => {
       const mockCompetitors: CompetitorData[] = [
         {
-          name: 'FormationPro Leader',
-          url: 'https://formation-pro-leader.com',
-          strength: 92,
+          name: 'Aquashop',
+          url: 'https://www.aquashop.fr',
+          strength: 87,
+          organic_traffic: 125000,
+          keywords: ['aquarium', 'poisson tropical', 'aquariophilie', 'pompe aquarium'],
+          domain: 'aquashop.fr',
+          estimatedTraffic: 125000,
+          topKeywords: ['aquarium pas cher', 'poisson rouge', 'pompe à air aquarium'],
+          gaps: ['aquascaping', 'plantes aquatiques rares', 'éclairage LED']
+        },
+        {
+          name: 'Poisson d\'Or',
+          url: 'https://www.poissondor.com',
+          strength: 79,
           organic_traffic: 85000,
-          keywords: ['formation professionnelle', 'cours en ligne certifiants', 'e-learning pro', 'formation continue'],
-          domain: 'formation-pro-leader.com',
+          keywords: ['poisson exotique', 'aquarium tropical', 'nourriture poisson'],
+          domain: 'poissondor.com',
           estimatedTraffic: 85000,
-          topKeywords: ['formation professionnelle certifiée', 'cours pro en ligne', 'certification métier'],
-          gaps: ['formation accélérée', 'micro-apprentissage', 'formation IA']
+          topKeywords: ['guppy', 'néon bleu', 'aquarium 100L'],
+          gaps: ['aquarium marin', 'coraux', 'osmoseur']
         },
         {
-          name: 'École Digitale Expert',
-          url: 'https://ecole-digitale-expert.fr',
-          strength: 78,
-          organic_traffic: 52000,
-          keywords: ['formation numérique', 'cours digital', 'apprentissage en ligne', 'école virtuelle'],
-          domain: 'ecole-digitale-expert.fr',
-          estimatedTraffic: 52000,
-          topKeywords: ['formation digitale certifiante', 'cours interactifs en ligne'],
-          gaps: ['formation mobile', 'réalité virtuelle formation', 'gamification']
+          name: 'Zoomalia',
+          url: 'https://www.zoomalia.com',
+          strength: 92,
+          organic_traffic: 280000,
+          keywords: ['animalerie en ligne', 'aquarium complet', 'accessoires aquarium'],
+          domain: 'zoomalia.com',
+          estimatedTraffic: 280000,
+          topKeywords: ['aquarium 60L', 'filtre externe', 'chauffage aquarium'],
+          gaps: ['aquarium nano', 'crevettes aquarium', 'mousses aquatiques']
         },
         {
-          name: 'Campus Virtuel Pro',
-          url: 'https://campus-virtuel-pro.com',
-          strength: 71,
-          organic_traffic: 38000,
-          keywords: ['campus en ligne', 'université virtuelle', 'formation à distance'],
-          domain: 'campus-virtuel-pro.com',
-          estimatedTraffic: 38000,
-          topKeywords: ['campus numérique', 'formation universitaire en ligne'],
-          gaps: ['formation express', 'cours du soir en ligne']
+          name: 'Truffaut Aquariophilie',
+          url: 'https://www.truffaut.com/aquariophilie',
+          strength: 85,
+          organic_traffic: 95000,
+          keywords: ['plantes aquarium', 'décoration aquarium', 'substrat aquarium'],
+          domain: 'truffaut.com',
+          estimatedTraffic: 95000,
+          topKeywords: ['aquarium débutant', 'poisson facile', 'kit aquarium'],
+          gaps: ['aquarium biotope', 'poissons rares', 'reproduction poissons']
         },
         {
-          name: 'Skills Academy',
-          url: 'https://skills-academy.fr',
-          strength: 65,
-          organic_traffic: 29000,
-          keywords: ['développement compétences', 'academy formation', 'skills training'],
-          domain: 'skills-academy.fr',
-          estimatedTraffic: 29000,
-          topKeywords: ['développement skills', 'formation compétences'],
-          gaps: ['soft skills formation', 'leadership training']
-        },
-        {
-          name: 'Learn & Work Platform',
-          url: 'https://learn-work-platform.com',
-          strength: 58,
-          organic_traffic: 21000,
-          keywords: ['formation travail', 'learn at work', 'corporate training'],
-          domain: 'learn-work-platform.com',
-          estimatedTraffic: 21000,
-          topKeywords: ['formation entreprise', 'corporate learning'],
-          gaps: ['formation télétravail', 'team building online']
+          name: 'Animalis Aquarium',
+          url: 'https://www.animalis.com/aquariophilie',
+          strength: 74,
+          organic_traffic: 62000,
+          keywords: ['aquarium design', 'meuble aquarium', 'éclairage aquarium'],
+          domain: 'animalis.com',
+          estimatedTraffic: 62000,
+          topKeywords: ['aquarium sur mesure', 'maintenance aquarium', 'test eau'],
+          gaps: ['aquarium connecté', 'automatisation', 'monitoring pH']
         }
       ];
 
       const mockSerp: SerpResult[] = [
         {
-          title: 'Formation Professionnelle Certifiée 2024 | Guide Complet',
-          url: 'https://formation-pro-leader.com/formation-certifiee',
-          description: 'Découvrez nos formations professionnelles certifiées. Plus de 50 domaines, experts reconnus, certification officielle garantie.',
+          title: 'Aquashop - Spécialiste Aquariophilie | Aquariums & Poissons',
+          url: 'https://www.aquashop.fr/aquarium-complet',
+          description: 'Découvrez notre gamme complète d\'aquariums, poissons tropicaux et accessoires. Livraison rapide, conseils d\'experts aquariophiles.',
           position: 1
         },
         {
-          title: 'Cours en Ligne Professionnels - École Digitale Expert',
-          url: 'https://ecole-digitale-expert.fr/cours-pro',
-          description: 'Formations professionnelles 100% en ligne. Accompagnement personnalisé, diplômes reconnus, financement CPF disponible.',
+          title: 'Poisson d\'Or - Aquariophilie Premium | Poissons Exotiques',
+          url: 'https://www.poissondor.com/aquarium-tropical',
+          description: 'Spécialiste des poissons exotiques et aquariums tropicaux. Plus de 200 espèces, matériel professionnel, conseils personnalisés.',
           position: 2
         },
         {
-          title: 'Campus Virtuel Pro : Votre Formation à Distance',
-          url: 'https://campus-virtuel-pro.com/formation-distance',
-          description: 'Formation professionnelle à distance avec suivi individualisé. Plus de 10 000 apprenants satisfaits.',
+          title: 'Zoomalia Aquariophilie - Tout pour votre Aquarium',
+          url: 'https://www.zoomalia.com/animalerie/aquariophilie',
+          description: 'Animalerie en ligne : aquariums, filtres, pompes, poissons. Livraison gratuite dès 39€. Conseils vétérinaires inclus.',
           position: 3
         },
         {
-          title: 'Skills Academy | Développez Vos Compétences Pro',
-          url: 'https://skills-academy.fr/competences',
-          description: 'Académie de formation pour développer vos compétences professionnelles. Méthodes innovantes et certifications.',
+          title: 'Truffaut Aquariophilie - Jardinerie & Aquariums',
+          url: 'https://www.truffaut.com/aquariophilie/aquarium-eau-douce',
+          description: 'Aquariums eau douce et marine, plantes aquatiques, poissons colorés. Magasins Truffaut partout en France.',
           position: 4
         },
         {
-          title: 'Learn & Work Platform - Formation Entreprise',
-          url: 'https://learn-work-platform.com/entreprise',
-          description: 'Solutions de formation pour entreprises. Programmes sur-mesure, ROI mesurable, accompagnement expert.',
+          title: 'Animalis - Aquarium & Poissons | Animalerie Spécialisée',
+          url: 'https://www.animalis.com/aquariophilie/aquarium-complet',
+          description: 'Aquariums design, poissons d\'eau douce et marine. Service installation à domicile. Garantie satisfaction.',
           position: 5
         }
       ];
@@ -125,7 +125,7 @@ const CompetitorAnalysis: React.FC<CompetitorAnalysisProps> = ({ keyword = '' })
       setCompetitors(mockCompetitors);
       setSerpResults(mockSerp);
       setIsAnalyzing(false);
-      toast.success(`Analyse terminée pour "${searchKeyword}" - ${mockCompetitors.length} concurrents identifiés`);
+      toast.success(`Analyse terminée pour "${searchKeyword}" - ${mockCompetitors.length} concurrents aquariophilie identifiés`);
     }, 3000);
   };
 
@@ -141,11 +141,11 @@ const CompetitorAnalysis: React.FC<CompetitorAnalysisProps> = ({ keyword = '' })
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `analyse-concurrents-${searchKeyword.replace(/\s+/g, '-')}.csv`;
+    a.download = `analyse-concurrents-aquariophilie-${searchKeyword.replace(/\s+/g, '-')}.csv`;
     a.click();
     URL.revokeObjectURL(url);
     
-    toast.success('Données concurrents exportées');
+    toast.success('Données concurrents aquariophilie exportées');
   };
 
   const getStrengthLevel = (strength: number) => {
@@ -160,7 +160,7 @@ const CompetitorAnalysis: React.FC<CompetitorAnalysisProps> = ({ keyword = '' })
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Users className="h-5 w-5 text-red-500" />
-          Analyse Concurrentielle Avancée
+          Analyse Concurrentielle Aquariophilie
           {competitors.length > 0 && (
             <Badge className="bg-blue-100 text-blue-800">
               {competitors.length} concurrents analysés
@@ -171,7 +171,7 @@ const CompetitorAnalysis: React.FC<CompetitorAnalysisProps> = ({ keyword = '' })
       <CardContent className="space-y-4">
         <div className="flex gap-2">
           <Input
-            placeholder="Mot-clé à analyser..."
+            placeholder="Mot-clé aquariophilie à analyser..."
             value={searchKeyword}
             onChange={(e) => setSearchKeyword(e.target.value)}
             className="flex-1"
@@ -318,7 +318,7 @@ const CompetitorAnalysis: React.FC<CompetitorAnalysisProps> = ({ keyword = '' })
                 <Card className="p-4">
                   <h3 className="font-medium mb-3 flex items-center gap-2">
                     <AlertTriangle className="h-4 w-4 text-orange-500" />
-                    Gaps détectés
+                    Gaps détectés - Aquariophilie
                   </h3>
                   <div className="space-y-2">
                     {competitors.flatMap(comp => comp.gaps).slice(0, 8).map((gap, idx) => (
@@ -335,20 +335,20 @@ const CompetitorAnalysis: React.FC<CompetitorAnalysisProps> = ({ keyword = '' })
                 <Card className="p-4">
                   <h3 className="font-medium mb-3 flex items-center gap-2">
                     <TrendingUp className="h-4 w-4 text-green-500" />
-                    Tendances marché
+                    Tendances Aquariophilie
                   </h3>
                   <div className="space-y-3">
                     <div className="p-3 bg-green-50 rounded">
-                      <div className="font-medium text-sm">Formation en ligne</div>
-                      <div className="text-xs text-gray-600">Croissance +45% cette année</div>
+                      <div className="font-medium text-sm">Aquascaping</div>
+                      <div className="text-xs text-gray-600">Croissance +65% cette année</div>
                     </div>
                     <div className="p-3 bg-blue-50 rounded">
-                      <div className="font-medium text-sm">Certification professionnelle</div>
-                      <div className="text-xs text-gray-600">Demande forte +32%</div>
+                      <div className="font-medium text-sm">Aquarium nano</div>
+                      <div className="text-xs text-gray-600">Demande forte +48%</div>
                     </div>
                     <div className="p-3 bg-purple-50 rounded">
-                      <div className="font-medium text-sm">Formation IA/Tech</div>
-                      <div className="text-xs text-gray-600">Secteur émergent +78%</div>
+                      <div className="font-medium text-sm">Aquarium connecté</div>
+                      <div className="text-xs text-gray-600">Secteur émergent +95%</div>
                     </div>
                   </div>
                 </Card>
