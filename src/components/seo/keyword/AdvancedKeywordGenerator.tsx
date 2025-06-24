@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
@@ -193,64 +194,66 @@ const AdvancedKeywordGenerator = () => {
       />
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-13">
-          <TabsTrigger value="config" className="flex items-center gap-1">
-            <Key className="h-4 w-4" />
-            API Config
-          </TabsTrigger>
-          <TabsTrigger value="generator" className="flex items-center gap-1">
-            <Target className="h-4 w-4" />
-            Générateur
-          </TabsTrigger>
-          <TabsTrigger value="blog-outline" className="flex items-center gap-1">
-            <BookOpen className="h-4 w-4" />
-            Plan Article
-          </TabsTrigger>
-          <TabsTrigger value="url-analyzer" className="flex items-center gap-1">
-            <Globe className="h-4 w-4" />
-            Analyse URL
-          </TabsTrigger>
-          <TabsTrigger value="competitors" className="flex items-center gap-1">
-            <Users className="h-4 w-4" />
-            Concurrents
-          </TabsTrigger>
-          <TabsTrigger value="semantic" className="flex items-center gap-1">
-            <Network className="h-4 w-4" />
-            Sémantique
-          </TabsTrigger>
-          <TabsTrigger value="serp" className="flex items-center gap-1">
-            <Search className="h-4 w-4" />
-            SERP
-          </TabsTrigger>
-          <TabsTrigger value="gaps" className="flex items-center gap-1">
-            <AlertTriangle className="h-4 w-4" />
-            Gaps
-          </TabsTrigger>
-          <TabsTrigger value="local" className="flex items-center gap-1">
-            <MapPin className="h-4 w-4" />
-            Local
-          </TabsTrigger>
-          <TabsTrigger value="ranking" className="flex items-center gap-1">
-            <Activity className="h-4 w-4" />
-            Positions
-          </TabsTrigger>
-          <TabsTrigger value="optimize" className="flex items-center gap-1">
-            <Lightbulb className="h-4 w-4" />
-            Optimiser
-          </TabsTrigger>
-          <TabsTrigger value="content" className="flex items-center gap-1">
-            <FileText className="h-4 w-4" />
-            Contenu
-          </TabsTrigger>
-          <TabsTrigger value="meta" className="flex items-center gap-1">
-            <PenTool className="h-4 w-4" />
-            Meta
-          </TabsTrigger>
-          <TabsTrigger value="density" className="flex items-center gap-1">
-            <BarChart3 className="h-4 w-4" />
-            Densité
-          </TabsTrigger>
-        </TabsList>
+        <div className="w-full overflow-x-auto">
+          <TabsList className="inline-flex h-10 items-center justify-start rounded-md bg-muted p-1 text-muted-foreground min-w-max">
+            <TabsTrigger value="config" className="flex items-center gap-1 whitespace-nowrap">
+              <Key className="h-4 w-4" />
+              API Config
+            </TabsTrigger>
+            <TabsTrigger value="generator" className="flex items-center gap-1 whitespace-nowrap">
+              <Target className="h-4 w-4" />
+              Générateur
+            </TabsTrigger>
+            <TabsTrigger value="blog-outline" className="flex items-center gap-1 whitespace-nowrap">
+              <BookOpen className="h-4 w-4" />
+              Plan Article
+            </TabsTrigger>
+            <TabsTrigger value="url-analyzer" className="flex items-center gap-1 whitespace-nowrap">
+              <Globe className="h-4 w-4" />
+              Analyse URL
+            </TabsTrigger>
+            <TabsTrigger value="competitors" className="flex items-center gap-1 whitespace-nowrap">
+              <Users className="h-4 w-4" />
+              Concurrents
+            </TabsTrigger>
+            <TabsTrigger value="semantic" className="flex items-center gap-1 whitespace-nowrap">
+              <Network className="h-4 w-4" />
+              Sémantique
+            </TabsTrigger>
+            <TabsTrigger value="serp" className="flex items-center gap-1 whitespace-nowrap">
+              <Search className="h-4 w-4" />
+              SERP
+            </TabsTrigger>
+            <TabsTrigger value="gaps" className="flex items-center gap-1 whitespace-nowrap">
+              <AlertTriangle className="h-4 w-4" />
+              Gaps
+            </TabsTrigger>
+            <TabsTrigger value="local" className="flex items-center gap-1 whitespace-nowrap">
+              <MapPin className="h-4 w-4" />
+              Local
+            </TabsTrigger>
+            <TabsTrigger value="ranking" className="flex items-center gap-1 whitespace-nowrap">
+              <Activity className="h-4 w-4" />
+              Positions
+            </TabsTrigger>
+            <TabsTrigger value="optimize" className="flex items-center gap-1 whitespace-nowrap">
+              <Lightbulb className="h-4 w-4" />
+              Optimiser
+            </TabsTrigger>
+            <TabsTrigger value="content" className="flex items-center gap-1 whitespace-nowrap">
+              <FileText className="h-4 w-4" />
+              Contenu
+            </TabsTrigger>
+            <TabsTrigger value="meta" className="flex items-center gap-1 whitespace-nowrap">
+              <PenTool className="h-4 w-4" />
+              Meta
+            </TabsTrigger>
+            <TabsTrigger value="density" className="flex items-center gap-1 whitespace-nowrap">
+              <BarChart3 className="h-4 w-4" />
+              Densité
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="config">
           <Card>
