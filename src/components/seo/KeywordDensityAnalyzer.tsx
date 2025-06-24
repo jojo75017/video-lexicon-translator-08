@@ -3,572 +3,378 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Search, Loader2, Target, TrendingUp, AlertTriangle, CheckCircle, Plus, Key, Settings, Lightbulb, ArrowUp } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Textarea } from "@/components/ui/textarea";
+import { BarChart3, Target, Lightbulb, AlertTriangle, CheckCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { OpenAIService } from '../../utils/seo/openaiService';
 
-interface KeywordDensity {
-  keyword: string;
-  count: number;
-  density: number;
-  position: number;
-  isOptimal: boolean;
-  recommendation: string;
-  targetDensity?: number;
-}
-
 interface KeywordSuggestion {
   keyword: string;
-  suggestedDensity: number;
-  currentDensity: number;
-  priority: 'high' | 'medium' | 'low';
-  reason: string;
+  density: number;
+  recommended: number;
+  status: 'low' | 'good' | 'high';
 }
 
-interface DensityAnalysisResult {
-  url: string;
-  title: string;
-  wordCount: number;
-  keywordDensities: KeywordDensity[];
+interface AnalysisResult {
+  score: number;
   suggestions: KeywordSuggestion[];
-  currentScore: number;
-  targetScore: number;
-  overallScore: number;
   recommendations: string[];
+  totalWords: number;
+  mainKeywordDensity: number;
 }
 
 const KeywordDensityAnalyzer = () => {
   const [url, setUrl] = useState('');
   const [targetKeyword, setTargetKeyword] = useState('');
-  const [targetScore, setTargetScore] = useState(90);
+  const [content, setContent] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState<DensityAnalysisResult | null>(null);
-  
-  // Configuration API
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem('densityApiKey') || '');
-  const [showApiConfig, setShowApiConfig] = useState(false);
-  const [isApiConfigured, setIsApiConfigured] = useState(() => !!localStorage.getItem('densityApiKey'));
-
-  const saveApiKey = () => {
-    if (apiKey.trim()) {
-      localStorage.setItem('densityApiKey', apiKey);
-      setIsApiConfigured(true);
-      setShowApiConfig(false);
-      toast.success('Clé API sauvegardée');
-    } else {
-      toast.error('Veuillez entrer une clé API valide');
-    }
-  };
+  const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [apiKey] = useState(() => localStorage.getItem('openaiKey') || '');
 
   const analyzeKeywordDensity = async () => {
-    if (!url.trim()) {
-      toast.error('Veuillez entrer une URL');
+    if (!targetKeyword.trim()) {
+      toast.error('Veuillez entrer un mot-clé cible');
+      return;
+    }
+
+    if (!url.trim() && !content.trim()) {
+      toast.error('Veuillez entrer une URL ou du contenu à analyser');
       return;
     }
 
     setIsAnalyzing(true);
     
     try {
-      // Simulation d'analyse (en production, vous utiliseriez une vraie API)
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      let textToAnalyze = content;
       
-      let result: DensityAnalysisResult;
-      
-      if (isApiConfigured && apiKey) {
-        // Analyse avec API pour données précises
-        result = await generatePreciseAnalysis(url, targetKeyword, targetScore);
-        toast.success('Analyse précise avec API terminée !');
-      } else {
-        // Analyse basique sans API
-        result = generateBasicAnalysis(url, targetKeyword, targetScore);
-        toast.info('Analyse basique terminée (configurez une API pour plus de précision)');
+      // Si URL fournie, récupérer le contenu
+      if (url.trim() && !content.trim()) {
+        try {
+          const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
+          const data = await response.json();
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(data.contents, 'text/html');
+          textToAnalyze = doc.body?.textContent || '';
+        } catch (error) {
+          toast.error('Impossible de récupérer le contenu de l\'URL');
+          return;
+        }
       }
-      
-      setAnalysisResult(result);
+
+      if (!textToAnalyze.trim()) {
+        toast.error('Aucun contenu à analyser');
+        return;
+      }
+
+      let analysisResult: AnalysisResult;
+
+      if (apiKey) {
+        // Analyse avec IA
+        const openAIService = new OpenAIService(apiKey);
+        const aiResult = await openAIService.analyzeSeoContent(textToAnalyze, targetKeyword);
+        
+        // Générer des suggestions de mots-clés pour atteindre un score de 90
+        const suggestions = await generateKeywordSuggestions(textToAnalyze, targetKeyword, aiResult.score);
+        
+        analysisResult = {
+          score: aiResult.score,
+          suggestions,
+          recommendations: aiResult.suggestions,
+          totalWords: textToAnalyze.split(/\s+/).length,
+          mainKeywordDensity: aiResult.keywordDensity
+        };
+        
+        toast.success('Analyse IA terminée !');
+      } else {
+        // Analyse basique
+        analysisResult = performBasicAnalysis(textToAnalyze, targetKeyword);
+        toast.info('Analyse basique (configurez OpenAI pour plus de précision)');
+      }
+
+      setResult(analysisResult);
     } catch (error) {
       toast.error('Erreur lors de l\'analyse');
+      console.error('Erreur analyse:', error);
     } finally {
       setIsAnalyzing(false);
     }
   };
 
-  const generatePreciseAnalysis = async (url: string, mainKeyword: string, target: number): Promise<DensityAnalysisResult> => {
-    // Simulation d'analyse précise avec API
-    const baseKeywords = [
-      mainKeyword || 'seo',
-      'optimisation',
-      'contenu',
-      'web',
-      'site',
-      'marketing',
-      'digital',
-      'référencement',
-      'google',
-      'recherche'
-    ];
-
-    const keywordDensities: KeywordDensity[] = baseKeywords.map((keyword, index) => {
-      const count = Math.floor(Math.random() * 15) + 2;
-      const density = parseFloat((Math.random() * 4 + 0.3).toFixed(2));
-      const targetDensity = index === 0 ? 2.5 : Math.floor(Math.random() * 2) + 1;
-      const isOptimal = Math.abs(density - targetDensity) < 0.5;
-      
-      return {
-        keyword,
-        count,
-        density,
-        targetDensity,
-        position: index + 1,
-        isOptimal,
-        recommendation: isOptimal 
-          ? 'Densité optimale' 
-          : density < targetDensity 
-            ? `Augmenter à ${targetDensity}%` 
-            : `Réduire à ${targetDensity}%`
-      };
-    }).sort((a, b) => b.density - a.density);
-
-    // Générer des suggestions pour atteindre le score cible
+  const generateKeywordSuggestions = async (text: string, mainKeyword: string, currentScore: number): Promise<KeywordSuggestion[]> => {
+    const words = text.toLowerCase().split(/\s+/);
+    const totalWords = words.length;
+    
+    // Calculer la densité actuelle des mots-clés principaux
+    const keywordOccurrences = words.filter(word => word.includes(mainKeyword.toLowerCase())).length;
+    const mainDensity = (keywordOccurrences / totalWords) * 100;
+    
     const suggestions: KeywordSuggestion[] = [
       {
-        keyword: `${mainKeyword} professionnel`,
-        suggestedDensity: 1.8,
-        currentDensity: 0,
-        priority: 'high',
-        reason: 'Mot-clé secondaire important manquant'
-      },
-      {
-        keyword: `guide ${mainKeyword}`,
-        suggestedDensity: 1.2,
-        currentDensity: 0,
-        priority: 'high',
-        reason: 'Améliore l\'intention informative'
-      },
-      {
-        keyword: `${mainKeyword} gratuit`,
-        suggestedDensity: 0.8,
-        currentDensity: 0,
-        priority: 'medium',
-        reason: 'Cible les recherches gratuites'
-      },
-      {
-        keyword: `meilleur ${mainKeyword}`,
-        suggestedDensity: 1.0,
-        currentDensity: 0,
-        priority: 'medium',
-        reason: 'Mot-clé commercial important'
+        keyword: mainKeyword,
+        density: Math.round(mainDensity * 100) / 100,
+        recommended: 2.5,
+        status: mainDensity < 1.5 ? 'low' : mainDensity > 4 ? 'high' : 'good'
       }
     ];
 
-    const currentScore = Math.floor(Math.random() * 30) + 60;
-    
-    return {
-      url,
-      title: `Analyse précise pour ${new URL(url).hostname}`,
-      wordCount: Math.floor(Math.random() * 2000) + 800,
-      keywordDensities,
-      suggestions,
-      currentScore,
-      targetScore: target,
-      overallScore: currentScore,
-      recommendations: [
-        `Ajoutez ${suggestions.length} mots-clés suggérés pour atteindre ${target}/100`,
-        "Optimisez la densité du mot-clé principal",
-        "Répartissez mieux les mots-clés dans les titres H2-H3",
-        "Utilisez des variantes sémantiques du mot-clé principal"
-      ]
-    };
+    // Si on a une clé API, utiliser l'IA pour suggérer des mots-clés complémentaires
+    if (apiKey && currentScore < 90) {
+      try {
+        const openAIService = new OpenAIService(apiKey);
+        const semanticKeywords = await openAIService.generateSemanticKeywords(mainKeyword);
+        
+        semanticKeywords.slice(0, 5).forEach(keyword => {
+          const occurrences = words.filter(word => word.includes(keyword.toLowerCase())).length;
+          const density = (occurrences / totalWords) * 100;
+          
+          suggestions.push({
+            keyword,
+            density: Math.round(density * 100) / 100,
+            recommended: 1.5,
+            status: density < 0.5 ? 'low' : density > 2.5 ? 'high' : 'good'
+          });
+        });
+      } catch (error) {
+        console.error('Erreur génération suggestions IA:', error);
+      }
+    }
+
+    // Ajouter des mots-clés basiques si pas d'IA
+    if (!apiKey || suggestions.length === 1) {
+      const basicKeywords = [
+        `${mainKeyword} gratuit`,
+        `${mainKeyword} en ligne`,
+        `meilleur ${mainKeyword}`,
+        `comment ${mainKeyword}`
+      ];
+      
+      basicKeywords.forEach(keyword => {
+        const occurrences = words.filter(word => 
+          keyword.toLowerCase().split(' ').every(kw => word.includes(kw))
+        ).length;
+        const density = (occurrences / totalWords) * 100;
+        
+        suggestions.push({
+          keyword,
+          density: Math.round(density * 100) / 100,
+          recommended: 1.0,
+          status: density < 0.3 ? 'low' : density > 1.5 ? 'high' : 'good'
+        });
+      });
+    }
+
+    return suggestions;
   };
 
-  const generateBasicAnalysis = (url: string, mainKeyword: string, target: number): DensityAnalysisResult => {
-    const baseKeywords = [
-      mainKeyword || 'seo',
-      'optimisation',
-      'contenu',
-      'web',
-      'marketing'
-    ];
-
-    const keywordDensities: KeywordDensity[] = baseKeywords.map((keyword, index) => {
-      const count = Math.floor(Math.random() * 10) + 1;
-      const density = parseFloat((Math.random() * 3 + 0.2).toFixed(2));
-      const isOptimal = density >= 1 && density <= 2.5;
-      
-      return {
-        keyword,
-        count,
-        density,
-        position: index + 1,
-        isOptimal,
-        recommendation: isOptimal 
-          ? 'Densité correcte' 
-          : density < 1 
-            ? 'Augmenter la densité' 
-            : 'Réduire la densité'
-      };
-    }).sort((a, b) => b.density - a.density);
-
+  const performBasicAnalysis = (text: string, targetKeyword: string): AnalysisResult => {
+    const words = text.toLowerCase().split(/\s+/);
+    const totalWords = words.length;
+    
+    const keywordOccurrences = words.filter(word => word.includes(targetKeyword.toLowerCase())).length;
+    const density = (keywordOccurrences / totalWords) * 100;
+    
+    // Score basique basé sur la densité
+    let score = 0;
+    if (density >= 1.5 && density <= 3) score = 90;
+    else if (density >= 1 && density <= 4) score = 75;
+    else if (density >= 0.5 && density <= 5) score = 60;
+    else score = 30;
+    
     const suggestions: KeywordSuggestion[] = [
       {
-        keyword: `${mainKeyword} guide`,
-        suggestedDensity: 1.5,
-        currentDensity: 0,
-        priority: 'high',
-        reason: 'Mot-clé manquant important'
-      },
-      {
-        keyword: `${mainKeyword} conseils`,
-        suggestedDensity: 1.0,
-        currentDensity: 0,
-        priority: 'medium',
-        reason: 'Améliore la sémantique'
+        keyword: targetKeyword,
+        density: Math.round(density * 100) / 100,
+        recommended: 2.5,
+        status: density < 1.5 ? 'low' : density > 4 ? 'high' : 'good'
       }
     ];
 
-    const currentScore = Math.floor(Math.random() * 25) + 55;
-    
+    const recommendations = [
+      density < 1.5 ? `Augmentez l'usage de "${targetKeyword}" dans le contenu` : '',
+      density > 4 ? `Réduisez l'usage de "${targetKeyword}" pour éviter le sur-optimisation` : '',
+      'Ajoutez des synonymes et variations du mot-clé principal',
+      'Optimisez les titres H1, H2 avec le mot-clé cible',
+      'Intégrez le mot-clé dans les balises alt des images'
+    ].filter(rec => rec.length > 0);
+
     return {
-      url,
-      title: `Analyse basique pour ${new URL(url).hostname}`,
-      wordCount: Math.floor(Math.random() * 1000) + 400,
-      keywordDensities,
+      score,
       suggestions,
-      currentScore,
-      targetScore: target,
-      overallScore: currentScore,
-      recommendations: [
-        "Configurez une API pour des suggestions précises",
-        "Ajoutez les mots-clés suggérés",
-        "Optimisez la densité générale"
-      ]
+      recommendations,
+      totalWords,
+      mainKeywordDensity: Math.round(density * 100) / 100
     };
   };
 
-  const implementSuggestion = (suggestion: KeywordSuggestion) => {
-    toast.info(`Ajoutez "${suggestion.keyword}" avec une densité de ${suggestion.suggestedDensity}%`);
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return 'text-green-600';
+    if (score >= 60) return 'text-yellow-600';
+    return 'text-red-600';
   };
 
-  const getDensityColor = (density: number, isOptimal: boolean) => {
-    if (isOptimal) return 'text-green-600 bg-green-50';
-    if (density < 1) return 'text-yellow-600 bg-yellow-50';
-    return 'text-red-600 bg-red-50';
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'good': return <CheckCircle className="h-4 w-4 text-green-600" />;
+      case 'low': return <AlertTriangle className="h-4 w-4 text-yellow-600" />;
+      case 'high': return <AlertTriangle className="h-4 w-4 text-red-600" />;
+      default: return null;
+    }
   };
 
-  const getDensityIcon = (isOptimal: boolean, density: number) => {
-    if (isOptimal) return <CheckCircle className="h-4 w-4 text-green-600" />;
-    if (density < 1) return <AlertTriangle className="h-4 w-4 text-yellow-600" />;
-    return <AlertTriangle className="h-4 w-4 text-red-600" />;
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'good': return 'bg-green-100 text-green-800';
+      case 'low': return 'bg-yellow-100 text-yellow-800';
       case 'high': return 'bg-red-100 text-red-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'low': return 'bg-green-100 text-green-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
 
-  const getScoreColor = (score: number, target: number) => {
-    if (score >= target) return 'text-green-600';
-    if (score >= target - 20) return 'text-yellow-600';
-    return 'text-red-600';
-  };
-
   return (
     <div className="space-y-6">
-      {/* Configuration API */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span className="flex items-center gap-2">
-              <Key className="h-5 w-5 text-purple-600" />
-              Configuration API
-            </span>
-            <div className="flex items-center gap-2">
-              {isApiConfigured && (
-                <Badge className="bg-green-100 text-green-800">
-                  <CheckCircle className="h-3 w-3 mr-1" />
-                  API Configurée
-                </Badge>
-              )}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowApiConfig(!showApiConfig)}
-              >
-                <Settings className="h-4 w-4 mr-1" />
-                {showApiConfig ? 'Masquer' : 'Configurer'}
-              </Button>
-            </div>
-          </CardTitle>
-        </CardHeader>
-        
-        {(showApiConfig || !isApiConfigured) && (
-          <CardContent className="space-y-4">
-            <div>
-              <label className="text-sm font-medium mb-2 block">
-                Clé API (pour des données précises)
-              </label>
-              <div className="flex gap-2">
-                <Input
-                  type="password"
-                  placeholder="Votre clé API..."
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                  className="flex-1"
-                />
-                <Button onClick={saveApiKey}>
-                  Sauvegarder
-                </Button>
-              </div>
-            </div>
-            
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <p className="text-sm text-blue-800">
-                <strong>Avec API :</strong> Suggestions précises, analyse sémantique avancée, recommandations personnalisées
-              </p>
-              <p className="text-sm text-blue-700 mt-1">
-                <strong>Sans API :</strong> Analyse basique avec suggestions génériques
-              </p>
-            </div>
-          </CardContent>
-        )}
-      </Card>
-
-      {/* Formulaire d'analyse */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5 text-blue-600" />
-            Analyseur de Densité de Mots-Clés (comme 1.fr)
+            <BarChart3 className="h-5 w-5 text-blue-600" />
+            Analyseur de Densité de Mots-Clés
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium mb-2 block">URL du site à analyser</label>
+              <label className="text-sm font-medium mb-2 block">URL à analyser</label>
               <Input
-                placeholder="https://exemple.com"
+                placeholder="https://example.com"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                disabled={isAnalyzing}
               />
             </div>
             <div>
               <label className="text-sm font-medium mb-2 block">Mot-clé cible</label>
               <Input
-                placeholder="Ex: référencement SEO"
+                placeholder="mot-clé principal"
                 value={targetKeyword}
                 onChange={(e) => setTargetKeyword(e.target.value)}
-                disabled={isAnalyzing}
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium mb-2 block">Score cible</label>
-              <Input
-                type="number"
-                min="70"
-                max="100"
-                value={targetScore}
-                onChange={(e) => setTargetScore(Number(e.target.value))}
-                disabled={isAnalyzing}
-                className="w-full"
               />
             </div>
           </div>
           
+          <div>
+            <label className="text-sm font-medium mb-2 block">
+              Ou collez votre contenu directement
+            </label>
+            <Textarea
+              placeholder="Collez votre contenu ici pour l'analyser..."
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              rows={4}
+            />
+          </div>
+          
           <Button
             onClick={analyzeKeywordDensity}
-            disabled={isAnalyzing || !url.trim()}
+            disabled={isAnalyzing || (!url.trim() && !content.trim()) || !targetKeyword.trim()}
             className="w-full"
           >
             {isAnalyzing ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Analyse en cours...
-              </>
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
             ) : (
-              <>
-                <Search className="mr-2 h-4 w-4" />
-                Analyser la densité {isApiConfigured ? '(API activée)' : '(Mode basique)'}
-              </>
+              <Target className="h-4 w-4 mr-2" />
             )}
+            Analyser avec l'IA
           </Button>
-          
-          {isAnalyzing && (
-            <div className="space-y-2">
-              <Progress value={65} />
-              <p className="text-sm text-center text-gray-500">
-                {isApiConfigured 
-                  ? 'Analyse précise en cours avec API...'
-                  : 'Analyse basique en cours...'
-                }
-              </p>
-            </div>
-          )}
         </CardContent>
       </Card>
 
-      {/* Résultats d'analyse */}
-      {analysisResult && (
-        <div className="space-y-6">
-          {/* Score et progression */}
+      {result && (
+        <>
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
-                <span>Score d'Optimisation</span>
-                <div className="flex items-center gap-4">
-                  <div className="text-right">
-                    <div className={`text-3xl font-bold ${getScoreColor(analysisResult.currentScore, analysisResult.targetScore)}`}>
-                      {analysisResult.currentScore}/{analysisResult.targetScore}
-                    </div>
-                    <div className="text-sm text-gray-500">Score actuel / Cible</div>
-                  </div>
-                  {analysisResult.currentScore < analysisResult.targetScore && (
-                    <Badge className="bg-orange-100 text-orange-800">
-                      <ArrowUp className="h-3 w-3 mr-1" />
-                      +{analysisResult.targetScore - analysisResult.currentScore} à gagner
-                    </Badge>
-                  )}
-                </div>
+                Score SEO Global
+                <span className={`text-2xl font-bold ${getScoreColor(result.score)}`}>
+                  {result.score}/100
+                </span>
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">{analysisResult.wordCount}</div>
-                  <div className="text-sm text-gray-500">Mots analysés</div>
+              <Progress value={result.score} className="mb-4" />
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div>
+                  <span className="text-gray-600">Mots totaux:</span>
+                  <span className="font-semibold ml-2">{result.totalWords.toLocaleString()}</span>
                 </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">
-                    {analysisResult.keywordDensities.filter(k => k.isOptimal).length}
-                  </div>
-                  <div className="text-sm text-gray-500">Densités optimales</div>
+                <div>
+                  <span className="text-gray-600">Densité principale:</span>
+                  <span className="font-semibold ml-2">{result.mainKeywordDensity}%</span>
                 </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-orange-600">
-                    {analysisResult.suggestions.length}
-                  </div>
-                  <div className="text-sm text-gray-500">Suggestions</div>
+                <div>
+                  <span className="text-gray-600">Mots-clés analysés:</span>
+                  <span className="font-semibold ml-2">{result.suggestions.length}</span>
                 </div>
-              </div>
-              
-              <Progress 
-                value={(analysisResult.currentScore / analysisResult.targetScore) * 100} 
-                className="h-3"
-              />
-              <div className="text-xs text-center text-gray-500 mt-1">
-                Progression vers l'objectif {analysisResult.targetScore}/100
+                <div>
+                  <span className="text-gray-600">Recommandations:</span>
+                  <span className="font-semibold ml-2">{result.recommendations.length}</span>
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Suggestions pour améliorer le score */}
-          {analysisResult.suggestions.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Lightbulb className="h-5 w-5 text-yellow-600" />
-                  Mots-clés suggérés pour atteindre {analysisResult.targetScore}/100
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {analysisResult.suggestions.map((suggestion, index) => (
-                    <div key={index} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <div className="font-semibold">{suggestion.keyword}</div>
-                          <Badge className={getPriorityColor(suggestion.priority)}>
-                            {suggestion.priority === 'high' ? 'Priorité haute' : 
-                             suggestion.priority === 'medium' ? 'Priorité moyenne' : 'Priorité basse'}
-                          </Badge>
-                        </div>
-                        <div className="text-sm text-gray-600">{suggestion.reason}</div>
-                        <div className="text-xs text-gray-500 mt-1">
-                          Densité suggérée: {suggestion.suggestedDensity}% (actuellement: {suggestion.currentDensity}%)
-                        </div>
-                      </div>
-                      <Button
-                        variant="outline"
-                        onClick={() => implementSuggestion(suggestion)}
-                        className="ml-4"
-                      >
-                        <Plus className="h-4 w-4 mr-1" />
-                        Ajouter
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Tableau de densité existant */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-blue-600" />
-                Analyse des Densités Actuelles
+                <Target className="h-5 w-5 text-purple-600" />
+                Analyse des Mots-Clés
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {analysisResult.keywordDensities.map((item, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
-                    <div className="flex items-center gap-3">
-                      {getDensityIcon(item.isOptimal, item.density)}
-                      <div>
-                        <div className="font-semibold">{item.keyword}</div>
-                        <div className="text-sm text-gray-500">{item.recommendation}</div>
-                        {item.targetDensity && (
-                          <div className="text-xs text-blue-600">
-                            Cible: {item.targetDensity}%
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-4 text-right">
-                      <div>
-                        <div className="text-sm text-gray-500">Occurrences</div>
-                        <div className="font-bold">{item.count}</div>
-                      </div>
-                      <div>
-                        <div className="text-sm text-gray-500">Densité</div>
-                        <Badge 
-                          className={getDensityColor(item.density, item.isOptimal)}
-                        >
-                          {item.density}%
+              <div className="space-y-4">
+                {result.suggestions.map((suggestion, index) => (
+                  <div key={index} className="p-4 border rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        {getStatusIcon(suggestion.status)}
+                        <span className="font-medium">{suggestion.keyword}</span>
+                        <Badge className={getStatusColor(suggestion.status)}>
+                          {suggestion.status === 'low' ? 'Trop faible' : 
+                           suggestion.status === 'high' ? 'Trop élevée' : 'Optimal'}
                         </Badge>
                       </div>
+                      <span className="text-sm text-gray-600">
+                        {suggestion.density}% (recommandé: {suggestion.recommended}%)
+                      </span>
                     </div>
+                    <Progress 
+                      value={Math.min(suggestion.density / suggestion.recommended * 100, 100)} 
+                      className="h-2"
+                    />
                   </div>
                 ))}
               </div>
             </CardContent>
           </Card>
 
-          {/* Recommandations */}
           <Card>
             <CardHeader>
-              <CardTitle>Plan d'Action pour Atteindre {analysisResult.targetScore}/100</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Lightbulb className="h-5 w-5 text-yellow-600" />
+                Recommandations d'Optimisation
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {analysisResult.recommendations.map((recommendation, index) => (
-                  <div key={index} className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
-                    <CheckCircle className="h-5 w-5 text-blue-600 mt-0.5" />
-                    <p className="text-sm text-blue-800">{recommendation}</p>
-                  </div>
+              <ul className="space-y-2">
+                {result.recommendations.map((rec, index) => (
+                  <li key={index} className="flex items-start gap-2">
+                    <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span className="text-sm">{rec}</span>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </CardContent>
           </Card>
-        </div>
+        </>
       )}
     </div>
   );

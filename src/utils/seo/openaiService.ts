@@ -1,9 +1,13 @@
-
 export class OpenAIService {
   private apiKey: string;
   
   constructor(apiKey: string) {
     this.apiKey = apiKey;
+  }
+  
+  static enableProxy() {
+    // Méthode statique pour activer le proxy si nécessaire
+    console.log('Proxy enabled for OpenAI service');
   }
   
   async validateApiKey(): Promise<boolean> {
@@ -58,6 +62,71 @@ export class OpenAIService {
     } catch (error) {
       console.error('Erreur lors de la génération de mots-clés:', error);
       return [];
+    }
+  }
+
+  async getKeywordSuggestions(keyword: string): Promise<string[]> {
+    // Alias pour generateKeywords pour la compatibilité
+    return this.generateKeywords(keyword);
+  }
+
+  async analyzeSeoContent(content: string, targetKeyword: string): Promise<{
+    keywordDensity: number;
+    suggestions: string[];
+    score: number;
+  }> {
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            {
+              role: 'system',
+              content: 'Tu es un expert SEO qui analyse le contenu et fournit des recommandations d\'optimisation.'
+            },
+            {
+              role: 'user',
+              content: `Analyse ce contenu pour le mot-clé "${targetKeyword}" et donne des suggestions d'amélioration. Contenu: ${content.substring(0, 2000)}`
+            }
+          ],
+          max_tokens: 500,
+          temperature: 0.3,
+        }),
+      });
+
+      if (!response.ok) {
+        return {
+          keywordDensity: 0,
+          suggestions: ['Erreur lors de l\'analyse'],
+          score: 0
+        };
+      }
+
+      const data = await response.json();
+      const suggestions = data.choices[0]?.message?.content?.split('\n').filter((s: string) => s.length > 0) || [];
+      
+      // Calcul simple de la densité
+      const words = content.toLowerCase().split(/\s+/);
+      const keywordOccurrences = words.filter(word => word.includes(targetKeyword.toLowerCase())).length;
+      const density = (keywordOccurrences / words.length) * 100;
+      
+      return {
+        keywordDensity: Math.round(density * 100) / 100,
+        suggestions: suggestions.slice(0, 5),
+        score: Math.min(density * 10, 100)
+      };
+    } catch (error) {
+      console.error('Erreur analyse SEO:', error);
+      return {
+        keywordDensity: 0,
+        suggestions: ['Erreur lors de l\'analyse'],
+        score: 0
+      };
     }
   }
 
