@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { 
   Globe, Loader2, Hash, AlertTriangle, CheckCircle, 
-  XCircle, FileText, Eye, Lightbulb
+  XCircle, FileText, Eye, Lightbulb, Shield
 } from "lucide-react";
 import { toast } from "sonner";
 import { analyzeHeadings, HeadingStructure } from '@/utils/seo/headingAnalyzer';
@@ -49,19 +49,59 @@ const UrlContentAnalyzer = () => {
     setIsAnalyzing(true);
     
     try {
-      // Utiliser un proxy CORS pour récupérer le contenu
-      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(cleanUrl)}`;
+      console.log(`🔍 Analyse de: ${cleanUrl}`);
       
-      const response = await fetch(proxyUrl);
-      if (!response.ok) {
-        throw new Error('Impossible de récupérer le contenu de la page');
+      // Liste de proxies CORS améliorée
+      const proxies = [
+        'https://api.allorigins.win/get?url=',
+        'https://corsproxy.io/?',
+        'https://cors-anywhere.herokuapp.com/',
+        'https://thingproxy.freeboard.io/fetch/'
+      ];
+      
+      let htmlContent = '';
+      let proxyUsed = '';
+      
+      // Essayer chaque proxy
+      for (let i = 0; i < proxies.length; i++) {
+        const proxy = proxies[i];
+        console.log(`Tentative avec proxy ${i + 1}: ${proxy}`);
+        
+        try {
+          const response = await fetch(`${proxy}${encodeURIComponent(cleanUrl)}`, {
+            method: 'GET',
+            headers: {
+              'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            },
+            signal: AbortSignal.timeout(10000) // Timeout de 10 secondes
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+
+          if (proxy.includes('allorigins')) {
+            const data = await response.json();
+            htmlContent = data.contents;
+          } else {
+            htmlContent = await response.text();
+          }
+
+          if (htmlContent && htmlContent.length > 100) {
+            proxyUsed = proxy;
+            console.log(`✅ Succès avec proxy: ${proxy}`);
+            break;
+          }
+          
+        } catch (proxyError) {
+          console.error(`❌ Proxy ${i + 1} échoué:`, proxyError);
+          continue;
+        }
       }
 
-      const data = await response.json();
-      const htmlContent = data.contents;
-
-      if (!htmlContent) {
-        throw new Error('Contenu de la page vide');
+      if (!htmlContent || htmlContent.length < 100) {
+        throw new Error('Impossible de récupérer le contenu de la page');
       }
 
       // Parser le HTML
@@ -148,6 +188,15 @@ const UrlContentAnalyzer = () => {
         issues.push({ type: 'success', message: `Contenu substantiel (${contentLength} mots)` });
       }
 
+      // Vérification HTTPS
+      if (cleanUrl.startsWith('https://')) {
+        issues.push({ type: 'success', message: 'Site sécurisé (HTTPS)' });
+      } else {
+        issues.push({ type: 'warning', message: 'Site non sécurisé (HTTP)' });
+        recommendations.push('Migrez vers HTTPS pour la sécurité');
+        seoScore -= 10;
+      }
+
       // S'assurer que le score reste positif
       seoScore = Math.max(20, seoScore);
 
@@ -167,7 +216,9 @@ const UrlContentAnalyzer = () => {
 
     } catch (error) {
       console.error('Erreur lors de l\'analyse:', error);
-      toast.error('Erreur lors de l\'analyse de la page');
+      toast.error('Impossible d\'analyser cette URL', {
+        description: 'Vérifiez que l\'URL est accessible et essayez une autre page'
+      });
     } finally {
       setIsAnalyzing(false);
     }

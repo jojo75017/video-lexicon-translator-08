@@ -6,103 +6,36 @@ export interface HeadingStructure {
   h4Count: number;
   h5Count: number;
   h6Count: number;
-  hierarchy: HierarchyItem[];
-  headings: HeadingData[];
-  issues: string[];
+  headings: Array<{
+    level: number;
+    text: string;
+  }>;
 }
 
-export interface HierarchyItem {
-  level: number;
-  text: string;
-  tagName: string;
-  parentFound: boolean;
-  children: HierarchyItem[];
-}
-
-export interface HeadingData {
-  level: number;
-  text: string;
-  position: number;
-}
-
-export function analyzeHeadings(doc: Document): HeadingStructure {
-  const headings = doc.querySelectorAll('h1, h2, h3, h4, h5, h6');
-  const headingData: HeadingData[] = [];
-  const hierarchy: HierarchyItem[] = [];
-  const issues: string[] = [];
+export const analyzeHeadings = (doc: Document): HeadingStructure => {
+  const headings: Array<{ level: number; text: string }> = [];
   
-  let h1Count = 0, h2Count = 0, h3Count = 0, h4Count = 0, h5Count = 0, h6Count = 0;
-  
-  headings.forEach((heading, index) => {
-    const level = parseInt(heading.tagName.charAt(1));
-    const text = heading.textContent?.trim() || '';
-    
-    // Count headings by level
-    switch (level) {
-      case 1: h1Count++; break;
-      case 2: h2Count++; break;
-      case 3: h3Count++; break;
-      case 4: h4Count++; break;
-      case 5: h5Count++; break;
-      case 6: h6Count++; break;
-    }
-    
-    headingData.push({
-      level,
-      text,
-      position: index
+  // Compter et collecter tous les titres
+  for (let i = 1; i <= 6; i++) {
+    const elements = doc.querySelectorAll(`h${i}`);
+    elements.forEach(element => {
+      const text = element.textContent?.trim() || '';
+      if (text) {
+        headings.push({
+          level: i,
+          text: text.substring(0, 100) // Limiter la longueur
+        });
+      }
     });
-    
-    // Build hierarchy
-    const hierarchyItem: HierarchyItem = {
-      level,
-      text,
-      tagName: heading.tagName.toLowerCase(),
-      parentFound: level === 1 || findParentInHierarchy(hierarchy, level),
-      children: []
-    };
-    
-    if (level === 1) {
-      hierarchy.push(hierarchyItem);
-    } else {
-      addToHierarchy(hierarchy, hierarchyItem);
-    }
-  });
-  
-  // Check for issues
-  if (h1Count === 0) {
-    issues.push("Aucune balise H1 trouvée");
-  } else if (h1Count > 1) {
-    issues.push(`${h1Count} balises H1 trouvées (recommandé: 1)`);
-  }
-  
-  if (h2Count === 0) {
-    issues.push("Aucune balise H2 trouvée");
   }
   
   return {
-    h1Count,
-    h2Count,
-    h3Count,
-    h4Count,
-    h5Count,
-    h6Count,
-    hierarchy,
-    headings: headingData,
-    issues
+    h1Count: doc.querySelectorAll('h1').length,
+    h2Count: doc.querySelectorAll('h2').length,
+    h3Count: doc.querySelectorAll('h3').length,
+    h4Count: doc.querySelectorAll('h4').length,
+    h5Count: doc.querySelectorAll('h5').length,
+    h6Count: doc.querySelectorAll('h6').length,
+    headings: headings.sort((a, b) => a.level - b.level)
   };
-}
-
-function findParentInHierarchy(hierarchy: HierarchyItem[], level: number): boolean {
-  return hierarchy.some(item => item.level < level);
-}
-
-function addToHierarchy(hierarchy: HierarchyItem[], item: HierarchyItem) {
-  for (let i = hierarchy.length - 1; i >= 0; i--) {
-    if (hierarchy[i].level < item.level) {
-      hierarchy[i].children.push(item);
-      return;
-    }
-  }
-  hierarchy.push(item);
-}
+};
