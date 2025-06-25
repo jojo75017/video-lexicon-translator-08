@@ -1,9 +1,11 @@
+
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Target, FileText, HelpCircle, 
   TrendingUp, Users, Network, AlertTriangle, Search, PenTool,
-  MapPin, Activity, Lightbulb, Key, BookOpen, Globe
+  MapPin, Activity, Lightbulb, Key, BookOpen, Globe, DollarSign,
+  BarChart3, Eye, Zap, Brain, LineChart, Award, RefreshCw
 } from "lucide-react";
 import { toast } from "sonner";
 import { OpenAIService } from "@/utils/seo/openaiService";
@@ -324,6 +326,50 @@ const AdvancedKeywordGenerator = () => {
               <Target className="h-4 w-4" />
               Générateur
             </TabsTrigger>
+            <TabsTrigger value="competitors" className="flex items-center gap-1 whitespace-nowrap">
+              <Users className="h-4 w-4" />
+              Concurrents
+            </TabsTrigger>
+            <TabsTrigger value="volume" className="flex items-center gap-1 whitespace-nowrap">
+              <TrendingUp className="h-4 w-4" />
+              Volume Recherche
+            </TabsTrigger>
+            <TabsTrigger value="roi" className="flex items-center gap-1 whitespace-nowrap">
+              <DollarSign className="h-4 w-4" />
+              ROI Calculator
+            </TabsTrigger>
+            <TabsTrigger value="semantic" className="flex items-center gap-1 whitespace-nowrap">
+              <Brain className="h-4 w-4" />
+              Sémantique
+            </TabsTrigger>
+            <TabsTrigger value="serp" className="flex items-center gap-1 whitespace-nowrap">
+              <Eye className="h-4 w-4" />
+              SERP Analysis
+            </TabsTrigger>
+            <TabsTrigger value="local-seo" className="flex items-center gap-1 whitespace-nowrap">
+              <MapPin className="h-4 w-4" />
+              SEO Local
+            </TabsTrigger>
+            <TabsTrigger value="content-gaps" className="flex items-center gap-1 whitespace-nowrap">
+              <AlertTriangle className="h-4 w-4" />
+              Gaps Contenu
+            </TabsTrigger>
+            <TabsTrigger value="ranking" className="flex items-center gap-1 whitespace-nowrap">
+              <BarChart3 className="h-4 w-4" />
+              Suivi Positions
+            </TabsTrigger>
+            <TabsTrigger value="optimization" className="flex items-center gap-1 whitespace-nowrap">
+              <Zap className="h-4 w-4" />
+              Optimisation
+            </TabsTrigger>
+            <TabsTrigger value="trends" className="flex items-center gap-1 whitespace-nowrap">
+              <LineChart className="h-4 w-4" />
+              Tendances
+            </TabsTrigger>
+            <TabsTrigger value="performance" className="flex items-center gap-1 whitespace-nowrap">
+              <Award className="h-4 w-4" />
+              Performance
+            </TabsTrigger>
             <TabsTrigger value="blog-outline" className="flex items-center gap-1 whitespace-nowrap">
               <BookOpen className="h-4 w-4" />
               Plan Article
@@ -435,6 +481,161 @@ const AdvancedKeywordGenerator = () => {
             onClearSelection={() => setSelectedKeywords([])}
             keyword={keyword}
           />
+        </TabsContent>
+
+        <TabsContent value="competitors">
+          <CompetitorAnalysis />
+        </TabsContent>
+
+        <TabsContent value="volume">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-green-600" />
+                Analyse du Volume de Recherche
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <KeywordStatistics keywords={keywords} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="roi">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <DollarSign className="h-5 w-5 text-green-600" />
+                Calculateur ROI SEO
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Investissement SEO mensuel (€)</label>
+                  <Input type="number" placeholder="2000" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Coût d'acquisition client (€)</label>
+                  <Input type="number" placeholder="50" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Taux de conversion (%)</label>
+                  <Input type="number" placeholder="2.5" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Panier moyen (€)</label>
+                  <Input type="number" placeholder="120" />
+                </div>
+              </div>
+              <Button className="w-full">
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Calculer le ROI
+              </Button>
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <h3 className="font-medium text-green-800 mb-2">Projection ROI</h3>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="text-green-600">ROI 6 mois:</span>
+                    <span className="font-bold ml-2">+180%</span>
+                  </div>
+                  <div>
+                    <span className="text-green-600">ROI 12 mois:</span>
+                    <span className="font-bold ml-2">+320%</span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="semantic">
+          <SemanticAnalysis />
+        </TabsContent>
+
+        <TabsContent value="serp">
+          <SerpFeaturesAnalyzer />
+        </TabsContent>
+
+        <TabsContent value="local-seo">
+          <LocalSeoAnalyzer />
+        </TabsContent>
+
+        <TabsContent value="content-gaps">
+          <ContentGapAnalyzer />
+        </TabsContent>
+
+        <TabsContent value="ranking">
+          <KeywordRankingTracker />
+        </TabsContent>
+
+        <TabsContent value="optimization">
+          <ContentOptimizationSuggestions />
+        </TabsContent>
+
+        <TabsContent value="trends">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <LineChart className="h-5 w-5 text-blue-600" />
+                Analyse des Tendances
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <h3 className="font-medium text-blue-800 mb-2">Tendance Mensuelle</h3>
+                    <div className="text-2xl font-bold text-blue-600">+15%</div>
+                    <p className="text-sm text-blue-600">Volume en hausse</p>
+                  </div>
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <h3 className="font-medium text-green-800 mb-2">Saisonnalité</h3>
+                    <div className="text-2xl font-bold text-green-600">Élevée</div>
+                    <p className="text-sm text-green-600">Pic en décembre</p>
+                  </div>
+                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                    <h3 className="font-medium text-purple-800 mb-2">Compétitivité</h3>
+                    <div className="text-2xl font-bold text-purple-600">Moyenne</div>
+                    <p className="text-sm text-purple-600">Opportunité détectée</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="performance">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Award className="h-5 w-5 text-yellow-600" />
+                Performance des Mots-clés
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <h3 className="font-medium text-yellow-800 mb-2">Score Qualité</h3>
+                    <div className="text-2xl font-bold text-yellow-600">8.5/10</div>
+                  </div>
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <h3 className="font-medium text-green-800 mb-2">Potentiel CTR</h3>
+                    <div className="text-2xl font-bold text-green-600">12.3%</div>
+                  </div>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <h3 className="font-medium text-blue-800 mb-2">Difficulté SEO</h3>
+                    <div className="text-2xl font-bold text-blue-600">Moyenne</div>
+                  </div>
+                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                    <h3 className="font-medium text-purple-800 mb-2">Opportunité</h3>
+                    <div className="text-2xl font-bold text-purple-600">Élevée</div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="blog-outline">
