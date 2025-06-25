@@ -1,92 +1,23 @@
 
-import { detectGeographicKeyword } from '../titleGenerator';
-
-/**
- * Detects various keyword types and patterns to determine the appropriate template
- */
-export const detectKeywordType = (keyword: string): {
-  isGeographic: boolean;
-  hasBali: boolean;
-  hasDigitalNomad: boolean;
-  hasRizieres: boolean;
-  hasVoyage: boolean;
-  hasSolo: boolean;
-  isHowTo: boolean;
-  containsMultipleEntities: boolean;
-  mainSubject: string;
-} => {
-  if (!keyword || keyword.trim().length === 0) {
-    keyword = "sujet";
-  }
-
-  // Cleaning and prep
-  const keywordLowerCase = keyword.toLowerCase().trim();
+export const detectGeographicKeyword = (keyword: string): boolean => {
+  const geoTerms = ['paris', 'lyon', 'marseille', 'toulouse', 'nice', 'nantes', 'strasbourg', 'montpellier', 'bordeaux', 'lille', 'rennes', 'reims', 'le havre', 'saint-étienne', 'toulon', 'grenoble', 'dijon', 'angers', 'nîmes', 'villeurbanne', 'clermont-ferrand', 'aix-en-provence', 'brest', 'tours', 'amiens', 'limoges', 'annecy', 'perpignan', 'boulogne-billancourt', 'orléans', 'mulhouse', 'rouen', 'caen', 'nancy', 'saint-denis', 'argenteuil', 'montreuil', 'roubaix', 'tourcoing', 'avignon', 'créteil', 'poitiers', 'fort-de-france', 'courbevoie', 'versailles', 'colombes', 'aulnay-sous-bois', 'vitry-sur-seine', 'pau', 'la rochelle', 'rueil-malmaison', 'calais', 'neuilly-sur-seine', 'antony', 'troyes', 'la seyne-sur-mer', 'sarcelles', 'metz', 'béziers', 'boulognesur-mer', 'dunkerque', 'meaux', 'pessac', 'fréjus', 'cherbourg-octeville', 'chambéry', 'lorient', 'montluçon', 'cholet', 'saint-quentin', 'valence', 'bourges', 'calais', 'mâcon', 'saint-nazaire', 'colmar', 'ajaccio', 'drancy', 'issy-les-moulineaux', 'levallois-perret', 'quimper', 'valenciennes', 'cannes', 'bourg-en-bresse', 'blois', 'la roche-sur-yon', 'saint-maur-des-fossés', 'cergy', 'saint-brieuc', 'châlons-en-champagne', 'beauvais', 'meaux', 'évry', 'bayonne', 'charleville-mézières', 'vannes', 'laval', 'saint-priest', 'ivry-sur-seine', 'clichy', 'montauban', 'niort', 'châteauroux', 'sète', 'chalon-sur-saône', 'caluire-et-cuire', 'sartrouville', 'arles', 'saint-ouen', 'pontault-combault', 'saint-étienne', 'wattrelos', 'marseille', 'lyon', 'toulouse', 'nice', 'nantes', 'montpellier', 'strasbourg', 'bordeaux', 'lille', 'rennes', 'reims', 'saint-étienne', 'toulon', 'grenoble', 'dijon', 'angers', 'nîmes', 'aix-en-provence', 'brest', 'tours', 'amiens', 'limoges', 'annecy', 'perpignan', 'orléans', 'mulhouse', 'rouen', 'caen', 'nancy', 'argenteuil', 'montreuil', 'avignon', 'poitiers', 'versailles', 'la rochelle', 'metz', 'béziers', 'dunkerque', 'meaux', 'chambéry', 'lorient', 'montluçon', 'cholet', 'valence', 'bourges', 'mâcon', 'colmar', 'quimper', 'valenciennes', 'cannes', 'bourg-en-bresse', 'blois', 'la roche-sur-yon', 'évry', 'bayonne', 'vannes', 'laval', 'niort', 'châteauroux', 'arles', 'montauban', 'france', 'français', 'francophone'];
   
-  // Detect geographic keywords
-  const isGeographic = detectGeographicKeyword(keyword);
-  
-  // Detect multiple entities
-  const containsMultipleEntities = keyword.includes(" et ") || 
-                                  keyword.includes(" & ") || 
-                                  keyword.includes(" vs ") || 
-                                  keyword.includes(" ou ");
-  
-  // Detect specific topics
-  const hasBali = keywordLowerCase.includes("bali");
-  const hasDigitalNomad = keywordLowerCase.includes("digital nomad") || 
-                          keywordLowerCase.includes("nomade digital") || 
-                          keywordLowerCase.includes("nomade numérique") ||
-                          keywordLowerCase.includes("travail à distance");
-  const hasRizieres = keywordLowerCase.includes("rizière") || 
-                      keywordLowerCase.includes("rizieres") || 
-                      keywordLowerCase.includes("riziere");
-  const hasVoyage = keywordLowerCase.includes("voyage") || 
-                    keywordLowerCase.includes("voyager") ||
-                    keywordLowerCase.includes("voyageur") || 
-                    keywordLowerCase.includes("tourisme");
-  const hasSolo = keywordLowerCase.includes("solo") || 
-                  keywordLowerCase.includes("seul");
-  
-  // Detect how-to pattern
-  const isHowTo = keywordLowerCase.startsWith("comment ") || 
-                  keywordLowerCase.startsWith("découvrez comment ") ||
-                  keywordLowerCase.includes("guide") || 
-                  keywordLowerCase.includes("tutoriel") ||
-                  keywordLowerCase.includes("conseil");
-  
-  // Extract main subject after "comment" if present
-  let mainSubject = keyword;
-  if (keywordLowerCase.startsWith("comment ")) {
-    mainSubject = keyword.substring("comment ".length);
-  } else if (keywordLowerCase.startsWith("découvrez comment ")) {
-    mainSubject = keyword.substring("découvrez comment ".length);
-  }
-  
-  return {
-    isGeographic,
-    hasBali,
-    hasDigitalNomad,
-    hasRizieres,
-    hasVoyage,
-    hasSolo,
-    isHowTo,
-    containsMultipleEntities,
-    mainSubject
-  };
+  return geoTerms.some(term => keyword.toLowerCase().includes(term.toLowerCase()));
 };
 
-/**
- * Extracts entities from a compound keyword (for multiple locations)
- */
-export const extractEntities = (keyword: string): string[] => {
-  if (keyword.includes(" et ")) {
-    return keyword.split(" et ");
-  } else if (keyword.includes(" & ")) {
-    return keyword.split(" & ");
-  } else if (keyword.includes(" vs ")) {
-    return keyword.split(" vs ");
-  } else if (keyword.includes(" ou ")) {
-    return keyword.split(" ou ");
+export const detectWebsiteTheme = (keyword: string): string => {
+  const themes = {
+    'e-commerce': ['boutique', 'magasin', 'achat', 'vente', 'prix', 'commande'],
+    'blog': ['article', 'guide', 'conseil', 'astuce', 'tuto', 'information'],
+    'service': ['prestation', 'service', 'aide', 'assistance', 'conseil', 'expert'],
+    'local': ['près de chez', 'local', 'région', 'ville', 'quartier', 'proximité']
+  };
+  
+  for (const [theme, keywords] of Object.entries(themes)) {
+    if (keywords.some(kw => keyword.toLowerCase().includes(kw))) {
+      return theme;
+    }
   }
-  return [keyword];
+  
+  return 'général';
 };

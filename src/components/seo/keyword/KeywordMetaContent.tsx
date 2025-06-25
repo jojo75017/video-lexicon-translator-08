@@ -8,18 +8,63 @@ import { Badge } from "@/components/ui/badge";
 import { PenTool, Copy, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 
+// Fonctions améliorées pour générer du contenu vraiment personnalisé
+const generatePersonalizedTitle = (keyword: string): string => {
+  if (!keyword.trim()) return '';
+  
+  const currentYear = new Date().getFullYear();
+  const templates = [
+    `${keyword} : Guide Expert ${currentYear} - Conseils et Astuces`,
+    `Tout savoir sur ${keyword} - Guide Complet ${currentYear}`,
+    `${keyword} : Les Meilleures Pratiques et Solutions`,
+    `Guide ${keyword} : Stratégies Efficaces pour Réussir`,
+    `${keyword} - Expert Conseils et Recommandations`,
+    `Maîtriser ${keyword} : Guide Professionnel ${currentYear}`,
+    `${keyword} : Méthodes Éprouvées et Conseils d'Expert`
+  ];
+  
+  const selectedTemplate = templates[Math.floor(Math.random() * templates.length)];
+  return selectedTemplate.length > 60 ? selectedTemplate.substring(0, 57) + "..." : selectedTemplate;
+};
+
+const generatePersonalizedDescription = (keyword: string): string => {
+  if (!keyword.trim()) return '';
+  
+  const templates = [
+    `Découvrez tout sur ${keyword} avec notre guide expert. Conseils pratiques, astuces et stratégies pour réussir. Gratuit et complet.`,
+    `${keyword} : guide détaillé avec techniques avancées, bonnes pratiques et conseils d'experts pour optimiser vos résultats.`,
+    `Maîtrisez ${keyword} grâce à notre approche step-by-step. Méthodes éprouvées, exemples concrets et astuces pour réussir rapidement.`,
+    `Guide complet ${keyword} : tout ce que vous devez savoir. Solutions efficaces, conseils d'experts et outils recommandés.`,
+    `${keyword} expliqué simplement : guide pratique avec exemples, conseils et techniques pour obtenir des résultats concrets.`
+  ];
+  
+  const selectedTemplate = templates[Math.floor(Math.random() * templates.length)];
+  return selectedTemplate.length > 155 ? selectedTemplate.substring(0, 152) + "..." : selectedTemplate;
+};
+
 export const KeywordMetaContent = () => {
+  const [keyword, setKeyword] = useState('');
   const [title, setTitle] = useState('');
   const [metaDescription, setMetaDescription] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
 
   const generateMetaContent = () => {
+    if (!keyword.trim()) {
+      toast.error('Veuillez entrer un mot-clé avant de générer');
+      return;
+    }
+
     setIsGenerating(true);
+    
+    // Simuler un délai de génération IA
     setTimeout(() => {
-      setTitle('Guide Complet 2024 : Tout Savoir sur Votre Sujet Principal');
-      setMetaDescription('Découvrez notre guide expert complet avec conseils pratiques, astuces et stratégies pour réussir. Solutions efficaces et résultats garantis.');
+      const generatedTitle = generatePersonalizedTitle(keyword);
+      const generatedDescription = generatePersonalizedDescription(keyword);
+      
+      setTitle(generatedTitle);
+      setMetaDescription(generatedDescription);
       setIsGenerating(false);
-      toast.success('Contenu méta généré avec l\'IA');
+      toast.success('Contenu méta généré avec succès !');
     }, 1500);
   };
 
@@ -50,9 +95,24 @@ export const KeywordMetaContent = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Mot-clé principal
+          </label>
+          <Input
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            placeholder="Ex: conseiller en aquariophilie, voyage à Paris..."
+            className="w-full"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Entrez votre mot-clé pour générer du contenu personnalisé
+          </p>
+        </div>
+
         <Button 
           onClick={generateMetaContent}
-          disabled={isGenerating}
+          disabled={isGenerating || !keyword.trim()}
           className="w-full gap-2"
         >
           {isGenerating ? (
@@ -131,7 +191,7 @@ export const KeywordMetaContent = () => {
                   {title}
                 </div>
                 <div className="text-green-700 text-sm">
-                  https://votresite.com/page-exemple
+                  https://votresite.com/{keyword.toLowerCase().replace(/\s+/g, '-')}
                 </div>
                 <div className="text-gray-600 text-sm">
                   {metaDescription}
