@@ -13,6 +13,7 @@ export interface KeywordSuggestion {
   suggestedLongDescription?: string;
   searchVolume?: number;
   relevance?: number;
+  competition?: number;
 }
 
 export interface SerpResult {
@@ -89,4 +90,33 @@ export interface KeywordData {
   trend?: number[];
   searchVolume?: number;
   relevance?: number;
+  density?: number;
+  count?: number;
+  position?: number;
+}
+
+export interface KeywordTrend {
+  date: string;
+  volume: number;
+  interest: number;
+}
+
+export interface SemanticCluster {
+  mainKeyword: string;
+  relatedKeywords: string[];
+  semanticScore: number;
+  intent: string;
+}
+
+export interface ContentGap {
+  keyword: string;
+  missingContent: string[];
+  opportunity: number;
+  priority: 'high' | 'medium' | 'low';
+}
+
+export interface SerpFeature {
+  type: string;
+  present: boolean;
+  opportunity: number;
 }

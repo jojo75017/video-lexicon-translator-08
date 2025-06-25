@@ -1,158 +1,95 @@
 
 import { CompetitorData, SerpResult } from '@/types/seo/Keyword';
 
-/**
- * Validates URL format
- */
-export const validateUrl = (url: string): boolean => {
-  try {
-    if (!url) return false;
-    new URL(url);
-    return url.startsWith('http://') || url.startsWith('https://');
-  } catch (e) {
-    return false;
-  }
-};
-
-/**
- * Validate competitor data to ensure it meets our requirements
- */
 export const validateCompetitorData = (competitors: any[]): CompetitorData[] => {
-  if (!competitors || competitors.length === 0) {
-    return generateFallbackData("").competitors;
-  }
+  if (!Array.isArray(competitors)) return [];
   
   return competitors.map(comp => ({
-    name: comp.name || 'Concurrent',
-    url: validateUrl(comp.url) ? comp.url : `https://example-${Math.floor(Math.random() * 1000)}.com`,
-    strength: typeof comp.strength === 'number' ? comp.strength : Math.floor(Math.random() * 100),
-    organic_traffic: typeof comp.organic_traffic === 'number' ? comp.organic_traffic : Math.floor(Math.random() * 50000 + 1000),
-    keywords: typeof comp.keywords === 'number' ? comp.keywords : Math.floor(Math.random() * 5000 + 500)
-  })).slice(0, 5);
+    name: comp.name || 'Concurrent inconnu',
+    url: comp.url || '#',
+    domain: comp.domain || comp.url?.replace(/https?:\/\//, '').split('/')[0] || 'domain.com',
+    strength: comp.strength || Math.floor(Math.random() * 100),
+    organic_traffic: comp.organic_traffic || Math.floor(Math.random() * 50000),
+    estimatedTraffic: comp.estimatedTraffic || comp.organic_traffic || Math.floor(Math.random() * 50000),
+    keywords: comp.keywords || Math.floor(Math.random() * 1000),
+    topKeywords: Array.isArray(comp.topKeywords) ? comp.topKeywords : ['keyword 1', 'keyword 2'],
+    gaps: Array.isArray(comp.gaps) ? comp.gaps : ['gap 1', 'gap 2']
+  }));
 };
 
-/**
- * Validate SERP results to ensure they meet our requirements
- */
 export const validateSerpResults = (serps: any[]): SerpResult[] => {
-  if (!serps || serps.length === 0) {
-    return generateFallbackData("").serps;
-  }
+  if (!Array.isArray(serps)) return [];
   
-  return serps.map((serp, index) => ({
-    title: serp.title || 'Résultat de recherche',
-    url: validateUrl(serp.url) ? serp.url : `https://example-${Math.floor(Math.random() * 1000)}.com/page-${index}`,
-    description: serp.description || 'Description non disponible pour ce résultat de recherche.',
-    position: typeof serp.position === 'number' ? serp.position : index + 1
-  })).slice(0, 10);
+  return serps.map(serp => ({
+    title: serp.title || 'Titre inconnu',
+    url: serp.url || '#',
+    description: serp.description || 'Description non disponible',
+    position: serp.position || 1,
+    domain: serp.domain || serp.url?.replace(/https?:\/\//, '').split('/')[0] || 'domain.com',
+    authority: serp.authority || Math.floor(Math.random() * 100),
+    estimatedTraffic: serp.estimatedTraffic || Math.floor(Math.random() * 10000),
+    titleLength: serp.titleLength || serp.title?.length || 60,
+    descriptionLength: serp.descriptionLength || serp.description?.length || 160,
+    hasStructuredData: serp.hasStructuredData || false,
+    loadTime: serp.loadTime || Math.random() * 3,
+    mobileOptimized: serp.mobileOptimized || true
+  }));
 };
 
-/**
- * Generate fallback competitor data when the API fails
- */
-export const generateFallbackData = (keyword: string): { competitors: CompetitorData[], serps: SerpResult[] } => {
-  const keywordBase = keyword.split(' ')[0] || 'exemple';
+export const generateFallbackData = (keyword: string) => {
+  const isLocalSearch = keyword.toLowerCase().includes('dormir') || 
+                       keyword.toLowerCase().includes('hotel') || 
+                       keyword.toLowerCase().includes('restaurant') ||
+                       keyword.toLowerCase().includes('quimper');
   
-  const competitors: CompetitorData[] = [
-    {
-      name: `Guide${keywordBase.charAt(0).toUpperCase() + keywordBase.slice(1)}.fr`,
-      url: `https://www.guide${keywordBase.toLowerCase()}.fr`,
-      strength: Math.floor(Math.random() * 40 + 60),
-      organic_traffic: Math.floor(Math.random() * 50000 + 10000),
-      keywords: Math.floor(Math.random() * 5000 + 1000)
-    },
-    {
-      name: `${keywordBase.charAt(0).toUpperCase() + keywordBase.slice(1)}Expert.com`,
-      url: `https://www.${keywordBase.toLowerCase()}expert.com`,
-      strength: Math.floor(Math.random() * 30 + 50),
-      organic_traffic: Math.floor(Math.random() * 40000 + 8000),
-      keywords: Math.floor(Math.random() * 4000 + 800)
-    },
-    {
-      name: `Meilleur${keywordBase.charAt(0).toUpperCase() + keywordBase.slice(1)}.fr`,
-      url: `https://www.meilleur${keywordBase.toLowerCase()}.fr`,
-      strength: Math.floor(Math.random() * 30 + 40),
-      organic_traffic: Math.floor(Math.random() * 30000 + 5000),
-      keywords: Math.floor(Math.random() * 3000 + 600)
-    },
-    {
-      name: `${keywordBase.charAt(0).toUpperCase() + keywordBase.slice(1)}Pro.com`,
-      url: `https://www.${keywordBase.toLowerCase()}pro.com`,
-      strength: Math.floor(Math.random() * 20 + 40),
-      organic_traffic: Math.floor(Math.random() * 25000 + 3000),
-      keywords: Math.floor(Math.random() * 2500 + 500)
-    },
-    {
-      name: `Top${keywordBase.charAt(0).toUpperCase() + keywordBase.slice(1)}.com`,
-      url: `https://www.top${keywordBase.toLowerCase()}.com`,
-      strength: Math.floor(Math.random() * 20 + 30),
-      organic_traffic: Math.floor(Math.random() * 20000 + 2000),
-      keywords: Math.floor(Math.random() * 2000 + 400)
-    }
-  ];
+  const isTourismSearch = keyword.toLowerCase().includes('quimper') ||
+                        keyword.toLowerCase().includes('dormir') ||
+                        keyword.toLowerCase().includes('hotel');
 
-  const serps: SerpResult[] = [
-    {
-      title: `${keyword} - Guide complet et conseils`,
-      url: `https://www.guide${keywordBase.toLowerCase()}.fr/${keyword.replace(/\s+/g, '-').toLowerCase()}`,
-      description: `Découvrez tout ce que vous devez savoir sur ${keyword}. Guide complet, conseils d'experts et astuces pour réussir.`,
-      position: 1
-    },
-    {
-      title: `Les meilleurs ${keyword} en ${new Date().getFullYear()} - Comparatif complet`,
-      url: `https://www.meilleur${keywordBase.toLowerCase()}.fr/comparatif-${keyword.replace(/\s+/g, '-').toLowerCase()}`,
-      description: `Comparatif des meilleurs ${keyword} de l'année. Avis, tests et conseils pour faire le bon choix.`,
-      position: 2
-    },
-    {
-      title: `${keyword}: tout ce qu'il faut savoir - ${keywordBase}Expert`,
-      url: `https://www.${keywordBase.toLowerCase()}expert.com/guide/${keyword.replace(/\s+/g, '-').toLowerCase()}`,
-      description: `Guide complet sur ${keyword}. Découvrez nos conseils d'experts pour optimiser votre expérience.`,
-      position: 3
-    },
-    {
-      title: `${keyword} pas cher - Les meilleures offres`,
-      url: `https://www.bons-plans-${keywordBase.toLowerCase()}.com/${keyword.replace(/\s+/g, '-').toLowerCase()}-pas-cher`,
-      description: `Économisez sur votre ${keyword} avec nos conseils et bons plans. Offres mises à jour quotidiennement.`,
-      position: 4
-    },
-    {
-      title: `Avis sur les ${keyword} - Test complet`,
-      url: `https://www.avis-${keywordBase.toLowerCase()}.fr/test-${keyword.replace(/\s+/g, '-').toLowerCase()}`,
-      description: `Avis détaillés et tests des ${keyword}. Découvrez les avantages, inconvénients et retours d'expérience.`,
-      position: 5
-    },
-    {
-      title: `Comment choisir son ${keyword} ? Guide d'achat`,
-      url: `https://www.conseils-${keywordBase.toLowerCase()}.com/guide-achat-${keyword.replace(/\s+/g, '-').toLowerCase()}`,
-      description: `Guide d'achat pour bien choisir votre ${keyword}. Critères de sélection, comparatifs et conseils personnalisés.`,
-      position: 6
-    },
-    {
-      title: `${keyword} - Wikipédia`,
-      url: `https://fr.wikipedia.org/wiki/${keyword.replace(/\s+/g, '_')}`,
-      description: `${keyword} désigne... Découvrez l'histoire, les caractéristiques et l'évolution du concept de ${keyword} dans cet article.`,
-      position: 7
-    },
-    {
-      title: `${keyword.charAt(0).toUpperCase() + keyword.slice(1)} | Amazon.fr`,
-      url: `https://www.amazon.fr/s?k=${keyword.replace(/\s+/g, '+')}`,
-      description: `Achetez ${keyword} sur Amazon.fr. Livraison rapide et prix bas garantis. Grand choix parmi des milliers de produits.`,
-      position: 8
-    },
-    {
-      title: `Les tendances ${keyword} en ${new Date().getFullYear()}`,
-      url: `https://www.tendances-${keywordBase.toLowerCase()}.fr/${new Date().getFullYear()}/${keyword.replace(/\s+/g, '-').toLowerCase()}`,
-      description: `Découvrez les dernières tendances ${keyword} pour cette année. Innovations, nouveautés et évolutions à connaître.`,
-      position: 9
-    },
-    {
-      title: `Formation ${keyword} - Apprenez avec des experts`,
-      url: `https://www.formation-${keywordBase.toLowerCase()}.com/cours-${keyword.replace(/\s+/g, '-').toLowerCase()}`,
-      description: `Formez-vous au ${keyword} avec nos cours en ligne. Formation certifiante dispensée par des experts du domaine.`,
-      position: 10
-    }
-  ];
-  
-  return { competitors, serps };
+  if (isLocalSearch || isTourismSearch) {
+    return {
+      competitors: [
+        {
+          name: "Booking.com",
+          url: "https://www.booking.com",
+          domain: "booking.com",
+          strength: 95,
+          organic_traffic: 850000,
+          estimatedTraffic: 850000,
+          keywords: 45000,
+          topKeywords: [`hotel ${keyword}`, `${keyword} booking`, `réservation ${keyword}`],
+          gaps: [`${keyword} pas cher`, `${keyword} dernière minute`]
+        },
+        {
+          name: "TripAdvisor",
+          url: "https://www.tripadvisor.fr",
+          domain: "tripadvisor.fr",
+          strength: 88,
+          organic_traffic: 650000,
+          estimatedTraffic: 650000,
+          keywords: 35000,
+          topKeywords: [`avis ${keyword}`, `${keyword} restaurant`, `que faire ${keyword}`],
+          gaps: [`${keyword} guide`, `${keyword} attractions`]
+        }
+      ],
+      serps: []
+    };
+  }
+
+  return {
+    competitors: [
+      {
+        name: "Wikipedia",
+        url: "https://wikipedia.org",
+        domain: "wikipedia.org",
+        strength: 95,
+        organic_traffic: 500000,
+        estimatedTraffic: 500000,
+        keywords: 20000,
+        topKeywords: [`${keyword}`, `${keyword} définition`],
+        gaps: [`${keyword} guide`, `${keyword} tutoriel`]
+      }
+    ],
+    serps: []
+  };
 };

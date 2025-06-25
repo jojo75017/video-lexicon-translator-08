@@ -38,15 +38,63 @@ const KeywordGeneratorEnhanced: React.FC = () => {
     setIsGenerating(true);
     setTimeout(() => {
       const mockStandardKeywords: KeywordSuggestion[] = [
-        { keyword: `${keyword} guide`, volume: 1200, difficulty: 45, cpc: 1.25, type: 'standard' },
-        { keyword: `${keyword} tips`, volume: 800, difficulty: 35, cpc: 0.95, type: 'standard' },
-        { keyword: `${keyword} best practices`, volume: 600, difficulty: 55, cpc: 1.50, type: 'standard' },
+        { 
+          keyword: `${keyword} guide`, 
+          volume: 1200, 
+          difficulty: 45, 
+          cpc: 1.25, 
+          type: 'standard',
+          intent: 'informational',
+          opportunity: 75
+        },
+        { 
+          keyword: `${keyword} tips`, 
+          volume: 800, 
+          difficulty: 35, 
+          cpc: 0.95, 
+          type: 'standard',
+          intent: 'informational',
+          opportunity: 60
+        },
+        { 
+          keyword: `${keyword} best practices`, 
+          volume: 600, 
+          difficulty: 55, 
+          cpc: 1.50, 
+          type: 'standard',
+          intent: 'commercial',
+          opportunity: 80
+        },
       ];
       
       const mockLongTailKeywords: KeywordSuggestion[] = [
-        { keyword: `how to ${keyword} for beginners`, volume: 300, difficulty: 25, cpc: 0.85, type: 'long-tail' },
-        { keyword: `best ${keyword} tools 2024`, volume: 250, difficulty: 30, cpc: 1.10, type: 'long-tail' },
-        { keyword: `${keyword} vs alternatives comparison`, volume: 180, difficulty: 40, cpc: 1.35, type: 'long-tail' },
+        { 
+          keyword: `how to ${keyword} for beginners`, 
+          volume: 300, 
+          difficulty: 25, 
+          cpc: 0.85, 
+          type: 'long-tail',
+          intent: 'informational',
+          opportunity: 65
+        },
+        { 
+          keyword: `best ${keyword} tools 2024`, 
+          volume: 250, 
+          difficulty: 30, 
+          cpc: 1.10, 
+          type: 'long-tail',
+          intent: 'commercial',
+          opportunity: 70
+        },
+        { 
+          keyword: `${keyword} vs alternatives comparison`, 
+          volume: 180, 
+          difficulty: 40, 
+          cpc: 1.35, 
+          type: 'long-tail',
+          intent: 'commercial',
+          opportunity: 55
+        },
       ];
       
       setStandardKeywords(mockStandardKeywords);
@@ -86,22 +134,24 @@ const KeywordGeneratorEnhanced: React.FC = () => {
     toast.success(`${selectedKeywords.length} mots-clés exportés`);
   };
 
-  const handleIntelligentKeywords = (keywords: KeywordSuggestion[]) => {
-    setStandardKeywords(prev => [...prev, ...keywords]);
-    toast.success(`${keywords.length} nouveaux mots-clés ajoutés`);
+  const handleIntelligentKeywords = (keywordsList: KeywordSuggestion[]) => {
+    setStandardKeywords(prev => [...prev, ...keywordsList]);
+    toast.success(`${keywordsList.length} nouveaux mots-clés ajoutés`);
   };
 
-  const handleCompetitorKeywords = (keywords: string[]) => {
-    const competitorKeywords: KeywordSuggestion[] = keywords.map(kw => ({
+  const handleCompetitorKeywords = (keywordsList: string[]) => {
+    const competitorKeywords: KeywordSuggestion[] = keywordsList.map(kw => ({
       keyword: kw,
       volume: Math.floor(Math.random() * 1000) + 100,
       difficulty: Math.floor(Math.random() * 80) + 20,
       cpc: Math.random() * 2 + 0.5,
-      type: 'competitor' as const
+      type: 'competitor' as const,
+      intent: 'mixed' as const,
+      opportunity: Math.floor(Math.random() * 60) + 40
     }));
     
     setStandardKeywords(prev => [...prev, ...competitorKeywords]);
-    toast.success(`${keywords.length} mots-clés concurrents ajoutés`);
+    toast.success(`${keywordsList.length} mots-clés concurrents ajoutés`);
   };
 
   if (showApiConfig) {
@@ -207,18 +257,9 @@ const KeywordGeneratorEnhanced: React.FC = () => {
         />
         
         <KeywordTabsContent
-          standardKeywords={standardKeywords}
-          longTailKeywords={longTailKeywords}
-          allKeywords={allKeywords}
-          selectedKeywords={selectedKeywords}
-          keyword={keyword}
           activeTab={activeMainTab}
-          setActiveTab={setActiveMainTab}
-          toggleKeywordSelection={toggleKeywordSelection}
-          clearSelectedKeywords={clearSelectedKeywords}
-          exportSelectedKeywords={exportSelectedKeywords}
-          handleIntelligentKeywords={handleIntelligentKeywords}
-          handleCompetitorKeywords={handleCompetitorKeywords}
+          keywords={allKeywords}
+          keyword={keyword}
         />
       </Tabs>
     </div>
