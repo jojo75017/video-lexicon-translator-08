@@ -41,6 +41,103 @@ import KeywordFAQ from './keyword/KeywordFAQ';
 import SiteStructureAnalyzer from './keyword/SiteStructureAnalyzer';
 import { OpenAIService } from '@/utils/seo/openaiService';
 
+// Fonction pour générer des titres variés et personnalisés
+const generateDynamicTitle = (keyword: string, type: 'standard' | 'long-tail' | 'question' | 'semantic' | 'ai-generated'): string => {
+  const titleTemplates = {
+    'standard': [
+      `${keyword} : Guide Complet ${new Date().getFullYear()}`,
+      `Tout Savoir sur ${keyword} - Guide Expert`,
+      `${keyword} : Stratégies et Conseils Pratiques`,
+      `Maîtriser ${keyword} : Méthodes Éprouvées`,
+      `${keyword} - Solutions Efficaces et Astuces`,
+      `Guide ${keyword} : De Débutant à Expert`,
+      `${keyword} : Les Meilleures Pratiques`
+    ],
+    'long-tail': [
+      `Comment bien choisir ${keyword} : Guide pratique`,
+      `${keyword} : Comparatif et conseils d'achat`,
+      `Optimiser ${keyword} : techniques avancées`,
+      `${keyword} pour débutants : guide étape par étape`,
+      `Les erreurs à éviter avec ${keyword}`,
+      `${keyword} : prix, avis et recommandations`
+    ],
+    'question': [
+      `Réponse complète : ${keyword}`,
+      `${keyword} : explication détaillée`,
+      `Tout comprendre sur ${keyword}`,
+      `${keyword} : guide et solutions`,
+      `${keyword} : réponses d'experts`
+    ],
+    'semantic': [
+      `${keyword} : analyse approfondie ${new Date().getFullYear()}`,
+      `${keyword} : tendances et perspectives`,
+      `Comprendre ${keyword} : guide technique`,
+      `${keyword} : étude complète et insights`,
+      `${keyword} : vision d'expert et analyse`
+    ],
+    'ai-generated': [
+      `${keyword} avec l'IA : guide innovant`,
+      `${keyword} : approche moderne et efficace`,
+      `${keyword} : stratégies d'avenir`,
+      `${keyword} : méthodes optimisées par l'IA`,
+      `${keyword} : solutions intelligentes`
+    ]
+  };
+
+  const templates = titleTemplates[type] || titleTemplates['standard'];
+  const randomTemplate = templates[Math.floor(Math.random() * templates.length)];
+  
+  // Limiter à 60 caractères pour le SEO
+  return randomTemplate.length > 60 ? randomTemplate.substring(0, 57) + "..." : randomTemplate;
+};
+
+// Fonction pour générer des descriptions variées et personnalisées
+const generateDynamicDescription = (keyword: string, type: 'standard' | 'long-tail' | 'question' | 'semantic' | 'ai-generated'): string => {
+  const descTemplates = {
+    'standard': [
+      `Découvrez tout sur ${keyword} avec notre guide expert. Conseils pratiques, astuces et stratégies pour réussir. Gratuit et complet.`,
+      `Maîtrisez ${keyword} grâce à notre guide détaillé. Techniques avancées, bonnes pratiques et conseils d'experts pour optimiser vos résultats.`,
+      `Guide complet ${keyword} : tout ce que vous devez savoir. Méthodes éprouvées, exemples concrets et astuces pour réussir rapidement.`,
+      `Apprenez ${keyword} efficacement avec notre approche step-by-step. Conseils d'experts, outils recommandés et stratégies gagnantes.`,
+      `${keyword} expliqué simplement : guide pratique avec exemples, conseils et techniques pour obtenir des résultats concrets.`
+    ],
+    'long-tail': [
+      `${keyword} : trouvez les meilleures solutions avec notre comparatif expert. Prix, avis, recommandations et guide d'achat complet.`,
+      `Comment optimiser ${keyword} ? Découvrez nos techniques avancées, astuces pratiques et conseils pour améliorer vos performances.`,
+      `${keyword} pour débutants : guide étape par étape avec exemples concrets, erreurs à éviter et bonnes pratiques à adopter.`,
+      `Choisir ${keyword} en ${new Date().getFullYear()} : comparatif, avis utilisateurs et recommandations d'experts pour faire le bon choix.`,
+      `${keyword} : analyse détaillée, avantages, inconvénients et conseils pratiques pour optimiser votre stratégie.`
+    ],
+    'question': [
+      `${keyword} : obtenez une réponse complète avec nos experts. Solutions pratiques, conseils et guide étape par étape.`,
+      `Réponse détaillée à ${keyword} avec exemples concrets, explications claires et conseils d'experts pour réussir.`,
+      `${keyword} expliqué par nos spécialistes : réponse complète, astuces pratiques et solutions efficaces.`,
+      `Tout savoir sur ${keyword} : réponse exhaustive avec conseils, exemples et bonnes pratiques pour optimiser vos résultats.`,
+      `${keyword} : réponse d'expert avec solutions concrètes, conseils pratiques et méthodes éprouvées.`
+    ],
+    'semantic': [
+      `Analyse approfondie de ${keyword} : tendances, insights et perspectives d'experts pour optimiser votre stratégie.`,
+      `${keyword} : étude complète avec données récentes, analyses techniques et recommandations stratégiques.`,
+      `Comprendre ${keyword} : guide technique avec exemples pratiques, études de cas et conseils d'optimisation.`,
+      `${keyword} : vision d'expert avec analyse détaillée, bonnes pratiques et stratégies avancées pour réussir.`,
+      `${keyword} décrypté : analyse technique, tendances marché et conseils stratégiques pour optimiser vos performances.`
+    ],
+    'ai-generated': [
+      `${keyword} optimisé par l'IA : découvrez les stratégies innovantes et solutions intelligentes pour maximiser vos résultats.`,
+      `${keyword} avec l'intelligence artificielle : approches modernes, outils avancés et techniques d'optimisation.`,
+      `${keyword} : méthodes IA pour des résultats supérieurs. Stratégies innovantes et conseils d'experts en intelligence artificielle.`,
+      `Révolutionnez ${keyword} avec l'IA : techniques avancées, automatisation et optimisation pour des performances exceptionnelles.`,
+      `${keyword} nouvelle génération : solutions IA, algorithmes avancés et stratégies intelligentes pour réussir.`
+    ]
+  };
+
+  const templates = descTemplates[type] || descTemplates['standard'];
+  const randomTemplate = templates[Math.floor(Math.random() * templates.length)];
+  
+  // Limiter à 155 caractères pour le SEO
+  return randomTemplate.length > 155 ? randomTemplate.substring(0, 152) + "..." : randomTemplate;
+};
+
 const KeywordGenerator = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [keyword, setKeyword] = useState('');
@@ -109,11 +206,19 @@ const KeywordGenerator = () => {
     setHasSearched(true);
     
     try {
-      // Générer les mots-clés standards
-      let standards = generateStandardKeywords(keyword);
+      // Générer les mots-clés standards avec titres/descriptions personnalisés
+      let standards = generateStandardKeywords(keyword).map(kw => ({
+        ...kw,
+        suggestedTitle: generateDynamicTitle(kw.keyword, 'standard'),
+        suggestedDescription: generateDynamicDescription(kw.keyword, 'standard')
+      }));
       
-      // Générer les mots-clés longue traîne
-      let longTails = generateLongTailKeywords(keyword);
+      // Générer les mots-clés longue traîne avec titres/descriptions personnalisés
+      let longTails = generateLongTailKeywords(keyword).map(kw => ({
+        ...kw,
+        suggestedTitle: generateDynamicTitle(kw.keyword, 'long-tail'),
+        suggestedDescription: generateDynamicDescription(kw.keyword, 'long-tail')
+      }));
       
       // Si on a une clé OpenAI valide, enrichir avec l'IA
       if (apiKeyStatus === 'valid' && openaiKey) {
@@ -131,7 +236,9 @@ const KeywordGenerator = () => {
               type: 'ai-generated' as 'ai-generated',
               intent: 'mixed' as 'mixed',
               opportunity: Math.floor(Math.random() * 40) + 50,
-              trend: generateTrendData(kw)
+              trend: generateTrendData(kw),
+              suggestedTitle: generateDynamicTitle(kw, 'ai-generated'),
+              suggestedDescription: generateDynamicDescription(kw, 'ai-generated')
             }));
             
             // Mélanger avec les mots-clés existants
@@ -146,15 +253,23 @@ const KeywordGenerator = () => {
         }
       }
       
-      // Générer les questions fréquentes
+      // Générer les questions fréquentes avec titres/descriptions personnalisés
       const generateSimpleQuestions = (keyword: string): string[] => {
-        return [
-          `Comment ${keyword} fonctionne?`,
-          `Quelle est la meilleure façon d'utiliser ${keyword}?`,
-          `Pourquoi ${keyword} est-il important?`,
-          `Quelles sont les alternatives à ${keyword}?`,
-          `Quels sont les avantages de ${keyword}?`
+        const questionTypes = [
+          `Comment ${keyword} fonctionne-t-il exactement ?`,
+          `Quelle est la meilleure façon d'utiliser ${keyword} ?`,
+          `Pourquoi ${keyword} est-il si important aujourd'hui ?`,
+          `Quelles sont les meilleures alternatives à ${keyword} ?`,
+          `Quels sont les principaux avantages de ${keyword} ?`,
+          `Comment débuter avec ${keyword} efficacement ?`,
+          `${keyword} est-il fait pour mon entreprise ?`,
+          `Combien coûte réellement ${keyword} ?`,
+          `Comment optimiser ${keyword} pour de meilleurs résultats ?`,
+          `Quelles erreurs éviter avec ${keyword} ?`
         ];
+        
+        // Mélanger et prendre 5 questions aléatoirement
+        return questionTypes.sort(() => 0.5 - Math.random()).slice(0, 5);
       };
 
       const questions = generateSimpleQuestions(keyword).map(q => ({
@@ -166,21 +281,9 @@ const KeywordGenerator = () => {
         intent: 'informational' as 'informational',
         opportunity: Math.floor(Math.random() * 30) + 60,
         trend: generateTrendData(q),
-        suggestedTitle: `Guide complet: ${q}`,
-        suggestedDescription: `Découvrez tout ce que vous devez savoir sur ${q}. Guide pratique, conseils d'experts et astuces pour optimiser votre utilisation.`
+        suggestedTitle: generateDynamicTitle(q, 'question'),
+        suggestedDescription: generateDynamicDescription(q, 'question')
       }));
-      
-      // Enrichir les mots-clés avec des données supplémentaires
-      const enrichKeywordsSimple = (keywords: KeywordSuggestion[]): KeywordSuggestion[] => {
-        return keywords.map(kw => ({
-          ...kw,
-          suggestedTitle: `Guide complet sur ${kw.keyword}: Tout ce que vous devez savoir`,
-          suggestedDescription: `Découvrez les meilleures pratiques pour maîtriser ${kw.keyword}. Conseils d'experts, astuces et stratégies pour réussir.`
-        }));
-      };
-      
-      const enrichedStandards = enrichKeywordsSimple(standards);
-      const enrichedLongTails = enrichKeywordsSimple(longTails);
       
       // Genérer des données de concurrents fictives
       const mockCompetitors = [
@@ -208,14 +311,14 @@ const KeywordGenerator = () => {
       ];
       
       // Mettre à jour les états
-      setStandardKeywords(enrichedStandards);
-      setLongTailKeywords(enrichedLongTails);
+      setStandardKeywords(standards);
+      setLongTailKeywords(longTails);
       setQuestionKeywords(questions);
       setCompetitors(mockCompetitors);
       setSerpResults([]);
       setHasGenerated(true);
       
-      const totalGenerated = enrichedStandards.length + enrichedLongTails.length + questions.length;
+      const totalGenerated = standards.length + longTails.length + questions.length;
       toast.success(`${totalGenerated} mots-clés générés${apiKeyStatus === 'valid' ? ' (IA activée)' : ''}`);
     } catch (error) {
       console.error("Erreur lors de la génération des mots-clés:", error);
@@ -304,53 +407,6 @@ const KeywordGenerator = () => {
     toast.info("Panneau d'idées IA", {
       description: showAiIdeas ? "Panneau fermé" : "Explorez des suggestions générées par l'IA"
     });
-  };
-
-  const fetchSearchConsoleData = () => {
-    if (!keyword.trim()) {
-      toast.error("Veuillez d'abord entrer un mot-clé");
-      return;
-    }
-    
-    setIsLoadingSearchConsole(true);
-    
-    setTimeout(() => {
-      const mockData = {
-        totalImpressions: Math.floor(Math.random() * 10000) + 500,
-        totalClicks: Math.floor(Math.random() * 2000) + 100,
-        averageCTR: ((Math.random() * 5) + 1).toFixed(2),
-        averagePosition: Math.random() * 20 + 1,
-        impressions: Math.floor(Math.random() * 10000) + 1000,
-        clicks: Math.floor(Math.random() * 2000) + 100,
-        position: Math.random() * 10 + 1,
-        historicalData: Array.from({ length: 30 }, (_, i) => {
-          const date = new Date();
-          date.setDate(date.getDate() - (30 - i));
-          return {
-            date: date.toLocaleDateString('fr-FR', { month: 'short', day: 'numeric' }),
-            position: Math.random() * 30 + 1
-          };
-        }),
-        topQueries: [
-          { query: keyword, clicks: 120, impressions: 1500, ctr: 0.08, position: 3.2, change: -0.5 },
-          { query: `${keyword} gratuit`, clicks: 85, impressions: 980, ctr: 0.087, position: 4.8, change: 0 },
-          { query: `${keyword} en ligne`, clicks: 65, impressions: 750, ctr: 0.087, position: 5.3, change: 1.2 },
-          { query: `meilleur ${keyword}`, clicks: 45, impressions: 690, ctr: 0.065, position: 6.7, change: -0.8 },
-          { query: `tutoriel ${keyword}`, clicks: 38, impressions: 520, ctr: 0.073, position: 8.1, change: 0.4 },
-        ],
-        optimizationOpportunities: [
-          { query: `comment utiliser ${keyword}`, clicks: 15, impressions: 450, ctr: 0.033, position: 5.2, change: 0 },
-          { query: `comparatif ${keyword}`, clicks: 12, impressions: 380, ctr: 0.031, position: 4.8, change: 0 },
-          { query: `${keyword} vs concurrent`, clicks: 8, impressions: 290, ctr: 0.027, position: 6.3, change: 0 }
-        ]
-      };
-      
-      setSearchConsoleData(mockData);
-      setIsLoadingSearchConsole(false);
-      toast.success("Données Search Console chargées", {
-        description: `Analyse pour: "${keyword}"`
-      });
-    }, 2000);
   };
 
   // Nombre total de mots-clés générés
@@ -567,10 +623,6 @@ const KeywordGenerator = () => {
                 <Sparkles className="h-4 w-4" />
                 Opportunités
               </TabsTrigger>
-              <TabsTrigger value="searchConsole" className="flex items-center gap-1.5">
-                <BarChart3 className="h-4 w-4" />
-                Search Console
-              </TabsTrigger>
               <TabsTrigger value="structure" className="flex items-center gap-1.5">
                 <FolderTree className="h-4 w-4" />
                 Structure du site
@@ -588,31 +640,6 @@ const KeywordGenerator = () => {
                   mainKeyword={keyword}
                 />
                 <DynamicFAQ keyword={keyword} />
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="searchConsole">
-              <div className="grid grid-cols-1 gap-6">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-semibold">Données Google Search Console</h3>
-                  <Button 
-                    variant="outline" 
-                    className="flex items-center gap-2"
-                    onClick={fetchSearchConsoleData}
-                    disabled={isLoadingSearchConsole}
-                  >
-                    {isLoadingSearchConsole ? (
-                      <span>Chargement...</span>
-                    ) : (
-                      <>
-                        <TrendingUp className="h-4 w-4" />
-                        <span>Charger les données</span>
-                      </>
-                    )}
-                  </Button>
-                </div>
-                
-                
               </div>
             </TabsContent>
             
@@ -681,25 +708,17 @@ const KeywordGenerator = () => {
             
             <div className="flex items-center gap-2 mb-4">
               <FileText className="h-5 w-5 text-emerald-500" />
-              <h2 className="text-lg font-semibold">Suggestions de contenu</h2>
+              <h2 className="text-lg font-semibold">Suggestions de contenu personnalisées</h2>
             </div>
             
             <ul className="space-y-2 mb-6">
               {[...questionKeywords].slice(0, 3).map((q, idx) => (
                 <li key={idx} className="flex items-start gap-2">
                   <ArrowRight className="h-5 w-5 text-emerald-500 mt-0.5" />
-                  <span>{q.keyword}</span>
-                </li>
-              ))}
-              
-              {[
-                `Guide complet sur ${keyword}`,
-                `Les 10 erreurs à éviter avec ${keyword}`,
-                `Comment optimiser votre ${keyword} en 2024`
-              ].map((title, idx) => (
-                <li key={idx} className="flex items-start gap-2">
-                  <ArrowRight className="h-5 w-5 text-emerald-500 mt-0.5" />
-                  <span>{title}</span>
+                  <div>
+                    <span className="font-medium">{q.suggestedTitle}</span>
+                    <p className="text-sm text-gray-600 mt-1">{q.suggestedDescription}</p>
+                  </div>
                 </li>
               ))}
             </ul>
@@ -721,17 +740,20 @@ const KeywordGenerator = () => {
                 
                 <div className="space-y-3">
                   {[
-                    `Comparatif des meilleurs outils pour ${keyword} en 2024`,
-                    `Comment mesurer l'efficacité de votre stratégie ${keyword}`,
-                    `${keyword} pour débutants : guide pas à pas`,
-                    `Les tendances ${keyword} à surveiller cette année`,
-                    `Étude de cas : Comment augmenter son ROI avec ${keyword}`
+                    { title: `Comparatif des meilleurs outils pour ${keyword} en ${new Date().getFullYear()}`, desc: `Analyse comparative détaillée des solutions ${keyword} disponibles sur le marché avec prix et fonctionnalités.` },
+                    { title: `Comment mesurer l'efficacité de votre stratégie ${keyword}`, desc: `KPIs essentiels et métriques clés pour évaluer la performance de votre approche ${keyword}.` },
+                    { title: `${keyword} pour débutants : guide pas à pas`, desc: `Tutoriel complet pour maîtriser ${keyword} même sans expérience préalable, avec exemples pratiques.` },
+                    { title: `Les tendances ${keyword} à surveiller cette année`, desc: `Analyse des évolutions récentes et perspectives d'avenir dans le domaine ${keyword}.` },
+                    { title: `Étude de cas : Comment augmenter son ROI avec ${keyword}`, desc: `Retour d'expérience concret sur l'optimisation des investissements ${keyword} pour maximiser les résultats.` }
                   ].map((idea, idx) => (
                     <div key={idx} className="p-3 bg-white rounded-lg border border-blue-100">
                       <div className="flex items-start justify-between">
                         <div className="flex items-start gap-2">
                           <MessageSquare className="h-4 w-4 text-blue-500 mt-1" />
-                          <span>{idea}</span>
+                          <div>
+                            <span className="font-medium">{idea.title}</span>
+                            <p className="text-sm text-gray-600 mt-1">{idea.desc}</p>
+                          </div>
                         </div>
                         <Button variant="ghost" size="sm" className="h-6 px-2">
                           <ArrowRight className="h-4 w-4" />

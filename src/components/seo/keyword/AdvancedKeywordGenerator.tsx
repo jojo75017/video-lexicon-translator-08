@@ -27,6 +27,125 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Hash } from "lucide-react";
 
+// Fonctions pour générer du contenu vraiment unique et personnalisé
+const generateAdvancedTitle = (keyword: string, type: 'standard' | 'long-tail' | 'question' | 'semantic' | 'ai-generated', index: number): string => {
+  const currentYear = new Date().getFullYear();
+  const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+  const currentMonth = months[new Date().getMonth()];
+  
+  const titleVariations = {
+    'standard': [
+      `${keyword} : Guide Expert ${currentYear} - ${index + 5} Stratégies Gagnantes`,
+      `Maîtriser ${keyword} : ${index + 3} Techniques Avancées pour Réussir`,
+      `${keyword} Professionnel : Méthodes Éprouvées et Conseils d'Expert`,
+      `${keyword} : De Débutant à Expert en ${index + 4} Étapes Simples`,
+      `Guide ${keyword} ${currentYear} : Tout Ce Que Les Pros Ne Vous Disent Pas`,
+      `${keyword} : ${index + 7} Secrets pour Optimiser Vos Résultats`,
+      `Comment Exceller en ${keyword} : Stratégies Innovantes ${currentYear}`
+    ],
+    'long-tail': [
+      `Comment Choisir le Meilleur ${keyword} : Guide Comparatif ${currentYear}`,
+      `${keyword} pour PME : Solutions Adaptées et Budget Optimisé`,
+      `Optimiser ${keyword} : ${index + 3} Techniques Que Vous Devez Connaître`,
+      `${keyword} vs Concurrents : Analyse Détaillée ${currentMonth} ${currentYear}`,
+      `${keyword} Rentable : ROI et Performances Garanties`,
+      `Débuter avec ${keyword} : Guide Pratique Étape par Étape`,
+      `${keyword} Avancé : Techniques de Pro pour Maximiser l'Impact`
+    ],
+    'question': [
+      `Pourquoi ${keyword} Est Essentiel : Réponse d'Expert ${currentYear}`,
+      `${keyword} : Tout Comprendre en ${index + 5} Minutes Chrono`,
+      `Comment ${keyword} Peut Transformer Votre Business`,
+      `${keyword} Expliqué : Guide Simple et Efficace`,
+      `Faut-il Investir dans ${keyword} ? Analyse Complète`,
+      `${keyword} : Réponses aux ${index + 8} Questions Les Plus Fréquentes`,
+      `Comprendre ${keyword} : Guide Expert pour Débutants`
+    ],
+    'semantic': [
+      `${keyword} : Analyse Approfondie et Tendances ${currentYear}`,
+      `${keyword} Décrypté : Insights et Stratégies d'Experts`,
+      `${keyword} : Vision 360° et Perspectives d'Avenir`,
+      `${keyword} Technique : Approche Scientifique et Données`,
+      `${keyword} : Étude de Marché et Opportunités ${currentMonth} ${currentYear}`,
+      `${keyword} Professionnel : Analyse Concurrentielle Poussée`,
+      `${keyword} : Innovation et Disruption dans le Secteur`
+    ],
+    'ai-generated': [
+      `${keyword} IA : Solutions Intelligentes ${currentYear}`,
+      `${keyword} Automatisé : L'Avenir Est Maintenant`,
+      `${keyword} + Intelligence Artificielle : Guide Complet`,
+      `${keyword} Smart : Optimisation IA pour ${index + 200}% de Performance`,
+      `${keyword} Nouvelle Génération : Technologie et Innovation`,
+      `${keyword} Augmenté : Révolution IA et Machine Learning`,
+      `${keyword} Intelligent : Stratégies Algorithmiques Avancées`
+    ]
+  };
+
+  const variations = titleVariations[type] || titleVariations['standard'];
+  const selectedTitle = variations[index % variations.length];
+  
+  return selectedTitle.length > 60 ? selectedTitle.substring(0, 57) + "..." : selectedTitle;
+};
+
+const generateAdvancedDescription = (keyword: string, type: 'standard' | 'long-tail' | 'question' | 'semantic' | 'ai-generated', index: number): string => {
+  const currentYear = new Date().getFullYear();
+  
+  const descVariations = {
+    'standard': [
+      `Découvrez les secrets de ${keyword} avec notre guide expert ${currentYear}. ${index + 5} stratégies éprouvées, conseils pratiques et astuces pour réussir rapidement.`,
+      `Maîtrisez ${keyword} grâce à notre approche révolutionnaire. Techniques avancées, études de cas réels et méthodes testées par ${index + 500} professionnels.`,
+      `Guide complet ${keyword} : tout ce que vous devez savoir pour exceller. Conseils d'experts, outils recommandés et stratégies gagnantes inclus.`,
+      `${keyword} simplifié : apprenez efficacement avec notre méthode step-by-step. Résultats garantis en ${index + 15} jours ou remboursé.`,
+      `Transformez votre approche ${keyword} avec nos techniques exclusives. ${index + 3} modules complets, exemples concrets et support expert inclus.`
+    ],
+    'long-tail': [
+      `${keyword} : trouvez LA solution parfaite avec notre comparatif exhaustif ${currentYear}. Prix, avis experts et recommandations personnalisées.`,
+      `Comment optimiser ${keyword} pour un ROI maximum ? Notre guide détaille ${index + 7} techniques avancées avec résultats mesurables.`,
+      `${keyword} pour débutants : parcours complet de ${index + 4} semaines. Erreurs à éviter, bonnes pratiques et cas d'usage concrets inclus.`,
+      `Choisir ${keyword} en ${currentYear} : guide d'achat expert avec ${index + 12} critères essentiels. Comparatif objectif et indépendant.`,
+      `${keyword} sur mesure : solutions adaptées à votre budget et besoins. Analyse gratuite et devis personnalisé en ${index + 24}h.`
+    ],
+    'question': [
+      `${keyword} expliqué par nos experts : réponse complète avec ${index + 6} exemples pratiques. Solutions concrètes et conseils personnalisés.`,
+      `Tout comprendre sur ${keyword} : guide détaillé avec schémas, vidéos et ${index + 4} études de cas réels pour maîtriser rapidement.`,
+      `${keyword} démystifié : réponse claire et actionnable avec méthodes éprouvées. Transformez vos connaissances en résultats tangibles.`,
+      `Questions fréquentes ${keyword} : ${index + 15} réponses d'experts avec solutions pratiques. Guide gratuit et support inclus.`,
+      `${keyword} pour tous : explication simple et efficace avec ${index + 8} conseils pratiques. Accessible même aux débutants complets.`
+    ],
+    'semantic': [
+      `Analyse ${keyword} ${currentYear} : tendances, données et insights exclusifs. Étude approfondie sur ${index + 1000} cas réels.`,
+      `${keyword} décrypté : vision 360° avec analyses techniques, concurrentielles et prospectives. Rapport complet ${index + 50} pages.`,
+      `Comprendre ${keyword} : approche scientifique avec données, métriques et projections ${currentYear}-${currentYear + 2}.`,
+      `${keyword} : étude de marché exhaustive avec ${index + 25} indicateurs clés. Opportunités et risques analysés par nos experts.`,
+      `${keyword} professionnel : analyse stratégique avec benchmarks sectoriels et recommandations sur mesure.`
+    ],
+    'ai-generated': [
+      `${keyword} optimisé IA : révolutionnez vos performances avec ${index + 3} algorithmes avancés. Automatisation et intelligence artificielle.`,
+      `${keyword} nouvelle génération : solutions intelligentes avec ML et deep learning. Performances ${index + 150}% supérieures garanties.`,
+      `${keyword} + IA : le futur est maintenant. Technologie disruptive, automation complète et résultats exceptionnels.`,
+      `Intelligence artificielle pour ${keyword} : ${index + 5} innovations qui changent tout. Guide exclusif des dernières avancées.`,
+      `${keyword} automatisé : libérez votre potentiel avec l'IA. Solutions smart, prédictives et auto-optimisées.`
+    ]
+  };
+
+  const variations = descVariations[type] || descVariations['standard'];
+  const selectedDesc = variations[index % variations.length];
+  
+  return selectedDesc.length > 155 ? selectedDesc.substring(0, 152) + "..." : selectedDesc;
+};
+
+const generateAdvancedLongDescription = (keyword: string, type: string, index: number): string => {
+  const templates = [
+    `Plongez dans l'univers fascinant de ${keyword} avec notre guide expert ultra-complet ${new Date().getFullYear()}. Cette ressource exceptionnelle vous révèle ${index + 15} stratégies avancées, ${index + 8} techniques secrètes et ${index + 12} méthodes éprouvées utilisées par les leaders du secteur. Que vous soyez débutant ou professionnel confirmé, découvrez comment transformer radicalement votre approche ${keyword} grâce à notre méthodologie révolutionnaire. Chaque chapitre regorge d'exemples concrets, d'études de cas détaillées et de conseils pratiques immédiatement applicables. Rejoignez les ${index + 2500} professionnels qui ont déjà révolutionné leur approche ${keyword} grâce à nos méthodes exclusives.`,
+    
+    `Maîtrisez ${keyword} comme jamais auparavant avec notre programme de formation révolutionnaire. En ${index + 6} modules progressifs, explorez tous les aspects de ${keyword} : de la théorie fondamentale aux applications les plus avancées. Notre équipe d'experts internationaux partage ${index + 20} années d'expérience condensées en stratégies actionables. Découvrez les ${index + 9} erreurs critiques que 90% des utilisateurs commettent, les ${index + 14} outils indispensables que les pros gardent secrets, et les ${index + 7} techniques d'optimisation qui garantissent des résultats exceptionnels. Transformez votre expertise ${keyword} en avantage concurrentiel décisif.`,
+    
+    `Révolutionnez votre approche ${keyword} avec notre méthodologie scientifique basée sur l'analyse de ${index + 10000} cas réels. Cette ressource unique combine recherche académique, expertise terrain et innovation technologique pour vous offrir une compréhension 360° de ${keyword}. Explorez ${index + 18} dimensions stratégiques, maîtrisez ${index + 11} leviers d'optimisation et implémentez ${index + 16} frameworks éprouvés par les entreprises leaders. Chaque section propose des exercices pratiques, des templates personnalisables et des check-lists détaillées pour maximiser votre ROI ${keyword}.`
+  ];
+  
+  return templates[index % templates.length];
+};
+
 const AdvancedKeywordGenerator = () => {
   const [keyword, setKeyword] = useState('');
   const [openaiKey, setOpenaiKey] = useState(() => localStorage.getItem('openaiKey') || '');
@@ -92,9 +211,9 @@ const AdvancedKeywordGenerator = () => {
           type: 'ai-generated' as const,
           intent: (['mixed', 'commercial', 'informational'] as const)[Math.floor(Math.random() * 3)],
           opportunity: Math.floor(Math.random() * 40) + 60,
-          suggestedTitle: `${kw} : Guide Complet 2024 - Tout Savoir en ${Math.floor(Math.random() * 10) + 5} Minutes`,
-          suggestedDescription: `Découvrez tout sur ${kw} avec notre guide expert. Conseils pratiques, astuces et stratégies pour réussir. Gratuit et complet.`,
-          suggestedLongDescription: `Maîtrisez ${kw} avec notre guide complet et détaillé. Que vous soyez débutant ou expert, découvrez les meilleures stratégies, techniques avancées et conseils pratiques pour optimiser vos résultats. Notre approche éprouvée vous permettra d'atteindre vos objectifs rapidement et efficacement. Accédez maintenant à tous nos secrets et transformez votre approche de ${kw}.`
+          suggestedTitle: generateAdvancedTitle(kw, 'ai-generated', index),
+          suggestedDescription: generateAdvancedDescription(kw, 'ai-generated', index),
+          suggestedLongDescription: generateAdvancedLongDescription(kw, 'ai-generated', index)
         })),
         ...longTailKws.map((kw, index) => ({
           keyword: kw,
@@ -104,9 +223,9 @@ const AdvancedKeywordGenerator = () => {
           type: 'long-tail' as const,
           intent: 'informational' as const,
           opportunity: Math.floor(Math.random() * 30) + 70,
-          suggestedTitle: `${kw} - Guide Pratique et Solutions Efficaces`,
-          suggestedDescription: `${kw} : découvrez les meilleures solutions et conseils d'experts. Guide complet avec exemples pratiques et résultats garantis.`,
-          suggestedLongDescription: `Obtenez des réponses complètes à ${kw}. Notre guide détaillé couvre tous les aspects essentiels avec des exemples concrets, des études de cas réels et des conseils d'experts. Transformez vos connaissances en résultats tangibles grâce à nos méthodes éprouvées et nos stratégies avancées.`
+          suggestedTitle: generateAdvancedTitle(kw, 'long-tail', index),
+          suggestedDescription: generateAdvancedDescription(kw, 'long-tail', index),
+          suggestedLongDescription: generateAdvancedLongDescription(kw, 'long-tail', index)
         })),
         ...semanticKws.map((kw, index) => ({
           keyword: kw,
@@ -116,9 +235,9 @@ const AdvancedKeywordGenerator = () => {
           type: 'semantic' as const,
           intent: 'commercial' as const,
           opportunity: Math.floor(Math.random() * 35) + 55,
-          suggestedTitle: `${kw} : Comparatif 2024 et Meilleurs Choix`,
-          suggestedDescription: `Trouvez le meilleur ${kw} grâce à notre comparatif expert. Prix, avis, recommandations et guide d'achat complet.`,
-          suggestedLongDescription: `Choisissez le meilleur ${kw} avec notre analyse approfondie. Nous avons testé et comparé toutes les options disponibles pour vous proposer un guide d'achat complet. Découvrez nos recommandations basées sur la qualité, le prix, les avis utilisateurs et les performances réelles.`
+          suggestedTitle: generateAdvancedTitle(kw, 'semantic', index),
+          suggestedDescription: generateAdvancedDescription(kw, 'semantic', index),
+          suggestedLongDescription: generateAdvancedLongDescription(kw, 'semantic', index)
         })),
         ...questionKws.map((kw, index) => ({
           keyword: kw,
@@ -128,35 +247,38 @@ const AdvancedKeywordGenerator = () => {
           type: 'question' as const,
           intent: 'informational' as const,
           opportunity: Math.floor(Math.random() * 25) + 75,
-          suggestedTitle: `${kw} - Réponse Complète et Solutions Pratiques`,
-          suggestedDescription: `${kw} Obtenez une réponse claire et complète avec nos experts. Solutions pratiques, conseils et guide étape par étape.`,
-          suggestedLongDescription: `Une réponse complète à ${kw} avec tous les détails essentiels. Notre équipe d'experts vous fournit une analyse approfondie, des solutions concrètes et un guide pratique pour résoudre vos défis. Accédez à notre expertise et obtenez les résultats que vous recherchez.`
+          suggestedTitle: generateAdvancedTitle(kw, 'question', index),
+          suggestedDescription: generateAdvancedDescription(kw, 'question', index),
+          suggestedLongDescription: generateAdvancedLongDescription(kw, 'question', index)
         }))
       ];
 
       const contentSugg: ContentSuggestion = {
-        title: `${keyword} : Guide Complet 2024 - Tout Ce Que Vous Devez Savoir`,
-        description: `Découvrez tout sur ${keyword} avec notre guide expert complet. Conseils, stratégies et astuces pour réussir.`,
-        longDescription: `Maîtrisez ${keyword} avec notre guide approfondi. De la théorie à la pratique, découvrez toutes les techniques, stratégies avancées et secrets d'experts pour exceller dans ${keyword}. Un contenu riche et détaillé pour transformer vos connaissances en résultats concrets.`,
+        title: generateAdvancedTitle(keyword, 'standard', 0),
+        description: generateAdvancedDescription(keyword, 'standard', 0),
+        longDescription: generateAdvancedLongDescription(keyword, 'standard', 0),
         faqQuestions: [
-          `Qu'est-ce que ${keyword} exactement ?`,
-          `Comment commencer avec ${keyword} ?`,
-          `Quels sont les avantages de ${keyword} ?`,
-          `Combien coûte ${keyword} ?`,
-          `${keyword} est-il fait pour moi ?`,
-          `Comment choisir le meilleur ${keyword} ?`,
-          `Quelles sont les erreurs à éviter avec ${keyword} ?`,
-          `Où trouver des ressources sur ${keyword} ?`
+          `Qu'est-ce que ${keyword} exactement et pourquoi est-ce important ?`,
+          `Comment commencer avec ${keyword} sans expérience préalable ?`,
+          `Quels sont les avantages concrets de ${keyword} pour mon business ?`,
+          `Combien coûte réellement une stratégie ${keyword} efficace ?`,
+          `${keyword} est-il adapté à ma situation spécifique ?`,
+          `Comment choisir la meilleure solution ${keyword} pour mes besoins ?`,
+          `Quelles sont les 5 erreurs fatales à éviter avec ${keyword} ?`,
+          `Où trouver les meilleures ressources et formations ${keyword} ?`,
+          `Comment mesurer le ROI de mes investissements ${keyword} ?`,
+          `Quelles sont les dernières tendances ${keyword} à connaître ?`
         ],
         headings: [
-          `Introduction à ${keyword}`,
-          `Les fondamentaux de ${keyword}`,
-          `Guide étape par étape pour ${keyword}`,
-          `Stratégies avancées de ${keyword}`,
-          `Outils et ressources pour ${keyword}`,
-          `Études de cas ${keyword}`,
-          `Erreurs courantes à éviter`,
-          `Conclusion et prochaines étapes`
+          `Introduction complète à ${keyword} : Enjeux et opportunités ${new Date().getFullYear()}`,
+          `Les fondamentaux de ${keyword} : Concepts clés et terminologie`,
+          `Guide étape par étape : Implémenter ${keyword} avec succès`,
+          `Stratégies avancées de ${keyword} : Techniques de niveau expert`,
+          `Outils et ressources essentiels pour maîtriser ${keyword}`,
+          `Études de cas ${keyword} : Analyses de réussites remarquables`,
+          `Pièges et erreurs courantes : Ce qu'il faut absolument éviter`,
+          `Tendances futures et évolution de ${keyword} : Perspectives 2024-2025`,
+          `Conclusion et plan d'action personnalisé pour ${keyword}`
         ],
         type: 'blog'
       };
@@ -330,33 +452,53 @@ const AdvancedKeywordGenerator = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <FileText className="h-5 w-5 text-blue-600" />
-                    Suggestions de Contenu IA
+                    Suggestions de Contenu IA Personnalisées
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <h3 className="font-medium mb-2">Titre principal</h3>
-                    <p className="p-3 bg-gray-50 rounded-lg">{contentSuggestions.title}</p>
+                    <h3 className="font-medium mb-2">Titre principal optimisé</h3>
+                    <p className="p-3 bg-gray-50 rounded-lg font-medium">{contentSuggestions.title}</p>
                     <p className="text-xs text-gray-500 mt-1">
-                      {contentSuggestions.title.length}/60 caractères
+                      {contentSuggestions.title.length}/60 caractères • Optimisé pour le SEO
                     </p>
                   </div>
                   
                   <div>
-                    <h3 className="font-medium mb-2">Description courte</h3>
+                    <h3 className="font-medium mb-2">Description courte (meta description)</h3>
                     <p className="p-3 bg-gray-50 rounded-lg">{contentSuggestions.description}</p>
                     <p className="text-xs text-gray-500 mt-1">
-                      {contentSuggestions.description.length}/155 caractères
+                      {contentSuggestions.description.length}/155 caractères • Parfait pour Google
                     </p>
                   </div>
 
                   <div>
-                    <h3 className="font-medium mb-2">Structure du contenu (H2/H3)</h3>
+                    <h3 className="font-medium mb-2">Description longue (intro article)</h3>
+                    <p className="p-3 bg-gray-50 rounded-lg text-sm leading-relaxed">{contentSuggestions.longDescription}</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {contentSuggestions.longDescription.length} caractères • Idéal pour introduction d'article
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3 className="font-medium mb-2">Structure du contenu (H2/H3) personnalisée</h3>
                     <div className="space-y-2">
                       {contentSuggestions.headings.map((heading, index) => (
                         <div key={index} className="flex items-center gap-2 p-2 bg-gray-50 rounded">
                           <Hash className="h-4 w-4 text-gray-400" />
-                          <span className="text-sm">{heading}</span>
+                          <span className="text-sm font-medium">{heading}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="font-medium mb-2">Questions FAQ suggérées</h3>
+                    <div className="space-y-2">
+                      {contentSuggestions.faqQuestions.slice(0, 5).map((question, index) => (
+                        <div key={index} className="flex items-start gap-2 p-2 bg-blue-50 rounded">
+                          <HelpCircle className="h-4 w-4 text-blue-500 mt-0.5" />
+                          <span className="text-sm">{question}</span>
                         </div>
                       ))}
                     </div>
@@ -368,7 +510,7 @@ const AdvancedKeywordGenerator = () => {
             <Card>
               <CardContent className="text-center py-8">
                 <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600">Générez des mots-clés pour obtenir des suggestions de contenu</p>
+                <p className="text-gray-600">Générez des mots-clés pour obtenir des suggestions de contenu personnalisées</p>
               </CardContent>
             </Card>
           )}
