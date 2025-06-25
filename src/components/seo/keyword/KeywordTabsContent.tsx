@@ -4,10 +4,11 @@ import { TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Info } from "lucide-react";
+import { KeywordSuggestion } from "@/types/seo/Keyword";
 
 interface KeywordTabsContentProps {
   activeTab: string;
-  keywords: any[];
+  keywords: KeywordSuggestion[];
 }
 
 const KeywordTabsContent: React.FC<KeywordTabsContentProps> = ({ activeTab, keywords }) => {
@@ -25,6 +26,8 @@ const KeywordTabsContent: React.FC<KeywordTabsContentProps> = ({ activeTab, keyw
                   <div key={index} className="p-4 border rounded-lg">
                     <h3 className="font-medium">{keyword.keyword}</h3>
                     <p className="text-sm text-gray-600">Volume: {keyword.volume}</p>
+                    <p className="text-sm text-gray-600">Difficulté: {keyword.difficulty}</p>
+                    <p className="text-sm text-gray-600">CPC: {keyword.cpc}€</p>
                   </div>
                 ))}
               </div>
