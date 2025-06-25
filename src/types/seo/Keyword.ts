@@ -11,6 +11,23 @@ export interface KeywordSuggestion {
   suggestedTitle?: string;
   suggestedDescription?: string;
   suggestedLongDescription?: string;
+  searchVolume?: number;
+  relevance?: number;
+}
+
+export interface SerpResult {
+  position: number;
+  title: string;
+  url: string;
+  description: string;
+  domain: string;
+  authority: number;
+  estimatedTraffic: number;
+  titleLength: number;
+  descriptionLength: number;
+  hasStructuredData: boolean;
+  loadTime: number;
+  mobileOptimized: boolean;
 }
 
 export interface ContentSuggestion {
@@ -59,4 +76,17 @@ export interface RoiParameters {
   contentCost: number;
   toolsCost: number;
   maintenanceCost: number;
+}
+
+export interface KeywordData {
+  keyword: string;
+  volume: number;
+  difficulty: number;
+  cpc: number;
+  type: 'standard' | 'long-tail' | 'question' | 'semantic' | 'ai-generated' | 'intent-based' | 'competitor';
+  intent: 'informational' | 'commercial' | 'navigational' | 'transactional' | 'mixed';
+  opportunity: number;
+  trend?: number[];
+  searchVolume?: number;
+  relevance?: number;
 }

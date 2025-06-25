@@ -1,360 +1,283 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
-import { Users, ExternalLink, Target, TrendingUp, AlertTriangle, Eye, BarChart3, Share2, Download } from "lucide-react";
+import { Building2, Globe, TrendingUp, Eye, Target, Star } from "lucide-react";
 import { toast } from "sonner";
-import { CompetitorData, SerpResult } from "@/types/seo/Keyword";
+import { CompetitorData } from "@/types/seo/Keyword";
 
 interface CompetitorAnalysisProps {
-  keyword?: string;
+  keyword: string;
+  onCompetitorData?: (data: CompetitorData[]) => void;
 }
 
-const CompetitorAnalysis: React.FC<CompetitorAnalysisProps> = ({ keyword = '' }) => {
-  const [searchKeyword, setSearchKeyword] = useState(keyword);
+const CompetitorAnalysis: React.FC<CompetitorAnalysisProps> = ({ keyword, onCompetitorData }) => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [competitors, setCompetitors] = useState<CompetitorData[]>([]);
-  const [serpResults, setSerpResults] = useState<SerpResult[]>([]);
-  const [selectedCompetitor, setSelectedCompetitor] = useState<string | null>(null);
+  const [hasAnalyzed, setHasAnalyzed] = useState(false);
+
+  const generateCompetitorData = (searchKeyword: string): CompetitorData[] => {
+    // Générer des données contextualisées basées sur le mot-clé
+    const isLocalSearch = searchKeyword.toLowerCase().includes('dormir') || 
+                         searchKeyword.toLowerCase().includes('hotel') || 
+                         searchKeyword.toLowerCase().includes('restaurant') ||
+                         searchKeyword.toLowerCase().includes('quimper');
+    
+    const isTourismSearch = searchKeyword.toLowerCase().includes('quimper') ||
+                          searchKeyword.toLowerCase().includes('dormir') ||
+                          searchKeyword.toLowerCase().includes('hotel');
+
+    if (isLocalSearch || isTourismSearch) {
+      return [
+        {
+          name: "Booking.com",
+          url: "https://www.booking.com",
+          domain: "booking.com",
+          strength: 95,
+          organic_traffic: 850000,
+          estimatedTraffic: 850000,
+          keywords: 45000,
+          topKeywords: [`hotel ${searchKeyword}`, `${searchKeyword} booking`, `réservation ${searchKeyword}`],
+          gaps: [`${searchKeyword} pas cher`, `${searchKeyword} dernière minute`]
+        },
+        {
+          name: "TripAdvisor",
+          url: "https://www.tripadvisor.fr",
+          domain: "tripadvisor.fr",
+          strength: 88,
+          organic_traffic: 650000,
+          estimatedTraffic: 650000,
+          keywords: 35000,
+          topKeywords: [`avis ${searchKeyword}`, `${searchKeyword} restaurant`, `que faire ${searchKeyword}`],
+          gaps: [`${searchKeyword} guide`, `${searchKeyword} attractions`]
+        },
+        {
+          name: "Airbnb",
+          url: "https://www.airbnb.fr",
+          domain: "airbnb.fr",
+          strength: 82,
+          organic_traffic: 420000,
+          estimatedTraffic: 420000,
+          keywords: 28000,
+          topKeywords: [`location ${searchKeyword}`, `${searchKeyword} airbnb`, `appartement ${searchKeyword}`],
+          gaps: [`${searchKeyword} location courte durée`, `${searchKeyword} vacances`]
+        },
+        {
+          name: "Office de Tourisme",
+          url: "https://www.quimper-tourisme.bzh",
+          domain: "quimper-tourisme.bzh",
+          strength: 65,
+          organic_traffic: 45000,
+          estimatedTraffic: 45000,
+          keywords: 2800,
+          topKeywords: [`tourisme ${searchKeyword}`, `${searchKeyword} visite`, `${searchKeyword} événements`],
+          gaps: [`${searchKeyword} histoire`, `${searchKeyword} culture`]
+        },
+        {
+          name: "Hotels.com",
+          url: "https://fr.hotels.com",
+          domain: "hotels.com",
+          strength: 78,
+          organic_traffic: 320000,
+          estimatedTraffic: 320000,
+          keywords: 22000,
+          topKeywords: [`hotel ${searchKeyword}`, `${searchKeyword} hébergement`, `${searchKeyword} nuit`],
+          gaps: [`${searchKeyword} luxe`, `${searchKeyword} famille`]
+        }
+      ];
+    }
+
+    // Pour d'autres types de mots-clés, générer des concurrents génériques mais contextualisés
+    const baseCompetitors = [
+      { name: "Wikipedia", domain: "wikipedia.org", strength: 95 },
+      { name: "YouTube", domain: "youtube.com", strength: 90 },
+      { name: "Site spécialisé 1", domain: `${searchKeyword.toLowerCase().split(' ')[0]}-expert.com`, strength: 75 },
+      { name: "Site spécialisé 2", domain: `guide-${searchKeyword.toLowerCase().split(' ')[0]}.fr`, strength: 68 },
+      { name: "Forum spécialisé", domain: `forum-${searchKeyword.toLowerCase().split(' ')[0]}.com`, strength: 60 }
+    ];
+
+    return baseCompetitors.map((comp, index) => ({
+      name: comp.name,
+      url: `https://${comp.domain}`,
+      domain: comp.domain,
+      strength: comp.strength,
+      organic_traffic: Math.floor(Math.random() * 500000) + 50000,
+      estimatedTraffic: Math.floor(Math.random() * 500000) + 50000,
+      keywords: Math.floor(Math.random() * 20000) + 5000,
+      topKeywords: [
+        `${searchKeyword}`,
+        `${searchKeyword} guide`,
+        `comment ${searchKeyword}`,
+        `${searchKeyword} conseils`
+      ],
+      gaps: [
+        `${searchKeyword} débutant`,
+        `${searchKeyword} prix`,
+        `${searchKeyword} comparatif`
+      ]
+    }));
+  };
 
   const analyzeCompetitors = async () => {
-    if (!searchKeyword.trim()) {
-      toast.error("Veuillez entrer un mot-clé");
+    if (!keyword.trim()) {
+      toast.error("Veuillez d'abord entrer un mot-clé");
       return;
     }
 
     setIsAnalyzing(true);
     
-    // Simulation d'analyse concurrentielle avec données réalistes aquariophilie
-    setTimeout(() => {
-      const mockCompetitors: CompetitorData[] = [
-        {
-          name: 'Aquashop',
-          url: 'https://www.aquashop.fr',
-          strength: 87,
-          organic_traffic: 125000,
-          keywords: ['aquarium', 'poisson tropical', 'aquariophilie', 'pompe aquarium'],
-          domain: 'aquashop.fr',
-          estimatedTraffic: 125000,
-          topKeywords: ['aquarium pas cher', 'poisson rouge', 'pompe à air aquarium'],
-          gaps: ['aquascaping', 'plantes aquatiques rares', 'éclairage LED']
-        },
-        {
-          name: 'Poisson d\'Or',
-          url: 'https://www.poissondor.com',
-          strength: 79,
-          organic_traffic: 85000,
-          keywords: ['poisson exotique', 'aquarium tropical', 'nourriture poisson'],
-          domain: 'poissondor.com',
-          estimatedTraffic: 85000,
-          topKeywords: ['guppy', 'néon bleu', 'aquarium 100L'],
-          gaps: ['aquarium marin', 'coraux', 'osmoseur']
-        },
-        {
-          name: 'Zoomalia',
-          url: 'https://www.zoomalia.com',
-          strength: 92,
-          organic_traffic: 280000,
-          keywords: ['animalerie en ligne', 'aquarium complet', 'accessoires aquarium'],
-          domain: 'zoomalia.com',
-          estimatedTraffic: 280000,
-          topKeywords: ['aquarium 60L', 'filtre externe', 'chauffage aquarium'],
-          gaps: ['aquarium nano', 'crevettes aquarium', 'mousses aquatiques']
-        },
-        {
-          name: 'Truffaut Aquariophilie',
-          url: 'https://www.truffaut.com/aquariophilie',
-          strength: 85,
-          organic_traffic: 95000,
-          keywords: ['plantes aquarium', 'décoration aquarium', 'substrat aquarium'],
-          domain: 'truffaut.com',
-          estimatedTraffic: 95000,
-          topKeywords: ['aquarium débutant', 'poisson facile', 'kit aquarium'],
-          gaps: ['aquarium biotope', 'poissons rares', 'reproduction poissons']
-        },
-        {
-          name: 'Animalis Aquarium',
-          url: 'https://www.animalis.com/aquariophilie',
-          strength: 74,
-          organic_traffic: 62000,
-          keywords: ['aquarium design', 'meuble aquarium', 'éclairage aquarium'],
-          domain: 'animalis.com',
-          estimatedTraffic: 62000,
-          topKeywords: ['aquarium sur mesure', 'maintenance aquarium', 'test eau'],
-          gaps: ['aquarium connecté', 'automatisation', 'monitoring pH']
-        }
-      ];
-
-      const mockSerp: SerpResult[] = [
-        {
-          title: 'Aquashop - Spécialiste Aquariophilie | Aquariums & Poissons',
-          url: 'https://www.aquashop.fr/aquarium-complet',
-          description: 'Découvrez notre gamme complète d\'aquariums, poissons tropicaux et accessoires. Livraison rapide, conseils d\'experts aquariophiles.',
-          position: 1
-        },
-        {
-          title: 'Poisson d\'Or - Aquariophilie Premium | Poissons Exotiques',
-          url: 'https://www.poissondor.com/aquarium-tropical',
-          description: 'Spécialiste des poissons exotiques et aquariums tropicaux. Plus de 200 espèces, matériel professionnel, conseils personnalisés.',
-          position: 2
-        },
-        {
-          title: 'Zoomalia Aquariophilie - Tout pour votre Aquarium',
-          url: 'https://www.zoomalia.com/animalerie/aquariophilie',
-          description: 'Animalerie en ligne : aquariums, filtres, pompes, poissons. Livraison gratuite dès 39€. Conseils vétérinaires inclus.',
-          position: 3
-        },
-        {
-          title: 'Truffaut Aquariophilie - Jardinerie & Aquariums',
-          url: 'https://www.truffaut.com/aquariophilie/aquarium-eau-douce',
-          description: 'Aquariums eau douce et marine, plantes aquatiques, poissons colorés. Magasins Truffaut partout en France.',
-          position: 4
-        },
-        {
-          title: 'Animalis - Aquarium & Poissons | Animalerie Spécialisée',
-          url: 'https://www.animalis.com/aquariophilie/aquarium-complet',
-          description: 'Aquariums design, poissons d\'eau douce et marine. Service installation à domicile. Garantie satisfaction.',
-          position: 5
-        }
-      ];
-
-      setCompetitors(mockCompetitors);
-      setSerpResults(mockSerp);
+    try {
+      // Simuler l'analyse avec des données contextualisées
+      const competitorData = generateCompetitorData(keyword);
+      
+      // Simuler un délai d'analyse
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      setCompetitors(competitorData);
+      setHasAnalyzed(true);
+      
+      if (onCompetitorData) {
+        onCompetitorData(competitorData);
+      }
+      
+      toast.success(`Analyse concurrentielle terminée pour "${keyword}"`);
+    } catch (error) {
+      console.error('Erreur lors de l\'analyse concurrentielle:', error);
+      toast.error("Erreur lors de l'analyse concurrentielle");
+    } finally {
       setIsAnalyzing(false);
-      toast.success(`Analyse terminée pour "${searchKeyword}" - ${mockCompetitors.length} concurrents aquariophilie identifiés`);
-    }, 3000);
+    }
   };
 
-  const exportCompetitorData = () => {
-    const csvContent = [
-      'Nom,Domaine,Force,Trafic Organique,Mots-clés Top,Opportunités',
-      ...competitors.map(comp => 
-        `"${comp.name}","${comp.domain}",${comp.strength},${comp.estimatedTraffic},"${comp.topKeywords.join('; ')}","${comp.gaps.join('; ')}"`
-      )
-    ].join('\n');
-    
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `analyse-concurrents-aquariophilie-${searchKeyword.replace(/\s+/g, '-')}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-    
-    toast.success('Données concurrents aquariophilie exportées');
+  const getStrengthColor = (strength: number) => {
+    if (strength >= 80) return 'text-red-600';
+    if (strength >= 60) return 'text-yellow-600';
+    return 'text-green-600';
   };
 
-  const getStrengthLevel = (strength: number) => {
-    if (strength >= 90) return { label: 'Dominant', color: 'bg-red-500', textColor: 'text-red-600' };
-    if (strength >= 75) return { label: 'Fort', color: 'bg-orange-500', textColor: 'text-orange-600' };
-    if (strength >= 60) return { label: 'Moyen', color: 'bg-yellow-500', textColor: 'text-yellow-600' };
-    return { label: 'Faible', color: 'bg-green-500', textColor: 'text-green-600' };
+  const getStrengthBadge = (strength: number) => {
+    if (strength >= 80) return { variant: 'destructive' as const, text: 'Fort' };
+    if (strength >= 60) return { variant: 'default' as const, text: 'Moyen' };
+    return { variant: 'secondary' as const, text: 'Faible' };
   };
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Users className="h-5 w-5 text-red-500" />
-          Analyse Concurrentielle Aquariophilie
-          {competitors.length > 0 && (
-            <Badge className="bg-blue-100 text-blue-800">
-              {competitors.length} concurrents analysés
-            </Badge>
-          )}
+          <Building2 className="h-5 w-5 text-blue-500" />
+          Analyse concurrentielle
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex gap-2">
-          <Input
-            placeholder="Mot-clé aquariophilie à analyser..."
-            value={searchKeyword}
-            onChange={(e) => setSearchKeyword(e.target.value)}
-            className="flex-1"
-          />
-          <Button onClick={analyzeCompetitors} disabled={isAnalyzing}>
-            {isAnalyzing ? 'Analyse...' : 'Analyser'}
-          </Button>
-          {competitors.length > 0 && (
-            <Button variant="outline" onClick={exportCompetitorData}>
-              <Download className="h-4 w-4 mr-1" />
-              Export
+        {!hasAnalyzed && (
+          <div className="text-center py-8">
+            <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium mb-2">Analyse de la concurrence</h3>
+            <p className="text-gray-600 mb-4">
+              Découvrez qui sont vos principaux concurrents pour "{keyword}" et analysez leurs stratégies SEO.
+            </p>
+            <Button onClick={analyzeCompetitors} disabled={isAnalyzing || !keyword.trim()}>
+              {isAnalyzing ? 'Analyse en cours...' : 'Analyser la concurrence'}
             </Button>
-          )}
-        </div>
+          </div>
+        )}
 
-        {competitors.length > 0 && (
-          <Tabs defaultValue="competitors">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="competitors">Concurrents ({competitors.length})</TabsTrigger>
-              <TabsTrigger value="serp">SERP Analysis ({serpResults.length})</TabsTrigger>
-              <TabsTrigger value="opportunities">Opportunités</TabsTrigger>
-            </TabsList>
+        {isAnalyzing && (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Building2 className="h-4 w-4 animate-pulse" />
+              <span className="text-sm">Analyse en cours pour "{keyword}"...</span>
+            </div>
+            <Progress value={65} className="w-full" />
+            <p className="text-xs text-gray-500">Identification des principaux concurrents et analyse de leurs performances...</p>
+          </div>
+        )}
 
-            <TabsContent value="competitors" className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {competitors.map((competitor, index) => {
-                  const strengthInfo = getStrengthLevel(competitor.strength);
-                  return (
-                    <Card 
-                      key={index} 
-                      className={`p-4 cursor-pointer transition-all hover:shadow-lg ${
-                        selectedCompetitor === competitor.domain ? 'ring-2 ring-blue-500 bg-blue-50' : ''
-                      }`}
-                      onClick={() => setSelectedCompetitor(
-                        selectedCompetitor === competitor.domain ? null : competitor.domain
-                      )}
-                    >
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h3 className="font-bold text-lg text-gray-900">{competitor.name}</h3>
-                            <p className="text-sm text-gray-600">{competitor.domain}</p>
-                          </div>
-                          <div className="flex gap-2">
-                            <Button variant="outline" size="sm" asChild>
-                              <a href={competitor.url} target="_blank" rel="noopener noreferrer">
-                                <ExternalLink className="h-3 w-3 mr-1" />
-                                Visiter
-                              </a>
-                            </Button>
-                            <Button variant="outline" size="sm">
-                              <Eye className="h-3 w-3 mr-1" />
-                              Analyser
-                            </Button>
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-3">
-                          <div>
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-sm font-medium">Force du domaine</span>
-                              <Badge className={`${strengthInfo.textColor} bg-opacity-20`}>
-                                {strengthInfo.label}
-                              </Badge>
-                            </div>
-                            <Progress 
-                              value={competitor.strength} 
-                              className="h-2"
-                            />
-                            <p className="text-xs text-gray-500 mt-1">{competitor.strength}/100</p>
-                          </div>
+        {competitors.length > 0 && !isAnalyzing && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-medium">Top 5 concurrents pour "{keyword}"</h3>
+              <Button variant="outline" size="sm" onClick={analyzeCompetitors}>
+                Actualiser
+              </Button>
+            </div>
 
-                          <div className="grid grid-cols-2 gap-3">
-                            <div className="text-center p-2 bg-blue-50 rounded">
-                              <div className="text-blue-600 font-bold">{competitor.estimatedTraffic.toLocaleString()}</div>
-                              <div className="text-xs text-gray-600">Trafic/mois</div>
-                            </div>
-                            <div className="text-center p-2 bg-green-50 rounded">
-                              <div className="text-green-600 font-bold">{competitor.keywords.length}</div>
-                              <div className="text-xs text-gray-600">Mots-clés</div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {selectedCompetitor === competitor.domain && (
-                          <div className="space-y-3 pt-3 border-t">
-                            <div>
-                              <h4 className="text-sm font-medium text-gray-700 mb-2">Top mots-clés:</h4>
-                              <div className="flex flex-wrap gap-1">
-                                {competitor.topKeywords.map((kw, idx) => (
-                                  <Badge key={idx} variant="secondary" className="text-xs">
-                                    {kw}
-                                  </Badge>
-                                ))}
-                              </div>
-                            </div>
-                            
-                            <div>
-                              <h4 className="text-sm font-medium text-gray-700 mb-2">Opportunités gaps:</h4>
-                              <div className="flex flex-wrap gap-1">
-                                {competitor.gaps.map((gap, idx) => (
-                                  <Badge key={idx} className="text-xs bg-yellow-100 text-yellow-800">
-                                    {gap}
-                                  </Badge>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        )}
+            <div className="space-y-3">
+              {competitors.map((competitor, index) => (
+                <div key={index} className="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-full text-sm font-medium text-blue-700">
+                        #{index + 1}
                       </div>
-                    </Card>
-                  );
-                })}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="serp" className="space-y-3">
-              {serpResults.map((result, index) => (
-                <Card key={index} className="p-4">
-                  <div className="flex items-start gap-3">
-                    <Badge className="mt-1">#{result.position}</Badge>
-                    <div className="flex-1">
-                      <h3 className="font-medium text-blue-600 hover:underline cursor-pointer mb-1">
-                        {result.title}
-                      </h3>
-                      <p className="text-sm text-green-700 mb-2">{result.url}</p>
-                      <p className="text-sm text-gray-600">{result.description}</p>
+                      <div>
+                        <h4 className="font-medium">{competitor.name}</h4>
+                        <p className="text-sm text-gray-600 flex items-center gap-1">
+                          <Globe className="h-3 w-3" />
+                          {competitor.domain}
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex gap-1">
-                      <Button variant="ghost" size="sm">
-                        <Share2 className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm">
-                        <BarChart3 className="h-4 w-4" />
-                      </Button>
+                    <div className="flex items-center gap-2">
+                      <Badge 
+                        {...getStrengthBadge(competitor.strength)}
+                        className="text-xs"
+                      >
+                        {competitor.strength}/100
+                      </Badge>
                     </div>
                   </div>
-                </Card>
-              ))}
-            </TabsContent>
 
-            <TabsContent value="opportunities" className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Card className="p-4">
-                  <h3 className="font-medium mb-3 flex items-center gap-2">
-                    <AlertTriangle className="h-4 w-4 text-orange-500" />
-                    Gaps détectés - Aquariophilie
-                  </h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-3">
+                    <div className="text-center p-2 bg-blue-50 rounded">
+                      <div className="text-sm font-medium text-blue-600">
+                        {competitor.organic_traffic.toLocaleString()}
+                      </div>
+                      <div className="text-xs text-gray-600">Trafic organique</div>
+                    </div>
+                    <div className="text-center p-2 bg-green-50 rounded">
+                      <div className="text-sm font-medium text-green-600">
+                        {competitor.keywords.toLocaleString()}
+                      </div>
+                      <div className="text-xs text-gray-600">Mots-clés</div>
+                    </div>
+                    <div className="text-center p-2 bg-purple-50 rounded">
+                      <div className="text-sm font-medium text-purple-600">
+                        {competitor.strength}
+                      </div>
+                      <div className="text-xs text-gray-600">Authorité</div>
+                    </div>
+                  </div>
+
                   <div className="space-y-2">
-                    {competitors.flatMap(comp => comp.gaps).slice(0, 8).map((gap, idx) => (
-                      <div key={idx} className="p-2 bg-orange-50 border border-orange-200 rounded">
-                        <span className="text-sm font-medium">{gap}</span>
-                        <Badge variant="outline" className="ml-2 text-xs">
-                          Opportunité
-                        </Badge>
+                    <div>
+                      <p className="text-xs font-medium text-gray-700 mb-1">Top mots-clés :</p>
+                      <div className="flex flex-wrap gap-1">
+                        {competitor.topKeywords.slice(0, 3).map((kw, i) => (
+                          <Badge key={i} variant="outline" className="text-xs">
+                            {kw}
+                          </Badge>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                </Card>
-
-                <Card className="p-4">
-                  <h3 className="font-medium mb-3 flex items-center gap-2">
-                    <TrendingUp className="h-4 w-4 text-green-500" />
-                    Tendances Aquariophilie
-                  </h3>
-                  <div className="space-y-3">
-                    <div className="p-3 bg-green-50 rounded">
-                      <div className="font-medium text-sm">Aquascaping</div>
-                      <div className="text-xs text-gray-600">Croissance +65% cette année</div>
                     </div>
-                    <div className="p-3 bg-blue-50 rounded">
-                      <div className="font-medium text-sm">Aquarium nano</div>
-                      <div className="text-xs text-gray-600">Demande forte +48%</div>
-                    </div>
-                    <div className="p-3 bg-purple-50 rounded">
-                      <div className="font-medium text-sm">Aquarium connecté</div>
-                      <div className="text-xs text-gray-600">Secteur émergent +95%</div>
+                    <div>
+                      <p className="text-xs font-medium text-gray-700 mb-1">Opportunités :</p>
+                      <div className="flex flex-wrap gap-1">
+                        {competitor.gaps.slice(0, 2).map((gap, i) => (
+                          <Badge key={i} variant="secondary" className="text-xs">
+                            {gap}
+                          </Badge>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </Card>
-              </div>
-            </TabsContent>
-          </Tabs>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
       </CardContent>
     </Card>

@@ -5,13 +5,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Info } from "lucide-react";
 import { KeywordSuggestion } from "@/types/seo/Keyword";
+import CompetitorAnalysis from './CompetitorAnalysis';
+import SerpAnalysis from './SerpAnalysis';
 
 interface KeywordTabsContentProps {
   activeTab: string;
   keywords: KeywordSuggestion[];
+  keyword: string;
 }
 
-const KeywordTabsContent: React.FC<KeywordTabsContentProps> = ({ activeTab, keywords }) => {
+const KeywordTabsContent: React.FC<KeywordTabsContentProps> = ({ activeTab, keywords, keyword }) => {
   return (
     <div className="space-y-4">
       <TabsContent value="results">
@@ -22,12 +25,12 @@ const KeywordTabsContent: React.FC<KeywordTabsContentProps> = ({ activeTab, keyw
           <CardContent>
             {keywords.length > 0 ? (
               <div className="grid gap-4">
-                {keywords.map((keyword, index) => (
+                {keywords.map((keywordData, index) => (
                   <div key={index} className="p-4 border rounded-lg">
-                    <h3 className="font-medium">{keyword.keyword}</h3>
-                    <p className="text-sm text-gray-600">Volume: {keyword.volume}</p>
-                    <p className="text-sm text-gray-600">Difficulté: {keyword.difficulty}</p>
-                    <p className="text-sm text-gray-600">CPC: {keyword.cpc}€</p>
+                    <h3 className="font-medium">{keywordData.keyword}</h3>
+                    <p className="text-sm text-gray-600">Volume: {keywordData.volume}</p>
+                    <p className="text-sm text-gray-600">Difficulté: {keywordData.difficulty}</p>
+                    <p className="text-sm text-gray-600">CPC: {keywordData.cpc}€</p>
                   </div>
                 ))}
               </div>
@@ -41,6 +44,14 @@ const KeywordTabsContent: React.FC<KeywordTabsContentProps> = ({ activeTab, keyw
             )}
           </CardContent>
         </Card>
+      </TabsContent>
+
+      <TabsContent value="competitors">
+        <CompetitorAnalysis keyword={keyword} />
+      </TabsContent>
+
+      <TabsContent value="serp-analysis">
+        <SerpAnalysis keywords={keywords} />
       </TabsContent>
     </div>
   );

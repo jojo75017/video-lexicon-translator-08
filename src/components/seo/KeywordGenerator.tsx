@@ -210,14 +210,16 @@ const KeywordGenerator = () => {
       let standards = generateStandardKeywords(keyword).map(kw => ({
         ...kw,
         suggestedTitle: generateDynamicTitle(kw.keyword, 'standard'),
-        suggestedDescription: generateDynamicDescription(kw.keyword, 'standard')
+        suggestedDescription: generateDynamicDescription(kw.keyword, 'standard'),
+        trend: generateTrendData(kw.keyword) // Ensure trend is number[]
       }));
       
       // Générer les mots-clés longue traîne avec titres/descriptions personnalisés
       let longTails = generateLongTailKeywords(keyword).map(kw => ({
         ...kw,
         suggestedTitle: generateDynamicTitle(kw.keyword, 'long-tail'),
-        suggestedDescription: generateDynamicDescription(kw.keyword, 'long-tail')
+        suggestedDescription: generateDynamicDescription(kw.keyword, 'long-tail'),
+        trend: generateTrendData(kw.keyword) // Ensure trend is number[]
       }));
       
       // Si on a une clé OpenAI valide, enrichir avec l'IA
@@ -238,7 +240,9 @@ const KeywordGenerator = () => {
               opportunity: Math.floor(Math.random() * 40) + 50,
               trend: generateTrendData(kw),
               suggestedTitle: generateDynamicTitle(kw, 'ai-generated'),
-              suggestedDescription: generateDynamicDescription(kw, 'ai-generated')
+              suggestedDescription: generateDynamicDescription(kw, 'ai-generated'),
+              searchVolume: Math.floor(Math.random() * 2000) + 100,
+              relevance: Math.floor(Math.random() * 40) + 60
             }));
             
             // Mélanger avec les mots-clés existants
@@ -282,31 +286,47 @@ const KeywordGenerator = () => {
         opportunity: Math.floor(Math.random() * 30) + 60,
         trend: generateTrendData(q),
         suggestedTitle: generateDynamicTitle(q, 'question'),
-        suggestedDescription: generateDynamicDescription(q, 'question')
+        suggestedDescription: generateDynamicDescription(q, 'question'),
+        searchVolume: Math.floor(Math.random() * 500) + 10,
+        relevance: Math.floor(Math.random() * 30) + 70
       }));
       
       // Genérer des données de concurrents fictives
       const mockCompetitors = [
         { 
-          name: "competitor1.com", 
-          url: "https://www.competitor1.com", 
-          strength: 85, 
+          name: "Booking.com", 
+          url: "https://www.booking.com", 
+          strength: 95, 
+          organic_traffic: 850000, 
+          keywords: 45000 
+        },
+        { 
+          name: "TripAdvisor", 
+          url: "https://www.tripadvisor.fr", 
+          strength: 88, 
+          organic_traffic: 650000, 
+          keywords: 35000 
+        },
+        { 
+          name: "Airbnb", 
+          url: "https://www.airbnb.fr", 
+          strength: 82, 
+          organic_traffic: 420000, 
+          keywords: 28000 
+        },
+        { 
+          name: "Office de Tourisme de Quimper", 
+          url: "https://www.quimper-tourisme.bzh", 
+          strength: 65, 
           organic_traffic: 45000, 
-          keywords: 1200 
+          keywords: 2800 
         },
         { 
-          name: "competitor2.com", 
-          url: "https://www.competitor2.com", 
-          strength: 72, 
-          organic_traffic: 28000, 
-          keywords: 850 
-        },
-        { 
-          name: "competitor3.com", 
-          url: "https://www.competitor3.com", 
-          strength: 63, 
-          organic_traffic: 17500, 
-          keywords: 520 
+          name: "Hotels.com", 
+          url: "https://fr.hotels.com", 
+          strength: 78, 
+          organic_traffic: 320000, 
+          keywords: 22000 
         }
       ];
       
