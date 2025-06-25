@@ -1,8 +1,7 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
-  Target, BarChart3, MessageSquare, FileText, HelpCircle, 
+  Target, FileText, HelpCircle, 
   TrendingUp, Users, Network, AlertTriangle, Search, PenTool,
   MapPin, Activity, Lightbulb, Key, BookOpen, Globe
 } from "lucide-react";
@@ -12,7 +11,6 @@ import { KeywordSuggestion, ContentSuggestion } from "@/types/seo/Keyword";
 import KeywordSearchForm from './KeywordSearchForm';
 import KeywordResultsDisplay from './KeywordResultsDisplay';
 import KeywordStatistics from './KeywordStatistics';
-import KeywordDensityAnalyzer from './KeywordDensityAnalyzer';
 import KeywordQuestions from './KeywordQuestions';
 import { KeywordMetaContent } from './KeywordMetaContent';
 import CompetitorAnalysis from './CompetitorAnalysis';
@@ -212,34 +210,6 @@ const AdvancedKeywordGenerator = () => {
               <Globe className="h-4 w-4" />
               Analyse URL
             </TabsTrigger>
-            <TabsTrigger value="competitors" className="flex items-center gap-1 whitespace-nowrap">
-              <Users className="h-4 w-4" />
-              Concurrents
-            </TabsTrigger>
-            <TabsTrigger value="semantic" className="flex items-center gap-1 whitespace-nowrap">
-              <Network className="h-4 w-4" />
-              Sémantique
-            </TabsTrigger>
-            <TabsTrigger value="serp" className="flex items-center gap-1 whitespace-nowrap">
-              <Search className="h-4 w-4" />
-              SERP
-            </TabsTrigger>
-            <TabsTrigger value="gaps" className="flex items-center gap-1 whitespace-nowrap">
-              <AlertTriangle className="h-4 w-4" />
-              Gaps
-            </TabsTrigger>
-            <TabsTrigger value="local" className="flex items-center gap-1 whitespace-nowrap">
-              <MapPin className="h-4 w-4" />
-              Local
-            </TabsTrigger>
-            <TabsTrigger value="ranking" className="flex items-center gap-1 whitespace-nowrap">
-              <Activity className="h-4 w-4" />
-              Positions
-            </TabsTrigger>
-            <TabsTrigger value="optimize" className="flex items-center gap-1 whitespace-nowrap">
-              <Lightbulb className="h-4 w-4" />
-              Optimiser
-            </TabsTrigger>
             <TabsTrigger value="content" className="flex items-center gap-1 whitespace-nowrap">
               <FileText className="h-4 w-4" />
               Contenu
@@ -247,10 +217,6 @@ const AdvancedKeywordGenerator = () => {
             <TabsTrigger value="meta" className="flex items-center gap-1 whitespace-nowrap">
               <PenTool className="h-4 w-4" />
               Meta
-            </TabsTrigger>
-            <TabsTrigger value="density" className="flex items-center gap-1 whitespace-nowrap">
-              <BarChart3 className="h-4 w-4" />
-              Densité
             </TabsTrigger>
           </TabsList>
         </div>
@@ -357,34 +323,6 @@ const AdvancedKeywordGenerator = () => {
           <UrlContentAnalyzer />
         </TabsContent>
 
-        <TabsContent value="competitors">
-          <CompetitorAnalysis keyword={keyword} />
-        </TabsContent>
-
-        <TabsContent value="semantic">
-          <SemanticAnalysis keyword={keyword} />
-        </TabsContent>
-
-        <TabsContent value="serp">
-          <SerpFeaturesAnalyzer />
-        </TabsContent>
-
-        <TabsContent value="gaps">
-          <ContentGapAnalyzer />
-        </TabsContent>
-
-        <TabsContent value="local">
-          <LocalSeoAnalyzer />
-        </TabsContent>
-
-        <TabsContent value="ranking">
-          <KeywordRankingTracker />
-        </TabsContent>
-
-        <TabsContent value="optimize">
-          <ContentOptimizationSuggestions />
-        </TabsContent>
-
         <TabsContent value="content">
           {contentSuggestions ? (
             <div className="space-y-6">
@@ -438,10 +376,6 @@ const AdvancedKeywordGenerator = () => {
 
         <TabsContent value="meta">
           <KeywordMetaContent />
-        </TabsContent>
-
-        <TabsContent value="density">
-          <KeywordDensityAnalyzer />
         </TabsContent>
       </Tabs>
     </div>

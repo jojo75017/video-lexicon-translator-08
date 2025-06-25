@@ -38,9 +38,7 @@ import {
 import DynamicFAQ from './keyword/DynamicFAQ';
 import KeywordOpportunities from './keyword/KeywordOpportunities';
 import KeywordFAQ from './keyword/KeywordFAQ';
-import SearchConsoleDataViewer from './keyword/SearchConsoleData';
 import SiteStructureAnalyzer from './keyword/SiteStructureAnalyzer';
-import { RankingData } from '@/types/seo/Ranking';
 import { OpenAIService } from '@/utils/seo/openaiService';
 
 const KeywordGenerator = () => {
@@ -70,10 +68,6 @@ const KeywordGenerator = () => {
     localStorage.getItem('openaiKey') ? 'valid' : 'unchecked'
   );
   const [showApiConfig, setShowApiConfig] = useState(false);
-  
-  // État pour les données de Search Console
-  const [searchConsoleData, setSearchConsoleData] = useState<RankingData | undefined>(undefined);
-  const [isLoadingSearchConsole, setIsLoadingSearchConsole] = useState<boolean>(false);
 
   // Validation de la clé API OpenAI
   const validateAndSaveApiKey = async () => {
@@ -321,7 +315,7 @@ const KeywordGenerator = () => {
     setIsLoadingSearchConsole(true);
     
     setTimeout(() => {
-      const mockData: RankingData = {
+      const mockData = {
         totalImpressions: Math.floor(Math.random() * 10000) + 500,
         totalClicks: Math.floor(Math.random() * 2000) + 100,
         averageCTR: ((Math.random() * 5) + 1).toFixed(2),
@@ -618,11 +612,7 @@ const KeywordGenerator = () => {
                   </Button>
                 </div>
                 
-                <SearchConsoleDataViewer 
-                  data={searchConsoleData}
-                  isLoading={isLoadingSearchConsole}
-                  keyword={keyword}
-                />
+                
               </div>
             </TabsContent>
             
