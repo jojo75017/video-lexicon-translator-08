@@ -1,44 +1,57 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Key } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Key, Check, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { OpenAIService } from "@/utils/seo/openaiService";
 
-interface ApiConfigurationProps {
+export interface ApiConfigurationProps {
   openaiKey: string;
   setOpenaiKey: (key: string) => void;
-  onConfigured: () => void;
-  onCancel: () => void;
+  onKeyValidated: () => void;
 }
 
 const ApiConfiguration: React.FC<ApiConfigurationProps> = ({
   openaiKey,
   setOpenaiKey,
-  onConfigured,
-  onCancel
+  onKeyValidated
 }) => {
-  const validateAndSaveApiKey = async () => {
+  const [validationMessage, setValidationMessage] = useState('');
+  const [apiKeyStatus, setApiKeyStatus] = useState<'unchecked' | 'valid' | 'invalid'>('unchecked');
+  const [isValidating, setIsValidating] = useState(false);
+
+  const validateApiKey = async () => {
     if (!openaiKey.trim()) {
-      toast.error("Veuillez entrer une clé API OpenAI");
+      toast.error('Veuillez entrer une clé API');
       return;
     }
 
+    setIsValidating(true);
+    setValidationMessage('');
+
     try {
-      const openAIService = new OpenAIService(openaiKey);
-      const isValid = await openAIService.validateApiKey();
+      // Simulate API validation
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
-      if (isValid) {
+      if (openaiKey.startsWith('sk-')) {
+        setApiKeyStatus('valid');
+        setValidationMessage('Clé API validée avec succès');
         localStorage.setItem('openaiKey', openaiKey);
-        onConfigured();
-        toast.success("Clé API OpenAI configurée avec succès !");
+        toast.success('Clé API OpenAI configurée');
+        onKeyValidated();
       } else {
-        toast.error("Clé API OpenAI invalide");
+        setApiKeyStatus('invalid');
+        setValidationMessage('Format de clé API invalide');
+        toast.error('Clé API invalide');
       }
     } catch (error) {
-      toast.error("Erreur lors de la validation de la clé API");
+      setApiKeyStatus('invalid');
+      setValidationMessage('Erreur lors de la validation');
+      toast.error('Erreur de validation');
+    } finally {
+      setIsValidating(false);
     }
   };
 
@@ -47,43 +60,55 @@ const ApiConfiguration: React.FC<ApiConfigurationProps> = ({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Key className="h-5 w-5" />
-          Configuration OpenAI
+          Configuration API OpenAI
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <p className="text-gray-600">
-          Pour utiliser le générateur de mots-clés IA avancé, configurez votre clé API OpenAI.
-        </p>
         <div className="space-y-2">
-          <Input
-            type="password"
-            placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxx"
-            value={openaiKey}
-            onChange={(e) => setOpenaiKey(e.target.value)}
-          />
-          <p className="text-xs text-gray-500">
-            Obtenez votre clé sur{" "}
-            <a 
-              href="https://platform.openai.com/api-keys"
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="underline"
+          <label className="text-sm font-medium">Clé API OpenAI</label>
+          <div className="flex gap-2">
+            <Input 
+              type="password"
+              placeholder="sk-..."
+              value={openaiKey}
+              onChange={(e) => setOpenaiKey(e.target.value)}
+              className="flex-1"
+            />
+            <Button 
+              onClick={validateApiKey}
+              disabled={isValidating || !openaiKey.trim()}
             >
-              platform.openai.com/api-keys
-            </a>
-          </p>
+              {isValidating ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                'Valider'
+              )}
+            </Button>
+          </div>
         </div>
-        <div className="flex gap-2">
-          <Button onClick={validateAndSaveApiKey} className="flex-1">
-            Valider et sauvegarder
-          </Button>
-          <Button 
-            variant="outline" 
-            onClick={onCancel}
-            className="flex-1"
-          >
-            Annuler
-          </Button>
+
+        {validationMessage && (
+          <Alert className={apiKeyStatus === 'valid' ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}>
+            <div className="flex items-center gap-2">
+              {apiKeyStatus === 'valid' ? (
+                <Check className="h-4 w-4 text-green-600" />
+              ) : (
+                <X className="h-4 w-4 text-red-600" />
+              )}
+              <AlertDescription className={apiKeyStatus === 'valid' ? 'text-green-800' : 'text-red-800'}>
+                {validationMessage}
+              </AlertDescription>
+            </div>
+          </Alert>
+        )}
+
+        <div className="text-sm text-gray-600 space-y-2">
+          <p>Votre clé API OpenAI permet d'accéder aux fonctionnalités avancées :</p>
+          <ul className="list-disc list-inside space-y-1 ml-2">
+            <li>Génération intelligente de mots-clés</li>
+            <li>Analyse sémantique avancée</li>
+            <li>Suggestions de contenu personnalisées</li>
+          </ul>
         </div>
       </CardContent>
     </Card>

@@ -1,10 +1,9 @@
-
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs } from '@/components/ui/tabs';
-import ApiKeyConfig from './ApiConfiguration';
+import ApiConfiguration from './ApiConfiguration';
 import KeywordTabsNavigation from './KeywordTabsNavigation';
 import KeywordTabsContent from './KeywordTabsContent';
 import { Sparkles, Settings, Loader2, Key } from 'lucide-react';
@@ -16,14 +15,13 @@ const AdvancedKeywordGenerator: React.FC = () => {
   const [keyword, setKeyword] = useState('');
   const [showApiConfig, setShowApiConfig] = useState(false);
   const [openaiKey, setOpenaiKey] = useState(() => localStorage.getItem('openaiKey') || '');
-  const [apiKeyStatus, setApiKeyStatus] = useState<'unchecked' | 'valid' | 'invalid'>('unchecked');
-  const [validationMessage, setValidationMessage] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [standardKeywords, setStandardKeywords] = useState<KeywordSuggestion[]>([]);
   const [longTailKeywords, setLongTailKeywords] = useState<KeywordSuggestion[]>([]);
   const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
 
   const handleKeyValidated = () => {
+    setShowApiConfig(false);
     if (keyword) {
       generateKeywords();
     }
@@ -156,13 +154,9 @@ const AdvancedKeywordGenerator: React.FC = () => {
 
   if (showApiConfig) {
     return (
-      <ApiKeyConfig
+      <ApiConfiguration
         openaiKey={openaiKey}
         setOpenaiKey={setOpenaiKey}
-        apiKeyStatus={apiKeyStatus}
-        setApiKeyStatus={setApiKeyStatus}
-        validationMessage={validationMessage}
-        setValidationMessage={setValidationMessage}
         onKeyValidated={handleKeyValidated}
       />
     );
@@ -206,17 +200,10 @@ const AdvancedKeywordGenerator: React.FC = () => {
           </ul>
         </div>
         
-        {apiKeyStatus === 'valid' && (
+        {openaiKey && (
           <div className="mt-4 flex items-center gap-2 text-green-700 bg-green-50 p-3 rounded-lg border border-green-200">
             <Sparkles className="h-5 w-5" />
-            <span className="font-medium">✅ API OpenAI configurée et validée - IA activée !</span>
-          </div>
-        )}
-        
-        {apiKeyStatus === 'invalid' && (
-          <div className="mt-4 flex items-center gap-2 text-red-700 bg-red-50 p-3 rounded-lg border border-red-200">
-            <Settings className="h-5 w-5" />
-            <span className="font-medium">❌ Configuration API requise pour utiliser l'IA</span>
+            <span className="font-medium">✅ API OpenAI configurée - IA activée !</span>
           </div>
         )}
       </Card>
