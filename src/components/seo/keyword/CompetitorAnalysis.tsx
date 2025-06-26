@@ -19,7 +19,6 @@ const CompetitorAnalysis: React.FC<CompetitorAnalysisProps> = ({ keyword, onComp
   const [hasAnalyzed, setHasAnalyzed] = useState(false);
 
   const generateCompetitorData = (searchKeyword: string): CompetitorData[] => {
-    // Générer des données contextualisées basées sur le mot-clé
     const isLocalSearch = searchKeyword.toLowerCase().includes('dormir') || 
                          searchKeyword.toLowerCase().includes('hotel') || 
                          searchKeyword.toLowerCase().includes('restaurant') ||
@@ -89,7 +88,6 @@ const CompetitorAnalysis: React.FC<CompetitorAnalysisProps> = ({ keyword, onComp
       ];
     }
 
-    // Pour d'autres types de mots-clés, générer des concurrents génériques mais contextualisés
     const baseCompetitors = [
       { name: "Wikipedia", domain: "wikipedia.org", strength: 95 },
       { name: "YouTube", domain: "youtube.com", strength: 90 },
@@ -129,10 +127,8 @@ const CompetitorAnalysis: React.FC<CompetitorAnalysisProps> = ({ keyword, onComp
     setIsAnalyzing(true);
     
     try {
-      // Simuler l'analyse avec des données contextualisées
       const competitorData = generateCompetitorData(keyword);
       
-      // Simuler un délai d'analyse
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       setCompetitors(competitorData);
@@ -149,12 +145,6 @@ const CompetitorAnalysis: React.FC<CompetitorAnalysisProps> = ({ keyword, onComp
     } finally {
       setIsAnalyzing(false);
     }
-  };
-
-  const getStrengthColor = (strength: number) => {
-    if (strength >= 80) return 'text-red-600';
-    if (strength >= 60) return 'text-yellow-600';
-    return 'text-green-600';
   };
 
   const getStrengthBadge = (strength: number) => {
