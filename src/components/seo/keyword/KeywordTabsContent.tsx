@@ -8,7 +8,7 @@ import { KeywordSuggestion } from "@/types/seo/Keyword";
 import CompetitorAnalysis from './CompetitorAnalysis';
 import SerpAnalysis from './SerpAnalysis';
 import ArticlePlanGenerator from './ArticlePlanGenerator';
-import SiteStructureAnalyzer from './SiteStructureAnalyzer';
+import PageStructurePlanner from './PageStructurePlanner';
 
 interface KeywordTabsContentProps {
   activeTab: string;
@@ -152,17 +152,7 @@ const KeywordTabsContent: React.FC<KeywordTabsContentProps> = ({ activeTab, keyw
       </TabsContent>
 
       <TabsContent value="structure">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TreePine className="h-5 w-5 text-teal-500" />
-              Analyse de structure
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <SiteStructureAnalyzer />
-          </CardContent>
-        </Card>
+        <PageStructurePlanner />
       </TabsContent>
 
       {/* Onglets par défaut pour les autres valeurs */}

@@ -4,9 +4,14 @@ export interface KeywordSuggestion {
   volume: number;
   difficulty: number;
   cpc: number;
-  type: 'primary' | 'secondary' | 'long-tail' | 'question' | 'commercial' | 'informational';
-  intent: 'informational' | 'commercial' | 'transactional' | 'navigational';
+  type: 'primary' | 'secondary' | 'long-tail' | 'question' | 'commercial' | 'informational' | 'standard' | 'ai-generated' | 'competitor';
+  intent: 'informational' | 'commercial' | 'transactional' | 'navigational' | 'mixed';
   opportunity: number;
+  suggestedTitle?: string;
+  suggestedDescription?: string;
+  trend?: number[];
+  searchVolume?: number;
+  relevance?: number;
 }
 
 export interface KeywordData {
@@ -18,6 +23,9 @@ export interface KeywordData {
   relatedKeywords: string[];
   questions: string[];
   competition: number;
+  density?: number;
+  count?: number;
+  position?: number;
 }
 
 // Ajout des types manquants pour corriger les erreurs
