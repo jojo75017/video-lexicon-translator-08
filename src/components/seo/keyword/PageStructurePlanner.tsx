@@ -46,13 +46,14 @@ const PageStructurePlanner: React.FC = () => {
   const fetchPageContent = async (targetUrl: string): Promise<string> => {
     console.log(`🔍 Tentative de récupération: ${targetUrl}`);
     
-    // Liste de proxies CORS plus robustes
+    // Nouveaux proxies CORS plus fiables
     const proxies = [
-      'https://api.codetabs.com/v1/proxy?quest=',
-      'https://api.allorigins.win/raw?url=',
-      'https://crossorigin.me/',
-      'https://thingproxy.freeboard.io/fetch/',
-      'https://cors.io/?'
+      { url: 'https://corsproxy.io/?', name: 'CorsProxy.io' },
+      { url: 'https://cors-anywhere.herokuapp.com/', name: 'Cors-Anywhere' },
+      { url: 'https://api.codetabs.com/v1/proxy?quest=', name: 'CodeTabs' },
+      { url: 'https://yacdn.org/proxy/', name: 'YaCDN' },
+      { url: 'https://proxy.cors.sh/', name: 'Cors.sh' },
+      { url: 'https://cors.bridged.cc/', name: 'Bridged' }
     ];
     
     let lastError = '';
@@ -60,45 +61,42 @@ const PageStructurePlanner: React.FC = () => {
     for (let i = 0; i < proxies.length; i++) {
       try {
         const proxy = proxies[i];
-        const proxyName = proxy.split('/')[2] || `Proxy ${i + 1}`;
-        setCurrentStep(`Tentative ${i + 1}/${proxies.length}: ${proxyName}...`);
+        setCurrentStep(`Tentative ${i + 1}/${proxies.length}: ${proxy.name}...`);
         
-        console.log(`Proxy ${i + 1}: ${proxy}`);
+        console.log(`Proxy ${i + 1}: ${proxy.url}`);
         
-        const response = await fetch(`${proxy}${encodeURIComponent(targetUrl)}`, {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 secondes
+        
+        const response = await fetch(`${proxy.url}${encodeURIComponent(targetUrl)}`, {
           method: 'GET',
           headers: {
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
             'Accept-Language': 'fr-FR,fr;q=0.9,en;q=0.8',
-            'Cache-Control': 'no-cache',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            'Cache-Control': 'no-cache'
           },
-          signal: AbortSignal.timeout(10000) // 10 secondes timeout
+          signal: controller.signal
         });
+
+        clearTimeout(timeoutId);
 
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
 
-        let content = '';
-        
-        // Gérer différents types de réponses selon le proxy
-        if (proxy.includes('allorigins')) {
-          try {
-            const data = await response.json();
-            content = data.contents || '';
-          } catch {
-            content = await response.text();
-          }
-        } else {
-          content = await response.text();
-        }
+        const content = await response.text();
 
-        if (!content || content.length < 100) {
+        if (!content || content.length < 500) {
           throw new Error('Contenu vide ou trop court');
         }
 
-        console.log(`✅ Succès avec ${proxy} - Contenu: ${content.length} caractères`);
+        // Vérifier que c'est bien du HTML
+        if (!content.includes('<html') && !content.includes('<!DOCTYPE')) {
+          throw new Error('Contenu non-HTML reçu');
+        }
+
+        console.log(`✅ Succès avec ${proxy.name} - Contenu: ${content.length} caractères`);
         return content;
         
       } catch (error) {
@@ -106,33 +104,31 @@ const PageStructurePlanner: React.FC = () => {
         console.error(`❌ Proxy ${i + 1} échoué:`, lastError);
         
         if (i < proxies.length - 1) {
-          // Attendre 1 seconde avant le prochain essai
           await new Promise(resolve => setTimeout(resolve, 1000));
         }
       }
     }
     
-    // Si tous les proxies échouent, essayer un accès direct
+    // Dernier recours : essayer une méthode alternative
     try {
-      setCurrentStep('Tentative d\'accès direct...');
-      console.log('Tentative d\'accès direct à', targetUrl);
+      setCurrentStep('Tentative alternative...');
       
-      const directResponse = await fetch(targetUrl, {
-        method: 'GET',
-        mode: 'no-cors', // Mode no-cors pour éviter les erreurs CORS
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      // Utiliser jsonp ou iframe comme fallback
+      const fallbackUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+      const response = await fetch(fallbackUrl);
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.contents && data.contents.length > 500) {
+          console.log('✅ Succès avec AllOrigins fallback');
+          return data.contents;
         }
-      });
-      
-      // En mode no-cors, nous ne pouvons pas lire le contenu
-      throw new Error('Accès direct impossible en mode no-cors');
-      
-    } catch (directError) {
-      console.error('Accès direct échoué:', directError);
+      }
+    } catch (fallbackError) {
+      console.error('Fallback échoué:', fallbackError);
     }
     
-    throw new Error(`Impossible de récupérer le contenu. Dernière erreur: ${lastError}`);
+    throw new Error(`Impossible de récupérer le contenu de la page. Tous les proxies ont échoué. Dernière erreur: ${lastError}`);
   };
 
   const analyzePageStructure = async () => {
@@ -169,6 +165,11 @@ const PageStructurePlanner: React.FC = () => {
       setCurrentStep('Analyse du contenu...');
       const parser = new DOMParser();
       const doc = parser.parseFromString(htmlContent, 'text/html');
+
+      // Vérifier que le parsing a réussi
+      if (!doc.body) {
+        throw new Error('Impossible de parser le contenu HTML');
+      }
 
       // Analyse des éléments de la page
       const title = doc.title || doc.querySelector('meta[property="og:title"]')?.getAttribute('content') || 'Sans titre';
@@ -370,8 +371,9 @@ const PageStructurePlanner: React.FC = () => {
         suggestions: [
           'Vérifiez que l\'URL est accessible publiquement',
           'Certains sites bloquent l\'analyse automatique pour des raisons de sécurité',
-          'Essayez avec une autre URL',
-          'Les sites avec protection anti-bot peuvent être difficiles à analyser'
+          'Essayez avec une autre URL plus simple (ex: wikipedia.org)',
+          'Les sites avec protection anti-bot (Cloudflare, etc.) peuvent être difficiles à analyser',
+          'Essayez à nouveau dans quelques minutes - les proxies peuvent être temporairement indisponibles'
         ]
       });
       
@@ -442,6 +444,8 @@ const PageStructurePlanner: React.FC = () => {
                 Entrez l'URL d'une page pour analyser sa structure réelle et obtenir des recommandations d'optimisation SEO.
                 <br />
                 <strong>Note :</strong> L'analyse nécessite un accès au contenu de la page. Certains sites peuvent bloquer l'analyse automatique.
+                <br />
+                <strong>Conseil :</strong> Essayez d'abord avec des sites simples comme wikipedia.org pour tester le fonctionnement.
               </AlertDescription>
             </Alert>
           )}
