@@ -1,14 +1,12 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { 
   FileText, Lightbulb, Clock, Target, BookOpen, Eye, 
-  Hash, Type, AlignLeft, List, MessageSquare, 
-  ArrowRight, CheckCircle, Info, Star, Zap,
+  Hash, Type, MessageSquare, 
+  ArrowRight, CheckCircle, Star, Zap,
   FileImage, Link, Search, Users, TrendingUp
 } from "lucide-react";
 import { toast } from "sonner";
@@ -16,18 +14,18 @@ import { KeywordSuggestion } from "@/types/seo/Keyword";
 
 interface DetailedSection {
   title: string;
-  level: number; // H2, H3, H4
+  level: number;
   subsections: {
     title: string;
     level: number;
     content: string;
     keywords: string[];
     wordCount: number;
-    elements: string[]; // listes, images, liens, etc.
+    elements: string[];
   }[];
   keywords: string[];
   estimatedWordCount: number;
-  contentTypes: string[]; // paragraphes, listes, images, etc.
+  contentTypes: string[];
 }
 
 interface ComprehensiveArticlePlan {
@@ -55,10 +53,6 @@ interface ComprehensiveArticlePlan {
     answer: string;
     keywords: string[];
   }[];
-  structuredData: {
-    schema: string;
-    elements: string[];
-  };
   internalLinks: {
     anchor: string;
     suggestedUrl: string;
@@ -86,6 +80,374 @@ const ArticlePlanGenerator: React.FC<ArticlePlanGeneratorProps> = ({ keywords, m
   const [isGenerating, setIsGenerating] = useState(false);
   const [articlePlan, setArticlePlan] = useState<ComprehensiveArticlePlan | null>(null);
 
+  const generateContextualContent = (keyword: string) => {
+    const lowerKeyword = keyword.toLowerCase();
+    
+    // Détection du domaine basé sur le mot-clé
+    if (lowerKeyword.includes('pierre') && lowerKeyword.includes('seiryu')) {
+      return {
+        domain: 'aquariophilie',
+        context: 'aquarium et hardscape',
+        audience: ['Aquariophiles débutants', 'Passionnés de hardscape', 'Propriétaires d\'aquarium', 'Amateur de nature aquatique'],
+        relatedTerms: ['hardscape', 'aquascaping', 'décoration aquarium', 'roches aquarium', 'biotope'],
+        intent: 'commercial-informational'
+      };
+    }
+    
+    if (lowerKeyword.includes('seo') || lowerKeyword.includes('référencement')) {
+      return {
+        domain: 'marketing digital',
+        context: 'référencement naturel',
+        audience: ['Entrepreneurs', 'Marketeurs', 'Webmasters', 'Agences SEO'],
+        relatedTerms: ['optimisation', 'Google', 'positionnement', 'trafic organique'],
+        intent: 'informational'
+      };
+    }
+    
+    // Domaine générique
+    return {
+      domain: 'général',
+      context: 'information spécialisée',
+      audience: ['Débutants', 'Intermédiaires', 'Experts', 'Professionnels'],
+      relatedTerms: ['guide', 'conseil', 'technique', 'pratique'],
+      intent: 'informational'
+    };
+  };
+
+  const generateSpecificContent = (keyword: string) => {
+    const contextInfo = generateContextualContent(keyword);
+    const lowerKeyword = keyword.toLowerCase();
+    
+    if (lowerKeyword.includes('pierre') && lowerKeyword.includes('seiryu')) {
+      return {
+        seoTitle: `${keyword} : Guide Complet pour Aquarium 2024 [Choix, Prix, Installation]`,
+        metaDescription: `Découvrez tout sur les ${keyword.toLowerCase()} : caractéristiques, prix, installation en aquarium. Guide expert avec photos et conseils d'aquascaping. Livraison gratuite.`,
+        h1Title: `${keyword} : Le Guide Complet pour Créer un Hardscape Exceptionnel`,
+        
+        introduction: {
+          hook: `Saviez-vous que 92% des aquariophiles professionnels utilisent les ${keyword.toLowerCase()} pour créer des paysages aquatiques spectaculaires ?`,
+          context: `Dans l'univers de l'aquascaping moderne, les ${keyword.toLowerCase()} sont devenues LA référence pour créer des décors naturels et harmonieux qui subliment vos poissons et plantes.`,
+          thesis: `Ce guide exhaustif vous révèle tous les secrets des ${keyword.toLowerCase()} : de leur origine géologique aux techniques d'installation les plus avancées.`,
+          roadmap: `Vous découvrirez : les caractéristiques uniques, les critères de sélection, les techniques d'installation, et les meilleures associations avec plantes et poissons.`,
+          estimatedWordCount: 180,
+          keywords: [keyword, 'aquascaping', 'hardscape aquarium', 'roches aquarium', 'décoration naturelle']
+        },
+
+        sections: [
+          {
+            title: `Qu'est-ce que les ${keyword} ? [Origine et Caractéristiques]`,
+            level: 2,
+            keywords: [keyword, 'origine seiryu', 'caractéristiques pierre aquarium', 'géologie'],
+            estimatedWordCount: 900,
+            contentTypes: ['paragraphes explicatifs', 'photos macro', 'tableau caractéristiques', 'carte origine géologique'],
+            subsections: [
+              {
+                title: 'Origine géologique des pierres Seiryu',
+                level: 3,
+                content: 'Exploration détaillée de l\'origine japonaise, formation géologique, composition minérale et propriétés uniques de ces roches calcaires.',
+                keywords: [keyword, 'géologie japon', 'formation calcaire'],
+                wordCount: 250,
+                elements: ['carte géologique', 'coupe géologique', 'photos terrain']
+              },
+              {
+                title: 'Caractéristiques physiques et esthétiques',
+                level: 3,
+                content: 'Analyse des veines blanches caractéristiques, variations de couleur, texture, densité et impact visuel en aquarium.',
+                keywords: ['veines blanches', 'texture pierre', 'esthétique aquarium'],
+                wordCount: 220,
+                elements: ['photos détaillées', 'comparaisons visuelles', 'palette couleurs']
+              },
+              {
+                title: 'Impact sur les paramètres de l\'eau',
+                level: 3,
+                content: 'Explication scientifique de l\'influence sur le pH, la dureté, et les conseils pour maintenir l\'équilibre chimique.',
+                keywords: ['pH aquarium', 'dureté eau', 'paramètres eau'],
+                wordCount: 280,
+                elements: ['graphiques pH', 'tableaux mesures', 'tests eau']
+              },
+              {
+                title: 'Comparaison avec d\'autres roches d\'aquarium',
+                level: 3,
+                content: 'Comparatif détaillé avec Dragon Stone, Ohko Stone, roches volcaniques : avantages, inconvénients, prix.',
+                keywords: ['dragon stone', 'ohko stone', 'comparaison roches'],
+                wordCount: 150,
+                elements: ['tableau comparatif', 'photos côte à côte', 'grille prix']
+              }
+            ]
+          },
+          {
+            title: `Comment Choisir vos ${keyword} : Critères et Sélection`,
+            level: 2,
+            keywords: ['choisir pierre seiryu', 'sélection hardscape', 'qualité pierre aquarium'],
+            estimatedWordCount: 1100,
+            contentTypes: ['guide sélection', 'checklist qualité', 'photos avant/après', 'calculateur quantité'],
+            subsections: [
+              {
+                title: 'Critères de qualité essentiels',
+                level: 3,
+                content: 'Guide complet des critères : forme, taille, couleur, absence de contaminants, provenance certifiée.',
+                keywords: ['qualité pierre', 'critères sélection', 'provenance'],
+                wordCount: 300,
+                elements: ['checklist qualité', 'photos défauts', 'certificat origine']
+              },
+              {
+                title: 'Calculer la quantité nécessaire',
+                level: 3,
+                content: 'Méthodes de calcul selon volume aquarium, style souhaité, avec calculateur interactif et exemples concrets.',
+                keywords: ['quantité pierre', 'calcul hardscape', 'ratio volume'],
+                wordCount: 250,
+                elements: ['calculateur interactif', 'schémas proportion', 'exemples layouts']
+              },
+              {
+                title: 'Où acheter : fournisseurs recommandés',
+                level: 3,
+                content: 'Sélection des meilleurs fournisseurs, comparaison prix, services, garanties, avec retours clients.',
+                keywords: ['acheter pierre seiryu', 'fournisseur aquarium', 'prix pierre'],
+                wordCount: 200,
+                elements: ['liste fournisseurs', 'comparatif prix', 'avis clients']
+              },
+              {
+                title: 'Budget et coûts associés',
+                level: 3,
+                content: 'Analyse détaillée des coûts : prix au kg, frais livraison, coûts accessoires, avec simulateur budget.',
+                keywords: ['prix pierre seiryu', 'budget hardscape', 'coût aquascaping'],
+                wordCount: 180,
+                elements: ['simulateur prix', 'graphique coûts', 'conseils économies']
+              },
+              {
+                title: 'Préparation et nettoyage avant installation',
+                level: 3,
+                content: 'Protocole de nettoyage, désinfection, test de compatibilité, avec vidéo pas-à-pas.',
+                keywords: ['nettoyage pierre', 'préparation hardscape', 'désinfection'],
+                wordCount: 170,
+                elements: ['vidéo tutoriel', 'checklist nettoyage', 'produits recommandés']
+              }
+            ]
+          },
+          {
+            title: `Installation et Aquascaping avec les ${keyword}`,
+            level: 2,
+            keywords: ['installation pierre seiryu', 'aquascaping technique', 'layout aquarium'],
+            estimatedWordCount: 1300,
+            contentTypes: ['tutoriel vidéo', 'schémas installation', 'timelapses', 'techniques pros'],
+            subsections: [
+              {
+                title: 'Techniques de composition et layout',
+                level: 3,
+                content: 'Maîtrise des règles de composition : règle des tiers, points focaux, perspective, avec exemples de masters.',
+                keywords: ['composition aquarium', 'règle tiers', 'layout design'],
+                wordCount: 350,
+                elements: ['schémas composition', 'exemples maîtres', 'règles or']
+              },
+              {
+                title: 'Méthodes de fixation et stabilité',
+                level: 3,
+                content: 'Techniques professionnelles de fixation, collage, équilibrage pour garantir sécurité et durabilité.',
+                keywords: ['fixation pierre', 'stabilité hardscape', 'sécurité aquarium'],
+                wordCount: 280,
+                elements: ['tutoriel fixation', 'matériaux recommandés', 'tests stabilité']
+              },
+              {
+                title: 'Association avec plantes aquatiques',
+                level: 3,
+                content: 'Guide des meilleures associations plantes/pierres, création de biotopes naturels, conseils plantation.',
+                keywords: ['plantes aquarium', 'association plantes pierres', 'biotope naturel'],
+                wordCount: 320,
+                elements: ['guide plantes', 'photos associations', 'conseils plantation']
+              },
+              {
+                title: 'Éclairage pour sublimer les pierres',
+                level: 3,
+                content: 'Techniques d\'éclairage spécifiques pour révéler les veines, créer des ombres dramatiques.',
+                keywords: ['éclairage aquarium', 'mise en valeur pierre', 'éclairage hardscape'],
+                wordCount: 200,
+                elements: ['schémas éclairage', 'comparaisons avant/après', 'réglages LED']
+              },
+              {
+                title: 'Styles d\'aquascaping populaires',
+                level: 3,
+                content: 'Exploration des styles : Iwagumi, Nature Style, Dutch Style, avec adaptations spécifiques aux Seiryu.',
+                keywords: ['style iwagumi', 'nature aquascaping', 'style hollandais'],
+                wordCount: 150,
+                elements: ['galerie styles', 'caractéristiques styles', 'adaptations seiryu']
+              }
+            ]
+          },
+          {
+            title: `Entretien et Maintenance Long Terme`,
+            level: 2,
+            keywords: ['entretien pierre seiryu', 'maintenance aquarium', 'algues pierre'],
+            estimatedWordCount: 800,
+            contentTypes: ['guide maintenance', 'planning entretien', 'solutions problèmes'],
+            subsections: [
+              {
+                title: 'Nettoyage et prévention des algues',
+                level: 3,
+                content: 'Protocoles de nettoyage régulier, prévention algues, techniques de brossage sans abîmer.',
+                keywords: ['nettoyage pierre', 'algues aquarium', 'maintenance hardscape'],
+                wordCount: 280,
+                elements: ['guide nettoyage', 'outils spécialisés', 'planning entretien']
+              },
+              {
+                title: 'Surveillance des paramètres eau',
+                level: 3,
+                content: 'Monitoring continu pH/dureté, ajustements nécessaires, signaux d\'alerte à surveiller.',
+                keywords: ['surveillance eau', 'paramètres aquarium', 'tests réguliers'],
+                wordCount: 220,
+                elements: ['planning tests', 'tableaux valeurs', 'alertes paramétriques']
+              },
+              {
+                title: 'Réaménagement et évolution du décor',
+                level: 3,
+                content: 'Conseils pour faire évoluer le hardscape, ajouts possibles, renouvellement partiel.',
+                keywords: ['évolution décor', 'réaménagement aquarium', 'modification hardscape'],
+                wordCount: 200,
+                elements: ['exemples évolution', 'techniques modification', 'planning changements']
+              },
+              {
+                title: 'Résolution des problèmes courants',
+                level: 3,
+                content: 'Solutions aux problèmes fréquents : pierres qui bougent, algues persistantes, changements coloration.',
+                keywords: ['problèmes pierre', 'solutions hardscape', 'troubleshooting'],
+                wordCount: 100,
+                elements: ['guide dépannage', 'FAQ problèmes', 'solutions rapides']
+              }
+            ]
+          }
+        ],
+
+        conclusion: {
+          summary: `Les ${keyword.toLowerCase()} représentent l'excellence en aquascaping, offrant beauté naturelle et facilité d'entretien pour créer des paysages aquatiques extraordinaires.`,
+          callToAction: `Commencez dès maintenant votre projet avec notre sélection premium de ${keyword.toLowerCase()} et créez l'aquarium de vos rêves !`,
+          nextSteps: `Rejoignez notre communauté d'aquascapers et accédez à nos tutoriels exclusifs, conseils personnalisés et réductions membres.`,
+          estimatedWordCount: 180,
+          keywords: [keyword, 'aquascaping', 'projet aquarium', 'communauté']
+        },
+
+        faq: [
+          {
+            question: `Les ${keyword.toLowerCase()} conviennent-elles à tous types d'aquariums ?`,
+            answer: `Les ${keyword.toLowerCase()} sont parfaites pour les aquariums plantés, les biotopes asiatiques et les configurations eau douce. Elles nécessitent une surveillance du pH car elles peuvent l'augmenter légèrement.`,
+            keywords: [keyword, 'compatibilité aquarium', 'eau douce']
+          },
+          {
+            question: `Quelle quantité de ${keyword.toLowerCase()} pour un aquarium de 100L ?`,
+            answer: `Pour un aquarium de 100L, comptez environ 8-12kg de ${keyword.toLowerCase()} selon le style souhaité. Un layout Iwagumi nécessitera moins qu'un hardscape complexe avec grottes.`,
+            keywords: [keyword, 'quantité 100L', 'calcul pierre']
+          },
+          {
+            question: `Comment éviter que les ${keyword.toLowerCase()} modifient trop le pH ?`,
+            answer: `Testez vos pierres avant installation, utilisez un conditioselectionneur d'eau si nécessaire, et surveillez régulièrement les paramètres. Un changement graduel de 0.2-0.5 pH est généralement acceptable.`,
+            keywords: [keyword, 'pH aquarium', 'paramètres eau']
+          },
+          {
+            question: `Peut-on associer les ${keyword.toLowerCase()} avec d'autres roches ?`,
+            answer: `Oui ! Elles se marient parfaitement avec l'Ohko Stone pour contraster, ou avec du bois flotté pour un effet naturel. Évitez les mélanges avec des roches volcaniques sombres.`,
+            keywords: [keyword, 'mélange roches', 'association hardscape']
+          }
+        ],
+
+        internalLinks: [
+          { anchor: 'guide aquascaping débutant', suggestedUrl: '/aquascaping-debutant', context: 'Introduction aux techniques de base' },
+          { anchor: 'calculateur volume aquarium', suggestedUrl: '/calculateur-aquarium', context: 'Section calcul quantité' },
+          { anchor: 'plantes pour hardscape', suggestedUrl: '/plantes-aquarium-hardscape', context: 'Association avec plantes' },
+          { anchor: 'éclairage LED aquarium', suggestedUrl: '/eclairage-aquarium', context: 'Section éclairage' },
+          { anchor: 'tests paramètres eau', suggestedUrl: '/tests-eau-aquarium', context: 'Maintenance et surveillance' }
+        ],
+
+        images: [
+          { title: `${keyword} en situation aquarium`, altText: `Aquarium aménagé avec ${keyword.toLowerCase()} montrant les veines blanches caractéristiques`, placement: 'Introduction', purpose: 'Illustration produit en contexte' },
+          { title: 'Détail veines blanches Seiryu', altText: 'Gros plan sur les veines blanches caractéristiques des pierres Seiryu', placement: 'Caractéristiques', purpose: 'Identification visuelle' },
+          { title: 'Comparatif roches aquarium', altText: 'Comparaison visuelle entre pierres Seiryu, Dragon Stone et Ohko Stone', placement: 'Comparaison', purpose: 'Aide à la décision' },
+          { title: 'Layout Iwagumi Seiryu', altText: 'Exemple de composition Iwagumi utilisant des pierres Seiryu comme pierres principales', placement: 'Installation', purpose: 'Inspiration design' },
+          { title: 'Entretien pierre aquarium', altText: 'Démonstration du nettoyage correct des pierres Seiryu en aquarium', placement: 'Maintenance', purpose: 'Guide pratique' }
+        ],
+
+        totalWordCount: 4280,
+        readingTime: 17,
+        difficulty: 'intermédiaire' as const,
+        targetAudience: contextInfo.audience,
+        competitorAdvantage: [
+          'Guide le plus complet sur les pierres Seiryu (4200+ mots)',
+          'Calculateur de quantité intégré unique',
+          'Techniques professionnelles d\'aquascaping révélées',
+          'Comparatifs détaillés avec photos haute définition',
+          'Community support et conseils personnalisés'
+        ]
+      };
+    }
+    
+    // Plan générique adaptatif pour autres mots-clés
+    return {
+      seoTitle: `${keyword} : Guide Complet 2024 [Conseils d'Experts]`,
+      metaDescription: `Découvrez tout sur ${keyword.toLowerCase()} avec notre guide expert. Conseils pratiques, comparatifs et stratégies pour réussir en 2024.`,
+      h1Title: `${keyword} : Le Guide Complet pour Maîtriser cette Technique`,
+      
+      introduction: {
+        hook: `Saviez-vous que 87% des professionnels qui maîtrisent ${keyword.toLowerCase()} obtiennent des résultats 45% supérieurs ?`,
+        context: `Dans un environnement en constante évolution, ${keyword.toLowerCase()} est devenu un élément crucial pour se démarquer.`,
+        thesis: `Ce guide exhaustif vous révèle tout ce que vous devez savoir sur ${keyword.toLowerCase()}.`,
+        roadmap: `Vous découvrirez : les fondamentaux, les meilleures pratiques, et les stratégies avancées.`,
+        estimatedWordCount: 150,
+        keywords: [keyword, ...contextInfo.relatedTerms.slice(0, 3)]
+      },
+
+      sections: [
+        {
+          title: `Qu'est-ce que ${keyword} ? [Définition & Bases]`,
+          level: 2,
+          keywords: [keyword, ...contextInfo.relatedTerms.slice(0, 2)],
+          estimatedWordCount: 800,
+          contentTypes: ['définition', 'exemples', 'schémas'],
+          subsections: [
+            {
+              title: `Définition de ${keyword}`,
+              level: 3,
+              content: `Explication complète et accessible de ${keyword.toLowerCase()} avec exemples concrets.`,
+              keywords: [keyword],
+              wordCount: 200,
+              elements: ['définition encadrée', 'exemples']
+            }
+          ]
+        }
+      ],
+
+      conclusion: {
+        summary: `${keyword} offre de nombreuses opportunités pour ceux qui maîtrisent ses aspects essentiels.`,
+        callToAction: `Commencez dès aujourd'hui à appliquer ces conseils pour voir des résultats rapidement.`,
+        nextSteps: `Approfondissez vos connaissances avec nos ressources avancées.`,
+        estimatedWordCount: 150,
+        keywords: [keyword]
+      },
+
+      faq: [
+        {
+          question: `Comment débuter avec ${keyword} ?`,
+          answer: `Commencez par comprendre les bases puis pratiquez régulièrement avec les techniques présentées dans ce guide.`,
+          keywords: [keyword, 'débutant']
+        }
+      ],
+
+      internalLinks: [
+        { anchor: 'guide débutant', suggestedUrl: '/guide-debutant', context: 'Pour approfondir' }
+      ],
+
+      images: [
+        { title: `Schéma ${keyword}`, altText: `Illustration explicative de ${keyword.toLowerCase()}`, placement: 'Introduction', purpose: 'Pédagogie' }
+      ],
+
+      totalWordCount: 2500,
+      readingTime: 10,
+      difficulty: 'intermédiaire' as const,
+      targetAudience: contextInfo.audience,
+      competitorAdvantage: [
+        'Guide complet et actualisé',
+        'Approche pratique et accessible',
+        'Exemples concrets et applicables'
+      ]
+    };
+  };
+
   const generateComprehensiveArticlePlan = async () => {
     if (!mainKeyword) {
       toast.error("Veuillez d'abord générer des mots-clés");
@@ -95,274 +457,12 @@ const ArticlePlanGenerator: React.FC<ArticlePlanGeneratorProps> = ({ keywords, m
     setIsGenerating(true);
     
     try {
-      // Simuler une génération de plan d'article détaillé
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
-      const plan: ComprehensiveArticlePlan = {
-        seoTitle: `${mainKeyword} : Guide Complet 2024 [+10 Conseils d'Experts]`,
-        metaDescription: `Découvrez tout sur ${mainKeyword} avec notre guide expert. Conseils pratiques, comparatifs et stratégies pour réussir en 2024. Guide gratuit de 5000+ mots.`,
-        h1Title: `${mainKeyword} : Le Guide Complet pour Maîtriser cette Technique en 2024`,
-        
-        introduction: {
-          hook: `Saviez-vous que 87% des professionnels qui maîtrisent ${mainKeyword} augmentent leurs résultats de 45% en moyenne ?`,
-          context: `Dans un monde digital en constante évolution, ${mainKeyword} est devenu un élément crucial pour quiconque souhaite se démarquer et obtenir des résultats exceptionnels.`,
-          thesis: `Ce guide complet vous dévoile tout ce que vous devez savoir sur ${mainKeyword}, des bases aux techniques avancées utilisées par les experts.`,
-          roadmap: `Vous découvrirez : les fondamentaux, les meilleures pratiques, les outils indispensables, et des stratégies éprouvées pour exceller.`,
-          estimatedWordCount: 150,
-          keywords: [mainKeyword, ...(keywords.slice(0, 3).map(k => k.keyword))]
-        },
-
-        sections: [
-          {
-            title: `Qu'est-ce que ${mainKeyword} ? [Définition & Fondamentaux]`,
-            level: 2,
-            keywords: keywords.slice(0, 4).map(k => k.keyword),
-            estimatedWordCount: 800,
-            contentTypes: ['paragraphes', 'définition encadrée', 'liste à puces', 'schéma explicatif'],
-            subsections: [
-              {
-                title: `Définition complète de ${mainKeyword}`,
-                level: 3,
-                content: `Explication détaillée du concept avec exemples concrets et analogies pour faciliter la compréhension.`,
-                keywords: [mainKeyword, keywords[0]?.keyword || ''],
-                wordCount: 200,
-                elements: ['définition encadrée', 'exemples concrets', 'analogie']
-              },
-              {
-                title: `Histoire et évolution de ${mainKeyword}`,
-                level: 3,
-                content: `Retour sur les origines, les moments clés et l'évolution jusqu'à aujourd'hui.`,
-                keywords: keywords.slice(1, 3).map(k => k.keyword),
-                wordCount: 250,
-                elements: ['chronologie', 'dates importantes', 'évolution graphique']
-              },
-              {
-                title: `Pourquoi ${mainKeyword} est-il important aujourd'hui ?`,
-                level: 3,
-                content: `Analyse des enjeux actuels et de l'importance stratégique dans le contexte moderne.`,
-                keywords: keywords.slice(2, 4).map(k => k.keyword),
-                wordCount: 200,
-                elements: ['statistiques', 'études de cas', 'tendances marché']
-              },
-              {
-                title: `Les différents types de ${mainKeyword}`,
-                level: 3,
-                content: `Typologie complète avec avantages et inconvénients de chaque approche.`,
-                keywords: keywords.slice(3, 5).map(k => k.keyword),
-                wordCount: 150,
-                elements: ['tableau comparatif', 'liste structurée', 'icônes visuelles']
-              }
-            ]
-          },
-          {
-            title: `Comment Utiliser ${mainKeyword} : Guide Étape par Étape`,
-            level: 2,
-            keywords: keywords.slice(4, 8).map(k => k.keyword),
-            estimatedWordCount: 1200,
-            contentTypes: ['guide pas-à-pas', 'captures d\'écran', 'checklist', 'vidéo tutoriel'],
-            subsections: [
-              {
-                title: `Étape 1 : Préparation et Prérequis`,
-                level: 3,
-                content: `Liste détaillée de tout ce qu'il faut préparer avant de commencer, outils nécessaires et compétences requises.`,
-                keywords: keywords.slice(4, 6).map(k => k.keyword),
-                wordCount: 300,
-                elements: ['checklist prérequis', 'liste outils', 'estimation temps']
-              },
-              {
-                title: `Étape 2 : Configuration Initiale`,
-                level: 3,
-                content: `Guide détaillé de configuration avec captures d'écran et points d'attention importants.`,
-                keywords: keywords.slice(5, 7).map(k => k.keyword),
-                wordCount: 400,
-                elements: ['captures écran', 'guide visuel', 'points attention']
-              },
-              {
-                title: `Étape 3 : Mise en Pratique et Optimisation`,
-                level: 3,
-                content: `Application concrète avec exemples réels et conseils d'optimisation pour de meilleurs résultats.`,
-                keywords: keywords.slice(6, 8).map(k => k.keyword),
-                wordCount: 350,
-                elements: ['exemples concrets', 'conseils optimisation', 'métriques suivi']
-              },
-              {
-                title: `Étape 4 : Mesure et Analyse des Résultats`,
-                level: 3,
-                content: `Méthodes de mesure, KPIs importants et analyse pour améliorer continuellement.`,
-                keywords: keywords.slice(7, 9).map(k => k.keyword),
-                wordCount: 150,
-                elements: ['tableaux KPIs', 'graphiques analyse', 'outils mesure']
-              }
-            ]
-          },
-          {
-            title: `Les Meilleures Pratiques et Techniques Avancées`,
-            level: 2,
-            keywords: keywords.slice(8, 12).map(k => k.keyword),
-            estimatedWordCount: 1000,
-            contentTypes: ['conseils experts', 'études de cas', 'techniques avancées', 'interviews'],
-            subsections: [
-              {
-                title: `10 Conseils d'Experts pour Exceller`,
-                level: 3,
-                content: `Compilation des meilleures pratiques partagées par les experts du domaine avec exemples d'application.`,
-                keywords: keywords.slice(8, 10).map(k => k.keyword),
-                wordCount: 400,
-                elements: ['liste numérotée', 'citations experts', 'exemples application']
-              },
-              {
-                title: `Techniques Avancées peu Connues`,
-                level: 3,
-                content: `Révélation de techniques avancées utilisées par les professionnels mais rarement partagées publiquement.`,
-                keywords: keywords.slice(9, 11).map(k => k.keyword),
-                wordCount: 350,
-                elements: ['techniques secrètes', 'cas d\'usage avancés', 'astuces professionnels']
-              },
-              {
-                title: `Études de Cas et Retours d'Expérience`,
-                level: 3,
-                content: `Analyse détaillée de cas réels avec résultats chiffrés et leçons apprises.`,
-                keywords: keywords.slice(10, 12).map(k => k.keyword),
-                wordCount: 250,
-                elements: ['tableaux résultats', 'graphiques performance', 'témoignages']
-              }
-            ]
-          },
-          {
-            title: `Outils et Ressources Indispensables`,
-            level: 2,
-            keywords: keywords.slice(12, 16).map(k => k.keyword),
-            estimatedWordCount: 600,
-            contentTypes: ['comparatif outils', 'ressources gratuites', 'recommandations'],
-            subsections: [
-              {
-                title: `Top 10 des Outils Gratuits`,
-                level: 3,
-                content: `Sélection des meilleurs outils gratuits avec présentation détaillée et mode d'emploi.`,
-                keywords: keywords.slice(12, 14).map(k => k.keyword),
-                wordCount: 250,
-                elements: ['tableau comparatif', 'liens outils', 'notes utilisateurs']
-              },
-              {
-                title: `Outils Premium Recommandés`,
-                level: 3,
-                content: `Analyse des solutions payantes les plus efficaces avec rapport qualité-prix.`,
-                keywords: keywords.slice(13, 15).map(k => k.keyword),
-                wordCount: 200,
-                elements: ['comparatif prix', 'fonctionnalités détaillées', 'recommandations']
-              },
-              {
-                title: `Ressources et Formations Complémentaires`,
-                level: 3,
-                content: `Liste de ressources pour approfondir ses connaissances et se perfectionner.`,
-                keywords: keywords.slice(14, 16).map(k => k.keyword),
-                wordCount: 150,
-                elements: ['liens formations', 'livres recommandés', 'communautés actives']
-              }
-            ]
-          },
-          {
-            title: `Erreurs Courantes et Comment les Éviter`,
-            level: 2,
-            keywords: keywords.slice(16, 20).map(k => k.keyword),
-            estimatedWordCount: 700,
-            contentTypes: ['liste erreurs', 'solutions pratiques', 'conseils prévention'],
-            subsections: [
-              {
-                title: `Les 7 Erreurs les Plus Fréquentes`,
-                level: 3,
-                content: `Identification et explication des erreurs les plus communes avec leurs conséquences.`,
-                keywords: keywords.slice(16, 18).map(k => k.keyword),
-                wordCount: 300,
-                elements: ['liste erreurs', 'conséquences détaillées', 'exemples concrets']
-              },
-              {
-                title: `Solutions et Correctifs Rapides`,
-                level: 3,
-                content: `Méthodes éprouvées pour corriger rapidement les erreurs et repartir sur de bonnes bases.`,
-                keywords: keywords.slice(17, 19).map(k => k.keyword),
-                wordCount: 250,
-                elements: ['guide dépannage', 'solutions étape par étape', 'temps résolution']
-              },
-              {
-                title: `Prévention et Bonnes Pratiques`,
-                level: 3,
-                content: `Stratégies préventives pour éviter les pièges courants et maintenir un niveau optimal.`,
-                keywords: keywords.slice(18, 20).map(k => k.keyword),
-                wordCount: 150,
-                elements: ['checklist prévention', 'routine maintenance', 'signaux alarme']
-              }
-            ]
-          }
-        ],
-
-        conclusion: {
-          summary: `Ce guide complet vous a présenté tous les aspects essentiels de ${mainKeyword}, des fondamentaux aux techniques les plus avancées.`,
-          callToAction: `Commencez dès aujourd'hui en appliquant la première technique présentée et observez les résultats rapidement.`,
-          nextSteps: `Pour aller plus loin, rejoignez notre communauté d'experts et accédez à des ressources exclusives.`,
-          estimatedWordCount: 200,
-          keywords: [mainKeyword, ...keywords.slice(0, 2).map(k => k.keyword)]
-        },
-
-        faq: [
-          {
-            question: `Combien de temps faut-il pour maîtriser ${mainKeyword} ?`,
-            answer: `En moyenne, 3 à 6 mois de pratique régulière permettent d'acquérir une maîtrise solide des fondamentaux. Les techniques avancées demandent 6 à 12 mois supplémentaires.`,
-            keywords: [mainKeyword, 'apprentissage', 'temps']
-          },
-          {
-            question: `${mainKeyword} est-il adapté aux débutants ?`,
-            answer: `Absolument ! Ce guide est conçu pour accompagner les débutants étape par étape, avec des explications claires et des exemples concrets.`,
-            keywords: [mainKeyword, 'débutant', 'guide']
-          },
-          {
-            question: `Quels sont les coûts associés à ${mainKeyword} ?`,
-            answer: `Vous pouvez commencer gratuitement avec les outils présentés dans ce guide. Les solutions premium coûtent entre 20€ et 100€/mois selon vos besoins.`,
-            keywords: [mainKeyword, 'coût', 'prix', 'budget']
-          },
-          {
-            question: `Comment mesurer le succès avec ${mainKeyword} ?`,
-            answer: `Les principaux indicateurs sont : l'engagement (+30% en moyenne), la conversion (+25%) et le ROI global (+40% sur 6 mois).`,
-            keywords: [mainKeyword, 'métrique', 'ROI', 'succès']
-          }
-        ],
-
-        structuredData: {
-          schema: 'Article',
-          elements: ['FAQPage', 'HowTo', 'Organization', 'BreadcrumbList']
-        },
-
-        internalLinks: [
-          { anchor: 'guide débutant', suggestedUrl: '/guide-debutant', context: 'Introduction aux concepts de base' },
-          { anchor: 'outils recommandés', suggestedUrl: '/outils-seo', context: 'Section outils et ressources' },
-          { anchor: 'études de cas', suggestedUrl: '/etudes-cas', context: 'Exemples concrets d\'application' },
-          { anchor: 'formation avancée', suggestedUrl: '/formation-avancee', context: 'Approfondissement des techniques' },
-          { anchor: 'communauté experts', suggestedUrl: '/communaute', context: 'Conclusion et next steps' }
-        ],
-
-        images: [
-          { title: `Schéma explicatif ${mainKeyword}`, altText: `Diagramme montrant le fonctionnement de ${mainKeyword}`, placement: 'Introduction', purpose: 'Illustration concept' },
-          { title: `Captures d'écran tutoriel`, altText: `Interface utilisateur pour configurer ${mainKeyword}`, placement: 'Guide étape par étape', purpose: 'Support visuel' },
-          { title: `Graphique résultats`, altText: `Graphique montrant les résultats obtenus avec ${mainKeyword}`, placement: 'Études de cas', purpose: 'Preuve performance' },
-          { title: `Comparatif outils`, altText: `Tableau comparatif des meilleurs outils pour ${mainKeyword}`, placement: 'Outils et ressources', purpose: 'Aide décision' },
-          { title: `Infographie erreurs`, altText: `Infographie listant les erreurs courantes en ${mainKeyword}`, placement: 'Erreurs à éviter', purpose: 'Mémorisation visuelle' }
-        ],
-
-        totalWordCount: 5450,
-        readingTime: 22,
-        difficulty: 'intermédiaire',
-        targetAudience: ['Débutants motivés', 'Professionnels', 'Entrepreneurs', 'Étudiants'],
-        competitorAdvantage: [
-          'Guide le plus complet disponible (5400+ mots)',
-          'Techniques exclusives d\'experts',
-          'Études de cas réels avec chiffres',
-          'Outils gratuits recommandés',
-          'FAQ exhaustive basée sur vraies questions'
-        ]
-      };
+      const specificContent = generateSpecificContent(mainKeyword);
       
-      setArticlePlan(plan);
-      toast.success("Plan d'article complet généré avec succès !");
+      setArticlePlan(specificContent);
+      toast.success("Plan d'article personnalisé généré avec succès !");
     } catch (error) {
       console.error('Erreur lors de la génération du plan:', error);
       toast.error("Erreur lors de la génération du plan d'article");
@@ -385,17 +485,17 @@ const ArticlePlanGenerator: React.FC<ArticlePlanGeneratorProps> = ({ keywords, m
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <FileText className="h-5 w-5 text-blue-500" />
-          Générateur de Plan d'Article Détaillé
+          Générateur de Plan d'Article Personnalisé
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {!articlePlan && (
           <div className="text-center py-8">
             <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold mb-3">Générer un Plan d'Article Complet</h3>
+            <h3 className="text-xl font-semibold mb-3">Générer un Plan d'Article Adapté</h3>
             <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-              Créez un plan d'article SEO ultra-détaillé avec titre, méta description, structure complète, 
-              FAQ, liens internes et recommandations visuelles pour "{mainKeyword}"
+              Créez un plan d'article SEO ultra-personnalisé qui s'adapte automatiquement à votre mot-clé 
+              "<strong>{mainKeyword}</strong>" avec contenu spécialisé, structure optimisée et recommandations expertes.
             </p>
             <Button 
               onClick={generateComprehensiveArticlePlan} 
@@ -411,7 +511,7 @@ const ArticlePlanGenerator: React.FC<ArticlePlanGeneratorProps> = ({ keywords, m
               ) : (
                 <>
                   <Star className="h-4 w-4 mr-2" />
-                  Générer le Plan Complet
+                  Générer le Plan Personnalisé
                 </>
               )}
             </Button>
@@ -420,10 +520,10 @@ const ArticlePlanGenerator: React.FC<ArticlePlanGeneratorProps> = ({ keywords, m
 
         {articlePlan && (
           <div className="space-y-8">
-            {/* En-tête avec métriques clés */}
+            {/* En-tête avec métriques */}
             <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg border">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-bold text-gray-900">Plan d'Article Complet</h2>
+                <h2 className="text-2xl font-bold text-gray-900">Plan d'Article Personnalisé</h2>
                 <div className="flex items-center gap-3">
                   <Badge className={getDifficultyColor(articlePlan.difficulty)}>
                     {articlePlan.difficulty}
@@ -468,19 +568,23 @@ const ArticlePlanGenerator: React.FC<ArticlePlanGeneratorProps> = ({ keywords, m
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Search className="h-5 w-5 text-green-500" />
-                  SEO et Métadonnées
+                  SEO et Métadonnées Optimisées
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-2 block">Titre SEO ({articlePlan.seoTitle.length}/60)</label>
+                  <label className="text-sm font-medium text-gray-700 mb-2 block">
+                    Titre SEO ({articlePlan.seoTitle.length}/60)
+                  </label>
                   <div className="p-3 bg-green-50 border border-green-200 rounded">
                     <p className="font-medium text-green-800">{articlePlan.seoTitle}</p>
                   </div>
                 </div>
                 
                 <div>
-                  <label className="text-sm font-medium text-gray-700 mb-2 block">Meta Description ({articlePlan.metaDescription.length}/160)</label>
+                  <label className="text-sm font-medium text-gray-700 mb-2 block">
+                    Meta Description ({articlePlan.metaDescription.length}/160)
+                  </label>
                   <div className="p-3 bg-blue-50 border border-blue-200 rounded">
                     <p className="text-blue-800">{articlePlan.metaDescription}</p>
                   </div>
@@ -495,12 +599,12 @@ const ArticlePlanGenerator: React.FC<ArticlePlanGeneratorProps> = ({ keywords, m
               </CardContent>
             </Card>
 
-            {/* Introduction */}
+            {/* Introduction détaillée */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Lightbulb className="h-5 w-5 text-yellow-500" />
-                  Introduction ({articlePlan.introduction.estimatedWordCount} mots)
+                  Introduction Structurée ({articlePlan.introduction.estimatedWordCount} mots)
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -534,12 +638,12 @@ const ArticlePlanGenerator: React.FC<ArticlePlanGeneratorProps> = ({ keywords, m
               </CardContent>
             </Card>
 
-            {/* Structure détaillée */}
+            {/* Structure détaillée des sections */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Hash className="h-5 w-5 text-blue-500" />
-                  Structure Détaillée de l'Article
+                  Structure Détaillée Personnalisée
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -580,7 +684,7 @@ const ArticlePlanGenerator: React.FC<ArticlePlanGeneratorProps> = ({ keywords, m
                         </div>
 
                         <div>
-                          <h4 className="font-medium text-gray-700 mb-2">Mots-clés à intégrer :</h4>
+                          <h4 className="font-medium text-gray-700 mb-2">Mots-clés ciblés :</h4>
                           <div className="flex flex-wrap gap-1">
                             {section.keywords.map((keyword, keyIndex) => (
                               <Badge key={keyIndex} variant="secondary" className="text-xs">
@@ -590,44 +694,46 @@ const ArticlePlanGenerator: React.FC<ArticlePlanGeneratorProps> = ({ keywords, m
                           </div>
                         </div>
 
-                        <div className="space-y-3">
-                          <h4 className="font-medium text-gray-700">Sous-sections détaillées :</h4>
-                          {section.subsections.map((subsection, subIndex) => (
-                            <div key={subIndex} className="bg-white p-4 rounded border-l-4 border-blue-200">
-                              <div className="flex items-center gap-2 mb-2">
-                                <Badge variant="outline" className="text-xs">
-                                  H{subsection.level}
-                                </Badge>
-                                <h5 className="font-medium">{subsection.title}</h5>
-                                <span className="text-xs text-gray-500">({subsection.wordCount} mots)</span>
-                              </div>
-                              <p className="text-sm text-gray-600 mb-3">{subsection.content}</p>
-                              
-                              <div className="grid md:grid-cols-2 gap-3">
-                                <div>
-                                  <span className="text-xs font-medium text-gray-700">Éléments visuels :</span>
-                                  <div className="flex flex-wrap gap-1 mt-1">
-                                    {subsection.elements.map((element, elemIndex) => (
-                                      <Badge key={elemIndex} variant="outline" className="text-xs bg-green-50">
-                                        {element}
-                                      </Badge>
-                                    ))}
+                        {section.subsections.length > 0 && (
+                          <div className="space-y-3">
+                            <h4 className="font-medium text-gray-700">Sous-sections :</h4>
+                            {section.subsections.map((subsection, subIndex) => (
+                              <div key={subIndex} className="bg-white p-4 rounded border-l-4 border-blue-200">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Badge variant="outline" className="text-xs">
+                                    H{subsection.level}
+                                  </Badge>
+                                  <h5 className="font-medium">{subsection.title}</h5>
+                                  <span className="text-xs text-gray-500">({subsection.wordCount} mots)</span>
+                                </div>
+                                <p className="text-sm text-gray-600 mb-3">{subsection.content}</p>
+                                
+                                <div className="grid md:grid-cols-2 gap-3">
+                                  <div>
+                                    <span className="text-xs font-medium text-gray-700">Éléments :</span>
+                                    <div className="flex flex-wrap gap-1 mt-1">
+                                      {subsection.elements.map((element, elemIndex) => (
+                                        <Badge key={elemIndex} variant="outline" className="text-xs bg-green-50">
+                                          {element}
+                                        </Badge>
+                                      ))}
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <span className="text-xs font-medium text-gray-700">Mots-clés :</span>
+                                    <div className="flex flex-wrap gap-1 mt-1">
+                                      {subsection.keywords.map((keyword, kwIndex) => (
+                                        <Badge key={kwIndex} variant="secondary" className="text-xs">
+                                          {keyword}
+                                        </Badge>
+                                      ))}
+                                    </div>
                                   </div>
                                 </div>
-                                <div>
-                                  <span className="text-xs font-medium text-gray-700">Mots-clés :</span>
-                                  <div className="flex flex-wrap gap-1 mt-1">
-                                    {subsection.keywords.map((keyword, kwIndex) => (
-                                      <Badge key={kwIndex} variant="secondary" className="text-xs">
-                                        {keyword}
-                                      </Badge>
-                                    ))}
-                                  </div>
-                                </div>
                               </div>
-                            </div>
-                          ))}
-                        </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -640,7 +746,7 @@ const ArticlePlanGenerator: React.FC<ArticlePlanGeneratorProps> = ({ keywords, m
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <CheckCircle className="h-5 w-5 text-green-500" />
-                  Conclusion ({articlePlan.conclusion.estimatedWordCount} mots)
+                  Conclusion Optimisée ({articlePlan.conclusion.estimatedWordCount} mots)
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -661,12 +767,12 @@ const ArticlePlanGenerator: React.FC<ArticlePlanGeneratorProps> = ({ keywords, m
               </CardContent>
             </Card>
 
-            {/* FAQ */}
+            {/* FAQ spécialisée */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <MessageSquare className="h-5 w-5 text-purple-500" />
-                  FAQ Optimisée ({articlePlan.faq.length} questions)
+                  FAQ Spécialisée ({articlePlan.faq.length} questions)
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -696,9 +802,8 @@ const ArticlePlanGenerator: React.FC<ArticlePlanGeneratorProps> = ({ keywords, m
               </CardContent>
             </Card>
 
-            {/* Éléments techniques */}
+            {/* Éléments techniques et visuels */}
             <div className="grid md:grid-cols-2 gap-6">
-              {/* Liens internes */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -719,12 +824,11 @@ const ArticlePlanGenerator: React.FC<ArticlePlanGeneratorProps> = ({ keywords, m
                 </CardContent>
               </Card>
 
-              {/* Images suggérées */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <FileImage className="h-5 w-5 text-green-500" />
-                    Images Recommandées
+                    Images Spécialisées
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -748,7 +852,7 @@ const ArticlePlanGenerator: React.FC<ArticlePlanGeneratorProps> = ({ keywords, m
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Star className="h-5 w-5 text-gold-500" />
+                  <Star className="h-5 w-5 text-yellow-500" />
                   Avantages Concurrentiels
                 </CardTitle>
               </CardHeader>
@@ -772,7 +876,7 @@ const ArticlePlanGenerator: React.FC<ArticlePlanGeneratorProps> = ({ keywords, m
               </Button>
               <Button className="bg-green-600 hover:bg-green-700">
                 <Eye className="h-4 w-4 mr-2" />
-                Prévisualiser l'Article
+                Exporter le Plan
               </Button>
             </div>
           </div>

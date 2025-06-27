@@ -4,94 +4,78 @@ export interface KeywordSuggestion {
   volume: number;
   difficulty: number;
   cpc: number;
-  type: 'primary' | 'secondary' | 'long-tail' | 'question' | 'commercial' | 'informational' | 'standard' | 'ai-generated' | 'competitor' | 'semantic';
-  intent: 'informational' | 'commercial' | 'transactional' | 'navigational' | 'mixed';
-  opportunity: number;
-  suggestedTitle?: string;
-  suggestedDescription?: string;
-  suggestedLongDescription?: string;
-  trend?: number[];
-  searchVolume?: number;
-  relevance?: number;
   competition?: number;
+  trend?: number;
+  intent?: 'informational' | 'commercial' | 'transactional' | 'navigational';
+  type?: 'primary' | 'secondary' | 'long-tail' | 'semantic' | 'related';
+  opportunity?: number;
+  seasonality?: {
+    jan: number;
+    feb: number;
+    mar: number;
+    apr: number;
+    may: number;
+    jun: number;
+    jul: number;
+    aug: number;
+    sep: number;
+    oct: number;
+    nov: number;
+    dec: number;
+  };
 }
 
-export interface KeywordData {
-  keyword: string;
+export interface KeywordGroup {
+  id: string;
+  name: string;
+  keywords: KeywordSuggestion[];
+  totalVolume: number;
+  averageDifficulty: number;
+  intent: string;
+}
+
+export interface KeywordCluster {
+  name: string;
+  keywords: string[];
   volume: number;
   difficulty: number;
-  cpc: number;
-  trends: number[];
-  relatedKeywords: string[];
-  questions: string[];
-  competition: number;
-  density?: number;
-  count?: number;
-  position?: number;
+  intent: string;
 }
 
-export interface CompetitorData {
-  domain: string;
-  url: string;
-  title: string;
-  description: string;
-  keywords: string[];
-  ranking: number;
-  traffic: number;
-  backlinks: number;
-  domainAuthority: number;
-  contentLength: number;
-  lastUpdated: string;
-  strengths: string[];
-  weaknesses: string[];
-  opportunities: string[];
-  // Propriétés optionnelles pour compatibilité
-  name?: string;
-  strength?: number;
-  organic_traffic?: number;
-  estimatedTraffic?: number;
-  topKeywords?: string[];
-  gaps?: string[];
-}
-
-export interface ContentGap {
+export interface KeywordAnalysis {
   keyword: string;
-  type: 'missing' | 'weak' | 'opportunity';
-  priority: 'high' | 'medium' | 'low';
+  competitors: string[];
+  opportunities: string[];
+  questions: string[];
+  relatedTopics: string[];
   searchVolume: number;
   difficulty: number;
-  currentRanking?: number;
-  competitorRanking: number;
-  contentSuggestion: string;
   trends: number[];
-}
-
-export interface KeywordTrend {
-  month: string;
-  volume: number;
-  data: number[];
-  growth: number;
-  seasonal: boolean;
 }
 
 export interface SemanticCluster {
   id: string;
   name: string;
   mainTopic: string;
-  contentType: string;
+  keywords: string[];
+  intent: 'informational' | 'commercial' | 'transactional' | 'navigational';
   difficulty: number;
   opportunity: number;
-  keywords: string[];
-  intent: 'informational' | 'commercial' | 'transactional' | 'navigational' | 'mixed';
+  contentType: string;
 }
 
-export interface SerpFeature {
-  type: string;
-  title: string;
-  description?: string;
-  position: number;
-  content: string;
-  present: boolean;
+export interface ContentGap {
+  keyword: string;
+  volume: number;
+  difficulty: number;
+  currentRanking: number;
+  opportunity: number;
+  content: {
+    title: string;
+    description: string;
+    recommendedWordCount: number;
+    suggestedFormat: string;
+  };
 }
 
 export interface VoiceSearchData {
@@ -106,31 +90,37 @@ export interface VoiceSearchData {
   featuredSnippetChance: number;
 }
 
-export interface RoiParameters {
-  seoInvestment: number;
-  acquisitionCost: number;
-  conversionRate: number;
-  averageOrderValue: number;
-  organicTraffic: number;
-  timeFrame: number;
-  targetKeywords: string[];
-  averagePosition: number;
-  clickThroughRate: number;
-  contentCost: number;
-  toolsCost: number;
+export interface SerpFeature {
+  type: string;
+  title: string;
+  content: string;
+  present: boolean;
+  position?: number;
+}
+
+export interface CompetitorData {
+  name: string;
+  url: string;
+  domain: string;
+  title: string;
+  description: string;
+  ranking: number;
+  traffic: number;
+  strength: number;
+  organic_traffic: number;
+  estimatedTraffic: number;
+  keywords: number;
+  topKeywords: string[];
+  gaps: string[];
+  backlinks: number;
+  domainAuthority: number;
+  contentGaps: string[];
 }
 
 export interface SerpResult {
-  position: number;
   title: string;
   url: string;
   description: string;
+  position: number;
   domain: string;
-  authority: number;
-  estimatedTraffic: number;
-  titleLength: number;
-  descriptionLength: number;
-  hasStructuredData: boolean;
-  loadTime: number;
-  mobileOptimized: boolean;
 }
