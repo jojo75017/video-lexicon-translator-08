@@ -45,6 +45,13 @@ export interface CompetitorData {
   strengths: string[];
   weaknesses: string[];
   opportunities: string[];
+  // Propriétés optionnelles pour compatibilité
+  name?: string;
+  strength?: number;
+  organic_traffic?: number;
+  estimatedTraffic?: number;
+  topKeywords?: string[];
+  gaps?: string[];
 }
 
 export interface ContentGap {
