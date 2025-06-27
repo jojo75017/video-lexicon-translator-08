@@ -46,12 +46,13 @@ const PageStructurePlanner: React.FC = () => {
   const fetchPageContent = async (targetUrl: string): Promise<string> => {
     console.log(`🔍 Tentative de récupération: ${targetUrl}`);
     
-    // Liste de proxies CORS fiables
+    // Liste de proxies CORS plus robustes
     const proxies = [
       'https://api.codetabs.com/v1/proxy?quest=',
-      'https://api.allorigins.win/get?url=',
-      'https://cors-anywhere.herokuapp.com/',
-      'https://thingproxy.freeboard.io/fetch/'
+      'https://api.allorigins.win/raw?url=',
+      'https://crossorigin.me/',
+      'https://thingproxy.freeboard.io/fetch/',
+      'https://cors.io/?'
     ];
     
     let lastError = '';
@@ -59,7 +60,8 @@ const PageStructurePlanner: React.FC = () => {
     for (let i = 0; i < proxies.length; i++) {
       try {
         const proxy = proxies[i];
-        setCurrentStep(`Tentative ${i + 1}/${proxies.length}: ${proxy.split('/')[2]}...`);
+        const proxyName = proxy.split('/')[2] || `Proxy ${i + 1}`;
+        setCurrentStep(`Tentative ${i + 1}/${proxies.length}: ${proxyName}...`);
         
         console.log(`Proxy ${i + 1}: ${proxy}`);
         
@@ -70,7 +72,8 @@ const PageStructurePlanner: React.FC = () => {
             'Accept-Language': 'fr-FR,fr;q=0.9,en;q=0.8',
             'Cache-Control': 'no-cache',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-          }
+          },
+          signal: AbortSignal.timeout(10000) // 10 secondes timeout
         });
 
         if (!response.ok) {
@@ -79,9 +82,14 @@ const PageStructurePlanner: React.FC = () => {
 
         let content = '';
         
+        // Gérer différents types de réponses selon le proxy
         if (proxy.includes('allorigins')) {
-          const data = await response.json();
-          content = data.contents || '';
+          try {
+            const data = await response.json();
+            content = data.contents || '';
+          } catch {
+            content = await response.text();
+          }
         } else {
           content = await response.text();
         }
@@ -102,6 +110,26 @@ const PageStructurePlanner: React.FC = () => {
           await new Promise(resolve => setTimeout(resolve, 1000));
         }
       }
+    }
+    
+    // Si tous les proxies échouent, essayer un accès direct
+    try {
+      setCurrentStep('Tentative d\'accès direct...');
+      console.log('Tentative d\'accès direct à', targetUrl);
+      
+      const directResponse = await fetch(targetUrl, {
+        method: 'GET',
+        mode: 'no-cors', // Mode no-cors pour éviter les erreurs CORS
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+      });
+      
+      // En mode no-cors, nous ne pouvons pas lire le contenu
+      throw new Error('Accès direct impossible en mode no-cors');
+      
+    } catch (directError) {
+      console.error('Accès direct échoué:', directError);
     }
     
     throw new Error(`Impossible de récupérer le contenu. Dernière erreur: ${lastError}`);
@@ -341,8 +369,9 @@ const PageStructurePlanner: React.FC = () => {
         issues: [`Impossible d'analyser cette page: ${errorMessage}`],
         suggestions: [
           'Vérifiez que l\'URL est accessible publiquement',
-          'Certains sites bloquent l\'analyse automatique',
-          'Essayez avec une autre URL'
+          'Certains sites bloquent l\'analyse automatique pour des raisons de sécurité',
+          'Essayez avec une autre URL',
+          'Les sites avec protection anti-bot peuvent être difficiles à analyser'
         ]
       });
       
@@ -411,6 +440,8 @@ const PageStructurePlanner: React.FC = () => {
               <Info className="h-4 w-4" />
               <AlertDescription>
                 Entrez l'URL d'une page pour analyser sa structure réelle et obtenir des recommandations d'optimisation SEO.
+                <br />
+                <strong>Note :</strong> L'analyse nécessite un accès au contenu de la page. Certains sites peuvent bloquer l'analyse automatique.
               </AlertDescription>
             </Alert>
           )}
