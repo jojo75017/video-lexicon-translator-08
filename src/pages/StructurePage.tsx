@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import UnifiedDashboard from '@/components/dashboard/UnifiedDashboard';
 import { Card } from '@/components/ui/card';
@@ -65,8 +64,8 @@ const StructurePage = () => {
         
         // Analyse de la structure
         const headingStructure = analyzeHeadings(doc);
-        const allLinks = Array.from(doc.querySelectorAll('a[href]'));
-        const images = Array.from(doc.querySelectorAll('img'));
+        const allLinks = Array.from(doc.querySelectorAll('a[href]')) as HTMLAnchorElement[];
+        const images = Array.from(doc.querySelectorAll('img')) as HTMLImageElement[];
         
         const structureAnalysis = {
           url: formattedUrl,

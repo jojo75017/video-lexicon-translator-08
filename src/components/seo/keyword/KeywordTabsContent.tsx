@@ -7,6 +7,7 @@ import { Info, Sparkles, Target, TrendingUp } from "lucide-react";
 import { KeywordSuggestion } from "@/types/seo/Keyword";
 import CompetitorAnalysis from './CompetitorAnalysis';
 import SerpAnalysis from './SerpAnalysis';
+import ArticlePlanGenerator from './ArticlePlanGenerator';
 
 interface KeywordTabsContentProps {
   activeTab: string;
@@ -145,9 +146,13 @@ const KeywordTabsContent: React.FC<KeywordTabsContentProps> = ({ activeTab, keyw
         <SerpAnalysis keywords={keywords} />
       </TabsContent>
 
+      <TabsContent value="content">
+        <ArticlePlanGenerator keywords={keywords} mainKeyword={keyword} />
+      </TabsContent>
+
       {/* Onglets par défaut pour les autres valeurs */}
       {[
-        'intelligent', 'audience', 'content', 'analytics', 'mobile', 'voice', 
+        'intelligent', 'audience', 'analytics', 'mobile', 'voice', 
         'seasonal', 'opportunities', 'internal-links', 'difficulty', 'roi', 
         'faq', 'clustering', 'export'
       ].map((tabValue) => (
