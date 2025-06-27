@@ -4,16 +4,84 @@ export interface KeywordSuggestion {
   volume: number;
   difficulty: number;
   cpc: number;
-  type: 'standard' | 'long-tail' | 'question' | 'semantic' | 'ai-generated' | 'intent-based' | 'competitor';
-  intent: 'informational' | 'commercial' | 'navigational' | 'transactional' | 'mixed';
+  type: 'primary' | 'secondary' | 'long-tail' | 'question' | 'commercial' | 'informational';
+  intent: 'informational' | 'commercial' | 'transactional' | 'navigational';
   opportunity: number;
-  trend?: number[];
-  suggestedTitle?: string;
-  suggestedDescription?: string;
-  suggestedLongDescription?: string;
-  searchVolume?: number;
-  relevance?: number;
-  competition?: number;
+}
+
+export interface KeywordData {
+  keyword: string;
+  volume: number;
+  difficulty: number;
+  cpc: number;
+  trends: number[];
+  relatedKeywords: string[];
+  questions: string[];
+  competition: number;
+}
+
+// Ajout des types manquants pour corriger les erreurs
+export interface ContentGap {
+  keyword: string;
+  type: 'missing' | 'weak' | 'opportunity';
+  priority: 'high' | 'medium' | 'low';
+  searchVolume: number;
+  difficulty: number;
+  currentRanking?: number;
+  competitorRanking: number;
+  contentSuggestion: string;
+}
+
+export interface KeywordTrend {
+  month: string;
+  volume: number;
+  data: number[];
+  growth: number;
+  seasonal: boolean;
+}
+
+export interface SemanticCluster {
+  id: string;
+  name: string;
+  mainTopic: string;
+  contentType: string;
+  difficulty: number;
+  opportunity: number;
+  keywords: string[];
+}
+
+export interface SerpFeature {
+  type: string;
+  title: string;
+  description?: string;
+  position: number;
+  content: string;
+}
+
+export interface VoiceSearchData {
+  keyword: string;
+  voiceScore: number;
+  naturalLanguageQueries: string[];
+  conversationalKeywords: string[];
+  isVoiceOptimized: boolean;
+  questionFormat: string;
+  conversationalVariants: string[];
+  avgQuestionLength: number;
+  featuredSnippetChance: number;
+}
+
+export interface RoiParameters {
+  seoInvestment: number;
+  acquisitionCost: number;
+  conversionRate: number;
+  averageOrderValue: number;
+  organicTraffic: number;
+  timeFrame: number;
+  targetKeywords: string[];
+  averagePosition: number;
+  clickThroughRate: number;
+  contentCost: number;
+  toolsCost: number;
 }
 
 export interface SerpResult {
@@ -29,94 +97,4 @@ export interface SerpResult {
   hasStructuredData: boolean;
   loadTime: number;
   mobileOptimized: boolean;
-}
-
-export interface ContentSuggestion {
-  title: string;
-  description: string;
-  longDescription: string;
-  faqQuestions: string[];
-  headings: string[];
-  type: 'blog' | 'product' | 'service' | 'guide';
-}
-
-export interface CompetitorData {
-  name: string;
-  url: string;
-  domain: string;
-  strength: number;
-  organic_traffic: number;
-  estimatedTraffic: number;
-  keywords: number;
-  topKeywords: string[];
-  gaps: string[];
-}
-
-export interface VoiceSearchData {
-  keyword: string;
-  isVoiceOptimized: boolean;
-  questionFormat: string;
-  conversationalVariants: string[];
-  avgQuestionLength: number;
-  featuredSnippetChance: number;
-  voiceScore: number;
-  naturalLanguageQueries: string[];
-  conversationalKeywords: string[];
-}
-
-export interface RoiParameters {
-  seoInvestment: number;
-  acquisitionCost: number;
-  conversionRate: number;
-  averageOrderValue: number;
-  organicTraffic: number;
-  timeFrame: number;
-  targetKeywords: string[];
-  averagePosition: number;
-  clickThroughRate: number;
-  contentCost: number;
-  toolsCost: number;
-  maintenanceCost: number;
-}
-
-export interface KeywordData {
-  keyword: string;
-  volume: number;
-  difficulty: number;
-  cpc: number;
-  type: 'standard' | 'long-tail' | 'question' | 'semantic' | 'ai-generated' | 'intent-based' | 'competitor';
-  intent: 'informational' | 'commercial' | 'navigational' | 'transactional' | 'mixed';
-  opportunity: number;
-  trend?: number[];
-  searchVolume?: number;
-  relevance?: number;
-  density?: number;
-  count?: number;
-  position?: number;
-}
-
-export interface KeywordTrend {
-  date: string;
-  volume: number;
-  interest: number;
-}
-
-export interface SemanticCluster {
-  mainKeyword: string;
-  relatedKeywords: string[];
-  semanticScore: number;
-  intent: string;
-}
-
-export interface ContentGap {
-  keyword: string;
-  missingContent: string[];
-  opportunity: number;
-  priority: 'high' | 'medium' | 'low';
-}
-
-export interface SerpFeature {
-  type: string;
-  present: boolean;
-  opportunity: number;
 }

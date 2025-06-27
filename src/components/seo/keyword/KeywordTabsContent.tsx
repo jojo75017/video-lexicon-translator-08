@@ -3,11 +3,12 @@ import React from 'react';
 import { TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Info, Sparkles, Target, TrendingUp } from "lucide-react";
+import { Info, Sparkles, Target, TrendingUp, TreePine } from "lucide-react";
 import { KeywordSuggestion } from "@/types/seo/Keyword";
 import CompetitorAnalysis from './CompetitorAnalysis';
 import SerpAnalysis from './SerpAnalysis';
 import ArticlePlanGenerator from './ArticlePlanGenerator';
+import SiteStructureAnalyzer from './SiteStructureAnalyzer';
 
 interface KeywordTabsContentProps {
   activeTab: string;
@@ -148,6 +149,20 @@ const KeywordTabsContent: React.FC<KeywordTabsContentProps> = ({ activeTab, keyw
 
       <TabsContent value="content">
         <ArticlePlanGenerator keywords={keywords} mainKeyword={keyword} />
+      </TabsContent>
+
+      <TabsContent value="structure">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TreePine className="h-5 w-5 text-teal-500" />
+              Analyse de structure
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <SiteStructureAnalyzer />
+          </CardContent>
+        </Card>
       </TabsContent>
 
       {/* Onglets par défaut pour les autres valeurs */}

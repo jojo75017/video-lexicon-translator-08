@@ -5,7 +5,7 @@ import {
   Sparkles, Target, TrendingUp, Building2, Search, 
   FileText, Brain, Users, BarChart3, Smartphone, 
   Mic, Calendar, Lightbulb, Link, Zap, DollarSign, 
-  HelpCircle, Layers, Download 
+  HelpCircle, Layers, Download, TreePine
 } from "lucide-react";
 
 interface KeywordTabsNavigationProps {
@@ -26,6 +26,7 @@ const KeywordTabsNavigation: React.FC<KeywordTabsNavigationProps> = ({
     { id: 'competitive', label: 'Concurrence', icon: Building2, color: 'text-blue-500' },
     { id: 'serp', label: 'SERP', icon: Search, color: 'text-green-500' },
     { id: 'content', label: 'Plan d\'article', icon: FileText, color: 'text-orange-500' },
+    { id: 'structure', label: 'Structure', icon: TreePine, color: 'text-teal-500' },
     { id: 'intelligent', label: 'IA Avancée', icon: Brain, color: 'text-purple-600' },
     { id: 'audience', label: 'Audience', icon: Users, color: 'text-indigo-500' },
     { id: 'analytics', label: 'Analytics', icon: BarChart3, color: 'text-emerald-500' },
