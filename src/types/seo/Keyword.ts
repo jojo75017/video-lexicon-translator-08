@@ -7,8 +7,13 @@ export interface KeywordSuggestion {
   competition?: number;
   trend?: number;
   intent?: 'informational' | 'commercial' | 'transactional' | 'navigational';
-  type?: 'primary' | 'secondary' | 'long-tail' | 'semantic' | 'related';
+  type?: 'primary' | 'secondary' | 'long-tail' | 'semantic' | 'related' | 'question' | 'ai-generated';
   opportunity?: number;
+  searchVolume?: number;
+  relevance?: number;
+  suggestedTitle?: string;
+  suggestedDescription?: string;
+  suggestedLongDescription?: string;
   seasonality?: {
     jan: number;
     feb: number;

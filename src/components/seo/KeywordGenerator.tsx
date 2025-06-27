@@ -211,7 +211,7 @@ const KeywordGenerator = () => {
         ...kw,
         suggestedTitle: generateDynamicTitle(kw.keyword, 'standard'),
         suggestedDescription: generateDynamicDescription(kw.keyword, 'standard'),
-        trend: generateTrendData(kw.keyword) // Ensure trend is number[]
+        trend: generateTrendData(kw.keyword)[0] || 0
       }));
       
       // Générer les mots-clés longue traîne avec titres/descriptions personnalisés
@@ -219,7 +219,7 @@ const KeywordGenerator = () => {
         ...kw,
         suggestedTitle: generateDynamicTitle(kw.keyword, 'long-tail'),
         suggestedDescription: generateDynamicDescription(kw.keyword, 'long-tail'),
-        trend: generateTrendData(kw.keyword) // Ensure trend is number[]
+        trend: generateTrendData(kw.keyword)[0] || 0
       }));
       
       // Si on a une clé OpenAI valide, enrichir avec l'IA
@@ -236,9 +236,9 @@ const KeywordGenerator = () => {
               difficulty: Math.floor(Math.random() * 80) + 10,
               cpc: parseFloat((Math.random() * 3).toFixed(2)),
               type: 'ai-generated' as 'ai-generated',
-              intent: 'mixed' as 'mixed',
+              intent: 'informational' as 'informational',
               opportunity: Math.floor(Math.random() * 40) + 50,
-              trend: generateTrendData(kw),
+              trend: generateTrendData(kw)[0] || 0,
               suggestedTitle: generateDynamicTitle(kw, 'ai-generated'),
               suggestedDescription: generateDynamicDescription(kw, 'ai-generated'),
               searchVolume: Math.floor(Math.random() * 2000) + 100,
@@ -284,7 +284,7 @@ const KeywordGenerator = () => {
         type: 'question' as 'question',
         intent: 'informational' as 'informational',
         opportunity: Math.floor(Math.random() * 30) + 60,
-        trend: generateTrendData(q),
+        trend: generateTrendData(q)[0] || 0,
         suggestedTitle: generateDynamicTitle(q, 'question'),
         suggestedDescription: generateDynamicDescription(q, 'question'),
         searchVolume: Math.floor(Math.random() * 500) + 10,
