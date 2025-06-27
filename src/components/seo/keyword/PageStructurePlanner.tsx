@@ -5,25 +5,36 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { TreePine, Globe, Search, FileText, Target, ArrowRight, Info } from "lucide-react";
+import { TreePine, Globe, Search, FileText, Target, ArrowRight, Info, Layout, Link, Image, CheckCircle, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
+
+interface PageElement {
+  tag: string;
+  text: string;
+  attributes: Record<string, string>;
+  level?: number;
+}
 
 interface PageStructureData {
   url: string;
-  pageTitle: string;
-  headings: {
-    level: number;
-    text: string;
-    keywords: string[];
-  }[];
+  title: string;
   metaDescription: string;
-  keywordDensity: {
-    keyword: string;
-    density: number;
-    count: number;
-  }[];
-  suggestions: string[];
+  headings: PageElement[];
+  links: {
+    internal: PageElement[];
+    external: PageElement[];
+    total: number;
+  };
+  images: PageElement[];
+  content: {
+    wordCount: number;
+    paragraphs: number;
+    lists: number;
+    tables: number;
+  };
   seoScore: number;
+  issues: string[];
+  suggestions: string[];
 }
 
 const PageStructurePlanner: React.FC = () => {
@@ -40,43 +51,174 @@ const PageStructurePlanner: React.FC = () => {
     setIsAnalyzing(true);
     
     try {
-      // Simuler l'analyse de structure de page
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Formatage de l'URL
+      let formattedUrl = url;
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        formattedUrl = 'https://' + url;
+      }
+
+      toast.info('Analyse en cours...', {
+        description: 'Récupération et analyse de la structure de la page'
+      });
+
+      // Utilisation d'un proxy CORS pour récupérer le contenu
+      const proxyUrl = 'https://corsproxy.io/?';
+      const response = await fetch(proxyUrl + encodeURIComponent(formattedUrl));
       
-      const mockData: PageStructureData = {
-        url: url,
-        pageTitle: "Guide complet pour optimiser votre SEO",
-        headings: [
-          { level: 1, text: "Guide SEO complet", keywords: ["seo", "guide"] },
-          { level: 2, text: "Qu'est-ce que le SEO ?", keywords: ["seo", "définition"] },
-          { level: 3, text: "Les bases du référencement", keywords: ["référencement", "bases"] },
-          { level: 2, text: "Optimisation technique", keywords: ["optimisation", "technique"] },
-          { level: 3, text: "Vitesse de chargement", keywords: ["vitesse", "performance"] },
-          { level: 3, text: "Structure des URLs", keywords: ["url", "structure"] },
-          { level: 2, text: "Contenu et mots-clés", keywords: ["contenu", "mots-clés"] }
-        ],
-        metaDescription: "Découvrez notre guide complet pour optimiser votre SEO et améliorer votre référencement naturel.",
-        keywordDensity: [
-          { keyword: "seo", density: 2.5, count: 12 },
-          { keyword: "référencement", density: 1.8, count: 8 },
-          { keyword: "optimisation", density: 1.2, count: 6 },
-          { keyword: "guide", density: 0.8, count: 4 }
-        ],
-        suggestions: [
-          "Ajouter plus de sous-titres H3 pour structurer le contenu",
-          "Optimiser la densité du mot-clé principal (actuellement trop élevée)",
-          "Inclure des mots-clés de longue traîne dans les titres",
-          "Améliorer la méta description avec un appel à l'action",
-          "Ajouter des liens internes vers d'autres pages pertinentes"
-        ],
-        seoScore: 78
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+
+      const html = await response.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+
+      // Analyse des éléments de la page
+      const title = doc.title || 'Sans titre';
+      const metaDescription = doc.querySelector('meta[name="description"]')?.getAttribute('content') || '';
+
+      // Analyse des titres
+      const headings: PageElement[] = [];
+      doc.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(heading => {
+        headings.push({
+          tag: heading.tagName.toLowerCase(),
+          text: heading.textContent?.trim() || '',
+          attributes: {},
+          level: parseInt(heading.tagName.charAt(1))
+        });
+      });
+
+      // Analyse des liens
+      const allLinks = Array.from(doc.querySelectorAll('a[href]'));
+      const internal: PageElement[] = [];
+      const external: PageElement[] = [];
+
+      allLinks.forEach(link => {
+        const href = link.getAttribute('href') || '';
+        const text = link.textContent?.trim() || '';
+        const linkData: PageElement = {
+          tag: 'a',
+          text,
+          attributes: { href, rel: link.getAttribute('rel') || '' }
+        };
+
+        if (href.startsWith('/') || href.includes(new URL(formattedUrl).hostname)) {
+          internal.push(linkData);
+        } else if (href.startsWith('http')) {
+          external.push(linkData);
+        }
+      });
+
+      // Analyse des images
+      const images: PageElement[] = [];
+      doc.querySelectorAll('img').forEach(img => {
+        images.push({
+          tag: 'img',
+          text: img.getAttribute('alt') || 'Sans alt',
+          attributes: {
+            src: img.getAttribute('src') || '',
+            alt: img.getAttribute('alt') || '',
+            width: img.getAttribute('width') || '',
+            height: img.getAttribute('height') || ''
+          }
+        });
+      });
+
+      // Analyse du contenu
+      const bodyText = doc.body?.textContent || '';
+      const wordCount = bodyText.trim().split(/\s+/).filter(Boolean).length;
+      const paragraphs = doc.querySelectorAll('p').length;
+      const lists = doc.querySelectorAll('ul, ol').length;
+      const tables = doc.querySelectorAll('table').length;
+
+      // Calcul du score SEO et des problèmes
+      const issues: string[] = [];
+      const suggestions: string[] = [];
+      let seoScore = 100;
+
+      // Vérifications SEO
+      if (!title) {
+        issues.push('Titre manquant');
+        seoScore -= 15;
+      } else if (title.length < 30 || title.length > 60) {
+        issues.push(`Titre trop ${title.length < 30 ? 'court' : 'long'} (${title.length} caractères)`);
+        seoScore -= 5;
+      }
+
+      if (!metaDescription) {
+        issues.push('Meta description manquante');
+        seoScore -= 10;
+      } else if (metaDescription.length < 120 || metaDescription.length > 160) {
+        issues.push(`Meta description trop ${metaDescription.length < 120 ? 'courte' : 'longue'} (${metaDescription.length} caractères)`);
+        seoScore -= 5;
+      }
+
+      const h1Count = headings.filter(h => h.level === 1).length;
+      if (h1Count === 0) {
+        issues.push('Aucun titre H1 trouvé');
+        seoScore -= 10;
+      } else if (h1Count > 1) {
+        issues.push(`Plusieurs titres H1 (${h1Count})`);
+        seoScore -= 5;
+      }
+
+      const imagesWithoutAlt = images.filter(img => !img.attributes.alt);
+      if (imagesWithoutAlt.length > 0) {
+        issues.push(`${imagesWithoutAlt.length} image(s) sans attribut alt`);
+        seoScore -= Math.min(10, imagesWithoutAlt.length);
+      }
+
+      if (wordCount < 300) {
+        issues.push('Contenu trop court (moins de 300 mots)');
+        seoScore -= 8;
+      }
+
+      // Suggestions d'amélioration
+      if (headings.length < 3) {
+        suggestions.push('Ajoutez plus de sous-titres pour structurer le contenu');
+      }
+
+      if (internal.length < 3) {
+        suggestions.push('Ajoutez plus de liens internes vers d\'autres pages');
+      }
+
+      if (lists.length === 0) {
+        suggestions.push('Utilisez des listes à puces pour améliorer la lisibilité');
+      }
+
+      suggestions.push('Optimisez les images avec des formats WebP pour de meilleures performances');
+      suggestions.push('Ajoutez des données structurées pour améliorer l\'affichage dans les résultats de recherche');
+
+      const analysisData: PageStructureData = {
+        url: formattedUrl,
+        title,
+        metaDescription,
+        headings,
+        links: {
+          internal,
+          external,
+          total: internal.length + external.length
+        },
+        images,
+        content: {
+          wordCount,
+          paragraphs,
+          lists,
+          tables
+        },
+        seoScore: Math.max(0, seoScore),
+        issues,
+        suggestions
       };
+
+      setStructureData(analysisData);
+      toast.success('Analyse terminée avec succès');
       
-      setStructureData(mockData);
-      toast.success('Analyse de structure terminée');
     } catch (error) {
       console.error('Erreur lors de l\'analyse:', error);
-      toast.error('Erreur lors de l\'analyse de la page');
+      toast.error('Erreur lors de l\'analyse', {
+        description: 'Impossible d\'analyser cette page. Vérifiez l\'URL.'
+      });
     } finally {
       setIsAnalyzing(false);
     }
@@ -86,11 +228,6 @@ const PageStructurePlanner: React.FC = () => {
     if (score >= 80) return 'text-green-600 bg-green-100';
     if (score >= 60) return 'text-yellow-600 bg-yellow-100';
     return 'text-red-600 bg-red-100';
-  };
-
-  const getHeadingIcon = (level: number) => {
-    const size = Math.max(6 - level, 1);
-    return `H${level}`;
   };
 
   return (
@@ -132,7 +269,7 @@ const PageStructurePlanner: React.FC = () => {
             <Alert>
               <Info className="h-4 w-4" />
               <AlertDescription>
-                Entrez l'URL d'une page pour analyser sa structure SEO et obtenir des recommandations d'optimisation.
+                Entrez l'URL d'une page pour analyser sa structure réelle et obtenir des recommandations d'optimisation.
               </AlertDescription>
             </Alert>
           )}
@@ -150,13 +287,13 @@ const PageStructurePlanner: React.FC = () => {
 
       {structureData && (
         <div className="space-y-6">
-          {/* Score SEO */}
+          {/* Informations générales */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
                 <span className="flex items-center gap-2">
-                  <Target className="h-5 w-5 text-blue-500" />
-                  Score SEO de la page
+                  <Globe className="h-5 w-5 text-blue-500" />
+                  Informations de la page
                 </span>
                 <Badge className={`${getScoreColor(structureData.seoScore)} text-lg px-3 py-1`}>
                   {structureData.seoScore}/100
@@ -164,13 +301,17 @@ const PageStructurePlanner: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="mb-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Globe className="h-4 w-4 text-gray-500" />
-                  <span className="text-sm text-gray-600">{structureData.url}</span>
+              <div className="space-y-3">
+                <div>
+                  <h3 className="font-medium text-lg">{structureData.title}</h3>
+                  <p className="text-sm text-gray-600">{structureData.url}</p>
                 </div>
-                <h3 className="font-medium">{structureData.pageTitle}</h3>
-                <p className="text-sm text-gray-600 mt-1">{structureData.metaDescription}</p>
+                {structureData.metaDescription && (
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 mb-1">Meta Description</h4>
+                    <p className="text-sm text-gray-600">{structureData.metaDescription}</p>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -179,77 +320,149 @@ const PageStructurePlanner: React.FC = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-purple-500" />
-                Structure des titres
+                <Layout className="h-5 w-5 text-purple-500" />
+                Structure des titres ({structureData.headings.length})
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {structureData.headings.map((heading, index) => (
-                  <div key={index} className="flex items-center gap-3 p-3 border rounded-lg">
+                  <div key={index} className="flex items-center gap-3 p-2 border rounded-lg">
                     <Badge variant="outline" className="text-xs">
-                      {getHeadingIcon(heading.level)}
+                      {heading.tag.toUpperCase()}
                     </Badge>
-                    <div className="flex-1">
-                      <span className="font-medium">{heading.text}</span>
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {heading.keywords.map((keyword, idx) => (
-                          <Badge key={idx} variant="secondary" className="text-xs">
-                            {keyword}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
+                    <span className="flex-1 text-sm">{heading.text}</span>
                   </div>
                 ))}
               </div>
             </CardContent>
           </Card>
 
-          {/* Densité des mots-clés */}
+          {/* Liens et images */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Link className="h-5 w-5 text-blue-500" />
+                  Liens ({structureData.links.total})
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                    <span className="text-sm text-gray-600">Liens internes</span>
+                    <Badge variant="secondary">{structureData.links.internal.length}</Badge>
+                  </div>
+                  <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                    <span className="text-sm text-gray-600">Liens externes</span>
+                    <Badge variant="secondary">{structureData.links.external.length}</Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Image className="h-5 w-5 text-green-500" />
+                  Images ({structureData.images.length})
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                    <span className="text-sm text-gray-600">Avec alt</span>
+                    <Badge variant="secondary">
+                      {structureData.images.filter(img => img.attributes.alt).length}
+                    </Badge>
+                  </div>
+                  <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                    <span className="text-sm text-gray-600">Sans alt</span>
+                    <Badge variant="destructive">
+                      {structureData.images.filter(img => !img.attributes.alt).length}
+                    </Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Contenu */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Search className="h-5 w-5 text-green-500" />
-                Densité des mots-clés
+                <FileText className="h-5 w-5 text-orange-500" />
+                Analyse du contenu
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {structureData.keywordDensity.map((item, index) => (
-                  <div key={index} className="p-3 border rounded-lg">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="font-medium">{item.keyword}</span>
-                      <Badge variant={item.density > 3 ? "destructive" : item.density > 1 ? "default" : "secondary"}>
-                        {item.density}%
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-gray-600">{item.count} occurrences</p>
-                  </div>
-                ))}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="p-3 bg-gray-50 rounded">
+                  <div className="text-sm text-gray-600">Mots</div>
+                  <div className="text-lg font-semibold">{structureData.content.wordCount}</div>
+                </div>
+                <div className="p-3 bg-gray-50 rounded">
+                  <div className="text-sm text-gray-600">Paragraphes</div>
+                  <div className="text-lg font-semibold">{structureData.content.paragraphs}</div>
+                </div>
+                <div className="p-3 bg-gray-50 rounded">
+                  <div className="text-sm text-gray-600">Listes</div>
+                  <div className="text-lg font-semibold">{structureData.content.lists}</div>
+                </div>
+                <div className="p-3 bg-gray-50 rounded">
+                  <div className="text-sm text-gray-600">Tableaux</div>
+                  <div className="text-lg font-semibold">{structureData.content.tables}</div>
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Suggestions d'amélioration */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ArrowRight className="h-5 w-5 text-orange-500" />
-                Suggestions d'amélioration
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {structureData.suggestions.map((suggestion, index) => (
-                  <div key={index} className="flex items-start gap-2 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                    <ArrowRight className="h-4 w-4 text-orange-500 mt-0.5" />
-                    <span className="text-sm">{suggestion}</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          {/* Problèmes et suggestions */}
+          {(structureData.issues.length > 0 || structureData.suggestions.length > 0) && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {structureData.issues.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <AlertCircle className="h-5 w-5 text-red-500" />
+                      Problèmes détectés
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {structureData.issues.map((issue, index) => (
+                        <div key={index} className="flex items-start gap-2 p-2 bg-red-50 border border-red-200 rounded">
+                          <AlertCircle className="h-4 w-4 text-red-500 mt-0.5" />
+                          <span className="text-sm text-red-700">{issue}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {structureData.suggestions.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <CheckCircle className="h-5 w-5 text-green-500" />
+                      Suggestions d'amélioration
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {structureData.suggestions.map((suggestion, index) => (
+                        <div key={index} className="flex items-start gap-2 p-2 bg-green-50 border border-green-200 rounded">
+                          <ArrowRight className="h-4 w-4 text-green-500 mt-0.5" />
+                          <span className="text-sm text-green-700">{suggestion}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>

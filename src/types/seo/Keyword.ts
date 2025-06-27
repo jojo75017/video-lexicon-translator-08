@@ -4,14 +4,16 @@ export interface KeywordSuggestion {
   volume: number;
   difficulty: number;
   cpc: number;
-  type: 'primary' | 'secondary' | 'long-tail' | 'question' | 'commercial' | 'informational' | 'standard' | 'ai-generated' | 'competitor';
+  type: 'primary' | 'secondary' | 'long-tail' | 'question' | 'commercial' | 'informational' | 'standard' | 'ai-generated' | 'competitor' | 'semantic';
   intent: 'informational' | 'commercial' | 'transactional' | 'navigational' | 'mixed';
   opportunity: number;
   suggestedTitle?: string;
   suggestedDescription?: string;
+  suggestedLongDescription?: string;
   trend?: number[];
   searchVolume?: number;
   relevance?: number;
+  competition?: number;
 }
 
 export interface KeywordData {
@@ -28,7 +30,23 @@ export interface KeywordData {
   position?: number;
 }
 
-// Ajout des types manquants pour corriger les erreurs
+export interface CompetitorData {
+  domain: string;
+  url: string;
+  title: string;
+  description: string;
+  keywords: string[];
+  ranking: number;
+  traffic: number;
+  backlinks: number;
+  domainAuthority: number;
+  contentLength: number;
+  lastUpdated: string;
+  strengths: string[];
+  weaknesses: string[];
+  opportunities: string[];
+}
+
 export interface ContentGap {
   keyword: string;
   type: 'missing' | 'weak' | 'opportunity';
@@ -38,6 +56,7 @@ export interface ContentGap {
   currentRanking?: number;
   competitorRanking: number;
   contentSuggestion: string;
+  trends: number[];
 }
 
 export interface KeywordTrend {
@@ -56,6 +75,7 @@ export interface SemanticCluster {
   difficulty: number;
   opportunity: number;
   keywords: string[];
+  intent: 'informational' | 'commercial' | 'transactional' | 'navigational' | 'mixed';
 }
 
 export interface SerpFeature {
@@ -64,6 +84,7 @@ export interface SerpFeature {
   description?: string;
   position: number;
   content: string;
+  present: boolean;
 }
 
 export interface VoiceSearchData {
