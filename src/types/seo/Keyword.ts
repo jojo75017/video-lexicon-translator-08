@@ -132,6 +132,10 @@ export interface SerpResult {
   description: string;
   position: number;
   domain: string;
+  authority?: number;
+  estimatedTraffic?: number;
+  titleLength?: number;
+  loadTime?: number;
 }
 
 export interface KeywordTrend {
@@ -148,6 +152,9 @@ export interface KeywordData {
   competition?: number;
   intent?: 'informational' | 'commercial' | 'transactional' | 'navigational';
   trends?: number[];
+  density?: number;
+  count?: number;
+  position?: number;
 }
 
 export interface RoiParameters {

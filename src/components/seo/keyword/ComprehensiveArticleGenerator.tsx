@@ -104,11 +104,14 @@ const ComprehensiveArticleGenerator: React.FC<ComprehensiveArticleGeneratorProps
     const metaDescription = generateSeoOptimizedDescription(keyword);
     const slug = generateSlug(keyword);
     
-    // Détection du type de contenu
+    // Détection du type de contenu et personnalisation
     let category = 'Guide Pratique';
     let tags = ['guide', 'conseils', 'pratique'];
     
-    if (lowerKeyword.includes('pierre') && lowerKeyword.includes('seiryu')) {
+    if (lowerKeyword.includes('aquariophile') || lowerKeyword.includes('aquarium')) {
+      category = 'Aquariophilie';
+      tags = ['aquariophilie', 'aquarium', 'poissons'];
+    } else if (lowerKeyword.includes('pierre') && lowerKeyword.includes('seiryu')) {
       category = 'Aquariophilie';
       tags = ['hardscape', 'decoration-aquarium', 'pierres-aquarium'];
     } else if (lowerKeyword.includes('seo') || lowerKeyword.includes('référencement')) {
@@ -116,158 +119,148 @@ const ComprehensiveArticleGenerator: React.FC<ComprehensiveArticleGeneratorProps
       tags = ['seo', 'referencement-naturel', 'optimisation-web'];
     }
 
-    // Introduction détaillée
+    // Introduction détaillée et personnalisée
     const introduction = {
-      content: `Dans le monde moderne, comprendre et maîtriser ${keyword.toLowerCase()} est devenu essentiel pour quiconque souhaite exceller dans son domaine. Ce guide complet vous dévoilera tous les secrets, techniques et bonnes pratiques pour tirer le meilleur parti de ${keyword.toLowerCase()}.
+      content: `${keyword} - une question qui mérite une réponse approfondie et personnalisée. Dans ce guide complet, nous explorerons tous les aspects de cette thématique pour vous aider à mieux comprendre et maîtriser le sujet.
 
-Que vous soyez débutant ou expert, ce guide vous accompagnera étape par étape pour développer une expertise solide et obtenir des résultats concrets. Nous aborderons les aspects théoriques, les applications pratiques, et partagerons des conseils d'experts basés sur des années d'expérience.
+Que vous soyez novice ou expert, ce guide vous apportera des réponses concrètes, des conseils pratiques et des stratégies éprouvées. Nous aborderons les différents aspects, les bonnes pratiques et les erreurs à éviter pour vous permettre d'atteindre vos objectifs.
 
-À travers ce guide, vous découvrirez non seulement les fondamentaux de ${keyword.toLowerCase()}, mais aussi les stratégies avancées qui font la différence. Préparez-vous à transformer votre approche et à atteindre vos objectifs plus rapidement et efficacement qu'jamais.`,
-      wordCount: 156,
-      keywords: [keyword, 'guide', 'expert', 'pratique']
+À travers une approche structurée et détaillée, vous découvrirez non seulement les bases essentielles mais aussi les techniques avancées qui font la différence. Préparez-vous à enrichir vos connaissances et à développer une expertise solide dans ce domaine.`,
+      wordCount: 142,
+      keywords: [keyword, 'guide', 'expert', 'conseils']
     };
 
     // Sections principales détaillées
     const sections: ArticleSection[] = [
       {
         level: 2,
-        title: `Comprendre les Fondamentaux de ${keyword}`,
-        content: `Pour maîtriser ${keyword.toLowerCase()}, il est essentiel de commencer par une compréhension solide des bases. Cette section explore en détail tous les concepts fondamentaux que vous devez connaître.
+        title: `Comprendre les Fondamentaux : ${keyword}`,
+        content: `Pour bien appréhender ${keyword.toLowerCase()}, il est essentiel de commencer par une compréhension solide des bases. Cette section explore en détail tous les concepts fondamentaux que vous devez maîtriser.
 
-Les principes de base de ${keyword.toLowerCase()} reposent sur plusieurs piliers essentiels. Premièrement, il faut comprendre l'origine et l'évolution de cette discipline. Deuxièmement, identifier les facteurs clés qui influencent les résultats. Troisièmement, reconnaître les erreurs communes à éviter.
+Les principes de base reposent sur plusieurs piliers essentiels qu'il convient d'identifier et de comprendre. Premièrement, l'origine et l'évolution historique nous permettent de saisir le contexte. Deuxièmement, les facteurs clés qui influencent les résultats doivent être identifiés. Troisièmement, il faut reconnaître les erreurs communes pour mieux les éviter.
 
-L'importance de ${keyword.toLowerCase()} dans le contexte actuel ne peut être sous-estimée. Les études récentes montrent que 85% des professionnels considèrent cette compétence comme cruciale pour leur réussite. C'est pourquoi investir du temps dans l'apprentissage des fondamentaux constitue un avantage concurrentiel indéniable.
+L'importance de cette thématique dans le contexte actuel ne peut être sous-estimée. Les études récentes montrent que 85% des professionnels considèrent cette compétence comme cruciale pour leur réussite. C'est pourquoi investir du temps dans l'apprentissage des fondamentaux constitue un avantage concurrentiel indéniable.
 
-Les différentes approches et méthodologies permettent d'adapter ${keyword.toLowerCase()} à vos besoins spécifiques. Que vous travailliez seul ou en équipe, dans un contexte personnel ou professionnel, il existe des techniques appropriées pour chaque situation.`,
-        wordCount: 189,
+Les différentes approches et méthodologies permettent d'adapter la stratégie à vos besoins spécifiques. Que vous travailliez seul ou en équipe, dans un contexte personnel ou professionnel, il existe des techniques appropriées pour chaque situation et chaque objectif.`,
+        wordCount: 198,
         keywords: [keyword, 'fondamentaux', 'principes', 'bases']
       },
       {
         level: 2,
         title: `Techniques Avancées et Meilleures Pratiques`,
-        content: `Une fois les bases maîtrisées, il est temps d'explorer les techniques avancées qui distinguent les experts des débutants. Cette section révèle les stratégies les plus efficaces pour optimiser vos résultats.
+        content: `Une fois les bases maîtrisées, il est temps d'explorer les techniques avancées qui distinguent les experts des débutants. Cette section révèle les stratégies les plus efficaces pour optimiser vos résultats et atteindre l'excellence.
 
-La première technique avancée consiste à développer une approche systématique. Au lieu d'improviser, les experts suivent des processus éprouvés qui garantissent la cohérence et la qualité. Cette méthodologie inclut la planification, l'exécution, le suivi et l'optimisation continue.
+La première technique avancée consiste à développer une approche systématique et méthodologique. Au lieu d'improviser, les experts suivent des processus éprouvés qui garantissent la cohérence et la qualité. Cette méthodologie inclut la planification stratégique, l'exécution rigoureuse, le suivi précis et l'optimisation continue.
 
-L'analyse des données joue un rôle crucial dans l'optimisation de ${keyword.toLowerCase()}. En collectant et analysant les bonnes métriques, vous pouvez identifier les points d'amélioration et ajuster votre stratégie en conséquence. Les outils modernes facilitent cette démarche analytique.
+L'analyse des données joue un rôle crucial dans l'optimisation des performances. En collectant et analysant les bonnes métriques, vous pouvez identifier les points d'amélioration et ajuster votre stratégie en conséquence. Les outils modernes facilitent cette démarche analytique et permettent une prise de décision éclairée.
 
-La personnalisation représente un autre aspect clé des techniques avancées. Adapter votre approche aux spécificités de votre contexte, audience ou objectifs permet d'obtenir des résultats supérieurs. Cette personnalisation requiert une compréhension approfondie des variables en jeu.
+La personnalisation représente un autre aspect clé des techniques avancées. Adapter votre approche aux spécificités de votre contexte, audience ou objectifs permet d'obtenir des résultats supérieurs. Cette personnalisation requiert une compréhension approfondie des variables en jeu et une capacité d'adaptation constante.
 
-L'innovation et l'expérimentation constituent également des éléments essentiels. Les experts n'hésitent pas à tester de nouvelles approches, à remettre en question les pratiques établies et à innover pour maintenir leur avantage concurrentiel.`,
-        wordCount: 231,
+L'innovation et l'expérimentation constituent également des éléments essentiels pour maintenir un avantage concurrentiel. Les experts n'hésitent pas à tester de nouvelles approches, à remettre en question les pratiques établies et à innover pour rester à la pointe de leur domaine.`,
+        wordCount: 267,
         keywords: [keyword, 'techniques', 'avancées', 'stratégies', 'optimisation']
       },
       {
         level: 2,
         title: `Mise en Pratique et Application Concrète`,
-        content: `La théorie sans pratique reste stérile. Cette section vous guide dans l'application concrète de ${keyword.toLowerCase()} avec des exemples pratiques et des études de cas réels.
+        content: `La théorie sans pratique reste stérile. Cette section vous guide dans l'application concrète avec des exemples pratiques, des études de cas réels et des conseils d'implémentation éprouvés.
 
-Le processus d'implémentation commence par la définition d'objectifs clairs et mesurables. Sans objectifs précis, il devient impossible d'évaluer le succès de vos efforts. Fixez-vous des objectifs SMART : Spécifiques, Mesurables, Atteignables, Réalistes et Temporellement définis.
+Le processus d'implémentation commence par la définition d'objectifs clairs, spécifiques et mesurables. Sans objectifs précis, il devient impossible d'évaluer le succès de vos efforts et d'ajuster votre stratégie. Fixez-vous des objectifs SMART : Spécifiques, Mesurables, Atteignables, Réalistes et Temporellement définis.
 
-La planification détaillée constitue l'étape suivante. Décomposez vos objectifs en actions concrètes, établissez un timeline réaliste et identifiez les ressources nécessaires. Une bonne planification prévient 80% des problèmes potentiels.
+La planification détaillée constitue l'étape suivante cruciale pour le succès. Décomposez vos objectifs en actions concrètes, établissez un timeline réaliste et identifiez les ressources nécessaires. Une bonne planification prévient 80% des problèmes potentiels et facilite grandement l'exécution.
 
-L'exécution méthodique de votre plan nécessite discipline et persévérance. Concentrez-vous sur une tâche à la fois, documentez votre progression et restez flexible face aux imprévus. La régularité dans l'effort prime sur l'intensité ponctuelle.
+L'exécution méthodique de votre plan nécessite discipline, persévérance et flexibilité. Concentrez-vous sur une tâche à la fois, documentez votre progression régulièrement et restez flexible face aux imprévus. La régularité dans l'effort prime toujours sur l'intensité ponctuelle.
 
-Le suivi et l'ajustement continus garantissent l'amélioration constante. Mesurez régulièrement vos résultats, identifiez les écarts par rapport aux objectifs et ajustez votre approche si nécessaire. Cette boucle d'amélioration continue est la clé du succès à long terme.
-
-Les études de cas présentées illustrent comment d'autres ont réussi à appliquer ces principes. Analysez leurs stratégies, adaptez leurs bonnes pratiques à votre contexte et évitez leurs erreurs pour accélérer votre progression.`,
-        wordCount: 267,
+Le suivi et l'ajustement continus garantissent l'amélioration constante et l'optimisation des résultats. Mesurez régulièrement vos performances, identifiez les écarts par rapport aux objectifs et ajustez votre approche si nécessaire. Cette boucle d'amélioration continue est la clé du succès à long terme.`,
+        wordCount: 254,
         keywords: [keyword, 'pratique', 'application', 'mise en oeuvre', 'résultats']
       },
       {
         level: 2,
         title: `Optimisation et Amélioration Continue`,
-        content: `L'optimisation de ${keyword.toLowerCase()} est un processus continu qui nécessite vigilance et adaptation constante. Cette section explore les stratégies d'amélioration continue et d'optimisation des performances.
+        content: `L'optimisation est un processus continu qui nécessite vigilance, analyse et adaptation constante. Cette section explore les stratégies d'amélioration continue et d'optimisation des performances pour maintenir votre avantage concurrentiel.
 
-L'audit régulier de vos pratiques permet d'identifier les points d'amélioration. Analysez objectivement vos méthodes actuelles, comparez-les aux meilleures pratiques du secteur et identifiez les écarts de performance. Cet exercice révèle souvent des opportunités d'optimisation insoupçonnées.
+L'audit régulier de vos pratiques permet d'identifier les points d'amélioration et les opportunités d'optimisation. Analysez objectivement vos méthodes actuelles, comparez-les aux meilleures pratiques du secteur et identifiez les écarts de performance. Cet exercice révèle souvent des opportunités d'optimisation insoupçonnées.
 
-L'automatisation des tâches répétitives libère du temps pour les activités à plus forte valeur ajoutée. Identifiez les processus automatisables, investissez dans les bons outils et formez-vous à leur utilisation. L'automatisation améliore la productivité et réduit les erreurs.
+L'automatisation des tâches répétitives libère du temps pour les activités à plus forte valeur ajoutée. Identifiez les processus automatisables, investissez dans les bons outils et formez-vous à leur utilisation efficace. L'automatisation améliore la productivité et réduit considérablement les erreurs humaines.
 
-La formation continue maintient vos compétences à jour. ${keyword} évolue constamment, et rester informé des dernières tendances, techniques et outils est crucial pour maintenir votre avantage concurrentiel. Participez à des formations, lisez les publications spécialisées et échangez avec d'autres experts.
+La formation continue maintient vos compétences à jour et vous permet de rester compétitif. Le domaine évolue constamment, et rester informé des dernières tendances, techniques et outils est crucial pour maintenir votre avantage. Participez à des formations, lisez les publications spécialisées et échangez avec d'autres experts.
 
-L'innovation incrémentale produit des améliorations significatives sur le long terme. Plutôt que d'attendre la révolution, implémentez régulièrement de petites améliorations. Ces optimisations graduelles s'accumulent pour créer un avantage substantiel.
-
-La mesure de l'impact guide vos efforts d'optimisation. Définissez des KPIs pertinents, suivez-les régulièrement et analysez les tendances. Cette approche data-driven assure que vos efforts d'optimisation produisent des résultats tangibles.`,
-        wordCount: 254,
+L'innovation incrémentale produit des améliorations significatives sur le long terme. Plutôt que d'attendre la révolution, implémentez régulièrement de petites améliorations. Ces optimisations graduelles s'accumulent pour créer un avantage substantiel et durable dans votre domaine d'expertise.`,
+        wordCount: 248,
         keywords: [keyword, 'optimisation', 'amélioration', 'performance', 'efficacité']
       },
       {
         level: 2,
         title: `Éviter les Erreurs Communes et Pièges`,
-        content: `Apprendre des erreurs des autres permet d'éviter des écueils coûteux. Cette section identifie les erreurs les plus fréquentes en matière de ${keyword.toLowerCase()} et explique comment les éviter.
+        content: `Apprendre des erreurs des autres permet d'éviter des écueils coûteux et de progresser plus rapidement. Cette section identifie les erreurs les plus fréquentes et explique comment les éviter efficacement.
 
-La précipitation représente l'erreur la plus commune. Vouloir obtenir des résultats rapidement pousse à brûler les étapes, négliger les fondamentaux et prendre des raccourcis dangereux. La patience et la méthodologie sont vos meilleurs alliés pour un succès durable.
+La précipitation représente l'erreur la plus commune et la plus coûteuse. Vouloir obtenir des résultats rapidement pousse à brûler les étapes, négliger les fondamentaux et prendre des raccourcis dangereux. La patience et la méthodologie sont vos meilleurs alliés pour un succès durable et solide.
 
-Le manque de planification génère chaos et inefficacité. Sans roadmap claire, vous risquez de vous disperser, gaspiller vos ressources et perdre de vue vos objectifs. Investissez du temps dans la planification pour économiser des efforts par la suite.
+Le manque de planification génère chaos, inefficacité et gaspillage de ressources. Sans roadmap claire et structurée, vous risquez de vous disperser, gaspiller vos ressources précieuses et perdre de vue vos objectifs principaux. Investissez du temps dans la planification pour économiser des efforts considérables par la suite.
 
-L'absence de suivi empêche l'amélioration. Sans mesure de vos résultats, impossible d'identifier ce qui fonctionne et ce qui doit être ajusté. Mettez en place des systèmes de suivi dès le début de votre démarche.
+L'absence de suivi empêche l'amélioration et la correction de trajectoire. Sans mesure régulière de vos résultats, impossible d'identifier ce qui fonctionne et ce qui doit être ajusté. Mettez en place des systèmes de suivi et d'évaluation dès le début de votre démarche.
 
-La résistance au changement limite votre potentiel d'amélioration. ${keyword} évolue constamment, et s'accrocher à des méthodes obsolètes vous désavantage. Cultivez une mentalité d'apprentissage continu et d'adaptation.
-
-L'isolement professionnel prive de précieux conseils et retours d'expérience. Rejoignez des communautés, participez à des événements et construisez un réseau de pairs. L'échange avec d'autres praticiens enrichit votre perspective et accélère votre progression.`,
-        wordCount: 243,
+La résistance au changement limite votre potentiel d'amélioration et d'adaptation. Le domaine évolue constamment, et s'accrocher à des méthodes obsolètes vous désavantage face à la concurrence. Cultivez une mentalité d'apprentissage continu et d'adaptation aux nouvelles réalités du marché.`,
+        wordCount: 237,
         keywords: [keyword, 'erreurs', 'pièges', 'éviter', 'conseils']
       },
       {
         level: 2,
         title: `Outils et Ressources Recommandées`,
-        content: `Disposer des bons outils facilite grandement la maîtrise de ${keyword.toLowerCase()}. Cette section présente une sélection d'outils, ressources et références indispensables pour votre progression.
+        content: `Disposer des bons outils facilite grandement la réussite et l'efficacité. Cette section présente une sélection d'outils, ressources et références indispensables pour votre progression et votre succès.
 
-Les outils de base constituent le minimum requis pour débuter efficacement. Ces solutions abordables et accessibles permettent de poser des fondations solides sans investissement initial important. Maîtrisez d'abord ces outils essentiels avant d'explorer des solutions plus sophistiquées.
+Les outils de base constituent le minimum requis pour débuter efficacement dans ce domaine. Ces solutions abordables et accessibles permettent de poser des fondations solides sans investissement initial important. Maîtrisez d'abord ces outils essentiels avant d'explorer des solutions plus sophistiquées et coûteuses.
 
-Les outils avancés offrent des fonctionnalités supplémentaires pour les utilisateurs expérimentés. Ces solutions plus complexes nécessitent un apprentissage initial mais démultiplient votre efficacité une fois maîtrisées. Évaluez le rapport coût/bénéfice avant d'investir.
+Les outils avancés offrent des fonctionnalités supplémentaires pour les utilisateurs expérimentés et exigeants. Ces solutions plus complexes nécessitent un apprentissage initial mais démultiplient votre efficacité une fois maîtrisées. Évaluez soigneusement le rapport coût/bénéfice avant d'investir dans ces technologies.
 
-Les ressources éducatives accélèrent votre montée en compétences. Livres de référence, formations en ligne, webinaires et tutoriels constituent autant d'opportunités d'apprentissage. Diversifiez vos sources pour obtenir une perspective complète.
+Les ressources éducatives accélèrent votre montée en compétences et votre expertise. Livres de référence, formations en ligne, webinaires et tutoriels constituent autant d'opportunités d'apprentissage à saisir. Diversifiez vos sources pour obtenir une perspective complète et équilibrée du sujet.
 
-Les communautés et forums fournissent support et inspiration. Rejoindre des groupes de praticiens permet d'échanger expériences, poser des questions et rester informé des dernières évolutions. Ces interactions enrichissent votre pratique et élargissent votre réseau.
-
-La veille technologique maintient votre avantage concurrentiel. Suivez les blogs spécialisés, abonnez-vous aux newsletters sectorielles et participez aux événements de votre domaine. Cette veille continue vous permet d'anticiper les évolutions et d'adapter votre stratégie.`,
-        wordCount: 261,
+Les communautés et forums fournissent support, inspiration et opportunités de networking. Rejoindre des groupes de praticiens permet d'échanger expériences, poser des questions et rester informé des dernières évolutions. Ces interactions enrichissent votre pratique et élargissent votre réseau professionnel.`,
+        wordCount: 243,
         keywords: [keyword, 'outils', 'ressources', 'formation', 'communauté']
       }
     ];
 
     // Conclusion détaillée
     const conclusion = {
-      content: `Maîtriser ${keyword.toLowerCase()} représente un investissement rentable pour votre développement personnel et professionnel. Les techniques, stratégies et bonnes pratiques présentées dans ce guide constituent un socle solide pour votre progression.
+      content: `${keyword} représente bien plus qu'une simple question - c'est une réflexion profonde qui mérite attention et expertise. À travers ce guide complet, nous avons exploré tous les aspects essentiels pour vous permettre de développer une compréhension approfondie et une maîtrise pratique.
 
-Le chemin vers l'excellence demande patience, persévérance et pratique régulière. Ne vous découragez pas face aux premiers obstacles, ils font partie intégrante du processus d'apprentissage. Chaque expert a été débutant un jour.
+Le chemin vers l'excellence demande patience, persévérance et pratique régulière. Ne vous découragez pas face aux premiers obstacles, ils font partie intégrante du processus d'apprentissage et de développement. Chaque expert a été débutant un jour et a surmonté les mêmes défis que vous rencontrez aujourd'hui.
 
-L'application méthodique des conseils de ce guide vous permettra d'obtenir des résultats tangibles rapidement. Commencez par les fondamentaux, progressez graduellement vers les techniques avancées et n'hésitez pas à expérimenter pour trouver votre propre style.
+L'application méthodique des conseils et stratégies présentés dans ce guide vous permettra d'obtenir des résultats tangibles et durables. Commencez par les fondamentaux, progressez graduellement vers les techniques avancées et n'hésitez pas à expérimenter pour trouver votre propre style et approche.
 
-Rappelez-vous que ${keyword.toLowerCase()} est un domaine en constante évolution. Maintenez votre curiosité, continuez à apprendre et adaptez-vous aux changements. Cette mentalité d'amélioration continue vous garantira un succès durable.
-
-Nous espérons que ce guide vous accompagnera efficacement dans votre parcours d'apprentissage. N'hésitez pas à y revenir régulièrement pour consolider vos connaissances et découvrir de nouveaux aspects au fur et à mesure de votre progression.`,
-      wordCount: 197,
-      keywords: [keyword, 'maîtrise', 'succès', 'progression']
+Rappelez-vous que ce domaine est en constante évolution et transformation. Maintenez votre curiosité, continuez à apprendre et adaptez-vous aux changements avec agilité. Cette mentalité d'amélioration continue vous garantira un succès durable et une expertise reconnue dans votre domaine.`,
+      wordCount: 189,
+      keywords: [keyword, 'expertise', 'succès', 'maîtrise']
     };
 
-    // FAQ spécialisée
+    // FAQ spécialisée et pertinente
     const faq: ArticleFAQ[] = [
       {
-        question: `Combien de temps faut-il pour maîtriser ${keyword.toLowerCase()} ?`,
-        answer: `Le temps nécessaire varie selon votre niveau initial et vos objectifs. En moyenne, comptez 3-6 mois pour acquérir les bases solides et 1-2 ans pour développer une expertise avancée. La pratique régulière accélère significativement l'apprentissage.`,
-        keywords: [keyword, 'apprentissage', 'temps', 'maîtrise']
+        question: `Comment bien aborder la question : ${keyword} ?`,
+        answer: `Pour bien aborder cette question, commencez par une auto-évaluation honnête de votre situation actuelle. Identifiez vos forces, vos points d'amélioration et vos objectifs spécifiques. Cette approche structurée vous permettra de développer une stratégie personnalisée et efficace.`,
+        keywords: [keyword, 'approche', 'stratégie', 'évaluation']
       },
       {
-        question: `Quelles sont les erreurs les plus fréquentes avec ${keyword.toLowerCase()} ?`,
-        answer: `Les erreurs principales incluent : manque de planification, précipitation dans l'exécution, négligence du suivi des résultats, résistance aux changements et isolement professionnel. Éviter ces pièges améliore considérablement vos chances de succès.`,
+        question: `Quelles sont les erreurs courantes à éviter ?`,
+        answer: `Les erreurs principales incluent : manque de planification, précipitation dans l'exécution, négligence du suivi des résultats et résistance aux changements nécessaires. Éviter ces pièges améliore considérablement vos chances de succès et d'épanouissement.`,
         keywords: [keyword, 'erreurs', 'pièges', 'éviter']
       },
       {
-        question: `${keyword} nécessite-t-il des outils spécialisés ?`,
-        answer: `Des outils de base suffisent pour débuter, mais des solutions spécialisées améliorent l'efficacité et la qualité des résultats. Commencez simple, puis investissez graduellement dans des outils plus avancés selon vos besoins et votre budget.`,
-        keywords: [keyword, 'outils', 'équipement', 'investissement']
+        question: `Combien de temps faut-il pour voir des résultats ?`,
+        answer: `Le temps nécessaire varie selon votre situation de départ et vos objectifs. En moyenne, les premiers résultats apparaissent après 3-6 semaines d'application méthodique, tandis que des changements significatifs demandent généralement 3-6 mois d'efforts soutenus.`,
+        keywords: [keyword, 'temps', 'résultats', 'progression']
       },
       {
-        question: `Comment mesurer ses progrès en ${keyword.toLowerCase()} ?`,
-        answer: `Définissez des KPIs clairs et mesurables dès le début. Suivez régulièrement vos métriques, documentez vos résultats et comparez votre évolution dans le temps. Cette approche data-driven guide vos efforts d'amélioration.`,
-        keywords: [keyword, 'mesure', 'progrès', 'KPIs']
+        question: `Quels outils recommandez-vous pour débuter ?`,
+        answer: `Pour débuter efficacement, concentrez-vous sur les outils de base : un système de planification, des méthodes de suivi simples et des ressources éducatives de qualité. Ces fondamentaux suffisent largement avant d'investir dans des solutions plus sophistiquées.`,
+        keywords: [keyword, 'outils', 'débutant', 'ressources']
       },
       {
-        question: `Où trouver de l'aide pour ${keyword.toLowerCase()} ?`,
-        answer: `Rejoignez des communautés en ligne, participez à des forums spécialisés, suivez des formations et consultez les ressources documentaires. L'échange avec d'autres praticiens accélère votre apprentissage et résout vos difficultés.`,
-        keywords: [keyword, 'aide', 'support', 'communauté']
+        question: `Comment maintenir sa motivation sur le long terme ?`,
+        answer: `La motivation se maintient grâce à des objectifs clairs, des résultats mesurables et un système de récompenses personnelles. Célébrez vos progrès, même petits, entourez-vous de personnes positives et rappelez-vous régulièrement pourquoi vous avez commencé ce parcours.`,
+        keywords: [keyword, 'motivation', 'objectifs', 'persévérance']
       }
     ];
 
@@ -281,7 +274,7 @@ Nous espérons que ce guide vous accompagnera efficacement dans votre parcours d
       slug,
       category,
       tags,
-      h1Title: `${keyword} : Guide Complet et Pratique 2024`,
+      h1Title: keyword,
       introduction,
       sections,
       conclusion,
@@ -294,7 +287,7 @@ Nous espérons que ce guide vous accompagnera efficacement dans votre parcours d
 
   const generateComprehensiveArticle = async () => {
     if (!mainKeyword) {
-      toast.error("Veuillez d'abord générer des mots-clés");
+      toast.error("Veuillez d'abord entrer un mot-clé");
       return;
     }
 
