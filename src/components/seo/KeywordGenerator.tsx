@@ -213,8 +213,8 @@ const KeywordGenerator = () => {
         suggestedTitle: generateDynamicTitle(kw.keyword, 'standard'),
         suggestedDescription: generateDynamicDescription(kw.keyword, 'standard'),
         trend: generateTrendData(kw.keyword)[0] || 0,
-        intent: 'informational' as 'informational',
-        type: 'standard' as 'standard'
+        intent: 'informational' as const,
+        type: 'standard' as const
       }));
       
       // Générer les mots-clés longue traîne avec titres/descriptions personnalisés
@@ -223,8 +223,8 @@ const KeywordGenerator = () => {
         suggestedTitle: generateDynamicTitle(kw.keyword, 'long-tail'),
         suggestedDescription: generateDynamicDescription(kw.keyword, 'long-tail'),
         trend: generateTrendData(kw.keyword)[0] || 0,
-        intent: 'informational' as 'informational',
-        type: 'long-tail' as 'long-tail'
+        intent: 'informational' as const,
+        type: 'long-tail' as const
       }));
       
       // Si on a une clé OpenAI valide, enrichir avec l'IA
@@ -240,8 +240,8 @@ const KeywordGenerator = () => {
               volume: Math.floor(Math.random() * 2000) + 100,
               difficulty: Math.floor(Math.random() * 80) + 10,
               cpc: parseFloat((Math.random() * 3).toFixed(2)),
-              type: 'ai-generated' as 'ai-generated',
-              intent: 'informational' as 'informational',
+              type: 'ai-generated' as const,
+              intent: 'informational' as const,
               opportunity: Math.floor(Math.random() * 40) + 50,
               trend: generateTrendData(kw)[0] || 0,
               suggestedTitle: generateDynamicTitle(kw, 'ai-generated'),
@@ -286,8 +286,8 @@ const KeywordGenerator = () => {
         volume: Math.floor(Math.random() * 500) + 10,
         difficulty: Math.floor(Math.random() * 40) + 5,
         cpc: parseFloat((Math.random() * 0.8).toFixed(2)),
-        type: 'question' as 'question',
-        intent: 'informational' as 'informational',
+        type: 'question' as const,
+        intent: 'informational' as const,
         opportunity: Math.floor(Math.random() * 30) + 60,
         trend: generateTrendData(q)[0] || 0,
         suggestedTitle: generateDynamicTitle(q, 'question'),
@@ -301,37 +301,36 @@ const KeywordGenerator = () => {
         { 
           name: "Booking.com", 
           url: "https://www.booking.com", 
+          domain: "booking.com",
+          title: "Réservation d'hôtels",
+          description: "Plateforme de réservation",
+          ranking: 1,
+          traffic: 850000,
           strength: 95, 
           organic_traffic: 850000, 
-          keywords: 45000 
+          keywords: 45000,
+          topKeywords: ["hotel", "booking", "reservation"],
+          gaps: ["aquarium", "poissons"],
+          backlinks: 1200000,
+          domainAuthority: 95,
+          contentGaps: ["guide aquarium"]
         },
         { 
           name: "TripAdvisor", 
           url: "https://www.tripadvisor.fr", 
+          domain: "tripadvisor.fr",
+          title: "Avis et conseils voyage",
+          description: "Plateforme d'avis",
+          ranking: 2,
+          traffic: 650000,
           strength: 88, 
           organic_traffic: 650000, 
-          keywords: 35000 
-        },
-        { 
-          name: "Airbnb", 
-          url: "https://www.airbnb.fr", 
-          strength: 82, 
-          organic_traffic: 420000, 
-          keywords: 28000 
-        },
-        { 
-          name: "Office de Tourisme de Quimper", 
-          url: "https://www.quimper-tourisme.bzh", 
-          strength: 65, 
-          organic_traffic: 45000, 
-          keywords: 2800 
-        },
-        { 
-          name: "Hotels.com", 
-          url: "https://fr.hotels.com", 
-          strength: 78, 
-          organic_traffic: 320000, 
-          keywords: 22000 
+          keywords: 35000,
+          topKeywords: ["avis", "voyage", "hotel"],
+          gaps: ["aquariophilie", "maintenance"],
+          backlinks: 800000,
+          domainAuthority: 88,
+          contentGaps: ["types aquarium"]
         }
       ];
       
@@ -438,7 +437,7 @@ const KeywordGenerator = () => {
   const totalKeywords = standardKeywords.length + longTailKeywords.length + questionKeywords.length;
   
   // Vérifier si des données de concurrents sont disponibles
-  const hasCompetitorData = competitors.length > 0;
+  const hasCompetitors = competitors.length > 0;
   
   return (
     <div className="space-y-6">
@@ -626,13 +625,31 @@ const KeywordGenerator = () => {
       {/* Résultats */}
       {hasGenerated && !isLoading && (
         <>
+          {/* GÉNÉRATEUR D'ARTICLE COMPLET - BIEN VISIBLE */}
+          <Card className="p-6 border-2 border-emerald-500 bg-gradient-to-r from-emerald-50 to-blue-50">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-emerald-500 rounded-lg">
+                <FileText className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-emerald-800">Générateur d'Article Complet</h2>
+                <p className="text-emerald-600">Créez un article de 1500+ mots optimisé SEO</p>
+              </div>
+            </div>
+            
+            <ComprehensiveArticleGenerator 
+              keywords={[...standardKeywords, ...longTailKeywords, ...questionKeywords]}
+              mainKeyword={keyword}
+            />
+          </Card>
+
           <KeywordResults 
             standardKeywords={standardKeywords}
             longTailKeywords={longTailKeywords}
             selectedKeywords={selectedKeywords}
             competitors={competitors}
             serpResults={serpResults}
-            hasCompetitorData={hasCompetitorData}
+            hasCompetitorData={hasCompetitors}
             totalKeywords={totalKeywords}
             activeTab={activeTab}
             setActiveTab={setActiveTab}
@@ -640,12 +657,6 @@ const KeywordGenerator = () => {
             clearSelectedKeywords={clearSelectedKeywords}
             exportSelectedKeywords={exportSelectedKeywords}
             keyword={keyword}
-          />
-          
-          {/* Générateur d'article complet - Section principale */}
-          <ComprehensiveArticleGenerator 
-            keywords={[...standardKeywords, ...longTailKeywords, ...questionKeywords]}
-            mainKeyword={keyword}
           />
           
           <Tabs defaultValue="opportunities" className="mt-6">

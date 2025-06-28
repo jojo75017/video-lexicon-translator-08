@@ -6,7 +6,7 @@ export interface KeywordSuggestion {
   cpc: number;
   competition?: number;
   trend?: number;
-  intent?: 'informational' | 'commercial' | 'transactional' | 'navigational';
+  intent?: 'informational' | 'commercial' | 'transactional' | 'navigational' | 'mixed';
   type?: 'primary' | 'secondary' | 'long-tail' | 'semantic' | 'related' | 'question' | 'ai-generated' | 'standard' | 'competitor';
   opportunity?: number;
   searchVolume?: number;
