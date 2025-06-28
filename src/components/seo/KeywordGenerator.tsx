@@ -40,6 +40,7 @@ import KeywordOpportunities from './keyword/KeywordOpportunities';
 import KeywordFAQ from './keyword/KeywordFAQ';
 import SiteStructureAnalyzer from './keyword/SiteStructureAnalyzer';
 import { OpenAIService } from '@/utils/seo/openaiService';
+import ComprehensiveArticleGenerator from './keyword/ComprehensiveArticleGenerator';
 
 // Fonction pour générer des titres variés et personnalisés
 const generateDynamicTitle = (keyword: string, type: 'standard' | 'long-tail' | 'question' | 'semantic' | 'ai-generated'): string => {
@@ -637,8 +638,12 @@ const KeywordGenerator = () => {
             keyword={keyword}
           />
           
-          <Tabs defaultValue="opportunities" className="mt-6">
+          <Tabs defaultValue="article" className="mt-6">
             <TabsList className="mb-4">
+              <TabsTrigger value="article" className="flex items-center gap-1.5">
+                <FileText className="h-4 w-4" />
+                Article Complet
+              </TabsTrigger>
               <TabsTrigger value="opportunities" className="flex items-center gap-1.5">
                 <Sparkles className="h-4 w-4" />
                 Opportunités
@@ -652,6 +657,13 @@ const KeywordGenerator = () => {
                 FAQ
               </TabsTrigger>
             </TabsList>
+            
+            <TabsContent value="article">
+              <ComprehensiveArticleGenerator 
+                keywords={[...standardKeywords, ...longTailKeywords, ...questionKeywords]}
+                mainKeyword={keyword}
+              />
+            </TabsContent>
             
             <TabsContent value="opportunities">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

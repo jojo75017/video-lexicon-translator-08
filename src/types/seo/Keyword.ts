@@ -7,7 +7,7 @@ export interface KeywordSuggestion {
   competition?: number;
   trend?: number;
   intent?: 'informational' | 'commercial' | 'transactional' | 'navigational';
-  type?: 'primary' | 'secondary' | 'long-tail' | 'semantic' | 'related' | 'question' | 'ai-generated';
+  type?: 'primary' | 'secondary' | 'long-tail' | 'semantic' | 'related' | 'question' | 'ai-generated' | 'standard' | 'competitor';
   opportunity?: number;
   searchVolume?: number;
   relevance?: number;
@@ -75,6 +75,10 @@ export interface ContentGap {
   difficulty: number;
   currentRanking: number;
   opportunity: number;
+  priority?: string;
+  searchVolume?: number;
+  competitorRanking?: number;
+  contentSuggestion?: string;
   content: {
     title: string;
     description: string;
@@ -128,4 +132,35 @@ export interface SerpResult {
   description: string;
   position: number;
   domain: string;
+}
+
+export interface KeywordTrend {
+  data: number[];
+  growth: number;
+  seasonal: boolean;
+}
+
+export interface KeywordData {
+  keyword: string;
+  volume: number;
+  difficulty: number;
+  cpc?: number;
+  competition?: number;
+  intent?: 'informational' | 'commercial' | 'transactional' | 'navigational';
+  trends?: number[];
+}
+
+export interface RoiParameters {
+  seoInvestment: number;
+  acquisitionCost: number;
+  conversionRate: number;
+  averageOrderValue: number;
+  organicTraffic: number;
+  timeFrame: number;
+  targetKeywords: string[];
+  averagePosition: number;
+  clickThroughRate: number;
+  contentCost: number;
+  technicalCost: number;
+  linkBuildingCost: number;
 }
