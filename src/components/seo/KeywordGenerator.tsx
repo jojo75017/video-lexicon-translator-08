@@ -443,6 +443,36 @@ const KeywordGenerator = () => {
   
   return (
     <div className="space-y-6">
+      {/* GÉNÉRATEUR D'ARTICLE COMPLET - VISIBLE DÈS LE DÉBUT */}
+      <Card className="p-8 border-4 border-emerald-600 bg-gradient-to-br from-emerald-50 via-white to-blue-50 shadow-2xl">
+        <div className="text-center mb-8">
+          <div className="flex justify-center mb-4">
+            <div className="p-4 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-2xl shadow-lg">
+              <FileText className="h-12 w-12 text-white" />
+            </div>
+          </div>
+          <h1 className="text-4xl font-bold text-emerald-800 mb-4">
+            🚀 Générateur d'Article Complet Ultra-Avancé
+          </h1>
+          <p className="text-xl text-emerald-700 max-w-3xl mx-auto">
+            Créez instantanément un article de 1500+ mots avec structure H1/H2/H3, 
+            paragraphes détaillés, FAQ optimisée et méta-données SEO parfaites !
+          </p>
+          {keyword && (
+            <div className="mt-4">
+              <Badge className="bg-emerald-100 text-emerald-800 text-lg px-4 py-2">
+                Mot-clé principal : <strong>{keyword}</strong>
+              </Badge>
+            </div>
+          )}
+        </div>
+        
+        <ComprehensiveArticleGenerator 
+          keywords={[...standardKeywords, ...longTailKeywords, ...questionKeywords]}
+          mainKeyword={keyword || 'votre sujet'}
+        />
+      </Card>
+
       {/* Configuration de l'API OpenAI */}
       <Card className="p-6 border-t-4 border-t-purple-500">
         <div className="flex items-center gap-2 mb-4">
@@ -627,26 +657,6 @@ const KeywordGenerator = () => {
       {/* Résultats */}
       {hasGenerated && !isLoading && (
         <>
-          {/* GÉNÉRATEUR D'ARTICLE COMPLET - BIEN VISIBLE */}
-          <Card className="p-8 border-2 border-emerald-500 bg-gradient-to-r from-emerald-50 to-blue-50 shadow-lg">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="p-3 bg-emerald-500 rounded-xl shadow-md">
-                <FileText className="h-8 w-8 text-white" />
-              </div>
-              <div>
-                <h2 className="text-3xl font-bold text-emerald-800 mb-2">🚀 Générateur d'Article Complet</h2>
-                <p className="text-lg text-emerald-700">Créez un article de 1500+ mots optimisé SEO pour "<strong>{keyword}</strong>"</p>
-              </div>
-            </div>
-            
-            <div className="bg-white p-6 rounded-lg border border-emerald-200 shadow-sm">
-              <ComprehensiveArticleGenerator 
-                keywords={[...standardKeywords, ...longTailKeywords, ...questionKeywords]}
-                mainKeyword={keyword}
-              />
-            </div>
-          </Card>
-
           <KeywordResults 
             standardKeywords={standardKeywords}
             longTailKeywords={longTailKeywords}

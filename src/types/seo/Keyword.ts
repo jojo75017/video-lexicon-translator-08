@@ -138,6 +138,7 @@ export interface SerpResult {
   loadTime?: number;
   descriptionLength?: number;
   hasStructuredData?: boolean;
+  mobileOptimized?: boolean;
 }
 
 export interface KeywordTrend {
