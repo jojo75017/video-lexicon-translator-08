@@ -308,6 +308,7 @@ const KeywordGenerator = () => {
           traffic: 850000,
           strength: 95, 
           organic_traffic: 850000, 
+          estimatedTraffic: 850000,
           keywords: 45000,
           topKeywords: ["hotel", "booking", "reservation"],
           gaps: ["aquarium", "poissons"],
@@ -325,6 +326,7 @@ const KeywordGenerator = () => {
           traffic: 650000,
           strength: 88, 
           organic_traffic: 650000, 
+          estimatedTraffic: 650000,
           keywords: 35000,
           topKeywords: ["avis", "voyage", "hotel"],
           gaps: ["aquariophilie", "maintenance"],
@@ -626,21 +628,23 @@ const KeywordGenerator = () => {
       {hasGenerated && !isLoading && (
         <>
           {/* GÉNÉRATEUR D'ARTICLE COMPLET - BIEN VISIBLE */}
-          <Card className="p-6 border-2 border-emerald-500 bg-gradient-to-r from-emerald-50 to-blue-50">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-emerald-500 rounded-lg">
-                <FileText className="h-6 w-6 text-white" />
+          <Card className="p-8 border-2 border-emerald-500 bg-gradient-to-r from-emerald-50 to-blue-50 shadow-lg">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="p-3 bg-emerald-500 rounded-xl shadow-md">
+                <FileText className="h-8 w-8 text-white" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-emerald-800">Générateur d'Article Complet</h2>
-                <p className="text-emerald-600">Créez un article de 1500+ mots optimisé SEO</p>
+                <h2 className="text-3xl font-bold text-emerald-800 mb-2">🚀 Générateur d'Article Complet</h2>
+                <p className="text-lg text-emerald-700">Créez un article de 1500+ mots optimisé SEO pour "<strong>{keyword}</strong>"</p>
               </div>
             </div>
             
-            <ComprehensiveArticleGenerator 
-              keywords={[...standardKeywords, ...longTailKeywords, ...questionKeywords]}
-              mainKeyword={keyword}
-            />
+            <div className="bg-white p-6 rounded-lg border border-emerald-200 shadow-sm">
+              <ComprehensiveArticleGenerator 
+                keywords={[...standardKeywords, ...longTailKeywords, ...questionKeywords]}
+                mainKeyword={keyword}
+              />
+            </div>
           </Card>
 
           <KeywordResults 
