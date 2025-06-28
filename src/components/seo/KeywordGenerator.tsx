@@ -208,7 +208,7 @@ const KeywordGenerator = () => {
     
     try {
       // Générer les mots-clés standards avec titres/descriptions personnalisés
-      let standards = generateStandardKeywords(keyword).map(kw => ({
+      let standards: KeywordSuggestion[] = generateStandardKeywords(keyword).map(kw => ({
         ...kw,
         suggestedTitle: generateDynamicTitle(kw.keyword, 'standard'),
         suggestedDescription: generateDynamicDescription(kw.keyword, 'standard'),
@@ -218,7 +218,7 @@ const KeywordGenerator = () => {
       }));
       
       // Générer les mots-clés longue traîne avec titres/descriptions personnalisés
-      let longTails = generateLongTailKeywords(keyword).map(kw => ({
+      let longTails: KeywordSuggestion[] = generateLongTailKeywords(keyword).map(kw => ({
         ...kw,
         suggestedTitle: generateDynamicTitle(kw.keyword, 'long-tail'),
         suggestedDescription: generateDynamicDescription(kw.keyword, 'long-tail'),
@@ -235,7 +235,7 @@ const KeywordGenerator = () => {
           
           if (aiKeywords.length > 0) {
             // Enrichir les mots-clés avec les suggestions IA
-            const aiEnrichedKeywords = aiKeywords.map(kw => ({
+            const aiEnrichedKeywords: KeywordSuggestion[] = aiKeywords.map(kw => ({
               keyword: kw,
               volume: Math.floor(Math.random() * 2000) + 100,
               difficulty: Math.floor(Math.random() * 80) + 10,
@@ -281,7 +281,7 @@ const KeywordGenerator = () => {
         return questionTypes.sort(() => 0.5 - Math.random()).slice(0, 5);
       };
 
-      const questions = generateSimpleQuestions(keyword).map(q => ({
+      const questions: KeywordSuggestion[] = generateSimpleQuestions(keyword).map(q => ({
         keyword: q,
         volume: Math.floor(Math.random() * 500) + 10,
         difficulty: Math.floor(Math.random() * 40) + 5,
