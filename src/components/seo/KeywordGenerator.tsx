@@ -212,7 +212,9 @@ const KeywordGenerator = () => {
         ...kw,
         suggestedTitle: generateDynamicTitle(kw.keyword, 'standard'),
         suggestedDescription: generateDynamicDescription(kw.keyword, 'standard'),
-        trend: generateTrendData(kw.keyword)[0] || 0
+        trend: generateTrendData(kw.keyword)[0] || 0,
+        intent: 'informational' as 'informational',
+        type: 'standard' as 'standard'
       }));
       
       // Générer les mots-clés longue traîne avec titres/descriptions personnalisés
@@ -220,7 +222,9 @@ const KeywordGenerator = () => {
         ...kw,
         suggestedTitle: generateDynamicTitle(kw.keyword, 'long-tail'),
         suggestedDescription: generateDynamicDescription(kw.keyword, 'long-tail'),
-        trend: generateTrendData(kw.keyword)[0] || 0
+        trend: generateTrendData(kw.keyword)[0] || 0,
+        intent: 'informational' as 'informational',
+        type: 'long-tail' as 'long-tail'
       }));
       
       // Si on a une clé OpenAI valide, enrichir avec l'IA

@@ -136,6 +136,8 @@ export interface SerpResult {
   estimatedTraffic?: number;
   titleLength?: number;
   loadTime?: number;
+  descriptionLength?: number;
+  hasStructuredData?: boolean;
 }
 
 export interface KeywordTrend {
