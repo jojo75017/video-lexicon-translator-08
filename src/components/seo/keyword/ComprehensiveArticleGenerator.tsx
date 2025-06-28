@@ -110,10 +110,7 @@ const ComprehensiveArticleGenerator: React.FC<ComprehensiveArticleGeneratorProps
     
     if (lowerKeyword.includes('aquariophile') || lowerKeyword.includes('aquarium')) {
       category = 'Aquariophilie';
-      tags = ['aquariophilie', 'aquarium', 'poissons'];
-    } else if (lowerKeyword.includes('pierre') && lowerKeyword.includes('seiryu')) {
-      category = 'Aquariophilie';
-      tags = ['hardscape', 'decoration-aquarium', 'pierres-aquarium'];
+      tags = ['aquariophilie', 'passion-aquarium', 'profil-aquariophile'];
     } else if (lowerKeyword.includes('seo') || lowerKeyword.includes('référencement')) {
       category = 'Marketing Digital';
       tags = ['seo', 'referencement-naturel', 'optimisation-web'];
@@ -121,146 +118,160 @@ const ComprehensiveArticleGenerator: React.FC<ComprehensiveArticleGeneratorProps
 
     // Introduction détaillée et personnalisée
     const introduction = {
-      content: `${keyword} - une question qui mérite une réponse approfondie et personnalisée. Dans ce guide complet, nous explorerons tous les aspects de cette thématique pour vous aider à mieux comprendre et maîtriser le sujet.
+      content: `${keyword} - Cette question révèle bien plus qu'une simple curiosité sur l'aquariophilie. Elle dévoile votre personnalité, vos motivations profondes et votre approche unique de cet art fascinant qu'est l'aquariophilie.
 
-Que vous soyez novice ou expert, ce guide vous apportera des réponses concrètes, des conseils pratiques et des stratégies éprouvées. Nous aborderons les différents aspects, les bonnes pratiques et les erreurs à éviter pour vous permettre d'atteindre vos objectifs.
+L'aquariophilie ne se résume pas à maintenir des poissons dans un bocal. C'est un univers complexe qui demande patience, connaissances techniques et passion authentique. Chaque aquariophile développe sa propre philosophie, ses préférences et son style unique.
 
-À travers une approche structurée et détaillée, vous découvrirez non seulement les bases essentielles mais aussi les techniques avancées qui font la différence. Préparez-vous à enrichir vos connaissances et à développer une expertise solide dans ce domaine.`,
+Dans ce guide complet, nous explorerons les différents profils d'aquariophiles, leurs caractéristiques distinctives et leurs approches variées. Vous découvrirez non seulement quel type d'aquariophile vous êtes, mais aussi comment développer vos compétences et approfondir votre passion pour cet art aquatique extraordinaire.
+
+Que vous soyez débutant ou expert confirmé, cette analyse vous permettra de mieux comprendre votre relation avec l'aquariophilie et d'identifier les axes d'amélioration pour enrichir votre expérience et celle de vos pensionnaires aquatiques.`,
       wordCount: 142,
-      keywords: [keyword, 'guide', 'expert', 'conseils']
+      keywords: [keyword, 'aquariophile', 'aquariophilie', 'passion']
     };
 
     // Sections principales détaillées
     const sections: ArticleSection[] = [
       {
         level: 2,
-        title: `Comprendre les Fondamentaux : ${keyword}`,
-        content: `Pour bien appréhender ${keyword.toLowerCase()}, il est essentiel de commencer par une compréhension solide des bases. Cette section explore en détail tous les concepts fondamentaux que vous devez maîtriser.
+        title: `Les Différents Types d'Aquariophiles : Comprendre Votre Profil`,
+        content: `L'aquariophilie attire des personnalités très diverses, chacune apportant sa propre vision et ses objectifs spécifiques. Identifier votre profil d'aquariophile vous permet de mieux orienter vos choix et d'optimiser votre approche.
 
-Les principes de base reposent sur plusieurs piliers essentiels qu'il convient d'identifier et de comprendre. Premièrement, l'origine et l'évolution historique nous permettent de saisir le contexte. Deuxièmement, les facteurs clés qui influencent les résultats doivent être identifiés. Troisièmement, il faut reconnaître les erreurs communes pour mieux les éviter.
+**L'Aquariophile Débutant Passionné** se caractérise par son enthousiasme débordant et sa soif d'apprendre. Il multiplie les lectures, pose mille questions et parfois se précipite dans ses achats. Son aquarium reflète souvent cette période d'apprentissage : quelques erreurs de parcours, mais une motivation intacte qui compense largement les imperfections techniques.
 
-L'importance de cette thématique dans le contexte actuel ne peut être sous-estimée. Les études récentes montrent que 85% des professionnels considèrent cette compétence comme cruciale pour leur réussite. C'est pourquoi investir du temps dans l'apprentissage des fondamentaux constitue un avantage concurrentiel indéniable.
+**L'Aquariophile Technicien** privilégie l'aspect scientifique et technique. Il maîtrise parfaitement les paramètres de l'eau, investit dans du matériel haut de gamme et tient des registres précis. Ses aquariums sont des modèles de stabilité et d'équilibre, même si l'aspect esthétique peut parfois passer au second plan.
 
-Les différentes approches et méthodologies permettent d'adapter la stratégie à vos besoins spécifiques. Que vous travailliez seul ou en équipe, dans un contexte personnel ou professionnel, il existe des techniques appropriées pour chaque situation et chaque objectif.`,
-        wordCount: 198,
-        keywords: [keyword, 'fondamentaux', 'principes', 'bases']
-      },
-      {
-        level: 2,
-        title: `Techniques Avancées et Meilleures Pratiques`,
-        content: `Une fois les bases maîtrisées, il est temps d'explorer les techniques avancées qui distinguent les experts des débutants. Cette section révèle les stratégies les plus efficaces pour optimiser vos résultats et atteindre l'excellence.
+**L'Aquariophile Artiste** considère l'aquarium comme une œuvre d'art vivante. Il privilégie l'aquascaping, recherche l'harmonie visuelle et crée de véritables paysages aquatiques. Chaque élément est choisi avec soin pour créer une composition équilibrée et esthétiquement remarquable.
 
-La première technique avancée consiste à développer une approche systématique et méthodologique. Au lieu d'improviser, les experts suivent des processus éprouvés qui garantissent la cohérence et la qualité. Cette méthodologie inclut la planification stratégique, l'exécution rigoureuse, le suivi précis et l'optimisation continue.
-
-L'analyse des données joue un rôle crucial dans l'optimisation des performances. En collectant et analysant les bonnes métriques, vous pouvez identifier les points d'amélioration et ajuster votre stratégie en conséquence. Les outils modernes facilitent cette démarche analytique et permettent une prise de décision éclairée.
-
-La personnalisation représente un autre aspect clé des techniques avancées. Adapter votre approche aux spécificités de votre contexte, audience ou objectifs permet d'obtenir des résultats supérieurs. Cette personnalisation requiert une compréhension approfondie des variables en jeu et une capacité d'adaptation constante.
-
-L'innovation et l'expérimentation constituent également des éléments essentiels pour maintenir un avantage concurrentiel. Les experts n'hésitent pas à tester de nouvelles approches, à remettre en question les pratiques établies et à innover pour rester à la pointe de leur domaine.`,
-        wordCount: 267,
-        keywords: [keyword, 'techniques', 'avancées', 'stratégies', 'optimisation']
-      },
-      {
-        level: 2,
-        title: `Mise en Pratique et Application Concrète`,
-        content: `La théorie sans pratique reste stérile. Cette section vous guide dans l'application concrète avec des exemples pratiques, des études de cas réels et des conseils d'implémentation éprouvés.
-
-Le processus d'implémentation commence par la définition d'objectifs clairs, spécifiques et mesurables. Sans objectifs précis, il devient impossible d'évaluer le succès de vos efforts et d'ajuster votre stratégie. Fixez-vous des objectifs SMART : Spécifiques, Mesurables, Atteignables, Réalistes et Temporellement définis.
-
-La planification détaillée constitue l'étape suivante cruciale pour le succès. Décomposez vos objectifs en actions concrètes, établissez un timeline réaliste et identifiez les ressources nécessaires. Une bonne planification prévient 80% des problèmes potentiels et facilite grandement l'exécution.
-
-L'exécution méthodique de votre plan nécessite discipline, persévérance et flexibilité. Concentrez-vous sur une tâche à la fois, documentez votre progression régulièrement et restez flexible face aux imprévus. La régularité dans l'effort prime toujours sur l'intensité ponctuelle.
-
-Le suivi et l'ajustement continus garantissent l'amélioration constante et l'optimisation des résultats. Mesurez régulièrement vos performances, identifiez les écarts par rapport aux objectifs et ajustez votre approche si nécessaire. Cette boucle d'amélioration continue est la clé du succès à long terme.`,
-        wordCount: 254,
-        keywords: [keyword, 'pratique', 'application', 'mise en oeuvre', 'résultats']
-      },
-      {
-        level: 2,
-        title: `Optimisation et Amélioration Continue`,
-        content: `L'optimisation est un processus continu qui nécessite vigilance, analyse et adaptation constante. Cette section explore les stratégies d'amélioration continue et d'optimisation des performances pour maintenir votre avantage concurrentiel.
-
-L'audit régulier de vos pratiques permet d'identifier les points d'amélioration et les opportunités d'optimisation. Analysez objectivement vos méthodes actuelles, comparez-les aux meilleures pratiques du secteur et identifiez les écarts de performance. Cet exercice révèle souvent des opportunités d'optimisation insoupçonnées.
-
-L'automatisation des tâches répétitives libère du temps pour les activités à plus forte valeur ajoutée. Identifiez les processus automatisables, investissez dans les bons outils et formez-vous à leur utilisation efficace. L'automatisation améliore la productivité et réduit considérablement les erreurs humaines.
-
-La formation continue maintient vos compétences à jour et vous permet de rester compétitif. Le domaine évolue constamment, et rester informé des dernières tendances, techniques et outils est crucial pour maintenir votre avantage. Participez à des formations, lisez les publications spécialisées et échangez avec d'autres experts.
-
-L'innovation incrémentale produit des améliorations significatives sur le long terme. Plutôt que d'attendre la révolution, implémentez régulièrement de petites améliorations. Ces optimisations graduelles s'accumulent pour créer un avantage substantiel et durable dans votre domaine d'expertise.`,
+**L'Aquariophile Collectionneur** se passionne pour certaines espèces spécifiques. Qu'il s'agisse de cichlidés, de betta ou de crevettes, il développe une expertise pointue sur ses espèces favorites et cherche constamment à enrichir sa collection avec des variétés rares ou des souches particulières.`,
         wordCount: 248,
-        keywords: [keyword, 'optimisation', 'amélioration', 'performance', 'efficacité']
+        keywords: ['types aquariophiles', 'profil', 'débutant', 'technicien', 'artiste', 'collectionneur']
       },
       {
         level: 2,
-        title: `Éviter les Erreurs Communes et Pièges`,
-        content: `Apprendre des erreurs des autres permet d'éviter des écueils coûteux et de progresser plus rapidement. Cette section identifie les erreurs les plus fréquentes et explique comment les éviter efficacement.
+        title: `Test de Personnalité : Découvrez Votre Style Aquariophile`,
+        content: `Pour mieux cerner votre profil d'aquariophile, analysons vos motivations, vos préférences et vos habitudes. Cette auto-évaluation vous aidera à identifier vos forces et les domaines à développer.
 
-La précipitation représente l'erreur la plus commune et la plus coûteuse. Vouloir obtenir des résultats rapidement pousse à brûler les étapes, négliger les fondamentaux et prendre des raccourcis dangereux. La patience et la méthodologie sont vos meilleurs alliés pour un succès durable et solide.
+**Vos Motivations Principales** révèlent beaucoup sur votre type d'aquariophile. Recherchez-vous la détente et l'apaisement ? Vous êtes probablement un aquariophile contemplatif qui privilégie les bacs communautaires paisibles. Êtes-vous motivé par le défi technique ? Vous tendez vers le profil technicien avec un goût pour les systèmes complexes.
 
-Le manque de planification génère chaos, inefficacité et gaspillage de ressources. Sans roadmap claire et structurée, vous risquez de vous disperser, gaspiller vos ressources précieuses et perdre de vue vos objectifs principaux. Investissez du temps dans la planification pour économiser des efforts considérables par la suite.
+**Votre Approche de l'Achat** en dit long sur votre personnalité. L'achat impulsif caractérise souvent le débutant enthousiaste, tandis que l'achat planifié et recherché révèle un aquariophile expérimenté ou un collectionneur méticuleux.
 
-L'absence de suivi empêche l'amélioration et la correction de trajectoire. Sans mesure régulière de vos résultats, impossible d'identifier ce qui fonctionne et ce qui doit être ajusté. Mettez en place des systèmes de suivi et d'évaluation dès le début de votre démarche.
+**Votre Relation aux Paramètres de l'Eau** constitue un excellent indicateur. Testez-vous quotidiennement avec une précision scientifique ? Vous avez l'âme d'un technicien. Vous fiez-vous plutôt à l'observation visuelle et au comportement des poissons ? Vous développez une approche intuitive basée sur l'expérience.
 
-La résistance au changement limite votre potentiel d'amélioration et d'adaptation. Le domaine évolue constamment, et s'accrocher à des méthodes obsolètes vous désavantage face à la concurrence. Cultivez une mentalité d'apprentissage continu et d'adaptation aux nouvelles réalités du marché.`,
-        wordCount: 237,
-        keywords: [keyword, 'erreurs', 'pièges', 'éviter', 'conseils']
+**Votre Gestion du Temps Aquariophile** révèle vos priorités. Passez-vous des heures à observer vos pensionnaires ? Vous êtes probablement un contemplatif. Consacrez-vous plus de temps à l'entretien technique qu'à l'observation ? Votre profil tend vers le technicien méticuleux.
+
+**Votre Approche de la Décoration** distingue clairement l'artiste du technicien. L'harmonie visuelle prime-t-elle sur la fonctionnalité ? Vous avez l'âme d'un aquascaper. La fonction prime-t-elle sur l'esthétique ? Vous privilégiez l'efficacité technique.`,
+        wordCount: 287,
+        keywords: ['test personnalité', 'style aquariophile', 'motivations', 'habitudes', 'préférences']
       },
       {
         level: 2,
-        title: `Outils et Ressources Recommandées`,
-        content: `Disposer des bons outils facilite grandement la réussite et l'efficacité. Cette section présente une sélection d'outils, ressources et références indispensables pour votre progression et votre succès.
+        title: `L'Évolution de l'Aquariophile : Votre Parcours et Progression`,
+        content: `L'aquariophilie est un voyage en constante évolution. Votre profil d'aujourd'hui n'est pas figé et se transforme au gré de vos expériences, réussites et parfois échecs qui constituent autant d'apprentissages précieux.
 
-Les outils de base constituent le minimum requis pour débuter efficacement dans ce domaine. Ces solutions abordables et accessibles permettent de poser des fondations solides sans investissement initial important. Maîtrisez d'abord ces outils essentiels avant d'explorer des solutions plus sophistiquées et coûteuses.
+**Les Étapes Classiques de Progression** suivent généralement un schéma prévisible. La phase découverte se caractérise par l'émerveillement et quelques erreurs de débutant. Vient ensuite la phase d'approfondissement où vous développez vos connaissances techniques et affinez vos préférences.
 
-Les outils avancés offrent des fonctionnalités supplémentaires pour les utilisateurs expérimentés et exigeants. Ces solutions plus complexes nécessitent un apprentissage initial mais démultiplient votre efficacité une fois maîtrisées. Évaluez soigneusement le rapport coût/bénéfice avant d'investir dans ces technologies.
+**La Spécialisation Progressive** marque une étape importante dans l'évolution de l'aquariophile. Après avoir exploré différents aspects, vous développez naturellement des affinités particulières : biotopes spécifiques, espèces favorites, techniques privilégiées ou styles d'aquascaping préférés.
 
-Les ressources éducatives accélèrent votre montée en compétences et votre expertise. Livres de référence, formations en ligne, webinaires et tutoriels constituent autant d'opportunités d'apprentissage à saisir. Diversifiez vos sources pour obtenir une perspective complète et équilibrée du sujet.
+**L'Acquisition de l'Expérience** transforme progressivement votre approche. Les réflexes se développent, l'œil s'affine et vous apprenez à détecter les signaux subtils de vos pensionnaires. Cette intuition, fruit de l'expérience, complète et parfois remplace les connaissances purement théoriques.
 
-Les communautés et forums fournissent support, inspiration et opportunités de networking. Rejoindre des groupes de praticiens permet d'échanger expériences, poser des questions et rester informé des dernières évolutions. Ces interactions enrichissent votre pratique et élargissent votre réseau professionnel.`,
-        wordCount: 243,
-        keywords: [keyword, 'outils', 'ressources', 'formation', 'communauté']
+**La Transmission du Savoir** constitue souvent l'aboutissement naturel du parcours aquariophile. Partager ses connaissances, conseiller les débutants et contribuer à la communauté aquariophile devient une source de satisfaction personnelle enrichissante.
+
+**L'Innovation et l'Expérimentation** caractérisent les aquariophiles expérimentés qui n'hésitent pas à sortir des sentiers battus. Ils testent de nouvelles techniques, explorent des biotopes méconnus ou développent des méthodes originales adaptées à leurs objectifs spécifiques.`,
+        wordCount: 267,
+        keywords: ['évolution aquariophile', 'progression', 'spécialisation', 'expérience', 'transmission']
+      },
+      {
+        level: 2,
+        title: `Votre Environnement Aquariophile : Reflet de Votre Personnalité`,
+        content: `L'aménagement de votre espace aquariophile en dit long sur votre personnalité et vos priorités. Chaque choix, du nombre d'aquariums à leur style, révèle des aspects de votre profil d'aquariophile.
+
+**L'Organisation de Votre Espace** reflète votre approche générale. Un seul bac soigneusement entretenu révèle une personnalité perfectionniste qui privilégie la qualité. Plusieurs aquariums indiquent souvent un collectionneur ou un expérimentateur qui aime diversifier ses expériences.
+
+**Le Style de Vos Installations** trahit vos priorités esthétiques et fonctionnelles. Des équipements visibles mais efficaces caractérisent le technicien pratique. Des installations discrètement intégrées révèlent l'artiste soucieux d'harmonie visuelle.
+
+**Votre Approche de l'Aquascaping** constitue un révélateur puissant de personnalité. Les layouts géométriques attirent les esprits méthodiques et structurés. Les compositions naturelles séduisent les personnalités créatives et intuitives.
+
+**La Diversité de Votre Population** indique vos préférences relationnelles. Les bacs communautaires harmonieux révèlent un tempérament diplomate qui privilégie l'équilibre. Les bacs spécialisés pour espèces difficiles trahissent un goût pour les défis techniques.
+
+**Votre Gestion de l'Espace Technique** dévoile votre rapport à la technologie. Une salle technique organisée et étiquetée révèle un esprit méthodique. Un système simple mais efficace indique une approche pragmatique qui privilégie les résultats sur la complexité.`,
+        wordCount: 254,
+        keywords: ['environnement aquariophile', 'aménagement', 'organisation', 'style', 'aquascaping']
+      },
+      {
+        level: 2,
+        title: `Relations Sociales et Communauté : Votre Place dans l'Aquariophilie`,
+        content: `Votre façon d'interagir avec la communauté aquariophile révèle des aspects importants de votre personnalité et influence votre évolution dans cette passion partagée.
+
+**Votre Participation aux Forums et Réseaux** indique votre tempérament social. Les contributeurs actifs qui partagent régulièrement leurs expériences révèlent une personnalité généreuse et pédagogue. Les lecteurs silencieux privilégient souvent l'apprentissage discret et l'observation.
+
+**Votre Approche des Bourses et Événements** dévoile vos priorités sociales. Les habitués des bourses qui connaissent tous les vendeurs ont l'âme de collectionneurs sociables. Ceux qui préfèrent les visites de clubs privilégient les échanges techniques approfondis.
+
+**Votre Attitude Face aux Conseils** révèle votre rapport à l'autorité et à l'expertise. Acceptez-vous facilement les suggestions ? Vous avez probablement une personnalité ouverte et humble. Questionnez-vous systématiquement les recommandations ? Vous développez un esprit critique constructif.
+
+**Votre Rôle dans les Discussions** indique votre position naturelle dans les groupes. Êtes-vous celui qui pose les questions ? Vous avez l'âme d'un apprenant curieux. Répondez-vous souvent aux interrogations ? Vous tendez naturellement vers le rôle de mentor.
+
+**Votre Approche du Partage de Connaissances** révèle votre philosophie aquariophile. Le partage généreux caractérise les aquariophiles épanouis qui trouvent du plaisir dans la transmission. La réserve peut indiquer soit une personnalité discrète, soit un manque de confiance en ses compétences.`,
+        wordCount: 248,
+        keywords: ['relations sociales', 'communauté aquariophile', 'forums', 'bourses', 'partage']
+      },
+      {
+        level: 2,
+        title: `Développer Votre Potentiel Aquariophile : Conseils Personnalisés`,
+        content: `Une fois votre profil identifié, vous pouvez développer stratégiquement vos compétences et approfondir votre épanouissement dans l'aquariophilie selon vos affinités naturelles.
+
+**Pour l'Aquariophile Débutant**, la priorité consiste à structurer son apprentissage. Rejoignez un club local, trouvez un mentor expérimenté et concentrez-vous sur les bases avant de vous diversifier. Résistez à la tentation d'acheter impulsivement et privilégiez la qualité sur la quantité.
+
+**Pour l'Aquariophile Technicien**, l'enjeu réside dans l'équilibre entre performance technique et plaisir esthétique. Explorez l'aquascaping pour enrichir votre approche. Vos compétences techniques constituent un atout précieux pour expérimenter des biotopes exigeants.
+
+**Pour l'Aquariophile Artiste**, développez vos connaissances techniques pour soutenir vos créations esthétiques. La maîtrise des paramètres de l'eau garantit la pérennité de vos œuvres vivantes. Explorez différents styles d'aquascaping pour enrichir votre palette créative.
+
+**Pour l'Aquariophile Collectionneur**, la networking devient cruciale pour accéder aux espèces rares. Développez vos compétences en reproduction pour contribuer à la préservation des souches. Documentez méticuleusement vos lignées pour apporter une valeur scientifique à votre passion.
+
+**Quel que soit votre profil**, cultivez la curiosité et l'ouverture d'esprit. L'aquariophilie évolue constamment avec de nouvelles techniques, espèces et approches. Restez connecté à la communauté, expérimentez régulièrement et n'hésitez jamais à remettre en question vos habitudes pour progresser continuellement.`,
+        wordCount: 267,
+        keywords: ['développement potentiel', 'conseils personnalisés', 'progression', 'amélioration', 'épanouissement']
       }
     ];
 
     // Conclusion détaillée
     const conclusion = {
-      content: `${keyword} représente bien plus qu'une simple question - c'est une réflexion profonde qui mérite attention et expertise. À travers ce guide complet, nous avons exploré tous les aspects essentiels pour vous permettre de développer une compréhension approfondie et une maîtrise pratique.
+      content: `${keyword} ne se résume pas à une simple catégorisation, mais révèle la richesse et la diversité de notre communauté passionnée. Chaque profil d'aquariophile apporte sa contribution unique à cet art fascinant.
 
-Le chemin vers l'excellence demande patience, persévérance et pratique régulière. Ne vous découragez pas face aux premiers obstacles, ils font partie intégrante du processus d'apprentissage et de développement. Chaque expert a été débutant un jour et a surmonté les mêmes défis que vous rencontrez aujourd'hui.
+Que vous vous reconnaissiez dans un profil spécifique ou que vous combiniez plusieurs caractéristiques, l'important réside dans l'épanouissement personnel que vous procure cette passion. L'aquariophilie offre un terrain d'expression illimité pour exprimer votre créativité, vos compétences techniques et votre sensibilité artistique.
 
-L'application méthodique des conseils et stratégies présentés dans ce guide vous permettra d'obtenir des résultats tangibles et durables. Commencez par les fondamentaux, progressez graduellement vers les techniques avancées et n'hésitez pas à expérimenter pour trouver votre propre style et approche.
+Votre évolution en tant qu'aquariophile ne s'arrête jamais. Chaque expérience, réussite ou échec, enrichit votre compréhension et affine votre approche. Embrassez cette progression continue et laissez votre passion vous guider vers de nouveaux horizons aquatiques.
 
-Rappelez-vous que ce domaine est en constante évolution et transformation. Maintenez votre curiosité, continuez à apprendre et adaptez-vous aux changements avec agilité. Cette mentalité d'amélioration continue vous garantira un succès durable et une expertise reconnue dans votre domaine.`,
+N'oubliez jamais que derrière chaque aquarium se cache une histoire personnelle, des choix réfléchis et une vision unique de l'aquariophilie. Votre profil d'aquariophile reflète votre personnalité, vos valeurs et votre façon d'appréhender ce monde aquatique merveilleux qui nous unit tous.`,
       wordCount: 189,
-      keywords: [keyword, 'expertise', 'succès', 'maîtrise']
+      keywords: [keyword, 'communauté', 'épanouissement', 'évolution']
     };
 
     // FAQ spécialisée et pertinente
     const faq: ArticleFAQ[] = [
       {
-        question: `Comment bien aborder la question : ${keyword} ?`,
-        answer: `Pour bien aborder cette question, commencez par une auto-évaluation honnête de votre situation actuelle. Identifiez vos forces, vos points d'amélioration et vos objectifs spécifiques. Cette approche structurée vous permettra de développer une stratégie personnalisée et efficace.`,
-        keywords: [keyword, 'approche', 'stratégie', 'évaluation']
+        question: `Comment identifier précisément mon profil d'aquariophile ?`,
+        answer: `L'identification de votre profil se base sur l'observation de vos habitudes, motivations et préférences. Analysez ce qui vous passionne le plus : l'aspect technique, esthétique, la collection d'espèces ou la détente. Vos choix d'équipement, votre gestion du temps et votre interaction avec la communauté révèlent également votre tempérament aquariophile dominant.`,
+        keywords: ['identifier profil', 'habitudes', 'motivations', 'tempérament']
       },
       {
-        question: `Quelles sont les erreurs courantes à éviter ?`,
-        answer: `Les erreurs principales incluent : manque de planification, précipitation dans l'exécution, négligence du suivi des résultats et résistance aux changements nécessaires. Éviter ces pièges améliore considérablement vos chances de succès et d'épanouissement.`,
-        keywords: [keyword, 'erreurs', 'pièges', 'éviter']
+        question: `Peut-on appartenir à plusieurs catégories d'aquariophiles simultanément ?`,
+        answer: `Absolument ! La plupart des aquariophiles expérimentés combinent plusieurs profils selon leurs projets et leur évolution. Un technicien peut développer sa fibre artistique, tandis qu'un collectionneur peut s'intéresser aux aspects techniques. Cette polyvalence enrichit l'expérience aquariophile et favorise une approche holistique de la passion.`,
+        keywords: ['plusieurs profils', 'polyvalence', 'évolution', 'expérience']
       },
       {
-        question: `Combien de temps faut-il pour voir des résultats ?`,
-        answer: `Le temps nécessaire varie selon votre situation de départ et vos objectifs. En moyenne, les premiers résultats apparaissent après 3-6 semaines d'application méthodique, tandis que des changements significatifs demandent généralement 3-6 mois d'efforts soutenus.`,
-        keywords: [keyword, 'temps', 'résultats', 'progression']
+        question: `Comment faire évoluer mon profil d'aquariophile vers d'autres domaines ?`,
+        answer: `L'évolution naturelle se fait progressivement en explorant de nouveaux aspects. Rejoignez des communautés spécialisées, expérimentez de nouvelles techniques, assistez à des conférences ou bourses. La curiosité et l'ouverture d'esprit constituent les meilleurs moteurs pour développer de nouvelles compétences et enrichir votre profil aquariophile.`,
+        keywords: ['évolution profil', 'développement', 'nouvelles techniques', 'curiosité']
       },
       {
-        question: `Quels outils recommandez-vous pour débuter ?`,
-        answer: `Pour débuter efficacement, concentrez-vous sur les outils de base : un système de planification, des méthodes de suivi simples et des ressources éducatives de qualité. Ces fondamentaux suffisent largement avant d'investir dans des solutions plus sophistiquées.`,
-        keywords: [keyword, 'outils', 'débutant', 'ressources']
+        question: `Quel profil d'aquariophile convient le mieux aux débutants ?`,
+        answer: `Aucun profil n'est intrinsèquement meilleur pour débuter. L'important est de respecter votre tempérament naturel tout en acquérant les bases essentielles. Un futur artiste doit maîtriser les fondamentaux techniques, tandis qu'un technicien en herbe peut développer sa sensibilité esthétique. L'équilibre et la progression graduelle restent les clés du succès.`,
+        keywords: ['profil débutant', 'tempérament', 'bases essentielles', 'progression']
       },
       {
-        question: `Comment maintenir sa motivation sur le long terme ?`,
-        answer: `La motivation se maintient grâce à des objectifs clairs, des résultats mesurables et un système de récompenses personnelles. Célébrez vos progrès, même petits, entourez-vous de personnes positives et rappelez-vous régulièrement pourquoi vous avez commencé ce parcours.`,
-        keywords: [keyword, 'motivation', 'objectifs', 'persévérance']
+        question: `Comment concilier passion aquariophile et contraintes familiales/professionnelles ?`,
+        answer: `L'adaptation de votre approche aquariophile à vos contraintes personnelles est essentielle. Optez pour des systèmes peu exigeants en maintenance si le temps manque, ou automatisez certaines tâches. Impliquez votre famille dans votre passion et organisez votre planning pour préserver des moments dédiés à vos aquariums sans négliger vos autres responsabilités.`,
+        keywords: ['concilier passion', 'contraintes', 'organisation', 'équilibre vie']
       }
     ];
 
