@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -67,7 +68,7 @@ const AdvancedKeywordGenerator: React.FC<AdvancedKeywordGeneratorProps> = () => 
           suggestedDescription: `Découvrez tout sur ${keyword} avec notre guide expert. Conseils pratiques et stratégies éprouvées.`
         },
         {
-          keyword: `comment utiliser ${keyword}`,
+          keyword: `comment ${keyword}`,
           volume: 1800,
           difficulty: 35,
           cpc: 0.8,
@@ -78,8 +79,8 @@ const AdvancedKeywordGenerator: React.FC<AdvancedKeywordGeneratorProps> = () => 
           opportunity: 80,
           searchVolume: 1800,
           relevance: 85,
-          suggestedTitle: `Comment Utiliser ${keyword} Efficacement`,
-          suggestedDescription: `Apprenez à utiliser ${keyword} étape par étape avec nos conseils d'experts.`
+          suggestedTitle: `Comment ${keyword} Efficacement`,
+          suggestedDescription: `Apprenez ${keyword} étape par étape avec nos conseils d'experts.`
         },
         {
           keyword: `${keyword} prix`,
@@ -131,8 +132,8 @@ const AdvancedKeywordGenerator: React.FC<AdvancedKeywordGeneratorProps> = () => 
       setKeywords(generatedKeywords);
       setHasGenerated(true);
       
-      // Générer l'article automatiquement
-      await generateArticle();
+      // Générer l'article automatiquement avec le vrai mot-clé de l'utilisateur
+      generateArticle(keyword);
       
       toast.success(`${generatedKeywords.length} mots-clés générés avec succès !`);
       
@@ -143,16 +144,16 @@ const AdvancedKeywordGenerator: React.FC<AdvancedKeywordGeneratorProps> = () => 
     }
   };
 
-  const generateArticle = async () => {
-    if (!keyword) return;
+  const generateArticle = (userKeyword: string) => {
+    if (!userKeyword) return;
     
-    const article = `# ${keyword.charAt(0).toUpperCase() + keyword.slice(1)} : Guide Complet 2025
+    const article = `# ${userKeyword.charAt(0).toUpperCase() + userKeyword.slice(1)} : Guide Complet 2025
 
 ## Table des matières
 1. [Introduction](#introduction)
-2. [Qu'est-ce que ${keyword} ?](#definition)
-3. [Comment bien utiliser ${keyword}](#utilisation)
-4. [Les meilleures pratiques](#meilleures-pratiques)
+2. [Qu'est-ce que ${userKeyword} ?](#definition)
+3. [Comment bien choisir ${userKeyword}](#utilisation)
+4. [Les meilleures pratiques pour ${userKeyword}](#meilleures-pratiques)
 5. [Erreurs courantes à éviter](#erreurs-courantes)
 6. [Outils et ressources recommandés](#outils-ressources)
 7. [Études de cas et exemples](#etudes-cas)
@@ -162,106 +163,164 @@ const AdvancedKeywordGenerator: React.FC<AdvancedKeywordGeneratorProps> = () => 
 
 ## Introduction {#introduction}
 
-Découvrez tout ce que vous devez savoir sur **${keyword}** dans ce guide exhaustif. Que vous soyez débutant ou expert, ce guide vous accompagnera pas à pas pour maîtriser parfaitement ce sujet essentiel.
+Découvrez tout ce que vous devez savoir sur **${userKeyword}** dans ce guide exhaustif. Que vous soyez débutant ou expert, ce guide vous accompagnera pas à pas pour maîtriser parfaitement ce sujet essentiel.
 
-Dans un monde où la concurrence est de plus en plus forte, comprendre ${keyword} devient crucial pour réussir. Ce guide de plus de 1500 mots vous donnera toutes les clés pour exceller.
+Dans un monde où les choix sont de plus en plus nombreux, bien comprendre ${userKeyword} devient crucial pour faire les meilleurs choix. Ce guide de plus de 1500 mots vous donnera toutes les clés pour exceller dans votre recherche de ${userKeyword}.
 
-## Qu'est-ce que ${keyword} ? {#definition}
+## Qu'est-ce que ${userKeyword} ? {#definition}
 
-${keyword} représente un élément fondamental dans son domaine. Pour bien comprendre son importance, analysons ses différents aspects et applications pratiques.
+${userKeyword} représente un choix important qui mérite une attention particulière. Pour bien comprendre son importance, analysons ses différents aspects et applications pratiques.
 
 ### Les bases essentielles
 
-Avant de vous lancer, maîtrisez ces concepts de base :
+Avant de vous lancer dans votre recherche de ${userKeyword}, maîtrisez ces concepts de base :
 
-- **Définition claire** : ${keyword} se caractérise par ses spécificités uniques qui le distinguent des alternatives
-- **Applications pratiques** : Utilisations concrètes dans différents contextes professionnels et personnels
-- **Avantages principaux** : Bénéfices directs et indirects pour les utilisateurs et entreprises
+- **Définition claire** : ${userKeyword} se caractérise par ses spécificités uniques qui le distinguent des alternatives
+- **Applications pratiques** : Utilisations concrètes dans différents contextes
+- **Avantages principaux** : Bénéfices directs et indirects pour les utilisateurs
 - **Considérations importantes** : Points d'attention cruciaux à retenir pour éviter les pièges
 
 ### Historique et évolution
 
-L'évolution de ${keyword} au fil des années montre une progression constante vers plus d'efficacité et d'accessibilité. Les innovations récentes ont révolutionné la façon dont nous appréhendons cette discipline.
+L'évolution de ${userKeyword} au fil des années montre une progression constante vers plus de qualité et d'accessibilité. Les innovations récentes ont révolutionné la façon dont nous appréhendons ${userKeyword}.
 
-## Comment bien utiliser ${keyword} {#utilisation}
+## Comment bien choisir ${userKeyword} {#utilisation}
 
-### Étape 1 : Préparation stratégique
+### Étape 1 : Analyse de vos besoins
 
-La première étape consiste à bien préparer votre approche. Cette phase de préparation est cruciale car elle détermine 80% de votre succès futur.
+La première étape consiste à bien analyser vos besoins spécifiques concernant ${userKeyword}. Cette phase d'analyse est cruciale car elle détermine 80% de votre satisfaction future.
 
 **Actions concrètes :**
 - Analysez vos besoins spécifiques et contraintes
-- Définissez vos objectifs SMART (Spécifiques, Mesurables, Atteignables, Réalistes, Temporels)
-- Évaluez les ressources disponibles (temps, budget, compétences)
-- Identifiez les parties prenantes et leurs attentes
+- Définissez vos critères prioritaires
+- Évaluez votre budget disponible
+- Identifiez les caractéristiques indispensables
 
-### Étape 2 : Mise en œuvre progressive
+### Étape 2 : Recherche et comparaison
 
-Une fois la préparation terminée, passez à l'action avec une méthode structurée et progressive qui a fait ses preuves.
+Une fois vos besoins définis, passez à la phase de recherche avec une méthode structurée et comparative qui a fait ses preuves.
 
 **Méthode recommandée :**
-1. Commencez par les bases fondamentales
-2. Testez sur de petits projets pilotes
-3. Mesurez les résultats intermédiaires
-4. Ajustez votre approche selon les retours
-5. Déployez à plus grande échelle
+1. Listez les options disponibles pour ${userKeyword}
+2. Comparez les caractéristiques principales
+3. Lisez les avis et retours d'expérience
+4. Vérifiez la réputation et la fiabilité
+5. Prenez votre décision en toute connaissance de cause
 
-### Étape 3 : Optimisation continue
+### Étape 3 : Validation et suivi
 
-L'optimisation continue vous permettra d'obtenir les meilleurs résultats possibles avec ${keyword} et de maintenir un avantage concurrentiel.
+La validation de votre choix vous permettra d'obtenir les meilleurs résultats avec ${userKeyword} et d'éviter les déceptions.
 
-## Les meilleures pratiques {#meilleures-pratiques}
+## Les meilleures pratiques pour ${userKeyword} {#meilleures-pratiques}
 
-Pour maximiser l'efficacité de votre approche ${keyword}, suivez ces recommandations d'experts qui ont fait leurs preuves :
+Pour maximiser votre satisfaction avec ${userKeyword}, suivez ces recommandations d'experts qui ont fait leurs preuves :
 
-### 1. Planification rigoureuse
-- Établissez un plan détaillé avec des jalons clairs
-- Anticipez les obstacles potentiels et préparez des solutions de contournement
-- Définissez des indicateurs de performance pertinents
+### 1. Préparation rigoureuse
+- Établissez une liste de critères clairs
+- Définissez un budget réaliste
+- Planifiez le timing de votre recherche
 
-### 2. Suivi et analyse réguliers
-- Mettez en place un système de monitoring efficace
-- Analysez les données régulièrement (hebdomadaire ou mensuelle)
-- Ajustez votre stratégie selon les insights obtenus
+### 2. Recherche approfondie
+- Consultez plusieurs sources fiables
+- Lisez les avis clients authentiques
+- Comparez objectivement les options
 
-### 3. Formation continue
-- Restez informé des dernières évolutions et tendances
-- Participez à des formations spécialisées
-- Échangez avec d'autres professionnels du secteur
+### 3. Vérification continue
+- Surveillez les évolutions du marché
+- Restez informé des nouveautés
+- Adaptez vos critères si nécessaire
+
+## Erreurs courantes à éviter {#erreurs-courantes}
+
+Voici les principales erreurs que font 90% des personnes lors de leur recherche de ${userKeyword} :
+
+### Erreur #1 : Se précipiter
+Beaucoup se précipitent sans avoir suffisamment analysé leurs besoins. Cette précipitation coûte cher en satisfaction.
+
+**Solution :** Prenez le temps nécessaire pour bien définir vos critères.
+
+### Erreur #2 : Ne considérer que le prix
+Se focaliser uniquement sur le prix peut conduire à des choix décevants pour ${userKeyword}.
+
+**Solution :** Considérez le rapport qualité-prix global.
+
+### Erreur #3 : Ignorer les avis
+Négliger les retours d'expérience d'autres utilisateurs est une erreur commune.
+
+**Solution :** Consultez toujours les avis authentiques et récents.
 
 ## FAQ - Questions fréquentes {#faq}
 
-### Combien de temps faut-il pour maîtriser ${keyword} ?
-La maîtrise de ${keyword} dépend de votre niveau initial et de votre investissement personnel. En général :
-- **Niveau débutant :** 2-3 mois pour les bases
-- **Niveau intermédiaire :** 6-12 mois de pratique régulière
-- **Niveau expert :** 2-3 ans d'expérience variée
+### Comment choisir le meilleur ${userKeyword} ?
+Le choix du meilleur ${userKeyword} dépend de vos besoins spécifiques et de votre budget. En général :
+- **Analysez vos besoins** : 2-3 critères prioritaires
+- **Comparez les options** : Au moins 3-5 alternatives
+- **Vérifiez la qualité** : Avis, garanties, réputation
 
-### ${keyword} est-il adapté aux débutants ?
-Absolument ! Avec une approche progressive et les bonnes ressources, tout le monde peut apprendre ${keyword} efficacement.
+### ${userKeyword} est-il adapté aux débutants ?
+Absolument ! Avec une approche progressive et les bonnes informations, tout le monde peut faire le bon choix pour ${userKeyword}.
 
-### Quels sont les coûts associés à ${keyword} ?
-Les coûts varient considérablement selon vos besoins :
-- **Solutions gratuites :** Parfaites pour débuter et tester
-- **Solutions intermédiaires :** 50-200€/mois pour PME
-- **Solutions enterprise :** 500-2000€/mois pour grandes structures
+### Quels sont les budgets moyens pour ${userKeyword} ?
+Les budgets varient considérablement selon vos besoins :
+- **Entrée de gamme :** Solutions abordables pour débuter
+- **Milieu de gamme :** Bon compromis qualité-prix
+- **Haut de gamme :** Solutions premium pour exigences élevées
+
+### Comment éviter les arnaques liées à ${userKeyword} ?
+Pour éviter les problèmes :
+- Vérifiez la réputation du fournisseur
+- Lisez les conditions générales
+- Méfiez-vous des offres trop alléchantes
+- Privilégiez les sources fiables
+
+### Quand revoir son choix de ${userKeyword} ?
+Il est recommandé de réévaluer votre choix :
+- Tous les 6-12 mois selon le domaine
+- Lors de changements de besoins
+- Si de nouvelles options apparaissent
+- En cas d'insatisfaction
+
+## Tendances et évolutions futures {#tendances}
+
+Le domaine de ${userKeyword} évolue rapidement. Voici les principales tendances à surveiller :
+
+### Innovation technologique
+L'intégration de nouvelles technologies révolutionne ${userKeyword} :
+- Amélioration de la qualité
+- Nouvelles fonctionnalités
+- Meilleure accessibilité
+- Prix plus compétitifs
+
+### Approches durables
+La durabilité devient un critère essentiel pour ${userKeyword} :
+- Solutions éco-responsables
+- Longévité accrue
+- Impact environnemental réduit
+- Transparence des pratiques
 
 ## Conclusion {#conclusion}
 
-${keyword} représente une opportunité majeure pour quiconque souhaite progresser dans ce domaine en 2025. Avec les bonnes connaissances, les outils adaptés et une approche méthodique, vous pouvez obtenir d'excellents résultats.
+${userKeyword} représente un choix important qui mérite une attention particulière en 2025. Avec les bonnes informations, une méthode claire et une approche réfléchie, vous pouvez faire le meilleur choix possible.
 
 ### Points clés à retenir :
-1. **Préparation** : 20% du temps, 80% du succès
-2. **Formation** : Investissez dans vos compétences
-3. **Pratique** : L'expérience est irremplaçable
-4. **Patience** : Les résultats prennent du temps
-5. **Amélioration continue** : Restez curieux et adaptable
+1. **Préparation** : Analysez bien vos besoins avant tout
+2. **Recherche** : Comparez plusieurs options sérieusement
+3. **Vérification** : Consultez les avis et références
+4. **Budget** : Définissez un budget réaliste
+5. **Suivi** : Restez informé des évolutions
 
-N'hésitez pas à commencer dès aujourd'hui en appliquant les conseils de ce guide !
+### Prochaines étapes recommandées :
+- Définissez vos critères prioritaires pour ${userKeyword}
+- Établissez votre budget maximum
+- Consultez les sources fiables
+- Comparez au moins 3 options
+- Prenez votre décision en toute sérénité
+
+N'hésitez pas à prendre le temps nécessaire pour faire le bon choix concernant ${userKeyword}. Un choix réfléchi aujourd'hui vous évitera bien des déceptions demain !
 
 ---
 
-*Article généré automatiquement le ${new Date().toLocaleDateString('fr-FR')} - Guide professionnel ${keyword}*`;
+*Article généré automatiquement le ${new Date().toLocaleDateString('fr-FR')} - Guide professionnel ${userKeyword}*`;
 
     setGeneratedArticle(article);
   };
@@ -283,47 +342,6 @@ N'hésitez pas à commencer dès aujourd'hui en appliquant les conseils de ce gu
     URL.revokeObjectURL(url);
     toast.success('Article téléchargé');
   };
-
-  const KeywordCard = ({ keywordData }: { keywordData: KeywordSuggestion }) => (
-    <Card className="p-4 hover:shadow-md transition-shadow">
-      <div className="flex justify-between items-start mb-3">
-        <h3 className="font-semibold text-gray-900">{keywordData.keyword}</h3>
-        <Badge className={`
-          ${keywordData.intent === 'commercial' ? 'bg-green-100 text-green-800' : ''}
-          ${keywordData.intent === 'informational' ? 'bg-blue-100 text-blue-800' : ''}
-          ${keywordData.intent === 'transactional' ? 'bg-purple-100 text-purple-800' : ''}
-        `}>
-          {keywordData.intent}
-        </Badge>
-      </div>
-      
-      <div className="grid grid-cols-2 gap-3 text-sm mb-3">
-        <div>
-          <span className="text-gray-500">Volume:</span>
-          <span className="ml-1 font-medium">{keywordData.volume?.toLocaleString()}</span>
-        </div>
-        <div>
-          <span className="text-gray-500">Difficulté:</span>
-          <span className="ml-1 font-medium">{keywordData.difficulty}/100</span>
-        </div>
-        <div>
-          <span className="text-gray-500">CPC:</span>
-          <span className="ml-1 font-medium">{keywordData.cpc}€</span>
-        </div>
-        <div>
-          <span className="text-gray-500">Opportunité:</span>
-          <span className="ml-1 font-medium text-green-600">{keywordData.opportunity}%</span>
-        </div>
-      </div>
-      
-      {keywordData.suggestedTitle && (
-        <div className="mt-3 p-2 bg-gray-50 rounded">
-          <p className="text-xs text-gray-600 mb-1">Titre suggéré:</p>
-          <p className="text-sm font-medium">{keywordData.suggestedTitle}</p>
-        </div>
-      )}
-    </Card>
-  );
 
   return (
     <div className="space-y-6">
@@ -401,25 +419,11 @@ N'hésitez pas à commencer dès aujourd'hui en appliquant les conseils de ce gu
                   <DialogTitle className="flex items-center justify-between">
                     <span>Article Professionnel - {keyword}</span>
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm" onClick={() => {
-                        navigator.clipboard.writeText(generatedArticle);
-                        toast.success('Article copié dans le presse-papiers');
-                      }}>
+                      <Button variant="outline" size="sm" onClick={copyArticle}>
                         <Copy className="h-4 w-4 mr-1" />
                         Copier
                       </Button>
-                      <Button variant="outline" size="sm" onClick={() => {
-                        const blob = new Blob([generatedArticle], { type: 'text/markdown' });
-                        const url = URL.createObjectURL(blob);
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = `article-${keyword.replace(/\s+/g, '-')}.md`;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        URL.revokeObjectURL(url);
-                        toast.success('Article téléchargé');
-                      }}>
+                      <Button variant="outline" size="sm" onClick={downloadArticle}>
                         <Download className="h-4 w-4 mr-1" />
                         Télécharger
                       </Button>
@@ -504,129 +508,6 @@ N'hésitez pas à commencer dès aujourd'hui en appliquant les conseils de ce gu
       )}
     </div>
   );
-};
-
-const generateArticle = async (keyword: string) => {
-  if (!keyword) return '';
-  
-  const article = `# ${keyword.charAt(0).toUpperCase() + keyword.slice(1)} : Guide Complet 2025
-
-## Table des matières
-1. [Introduction](#introduction)
-2. [Qu'est-ce que ${keyword} ?](#definition)
-3. [Comment bien utiliser ${keyword}](#utilisation)
-4. [Les meilleures pratiques](#meilleures-pratiques)
-5. [Erreurs courantes à éviter](#erreurs-courantes)
-6. [Outils et ressources recommandés](#outils-ressources)
-7. [Études de cas et exemples](#etudes-cas)
-8. [FAQ - Questions fréquentes](#faq)
-9. [Tendances et évolutions futures](#tendances)
-10. [Conclusion](#conclusion)
-
-## Introduction {#introduction}
-
-Découvrez tout ce que vous devez savoir sur **${keyword}** dans ce guide exhaustif. Que vous soyez débutant ou expert, ce guide vous accompagnera pas à pas pour maîtriser parfaitement ce sujet essentiel.
-
-Dans un monde où la concurrence est de plus en plus forte, comprendre ${keyword} devient crucial pour réussir. Ce guide de plus de 1500 mots vous donnera toutes les clés pour exceller.
-
-## Qu'est-ce que ${keyword} ? {#definition}
-
-${keyword} représente un élément fondamental dans son domaine. Pour bien comprendre son importance, analysons ses différents aspects et applications pratiques.
-
-### Les bases essentielles
-
-Avant de vous lancer, maîtrisez ces concepts de base :
-
-- **Définition claire** : ${keyword} se caractérise par ses spécificités uniques qui le distinguent des alternatives
-- **Applications pratiques** : Utilisations concrètes dans différents contextes professionnels et personnels
-- **Avantages principaux** : Bénéfices directs et indirects pour les utilisateurs et entreprises
-- **Considérations importantes** : Points d'attention cruciaux à retenir pour éviter les pièges
-
-### Historique et évolution
-
-L'évolution de ${keyword} au fil des années montre une progression constante vers plus d'efficacité et d'accessibilité. Les innovations récentes ont révolutionné la façon dont nous appréhendons cette discipline.
-
-## Comment bien utiliser ${keyword} {#utilisation}
-
-### Étape 1 : Préparation stratégique
-
-La première étape consiste à bien préparer votre approche. Cette phase de préparation est cruciale car elle détermine 80% de votre succès futur.
-
-**Actions concrètes :**
-- Analysez vos besoins spécifiques et contraintes
-- Définissez vos objectifs SMART (Spécifiques, Mesurables, Atteignables, Réalistes, Temporels)
-- Évaluez les ressources disponibles (temps, budget, compétences)
-- Identifiez les parties prenantes et leurs attentes
-
-### Étape 2 : Mise en œuvre progressive
-
-Une fois la préparation terminée, passez à l'action avec une méthode structurée et progressive qui a fait ses preuves.
-
-**Méthode recommandée :**
-1. Commencez par les bases fondamentales
-2. Testez sur de petits projets pilotes
-3. Mesurez les résultats intermédiaires
-4. Ajustez votre approche selon les retours
-5. Déployez à plus grande échelle
-
-### Étape 3 : Optimisation continue
-
-L'optimisation continue vous permettra d'obtenir les meilleurs résultats possibles avec ${keyword} et de maintenir un avantage concurrentiel.
-
-## Les meilleures pratiques {#meilleures-pratiques}
-
-Pour maximiser l'efficacité de votre approche ${keyword}, suivez ces recommandations d'experts qui ont fait leurs preuves :
-
-### 1. Planification rigoureuse
-- Établissez un plan détaillé avec des jalons clairs
-- Anticipez les obstacles potentiels et préparez des solutions de contournement
-- Définissez des indicateurs de performance pertinents
-
-### 2. Suivi et analyse réguliers
-- Mettez en place un système de monitoring efficace
-- Analysez les données régulièrement (hebdomadaire ou mensuelle)
-- Ajustez votre stratégie selon les insights obtenus
-
-### 3. Formation continue
-- Restez informé des dernières évolutions et tendances
-- Participez à des formations spécialisées
-- Échangez avec d'autres professionnels du secteur
-
-## FAQ - Questions fréquentes {#faq}
-
-### Combien de temps faut-il pour maîtriser ${keyword} ?
-La maîtrise de ${keyword} dépend de votre niveau initial et de votre investissement personnel. En général :
-- **Niveau débutant :** 2-3 mois pour les bases
-- **Niveau intermédiaire :** 6-12 mois de pratique régulière
-- **Niveau expert :** 2-3 ans d'expérience variée
-
-### ${keyword} est-il adapté aux débutants ?
-Absolument ! Avec une approche progressive et les bonnes ressources, tout le monde peut apprendre ${keyword} efficacement.
-
-### Quels sont les coûts associés à ${keyword} ?
-Les coûts varient considérablement selon vos besoins :
-- **Solutions gratuites :** Parfaites pour débuter et tester
-- **Solutions intermédiaires :** 50-200€/mois pour PME
-- **Solutions enterprise :** 500-2000€/mois pour grandes structures
-
-## Conclusion {#conclusion}
-
-${keyword} représente une opportunité majeure pour quiconque souhaite progresser dans ce domaine en 2025. Avec les bonnes connaissances, les outils adaptés et une approche méthodique, vous pouvez obtenir d'excellents résultats.
-
-### Points clés à retenir :
-1. **Préparation** : 20% du temps, 80% du succès
-2. **Formation** : Investissez dans vos compétences
-3. **Pratique** : L'expérience est irremplaçable
-4. **Patience** : Les résultats prennent du temps
-5. **Amélioration continue** : Restez curieux et adaptable
-
-N'hésitez pas à commencer dès aujourd'hui en appliquant les conseils de ce guide !
-
----
-
-*Article généré automatiquement le ${new Date().toLocaleDateString('fr-FR')} - Guide professionnel ${keyword}*`;
-
-  return article;
 };
 
 export default AdvancedKeywordGenerator;
