@@ -177,132 +177,6 @@ const ProfessionalKeywordGenerator: React.FC<ProfessionalKeywordGeneratorProps> 
     </Card>
   );
 
-  const CompetitorAnalysisTab = () => (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Building2 className="h-5 w-5 text-blue-500" />
-          Analyse Concurrentielle
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {[
-            { domain: 'competitor1.com', position: 1, traffic: '45K', strength: 85 },
-            { domain: 'competitor2.com', position: 3, traffic: '32K', strength: 78 },
-            { domain: 'competitor3.com', position: 5, traffic: '28K', strength: 72 }
-          ].map((comp, idx) => (
-            <div key={idx} className="p-4 border rounded-lg">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h4 className="font-medium">{comp.domain}</h4>
-                  <p className="text-sm text-gray-600">Position #{comp.position}</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-medium">{comp.traffic}/mois</p>
-                  <p className="text-sm text-gray-600">Force: {comp.strength}/100</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-  );
-
-  const TrendAnalysisTab = () => (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <TrendingUp className="h-5 w-5 text-purple-500" />
-          Analyse des Tendances
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {keywords.slice(0, 3).map((kw, idx) => (
-            <div key={idx} className="p-4 border rounded-lg">
-              <div className="flex justify-between items-center mb-2">
-                <h4 className="font-medium">{kw.keyword}</h4>
-                <Badge className="bg-green-100 text-green-800">+15% ce mois</Badge>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="flex-1 bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-purple-500 h-2 rounded-full" 
-                    style={{ width: `${Math.min(100, (kw.volume || 0) / 50)}%` }}
-                  />
-                </div>
-                <span className="text-sm text-gray-600">{kw.volume}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-  );
-
-  const OpportunitiesTab = () => (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Lightbulb className="h-5 w-5 text-yellow-500" />
-          Opportunités SEO
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {keywords
-            .filter(kw => (kw.opportunity || 0) > 70)
-            .map((kw, idx) => (
-              <div key={idx} className="p-4 border rounded-lg bg-yellow-50">
-                <div className="flex justify-between items-start mb-2">
-                  <h4 className="font-medium">{kw.keyword}</h4>
-                  <Badge className="bg-yellow-100 text-yellow-800">
-                    {kw.opportunity}% opportunité
-                  </Badge>
-                </div>
-                <p className="text-sm text-gray-600 mb-2">
-                  Faible concurrence mais volume élevé - Excellent potentiel de classement
-                </p>
-                <div className="flex items-center gap-4 text-sm">
-                  <span>Volume: {kw.volume}</span>
-                  <span>Difficulté: {kw.difficulty}/100</span>
-                  <span className="text-green-600">ROI estimé: Élevé</span>
-                </div>
-              </div>
-            ))}
-        </div>
-      </CardContent>
-    </Card>
-  );
-
-  const ContentIdeasTab = () => (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <FileText className="h-5 w-5 text-orange-500" />
-          Idées de Contenu
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {keywords.map((kw, idx) => (
-            <div key={idx} className="p-4 border rounded-lg">
-              <h4 className="font-medium mb-2">{kw.suggestedTitle}</h4>
-              <p className="text-sm text-gray-600 mb-3">{kw.suggestedDescription}</p>
-              <div className="flex items-center gap-2">
-                <Badge variant="outline">Article</Badge>
-                <Badge variant="outline">{kw.intent}</Badge>
-                <span className="text-xs text-gray-500">~1500 mots recommandés</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-  );
-
   return (
     <div className="space-y-6">
       {/* En-tête du générateur */}
@@ -372,97 +246,16 @@ const ProfessionalKeywordGenerator: React.FC<ProfessionalKeywordGeneratorProps> 
         />
       )}
 
-      {/* Onglets d'analyse */}
+      {/* Résultats des mots-clés */}
       {hasGenerated && (
-        <Tabs defaultValue="suggestions" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger value="suggestions" className="flex items-center gap-1">
-              <Target className="h-4 w-4" />
-              Suggestions
-            </TabsTrigger>
-            <TabsTrigger value="trends" className="flex items-center gap-1">
-              <TrendingUp className="h-4 w-4" />
-              Tendances
-            </TabsTrigger>
-            <TabsTrigger value="competitors" className="flex items-center gap-1">
-              <Building2 className="h-4 w-4" />
-              Concurrence
-            </TabsTrigger>
-            <TabsTrigger value="opportunities" className="flex items-center gap-1">
-              <Lightbulb className="h-4 w-4" />
-              Opportunités
-            </TabsTrigger>
-            <TabsTrigger value="content" className="flex items-center gap-1">
-              <FileText className="h-4 w-4" />
-              Contenu
-            </TabsTrigger>
-            <TabsTrigger value="export" className="flex items-center gap-1">
-              <Download className="h-4 w-4" />
-              Export
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="suggestions">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {keywords.map((kw, idx) => (
-                <KeywordCard key={idx} keywordData={kw} />
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="trends">
-            <TrendAnalysisTab />
-          </TabsContent>
-
-          <TabsContent value="competitors">
-            <CompetitorAnalysisTab />
-          </TabsContent>
-
-          <TabsContent value="opportunities">
-            <OpportunitiesTab />
-          </TabsContent>
-
-          <TabsContent value="content">
-            <ContentIdeasTab />
-          </TabsContent>
-
-          <TabsContent value="export">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Download className="h-5 w-5 text-gray-500" />
-                  Exporter les Données
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Button variant="outline" className="flex items-center gap-2">
-                    <Download className="h-4 w-4" />
-                    Export CSV
-                  </Button>
-                  <Button variant="outline" className="flex items-center gap-2">
-                    <Download className="h-4 w-4" />
-                    Export PDF
-                  </Button>
-                  <Button variant="outline" className="flex items-center gap-2">
-                    <Download className="h-4 w-4" />
-                    Export Excel
-                  </Button>
-                </div>
-                
-                <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-                  <h4 className="font-medium mb-2">Résumé de l'export:</h4>
-                  <ul className="text-sm text-gray-600 space-y-1">
-                    <li>• {keywords.length} mots-clés générés</li>
-                    <li>• Données de volume et difficulté</li>
-                    <li>• Suggestions de titres et descriptions</li>
-                    <li>• Analyse des opportunités</li>
-                  </ul>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+        <Card className="p-6">
+          <h2 className="text-xl font-bold mb-4">Mots-clés générés</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {keywords.map((kw, idx) => (
+              <KeywordCard key={idx} keywordData={kw} />
+            ))}
+          </div>
+        </Card>
       )}
 
       {/* État vide */}

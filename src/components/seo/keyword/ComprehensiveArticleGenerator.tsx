@@ -48,6 +48,9 @@ const ComprehensiveArticleGenerator: React.FC<ComprehensiveArticleGeneratorProps
     setIsGenerating(true);
     
     try {
+      // Simuler la génération d'article
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
       // Article complet avec structure professionnelle
       const article = `# ${mainKeyword.charAt(0).toUpperCase() + mainKeyword.slice(1)} : Guide Complet 2025
 
