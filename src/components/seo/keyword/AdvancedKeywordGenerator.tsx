@@ -12,7 +12,10 @@ import {
   Zap,
   Eye,
   Copy,
-  Download
+  Download,
+  Rocket,
+  Target,
+  TrendingUp
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { KeywordSuggestion } from '@/types/seo/Keyword';
@@ -139,89 +142,89 @@ const AdvancedKeywordGenerator: React.FC<AdvancedKeywordGeneratorProps> = () => 
     
     const article = `# ${userKeyword.charAt(0).toUpperCase() + userKeyword.slice(1)} : Guide Complet 2025
 
-## Introduction
+## Introduction à ${userKeyword}
 
-Si vous cherchez des informations sur **${userKeyword}**, vous êtes au bon endroit ! Ce guide complet vous donnera toutes les clés pour bien comprendre et maîtriser ${userKeyword}.
+Dans le monde d'aujourd'hui, **${userKeyword}** représente un enjeu majeur pour de nombreuses personnes. Ce guide complet vous donnera toutes les clés pour comprendre et maîtriser ${userKeyword} efficacement.
 
-${userKeyword} est devenu un élément incontournable en 2025. Que vous soyez débutant ou que vous souhaitiez approfondir vos connaissances sur ${userKeyword}, ce guide détaillé vous accompagnera pas à pas.
+## Pourquoi ${userKeyword} est-il important ?
 
-## Pourquoi s'intéresser à ${userKeyword} ?
+### Les enjeux de ${userKeyword}
+- **Impact direct** : ${userKeyword} influence directement vos résultats
+- **Évolution constante** : Le domaine de ${userKeyword} évolue rapidement
+- **Opportunités** : Maîtriser ${userKeyword} ouvre de nouvelles possibilités
 
-### Les avantages principaux de ${userKeyword}
+### Tendances actuelles pour ${userKeyword}
+En 2025, ${userKeyword} connaît des évolutions importantes :
+- Nouvelles approches pour ${userKeyword}
+- Technologies émergentes dans ${userKeyword}
+- Changements réglementaires autour de ${userKeyword}
 
-Comprendre ${userKeyword} présente de nombreux avantages :
+## Comment optimiser ${userKeyword}
 
-- **Efficacité** : Une bonne maîtrise de ${userKeyword} vous permettra d'être plus performant
-- **Économies** : Évitez les erreurs coûteuses en connaissant les bonnes pratiques de ${userKeyword}
-- **Résultats optimaux** : Obtenez de meilleurs résultats en appliquant les bonnes méthodes pour ${userKeyword}
-- **Expertise** : Développez votre expertise sur ${userKeyword}
+### Étape 1 : Analyse de ${userKeyword}
+Avant de vous lancer, analysez votre situation actuelle concernant ${userKeyword} :
+- Évaluez vos besoins spécifiques pour ${userKeyword}
+- Identifiez les obstacles liés à ${userKeyword}
+- Définissez des objectifs clairs pour ${userKeyword}
 
-### Pourquoi ${userKeyword} maintenant ?
+### Étape 2 : Stratégie pour ${userKeyword}
+Développez une approche structurée :
+- **Planification** : Établissez un plan d'action pour ${userKeyword}
+- **Ressources** : Identifiez les outils nécessaires pour ${userKeyword}
+- **Timeline** : Définissez un calendrier réaliste pour ${userKeyword}
 
-2025 est l'année parfaite pour s'intéresser à ${userKeyword} car :
-- Les innovations récentes ont simplifié l'approche de ${userKeyword}
-- Les ressources sur ${userKeyword} sont maintenant plus accessibles
-- L'information de qualité sur ${userKeyword} est disponible
-- C'est le moment idéal pour se lancer avec ${userKeyword}
+### Étape 3 : Mise en œuvre de ${userKeyword}
+- Commencez par les aspects fondamentaux de ${userKeyword}
+- Progressez étape par étape avec ${userKeyword}
+- Mesurez régulièrement vos progrès avec ${userKeyword}
 
-## Comment bien choisir ${userKeyword}
+## Meilleures pratiques pour ${userKeyword}
 
-### Étape 1 : Définir vos besoins pour ${userKeyword}
-Avant de vous lancer avec ${userKeyword}, posez-vous ces questions :
-- Quel est votre objectif principal avec ${userKeyword} ?
-- Quel budget pouvez-vous allouer à ${userKeyword} ?
-- Dans quel délai souhaitez-vous des résultats avec ${userKeyword} ?
+### Conseils d'experts pour ${userKeyword}
+1. **Restez informé** : Suivez les actualités sur ${userKeyword}
+2. **Expérimentez** : Testez différentes approches de ${userKeyword}
+3. **Mesurez** : Analysez l'impact de vos actions sur ${userKeyword}
+4. **Adaptez** : Ajustez votre stratégie ${userKeyword} si nécessaire
 
-### Étape 2 : Comparer les options de ${userKeyword}
-Ne vous précipitez pas sur la première option de ${userKeyword}. Prenez le temps de comparer :
-- **Fonctionnalités** : Vérifiez que ${userKeyword} couvre tous vos besoins
-- **Prix** : Analysez le rapport qualité-prix de ${userKeyword}
-- **Support** : Assurez-vous d'avoir un accompagnement pour ${userKeyword}
-
-## Conseils d'experts pour ${userKeyword}
-
-### Conseil n°1 : Commencez simple avec ${userKeyword}
-Ne cherchez pas la complexité dès le départ avec ${userKeyword}. Maîtrisez d'abord les bases avant d'explorer les fonctionnalités avancées de ${userKeyword}.
-
-### Conseil n°2 : Planifiez sur le long terme pour ${userKeyword}
-${userKeyword} n'est pas une solution miracle instantanée. Prévoyez une approche progressive avec ${userKeyword} et des résultats sur plusieurs mois.
-
-### Conseil n°3 : Restez informé sur ${userKeyword}
-Le domaine de ${userKeyword} évolue rapidement. Suivez les actualités sur ${userKeyword}, participez à des formations et échangez avec d'autres praticiens de ${userKeyword}.
+### Erreurs à éviter avec ${userKeyword}
+- Ne pas sous-estimer l'importance de ${userKeyword}
+- Négliger la veille sur ${userKeyword}
+- Manquer de patience avec ${userKeyword}
+- Oublier de mesurer les résultats de ${userKeyword}
 
 ## Questions fréquentes sur ${userKeyword}
 
-### Combien coûte ${userKeyword} ?
-Le coût de ${userKeyword} varie considérablement selon vos besoins :
-- **Solution de base pour ${userKeyword}** : 0 à 50€/mois
-- **Solution intermédiaire pour ${userKeyword}** : 50 à 200€/mois  
-- **Solution premium pour ${userKeyword}** : 200€ et plus/mois
-
 ### Combien de temps faut-il pour maîtriser ${userKeyword} ?
-La courbe d'apprentissage de ${userKeyword} dépend de votre niveau initial :
-- **Bases de ${userKeyword}** : 1 à 2 semaines
-- **Niveau intermédiaire avec ${userKeyword}** : 1 à 3 mois
-- **Maîtrise de ${userKeyword}** : 6 mois à 1 an
+La maîtrise de ${userKeyword} dépend de plusieurs facteurs :
+- Votre niveau de départ avec ${userKeyword}
+- Le temps que vous consacrez à ${userKeyword}
+- La complexité de votre domaine d'application de ${userKeyword}
 
-### ${userKeyword} convient-il aux débutants ?
-Absolument ! De nombreuses solutions ${userKeyword} sont spécialement conçues pour les débutants. Commencez par les options les plus simples de ${userKeyword} et progressez à votre rythme.
+En général, comptez :
+- **Bases de ${userKeyword}** : 2-4 semaines
+- **Niveau intermédiaire** : 2-6 mois
+- **Expertise en ${userKeyword}** : 1-2 ans
+
+### Quels sont les coûts associés à ${userKeyword} ?
+Les coûts varient selon vos besoins :
+- **Formation ${userKeyword}** : 100-1000€
+- **Outils pour ${userKeyword}** : 50-500€/mois
+- **Accompagnement ${userKeyword}** : 500-5000€
 
 ## Conclusion sur ${userKeyword}
 
-${userKeyword} représente une opportunité fantastique en 2025. Avec les bonnes informations, une approche méthodique et de la patience, vous pouvez obtenir d'excellents résultats avec ${userKeyword}.
+${userKeyword} représente un investissement stratégique important en 2025. Avec une approche méthodique et les bonnes ressources, vous pouvez obtenir d'excellents résultats avec ${userKeyword}.
 
-### Points clés à retenir sur ${userKeyword} :
-1. **Commencez simple** avec ${userKeyword} et progressez étape par étape
-2. **Planifiez sur le long terme** pour des résultats durables avec ${userKeyword}
-3. **Restez informé** des évolutions de ${userKeyword}
-4. **Mesurez vos résultats** avec ${userKeyword} et ajustez si nécessaire
-5. **N'hésitez pas à demander conseil** aux experts de ${userKeyword}
+### Points clés à retenir :
+- ${userKeyword} nécessite une approche structurée
+- La réussite avec ${userKeyword} demande du temps et de la patience
+- Les bénéfices de ${userKeyword} sont durables
+- L'évolution constante de ${userKeyword} nécessite une veille permanente
 
-N'attendez plus pour vous lancer avec ${userKeyword} ! Les meilleures opportunités sont souvent saisies par ceux qui agissent en premier.
+N'hésitez pas à commencer dès maintenant votre parcours avec ${userKeyword} !
 
 ---
-
-*Guide ${userKeyword} rédigé le ${new Date().toLocaleDateString('fr-FR')}*`;
+*Guide rédigé le ${new Date().toLocaleDateString('fr-FR')} - Dernière mise à jour sur ${userKeyword}*`;
 
     setGeneratedArticle(article);
   };
@@ -245,122 +248,177 @@ N'attendez plus pour vous lancer avec ${userKeyword} ! Les meilleures opportunit
   };
 
   return (
-    <div className="space-y-6">
-      <Card className="p-6 bg-gradient-to-r from-blue-50 to-purple-50">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            Générateur de Mots-Clés IA Avancé
+    <div className="space-y-8">
+      {/* Hero Section with Gradient */}
+      <Card className="relative overflow-hidden border-0 shadow-2xl">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/90 via-purple-600/90 to-pink-500/90"></div>
+        <CardContent className="relative p-12 text-center text-white">
+          <div className="flex justify-center mb-6">
+            <div className="p-4 bg-white/20 rounded-full backdrop-blur-sm">
+              <Sparkles className="h-12 w-12 text-white" />
+            </div>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
+            Générateur de Mots-Clés IA
           </h1>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Générez des mots-clés intelligents avec l'IA. Obtenez des suggestions sémantiques, 
-            longue traîne, analyses approfondies, générateur de contenu et optimisation complète.
+          <p className="text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
+            Découvrez des mots-clés performants avec l'intelligence artificielle. 
+            Analysez la concurrence, générez du contenu optimisé et boostez votre SEO.
           </p>
-        </div>
+        </CardContent>
       </Card>
 
-      <Card className="p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <Search className="h-5 w-5 text-blue-500" />
-          <h2 className="text-xl font-bold">Générateur de mots-clés</h2>
-        </div>
-        
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-4">
-          <Input 
-            placeholder="Entrez votre mot-clé principal"
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            className="w-full"
-          />
-          
-          <Select value={language} onValueChange={setLanguage}>
-            <SelectTrigger>
-              <SelectValue placeholder="Langue" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="fr">Français</SelectItem>
-              <SelectItem value="en">Anglais</SelectItem>
-              <SelectItem value="es">Espagnol</SelectItem>
-            </SelectContent>
-          </Select>
-          
-          <Button 
-            onClick={generateKeywords}
-            disabled={isLoading || !keyword.trim()}
-            className="w-full"
-          >
-            {isLoading ? (
-              <>
-                <Zap className="mr-2 h-4 w-4 animate-spin" />
-                Génération...
-              </>
-            ) : (
-              <>
-                <Sparkles className="mr-2 h-4 w-4" />
-                Générer
-              </>
-            )}
-          </Button>
+      {/* Main Generator Card */}
+      <Card className="shadow-xl border-2 border-gradient-to-r from-blue-200 to-purple-200">
+        <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 border-b">
+          <CardTitle className="flex items-center gap-3 text-2xl">
+            <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg">
+              <Search className="h-6 w-6 text-white" />
+            </div>
+            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Générateur de mots-clés
+            </span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-8">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-6">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Mot-clé principal</label>
+              <Input 
+                placeholder="ex: marketing digital"
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                className="border-2 border-blue-200 focus:border-blue-500 rounded-lg"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Langue</label>
+              <Select value={language} onValueChange={setLanguage}>
+                <SelectTrigger className="border-2 border-blue-200 focus:border-blue-500 rounded-lg">
+                  <SelectValue placeholder="Langue" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="fr">🇫🇷 Français</SelectItem>
+                  <SelectItem value="en">🇺🇸 Anglais</SelectItem>
+                  <SelectItem value="es">🇪🇸 Espagnol</SelectItem>
+                  <SelectItem value="de">🇩🇪 Allemand</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <Button 
+              onClick={generateKeywords}
+              disabled={isLoading || !keyword.trim()}
+              className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-lg h-12 mt-6"
+            >
+              {isLoading ? (
+                <>
+                  <Zap className="mr-2 h-5 w-5 animate-spin" />
+                  Génération...
+                </>
+              ) : (
+                <>
+                  <Rocket className="mr-2 h-5 w-5" />
+                  Générer les mots-clés
+                </>
+              )}
+            </Button>
 
-          {hasGenerated && generatedArticle && (
-            <Dialog open={showArticleDialog} onOpenChange={setShowArticleDialog}>
-              <DialogTrigger asChild>
-                <Button 
-                  variant="secondary" 
-                  className="w-full bg-green-100 hover:bg-green-200 text-green-800 border-green-300"
-                >
-                  <Eye className="mr-2 h-4 w-4" />
-                  Voir l'Article
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle className="flex items-center justify-between">
-                    <span>Article Professionnel - {keyword}</span>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm" onClick={copyArticle}>
-                        <Copy className="h-4 w-4 mr-1" />
-                        Copier
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={downloadArticle}>
-                        <Download className="h-4 w-4 mr-1" />
-                        Télécharger
-                      </Button>
+            {hasGenerated && generatedArticle && (
+              <Dialog open={showArticleDialog} onOpenChange={setShowArticleDialog}>
+                <DialogTrigger asChild>
+                  <Button 
+                    className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-lg h-12 mt-6"
+                  >
+                    <Eye className="mr-2 h-5 w-5" />
+                    Voir l'Article
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-5xl max-h-[80vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center justify-between text-xl">
+                      <span className="flex items-center gap-2">
+                        <Target className="h-6 w-6 text-blue-500" />
+                        Article Optimisé SEO - {keyword}
+                      </span>
+                      <div className="flex gap-3">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={copyArticle}
+                          className="hover:bg-blue-50 border-blue-200"
+                        >
+                          <Copy className="h-4 w-4 mr-2" />
+                          Copier
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={downloadArticle}
+                          className="hover:bg-green-50 border-green-200"
+                        >
+                          <Download className="h-4 w-4 mr-2" />
+                          Télécharger
+                        </Button>
+                      </div>
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="mt-6">
+                    <div className="bg-gradient-to-br from-gray-50 to-blue-50 p-6 rounded-xl border-2 border-blue-100 max-h-96 overflow-y-auto">
+                      <pre className="whitespace-pre-wrap text-sm text-gray-800 leading-relaxed">
+                        {generatedArticle}
+                      </pre>
                     </div>
-                  </DialogTitle>
-                </DialogHeader>
-                <div className="prose prose-lg max-w-none mt-4">
-                  <div className="whitespace-pre-wrap text-sm bg-gray-50 p-4 rounded-lg max-h-96 overflow-y-auto">
-                    {generatedArticle}
                   </div>
-                </div>
-              </DialogContent>
-            </Dialog>
+                </DialogContent>
+              </Dialog>
+            )}
+          </div>
+
+          {hasGenerated && (
+            <div className="flex items-center gap-2 p-4 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-lg">
+              <TrendingUp className="h-5 w-5 text-green-600" />
+              <span className="text-green-700 font-medium">
+                ✨ {keywords.length} mots-clés générés avec succès !
+              </span>
+            </div>
           )}
-        </div>
+        </CardContent>
       </Card>
 
       {hasGenerated && (
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <KeywordTabsNavigation 
-            activeTab={activeTab} 
-            setActiveTab={setActiveTab} 
-            hasResults={hasGenerated} 
-          />
-          <KeywordTabsContent 
-            activeTab={activeTab} 
-            keywords={keywords} 
-            keyword={keyword} 
-          />
-        </Tabs>
+        <div className="bg-white rounded-xl shadow-xl border-2 border-gray-100">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <div className="border-b bg-gradient-to-r from-gray-50 to-blue-50 p-2 rounded-t-xl">
+              <KeywordTabsNavigation 
+                activeTab={activeTab} 
+                setActiveTab={setActiveTab} 
+                hasResults={hasGenerated} 
+              />
+            </div>
+            <div className="p-6">
+              <KeywordTabsContent 
+                activeTab={activeTab} 
+                keywords={keywords} 
+                keyword={keyword} 
+              />
+            </div>
+          </Tabs>
+        </div>
       )}
 
       {!hasGenerated && !isLoading && (
-        <Card className="p-12 text-center">
-          <Search className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-xl font-medium mb-2">Commencez votre recherche</h3>
-          <p className="text-gray-600 max-w-md mx-auto">
+        <Card className="p-16 text-center bg-gradient-to-br from-gray-50 to-blue-50 border-2 border-dashed border-blue-200">
+          <div className="p-6 bg-white rounded-full w-32 h-32 mx-auto mb-6 shadow-lg">
+            <Search className="h-20 w-20 text-blue-400 mx-auto mt-6" />
+          </div>
+          <h3 className="text-2xl font-bold mb-4 text-gray-800">Commencez votre recherche</h3>
+          <p className="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed">
             Entrez un mot-clé pour générer des suggestions intelligentes, 
-            analyser la concurrence et découvrir de nouvelles opportunités SEO.
+            analyser la concurrence et découvrir de nouvelles opportunités SEO. 
+            Notre IA vous accompagne dans votre stratégie de contenu.
           </p>
         </Card>
       )}
