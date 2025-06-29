@@ -14,7 +14,9 @@ import {
   CheckCircle,
   Globe,
   Target,
-  TrendingUp
+  TrendingUp,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { KeywordSuggestion } from '@/types/seo/Keyword';
@@ -30,6 +32,7 @@ const ComprehensiveArticleGenerator: React.FC<ComprehensiveArticleGeneratorProps
 }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedArticle, setGeneratedArticle] = useState('');
+  const [showPreview, setShowPreview] = useState(false);
   const [articleStats, setArticleStats] = useState({
     wordCount: 0,
     readingTime: 0,
@@ -151,6 +154,7 @@ N'hésitez pas à commencer dès aujourd'hui en appliquant les conseils de ce gu
 *Article généré automatiquement - ${new Date().toLocaleDateString('fr-FR')}*`;
 
       setGeneratedArticle(article);
+      setShowPreview(true);
       
       // Calculate stats
       const wordCount = article.split(/\s+/).length;
@@ -191,6 +195,20 @@ N'hésitez pas à commencer dès aujourd'hui en appliquant les conseils de ce gu
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     toast.success('Article téléchargé');
+  };
+
+  // Convert markdown to HTML for preview
+  const renderMarkdownAsHTML = (markdown: string) => {
+    return markdown
+      .replace(/^# (.*$)/gim, '<h1 class="text-3xl font-bold mb-4 text-gray-900">$1</h1>')
+      .replace(/^## (.*$)/gim, '<h2 class="text-2xl font-semibold mb-3 text-gray-800 mt-6">$1</h2>')
+      .replace(/^### (.*$)/gim, '<h3 class="text-xl font-medium mb-2 text-gray-700 mt-4">$1</h3>')
+      .replace(/^\*\*(.*?)\*\*/gim, '<strong class="font-semibold">$1</strong>')
+      .replace(/^\* (.*$)/gim, '<li class="ml-4">$1</li>')
+      .replace(/^- (.*$)/gim, '<li class="ml-4 list-disc">$1</li>')
+      .replace(/\n\n/g, '</p><p class="mb-3">')
+      .replace(/^(?!<[h|l])/gm, '<p class="mb-3">')
+      .replace(/\n/g, '<br>');
   };
 
   return (
@@ -270,6 +288,23 @@ N'hésitez pas à commencer dès aujourd'hui en appliquant les conseils de ce gu
             </div>
             
             <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setShowPreview(!showPreview)}
+              >
+                {showPreview ? (
+                  <>
+                    <EyeOff className="h-4 w-4 mr-1" />
+                    Code
+                  </>
+                ) : (
+                  <>
+                    <Eye className="h-4 w-4 mr-1" />
+                    Aperçu
+                  </>
+                )}
+              </Button>
               <Button variant="outline" size="sm" onClick={copyArticle}>
                 <Copy className="h-4 w-4 mr-1" />
                 Copier
@@ -283,13 +318,22 @@ N'hésitez pas à commencer dès aujourd'hui en appliquant les conseils de ce gu
           
           <Separator className="mb-4" />
           
-          <div className="max-h-96 overflow-y-auto">
-            <Textarea
-              value={generatedArticle}
-              onChange={(e) => setGeneratedArticle(e.target.value)}
-              className="min-h-[300px] font-mono text-sm"
-              placeholder="L'article généré apparaîtra ici..."
-            />
+          <div className="max-h-96 overflow-y-auto border rounded-lg">
+            {showPreview ? (
+              <div 
+                className="p-6 prose prose-lg max-w-none"
+                dangerouslySetInnerHTML={{ 
+                  __html: renderMarkdownAsHTML(generatedArticle) 
+                }}
+              />
+            ) : (
+              <Textarea
+                value={generatedArticle}
+                onChange={(e) => setGeneratedArticle(e.target.value)}
+                className="min-h-[300px] font-mono text-sm border-0 resize-none"
+                placeholder="L'article généré apparaîtra ici..."
+              />
+            )}
           </div>
         </Card>
       )}
