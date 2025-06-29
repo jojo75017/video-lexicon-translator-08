@@ -66,6 +66,12 @@ export interface ContentGap {
   keyword: string;
   missingContent: string[];
   opportunity: number;
+  searchVolume?: number;
+  difficulty?: number;
+  priority?: 'high' | 'medium' | 'low';
+  currentRanking?: number;
+  competitorRanking?: number;
+  contentSuggestion?: string;
 }
 
 export interface SemanticCluster {
@@ -77,4 +83,49 @@ export interface SemanticCluster {
   difficulty: number;
   opportunity: number;
   contentType: string;
+}
+
+export interface CompetitorData {
+  name: string;
+  url: string;
+  domain: string;
+  title: string;
+  description: string;
+  ranking: number;
+  traffic: number;
+  strength: number;
+  organic_traffic: number;
+  estimatedTraffic: number;
+  keywords: number;
+  topKeywords: string[];
+  gaps: string[];
+  backlinks?: number;
+  authority?: number;
+}
+
+export interface VoiceSearchData {
+  keyword: string;
+  isVoiceOptimized: boolean;
+  questionFormat: string;
+  conversationalVariants: string[];
+  avgQuestionLength: number;
+  featuredSnippetChance: number;
+  voiceScore: number;
+  naturalLanguageQueries: string[];
+  conversationalKeywords: string[];
+}
+
+export interface RoiParameters {
+  seoInvestment: number;
+  acquisitionCost: number;
+  conversionRate: number;
+  averageOrderValue: number;
+  organicTraffic: number;
+  timeFrame: number;
+  targetKeywords: string[];
+  averagePosition: number;
+  clickThroughRate: number;
+  contentCost: number;
+  linkBuildingCost: number;
+  toolsCost: number;
 }

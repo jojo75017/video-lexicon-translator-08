@@ -4,26 +4,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { 
   Search, 
   Sparkles, 
-  Target, 
-  TrendingUp, 
-  Building2, 
-  FileText, 
-  Users, 
-  BarChart3,
-  Lightbulb,
-  Download,
-  Key,
-  MessageSquare,
   Zap,
   Eye,
   Copy,
-  TreePine
+  Download
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { KeywordSuggestion } from '@/types/seo/Keyword';
@@ -37,7 +26,7 @@ const AdvancedKeywordGenerator: React.FC<AdvancedKeywordGeneratorProps> = () => 
   const [language, setLanguage] = useState('fr');
   const [isLoading, setIsLoading] = useState(false);
   const [keywords, setKeywords] = useState<KeywordSuggestion[]>([]);
-  const [activeTab, setActiveTab] = useState('generator');
+  const [activeTab, setActiveTab] = useState('keywords');
   const [hasGenerated, setHasGenerated] = useState(false);
   const [generatedArticle, setGeneratedArticle] = useState('');
   const [showArticleDialog, setShowArticleDialog] = useState(false);
@@ -66,8 +55,8 @@ const AdvancedKeywordGenerator: React.FC<AdvancedKeywordGeneratorProps> = () => 
           opportunity: 75,
           searchVolume: 2400,
           relevance: 90,
-          suggestedTitle: `Guide Complet - ${keyword.charAt(0).toUpperCase() + keyword.slice(1)} 2025`,
-          suggestedDescription: `Découvrez tout sur ${keyword} avec notre guide expert. Conseils pratiques et stratégies éprouvées.`
+          suggestedTitle: `Guide Complet ${keyword.charAt(0).toUpperCase() + keyword.slice(1)} 2025`,
+          suggestedDescription: `Découvrez tout sur ${keyword} avec notre guide expert. Conseils pratiques et stratégies éprouvées pour ${keyword}.`
         },
         {
           keyword: `comment ${keyword}`,
@@ -82,7 +71,7 @@ const AdvancedKeywordGenerator: React.FC<AdvancedKeywordGeneratorProps> = () => 
           searchVolume: 1800,
           relevance: 85,
           suggestedTitle: `Comment ${keyword} - Guide Pratique`,
-          suggestedDescription: `Apprenez ${keyword} étape par étape avec nos conseils d'experts.`
+          suggestedDescription: `Apprenez comment bien faire ${keyword} étape par étape avec nos conseils d'experts.`
         },
         {
           keyword: `${keyword} prix`,
@@ -96,8 +85,8 @@ const AdvancedKeywordGenerator: React.FC<AdvancedKeywordGeneratorProps> = () => 
           opportunity: 65,
           searchVolume: 3200,
           relevance: 95,
-          suggestedTitle: `Prix ${keyword} 2025 : Comparatif Complet`,
-          suggestedDescription: `Découvrez les prix ${keyword} actuels. Comparaisons, promotions et conseils d'achat.`
+          suggestedTitle: `Prix ${keyword.charAt(0).toUpperCase() + keyword.slice(1)} 2025 : Comparatif`,
+          suggestedDescription: `Découvrez les prix ${keyword} actuels. Comparaisons détaillées, promotions et conseils d'achat pour ${keyword}.`
         },
         {
           keyword: `meilleur ${keyword}`,
@@ -111,8 +100,8 @@ const AdvancedKeywordGenerator: React.FC<AdvancedKeywordGeneratorProps> = () => 
           opportunity: 70,
           searchVolume: 2800,
           relevance: 88,
-          suggestedTitle: `Meilleur ${keyword} 2025 : Top 10`,
-          suggestedDescription: `Classement des meilleurs ${keyword}. Tests, avis et recommandations d'experts.`
+          suggestedTitle: `Meilleur ${keyword.charAt(0).toUpperCase() + keyword.slice(1)} 2025 : Top 10`,
+          suggestedDescription: `Classement des meilleurs ${keyword}. Tests complets, avis détaillés et recommandations d'experts pour ${keyword}.`
         },
         {
           keyword: `${keyword} conseils`,
@@ -127,7 +116,7 @@ const AdvancedKeywordGenerator: React.FC<AdvancedKeywordGeneratorProps> = () => 
           searchVolume: 1600,
           relevance: 82,
           suggestedTitle: `${keyword.charAt(0).toUpperCase() + keyword.slice(1)} : Conseils d'Experts`,
-          suggestedDescription: `Conseils pratiques pour ${keyword}. Guide complet avec exemples concrets.`
+          suggestedDescription: `Conseils pratiques pour ${keyword}. Guide complet avec exemples concrets et astuces d'experts.`
         }
       ];
 
@@ -148,172 +137,91 @@ const AdvancedKeywordGenerator: React.FC<AdvancedKeywordGeneratorProps> = () => 
   const generateArticle = (userKeyword: string) => {
     if (!userKeyword) return;
     
-    // Générer un article spécifique au mot-clé saisi
     const article = `# ${userKeyword.charAt(0).toUpperCase() + userKeyword.slice(1)} : Guide Complet 2025
 
-## Table des matières
-1. [Introduction](#introduction)
-2. [Pourquoi s'intéresser à ${userKeyword} ?](#pourquoi)
-3. [Les meilleures options pour ${userKeyword}](#meilleures-options)
-4. [Comment bien choisir ${userKeyword}](#comment-choisir)
-5. [Conseils d'experts pour ${userKeyword}](#conseils-experts)
-6. [Erreurs courantes à éviter](#erreurs-courantes)
-7. [FAQ - Questions fréquentes](#faq)
-8. [Tendances 2025 pour ${userKeyword}](#tendances)
-9. [Conclusion](#conclusion)
+## Introduction
 
-## Introduction {#introduction}
+Si vous cherchez des informations sur **${userKeyword}**, vous êtes au bon endroit ! Ce guide complet vous donnera toutes les clés pour bien comprendre et maîtriser ${userKeyword}.
 
-Si vous cherchez des informations sur **${userKeyword}**, vous êtes au bon endroit ! Ce guide complet vous donnera toutes les clés pour bien comprendre et maîtriser ce sujet important.
+${userKeyword} est devenu un élément incontournable en 2025. Que vous soyez débutant ou que vous souhaitiez approfondir vos connaissances sur ${userKeyword}, ce guide détaillé vous accompagnera pas à pas.
 
-${userKeyword} est devenu un élément incontournable qu'il faut absolument connaître en 2025. Que vous soyez débutant ou que vous souhaitiez approfondir vos connaissances, ce guide détaillé vous accompagnera pas à pas.
+## Pourquoi s'intéresser à ${userKeyword} ?
 
-## Pourquoi s'intéresser à ${userKeyword} ? {#pourquoi}
-
-### Les avantages principaux
+### Les avantages principaux de ${userKeyword}
 
 Comprendre ${userKeyword} présente de nombreux avantages :
 
-- **Gain de temps** : Une bonne maîtrise de ${userKeyword} vous permettra d'être plus efficace
-- **Économies** : Évitez les erreurs coûteuses en connaissant les bonnes pratiques
-- **Résultats optimaux** : Obtenez de meilleurs résultats en appliquant les bonnes méthodes
-- **Confiance** : Prenez des décisions éclairées concernant ${userKeyword}
+- **Efficacité** : Une bonne maîtrise de ${userKeyword} vous permettra d'être plus performant
+- **Économies** : Évitez les erreurs coûteuses en connaissant les bonnes pratiques de ${userKeyword}
+- **Résultats optimaux** : Obtenez de meilleurs résultats en appliquant les bonnes méthodes pour ${userKeyword}
+- **Expertise** : Développez votre expertise sur ${userKeyword}
 
-### Pourquoi maintenant ?
+### Pourquoi ${userKeyword} maintenant ?
 
 2025 est l'année parfaite pour s'intéresser à ${userKeyword} car :
-- Les innovations récentes ont simplifié l'approche
-- Les coûts sont devenus plus accessibles
-- L'information de qualité est maintenant disponible
-- La concurrence n'est pas encore trop forte
+- Les innovations récentes ont simplifié l'approche de ${userKeyword}
+- Les ressources sur ${userKeyword} sont maintenant plus accessibles
+- L'information de qualité sur ${userKeyword} est disponible
+- C'est le moment idéal pour se lancer avec ${userKeyword}
 
-## Les meilleures options pour ${userKeyword} {#meilleures-options}
+## Comment bien choisir ${userKeyword}
 
-### Option 1 : L'approche classique
-L'approche traditionnelle de ${userKeyword} reste une valeur sûre. Elle convient parfaitement aux débutants et offre :
-- **Fiabilité** : Méthodes éprouvées et testées
-- **Simplicité** : Facile à comprendre et à mettre en œuvre  
-- **Coût maîtrisé** : Budget prévisible et raisonnable
+### Étape 1 : Définir vos besoins pour ${userKeyword}
+Avant de vous lancer avec ${userKeyword}, posez-vous ces questions :
+- Quel est votre objectif principal avec ${userKeyword} ?
+- Quel budget pouvez-vous allouer à ${userKeyword} ?
+- Dans quel délai souhaitez-vous des résultats avec ${userKeyword} ?
 
-### Option 2 : L'approche moderne
-Les nouvelles approches de ${userKeyword} apportent innovation et efficacité :
-- **Performance** : Résultats supérieurs aux méthodes classiques
-- **Rapidité** : Mise en œuvre plus rapide
-- **Flexibilité** : S'adapte à différents contextes
+### Étape 2 : Comparer les options de ${userKeyword}
+Ne vous précipitez pas sur la première option de ${userKeyword}. Prenez le temps de comparer :
+- **Fonctionnalités** : Vérifiez que ${userKeyword} couvre tous vos besoins
+- **Prix** : Analysez le rapport qualité-prix de ${userKeyword}
+- **Support** : Assurez-vous d'avoir un accompagnement pour ${userKeyword}
 
-### Option 3 : L'approche hybride
-Combiner les avantages des deux approches précédentes :
-- **Équilibre** : Le meilleur des deux mondes
-- **Personnalisation** : Adaptation selon vos besoins spécifiques
-- **Évolutivité** : Possibilité de faire évoluer votre approche
+## Conseils d'experts pour ${userKeyword}
 
-## Comment bien choisir ${userKeyword} {#comment-choisir}
+### Conseil n°1 : Commencez simple avec ${userKeyword}
+Ne cherchez pas la complexité dès le départ avec ${userKeyword}. Maîtrisez d'abord les bases avant d'explorer les fonctionnalités avancées de ${userKeyword}.
 
-### Étape 1 : Définir vos besoins
-Avant de vous lancer avec ${userKeyword}, posez-vous ces questions essentielles :
-- Quel est votre objectif principal ?
-- Quel budget pouvez-vous allouer ?
-- Dans quel délai souhaitez-vous des résultats ?
-- Avez-vous des contraintes particulières ?
+### Conseil n°2 : Planifiez sur le long terme pour ${userKeyword}
+${userKeyword} n'est pas une solution miracle instantanée. Prévoyez une approche progressive avec ${userKeyword} et des résultats sur plusieurs mois.
 
-### Étape 2 : Comparer les options
-Ne vous précipitez pas sur la première option venue. Prenez le temps de comparer :
-- **Fonctionnalités** : Vérifiez que tous vos besoins sont couverts
-- **Prix** : Analysez le rapport qualité-prix
-- **Support** : Assurez-vous d'avoir un accompagnement si nécessaire
-- **Évolutivité** : Pensez à vos besoins futurs
+### Conseil n°3 : Restez informé sur ${userKeyword}
+Le domaine de ${userKeyword} évolue rapidement. Suivez les actualités sur ${userKeyword}, participez à des formations et échangez avec d'autres praticiens de ${userKeyword}.
 
-### Étape 3 : Tester avant de s'engager
-Chaque fois que c'est possible :
-- Demandez une période d'essai
-- Consultez les avis d'autres utilisateurs
-- Vérifiez les références et études de cas
-- Posez toutes vos questions avant de décider
-
-## Conseils d'experts pour ${userKeyword} {#conseils-experts}
-
-### Conseil n°1 : Commencez simple
-Ne cherchez pas la complexité dès le départ. Maîtrisez d'abord les bases de ${userKeyword} avant d'explorer les fonctionnalités avancées.
-
-### Conseil n°2 : Planifiez sur le long terme
-${userKeyword} n'est pas une solution miracle instantanée. Prévoyez une approche progressive et des résultats sur plusieurs mois.
-
-### Conseil n°3 : Restez informé
-Le domaine de ${userKeyword} évolue rapidement. Suivez les actualités, participez à des formations et échangez avec d'autres praticiens.
-
-### Conseil n°4 : Mesurez vos résultats
-Mettez en place des indicateurs pour mesurer l'efficacité de votre approche de ${userKeyword}. Ajustez si nécessaire.
-
-## FAQ - Questions fréquentes {#faq}
+## Questions fréquentes sur ${userKeyword}
 
 ### Combien coûte ${userKeyword} ?
 Le coût de ${userKeyword} varie considérablement selon vos besoins :
-- **Solution de base** : 0 à 50€/mois
-- **Solution intermédiaire** : 50 à 200€/mois  
-- **Solution premium** : 200€ et plus/mois
+- **Solution de base pour ${userKeyword}** : 0 à 50€/mois
+- **Solution intermédiaire pour ${userKeyword}** : 50 à 200€/mois  
+- **Solution premium pour ${userKeyword}** : 200€ et plus/mois
 
 ### Combien de temps faut-il pour maîtriser ${userKeyword} ?
-La courbe d'apprentissage dépend de votre niveau initial :
-- **Bases** : 1 à 2 semaines
-- **Niveau intermédiaire** : 1 à 3 mois
-- **Maîtrise** : 6 mois à 1 an
+La courbe d'apprentissage de ${userKeyword} dépend de votre niveau initial :
+- **Bases de ${userKeyword}** : 1 à 2 semaines
+- **Niveau intermédiaire avec ${userKeyword}** : 1 à 3 mois
+- **Maîtrise de ${userKeyword}** : 6 mois à 1 an
 
 ### ${userKeyword} convient-il aux débutants ?
-Absolument ! De nombreuses solutions sont spécialement conçues pour les débutants. Commencez par les options les plus simples et progressez à votre rythme.
+Absolument ! De nombreuses solutions ${userKeyword} sont spécialement conçues pour les débutants. Commencez par les options les plus simples de ${userKeyword} et progressez à votre rythme.
 
-### Quelles sont les erreurs les plus courantes avec ${userKeyword} ?
-Les principales erreurs à éviter :
-- Se précipiter sans planification
-- Négliger la formation initiale
-- Choisir une solution trop complexe au début
-- Ne pas mesurer les résultats
+## Conclusion sur ${userKeyword}
 
-## Tendances 2025 pour ${userKeyword} {#tendances}
+${userKeyword} représente une opportunité fantastique en 2025. Avec les bonnes informations, une approche méthodique et de la patience, vous pouvez obtenir d'excellents résultats avec ${userKeyword}.
 
-### Intelligence artificielle
-L'IA révolutionne ${userKeyword} avec :
-- Automatisation des tâches répétitives
-- Analyse prédictive avancée
-- Personnalisation intelligente
-- Optimisation en temps réel
-
-### Mobilité et accessibilité
-${userKeyword} devient de plus en plus mobile :
-- Applications dédiées
-- Interface responsive
-- Accès hors ligne
-- Synchronisation multi-appareils
-
-### Durabilité et responsabilité
-L'approche de ${userKeyword} évolue vers plus de durabilité :
-- Solutions éco-responsables
-- Transparence accrue
-- Impact social positif
-- Économie circulaire
-
-## Conclusion {#conclusion}
-
-${userKeyword} représente une opportunité fantastique en 2025. Avec les bonnes informations, une approche méthodique et de la patience, vous pouvez obtenir d'excellents résultats.
-
-### Points clés à retenir :
-1. **Commencez simple** et progressez étape par étape
-2. **Planifiez sur le long terme** pour des résultats durables
-3. **Restez informé** des évolutions du secteur
-4. **Mesurez vos résultats** et ajustez si nécessaire
-5. **N'hésitez pas à demander conseil** aux experts
-
-### Prochaines étapes recommandées :
-- Définissez clairement vos objectifs avec ${userKeyword}
-- Établissez un budget réaliste
-- Choisissez votre première solution
-- Planifiez votre montée en compétences
-- Commencez votre premier projet
+### Points clés à retenir sur ${userKeyword} :
+1. **Commencez simple** avec ${userKeyword} et progressez étape par étape
+2. **Planifiez sur le long terme** pour des résultats durables avec ${userKeyword}
+3. **Restez informé** des évolutions de ${userKeyword}
+4. **Mesurez vos résultats** avec ${userKeyword} et ajustez si nécessaire
+5. **N'hésitez pas à demander conseil** aux experts de ${userKeyword}
 
 N'attendez plus pour vous lancer avec ${userKeyword} ! Les meilleures opportunités sont souvent saisies par ceux qui agissent en premier.
 
 ---
 
-*Guide rédigé le ${new Date().toLocaleDateString('fr-FR')} - Spécialiste ${userKeyword}*`;
+*Guide ${userKeyword} rédigé le ${new Date().toLocaleDateString('fr-FR')}*`;
 
     setGeneratedArticle(article);
   };
@@ -344,8 +252,8 @@ N'attendez plus pour vous lancer avec ${userKeyword} ! Les meilleures opportunit
             Générateur de Mots-Clés IA Avancé
           </h1>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Générez des mots-clés intelligents avec l'IA OpenAI. Obtenez des suggestions sémantiques, 
-            longue traîne, analyses approfondies, générateur de contenu, FAQ automatique et optimisation complète.
+            Générez des mots-clés intelligents avec l'IA. Obtenez des suggestions sémantiques, 
+            longue traîne, analyses approfondies, générateur de contenu et optimisation complète.
           </p>
         </div>
       </Card>
@@ -421,7 +329,7 @@ N'attendez plus pour vous lancer avec ${userKeyword} ! Les meilleures opportunit
                   </DialogTitle>
                 </DialogHeader>
                 <div className="prose prose-lg max-w-none mt-4">
-                  <div className="whitespace-pre-wrap text-sm font-mono bg-gray-50 p-4 rounded-lg max-h-96 overflow-y-auto">
+                  <div className="whitespace-pre-wrap text-sm bg-gray-50 p-4 rounded-lg max-h-96 overflow-y-auto">
                     {generatedArticle}
                   </div>
                 </div>

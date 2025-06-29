@@ -1,229 +1,125 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
-import { Network, Brain, Target, Zap, TrendingUp, Eye } from "lucide-react";
-import { toast } from "sonner";
-import { SemanticCluster, KeywordSuggestion } from "@/types/seo/Keyword";
+import { Lightbulb, Target } from 'lucide-react';
+import { SemanticCluster } from '@/types/seo/Keyword';
 
 interface SemanticAnalysisProps {
-  keyword?: string;
+  keyword: string;
 }
 
-const SemanticAnalysis: React.FC<SemanticAnalysisProps> = ({ keyword = '' }) => {
-  const [searchKeyword, setSearchKeyword] = useState(keyword);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [semanticClusters, setSemanticClusters] = useState<SemanticCluster[]>([]);
-  const [entityMapping, setEntityMapping] = useState<any[]>([]);
-  const [topicalAuthority, setTopicalAuthority] = useState<any[]>([]);
-
-  const analyzeSemantics = async () => {
-    if (!searchKeyword.trim()) {
-      toast.error("Veuillez entrer un mot-clé");
-      return;
+const SemanticAnalysis: React.FC<SemanticAnalysisProps> = ({ keyword }) => {
+  const clusters: SemanticCluster[] = [
+    {
+      id: '1',
+      name: `Guide ${keyword}`,
+      mainTopic: `${keyword} guide complet`,
+      keywords: [`guide ${keyword}`, `comment ${keyword}`, `${keyword} tutoriel`],
+      intent: 'informational',
+      difficulty: 35,
+      opportunity: 85,
+      contentType: 'Guide détaillé'
+    },
+    {
+      id: '2', 
+      name: `${keyword} commercial`,
+      mainTopic: `${keyword} prix et achat`,
+      keywords: [`${keyword} prix`, `acheter ${keyword}`, `${keyword} pas cher`],
+      intent: 'commercial',
+      difficulty: 55,
+      opportunity: 70,
+      contentType: 'Page commerciale'
+    },
+    {
+      id: '3',
+      name: `${keyword} comparatif`,
+      mainTopic: `meilleur ${keyword}`,
+      keywords: [`meilleur ${keyword}`, `${keyword} comparatif`, `top ${keyword}`],
+      intent: 'transactional',
+      difficulty: 65,
+      opportunity: 60,
+      contentType: 'Comparatif'
+    },
+    {
+      id: '4',
+      name: `${keyword} conseils`,
+      mainTopic: `${keyword} astuces`,
+      keywords: [`${keyword} conseils`, `${keyword} astuces`, `${keyword} tips`],
+      intent: 'informational',
+      difficulty: 25,
+      opportunity: 90,
+      contentType: 'Article conseil'
     }
+  ];
 
-    setIsAnalyzing(true);
-    
-    setTimeout(() => {
-      // Simulation d'analyse sémantique avancée
-      const clusters: SemanticCluster[] = [
-        {
-          mainTopic: `${searchKeyword} - Guide complet`,
-          keywords: [`guide ${searchKeyword}`, `tutoriel ${searchKeyword}`, `apprendre ${searchKeyword}`, `débuter avec ${searchKeyword}`],
-          intent: 'informational',
-          difficulty: 45,
-          opportunity: 78,
-          contentType: 'Guide détaillé'
-        },
-        {
-          mainTopic: `${searchKeyword} - Comparaison`,
-          keywords: [`meilleur ${searchKeyword}`, `${searchKeyword} vs`, `comparatif ${searchKeyword}`, `choisir ${searchKeyword}`],
-          intent: 'commercial',
-          difficulty: 62,
-          opportunity: 65,
-          contentType: 'Article comparatif'
-        },
-        {
-          mainTopic: `${searchKeyword} - Achat`,
-          keywords: [`acheter ${searchKeyword}`, `prix ${searchKeyword}`, `${searchKeyword} pas cher`, `promo ${searchKeyword}`],
-          intent: 'transactional',
-          difficulty: 78,
-          opportunity: 85,
-          contentType: 'Page produit'
-        },
-        {
-          mainTopic: `${searchKeyword} - Problèmes`,
-          keywords: [`problème ${searchKeyword}`, `erreur ${searchKeyword}`, `dépannage ${searchKeyword}`, `résoudre ${searchKeyword}`],
-          intent: 'informational',
-          difficulty: 35,
-          opportunity: 72,
-          contentType: 'FAQ / Support'
-        }
-      ];
-
-      const entities = [
-        { entity: searchKeyword, relevance: 95, type: 'Main Entity', mentions: 127 },
-        { entity: `${searchKeyword} professionnel`, relevance: 78, type: 'Related Entity', mentions: 89 },
-        { entity: `alternative ${searchKeyword}`, relevance: 65, type: 'Alternative', mentions: 56 },
-        { entity: `${searchKeyword} gratuit`, relevance: 82, type: 'Modifier', mentions: 73 }
-      ];
-
-      const authority = [
-        { topic: `Bases ${searchKeyword}`, authority: 85, coverage: 92, gaps: 2 },
-        { topic: `${searchKeyword} avancé`, authority: 67, coverage: 74, gaps: 8 },
-        { topic: `${searchKeyword} technique`, authority: 45, coverage: 58, gaps: 15 },
-        { topic: `Tendances ${searchKeyword}`, authority: 72, coverage: 81, gaps: 5 }
-      ];
-
-      setSemanticClusters(clusters);
-      setEntityMapping(entities);
-      setTopicalAuthority(authority);
-      setIsAnalyzing(false);
-      toast.success(`Analyse sémantique terminée pour "${searchKeyword}"`);
-    }, 3000);
+  const getIntentColor = (intent: string) => {
+    switch (intent) {
+      case 'informational': return 'bg-blue-100 text-blue-800';
+      case 'commercial': return 'bg-green-100 text-green-800';
+      case 'transactional': return 'bg-purple-100 text-purple-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
   };
 
-  const getDifficultyColor = (difficulty: number) => {
-    if (difficulty < 40) return 'text-green-600';
-    if (difficulty < 70) return 'text-yellow-600';
+  const getOpportunityColor = (opportunity: number) => {
+    if (opportunity >= 80) return 'text-green-600';
+    if (opportunity >= 60) return 'text-yellow-600';
     return 'text-red-600';
-  };
-
-  const getAuthorityColor = (authority: number) => {
-    if (authority >= 80) return 'bg-green-500';
-    if (authority >= 60) return 'bg-yellow-500';
-    return 'bg-red-500';
   };
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Brain className="h-5 w-5 text-purple-600" />
-          Analyse Sémantique Avancée
+          <Lightbulb className="h-5 w-5 text-yellow-500" />
+          Analyse Sémantique
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex gap-2">
-          <Input
-            placeholder="Mot-clé pour l'analyse sémantique..."
-            value={searchKeyword}
-            onChange={(e) => setSearchKeyword(e.target.value)}
-            className="flex-1"
-          />
-          <Button onClick={analyzeSemantics} disabled={isAnalyzing}>
-            {isAnalyzing ? 'Analyse...' : 'Analyser'}
-          </Button>
+      <CardContent>
+        <div className="space-y-4">
+          {clusters.map((cluster) => (
+            <div key={cluster.id} className="p-4 border rounded-lg">
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg">{cluster.name}</h3>
+                  <p className="text-sm text-gray-600 mt-1">{cluster.mainTopic}</p>
+                </div>
+                <Badge className={getIntentColor(cluster.intent)}>
+                  {cluster.intent}
+                </Badge>
+              </div>
+              
+              <div className="mb-3">
+                <h4 className="text-sm font-medium text-gray-700 mb-2">Mots-clés du cluster :</h4>
+                <div className="flex flex-wrap gap-2">
+                  {cluster.keywords.map((kw, index) => (
+                    <Badge key={index} variant="outline" className="text-xs">
+                      {kw}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-3 gap-4 text-sm">
+                <div>
+                  <span className="text-gray-600">Difficulté</span>
+                  <div className="font-medium">{cluster.difficulty}/100</div>
+                </div>
+                <div>
+                  <span className="text-gray-600">Opportunité</span>
+                  <div className={`font-medium ${getOpportunityColor(cluster.opportunity)}`}>
+                    {cluster.opportunity}%
+                  </div>
+                </div>
+                <div>
+                  <span className="text-gray-600">Type de contenu</span>
+                  <div className="font-medium">{cluster.contentType}</div>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
-
-        {semanticClusters.length > 0 && (
-          <Tabs defaultValue="clusters">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="clusters">Clusters sémantiques</TabsTrigger>
-              <TabsTrigger value="entities">Entités</TabsTrigger>
-              <TabsTrigger value="authority">Autorité topique</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="clusters" className="space-y-4">
-              {semanticClusters.map((cluster, index) => (
-                <Card key={index} className="p-4">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-medium">{cluster.mainTopic}</h3>
-                      <Badge className="bg-blue-100 text-blue-800">
-                        {cluster.contentType}
-                      </Badge>
-                    </div>
-                    
-                    <div className="flex gap-2 text-sm">
-                      <span>Intent: <Badge variant="outline">{cluster.intent}</Badge></span>
-                      <span className={getDifficultyColor(cluster.difficulty)}>
-                        Difficulté: {cluster.difficulty}/100
-                      </span>
-                      <span className="text-green-600">
-                        Opportunité: {cluster.opportunity}%
-                      </span>
-                    </div>
-
-                    <div>
-                      <p className="text-sm text-gray-600 mb-2">Mots-clés du cluster:</p>
-                      <div className="flex flex-wrap gap-1">
-                        {cluster.keywords.map((kw, idx) => (
-                          <Badge key={idx} variant="secondary" className="text-xs">
-                            {kw}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-
-                    <Progress value={cluster.opportunity} className="h-2" />
-                  </div>
-                </Card>
-              ))}
-            </TabsContent>
-
-            <TabsContent value="entities" className="space-y-3">
-              {entityMapping.map((entity, index) => (
-                <Card key={index} className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium">{entity.entity}</h4>
-                      <p className="text-sm text-gray-600">{entity.type}</p>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm font-medium">{entity.relevance}%</div>
-                      <div className="text-xs text-gray-500">{entity.mentions} mentions</div>
-                    </div>
-                  </div>
-                  <Progress value={entity.relevance} className="mt-2 h-2" />
-                </Card>
-              ))}
-            </TabsContent>
-
-            <TabsContent value="authority" className="space-y-3">
-              {topicalAuthority.map((topic, index) => (
-                <Card key={index} className="p-4">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-medium">{topic.topic}</h4>
-                      <Badge className={`${getAuthorityColor(topic.authority)} text-white`}>
-                        {topic.authority}% autorité
-                      </Badge>
-                    </div>
-                    
-                    <div className="grid grid-cols-3 gap-4 text-sm">
-                      <div>
-                        <span className="text-gray-600">Couverture:</span>
-                        <div className="font-medium">{topic.coverage}%</div>
-                      </div>
-                      <div>
-                        <span className="text-gray-600">Gaps:</span>
-                        <div className="font-medium text-red-600">{topic.gaps}</div>
-                      </div>
-                      <div>
-                        <span className="text-gray-600">Score:</span>
-                        <div className="font-medium">{topic.authority}/100</div>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-1">
-                      <div className="flex justify-between text-xs">
-                        <span>Autorité</span>
-                        <span>{topic.authority}%</span>
-                      </div>
-                      <Progress value={topic.authority} className="h-2" />
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </TabsContent>
-          </Tabs>
-        )}
       </CardContent>
     </Card>
   );
