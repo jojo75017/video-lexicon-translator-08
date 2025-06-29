@@ -385,11 +385,14 @@ N'hésitez pas à commencer dès aujourd'hui en appliquant les conseils de ce gu
             )}
           </Button>
 
-          {/* Bouton pour voir l'article */}
+          {/* Bouton pour voir l'article - Toujours visible si un article existe */}
           {hasGenerated && generatedArticle && (
             <Dialog open={showArticleDialog} onOpenChange={setShowArticleDialog}>
               <DialogTrigger asChild>
-                <Button variant="secondary" className="w-full">
+                <Button 
+                  variant="secondary" 
+                  className="w-full bg-green-100 hover:bg-green-200 text-green-800 border-green-300"
+                >
                   <Eye className="mr-2 h-4 w-4" />
                   Voir l'Article
                 </Button>
