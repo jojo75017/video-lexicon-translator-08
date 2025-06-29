@@ -22,10 +22,13 @@ import {
   MessageSquare,
   Zap,
   Eye,
-  Copy
+  Copy,
+  TreePine
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { KeywordSuggestion } from '@/types/seo/Keyword';
+import KeywordTabsNavigation from './KeywordTabsNavigation';
+import KeywordTabsContent from './KeywordTabsContent';
 
 interface AdvancedKeywordGeneratorProps {}
 
@@ -48,7 +51,6 @@ const AdvancedKeywordGenerator: React.FC<AdvancedKeywordGeneratorProps> = () => 
     setIsLoading(true);
     
     try {
-      // Simuler la génération de mots-clés
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       const generatedKeywords: KeywordSuggestion[] = [
@@ -64,7 +66,7 @@ const AdvancedKeywordGenerator: React.FC<AdvancedKeywordGeneratorProps> = () => 
           opportunity: 75,
           searchVolume: 2400,
           relevance: 90,
-          suggestedTitle: `Guide Complet ${keyword} 2025`,
+          suggestedTitle: `Guide Complet - ${keyword.charAt(0).toUpperCase() + keyword.slice(1)} 2025`,
           suggestedDescription: `Découvrez tout sur ${keyword} avec notre guide expert. Conseils pratiques et stratégies éprouvées.`
         },
         {
@@ -79,7 +81,7 @@ const AdvancedKeywordGenerator: React.FC<AdvancedKeywordGeneratorProps> = () => 
           opportunity: 80,
           searchVolume: 1800,
           relevance: 85,
-          suggestedTitle: `Comment ${keyword} Efficacement`,
+          suggestedTitle: `Comment ${keyword} - Guide Pratique`,
           suggestedDescription: `Apprenez ${keyword} étape par étape avec nos conseils d'experts.`
         },
         {
@@ -113,7 +115,7 @@ const AdvancedKeywordGenerator: React.FC<AdvancedKeywordGeneratorProps> = () => 
           suggestedDescription: `Classement des meilleurs ${keyword}. Tests, avis et recommandations d'experts.`
         },
         {
-          keyword: `${keyword} débutant`,
+          keyword: `${keyword} conseils`,
           volume: 1600,
           difficulty: 30,
           cpc: 0.9,
@@ -124,15 +126,14 @@ const AdvancedKeywordGenerator: React.FC<AdvancedKeywordGeneratorProps> = () => 
           opportunity: 85,
           searchVolume: 1600,
           relevance: 82,
-          suggestedTitle: `${keyword} pour Débutants : Guide Facile`,
-          suggestedDescription: `Commencez avec ${keyword} facilement. Guide débutant avec exemples pratiques.`
+          suggestedTitle: `${keyword.charAt(0).toUpperCase() + keyword.slice(1)} : Conseils d'Experts`,
+          suggestedDescription: `Conseils pratiques pour ${keyword}. Guide complet avec exemples concrets.`
         }
       ];
 
       setKeywords(generatedKeywords);
       setHasGenerated(true);
       
-      // Générer l'article automatiquement avec le vrai mot-clé de l'utilisateur
       generateArticle(keyword);
       
       toast.success(`${generatedKeywords.length} mots-clés générés avec succès !`);
@@ -147,180 +148,172 @@ const AdvancedKeywordGenerator: React.FC<AdvancedKeywordGeneratorProps> = () => 
   const generateArticle = (userKeyword: string) => {
     if (!userKeyword) return;
     
+    // Générer un article spécifique au mot-clé saisi
     const article = `# ${userKeyword.charAt(0).toUpperCase() + userKeyword.slice(1)} : Guide Complet 2025
 
 ## Table des matières
 1. [Introduction](#introduction)
-2. [Qu'est-ce que ${userKeyword} ?](#definition)
-3. [Comment bien choisir ${userKeyword}](#utilisation)
-4. [Les meilleures pratiques pour ${userKeyword}](#meilleures-pratiques)
-5. [Erreurs courantes à éviter](#erreurs-courantes)
-6. [Outils et ressources recommandés](#outils-ressources)
-7. [Études de cas et exemples](#etudes-cas)
-8. [FAQ - Questions fréquentes](#faq)
-9. [Tendances et évolutions futures](#tendances)
-10. [Conclusion](#conclusion)
+2. [Pourquoi s'intéresser à ${userKeyword} ?](#pourquoi)
+3. [Les meilleures options pour ${userKeyword}](#meilleures-options)
+4. [Comment bien choisir ${userKeyword}](#comment-choisir)
+5. [Conseils d'experts pour ${userKeyword}](#conseils-experts)
+6. [Erreurs courantes à éviter](#erreurs-courantes)
+7. [FAQ - Questions fréquentes](#faq)
+8. [Tendances 2025 pour ${userKeyword}](#tendances)
+9. [Conclusion](#conclusion)
 
 ## Introduction {#introduction}
 
-Découvrez tout ce que vous devez savoir sur **${userKeyword}** dans ce guide exhaustif. Que vous soyez débutant ou expert, ce guide vous accompagnera pas à pas pour maîtriser parfaitement ce sujet essentiel.
+Si vous cherchez des informations sur **${userKeyword}**, vous êtes au bon endroit ! Ce guide complet vous donnera toutes les clés pour bien comprendre et maîtriser ce sujet important.
 
-Dans un monde où les choix sont de plus en plus nombreux, bien comprendre ${userKeyword} devient crucial pour faire les meilleurs choix. Ce guide de plus de 1500 mots vous donnera toutes les clés pour exceller dans votre recherche de ${userKeyword}.
+${userKeyword} est devenu un élément incontournable qu'il faut absolument connaître en 2025. Que vous soyez débutant ou que vous souhaitiez approfondir vos connaissances, ce guide détaillé vous accompagnera pas à pas.
 
-## Qu'est-ce que ${userKeyword} ? {#definition}
+## Pourquoi s'intéresser à ${userKeyword} ? {#pourquoi}
 
-${userKeyword} représente un choix important qui mérite une attention particulière. Pour bien comprendre son importance, analysons ses différents aspects et applications pratiques.
+### Les avantages principaux
 
-### Les bases essentielles
+Comprendre ${userKeyword} présente de nombreux avantages :
 
-Avant de vous lancer dans votre recherche de ${userKeyword}, maîtrisez ces concepts de base :
+- **Gain de temps** : Une bonne maîtrise de ${userKeyword} vous permettra d'être plus efficace
+- **Économies** : Évitez les erreurs coûteuses en connaissant les bonnes pratiques
+- **Résultats optimaux** : Obtenez de meilleurs résultats en appliquant les bonnes méthodes
+- **Confiance** : Prenez des décisions éclairées concernant ${userKeyword}
 
-- **Définition claire** : ${userKeyword} se caractérise par ses spécificités uniques qui le distinguent des alternatives
-- **Applications pratiques** : Utilisations concrètes dans différents contextes
-- **Avantages principaux** : Bénéfices directs et indirects pour les utilisateurs
-- **Considérations importantes** : Points d'attention cruciaux à retenir pour éviter les pièges
+### Pourquoi maintenant ?
 
-### Historique et évolution
+2025 est l'année parfaite pour s'intéresser à ${userKeyword} car :
+- Les innovations récentes ont simplifié l'approche
+- Les coûts sont devenus plus accessibles
+- L'information de qualité est maintenant disponible
+- La concurrence n'est pas encore trop forte
 
-L'évolution de ${userKeyword} au fil des années montre une progression constante vers plus de qualité et d'accessibilité. Les innovations récentes ont révolutionné la façon dont nous appréhendons ${userKeyword}.
+## Les meilleures options pour ${userKeyword} {#meilleures-options}
 
-## Comment bien choisir ${userKeyword} {#utilisation}
+### Option 1 : L'approche classique
+L'approche traditionnelle de ${userKeyword} reste une valeur sûre. Elle convient parfaitement aux débutants et offre :
+- **Fiabilité** : Méthodes éprouvées et testées
+- **Simplicité** : Facile à comprendre et à mettre en œuvre  
+- **Coût maîtrisé** : Budget prévisible et raisonnable
 
-### Étape 1 : Analyse de vos besoins
+### Option 2 : L'approche moderne
+Les nouvelles approches de ${userKeyword} apportent innovation et efficacité :
+- **Performance** : Résultats supérieurs aux méthodes classiques
+- **Rapidité** : Mise en œuvre plus rapide
+- **Flexibilité** : S'adapte à différents contextes
 
-La première étape consiste à bien analyser vos besoins spécifiques concernant ${userKeyword}. Cette phase d'analyse est cruciale car elle détermine 80% de votre satisfaction future.
+### Option 3 : L'approche hybride
+Combiner les avantages des deux approches précédentes :
+- **Équilibre** : Le meilleur des deux mondes
+- **Personnalisation** : Adaptation selon vos besoins spécifiques
+- **Évolutivité** : Possibilité de faire évoluer votre approche
 
-**Actions concrètes :**
-- Analysez vos besoins spécifiques et contraintes
-- Définissez vos critères prioritaires
-- Évaluez votre budget disponible
-- Identifiez les caractéristiques indispensables
+## Comment bien choisir ${userKeyword} {#comment-choisir}
 
-### Étape 2 : Recherche et comparaison
+### Étape 1 : Définir vos besoins
+Avant de vous lancer avec ${userKeyword}, posez-vous ces questions essentielles :
+- Quel est votre objectif principal ?
+- Quel budget pouvez-vous allouer ?
+- Dans quel délai souhaitez-vous des résultats ?
+- Avez-vous des contraintes particulières ?
 
-Une fois vos besoins définis, passez à la phase de recherche avec une méthode structurée et comparative qui a fait ses preuves.
+### Étape 2 : Comparer les options
+Ne vous précipitez pas sur la première option venue. Prenez le temps de comparer :
+- **Fonctionnalités** : Vérifiez que tous vos besoins sont couverts
+- **Prix** : Analysez le rapport qualité-prix
+- **Support** : Assurez-vous d'avoir un accompagnement si nécessaire
+- **Évolutivité** : Pensez à vos besoins futurs
 
-**Méthode recommandée :**
-1. Listez les options disponibles pour ${userKeyword}
-2. Comparez les caractéristiques principales
-3. Lisez les avis et retours d'expérience
-4. Vérifiez la réputation et la fiabilité
-5. Prenez votre décision en toute connaissance de cause
+### Étape 3 : Tester avant de s'engager
+Chaque fois que c'est possible :
+- Demandez une période d'essai
+- Consultez les avis d'autres utilisateurs
+- Vérifiez les références et études de cas
+- Posez toutes vos questions avant de décider
 
-### Étape 3 : Validation et suivi
+## Conseils d'experts pour ${userKeyword} {#conseils-experts}
 
-La validation de votre choix vous permettra d'obtenir les meilleurs résultats avec ${userKeyword} et d'éviter les déceptions.
+### Conseil n°1 : Commencez simple
+Ne cherchez pas la complexité dès le départ. Maîtrisez d'abord les bases de ${userKeyword} avant d'explorer les fonctionnalités avancées.
 
-## Les meilleures pratiques pour ${userKeyword} {#meilleures-pratiques}
+### Conseil n°2 : Planifiez sur le long terme
+${userKeyword} n'est pas une solution miracle instantanée. Prévoyez une approche progressive et des résultats sur plusieurs mois.
 
-Pour maximiser votre satisfaction avec ${userKeyword}, suivez ces recommandations d'experts qui ont fait leurs preuves :
+### Conseil n°3 : Restez informé
+Le domaine de ${userKeyword} évolue rapidement. Suivez les actualités, participez à des formations et échangez avec d'autres praticiens.
 
-### 1. Préparation rigoureuse
-- Établissez une liste de critères clairs
-- Définissez un budget réaliste
-- Planifiez le timing de votre recherche
-
-### 2. Recherche approfondie
-- Consultez plusieurs sources fiables
-- Lisez les avis clients authentiques
-- Comparez objectivement les options
-
-### 3. Vérification continue
-- Surveillez les évolutions du marché
-- Restez informé des nouveautés
-- Adaptez vos critères si nécessaire
-
-## Erreurs courantes à éviter {#erreurs-courantes}
-
-Voici les principales erreurs que font 90% des personnes lors de leur recherche de ${userKeyword} :
-
-### Erreur #1 : Se précipiter
-Beaucoup se précipitent sans avoir suffisamment analysé leurs besoins. Cette précipitation coûte cher en satisfaction.
-
-**Solution :** Prenez le temps nécessaire pour bien définir vos critères.
-
-### Erreur #2 : Ne considérer que le prix
-Se focaliser uniquement sur le prix peut conduire à des choix décevants pour ${userKeyword}.
-
-**Solution :** Considérez le rapport qualité-prix global.
-
-### Erreur #3 : Ignorer les avis
-Négliger les retours d'expérience d'autres utilisateurs est une erreur commune.
-
-**Solution :** Consultez toujours les avis authentiques et récents.
+### Conseil n°4 : Mesurez vos résultats
+Mettez en place des indicateurs pour mesurer l'efficacité de votre approche de ${userKeyword}. Ajustez si nécessaire.
 
 ## FAQ - Questions fréquentes {#faq}
 
-### Comment choisir le meilleur ${userKeyword} ?
-Le choix du meilleur ${userKeyword} dépend de vos besoins spécifiques et de votre budget. En général :
-- **Analysez vos besoins** : 2-3 critères prioritaires
-- **Comparez les options** : Au moins 3-5 alternatives
-- **Vérifiez la qualité** : Avis, garanties, réputation
+### Combien coûte ${userKeyword} ?
+Le coût de ${userKeyword} varie considérablement selon vos besoins :
+- **Solution de base** : 0 à 50€/mois
+- **Solution intermédiaire** : 50 à 200€/mois  
+- **Solution premium** : 200€ et plus/mois
 
-### ${userKeyword} est-il adapté aux débutants ?
-Absolument ! Avec une approche progressive et les bonnes informations, tout le monde peut faire le bon choix pour ${userKeyword}.
+### Combien de temps faut-il pour maîtriser ${userKeyword} ?
+La courbe d'apprentissage dépend de votre niveau initial :
+- **Bases** : 1 à 2 semaines
+- **Niveau intermédiaire** : 1 à 3 mois
+- **Maîtrise** : 6 mois à 1 an
 
-### Quels sont les budgets moyens pour ${userKeyword} ?
-Les budgets varient considérablement selon vos besoins :
-- **Entrée de gamme :** Solutions abordables pour débuter
-- **Milieu de gamme :** Bon compromis qualité-prix
-- **Haut de gamme :** Solutions premium pour exigences élevées
+### ${userKeyword} convient-il aux débutants ?
+Absolument ! De nombreuses solutions sont spécialement conçues pour les débutants. Commencez par les options les plus simples et progressez à votre rythme.
 
-### Comment éviter les arnaques liées à ${userKeyword} ?
-Pour éviter les problèmes :
-- Vérifiez la réputation du fournisseur
-- Lisez les conditions générales
-- Méfiez-vous des offres trop alléchantes
-- Privilégiez les sources fiables
+### Quelles sont les erreurs les plus courantes avec ${userKeyword} ?
+Les principales erreurs à éviter :
+- Se précipiter sans planification
+- Négliger la formation initiale
+- Choisir une solution trop complexe au début
+- Ne pas mesurer les résultats
 
-### Quand revoir son choix de ${userKeyword} ?
-Il est recommandé de réévaluer votre choix :
-- Tous les 6-12 mois selon le domaine
-- Lors de changements de besoins
-- Si de nouvelles options apparaissent
-- En cas d'insatisfaction
+## Tendances 2025 pour ${userKeyword} {#tendances}
 
-## Tendances et évolutions futures {#tendances}
+### Intelligence artificielle
+L'IA révolutionne ${userKeyword} avec :
+- Automatisation des tâches répétitives
+- Analyse prédictive avancée
+- Personnalisation intelligente
+- Optimisation en temps réel
 
-Le domaine de ${userKeyword} évolue rapidement. Voici les principales tendances à surveiller :
+### Mobilité et accessibilité
+${userKeyword} devient de plus en plus mobile :
+- Applications dédiées
+- Interface responsive
+- Accès hors ligne
+- Synchronisation multi-appareils
 
-### Innovation technologique
-L'intégration de nouvelles technologies révolutionne ${userKeyword} :
-- Amélioration de la qualité
-- Nouvelles fonctionnalités
-- Meilleure accessibilité
-- Prix plus compétitifs
-
-### Approches durables
-La durabilité devient un critère essentiel pour ${userKeyword} :
+### Durabilité et responsabilité
+L'approche de ${userKeyword} évolue vers plus de durabilité :
 - Solutions éco-responsables
-- Longévité accrue
-- Impact environnemental réduit
-- Transparence des pratiques
+- Transparence accrue
+- Impact social positif
+- Économie circulaire
 
 ## Conclusion {#conclusion}
 
-${userKeyword} représente un choix important qui mérite une attention particulière en 2025. Avec les bonnes informations, une méthode claire et une approche réfléchie, vous pouvez faire le meilleur choix possible.
+${userKeyword} représente une opportunité fantastique en 2025. Avec les bonnes informations, une approche méthodique et de la patience, vous pouvez obtenir d'excellents résultats.
 
 ### Points clés à retenir :
-1. **Préparation** : Analysez bien vos besoins avant tout
-2. **Recherche** : Comparez plusieurs options sérieusement
-3. **Vérification** : Consultez les avis et références
-4. **Budget** : Définissez un budget réaliste
-5. **Suivi** : Restez informé des évolutions
+1. **Commencez simple** et progressez étape par étape
+2. **Planifiez sur le long terme** pour des résultats durables
+3. **Restez informé** des évolutions du secteur
+4. **Mesurez vos résultats** et ajustez si nécessaire
+5. **N'hésitez pas à demander conseil** aux experts
 
 ### Prochaines étapes recommandées :
-- Définissez vos critères prioritaires pour ${userKeyword}
-- Établissez votre budget maximum
-- Consultez les sources fiables
-- Comparez au moins 3 options
-- Prenez votre décision en toute sérénité
+- Définissez clairement vos objectifs avec ${userKeyword}
+- Établissez un budget réaliste
+- Choisissez votre première solution
+- Planifiez votre montée en compétences
+- Commencez votre premier projet
 
-N'hésitez pas à prendre le temps nécessaire pour faire le bon choix concernant ${userKeyword}. Un choix réfléchi aujourd'hui vous évitera bien des déceptions demain !
+N'attendez plus pour vous lancer avec ${userKeyword} ! Les meilleures opportunités sont souvent saisies par ceux qui agissent en premier.
 
 ---
 
-*Article généré automatiquement le ${new Date().toLocaleDateString('fr-FR')} - Guide professionnel ${userKeyword}*`;
+*Guide rédigé le ${new Date().toLocaleDateString('fr-FR')} - Spécialiste ${userKeyword}*`;
 
     setGeneratedArticle(article);
   };
@@ -345,7 +338,6 @@ N'hésitez pas à prendre le temps nécessaire pour faire le bon choix concernan
 
   return (
     <div className="space-y-6">
-      {/* En-tête du générateur */}
       <Card className="p-6 bg-gradient-to-r from-blue-50 to-purple-50">
         <div className="text-center">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">
@@ -358,7 +350,6 @@ N'hésitez pas à prendre le temps nécessaire pour faire le bon choix concernan
         </div>
       </Card>
 
-      {/* Formulaire de recherche */}
       <Card className="p-6">
         <div className="flex items-center gap-2 mb-4">
           <Search className="h-5 w-5 text-blue-500" />
@@ -402,7 +393,6 @@ N'hésitez pas à prendre le temps nécessaire pour faire le bon choix concernan
             )}
           </Button>
 
-          {/* Bouton pour voir l'article - Visible après génération */}
           {hasGenerated && generatedArticle && (
             <Dialog open={showArticleDialog} onOpenChange={setShowArticleDialog}>
               <DialogTrigger asChild>
@@ -441,61 +431,21 @@ N'hésitez pas à prendre le temps nécessaire pour faire le bon choix concernan
         </div>
       </Card>
 
-      {/* Résultats des mots-clés */}
       {hasGenerated && (
-        <Card className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold">Mots-clés générés</h2>
-            <Badge variant="secondary" className="bg-green-100 text-green-800">
-              {keywords.length} mots-clés
-            </Badge>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {keywords.map((kw, idx) => (
-              <Card key={idx} className="p-4 hover:shadow-md transition-shadow">
-                <div className="flex justify-between items-start mb-3">
-                  <h3 className="font-semibold text-gray-900">{kw.keyword}</h3>
-                  <Badge className={`
-                    ${kw.intent === 'commercial' ? 'bg-green-100 text-green-800' : ''}
-                    ${kw.intent === 'informational' ? 'bg-blue-100 text-blue-800' : ''}
-                    ${kw.intent === 'transactional' ? 'bg-purple-100 text-purple-800' : ''}
-                  `}>
-                    {kw.intent}
-                  </Badge>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-3 text-sm mb-3">
-                  <div>
-                    <span className="text-gray-500">Volume:</span>
-                    <span className="ml-1 font-medium">{kw.volume?.toLocaleString()}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-500">Difficulté:</span>
-                    <span className="ml-1 font-medium">{kw.difficulty}/100</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-500">CPC:</span>
-                    <span className="ml-1 font-medium">{kw.cpc}€</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-500">Opportunité:</span>
-                    <span className="ml-1 font-medium text-green-600">{kw.opportunity}%</span>
-                  </div>
-                </div>
-                
-                {kw.suggestedTitle && (
-                  <div className="mt-3 p-2 bg-gray-50 rounded">
-                    <p className="text-xs text-gray-600 mb-1">Titre suggéré:</p>
-                    <p className="text-sm font-medium">{kw.suggestedTitle}</p>
-                  </div>
-                )}
-              </Card>
-            ))}
-          </div>
-        </Card>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <KeywordTabsNavigation 
+            activeTab={activeTab} 
+            setActiveTab={setActiveTab} 
+            hasResults={hasGenerated} 
+          />
+          <KeywordTabsContent 
+            activeTab={activeTab} 
+            keywords={keywords} 
+            keyword={keyword} 
+          />
+        </Tabs>
       )}
 
-      {/* État vide */}
       {!hasGenerated && !isLoading && (
         <Card className="p-12 text-center">
           <Search className="h-16 w-16 text-gray-400 mx-auto mb-4" />
