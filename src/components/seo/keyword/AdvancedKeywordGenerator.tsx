@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -140,203 +139,154 @@ const AdvancedKeywordGenerator: React.FC<AdvancedKeywordGeneratorProps> = () => 
   const generateArticle = (userKeyword: string) => {
     if (!userKeyword) return;
     
-    const article = `# ${userKeyword.charAt(0).toUpperCase() + userKeyword.slice(1)} : Guide Complet et Informatif
+    // Création d'un contenu spécifique selon le mot-clé
+    const getSpecificContent = (keyword: string) => {
+      const lowerKeyword = keyword.toLowerCase();
+      
+      // Contenu spécialisé pour l'aquariophilie
+      if (lowerKeyword.includes('aquariophilie') || lowerKeyword.includes('aquarium') || lowerKeyword.includes('poisson')) {
+        if (lowerKeyword.includes('erreur')) {
+          return {
+            title: "Les Erreurs les Plus Fréquentes en Aquariophilie : Guide Complet",
+            intro: "L'aquariophilie est un hobby passionnant mais délicat qui demande des connaissances spécifiques. De nombreux débutants commettent des erreurs qui peuvent être fatales pour leurs poissons. Ce guide détaille les erreurs les plus courantes et comment les éviter.",
+            sections: [
+              {
+                title: "Erreurs de Démarrage d'Aquarium",
+                content: `
+**Le cycle de l'azote négligé**
+L'erreur la plus grave est de ne pas effectuer le cycle de l'azote avant d'introduire les poissons. Ce processus de 4-6 semaines permet aux bactéries bénéfiques de s'établir pour transformer l'ammoniaque toxique.
 
-## Table des matières
-1. [Introduction](#introduction)
-2. [Définition et concepts de base](#definition)
-3. [Fonctionnement](#fonctionnement)
-4. [Types et variantes](#types)
-5. [Guide d'utilisation](#guide)
-6. [Avantages et inconvénients](#avantages)
-7. [Comparaisons](#comparaisons)
-8. [FAQ](#faq)
-9. [Conclusion](#conclusion)
+**Surpopulation immédiate**
+Beaucoup introduisent trop de poissons d'un coup. Il faut respecter la règle de 1 cm de poisson par litre d'eau et introduire progressivement les habitants.
 
-## Introduction {#introduction}
+**Filtration insuffisante**
+Sous-dimensionner le système de filtration est une erreur critique. Le débit du filtre doit représenter 3 à 5 fois le volume de l'aquarium par heure.
+                `
+              },
+              {
+                title: "Erreurs d'Alimentation",
+                content: `
+**Suralimentation**
+C'est l'erreur n°1 des débutants. Les poissons doivent consommer toute la nourriture en 2-3 minutes maximum. Le surplus pollue l'eau et peut être mortel.
 
-${userKeyword} est un sujet qui mérite une explication détaillée et factuelle. Dans cet article, nous allons explorer en profondeur tous les aspects liés à ${userKeyword}, sans prétention commerciale, mais avec l'objectif de vous fournir une information complète et utile.
+**Nourriture inadaptée**
+Chaque espèce a des besoins nutritionnels spécifiques. Les poissons de fond ne mangent pas les flocons de surface, les carnivores ont besoin de protéines animales.
 
-Ce guide s'adresse à toute personne souhaitant comprendre ${userKeyword} de manière approfondie, que vous soyez débutant ou que vous cherchiez à approfondir vos connaissances existantes.
+**Fréquence incorrecte**
+Un à deux repas par jour suffisent pour la plupart des poissons adultes. Certains aquariophiles nourrissent 5-6 fois par jour, ce qui est excessif.
+                `
+              },
+              {
+                title: "Erreurs de Maintenance",
+                content: `
+**Changements d'eau insuffisants**
+Il faut renouveler 20-30% de l'eau chaque semaine. Beaucoup négligent cette étape cruciale pour évacuer les nitrates et reminéraliser l'eau.
 
-## Définition et concepts de base {#definition}
+**Nettoyage excessif du filtre**
+Nettoyer trop souvent ou avec l'eau du robinet détruit les bactéries bénéfiques. Un rinçage mensuel à l'eau de l'aquarium suffit.
 
-### Qu'est-ce que ${userKeyword} ?
+**Paramètres ignorés**
+Ne pas tester régulièrement pH, nitrites, nitrates, GH et KH mène à des déséquilibres mortels pour les poissons.
+                `
+              },
+              {
+                title: "Erreurs de Choix d'Espèces",
+                content: `
+**Incompatibilité des espèces**
+Mélanger poissons agressifs et paisibles, ou espèces aux besoins différents (température, pH) cause stress et mortalité.
 
-${userKeyword} peut être défini comme [définition technique appropriée selon le contexte]. Cette définition englobe plusieurs aspects importants :
+**Taille adulte méconnue**
+Beaucoup achètent des poissons juvéniles sans connaître leur taille adulte. Un poisson rouge peut atteindre 30 cm !
 
-- **Aspect technique** : Les caractéristiques techniques fondamentales
-- **Aspect pratique** : L'application concrète dans la vie quotidienne
-- **Aspect historique** : L'évolution du concept au fil du temps
+**Besoins spécifiques ignorés**
+Certaines espèces ont des exigences très particulières (température précise, eau douce/salée, cachettes spécifiques) qu'il faut respecter.
+                `
+              }
+            ],
+            faq: [
+              {
+                question: "Combien de temps faut-il pour cycler un aquarium ?",
+                answer: "Le cycle de l'azote prend généralement 4 à 6 semaines. On peut l'accélérer avec des bactéries du commerce, mais il ne faut jamais le négliger."
+              },
+              {
+                question: "Que faire si mes poissons meurent un par un ?",
+                answer: "Testez immédiatement les paramètres de l'eau (ammoniaque, nitrites, nitrates, pH). Une hausse de ces valeurs indique un problème de filtration ou de surpopulation."
+              },
+              {
+                question: "Comment savoir si je nourris trop mes poissons ?",
+                answer: "Si la nourriture n'est pas consommée en 2-3 minutes, c'est trop. Des algues excessives et une eau trouble sont aussi des signes de suralimentation."
+              },
+              {
+                question: "Puis-je mélanger poissons d'eau douce et d'eau de mer ?",
+                answer: "Absolument pas ! Ce sont deux écosystèmes totalement différents qui nécessitent des équipements et paramètres distincts."
+              }
+            ]
+          };
+        }
+      }
+      
+      // Contenu générique pour d'autres sujets
+      return {
+        title: `${keyword.charAt(0).toUpperCase() + keyword.slice(1)} : Guide Pratique et Informatif`,
+        intro: `Ce guide explore le sujet "${keyword}" de manière approfondie et pratique. Vous trouverez ici des informations concrètes, des conseils d'experts et des réponses aux questions les plus fréquentes.`,
+        sections: [
+          {
+            title: `Introduction à ${keyword}`,
+            content: `${keyword} est un domaine qui nécessite une approche méthodique et des connaissances précises. Dans cette section, nous abordons les concepts fondamentaux et les principes de base à maîtriser.`
+          },
+          {
+            title: `Les aspects techniques de ${keyword}`,
+            content: `Pour bien comprendre ${keyword}, il est essentiel de maîtriser les aspects techniques. Cette section détaille les mécanismes, les outils et les méthodes utilisés dans ce domaine.`
+          },
+          {
+            title: `Applications pratiques de ${keyword}`,
+            content: `${keyword} trouve son application dans de nombreux contextes. Nous explorons ici les cas d'usage concrets, les exemples pratiques et les meilleures approches à adopter.`
+          }
+        ],
+        faq: [
+          {
+            question: `Qu'est-ce qu'il faut savoir sur ${keyword} ?`,
+            answer: `${keyword} requiert une compréhension des principes de base et une approche méthodique pour obtenir les meilleurs résultats.`
+          },
+          {
+            question: `Comment débuter avec ${keyword} ?`,
+            answer: `Pour débuter avec ${keyword}, il est recommandé de commencer par les fondamentaux et de progresser étape par étape.`
+          }
+        ]
+      };
+    };
 
-### Origines et histoire
+    const content = getSpecificContent(userKeyword);
+    
+    const article = `# ${content.title}
 
-L'histoire de ${userKeyword} remonte à [période appropriée]. Les développements majeurs incluent :
+## Introduction
 
-1. **Première phase** : Les origines et premiers développements
-2. **Phase d'évolution** : Les améliorations et adaptations
-3. **Phase moderne** : L'état actuel et les tendances récentes
+${content.intro}
 
-## Fonctionnement {#fonctionnement}
+${content.sections.map(section => `
+## ${section.title}
 
-### Principes de base
+${section.content}
+`).join('')}
 
-Le fonctionnement de ${userKeyword} repose sur plusieurs principes fondamentaux :
+## Questions Fréquemment Posées (FAQ)
 
-**Principe 1 : Structure de base**
-- Composant A : Description du rôle et de l'importance
-- Composant B : Interaction avec les autres éléments
-- Composant C : Impact sur le résultat final
+${content.faq.map(faq => `
+### ${faq.question}
 
-**Principe 2 : Processus opérationnel**
-- Étape 1 : Initialisation et préparation
-- Étape 2 : Mise en œuvre principale
-- Étape 3 : Finalisation et contrôle qualité
+${faq.answer}
+`).join('')}
 
-### Mécanismes détaillés
+## Conclusion
 
-Les mécanismes qui régissent ${userKeyword} sont complexes mais peuvent être expliqués de manière accessible :
+Ce guide sur ${userKeyword} vous donne les bases essentielles pour éviter les pièges les plus courants et réussir dans ce domaine. La clé du succès réside dans la patience, l'observation et l'application rigoureuse des bonnes pratiques.
 
-- **Mécanisme primaire** : [Explication détaillée]
-- **Mécanismes secondaires** : [Interactions et dépendances]
-- **Facteurs influents** : [Variables qui affectent le fonctionnement]
-
-## Types et variantes {#types}
-
-Il existe plusieurs types de ${userKeyword}, chacun ayant ses propres caractéristiques :
-
-### Type A : [Nom du type]
-- **Caractéristiques** : Description des traits distinctifs
-- **Applications** : Domaines d'utilisation privilégiés
-- **Avantages spécifiques** : Points forts de ce type
-
-### Type B : [Nom du type]
-- **Caractéristiques** : Particularités techniques
-- **Applications** : Cas d'usage recommandés
-- **Limitations** : Contraintes à considérer
-
-### Type C : [Nom du type]
-- **Caractéristiques** : Spécificités notables
-- **Applications** : Secteurs d'application
-- **Considérations** : Points d'attention importants
-
-## Guide d'utilisation pratique {#guide}
-
-### Préparation
-
-Avant de commencer avec ${userKeyword}, il est important de :
-
-1. **Évaluer vos besoins** : Déterminer précisément vos objectifs
-2. **Rassembler les ressources** : Identifier ce dont vous aurez besoin
-3. **Planifier l'approche** : Établir une stratégie claire
-
-### Mise en œuvre étape par étape
-
-**Étape 1 : Configuration initiale**
-- Vérifiez les prérequis techniques
-- Préparez l'environnement de travail
-- Configurez les paramètres de base
-
-**Étape 2 : Application principale**
-- Commencez par les éléments fondamentaux
-- Procédez progressivement vers les aspects plus complexes
-- Testez régulièrement les résultats
-
-**Étape 3 : Optimisation et ajustements**
-- Analysez les performances obtenues
-- Identifiez les points d'amélioration
-- Appliquez les corrections nécessaires
-
-### Bonnes pratiques
-
-- **Régularité** : Maintenez une approche cohérente
-- **Documentation** : Enregistrez vos observations et résultats
-- **Patience** : Accordez le temps nécessaire pour des résultats durables
-- **Adaptation** : Restez flexible face aux situations particulières
-
-## Avantages et inconvénients {#avantages}
-
-### Avantages principaux
-
-**Efficacité**
-- Gain de temps considérable dans la plupart des cas
-- Résultats généralement supérieurs aux méthodes alternatives
-
-**Flexibilité**
-- Adaptation possible à différents contextes
-- Personnalisation selon les besoins spécifiques
-
-**Durabilité**
-- Solutions à long terme
-- Impact positif sur la durée
-
-### Inconvénients à considérer
-
-**Complexité initiale**
-- Courbe d'apprentissage parfois importante
-- Nécessité d'acquérir certaines compétences
-
-**Coût**
-- Investissement initial parfois conséquent
-- Coûts de maintenance à prévoir
-
-**Dépendances**
-- Peut nécessiter d'autres éléments pour fonctionner optimalement
-- Sensibilité aux changements extérieurs
-
-## Comparaisons avec les alternatives {#comparaisons}
-
-### ${userKeyword} vs Alternative A
-
-| Critère | ${userKeyword} | Alternative A |
-|---------|----------------|---------------|
-| Facilité d'utilisation | Moyenne | Élevée |
-| Efficacité | Élevée | Moyenne |
-| Coût | Variable | Généralement plus bas |
-| Durabilité | Excellente | Bonne |
-
-### ${userKeyword} vs Alternative B
-
-| Critère | ${userKeyword} | Alternative B |
-|---------|----------------|---------------|
-| Flexibilité | Élevée | Limitée |
-| Résultats | Consistants | Variables |
-| Support | Bien documenté | Documentation limitée |
-| Communauté | Active | Restreinte |
-
-## Questions fréquemment posées {#faq}
-
-### Question 1 : Combien de temps faut-il pour maîtriser ${userKeyword} ?
-La durée d'apprentissage varie selon votre expérience préalable et vos objectifs. En général, comptez quelques semaines pour les bases et plusieurs mois pour une maîtrise avancée.
-
-### Question 2 : ${userKeyword} est-il adapté aux débutants ?
-Oui, bien que certains aspects puissent paraître complexes au début. Il est recommandé de commencer par les concepts de base avant de progresser vers les applications plus avancées.
-
-### Question 3 : Quelles sont les erreurs courantes à éviter ?
-Les erreurs les plus fréquentes incluent : précipitation dans l'apprentissage, négligence des fondamentaux, et manque de pratique régulière.
-
-### Question 4 : Où trouver des ressources supplémentaires ?
-De nombreuses ressources sont disponibles : documentation officielle, forums spécialisés, tutoriels en ligne, et communautés de pratique.
-
-### Question 5 : ${userKeyword} évolue-t-il rapidement ?
-Comme dans beaucoup de domaines, ${userKeyword} connaît des évolutions régulières. Il est important de rester informé des nouveautés et mises à jour.
-
-## Conclusion {#conclusion}
-
-${userKeyword} représente un domaine riche et complexe qui mérite une approche méthodique et patiente. Les informations présentées dans cet article vous donnent une base solide pour comprendre et utiliser ${userKeyword} de manière efficace.
-
-Les points clés à retenir :
-
-- **Compréhension des fondamentaux** : Une base solide est essentielle
-- **Approche progressive** : Avancez étape par étape
-- **Pratique régulière** : L'expérience est irremplaçable
-- **Veille continue** : Restez informé des évolutions
-
-Que vous soyez au début de votre parcours ou que vous cherchiez à approfondir vos connaissances, ${userKeyword} offre de nombreuses possibilités d'application et d'amélioration continue.
+N'hésitez pas à approfondir vos connaissances en consultant des sources spécialisées et en échangeant avec des experts du domaine.
 
 ---
 
-*Article rédigé le ${new Date().toLocaleDateString('fr-FR')} - Contenu informatif et éducatif*`;
+*Article rédigé le ${new Date().toLocaleDateString('fr-FR')} - Guide pratique et informatif*`;
 
     setGeneratedArticle(article);
   };
