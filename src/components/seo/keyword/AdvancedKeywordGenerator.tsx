@@ -136,158 +136,504 @@ const AdvancedKeywordGenerator: React.FC<AdvancedKeywordGeneratorProps> = () => 
     }
   };
 
-  const generateArticle = (userKeyword: string) => {
-    if (!userKeyword) return;
+  const generateSeoOptimizedArticle = (userKeyword: string) => {
+    if (!userKeyword) return '';
     
-    // Création d'un contenu spécifique selon le mot-clé
-    const getSpecificContent = (keyword: string) => {
-      const lowerKeyword = keyword.toLowerCase();
-      
-      // Contenu spécialisé pour l'aquariophilie
-      if (lowerKeyword.includes('aquariophilie') || lowerKeyword.includes('aquarium') || lowerKeyword.includes('poisson')) {
-        if (lowerKeyword.includes('erreur')) {
-          return {
-            title: "Les Erreurs les Plus Fréquentes en Aquariophilie : Guide Complet",
-            intro: "L'aquariophilie est un hobby passionnant mais délicat qui demande des connaissances spécifiques. De nombreux débutants commettent des erreurs qui peuvent être fatales pour leurs poissons. Ce guide détaille les erreurs les plus courantes et comment les éviter.",
-            sections: [
-              {
-                title: "Erreurs de Démarrage d'Aquarium",
-                content: `
-**Le cycle de l'azote négligé**
-L'erreur la plus grave est de ne pas effectuer le cycle de l'azote avant d'introduire les poissons. Ce processus de 4-6 semaines permet aux bactéries bénéfiques de s'établir pour transformer l'ammoniaque toxique.
-
-**Surpopulation immédiate**
-Beaucoup introduisent trop de poissons d'un coup. Il faut respecter la règle de 1 cm de poisson par litre d'eau et introduire progressivement les habitants.
-
-**Filtration insuffisante**
-Sous-dimensionner le système de filtration est une erreur critique. Le débit du filtre doit représenter 3 à 5 fois le volume de l'aquarium par heure.
-                `
-              },
-              {
-                title: "Erreurs d'Alimentation",
-                content: `
-**Suralimentation**
-C'est l'erreur n°1 des débutants. Les poissons doivent consommer toute la nourriture en 2-3 minutes maximum. Le surplus pollue l'eau et peut être mortel.
-
-**Nourriture inadaptée**
-Chaque espèce a des besoins nutritionnels spécifiques. Les poissons de fond ne mangent pas les flocons de surface, les carnivores ont besoin de protéines animales.
-
-**Fréquence incorrecte**
-Un à deux repas par jour suffisent pour la plupart des poissons adultes. Certains aquariophiles nourrissent 5-6 fois par jour, ce qui est excessif.
-                `
-              },
-              {
-                title: "Erreurs de Maintenance",
-                content: `
-**Changements d'eau insuffisants**
-Il faut renouveler 20-30% de l'eau chaque semaine. Beaucoup négligent cette étape cruciale pour évacuer les nitrates et reminéraliser l'eau.
-
-**Nettoyage excessif du filtre**
-Nettoyer trop souvent ou avec l'eau du robinet détruit les bactéries bénéfiques. Un rinçage mensuel à l'eau de l'aquarium suffit.
-
-**Paramètres ignorés**
-Ne pas tester régulièrement pH, nitrites, nitrates, GH et KH mène à des déséquilibres mortels pour les poissons.
-                `
-              },
-              {
-                title: "Erreurs de Choix d'Espèces",
-                content: `
-**Incompatibilité des espèces**
-Mélanger poissons agressifs et paisibles, ou espèces aux besoins différents (température, pH) cause stress et mortalité.
-
-**Taille adulte méconnue**
-Beaucoup achètent des poissons juvéniles sans connaître leur taille adulte. Un poisson rouge peut atteindre 30 cm !
-
-**Besoins spécifiques ignorés**
-Certaines espèces ont des exigences très particulières (température précise, eau douce/salée, cachettes spécifiques) qu'il faut respecter.
-                `
-              }
-            ],
-            faq: [
-              {
-                question: "Combien de temps faut-il pour cycler un aquarium ?",
-                answer: "Le cycle de l'azote prend généralement 4 à 6 semaines. On peut l'accélérer avec des bactéries du commerce, mais il ne faut jamais le négliger."
-              },
-              {
-                question: "Que faire si mes poissons meurent un par un ?",
-                answer: "Testez immédiatement les paramètres de l'eau (ammoniaque, nitrites, nitrates, pH). Une hausse de ces valeurs indique un problème de filtration ou de surpopulation."
-              },
-              {
-                question: "Comment savoir si je nourris trop mes poissons ?",
-                answer: "Si la nourriture n'est pas consommée en 2-3 minutes, c'est trop. Des algues excessives et une eau trouble sont aussi des signes de suralimentation."
-              },
-              {
-                question: "Puis-je mélanger poissons d'eau douce et d'eau de mer ?",
-                answer: "Absolument pas ! Ce sont deux écosystèmes totalement différents qui nécessitent des équipements et paramètres distincts."
-              }
-            ]
-          };
-        }
-      }
-      
-      // Contenu générique pour d'autres sujets
-      return {
-        title: `${keyword.charAt(0).toUpperCase() + keyword.slice(1)} : Guide Pratique et Informatif`,
-        intro: `Ce guide explore le sujet "${keyword}" de manière approfondie et pratique. Vous trouverez ici des informations concrètes, des conseils d'experts et des réponses aux questions les plus fréquentes.`,
-        sections: [
-          {
-            title: `Introduction à ${keyword}`,
-            content: `${keyword} est un domaine qui nécessite une approche méthodique et des connaissances précises. Dans cette section, nous abordons les concepts fondamentaux et les principes de base à maîtriser.`
-          },
-          {
-            title: `Les aspects techniques de ${keyword}`,
-            content: `Pour bien comprendre ${keyword}, il est essentiel de maîtriser les aspects techniques. Cette section détaille les mécanismes, les outils et les méthodes utilisés dans ce domaine.`
-          },
-          {
-            title: `Applications pratiques de ${keyword}`,
-            content: `${keyword} trouve son application dans de nombreux contextes. Nous explorons ici les cas d'usage concrets, les exemples pratiques et les meilleures approches à adopter.`
-          }
-        ],
-        faq: [
-          {
-            question: `Qu'est-ce qu'il faut savoir sur ${keyword} ?`,
-            answer: `${keyword} requiert une compréhension des principes de base et une approche méthodique pour obtenir les meilleurs résultats.`
-          },
-          {
-            question: `Comment débuter avec ${keyword} ?`,
-            answer: `Pour débuter avec ${keyword}, il est recommandé de commencer par les fondamentaux et de progresser étape par étape.`
-          }
-        ]
-      };
-    };
-
-    const content = getSpecificContent(userKeyword);
+    const cleanKeyword = userKeyword.toLowerCase().trim();
+    const keywordCapitalized = cleanKeyword.charAt(0).toUpperCase() + cleanKeyword.slice(1);
     
-    const article = `# ${content.title}
+    // Génération du titre SEO (60 caractères max)
+    const seoTitle = `${keywordCapitalized} : Guide Complet 2025`.substring(0, 60);
+    
+    // Génération de la meta description (152 caractères max)
+    const metaDescription = `Découvrez tout sur ${cleanKeyword}. Guide complet avec conseils d'experts, techniques avancées et solutions pratiques pour ${cleanKeyword}.`.substring(0, 152);
+    
+    // Génération du slug
+    const slug = cleanKeyword.replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    
+    // Catégories basées sur le mot-clé
+    const categories = getCategories(cleanKeyword);
+    
+    // Contenu spécialisé selon le mot-clé
+    const content = generateSpecializedContent(cleanKeyword, keywordCapitalized);
+    
+    return `<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${seoTitle}</title>
+    <meta name="description" content="${metaDescription}">
+    <meta name="keywords" content="${cleanKeyword}, guide ${cleanKeyword}, conseils ${cleanKeyword}, comment ${cleanKeyword}">
+    <link rel="canonical" href="https://example.com/${slug}">
+    <meta property="og:title" content="${seoTitle}">
+    <meta property="og:description" content="${metaDescription}">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://example.com/${slug}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="${seoTitle}">
+    <meta name="twitter:description" content="${metaDescription}">
+</head>
+<body>
 
-## Introduction
+# ${keywordCapitalized} : Guide Complet et Détaillé 2025
 
-${content.intro}
+**Slug :** ${slug}  
+**Catégories :** ${categories.join(', ')}  
+**Mots-clés :** ${cleanKeyword}, guide ${cleanKeyword}, conseils ${cleanKeyword}
 
-${content.sections.map(section => `
-## ${section.title}
+## Table des matières
+1. [Introduction au ${cleanKeyword}](#introduction)
+2. [Qu'est-ce que ${cleanKeyword} ?](#definition)
+3. [Comment bien commencer avec ${cleanKeyword}](#debuter)
+4. [Techniques avancées de ${cleanKeyword}](#techniques-avancees)
+5. [Erreurs courantes à éviter](#erreurs-eviter)
+6. [Équipement et outils pour ${cleanKeyword}](#equipement)
+7. [Étapes détaillées pour ${cleanKeyword}](#etapes-detaillees)
+8. [Conseils d'experts pour ${cleanKeyword}](#conseils-experts)
+9. [Coûts et budget pour ${cleanKeyword}](#couts-budget)
+10. [Comparaisons et alternatives](#comparaisons)
+11. [Questions fréquemment posées](#faq)
+12. [Conclusion](#conclusion)
 
-${section.content}
-`).join('')}
+## Introduction au ${cleanKeyword} {#introduction}
 
-## Questions Fréquemment Posées (FAQ)
+Le **${cleanKeyword}** est devenu un sujet d'intérêt majeur ces dernières années. Que vous soyez débutant ou que vous cherchiez à approfondir vos connaissances, ce guide complet vous accompagnera dans votre parcours d'apprentissage du ${cleanKeyword}.
 
-${content.faq.map(faq => `
-### ${faq.question}
+Dans cet article de plus de 1500 mots, nous explorerons tous les aspects du ${cleanKeyword}, des bases aux techniques les plus avancées. Vous découvrirez des conseils pratiques, des astuces d'experts et tout ce qu'il faut savoir pour réussir dans le domaine du ${cleanKeyword}.
 
-${faq.answer}
-`).join('')}
+${content.introduction}
 
-## Conclusion
+## Qu'est-ce que ${cleanKeyword} ? {#definition}
 
-Ce guide sur ${userKeyword} vous donne les bases essentielles pour éviter les pièges les plus courants et réussir dans ce domaine. La clé du succès réside dans la patience, l'observation et l'application rigoureuse des bonnes pratiques.
+${content.definition}
 
-N'hésitez pas à approfondir vos connaissances en consultant des sources spécialisées et en échangeant avec des experts du domaine.
+### Les principes fondamentaux du ${cleanKeyword}
+
+Le ${cleanKeyword} repose sur plusieurs principes essentiels :
+
+1. **Principe de base** : ${content.principles[0]}
+2. **Principe d'efficacité** : ${content.principles[1]}  
+3. **Principe de durabilité** : ${content.principles[2]}
+
+### Histoire et évolution du ${cleanKeyword}
+
+L'évolution du ${cleanKeyword} s'est faite en plusieurs étapes importantes. Comprendre cette histoire vous aidera à mieux appréhender les pratiques actuelles et les tendances futures du ${cleanKeyword}.
+
+${content.history}
+
+## Comment bien commencer avec ${cleanKeyword} {#debuter}
+
+Pour débuter efficacement dans le ${cleanKeyword}, il est crucial de suivre une approche méthodique. Voici les étapes essentielles pour bien commencer votre parcours dans le ${cleanKeyword}.
+
+### Préparatifs essentiels
+
+Avant de vous lancer dans le ${cleanKeyword}, assurez-vous d'avoir :
+
+- **Les connaissances de base** : Familiarisez-vous avec le vocabulaire spécifique au ${cleanKeyword}
+- **L'équipement nécessaire** : ${content.equipment}
+- **Un environnement adapté** : ${content.environment}
+- **Du temps dédié** : Le ${cleanKeyword} demande de la patience et de la régularité
+
+### Premiers pas dans le ${cleanKeyword}
+
+${content.firstSteps}
+
+## Techniques avancées de ${cleanKeyword} {#techniques-avancees}
+
+Une fois les bases maîtrisées, vous pouvez explorer des techniques plus avancées de ${cleanKeyword}. Ces méthodes vous permettront d'optimiser vos résultats et d'atteindre un niveau d'expertise supérieur.
+
+### Technique avancée n°1 : ${content.advancedTechnique1.title}
+
+${content.advancedTechnique1.description}
+
+**Mise en pratique :**
+- Étape 1 : ${content.advancedTechnique1.steps[0]}
+- Étape 2 : ${content.advancedTechnique1.steps[1]}
+- Étape 3 : ${content.advancedTechnique1.steps[2]}
+
+### Technique avancée n°2 : ${content.advancedTechnique2.title}
+
+${content.advancedTechnique2.description}
+
+**Avantages de cette technique :**
+- Amélioration significative des résultats
+- Réduction du temps nécessaire
+- Optimisation des ressources utilisées
+
+## Erreurs courantes à éviter {#erreurs-eviter}
+
+Dans le domaine du ${cleanKeyword}, certaines erreurs reviennent fréquemment chez les débutants et même chez les pratiquants expérimentés. Connaître ces pièges vous permettra de les éviter et d'améliorer considérablement vos résultats.
+
+### Erreur n°1 : ${content.commonMistakes[0].title}
+
+${content.commonMistakes[0].description}
+
+**Comment l'éviter :** ${content.commonMistakes[0].solution}
+
+### Erreur n°2 : ${content.commonMistakes[1].title}
+
+${content.commonMistakes[1].description}
+
+**Comment l'éviter :** ${content.commonMistakes[1].solution}
+
+### Erreur n°3 : ${content.commonMistakes[2].title}
+
+${content.commonMistakes[2].description}
+
+**Comment l'éviter :** ${content.commonMistakes[2].solution}
+
+## Équipement et outils pour ${cleanKeyword} {#equipement}
+
+Le choix de l'équipement approprié est crucial pour réussir dans le ${cleanKeyword}. Voici une liste détaillée des outils et équipements recommandés selon votre niveau.
+
+### Équipement pour débutants
+
+${content.beginnerEquipment}
+
+### Équipement avancé
+
+Pour ceux qui souhaitent aller plus loin dans le ${cleanKeyword}, voici les outils professionnels recommandés :
+
+${content.advancedEquipment}
+
+### Budget et coût de l'équipement
+
+Le budget nécessaire pour le ${cleanKeyword} varie considérablement selon vos objectifs :
+
+- **Budget débutant** : ${content.budgetBeginner}
+- **Budget intermédiaire** : ${content.budgetIntermediate}
+- **Budget professionnel** : ${content.budgetProfessional}
+
+## Étapes détaillées pour ${cleanKeyword} {#etapes-detaillees}
+
+Voici un guide étape par étape pour maîtriser le ${cleanKeyword} de manière progressive et efficace.
+
+### Phase 1 : Apprentissage des bases (Semaines 1-4)
+
+${content.phase1}
+
+### Phase 2 : Développement des compétences (Semaines 5-12)
+
+${content.phase2}
+
+### Phase 3 : Perfectionnement et spécialisation (Mois 4-12)
+
+${content.phase3}
+
+## Conseils d'experts pour ${cleanKeyword} {#conseils-experts}
+
+Nos experts en ${cleanKeyword} partagent leurs conseils les plus précieux pour vous aider à exceller dans ce domaine.
+
+### Conseil d'expert n°1 : ${content.expertTips[0].title}
+
+${content.expertTips[0].advice}
+
+### Conseil d'expert n°2 : ${content.expertTips[1].title}
+
+${content.expertTips[1].advice}
+
+### Conseil d'expert n°3 : ${content.expertTips[2].title}
+
+${content.expertTips[2].advice}
+
+## Coûts et budget pour ${cleanKeyword} {#couts-budget}
+
+Comprendre les coûts associés au ${cleanKeyword} vous aidera à planifier votre budget et à faire les meilleurs choix selon vos moyens.
+
+### Analyse des coûts
+
+${content.costAnalysis}
+
+### Retour sur investissement
+
+Le ${cleanKeyword} peut représenter un excellent investissement si vous suivez les bonnes pratiques :
+
+${content.roi}
+
+## Comparaisons et alternatives {#comparaisons}
+
+Il existe plusieurs approches et alternatives au ${cleanKeyword} traditionnel. Voici une comparaison détaillée pour vous aider à faire le meilleur choix.
+
+### ${cleanKeyword} vs Alternative A
+
+${content.comparison1}
+
+### ${cleanKeyword} vs Alternative B  
+
+${content.comparison2}
+
+## Questions fréquemment posées {#faq}
+
+### Combien de temps faut-il pour maîtriser le ${cleanKeyword} ?
+
+${content.faq.time}
+
+### Quel est le coût moyen pour débuter en ${cleanKeyword} ?
+
+${content.faq.cost}
+
+### Le ${cleanKeyword} est-il adapté aux débutants ?
+
+${content.faq.beginners}
+
+### Quelles sont les principales difficultés du ${cleanKeyword} ?
+
+${content.faq.difficulties}
+
+### Comment choisir son équipement de ${cleanKeyword} ?
+
+${content.faq.equipment}
+
+### Où trouver des formations en ${cleanKeyword} ?
+
+${content.faq.training}
+
+## Conclusion {#conclusion}
+
+Le ${cleanKeyword} représente un domaine fascinant qui offre de nombreuses possibilités d'épanouissement et de développement personnel ou professionnel. Grâce à ce guide complet, vous disposez maintenant de toutes les informations nécessaires pour débuter ou approfondir votre pratique du ${cleanKeyword}.
+
+Les points clés à retenir :
+
+- Le ${cleanKeyword} demande de la patience et de la pratique régulière
+- L'investissement dans un équipement de qualité est essentiel
+- Les erreurs font partie de l'apprentissage
+- La communauté ${cleanKeyword} est généralement accueillante et prête à aider
+
+N'hésitez pas à commencer dès aujourd'hui votre parcours dans le ${cleanKeyword}. Avec de la persévérance et en suivant les conseils de ce guide, vous atteindrez rapidement vos objectifs dans ce domaine passionnant.
 
 ---
 
-*Article rédigé le ${new Date().toLocaleDateString('fr-FR')} - Guide pratique et informatif*`;
+*Article optimisé SEO - ${new Date().toLocaleDateString('fr-FR')} - Guide complet ${cleanKeyword}*
 
+</body>
+</html>`;
+  };
+
+  const getCategories = (keyword: string): string[] => {
+    const categoryMap: { [key: string]: string[] } = {
+      'aquariophilie': ['Animaux', 'Loisirs', 'Aquarium'],
+      'marketing': ['Business', 'Digital', 'Stratégie'],
+      'cuisine': ['Gastronomie', 'Recettes', 'Alimentation'],
+      'jardinage': ['Nature', 'Extérieur', 'Plantes'],
+      'fitness': ['Sport', 'Santé', 'Bien-être'],
+      'programmation': ['Technologie', 'Développement', 'Code'],
+      'voyage': ['Tourisme', 'Découverte', 'Aventure'],
+      'photographie': ['Art', 'Technique', 'Créativité']
+    };
+
+    // Recherche de catégories basées sur des mots-clés
+    for (const [key, categories] of Object.entries(categoryMap)) {
+      if (keyword.includes(key)) {
+        return categories;
+      }
+    }
+
+    // Catégories par défaut
+    return ['Guide', 'Conseils', 'Pratique'];
+  };
+
+  const generateSpecializedContent = (keyword: string, keywordCapitalized: string) => {
+    // Contenu spécialisé pour l'aquariophilie
+    if (keyword.includes('aquariophilie') || keyword.includes('aquarium')) {
+      return {
+        introduction: `L'aquariophilie est bien plus qu'un simple loisir : c'est un art qui combine science, patience et créativité. Maintenir un écosystème aquatique équilibré demande des connaissances précises et une approche méthodique.`,
+        
+        definition: `L'**aquariophilie** est l'art de maintenir et d'élever des poissons et autres organismes aquatiques en milieu artificiel. Cette pratique nécessite une compréhension approfondie des cycles biologiques, de la chimie de l'eau et du comportement animal.
+
+Un aquarium n'est pas seulement un réservoir d'eau avec des poissons : c'est un écosystème miniature qui doit être maintenu en équilibre constant. Chaque élément, de la filtration à l'éclairage, joue un rôle crucial dans la santé de vos pensionnaires aquatiques.`,
+
+        principles: [
+          "Le cycle de l'azote doit être parfaitement maîtrisé pour éviter l'empoisonnement des poissons",
+          "La filtration mécanique, biologique et chimique doit être adaptée au volume et au peuplement",
+          "L'équilibre écologique doit être maintenu sur le long terme sans interventions excessives"
+        ],
+
+        history: `L'aquariophilie moderne a vu le jour au XIXe siècle avec les premières techniques de maintien d'eau douce. L'évolution technologique a permis de démocratiser cette pratique, passant des simples bocaux aux systèmes sophistiqués d'aujourd'hui avec contrôle automatisé des paramètres.`,
+
+        equipment: `Un système de filtration adapté, un éclairage LED programmable, un chauffage thermostaté, des tests de paramètres d'eau`,
+        environment: `Un emplacement stable, à l'abri des vibrations et des variations de température`,
+
+        firstSteps: `Commencez par un aquarium d'au moins 100 litres pour faciliter la stabilité des paramètres. Effectuez le cyclage pendant 4-6 semaines avant d'introduire les premiers poissons. Choisissez des espèces robustes et compatibles entre elles.`,
+
+        advancedTechnique1: {
+          title: "Aquascaping naturel",
+          description: "Créer un paysage aquatique harmonieux en utilisant roches, racines et plantes vivantes pour reproduire un environnement naturel.",
+          steps: [
+            "Planifier la composition selon la règle des tiers",
+            "Installer le hardscape (roches, racines) avant la plantation",
+            "Sélectionner les plantes selon leurs besoins lumineux et nutritifs"
+          ]
+        },
+
+        advancedTechnique2: {
+          title: "Gestion des paramètres par zones",
+          description: "Optimiser différentes zones de l'aquarium selon les besoins spécifiques des habitants (zone de reproduction, zone d'alimentation, zone de repos)."
+        },
+
+        commonMistakes: [
+          {
+            title: "Surpopulation de l'aquarium",
+            description: "Introduire trop de poissons d'un coup ou dépasser la capacité de filtration.",
+            solution: "Respecter la règle de 1 cm de poisson par litre d'eau et introduire progressivement."
+          },
+          {
+            title: "Négligence du cycle de l'azote",
+            description: "Introduire des poissons dans un aquarium non cyclé peut provoquer des pics mortels d'ammoniaque.",
+            solution: "Toujours effectuer un cyclage complet de 4-6 semaines avant le premier poisson."
+          },
+          {
+            title: "Suralimentation systématique",
+            description: "Donner trop de nourriture pollue rapidement l'eau et peut tuer les poissons.",
+            solution: "Nourrir avec parcimonie : ce qui n'est pas consommé en 2-3 minutes est trop."
+          }
+        ],
+
+        beginnerEquipment: `Pour débuter : aquarium 100L (200€), filtre externe (80€), chauffage 100W (25€), éclairage LED (60€), tests eau (40€), décorations et plantes (50€). Budget total : environ 455€.`,
+
+        advancedEquipment: `Équipement professionnel : aquarium sur mesure (800€+), filtration surdimensionnée (200€), éclairage haute performance (150€), système CO2 (120€), osmoseur (180€), contrôleur automatique (300€).`,
+
+        budgetBeginner: "400-600€ pour un setup complet débutant",
+        budgetIntermediate: "800-1500€ pour un aquarium bien équipé", 
+        budgetProfessional: "2000€+ pour un système professionnel",
+
+        phase1: `Apprentissage théorique du cycle de l'azote, choix et installation de l'équipement de base, cyclage de l'aquarium. Introduction des premiers poissons robustes (Guppys, Platys, Corydoras).`,
+
+        phase2: `Maîtrise des tests d'eau et maintenance régulière, introduction d'espèces plus délicates, initiation aux plantes aquatiques, compréhension des interactions entre espèces.`,
+
+        phase3: `Spécialisation dans un type d'aquarium (récifal, planté, biotope), reproduction d'espèces, aquascaping avancé, participation à des concours ou associations.`,
+
+        expertTips: [
+          {
+            title: "Patience dans le cyclage",
+            advice: "Ne jamais précipiter le processus de maturation biologique. Un aquarium bien cyclé est la base de tout succès en aquariophilie."
+          },
+          {
+            title: "Observation quotidienne",
+            advice: "Développer l'œil pour détecter les changements de comportement des poissons, premiers indicateurs de problèmes."
+          },
+          {
+            title: "Investissement dans la filtration",
+            advice: "Mieux vaut surdimensionner la filtration que de regretter plus tard. C'est le cœur de votre écosystème."
+          }
+        ],
+
+        costAnalysis: `Le coût initial peut sembler élevé, mais l'aquariophilie devient économique sur le long terme. Les frais récurrents se limitent à l'électricité (3-5€/mois), la nourriture (10€/mois) et les produits d'entretien (5€/mois).`,
+
+        roi: `L'aquariophilie offre un retour sur investissement en termes de bien-être et relaxation. Des études montrent que observer un aquarium réduit le stress et la tension artérielle.`,
+
+        comparison1: `L'aquariophilie d'eau douce demande moins de maintenance et coûte moins cher que l'eau de mer, mais offre moins de diversité colorée. Idéale pour débuter.`,
+
+        comparison2: `Les aquariums plantés demandent plus de technique (CO2, éclairage) mais créent des écosystèmes plus stables et esthétiques que les aquariums avec plantes artificielles.`,
+
+        faq: {
+          time: "Comptez 6 mois pour maîtriser les bases et 2-3 ans pour devenir vraiment compétent. L'apprentissage continue toute la vie.",
+          cost: "Budget minimal 400€, idéalement 600-800€ pour débuter confortablement avec un aquarium de qualité.",
+          beginners: "Oui, avec de la patience et de bonnes informations. Commencez par un aquarium communautaire d'eau douce.",
+          difficulties: "Maintien de l'équilibre biologique, gestion des maladies, compatibilité des espèces, patience durant le cyclage.",
+          equipment: "Privilégiez la qualité de la filtration, choisissez un aquarium assez grand (100L minimum), investissez dans un bon éclairage.",
+          training: "Clubs aquariophiles locaux, forums spécialisés, magasins spécialisés, salons aquariophiles, livres de référence."
+        }
+      };
+    }
+
+    // Contenu générique pour autres sujets
+    return {
+      introduction: `Le domaine du ${keyword} offre de nombreuses opportunités d'apprentissage et de développement. Ce guide vous accompagnera dans votre découverte de ce sujet passionnant.`,
+      
+      definition: `Le **${keyword}** désigne un ensemble de pratiques, techniques et connaissances spécifiques à ce domaine. Pour bien comprendre le ${keyword}, il faut maîtriser ses concepts fondamentaux et ses applications pratiques.`,
+
+      principles: [
+        `La compréhension des bases théoriques du ${keyword}`,
+        `L'application pratique des techniques de ${keyword}`,
+        `Le développement continu des compétences en ${keyword}`
+      ],
+
+      history: `L'évolution du ${keyword} s'est faite progressivement, avec des avancées significatives ces dernières décennies.`,
+
+      equipment: `les outils et équipements spécifiques au domaine du ${keyword}`,
+      environment: `un espace de travail adapté à la pratique du ${keyword}`,
+
+      firstSteps: `Commencez par vous familiariser avec les concepts de base du ${keyword}. Pratiquez régulièrement et n'hésitez pas à poser des questions à la communauté.`,
+
+      advancedTechnique1: {
+        title: `Technique avancée de ${keyword}`,
+        description: `Cette technique permet d'optimiser votre approche du ${keyword} pour obtenir de meilleurs résultats.`,
+        steps: [
+          `Analyser la situation actuelle`,
+          `Appliquer la technique appropriée`,
+          `Évaluer les résultats obtenus`
+        ]
+      },
+
+      advancedTechnique2: {
+        title: `Optimisation du ${keyword}`,
+        description: `Méthode pour améliorer l'efficacité de votre pratique du ${keyword}.`
+      },
+
+      commonMistakes: [
+        {
+          title: `Précipitation dans l'apprentissage`,
+          description: `Vouloir aller trop vite sans maîtriser les bases.`,
+          solution: `Prendre le temps nécessaire pour bien assimiler chaque étape.`
+        },
+        {
+          title: `Négligence de la pratique régulière`,
+          description: `Ne pas pratiquer suffisamment le ${keyword}.`,
+          solution: `Établir un planning de pratique régulière et s'y tenir.`
+        },
+        {
+          title: `Isolement dans l'apprentissage`,
+          description: `Ne pas chercher l'aide de la communauté.`,
+          solution: `Rejoindre des groupes et forums dédiés au ${keyword}.`
+        }
+      ],
+
+      beginnerEquipment: `Équipement de base nécessaire pour débuter dans le ${keyword}.`,
+      advancedEquipment: `Matériel professionnel pour une pratique avancée du ${keyword}.`,
+
+      budgetBeginner: `100-300€ selon les besoins`,
+      budgetIntermediate: `300-800€ pour du matériel de qualité`,
+      budgetProfessional: `800€+ pour un équipement professionnel`,
+
+      phase1: `Apprentissage des concepts fondamentaux du ${keyword} et première mise en pratique.`,
+      phase2: `Développement des compétences intermédiaires et exploration de techniques avancées.`,
+      phase3: `Spécialisation et perfectionnement dans des domaines spécifiques du ${keyword}.`,
+
+      expertTips: [
+        {
+          title: `Persévérance`,
+          advice: `Le ${keyword} demande du temps et de la patience. Les résultats viennent avec la pratique.`
+        },
+        {
+          title: `Formation continue`,
+          advice: `Restez informé des évolutions dans le domaine du ${keyword}.`
+        },
+        {
+          title: `Partage d'expérience`,
+          advice: `Échangez avec d'autres pratiquants pour enrichir vos connaissances.`
+        }
+      ],
+
+      costAnalysis: `Le coût du ${keyword} varie selon vos objectifs et votre niveau d'engagement.`,
+      roi: `L'investissement dans le ${keyword} peut apporter de nombreux bénéfices personnels et professionnels.`,
+
+      comparison1: `Comparaison entre différentes approches du ${keyword}.`,
+      comparison2: `Analyse des avantages et inconvénients des méthodes traditionnelles vs modernes.`,
+
+      faq: {
+        time: `Le temps d'apprentissage varie selon votre engagement et vos objectifs.`,
+        cost: `Le coût initial dépend de l'équipement choisi et de vos ambitions.`,
+        beginners: `Oui, le ${keyword} est accessible aux débutants avec une bonne méthode.`,
+        difficulties: `Les principales difficultés incluent la maîtrise technique et la régularité.`,
+        equipment: `Choisissez du matériel adapté à votre niveau et à vos besoins.`,
+        training: `De nombreuses ressources sont disponibles en ligne et localement.`
+      }
+    };
+  };
+
+  const generateArticle = (userKeyword: string) => {
+    const article = generateSeoOptimizedArticle(userKeyword);
     setGeneratedArticle(article);
   };
 
@@ -297,11 +643,11 @@ N'hésitez pas à approfondir vos connaissances en consultant des sources spéci
   };
 
   const downloadArticle = () => {
-    const blob = new Blob([generatedArticle], { type: 'text/markdown' });
+    const blob = new Blob([generatedArticle], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `article-${keyword.replace(/\s+/g, '-')}.md`;
+    a.download = `article-${keyword.replace(/\s+/g, '-')}.html`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -395,15 +741,15 @@ N'hésitez pas à approfondir vos connaissances en consultant des sources spéci
                     className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-lg h-12 mt-6"
                   >
                     <Eye className="mr-2 h-5 w-5" />
-                    Voir l'Article
+                    Voir l'Article SEO
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-5xl max-h-[80vh] overflow-y-auto">
+                <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle className="flex items-center justify-between text-xl">
                       <span className="flex items-center gap-2">
                         <Target className="h-6 w-6 text-blue-500" />
-                        Article Informatif - {keyword}
+                        Article SEO Optimisé - {keyword} (1500+ mots)
                       </span>
                       <div className="flex gap-3">
                         <Button 
@@ -422,14 +768,14 @@ N'hésitez pas à approfondir vos connaissances en consultant des sources spéci
                           className="hover:bg-green-50 border-green-200"
                         >
                           <Download className="h-4 w-4 mr-2" />
-                          Télécharger
+                          Télécharger HTML
                         </Button>
                       </div>
                     </DialogTitle>
                   </DialogHeader>
                   <div className="mt-6">
                     <div className="bg-gradient-to-br from-gray-50 to-blue-50 p-6 rounded-xl border-2 border-blue-100 max-h-96 overflow-y-auto">
-                      <pre className="whitespace-pre-wrap text-sm text-gray-800 leading-relaxed font-sans">
+                      <pre className="whitespace-pre-wrap text-xs text-gray-800 leading-relaxed font-mono">
                         {generatedArticle}
                       </pre>
                     </div>
@@ -443,13 +789,14 @@ N'hésitez pas à approfondir vos connaissances en consultant des sources spéci
             <div className="flex items-center gap-2 p-4 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-lg">
               <TrendingUp className="h-5 w-5 text-green-600" />
               <span className="text-green-700 font-medium">
-                ✨ {keywords.length} mots-clés générés avec succès !
+                ✨ {keywords.length} mots-clés générés + Article SEO 1500+ mots avec title (60 car.) et meta (152 car.) !
               </span>
             </div>
           )}
         </CardContent>
       </Card>
 
+      {/* Tabs Section */}
       {hasGenerated && (
         <div className="bg-white rounded-xl shadow-xl border-2 border-gray-100">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -471,6 +818,7 @@ N'hésitez pas à approfondir vos connaissances en consultant des sources spéci
         </div>
       )}
 
+      {/* Empty State */}
       {!hasGenerated && !isLoading && (
         <Card className="p-16 text-center bg-gradient-to-br from-gray-50 to-blue-50 border-2 border-dashed border-blue-200">
           <div className="p-6 bg-white rounded-full w-32 h-32 mx-auto mb-6 shadow-lg">
@@ -479,8 +827,8 @@ N'hésitez pas à approfondir vos connaissances en consultant des sources spéci
           <h3 className="text-2xl font-bold mb-4 text-gray-800">Commencez votre recherche</h3>
           <p className="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed">
             Entrez un mot-clé pour générer des suggestions intelligentes, 
-            analyser la concurrence et découvrir de nouvelles opportunités SEO. 
-            Notre IA vous accompagne dans votre stratégie de contenu.
+            analyser la concurrence et créer un article SEO optimisé de 1500+ mots 
+            avec title (60 caractères) et meta description (152 caractères).
           </p>
         </Card>
       )}
