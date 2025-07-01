@@ -1,75 +1,113 @@
 
 import React from 'react';
-import { PieChart } from 'lucide-react';
-import { 
-  PieChart as RechartsPieChart, 
-  Pie, 
-  Cell, 
-  Tooltip, 
-  ResponsiveContainer 
-} from 'recharts';
-import { ResourcesChartProps } from './types';
-import { formatSize, CHART_COLORS } from './utils';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { FileText, Image, Code, Palette } from 'lucide-react';
 
-const ResourcesChart: React.FC<ResourcesChartProps> = ({ 
-  activeDevice, 
-  resourcesData 
-}) => {
+interface ResourceBreakdown {
+  js: number;
+  css: number;
+  images: number;
+  fonts: number;
+  other: number;
+}
+
+interface ResourcesChartProps {
+  resources: ResourceBreakdown;
+  totalSize: number;
+}
+
+const ResourcesChart: React.FC<ResourcesChartProps> = ({ resources, totalSize }) => {
+  const formatSize = (bytes: number) => {
+    if (bytes >= 1000000) return `${(bytes / 1000000).toFixed(1)}MB`;
+    if (bytes >= 1000) return `${(bytes / 1000).toFixed(0)}KB`;
+    return `${bytes}B`;
+  };
+
+  const chartData = [
+    { name: 'JavaScript', value: resources.js, color: '#f59e0b', icon: Code },
+    { name: 'Images', value: resources.images, color: '#10b981', icon: Image },
+    { name: 'CSS', value: resources.css, color: '#3b82f6', icon: Palette },
+    { name: 'Fonts', value: resources.fonts, color: '#8b5cf6', icon: FileText },
+    { name: 'Autres', value: resources.other, color: '#6b7280', icon: FileText }
+  ].filter(item => item.value > 0);
+
+  const barData = chartData.map(item => ({
+    name: item.name,
+    size: item.value,
+    percentage: ((item.value / totalSize) * 100).toFixed(1)
+  }));
+
   return (
-    <div className="border rounded-lg p-4 bg-white shadow-sm">
-      <div className="flex items-center mb-4">
-        <PieChart className="w-4 h-4 mr-2 text-blue-600" />
-        <h4 className="font-medium">
-          {activeDevice === 'mobile' ? 'Répartition des ressources (Mobile)' : 'Répartition des ressources (Desktop)'}
-        </h4>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="h-[200px] flex items-center justify-center">
-          <ResponsiveContainer width="100%" height="100%">
-            <RechartsPieChart>
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Répartition par type</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
               <Pie
-                data={resourcesData}
+                data={chartData}
                 cx="50%"
                 cy="50%"
-                labelLine={false}
-                outerRadius={80}
+                outerRadius={100}
                 fill="#8884d8"
                 dataKey="value"
                 label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
               >
-                {resourcesData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                {chartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip formatter={(value) => formatSize(Number(value))} />
-            </RechartsPieChart>
+              <Tooltip formatter={(value: number) => formatSize(value)} />
+            </PieChart>
           </ResponsiveContainer>
-        </div>
-        
-        <div className="col-span-2 space-y-3">
-          <h5 className="font-medium text-sm">Détail des ressources:</h5>
-          {resourcesData.map((resource, index) => (
-            <div key={index} className="flex items-center justify-between text-sm">
-              <div className="flex items-center">
-                <div 
-                  className="w-3 h-3 rounded-full mr-2" 
-                  style={{ backgroundColor: CHART_COLORS[index % CHART_COLORS.length] }}
-                ></div>
-                <span>{resource.name}</span>
-              </div>
-              <span className="font-medium">{formatSize(resource.value)}</span>
-            </div>
-          ))}
-          
-          <div className="flex items-center justify-between text-sm font-bold pt-2 border-t mt-2">
-            <span>Total</span>
-            <span>
-              {formatSize(resourcesData.reduce((sum, item) => sum + item.value, 0))}
-            </span>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Taille des ressources</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={barData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis tickFormatter={formatSize} />
+              <Tooltip 
+                formatter={(value: number) => [formatSize(value), 'Taille']}
+                labelFormatter={(label) => `Type: ${label}`}
+              />
+              <Bar dataKey="size" fill="#3b82f6" />
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      <Card className="lg:col-span-2">
+        <CardHeader>
+          <CardTitle>Détails des ressources</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            {chartData.map((resource, index) => {
+              const IconComponent = resource.icon;
+              const percentage = ((resource.value / totalSize) * 100).toFixed(1);
+              
+              return (
+                <div key={index} className="text-center p-4 border rounded-lg">
+                  <IconComponent className="h-6 w-6 mx-auto mb-2" style={{ color: resource.color }} />
+                  <div className="font-medium">{resource.name}</div>
+                  <div className="text-sm text-gray-600">{formatSize(resource.value)}</div>
+                  <div className="text-xs text-gray-500">{percentage}%</div>
+                </div>
+              );
+            })}
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
