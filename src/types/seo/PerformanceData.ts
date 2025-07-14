@@ -1,5 +1,6 @@
 
 export interface PerformanceData {
+  score: number;
   loadTime: number;
   firstContentfulPaint: number;
   domLoadTime: number;
@@ -8,7 +9,6 @@ export interface PerformanceData {
   cumulativeLayoutShift: number;
   timeToInteractive: number;
   totalSize: number;
-  score: number;
   resourceCount: number;
   resourceBreakdown: {
     js: number;
@@ -17,4 +17,15 @@ export interface PerformanceData {
     fonts: number;
     other: number;
   };
+}
+
+export interface Performance {
+  mobile: PerformanceData;
+  desktop: PerformanceData;
+}
+
+export interface MobileAnalysis {
+  score: number;
+  issues: string[];
+  recommendations: string[];
 }

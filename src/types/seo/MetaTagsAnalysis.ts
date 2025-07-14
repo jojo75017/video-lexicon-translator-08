@@ -1,13 +1,21 @@
 
 export interface MetaTagsAnalysis {
-  hasTitle: boolean;
-  hasDescription: boolean;
+  title: string;
+  description: string;
+  keywords: string;
+  ogTitle: string;
+  ogDescription: string;
+  ogImage: string;
+  twitterTitle: string;
+  twitterDescription: string;
+  twitterImage: string;
+  viewport: string;
+  charset: string;
+  robots: string;
+  canonical: string;
   hasCanonical: boolean;
-  hasRobotsTag: boolean;
-  hasOpenGraphTags: boolean;
-  hasTwitterTags?: boolean;
   titleLength: number;
   descriptionLength: number;
-  canonicalUrl: string | null;
-  robotsContent: string | null;
+  issues: string[];
+  suggestions: string[];
 }
