@@ -1,129 +1,164 @@
 
-import { CompetitorComparison, CompetitorAnalysisResult } from "@/types/seo/CompetitorData";
+import { CompetitorComparison, KeywordWithMetrics } from '@/types/seo/CompetitorData';
 
-export const generateSiteAnalysis = (url: string, type: 'your' | 'comp1' | 'comp2'): CompetitorAnalysisResult => {
-  const isTravel = url.toLowerCase().includes('voyage') || url.toLowerCase().includes('travel');
-  const domain = url.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
-  
-  const baseScores = { your: 58, comp1: 85, comp2: 76 };
-  const baseTraffic = { your: 5500, comp1: 28000, comp2: 19500 };
-  
-  const travelKeywords = [
-    { keyword: 'voyage organisé', position: Math.floor(Math.random() * 15) + 1, volume: 18500 },
-    { keyword: 'destination voyage', position: Math.floor(Math.random() * 20) + 1, volume: 12400 },
-    { keyword: 'séjour all inclusive', position: Math.floor(Math.random() * 25) + 1, volume: 9800 },
-    { keyword: 'réservation hotel', position: Math.floor(Math.random() * 18) + 1, volume: 15200 },
-    { keyword: 'guide voyage', position: Math.floor(Math.random() * 12) + 1, volume: 8900 }
-  ];
-
-  const genericKeywords = [
-    { keyword: 'service principal', position: Math.floor(Math.random() * 20) + 1, volume: 12000 },
-    { keyword: 'solution experte', position: Math.floor(Math.random() * 20) + 1, volume: 8900 },
-    { keyword: 'conseil professionnel', position: Math.floor(Math.random() * 20) + 1, volume: 6500 },
-    { keyword: 'accompagnement', position: Math.floor(Math.random() * 20) + 1, volume: 4200 },
-    { keyword: 'expertise', position: Math.floor(Math.random() * 20) + 1, volume: 3800 }
-  ];
-  
-  return {
-    site: url,
-    domain: domain,
-    seoScore: baseScores[type] + Math.floor(Math.random() * 15),
-    topKeywords: isTravel ? travelKeywords : genericKeywords,
-    totalKeywords: Math.floor(Math.random() * 800) + 350,
-    organicTraffic: baseTraffic[type] + Math.floor(Math.random() * 8000),
-    backlinksCount: Math.floor(Math.random() * 3500) + 800,
-    domainAuthority: Math.floor(Math.random() * 35) + 45,
-    technicalSeo: {
-      loadSpeed: Math.floor(Math.random() * 40) + 50,
-      mobileOptimization: Math.floor(Math.random() * 25) + 70,
-      sslCertificate: Math.random() > 0.1,
-      structuredData: Math.random() > 0.2
-    }
-  };
+export const getPositionColor = (position: number): string => {
+  if (position <= 3) return 'bg-green-500 text-white';
+  if (position <= 10) return 'bg-yellow-500 text-white';
+  if (position <= 20) return 'bg-orange-500 text-white';
+  return 'bg-red-500 text-white';
 };
 
-export const generateKeywordGaps = (yourSite: string) => {
-  const isTravel = yourSite.toLowerCase().includes('voyage') || yourSite.toLowerCase().includes('travel');
-  
-  if (isTravel) {
-    return [
-      'voyage dernière minute',
-      'croisière méditerranée',
-      'circuit organisé asie',
-      'weekend romantique',
-      'séjour spa détente',
-      'voyage groupe famille',
-      'excursion locale'
-    ];
-  }
-  
-  return [
-    'solution avancée',
-    'expertise technique',
-    'conseil stratégique',
-    'accompagnement personnalisé',
-    'formation spécialisée'
-  ];
-};
-
-export const generatePositionAnalysis = () => [
-  { keyword: 'mot-clé principal 1', yourPosition: 18, comp1Position: 4, comp2Position: 9 },
-  { keyword: 'mot-clé principal 2', yourPosition: 25, comp1Position: 6, comp2Position: 14 },
-  { keyword: 'mot-clé principal 3', yourPosition: 12, comp1Position: 15, comp2Position: 7 },
-  { keyword: 'mot-clé principal 4', yourPosition: 8, comp1Position: 3, comp2Position: 21 },
-  { keyword: 'mot-clé principal 5', yourPosition: 32, comp1Position: 11, comp2Position: 16 }
-];
-
-export const generateOpportunities = (yourSite: string) => {
-  const isTravel = yourSite.toLowerCase().includes('voyage') || yourSite.toLowerCase().includes('travel');
-  
-  if (isTravel) {
-    return [
-      'Créer du contenu sur les voyages dernière minute pour capturer 18k recherches/mois',
-      'Optimiser les pages destinations avec des guides locaux détaillés',
-      'Développer une section avis clients pour améliorer la confiance',
-      'Améliorer le maillage interne entre destinations similaires',
-      'Créer des landing pages saisonnières (été, hiver, printemps)',
-      'Optimiser pour la recherche locale "voyage + ville"',
-      'Développer du contenu vidéo pour les réseaux sociaux'
-    ];
-  }
-  
-  return [
-    'Améliorer le contenu existant avec les mots-clés gaps identifiés',
-    'Créer une stratégie de backlinks plus agressive',
-    'Optimiser la vitesse de chargement (gain potentiel +15 positions)',
-    'Développer du contenu longue traîne sur votre expertise',
-    'Améliorer l\'UX mobile pour réduire le taux de rebond'
-  ];
-};
-
-export const getScoreColor = (score: number) => {
-  if (score >= 80) return 'text-green-600 bg-green-50';
-  if (score >= 60) return 'text-orange-600 bg-orange-50';
-  return 'text-red-600 bg-red-50';
-};
-
-export const getPositionColor = (position: number) => {
-  if (position <= 3) return 'text-green-600 bg-green-50';
-  if (position <= 10) return 'text-orange-600 bg-orange-50';
-  return 'text-red-600 bg-red-50';
+export const getScoreColor = (score: number): string => {
+  if (score >= 80) return 'bg-green-500 text-white';
+  if (score >= 60) return 'bg-yellow-500 text-white';
+  if (score >= 40) return 'bg-orange-500 text-white';
+  return 'bg-red-500 text-white';
 };
 
 export const createMockAnalysisResult = (yourSite: string, competitor1: string, competitor2: string): CompetitorComparison => {
+  const mockKeywords: KeywordWithMetrics[] = [
+    { keyword: 'guide complet', position: 5, volume: 8500, difficulty: 65, traffic: 450 },
+    { keyword: 'meilleur choix', position: 8, volume: 6200, difficulty: 58, traffic: 320 },
+    { keyword: 'comparatif détaillé', position: 12, volume: 4800, difficulty: 52, traffic: 280 },
+    { keyword: 'conseils experts', position: 15, volume: 3400, difficulty: 45, traffic: 180 },
+    { keyword: 'avis utilisateurs', position: 18, volume: 2900, difficulty: 41, traffic: 150 }
+  ];
+
+  const extractDomain = (url: string) => url.replace(/^https?:\/\//, '').replace(/\/.*$/, '').replace(/^www\./, '');
+
+  const yourDomain = extractDomain(yourSite);
+  const comp1Domain = extractDomain(competitor1);
+  const comp2Domain = extractDomain(competitor2);
+
   return {
-    yourSite: generateSiteAnalysis(yourSite, 'your'),
-    competitor1: generateSiteAnalysis(competitor1, 'comp1'),
-    competitor2: generateSiteAnalysis(competitor2, 'comp2'),
+    yourSite: {
+      name: 'Votre site',
+      url: yourSite,
+      domain: yourDomain,
+      score: 72,
+      seoScore: 72,
+      strengths: ['Contenu de qualité', 'Bonne structure technique'],
+      weaknesses: ['Vitesse à améliorer', 'Maillage interne insuffisant'],
+      keywords: mockKeywords.map(k => k.keyword),
+      topKeywords: mockKeywords,
+      ranking: Object.fromEntries(mockKeywords.map(k => [k.keyword, k.position])),
+      organicTraffic: 25000,
+      totalKeywords: 1500,
+      backlinksCount: 850,
+      domainAuthority: 45,
+      site: yourSite
+    },
+    competitor1: {
+      name: 'Concurrent leader',
+      url: competitor1,
+      domain: comp1Domain,
+      score: 85,
+      seoScore: 85,
+      strengths: ['Autorité élevée', 'Excellent contenu', 'Backlinks de qualité'],
+      keywords: mockKeywords.map(k => k.keyword),
+      topKeywords: mockKeywords.map(k => ({ ...k, position: Math.max(1, k.position - 8) })),
+      ranking: Object.fromEntries(mockKeywords.map(k => [k.keyword, Math.max(1, k.position - 8)])),
+      organicTraffic: 45000,
+      totalKeywords: 3200,
+      backlinksCount: 2500,
+      domainAuthority: 68,
+      site: competitor1
+    },
+    competitor2: {
+      name: 'Concurrent secondaire',
+      url: competitor2,
+      domain: comp2Domain,
+      score: 78,
+      seoScore: 78,
+      strengths: ['Bon maillage interne', 'Contenu régulier'],
+      keywords: mockKeywords.map(k => k.keyword),
+      topKeywords: mockKeywords.map(k => ({ ...k, position: Math.max(1, k.position - 4) })),
+      ranking: Object.fromEntries(mockKeywords.map(k => [k.keyword, Math.max(1, k.position - 4)])),
+      organicTraffic: 32000,
+      totalKeywords: 2100,
+      backlinksCount: 1200,
+      domainAuthority: 52,
+      site: competitor2
+    },
+    opportunities: [
+      {
+        keyword: 'guide débutant',
+        difficulty: 45,
+        volume: 5400,
+        yourPosition: 25,
+        comp1Position: 3,
+        comp2Position: 8,
+        opportunity: 'Créer un guide pour débutants'
+      },
+      {
+        keyword: 'tutoriel complet',
+        difficulty: 38,
+        volume: 4200,
+        yourPosition: 0,
+        comp1Position: 5,
+        comp2Position: 12,
+        opportunity: 'Développer des tutoriels détaillés'
+      }
+    ],
+    actionPlan: [
+      {
+        priority: 'high',
+        action: 'Optimiser le contenu principal',
+        description: 'Enrichir vos pages principales avec plus de contenu de qualité',
+        timeframe: '2-3 semaines',
+        impact: 'Amélioration des positions de 5-10 places'
+      },
+      {
+        priority: 'medium',
+        action: 'Améliorer la vitesse de chargement',
+        description: 'Optimiser les images et réduire le temps de chargement',
+        timeframe: '1 semaine',
+        impact: 'Amélioration du taux de conversion'
+      }
+    ],
+    keywordGaps: [
+      'guide débutant',
+      'tutoriel avancé',
+      'comparatif produits',
+      'avis experts',
+      'conseils pratiques'
+    ],
+    contentGaps: [
+      'Articles de blog approfondis',
+      'Pages de destination spécialisées',
+      'Guides pratiques détaillés'
+    ],
+    technicalIssues: [
+      'Optimisation Core Web Vitals',
+      'Schema markup incomplet',
+      'Images non optimisées'
+    ],
     comparison: {
-      keywordGaps: generateKeywordGaps(yourSite),
-      strengthComparison: [
-        { site: yourSite, strength: Math.floor(Math.random() * 25) + 55 },
-        { site: competitor1, strength: Math.floor(Math.random() * 25) + 70 },
-        { site: competitor2, strength: Math.floor(Math.random() * 25) + 60 }
+      keywordGaps: [
+        'guide débutant',
+        'tutoriel avancé',
+        'comparatif produits',
+        'avis experts',
+        'conseils pratiques'
       ],
-      positionAnalysis: generatePositionAnalysis(),
-      opportunities: generateOpportunities(yourSite)
+      opportunities: [
+        'Créer un guide pour débutants',
+        'Développer des tutoriels détaillés',
+        'Améliorer le maillage interne',
+        'Optimiser les images',
+        'Créer du contenu longue traîne'
+      ],
+      strengthComparison: [
+        { site: 'Votre site', strength: 72 },
+        { site: 'Concurrent leader', strength: 85 },
+        { site: 'Concurrent 2', strength: 78 }
+      ],
+      positionAnalysis: mockKeywords.map(keyword => ({
+        keyword: keyword.keyword,
+        yourPosition: keyword.position,
+        comp1Position: Math.max(1, keyword.position - 8),
+        comp2Position: Math.max(1, keyword.position - 4)
+      }))
     }
   };
 };
