@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,7 +8,7 @@ import KeywordTabsNavigation from './keyword/KeywordTabsNavigation';
 import KeywordTabsContent from './keyword/KeywordTabsContent';
 import { Sparkles, Settings, Loader2, Key } from 'lucide-react';
 import { toast } from 'sonner';
-import { KeywordSuggestion } from '@/types/seo/Keyword';
+import { KeywordSuggestion } from '@/types/seo/KeywordSuggestion';
 
 const KeywordGeneratorEnhanced: React.FC = () => {
   const [activeMainTab, setActiveMainTab] = useState('generator');
@@ -43,7 +42,7 @@ const KeywordGeneratorEnhanced: React.FC = () => {
           volume: 1200, 
           difficulty: 45, 
           cpc: 1.25, 
-          type: 'standard',
+          type: 'primary',
           intent: 'informational',
           opportunity: 75
         },
@@ -52,7 +51,7 @@ const KeywordGeneratorEnhanced: React.FC = () => {
           volume: 800, 
           difficulty: 35, 
           cpc: 0.95, 
-          type: 'standard',
+          type: 'primary',
           intent: 'informational',
           opportunity: 60
         },
@@ -61,7 +60,7 @@ const KeywordGeneratorEnhanced: React.FC = () => {
           volume: 600, 
           difficulty: 55, 
           cpc: 1.50, 
-          type: 'standard',
+          type: 'primary',
           intent: 'commercial',
           opportunity: 80
         },
@@ -73,7 +72,7 @@ const KeywordGeneratorEnhanced: React.FC = () => {
           volume: 300, 
           difficulty: 25, 
           cpc: 0.85, 
-          type: 'long-tail',
+          type: 'longtail',
           intent: 'informational',
           opportunity: 65
         },
@@ -82,7 +81,7 @@ const KeywordGeneratorEnhanced: React.FC = () => {
           volume: 250, 
           difficulty: 30, 
           cpc: 1.10, 
-          type: 'long-tail',
+          type: 'longtail',
           intent: 'commercial',
           opportunity: 70
         },
@@ -91,7 +90,7 @@ const KeywordGeneratorEnhanced: React.FC = () => {
           volume: 180, 
           difficulty: 40, 
           cpc: 1.35, 
-          type: 'long-tail',
+          type: 'longtail',
           intent: 'commercial',
           opportunity: 55
         },
@@ -146,7 +145,7 @@ const KeywordGeneratorEnhanced: React.FC = () => {
       difficulty: Math.floor(Math.random() * 80) + 20,
       cpc: Math.random() * 2 + 0.5,
       type: 'competitor' as const,
-      intent: 'mixed' as const,
+      intent: 'commercial' as const,
       opportunity: Math.floor(Math.random() * 60) + 40
     }));
     

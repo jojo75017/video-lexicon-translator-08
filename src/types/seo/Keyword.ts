@@ -1,4 +1,10 @@
 
+export interface KeywordFrequency {
+  keyword: string;
+  frequency: number;
+  density?: number;
+}
+
 export interface KeywordData {
   keyword: string;
   volume: number;
@@ -7,22 +13,19 @@ export interface KeywordData {
   competition?: number;
   intent?: KeywordIntent;
   trends?: number[];
-  density?: number;
-  count?: number;
-  position?: number;
 }
 
 export interface KeywordSuggestion {
   keyword: string;
   volume: number;
   difficulty: number;
-  relevance?: number;
   cpc?: number;
   competition?: string;
   intent?: KeywordIntent;
   trends?: number[];
   clicks?: number;
   searchVolume?: number;
+  relevance?: number;
   type?: 'primary' | 'longtail' | 'competitor' | 'semantic';
   opportunity?: number;
   suggestedTitle?: string;
@@ -37,7 +40,6 @@ export interface SerpResult {
   url: string;
   description: string;
   position: number;
-  domain?: string;
 }
 
 export interface SerpsResult {
@@ -53,26 +55,5 @@ export interface KeywordTrend {
   seasonal: boolean;
 }
 
-export interface KeywordFrequency {
-  keyword: string;
-  count: number;
-  density: number;
-}
-
-export interface CompetitorData {
-  name: string;
-  url: string;
-  domain: string;
-  title: string;
-  description: string;
-  ranking: number;
-  traffic: number;
-  strength: number;
-  organic_traffic: number;
-  estimatedTraffic: number;
-  keywords: string[];
-  topKeywords: string[];
-  gaps: string[];
-  backlinks?: number;
-  authority?: number;
-}
+// Export CompetitorData and SerpResult from CompetitorData.ts
+export type { CompetitorData } from './CompetitorData';

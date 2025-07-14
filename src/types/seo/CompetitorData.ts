@@ -3,10 +3,10 @@ export interface CompetitorData {
   name: string;
   url: string;
   domain: string;
-  title: string;
-  description: string;
-  ranking: number;
-  traffic: number;
+  title?: string;
+  description?: string;
+  ranking?: number;
+  traffic?: number;
   strength: number;
   organic_traffic: number;
   estimatedTraffic: number;
@@ -26,30 +26,48 @@ export interface SerpResult {
 }
 
 export interface CompetitorComparison {
-  yourSite: CompetitorAnalysisResult;
-  competitor1: CompetitorAnalysisResult;
-  competitor2: CompetitorAnalysisResult;
-  comparison: {
-    keywordGaps: string[];
-    strengthComparison: { site: string; strength: number; }[];
-    positionAnalysis: { keyword: string; yourPosition: number; comp1Position: number; comp2Position: number; }[];
-    opportunities: string[];
+  yourSite: {
+    name: string;
+    url: string;
+    score: number;
+    strengths: string[];
+    weaknesses: string[];
+    keywords: string[];
+    ranking: { [keyword: string]: number };
   };
-}
-
-export interface CompetitorAnalysisResult {
-  site: string;
-  domain: string;
-  seoScore: number;
-  topKeywords: { keyword: string; position: number; volume: number; }[];
-  totalKeywords: number;
-  organicTraffic: number;
-  backlinksCount: number;
-  domainAuthority: number;
-  technicalSeo: {
-    loadSpeed: number;
-    mobileOptimization: number;
-    sslCertificate: boolean;
-    structuredData: boolean;
+  competitor1: {
+    name: string;
+    url: string;
+    score: number;
+    strengths: string[];
+    keywords: string[];
+    ranking: { [keyword: string]: number };
   };
+  competitor2: {
+    name: string;
+    url: string;
+    score: number;
+    strengths: string[];
+    keywords: string[];
+    ranking: { [keyword: string]: number };
+  };
+  opportunities: Array<{
+    keyword: string;
+    difficulty: number;
+    volume: number;
+    yourPosition: number;
+    comp1Position: number;
+    comp2Position: number;
+    opportunity: string;
+  }>;
+  actionPlan: Array<{
+    priority: 'high' | 'medium' | 'low';
+    action: string;
+    description: string;
+    timeframe: string;
+    impact: string;
+  }>;
+  keywordGaps: string[];
+  contentGaps: string[];
+  technicalIssues: string[];
 }
