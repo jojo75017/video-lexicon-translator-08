@@ -1,147 +1,137 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { KeywordSuggestion } from "@/types/seo";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Lightbulb, Copy, CheckCircle } from "lucide-react";
-import { KeywordSuggestion } from "@/types/seo/Keyword";
-import { toast } from "sonner";
+import { CheckCircle, TrendingUp, Target, Eye } from "lucide-react";
 
-interface SeoSuggestionsProps {
-  keyword: KeywordSuggestion;
-  onInsertTitle: (title: string) => void;
-  onInsertDescription: (description: string) => void;
+export interface SeoSuggestionsProps {
+  keywordData: KeywordSuggestion;
+  onInsertTitle?: (title: string) => void;
+  onInsertDescription?: (description: string) => void;
 }
 
-const SeoSuggestions: React.FC<SeoSuggestionsProps> = ({ 
-  keyword, 
-  onInsertTitle, 
-  onInsertDescription 
+const SeoSuggestions: React.FC<SeoSuggestionsProps> = ({
+  keywordData,
+  onInsertTitle,
+  onInsertDescription
 }) => {
-  const handleCopyToClipboard = (text: string, type: string) => {
-    navigator.clipboard.writeText(text);
-    toast.success(`${type} copié dans le presse-papiers`);
-  };
-
-  const generateTitleSuggestions = () => {
-    if (!keyword?.keyword) return [];
-    
-    return [
-      `Guide complet: ${keyword.keyword} en 2024`,
-      `${keyword.keyword}: 10 conseils d'experts`,
-      `Tout savoir sur ${keyword.keyword} - Guide pratique`,
-      `${keyword.keyword}: Techniques avancées et astuces`,
-      `Maîtriser ${keyword.keyword}: Le guide ultime`
-    ];
-  };
-
-  const generateDescriptionSuggestions = () => {
-    if (!keyword?.keyword) return [];
-    
-    return [
-      `Découvrez tout ce qu'il faut savoir sur ${keyword.keyword}. Guide complet avec conseils pratiques, techniques avancées et exemples concrets.`,
-      `Apprenez ${keyword.keyword} étape par étape. Méthodes éprouvées, astuces d'experts et ressources pour réussir dès maintenant.`,
-      `${keyword.keyword} expliqué simplement. Techniques, conseils et stratégies pour obtenir des résultats rapidement et efficacement.`
-    ];
-  };
-
-  const titleSuggestions = generateTitleSuggestions();
-  const descriptionSuggestions = generateDescriptionSuggestions();
-
-  if (!keyword?.keyword) {
+  if (!keywordData) {
     return (
-      <Card>
-        <CardContent className="p-4">
-          <p className="text-gray-500 text-center">Sélectionnez un mot-clé pour voir les suggestions SEO</p>
-        </CardContent>
-      </Card>
+      <div className="text-center text-gray-500 py-8">
+        <Target className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+        <p>Sélectionnez un mot-clé pour voir les suggestions SEO</p>
+      </div>
     );
   }
 
+  const handleInsertTitle = () => {
+    if (keywordData.suggestedTitle && onInsertTitle) {
+      onInsertTitle(keywordData.suggestedTitle);
+    }
+  };
+
+  const handleInsertDescription = () => {
+    if (keywordData.suggestedDescription && onInsertDescription) {
+      onInsertDescription(keywordData.suggestedDescription);
+    }
+  };
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Lightbulb className="h-5 w-5 text-yellow-500" />
-          Suggestions SEO pour "{keyword.keyword}"
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div>
-          <h4 className="font-medium mb-3">Suggestions de titres</h4>
-          <div className="space-y-2">
-            {titleSuggestions.map((title, index) => (
-              <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                <span className="text-sm flex-1">{title}</span>
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleCopyToClipboard(title, 'Titre')}
-                  >
-                    <Copy className="h-3 w-3" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    onClick={() => onInsertTitle(title)}
-                    className="bg-green-600 hover:bg-green-700"
-                  >
-                    <CheckCircle className="h-3 w-3 mr-1" />
-                    Utiliser
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+    <div className="space-y-4">
+      <div className="flex items-center gap-2 mb-4">
+        <CheckCircle className="h-5 w-5 text-green-600" />
+        <h3 className="font-semibold">Suggestions SEO pour "{keywordData.keyword}"</h3>
+      </div>
 
-        <div>
-          <h4 className="font-medium mb-3">Suggestions de descriptions</h4>
-          <div className="space-y-2">
-            {descriptionSuggestions.map((description, index) => (
-              <div key={index} className="flex items-start justify-between p-3 border rounded-lg">
-                <span className="text-sm flex-1">{description}</span>
-                <div className="flex gap-2 ml-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleCopyToClipboard(description, 'Description')}
-                  >
-                    <Copy className="h-3 w-3" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    onClick={() => onInsertDescription(description)}
-                    className="bg-green-600 hover:bg-green-700"
-                  >
-                    <CheckCircle className="h-3 w-3 mr-1" />
-                    Utiliser
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
+      {/* Métriques du mot-clé */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        <div className="text-center">
+          <div className="text-lg font-bold text-blue-600">{keywordData.searchVolume || 'N/A'}</div>
+          <div className="text-xs text-gray-500">Volume</div>
         </div>
+        <div className="text-center">
+          <div className="text-lg font-bold text-green-600">{keywordData.relevance}%</div>
+          <div className="text-xs text-gray-500">Pertinence</div>
+        </div>
+        <div className="text-center">
+          <div className="text-lg font-bold text-orange-600">{keywordData.difficulty || 'N/A'}</div>
+          <div className="text-xs text-gray-500">Difficulté</div>
+        </div>
+        <div className="text-center">
+          <div className="text-lg font-bold text-purple-600">{keywordData.cpc?.toFixed(2) || 'N/A'}€</div>
+          <div className="text-xs text-gray-500">CPC</div>
+        </div>
+      </div>
 
-        <div className="bg-blue-50 p-4 rounded-lg">
-          <h5 className="font-medium text-blue-900 mb-2">Informations sur le mot-clé</h5>
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <span className="text-blue-700">Volume de recherche:</span>
-              <Badge variant="outline" className="ml-2">
-                {keyword.volume ? keyword.volume.toLocaleString() : 'N/A'}
-              </Badge>
-            </div>
-            <div>
-              <span className="text-blue-700">Difficulté:</span>
-              <Badge variant="outline" className="ml-2">
-                {keyword.difficulty || 'N/A'}
-              </Badge>
-            </div>
+      {/* Titre suggéré */}
+      {keywordData.suggestedTitle && (
+        <Card className="p-4 border-blue-200">
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="font-medium text-blue-800">Titre suggéré</h4>
+            <Badge variant="outline" className="bg-blue-50">
+              {keywordData.suggestedTitle.length}/60
+            </Badge>
+          </div>
+          <div className="bg-blue-50 p-3 rounded mb-3">
+            <div className="text-blue-900 font-medium">{keywordData.suggestedTitle}</div>
+          </div>
+          {onInsertTitle && (
+            <Button 
+              onClick={handleInsertTitle}
+              size="sm" 
+              className="w-full"
+            >
+              Insérer ce titre
+            </Button>
+          )}
+        </Card>
+      )}
+
+      {/* Description suggérée */}
+      {keywordData.suggestedDescription && (
+        <Card className="p-4 border-green-200">
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="font-medium text-green-800">Meta description suggérée</h4>
+            <Badge variant="outline" className="bg-green-50">
+              {keywordData.suggestedDescription.length}/155
+            </Badge>
+          </div>
+          <div className="bg-green-50 p-3 rounded mb-3">
+            <div className="text-green-900 text-sm">{keywordData.suggestedDescription}</div>
+          </div>
+          {onInsertDescription && (
+            <Button 
+              onClick={handleInsertDescription}
+              size="sm" 
+              className="w-full"
+            >
+              Insérer cette description
+            </Button>
+          )}
+        </Card>
+      )}
+
+      {/* Aperçu SERP */}
+      <Card className="p-4 bg-gray-50">
+        <div className="flex items-center gap-2 mb-3">
+          <Eye className="h-4 w-4 text-gray-600" />
+          <h4 className="font-medium text-gray-800">Aperçu dans les résultats Google</h4>
+        </div>
+        <div className="bg-white p-4 rounded border">
+          <div className="text-blue-600 text-lg font-medium hover:underline cursor-pointer mb-1">
+            {keywordData.suggestedTitle || keywordData.keyword}
+          </div>
+          <div className="text-green-700 text-sm mb-2">
+            https://votre-site.com/page-optimisee
+          </div>
+          <div className="text-gray-700 text-sm">
+            {keywordData.suggestedDescription || `Découvrez tout sur ${keywordData.keyword}...`}
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </Card>
+    </div>
   );
 };
 
