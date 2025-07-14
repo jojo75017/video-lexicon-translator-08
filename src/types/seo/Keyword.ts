@@ -4,12 +4,12 @@ export interface KeywordData {
   volume: number;
   difficulty: number;
   cpc?: number;
-  competition?: string;
-  trend?: number[];
-  intent?: 'informational' | 'commercial' | 'transactional' | 'navigational';
-  relatedKeywords?: string[];
-  questions?: string[];
-  longtail?: string[];
+  competition?: number;
+  intent?: KeywordIntent;
+  trends?: number[];
+  density?: number;
+  count?: number;
+  position?: number;
 }
 
 export interface KeywordSuggestion {
@@ -19,7 +19,44 @@ export interface KeywordSuggestion {
   relevance?: number;
   cpc?: number;
   competition?: string;
-  intent?: 'informational' | 'commercial' | 'transactional' | 'navigational';
+  intent?: KeywordIntent;
+  trends?: number[];
+  clicks?: number;
+  searchVolume?: number;
+  type?: 'primary' | 'longtail' | 'competitor' | 'semantic';
+  opportunity?: number;
+  suggestedTitle?: string;
+  suggestedDescription?: string;
+  trend?: 'rising' | 'stable' | 'declining';
+}
+
+export type KeywordIntent = 'informational' | 'navigational' | 'transactional' | 'commercial';
+
+export interface SerpResult {
+  title: string;
+  url: string;
+  description: string;
+  position: number;
+  domain?: string;
+}
+
+export interface SerpsResult {
+  title: string;
+  url: string;
+  description: string;
+  position: number;
+}
+
+export interface KeywordTrend {
+  data: number[];
+  growth: number;
+  seasonal: boolean;
+}
+
+export interface KeywordFrequency {
+  keyword: string;
+  count: number;
+  density: number;
 }
 
 export interface CompetitorData {
@@ -33,23 +70,9 @@ export interface CompetitorData {
   strength: number;
   organic_traffic: number;
   estimatedTraffic: number;
-  keywords: number; // Changed from string[] to number to match usage
+  keywords: string[];
   topKeywords: string[];
   gaps: string[];
   backlinks?: number;
   authority?: number;
-}
-
-export interface SerpResult {
-  title: string;
-  url: string;
-  description: string;
-  position: number;
-  domain?: string;
-}
-
-export interface KeywordFrequency {
-  keyword: string;
-  count: number;
-  density: number;
 }
