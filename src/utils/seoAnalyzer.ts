@@ -1,4 +1,3 @@
-
 import { SeoAnalysis, MetaTagsAnalysis, BacklinkInfo, SocialMetrics } from '@/types/seo';
 import { analyzeImages } from './seo/imageAnalyzer';
 import { analyzeSearchConsoleData } from './seo/searchConsoleAnalyzer';
@@ -12,7 +11,6 @@ export const analyzeMetaTags = (htmlContent: string): MetaTagsAnalysis => {
     return {
       hasTitle: false,
       hasDescription: false,
-      hasCanonical: false,
       hasRobotsTag: false,
       hasOpenGraphTags: false,
       titleLength: 0,
@@ -39,7 +37,6 @@ export const analyzeMetaTags = (htmlContent: string): MetaTagsAnalysis => {
   
   // Canonical URL analysis
   const canonicalLink = doc.querySelector('link[rel="canonical"]');
-  const hasCanonical = !!canonicalLink;
   const canonicalUrl = canonicalLink?.getAttribute('href') || null;
   
   // Robots tag analysis
@@ -63,7 +60,6 @@ export const analyzeMetaTags = (htmlContent: string): MetaTagsAnalysis => {
   return {
     hasTitle,
     hasDescription,
-    hasCanonical,
     hasRobotsTag,
     hasOpenGraphTags,
     hasTwitterTags,
@@ -148,16 +144,15 @@ export const analyzeSeo = (htmlContent: string, url: string): SeoAnalysis => {
   
   // Mock backlink data (in a real app, this would come from an API)
   const backlinks: BacklinkInfo[] = [
-    { domain: 'example.com', url: 'https://example.com/page1', anchor: 'SEO Tips', dofollow: true },
-    { domain: 'test.org', url: 'https://test.org/resources', anchor: 'Web Tools', dofollow: false }
+    { domain: 'example.com', url: 'https://example.com/page1', anchor: 'SEO Tips', dofollow: true, authority: 75, isDoFollow: true },
+    { domain: 'test.org', url: 'https://test.org/resources', anchor: 'Web Tools', dofollow: false, authority: 60, isDoFollow: false }
   ];
   
   // Mock data for social metrics (would come from social APIs)
   const socialMetrics: SocialMetrics = {
     shares: 245,
     likes: 123,
-    comments: 45,
-    total: 413
+    comments: 45
   };
   
   // Mock data for social tags
@@ -192,7 +187,8 @@ export const analyzeSeo = (htmlContent: string, url: string): SeoAnalysis => {
       images: 256000,
       fonts: 64000,
       other: 64000
-    }
+    },
+    score: 75
   };
   
   // Mobile analysis (mock)

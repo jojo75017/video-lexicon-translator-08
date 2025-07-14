@@ -1,88 +1,25 @@
 
-export interface KeywordFrequency {
-  keyword: string;
-  frequency: number;
-  density?: number;
-}
-
 export interface KeywordData {
   keyword: string;
   volume: number;
   difficulty: number;
   cpc?: number;
-  competition?: number;
-  intent?: KeywordIntent;
-  trends?: number[];
-  density?: number;
-  count?: number;
-  position?: number;
+  competition?: string;
+  trend?: number[];
+  intent?: 'informational' | 'commercial' | 'transactional' | 'navigational';
+  relatedKeywords?: string[];
+  questions?: string[];
+  longtail?: string[];
 }
 
 export interface KeywordSuggestion {
   keyword: string;
-  volume?: number;
-  difficulty?: number;
-  cpc?: number;
-  competition?: number;
-  intent?: KeywordIntent;
-  trend?: number[];
-  type?: string;
-  opportunity?: number;
-  searchVolume?: number;
-  relevance?: number;
-  suggestedTitle?: string;
-  suggestedDescription?: string;
-}
-
-export type KeywordIntent = 'informational' | 'navigational' | 'transactional' | 'commercial' | 'mixed';
-
-export interface SerpResult {
-  title: string;
-  url: string;
-  description: string;
-  position: number;
-  domain?: string;
-  authority?: number;
-  estimatedTraffic?: number;
-  titleLength?: number;
-  loadTime?: number;
-  hasStructuredData?: boolean;
-}
-
-export interface SerpsResult {
-  title: string;
-  url: string;
-  description: string;
-  position: number;
-}
-
-export interface KeywordTrend {
-  data: number[];
-  growth: number;
-  seasonal: boolean;
-}
-
-export interface ContentGap {
-  keyword: string;
-  missingContent: string[];
-  opportunity: number;
-  searchVolume?: number;
-  difficulty?: number;
-  priority?: 'high' | 'medium' | 'low';
-  currentRanking?: number;
-  competitorRanking?: number;
-  contentSuggestion?: string;
-}
-
-export interface SemanticCluster {
-  id: string;
-  name: string;
-  mainTopic: string;
-  keywords: string[];
-  intent: 'informational' | 'commercial' | 'transactional';
+  volume: number;
   difficulty: number;
-  opportunity: number;
-  contentType: string;
+  relevance?: number;
+  cpc?: number;
+  competition?: string;
+  intent?: 'informational' | 'commercial' | 'transactional' | 'navigational';
 }
 
 export interface CompetitorData {
@@ -96,36 +33,23 @@ export interface CompetitorData {
   strength: number;
   organic_traffic: number;
   estimatedTraffic: number;
-  keywords: number;
+  keywords: number; // Changed from string[] to number to match usage
   topKeywords: string[];
   gaps: string[];
   backlinks?: number;
   authority?: number;
 }
 
-export interface VoiceSearchData {
-  keyword: string;
-  isVoiceOptimized: boolean;
-  questionFormat: string;
-  conversationalVariants: string[];
-  avgQuestionLength: number;
-  featuredSnippetChance: number;
-  voiceScore: number;
-  naturalLanguageQueries: string[];
-  conversationalKeywords: string[];
+export interface SerpResult {
+  title: string;
+  url: string;
+  description: string;
+  position: number;
+  domain?: string;
 }
 
-export interface RoiParameters {
-  seoInvestment: number;
-  acquisitionCost: number;
-  conversionRate: number;
-  averageOrderValue: number;
-  organicTraffic: number;
-  timeFrame: number;
-  targetKeywords: string[];
-  averagePosition: number;
-  clickThroughRate: number;
-  contentCost: number;
-  linkBuildingCost: number;
-  toolsCost: number;
+export interface KeywordFrequency {
+  keyword: string;
+  count: number;
+  density: number;
 }

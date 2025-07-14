@@ -3,14 +3,14 @@ export interface PerformanceData {
   score: number;
   loadTime: number;
   firstContentfulPaint: number;
-  domLoadTime: number;
-  speedIndex: number;
   largestContentfulPaint: number;
   cumulativeLayoutShift: number;
   timeToInteractive: number;
-  totalSize: number;
   resourceCount: number;
-  resourceBreakdown: {
+  totalSize: number;
+  speedIndex?: number;
+  domLoadTime?: number;
+  resourceBreakdown?: {
     js: number;
     css: number;
     images: number;
@@ -20,12 +20,26 @@ export interface PerformanceData {
 }
 
 export interface Performance {
-  mobile: PerformanceData;
-  desktop: PerformanceData;
+  loadTime: number;
+  firstContentfulPaint: number;
+  domLoadTime: number;
+  speedIndex: number;
+  largestContentfulPaint: number;
+  cumulativeLayoutShift: number;
+  timeToInteractive: number;
+  totalSize: number;
+  resourceBreakdown: {
+    js: number;
+    css: number;
+    images: number;
+    fonts: number;
+    other: number;
+  };
 }
 
 export interface MobileAnalysis {
   score: number;
+  isMobileFriendly: boolean;
+  mobileScore: number;
   issues: string[];
-  recommendations: string[];
 }

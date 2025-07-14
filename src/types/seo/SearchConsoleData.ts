@@ -1,15 +1,21 @@
 
 export interface SearchConsoleData {
-  clicks: number;
   impressions: number;
+  clicks: number;
   ctr: number;
-  position: number;
-  topQueries: { query: string; clicks: number; impressions: number; ctr: number; position: number; }[];
-  topPages: { page: string; clicks: number; impressions: number; ctr: number; position: number; }[];
-  dateRange: {
-    start: string;
-    end: string;
-  };
-  totalQueries: number;
-  totalPages: number;
+  averagePosition: number;
+  queries?: Array<{
+    query: string;
+    impressions: number;
+    clicks: number;
+    ctr: number;
+    position: number;
+  }>;
+  pages?: Array<{
+    page: string;
+    impressions: number;
+    clicks: number;
+    ctr: number;
+    position: number;
+  }>;
 }
