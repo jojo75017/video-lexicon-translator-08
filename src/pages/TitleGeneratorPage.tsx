@@ -528,6 +528,121 @@ Angle: ${titleData.angle}`;
                         >
                           📋 Plan SEO
                         </Button>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => {
+                            const promptMarkdown = `# Prompt de Génération d'Article SEO
+
+## Informations SEO de base
+- **Titre H1** : ${titleData.title}
+- **Title Tag** : ${titleData.titleTag}
+- **Meta Description** : ${titleData.metaDescription}
+- **Mot-clé principal** : ${titleData.keyword}
+- **Catégorie** : ${titleData.category}
+- **Slug URL** : ${titleData.slug}
+- **Volume de recherche** : ${titleData.searchVolume.toLocaleString()}/mois
+- **Difficulté SEO** : ${titleData.difficulty}/100
+- **Type de contenu** : ${titleData.type}
+
+## Instructions de rédaction
+
+### Objectif principal
+Créer un article SEO optimisé de 1500-2000 mots sur le sujet "${titleData.title}" qui se positionne dans les premiers résultats Google pour le mot-clé "${titleData.keyword}".
+
+### Ton et style
+- **Ton** : ${selectedThematic === 'technologie' ? 'Expert et accessible' : selectedThematic === 'sante' ? 'Professionnel et rassurant' : selectedThematic === 'finance' ? 'Technique et fiable' : selectedThematic === 'marketing' ? 'Dynamique et orienté résultats' : selectedThematic === 'lifestyle' ? 'Inspirant et moderne' : selectedThematic === 'education' ? 'Pédagogique et encourageant' : selectedThematic === 'voyage' ? 'Enthousiaste et informatif' : selectedThematic === 'cuisine' ? 'Chaleureux et passionné' : selectedThematic === 'immobilier' ? 'Professionnel et conseil' : 'Motivant et technique'}
+- **Public cible** : ${selectedThematic === 'technologie' ? 'Professionnels et passionnés de tech' : selectedThematic === 'sante' ? 'Personnes soucieuses de leur bien-être' : selectedThematic === 'finance' ? 'Investisseurs et épargnants' : selectedThematic === 'marketing' ? 'Entrepreneurs et marketeurs' : selectedThematic === 'lifestyle' ? 'Lecteurs intéressés par les tendances' : selectedThematic === 'education' ? 'Apprenants et professionnels en formation' : selectedThematic === 'voyage' ? 'Voyageurs et passionnés de découverte' : selectedThematic === 'cuisine' ? 'Amateurs de cuisine et gastronomes' : selectedThematic === 'immobilier' ? 'Investisseurs et futurs propriétaires' : 'Pratiquants et passionnés de sport'}
+
+### Structure détaillée
+
+#### 1. Introduction (150-200 mots)
+- **Hook accrocheur** : Commencer par une statistique surprenante ou une question qui interpelle
+- **Problématique** : Identifier le problème ou besoin principal lié à "${titleData.keyword}"
+- **Promesse de valeur** : Expliquer ce que le lecteur va apprendre
+- **Plan de l'article** : Annoncer les sections principales
+- **Intégration du mot-clé** : Utiliser "${titleData.keyword}" naturellement dans les 100 premiers mots
+
+#### 2. Contexte et enjeux (300-400 mots)
+- **État actuel** : Panorama du marché/secteur de "${titleData.keyword}"
+- **Tendances 2024** : Évolutions récentes et futures
+- **Défis principaux** : Obstacles que rencontrent les utilisateurs
+- **Opportunités** : Potentiel et bénéfices à saisir
+- **Données chiffrées** : Statistiques récentes et sources fiables
+
+#### 3. Solutions pratiques (400-500 mots)
+- **Méthode principale** : Approche recommandée pour "${titleData.keyword}"
+- **Étapes détaillées** : Guide pas-à-pas avec actions concrètes
+- **Conseils d'experts** : Bonnes pratiques et recommandations
+- **Outils recommandés** : Ressources utiles et logiciels
+- **Erreurs à éviter** : Pièges courants et comment les contourner
+
+#### 4. Exemples et études de cas (300-400 mots)
+- **Cas pratique 1** : Exemple concret d'application réussie
+- **Cas pratique 2** : Situation différente avec résultats mesurables
+- **Témoignages** : Retours d'expérience authentiques
+- **Résultats chiffrés** : ROI, économies, gains de temps, etc.
+- **Leçons apprises** : Enseignements clés à retenir
+
+#### 5. FAQ (200-250 mots)
+Répondre aux 6-8 questions les plus fréquentes sur "${titleData.keyword}" :
+- Questions débutants (2-3 questions)
+- Questions techniques (2-3 questions)
+- Questions sur les coûts/prix (1-2 questions)
+- Questions sur les résultats/délais (1-2 questions)
+
+#### 6. Conclusion et appel à l'action (100-150 mots)
+- **Récapitulatif** : Points clés essentiels à retenir
+- **Prochaines étapes** : Actions concrètes pour le lecteur
+- **CTA principal** : Invitation claire et motivante
+- **Ressources bonus** : Liens vers contenus complémentaires
+
+### Optimisations SEO obligatoires
+
+#### Mots-clés
+- **Principal** : "${titleData.keyword}" (densité 1-2%, variations naturelles)
+- **Secondaires** : Intégrer 5-7 mots-clés sémantiquement liés
+- **Longue traîne** : Questions et expressions naturelles des utilisateurs
+
+#### Structure technique
+- **Balises H2-H6** : Hiérarchie claire avec mots-clés
+- **Méta-données** : Title et description fournis ci-dessus
+- **Liens internes** : 3-5 liens vers contenus connexes
+- **Liens externes** : 2-3 liens vers sources authorités
+
+#### Expérience utilisateur
+- **Lisibilité** : Phrases courtes, paragraphes aérés
+- **Éléments visuels** : Suggestions pour images/infographies
+- **Temps de lecture** : 8-12 minutes (optimal pour l'engagement)
+- **Call-to-action** : Boutons et liens clairs
+
+### Éléments de crédibilité
+- **Sources fiables** : Citer études, recherches, experts reconnus
+- **Données récentes** : Informations de 2024 ou très récentes
+- **Expertise** : Démontrer une connaissance approfondie du sujet
+- **Transparence** : Mentionner limites et nuances quand approprié
+
+### Checklist finale
+- [ ] Mot-clé principal dans le titre H1
+- [ ] Meta description attractive et informative
+- [ ] Structure H2-H6 optimisée
+- [ ] Densité de mots-clés appropriée
+- [ ] Liens internes et externes pertinents
+- [ ] Appel à l'action clair
+- [ ] Contenu unique et de valeur
+- [ ] Lisibilité optimale
+- [ ] Sources et données vérifiées
+
+**Longueur cible** : 1500-2000 mots
+**Objectif de positionnement** : Top 3 Google pour "${titleData.keyword}"
+**Public** : ${selectedThematic === 'technologie' ? 'Professionnels et passionnés de technologie' : selectedThematic === 'sante' ? 'Personnes intéressées par leur santé et bien-être' : selectedThematic === 'finance' ? 'Investisseurs, épargnants et professionnels financiers' : selectedThematic === 'marketing' ? 'Entrepreneurs, marketeurs et dirigeants' : selectedThematic === 'lifestyle' ? 'Lecteurs intéressés par les tendances lifestyle' : selectedThematic === 'education' ? 'Apprenants, formateurs et professionnels en développement' : selectedThematic === 'voyage' ? 'Voyageurs, touristes et passionnés de découverte' : selectedThematic === 'cuisine' ? 'Amateurs de cuisine, chefs et gourmets' : selectedThematic === 'immobilier' ? 'Investisseurs immobiliers et futurs propriétaires' : 'Sportifs, coachs et passionnés de fitness'}`;
+
+                            navigator.clipboard.writeText(promptMarkdown);
+                            toast.success('Prompt markdown complet copié !');
+                          }}
+                        >
+                          📝 Prompt
+                        </Button>
                       </div>
                     </div>
                   </div>
