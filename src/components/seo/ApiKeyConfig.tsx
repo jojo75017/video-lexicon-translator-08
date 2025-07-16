@@ -43,10 +43,9 @@ const ApiKeyConfig: React.FC<ApiKeyConfigProps> = ({
       setValidationInProgress(true);
       
       // Valider la clé API
-      const openAIService = new OpenAIService(openaiKey);
-      OpenAIService.enableProxy();
+      OpenAIService.enableProxy(true);
       try {
-        const isValid = await openAIService.validateApiKey();
+        const isValid = await OpenAIService.validateApiKey(openaiKey);
         setApiKeyStatus(isValid ? 'valid' : 'invalid');
         
         if (isValid) {
