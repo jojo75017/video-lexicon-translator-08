@@ -16,7 +16,7 @@ export const useKeywordGenerator = () => {
           volume: 1200,
           difficulty: 45,
           cpc: 1.23,
-          type: 'primary',
+          type: 'standard',
           intent: 'informational',
           opportunity: 75
         },
@@ -25,7 +25,7 @@ export const useKeywordGenerator = () => {
           volume: 950,
           difficulty: 52,
           cpc: 2.15,
-          type: 'primary',
+          type: 'standard',
           intent: 'commercial',
           opportunity: 68
         },
@@ -34,7 +34,7 @@ export const useKeywordGenerator = () => {
           volume: 800,
           difficulty: 38,
           cpc: 1.87,
-          type: 'primary',
+          type: 'standard',
           intent: 'commercial',
           opportunity: 82
         },
@@ -52,7 +52,7 @@ export const useKeywordGenerator = () => {
           volume: 420,
           difficulty: 29,
           cpc: 1.45,
-          type: 'primary',
+          type: 'standard',
           intent: 'commercial',
           opportunity: 73
         }
