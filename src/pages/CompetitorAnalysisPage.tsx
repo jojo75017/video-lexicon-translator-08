@@ -156,19 +156,19 @@ const CompetitorAnalysisPage: React.FC = () => {
                     <div className="space-y-3">
                       <div className="flex justify-between">
                         <span>Trafic organique:</span>
-                        <span className="font-medium">{analysis.competitor1.organicTraffic.toLocaleString()}/mois</span>
+                        <span className="font-medium">{analysis.competitor1.organicTraffic?.toLocaleString() || 'N/A'}/mois</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Mots-clés positionnés:</span>
-                        <span className="font-medium">{analysis.competitor1.totalKeywords.toLocaleString()}</span>
+                        <span className="font-medium">{analysis.competitor1.totalKeywords?.toLocaleString() || 'N/A'}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Backlinks:</span>
-                        <span className="font-medium">{analysis.competitor1.backlinks.toLocaleString()}</span>
+                        <span className="font-medium">{analysis.competitor1.backlinksCount?.toLocaleString() || 'N/A'}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Authority Score:</span>
-                        <span className="font-medium">{analysis.competitor1.authorityScore}/100</span>
+                        <span className="font-medium">{analysis.competitor1.domainAuthority || 'N/A'}/100</span>
                       </div>
                     </div>
                   </CardContent>
@@ -185,19 +185,19 @@ const CompetitorAnalysisPage: React.FC = () => {
                     <div className="space-y-3">
                       <div className="flex justify-between">
                         <span>Trafic organique:</span>
-                        <span className="font-medium">{analysis.competitor2.organicTraffic.toLocaleString()}/mois</span>
+                        <span className="font-medium">{analysis.competitor2.organicTraffic?.toLocaleString() || 'N/A'}/mois</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Mots-clés positionnés:</span>
-                        <span className="font-medium">{analysis.competitor2.totalKeywords.toLocaleString()}</span>
+                        <span className="font-medium">{analysis.competitor2.totalKeywords?.toLocaleString() || 'N/A'}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Backlinks:</span>
-                        <span className="font-medium">{analysis.competitor2.backlinks.toLocaleString()}</span>
+                        <span className="font-medium">{analysis.competitor2.backlinksCount?.toLocaleString() || 'N/A'}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Authority Score:</span>
-                        <span className="font-medium">{analysis.competitor2.authorityScore}/100</span>
+                        <span className="font-medium">{analysis.competitor2.domainAuthority || 'N/A'}/100</span>
                       </div>
                     </div>
                   </CardContent>
@@ -220,7 +220,7 @@ const CompetitorAnalysisPage: React.FC = () => {
                         <div className="flex items-center gap-3">
                           <span className="font-medium">{keyword.keyword}</span>
                           <Badge variant="outline">
-                            Vol: {keyword.searchVolume.toLocaleString()}
+                            Vol: {keyword.volume?.toLocaleString() || 'N/A'}
                           </Badge>
                         </div>
                         <div className="flex items-center gap-2">

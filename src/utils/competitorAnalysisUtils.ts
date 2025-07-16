@@ -133,6 +133,29 @@ export const createMockAnalysisResult = (yourSite: string, competitor1: string, 
       'Schema markup incomplet',
       'Images non optimisées'
     ],
+    commonKeywords: [
+      {
+        keyword: 'guide complet',
+        volume: 8500,
+        yourPosition: 5,
+        competitor1Position: 3,
+        competitor2Position: 7
+      },
+      {
+        keyword: 'meilleur choix',
+        volume: 6200,
+        yourPosition: 8,
+        competitor1Position: 2,
+        competitor2Position: 5
+      },
+      {
+        keyword: 'comparatif détaillé',
+        volume: 4800,
+        yourPosition: 12,
+        competitor1Position: 4,
+        competitor2Position: 8
+      }
+    ],
     comparison: {
       keywordGaps: [
         'guide débutant',

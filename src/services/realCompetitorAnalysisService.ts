@@ -30,6 +30,7 @@ export class RealCompetitorAnalysisService {
         keywordGaps: comparison.keywordGaps,
         contentGaps: comparison.contentGaps,
         technicalIssues: comparison.technicalIssues,
+        commonKeywords: [],
         comparison: comparison.comparisonData
       };
     } catch (error) {

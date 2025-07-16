@@ -108,6 +108,13 @@ export interface CompetitorComparison {
   keywordGaps: string[];
   contentGaps: string[];
   technicalIssues: string[];
+  commonKeywords: Array<{
+    keyword: string;
+    volume: number;
+    yourPosition: number;
+    competitor1Position: number;
+    competitor2Position: number;
+  }>;
   comparison: {
     keywordGaps: string[];
     opportunities: string[];
