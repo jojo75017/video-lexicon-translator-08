@@ -48,12 +48,35 @@ const SeoGeneratorPage: React.FC = () => {
         const parser = new DOMParser();
         const doc = parser.parseFromString(data.contents, 'text/html');
         
-        // Extraire les métadonnées
+        // Extraire les métadonnées avec différentes variantes
         const title = doc.querySelector('title')?.textContent || '';
-        const description = doc.querySelector('meta[name="description"]')?.getAttribute('content') || '';
-        const keywords = doc.querySelector('meta[name="keywords"]')?.getAttribute('content') || '';
+        
+        // Plusieurs façons de récupérer la description
+        const description = doc.querySelector('meta[name="description"]')?.getAttribute('content') || 
+                          doc.querySelector('meta[property="og:description"]')?.getAttribute('content') || '';
+        
+        // Plusieurs façons de récupérer les mots-clés
+        const keywords = doc.querySelector('meta[name="keywords"]')?.getAttribute('content') || 
+                        doc.querySelector('meta[name="Keywords"]')?.getAttribute('content') || 
+                        doc.querySelector('meta[property="keywords"]')?.getAttribute('content') || '';
+        
         const h1 = doc.querySelector('h1')?.textContent || '';
-        const h2Elements = Array.from(doc.querySelectorAll('h2')).map(h2 => h2.textContent || '');
+        const h2Elements = Array.from(doc.querySelectorAll('h2')).map(h2 => h2.textContent || '').filter(text => text.length > 0);
+        
+        // Extraire plus d'informations pour l'analyse
+        const metaTags = Array.from(doc.querySelectorAll('meta')).map(tag => ({
+          name: tag.getAttribute('name') || tag.getAttribute('property') || '',
+          content: tag.getAttribute('content') || ''
+        }));
+        
+        const ogTitle = doc.querySelector('meta[property="og:title"]')?.getAttribute('content') || '';
+        const ogDescription = doc.querySelector('meta[property="og:description"]')?.getAttribute('content') || '';
+        
+        // Analyser le contenu pour des suggestions
+        const pageText = doc.body?.textContent || '';
+        const wordCount = pageText.split(/\s+/).length;
+        const images = Array.from(doc.querySelectorAll('img'));
+        const imagesWithoutAlt = images.filter(img => !img.getAttribute('alt'));
         
         // Stocker les données extraites pour l'affichage
         const extractedInfo = {
@@ -62,7 +85,21 @@ const SeoGeneratorPage: React.FC = () => {
           keywords,
           h1,
           h2Elements,
-          url: urlToAnalyze
+          url: urlToAnalyze,
+          metaTags,
+          ogTitle,
+          ogDescription,
+          analysis: {
+            titleLength: title.length,
+            descriptionLength: description.length,
+            hasH1: !!h1,
+            h2Count: h2Elements.length,
+            wordCount,
+            imagesCount: images.length,
+            imagesWithoutAlt: imagesWithoutAlt.length,
+            hasKeywords: !!keywords,
+            hasOgTags: !!ogTitle || !!ogDescription
+          }
         };
         setExtractedData(extractedInfo);
         
@@ -78,7 +115,7 @@ const SeoGeneratorPage: React.FC = () => {
           canonical: urlToAnalyze,
         }));
         
-        toast.success('Analyse terminée ! Formulaire pré-rempli avec les données du site.');
+        toast.success('Analyse terminée ! Données extraites et suggestions générées.');
       } else {
         throw new Error('Impossible d\'extraire le contenu');
       }
@@ -343,6 +380,165 @@ ${formData.h2Tags.filter(h2 => h2.trim()).map(h2 => `<h2>${h2}</h2>`).join('\n')
                   </div>
                 )}
               </div>
+              
+              {/* Analysis & Suggestions */}
+              {extractedData.analysis && (
+                <div className="mt-6 pt-6 border-t">
+                  <h4 className="font-medium text-sm mb-4 flex items-center gap-2">
+                    <Zap className="h-4 w-4" />
+                    Analyse SEO et suggestions d'amélioration
+                  </h4>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Titre */}
+                    <div className="p-3 rounded border">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium">Titre</span>
+                        <Badge variant={extractedData.analysis.titleLength >= 30 && extractedData.analysis.titleLength <= 60 ? 'default' : 'destructive'}>
+                          {extractedData.analysis.titleLength >= 30 && extractedData.analysis.titleLength <= 60 ? '✓' : '!'}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {extractedData.analysis.titleLength} caractères 
+                        {extractedData.analysis.titleLength < 30 && ' (trop court, recommandé: 30-60)'}
+                        {extractedData.analysis.titleLength > 60 && ' (trop long, recommandé: 30-60)'}
+                        {extractedData.analysis.titleLength >= 30 && extractedData.analysis.titleLength <= 60 && ' (optimal)'}
+                      </p>
+                    </div>
+                    
+                    {/* Description */}
+                    <div className="p-3 rounded border">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium">Meta Description</span>
+                        <Badge variant={extractedData.analysis.descriptionLength >= 120 && extractedData.analysis.descriptionLength <= 160 ? 'default' : 'destructive'}>
+                          {extractedData.analysis.descriptionLength >= 120 && extractedData.analysis.descriptionLength <= 160 ? '✓' : '!'}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {extractedData.analysis.descriptionLength} caractères
+                        {extractedData.analysis.descriptionLength < 120 && ' (trop courte, recommandé: 120-160)'}
+                        {extractedData.analysis.descriptionLength > 160 && ' (trop longue, recommandé: 120-160)'}
+                        {extractedData.analysis.descriptionLength >= 120 && extractedData.analysis.descriptionLength <= 160 && ' (optimal)'}
+                      </p>
+                    </div>
+                    
+                    {/* H1 */}
+                    <div className="p-3 rounded border">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium">Titre H1</span>
+                        <Badge variant={extractedData.analysis.hasH1 ? 'default' : 'destructive'}>
+                          {extractedData.analysis.hasH1 ? '✓' : '!'}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {extractedData.analysis.hasH1 ? 'H1 présent' : 'Aucun H1 trouvé (recommandé)'}
+                      </p>
+                    </div>
+                    
+                    {/* H2 */}
+                    <div className="p-3 rounded border">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium">Structure H2</span>
+                        <Badge variant={extractedData.analysis.h2Count > 0 ? 'default' : 'secondary'}>
+                          {extractedData.analysis.h2Count > 0 ? '✓' : 'i'}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {extractedData.analysis.h2Count} titre(s) H2 trouvé(s)
+                        {extractedData.analysis.h2Count === 0 && ' (recommandé pour structurer le contenu)'}
+                      </p>
+                    </div>
+                    
+                    {/* Mots-clés */}
+                    <div className="p-3 rounded border">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium">Mots-clés Meta</span>
+                        <Badge variant={extractedData.analysis.hasKeywords ? 'default' : 'secondary'}>
+                          {extractedData.analysis.hasKeywords ? '✓' : 'i'}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {extractedData.analysis.hasKeywords ? 'Mots-clés présents' : 'Aucun mot-clé meta (optionnel en 2024)'}
+                      </p>
+                    </div>
+                    
+                    {/* Open Graph */}
+                    <div className="p-3 rounded border">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium">Open Graph</span>
+                        <Badge variant={extractedData.analysis.hasOgTags ? 'default' : 'destructive'}>
+                          {extractedData.analysis.hasOgTags ? '✓' : '!'}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {extractedData.analysis.hasOgTags ? 'Tags OG présents' : 'Tags Open Graph manquants (recommandé pour les réseaux sociaux)'}
+                      </p>
+                    </div>
+                    
+                    {/* Images */}
+                    <div className="p-3 rounded border">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium">Images</span>
+                        <Badge variant={extractedData.analysis.imagesWithoutAlt === 0 ? 'default' : 'destructive'}>
+                          {extractedData.analysis.imagesWithoutAlt === 0 ? '✓' : '!'}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {extractedData.analysis.imagesCount} image(s), {extractedData.analysis.imagesWithoutAlt} sans attribut alt
+                        {extractedData.analysis.imagesWithoutAlt > 0 && ' (ajouter des descriptions alt pour l\'accessibilité)'}
+                      </p>
+                    </div>
+                    
+                    {/* Contenu */}
+                    <div className="p-3 rounded border">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium">Contenu</span>
+                        <Badge variant={extractedData.analysis.wordCount >= 300 ? 'default' : 'secondary'}>
+                          {extractedData.analysis.wordCount >= 300 ? '✓' : 'i'}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        ~{extractedData.analysis.wordCount} mots
+                        {extractedData.analysis.wordCount < 300 && ' (recommandé: +300 mots pour le SEO)'}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* Suggestions principales */}
+                  <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-950/20 rounded border border-blue-200 dark:border-blue-800">
+                    <h5 className="font-medium text-sm mb-2 text-blue-900 dark:text-blue-100">📋 Suggestions prioritaires :</h5>
+                    <ul className="text-xs text-blue-800 dark:text-blue-200 space-y-1">
+                      {!extractedData.analysis.hasOgTags && (
+                        <li>• Ajouter les balises Open Graph (og:title, og:description, og:image)</li>
+                      )}
+                      {extractedData.analysis.titleLength < 30 && (
+                        <li>• Allonger le titre (actuellement {extractedData.analysis.titleLength} caractères, optimal: 30-60)</li>
+                      )}
+                      {extractedData.analysis.titleLength > 60 && (
+                        <li>• Raccourcir le titre (actuellement {extractedData.analysis.titleLength} caractères, optimal: 30-60)</li>
+                      )}
+                      {extractedData.analysis.descriptionLength < 120 && (
+                        <li>• Étoffer la meta description (actuellement {extractedData.analysis.descriptionLength} caractères, optimal: 120-160)</li>
+                      )}
+                      {extractedData.analysis.descriptionLength > 160 && (
+                        <li>• Raccourcir la meta description (actuellement {extractedData.analysis.descriptionLength} caractères, optimal: 120-160)</li>
+                      )}
+                      {!extractedData.analysis.hasH1 && (
+                        <li>• Ajouter un titre H1 principal à la page</li>
+                      )}
+                      {extractedData.analysis.h2Count === 0 && (
+                        <li>• Structurer le contenu avec des titres H2</li>
+                      )}
+                      {extractedData.analysis.imagesWithoutAlt > 0 && (
+                        <li>• Ajouter des attributs alt aux {extractedData.analysis.imagesWithoutAlt} image(s) manquante(s)</li>
+                      )}
+                      {extractedData.analysis.wordCount < 300 && (
+                        <li>• Enrichir le contenu textuel (actuellement ~{extractedData.analysis.wordCount} mots, recommandé: +300)</li>
+                      )}
+                    </ul>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         )}
