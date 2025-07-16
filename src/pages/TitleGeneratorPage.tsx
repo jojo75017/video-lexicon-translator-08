@@ -114,9 +114,10 @@ const TitleGeneratorPage: React.FC = () => {
       // Utiliser les templates selon la thématique
       const templates = titleTemplates[selectedThematic] || titleTemplates.technologie;
       
-      // Fonction pour générer le slug
-      const generateSlug = (title: string) => {
-        return title
+      // Fonction pour générer le slug (raccourci)
+      const generateSlug = (title: string, keyword: string) => {
+        // Créer un slug plus court basé sur le mot-clé principal et quelques mots-clés du titre
+        const titleWords = title
           .toLowerCase()
           .replace(/[àáâãäå]/g, 'a')
           .replace(/[èéêë]/g, 'e')
@@ -125,26 +126,42 @@ const TitleGeneratorPage: React.FC = () => {
           .replace(/[ùúûü]/g, 'u')
           .replace(/[çc]/g, 'c')
           .replace(/[^a-z0-9\s-]/g, '')
-          .replace(/\s+/g, '-')
+          .split(' ')
+          .filter(word => word.length > 2)
+          .slice(0, 4); // Prendre seulement les 4 premiers mots significatifs
+        
+        return [keyword.toLowerCase().replace(/\s+/g, '-'), ...titleWords]
+          .join('-')
           .replace(/-+/g, '-')
-          .trim();
+          .substring(0, 50); // Limiter à 50 caractères maximum
       };
 
-      // Fonction pour générer la meta description
-      const generateMetaDescription = (title: string, thematic: string) => {
+      // Fonction pour générer la meta description (155 caractères max)
+      const generateMetaDescription = (title: string, thematic: string, keyword: string) => {
         const descriptions = {
-          'technologie': `Découvrez ${keyword} et révolutionnez votre approche technologique. Guide complet avec conseils d'experts et solutions pratiques.`,
-          'sante': `Tout savoir sur ${keyword} pour améliorer votre santé. Conseils médicaux validés et solutions naturelles efficaces.`,
-          'finance': `Investir dans ${keyword} en 2024 : stratégies gagnantes, conseils d'experts et analyses de marché détaillées.`,
-          'marketing': `Boostez votre marketing avec ${keyword}. Stratégies éprouvées pour augmenter vos conversions et votre ROI.`,
+          'technologie': `Découvrez ${keyword} et révolutionnez votre approche tech. Guide complet avec conseils d'experts pour optimiser vos résultats.`,
+          'sante': `Tout sur ${keyword} pour améliorer votre santé. Conseils médicaux validés et solutions naturelles efficaces à appliquer.`,
+          'finance': `Investir dans ${keyword} en 2024 : stratégies gagnantes, conseils d'experts et analyses de marché pour maximiser vos gains.`,
+          'marketing': `Boostez votre marketing avec ${keyword}. Stratégies éprouvées pour augmenter vos conversions et multiplier votre ROI.`,
           'lifestyle': `${keyword} tendance 2024 : guide complet pour adopter le style parfait. Conseils d'experts et inspirations mode.`,
-          'education': `Maîtrisez ${keyword} rapidement avec notre formation complète. Méthodes éprouvées et ressources gratuites.`,
-          'voyage': `Voyager à ${keyword} : guide complet avec conseils pratiques, bons plans et destinations incontournables.`,
-          'cuisine': `Recettes ${keyword} authentiques et modernes. Techniques de chef et secrets culinaires révélés.`,
-          'immobilier': `Investissement ${keyword} 2024 : analyse de marché, conseils d'experts et opportunités rentables.`,
-          'sport': `Programme ${keyword} efficace : techniques d'experts, nutrition optimale et résultats garantis.`
+          'education': `Maîtrisez ${keyword} rapidement avec notre formation complète. Méthodes éprouvées et ressources gratuites incluses.`,
+          'voyage': `Voyager à ${keyword} : guide complet avec conseils pratiques, bons plans et destinations incontournables à découvrir.`,
+          'cuisine': `Recettes ${keyword} authentiques et modernes. Techniques de chef et secrets culinaires révélés par les experts.`,
+          'immobilier': `Investissement ${keyword} 2024 : analyse de marché, conseils d'experts et opportunités rentables à saisir maintenant.`,
+          'sport': `Programme ${keyword} efficace : techniques d'experts, nutrition optimale et résultats garantis en quelques semaines.`
         };
-        return descriptions[thematic] || `Découvrez tout sur ${keyword} avec notre guide complet. Conseils d'experts et solutions pratiques.`;
+        
+        const baseDesc = descriptions[thematic] || `Découvrez tout sur ${keyword} avec notre guide complet. Conseils d'experts et solutions pratiques.`;
+        return baseDesc.substring(0, 155); // Limiter à 155 caractères
+      };
+
+      // Fonction pour générer le title tag (60 caractères max)
+      const generateTitleTag = (title: string, keyword: string) => {
+        if (title.length <= 60) return title;
+        
+        // Si trop long, créer une version plus courte en gardant le mot-clé
+        const shortTitle = `${keyword} : Guide Complet 2024`;
+        return shortTitle.length <= 60 ? shortTitle : keyword.substring(0, 57) + '...';
       };
 
       // Générer des variantes avec le mot-clé
@@ -155,11 +172,11 @@ const TitleGeneratorPage: React.FC = () => {
         return {
           id: index + 1,
           title: title,
-          titleTag: title.length > 60 ? title.substring(0, 57) + '...' : title,
-          metaDescription: generateMetaDescription(title, selectedThematic),
+          titleTag: generateTitleTag(title, keyword),
+          metaDescription: generateMetaDescription(title, selectedThematic, keyword),
           keyword: keyword,
           category: selectedThematicData?.name || 'Général',
-          slug: generateSlug(title),
+          slug: generateSlug(title, keyword),
           searchVolume: Math.floor(Math.random() * 10000) + 500,
           difficulty: Math.floor(Math.random() * 100) + 1,
           ctr: (Math.random() * 15 + 2).toFixed(1),
@@ -177,7 +194,7 @@ const TitleGeneratorPage: React.FC = () => {
           metaDescription: `Découvrez les dernières évolutions de ${keyword} en 2024. Tendances, innovations et prédictions d'experts.`,
           keyword: keyword,
           category: thematics.find(t => t.id === selectedThematic)?.name || 'Général',
-          slug: generateSlug(`${keyword} 2024 nouveautes evolutions`),
+          slug: generateSlug(`${keyword} 2024 nouveautes evolutions`, keyword),
           searchVolume: Math.floor(Math.random() * 5000) + 1000,
           difficulty: Math.floor(Math.random() * 80) + 20,
           ctr: (Math.random() * 12 + 3).toFixed(1),
@@ -191,7 +208,7 @@ const TitleGeneratorPage: React.FC = () => {
           metaDescription: `Évitez les erreurs courantes avec ${keyword}. Guide pratique pour optimiser vos résultats et éviter les pièges.`,
           keyword: keyword,
           category: thematics.find(t => t.id === selectedThematic)?.name || 'Général',
-          slug: generateSlug(`${keyword} erreurs fatales eviter`),
+          slug: generateSlug(`${keyword} erreurs fatales eviter`, keyword),
           searchVolume: Math.floor(Math.random() * 8000) + 500,
           difficulty: Math.floor(Math.random() * 70) + 15,
           ctr: (Math.random() * 18 + 5).toFixed(1),
@@ -205,7 +222,7 @@ const TitleGeneratorPage: React.FC = () => {
           metaDescription: `Test complet de ${keyword} : avantages, inconvénients et recommandations d'experts. Avis objectif et détaillé.`,
           keyword: keyword,
           category: thematics.find(t => t.id === selectedThematic)?.name || 'Général',
-          slug: generateSlug(`avis ${keyword} test complet honnete`),
+          slug: generateSlug(`avis ${keyword} test complet honnete`, keyword),
           searchVolume: Math.floor(Math.random() * 6000) + 800,
           difficulty: Math.floor(Math.random() * 60) + 25,
           ctr: (Math.random() * 14 + 4).toFixed(1),
