@@ -86,26 +86,28 @@ const SimpleSerpGenerator: React.FC = () => {
     }
 
     setIsLoading(true);
+    
     try {
-      // Simuler un délai d'API
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Simuler un délai d'API  
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       const results: SerpResult[] = frenchTravelSites.map((site, index) => {
-        const cleanKeyword = keyword.toLowerCase().replace(/\s+/g, '-');
+        const cleanKeyword = keyword.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
         return {
           position: index + 1,
           title: `${site.name} - ${keyword} | Réservation en ligne`,
-          url: `https://${site.domain}/${cleanKeyword}`,
+          url: `https://${site.domain}/destination/${cleanKeyword}`,
           domain: site.domain,
           description: `Découvrez nos offres ${keyword.toLowerCase()} sur ${site.name}. ${site.description}. Réservation sécurisée et service client français.`
         };
       });
 
       setSerpResults(results);
-      toast.success(`${results.length} résultats SERP générés pour "${keyword}"`);
+      toast.success(`✅ ${results.length} résultats SERP générés pour "${keyword}"`);
+      
     } catch (error) {
       console.error('Erreur génération SERP:', error);
-      toast.error('Erreur lors de la génération des résultats');
+      toast.error('❌ Erreur lors de la génération des résultats');
     } finally {
       setIsLoading(false);
     }
