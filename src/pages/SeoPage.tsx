@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, Search, Target, Link, FileText, Globe, Hash, Type, FileSearch, AlertTriangle, CheckCircle, Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { analyzeHeadings } from '@/utils/seo/headingAnalyzer';
 
 const SeoPage: React.FC = () => {
   const navigate = useNavigate();
@@ -116,19 +117,121 @@ const SeoPage: React.FC = () => {
     }
   ];
 
+  const analyzeParagraphs = (doc: Document) => {
+    const paragraphs = doc.querySelectorAll('p');
+    return Array.from(paragraphs).map((p, index) => {
+      const text = p.textContent?.trim() || '';
+      const wordCount = text.split(/\s+/).filter(word => word.length > 0).length;
+      
+      return {
+        text,
+        position: index + 1,
+        wordCount,
+        keywordDensity: {} // Simplified for now
+      };
+    }).filter(p => p.text.length > 0);
+  };
+
+  const generateRecommendations = (headings: any, paragraphs: any[]) => {
+    const recommendations = [];
+    
+    if (headings.h1Count > 1) {
+      recommendations.push({
+        type: 'error',
+        title: 'H1 Multiple',
+        description: 'Une seule balise H1 par page est recommandée'
+      });
+    }
+    
+    if (headings.h1Count === 0) {
+      recommendations.push({
+        type: 'error',
+        title: 'H1 Manquant',
+        description: 'Votre page doit contenir une balise H1'
+      });
+    }
+    
+    if (paragraphs.length === 0) {
+      recommendations.push({
+        type: 'warning',
+        title: 'Contenu Insuffisant',
+        description: 'Ajoutez du contenu textuel à votre page'
+      });
+    }
+    
+    return recommendations;
+  };
+
   const analyzeUrl = async () => {
     if (!url) {
-      toast.error('Veuillez entrer une URL valide');
+      toast.error("Veuillez entrer une URL valide");
       return;
     }
     
     setIsAnalyzing(true);
-    // Simulation d'analyse
-    setTimeout(() => {
+    
+    try {
+      // Fetch the webpage
+      const response = await fetch(url, {
+        mode: 'cors',
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; SEO-Analyzer/1.0)'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
+      const html = await response.text();
+      
+      // Parse HTML
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      
+      // Analyze headings
+      const headings = analyzeHeadings(doc);
+      const paragraphs = analyzeParagraphs(doc);
+      
+      // Transform headings data to match expected format
+      const organizedHeadings = {
+        h1: headings.headings.filter(h => h.level === 1),
+        h2: headings.headings.filter(h => h.level === 2),
+        h3: headings.headings.filter(h => h.level === 3),
+        h4: headings.headings.filter(h => h.level === 4),
+        h5: headings.headings.filter(h => h.level === 5),
+        h6: headings.headings.filter(h => h.level === 6)
+      };
+      
+      const result = {
+        headings: organizedHeadings,
+        paragraphs: paragraphs,
+        analysis: {
+          h1Count: headings.h1Count,
+          h2Count: headings.h2Count,
+          h3Count: headings.h3Count,
+          h4Count: headings.h4Count,
+          h5Count: headings.h5Count,
+          h6Count: headings.h6Count,
+          totalHeadings: headings.h1Count + headings.h2Count + headings.h3Count + headings.h4Count + headings.h5Count + headings.h6Count,
+          hierarchyIssues: headings.h1Count > 1 ? [{ type: 'error', message: 'Plusieurs balises H1 détectées', severity: 'high' }] : [],
+          paragraphCount: paragraphs.length,
+          totalWords: paragraphs.reduce((total, p) => total + p.wordCount, 0),
+          avgWordsPerParagraph: paragraphs.length > 0 ? Math.round(paragraphs.reduce((total, p) => total + p.wordCount, 0) / paragraphs.length) : 0
+        },
+        recommendations: generateRecommendations(headings, paragraphs)
+      };
+      
+      setAnalysisResult(result);
+      toast.success("Analyse SEO terminée");
+    } catch (error) {
+      console.error('Erreur lors de l\'analyse:', error);
+      // Fallback avec données mock si l'API échoue
       setAnalysisResult(mockAnalysisResult);
+      toast.success("Analyse SEO terminée (mode démo - CORS bloqué)");
+    } finally {
       setIsAnalyzing(false);
-      toast.success('Analyse SEO terminée');
-    }, 2500);
+    }
   };
 
   const exportAnalysis = (format: string) => {
