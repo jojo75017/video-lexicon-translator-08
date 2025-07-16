@@ -117,16 +117,34 @@ const GoogleSerpFetcher: React.FC = () => {
         
         if (response && response.length > 0) {
           try {
-            // Essayer de parser la réponse comme JSON
-            const jsonContent = response[0].keyword;
-            const results = JSON.parse(jsonContent);
+            // Traiter la réponse OpenAI
+            let results: SerpResult[] = [];
+            const content = response[0]?.keyword || '';
             
-            if (Array.isArray(results)) {
+            // Essayer de parser comme JSON d'abord
+            try {
+              results = JSON.parse(content);
+            } catch {
+              // Si ce n'est pas du JSON, créer des résultats basés sur la réponse
+              const lines = content.split('\n').filter(line => line.trim() && !line.includes('[') && !line.includes(']'));
+              results = lines.slice(0, 10).map((line, i) => {
+                const cleanLine = line.replace(/^\d+\.?\s*/, '').trim();
+                return {
+                  position: i + 1,
+                  title: cleanLine || `Résultat ${i + 1} pour "${keyword}"`,
+                  url: `https://www.google.com/search?q=${encodeURIComponent(keyword)}`,
+                  domain: 'google.com',
+                  description: `Recherche Google pour "${keyword}"`
+                };
+              });
+            }
+            
+            if (results.length > 0) {
               setSerpResults(results);
               generateAnalysis(results);
-              toast.success('Résultats SERP récupérés avec succès');
+              toast.success('Résultats SERP générés avec OpenAI');
             } else {
-              throw new Error('Format invalide');
+              throw new Error('Aucun résultat généré');
             }
           } catch {
             // Si le JSON parse échoue, créer des résultats basés sur la réponse texte

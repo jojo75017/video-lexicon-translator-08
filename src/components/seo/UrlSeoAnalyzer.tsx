@@ -127,8 +127,7 @@ const UrlSeoAnalyzer: React.FC = () => {
     if (apiKeyStatus === 'valid' && openaiKey) {
       try {
         setAnalysisStep('Analyse IA en cours...');
-        const openAIService = new OpenAIService(openaiKey);
-        const aiAnalysis = await openAIService.analyzeSeoContent(targetUrl, htmlContent.substring(0, 4000));
+        const aiAnalysis = await OpenAIService.analyzeSeoContent(targetUrl, htmlContent.substring(0, 4000));
         
         if (aiAnalysis) {
           aiEnhanced = true;

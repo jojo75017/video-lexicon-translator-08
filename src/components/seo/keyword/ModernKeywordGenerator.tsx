@@ -26,8 +26,7 @@ const ModernKeywordGenerator = () => {
     }
 
     try {
-      const openAIService = new OpenAIService(openaiKey);
-      const isValid = await openAIService.validateApiKey();
+      const isValid = await OpenAIService.validateApiKey(openaiKey);
       
       if (isValid) {
         localStorage.setItem('openaiKey', openaiKey);
@@ -60,9 +59,9 @@ const ModernKeywordGenerator = () => {
       
       // Générer différents types de mots-clés
       const [standardKws, longTailKws, semanticKws] = await Promise.all([
-        openAIService.generateKeywords(keyword),
-        openAIService.generateLongTailKeywords(keyword),
-        openAIService.generateSemanticKeywords(keyword)
+        OpenAIService.generateKeywords(keyword, openaiKey),
+        OpenAIService.generateLongTailKeywords(keyword, openaiKey),
+        OpenAIService.generateSemanticKeywords(keyword, openaiKey)
       ]);
 
       // Créer des objets KeywordSuggestion complets
