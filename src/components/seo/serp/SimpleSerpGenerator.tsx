@@ -214,19 +214,36 @@ const SimpleSerpGenerator: React.FC = () => {
                         </Badge>
                         <span className="text-sm text-green-600 font-medium">{result.domain}</span>
                       </div>
-                      <h3 className="font-medium text-blue-600 hover:underline cursor-pointer mb-2">
-                        {result.title}
-                      </h3>
-                      <p className="text-sm text-muted-foreground mb-2">{result.description}</p>
-                      <p className="text-xs text-muted-foreground font-mono bg-muted px-2 py-1 rounded">
-                        {result.url}
-                      </p>
-                    </div>
-                    <Button variant="ghost" size="sm" asChild>
-                      <a href={result.url} target="_blank" rel="noopener noreferrer">
-                        <ExternalLink className="h-4 w-4" />
+                      <a 
+                        href={result.url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="block"
+                      >
+                        <h3 className="font-medium text-blue-600 hover:underline cursor-pointer mb-2">
+                          {result.title}
+                        </h3>
                       </a>
-                    </Button>
+                      <p className="text-sm text-muted-foreground mb-2">{result.description}</p>
+                      <a 
+                        href={result.url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-xs text-blue-600 hover:underline font-mono bg-muted px-2 py-1 rounded inline-block"
+                      >
+                        {result.url}
+                      </a>
+                    </div>
+                    <a 
+                      href={result.url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="ml-2"
+                    >
+                      <Button variant="ghost" size="sm">
+                        <ExternalLink className="h-4 w-4" />
+                      </Button>
+                    </a>
                   </div>
                 </div>
               ))}
