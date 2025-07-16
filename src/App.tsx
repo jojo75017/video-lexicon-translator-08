@@ -13,6 +13,7 @@ import QuoraPage from './pages/QuoraPage';
 import PinterestPage from './pages/PinterestPage';
 import KeywordGeneratorPage from './pages/KeywordGeneratorPage';
 import SignaturePage from './pages/SignaturePage';
+import CompetitorAnalysisPage from './pages/CompetitorAnalysisPage';
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ const App = () => (
         <Route path="/pinterest" element={<PinterestPage />} />
         <Route path="/keyword-generator" element={<KeywordGeneratorPage />} />
         <Route path="/signature" element={<SignaturePage />} />
+        <Route path="/competitor-analysis" element={<CompetitorAnalysisPage />} />
       </Routes>
       <Toaster />
     </TooltipProvider>
