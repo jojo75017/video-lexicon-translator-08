@@ -114,7 +114,7 @@ export const analyzeIndexability = (doc: Document): IndexabilityReport => {
   }
 
   // Analyser les liens en détail
-  const allLinks = Array.from(doc.querySelectorAll('a[href]'));
+  const allLinks = Array.from(doc.querySelectorAll('a[href]')) as HTMLAnchorElement[];
   const internalLinks = allLinks.filter(a => {
     const href = a.getAttribute('href');
     if (!href) return false;
@@ -347,7 +347,7 @@ ${results.securityIssues.map(issue => `- ${issue}`).join('\n')}
  * Analyse la structure des liens internes pour l'indexabilité
  */
 export const analyzeLinkStructure = (doc: Document) => {
-  const allLinks = Array.from(doc.querySelectorAll('a[href]'));
+  const allLinks = Array.from(doc.querySelectorAll('a[href]')) as HTMLAnchorElement[];
   const internalLinks = allLinks.filter(a => {
     const href = a.getAttribute('href');
     if (!href) return false;
