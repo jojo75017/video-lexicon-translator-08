@@ -9,7 +9,7 @@ import AdvancedCompetitorAnalyzer from '@/components/seo/competitor/AdvancedComp
 import SectorSpecificAnalyzer from '@/components/seo/competitor/SectorSpecificAnalyzer';
 import SerpAnalyzer from '@/components/seo/serp/SerpAnalyzer';
 import GoogleSerpFetcher from '@/components/seo/serp/GoogleSerpFetcher';
-import SimpleSerpGenerator from '@/components/seo/serp/SimpleSerpGenerator';
+import WorkingSerpGenerator from '@/components/seo/serp/WorkingSerpGenerator';
 
 const CompetitorAnalysisPage = () => {
   return (
@@ -66,7 +66,7 @@ const CompetitorAnalysisPage = () => {
           </TabsList>
 
           <TabsContent value="serp-generator">
-            <SimpleSerpGenerator />
+            <WorkingSerpGenerator />
           </TabsContent>
 
           <TabsContent value="serp-fetch">
