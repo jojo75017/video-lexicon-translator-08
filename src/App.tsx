@@ -34,16 +34,16 @@ const SerpGenerator: React.FC = () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       const frenchTravelSites = [
-        { domain: 'booking.com', name: 'Booking.com', description: 'Réservation d\'hôtels dans le monde entier' },
-        { domain: 'expedia.fr', name: 'Expedia France', description: 'Vols, hôtels et séjours combinés' },
-        { domain: 'kayak.fr', name: 'KAYAK', description: 'Comparateur de voyages et vols' },
-        { domain: 'tripadvisor.fr', name: 'TripAdvisor', description: 'Avis et conseils de voyage' },
-        { domain: 'lastminute.com', name: 'Last Minute', description: 'Séjours de dernière minute' },
-        { domain: 'opodo.fr', name: 'Opodo', description: 'Vols, hôtels et voitures de location' },
-        { domain: 'promovacances.com', name: 'Promovacances', description: 'Vacances pas chères, tout compris' },
-        { domain: 'voyage-privé.com', name: 'Voyage Privé', description: 'Ventes flash et séjours de luxe' },
-        { domain: 'carrefourvoyages.fr', name: 'Carrefour Voyages', description: 'Séjours et circuits au meilleur prix' },
-        { domain: 'voyages.leclerc', name: 'Leclerc Voyages', description: 'Offres exceptionnelles et prix garantis' }
+        { domain: 'www.booking.com', name: 'Booking.com', description: 'Réservation d\'hôtels dans le monde entier' },
+        { domain: 'www.expedia.fr', name: 'Expedia France', description: 'Vols, hôtels et séjours combinés' },
+        { domain: 'www.kayak.fr', name: 'KAYAK', description: 'Comparateur de voyages et vols' },
+        { domain: 'www.tripadvisor.fr', name: 'TripAdvisor', description: 'Avis et conseils de voyage' },
+        { domain: 'www.lastminute.com', name: 'Last Minute', description: 'Séjours de dernière minute' },
+        { domain: 'www.opodo.fr', name: 'Opodo', description: 'Vols, hôtels et voitures de location' },
+        { domain: 'www.promovacances.com', name: 'Promovacances', description: 'Vacances pas chères, tout compris' },
+        { domain: 'www.voyage-prive.com', name: 'Voyage Privé', description: 'Ventes flash et séjours de luxe' },
+        { domain: 'www.carrefour-voyages.fr', name: 'Carrefour Voyages', description: 'Séjours et circuits au meilleur prix' },
+        { domain: 'www.e-leclerc.com/voyages', name: 'Leclerc Voyages', description: 'Offres exceptionnelles et prix garantis' }
       ];
 
       const results: SerpResult[] = frenchTravelSites.map((site, index) => ({
