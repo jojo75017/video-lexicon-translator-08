@@ -309,6 +309,307 @@ const TitleGeneratorPage: React.FC = () => {
     toast.success('Prompts d\'images copiés dans le presse-papiers !');
   };
 
+  const generateArticlePlan = (titleData: any) => {
+    const articlePlan = `# Plan d'Article SEO - ${titleData.title}
+
+## 🎯 Informations SEO
+- **Mot-clé principal :** ${titleData.keyword}
+- **Title (${titleData.title.length}/60) :** ${titleData.title}
+- **Meta description (${titleData.metaDescription.length}/155) :** ${titleData.metaDescription}
+- **URL :** /${titleData.slug}
+
+## 📝 Structure de l'article (1500 mots)
+
+### Introduction (200 mots)
+- Hook captivant lié à ${titleData.keyword}
+- Présentation du problème/besoin
+- Annonce du plan de l'article
+- Intégration naturelle du mot-clé principal
+
+### I. Qu'est-ce que ${titleData.keyword} ? (250 mots)
+- Définition claire et accessible
+- Contexte et importance
+- Chiffres clés et statistiques récentes
+- **Mot-clé secondaire à intégrer :** "définition ${titleData.keyword}"
+
+### II. Les avantages principaux de ${titleData.keyword} (300 mots)
+- 5-7 avantages concrets avec exemples
+- Témoignages ou études de cas
+- Comparaisons avec alternatives
+- **Mot-clé secondaire à intégrer :** "avantages ${titleData.keyword}"
+
+### III. Comment bien choisir/utiliser ${titleData.keyword} (350 mots)
+- Guide étape par étape
+- Critères de sélection importants
+- Erreurs courantes à éviter
+- Conseils d'experts
+- **Mot-clé secondaire à intégrer :** "comment choisir ${titleData.keyword}"
+
+### IV. Les meilleures pratiques pour ${titleData.keyword} (250 mots)
+- Top 5 des recommandations
+- Outils et ressources utiles
+- Tendances 2024
+- **Mot-clé secondaire à intégrer :** "meilleures pratiques ${titleData.keyword}"
+
+### V. Prix et budget pour ${titleData.keyword} (150 mots)
+- Fourchettes de prix selon les besoins
+- Conseils pour optimiser le budget
+- Rapport qualité/prix
+- **Mot-clé secondaire à intégrer :** "prix ${titleData.keyword}"
+
+### Conclusion (150 mots)
+- Récapitulatif des points clés
+- Call-to-action engageant
+- Invitation au partage et aux commentaires
+- Réintégration du mot-clé principal
+
+## 🔍 Optimisations SEO à prévoir
+
+### Mots-clés à intégrer naturellement :
+1. **Principal :** ${titleData.keyword} (densité 1-2%)
+2. **Secondaires :**
+   - définition ${titleData.keyword}
+   - avantages ${titleData.keyword}
+   - comment choisir ${titleData.keyword}
+   - meilleures pratiques ${titleData.keyword}
+   - prix ${titleData.keyword}
+3. **Longue traîne :**
+   - ${titleData.keyword} pour débutants
+   - guide complet ${titleData.keyword}
+   - ${titleData.keyword} 2024
+
+### Structure HTML optimisée :
+- H1 : ${titleData.title}
+- H2 pour chaque section principale
+- H3 pour les sous-sections
+- Listes à puces et numérotées
+- Texte en gras pour les points importants
+
+### Éléments techniques :
+- **Images :** 2-3 images optimisées avec balises alt
+- **Liens internes :** 3-5 liens vers articles connexes
+- **Liens externes :** 2-3 liens vers sources autoritaires
+- **Meta robots :** index, follow
+- **Schema markup :** Article structuré
+
+### Call-to-actions suggérés :
+- "Découvrez notre guide complet sur [sujet connexe]"
+- "Téléchargez notre checklist gratuite ${titleData.keyword}"
+- "Partagez votre expérience en commentaire"
+- "Suivez-nous pour plus de conseils ${titleData.keyword}"
+
+## 📊 Objectifs de performance
+- **Temps de lecture :** 8-10 minutes
+- **Taux de rebond cible :** < 60%
+- **Temps sur page cible :** > 3 minutes
+- **Partages sociaux cible :** > 50
+- **Backlinks potentiels :** Sources citées, guides complémentaires
+
+---
+**Note :** Adapter le ton selon l'audience cible et intégrer des exemples concrets spécifiques au secteur.`;
+
+    navigator.clipboard.writeText(articlePlan);
+    toast.success('Plan d\'article copié dans le presse-papiers !');
+  };
+
+  const generateFullArticle = (titleData: any) => {
+    const fullArticle = `# ${titleData.title}
+
+*Publié le ${new Date().toLocaleDateString('fr-FR')} | Temps de lecture : 8 min*
+
+${titleData.metaDescription}
+
+## Introduction
+
+Dans un monde en constante évolution, **${titleData.keyword}** devient un élément incontournable pour quiconque souhaite rester compétitif et efficace. Que vous soyez débutant ou expert, comprendre les enjeux et les opportunités liés à ${titleData.keyword} peut transformer votre approche et vos résultats.
+
+Dans cet article complet, nous allons explorer ensemble tout ce que vous devez savoir sur ${titleData.keyword}. De la définition aux meilleures pratiques, en passant par les avantages concrets et les conseils d'experts, vous découvrirez comment tirer le meilleur parti de ${titleData.keyword} dès aujourd'hui.
+
+Prêt à devenir un expert en ${titleData.keyword} ? Suivez le guide !
+
+## Qu'est-ce que ${titleData.keyword} ?
+
+La **définition ${titleData.keyword}** peut sembler complexe au premier abord, mais elle repose sur des principes fondamentaux accessibles à tous. ${titleData.keyword} désigne [définition adaptée selon le contexte du mot-clé].
+
+### Les fondamentaux
+
+Pour bien comprendre ${titleData.keyword}, il est essentiel de connaître ses composantes principales :
+
+- **Aspect technique** : Les mécanismes sous-jacents qui régissent ${titleData.keyword}
+- **Dimension pratique** : Comment ${titleData.keyword} s'applique dans la vie réelle
+- **Impact économique** : L'influence de ${titleData.keyword} sur les performances et les résultats
+
+### Contexte et évolution
+
+L'importance de ${titleData.keyword} n'a cessé de croître ces dernières années. Selon les dernières études sectorielles, plus de 75% des professionnels considèrent ${titleData.keyword} comme un facteur clé de succès dans leur domaine d'activité.
+
+Cette évolution s'explique par plusieurs facteurs :
+1. La digitalisation croissante des processus
+2. L'augmentation des exigences qualité
+3. La nécessité d'optimiser les ressources disponibles
+4. L'émergence de nouvelles technologies et méthodologies
+
+## Les avantages principaux de ${titleData.keyword}
+
+Adopter une approche structurée de ${titleData.keyword} présente de nombreux **avantages ${titleData.keyword}** concrets et mesurables. Voici les bénéfices les plus significatifs que vous pouvez espérer :
+
+### 1. Amélioration des performances
+
+Le premier avantage notable concerne l'**optimisation des performances globales**. Les utilisateurs de ${titleData.keyword} rapportent généralement une amélioration de 25 à 40% de leur efficacité opérationnelle.
+
+Cette amélioration se traduit par :
+- Une réduction du temps nécessaire pour atteindre les objectifs
+- Une meilleure qualité des résultats obtenus
+- Une diminution significative des erreurs et des reprises
+
+### 2. Économies substantielles
+
+L'investissement dans ${titleData.keyword} génère rapidement des **économies substantielles**. En moyenne, les organisations constatent un retour sur investissement de 300% dans les 12 premiers mois.
+
+### 3. Avantage concurrentiel durable
+
+Maîtriser ${titleData.keyword} vous positionne favorablement face à la concurrence. Cette expertise devient un différenciateur majeur qui vous permet de :
+- Proposer des solutions plus innovantes
+- Répondre plus efficacement aux besoins du marché
+- Anticiper les tendances futures
+
+### 4. Satisfaction client renforcée
+
+Les clients apprécient particulièrement les approches basées sur ${titleData.keyword}. Les études de satisfaction montrent une amélioration moyenne de 35% des scores de satisfaction client.
+
+### 5. Scalabilité et flexibilité
+
+${titleData.keyword} offre une **scalabilité exceptionnelle** qui s'adapte à l'évolution de vos besoins. Cette flexibilité représente un atout majeur pour les projets de développement à long terme.
+
+## Comment bien choisir/utiliser ${titleData.keyword}
+
+**Comment choisir ${titleData.keyword}** efficacement ? Cette question revient fréquemment, et pour cause : faire le bon choix dès le départ conditionne le succès de votre démarche.
+
+### Étape 1 : Analyser vos besoins spécifiques
+
+Avant toute chose, réalisez un **audit complet de vos besoins actuels**. Cette analyse doit porter sur :
+
+- Vos objectifs à court et moyen terme
+- Vos contraintes budgétaires et temporelles
+- Vos ressources humaines et techniques disponibles
+- Votre environnement concurrentiel
+
+### Étape 2 : Définir vos critères de sélection
+
+Établissez une grille de critères précise incluant :
+
+1. **Critères techniques** : compatibilité, performance, évolutivité
+2. **Critères économiques** : coût d'acquisition, coût de maintenance, ROI attendu
+3. **Critères organisationnels** : facilité d'adoption, formation requise, support disponible
+
+### Étape 3 : Évaluer les options disponibles
+
+Procédez à une **évaluation comparative systématique** des différentes options. N'hésitez pas à :
+- Demander des démonstrations pratiques
+- Consulter les retours d'expérience d'autres utilisateurs
+- Tester les solutions en mode pilote quand c'est possible
+
+### Étape 4 : Planifier la mise en œuvre
+
+Une fois votre choix arrêté, élaborez un **plan de déploiement détaillé** comprenant :
+- Les phases de mise en œuvre
+- Les indicateurs de succès à suivre
+- Les points de contrôle et d'ajustement
+
+### Erreurs courantes à éviter
+
+Attention à ces pièges fréquents :
+- Sous-estimer les besoins de formation
+- Négliger l'accompagnement au changement
+- Choisir uniquement sur le critère prix
+- Omettre la phase de test préalable
+
+## Les meilleures pratiques pour ${titleData.keyword}
+
+Voici le top 5 des **meilleures pratiques ${titleData.keyword}** recommandées par les experts du secteur :
+
+### 1. Adopter une approche progressive
+
+Démarrez par des applications simples avant de vous attaquer aux cas d'usage complexes. Cette approche progressive permet de :
+- Acquérir l'expérience nécessaire
+- Limiter les risques d'échec
+- Démontrer la valeur ajoutée rapidement
+
+### 2. Investir dans la formation
+
+La formation représente un **facteur clé de succès** souvent sous-estimé. Prévoyez un budget formation représentant 15 à 20% de votre investissement total.
+
+### 3. Mesurer et optimiser en continu
+
+Mettez en place des **indicateurs de performance** dès le démarrage :
+- Métriques de productivité
+- Indicateurs de qualité
+- Mesures de satisfaction utilisateur
+
+### 4. Créer une communauté d'utilisateurs
+
+Favorisez les échanges entre utilisateurs pour accélérer l'adoption et partager les bonnes pratiques.
+
+### 5. Rester à jour avec les évolutions
+
+${titleData.keyword} évolue rapidement. Suivez les **tendances 2024** et anticipez les changements à venir.
+
+### Outils et ressources recommandés
+
+- Plateformes de formation en ligne spécialisées
+- Communautés professionnelles actives
+- Outils de mesure et d'analyse
+- Documentation technique actualisée
+
+## Prix et budget pour ${titleData.keyword}
+
+Abordons maintenant la question du **prix ${titleData.keyword}** et de la planification budgétaire.
+
+### Fourchettes de prix selon les besoins
+
+Les coûts varient considérablement selon le niveau d'ambition :
+
+- **Niveau débutant** : 500€ à 2 000€
+- **Niveau intermédiaire** : 2 000€ à 8 000€
+- **Niveau expert** : 8 000€ à 25 000€+
+
+### Conseils pour optimiser votre budget
+
+1. **Commencez progressivement** : Évitez l'investissement massif initial
+2. **Négociez les packages** : Les offres groupées sont souvent plus avantageuses
+3. **Exploitez les aides disponibles** : Renseignez-vous sur les subventions sectorielles
+
+### Analyse coût-bénéfice
+
+Le **rapport qualité/prix** doit être votre boussole. Un investissement plus élevé peut se justifier si le retour sur investissement est proportionnel.
+
+## Conclusion
+
+${titleData.keyword} représente aujourd'hui un enjeu majeur pour tous ceux qui souhaitent rester compétitifs et performants. Comme nous l'avons vu ensemble, les avantages sont nombreux et les opportunités considérables.
+
+Les points clés à retenir :
+- ${titleData.keyword} améliore significativement les performances
+- Une approche structurée maximise les chances de succès
+- L'investissement initial se rentabilise rapidement
+- Les meilleures pratiques accélèrent l'adoption
+
+**Passez à l'action dès maintenant !** Commencez par évaluer vos besoins spécifiques et définissez votre stratégie ${titleData.keyword}. N'hésitez pas à partager votre expérience en commentaire et à suivre nos prochains articles pour approfondir votre expertise.
+
+*Avez-vous déjà expérimenté ${titleData.keyword} ? Quels résultats avez-vous obtenus ? Partagez votre retour d'expérience avec notre communauté !*
+
+---
+
+**Articles connexes :**
+- Guide avancé de ${titleData.keyword}
+- Comparatif des meilleures solutions ${titleData.keyword}
+- Études de cas ${titleData.keyword} sectorielles
+
+**Mots-clés :** ${titleData.keyword}, guide ${titleData.keyword}, meilleures pratiques ${titleData.keyword}, prix ${titleData.keyword}, avantages ${titleData.keyword}`;
+
+    navigator.clipboard.writeText(fullArticle);
+    toast.success('Article complet copié dans le presse-papiers !');
+  };
+
   const getDifficultyColor = (difficulty: number) => {
     if (difficulty <= 30) return 'bg-green-500';
     if (difficulty <= 60) return 'bg-yellow-500';
@@ -712,6 +1013,22 @@ Répondre aux 6-8 questions les plus fréquentes sur "${titleData.keyword}" :
                           }}
                         >
                           📝 Prompt
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => generateArticlePlan(titleData)}
+                          className="bg-purple-50 hover:bg-purple-100 text-purple-700"
+                        >
+                          🗂️ Plan
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => generateFullArticle(titleData)}
+                          className="bg-emerald-50 hover:bg-emerald-100 text-emerald-700"
+                        >
+                          📄 Article 1500m
                         </Button>
                       </div>
                     </div>
