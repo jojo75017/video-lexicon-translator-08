@@ -12,25 +12,29 @@ const SeoPage: React.FC = () => {
       title: 'Analyse des Mots-clés',
       description: 'Trouvez les meilleurs mots-clés pour votre contenu',
       icon: Search,
-      status: 'Disponible'
+      status: 'Disponible',
+      route: '/keyword-generator'
     },
     {
-      title: 'Audit Technique',
-      description: 'Vérifiez la santé technique de votre site',
+      title: 'Suggestions de Mots-clés',
+      description: 'Générez des suggestions de mots-clés',
       icon: Target,
-      status: 'En cours'
+      status: 'Disponible',
+      route: '/suggestions'
     },
     {
-      title: 'Analyse des Backlinks',
-      description: 'Surveillez vos liens entrants',
-      icon: Link,
-      status: 'Disponible'
-    },
-    {
-      title: 'Optimisation du Contenu',
-      description: 'Améliorez vos textes pour le SEO',
+      title: 'Compteur de Mots',
+      description: 'Analysez la densité de vos mots-clés',
       icon: FileText,
-      status: 'Bientôt'
+      status: 'Disponible',
+      route: '/wordcount'
+    },
+    {
+      title: 'Hiérarchie du Site',
+      description: 'Visualisez la structure de votre site',
+      icon: Link,
+      status: 'Disponible',
+      route: '/hierarchy'
     }
   ];
 
@@ -81,6 +85,7 @@ const SeoPage: React.FC = () => {
                   className="w-full"
                   variant="outline"
                   disabled={tool.status !== 'Disponible'}
+                  onClick={() => tool.route && navigate(tool.route)}
                 >
                   {tool.status === 'Disponible' ? 'Utiliser' : 'Bientôt disponible'}
                 </Button>
