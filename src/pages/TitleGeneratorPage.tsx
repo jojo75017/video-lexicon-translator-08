@@ -247,6 +247,52 @@ const TitleGeneratorPage: React.FC = () => {
     toast.success('Titre copié dans le presse-papiers !');
   };
 
+  const generateImagePrompts = (titleData: any) => {
+    const imagePrompts = [
+      {
+        prompt: `Photo professionnelle haute résolution montrant ${titleData.keyword} en action, style moderne et épuré, éclairage naturel, composition équilibrée, arrière-plan flou`,
+        alt: `Image professionnelle illustrant ${titleData.keyword} - Guide complet ${new Date().getFullYear()}`
+      },
+      {
+        prompt: `Infographie moderne et colorée expliquant les concepts clés de ${titleData.keyword}, design flat, icônes vectorielles, palette de couleurs harmonieuse, typographie lisible`,
+        alt: `Infographie explicative sur ${titleData.keyword} - Conseils et bonnes pratiques`
+      }
+    ];
+
+    const promptText = `# Prompts pour Images SEO - ${titleData.title}
+
+## 🖼️ Image 1 - Photo principale
+**Prompt :** ${imagePrompts[0].prompt}
+**Balise Alt :** ${imagePrompts[0].alt}
+**Utilisation :** Image d'en-tête de l'article
+
+## 🖼️ Image 2 - Infographie
+**Prompt :** ${imagePrompts[1].prompt}
+**Balise Alt :** ${imagePrompts[1].alt}
+**Utilisation :** Support visuel dans le contenu
+
+## 📋 Instructions techniques
+- **Format recommandé :** JPG pour les photos, PNG pour les infographies
+- **Dimensions :** 1200x630px (ratio 1.91:1) pour un partage social optimal
+- **Poids :** Maximum 200KB après compression
+- **Nom de fichier :** ${titleData.slug}-image-1.jpg / ${titleData.slug}-infographie.png
+
+## 🔍 Optimisation SEO des images
+- Utilisez les balises alt fournies pour améliorer l'accessibilité
+- Intégrez le mot-clé "${titleData.keyword}" dans le nom du fichier
+- Ajoutez un titre descriptif à vos images
+- Compressez vos images pour améliorer la vitesse de chargement
+
+## 💡 Conseils de création
+- Assurez-vous que les images sont en haute résolution
+- Utilisez des couleurs cohérentes avec votre charte graphique
+- Vérifiez que le texte sur les infographies reste lisible sur mobile
+- Testez vos images sur différents appareils`;
+
+    navigator.clipboard.writeText(promptText);
+    toast.success('Prompts d\'images copiés dans le presse-papiers !');
+  };
+
   const getDifficultyColor = (difficulty: number) => {
     if (difficulty <= 30) return 'bg-green-500';
     if (difficulty <= 60) return 'bg-yellow-500';
@@ -472,6 +518,14 @@ const TitleGeneratorPage: React.FC = () => {
                           onClick={() => copyTitle(titleData.title)}
                         >
                           <Copy className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => generateImagePrompts(titleData)}
+                          className="bg-orange-50 hover:bg-orange-100 text-orange-700"
+                        >
+                          🖼️
                         </Button>
                         <Button
                           variant="default"
