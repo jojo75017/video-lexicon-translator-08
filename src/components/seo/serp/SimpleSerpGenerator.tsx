@@ -92,11 +92,10 @@ const SimpleSerpGenerator: React.FC = () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       const results: SerpResult[] = frenchTravelSites.map((site, index) => {
-        const cleanKeyword = keyword.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
         return {
           position: index + 1,
           title: `${site.name} - ${keyword} | Réservation en ligne`,
-          url: `https://${site.domain}/destination/${cleanKeyword}`,
+          url: `https://${site.domain}`,
           domain: site.domain,
           description: `Découvrez nos offres ${keyword.toLowerCase()} sur ${site.name}. ${site.description}. Réservation sécurisée et service client français.`
         };
