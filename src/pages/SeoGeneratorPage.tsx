@@ -8,12 +8,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, FileText, Settings, Link, Image, Code, Network, Zap, Copy, Download, CheckCircle, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { useSiteAnalyzer } from '@/hooks/useSiteAnalyzer';
+
 
 const SeoGeneratorPage: React.FC = () => {
   const navigate = useNavigate();
-  const { setUrl, analyzeSite, isLoading, seoAnalysis } = useSiteAnalyzer();
   const [urlToAnalyze, setUrlToAnalyze] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   
   const analyzeUrl = async () => {
     if (!urlToAnalyze.trim()) {
@@ -21,31 +21,57 @@ const SeoGeneratorPage: React.FC = () => {
       return;
     }
     
+    setIsLoading(true);
     try {
-      setUrl(urlToAnalyze);
-      await analyzeSite();
+      // Extraire le contenu de la page
+      const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(urlToAnalyze)}`);
+      const data = await response.json();
       
-      // Attendre un peu pour que l'analyse se termine
-      setTimeout(() => {
-        if (seoAnalysis) {
-          // Pré-remplir le formulaire avec les données analysées
-          setFormData(prev => ({
-            ...prev,
-            title: seoAnalysis.title || prev.title,
-            description: seoAnalysis.description || prev.description,
-            keywords: seoAnalysis.keywords?.join(', ') || prev.keywords,
-            h1: seoAnalysis.headings?.h1?.[0] || prev.h1,
-            h2Tags: seoAnalysis.headings?.h2 || prev.h2Tags,
-            targetUrl: urlToAnalyze,
-            canonical: urlToAnalyze,
-            organizationName: seoAnalysis.metadata?.title || prev.organizationName,
-          }));
-          
-          toast.success('Analyse terminée ! Formulaire pré-rempli.');
-        }
-      }, 2000);
+      if (data.contents) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(data.contents, 'text/html');
+        
+        // Extraire les métadonnées
+        const title = doc.querySelector('title')?.textContent || '';
+        const description = doc.querySelector('meta[name="description"]')?.getAttribute('content') || '';
+        const keywords = doc.querySelector('meta[name="keywords"]')?.getAttribute('content') || '';
+        const h1 = doc.querySelector('h1')?.textContent || '';
+        const h2Elements = Array.from(doc.querySelectorAll('h2')).map(h2 => h2.textContent || '');
+        
+        // Pré-remplir le formulaire avec les données extraites
+        setFormData(prev => ({
+          ...prev,
+          title: title || `SEO Optimisé pour ${urlToAnalyze}`,
+          description: description || `Optimisation SEO complète pour améliorer le référencement de votre site web.`,
+          keywords: keywords || 'seo, référencement, optimisation, web',
+          h1: h1 || title || 'Titre Principal SEO',
+          h2Tags: h2Elements.length > 0 ? h2Elements : ['Section Important', 'Avantages Clés'],
+          targetUrl: urlToAnalyze,
+          canonical: urlToAnalyze,
+        }));
+        
+        toast.success('Analyse terminée ! Formulaire pré-rempli avec les données du site.');
+      } else {
+        throw new Error('Impossible d\'extraire le contenu');
+      }
     } catch (error) {
-      toast.error('Erreur lors de l\'analyse de l\'URL');
+      console.error('Erreur analyse URL:', error);
+      toast.error('Erreur lors de l\'analyse. Formulaire pré-rempli avec des données par défaut.');
+      
+      // Pré-remplir avec des données par défaut basées sur l'URL
+      const domain = new URL(urlToAnalyze).hostname;
+      setFormData(prev => ({
+        ...prev,
+        title: `Guide SEO Complet pour ${domain} - Optimisation 2024`,
+        description: `Découvrez comment optimiser ${domain} pour les moteurs de recherche avec notre guide SEO complet et nos techniques avancées.`,
+        keywords: `${domain}, seo, référencement, optimisation, marketing digital`,
+        h1: `Optimisation SEO pour ${domain}`,
+        h2Tags: ['Stratégie SEO', 'Mots-clés ciblés', 'Optimisation technique', 'Contenu de qualité'],
+        targetUrl: urlToAnalyze,
+        canonical: urlToAnalyze,
+      }));
+    } finally {
+      setIsLoading(false);
     }
   };
 
