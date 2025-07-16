@@ -29,7 +29,6 @@ const QuoraStep: React.FC<QuoraStepProps> = ({ onNext, onPrevious }) => {
     setIsGenerating(true);
     
     try {
-      // Simulation de génération de réponse
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       const mockAnswer = `Excellente question ! Pour répondre à "${question}", voici une approche structurée :
