@@ -284,10 +284,15 @@ ${formData.h2Tags.filter(h2 => h2.trim()).map(h2 => `<h2>${h2}</h2>`).join('\n')
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
-          <Button variant="outline" onClick={() => navigate(-1)}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Retour
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={() => navigate('/dashboard')}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Tableau de bord
+            </Button>
+            <Button variant="ghost" onClick={() => navigate(-1)}>
+              Retour
+            </Button>
+          </div>
           <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
             🚀 Générateur SEO Complet
           </h1>
