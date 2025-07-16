@@ -9,6 +9,7 @@ import AdvancedCompetitorAnalyzer from '@/components/seo/competitor/AdvancedComp
 import SectorSpecificAnalyzer from '@/components/seo/competitor/SectorSpecificAnalyzer';
 import SerpAnalyzer from '@/components/seo/serp/SerpAnalyzer';
 import GoogleSerpFetcher from '@/components/seo/serp/GoogleSerpFetcher';
+import SimpleSerpGenerator from '@/components/seo/serp/SimpleSerpGenerator';
 
 const CompetitorAnalysisPage = () => {
   return (
@@ -56,23 +57,16 @@ const CompetitorAnalysisPage = () => {
             </div>
           </div>
           
-        <Tabs defaultValue="sector" className="w-full">
+        <Tabs defaultValue="serp-generator" className="w-full">
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="sector">Analyse Sectorielle</TabsTrigger>
-            <TabsTrigger value="advanced">Analyse Avancée</TabsTrigger>
-            <TabsTrigger value="serp-fetch">SERP URLs</TabsTrigger>
-            <TabsTrigger value="serp">Analyse SERP</TabsTrigger>
+            <TabsTrigger value="serp-generator">🔗 Générateur URLs</TabsTrigger>
+            <TabsTrigger value="serp-fetch">🤖 SERP avec IA</TabsTrigger>
+            <TabsTrigger value="serp">📊 Analyse SERP</TabsTrigger>
+            <TabsTrigger value="advanced">🚀 Analyse Avancée</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="sector">
-            <SectorSpecificAnalyzer 
-              urls={[]} 
-              onAnalysisComplete={(results) => console.log('Analyse terminée:', results)}
-            />
-          </TabsContent>
-
-          <TabsContent value="advanced">
-            <AdvancedCompetitorAnalyzer />
+          <TabsContent value="serp-generator">
+            <SimpleSerpGenerator />
           </TabsContent>
 
           <TabsContent value="serp-fetch">
@@ -81,6 +75,10 @@ const CompetitorAnalysisPage = () => {
 
           <TabsContent value="serp">
             <SerpAnalyzer />
+          </TabsContent>
+
+          <TabsContent value="advanced">
+            <AdvancedCompetitorAnalyzer />
           </TabsContent>
         </Tabs>
         </Card>
