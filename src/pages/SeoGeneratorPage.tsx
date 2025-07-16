@@ -5,12 +5,50 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, FileText, Settings, Link, Image, Code, Network, Zap, Copy, Download, CheckCircle } from 'lucide-react';
+import { ArrowLeft, FileText, Settings, Link, Image, Code, Network, Zap, Copy, Download, CheckCircle, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useSiteAnalyzer } from '@/hooks/useSiteAnalyzer';
 
 const SeoGeneratorPage: React.FC = () => {
   const navigate = useNavigate();
+  const { setUrl, analyzeSite, isLoading, seoAnalysis } = useSiteAnalyzer();
+  const [urlToAnalyze, setUrlToAnalyze] = useState('');
+  
+  const analyzeUrl = async () => {
+    if (!urlToAnalyze.trim()) {
+      toast.error('Veuillez entrer une URL valide');
+      return;
+    }
+    
+    try {
+      setUrl(urlToAnalyze);
+      await analyzeSite();
+      
+      // Attendre un peu pour que l'analyse se termine
+      setTimeout(() => {
+        if (seoAnalysis) {
+          // Pré-remplir le formulaire avec les données analysées
+          setFormData(prev => ({
+            ...prev,
+            title: seoAnalysis.title || prev.title,
+            description: seoAnalysis.description || prev.description,
+            keywords: seoAnalysis.keywords?.join(', ') || prev.keywords,
+            h1: seoAnalysis.headings?.h1?.[0] || prev.h1,
+            h2Tags: seoAnalysis.headings?.h2 || prev.h2Tags,
+            targetUrl: urlToAnalyze,
+            canonical: urlToAnalyze,
+            organizationName: seoAnalysis.metadata?.title || prev.organizationName,
+          }));
+          
+          toast.success('Analyse terminée ! Formulaire pré-rempli.');
+        }
+      }, 2000);
+    } catch (error) {
+      toast.error('Erreur lors de l\'analyse de l\'URL');
+    }
+  };
+
   const [formData, setFormData] = useState({
     // Rédaction
     title: 'Guide Complet SEO 2024 : Optimisation pour les Moteurs de Recherche',
@@ -166,6 +204,46 @@ ${formData.h2Tags.filter(h2 => h2.trim()).map(h2 => `<h2>${h2}</h2>`).join('\n')
             🚀 Générateur SEO Complet
           </h1>
         </div>
+
+        {/* URL Analysis Section */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Search className="h-5 w-5" />
+              Analyser une URL existante
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex gap-4">
+              <Input
+                placeholder="https://monsite.com/ma-page"
+                value={urlToAnalyze}
+                onChange={(e) => setUrlToAnalyze(e.target.value)}
+                className="flex-1"
+              />
+              <Button 
+                onClick={analyzeUrl} 
+                disabled={isLoading}
+                className="min-w-[140px]"
+              >
+                {isLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Analyse...
+                  </>
+                ) : (
+                  <>
+                    <Search className="h-4 w-4 mr-2" />
+                    Analyser
+                  </>
+                )}
+              </Button>
+            </div>
+            <p className="text-sm text-muted-foreground mt-2">
+              Analysez une URL existante pour pré-remplir automatiquement le formulaire avec les données SEO détectées.
+            </p>
+          </CardContent>
+        </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Configuration Panel */}
