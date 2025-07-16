@@ -23,9 +23,26 @@ const SeoGeneratorPage: React.FC = () => {
     
     setIsLoading(true);
     try {
-      // Extraire le contenu de la page
-      const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(urlToAnalyze)}`);
-      const data = await response.json();
+      // Essayer plusieurs APIs CORS proxy
+      let data = null;
+      const proxies = [
+        `https://corsproxy.io/?${encodeURIComponent(urlToAnalyze)}`,
+        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(urlToAnalyze)}`,
+        `https://cors-anywhere.herokuapp.com/${urlToAnalyze}`
+      ];
+      
+      for (const proxyUrl of proxies) {
+        try {
+          const response = await fetch(proxyUrl);
+          if (response.ok) {
+            const text = await response.text();
+            data = { contents: text };
+            break;
+          }
+        } catch (e) {
+          console.log(`Proxy ${proxyUrl} failed, trying next...`);
+        }
+      }
       
       if (data.contents) {
         const parser = new DOMParser();
