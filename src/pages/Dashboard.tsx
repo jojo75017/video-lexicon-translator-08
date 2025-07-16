@@ -56,6 +56,13 @@ const Dashboard: React.FC = () => {
       icon: Users,
       path: '/competitor-analysis',
       color: 'from-red-500 to-red-600'
+    },
+    {
+      title: 'Test Robots.txt',
+      description: 'Testez votre robots.txt et validez les règles',
+      icon: Search,
+      path: '/robots-txt',
+      color: 'from-cyan-500 to-cyan-600'
     }
   ];
 

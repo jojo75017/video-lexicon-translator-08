@@ -16,6 +16,7 @@ import SignaturePage from './pages/SignaturePage';
 import CompetitorAnalysisPage from './pages/CompetitorAnalysisPage';
 import SeoGeneratorPage from './pages/SeoGeneratorPage';
 import TitleGeneratorPage from './pages/TitleGeneratorPage';
+import RobotsTxtPage from './pages/RobotsTxtPage';
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,7 @@ const App = () => (
         <Route path="/competitor-analysis" element={<CompetitorAnalysisPage />} />
         <Route path="/seo-generator" element={<SeoGeneratorPage />} />
         <Route path="/title-generator" element={<TitleGeneratorPage />} />
+        <Route path="/robots-txt" element={<RobotsTxtPage />} />
       </Routes>
       <Toaster />
     </TooltipProvider>
