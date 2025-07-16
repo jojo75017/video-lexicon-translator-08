@@ -620,26 +620,159 @@ const CompetitorAnalysisPage: React.FC = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Award className="h-5 w-5" />
-                    Recommandations Stratégiques
+                    Recommandations Stratégiques & Plan d'Action
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    <div className="p-4 border-l-4 border-blue-500 bg-blue-50">
-                      <div className="font-medium text-blue-900 mb-1">🎯 Priorité Haute</div>
-                      <p className="text-sm text-blue-800">Optimiser la vitesse de chargement mobile pour rattraper le concurrent #1</p>
+                  <div className="space-y-6">
+                    <div className="p-4 border-l-4 border-blue-500 bg-blue-50 rounded-r-lg">
+                      <div className="font-medium text-blue-900 mb-2 flex items-center gap-2">
+                        🎯 Priorité Haute - Performance Mobile
+                      </div>
+                      <p className="text-sm text-blue-800 mb-3">
+                        Optimiser la vitesse de chargement mobile pour rattraper le concurrent #1 (2.1s vs votre 3.2s estimé)
+                      </p>
+                      <div className="text-xs text-blue-700 mb-2 font-medium">Actions recommandées :</div>
+                      <ul className="text-xs text-blue-700 space-y-1 mb-3">
+                        <li>• Compresser et optimiser les images (format WebP)</li>
+                        <li>• Minifier CSS/JS et activer la compression GZIP</li>
+                        <li>• Implémenter le lazy loading pour les images</li>
+                        <li>• Utiliser un CDN pour la distribution de contenu</li>
+                      </ul>
+                      <div className="flex gap-2 flex-wrap">
+                        <a href="https://developers.google.com/speed/pagespeed/insights/" target="_blank" rel="noopener noreferrer" 
+                           className="text-xs bg-blue-200 text-blue-900 px-2 py-1 rounded hover:bg-blue-300 transition-colors">
+                          🔗 PageSpeed Insights
+                        </a>
+                        <a href="https://gtmetrix.com/" target="_blank" rel="noopener noreferrer"
+                           className="text-xs bg-blue-200 text-blue-900 px-2 py-1 rounded hover:bg-blue-300 transition-colors">
+                          🔗 GTmetrix
+                        </a>
+                        <a href="https://web.dev/fast/" target="_blank" rel="noopener noreferrer"
+                           className="text-xs bg-blue-200 text-blue-900 px-2 py-1 rounded hover:bg-blue-300 transition-colors">
+                          🔗 Guide Web.dev
+                        </a>
+                      </div>
                     </div>
-                    <div className="p-4 border-l-4 border-green-500 bg-green-50">
-                      <div className="font-medium text-green-900 mb-1">📈 Opportunité</div>
-                      <p className="text-sm text-green-800">Exploiter les 15 mots-clés à faible concurrence identifiés</p>
+
+                    <div className="p-4 border-l-4 border-green-500 bg-green-50 rounded-r-lg">
+                      <div className="font-medium text-green-900 mb-2 flex items-center gap-2">
+                        📈 Opportunité - Mots-clés Long Tail
+                      </div>
+                      <p className="text-sm text-green-800 mb-3">
+                        Exploiter les 15 mots-clés à faible concurrence identifiés pour gagner du trafic qualifié rapidement
+                      </p>
+                      <div className="text-xs text-green-700 mb-2 font-medium">Plan d'action :</div>
+                      <ul className="text-xs text-green-700 space-y-1 mb-3">
+                        <li>• Créer du contenu ciblé pour chaque mot-clé (articles de blog)</li>
+                        <li>• Optimiser les méta-descriptions et titres</li>
+                        <li>• Développer un calendrier éditorial sur 3 mois</li>
+                        <li>• Surveiller les positions et ajuster la stratégie</li>
+                      </ul>
+                      <div className="flex gap-2 flex-wrap">
+                        <a href="https://answerthepublic.com/" target="_blank" rel="noopener noreferrer"
+                           className="text-xs bg-green-200 text-green-900 px-2 py-1 rounded hover:bg-green-300 transition-colors">
+                          🔗 AnswerThePublic
+                        </a>
+                        <a href="https://keywordtool.io/" target="_blank" rel="noopener noreferrer"
+                           className="text-xs bg-green-200 text-green-900 px-2 py-1 rounded hover:bg-green-300 transition-colors">
+                          🔗 Keyword Tool
+                        </a>
+                        <a href="https://trends.google.com/" target="_blank" rel="noopener noreferrer"
+                           className="text-xs bg-green-200 text-green-900 px-2 py-1 rounded hover:bg-green-300 transition-colors">
+                          🔗 Google Trends
+                        </a>
+                      </div>
                     </div>
-                    <div className="p-4 border-l-4 border-yellow-500 bg-yellow-50">
-                      <div className="font-medium text-yellow-900 mb-1">⚠️ Attention</div>
-                      <p className="text-sm text-yellow-800">Améliorer le profil de liens avec plus de domaines référents de qualité</p>
+
+                    <div className="p-4 border-l-4 border-yellow-500 bg-yellow-50 rounded-r-lg">
+                      <div className="font-medium text-yellow-900 mb-2 flex items-center gap-2">
+                        ⚠️ Amélioration - Profil de Liens
+                      </div>
+                      <p className="text-sm text-yellow-800 mb-3">
+                        Rattraper le concurrent #1 avec plus de domaines référents de qualité (2,890 vs estimé 1,200)
+                      </p>
+                      <div className="text-xs text-yellow-700 mb-2 font-medium">Stratégie de link building :</div>
+                      <ul className="text-xs text-yellow-700 space-y-1 mb-3">
+                        <li>• Identifier les sites qui lient aux concurrents mais pas à vous</li>
+                        <li>• Créer du contenu linkable (études, infographies, guides)</li>
+                        <li>• Développer des partenariats avec des sites d'autorité</li>
+                        <li>• Corriger les liens brisés et faire du broken link building</li>
+                      </ul>
+                      <div className="flex gap-2 flex-wrap">
+                        <a href="https://ahrefs.com/backlink-checker" target="_blank" rel="noopener noreferrer"
+                           className="text-xs bg-yellow-200 text-yellow-900 px-2 py-1 rounded hover:bg-yellow-300 transition-colors">
+                          🔗 Ahrefs Backlinks
+                        </a>
+                        <a href="https://moz.com/link-explorer" target="_blank" rel="noopener noreferrer"
+                           className="text-xs bg-yellow-200 text-yellow-900 px-2 py-1 rounded hover:bg-yellow-300 transition-colors">
+                          🔗 Moz Link Explorer
+                        </a>
+                        <a href="https://hunter.io/" target="_blank" rel="noopener noreferrer"
+                           className="text-xs bg-yellow-200 text-yellow-900 px-2 py-1 rounded hover:bg-yellow-300 transition-colors">
+                          🔗 Hunter.io
+                        </a>
+                      </div>
                     </div>
-                    <div className="p-4 border-l-4 border-purple-500 bg-purple-50">
-                      <div className="font-medium text-purple-900 mb-1">🚀 Innovation</div>
-                      <p className="text-sm text-purple-800">Développer une stratégie de contenu vidéo (concurrent #2 en retard)</p>
+
+                    <div className="p-4 border-l-4 border-purple-500 bg-purple-50 rounded-r-lg">
+                      <div className="font-medium text-purple-900 mb-2 flex items-center gap-2">
+                        🚀 Innovation - Contenu Vidéo
+                      </div>
+                      <p className="text-sm text-purple-800 mb-3">
+                        Développer une stratégie de contenu vidéo car le concurrent #2 est en retard sur ce format
+                      </p>
+                      <div className="text-xs text-purple-700 mb-2 font-medium">Roadmap vidéo :</div>
+                      <ul className="text-xs text-purple-700 space-y-1 mb-3">
+                        <li>• Créer des tutoriels et guides pratiques en vidéo</li>
+                        <li>• Optimiser pour YouTube SEO et intégrer sur votre site</li>
+                        <li>• Développer des vidéos courtes pour les réseaux sociaux</li>
+                        <li>• Mesurer l'engagement et ajuster le contenu</li>
+                      </ul>
+                      <div className="flex gap-2 flex-wrap">
+                        <a href="https://studio.youtube.com/" target="_blank" rel="noopener noreferrer"
+                           className="text-xs bg-purple-200 text-purple-900 px-2 py-1 rounded hover:bg-purple-300 transition-colors">
+                          🔗 YouTube Studio
+                        </a>
+                        <a href="https://vidiq.com/" target="_blank" rel="noopener noreferrer"
+                           className="text-xs bg-purple-200 text-purple-900 px-2 py-1 rounded hover:bg-purple-300 transition-colors">
+                          🔗 VidIQ
+                        </a>
+                        <a href="https://www.canva.com/video-editor/" target="_blank" rel="noopener noreferrer"
+                           className="text-xs bg-purple-200 text-purple-900 px-2 py-1 rounded hover:bg-purple-300 transition-colors">
+                          🔗 Canva Vidéo
+                        </a>
+                      </div>
+                    </div>
+
+                    <div className="p-4 border-l-4 border-indigo-500 bg-indigo-50 rounded-r-lg">
+                      <div className="font-medium text-indigo-900 mb-2 flex items-center gap-2">
+                        📊 Suivi & Analytics
+                      </div>
+                      <p className="text-sm text-indigo-800 mb-3">
+                        Mettre en place un système de suivi pour mesurer l'impact de vos optimisations
+                      </p>
+                      <div className="text-xs text-indigo-700 mb-2 font-medium">Outils de mesure essentiels :</div>
+                      <ul className="text-xs text-indigo-700 space-y-1 mb-3">
+                        <li>• Configurer Google Search Console pour le suivi des positions</li>
+                        <li>• Installer Google Analytics 4 avec les événements personnalisés</li>
+                        <li>• Utiliser un outil de rank tracking pour surveiller les concurrents</li>
+                        <li>• Créer des rapports automatisés mensuels</li>
+                      </ul>
+                      <div className="flex gap-2 flex-wrap">
+                        <a href="https://search.google.com/search-console" target="_blank" rel="noopener noreferrer"
+                           className="text-xs bg-indigo-200 text-indigo-900 px-2 py-1 rounded hover:bg-indigo-300 transition-colors">
+                          🔗 Search Console
+                        </a>
+                        <a href="https://analytics.google.com/" target="_blank" rel="noopener noreferrer"
+                           className="text-xs bg-indigo-200 text-indigo-900 px-2 py-1 rounded hover:bg-indigo-300 transition-colors">
+                          🔗 Google Analytics
+                        </a>
+                        <a href="https://www.semrush.com/" target="_blank" rel="noopener noreferrer"
+                           className="text-xs bg-indigo-200 text-indigo-900 px-2 py-1 rounded hover:bg-indigo-300 transition-colors">
+                          🔗 SEMrush
+                        </a>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
