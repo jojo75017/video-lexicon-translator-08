@@ -13,39 +13,61 @@ const SeoGeneratorPage: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     // Rédaction
-    title: '',
-    description: '',
-    keywords: '',
-    h1: '',
-    h2Tags: [''],
-    content: '',
+    title: 'Guide Complet SEO 2024 : Optimisation pour les Moteurs de Recherche',
+    description: 'Découvrez les meilleures stratégies SEO 2024 pour améliorer votre référencement naturel et augmenter votre visibilité sur Google.',
+    keywords: 'SEO, référencement naturel, optimisation Google, stratégies SEO 2024, marketing digital',
+    h1: 'Guide Complet du SEO en 2024',
+    h2Tags: [
+      'Les Fondamentaux du Référencement Naturel',
+      'Techniques d\'Optimisation On-Page',
+      'Stratégies de Content Marketing',
+      'Analyse de la Concurrence'
+    ],
+    content: 'Le SEO (Search Engine Optimization) est devenu un élément crucial pour toute stratégie de marketing digital. En 2024, les moteurs de recherche privilégient un contenu de qualité, une expérience utilisateur optimale et une structure technique impeccable. Ce guide vous accompagne dans l\'optimisation complète de votre présence en ligne.',
     
     // Optimisation
-    focusKeyword: '',
-    targetUrl: '',
+    focusKeyword: 'SEO 2024',
+    targetUrl: 'https://monsite.com/guide-seo-2024',
     language: 'fr',
     country: 'FR',
     
     // Configuration
     robots: 'index,follow',
-    canonical: '',
+    canonical: 'https://monsite.com/guide-seo-2024',
     hreflang: [],
     
     // Liens
-    internalLinks: [''],
-    externalLinks: [''],
+    internalLinks: [
+      '/blog/techniques-seo',
+      '/services/audit-seo',
+      '/outils/analyse-mots-cles'
+    ],
+    externalLinks: [
+      'https://developers.google.com/search',
+      'https://search.google.com/search-console'
+    ],
     
     // Images
-    altTexts: [''],
-    imageUrls: [''],
+    altTexts: [
+      'Graphique des tendances SEO 2024',
+      'Schéma d\'optimisation on-page',
+      'Tableau de bord Google Analytics'
+    ],
+    imageUrls: [
+      '/images/seo-trends-2024.jpg',
+      '/images/on-page-optimization.png',
+      '/images/analytics-dashboard.jpg'
+    ],
     
     // Données structurées
     schemaType: 'Article',
-    organizationName: '',
+    organizationName: 'MonSite Digital',
     
     // HTTP & réseau
-    redirects: [''],
-    sitemapUrl: ''
+    redirects: [
+      '/ancien-guide-seo → /guide-seo-2024'
+    ],
+    sitemapUrl: 'https://monsite.com/sitemap.xml'
   });
 
   const [generatedContent, setGeneratedContent] = useState<any>(null);
