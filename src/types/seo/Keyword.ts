@@ -44,6 +44,8 @@ export interface SerpResult {
   url: string;
   description: string;
   position: number;
+  domain?: string;
+  authority?: number;
 }
 
 export interface SerpsResult {
@@ -57,6 +59,13 @@ export interface KeywordTrend {
   data: number[];
   growth: number;
   seasonal: boolean;
+}
+
+export interface SemanticCluster {
+  name: string;
+  keywords: string[];
+  volume: number;
+  difficulty: number;
 }
 
 // Export CompetitorData and SerpResult from CompetitorData.ts

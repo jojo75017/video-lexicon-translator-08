@@ -4,8 +4,10 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft } from "lucide-react";
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AdvancedCompetitorAnalyzer from '@/components/seo/competitor/AdvancedCompetitorAnalyzer';
 import SectorSpecificAnalyzer from '@/components/seo/competitor/SectorSpecificAnalyzer';
+import SerpAnalyzer from '@/components/seo/serp/SerpAnalyzer';
 
 const CompetitorAnalysisPage = () => {
   return (
@@ -53,11 +55,28 @@ const CompetitorAnalysisPage = () => {
             </div>
           </div>
           
-        <SectorSpecificAnalyzer 
-          urls={[]} 
-          onAnalysisComplete={(results) => console.log('Analyse terminée:', results)}
-        />
-        <AdvancedCompetitorAnalyzer />
+        <Tabs defaultValue="sector" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="sector">Analyse Sectorielle</TabsTrigger>
+            <TabsTrigger value="advanced">Analyse Avancée</TabsTrigger>
+            <TabsTrigger value="serp">Analyse SERP</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="sector">
+            <SectorSpecificAnalyzer 
+              urls={[]} 
+              onAnalysisComplete={(results) => console.log('Analyse terminée:', results)}
+            />
+          </TabsContent>
+
+          <TabsContent value="advanced">
+            <AdvancedCompetitorAnalyzer />
+          </TabsContent>
+
+          <TabsContent value="serp">
+            <SerpAnalyzer />
+          </TabsContent>
+        </Tabs>
         </Card>
       </div>
     </div>
