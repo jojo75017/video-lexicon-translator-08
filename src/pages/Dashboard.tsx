@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BarChart3, Search, Globe, TrendingUp, Users } from 'lucide-react';
+import { BarChart3, Search, Globe, TrendingUp, Users, Lightbulb } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Dashboard: React.FC = () => {
@@ -35,6 +35,13 @@ const Dashboard: React.FC = () => {
       icon: TrendingUp,
       path: '/seo-generator',
       color: 'from-indigo-500 to-indigo-600'
+    },
+    {
+      title: 'Générateur de Titres',
+      description: 'Titres SEO optimisés par thématique',
+      icon: Lightbulb,
+      path: '/title-generator',
+      color: 'from-yellow-500 to-orange-600'
     },
     {
       title: 'Hiérarchie',

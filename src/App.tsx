@@ -15,6 +15,7 @@ import KeywordGeneratorPage from './pages/KeywordGeneratorPage';
 import SignaturePage from './pages/SignaturePage';
 import CompetitorAnalysisPage from './pages/CompetitorAnalysisPage';
 import SeoGeneratorPage from './pages/SeoGeneratorPage';
+import TitleGeneratorPage from './pages/TitleGeneratorPage';
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
         <Route path="/signature" element={<SignaturePage />} />
         <Route path="/competitor-analysis" element={<CompetitorAnalysisPage />} />
         <Route path="/seo-generator" element={<SeoGeneratorPage />} />
+        <Route path="/title-generator" element={<TitleGeneratorPage />} />
       </Routes>
       <Toaster />
     </TooltipProvider>
