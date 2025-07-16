@@ -108,7 +108,7 @@ const SeoGeneratorPage: React.FC = () => {
           ...prev,
           title: title || prev.title, // Garder titre original ou existant
           description: description || prev.description, // Garder description originale 
-          keywords: keywords || prev.keywords, // Garder mots-clés originaux
+          keywords: keywords || '', // Vide si aucun mot-clé trouvé
           h1: h1 || prev.h1, // Garder H1 original
           h2Tags: h2Elements.length > 0 ? h2Elements : prev.h2Tags, // Garder H2 originaux
           targetUrl: urlToAnalyze,
@@ -139,7 +139,7 @@ const SeoGeneratorPage: React.FC = () => {
     // Rédaction
     title: 'Guide Complet SEO 2024 : Optimisation pour les Moteurs de Recherche',
     description: 'Découvrez les meilleures stratégies SEO 2024 pour améliorer votre référencement naturel et augmenter votre visibilité sur Google.',
-    keywords: 'SEO, référencement naturel, optimisation Google, stratégies SEO 2024, marketing digital',
+    keywords: '',
     h1: 'Guide Complet du SEO en 2024',
     h2Tags: [
       'Les Fondamentaux du Référencement Naturel',
