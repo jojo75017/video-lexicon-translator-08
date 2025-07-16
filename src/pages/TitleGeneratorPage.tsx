@@ -288,18 +288,45 @@ const TitleGeneratorPage: React.FC = () => {
             <CardContent>
               <div className="space-y-4">
                 {generatedTitles.map((titleData) => (
-                  <div key={titleData.id} className="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                  <div key={titleData.id} className="p-6 border rounded-lg hover:bg-gray-50 transition-colors">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
-                        <h3 className="font-medium text-lg mb-2">{titleData.title}</h3>
+                        <h3 className="font-medium text-lg mb-3">{titleData.title}</h3>
                         
-                        <div className="flex flex-wrap gap-2 mb-3">
+                        <div className="flex flex-wrap gap-2 mb-4">
                           <Badge className={getTypeColor(titleData.type)}>
                             {titleData.type}
                           </Badge>
                           <Badge variant="outline">
                             {titleData.angle}
                           </Badge>
+                        </div>
+
+                        {/* Proposition d'article */}
+                        <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg mb-4">
+                          <h4 className="font-medium text-gray-900 mb-2">📝 Proposition d'article :</h4>
+                          <div className="text-sm text-gray-700 space-y-2">
+                            <p><strong>Introduction :</strong> Contextualiser le sujet avec des statistiques actuelles sur {keyword}.</p>
+                            <p><strong>Problème :</strong> Identifier les défis principaux que rencontrent les lecteurs.</p>
+                            <p><strong>Solution :</strong> Présenter votre approche unique avec des exemples concrets.</p>
+                            <p><strong>Preuves :</strong> Études de cas, témoignages ou données chiffrées.</p>
+                            <p><strong>Action :</strong> Call-to-action clair pour engager les lecteurs.</p>
+                          </div>
+                        </div>
+
+                        {/* Structure détaillée */}
+                        <div className="bg-yellow-50 p-4 rounded-lg mb-4">
+                          <h4 className="font-medium text-gray-900 mb-2">🏗️ Structure recommandée :</h4>
+                          <div className="text-sm text-gray-700">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                              <div>• Introduction accrocheuse (150 mots)</div>
+                              <div>• 3-5 sections principales (300-500 mots/section)</div>
+                              <div>• Exemples pratiques et visuels</div>
+                              <div>• FAQ avec 5-8 questions</div>
+                              <div>• Conclusion avec CTA (100 mots)</div>
+                              <div>• Mots-clés secondaires intégrés</div>
+                            </div>
+                          </div>
                         </div>
 
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
@@ -328,14 +355,26 @@ const TitleGeneratorPage: React.FC = () => {
                         </div>
                       </div>
 
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => copyTitle(titleData.title)}
-                        className="shrink-0"
-                      >
-                        <Copy className="h-4 w-4" />
-                      </Button>
+                      <div className="flex flex-col gap-2 shrink-0">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => copyTitle(titleData.title)}
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="default"
+                          size="sm"
+                          onClick={() => {
+                            const articleOutline = `TITRE: ${titleData.title}\n\nSTRUCTURE D'ARTICLE:\n\n1. Introduction (150 mots)\n2. Contexte et enjeux actuels\n3. Solutions pratiques\n4. Exemples concrets\n5. FAQ\n6. Conclusion avec CTA\n\nMOTS-CLÉS: ${keyword}, [mots-clés secondaires]\nOBJECTIF: ${titleData.searchVolume.toLocaleString()} recherches/mois`;
+                            navigator.clipboard.writeText(articleOutline);
+                            toast.success('Plan d\'article copié !');
+                          }}
+                        >
+                          📋 Plan
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 ))}
