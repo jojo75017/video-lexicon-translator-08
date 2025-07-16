@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft } from "lucide-react";
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import EnhancedCompetitorAnalyzer from '@/components/seo/competitor/EnhancedCompetitorAnalyzer';
+import AdvancedCompetitorAnalyzer from '@/components/seo/competitor/AdvancedCompetitorAnalyzer';
 
 const CompetitorAnalysisPage = () => {
   return (
@@ -18,7 +18,7 @@ const CompetitorAnalysisPage = () => {
             </Button>
           </Link>
           <h1 className="ml-4 text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            Analyse Concurrentielle Avancée
+            Analyseur Concurrentiel Avancé - Toutes Thématiques
           </h1>
         </div>
       </header>
@@ -26,29 +26,33 @@ const CompetitorAnalysisPage = () => {
       <div className="container mx-auto pb-10">
         <Card className="p-6 mb-6 border-purple-500 border-t-4 bg-gradient-to-r from-purple-50/50 to-blue-50/50">
           <h2 className="text-2xl font-bold mb-2 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            Analyse Comparative Complète - Toutes Thématiques
+            🚀 Analyseur Concurrentiel Professionnel avec IA
           </h2>
           <p className="text-gray-600 mb-6">
-            Analysez n'importe quel secteur : e-commerce, voyage, santé, finance, tech, immobilier...
-            Comparez votre site avec 2 concurrents et obtenez un plan d'action détaillé pour les surpasser.
+            L'outil le plus complet pour dominer votre marché : analyse technique, contenu, backlinks, 
+            opportunités et plan d'action personnalisé par intelligence artificielle.
           </p>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <div className="p-4 bg-white rounded-lg border border-green-200">
               <h3 className="font-semibold text-green-700 mb-2">🌐 Analyse Universelle</h3>
-              <p className="text-sm text-gray-600">Fonctionne avec tous les secteurs et thématiques</p>
+              <p className="text-sm text-gray-600">E-commerce, SaaS, santé, finance, immobilier, voyage...</p>
             </div>
             <div className="p-4 bg-white rounded-lg border border-blue-200">
-              <h3 className="font-semibold text-blue-700 mb-2">🤖 IA Avancée</h3>
-              <p className="text-sm text-gray-600">Intégration OpenAI pour des insights personnalisés</p>
+              <h3 className="font-semibold text-blue-700 mb-2">🤖 IA OpenAI</h3>
+              <p className="text-sm text-gray-600">Insights personnalisés et recommandations stratégiques</p>
             </div>
             <div className="p-4 bg-white rounded-lg border border-purple-200">
-              <h3 className="font-semibold text-purple-700 mb-2">📊 Analyse Complète</h3>
-              <p className="text-sm text-gray-600">Mots-clés, positions, opportunités, plan d'action</p>
+              <h3 className="font-semibold text-purple-700 mb-2">⚡ Analyse Technique</h3>
+              <p className="text-sm text-gray-600">Core Web Vitals, sécurité, mobile, SEO technique</p>
+            </div>
+            <div className="p-4 bg-white rounded-lg border border-orange-200">
+              <h3 className="font-semibold text-orange-700 mb-2">🎯 Plan d'Action</h3>
+              <p className="text-sm text-gray-600">Roadmap détaillée pour surpasser vos concurrents</p>
             </div>
           </div>
           
-          <EnhancedCompetitorAnalyzer />
+          <AdvancedCompetitorAnalyzer />
         </Card>
       </div>
     </div>
