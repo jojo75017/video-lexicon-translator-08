@@ -62,20 +62,58 @@ const GoogleSerpFetcher: React.FC = () => {
       Basez-vous sur de vrais sites web qui pourraient apparaître pour ce mot-clé.`;
 
       if (!openaiKey) {
-        // Résultats fictifs si pas d'API OpenAI
-        const mockResults: SerpResult[] = Array.from({ length: 10 }, (_, i) => ({
+        // Résultats réalistes avec de vrais sites français
+        const realFrenchSites = [
+          { domain: 'carrefourvoyages.fr', title: 'Carrefour Voyages - Séjours et Circuits' },
+          { domain: 'voyages.leclerc', title: 'Leclerc Voyages - Offres Exceptionnelles' },
+          { domain: 'voyage-privé.com', title: 'Voyage Privé - Ventes Flash' },
+          { domain: 'promovacances.com', title: 'Promovacances - Vacances Pas Chères' },
+          { domain: 'lastminute.com', title: 'Last Minute - Séjours de dernière minute' },
+          { domain: 'booking.com', title: 'Booking.com - Réservation d\'hôtels' },
+          { domain: 'expedia.fr', title: 'Expedia France - Vols + Hôtels' },
+          { domain: 'kayak.fr', title: 'KAYAK - Comparateur de voyages' },
+          { domain: 'opodo.fr', title: 'Opodo - Vols, hôtels et voitures' },
+          { domain: 'tripadvisor.fr', title: 'TripAdvisor - Avis et conseils voyage' }
+        ];
+
+        const mockResults: SerpResult[] = realFrenchSites.map((site, i) => ({
           position: i + 1,
-          title: `Résultat ${i + 1} pour "${keyword}"`,
-          url: `https://example${i + 1}.com/${keyword.replace(/\s+/g, '-')}`,
-          domain: `example${i + 1}.com`,
-          description: `Description détaillée du résultat ${i + 1} pour le mot-clé ${keyword}...`
+          title: `${site.title} | ${keyword}`,
+          url: `https://${site.domain}/${keyword.replace(/\s+/g, '-').toLowerCase()}`,
+          domain: site.domain,
+          description: `Découvrez nos offres ${keyword.toLowerCase()} sur ${site.domain}. Réservation en ligne, prix garantis et service client français.`
         }));
         
         setSerpResults(mockResults);
         generateAnalysis(mockResults);
         toast.success('Résultats SERP simulés générés');
       } else {
-        const response = await OpenAIService.generateKeywords(prompt, openaiKey);
+        const enhancedPrompt = `En tant qu'expert SEO, générez 10 résultats de recherche Google RÉALISTES pour "${keyword}".
+
+        Incluez obligatoirement ces sites français populaires avec leurs vraies URLs:
+        - carrefourvoyages.fr
+        - voyages.leclerc  
+        - voyage-privé.com
+        - promovacances.com
+        - lastminute.com
+        - booking.com
+        - expedia.fr
+        - kayak.fr
+        - opodo.fr
+        - tripadvisor.fr
+
+        Format JSON strict:
+        [
+          {
+            "position": 1,
+            "title": "Titre réaliste du résultat",
+            "url": "https://vraieurl.com/page-realiste",
+            "domain": "vraieurl.com",
+            "description": "Description marketing réaliste..."
+          }
+        ]`;
+
+        const response = await OpenAIService.generateKeywords(enhancedPrompt, openaiKey);
         
         if (response && response.length > 0) {
           try {
