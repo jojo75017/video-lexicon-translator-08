@@ -7,6 +7,12 @@ import SerpGenerator from './pages/SerpGenerator';
 import AnalyticsPage from './pages/AnalyticsPage';
 import SeoPage from './pages/SeoPage';
 import HierarchyPage from './pages/HierarchyPage';
+import WordCountPage from './pages/WordCountPage';
+import SuggestionsPage from './pages/SuggestionsPage';
+import QuoraPage from './pages/QuoraPage';
+import PinterestPage from './pages/PinterestPage';
+import KeywordGeneratorPage from './pages/KeywordGeneratorPage';
+import SignaturePage from './pages/SignaturePage';
 
 const queryClient = new QueryClient();
 
@@ -20,6 +26,12 @@ const App = () => (
         <Route path="/analytics" element={<AnalyticsPage />} />
         <Route path="/seo" element={<SeoPage />} />
         <Route path="/hierarchy" element={<HierarchyPage />} />
+        <Route path="/wordcount" element={<WordCountPage />} />
+        <Route path="/suggestions" element={<SuggestionsPage />} />
+        <Route path="/quora" element={<QuoraPage />} />
+        <Route path="/pinterest" element={<PinterestPage />} />
+        <Route path="/keyword-generator" element={<KeywordGeneratorPage />} />
+        <Route path="/signature" element={<SignaturePage />} />
       </Routes>
       <Toaster />
     </TooltipProvider>
