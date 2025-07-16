@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AdvancedCompetitorAnalyzer from '@/components/seo/competitor/AdvancedCompetitorAnalyzer';
 import SectorSpecificAnalyzer from '@/components/seo/competitor/SectorSpecificAnalyzer';
 import SerpAnalyzer from '@/components/seo/serp/SerpAnalyzer';
+import GoogleSerpFetcher from '@/components/seo/serp/GoogleSerpFetcher';
 
 const CompetitorAnalysisPage = () => {
   return (
@@ -56,9 +57,10 @@ const CompetitorAnalysisPage = () => {
           </div>
           
         <Tabs defaultValue="sector" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="sector">Analyse Sectorielle</TabsTrigger>
             <TabsTrigger value="advanced">Analyse Avancée</TabsTrigger>
+            <TabsTrigger value="serp-fetch">SERP URLs</TabsTrigger>
             <TabsTrigger value="serp">Analyse SERP</TabsTrigger>
           </TabsList>
 
@@ -71,6 +73,10 @@ const CompetitorAnalysisPage = () => {
 
           <TabsContent value="advanced">
             <AdvancedCompetitorAnalyzer />
+          </TabsContent>
+
+          <TabsContent value="serp-fetch">
+            <GoogleSerpFetcher />
           </TabsContent>
 
           <TabsContent value="serp">
