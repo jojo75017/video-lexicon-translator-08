@@ -25,15 +25,15 @@ const SiteComparison = () => {
     try {
       // Simulation de données pour la comparaison
       const mockKeywords1: KeywordSuggestion[] = [
-        { keyword: 'seo analysis', volume: 1200, difficulty: 45, relevance: 85, type: 'primary' },
-        { keyword: 'website optimization', volume: 800, difficulty: 35, relevance: 78, type: 'semantic' },
-        { keyword: 'digital marketing', volume: 2000, difficulty: 60, relevance: 72, type: 'competitor' }
+        { keyword: 'seo analysis', volume: 1200, difficulty: 45 },
+        { keyword: 'website optimization', volume: 800, difficulty: 35 },
+        { keyword: 'digital marketing', volume: 2000, difficulty: 60 }
       ];
 
       const mockKeywords2: KeywordSuggestion[] = [
-        { keyword: 'seo tools', volume: 1500, difficulty: 50, relevance: 88, type: 'primary' },
-        { keyword: 'keyword research', volume: 900, difficulty: 40, relevance: 82, type: 'semantic' },
-        { keyword: 'content marketing', volume: 1800, difficulty: 55, relevance: 75, type: 'longtail' }
+        { keyword: 'seo tools', volume: 1500, difficulty: 50 },
+        { keyword: 'keyword research', volume: 900, difficulty: 40 },
+        { keyword: 'content marketing', volume: 1800, difficulty: 55 }
       ];
 
       setKeywords1(mockKeywords1);

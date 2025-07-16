@@ -59,7 +59,8 @@ const UrlSeoAnalyzer: React.FC = () => {
       setApiKeyStatus('unchecked');
       toast.info('Validation de la clé API...');
       
-      const isValid = await OpenAIService.validateApiKey(openaiKey);
+      const openAIService = new OpenAIService(openaiKey);
+      const isValid = await openAIService.validateApiKey();
       
       if (isValid) {
         localStorage.setItem('openaiKey', openaiKey);

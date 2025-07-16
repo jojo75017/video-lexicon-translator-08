@@ -1,58 +1,77 @@
 
-import { RoiResults } from '@/types/seo/RoiResults';
+import { RoiParameters, RoiResults } from '@/types/seo';
 
-export const calculateRoi = (
-  investment: number,
-  currentTraffic: number,
-  projectedIncrease: number,
-  conversionRate: number,
-  averageOrderValue: number,
-  timeframe: number = 12
-): RoiResults => {
-  const monthlyTrafficIncrease = (currentTraffic * projectedIncrease / 100) / 12;
-  const monthlyResults = [];
+export const calculateSeoRoi = (params: RoiParameters): RoiResults => {
+  const {
+    seoInvestment,
+    acquisitionCost,
+    conversionRate,
+    averageOrderValue,
+    organicTraffic,
+    timeFrame
+  } = params;
+  
+  let breakEvenMonth: number | null = null;
   let cumulativeRevenue = 0;
-  let cumulativeInvestment = investment;
+  let cumulativeConversions = 0;
   
-  for (let month = 1; month <= timeframe; month++) {
-    const traffic = monthlyTrafficIncrease * month;
-    const conversions = traffic * (conversionRate / 100);
-    const revenue = conversions * averageOrderValue;
-    cumulativeRevenue += revenue;
+  // Distribuer l'investissement SEO sur la période
+  const monthlyInvestment = (month: number): number => {
+    if (month === 0) return seoInvestment * 0.5; // 50% du budget au premier mois
+    if (month === 1) return seoInvestment * 0.2; // 20% au deuxième mois
+    return (seoInvestment * 0.3) / (timeFrame - 2); // Le reste réparti
+  };
+  
+  // Simuler la croissance organique
+  const expectedTrafficGrowth = (month: number): number => {
+    const baseTraffic = organicTraffic;
+    const growthFactor = month === 0 ? 1 : 1 + (0.1 * Math.log10(month + 1));
+    return Math.floor(baseTraffic * growthFactor);
+  };
+  
+  // Calculer les résultats mensuels
+  const monthlyResults = Array.from({ length: timeFrame }, (_, i) => {
+    const month = i + 1;
+    const monthTraffic = expectedTrafficGrowth(i);
+    const monthConversions = monthTraffic * conversionRate;
+    const monthRevenue = monthConversions * averageOrderValue;
     
-    const monthlyRoi = cumulativeRevenue > 0 ? 
-      ((cumulativeRevenue - cumulativeInvestment) / cumulativeInvestment) * 100 : 0;
+    cumulativeRevenue += monthRevenue;
+    cumulativeConversions += monthConversions;
     
-    monthlyResults.push({
+    const cumulativeInvestment = Array.from({ length: month }, (_, j) => monthlyInvestment(j))
+      .reduce((sum, investment) => sum + investment, 0);
+    
+    const monthlyRoi = ((monthRevenue / monthlyInvestment(i)) * 100) - 100;
+    
+    // Point d'équilibre
+    if (!breakEvenMonth && cumulativeRevenue >= cumulativeInvestment) {
+      breakEvenMonth = month;
+    }
+    
+    return {
       month,
-      traffic: Math.round(traffic),
-      conversions: Math.round(conversions),
-      revenue: Math.round(revenue),
-      cumulativeRevenue: Math.round(cumulativeRevenue),
-      cumulativeInvestment: Math.round(cumulativeInvestment),
-      monthlyRoi: Math.round(monthlyRoi * 100) / 100
-    });
-  }
+      traffic: monthTraffic,
+      conversions: monthConversions,
+      revenue: monthRevenue,
+      cumulativeRevenue,
+      cumulativeInvestment,
+      monthlyRoi
+    };
+  });
   
-  const totalRevenue = cumulativeRevenue;
-  const totalConversions = monthlyResults.reduce((sum, month) => sum + month.conversions, 0);
-  const roi = ((totalRevenue - investment) / investment) * 100;
-  const costSaved = Math.max(0, totalRevenue - investment);
-  const breakEvenMonth = monthlyResults.findIndex(month => month.cumulativeRevenue >= investment) + 1;
+  // Économies vs acquisition payante
+  const costSaved = cumulativeConversions * acquisitionCost;
   
-  const monthlyRevenue = totalRevenue / timeframe;
-  const yearlyRevenue = totalRevenue;
-  const breakEvenTime = breakEvenMonth;
-
+  // ROI global
+  const roi = (((cumulativeRevenue + costSaved) / seoInvestment) * 100) - 100;
+  
   return {
-    roi: Math.round(roi * 100) / 100,
-    monthlyRevenue: Math.round(monthlyRevenue),
-    yearlyRevenue: Math.round(yearlyRevenue),
-    totalRevenue: Math.round(totalRevenue),
-    totalConversions: Math.round(totalConversions),
-    costSaved: Math.round(costSaved),
-    breakEvenMonth: breakEvenMonth || timeframe,
-    breakEvenTime: breakEvenTime || timeframe,
+    roi,
+    totalRevenue: cumulativeRevenue,
+    totalConversions: cumulativeConversions,
+    costSaved,
+    breakEvenMonth,
     monthlyResults
   };
 };

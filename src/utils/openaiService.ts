@@ -12,157 +12,6 @@ export class OpenAIService {
     return localStorage.getItem('openaiKey');
   }
 
-  static enableProxy() {
-    // Méthode pour activer le proxy si nécessaire
-    console.log('Proxy enabled for OpenAI requests');
-  }
-
-  static async validateApiKey(apiKey?: string): Promise<boolean> {
-    const key = apiKey || this.getApiKey();
-    if (!key) return false;
-
-    try {
-      const response = await fetch('https://api.openai.com/v1/models', {
-        headers: {
-          'Authorization': `Bearer ${key}`,
-        },
-      });
-      return response.ok;
-    } catch {
-      return false;
-    }
-  }
-
-  static async generateKeywords(topic: string, count: number = 10): Promise<string[]> {
-    const apiKey = this.getApiKey();
-    if (!apiKey) {
-      throw new Error('Clé API OpenAI non configurée');
-    }
-
-    try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [
-            {
-              role: 'system',
-              content: 'Vous êtes un expert SEO. Générez des mots-clés pertinents pour le sujet donné.'
-            },
-            {
-              role: 'user',
-              content: `Générez ${count} mots-clés SEO pour: ${topic}`
-            }
-          ],
-          temperature: 0.7,
-        }),
-      });
-
-      const data: OpenAIResponse = await response.json();
-      const content = data.choices[0].message.content;
-      
-      // Parser les mots-clés de la réponse
-      const keywords = content.split('\n')
-        .map(line => line.replace(/^\d+\.?\s*/, '').trim())
-        .filter(keyword => keyword.length > 0)
-        .slice(0, count);
-      
-      return keywords;
-    } catch (error) {
-      console.error('Erreur génération mots-clés:', error);
-      return [];
-    }
-  }
-
-  static async generateLongTailKeywords(mainKeyword: string): Promise<string[]> {
-    const apiKey = this.getApiKey();
-    if (!apiKey) {
-      throw new Error('Clé API OpenAI non configurée');
-    }
-
-    try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [
-            {
-              role: 'system',
-              content: 'Générez des mots-clés longue traîne pour le SEO.'
-            },
-            {
-              role: 'user',
-              content: `Générez 15 mots-clés longue traîne pour: ${mainKeyword}`
-            }
-          ],
-          temperature: 0.7,
-        }),
-      });
-
-      const data: OpenAIResponse = await response.json();
-      const content = data.choices[0].message.content;
-      
-      return content.split('\n')
-        .map(line => line.replace(/^\d+\.?\s*/, '').trim())
-        .filter(keyword => keyword.length > 0)
-        .slice(0, 15);
-    } catch (error) {
-      console.error('Erreur génération longue traîne:', error);
-      return [];
-    }
-  }
-
-  static async generateBlogOutline(keyword: string): Promise<any> {
-    const apiKey = this.getApiKey();
-    if (!apiKey) {
-      throw new Error('Clé API OpenAI non configurée');
-    }
-
-    try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [
-            {
-              role: 'system',
-              content: 'Créez un plan d\'article de blog optimisé SEO.'
-            },
-            {
-              role: 'user',
-              content: `Créez un plan d'article pour le mot-clé: ${keyword}`
-            }
-          ],
-          temperature: 0.7,
-        }),
-      });
-
-      const data: OpenAIResponse = await response.json();
-      const content = data.choices[0].message.content;
-      
-      return {
-        title: `Guide complet sur ${keyword}`,
-        outline: content,
-        sections: content.split('\n').filter(line => line.trim().length > 0)
-      };
-    } catch (error) {
-      console.error('Erreur génération plan:', error);
-      return null;
-    }
-  }
-
   static async analyzeWebsiteStructure(content: string, url: string): Promise<{
     keywords: string[];
     structure: any;
@@ -231,6 +80,7 @@ Répondez au format JSON strictement:
         return parsed;
       } catch (e) {
         console.error('Erreur de parsing JSON:', content_response);
+        // Fallback avec analyse basique du contenu réel
         return this.fallbackAnalysis(content, url);
       }
     } catch (error) {
@@ -240,11 +90,12 @@ Répondez au format JSON strictement:
   }
 
   private static fallbackAnalysis(content: string, url: string) {
+    // Extraire les mots-clés réels du contenu
     const words = content.toLowerCase()
       .replace(/[^\w\sàâäéèêëïîôöùûüÿç]/g, ' ')
       .split(/\s+/)
       .filter(w => w.length > 3)
-      .filter(w => !/^\d+$/.test(w));
+      .filter(w => !/^\d+$/.test(w)); // Exclure les nombres
 
     const wordCount: Record<string, number> = {};
     
@@ -255,12 +106,14 @@ Répondez au format JSON strictement:
       }
     });
 
+    // Extraire les mots les plus fréquents comme mots-clés
     const keywords = Object.entries(wordCount)
       .filter(([_, count]) => count > 2)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 10)
       .map(([word]) => word);
 
+    // Extraire le sujet principal du titre ou du domaine
     const domain = url.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
     const mainTopic = keywords.length > 0 ? keywords[0] : domain;
     

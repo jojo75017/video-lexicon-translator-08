@@ -211,14 +211,14 @@ const AiWriter: React.FC<AiWriterProps> = ({ keywords, onContentGenerated }) => 
             {socialMode === 'quora' && (
               <>
                 <QuoraStep
-                  title={quoraTitle}
-                  setTitle={setQuoraTitle}
-                  question={quoraQuestion}
-                  setQuestion={setQuoraQuestion}
-                  answer={quoraAnswer}
-                  setAnswer={setQuoraAnswer}
-                  link={quoraLink}
-                  setLink={setQuoraLink}
+                  quoraTitle={quoraTitle}
+                  setQuoraTitle={setQuoraTitle}
+                  quoraQuestion={quoraQuestion}
+                  setQuoraQuestion={setQuoraQuestion}
+                  quoraAnswer={quoraAnswer}
+                  setQuoraAnswer={setQuoraAnswer}
+                  quoraLink={quoraLink}
+                  setQuoraLink={setQuoraLink}
                   onSubmit={handleSubmit}
                 />
                 {showResponse && (

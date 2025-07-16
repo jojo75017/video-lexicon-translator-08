@@ -7,7 +7,7 @@ import {
   LayoutDashboard, 
   Search, 
   BarChart,
-  Users
+  ArrowLeft
 } from 'lucide-react';
 
 const DashboardNavigation = () => {
@@ -32,12 +32,6 @@ const DashboardNavigation = () => {
       path: '/keyword-generator',
       icon: Search,
       description: 'Générateur de mots-clés'
-    },
-    {
-      name: 'Concurrents',
-      path: '/competitor-analysis',
-      icon: Users,
-      description: 'Analyse concurrentielle'
     }
   ];
 
@@ -50,7 +44,6 @@ const DashboardNavigation = () => {
           <div className="flex items-center gap-4">
             <h1 className="text-xl font-bold text-gray-900">
               {currentPath === '/keyword-generator' ? 'Générateur de Mots-Clés' : 
-               currentPath === '/competitor-analysis' ? 'Analyse Concurrentielle' :
                currentPath === '/dashboard' ? 'Dashboard SEO' : 
                'Plateforme SEO'}
             </h1>

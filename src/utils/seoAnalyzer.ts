@@ -1,3 +1,4 @@
+
 import { SeoAnalysis, MetaTagsAnalysis, BacklinkInfo, SocialMetrics } from '@/types/seo';
 import { analyzeImages } from './seo/imageAnalyzer';
 import { analyzeSearchConsoleData } from './seo/searchConsoleAnalyzer';
@@ -9,8 +10,9 @@ import { analyzeSearchConsoleData } from './seo/searchConsoleAnalyzer';
 export const analyzeMetaTags = (htmlContent: string): MetaTagsAnalysis => {
   if (!htmlContent) {
     return {
-      hasTitle: false,
-      hasDescription: false,
+      hasTitleTag: false,
+      hasDescriptionTag: false,
+      hasCanonical: false,
       hasRobotsTag: false,
       hasOpenGraphTags: false,
       titleLength: 0,
@@ -25,18 +27,19 @@ export const analyzeMetaTags = (htmlContent: string): MetaTagsAnalysis => {
   
   // Title analysis
   const titleTag = doc.querySelector('title');
-  const hasTitle = !!titleTag;
+  const hasTitleTag = !!titleTag;
   const titleContent = titleTag?.textContent || '';
   const titleLength = titleContent.length;
   
   // Meta description analysis
   const metaDescription = doc.querySelector('meta[name="description"]');
-  const hasDescription = !!metaDescription;
+  const hasDescriptionTag = !!metaDescription;
   const descriptionContent = metaDescription?.getAttribute('content') || '';
   const descriptionLength = descriptionContent.length;
   
   // Canonical URL analysis
   const canonicalLink = doc.querySelector('link[rel="canonical"]');
+  const hasCanonical = !!canonicalLink;
   const canonicalUrl = canonicalLink?.getAttribute('href') || null;
   
   // Robots tag analysis
@@ -58,8 +61,9 @@ export const analyzeMetaTags = (htmlContent: string): MetaTagsAnalysis => {
   const hasTwitterTags = !!twitterCardTag || !!twitterTitleTag || !!twitterDescriptionTag || !!twitterImageTag;
   
   return {
-    hasTitle,
-    hasDescription,
+    hasTitleTag,
+    hasDescriptionTag,
+    hasCanonical,
     hasRobotsTag,
     hasOpenGraphTags,
     hasTwitterTags,
@@ -144,15 +148,16 @@ export const analyzeSeo = (htmlContent: string, url: string): SeoAnalysis => {
   
   // Mock backlink data (in a real app, this would come from an API)
   const backlinks: BacklinkInfo[] = [
-    { domain: 'example.com', url: 'https://example.com/page1', anchor: 'SEO Tips', dofollow: true, authority: 75, isDoFollow: true },
-    { domain: 'test.org', url: 'https://test.org/resources', anchor: 'Web Tools', dofollow: false, authority: 60, isDoFollow: false }
+    { domain: 'example.com', url: 'https://example.com/page1', anchor: 'SEO Tips', doFollow: true },
+    { domain: 'test.org', url: 'https://test.org/resources', anchor: 'Web Tools', doFollow: false }
   ];
   
   // Mock data for social metrics (would come from social APIs)
   const socialMetrics: SocialMetrics = {
-    shares: 245,
-    likes: 123,
-    comments: 45
+    facebook: { likes: 245, shares: 123, comments: 45, engagements: 413 },
+    twitter: { tweets: 78, retweets: 34, likes: 156 },
+    linkedin: { shares: 56, engagements: 89 },
+    pinterest: { pins: 23, saves: 15 }
   };
   
   // Mock data for social tags
@@ -163,9 +168,7 @@ export const analyzeSeo = (htmlContent: string, url: string): SeoAnalysis => {
     twitterCard: doc.querySelector('meta[name="twitter:card"]')?.getAttribute('content') || null,
     twitterTitle: doc.querySelector('meta[name="twitter:title"]')?.getAttribute('content') || null,
     twitterDescription: doc.querySelector('meta[name="twitter:description"]')?.getAttribute('content') || null,
-    twitterImage: doc.querySelector('meta[name="twitter:image"]')?.getAttribute('content') || null,
-    hasOpenGraph: !!doc.querySelector('meta[property="og:title"]'),
-    hasTwitterCard: !!doc.querySelector('meta[name="twitter:card"]')
+    twitterImage: doc.querySelector('meta[name="twitter:image"]')?.getAttribute('content') || null
   };
   
   // Image details analysis
@@ -176,26 +179,19 @@ export const analyzeSeo = (htmlContent: string, url: string): SeoAnalysis => {
     loadTime: 2100, // ms
     firstContentfulPaint: 900, // ms
     domLoadTime: 1200, // ms
+    resourceCount: 45,
+    score: 82, // out of 100
     speedIndex: 1500,
+    totalBlockingTime: 350,
     largestContentfulPaint: 1800,
     cumulativeLayoutShift: 0.15,
-    timeToInteractive: 2500,
-    totalSize: 1024000,
-    resourceBreakdown: {
-      js: 512000,
-      css: 128000,
-      images: 256000,
-      fonts: 64000,
-      other: 64000
-    },
-    score: 75
+    performanceScore: 80
   };
   
   // Mobile analysis (mock)
   const mobileAnalysis = {
     score: 78,
     isMobileFriendly: true,
-    mobileScore: 78,
     issues: ["Touch elements too close together"]
   };
   
@@ -212,7 +208,7 @@ export const analyzeSeo = (htmlContent: string, url: string): SeoAnalysis => {
     technicalSuggestions.push(`Add alt attributes to ${imgWithoutAlt} images`);
   }
   
-  if (!metaTagsAnalysis.hasDescription) {
+  if (!metaTagsAnalysis.hasDescriptionTag) {
     technicalSuggestions.push("Add a meta description tag");
   }
   
@@ -232,7 +228,7 @@ export const analyzeSeo = (htmlContent: string, url: string): SeoAnalysis => {
   const readabilityScore = Math.floor(Math.random() * 30) + 70; // Mock score between 70-100
   
   // Mock search console data
-  const searchConsoleData = analyzeSearchConsoleData([]);
+  const searchConsoleData = analyzeSearchConsoleData(url);
   
   // Top backlink domains
   const topBacklinkDomains = ['example.com', 'test.org', 'referrer.net'];
@@ -271,7 +267,7 @@ export const analyzeSeo = (htmlContent: string, url: string): SeoAnalysis => {
     noFollowBacklinks: 1,
     socialMetrics,
     socialTags,
-    imagesDetails: imagesDetails.images,
+    imagesDetails,
     performance,
     mobileAnalysis,
     technicalSuggestions,

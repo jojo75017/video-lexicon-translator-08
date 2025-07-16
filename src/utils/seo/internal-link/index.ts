@@ -2,7 +2,6 @@
 // Point d'entrée unique pour l'analyse des liens internes
 
 import type { InternalLinkAnalysis } from "@/types/seo/InternalLinks";
-import { OrphanPage } from "@/types/seo/OrphanPage";
 import { countLinksByContainer, calculateAverageDepth } from "./helper-functions";
 import { processPageMetrics, calculateDepthDistribution, findOrphanedPages } from "./page-metrics";
 import { detectPotentialSilos } from "./silo-detector";
@@ -135,20 +134,13 @@ export function analyzeInternalLinks(htmlContent: string, url: string): Internal
     // Calculate depth distribution
     const depthDistribution = calculateDepthDistribution(pageMetrics);
 
-    // Find orphaned pages - convert to OrphanPage objects
-    const orphanPageUrls = findOrphanedPages(pageMetrics, url);
-    const orphanPages: OrphanPage[] = orphanPageUrls.map(pageUrl => ({
-      url: pageUrl,
-      title: extractTitleFromUrl(pageUrl),
-      lastModified: new Date().toISOString(),
-      pageRank: 0,
-      internalLinks: 0
-    }));
+    // Find orphaned pages
+    const orphanPages = findOrphanedPages(pageMetrics, url);
 
     // Generate recommendations
     const recommendations = generateRecommendations(
       pageMetrics, 
-      orphanPageUrls, 
+      orphanPages, 
       url, 
       contentLinks, 
       internalLinks.length

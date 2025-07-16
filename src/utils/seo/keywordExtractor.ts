@@ -1,90 +1,120 @@
 
-import { KeywordFrequency } from '@/types/seo/KeywordFrequency';
+import { KeywordFrequency } from "@/types/seo/Keyword";
+import { stopWords } from './constants/seoConstants';
 
-export const extractKeywords = (text: string, minLength: number = 3): KeywordFrequency[] => {
-  // Nettoyer le texte
-  const cleanText = text.toLowerCase()
-    .replace(/[^\w\sàâäéèêëïîôöùûüÿç]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-
-  const words = cleanText.split(' ').filter(word => 
-    word.length >= minLength && 
-    !isStopWord(word)
-  );
-
-  const wordCount: Record<string, number> = {};
-  const wordPositions: Record<string, number[]> = {};
-
-  words.forEach((word, index) => {
-    wordCount[word] = (wordCount[word] || 0) + 1;
-    if (!wordPositions[word]) {
-      wordPositions[word] = [];
-    }
-    wordPositions[word].push(index);
-  });
-
-  const totalWords = words.length;
-
-  return Object.entries(wordCount)
-    .map(([keyword, count]) => ({
-      keyword,
-      count,
-      frequency: count / totalWords,
-      density: (count / totalWords) * 100,
-      position: wordPositions[keyword][0]
-    }))
-    .sort((a, b) => b.count - a.count);
-};
-
-const isStopWord = (word: string): boolean => {
-  const stopWords = [
-    'le', 'de', 'et', 'à', 'un', 'il', 'être', 'et', 'en', 'avoir', 'que', 'pour',
-    'dans', 'ce', 'son', 'une', 'sur', 'avec', 'ne', 'se', 'pas', 'tout', 'plus',
-    'par', 'grand', 'en', 'être', 'et', 'en', 'avoir', 'que', 'pour', 'dans'
-  ];
-  return stopWords.includes(word);
-};
-
-export const generateKeywordSuggestions = (keywords: KeywordFrequency[], limit: number = 10) => {
-  return keywords
-    .slice(0, limit)
-    .map(kw => ({
-      keyword: kw.keyword,
-      searchVolume: Math.floor(Math.random() * 10000) + 100,
-      competition: Math.random(),
-      difficulty: Math.floor(Math.random() * 100),
-      relevance: Math.min(kw.frequency * 100, 100)
-    }));
-};
-
-export const analyzeKeywordDensity = (keywords: KeywordFrequency[], targetKeyword?: string) => {
-  const target = targetKeyword?.toLowerCase();
-  const targetData = target ? keywords.find(k => k.keyword === target) : null;
-  
-  return {
-    totalKeywords: keywords.length,
-    topKeywords: keywords.slice(0, 5),
-    targetKeywordDensity: targetData?.density || 0,
-    recommendations: generateDensityRecommendations(keywords, targetData)
-  };
-};
-
-const generateDensityRecommendations = (keywords: KeywordFrequency[], targetData: KeywordFrequency | null): string[] => {
-  const recommendations = [];
-  
-  if (targetData) {
-    if (targetData.density < 0.5) {
-      recommendations.push(`Augmenter la densité du mot-clé principal "${targetData.keyword}" (actuellement ${targetData.density.toFixed(2)}%)`);
-    } else if (targetData.density > 3) {
-      recommendations.push(`Réduire la densité du mot-clé principal "${targetData.keyword}" (actuellement ${targetData.density.toFixed(2)}%)`);
-    }
+/**
+ * Extraie les mots-clés les plus importants d'un contenu HTML
+ * @param htmlContent Le contenu HTML de la page à analyser
+ * @returns Une liste de mots-clés avec leur fréquence et densité
+ */
+export const extractKeywordsFromHtml = (htmlContent: string): KeywordFrequency[] => {
+  if (!htmlContent || htmlContent.length === 0) {
+    console.warn("Contenu HTML vide pour l'extraction de mots-clés");
+    return [];
   }
-  
-  const highDensityWords = keywords.filter(k => k.density > 5);
-  if (highDensityWords.length > 0) {
-    recommendations.push('Réduire la sur-optimisation de certains mots-clés');
+
+  try {
+    // Nettoyer le HTML pour extraire uniquement le texte
+    const textContent = htmlContent
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .toLowerCase()
+      .trim();
+
+    // Diviser le texte en mots
+    const words = textContent.split(/\s+/);
+    const totalWords = words.length;
+    
+    // Compter la fréquence des mots et des expressions
+    const keywordFrequency: Record<string, number> = {};
+    
+    // Parcourir les mots pour extraire mots simples et expressions
+    for (let i = 0; i < words.length; i++) {
+      const word = words[i].replace(/[^\w\sàáâäæçèéêëìíîïòóôöùúûüÿ-]/g, '');
+      
+      // Ne prendre en compte que les mots significatifs (plus de 3 caractères et pas dans les stop words)
+      if (word.length > 3 && !stopWords.has(word)) {
+        keywordFrequency[word] = (keywordFrequency[word] || 0) + 1;
+        
+        // Expressions de deux mots
+        if (i < words.length - 1) {
+          const word2 = words[i + 1].replace(/[^\w\sàáâäæçèéêëìíîïòóôöùúûüÿ-]/g, '');
+          if (word2.length > 3 && !stopWords.has(word2)) {
+            const phrase = `${word} ${word2}`;
+            keywordFrequency[phrase] = (keywordFrequency[phrase] || 0) + 1;
+          }
+          
+          // Expressions de trois mots
+          if (i < words.length - 2) {
+            const word3 = words[i + 2].replace(/[^\w\sàáâäæçèéêëìíîïòóôöùúûüÿ-]/g, '');
+            if (word3.length > 3 && !stopWords.has(word3)) {
+              const phrase = `${word} ${word2} ${word3}`;
+              keywordFrequency[phrase] = (keywordFrequency[phrase] || 0) + 1;
+            }
+          }
+        }
+      }
+    }
+    
+    // Convertir les résultats en tableau et trier par fréquence
+    const keywords: KeywordFrequency[] = Object.entries(keywordFrequency)
+      .filter(([_, count]) => count > 1) // Filtrer les occurrences uniques
+      .map(([keyword, count], index) => ({
+        keyword,
+        count,
+        density: (count / totalWords) * 100,
+        position: index + 1
+      }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 20); // Garder les 20 mots-clés les plus fréquents
+    
+    return keywords;
+  } catch (error) {
+    console.error("Erreur lors de l'extraction des mots-clés:", error);
+    return [];
   }
-  
-  return recommendations;
+};
+
+/**
+ * Transforme les mots-clés extraits en suggestions enrichies
+ */
+export const enrichKeywords = (keywords: KeywordFrequency[]): KeywordSuggestion[] => {
+  return keywords.map(kw => ({
+    keyword: kw.keyword,
+    volume: Math.floor(Math.random() * 5000) + 500, // Données fictives pour la démo
+    difficulty: Math.floor(Math.random() * 100),
+    relevance: Math.min(100, kw.count * 10),
+    searchVolume: Math.floor(Math.random() * 5000) + 500,
+    cpc: parseFloat((Math.random() * 5).toFixed(2)),
+    competition: parseFloat(Math.random().toFixed(2)),
+    suggestedTitle: `${kw.keyword} - Guide Complet | Informations et Conseils ${new Date().getFullYear()}`,
+    suggestedDescription: `Découvrez tout sur ${kw.keyword}. Guide complet avec conseils d'experts, astuces et informations pratiques pour optimiser votre stratégie.`
+  }));
+};
+
+/**
+ * Fonction principale pour extraire et enrichir les mots-clés d'un site web
+ */
+export const analyzeWebsiteKeywords = async (url: string): Promise<KeywordSuggestion[]> => {
+  try {
+    console.log(`Extraction des mots-clés pour: ${url}`);
+    
+    // Récupérer le contenu HTML de la page
+    const response = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`);
+    const html = await response.text();
+    
+    // Extraire les mots-clés bruts
+    const extractedKeywords = extractKeywordsFromHtml(html);
+    
+    // Enrichir les mots-clés avec des données supplémentaires
+    const enrichedKeywords = enrichKeywords(extractedKeywords);
+    
+    console.log(`Extraction terminée: ${enrichedKeywords.length} mots-clés trouvés`);
+    return enrichedKeywords;
+  } catch (error) {
+    console.error("Erreur lors de l'analyse des mots-clés:", error);
+    return [];
+  }
 };
