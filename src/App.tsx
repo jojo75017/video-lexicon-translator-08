@@ -14,6 +14,7 @@ import PinterestPage from './pages/PinterestPage';
 import KeywordGeneratorPage from './pages/KeywordGeneratorPage';
 import SignaturePage from './pages/SignaturePage';
 import CompetitorAnalysisPage from './pages/CompetitorAnalysisPage';
+import SeoGeneratorPage from './pages/SeoGeneratorPage';
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ const App = () => (
         <Route path="/keyword-generator" element={<KeywordGeneratorPage />} />
         <Route path="/signature" element={<SignaturePage />} />
         <Route path="/competitor-analysis" element={<CompetitorAnalysisPage />} />
+        <Route path="/seo-generator" element={<SeoGeneratorPage />} />
       </Routes>
       <Toaster />
     </TooltipProvider>

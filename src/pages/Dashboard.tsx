@@ -30,6 +30,13 @@ const Dashboard: React.FC = () => {
       color: 'from-purple-500 to-purple-600'
     },
     {
+      title: 'Générateur SEO',
+      description: 'Créez du contenu SEO optimisé',
+      icon: TrendingUp,
+      path: '/seo-generator',
+      color: 'from-indigo-500 to-indigo-600'
+    },
+    {
       title: 'Hiérarchie',
       description: 'Structure de votre site',
       icon: Globe,
