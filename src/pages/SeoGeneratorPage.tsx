@@ -103,35 +103,30 @@ const SeoGeneratorPage: React.FC = () => {
         };
         setExtractedData(extractedInfo);
         
-        // Pré-remplir le formulaire avec les données extraites
+        // Pré-remplir le formulaire avec les données extraites SANS marketing
         setFormData(prev => ({
           ...prev,
-          title: title || `SEO Optimisé pour ${urlToAnalyze}`,
-          description: description || `Optimisation SEO complète pour améliorer le référencement de votre site web.`,
-          keywords: keywords || 'seo, référencement, optimisation, web',
-          h1: h1 || title || 'Titre Principal SEO',
-          h2Tags: h2Elements.length > 0 ? h2Elements : ['Section Important', 'Avantages Clés'],
+          title: title || prev.title, // Garder titre original ou existant
+          description: description || prev.description, // Garder description originale 
+          keywords: keywords || prev.keywords, // Garder mots-clés originaux
+          h1: h1 || prev.h1, // Garder H1 original
+          h2Tags: h2Elements.length > 0 ? h2Elements : prev.h2Tags, // Garder H2 originaux
           targetUrl: urlToAnalyze,
           canonical: urlToAnalyze,
         }));
         
-        toast.success('Analyse terminée ! Données extraites et suggestions générées.');
+        toast.success("Analyse terminée ! Données réelles extraites du site.");
       } else {
         throw new Error('Impossible d\'extraire le contenu');
       }
     } catch (error) {
       console.error('Erreur analyse URL:', error);
-      toast.error('Erreur lors de l\'analyse. Formulaire pré-rempli avec des données par défaut.');
+      toast.error("Erreur lors de l'analyse. Impossible d'extraire les données.");
       
-      // Pré-remplir avec des données par défaut basées sur l'URL
-      const domain = new URL(urlToAnalyze).hostname;
+      // Ne pas pré-remplir avec du contenu marketing générique
+      // Juste mettre à jour l'URL cible
       setFormData(prev => ({
         ...prev,
-        title: `Guide SEO Complet pour ${domain} - Optimisation 2024`,
-        description: `Découvrez comment optimiser ${domain} pour les moteurs de recherche avec notre guide SEO complet et nos techniques avancées.`,
-        keywords: `${domain}, seo, référencement, optimisation, marketing digital`,
-        h1: `Optimisation SEO pour ${domain}`,
-        h2Tags: ['Stratégie SEO', 'Mots-clés ciblés', 'Optimisation technique', 'Contenu de qualité'],
         targetUrl: urlToAnalyze,
         canonical: urlToAnalyze,
       }));
