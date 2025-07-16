@@ -6,7 +6,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import DashboardPage from "./pages/DashboardPage";
 import KeywordGeneratorPage from "./pages/KeywordGeneratorPage";
-import CompetitorAnalysisPage from "./pages/CompetitorAnalysisPage";
+import CompetitorAnalysisPage from "./pages/CompetitorAnalysisPageFixed";
 
 const queryClient = new QueryClient();
 
