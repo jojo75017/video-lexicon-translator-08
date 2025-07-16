@@ -26,7 +26,9 @@ const TitleGeneratorPage: React.FC = () => {
     { id: 'voyage', name: 'Voyage & Tourisme', icon: '✈️', color: 'bg-cyan-500' },
     { id: 'cuisine', name: 'Cuisine & Gastronomie', icon: '🍳', color: 'bg-orange-500' },
     { id: 'immobilier', name: 'Immobilier', icon: '🏠', color: 'bg-red-500' },
-    { id: 'sport', name: 'Sport & Fitness', icon: '⚽', color: 'bg-green-600' }
+    { id: 'sport', name: 'Sport & Fitness', icon: '⚽', color: 'bg-green-600' },
+    { id: 'peche', name: 'Pêche', icon: '🎣', color: 'bg-teal-500' },
+    { id: 'aquariophilie', name: 'Aquariophilie', icon: '🐠', color: 'bg-blue-600' }
   ];
 
   const titleTemplates = {
@@ -99,6 +101,20 @@ const TitleGeneratorPage: React.FC = () => {
       "Nutrition et {keyword} : Optimiser ses performances",
       "{keyword} à domicile : Équipement minimal requis",
       "Records {keyword} : Techniques des champions"
+    ],
+    peche: [
+      "Guide {keyword} : Techniques secrètes des pros révélées",
+      "{keyword} pour débutants : Éviter les erreurs coûteuses",
+      "Meilleurs spots de {keyword} près de chez vous",
+      "{keyword} : Matériel indispensable selon les experts",
+      "Réglementation {keyword} 2024 : Ce qui change"
+    ],
+    aquariophilie: [
+      "{keyword} : Guide complet pour aquarium parfait",
+      "Élever {keyword} avec succès : Conseils d'experts",
+      "{keyword} pour débutants : Éviter la mortalité",
+      "Reproduction {keyword} : Techniques qui marchent",
+      "Aquarium {keyword} : Budget et équipement optimal"
     ]
   };
 
