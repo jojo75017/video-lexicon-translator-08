@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BarChart3, Search, Globe, TrendingUp } from 'lucide-react';
+import { BarChart3, Search, Globe, TrendingUp, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Dashboard: React.FC = () => {
@@ -35,6 +35,13 @@ const Dashboard: React.FC = () => {
       icon: Globe,
       path: '/hierarchy',
       color: 'from-orange-500 to-orange-600'
+    },
+    {
+      title: 'Analyse Concurrentielle',
+      description: 'Analysez vos concurrents en détail',
+      icon: Users,
+      path: '/competitor-analysis',
+      color: 'from-red-500 to-red-600'
     }
   ];
 
@@ -45,7 +52,7 @@ const Dashboard: React.FC = () => {
           🚀 Tableau de Bord SEO
         </h1>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((feature) => (
             <Card key={feature.title} className="group hover:shadow-lg transition-all duration-300 cursor-pointer">
               <CardHeader>
