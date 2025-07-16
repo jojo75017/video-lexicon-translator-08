@@ -61,8 +61,7 @@ const KeywordStep: React.FC<KeywordStepProps> = ({
 
   const validateApiKey = async (key: string) => {
     try {
-      const openAIService = new OpenAIService(key);
-      const isValid = await openAIService.validateApiKey();
+      const isValid = await OpenAIService.validateApiKey(key);
       setApiKeyStatus(isValid ? 'valid' : 'invalid');
       if (isValid) {
         toast.success("Clé API validée avec succès");

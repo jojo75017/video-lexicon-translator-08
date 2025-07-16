@@ -52,8 +52,7 @@ const BlogOutlineGenerator = () => {
 
     setIsGenerating(true);
     try {
-      const openAIService = new OpenAIService(apiKey);
-      const blogOutline = await openAIService.generateBlogOutline(keyword);
+      const blogOutline = await OpenAIService.generateBlogOutline(keyword, [], apiKey);
       
       setOutline(blogOutline);
       toast.success('Plan d\'article généré avec succès !');

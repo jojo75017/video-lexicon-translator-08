@@ -5,8 +5,7 @@ import { OpenAIService } from '@/utils/seo/openaiService';
 
 export const validateOpenAIApiKey = async (apiKey: string): Promise<boolean> => {
   try {
-    const openAIService = new OpenAIService(apiKey);
-    return await openAIService.validateApiKey();
+    return await OpenAIService.validateApiKey(apiKey);
   } catch (error) {
     return false;
   }
