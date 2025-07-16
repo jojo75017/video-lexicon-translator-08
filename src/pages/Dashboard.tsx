@@ -63,6 +63,13 @@ const Dashboard: React.FC = () => {
       icon: Search,
       path: '/robots-txt',
       color: 'from-cyan-500 to-cyan-600'
+    },
+    {
+      title: 'Crawler SEO par Alyze',
+      description: 'Analyseur de site web SEO complet',
+      icon: Globe,
+      path: '/crawler',
+      color: 'from-emerald-500 to-emerald-600'
     }
   ];
 
