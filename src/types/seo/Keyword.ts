@@ -7,12 +7,16 @@ export interface KeywordFrequency {
 
 export interface KeywordData {
   keyword: string;
-  volume: number;
-  difficulty: number;
+  volume?: number;
+  difficulty?: number;
   cpc?: number;
   competition?: number;
   intent?: KeywordIntent;
   trends?: number[];
+  frequency: number;
+  density?: number;
+  count?: number;
+  position?: number;
 }
 
 export interface KeywordSuggestion {
@@ -26,7 +30,7 @@ export interface KeywordSuggestion {
   clicks?: number;
   searchVolume?: number;
   relevance?: number;
-  type?: 'primary' | 'longtail' | 'competitor' | 'semantic';
+  type?: 'primary' | 'longtail' | 'competitor' | 'semantic' | 'ai-generated' | 'long-tail' | 'question';
   opportunity?: number;
   suggestedTitle?: string;
   suggestedDescription?: string;

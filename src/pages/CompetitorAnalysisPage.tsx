@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import AdvancedCompetitorAnalyzer from '@/components/seo/competitor/AdvancedCompetitorAnalyzer';
+import SectorSpecificAnalyzer from '@/components/seo/competitor/SectorSpecificAnalyzer';
 
 const CompetitorAnalysisPage = () => {
   return (
@@ -52,7 +53,11 @@ const CompetitorAnalysisPage = () => {
             </div>
           </div>
           
-          <AdvancedCompetitorAnalyzer />
+        <SectorSpecificAnalyzer 
+          urls={[]} 
+          onAnalysisComplete={(results) => console.log('Analyse terminée:', results)}
+        />
+        <AdvancedCompetitorAnalyzer />
         </Card>
       </div>
     </div>
