@@ -55,6 +55,17 @@ const SeoGeneratorPage: React.FC = () => {
         const h1 = doc.querySelector('h1')?.textContent || '';
         const h2Elements = Array.from(doc.querySelectorAll('h2')).map(h2 => h2.textContent || '');
         
+        // Stocker les données extraites pour l'affichage
+        const extractedInfo = {
+          title,
+          description,
+          keywords,
+          h1,
+          h2Elements,
+          url: urlToAnalyze
+        };
+        setExtractedData(extractedInfo);
+        
         // Pré-remplir le formulaire avec les données extraites
         setFormData(prev => ({
           ...prev,
@@ -234,6 +245,8 @@ ${formData.h2Tags.filter(h2 => h2.trim()).map(h2 => `<h2>${h2}</h2>`).join('\n')
     toast.success('Copié dans le presse-papiers !');
   };
 
+  const [extractedData, setExtractedData] = useState<any>(null);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -287,6 +300,52 @@ ${formData.h2Tags.filter(h2 => h2.trim()).map(h2 => `<h2>${h2}</h2>`).join('\n')
             </p>
           </CardContent>
         </Card>
+
+        {/* Extracted Data Display */}
+        {extractedData && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                Données extraites de {extractedData.url}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <h4 className="font-medium text-sm mb-2">Titre de la page</h4>
+                  <p className="text-sm bg-muted p-2 rounded">{extractedData.title || 'Non trouvé'}</p>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium text-sm mb-2">Meta Description</h4>
+                  <p className="text-sm bg-muted p-2 rounded">{extractedData.description || 'Non trouvée'}</p>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium text-sm mb-2">H1 Principal</h4>
+                  <p className="text-sm bg-muted p-2 rounded">{extractedData.h1 || 'Non trouvé'}</p>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium text-sm mb-2">Mots-clés Meta</h4>
+                  <p className="text-sm bg-muted p-2 rounded">{extractedData.keywords || 'Non trouvés'}</p>
+                </div>
+                
+                {extractedData.h2Elements && extractedData.h2Elements.length > 0 && (
+                  <div className="md:col-span-2">
+                    <h4 className="font-medium text-sm mb-2">Titres H2 détectés</h4>
+                    <div className="space-y-1">
+                      {extractedData.h2Elements.map((h2, index) => (
+                        <p key={index} className="text-sm bg-muted p-2 rounded">{h2}</p>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Configuration Panel */}
