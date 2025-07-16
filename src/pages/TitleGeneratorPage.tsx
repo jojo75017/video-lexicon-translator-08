@@ -114,13 +114,52 @@ const TitleGeneratorPage: React.FC = () => {
       // Utiliser les templates selon la thématique
       const templates = titleTemplates[selectedThematic] || titleTemplates.technologie;
       
+      // Fonction pour générer le slug
+      const generateSlug = (title: string) => {
+        return title
+          .toLowerCase()
+          .replace(/[àáâãäå]/g, 'a')
+          .replace(/[èéêë]/g, 'e')
+          .replace(/[ìíîï]/g, 'i')
+          .replace(/[òóôõö]/g, 'o')
+          .replace(/[ùúûü]/g, 'u')
+          .replace(/[çc]/g, 'c')
+          .replace(/[^a-z0-9\s-]/g, '')
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-')
+          .trim();
+      };
+
+      // Fonction pour générer la meta description
+      const generateMetaDescription = (title: string, thematic: string) => {
+        const descriptions = {
+          'technologie': `Découvrez ${keyword} et révolutionnez votre approche technologique. Guide complet avec conseils d'experts et solutions pratiques.`,
+          'sante': `Tout savoir sur ${keyword} pour améliorer votre santé. Conseils médicaux validés et solutions naturelles efficaces.`,
+          'finance': `Investir dans ${keyword} en 2024 : stratégies gagnantes, conseils d'experts et analyses de marché détaillées.`,
+          'marketing': `Boostez votre marketing avec ${keyword}. Stratégies éprouvées pour augmenter vos conversions et votre ROI.`,
+          'lifestyle': `${keyword} tendance 2024 : guide complet pour adopter le style parfait. Conseils d'experts et inspirations mode.`,
+          'education': `Maîtrisez ${keyword} rapidement avec notre formation complète. Méthodes éprouvées et ressources gratuites.`,
+          'voyage': `Voyager à ${keyword} : guide complet avec conseils pratiques, bons plans et destinations incontournables.`,
+          'cuisine': `Recettes ${keyword} authentiques et modernes. Techniques de chef et secrets culinaires révélés.`,
+          'immobilier': `Investissement ${keyword} 2024 : analyse de marché, conseils d'experts et opportunités rentables.`,
+          'sport': `Programme ${keyword} efficace : techniques d'experts, nutrition optimale et résultats garantis.`
+        };
+        return descriptions[thematic] || `Découvrez tout sur ${keyword} avec notre guide complet. Conseils d'experts et solutions pratiques.`;
+      };
+
       // Générer des variantes avec le mot-clé
       const generatedVariants = templates.map((template, index) => {
         const title = template.replace(/{keyword}/g, keyword);
+        const selectedThematicData = thematics.find(t => t.id === selectedThematic);
         
         return {
           id: index + 1,
           title: title,
+          titleTag: title.length > 60 ? title.substring(0, 57) + '...' : title,
+          metaDescription: generateMetaDescription(title, selectedThematic),
+          keyword: keyword,
+          category: selectedThematicData?.name || 'Général',
+          slug: generateSlug(title),
           searchVolume: Math.floor(Math.random() * 10000) + 500,
           difficulty: Math.floor(Math.random() * 100) + 1,
           ctr: (Math.random() * 15 + 2).toFixed(1),
@@ -134,6 +173,11 @@ const TitleGeneratorPage: React.FC = () => {
         {
           id: 6,
           title: `${keyword} en 2024 : Tout ce qui va changer`,
+          titleTag: `${keyword} 2024 : Nouveautés et Évolutions`,
+          metaDescription: `Découvrez les dernières évolutions de ${keyword} en 2024. Tendances, innovations et prédictions d'experts.`,
+          keyword: keyword,
+          category: thematics.find(t => t.id === selectedThematic)?.name || 'Général',
+          slug: generateSlug(`${keyword} 2024 nouveautes evolutions`),
           searchVolume: Math.floor(Math.random() * 5000) + 1000,
           difficulty: Math.floor(Math.random() * 80) + 20,
           ctr: (Math.random() * 12 + 3).toFixed(1),
@@ -143,6 +187,11 @@ const TitleGeneratorPage: React.FC = () => {
         {
           id: 7,
           title: `${keyword} : Erreurs fatales que 90% font`,
+          titleTag: `${keyword} : Top 10 Erreurs à Éviter Absolument`,
+          metaDescription: `Évitez les erreurs courantes avec ${keyword}. Guide pratique pour optimiser vos résultats et éviter les pièges.`,
+          keyword: keyword,
+          category: thematics.find(t => t.id === selectedThematic)?.name || 'Général',
+          slug: generateSlug(`${keyword} erreurs fatales eviter`),
           searchVolume: Math.floor(Math.random() * 8000) + 500,
           difficulty: Math.floor(Math.random() * 70) + 15,
           ctr: (Math.random() * 18 + 5).toFixed(1),
@@ -152,6 +201,11 @@ const TitleGeneratorPage: React.FC = () => {
         {
           id: 8,
           title: `Avis ${keyword} : Test complet et honnête`,
+          titleTag: `Avis ${keyword} 2024 : Test Complet et Objectif`,
+          metaDescription: `Test complet de ${keyword} : avantages, inconvénients et recommandations d'experts. Avis objectif et détaillé.`,
+          keyword: keyword,
+          category: thematics.find(t => t.id === selectedThematic)?.name || 'Général',
+          slug: generateSlug(`avis ${keyword} test complet honnete`),
           searchVolume: Math.floor(Math.random() * 6000) + 800,
           difficulty: Math.floor(Math.random() * 60) + 25,
           ctr: (Math.random() * 14 + 4).toFixed(1),
@@ -302,11 +356,50 @@ const TitleGeneratorPage: React.FC = () => {
                           </Badge>
                         </div>
 
+                        {/* Éléments SEO */}
+                        <div className="bg-green-50 p-4 rounded-lg mb-4">
+                          <h4 className="font-medium text-gray-900 mb-3">🔍 Éléments SEO :</h4>
+                          <div className="space-y-3 text-sm">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <label className="font-medium text-gray-700">Balise Title :</label>
+                                <div className="mt-1 p-2 bg-white rounded border text-gray-800">
+                                  {titleData.titleTag}
+                                </div>
+                              </div>
+                              <div>
+                                <label className="font-medium text-gray-700">Mot-clé principal :</label>
+                                <div className="mt-1 p-2 bg-white rounded border text-gray-800">
+                                  {titleData.keyword}
+                                </div>
+                              </div>
+                              <div>
+                                <label className="font-medium text-gray-700">Catégorie :</label>
+                                <div className="mt-1 p-2 bg-white rounded border text-gray-800">
+                                  {titleData.category}
+                                </div>
+                              </div>
+                              <div>
+                                <label className="font-medium text-gray-700">Slug URL :</label>
+                                <div className="mt-1 p-2 bg-white rounded border text-gray-800 font-mono text-xs">
+                                  {titleData.slug}
+                                </div>
+                              </div>
+                            </div>
+                            <div>
+                              <label className="font-medium text-gray-700">Meta Description :</label>
+                              <div className="mt-1 p-2 bg-white rounded border text-gray-800">
+                                {titleData.metaDescription}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
                         {/* Proposition d'article */}
                         <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg mb-4">
                           <h4 className="font-medium text-gray-900 mb-2">📝 Proposition d'article :</h4>
                           <div className="text-sm text-gray-700 space-y-2">
-                            <p><strong>Introduction :</strong> Contextualiser le sujet avec des statistiques actuelles sur {keyword}.</p>
+                            <p><strong>Introduction :</strong> Contextualiser le sujet avec des statistiques actuelles sur {titleData.keyword}.</p>
                             <p><strong>Problème :</strong> Identifier les défis principaux que rencontrent les lecteurs.</p>
                             <p><strong>Solution :</strong> Présenter votre approche unique avec des exemples concrets.</p>
                             <p><strong>Preuves :</strong> Études de cas, témoignages ou données chiffrées.</p>
@@ -367,12 +460,56 @@ const TitleGeneratorPage: React.FC = () => {
                           variant="default"
                           size="sm"
                           onClick={() => {
-                            const articleOutline = `TITRE: ${titleData.title}\n\nSTRUCTURE D'ARTICLE:\n\n1. Introduction (150 mots)\n2. Contexte et enjeux actuels\n3. Solutions pratiques\n4. Exemples concrets\n5. FAQ\n6. Conclusion avec CTA\n\nMOTS-CLÉS: ${keyword}, [mots-clés secondaires]\nOBJECTIF: ${titleData.searchVolume.toLocaleString()} recherches/mois`;
+                            const articleOutline = `=== ARTICLE SEO COMPLET ===
+
+TITRE H1: ${titleData.title}
+BALISE TITLE: ${titleData.titleTag}
+META DESCRIPTION: ${titleData.metaDescription}
+MOT-CLÉ PRINCIPAL: ${titleData.keyword}
+CATÉGORIE: ${titleData.category}
+SLUG URL: ${titleData.slug}
+
+=== STRUCTURE D'ARTICLE ===
+
+1. Introduction (150 mots)
+   - Hook avec statistique sur ${titleData.keyword}
+   - Problématique principale
+   - Annonce du plan
+
+2. Contexte et enjeux actuels (300 mots)
+   - État du marché ${titleData.keyword}
+   - Défis rencontrés
+   - Opportunités
+
+3. Solutions pratiques (400 mots)
+   - Méthodes éprouvées
+   - Étapes détaillées
+   - Conseils d'experts
+
+4. Exemples concrets (300 mots)
+   - Études de cas
+   - Témoignages
+   - Résultats chiffrés
+
+5. FAQ (200 mots)
+   - 5-8 questions fréquentes
+   - Réponses complètes
+
+6. Conclusion avec CTA (100 mots)
+   - Récapitulatif des points clés
+   - Appel à l'action
+
+=== SEO INFO ===
+Volume de recherche: ${titleData.searchVolume.toLocaleString()}/mois
+Difficulté: ${titleData.difficulty}/100
+CTR estimé: ${titleData.ctr}%
+Type de contenu: ${titleData.type}
+Angle: ${titleData.angle}`;
                             navigator.clipboard.writeText(articleOutline);
-                            toast.success('Plan d\'article copié !');
+                            toast.success('Plan d\'article SEO complet copié !');
                           }}
                         >
-                          📋 Plan
+                          📋 Plan SEO
                         </Button>
                       </div>
                     </div>
