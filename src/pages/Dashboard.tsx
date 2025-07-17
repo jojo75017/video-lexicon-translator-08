@@ -65,8 +65,8 @@ const Dashboard: React.FC = () => {
       color: 'from-cyan-500 to-cyan-600'
     },
     {
-      title: 'Crawler SEO par Alyze',
-      description: 'Analyseur de site web SEO complet',
+      title: 'Crawler SEO par Georges Boubet',
+      description: 'Analyseur de site web SEO',
       icon: Globe,
       path: '/crawler',
       color: 'from-emerald-500 to-emerald-600'
