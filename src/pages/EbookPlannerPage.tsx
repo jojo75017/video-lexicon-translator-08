@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { BookOpen, Plus, Trash2, FileText } from 'lucide-react';
+import { BookOpen, Plus, Trash2, FileText, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Chapter {
@@ -23,6 +23,7 @@ const EbookPlannerPage: React.FC = () => {
   const [authorName, setAuthorName] = useState('');
   const [preface, setPreface] = useState('');
   const [chapters, setChapters] = useState<Chapter[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const addChapter = () => {
     const newChapter: Chapter = {
@@ -76,6 +77,81 @@ const EbookPlannerPage: React.FC = () => {
     ));
   };
 
+  const generateAutomaticPlan = async () => {
+    if (!ebookTitle) {
+      toast.error('Veuillez entrer un titre ou mot-clé pour votre ebook');
+      return;
+    }
+
+    setIsGenerating(true);
+    
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer sk-' // L'utilisateur devra ajouter sa clé API
+        },
+        body: JSON.stringify({
+          model: 'gpt-4',
+          messages: [{
+            role: 'user',
+            content: `Crée un plan détaillé d'ebook sur le sujet: "${ebookTitle}". 
+            
+            Génère:
+            1. Un nom d'auteur approprié
+            2. Une préface courte et engageante (2-3 phrases)
+            3. 8-12 chapitres avec des titres accrocheurs
+            4. 3-5 sous-chapitres pour chaque chapitre
+            
+            Réponds uniquement au format JSON:
+            {
+              "author": "Nom de l'auteur",
+              "preface": "Texte de la préface",
+              "chapters": [
+                {
+                  "title": "Titre du chapitre",
+                  "subChapters": ["Sous-chapitre 1", "Sous-chapitre 2", ...]
+                }
+              ]
+            }`
+          }],
+          temperature: 0.7,
+          max_tokens: 2000
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur lors de la génération');
+      }
+
+      const data = await response.json();
+      const planData = JSON.parse(data.choices[0].message.content);
+      
+      // Remplir automatiquement tous les champs
+      setAuthorName(planData.author);
+      setPreface(planData.preface);
+      
+      const generatedChapters = planData.chapters.map((chapter: any, index: number) => ({
+        id: (Date.now() + index).toString(),
+        title: chapter.title,
+        subChapters: chapter.subChapters.map((sub: string, subIndex: number) => ({
+          id: (Date.now() + index * 100 + subIndex).toString(),
+          title: sub
+        }))
+      }));
+      
+      setChapters(generatedChapters);
+      toast.success('Plan d\'ebook généré automatiquement !');
+      
+    } catch (error) {
+      console.error('Erreur:', error);
+      toast.error('Erreur lors de la génération. Veuillez vérifier votre clé API OpenAI.');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const generatePlan = () => {
     if (!ebookTitle || !authorName || chapters.length === 0) {
       toast.error('Veuillez remplir au minimum le titre, l\'auteur et ajouter des chapitres');
@@ -125,12 +201,23 @@ const EbookPlannerPage: React.FC = () => {
             <CardContent className="space-y-4">
               <div>
                 <Label htmlFor="title">Titre de l'ebook</Label>
-                <Input
-                  id="title"
-                  placeholder="Entrez le titre de votre ebook"
-                  value={ebookTitle}
-                  onChange={(e) => setEbookTitle(e.target.value)}
-                />
+                <div className="flex gap-2">
+                  <Input
+                    id="title"
+                    placeholder="Entrez le titre ou mot-clé de votre ebook"
+                    value={ebookTitle}
+                    onChange={(e) => setEbookTitle(e.target.value)}
+                    className="flex-1"
+                  />
+                  <Button 
+                    onClick={generateAutomaticPlan}
+                    disabled={isGenerating || !ebookTitle}
+                    size="sm"
+                  >
+                    <Wand2 className="h-4 w-4 mr-1" />
+                    {isGenerating ? 'Génération...' : 'Générer auto'}
+                  </Button>
+                </div>
               </div>
               
               <div>
