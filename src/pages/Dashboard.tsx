@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BarChart3, Search, Globe, TrendingUp, Users, Lightbulb } from 'lucide-react';
+import { BarChart3, Search, Globe, TrendingUp, Users, Lightbulb, BookOpen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Dashboard: React.FC = () => {
@@ -70,6 +70,13 @@ const Dashboard: React.FC = () => {
       icon: Globe,
       path: '/crawler',
       color: 'from-emerald-500 to-emerald-600'
+    },
+    {
+      title: 'Générateur de Plan d\'Ebook',
+      description: 'Créez des plans détaillés pour vos ebooks avec sommaire',
+      icon: BookOpen,
+      path: '/ebook-planner',
+      color: 'from-purple-500 to-purple-600'
     }
   ];
 
