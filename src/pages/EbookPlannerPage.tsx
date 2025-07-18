@@ -107,8 +107,8 @@ const EbookPlannerPage: React.FC = () => {
             Génère:
             1. Un nom d'auteur approprié
             2. Une préface courte et engageante (2-3 phrases)
-            3. 8-12 chapitres avec des titres accrocheurs
-            4. 3-5 sous-chapitres pour chaque chapitre
+            3. Entre 5 et 20 chapitres avec des titres accrocheurs
+            4. 2-4 sous-chapitres pour chaque chapitre
             
             Réponds uniquement au format JSON:
             {
