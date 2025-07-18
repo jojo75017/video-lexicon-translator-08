@@ -24,6 +24,7 @@ const EbookPlannerPage: React.FC = () => {
   const [preface, setPreface] = useState('');
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [apiKey, setApiKey] = useState(localStorage.getItem('openai_api_key') || '');
 
   const addChapter = () => {
     const newChapter: Chapter = {
@@ -83,6 +84,11 @@ const EbookPlannerPage: React.FC = () => {
       return;
     }
 
+    if (!apiKey) {
+      toast.error('Veuillez configurer votre clé API OpenAI');
+      return;
+    }
+
     setIsGenerating(true);
     
     try {
@@ -90,7 +96,7 @@ const EbookPlannerPage: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer sk-' // L'utilisateur devra ajouter sa clé API
+          'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
           model: 'gpt-4',
@@ -191,6 +197,33 @@ const EbookPlannerPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Formulaire de création */}
         <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Configuration</CardTitle>
+              <CardDescription>
+                Pour utiliser la génération automatique, configurez votre clé API OpenAI
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div>
+                <Label htmlFor="apikey">Clé API OpenAI</Label>
+                <Input
+                  id="apikey"
+                  type="password"
+                  placeholder="sk-..."
+                  value={apiKey}
+                  onChange={(e) => {
+                    setApiKey(e.target.value);
+                    localStorage.setItem('openai_api_key', e.target.value);
+                  }}
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Obtenez votre clé sur <a href="https://platform.openai.com/api-keys" target="_blank" className="text-primary hover:underline">platform.openai.com</a>
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle>Informations générales</CardTitle>
