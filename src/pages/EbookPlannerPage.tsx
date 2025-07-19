@@ -23,6 +23,7 @@ const EbookPlannerPage: React.FC = () => {
   const [ebookTitle, setEbookTitle] = useState('');
   const [authorName, setAuthorName] = useState('');
   const [preface, setPreface] = useState('');
+  const [conclusion, setConclusion] = useState('');
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [apiKey, setApiKey] = useState(localStorage.getItem('openai_api_key') || '');
@@ -101,31 +102,33 @@ const EbookPlannerPage: React.FC = () => {
           'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: 'gpt-4',
+          model: 'gpt-4.1-2025-04-14',
           messages: [{
             role: 'user',
             content: `Crée un plan détaillé d'ebook sur le sujet: "${ebookTitle}". 
             
             Génère:
-            1. Un nom d'auteur approprié
+            1. ${authorName ? `Garde le nom d'auteur: "${authorName}"` : 'Un nom d\'auteur approprié'}
             2. Une préface d'au moins 500 caractères ou 350 mots, engageante et professionnelle
             3. Exactement ${numberOfChapters} chapitres avec des titres accrocheurs
             4. 2-4 sous-chapitres pour chaque chapitre
+            5. Une conclusion/mot de la fin de 300 mots environ qui remercie le lecteur, résume les points clés, et inclut cette phrase : "Si vous avez apprécié ce livre, dites-le nous en commentaire. Voici mon email : [email@exemple.com]"
             
             Réponds uniquement au format JSON:
             {
-              "author": "Nom de l'auteur",
+              "author": "${authorName || 'Nom de l\'auteur'}",
               "preface": "Texte de la préface",
               "chapters": [
                 {
                   "title": "Titre du chapitre",
                   "subChapters": ["Sous-chapitre 1", "Sous-chapitre 2", ...]
                 }
-              ]
+              ],
+              "conclusion": "Texte de la conclusion de 300 mots"
             }`
           }],
           temperature: 0.7,
-          max_tokens: 2000
+          max_tokens: 3000
         })
       });
 
@@ -136,9 +139,12 @@ const EbookPlannerPage: React.FC = () => {
       const data = await response.json();
       const planData = JSON.parse(data.choices[0].message.content);
       
-      // Remplir automatiquement tous les champs
-      setAuthorName(planData.author);
+      // Remplir automatiquement tous les champs (en gardant l'auteur s'il était déjà rempli)
+      if (!authorName) {
+        setAuthorName(planData.author);
+      }
       setPreface(planData.preface);
+      setConclusion(planData.conclusion);
       
       const generatedChapters = planData.chapters.map((chapter: any, index: number) => ({
         id: (Date.now() + index).toString(),
@@ -164,6 +170,7 @@ const EbookPlannerPage: React.FC = () => {
     setEbookTitle('');
     setAuthorName('');
     setPreface('');
+    setConclusion('');
     setChapters([]);
     setNumberOfChapters(8);
     toast.success('Plan réinitialisé !');
@@ -192,6 +199,10 @@ const EbookPlannerPage: React.FC = () => {
       });
       plan += '\n';
     });
+
+    if (conclusion) {
+      plan += `MOT DE LA FIN\n${conclusion}\n\n`;
+    }
 
     // Copy to clipboard
     navigator.clipboard.writeText(plan);
@@ -317,6 +328,17 @@ const EbookPlannerPage: React.FC = () => {
                   rows={4}
                 />
               </div>
+
+              <div>
+                <Label htmlFor="conclusion">Mot de la fin / Conclusion (optionnel)</Label>
+                <Textarea
+                  id="conclusion"
+                  placeholder="Rédigez votre conclusion avec remerciements et email de contact..."
+                  value={conclusion}
+                  onChange={(e) => setConclusion(e.target.value)}
+                  rows={4}
+                />
+              </div>
             </CardContent>
           </Card>
 
@@ -409,7 +431,7 @@ const EbookPlannerPage: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="bg-muted p-4 rounded-lg min-h-[400px] font-mono text-sm">
-                {ebookTitle || authorName || chapters.length > 0 ? (
+                {ebookTitle || authorName || chapters.length > 0 || preface || conclusion ? (
                   <div>
                     <div className="font-bold text-center mb-4">PLAN D'EBOOK</div>
                     {ebookTitle && <div><strong>Titre:</strong> {ebookTitle}</div>}
@@ -435,6 +457,13 @@ const EbookPlannerPage: React.FC = () => {
                             ))}
                           </div>
                         ))}
+                      </div>
+                    )}
+
+                    {conclusion && (
+                      <div className="mt-4">
+                        <div className="font-bold">MOT DE LA FIN</div>
+                        <div className="text-xs mt-1">{conclusion}</div>
                       </div>
                     )}
                   </div>
