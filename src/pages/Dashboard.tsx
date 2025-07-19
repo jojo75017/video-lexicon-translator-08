@@ -77,6 +77,13 @@ const Dashboard: React.FC = () => {
       icon: BookOpen,
       path: '/ebook-planner',
       color: 'from-purple-500 to-purple-600'
+    },
+    {
+      title: 'Idées de Titres d\'Ebook',
+      description: 'Découvrez 20+ thématiques et idées de titres pour vos ebooks',
+      icon: Lightbulb,
+      path: '/ebook-ideas',
+      color: 'from-pink-500 to-rose-600'
     }
   ];
 

@@ -5,8 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BookOpen, Plus, Trash2, FileText, Wand2, Settings, RotateCcw } from 'lucide-react';
+import { BookOpen, Plus, Trash2, FileText, Wand2, Settings, RotateCcw, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 interface Chapter {
   id: string;
@@ -20,6 +21,7 @@ interface SubChapter {
 }
 
 const EbookPlannerPage: React.FC = () => {
+  const navigate = useNavigate();
   const [ebookTitle, setEbookTitle] = useState('');
   const [authorName, setAuthorName] = useState('');
   const [preface, setPreface] = useState('');
@@ -212,6 +214,15 @@ const EbookPlannerPage: React.FC = () => {
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center gap-3 mb-6">
+        <Button 
+          onClick={() => navigate('/')} 
+          variant="outline" 
+          size="sm"
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Retour au tableau de bord
+        </Button>
         <BookOpen className="h-8 w-8 text-primary" />
         <h1 className="text-3xl font-bold">Générateur de Plan d'Ebook</h1>
       </div>
