@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { BookOpen, Plus, Trash2, FileText, Wand2 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { BookOpen, Plus, Trash2, FileText, Wand2, Settings } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Chapter {
@@ -25,6 +26,7 @@ const EbookPlannerPage: React.FC = () => {
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [apiKey, setApiKey] = useState(localStorage.getItem('openai_api_key') || '');
+  const [numberOfChapters, setNumberOfChapters] = useState(8);
 
   const addChapter = () => {
     const newChapter: Chapter = {
@@ -106,8 +108,8 @@ const EbookPlannerPage: React.FC = () => {
             
             Génère:
             1. Un nom d'auteur approprié
-            2. Une préface courte et engageante (2-3 phrases)
-            3. Entre 5 et 20 chapitres avec des titres accrocheurs
+            2. Une préface d'au moins 500 caractères ou 350 mots, engageante et professionnelle
+            3. Exactement ${numberOfChapters} chapitres avec des titres accrocheurs
             4. 2-4 sous-chapitres pour chaque chapitre
             
             Réponds uniquement au format JSON:
@@ -201,26 +203,59 @@ const EbookPlannerPage: React.FC = () => {
             <CardHeader>
               <CardTitle>Configuration</CardTitle>
               <CardDescription>
-                Pour utiliser la génération automatique, configurez votre clé API OpenAI
+                Configurez votre clé API OpenAI et les paramètres de génération
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div>
-                <Label htmlFor="apikey">Clé API OpenAI</Label>
-                <Input
-                  id="apikey"
-                  type="password"
-                  placeholder="sk-..."
-                  value={apiKey}
-                  onChange={(e) => {
-                    setApiKey(e.target.value);
-                    localStorage.setItem('openai_api_key', e.target.value);
-                  }}
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Obtenez votre clé sur <a href="https://platform.openai.com/api-keys" target="_blank" className="text-primary hover:underline">platform.openai.com</a>
-                </p>
-              </div>
+              <Tabs defaultValue="api" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="api">API OpenAI</TabsTrigger>
+                  <TabsTrigger value="settings">
+                    <Settings className="h-4 w-4 mr-1" />
+                    Paramètres
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent value="api" className="mt-4">
+                  <div>
+                    <Label htmlFor="apikey">Clé API OpenAI</Label>
+                    <Input
+                      id="apikey"
+                      type="password"
+                      placeholder="sk-..."
+                      value={apiKey}
+                      onChange={(e) => {
+                        setApiKey(e.target.value);
+                        localStorage.setItem('openai_api_key', e.target.value);
+                      }}
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Obtenez votre clé sur <a href="https://platform.openai.com/api-keys" target="_blank" className="text-primary hover:underline">platform.openai.com</a>
+                    </p>
+                  </div>
+                </TabsContent>
+                <TabsContent value="settings" className="mt-4">
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="chapters-range">Nombre de chapitres: {numberOfChapters}</Label>
+                      <div className="mt-2">
+                        <input
+                          id="chapters-range"
+                          type="range"
+                          min="5"
+                          max="20"
+                          value={numberOfChapters}
+                          onChange={(e) => setNumberOfChapters(parseInt(e.target.value))}
+                          className="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer slider"
+                        />
+                        <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                          <span>5 chapitres</span>
+                          <span>20 chapitres</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
             </CardContent>
           </Card>
 
