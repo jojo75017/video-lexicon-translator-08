@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BookOpen, Plus, Trash2, FileText, Wand2, Settings } from 'lucide-react';
+import { BookOpen, Plus, Trash2, FileText, Wand2, Settings, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Chapter {
@@ -158,6 +158,15 @@ const EbookPlannerPage: React.FC = () => {
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const resetPlan = () => {
+    setEbookTitle('');
+    setAuthorName('');
+    setPreface('');
+    setChapters([]);
+    setNumberOfChapters(8);
+    toast.success('Plan réinitialisé !');
   };
 
   const generatePlan = () => {
@@ -377,10 +386,16 @@ const EbookPlannerPage: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Button onClick={generatePlan} className="w-full" size="lg">
-            <FileText className="h-4 w-4 mr-2" />
-            Générer le plan d'ebook
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={generatePlan} className="flex-1" size="lg">
+              <FileText className="h-4 w-4 mr-2" />
+              Générer le plan d'ebook
+            </Button>
+            <Button onClick={resetPlan} variant="outline" size="lg">
+              <RotateCcw className="h-4 w-4 mr-2" />
+              Effacer
+            </Button>
+          </div>
         </div>
 
         {/* Aperçu du plan */}
