@@ -20,6 +20,7 @@ import RobotsTxtPage from './pages/RobotsTxtPage';
 import CrawlerPage from './pages/CrawlerPage';
 import EbookPlannerPage from './pages/EbookPlannerPage';
 import EbookIdeasPage from './pages/EbookIdeasPage';
+import PromptsGeneratorPage from './pages/PromptsGeneratorPage';
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,7 @@ const App = () => (
         <Route path="/crawler" element={<CrawlerPage />} />
         <Route path="/ebook-planner" element={<EbookPlannerPage />} />
         <Route path="/ebook-ideas" element={<EbookIdeasPage />} />
+        <Route path="/prompts-generator" element={<PromptsGeneratorPage />} />
       </Routes>
       <Toaster />
     </TooltipProvider>
