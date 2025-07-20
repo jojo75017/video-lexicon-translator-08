@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Lightbulb, BookOpen, TrendingUp, Heart, Brain, Briefcase, Fish } from 'lucide-react';
+import { ArrowLeft, Lightbulb, BookOpen, TrendingUp, Heart, Brain, Briefcase, Fish, Target } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const EbookIdeasPage: React.FC = () => {
@@ -339,7 +339,7 @@ const EbookIdeasPage: React.FC = () => {
         ))}
       </div>
 
-      <div className="text-center mt-12">
+      <div className="space-y-6 mt-12">
         <Card className="bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200">
           <CardContent className="p-6">
             <h3 className="text-xl font-bold mb-2">Prêt à créer votre ebook ?</h3>
@@ -353,6 +353,37 @@ const EbookIdeasPage: React.FC = () => {
             >
               <BookOpen className="h-5 w-5 mr-2" />
               Créer mon plan d'ebook
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-r from-orange-50 to-red-50 border-orange-200">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <Target className="h-8 w-8 text-orange-600" />
+              <h3 className="text-xl font-bold">🎯 Pack de 20 Prompts Professionnels</h3>
+            </div>
+            <p className="text-muted-foreground mb-4">
+              Générez un pack complet de 20 prompts IA professionnels, formatés et prêts à vendre, 
+              regroupés en 4-5 catégories (Business, Copywriting, Voyage, Développement personnel...)
+            </p>
+            <div className="bg-white/50 p-4 rounded-lg mb-4">
+              <h4 className="font-semibold mb-2">✨ Ce que vous obtiendrez :</h4>
+              <ul className="text-sm space-y-1 text-muted-foreground">
+                <li>• 20 prompts originaux et puissants</li>
+                <li>• Fiches formatées pour ChatGPT/IA</li>
+                <li>• Structure professionnelle vendable</li>
+                <li>• Catégories thématiques pertinentes</li>
+                <li>• Format PDF/Word compatible</li>
+              </ul>
+            </div>
+            <Button 
+              onClick={() => navigate('/prompts-generator')}
+              size="lg"
+              className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700"
+            >
+              <Target className="h-5 w-5 mr-2" />
+              Générer mes 20 prompts pros
             </Button>
           </CardContent>
         </Card>
