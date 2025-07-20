@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BarChart3, Search, Globe, TrendingUp, Users, Lightbulb, BookOpen } from 'lucide-react';
+import { BarChart3, Search, Globe, TrendingUp, Users, Lightbulb, BookOpen, Target } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Dashboard: React.FC = () => {
@@ -84,6 +84,13 @@ const Dashboard: React.FC = () => {
       icon: Lightbulb,
       path: '/ebook-ideas',
       color: 'from-pink-500 to-rose-600'
+    },
+    {
+      title: '🎯 Pack de 20 Prompts Professionnels',
+      description: 'Générez un pack complet de prompts IA prêts à vendre',
+      icon: Target,
+      path: '/prompts-generator',
+      color: 'from-orange-500 to-red-600'
     }
   ];
 
