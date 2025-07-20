@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Lightbulb, BookOpen, TrendingUp, Heart, Brain, Briefcase } from 'lucide-react';
+import { ArrowLeft, Lightbulb, BookOpen, TrendingUp, Heart, Brain, Briefcase, Fish } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const EbookIdeasPage: React.FC = () => {
@@ -30,7 +30,24 @@ const EbookIdeasPage: React.FC = () => {
         'Le guide du freelance qui cartonne',
         'Marketing digital pour débutants',
         'Comment vendre ses services 3x plus cher',
-        'Automatiser son business pour plus de liberté'
+        'Automatiser son business pour plus de liberté',
+        'Marketing d\'influence : devenir un pro',
+        'Stratégies SEO qui fonctionnent en 2024',
+        'Email marketing : convertir comme un chef',
+        'Publicité Facebook pour petites entreprises',
+        'Content marketing : créer du contenu viral',
+        'Marketing automation : vendre pendant son sommeil',
+        'Personal branding : construire sa marque personnelle',
+        'Growth hacking : exploser sa croissance',
+        'Marketing local pour commerçants',
+        'Copywriting : écrire pour vendre',
+        'Marketing sur Instagram : 100k followers en 6 mois',
+        'LinkedIn marketing pour B2B',
+        'Affiliation marketing : générer 5000€/mois',
+        'Marketing vidéo : TikTok et YouTube',
+        'Funnel de vente : convertir 10x plus',
+        'Retargeting publicitaire : reconquérir ses prospects',
+        'Marketing éthique et durable'
       ]
     },
     {
@@ -114,7 +131,27 @@ const EbookIdeasPage: React.FC = () => {
         'Road trip : guide de préparation',
         'Voyage solo en sécurité',
         'Destinations secrètes d\'Europe',
-        'Digital nomad : travailler en voyageant'
+        'Digital nomad : travailler en voyageant',
+        'Guide ultime de l\'Europe en train',
+        'Asie du Sud-Est : itinéraire parfait',
+        'Voyager malin : 50 astuces d\'expert',
+        'Europe de l\'Est : trésors cachés',
+        'Japon : guide du voyageur indépendant',
+        'Thaïlande : au-delà des sentiers battus',
+        'Interrail : traverser l\'Europe en liberté',
+        'Voyage d\'affaires : optimiser ses déplacements',
+        'Backpacking en Asie : guide survie',
+        'Capitales européennes en week-end',
+        'Vietnam : de Hanoï à Ho Chi Minh',
+        'Portugal secret : 15 lieux magiques',
+        'Corée du Sud : culture et modernité',
+        'Balkans : découvrir les perles cachées',
+        'Inde : voyage spirituel et culturel',
+        'Islande : terre de feu et de glace',
+        'Singapour et Malaisie : citytrip parfait',
+        'Scandinavie : fjords et aurores boréales',
+        'Camping-car en Europe : liberté totale',
+        'Voyager responsable et éco-friendly'
       ]
     },
     {
@@ -199,6 +236,38 @@ const EbookIdeasPage: React.FC = () => {
         'Créer son emploi idéal',
         'Du salariat à l\'entrepreneuriat',
         'Négocier sa reconversion interne'
+      ]
+    },
+    {
+      category: 'Aquariophilie & Poissons',
+      icon: Fish,
+      color: 'from-cyan-500 to-blue-600',
+      ideas: [
+        'Aquarium débutant : guide complet',
+        'Poissons tropicaux : espèces et soins',
+        'Aquascaping : créer un paysage aquatique',
+        'Eau douce vs eau de mer : faire son choix',
+        'Filtration d\'aquarium : système parfait',
+        'Reproduction des poissons d\'ornement',
+        'Plantes aquatiques : guide du débutant',
+        'Cichlidés africains : guide d\'élevage',
+        'Aquarium récifal : coraux et invertébrés',
+        'Maladies des poissons : prévenir et guérir',
+        'Discus : roi de l\'aquarium d\'eau douce',
+        'Nano-aquarium : petit mais parfait',
+        'Éclairage LED pour aquarium',
+        'Poissons rouges : au-delà du bocal',
+        'Betta splendens : guide complet',
+        'Aquarium biotope : recréer la nature',
+        'Maintenance aquarium : planning annuel',
+        'Poissons d\'eau froide sans chauffage',
+        'Aquaterrarium : terre et eau réunies',
+        'Crevettes d\'aquarium : guide d\'élevage',
+        'Aquarium communautaire harmonieux',
+        'Chimie de l\'eau : maîtriser les paramètres',
+        'Aquarium marin pour débutants',
+        'Poissons carnivores : nourrir et élever',
+        'Aquarium low-tech : simplicité efficace'
       ]
     }
   ];
