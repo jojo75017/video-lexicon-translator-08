@@ -278,7 +278,138 @@ Structure attendue :
 • Gestion des obstacles et rechutes
 • Tracking et mesure des progrès
 • Évolution et ajustement du système
-Style : [Scientifique, motivant, orienté résultats durables]`
+Style : [Scientifique, motivant, orienté résultats durables]`,
+
+      // AQUARIOPHILIE (10 prompts)
+      `🐠 Prompt 21 : Démarrer un aquarium tropical pour débutants
+Demande : [Créer un guide complet pour réussir son premier aquarium tropical]
+Rôle : [Vous êtes un aquariophile expert avec 20 ans d'expérience et formateur en aquariophilie.]
+Mission : [Concevoir un guide pas à pas pour débuter en aquariophilie sans erreurs courantes.]
+Structure attendue :
+• Choix de l'aquarium et équipements essentiels
+• Cycle de l'azote et maturation du bac
+• Sélection des premiers poissons compatibles
+• Paramètres de l'eau et maintenance quotidienne
+• Alimentation équilibrée et calendrier
+• Résolution des problèmes fréquents
+Style : [Pédagogique, rassurant, basé sur l'expérience]`,
+
+      `🐠 Prompt 22 : Aquascaping et création de paysages aquatiques
+Demande : [Concevoir des layouts d'aquascaping esthétiques et naturels]
+Rôle : [Vous êtes un aquascaper professionnel et designer d'écosystèmes aquatiques.]
+Mission : [Créer des guides de design pour réaliser des aquariums paysagers spectaculaires.]
+Structure attendue :
+• Principes de composition et règle des tiers
+• Sélection des roches, racines et substrats
+• Plantation et techniques de croissance
+• Éclairage adapté et périodes d'éclairage
+• Maintenance de l'équilibre esthétique
+• Évolution du paysage dans le temps
+Style : [Artistique, technique, inspirant]`,
+
+      `🐠 Prompt 23 : Reproduction et élevage de poissons tropicaux
+Demande : [Réussir la reproduction et l'élevage d'espèces tropicaux populaires]
+Rôle : [Vous êtes un éleveur professionnel spécialisé en reproduction de poissons d'aquarium.]
+Mission : [Développer des protocoles de reproduction pour différentes espèces avec taux de réussite optimaux.]
+Structure attendue :
+• Sélection des reproducteurs et conditionnement
+• Paramètres de l'eau pour déclencher la ponte
+• Aménagement du bac de reproduction
+• Soins aux œufs et développement des alevins
+• Alimentation spécifique par stade de croissance
+• Prévention des maladies et mortalité
+Style : [Scientifique, détaillé, orienté résultats]`,
+
+      `🐠 Prompt 24 : Aquarium récifal et coraux pour débutants
+Demande : [Créer et maintenir un récif corallien artificiel en aquarium marin]
+Rôle : [Vous êtes un spécialiste en aquariophilie marine et culture de coraux.]
+Mission : [Élaborer un plan complet pour débuter en récifal avec succès.]
+Structure attendue :
+• Équipement spécifique eau de mer (écumeur, pompes)
+• Préparation de l'eau de mer et salinité
+• Introduction progressive des coraux
+• Éclairage LED spécialisé et programmation
+• Supplémentation en calcium et magnésium
+• Maintenance et tests réguliers
+Style : [Précis, technique, progressif]`,
+
+      `🐠 Prompt 25 : Traitement des maladies et parasites aquatiques
+Demande : [Diagnostiquer et traiter efficacement les maladies courantes des poissons]
+Rôle : [Vous êtes un vétérinaire spécialisé en pathologies aquatiques.]
+Mission : [Créer un guide de diagnostic et traitement des principales maladies.]
+Structure attendue :
+• Reconnaissance des symptômes par pathologie
+• Diagnostic différentiel et examens complémentaires
+• Traitements spécifiques et posologies
+• Quarantaine et prévention de la propagation
+• Désinfection et remise en route du bac
+• Prévention et renforcement immunitaire
+Style : [Médical, précis, orienté guérison]`,
+
+      `🐠 Prompt 26 : Système de filtration avancée et biologie aquatique
+Demande : [Optimiser la filtration pour maintenir un écosystème aquatique stable]
+Rôle : [Vous êtes un ingénieur en systèmes aquatiques et biochimiste.]
+Mission : [Concevoir des systèmes de filtration performants adaptés à chaque type d'aquarium.]
+Structure attendue :
+• Types de filtration (mécanique, biologique, chimique)
+• Dimensionnement selon volume et population
+• Bactéries nitrifiantes et cycles biologiques
+• Maintenance préventive et nettoyage optimal
+• Ajout de probiotiques et suppléments biologiques
+• Surveillance des paramètres et ajustements
+Style : [Technique, scientifique, orienté performance]`,
+
+      `🐠 Prompt 27 : Aquarium amazonien biotope naturel
+Demande : [Recréer fidèlement un biotope amazonien avec espèces endémiques]
+Rôle : [Vous êtes un ichtyologue spécialisé dans les écosystèmes amazoniens.]
+Mission : [Développer un biotope authentique avec espèces, plantes et paramètres naturels.]
+Structure attendue :
+• Recherche géographique et conditions naturelles
+• Sélection d'espèces compatibles du même biotope
+• Reproduction des paramètres physico-chimiques
+• Plantation avec espèces végétales endémiques
+• Simulation des variations saisonnières
+• Comportements naturels et interactions
+Style : [Scientifique, authentique, respectueux de la nature]`,
+
+      `🐠 Prompt 28 : Aquarium automatisé et domotique aquatique
+Demande : [Automatiser la maintenance d'aquarium avec la technologie moderne]
+Rôle : [Vous êtes un ingénieur en domotique spécialisé dans l'automatisation aquatique.]
+Mission : [Créer un système d'automatisation complète pour optimiser la maintenance.]
+Structure attendue :
+• Capteurs de paramètres et monitoring en temps réel
+• Automatisation de l'éclairage et cycles circadiens
+• Distribution automatique de nourriture programmable
+• Changements d'eau automatiques et osmoseur
+• Alertes et notifications sur smartphone
+• Interface de contrôle et historiques
+Style : [Technologique, innovant, orienté facilité]`,
+
+      `🐠 Prompt 29 : Aquarium thérapeutique et bien-être
+Demande : [Utiliser l'aquariophilie comme outil de relaxation et thérapie]
+Rôle : [Vous êtes un thérapeute spécialisé en zoothérapie et aquariophilie thérapeutique.]
+Mission : [Concevoir des aquariums optimisés pour les bienfaits psychologiques et le bien-être.]
+Structure attendue :
+• Choix d'espèces apaisantes et comportements relaxants
+• Design et éclairage pour ambiance zen
+• Intégration dans l'espace de vie ou médical
+• Protocoles d'interaction et observation
+• Bénéfices mesurables sur stress et anxiété
+• Adaptation selon pathologies ou besoins spécifiques
+Style : [Thérapeutique, bienveillant, scientifiquement prouvé]`,
+
+      `🐠 Prompt 30 : Business plan élevage aquariophile rentable
+Demande : [Créer une activité rentable d'élevage et vente de poissons tropicaux]
+Rôle : [Vous êtes un entrepreneur aquariophile et consultant en business aquatique.]
+Mission : [Développer un modèle économique viable pour monétiser l'aquariophilie.]
+Structure attendue :
+• Analyse de marché et niches rentables
+• Sélection d'espèces à fort potentiel commercial
+• Infrastructure et investissements nécessaires
+• Stratégie de reproduction et planning de production
+• Circuits de distribution (animaleries, particuliers, export)
+• Gestion financière et optimisation des coûts
+Style : [Business, pragmatique, orienté rentabilité]`
     ];
 
     // Simuler un délai de génération
@@ -286,7 +417,7 @@ Style : [Scientifique, motivant, orienté résultats durables]`
     
     setPrompts(generatedPrompts);
     setIsGenerating(false);
-    toast.success("20 prompts professionnels générés avec succès !");
+    toast.success("30 prompts professionnels générés avec succès !");
   };
 
   const copyPrompt = async (prompt: string, index: number) => {
@@ -332,10 +463,10 @@ Style : [Scientifique, motivant, orienté résultats durables]`
 
       <div className="text-center mb-8">
         <p className="text-lg text-muted-foreground">
-          Générez un pack de 20 prompts IA professionnels, formatés et prêts à vendre
+          Générez un pack de 30 prompts IA professionnels, formatés et prêts à vendre
         </p>
         <p className="text-sm text-muted-foreground mt-2">
-          Regroupés en catégories : Business, Copywriting, Voyage, Développement personnel...
+          Regroupés en catégories : Business, Copywriting, Voyage, Développement personnel, Aquariophilie...
         </p>
       </div>
 
@@ -351,6 +482,7 @@ Style : [Scientifique, motivant, orienté résultats durables]`
                 <li>• 🔵 5 prompts Copywriting & Marketing</li>
                 <li>• 🟡 5 prompts Voyage & Aventure</li>
                 <li>• 🟢 5 prompts Développement Personnel</li>
+                <li>• 🐠 10 prompts Aquariophilie</li>
               </ul>
               <div className="mt-4 p-3 bg-orange-100 rounded-lg">
                 <p className="text-sm font-medium">Format professionnel avec :</p>
@@ -373,7 +505,7 @@ Style : [Scientifique, motivant, orienté résultats durables]`
               ) : (
                 <>
                   <Target className="h-5 w-5 mr-2" />
-                  Générer mes 20 prompts
+                  Générer mes 30 prompts
                 </>
               )}
             </Button>
@@ -382,7 +514,7 @@ Style : [Scientifique, motivant, orienté résultats durables]`
       ) : (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold">Vos 20 Prompts Professionnels</h2>
+            <h2 className="text-2xl font-bold">Vos 30 Prompts Professionnels</h2>
             <Button onClick={downloadAllPrompts} className="flex items-center gap-2">
               <Download className="h-4 w-4" />
               Télécharger tout
