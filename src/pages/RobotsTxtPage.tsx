@@ -4,8 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Shield, CheckCircle, XCircle, AlertTriangle, Search, Bot, Eye } from 'lucide-react';
+import { Shield, CheckCircle, XCircle, AlertTriangle, Search, Bot, Eye, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 interface RobotsTestResult {
   url: string;
@@ -17,6 +18,7 @@ interface RobotsTestResult {
 }
 
 const RobotsTxtPage: React.FC = () => {
+  const navigate = useNavigate();
   const [robotsTxt, setRobotsTxt] = useState('');
   const [urlsToTest, setUrlsToTest] = useState('');
   const [testResults, setTestResults] = useState<RobotsTestResult[]>([]);
@@ -187,13 +189,24 @@ Allow: /public/`;
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30 p-6">
       <div className="container mx-auto max-w-6xl">
-        <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            🤖 Test Robots.txt
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            Testez votre robots.txt - Bloquez les mauvais bots, autorisez les bons
-          </p>
+        <div className="mb-8">
+          <Button 
+            variant="outline" 
+            onClick={() => navigate('/dashboard')}
+            className="mb-6"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Retour au tableau de bord
+          </Button>
+          
+          <div className="text-center">
+            <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              🤖 Test Robots.txt
+            </h1>
+            <p className="text-lg text-muted-foreground">
+              Testez votre robots.txt - Bloquez les mauvais bots, autorisez les bons
+            </p>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
