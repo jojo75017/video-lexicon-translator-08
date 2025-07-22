@@ -5,10 +5,31 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BookOpen, Plus, Trash2, FileText, Wand2, Settings, RotateCcw, ArrowLeft, GripVertical, Split, Merge, Upload, Scissors, Copy, ArrowUp, ArrowDown } from 'lucide-react';
+import { 
+  BookOpen, Plus, Trash2, FileText, Wand2, Settings, RotateCcw, ArrowLeft, 
+  GripVertical, Split, Merge, Upload, Copy, ArrowUp, ArrowDown, Move 
+} from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import {
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface Chapter {
   id: string;
@@ -23,6 +44,175 @@ interface SubChapter {
   content?: string;
 }
 
+interface SortableChapterProps {
+  chapter: Chapter;
+  index: number;
+  isSelected: boolean;
+  onSelect: (id: string) => void;
+  onUpdateTitle: (id: string, title: string) => void;
+  onUpdateContent: (id: string, content: string) => void;
+  onAddSubChapter: (id: string) => void;
+  onRemoveSubChapter: (chapterId: string, subChapterId: string) => void;
+  onUpdateSubChapterTitle: (chapterId: string, subChapterId: string, title: string) => void;
+  onMoveChapter: (id: string, direction: 'up' | 'down') => void;
+  onDuplicateChapter: (id: string) => void;
+  onSplitChapter: (id: string) => void;
+  onRemoveChapter: (id: string) => void;
+  isGenerating: boolean;
+  apiKey: string;
+  totalChapters: number;
+}
+
+function SortableChapter({
+  chapter,
+  index,
+  isSelected,
+  onSelect,
+  onUpdateTitle,
+  onUpdateContent,
+  onAddSubChapter,
+  onRemoveSubChapter,
+  onUpdateSubChapterTitle,
+  onMoveChapter,
+  onDuplicateChapter,
+  onSplitChapter,
+  onRemoveChapter,
+  isGenerating,
+  apiKey,
+  totalChapters
+}: SortableChapterProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: chapter.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`border rounded-lg p-4 space-y-3 transition-colors ${
+        isDragging ? 'bg-accent' : ''
+      } ${isSelected ? 'border-primary bg-primary/5' : ''}`}
+    >
+      <div className="flex items-center gap-2">
+        <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing">
+          <GripVertical className="h-4 w-4 text-muted-foreground" />
+        </div>
+        <input
+          type="checkbox"
+          checked={isSelected}
+          onChange={() => onSelect(chapter.id)}
+          className="mr-2"
+        />
+        <span className="font-medium">Chapitre {index + 1}:</span>
+        <Input
+          placeholder="Titre du chapitre"
+          value={chapter.title}
+          onChange={(e) => onUpdateTitle(chapter.id, e.target.value)}
+          className="flex-1"
+        />
+        <div className="flex gap-1">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onMoveChapter(chapter.id, 'up')}
+            disabled={index === 0}
+            title="Déplacer vers le haut"
+          >
+            <ArrowUp className="h-3 w-3" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onMoveChapter(chapter.id, 'down')}
+            disabled={index === totalChapters - 1}
+            title="Déplacer vers le bas"
+          >
+            <ArrowDown className="h-3 w-3" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onDuplicateChapter(chapter.id)}
+            title="Dupliquer le chapitre"
+          >
+            <Copy className="h-3 w-3" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onSplitChapter(chapter.id)}
+            disabled={isGenerating || !apiKey}
+            title="Diviser automatiquement"
+          >
+            <Split className="h-3 w-3" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onRemoveChapter(chapter.id)}
+            title="Supprimer le chapitre"
+          >
+            <Trash2 className="h-3 w-3" />
+          </Button>
+        </div>
+      </div>
+
+      <div className="ml-6">
+        <Textarea
+          placeholder="Contenu du chapitre (optionnel, pour la division automatique)"
+          value={chapter.content || ''}
+          onChange={(e) => onUpdateContent(chapter.id, e.target.value)}
+          rows={3}
+          className="mb-3"
+        />
+      </div>
+      
+      <div className="ml-6 space-y-2">
+        {chapter.subChapters.map((subChapter, subIndex) => (
+          <div key={subChapter.id} className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">
+              {index + 1}.{subIndex + 1}:
+            </span>
+            <Input
+              placeholder="Titre du sous-chapitre"
+              value={subChapter.title}
+              onChange={(e) => onUpdateSubChapterTitle(chapter.id, subChapter.id, e.target.value)}
+              className="flex-1"
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onRemoveSubChapter(chapter.id, subChapter.id)}
+            >
+              <Trash2 className="h-3 w-3" />
+            </Button>
+          </div>
+        ))}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onAddSubChapter(chapter.id)}
+          className="ml-8"
+        >
+          <Plus className="h-3 w-3 mr-1" />
+          Ajouter un sous-chapitre
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 const EbookPlannerPage: React.FC = () => {
   const navigate = useNavigate();
   const [ebookTitle, setEbookTitle] = useState('');
@@ -35,6 +225,13 @@ const EbookPlannerPage: React.FC = () => {
   const [numberOfChapters, setNumberOfChapters] = useState(8);
   const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
   const [importText, setImportText] = useState('');
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const addChapter = () => {
     const newChapter: Chapter = {
@@ -98,15 +295,19 @@ const EbookPlannerPage: React.FC = () => {
   };
 
   // Nouvelle fonctionnalité : Glisser-déposer pour réorganiser les chapitres
-  const handleOnDragEnd = (result: DropResult) => {
-    if (!result.destination) return;
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
 
-    const items = Array.from(chapters);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
+    if (active.id !== over?.id) {
+      setChapters((chapters) => {
+        const oldIndex = chapters.findIndex(chapter => chapter.id === active.id);
+        const newIndex = chapters.findIndex(chapter => chapter.id === over?.id);
 
-    setChapters(items);
-    toast.success('Chapitres réorganisés !');
+        const newChapters = arrayMove(chapters, oldIndex, newIndex);
+        toast.success('Chapitres réorganisés !');
+        return newChapters;
+      });
+    }
   };
 
   // Nouvelle fonctionnalité : Sélection de chapitres
@@ -463,7 +664,7 @@ Réponds uniquement au format JSON:
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center gap-3 mb-6">
         <Button 
-          onClick={() => navigate('/')} 
+          onClick={() => navigate('/dashboard')} 
           variant="outline" 
           size="sm"
           className="flex items-center gap-2"
@@ -472,7 +673,7 @@ Réponds uniquement au format JSON:
           Retour au tableau de bord
         </Button>
         <BookOpen className="h-8 w-8 text-primary" />
-        <h1 className="text-3xl font-bold">Générateur de Plan d'Ebook Avancé</h1>
+        <h1 className="text-3xl font-bold">🚀 Générateur de Plan d'Ebook Avancé</h1>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -480,7 +681,7 @@ Réponds uniquement au format JSON:
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Configuration</CardTitle>
+              <CardTitle>⚙️ Configuration</CardTitle>
               <CardDescription>
                 Configurez votre clé API OpenAI et les paramètres de génération
               </CardDescription>
@@ -488,14 +689,14 @@ Réponds uniquement au format JSON:
             <CardContent>
               <Tabs defaultValue="api" className="w-full">
                 <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="api">API OpenAI</TabsTrigger>
+                  <TabsTrigger value="api">🔑 API OpenAI</TabsTrigger>
                   <TabsTrigger value="settings">
                     <Settings className="h-4 w-4 mr-1" />
                     Paramètres
                   </TabsTrigger>
                   <TabsTrigger value="import">
                     <Upload className="h-4 w-4 mr-1" />
-                    Import
+                    Import IA
                   </TabsTrigger>
                 </TabsList>
                 <TabsContent value="api" className="mt-4">
@@ -540,7 +741,7 @@ Réponds uniquement au format JSON:
                 </TabsContent>
                 <TabsContent value="import" className="mt-4">
                   <div className="space-y-4">
-                    <Label htmlFor="import-text">Importer du texte existant</Label>
+                    <Label htmlFor="import-text">🧠 Importer du texte existant</Label>
                     <Textarea
                       id="import-text"
                       placeholder="Collez votre texte ici pour l'analyser et générer une structure automatiquement..."
@@ -554,7 +755,7 @@ Réponds uniquement au format JSON:
                       className="w-full"
                     >
                       <Wand2 className="h-4 w-4 mr-2" />
-                      {isGenerating ? 'Analyse en cours...' : 'Analyser et structurer'}
+                      {isGenerating ? 'Analyse en cours...' : 'Analyser et structurer avec IA'}
                     </Button>
                   </div>
                 </TabsContent>
@@ -564,7 +765,7 @@ Réponds uniquement au format JSON:
 
           <Card>
             <CardHeader>
-              <CardTitle>Informations générales</CardTitle>
+              <CardTitle>📖 Informations générales</CardTitle>
               <CardDescription>
                 Renseignez les informations de base de votre ebook
               </CardDescription>
@@ -628,7 +829,7 @@ Réponds uniquement au format JSON:
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
-                Chapitres
+                📚 Chapitres Avancés
                 <div className="flex gap-2">
                   {selectedChapters.length > 1 && (
                     <Button onClick={mergeSelectedChapters} size="sm" variant="outline">
@@ -642,138 +843,52 @@ Réponds uniquement au format JSON:
                   </Button>
                 </div>
               </CardTitle>
+              <CardDescription>
+                ✨ Glissez-déposez pour réorganiser • ✂️ Divisez automatiquement • 📋 Sélectionnez pour fusionner
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <DragDropContext onDragEnd={handleOnDragEnd}>
-                <Droppable droppableId="chapters">
-                  {(provided) => (
-                    <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-4">
-                      {chapters.map((chapter, index) => (
-                        <Draggable key={chapter.id} draggableId={chapter.id} index={index}>
-                          {(provided, snapshot) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              className={`border rounded-lg p-4 space-y-3 transition-colors ${
-                                snapshot.isDragging ? 'bg-accent' : ''
-                              } ${selectedChapters.includes(chapter.id) ? 'border-primary bg-primary/5' : ''}`}
-                            >
-                              <div className="flex items-center gap-2">
-                                <div {...provided.dragHandleProps}>
-                                  <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab" />
-                                </div>
-                                <input
-                                  type="checkbox"
-                                  checked={selectedChapters.includes(chapter.id)}
-                                  onChange={() => toggleChapterSelection(chapter.id)}
-                                  className="mr-2"
-                                />
-                                <span className="font-medium">Chapitre {index + 1}:</span>
-                                <Input
-                                  placeholder="Titre du chapitre"
-                                  value={chapter.title}
-                                  onChange={(e) => updateChapterTitle(chapter.id, e.target.value)}
-                                  className="flex-1"
-                                />
-                                <div className="flex gap-1">
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => moveChapter(chapter.id, 'up')}
-                                    disabled={index === 0}
-                                  >
-                                    <ArrowUp className="h-3 w-3" />
-                                  </Button>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => moveChapter(chapter.id, 'down')}
-                                    disabled={index === chapters.length - 1}
-                                  >
-                                    <ArrowDown className="h-3 w-3" />
-                                  </Button>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => duplicateChapter(chapter.id)}
-                                  >
-                                    <Copy className="h-3 w-3" />
-                                  </Button>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => splitChapterAutomatically(chapter.id)}
-                                    disabled={isGenerating || !apiKey}
-                                  >
-                                    <Split className="h-3 w-3" />
-                                  </Button>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => removeChapter(chapter.id)}
-                                  >
-                                    <Trash2 className="h-3 w-3" />
-                                  </Button>
-                                </div>
-                              </div>
-
-                              <div className="ml-6">
-                                <Textarea
-                                  placeholder="Contenu du chapitre (optionnel, pour la division automatique)"
-                                  value={chapter.content || ''}
-                                  onChange={(e) => updateChapterContent(chapter.id, e.target.value)}
-                                  rows={3}
-                                  className="mb-3"
-                                />
-                              </div>
-                              
-                              <div className="ml-6 space-y-2">
-                                {chapter.subChapters.map((subChapter, subIndex) => (
-                                  <div key={subChapter.id} className="flex items-center gap-2">
-                                    <span className="text-sm text-muted-foreground">
-                                      {index + 1}.{subIndex + 1}:
-                                    </span>
-                                    <Input
-                                      placeholder="Titre du sous-chapitre"
-                                      value={subChapter.title}
-                                      onChange={(e) => updateSubChapterTitle(chapter.id, subChapter.id, e.target.value)}
-                                      className="flex-1"
-                                    />
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={() => removeSubChapter(chapter.id, subChapter.id)}
-                                    >
-                                      <Trash2 className="h-3 w-3" />
-                                    </Button>
-                                  </div>
-                                ))}
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => addSubChapter(chapter.id)}
-                                  className="ml-8"
-                                >
-                                  <Plus className="h-3 w-3 mr-1" />
-                                  Ajouter un sous-chapitre
-                                </Button>
-                              </div>
-                            </div>
-                          )}
-                        </Draggable>
-                      ))}
-                      {provided.placeholder}
-                    </div>
-                  )}
-                </Droppable>
-              </DragDropContext>
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={chapters.map(c => c.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="space-y-4">
+                    {chapters.map((chapter, index) => (
+                      <SortableChapter
+                        key={chapter.id}
+                        chapter={chapter}
+                        index={index}
+                        isSelected={selectedChapters.includes(chapter.id)}
+                        onSelect={toggleChapterSelection}
+                        onUpdateTitle={updateChapterTitle}
+                        onUpdateContent={updateChapterContent}
+                        onAddSubChapter={addSubChapter}
+                        onRemoveSubChapter={removeSubChapter}
+                        onUpdateSubChapterTitle={updateSubChapterTitle}
+                        onMoveChapter={moveChapter}
+                        onDuplicateChapter={duplicateChapter}
+                        onSplitChapter={splitChapterAutomatically}
+                        onRemoveChapter={removeChapter}
+                        isGenerating={isGenerating}
+                        apiKey={apiKey}
+                        totalChapters={chapters.length}
+                      />
+                    ))}
+                  </div>
+                </SortableContext>
+              </DndContext>
             </CardContent>
           </Card>
 
           <div className="flex gap-2">
             <Button onClick={generatePlan} className="flex-1" size="lg">
               <FileText className="h-4 w-4 mr-2" />
-              Générer le plan d'ebook
+              📋 Générer le plan d'ebook
             </Button>
             <Button onClick={resetPlan} variant="outline" size="lg">
               <RotateCcw className="h-4 w-4 mr-2" />
@@ -786,7 +901,7 @@ Réponds uniquement au format JSON:
         <div>
           <Card className="sticky top-6">
             <CardHeader>
-              <CardTitle>Aperçu du plan</CardTitle>
+              <CardTitle>👀 Aperçu du plan</CardTitle>
               <CardDescription>
                 Voici à quoi ressemblera votre plan d'ebook
               </CardDescription>
@@ -795,20 +910,20 @@ Réponds uniquement au format JSON:
               <div className="bg-muted p-4 rounded-lg min-h-[400px] font-mono text-sm max-h-[600px] overflow-y-auto">
                 {ebookTitle || authorName || chapters.length > 0 || preface || conclusion ? (
                   <div>
-                    <div className="font-bold text-center mb-4">PLAN D'EBOOK</div>
+                    <div className="font-bold text-center mb-4">📖 PLAN D'EBOOK</div>
                     {ebookTitle && <div><strong>Titre:</strong> {ebookTitle}</div>}
                     {authorName && <div><strong>Auteur:</strong> {authorName}</div>}
                     
                     {preface && (
                       <div className="mt-4">
-                        <div className="font-bold">PRÉFACE</div>
+                        <div className="font-bold">📝 PRÉFACE</div>
                         <div className="text-xs mt-1">{preface}</div>
                       </div>
                     )}
                     
                     {chapters.length > 0 && (
                       <div className="mt-4">
-                        <div className="font-bold mb-2">SOMMAIRE</div>
+                        <div className="font-bold mb-2">📚 SOMMAIRE</div>
                         {chapters.map((chapter, index) => (
                           <div key={chapter.id} className="mb-2">
                             <div className={`${selectedChapters.includes(chapter.id) ? 'bg-primary/20 px-1 rounded' : ''}`}>
@@ -826,14 +941,14 @@ Réponds uniquement au format JSON:
 
                     {conclusion && (
                       <div className="mt-4">
-                        <div className="font-bold">MOT DE LA FIN</div>
+                        <div className="font-bold">🎯 MOT DE LA FIN</div>
                         <div className="text-xs mt-1">{conclusion}</div>
                       </div>
                     )}
                   </div>
                 ) : (
                   <div className="text-muted-foreground text-center">
-                    Remplissez les informations pour voir l'aperçu du plan
+                    ✏️ Remplissez les informations pour voir l'aperçu du plan
                   </div>
                 )}
               </div>
