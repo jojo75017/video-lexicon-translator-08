@@ -120,8 +120,11 @@ function SortableChapter({
         <Input
           placeholder="Titre du chapitre"
           value={chapter.title}
+          onClick={() => onSelect(chapter.id)}
           onChange={(e) => onUpdateTitle(chapter.id, e.target.value)}
-          className="flex-1"
+          className={`flex-1 cursor-pointer transition-colors ${
+            isSelected ? 'border-blue-500 bg-blue-50 text-blue-900' : ''
+          }`}
         />
         <div className="flex gap-1">
           <Button
