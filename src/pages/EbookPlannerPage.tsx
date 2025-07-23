@@ -235,10 +235,29 @@ const EbookPlannerPage: React.FC = () => {
   const [conclusion, setConclusion] = useState('');
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [apiKey, setApiKey] = useState(localStorage.getItem('openai_api_key') || '');
+  const [apiKey, setApiKey] = useState('');
   const [numberOfChapters, setNumberOfChapters] = useState(8);
   const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
   const [importText, setImportText] = useState('');
+
+  // Charger la clé API au démarrage
+  React.useEffect(() => {
+    const savedApiKey = localStorage.getItem('openai_api_key');
+    if (savedApiKey) {
+      setApiKey(savedApiKey);
+    }
+  }, []);
+
+  // Sauvegarder automatiquement la clé API
+  const updateApiKey = (newApiKey: string) => {
+    setApiKey(newApiKey);
+    if (newApiKey.trim()) {
+      localStorage.setItem('openai_api_key', newApiKey);
+      toast.success('Clé API sauvegardée !');
+    } else {
+      localStorage.removeItem('openai_api_key');
+    }
+  };
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -778,10 +797,7 @@ Réponds uniquement avec le texte du chapitre, sans formatage JSON.`
                       type="password"
                       placeholder="sk-..."
                       value={apiKey}
-                      onChange={(e) => {
-                        setApiKey(e.target.value);
-                        localStorage.setItem('openai_api_key', e.target.value);
-                      }}
+                      onChange={(e) => updateApiKey(e.target.value)}
                     />
                     <p className="text-xs text-muted-foreground mt-1">
                       Obtenez votre clé sur <a href="https://platform.openai.com/api-keys" target="_blank" className="text-primary hover:underline">platform.openai.com</a>
