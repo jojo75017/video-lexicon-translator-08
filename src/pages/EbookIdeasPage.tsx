@@ -10,6 +10,38 @@ const EbookIdeasPage: React.FC = () => {
 
   const themes = [
     {
+      category: 'Romans & Fiction Populaires',
+      icon: BookOpen,
+      color: 'from-rose-500 to-pink-600',
+      ideas: [
+        'La Dernière Héritière : Romance Fantasy',
+        'Secrets de Minuit : Thriller Psychologique',
+        'L\'Empire des Cœurs Brisés : Dark Romance',
+        'Murmures dans la Brume : Mystère Gothique',
+        'La Prophétie de Luna : Fantasy Moderne',
+        'Passion Interdite : Romance Contemporaine',
+        'Le Chasseur d\'Âmes : Urban Fantasy',
+        'Souvenirs Effacés : Science-Fiction Romance',
+        'La Malédiction du Manoir : Romance Paranormale',
+        'Échos du Passé : Thriller Historique',
+        'L\'Académie des Ombres : Young Adult Fantasy',
+        'Amour en Temps de Guerre : Romance Historique',
+        'Le Royaume Oublié : Epic Fantasy',
+        'Secrets de Famille : Drame Contemporain',
+        'La Gardienne des Étoiles : Space Opera Romance',
+        'Vengeance Silencieuse : Thriller Revenge',
+        'Les Chroniques de Cristal : Fantasy Romance',
+        'Passion Dévastatrice : Romance Milliardaire',
+        'L\'Île des Mystères : Aventure Romance',
+        'Flammes du Destin : Paranormal Romance',
+        'Le Pacte du Diable : Dark Fantasy',
+        'Cœurs en Exil : Romance Émotionnelle',
+        'La Société Secrète : Mystery Romance',
+        'Rêves Interdits : Contemporary Romance',
+        'L\'Héritier Maudit : Gothic Romance'
+      ]
+    },
+    {
       category: 'Développement Personnel',
       icon: Brain,
       color: 'from-purple-500 to-purple-600',
@@ -23,19 +55,7 @@ const EbookIdeasPage: React.FC = () => {
         'Mindset de millionnaire : penser comme un leader',
         'Intelligence émotionnelle : maîtriser ses émotions',
         'Concentration laser : éliminer les distractions',
-        'Confiance absolue : surmonter peurs et blocages',
-        'Habitudes atomiques : transformer sa vie',
-        'Morning routine des champions',
-        'Gestion du temps pour entrepreneurs',
-        'Motivation permanente : ne plus jamais abandonner',
-        'Leadership naturel : influencer sans manipuler',
-        'Résilience mentale : rebondir après l\'échec',
-        'Charisme magnétique : attirer et inspirer',
-        'Autodiscipline totale : maîtriser ses instincts',
-        'Vision de vie : créer son plan de réussite',
-        'Mentalité de croissance : évoluer en permanence',
-        'Art de la persuasion : convaincre sans effort',
-        'Équilibre vie pro/perso : réussir sans se perdre'
+        'Confiance absolue : surmonter peurs et blocages'
       ]
     },
     {
