@@ -57,6 +57,7 @@ interface SortableChapterProps {
   onMoveChapter: (id: string, direction: 'up' | 'down') => void;
   onDuplicateChapter: (id: string) => void;
   onSplitChapter: (id: string) => void;
+  onGenerateChapterContent: (id: string) => void;
   onRemoveChapter: (id: string) => void;
   isGenerating: boolean;
   apiKey: string;
@@ -76,6 +77,7 @@ function SortableChapter({
   onMoveChapter,
   onDuplicateChapter,
   onSplitChapter,
+  onGenerateChapterContent,
   onRemoveChapter,
   isGenerating,
   apiKey,
@@ -156,6 +158,15 @@ function SortableChapter({
             title="Diviser automatiquement"
           >
             <Split className="h-3 w-3" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onGenerateChapterContent(chapter.id)}
+            disabled={isGenerating || !apiKey || !chapter.title}
+            title="Rédiger le chapitre (350 mots)"
+          >
+            <FileText className="h-3 w-3" />
           </Button>
           <Button
             variant="outline"
@@ -528,6 +539,63 @@ Réponds uniquement au format JSON:
     toast.success(`Chapitre déplacé vers le ${direction === 'up' ? 'haut' : 'bas'} !`);
   };
 
+  // Nouvelle fonctionnalité : Rédiger un chapitre avec IA (350 mots)
+  const generateChapterContent = async (chapterId: string) => {
+    const chapter = chapters.find(c => c.id === chapterId);
+    if (!chapter || !chapter.title || !apiKey) {
+      toast.error('Chapitre non trouvé, pas de titre ou clé API manquante');
+      return;
+    }
+
+    setIsGenerating(true);
+    
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [{
+            role: 'user',
+            content: `Rédige un chapitre complet de 350 mots exactement sur le sujet : "${chapter.title}".
+            
+Le contenu doit être :
+- Informatif et engageant
+- Bien structuré avec des paragraphes
+- Professionnel mais accessible
+- Exactement 350 mots
+${ebookTitle ? `- En lien avec le thème général : "${ebookTitle}"` : ''}
+${chapter.subChapters.length > 0 ? `- Couvrir ces sous-sujets : ${chapter.subChapters.map(sub => sub.title).join(', ')}` : ''}
+
+Réponds uniquement avec le texte du chapitre, sans formatage JSON.`
+          }],
+          temperature: 0.7,
+          max_tokens: 600
+        })
+      });
+
+      if (!response.ok) throw new Error('Erreur API');
+
+      const data = await response.json();
+      const generatedContent = data.choices[0].message.content.trim();
+      
+      setChapters(chapters.map(c => 
+        c.id === chapterId 
+          ? { ...c, content: generatedContent }
+          : c
+      ));
+
+      toast.success('Chapitre de 350 mots généré !');
+    } catch (error) {
+      toast.error('Erreur lors de la génération du chapitre');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const generateAutomaticPlan = async () => {
     if (!ebookTitle) {
       toast.error('Veuillez entrer un titre ou mot-clé pour votre ebook');
@@ -873,6 +941,7 @@ Réponds uniquement au format JSON:
                         onMoveChapter={moveChapter}
                         onDuplicateChapter={duplicateChapter}
                         onSplitChapter={splitChapterAutomatically}
+                        onGenerateChapterContent={generateChapterContent}
                         onRemoveChapter={removeChapter}
                         isGenerating={isGenerating}
                         apiKey={apiKey}
