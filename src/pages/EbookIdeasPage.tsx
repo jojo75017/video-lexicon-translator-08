@@ -18,7 +18,24 @@ const EbookIdeasPage: React.FC = () => {
         'Les 7 habitudes des personnes qui réussissent',
         'Guide complet de la gestion du stress',
         'Maîtriser l\'art de la communication',
-        'Comment transformer ses échecs en réussites'
+        'Comment transformer ses échecs en réussites',
+        'Productivité ultime : 10x votre efficacité en 2024',
+        'Mindset de millionnaire : penser comme un leader',
+        'Intelligence émotionnelle : maîtriser ses émotions',
+        'Concentration laser : éliminer les distractions',
+        'Confiance absolue : surmonter peurs et blocages',
+        'Habitudes atomiques : transformer sa vie',
+        'Morning routine des champions',
+        'Gestion du temps pour entrepreneurs',
+        'Motivation permanente : ne plus jamais abandonner',
+        'Leadership naturel : influencer sans manipuler',
+        'Résilience mentale : rebondir après l\'échec',
+        'Charisme magnétique : attirer et inspirer',
+        'Autodiscipline totale : maîtriser ses instincts',
+        'Vision de vie : créer son plan de réussite',
+        'Mentalité de croissance : évoluer en permanence',
+        'Art de la persuasion : convaincre sans effort',
+        'Équilibre vie pro/perso : réussir sans se perdre'
       ]
     },
     {
