@@ -397,7 +397,7 @@ const EbookPlannerPage: React.FC = () => {
           'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-4.1-2025-04-14',
           messages: [{
             role: 'user',
             content: `Analyse ce contenu de chapitre et propose une division logique en sous-chapitres :
@@ -465,7 +465,7 @@ Réponds uniquement au format JSON:
           'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-4.1-2025-04-14',
           messages: [{
             role: 'user',
             content: `Analyse ce texte et suggère une structure de chapitres et sous-chapitres :
@@ -579,7 +579,7 @@ Réponds uniquement au format JSON:
           'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-4.1-2025-04-14',
           messages: [{
             role: 'user',
             content: `Rédige un chapitre complet de 350 mots exactement sur le sujet : "${chapter.title}".
@@ -589,10 +589,18 @@ Le contenu doit être :
 - Bien structuré avec des paragraphes
 - Professionnel mais accessible
 - Exactement 350 mots
+- Utiliser des éléments de formatage variés comme :
+  * Du texte en *italique* pour l'emphase
+  * Des "citations" entre guillemets 
+  * Des commentaires entre parenthèses (comme des précisions)
+  * Des expressions clés importantes
 ${ebookTitle ? `- En lien avec le thème général : "${ebookTitle}"` : ''}
 ${chapter.subChapters.length > 0 ? `- Couvrir ces sous-sujets : ${chapter.subChapters.map(sub => sub.title).join(', ')}` : ''}
 
-Réponds uniquement avec le texte du chapitre, sans formatage JSON.`
+Exemple de formatage attendu :
+"L'art de la persuasion" est *fondamental* dans ce domaine. Comme le dit souvent (et à juste titre) les experts : "La première impression compte". Il faut donc *absolument* maîtriser ces techniques.
+
+Réponds uniquement avec le texte du chapitre formaté, sans JSON.`
           }],
           temperature: 0.7,
           max_tokens: 600
@@ -639,7 +647,7 @@ Réponds uniquement avec le texte du chapitre, sans formatage JSON.`
           'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-4.1-2025-04-14',
           messages: [{
             role: 'user',
             content: `Crée un plan détaillé d'ebook sur le sujet: "${ebookTitle}". 
@@ -763,7 +771,12 @@ Réponds uniquement avec le texte du chapitre, sans formatage JSON.`
           Retour au tableau de bord
         </Button>
         <BookOpen className="h-8 w-8 text-primary" />
-        <h1 className="text-3xl font-bold">🚀 Générateur de Plan d'Ebook Avancé</h1>
+        <div>
+          <h1 className="text-3xl font-bold">🚀 Générateur de Plan d'Ebook Avancé</h1>
+          {ebookTitle && (
+            <p className="text-lg text-muted-foreground mt-1">Sujet : {ebookTitle}</p>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
