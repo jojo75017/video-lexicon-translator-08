@@ -801,6 +801,29 @@ Réponds uniquement avec le texte du chapitre formaté, sans JSON.`
         </div>
       </div>
 
+      {/* Encart pour contenu lié à l'ebook */}
+      <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-l-primary">
+        <CardContent className="pt-6">
+          <div className="flex items-start gap-3">
+            <FileText className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+            <div className="flex-1">
+              <Label htmlFor="ebookContext" className="text-sm font-medium">
+                Description/Contexte de votre ebook
+              </Label>
+              <Textarea
+                id="ebookContext"
+                placeholder="Décrivez brièvement le contexte, l'objectif ou le public cible de votre ebook (optionnel)..."
+                className="mt-2 min-h-[80px] bg-white/80 border-primary/20"
+                rows={3}
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Cette information aidera l'IA à mieux générer le contenu adapté à votre projet
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Formulaire de création */}
         <div className="space-y-6">
