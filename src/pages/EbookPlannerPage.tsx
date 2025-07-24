@@ -1079,6 +1079,17 @@ Réponds uniquement avec le texte du chapitre formaté, sans JSON.`
           </Card>
         </div>
       </div>
+
+      {/* Légende d'aide pour le contenu */}
+      <div className="mt-8 p-4 bg-muted/50 rounded-lg border border-border">
+        <h3 className="text-sm font-medium text-foreground mb-2">💡 Conseils pour enrichir vos chapitres</h3>
+        <div className="text-xs text-muted-foreground space-y-1">
+          <p>• Utilisez *des italiques* pour mettre l'accent sur des mots importants</p>
+          <p>• Ajoutez "des citations" pour illustrer vos propos</p>
+          <p>• Insérez (des commentaires explicatifs) pour clarifier des concepts</p>
+          <p>• Structurez avec des paragraphes courts et des exemples concrets</p>
+        </div>
+      </div>
     </div>
   );
 };
