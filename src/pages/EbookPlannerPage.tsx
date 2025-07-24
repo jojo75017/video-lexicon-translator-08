@@ -183,13 +183,35 @@ function SortableChapter({
       </div>
 
       <div className="ml-6">
-        <Textarea
-          placeholder="Contenu du chapitre (optionnel, pour la division automatique)"
-          value={chapter.content || ''}
-          onChange={(e) => onUpdateContent(chapter.id, e.target.value)}
-          rows={3}
-          className="mb-3"
-        />
+        {chapter.content ? (
+          <div className="bg-muted p-3 rounded-lg mb-3 text-sm leading-relaxed whitespace-pre-wrap">
+            {/* Rendu du contenu avec formatage */}
+            {chapter.content.split('\n').map((line, lineIndex) => (
+              <p key={lineIndex} className="mb-2">
+                {line.split(/(\*[^*]+\*|"[^"]+"|(\([^)]+\)))/).map((part, partIndex) => {
+                  if (part.startsWith('*') && part.endsWith('*')) {
+                    return <em key={partIndex} className="font-medium text-primary">{part.slice(1, -1)}</em>;
+                  }
+                  if (part.startsWith('"') && part.endsWith('"')) {
+                    return <span key={partIndex} className="text-accent-foreground font-medium">"{part.slice(1, -1)}"</span>;
+                  }
+                  if (part.startsWith('(') && part.endsWith(')')) {
+                    return <span key={partIndex} className="text-muted-foreground italic">{part}</span>;
+                  }
+                  return part;
+                })}
+              </p>
+            ))}
+          </div>
+        ) : (
+          <Textarea
+            placeholder="Contenu du chapitre (optionnel, pour la division automatique)"
+            value=""
+            onChange={(e) => onUpdateContent(chapter.id, e.target.value)}
+            rows={3}
+            className="mb-3"
+          />
+        )}
       </div>
       
       <div className="ml-6 space-y-2">
