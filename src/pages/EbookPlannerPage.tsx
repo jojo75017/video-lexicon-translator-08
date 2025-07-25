@@ -966,8 +966,9 @@ Réponds uniquement avec le texte du chapitre formaté, sans JSON.`
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Tabs defaultValue="api" className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
+              <Tabs defaultValue="templates" className="w-full">
+                <TabsList className="grid w-full grid-cols-4">
+                  <TabsTrigger value="templates">📋 Templates</TabsTrigger>
                   <TabsTrigger value="api">🔑 API OpenAI</TabsTrigger>
                   <TabsTrigger value="settings">
                     <Settings className="h-4 w-4 mr-1" />
@@ -978,6 +979,66 @@ Réponds uniquement avec le texte du chapitre formaté, sans JSON.`
                     Import IA
                   </TabsTrigger>
                 </TabsList>
+                <TabsContent value="templates" className="mt-4">
+                  <div className="space-y-4">
+                    <Label className="text-base font-semibold">🚀 Modèles d'ebook prédéfinis</Label>
+                    <p className="text-sm text-muted-foreground">Choisissez un template pour commencer rapidement avec une structure complète</p>
+                    
+                    <div className="grid grid-cols-1 gap-3">
+                      <Button
+                        variant="outline"
+                        className="h-auto p-4 flex flex-col items-start gap-2 hover:bg-primary/5"
+                        onClick={() => applyTemplate('business')}
+                      >
+                        <div className="flex items-center gap-2 font-semibold">
+                          💼 Template Business
+                        </div>
+                        <p className="text-xs text-muted-foreground text-left">
+                          Stratégie business, analyse de marché, business model, marketing, leadership
+                        </p>
+                      </Button>
+                      
+                      <Button
+                        variant="outline"
+                        className="h-auto p-4 flex flex-col items-start gap-2 hover:bg-primary/5"
+                        onClick={() => applyTemplate('guide')}
+                      >
+                        <div className="flex items-center gap-2 font-semibold">
+                          📚 Template Guide Pratique
+                        </div>
+                        <p className="text-xs text-muted-foreground text-left">
+                          Structure pédagogique étape par étape, fondamentaux, mise en pratique
+                        </p>
+                      </Button>
+                      
+                      <Button
+                        variant="outline"
+                        className="h-auto p-4 flex flex-col items-start gap-2 hover:bg-primary/5"
+                        onClick={() => applyTemplate('fiction')}
+                      >
+                        <div className="flex items-center gap-2 font-semibold">
+                          📖 Template Fiction
+                        </div>
+                        <p className="text-xs text-muted-foreground text-left">
+                          Structure narrative classique : commencement, défis, tournant, résolution
+                        </p>
+                      </Button>
+                      
+                      <Button
+                        variant="outline"
+                        className="h-auto p-4 flex flex-col items-start gap-2 hover:bg-primary/5"
+                        onClick={() => applyTemplate('memoir')}
+                      >
+                        <div className="flex items-center gap-2 font-semibold">
+                          ✍️ Template Biographie
+                        </div>
+                        <p className="text-xs text-muted-foreground text-left">
+                          Parcours de vie : origines, formation, accomplissements, réflexions
+                        </p>
+                      </Button>
+                    </div>
+                  </div>
+                </TabsContent>
                 <TabsContent value="api" className="mt-4">
                   <div>
                     <Label htmlFor="apikey">Clé API OpenAI</Label>
@@ -995,46 +1056,7 @@ Réponds uniquement avec le texte du chapitre formaté, sans JSON.`
                 </TabsContent>
                 <TabsContent value="settings" className="mt-4">
                   <div className="space-y-4">
-                    {/* Templates prédéfinis */}
                     <div>
-                      <Label className="text-sm font-medium">📋 Templates d'ebook</Label>
-                      <div className="grid grid-cols-2 gap-2 mt-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => applyTemplate('business')}
-                          className="text-xs"
-                        >
-                          💼 Business
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => applyTemplate('guide')}
-                          className="text-xs"
-                        >
-                          📚 Guide pratique
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => applyTemplate('fiction')}
-                          className="text-xs"
-                        >
-                          📖 Fiction
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => applyTemplate('memoir')}
-                          className="text-xs"
-                        >
-                          ✍️ Biographie
-                        </Button>
-                      </div>
-                    </div>
-                    
-                    <div className="border-t pt-4">
                       <Label htmlFor="chapters-range">Nombre de chapitres: {numberOfChapters}</Label>
                       <div className="mt-2">
                         <input
