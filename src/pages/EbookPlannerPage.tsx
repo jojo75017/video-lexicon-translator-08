@@ -747,6 +747,132 @@ Réponds uniquement avec le texte du chapitre formaté, sans JSON.`
     toast.success('Plan réinitialisé !');
   };
 
+  // Templates prédéfinis par domaine
+  const templates = {
+    business: {
+      title: "Stratégie Business Efficace",
+      author: "Expert Business",
+      preface: "Dans un monde en constante évolution, maîtriser les stratégies business est devenu essentiel. Ce guide vous accompagne vers le succès.",
+      conclusion: "Vous avez maintenant toutes les clés pour réussir. Appliquez ces stratégies et transformez votre business !",
+      chapters: [
+        { title: "Analyse du marché et opportunités", subChapters: ["Étude de marché", "Identification des niches", "Analyse concurrentielle"] },
+        { title: "Développement du business model", subChapters: ["Canvas business model", "Proposition de valeur", "Sources de revenus"] },
+        { title: "Stratégies marketing et vente", subChapters: ["Marketing digital", "Funnel de vente", "Fidélisation client"] },
+        { title: "Gestion financière et croissance", subChapters: ["Prévisions financières", "Levée de fonds", "Optimisation des coûts"] },
+        { title: "Leadership et équipe", subChapters: ["Recrutement", "Management", "Culture d'entreprise"] }
+      ]
+    },
+    guide: {
+      title: "Guide Pratique Complet",
+      author: "Guide Expert",
+      preface: "Ce guide pratique vous accompagne étape par étape pour maîtriser votre sujet. Découvrez les méthodes qui fonctionnent vraiment.",
+      conclusion: "Félicitations ! Vous avez maintenant toutes les compétences nécessaires. Passez à l'action et observez les résultats.",
+      chapters: [
+        { title: "Les fondamentaux à connaître", subChapters: ["Concepts de base", "Erreurs à éviter", "Prérequis essentiels"] },
+        { title: "Préparation et planification", subChapters: ["Définir ses objectifs", "Créer un plan d'action", "Organiser ses ressources"] },
+        { title: "Mise en pratique étape par étape", subChapters: ["Première étape", "Techniques avancées", "Optimisation"] },
+        { title: "Résolution des problèmes courants", subChapters: ["Diagnostic des difficultés", "Solutions pratiques", "Cas d'étude"] },
+        { title: "Perfectionnement et évolution", subChapters: ["Techniques avancées", "Veille et actualisation", "Communauté et ressources"] }
+      ]
+    },
+    fiction: {
+      title: "Histoire Captivante",
+      author: "Auteur Fiction",
+      preface: "Plongez dans une aventure extraordinaire où chaque page vous réserve des surprises. Laissez-vous emporter par cette histoire unique.",
+      conclusion: "Cette aventure touche à sa fin, mais les émotions et les leçons resteront gravées. Merci de m'avoir accompagné dans ce voyage.",
+      chapters: [
+        { title: "Le commencement", subChapters: ["Présentation des personnages", "Le décor", "L'élément déclencheur"] },
+        { title: "Premiers défis", subChapters: ["La découverte", "Les obstacles", "Les alliés inattendus"] },
+        { title: "Le tournant", subChapters: ["La révélation", "Le conflit majeur", "Les enjeux grandissent"] },
+        { title: "L'épreuve finale", subChapters: ["La confrontation", "Le sacrifice", "La résolution"] },
+        { title: "L'épilogue", subChapters: ["Les conséquences", "Les nouveaux équilibres", "L'ouverture vers l'avenir"] }
+      ]
+    },
+    memoir: {
+      title: "Mon Parcours de Vie",
+      author: "Votre Nom",
+      preface: "Partager son histoire, c'est offrir un morceau de son âme. Ces pages retracent un parcours unique fait de joies, d'épreuves et d'apprentissages.",
+      conclusion: "Chaque vie est une histoire unique qui mérite d'être racontée. J'espère que mon parcours vous inspirera dans le vôtre.",
+      chapters: [
+        { title: "Les origines", subChapters: ["Enfance", "Famille", "Premiers souvenirs"] },
+        { title: "Formation et découvertes", subChapters: ["Études", "Premières passions", "Rencontres marquantes"] },
+        { title: "Les défis de l'âge adulte", subChapters: ["Premiers emplois", "Relations importantes", "Épreuves surmontées"] },
+        { title: "Accomplissements et leçons", subChapters: ["Réussites professionnelles", "Vie familiale", "Sagesse acquise"] },
+        { title: "Réflexions et perspective", subChapters: ["Bilan de vie", "Valeurs importantes", "Messages aux générations futures"] }
+      ]
+    }
+  };
+
+  const applyTemplate = (templateType: keyof typeof templates) => {
+    const template = templates[templateType];
+    setEbookTitle(template.title);
+    setAuthorName(template.author);
+    setPreface(template.preface);
+    setConclusion(template.conclusion);
+    
+    const templateChapters = template.chapters.map((chapter, index) => ({
+      id: (Date.now() + index).toString(),
+      title: chapter.title,
+      content: '',
+      subChapters: chapter.subChapters.map((sub, subIndex) => ({
+        id: (Date.now() + index * 100 + subIndex).toString(),
+        title: sub,
+        content: ''
+      }))
+    }));
+    
+    setChapters(templateChapters);
+    toast.success(`Template ${templateType} appliqué avec succès !`);
+  };
+
+  // Génération de table des matières avec pagination
+  const generateTableOfContents = () => {
+    if (chapters.length === 0) {
+      toast.error('Ajoutez des chapitres pour générer la table des matières');
+      return;
+    }
+
+    let toc = `📚 TABLE DES MATIÈRES\n`;
+    toc += `${'='.repeat(50)}\n\n`;
+    
+    if (preface) {
+      toc += `Préface ................................................ Page 3\n\n`;
+    }
+    
+    let currentPage = preface ? 5 : 3;
+    
+    chapters.forEach((chapter, index) => {
+      const chapterNumber = index + 1;
+      const pageNumber = currentPage;
+      
+      // Titre du chapitre
+      toc += `${chapterNumber}. ${chapter.title}`;
+      const dots = Math.max(2, 45 - chapter.title.length - chapterNumber.toString().length);
+      toc += `${'.'.repeat(dots)} Page ${pageNumber}\n`;
+      
+      // Sous-chapitres
+      chapter.subChapters.forEach((subChapter, subIndex) => {
+        const subNumber = `${chapterNumber}.${subIndex + 1}`;
+        toc += `   ${subNumber} ${subChapter.title}`;
+        const subDots = Math.max(2, 42 - subChapter.title.length - subNumber.length);
+        toc += `${'.'.repeat(subDots)} Page ${pageNumber + subIndex + 1}\n`;
+      });
+      
+      toc += '\n';
+      currentPage += Math.max(5, chapter.subChapters.length + 3); // Estimation de pages par chapitre
+    });
+    
+    if (conclusion) {
+      toc += `Conclusion/Mot de la fin ................................ Page ${currentPage + 2}\n`;
+    }
+    
+    toc += `\n${'='.repeat(50)}\n`;
+    toc += `Total estimé: ${currentPage + (conclusion ? 4 : 2)} pages\n`;
+
+    navigator.clipboard.writeText(toc);
+    toast.success('Table des matières copiée dans le presse-papiers !');
+  };
+
   const generatePlan = () => {
     if (!ebookTitle || !authorName || chapters.length === 0) {
       toast.error('Veuillez remplir au minimum le titre, l\'auteur et ajouter des chapitres');
@@ -869,7 +995,46 @@ Réponds uniquement avec le texte du chapitre formaté, sans JSON.`
                 </TabsContent>
                 <TabsContent value="settings" className="mt-4">
                   <div className="space-y-4">
+                    {/* Templates prédéfinis */}
                     <div>
+                      <Label className="text-sm font-medium">📋 Templates d'ebook</Label>
+                      <div className="grid grid-cols-2 gap-2 mt-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => applyTemplate('business')}
+                          className="text-xs"
+                        >
+                          💼 Business
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => applyTemplate('guide')}
+                          className="text-xs"
+                        >
+                          📚 Guide pratique
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => applyTemplate('fiction')}
+                          className="text-xs"
+                        >
+                          📖 Fiction
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => applyTemplate('memoir')}
+                          className="text-xs"
+                        >
+                          ✍️ Biographie
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div className="border-t pt-4">
                       <Label htmlFor="chapters-range">Nombre de chapitres: {numberOfChapters}</Label>
                       <div className="mt-2">
                         <input
@@ -1036,14 +1201,20 @@ Réponds uniquement avec le texte du chapitre formaté, sans JSON.`
             </CardContent>
           </Card>
 
-          <div className="flex gap-2">
-            <Button onClick={generatePlan} className="flex-1" size="lg">
-              <FileText className="h-4 w-4 mr-2" />
-              📋 Générer le plan d'ebook
-            </Button>
-            <Button onClick={resetPlan} variant="outline" size="lg">
-              <RotateCcw className="h-4 w-4 mr-2" />
-              Effacer
+          <div className="space-y-3">
+            <div className="flex gap-2">
+              <Button onClick={generatePlan} className="flex-1" size="lg">
+                <FileText className="h-4 w-4 mr-2" />
+                📋 Générer le plan d'ebook
+              </Button>
+              <Button onClick={resetPlan} variant="outline" size="lg">
+                <RotateCcw className="h-4 w-4 mr-2" />
+                Effacer
+              </Button>
+            </div>
+            <Button onClick={generateTableOfContents} variant="secondary" className="w-full" size="lg">
+              <BookOpen className="h-4 w-4 mr-2" />
+              📖 Générer la table des matières (avec pagination)
             </Button>
           </div>
         </div>
