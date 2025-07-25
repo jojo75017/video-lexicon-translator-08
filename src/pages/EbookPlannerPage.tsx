@@ -801,24 +801,27 @@ Réponds uniquement avec le texte du chapitre formaté, sans JSON.`
         </div>
       </div>
 
-      {/* Encart pour contenu lié à l'ebook */}
-      <div className="mb-6">
-        <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-l-primary shadow-sm">
-          <CardContent className="pt-6">
-            <div className="flex items-start gap-3">
-              <FileText className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+      {/* Encart pour contenu lié à l'ebook - VISIBLE */}
+      <div className="mb-8 mt-6">
+        <Card className="bg-gradient-to-r from-blue-100 to-indigo-100 border-2 border-primary shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-start gap-4">
+              <div className="bg-primary/10 p-2 rounded-lg">
+                <FileText className="h-6 w-6 text-primary" />
+              </div>
               <div className="flex-1">
-                <Label htmlFor="ebookContext" className="text-sm font-medium text-gray-800">
-                  📝 Description/Contexte de votre ebook
+                <Label htmlFor="ebookContext" className="text-base font-semibold text-gray-900 mb-2 block">
+                  📝 Description et contexte de votre ebook
                 </Label>
                 <Textarea
                   id="ebookContext"
-                  placeholder="Décrivez brièvement le contexte, l'objectif ou le public cible de votre ebook (optionnel)..."
-                  className="mt-2 min-h-[80px] bg-white/90 border-primary/20 focus:ring-2 focus:ring-primary/20"
-                  rows={3}
+                  placeholder="Décrivez le contexte, l'objectif, le public cible de votre ebook..."
+                  className="min-h-[100px] bg-white border-2 border-primary/30 focus:ring-2 focus:ring-primary/40 text-base"
+                  rows={4}
                 />
-                <p className="text-xs text-muted-foreground mt-2">
-                  💡 Cette information aidera l'IA à mieux générer le contenu adapté à votre projet
+                <p className="text-sm text-muted-foreground mt-3 flex items-center gap-2">
+                  <span className="text-lg">💡</span>
+                  Cette description aidera l'IA à générer un contenu plus précis et adapté
                 </p>
               </div>
             </div>
