@@ -927,379 +927,726 @@ Réponds uniquement avec le texte du chapitre formaté, sans JSON.`
         </div>
       </div>
 
-      {/* Encart pour contenu lié à l'ebook - VISIBLE */}
-      <div className="mb-8 mt-6">
-        <Card className="bg-gradient-to-r from-blue-100 to-indigo-100 border-2 border-primary shadow-lg">
-          <CardContent className="p-6">
-            <div className="flex items-start gap-4">
-              <div className="bg-primary/10 p-2 rounded-lg">
-                <FileText className="h-6 w-6 text-primary" />
-              </div>
-              <div className="flex-1">
-                <Label htmlFor="ebookContext" className="text-base font-semibold text-gray-900 mb-2 block">
-                  📝 Description et contexte de votre ebook
-                </Label>
-                <Textarea
-                  id="ebookContext"
-                  placeholder="Décrivez le contexte, l'objectif, le public cible de votre ebook..."
-                  className="min-h-[100px] bg-white border-2 border-primary/30 focus:ring-2 focus:ring-primary/40 text-base"
-                  rows={4}
-                />
-                <p className="text-sm text-muted-foreground mt-3 flex items-center gap-2">
-                  <span className="text-lg">💡</span>
-                  Cette description aidera l'IA à générer un contenu plus précis et adapté
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <Tabs defaultValue="planner" className="w-full">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="planner">📝 Planificateur</TabsTrigger>
+          <TabsTrigger value="templates">📋 Templates</TabsTrigger>
+          <TabsTrigger value="writing">✍️ Rédaction</TabsTrigger>
+          <TabsTrigger value="toc">📑 Table des matières</TabsTrigger>
+          <TabsTrigger value="settings">⚙️ Paramètres</TabsTrigger>
+        </TabsList>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Formulaire de création */}
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>⚙️ Configuration</CardTitle>
-              <CardDescription>
-                Configurez votre clé API OpenAI et les paramètres de génération
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Tabs defaultValue="templates" className="w-full">
-                <TabsList className="grid w-full grid-cols-4">
-                  <TabsTrigger value="templates">📋 Templates</TabsTrigger>
-                  <TabsTrigger value="api">🔑 API OpenAI</TabsTrigger>
-                  <TabsTrigger value="settings">
-                    <Settings className="h-4 w-4 mr-1" />
-                    Paramètres
-                  </TabsTrigger>
-                  <TabsTrigger value="import">
-                    <Upload className="h-4 w-4 mr-1" />
-                    Import IA
-                  </TabsTrigger>
-                </TabsList>
-                <TabsContent value="templates" className="mt-4">
-                  <div className="space-y-4">
-                    <Label className="text-base font-semibold">🚀 Modèles d'ebook prédéfinis</Label>
-                    <p className="text-sm text-muted-foreground">Choisissez un template pour commencer rapidement avec une structure complète</p>
-                    
-                    <div className="grid grid-cols-1 gap-3">
-                      <Button
-                        variant="outline"
-                        className="h-auto p-4 flex flex-col items-start gap-2 hover:bg-primary/5"
-                        onClick={() => applyTemplate('business')}
-                      >
-                        <div className="flex items-center gap-2 font-semibold">
-                          💼 Template Business
-                        </div>
-                        <p className="text-xs text-muted-foreground text-left">
-                          Stratégie business, analyse de marché, business model, marketing, leadership
-                        </p>
-                      </Button>
-                      
-                      <Button
-                        variant="outline"
-                        className="h-auto p-4 flex flex-col items-start gap-2 hover:bg-primary/5"
-                        onClick={() => applyTemplate('guide')}
-                      >
-                        <div className="flex items-center gap-2 font-semibold">
-                          📚 Template Guide Pratique
-                        </div>
-                        <p className="text-xs text-muted-foreground text-left">
-                          Structure pédagogique étape par étape, fondamentaux, mise en pratique
-                        </p>
-                      </Button>
-                      
-                      <Button
-                        variant="outline"
-                        className="h-auto p-4 flex flex-col items-start gap-2 hover:bg-primary/5"
-                        onClick={() => applyTemplate('fiction')}
-                      >
-                        <div className="flex items-center gap-2 font-semibold">
-                          📖 Template Fiction
-                        </div>
-                        <p className="text-xs text-muted-foreground text-left">
-                          Structure narrative classique : commencement, défis, tournant, résolution
-                        </p>
-                      </Button>
-                      
-                      <Button
-                        variant="outline"
-                        className="h-auto p-4 flex flex-col items-start gap-2 hover:bg-primary/5"
-                        onClick={() => applyTemplate('memoir')}
-                      >
-                        <div className="flex items-center gap-2 font-semibold">
-                          ✍️ Template Biographie
-                        </div>
-                        <p className="text-xs text-muted-foreground text-left">
-                          Parcours de vie : origines, formation, accomplissements, réflexions
-                        </p>
-                      </Button>
-                    </div>
+        <TabsContent value="planner" className="space-y-6 mt-6">
+          {/* Encart pour contenu lié à l'ebook - VISIBLE */}
+          <div className="mb-8">
+            <Card className="bg-gradient-to-r from-blue-100 to-indigo-100 border-2 border-primary shadow-lg">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  <div className="bg-primary/10 p-2 rounded-lg">
+                    <FileText className="h-6 w-6 text-primary" />
                   </div>
-                </TabsContent>
-                <TabsContent value="api" className="mt-4">
-                  <div>
-                    <Label htmlFor="apikey">Clé API OpenAI</Label>
-                    <Input
-                      id="apikey"
-                      type="password"
-                      placeholder="sk-..."
-                      value={apiKey}
-                      onChange={(e) => updateApiKey(e.target.value)}
+                  <div className="flex-1">
+                    <Label htmlFor="ebookContext" className="text-base font-semibold text-gray-900 mb-2 block">
+                      📝 Description et contexte de votre ebook
+                    </Label>
+                    <Textarea
+                      id="ebookContext"
+                      placeholder="Décrivez le contexte, l'objectif, le public cible de votre ebook..."
+                      className="min-h-[100px] bg-white border-2 border-primary/30 focus:ring-2 focus:ring-primary/40 text-base"
+                      rows={4}
                     />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Obtenez votre clé sur <a href="https://platform.openai.com/api-keys" target="_blank" className="text-primary hover:underline">platform.openai.com</a>
+                    <p className="text-sm text-muted-foreground mt-3 flex items-center gap-2">
+                      <span className="text-lg">💡</span>
+                      Cette description aidera l'IA à générer un contenu plus précis et adapté
                     </p>
                   </div>
-                </TabsContent>
-                <TabsContent value="settings" className="mt-4">
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="chapters-range">Nombre de chapitres: {numberOfChapters}</Label>
-                      <div className="mt-2">
-                        <input
-                          id="chapters-range"
-                          type="range"
-                          min="5"
-                          max="20"
-                          value={numberOfChapters}
-                          onChange={(e) => setNumberOfChapters(parseInt(e.target.value))}
-                          className="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer slider"
-                        />
-                        <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                          <span>5 chapitres</span>
-                          <span>20 chapitres</span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Formulaire de création */}
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>⚙️ Configuration</CardTitle>
+                  <CardDescription>
+                    Configurez votre clé API OpenAI et les paramètres de génération
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Tabs defaultValue="templates" className="w-full">
+                    <TabsList className="grid w-full grid-cols-4">
+                      <TabsTrigger value="templates">📋 Templates</TabsTrigger>
+                      <TabsTrigger value="api">🔑 API OpenAI</TabsTrigger>
+                      <TabsTrigger value="settings">
+                        <Settings className="h-4 w-4 mr-1" />
+                        Paramètres
+                      </TabsTrigger>
+                      <TabsTrigger value="import">
+                        <Upload className="h-4 w-4 mr-1" />
+                        Import IA
+                      </TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="templates" className="mt-4">
+                      <div className="space-y-4">
+                        <Label className="text-base font-semibold">🚀 Modèles d'ebook prédéfinis</Label>
+                        <p className="text-sm text-muted-foreground">Choisissez un template pour commencer rapidement avec une structure complète</p>
+                        
+                        <div className="grid grid-cols-1 gap-3">
+                          <Button
+                            variant="outline"
+                            className="h-auto p-4 flex flex-col items-start gap-2 hover:bg-primary/5"
+                            onClick={() => applyTemplate('business')}
+                          >
+                            <div className="flex items-center gap-2 font-semibold">
+                              💼 Template Business
+                            </div>
+                            <p className="text-xs text-muted-foreground text-left">
+                              Stratégie business, analyse de marché, business model, marketing, leadership
+                            </p>
+                          </Button>
+                          
+                          <Button
+                            variant="outline"
+                            className="h-auto p-4 flex flex-col items-start gap-2 hover:bg-primary/5"
+                            onClick={() => applyTemplate('guide')}
+                          >
+                            <div className="flex items-center gap-2 font-semibold">
+                              📚 Template Guide Pratique
+                            </div>
+                            <p className="text-xs text-muted-foreground text-left">
+                              Structure pédagogique étape par étape, fondamentaux, mise en pratique
+                            </p>
+                          </Button>
+                          
+                          <Button
+                            variant="outline"
+                            className="h-auto p-4 flex flex-col items-start gap-2 hover:bg-primary/5"
+                            onClick={() => applyTemplate('fiction')}
+                          >
+                            <div className="flex items-center gap-2 font-semibold">
+                              📖 Template Fiction
+                            </div>
+                            <p className="text-xs text-muted-foreground text-left">
+                              Structure narrative classique : commencement, défis, tournant, résolution
+                            </p>
+                          </Button>
+                          
+                          <Button
+                            variant="outline"
+                            className="h-auto p-4 flex flex-col items-start gap-2 hover:bg-primary/5"
+                            onClick={() => applyTemplate('memoir')}
+                          >
+                            <div className="flex items-center gap-2 font-semibold">
+                              ✍️ Template Biographie
+                            </div>
+                            <p className="text-xs text-muted-foreground text-left">
+                              Parcours de vie : origines, formation, accomplissements, réflexions
+                            </p>
+                          </Button>
                         </div>
                       </div>
+                    </TabsContent>
+                    <TabsContent value="api" className="mt-4">
+                      <div>
+                        <Label htmlFor="apikey">Clé API OpenAI</Label>
+                        <Input
+                          id="apikey"
+                          type="password"
+                          placeholder="sk-..."
+                          value={apiKey}
+                          onChange={(e) => updateApiKey(e.target.value)}
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Obtenez votre clé sur <a href="https://platform.openai.com/api-keys" target="_blank" className="text-primary hover:underline">platform.openai.com</a>
+                        </p>
+                      </div>
+                    </TabsContent>
+                    <TabsContent value="settings" className="mt-4">
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor="chapters-range">Nombre de chapitres: {numberOfChapters}</Label>
+                          <div className="mt-2">
+                            <input
+                              id="chapters-range"
+                              type="range"
+                              min="5"
+                              max="20"
+                              value={numberOfChapters}
+                              onChange={(e) => setNumberOfChapters(parseInt(e.target.value))}
+                              className="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer slider"
+                            />
+                            <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                              <span>5 chapitres</span>
+                              <span>20 chapitres</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </TabsContent>
+                    <TabsContent value="import" className="mt-4">
+                      <div className="space-y-4">
+                        <Label htmlFor="import-text">🧠 Importer du texte existant</Label>
+                        <Textarea
+                          id="import-text"
+                          placeholder="Collez votre texte ici pour l'analyser et générer une structure automatiquement..."
+                          value={importText}
+                          onChange={(e) => setImportText(e.target.value)}
+                          rows={6}
+                        />
+                        <Button 
+                          onClick={analyzeImportedText}
+                          disabled={isGenerating || !importText || !apiKey}
+                          className="w-full"
+                        >
+                          <Wand2 className="h-4 w-4 mr-2" />
+                          {isGenerating ? 'Analyse en cours...' : 'Analyser et structurer avec IA'}
+                        </Button>
+                      </div>
+                    </TabsContent>
+                  </Tabs>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>📖 Informations générales</CardTitle>
+                  <CardDescription>
+                    Renseignez les informations de base de votre ebook
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <Label htmlFor="title">Titre de l'ebook</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="title"
+                        placeholder="Entrez le titre ou mot-clé de votre ebook"
+                        value={ebookTitle}
+                        onChange={(e) => setEbookTitle(e.target.value)}
+                        className="flex-1"
+                      />
+                      <Button 
+                        onClick={generateAutomaticPlan}
+                        disabled={isGenerating || !ebookTitle}
+                        size="sm"
+                      >
+                        <Wand2 className="h-4 w-4 mr-1" />
+                        {isGenerating ? 'Génération...' : 'Générer auto'}
+                      </Button>
                     </div>
                   </div>
-                </TabsContent>
-                <TabsContent value="import" className="mt-4">
-                  <div className="space-y-4">
-                    <Label htmlFor="import-text">🧠 Importer du texte existant</Label>
-                    <Textarea
-                      id="import-text"
-                      placeholder="Collez votre texte ici pour l'analyser et générer une structure automatiquement..."
-                      value={importText}
-                      onChange={(e) => setImportText(e.target.value)}
-                      rows={6}
-                    />
-                    <Button 
-                      onClick={analyzeImportedText}
-                      disabled={isGenerating || !importText || !apiKey}
-                      className="w-full"
-                    >
-                      <Wand2 className="h-4 w-4 mr-2" />
-                      {isGenerating ? 'Analyse en cours...' : 'Analyser et structurer avec IA'}
-                    </Button>
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>📖 Informations générales</CardTitle>
-              <CardDescription>
-                Renseignez les informations de base de votre ebook
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="title">Titre de l'ebook</Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="title"
-                    placeholder="Entrez le titre ou mot-clé de votre ebook"
-                    value={ebookTitle}
-                    onChange={(e) => setEbookTitle(e.target.value)}
-                    className="flex-1"
-                  />
-                  <Button 
-                    onClick={generateAutomaticPlan}
-                    disabled={isGenerating || !ebookTitle}
-                    size="sm"
-                  >
-                    <Wand2 className="h-4 w-4 mr-1" />
-                    {isGenerating ? 'Génération...' : 'Générer auto'}
-                  </Button>
-                </div>
-              </div>
-              
-              <div>
-                <Label htmlFor="author">Nom de l'auteur</Label>
-                <Input
-                  id="author"
-                  placeholder="Nom de l'auteur"
-                  value={authorName}
-                  onChange={(e) => setAuthorName(e.target.value)}
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="preface">Préface (optionnel)</Label>
-                <Textarea
-                  id="preface"
-                  placeholder="Rédigez votre préface..."
-                  value={preface}
-                  onChange={(e) => setPreface(e.target.value)}
-                  rows={4}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="conclusion">Mot de la fin / Conclusion (optionnel)</Label>
-                <Textarea
-                  id="conclusion"
-                  placeholder="Rédigez votre conclusion avec remerciements et email de contact..."
-                  value={conclusion}
-                  onChange={(e) => setConclusion(e.target.value)}
-                  rows={4}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                📚 Chapitres Avancés
-                <div className="flex gap-2">
-                  {selectedChapters.length > 1 && (
-                    <Button onClick={mergeSelectedChapters} size="sm" variant="outline">
-                      <Merge className="h-4 w-4 mr-1" />
-                      Fusionner ({selectedChapters.length})
-                    </Button>
-                  )}
-                  <Button onClick={addChapter} size="sm">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Ajouter un chapitre
-                  </Button>
-                </div>
-              </CardTitle>
-              <CardDescription>
-                ✨ Glissez-déposez pour réorganiser • ✂️ Divisez automatiquement • 📋 Sélectionnez pour fusionner
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
-              >
-                <SortableContext
-                  items={chapters.map(c => c.id)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  <div className="space-y-4">
-                    {chapters.map((chapter, index) => (
-                      <SortableChapter
-                        key={chapter.id}
-                        chapter={chapter}
-                        index={index}
-                        isSelected={selectedChapters.includes(chapter.id)}
-                        onSelect={toggleChapterSelection}
-                        onUpdateTitle={updateChapterTitle}
-                        onUpdateContent={updateChapterContent}
-                        onAddSubChapter={addSubChapter}
-                        onRemoveSubChapter={removeSubChapter}
-                        onUpdateSubChapterTitle={updateSubChapterTitle}
-                        onMoveChapter={moveChapter}
-                        onDuplicateChapter={duplicateChapter}
-                        onSplitChapter={splitChapterAutomatically}
-                        onGenerateChapterContent={generateChapterContent}
-                        onRemoveChapter={removeChapter}
-                        isGenerating={isGenerating}
-                        apiKey={apiKey}
-                        totalChapters={chapters.length}
-                      />
-                    ))}
-                  </div>
-                </SortableContext>
-              </DndContext>
-            </CardContent>
-          </Card>
-
-          <div className="space-y-3">
-            <div className="flex gap-2">
-              <Button onClick={generatePlan} className="flex-1" size="lg">
-                <FileText className="h-4 w-4 mr-2" />
-                📋 Générer le plan d'ebook
-              </Button>
-              <Button onClick={resetPlan} variant="outline" size="lg">
-                <RotateCcw className="h-4 w-4 mr-2" />
-                Effacer
-              </Button>
-            </div>
-            <Button onClick={generateTableOfContents} variant="secondary" className="w-full" size="lg">
-              <BookOpen className="h-4 w-4 mr-2" />
-              📖 Générer la table des matières (avec pagination)
-            </Button>
-          </div>
-        </div>
-
-        {/* Aperçu du plan */}
-        <div>
-          <Card className="sticky top-6">
-            <CardHeader>
-              <CardTitle>👀 Aperçu du plan</CardTitle>
-              <CardDescription>
-                Voici à quoi ressemblera votre plan d'ebook
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="bg-muted p-4 rounded-lg min-h-[400px] font-mono text-sm max-h-[600px] overflow-y-auto">
-                {ebookTitle || authorName || chapters.length > 0 || preface || conclusion ? (
+                  
                   <div>
-                    <div className="font-bold text-center mb-4">📖 PLAN D'EBOOK</div>
-                    {ebookTitle && <div><strong>Titre:</strong> {ebookTitle}</div>}
-                    {authorName && <div><strong>Auteur:</strong> {authorName}</div>}
-                    
-                    {preface && (
-                      <div className="mt-4">
-                        <div className="font-bold">📝 PRÉFACE</div>
-                        <div className="text-xs mt-1">{preface}</div>
-                      </div>
-                    )}
-                    
-                    {chapters.length > 0 && (
-                      <div className="mt-4">
-                        <div className="font-bold mb-2">📚 SOMMAIRE</div>
+                    <Label htmlFor="author">Nom de l'auteur</Label>
+                    <Input
+                      id="author"
+                      placeholder="Nom de l'auteur"
+                      value={authorName}
+                      onChange={(e) => setAuthorName(e.target.value)}
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="preface">Préface (optionnel)</Label>
+                    <Textarea
+                      id="preface"
+                      placeholder="Rédigez votre préface..."
+                      value={preface}
+                      onChange={(e) => setPreface(e.target.value)}
+                      rows={4}
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="conclusion">Mot de la fin / Conclusion (optionnel)</Label>
+                    <Textarea
+                      id="conclusion"
+                      placeholder="Rédigez votre conclusion avec remerciements et email de contact..."
+                      value={conclusion}
+                      onChange={(e) => setConclusion(e.target.value)}
+                      rows={4}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    📚 Chapitres Avancés
+                    <div className="flex gap-2">
+                      {selectedChapters.length > 1 && (
+                        <Button onClick={mergeSelectedChapters} size="sm" variant="outline">
+                          <Merge className="h-4 w-4 mr-1" />
+                          Fusionner ({selectedChapters.length})
+                        </Button>
+                      )}
+                      <Button onClick={addChapter} size="sm">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Ajouter un chapitre
+                      </Button>
+                    </div>
+                  </CardTitle>
+                  <CardDescription>
+                    ✨ Glissez-déposez pour réorganiser • ✂️ Divisez automatiquement • 📋 Sélectionnez pour fusionner
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <SortableContext
+                      items={chapters.map(c => c.id)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      <div className="space-y-4">
                         {chapters.map((chapter, index) => (
-                          <div key={chapter.id} className="mb-2">
-                            <div className={`${selectedChapters.includes(chapter.id) ? 'bg-primary/20 px-1 rounded' : ''}`}>
-                              {index + 1}. {chapter.title || 'Titre du chapitre'}
-                            </div>
-                            {chapter.subChapters.map((subChapter, subIndex) => (
-                              <div key={subChapter.id} className="ml-4 text-xs">
-                                {index + 1}.{subIndex + 1}. {subChapter.title || 'Titre du sous-chapitre'}
+                          <SortableChapter
+                            key={chapter.id}
+                            chapter={chapter}
+                            index={index}
+                            isSelected={selectedChapters.includes(chapter.id)}
+                            onSelect={toggleChapterSelection}
+                            onUpdateTitle={updateChapterTitle}
+                            onUpdateContent={updateChapterContent}
+                            onAddSubChapter={addSubChapter}
+                            onRemoveSubChapter={removeSubChapter}
+                            onUpdateSubChapterTitle={updateSubChapterTitle}
+                            onMoveChapter={moveChapter}
+                            onDuplicateChapter={duplicateChapter}
+                            onSplitChapter={splitChapterAutomatically}
+                            onGenerateChapterContent={generateChapterContent}
+                            onRemoveChapter={removeChapter}
+                            isGenerating={isGenerating}
+                            apiKey={apiKey}
+                            totalChapters={chapters.length}
+                          />
+                        ))}
+                      </div>
+                    </SortableContext>
+                  </DndContext>
+                </CardContent>
+              </Card>
+
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <Button onClick={generatePlan} className="flex-1" size="lg">
+                    <FileText className="h-4 w-4 mr-2" />
+                    📋 Générer le plan d'ebook
+                  </Button>
+                  <Button onClick={resetPlan} variant="outline" size="lg">
+                    <RotateCcw className="h-4 w-4 mr-2" />
+                    Effacer
+                  </Button>
+                </div>
+                <Button onClick={generateTableOfContents} variant="secondary" className="w-full" size="lg">
+                  <BookOpen className="h-4 w-4 mr-2" />
+                  📖 Générer la table des matières (avec pagination)
+                </Button>
+              </div>
+            </div>
+
+            {/* Aperçu du plan */}
+            <div>
+              <Card className="sticky top-6">
+                <CardHeader>
+                  <CardTitle>👀 Aperçu du plan</CardTitle>
+                  <CardDescription>
+                    Voici à quoi ressemblera votre plan d'ebook
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="bg-muted p-4 rounded-lg min-h-[400px] font-mono text-sm max-h-[600px] overflow-y-auto">
+                    {ebookTitle || authorName || chapters.length > 0 || preface || conclusion ? (
+                      <div>
+                        <div className="font-bold text-center mb-4">📖 PLAN D'EBOOK</div>
+                        {ebookTitle && <div><strong>Titre:</strong> {ebookTitle}</div>}
+                        {authorName && <div><strong>Auteur:</strong> {authorName}</div>}
+                        
+                        {preface && (
+                          <div className="mt-4">
+                            <div className="font-bold">📝 PRÉFACE</div>
+                            <div className="text-xs mt-1">{preface}</div>
+                          </div>
+                        )}
+                        
+                        {chapters.length > 0 && (
+                          <div className="mt-4">
+                            <div className="font-bold mb-2">📚 SOMMAIRE</div>
+                            {chapters.map((chapter, index) => (
+                              <div key={chapter.id} className="mb-2">
+                                <div className={`${selectedChapters.includes(chapter.id) ? 'bg-primary/20 px-1 rounded' : ''}`}>
+                                  {index + 1}. {chapter.title || 'Titre du chapitre'}
+                                </div>
+                                {chapter.subChapters.map((subChapter, subIndex) => (
+                                  <div key={subChapter.id} className="ml-4 text-xs">
+                                    {index + 1}.{subIndex + 1}. {subChapter.title || 'Titre du sous-chapitre'}
+                                  </div>
+                                ))}
                               </div>
                             ))}
                           </div>
-                        ))}
-                      </div>
-                    )}
+                        )}
 
-                    {conclusion && (
-                      <div className="mt-4">
-                        <div className="font-bold">🎯 MOT DE LA FIN</div>
-                        <div className="text-xs mt-1">{conclusion}</div>
+                        {conclusion && (
+                          <div className="mt-4">
+                            <div className="font-bold">🎯 MOT DE LA FIN</div>
+                            <div className="text-xs mt-1">{conclusion}</div>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="text-muted-foreground text-center">
+                        ✏️ Remplissez les informations pour voir l'aperçu du plan
                       </div>
                     )}
                   </div>
-                ) : (
-                  <div className="text-muted-foreground text-center">
-                    ✏️ Remplissez les informations pour voir l'aperçu du plan
-                  </div>
-                )}
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="templates" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BookOpen className="h-5 w-5" />
+                Templates d'Ebook
+              </CardTitle>
+              <CardDescription>
+                Utilisez ces templates prédéfinis pour démarrer rapidement votre ebook
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 gap-4">
+                <Card className="border-l-4 border-l-blue-500">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="text-lg">💼 Template Business</CardTitle>
+                        <CardDescription className="mt-1">
+                          Guide complet pour entrepreneurs et professionnels
+                        </CardDescription>
+                      </div>
+                      <Button 
+                        onClick={() => applyTemplate('business')}
+                        variant="outline"
+                        size="sm"
+                      >
+                        Utiliser ce template
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="text-sm text-muted-foreground">
+                      <strong>Chapitres inclus :</strong>
+                      <ul className="mt-2 space-y-1">
+                        <li className="ml-4">• Vision et stratégie</li>
+                        <li className="ml-4">• Analyse de marché</li>
+                        <li className="ml-4">• Business model et monétisation</li>
+                        <li className="ml-4">• Marketing et croissance</li>
+                        <li className="ml-4">• Leadership et équipe</li>
+                      </ul>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-l-4 border-l-green-500">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="text-lg">📚 Template Guide Pratique</CardTitle>
+                        <CardDescription className="mt-1">
+                          Structure pédagogique étape par étape
+                        </CardDescription>
+                      </div>
+                      <Button 
+                        onClick={() => applyTemplate('guide')}
+                        variant="outline"
+                        size="sm"
+                      >
+                        Utiliser ce template
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="text-sm text-muted-foreground">
+                      <strong>Chapitres inclus :</strong>
+                      <ul className="mt-2 space-y-1">
+                        <li className="ml-4">• Introduction et fondamentaux</li>
+                        <li className="ml-4">• Prérequis et préparation</li>
+                        <li className="ml-4">• Étapes pratiques</li>
+                        <li className="ml-4">• Outils et ressources</li>
+                        <li className="ml-4">• Cas d'usage et exemples</li>
+                      </ul>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-l-4 border-l-purple-500">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="text-lg">📖 Template Fiction</CardTitle>
+                        <CardDescription className="mt-1">
+                          Structure narrative classique pour romans
+                        </CardDescription>
+                      </div>
+                      <Button 
+                        onClick={() => applyTemplate('fiction')}
+                        variant="outline"
+                        size="sm"
+                      >
+                        Utiliser ce template
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="text-sm text-muted-foreground">
+                      <strong>Chapitres inclus :</strong>
+                      <ul className="mt-2 space-y-1">
+                        <li className="ml-4">• Le commencement</li>
+                        <li className="ml-4">• Présentation des personnages</li>
+                        <li className="ml-4">• Les premiers défis</li>
+                        <li className="ml-4">• Le tournant dramatique</li>
+                        <li className="ml-4">• La résolution</li>
+                      </ul>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-l-4 border-l-orange-500">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="text-lg">✍️ Template Biographie</CardTitle>
+                        <CardDescription className="mt-1">
+                          Parcours de vie et accomplissements
+                        </CardDescription>
+                      </div>
+                      <Button 
+                        onClick={() => applyTemplate('memoir')}
+                        variant="outline"
+                        size="sm"
+                      >
+                        Utiliser ce template
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="text-sm text-muted-foreground">
+                      <strong>Chapitres inclus :</strong>
+                      <ul className="mt-2 space-y-1">
+                        <li className="ml-4">• Origines et enfance</li>
+                        <li className="ml-4">• Formation et éducation</li>
+                        <li className="ml-4">• Début de carrière</li>
+                        <li className="ml-4">• Accomplissements et leçons</li>
+                        <li className="ml-4">• Réflexions et perspective</li>
+                      </ul>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             </CardContent>
           </Card>
-        </div>
-      </div>
+        </TabsContent>
+
+        <TabsContent value="writing" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                Espace de Rédaction
+              </CardTitle>
+              <CardDescription>
+                Rédigez vos chapitres avec des modèles de mise en forme professionnels
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {chapters.length === 0 ? (
+                <div className="text-center py-8">
+                  <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground">
+                    Ajoutez d'abord des chapitres dans l'onglet Planificateur pour commencer à rédiger
+                  </p>
+                </div>
+              ) : (
+                chapters.map((chapter, index) => (
+                  <Card key={chapter.id} className="border-2">
+                    <CardHeader className="bg-muted/50">
+                      <CardTitle className="text-lg">
+                        Chapitre {index + 1}: {chapter.title || 'Sans titre'}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor={`chapter-${chapter.id}`} className="text-sm font-medium">
+                            Contenu du chapitre
+                          </Label>
+                          <Textarea
+                            id={`chapter-${chapter.id}`}
+                            placeholder="Commencez à rédiger votre chapitre ici..."
+                            value={chapter.content || ''}
+                            onChange={(e) => updateChapterContent(chapter.id, e.target.value)}
+                            className="min-h-[300px] mt-2 font-serif text-base leading-relaxed"
+                            style={{
+                              fontFamily: 'Georgia, serif',
+                              lineHeight: '1.8',
+                              fontSize: '16px'
+                            }}
+                          />
+                        </div>
+                        
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <span>
+                            Mots: {chapter.content ? chapter.content.split(/\s+/).filter(word => word.length > 0).length : 0}
+                          </span>
+                          <span>•</span>
+                          <span>
+                            Caractères: {chapter.content ? chapter.content.length : 0}
+                          </span>
+                        </div>
+
+                        {chapter.subChapters.length > 0 && (
+                          <div className="space-y-4 border-t pt-4">
+                            <h4 className="font-medium text-sm text-muted-foreground">Sous-chapitres:</h4>
+                            {chapter.subChapters.map((subChapter, subIndex) => (
+                              <div key={subChapter.id} className="space-y-2">
+                                <Label className="text-sm font-medium">
+                                  {index + 1}.{subIndex + 1} {subChapter.title || 'Sans titre'}
+                                </Label>
+                                <Textarea
+                                  placeholder="Contenu du sous-chapitre..."
+                                  value={subChapter.content || ''}
+                                  onChange={(e) => {
+                                    setChapters(chapters.map(c => 
+                                      c.id === chapter.id 
+                                        ? {
+                                            ...c,
+                                            subChapters: c.subChapters.map(sc =>
+                                              sc.id === subChapter.id ? { ...sc, content: e.target.value } : sc
+                                            )
+                                          }
+                                        : c
+                                    ));
+                                  }}
+                                  className="min-h-[200px] font-serif text-base leading-relaxed"
+                                  style={{
+                                    fontFamily: 'Georgia, serif',
+                                    lineHeight: '1.8',
+                                    fontSize: '16px'
+                                  }}
+                                />
+                                <div className="text-xs text-muted-foreground">
+                                  Mots: {subChapter.content ? subChapter.content.split(/\s+/).filter(word => word.length > 0).length : 0}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="toc" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BookOpen className="h-5 w-5" />
+                Table des Matières Automatique
+              </CardTitle>
+              <CardDescription>
+                Génération automatique avec numérotation et pagination
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button onClick={generateTableOfContents} className="w-full mb-4" size="lg">
+                <BookOpen className="h-4 w-4 mr-2" />
+                📖 Générer la table des matières
+              </Button>
+              <p className="text-sm text-muted-foreground text-center">
+                La table des matières sera copiée dans votre presse-papiers
+              </p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="settings" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>⚙️ Configuration API et Paramètres</CardTitle>
+              <CardDescription>
+                Configurez votre clé API OpenAI et les paramètres avancés
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="apikey">Clé API OpenAI</Label>
+                <Input
+                  id="apikey"
+                  type="password"
+                  placeholder="sk-..."
+                  value={apiKey}
+                  onChange={(e) => updateApiKey(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Obtenez votre clé sur <a href="https://platform.openai.com/api-keys" target="_blank" className="text-primary hover:underline">platform.openai.com</a>
+                </p>
+              </div>
+              
+              <div>
+                <Label htmlFor="chapters-range">Nombre de chapitres: {numberOfChapters}</Label>
+                <div className="mt-2">
+                  <input
+                    id="chapters-range"
+                    type="range"
+                    min="5"
+                    max="20"
+                    value={numberOfChapters}
+                    onChange={(e) => setNumberOfChapters(parseInt(e.target.value))}
+                    className="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer slider"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                    <span>5 chapitres</span>
+                    <span>20 chapitres</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <Label htmlFor="import-text">🧠 Importer du texte existant</Label>
+                <Textarea
+                  id="import-text"
+                  placeholder="Collez votre texte ici pour l'analyser et générer une structure automatiquement..."
+                  value={importText}
+                  onChange={(e) => setImportText(e.target.value)}
+                  rows={6}
+                />
+                <Button 
+                  onClick={analyzeImportedText}
+                  disabled={isGenerating || !importText || !apiKey}
+                  className="w-full"
+                >
+                  <Wand2 className="h-4 w-4 mr-2" />
+                  {isGenerating ? 'Analyse en cours...' : 'Analyser et structurer avec IA'}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
       {/* Légende d'aide pour le contenu */}
       <div className="mt-8 p-4 bg-muted/50 rounded-lg border border-border">
