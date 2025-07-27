@@ -11,6 +11,12 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+
+// Import des images de templates
+import templateBusiness from '@/assets/template-business.jpg';
+import templateGuide from '@/assets/template-guide.jpg';
+import templateFiction from '@/assets/template-fiction.jpg';
+import templateMemoir from '@/assets/template-memoir.jpg';
 import {
   DndContext,
   closestCenter,
@@ -419,7 +425,7 @@ const EbookPlannerPage: React.FC = () => {
           'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: 'gpt-4.1-2025-04-14',
+          model: 'gpt-4o-mini',
           messages: [{
             role: 'user',
             content: `Analyse ce contenu de chapitre et propose une division logique en sous-chapitres :
@@ -487,7 +493,7 @@ Réponds uniquement au format JSON:
           'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: 'gpt-4.1-2025-04-14',
+          model: 'gpt-4o-mini',
           messages: [{
             role: 'user',
             content: `Analyse ce texte et suggère une structure de chapitres et sous-chapitres :
@@ -601,7 +607,7 @@ Réponds uniquement au format JSON:
           'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: 'gpt-4.1-2025-04-14',
+          model: 'gpt-4o-mini',
           messages: [{
             role: 'user',
             content: `Rédige un chapitre complet de 350 mots exactement sur le sujet : "${chapter.title}".
@@ -669,7 +675,7 @@ Réponds uniquement avec le texte du chapitre formaté, sans JSON.`
           'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: 'gpt-4.1-2025-04-14',
+          model: 'gpt-4o-mini',
           messages: [{
             role: 'user',
             content: `Crée un plan détaillé d'ebook sur le sujet: "${ebookTitle}". 
@@ -1423,20 +1429,31 @@ Réponds uniquement avec le texte du chapitre formaté, sans JSON.`
 
                 <Card className="border-l-4 border-l-orange-500">
                   <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle className="text-lg">✍️ Template Biographie</CardTitle>
-                        <CardDescription className="mt-1">
-                          Parcours de vie et accomplissements
-                        </CardDescription>
+                    <div className="flex gap-4">
+                      <div className="w-20 h-28 rounded overflow-hidden border bg-muted">
+                        <img 
+                          src={templateMemoir} 
+                          alt="Template Biographie"
+                          className="w-full h-full object-cover"
+                        />
                       </div>
-                      <Button 
-                        onClick={() => applyTemplate('memoir')}
-                        variant="outline"
-                        size="sm"
-                      >
-                        Utiliser ce template
-                      </Button>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <CardTitle className="text-lg">✍️ Template Biographie</CardTitle>
+                            <CardDescription className="mt-1">
+                              Parcours de vie et accomplissements
+                            </CardDescription>
+                          </div>
+                          <Button 
+                            onClick={() => applyTemplate('memoir')}
+                            variant="outline"
+                            size="sm"
+                          >
+                            Utiliser ce template
+                          </Button>
+                        </div>
+                      </div>
                     </div>
                   </CardHeader>
                   <CardContent className="pt-0">
