@@ -23,6 +23,7 @@ interface EbookChapterProps {
   onDuplicateChapter: (id: string) => void;
   onSplitChapter: (id: string) => void;
   onGenerateChapterContent: (id: string) => void;
+  onGenerateSubChapterContent: (chapterId: string, subChapterId: string) => void;
   onRemoveChapter: (id: string) => void;
   isGenerating: boolean;
   apiKey: string;
@@ -43,6 +44,7 @@ export const EbookChapter: React.FC<EbookChapterProps> = ({
   onDuplicateChapter,
   onSplitChapter,
   onGenerateChapterContent,
+  onGenerateSubChapterContent,
   onRemoveChapter,
   isGenerating,
   apiKey,
@@ -187,7 +189,7 @@ export const EbookChapter: React.FC<EbookChapterProps> = ({
       
       <div className="ml-6 space-y-2">
         {chapter.subChapters.map((subChapter, subIndex) => (
-          <div key={subChapter.id} className="flex items-center gap-2">
+          <div key={subChapter.id} className="flex items-center gap-2 flex-wrap">
             <span className="text-sm text-muted-foreground">
               {index + 1}.{subIndex + 1}:
             </span>
@@ -195,14 +197,27 @@ export const EbookChapter: React.FC<EbookChapterProps> = ({
               placeholder="Titre du sous-chapitre"
               value={subChapter.title}
               onChange={(e) => onUpdateSubChapterTitle(chapter.id, subChapter.id, e.target.value)}
-              className="flex-1"
+              className="flex-1 min-w-[200px]"
             />
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => onGenerateSubChapterContent(chapter.id, subChapter.id)}
+              disabled={isGenerating || !apiKey || !subChapter.title}
+              title="Rédiger le sous-chapitre (200 mots)"
+              className="bg-green-600 hover:bg-green-700 text-white"
+            >
+              <FileText className="h-3 w-3 mr-1" />
+              {isGenerating ? 'Génération...' : 'Rédiger'}
+            </Button>
             <Button
               variant="outline"
               size="sm"
               onClick={() => onRemoveSubChapter(chapter.id, subChapter.id)}
+              title="Supprimer le sous-chapitre"
             >
-              <Trash2 className="h-3 w-3" />
+              <Trash2 className="h-3 w-3 mr-1" />
+              Supprimer
             </Button>
           </div>
         ))}

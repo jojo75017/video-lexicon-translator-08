@@ -70,6 +70,59 @@ Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajo
     }
   };
 
+  const generateSubChapterContent = async (subChapter: SubChapter, apiKey: string) => {
+    if (!subChapter.title || !apiKey) {
+      toast.error('Titre du sous-chapitre et clé API requis');
+      return null;
+    }
+
+    setIsGenerating(true);
+
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [{
+            role: 'user',
+            content: `Rédige un sous-chapitre complet de 200 mots exactement sur le sujet : "${subChapter.title}".
+            
+Le contenu doit être :
+- Informatif et engageant
+- Bien structuré avec des paragraphes
+- Professionnel mais accessible
+- Exactement 200 mots
+
+Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajoutée au lecteur.`
+          }],
+          temperature: 0.7,
+          max_tokens: 350
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur API');
+      }
+
+      const data = await response.json();
+      const content = data.choices[0].message.content;
+      
+      toast.success('Sous-chapitre généré avec succès !');
+      return content;
+
+    } catch (error) {
+      console.error('Erreur:', error);
+      toast.error('Erreur lors de la génération. Vérifiez votre clé API.');
+      return null;
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const generateEbookPlan = async (ebookTitle: string, authorName: string, numberOfChapters: number, apiKey: string) => {
     if (!ebookTitle || !apiKey) {
       toast.error('Titre et clé API requis');
@@ -202,6 +255,7 @@ Réponds uniquement au format JSON:
   return {
     isGenerating,
     generateChapterContent,
+    generateSubChapterContent,
     generateEbookPlan,
     splitChapterAutomatically
   };

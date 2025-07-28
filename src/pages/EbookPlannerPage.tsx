@@ -38,7 +38,7 @@ import { ebookTemplates } from '@/data/ebookTemplates';
 
 const EbookPlannerPage: React.FC = () => {
   const navigate = useNavigate();
-  const { isGenerating, generateChapterContent, generateEbookPlan, splitChapterAutomatically } = useEbookGeneration();
+  const { isGenerating, generateChapterContent, generateSubChapterContent, generateEbookPlan, splitChapterAutomatically } = useEbookGeneration();
   
   // États principaux
   const [ebookTitle, setEbookTitle] = useState('');
@@ -247,6 +247,20 @@ const EbookPlannerPage: React.FC = () => {
     const content = await generateChapterContent(chapter, apiKey);
     if (content) {
       updateChapterContent(chapterId, content);
+    }
+  };
+
+  // Générer le contenu d'un sous-chapitre
+  const handleGenerateSubChapterContent = async (chapterId: string, subChapterId: string) => {
+    const chapter = chapters.find(c => c.id === chapterId);
+    if (!chapter) return;
+    
+    const subChapter = chapter.subChapters.find(sc => sc.id === subChapterId);
+    if (!subChapter) return;
+
+    const content = await generateSubChapterContent(subChapter, apiKey);
+    if (content) {
+      updateSubChapterContent(chapterId, subChapterId, content);
     }
   };
 
@@ -589,6 +603,7 @@ Réponds uniquement au format JSON:
                               onDuplicateChapter={duplicateChapter}
                               onSplitChapter={handleSplitChapter}
                               onGenerateChapterContent={handleGenerateChapterContent}
+                              onGenerateSubChapterContent={handleGenerateSubChapterContent}
                               onRemoveChapter={removeChapter}
                               isGenerating={isGenerating}
                               apiKey={apiKey}
