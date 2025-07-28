@@ -36,15 +36,17 @@ export const useEbookGeneration = () => {
           model: 'gpt-4o-mini',
           messages: [{
             role: 'user',
-            content: `Rédige un chapitre complet de 350 mots exactement sur le sujet : "${chapter.title}".
+            content: `Rédige un chapitre complet de 300 mots exactement sur le sujet : "${chapter.title}" dans le contexte de l'AQUARIOPHILIE.
             
 Le contenu doit être :
-- Informatif et engageant
+- Spécifiquement lié à l'aquariophilie : poissons, plantes aquatiques, équipements, entretien, soins des poissons, etc.
+- Informatif et engageant pour les aquariophiles
 - Bien structuré avec des paragraphes
 - Professionnel mais accessible
-- Exactement 350 mots
+- Exactement 300 mots
+- Technique quand approprié (pH, température, filtration, etc.)
 
-Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajoutée au lecteur.`
+Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajoutée aux aquariophiles.`
           }],
           temperature: 0.7,
           max_tokens: 500
@@ -89,15 +91,17 @@ Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajo
           model: 'gpt-4o-mini',
           messages: [{
             role: 'user',
-            content: `Rédige un sous-chapitre complet de 200 mots exactement sur le sujet : "${subChapter.title}".
+            content: `Rédige un sous-chapitre complet de 300 mots exactement sur le sujet : "${subChapter.title}" dans le contexte de l'AQUARIOPHILIE.
             
 Le contenu doit être :
-- Informatif et engageant
+- Spécifiquement lié à l'aquariophilie : poissons, plantes aquatiques, équipements, entretien, soins des poissons, etc.
+- Informatif et engageant pour les aquariophiles
 - Bien structuré avec des paragraphes
 - Professionnel mais accessible
-- Exactement 200 mots
+- Exactement 300 mots
+- Technique quand approprié (pH, température, filtration, etc.)
 
-Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajoutée au lecteur.`
+Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajoutée aux aquariophiles.`
           }],
           temperature: 0.7,
           max_tokens: 350
@@ -142,26 +146,28 @@ Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajo
           model: 'gpt-4o-mini',
           messages: [{
             role: 'user',
-            content: `Crée un plan détaillé d'ebook sur le sujet: "${ebookTitle}". 
+            content: `Crée un plan détaillé d'ebook sur le sujet: "${ebookTitle}" spécifiquement axé sur l'AQUARIOPHILIE. 
             
             Génère:
             1. ${authorName ? `Garde le nom d'auteur: "${authorName}"` : 'Un nom d\'auteur approprié'}
-            2. Une préface d'au moins 500 caractères ou 350 mots, engageante et professionnelle
-            3. Exactement ${numberOfChapters} chapitres avec des titres accrocheurs
-            4. 2-4 sous-chapitres pour chaque chapitre
-            5. Une conclusion de 350 mots minimum
+            2. Une préface d'au moins 500 caractères sur l'aquariophilie, engageante et professionnelle
+            3. Exactement ${numberOfChapters} chapitres avec des titres liés à l'aquariophilie
+            4. 2-4 sous-chapitres pour chaque chapitre, tous liés à l'aquariophilie
+            5. Une conclusion sur l'aquariophilie de 350 mots minimum
 
-            Réponds uniquement au format JSON suivant:
+            IMPORTANT: Tous les titres et contenus doivent être liés à l'aquariophilie : poissons, plantes aquatiques, équipements d'aquarium, entretien, soins, paramètres de l'eau, etc.
+
+            Réponds uniquement au format JSON suivant (SANS balises markdown):
             {
               "author": "Nom de l'auteur",
-              "preface": "Préface complète...",
+              "preface": "Préface complète sur l'aquariophilie...",
               "chapters": [
                 {
-                  "title": "Titre du chapitre 1",
-                  "subChapters": ["Sous-chapitre 1", "Sous-chapitre 2"]
+                  "title": "Titre du chapitre lié à l'aquariophilie",
+                  "subChapters": ["Sous-chapitre aquariophilie 1", "Sous-chapitre aquariophilie 2"]
                 }
               ],
-              "conclusion": "Conclusion complète..."
+              "conclusion": "Conclusion complète sur l'aquariophilie..."
             }`
           }],
           temperature: 0.7,
@@ -174,7 +180,11 @@ Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajo
       }
 
       const data = await response.json();
-      const planData = JSON.parse(data.choices[0].message.content);
+      const content = data.choices[0].message.content;
+      
+      // Nettoyer le contenu pour enlever les balises markdown
+      const cleanContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      const planData = JSON.parse(cleanContent);
       
       toast.success('Plan d\'ebook généré automatiquement !');
       return planData;
@@ -233,7 +243,11 @@ Réponds uniquement au format JSON:
       if (!response.ok) throw new Error('Erreur API');
 
       const data = await response.json();
-      const result = JSON.parse(data.choices[0].message.content);
+      const content = data.choices[0].message.content;
+      
+      // Nettoyer le contenu pour enlever les balises markdown
+      const cleanContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      const result = JSON.parse(cleanContent);
       
       const newSubChapters = result.subChapters.map((sub: any, index: number) => ({
         id: (Date.now() + index).toString(),
