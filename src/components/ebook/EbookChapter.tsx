@@ -162,13 +162,13 @@ export const EbookChapter: React.FC<EbookChapterProps> = ({
             {chapter.content.split('\n').map((line, lineIndex) => (
               <p key={lineIndex} className="mb-2">
                 {line.split(/(\*[^*]+\*|"[^"]+"|(\([^)]+\)))/).map((part, partIndex) => {
-                  if (part.startsWith('*') && part.endsWith('*')) {
+                  if (part && part.startsWith && part.startsWith('*') && part.endsWith('*')) {
                     return <em key={partIndex} className="font-medium text-primary">{part.slice(1, -1)}</em>;
                   }
-                  if (part.startsWith('"') && part.endsWith('"')) {
+                  if (part && part.startsWith && part.startsWith('"') && part.endsWith('"')) {
                     return <span key={partIndex} className="text-accent-foreground font-medium">"{part.slice(1, -1)}"</span>;
                   }
-                  if (part.startsWith('(') && part.endsWith(')')) {
+                  if (part && part.startsWith && part.startsWith('(') && part.endsWith(')')) {
                     return <span key={partIndex} className="text-muted-foreground italic">{part}</span>;
                   }
                   return part;
