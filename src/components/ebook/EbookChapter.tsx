@@ -91,7 +91,7 @@ export const EbookChapter: React.FC<EbookChapterProps> = ({
             isSelected ? 'border-blue-500 bg-blue-50 text-blue-900' : ''
           }`}
         />
-        <div className="flex gap-1">
+        <div className="flex flex-wrap gap-2">
           <Button
             variant="outline"
             size="sm"
@@ -99,7 +99,8 @@ export const EbookChapter: React.FC<EbookChapterProps> = ({
             disabled={index === 0}
             title="Déplacer vers le haut"
           >
-            <ArrowUp className="h-3 w-3" />
+            <ArrowUp className="h-4 w-4 mr-1" />
+            Haut
           </Button>
           <Button
             variant="outline"
@@ -108,7 +109,8 @@ export const EbookChapter: React.FC<EbookChapterProps> = ({
             disabled={index === totalChapters - 1}
             title="Déplacer vers le bas"
           >
-            <ArrowDown className="h-3 w-3" />
+            <ArrowDown className="h-4 w-4 mr-1" />
+            Bas
           </Button>
           <Button
             variant="outline"
@@ -116,7 +118,8 @@ export const EbookChapter: React.FC<EbookChapterProps> = ({
             onClick={() => onDuplicateChapter(chapter.id)}
             title="Dupliquer le chapitre"
           >
-            <Copy className="h-3 w-3" />
+            <Copy className="h-4 w-4 mr-1" />
+            Dupliquer
           </Button>
           <Button
             variant="outline"
@@ -125,24 +128,28 @@ export const EbookChapter: React.FC<EbookChapterProps> = ({
             disabled={isGenerating || !apiKey}
             title="Diviser automatiquement"
           >
-            <Split className="h-3 w-3" />
+            <Split className="h-4 w-4 mr-1" />
+            Diviser
           </Button>
           <Button
-            variant="outline"
+            variant="default"
             size="sm"
             onClick={() => onGenerateChapterContent(chapter.id)}
             disabled={isGenerating || !apiKey || !chapter.title}
             title="Rédiger le chapitre (350 mots)"
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
           >
-            <FileText className="h-3 w-3" />
+            <FileText className="h-4 w-4 mr-1" />
+            {isGenerating ? 'Génération...' : 'Rédiger'}
           </Button>
           <Button
-            variant="outline"
+            variant="destructive"
             size="sm"
             onClick={() => onRemoveChapter(chapter.id)}
             title="Supprimer le chapitre"
           >
-            <Trash2 className="h-3 w-3" />
+            <Trash2 className="h-4 w-4 mr-1" />
+            Supprimer
           </Button>
         </div>
       </div>
