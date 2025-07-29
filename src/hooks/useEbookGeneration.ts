@@ -36,17 +36,17 @@ export const useEbookGeneration = () => {
           model: 'gpt-4o-mini',
           messages: [{
             role: 'user',
-            content: `Rédige un chapitre complet de 300 mots exactement sur le sujet : "${chapter.title}" dans le contexte de l'AQUARIOPHILIE.
+            content: `Rédige un chapitre complet de 350 mots exactement sur le sujet : "${chapter.title}".
             
 Le contenu doit être :
-- Spécifiquement lié à l'aquariophilie : poissons, plantes aquatiques, équipements, entretien, soins des poissons, etc.
-- Informatif et engageant pour les aquariophiles
+- Informatif et engageant sur le sujet donné
 - Bien structuré avec des paragraphes
 - Professionnel mais accessible
-- Exactement 300 mots
-- Technique quand approprié (pH, température, filtration, etc.)
+- Exactement 350 mots
+- Inclure des mots ou phrases importantes en *italique* pour mettre l'accent
+- Technique et détaillé quand approprié
 
-Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajoutée aux aquariophiles.`
+Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajoutée aux lecteurs sur ce sujet spécifique.`
           }],
           temperature: 0.7,
           max_tokens: 500
@@ -91,17 +91,17 @@ Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajo
           model: 'gpt-4o-mini',
           messages: [{
             role: 'user',
-            content: `Rédige un sous-chapitre complet de 300 mots exactement sur le sujet : "${subChapter.title}" dans le contexte de l'AQUARIOPHILIE.
+            content: `Rédige un sous-chapitre complet de 300 mots exactement sur le sujet : "${subChapter.title}".
             
 Le contenu doit être :
-- Spécifiquement lié à l'aquariophilie : poissons, plantes aquatiques, équipements, entretien, soins des poissons, etc.
-- Informatif et engageant pour les aquariophiles
+- Informatif et engageant sur le sujet donné
 - Bien structuré avec des paragraphes
 - Professionnel mais accessible
 - Exactement 300 mots
-- Technique quand approprié (pH, température, filtration, etc.)
+- Inclure des mots ou phrases importantes en *italique* pour mettre l'accent
+- Technique et détaillé quand approprié
 
-Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajoutée aux aquariophiles.`
+Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajoutée aux lecteurs sur ce sujet spécifique.`
           }],
           temperature: 0.7,
           max_tokens: 350
