@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
-  BookOpen, Plus, Wand2, RotateCcw, ArrowLeft, Merge
+  BookOpen, Plus, Wand2, RotateCcw, ArrowLeft, Merge, Sparkles, Eye, Search, Palette
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
@@ -38,7 +38,7 @@ import { ebookTemplates } from '@/data/ebookTemplates';
 
 const EbookPlannerPage: React.FC = () => {
   const navigate = useNavigate();
-  const { isGenerating, generateChapterContent, generateSubChapterContent, generateEbookPlan, splitChapterAutomatically } = useEbookGeneration();
+  const { isGenerating, generateChapterContent, generateSubChapterContent, generateEbookPlan, splitChapterAutomatically, generateBookSummary, generateEbookCover, optimizeForSEO } = useEbookGeneration();
   
   // États principaux
   const [ebookTitle, setEbookTitle] = useState('');
@@ -478,10 +478,11 @@ Réponds uniquement au format JSON:
         </div>
 
         <Tabs defaultValue="planner" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="planner">📝 Planificateur</TabsTrigger>
             <TabsTrigger value="templates">📋 Templates</TabsTrigger>
             <TabsTrigger value="writing">✍️ Rédaction</TabsTrigger>
+            <TabsTrigger value="tools">🚀 Outils Avancés</TabsTrigger>
             <TabsTrigger value="toc">📚 Table des matières</TabsTrigger>
             <TabsTrigger value="settings">⚙️ Paramètres</TabsTrigger>
           </TabsList>
@@ -694,6 +695,160 @@ Réponds uniquement au format JSON:
               onUpdateChapterContent={updateChapterContent}
               onUpdateSubChapterContent={updateSubChapterContent}
             />
+          </TabsContent>
+
+          <TabsContent value="tools" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+              {/* Résumé automatique */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Eye className="h-5 w-5" />
+                    Résumé de l'Ebook
+                  </CardTitle>
+                  <CardDescription>
+                    Génère un résumé attractif pour votre ebook
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button 
+                    onClick={async () => {
+                      const summary = await generateBookSummary(chapters, ebookTitle, apiKey);
+                      if (summary) {
+                        navigator.clipboard.writeText(summary);
+                        toast.success('Résumé copié dans le presse-papiers !');
+                      }
+                    }}
+                    disabled={!ebookTitle || chapters.length === 0 || isGenerating}
+                    className="w-full"
+                  >
+                    <Eye className="h-4 w-4 mr-2" />
+                    Générer le résumé
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Parfait pour la 4ème de couverture ou description en ligne
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Concepts de couverture */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Palette className="h-5 w-5" />
+                    Concepts de Couverture
+                  </CardTitle>
+                  <CardDescription>
+                    5 idées créatives pour votre couverture
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button 
+                    onClick={async () => {
+                      const concepts = await generateEbookCover(ebookTitle, apiKey);
+                      if (concepts) {
+                        navigator.clipboard.writeText(concepts);
+                        toast.success('Concepts copiés dans le presse-papiers !');
+                      }
+                    }}
+                    disabled={!ebookTitle || isGenerating}
+                    className="w-full"
+                  >
+                    <Palette className="h-4 w-4 mr-2" />
+                    Générer les concepts
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Descriptions détaillées pour votre designer
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Optimisation SEO */}
+              <Card className="md:col-span-2">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Search className="h-5 w-5" />
+                    Optimisation SEO
+                  </CardTitle>
+                  <CardDescription>
+                    Mots-clés, titres alternatifs et meta descriptions
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button 
+                    onClick={async () => {
+                      const seoData = await optimizeForSEO(ebookTitle, chapters, apiKey);
+                      if (seoData) {
+                        const formatted = `
+🎯 TITRES OPTIMISÉS SEO:
+${seoData.optimizedTitles.map((title: string, i: number) => `${i+1}. ${title}`).join('\n')}
+
+🔑 MOTS-CLÉS PRINCIPAUX:
+${seoData.keywords.join(', ')}
+
+📝 MOTS-CLÉS LONGUE TRAÎNE:
+${seoData.longTailKeywords.join(', ')}
+
+📄 META DESCRIPTION:
+${seoData.metaDescription}
+
+#️⃣ HASHTAGS:
+${seoData.hashtags.join(' ')}
+                        `;
+                        navigator.clipboard.writeText(formatted);
+                        toast.success('Données SEO copiées dans le presse-papiers !');
+                      }
+                    }}
+                    disabled={!ebookTitle || chapters.length === 0 || isGenerating}
+                    className="w-full"
+                    size="lg"
+                  >
+                    <Search className="h-4 w-4 mr-2" />
+                    Analyser et optimiser pour le SEO
+                  </Button>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Obtenez des titres alternatifs, mots-clés et hashtags optimisés pour la visibilité
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Statistiques */}
+              <Card className="md:col-span-2">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Sparkles className="h-5 w-5" />
+                    Statistiques de l'Ebook
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="text-center p-4 bg-muted rounded-lg">
+                      <div className="text-2xl font-bold text-primary">{chapters.length}</div>
+                      <div className="text-sm text-muted-foreground">Chapitres</div>
+                    </div>
+                    <div className="text-center p-4 bg-muted rounded-lg">
+                      <div className="text-2xl font-bold text-primary">
+                        {chapters.reduce((acc, ch) => acc + ch.subChapters.length, 0)}
+                      </div>
+                      <div className="text-sm text-muted-foreground">Sous-chapitres</div>
+                    </div>
+                    <div className="text-center p-4 bg-muted rounded-lg">
+                      <div className="text-2xl font-bold text-primary">
+                        {chapters.filter(ch => ch.content && ch.content.trim().length > 0).length}
+                      </div>
+                      <div className="text-sm text-muted-foreground">Chapitres rédigés</div>
+                    </div>
+                    <div className="text-center p-4 bg-muted rounded-lg">
+                      <div className="text-2xl font-bold text-primary">
+                        {Math.round((chapters.filter(ch => ch.content && ch.content.trim().length > 0).length / Math.max(1, chapters.length)) * 100)}%
+                      </div>
+                      <div className="text-sm text-muted-foreground">Progression</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
           <TabsContent value="toc">

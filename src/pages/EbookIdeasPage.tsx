@@ -306,6 +306,43 @@ const EbookIdeasPage: React.FC = () => {
         'Poissons carnivores : nourrir et élever',
         'Aquarium low-tech : simplicité efficace'
       ]
+    },
+    {
+      category: 'Enfants 6-10 ans 🧸',
+      icon: Heart,
+      color: 'from-pink-400 to-purple-500',
+      ideas: [
+        'Luna et le Dragon Magique',
+        'L\'École des Petits Sorciers',
+        'Les Aventures de Mimi la Souris',
+        'Le Secret du Jardin Enchanté',
+        'Tom et le Trésor des Pirates',
+        'La Princesse qui Aimait les Insectes',
+        'Les Amis de la Forêt Mystérieuse',
+        'Charlie et son Chat Volant',
+        'L\'Île aux Mille Couleurs',
+        'Les Super-Pouvoirs de Nina',
+        'Le Petit Robot qui Rêvait',
+        'Les Jumeaux et la Machine à Temps',
+        'L\'Ours qui ne Savait pas Hiberner',
+        'La Fée des Dents Perdues',
+        'Max et le Monstre Gentil',
+        'Les Créatures du Lac Cristal',
+        'Léa et les Animaux Parlants',
+        'Le Livre qui S\'écrivait Tout Seul',
+        'Les Gardiens de l\'Arc-en-Ciel',
+        'Le Petit Chef Cuisinier',
+        'L\'Astronaute de 8 ans',
+        'La Maison dans les Nuages',
+        'Sophie et le Pinceau Magique',
+        'Le Club des Détectives Juniors',
+        'Les Vacances Extraordinaires',
+        'Le Phare aux Histoires',
+        'Romain et son Dragon de Poche',
+        'La Bibliothèque Secrète',
+        'Les Superhéros du Quartier',
+        'L\'Arbre qui Chantait des Berceuses'
+      ]
     }
   ];
 

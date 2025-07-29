@@ -266,11 +266,187 @@ Réponds uniquement au format JSON:
     }
   };
 
+  const generateBookSummary = async (chapters: Chapter[], ebookTitle: string, apiKey: string) => {
+    if (!chapters.length || !apiKey) {
+      toast.error('Chapitres et clé API requis');
+      return null;
+    }
+
+    setIsGenerating(true);
+
+    try {
+      const chaptersText = chapters.map(c => `${c.title}: ${c.content || 'Pas de contenu'}`).join('\n\n');
+      
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [{
+            role: 'user',
+            content: `Créé un résumé engageant de 150-200 mots pour cet ebook intitulé "${ebookTitle}" basé sur ces chapitres:
+
+${chaptersText}
+
+Le résumé doit:
+- Présenter le livre de manière attractive
+- Mentionner les bénéfices pour le lecteur
+- Être accrocheur pour donner envie d'acheter
+- Inclure des mots-clés du sujet principal`
+          }],
+          temperature: 0.8,
+          max_tokens: 400
+        })
+      });
+
+      if (!response.ok) throw new Error('Erreur API');
+
+      const data = await response.json();
+      const summary = data.choices[0].message.content;
+      
+      toast.success('Résumé généré avec succès !');
+      return summary;
+
+    } catch (error) {
+      console.error('Erreur:', error);
+      toast.error('Erreur lors de la génération du résumé');
+      return null;
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const generateEbookCover = async (ebookTitle: string, apiKey: string) => {
+    if (!ebookTitle || !apiKey) {
+      toast.error('Titre et clé API requis');
+      return null;
+    }
+
+    setIsGenerating(true);
+
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [{
+            role: 'user',
+            content: `Génère 5 concepts visuels créatifs pour la couverture d'un ebook intitulé "${ebookTitle}".
+
+Pour chaque concept, décris:
+- Les couleurs principales
+- Les éléments visuels clés
+- Le style (moderne, classique, minimaliste, etc.)
+- La disposition du titre
+- L'ambiance générale
+
+Format de réponse:
+**Concept 1 - [Nom du style]**
+Couleurs: ...
+Éléments: ...
+Style: ...
+Disposition: ...
+Ambiance: ...`
+          }],
+          temperature: 0.9,
+          max_tokens: 800
+        })
+      });
+
+      if (!response.ok) throw new Error('Erreur API');
+
+      const data = await response.json();
+      const concepts = data.choices[0].message.content;
+      
+      toast.success('Concepts de couverture générés !');
+      return concepts;
+
+    } catch (error) {
+      console.error('Erreur:', error);
+      toast.error('Erreur lors de la génération des concepts');
+      return null;
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const optimizeForSEO = async (ebookTitle: string, chapters: Chapter[], apiKey: string) => {
+    if (!ebookTitle || !chapters.length || !apiKey) {
+      toast.error('Titre, chapitres et clé API requis');
+      return null;
+    }
+
+    setIsGenerating(true);
+
+    try {
+      const chaptersText = chapters.map(c => c.title).join(', ');
+      
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [{
+            role: 'user',
+            content: `Optimise ce titre d'ebook pour le SEO: "${ebookTitle}" avec ces chapitres: ${chaptersText}
+
+Génère:
+1. 3 titres alternatifs optimisés SEO (max 60 caractères)
+2. 5 mots-clés principaux
+3. 10 mots-clés longue traîne
+4. Meta description (150-160 caractères)
+5. 5 hashtags pertinents
+
+Réponds au format JSON:
+{
+  "optimizedTitles": ["titre1", "titre2", "titre3"],
+  "keywords": ["mot1", "mot2", "mot3", "mot4", "mot5"],
+  "longTailKeywords": ["expression1", "expression2", ...],
+  "metaDescription": "description optimisée...",
+  "hashtags": ["#tag1", "#tag2", "#tag3", "#tag4", "#tag5"]
+}`
+          }],
+          temperature: 0.7,
+          max_tokens: 800
+        })
+      });
+
+      if (!response.ok) throw new Error('Erreur API');
+
+      const data = await response.json();
+      const cleanContent = data.choices[0].message.content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      const seoData = JSON.parse(cleanContent);
+      
+      toast.success('Optimisation SEO générée !');
+      return seoData;
+
+    } catch (error) {
+      console.error('Erreur:', error);
+      toast.error('Erreur lors de l\'optimisation SEO');
+      return null;
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   return {
     isGenerating,
     generateChapterContent,
     generateSubChapterContent,
     generateEbookPlan,
-    splitChapterAutomatically
+    splitChapterAutomatically,
+    generateBookSummary,
+    generateEbookCover,
+    optimizeForSEO
   };
 };
