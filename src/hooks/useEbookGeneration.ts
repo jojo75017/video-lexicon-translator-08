@@ -439,6 +439,169 @@ Réponds au format JSON:
     }
   };
 
+  // Fonctions Amazon KDP
+  const generateKDPDescription = async (title: string, chapters: Chapter[], apiKey: string): Promise<string | null> => {
+    if (!apiKey) {
+      toast.error('Clé API OpenAI manquante');
+      return null;
+    }
+
+    setIsGenerating(true);
+    try {
+      const prompt = `Crée une description Amazon KDP attractive et optimisée pour l'ebook "${title}".
+
+Chapitres:
+${chapters.map(ch => `- ${ch.title}`).join('\n')}
+
+Critères:
+- 4000 caractères maximum
+- Utilise des bullet points et formatage HTML basique
+- Inclut un hook accrocheur
+- Mentionne les bénéfices pour le lecteur
+- Appel à l'action à la fin
+- Optimisé pour la conversion`;
+
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0.7,
+          max_tokens: 1200
+        })
+      });
+
+      if (!response.ok) throw new Error('Erreur API');
+
+      const data = await response.json();
+      const description = data.choices[0].message.content.trim();
+      
+      toast.success('Description KDP générée !');
+      return description;
+      
+    } catch (error) {
+      console.error('Erreur:', error);
+      toast.error('Erreur lors de la génération de la description KDP');
+      return null;
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const generateKDPKeywords = async (title: string, chapters: Chapter[], apiKey: string): Promise<string[] | null> => {
+    if (!apiKey) {
+      toast.error('Clé API OpenAI manquante');
+      return null;
+    }
+
+    setIsGenerating(true);
+    try {
+      const prompt = `Génère 7 mots-clés Amazon KDP pour l'ebook "${title}".
+
+Chapitres:
+${chapters.map(ch => `- ${ch.title}`).join('\n')}
+
+Critères:
+- Maximum 7 mots-clés (limite Amazon)
+- Chaque mot-clé: 50 caractères maximum
+- Mélange de mots-clés courts et longue traîne
+- Optimisés pour la recherche Amazon
+- Évite la répétition du titre
+- Format JSON: ["mot-clé 1", "mot-clé 2", ...]`;
+
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0.7,
+          max_tokens: 500
+        })
+      });
+
+      if (!response.ok) throw new Error('Erreur API');
+
+      const data = await response.json();
+      let content = data.choices[0].message.content.trim();
+      
+      // Nettoyer les balises markdown
+      content = content.replace(/```json\s*/, '').replace(/```\s*$/, '');
+      
+      const keywords = JSON.parse(content);
+      toast.success('Mots-clés KDP générés !');
+      return keywords;
+      
+    } catch (error) {
+      console.error('Erreur:', error);
+      toast.error('Erreur lors de la génération des mots-clés KDP');
+      return null;
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const generateKDPCategories = async (title: string, chapters: Chapter[], apiKey: string): Promise<string[] | null> => {
+    if (!apiKey) {
+      toast.error('Clé API OpenAI manquante');
+      return null;
+    }
+
+    setIsGenerating(true);
+    try {
+      const prompt = `Suggère les meilleures catégories Amazon KDP pour l'ebook "${title}".
+
+Chapitres:
+${chapters.map(ch => `- ${ch.title}`).join('\n')}
+
+Critères:
+- 2 catégories principales (Amazon permet 2 max)
+- Utilise la hiérarchie complète (ex: "Livres > Business > Marketing")
+- Choisis les catégories les moins concurrentielles mais pertinentes
+- Format JSON: ["Catégorie 1 > Sous-catégorie", "Catégorie 2 > Sous-catégorie"]`;
+
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0.7,
+          max_tokens: 400
+        })
+      });
+
+      if (!response.ok) throw new Error('Erreur API');
+
+      const data = await response.json();
+      let content = data.choices[0].message.content.trim();
+      
+      // Nettoyer les balises markdown
+      content = content.replace(/```json\s*/, '').replace(/```\s*$/, '');
+      
+      const categories = JSON.parse(content);
+      toast.success('Catégories KDP générées !');
+      return categories;
+      
+    } catch (error) {
+      console.error('Erreur:', error);
+      toast.error('Erreur lors de la génération des catégories KDP');
+      return null;
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   return {
     isGenerating,
     generateChapterContent,
@@ -447,6 +610,9 @@ Réponds au format JSON:
     splitChapterAutomatically,
     generateBookSummary,
     generateEbookCover,
-    optimizeForSEO
+    optimizeForSEO,
+    generateKDPDescription,
+    generateKDPKeywords,
+    generateKDPCategories
   };
 };

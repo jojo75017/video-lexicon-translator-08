@@ -38,7 +38,7 @@ import { ebookTemplates } from '@/data/ebookTemplates';
 
 const EbookPlannerPage: React.FC = () => {
   const navigate = useNavigate();
-  const { isGenerating, generateChapterContent, generateSubChapterContent, generateEbookPlan, splitChapterAutomatically, generateBookSummary, generateEbookCover, optimizeForSEO } = useEbookGeneration();
+  const { isGenerating, generateChapterContent, generateSubChapterContent, generateEbookPlan, splitChapterAutomatically, generateBookSummary, generateEbookCover, optimizeForSEO, generateKDPDescription, generateKDPKeywords, generateKDPCategories } = useEbookGeneration();
   
   // États principaux
   const [ebookTitle, setEbookTitle] = useState('');
@@ -809,6 +809,64 @@ ${seoData.hashtags.join(' ')}
                   </Button>
                   <p className="text-sm text-muted-foreground mt-2">
                     Obtenez des titres alternatifs, mots-clés et hashtags optimisés pour la visibilité
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Amazon KDP Tools */}
+              <Card className="md:col-span-2">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    📚 Outils Amazon KDP
+                  </CardTitle>
+                  <CardDescription>
+                    Optimisez votre ebook pour la publication sur Amazon KDP
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Button 
+                      onClick={async () => {
+                        const description = await generateKDPDescription(ebookTitle, chapters, apiKey);
+                        if (description) {
+                          navigator.clipboard.writeText(description);
+                          toast.success('Description KDP copiée !');
+                        }
+                      }}
+                      disabled={!ebookTitle || chapters.length === 0 || isGenerating}
+                      className="w-full"
+                    >
+                      📝 Description KDP
+                    </Button>
+                    <Button 
+                      onClick={async () => {
+                        const keywords = await generateKDPKeywords(ebookTitle, chapters, apiKey);
+                        if (keywords) {
+                          navigator.clipboard.writeText(keywords.join(', '));
+                          toast.success('Mots-clés KDP copiés !');
+                        }
+                      }}
+                      disabled={!ebookTitle || chapters.length === 0 || isGenerating}
+                      className="w-full"
+                    >
+                      🔑 Mots-clés KDP
+                    </Button>
+                    <Button 
+                      onClick={async () => {
+                        const categories = await generateKDPCategories(ebookTitle, chapters, apiKey);
+                        if (categories) {
+                          navigator.clipboard.writeText(categories.join('\n'));
+                          toast.success('Catégories KDP copiées !');
+                        }
+                      }}
+                      disabled={!ebookTitle || chapters.length === 0 || isGenerating}
+                      className="w-full"
+                    >
+                      📂 Catégories KDP
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-4 text-center">
+                    Générez description, mots-clés et catégories optimisés pour Amazon KDP
                   </p>
                 </CardContent>
               </Card>
