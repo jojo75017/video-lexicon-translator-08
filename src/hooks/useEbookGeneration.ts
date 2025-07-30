@@ -26,8 +26,13 @@ export const useEbookGeneration = () => {
     setIsGenerating(true);
 
     try {
+      // Configuration avec timeout plus long et gestion des erreurs renforcée
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 secondes timeout
+
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
+        signal: controller.signal,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${apiKey}`
@@ -49,23 +54,48 @@ Le contenu doit être :
 Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajoutée aux lecteurs sur ce sujet spécifique.`
           }],
           temperature: 0.7,
-          max_tokens: 500
+          max_tokens: 600 // Augmenté pour éviter la troncature
         })
       });
 
+      clearTimeout(timeoutId);
+
       if (!response.ok) {
-        throw new Error('Erreur API');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(`Erreur API ${response.status}: ${errorData.error?.message || 'Erreur inconnue'}`);
       }
 
       const data = await response.json();
-      const content = data.choices[0].message.content;
+      
+      // Vérification que la réponse contient bien du contenu
+      if (!data.choices || !data.choices[0] || !data.choices[0].message || !data.choices[0].message.content) {
+        throw new Error('Réponse API invalide - contenu manquant');
+      }
+
+      const content = data.choices[0].message.content.trim();
+      
+      // Vérification que le contenu n'est pas vide
+      if (!content || content.length < 50) {
+        throw new Error('Contenu généré trop court ou vide');
+      }
       
       toast.success('Chapitre généré avec succès !');
       return content;
 
     } catch (error) {
-      console.error('Erreur:', error);
-      toast.error('Erreur lors de la génération. Vérifiez votre clé API.');
+      console.error('Erreur détaillée:', error);
+      
+      if (error.name === 'AbortError') {
+        toast.error('Timeout - la génération a pris trop de temps. Réessayez.');
+      } else if (error.message.includes('401')) {
+        toast.error('Clé API invalide. Vérifiez votre clé OpenAI.');
+      } else if (error.message.includes('429')) {
+        toast.error('Limite de taux atteinte. Attendez un moment avant de réessayer.');
+      } else if (error.message.includes('quota')) {
+        toast.error('Quota API dépassé. Vérifiez votre compte OpenAI.');
+      } else {
+        toast.error(`Erreur: ${error.message}`);
+      }
       return null;
     } finally {
       setIsGenerating(false);
