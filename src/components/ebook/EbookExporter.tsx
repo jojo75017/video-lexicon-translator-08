@@ -8,6 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Download, FileText, Image, BookOpen, Printer } from 'lucide-react';
 import { toast } from 'sonner';
 import { Chapter } from '@/hooks/useEbookGeneration';
+import jsPDF from 'jspdf';
 
 interface EbookExporterProps {
   ebookTitle: string;
@@ -142,6 +143,209 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
     toast.success('Ebook exporté en format TXT !');
   };
 
+  const exportAsPDF = () => {
+    const pdf = new jsPDF();
+    let yPosition = 20;
+    const pageHeight = pdf.internal.pageSize.height;
+    const marginLeft = 20;
+    const marginRight = 20;
+    const pageWidth = pdf.internal.pageSize.width - marginLeft - marginRight;
+
+    // Function to add new page if needed
+    const checkPageBreak = (requiredHeight: number) => {
+      if (yPosition + requiredHeight > pageHeight - 20) {
+        pdf.addPage();
+        yPosition = 20;
+      }
+    };
+
+    // Function to split text into lines
+    const splitTextToSize = (text: string, maxWidth: number, fontSize: number) => {
+      pdf.setFontSize(fontSize);
+      return pdf.splitTextToSize(text, maxWidth);
+    };
+
+    // Page de couverture
+    if (includeCoverPage) {
+      pdf.setFontSize(24);
+      pdf.setFont('helvetica', 'bold');
+      const titleLines = splitTextToSize(ebookTitle, pageWidth, 24);
+      titleLines.forEach((line: string) => {
+        pdf.text(line, marginLeft, yPosition, { align: 'left' });
+        yPosition += 12;
+      });
+
+      yPosition += 20;
+      
+      if (authorName) {
+        pdf.setFontSize(16);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(`Par ${authorName}`, marginLeft, yPosition);
+        yPosition += 20;
+      }
+
+      pdf.addPage();
+      yPosition = 20;
+    }
+
+    // Table des matières
+    if (includeTableOfContents) {
+      pdf.setFontSize(18);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('TABLE DES MATIÈRES', marginLeft, yPosition);
+      yPosition += 15;
+
+      pdf.setFontSize(12);
+      pdf.setFont('helvetica', 'normal');
+
+      if (preface) {
+        pdf.text('Préface', marginLeft, yPosition);
+        yPosition += 8;
+      }
+
+      chapters.forEach((chapter, index) => {
+        checkPageBreak(8);
+        const chapterNumber = index + 1;
+        pdf.text(`${chapterNumber}. ${chapter.title}`, marginLeft, yPosition);
+        yPosition += 8;
+
+        chapter.subChapters.forEach((subChapter, subIndex) => {
+          checkPageBreak(6);
+          const subNumber = `${chapterNumber}.${subIndex + 1}`;
+          pdf.text(`   ${subNumber} ${subChapter.title}`, marginLeft + 10, yPosition);
+          yPosition += 6;
+        });
+      });
+
+      if (conclusion) {
+        checkPageBreak(8);
+        pdf.text('Conclusion', marginLeft, yPosition);
+        yPosition += 8;
+      }
+
+      pdf.addPage();
+      yPosition = 20;
+    }
+
+    // Préface
+    if (preface) {
+      pdf.setFontSize(16);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('PRÉFACE', marginLeft, yPosition);
+      yPosition += 15;
+
+      pdf.setFontSize(11);
+      pdf.setFont('helvetica', 'normal');
+      const prefaceLines = splitTextToSize(preface, pageWidth, 11);
+      prefaceLines.forEach((line: string) => {
+        checkPageBreak(6);
+        pdf.text(line, marginLeft, yPosition);
+        yPosition += 6;
+      });
+
+      pdf.addPage();
+      yPosition = 20;
+    }
+
+    // Chapitres
+    chapters.forEach((chapter, index) => {
+      const chapterNumber = index + 1;
+
+      // Titre du chapitre
+      pdf.setFontSize(16);
+      pdf.setFont('helvetica', 'bold');
+      const chapterTitle = `CHAPITRE ${chapterNumber}: ${chapter.title.toUpperCase()}`;
+      const titleLines = splitTextToSize(chapterTitle, pageWidth, 16);
+      
+      checkPageBreak(titleLines.length * 8 + 10);
+      titleLines.forEach((line: string) => {
+        pdf.text(line, marginLeft, yPosition);
+        yPosition += 8;
+      });
+      yPosition += 10;
+
+      // Contenu du chapitre
+      if (chapter.content) {
+        pdf.setFontSize(11);
+        pdf.setFont('helvetica', 'normal');
+        const contentLines = splitTextToSize(chapter.content, pageWidth, 11);
+        contentLines.forEach((line: string) => {
+          checkPageBreak(6);
+          pdf.text(line, marginLeft, yPosition);
+          yPosition += 6;
+        });
+        yPosition += 10;
+      }
+
+      // Sous-chapitres
+      chapter.subChapters.forEach((subChapter, subIndex) => {
+        const subNumber = `${chapterNumber}.${subIndex + 1}`;
+        
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        const subTitle = `${subNumber}. ${subChapter.title}`;
+        const subTitleLines = splitTextToSize(subTitle, pageWidth, 14);
+        
+        checkPageBreak(subTitleLines.length * 7 + 10);
+        subTitleLines.forEach((line: string) => {
+          pdf.text(line, marginLeft, yPosition);
+          yPosition += 7;
+        });
+        yPosition += 8;
+
+        if (subChapter.content) {
+          pdf.setFontSize(11);
+          pdf.setFont('helvetica', 'normal');
+          const subContentLines = splitTextToSize(subChapter.content, pageWidth, 11);
+          subContentLines.forEach((line: string) => {
+            checkPageBreak(6);
+            pdf.text(line, marginLeft, yPosition);
+            yPosition += 6;
+          });
+          yPosition += 10;
+        }
+      });
+
+      // Nouvelle page pour le chapitre suivant
+      if (index < chapters.length - 1) {
+        pdf.addPage();
+        yPosition = 20;
+      }
+    });
+
+    // Conclusion
+    if (conclusion) {
+      checkPageBreak(30);
+      pdf.setFontSize(16);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('MOT DE LA FIN', marginLeft, yPosition);
+      yPosition += 15;
+
+      pdf.setFontSize(11);
+      pdf.setFont('helvetica', 'normal');
+      const conclusionLines = splitTextToSize(conclusion, pageWidth, 11);
+      conclusionLines.forEach((line: string) => {
+        checkPageBreak(6);
+        pdf.text(line, marginLeft, yPosition);
+        yPosition += 6;
+      });
+    }
+
+    // Numérotation des pages
+    if (includePageNumbers) {
+      const totalPages = pdf.getNumberOfPages();
+      for (let i = 1; i <= totalPages; i++) {
+        pdf.setPage(i);
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(`${i}`, pdf.internal.pageSize.width / 2, pdf.internal.pageSize.height - 10, { align: 'center' });
+      }
+    }
+
+    pdf.save(`${ebookTitle || 'Mon-Ebook'}.pdf`);
+    toast.success('Ebook exporté en format PDF !');
+  };
+
   const exportAsHTML = () => {
     const textContent = generateEbookContent();
     
@@ -268,9 +472,11 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
           exportAsHTML();
           break;
         case 'pdf':
+          exportAsPDF();
+          break;
         case 'docx':
-          toast.info(`Export ${exportFormat.toUpperCase()} sera disponible prochainement. Utilisez HTML pour l'instant.`);
-          exportAsHTML();
+          toast.info(`Export DOCX sera disponible prochainement. Utilisez PDF pour l'instant.`);
+          exportAsPDF();
           break;
         default:
           exportAsText();
@@ -324,9 +530,9 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
                 <SelectValue placeholder="Choisir un format" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="html">📄 HTML (Recommandé)</SelectItem>
+                <SelectItem value="pdf">📄 PDF (Recommandé)</SelectItem>
+                <SelectItem value="html">📄 HTML</SelectItem>
                 <SelectItem value="txt">📝 Texte (.txt)</SelectItem>
-                <SelectItem value="pdf">📄 PDF (Bientôt disponible)</SelectItem>
                 <SelectItem value="docx">📄 Word (.docx) (Bientôt disponible)</SelectItem>
               </SelectContent>
             </Select>
