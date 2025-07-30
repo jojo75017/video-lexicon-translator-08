@@ -339,7 +339,7 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
               <Checkbox
                 id="cover"
                 checked={includeCoverPage}
-                onCheckedChange={setIncludeCoverPage}
+                onCheckedChange={(checked) => setIncludeCoverPage(checked === true)}
               />
               <Label htmlFor="cover">Inclure la page de couverture</Label>
             </div>
@@ -348,7 +348,7 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
               <Checkbox
                 id="toc"
                 checked={includeTableOfContents}
-                onCheckedChange={setIncludeTableOfContents}
+                onCheckedChange={(checked) => setIncludeTableOfContents(checked === true)}
               />
               <Label htmlFor="toc">Inclure la table des matières</Label>
             </div>
@@ -357,7 +357,7 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
               <Checkbox
                 id="pages"
                 checked={includePageNumbers}
-                onCheckedChange={setIncludePageNumbers}
+                onCheckedChange={(checked) => setIncludePageNumbers(checked === true)}
               />
               <Label htmlFor="pages">Inclure la numérotation des pages</Label>
             </div>
