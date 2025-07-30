@@ -31,6 +31,8 @@ import { EbookTemplates } from '@/components/ebook/EbookTemplates';
 import { EbookChapter } from '@/components/ebook/EbookChapter';
 import { EbookWriting } from '@/components/ebook/EbookWriting';
 import { EbookSettings } from '@/components/ebook/EbookSettings';
+import { EbookExporter } from '@/components/ebook/EbookExporter';
+import { EbookAdvancedFeatures } from '@/components/ebook/EbookAdvancedFeatures';
 
 // Hooks et données
 import { useEbookGeneration, Chapter, SubChapter } from '@/hooks/useEbookGeneration';
@@ -478,11 +480,13 @@ Réponds uniquement au format JSON:
         </div>
 
         <Tabs defaultValue="planner" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-8">
             <TabsTrigger value="planner">📝 Planificateur</TabsTrigger>
             <TabsTrigger value="templates">📋 Templates</TabsTrigger>
             <TabsTrigger value="writing">✍️ Rédaction</TabsTrigger>
             <TabsTrigger value="tools">🚀 Outils Avancés</TabsTrigger>
+            <TabsTrigger value="advanced">💼 Business</TabsTrigger>
+            <TabsTrigger value="export">📤 Export</TabsTrigger>
             <TabsTrigger value="toc">📚 Table des matières</TabsTrigger>
             <TabsTrigger value="settings">⚙️ Paramètres</TabsTrigger>
           </TabsList>
@@ -907,6 +911,25 @@ ${seoData.hashtags.join(' ')}
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          <TabsContent value="advanced">
+            <EbookAdvancedFeatures 
+              ebookTitle={ebookTitle}
+              chapters={chapters}
+              apiKey={apiKey}
+              isGenerating={isGenerating}
+            />
+          </TabsContent>
+
+          <TabsContent value="export">
+            <EbookExporter
+              ebookTitle={ebookTitle}
+              authorName={authorName}
+              preface={preface}
+              conclusion={conclusion}
+              chapters={chapters}
+            />
           </TabsContent>
 
           <TabsContent value="toc">
