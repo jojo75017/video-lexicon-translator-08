@@ -19,6 +19,13 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        
+        // Couleurs vives pour l'interface
+        "vibrant-blue": "hsl(var(--vibrant-blue))",
+        "vibrant-purple": "hsl(var(--vibrant-purple))",
+        "vibrant-pink": "hsl(var(--vibrant-pink))",
+        "vibrant-cyan": "hsl(var(--vibrant-cyan))",
+        "vibrant-green": "hsl(var(--vibrant-green))",
         primary: {
           DEFAULT: "#1EAEDB", // Bleu Systeme.io
           foreground: "#ffffff",
@@ -74,6 +81,20 @@ export default {
           300: "#D8F5A3",
           400: "#C5F080",
         },
+      },
+      backgroundImage: {
+        'gradient-primary': 'var(--gradient-primary)',
+        'gradient-secondary': 'var(--gradient-secondary)',
+        'gradient-accent': 'var(--gradient-accent)',
+        'gradient-success': 'var(--gradient-success)',
+        'gradient-hero': 'var(--gradient-hero)',
+        'gradient-card': 'var(--gradient-card)',
+      },
+      boxShadow: {
+        'glow': 'var(--shadow-glow)',
+        'blue': 'var(--shadow-blue)',
+        'purple': 'var(--shadow-purple)',
+        'pink': 'var(--shadow-pink)',
       },
       borderRadius: {
         lg: "var(--radius)",

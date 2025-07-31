@@ -463,35 +463,83 @@ Réponds uniquement au format JSON:
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
+    <div className="min-h-screen">
+      {/* Hero Section avec gradient coloré */}
+      <div className="relative overflow-hidden gradient-hero">
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="relative container mx-auto px-4 py-16 text-center">
           <Button
             variant="ghost"
             onClick={() => navigate('/dashboard')}
-            className="mb-4"
+            className="absolute top-4 left-4 text-white hover:bg-white/20"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Retour au Dashboard
+            Retour
           </Button>
-          <h1 className="text-4xl font-bold text-center mb-2">📖 Planificateur d'Ebook</h1>
-          <p className="text-muted-foreground text-center">
-            Créez et organisez votre ebook avec l'aide de l'IA
+          <div className="floating-animation inline-block mb-6">
+            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+              <BookOpen className="w-10 h-10 text-white" />
+            </div>
+          </div>
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 text-white drop-shadow-lg">
+            Créez votre Ebook
+            <span className="block text-4xl md:text-5xl bg-white/20 backdrop-blur-sm rounded-2xl px-6 py-2 mt-4 inline-block">
+              avec l'IA ✨
+            </span>
+          </h1>
+          <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-3xl mx-auto">
+            Transformez vos idées en livre numérique professionnel en quelques clics
           </p>
+          <div className="flex flex-wrap gap-4 justify-center">
+            <div className="bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 text-white font-medium">
+              🚀 Génération IA
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 text-white font-medium">
+              📖 Export PDF
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 text-white font-medium">
+              🎯 Outils KDP
+            </div>
+          </div>
         </div>
+      </div>
 
-        <Tabs defaultValue="planner" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-9">
-            <TabsTrigger value="planner">📝 Planificateur</TabsTrigger>
-            <TabsTrigger value="templates">📋 Templates</TabsTrigger>
-            <TabsTrigger value="writing">✍️ Rédaction</TabsTrigger>
-            <TabsTrigger value="tools">🚀 Outils Avancés</TabsTrigger>
-            <TabsTrigger value="kdp">📖 KDP</TabsTrigger>
-            <TabsTrigger value="advanced">💼 Business</TabsTrigger>
-            <TabsTrigger value="export">📤 Export</TabsTrigger>
-            <TabsTrigger value="toc">📚 Table des matières</TabsTrigger>
-            <TabsTrigger value="settings">⚙️ Paramètres</TabsTrigger>
-          </TabsList>
+      <div className="container mx-auto px-4 py-8 -mt-8 relative z-10">
+
+        {/* Navigation avec design moderne */}
+        <div className="mb-8">
+          <Tabs defaultValue="planner" className="space-y-6">
+            <div className="gradient-card rounded-2xl p-2 mb-8 glow-effect">
+              <TabsList className="grid w-full grid-cols-9 bg-transparent gap-1">
+                <TabsTrigger value="planner" className="text-sm gradient-primary text-white data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-xl">
+                  📝 Planificateur
+                </TabsTrigger>
+                <TabsTrigger value="templates" className="text-sm gradient-secondary text-white data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-xl">
+                  📋 Templates
+                </TabsTrigger>
+                <TabsTrigger value="writing" className="text-sm gradient-accent text-white data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-xl">
+                  ✍️ Rédaction
+                </TabsTrigger>
+                <TabsTrigger value="tools" className="text-sm gradient-success text-white data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-xl">
+                  🚀 Outils
+                </TabsTrigger>
+                <TabsTrigger value="kdp" className="text-sm bg-vibrant-purple text-white data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-xl">
+                  📖 KDP
+                </TabsTrigger>
+                <TabsTrigger value="advanced" className="text-sm bg-vibrant-pink text-white data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-xl">
+                  💼 Business
+                </TabsTrigger>
+                <TabsTrigger value="export" className="text-sm bg-vibrant-cyan text-white data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-xl">
+                  📤 Export
+                </TabsTrigger>
+                <TabsTrigger value="toc" className="text-sm bg-vibrant-green text-white data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-xl">
+                  📚 Sommaire
+                </TabsTrigger>
+                <TabsTrigger value="settings" className="text-sm gradient-primary text-white data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-xl">
+                  ⚙️ Paramètres
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
           <TabsContent value="planner" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -978,7 +1026,8 @@ ${seoData.hashtags.join(' ')}
               isGenerating={isGenerating}
             />
           </TabsContent>
-        </Tabs>
+          </Tabs>
+        </div>
       </div>
     </div>
   );

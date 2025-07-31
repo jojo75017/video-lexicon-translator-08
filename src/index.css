@@ -1,12 +1,11 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 220 15% 97%;
+    --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
@@ -25,7 +24,150 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 221.2 83.2% 53.3%;
     --radius: 0.75rem;
+    
+    /* Gradients colorés inspirés de Gamma */
+    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --gradient-accent: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --gradient-success: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    --gradient-hero: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    --gradient-card: linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+    
+    /* Couleurs vives pour l'interface */
+    --vibrant-blue: 220 100% 65%;
+    --vibrant-purple: 270 85% 70%;
+    --vibrant-pink: 320 85% 70%;
+    --vibrant-cyan: 190 85% 65%;
+    --vibrant-green: 150 75% 60%;
+    
+    /* Ombres colorées */
+    --shadow-blue: 0 20px 40px -10px rgba(102, 126, 234, 0.3);
+    --shadow-purple: 0 20px 40px -10px rgba(118, 75, 162, 0.3);
+    --shadow-pink: 0 20px 40px -10px rgba(240, 147, 251, 0.3);
+    --shadow-glow: 0 0 50px rgba(102, 126, 234, 0.2);
   }
+
+  .dark {
+    --background: 240 15% 8%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 84% 4.9%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 217.2 91.2% 59.8%;
+    
+    /* Gradients sombres mais colorés */
+    --gradient-primary: linear-gradient(135deg, #5a67d8 0%, #553c9a 100%);
+    --gradient-secondary: linear-gradient(135deg, #e53e3e 0%, #b91c1c 100%);
+    --gradient-accent: linear-gradient(135deg, #3182ce 0%, #2c5282 100%);
+    --gradient-success: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+    --gradient-hero: linear-gradient(135deg, #5a67d8 0%, #553c9a 50%, #e53e3e 100%);
+    --gradient-card: linear-gradient(145deg, rgba(45,55,72,0.9) 0%, rgba(45,55,72,0.7) 100%);
+  }
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(220 20% 95%) 100%);
+  color: hsl(var(--foreground));
+  min-height: 100vh;
+}
+
+.dark body {
+  background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(240 20% 6%) 100%);
+}
+
+/* Classes utilitaires pour les gradients */
+.gradient-primary {
+  background: var(--gradient-primary);
+}
+
+.gradient-secondary {
+  background: var(--gradient-secondary);
+}
+
+.gradient-accent {
+  background: var(--gradient-accent);
+}
+
+.gradient-success {
+  background: var(--gradient-success);
+}
+
+.gradient-hero {
+  background: var(--gradient-hero);
+}
+
+.gradient-card {
+  background: var(--gradient-card);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Animations et effets */
+.floating-animation {
+  animation: floating 6s ease-in-out infinite;
+}
+
+@keyframes floating {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33% { transform: translateY(-10px) rotate(1deg); }
+  66% { transform: translateY(5px) rotate(-1deg); }
+}
+
+.glow-effect {
+  box-shadow: var(--shadow-glow);
+  transition: all 0.3s ease;
+}
+
+.glow-effect:hover {
+  box-shadow: var(--shadow-blue);
+  transform: translateY(-2px);
+}
+
+/* Boutons avec gradients */
+.btn-gradient {
+  background: var(--gradient-primary);
+  color: white;
+  border: none;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-gradient:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-blue);
+}
+
+.btn-gradient::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-gradient:hover::before {
+  left: 100%;
 }
 
 /* Styles de base pour la visibilité des éléments interactifs */
