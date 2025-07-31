@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import EbookImageBank from '@/components/ebook/EbookImageBank';
 import {
   DndContext,
   closestCenter,
@@ -53,6 +54,7 @@ const EbookPlannerPage: React.FC = () => {
   const [numberOfChapters, setNumberOfChapters] = useState(8);
   const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
   const [importText, setImportText] = useState('');
+  const [ebookImages, setEbookImages] = useState<Array<{url: string, title: string, chapterIndex?: number}>>([]);
 
   // Charger la clé API au démarrage
   React.useEffect(() => {
@@ -459,7 +461,14 @@ Réponds uniquement au format JSON:
     setNumberOfChapters(8);
     setSelectedChapters([]);
     setImportText('');
+    setEbookImages([]);
     toast.success('Plan réinitialisé !');
+  };
+
+  const handleImageSelect = (imageUrl: string, title: string) => {
+    const newImage = { url: imageUrl, title };
+    setEbookImages(prev => [...prev, newImage]);
+    toast.success('Image ajoutée à votre ebook !');
   };
 
   return (
@@ -510,7 +519,7 @@ Réponds uniquement au format JSON:
         <div className="mb-8">
           <Tabs defaultValue="planner" className="space-y-6">
             <div className="gradient-card rounded-2xl p-2 mb-8 glow-effect">
-              <TabsList className="grid w-full grid-cols-9 bg-transparent gap-1">
+              <TabsList className="grid w-full grid-cols-10 bg-transparent gap-1">
                 <TabsTrigger value="planner" className="text-sm gradient-primary text-white data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-xl">
                   📝 Planificateur
                 </TabsTrigger>
@@ -534,6 +543,9 @@ Réponds uniquement au format JSON:
                 </TabsTrigger>
                 <TabsTrigger value="toc" className="text-sm bg-vibrant-green text-white data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-xl">
                   📚 Sommaire
+                </TabsTrigger>
+                <TabsTrigger value="images" className="text-sm gradient-success text-white data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-xl">
+                  🎨 Images IA
                 </TabsTrigger>
                 <TabsTrigger value="settings" className="text-sm gradient-primary text-white data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-xl">
                   ⚙️ Paramètres
@@ -1025,6 +1037,47 @@ ${seoData.hashtags.join(' ')}
               onAnalyzeImportedText={analyzeImportedText}
               isGenerating={isGenerating}
             />
+          </TabsContent>
+
+          <TabsContent value="images">
+            <EbookImageBank 
+              onImageSelect={handleImageSelect}
+              ebookTitle={ebookTitle}
+              chapters={chapters}
+            />
+            
+            {ebookImages.length > 0 && (
+              <Card className="mt-6 gradient-card glow-effect border-0">
+                <CardHeader>
+                  <CardTitle className="gradient-primary bg-clip-text text-transparent">
+                    📷 Images de votre Ebook
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {ebookImages.map((image, index) => (
+                      <div key={index} className="relative group">
+                        <img 
+                          src={image.url} 
+                          alt={image.title}
+                          className="w-full h-32 object-cover rounded-lg"
+                        />
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => setEbookImages(prev => prev.filter((_, i) => i !== index))}
+                          >
+                            Supprimer
+                          </Button>
+                        </div>
+                        <p className="text-xs text-gray-600 mt-1 line-clamp-2">{image.title}</p>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
           </Tabs>
         </div>
