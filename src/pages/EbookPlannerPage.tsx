@@ -11,6 +11,7 @@ import {
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import EbookImageBank from '@/components/ebook/EbookImageBank';
+import { EbookMarketing } from '@/components/ebook/EbookMarketing';
 import {
   DndContext,
   closestCenter,
@@ -519,7 +520,7 @@ Réponds uniquement au format JSON:
         <div className="mb-8">
           <Tabs defaultValue="planner" className="space-y-6">
             <div className="gradient-card rounded-2xl p-2 mb-8 glow-effect">
-              <TabsList className="grid w-full grid-cols-10 bg-transparent gap-1">
+              <TabsList className="grid w-full grid-cols-11 bg-transparent gap-1">
                 <TabsTrigger value="planner" className="text-sm gradient-primary text-white data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-xl">
                   📝 Planificateur
                 </TabsTrigger>
@@ -537,6 +538,9 @@ Réponds uniquement au format JSON:
                 </TabsTrigger>
                 <TabsTrigger value="advanced" className="text-sm bg-vibrant-pink text-white data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-xl">
                   💼 Business
+                </TabsTrigger>
+                <TabsTrigger value="marketing" className="text-sm bg-gradient-to-r from-blue-500 to-purple-500 text-white data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-xl">
+                  📢 Marketing
                 </TabsTrigger>
                 <TabsTrigger value="export" className="text-sm bg-vibrant-cyan text-white data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-xl">
                   📤 Export
@@ -1079,6 +1083,16 @@ ${seoData.hashtags.join(' ')}
               </Card>
             )}
           </TabsContent>
+
+          <TabsContent value="marketing" className="space-y-6">
+            <EbookMarketing
+              ebookTitle={ebookTitle}
+              chapters={chapters}
+              apiKey={apiKey}
+              isGenerating={isGenerating}
+            />
+          </TabsContent>
+
           </Tabs>
         </div>
       </div>
