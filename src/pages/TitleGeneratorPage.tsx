@@ -28,7 +28,15 @@ const TitleGeneratorPage: React.FC = () => {
     { id: 'immobilier', name: 'Immobilier', icon: '🏠', color: 'bg-red-500' },
     { id: 'sport', name: 'Sport & Fitness', icon: '⚽', color: 'bg-green-600' },
     { id: 'peche', name: 'Pêche', icon: '🎣', color: 'bg-teal-500' },
-    { id: 'aquariophilie', name: 'Aquariophilie', icon: '🐠', color: 'bg-blue-600' }
+    { id: 'aquariophilie', name: 'Aquariophilie', icon: '🐠', color: 'bg-blue-600' },
+    { id: 'jardinage', name: 'Jardinage', icon: '🌱', color: 'bg-emerald-500' },
+    { id: 'jardin-bio', name: 'Jardin Bio', icon: '🌿', color: 'bg-lime-500' },
+    { id: 'bricolage', name: 'Bricolage', icon: '🔨', color: 'bg-amber-600' },
+    { id: 'apiculture', name: 'Apiculture', icon: '🐝', color: 'bg-yellow-600' },
+    { id: 'permaculture', name: 'Permaculture', icon: '🌾', color: 'bg-green-700' },
+    { id: 'potager', name: 'Potager', icon: '🥕', color: 'bg-orange-600' },
+    { id: 'ecologie', name: 'Écologie', icon: '🌍', color: 'bg-teal-600' },
+    { id: 'plantes', name: 'Plantes d\'intérieur', icon: '🪴', color: 'bg-green-400' }
   ];
 
   const titleTemplates = {
@@ -115,6 +123,62 @@ const TitleGeneratorPage: React.FC = () => {
       "{keyword} pour débutants : Éviter la mortalité",
       "Reproduction {keyword} : Techniques qui marchent",
       "Aquarium {keyword} : Budget et équipement optimal"
+    ],
+    jardinage: [
+      "Guide {keyword} : Techniques de jardinage qui marchent",
+      "{keyword} pour débutants : Éviter les erreurs fatales",
+      "Calendrier {keyword} : Quand et comment planter",
+      "{keyword} naturel : Solutions bio et écologiques",
+      "Réussir {keyword} sans produits chimiques"
+    ],
+    'jardin-bio': [
+      "{keyword} bio : Guide complet du jardinage naturel",
+      "Cultiver {keyword} sans pesticides : Méthodes éprouvées",
+      "{keyword} écologique : Permaculture et biodiversité",
+      "Compost et {keyword} : Fertilisation naturelle",
+      "Protection {keyword} : Lutte biologique efficace"
+    ],
+    bricolage: [
+      "DIY {keyword} : Tutoriel pas à pas illustré",
+      "{keyword} fait maison : Économiser 70% du budget",
+      "Bricolage {keyword} : Outils indispensables débutants",
+      "Réparer {keyword} soi-même : Techniques simples",
+      "{keyword} : Astuces de pro révélées"
+    ],
+    apiculture: [
+      "Débuter en {keyword} : Guide complet apiculteur",
+      "{keyword} moderne : Techniques respectueuses abeilles",
+      "Récolte {keyword} : Maximiser la production miel",
+      "{keyword} urbaine : Installer ruches en ville",
+      "Maladies {keyword} : Prévention et traitement naturel"
+    ],
+    permaculture: [
+      "Principes {keyword} : Design jardin autosuffisant",
+      "{keyword} pour débutants : Créer écosystème durable",
+      "Techniques {keyword} : Sol vivant et biodiversité",
+      "{keyword} urbaine : Balcon et petit espace",
+      "Économie {keyword} : Autonomie alimentaire possible"
+    ],
+    potager: [
+      "{keyword} productif : Légumes toute l'année",
+      "Planification {keyword} : Rotations et associations",
+      "{keyword} sur balcon : Optimiser petit espace",
+      "Graines {keyword} : Variétés anciennes résistantes",
+      "Arrosage {keyword} : Techniques économes en eau"
+    ],
+    ecologie: [
+      "Mode de vie {keyword} : Réduire empreinte carbone",
+      "{keyword} au quotidien : Gestes simples efficaces",
+      "Transition {keyword} : Famille zéro déchet",
+      "Consommation {keyword} : Alternatives durables",
+      "Économies {keyword} : Factures divisées par 2"
+    ],
+    plantes: [
+      "{keyword} faciles : Top 10 pour débutants",
+      "Entretien {keyword} : Arrosage et lumière parfaits",
+      "{keyword} dépolluantes : Purifier air naturellement",
+      "Bouturage {keyword} : Multiplier collection gratuitement",
+      "Problèmes {keyword} : Diagnostic et solutions rapides"
     ]
   };
 

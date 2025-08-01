@@ -95,45 +95,83 @@ const EbookImageBank: React.FC<EbookImageBankProps> = ({
       };
 
       ws.onmessage = (event) => {
-        const response = JSON.parse(event.data);
-        
-        if (response.data) {
-          response.data.forEach((item: any) => {
-            if (item.taskType === "authentication") {
-              // Authentification réussie, envoyer la demande de génération
-              const generateMessage = [{
-                taskType: "imageInference",
-                taskUUID: tempId,
-                positivePrompt: prompt,
-                model: "runware:100@1",
-                width: 1024,
-                height: 1024,
-                numberResults: 1,
-                outputFormat: "WEBP",
-                CFGScale: 1,
-                scheduler: "FlowMatchEulerDiscreteScheduler"
-              }];
-              ws.send(JSON.stringify(generateMessage));
-            } else if (item.taskType === "imageInference" && item.taskUUID === tempId) {
-              // Image générée avec succès
-              setGeneratedImages(prev => 
-                prev.map(img => 
-                  img.id === tempId 
-                    ? { ...img, url: item.imageURL, isGenerating: false }
-                    : img
-                )
-              );
-              toast.success('Image générée avec succès !');
-              ws.close();
-            }
-          });
+        try {
+          const response = JSON.parse(event.data);
+          console.log('WebSocket response:', response);
+          
+          if (response.error || response.errors) {
+            console.error('API Error:', response);
+            toast.error(response.errorMessage || 'Erreur API');
+            setGeneratedImages(prev => prev.filter(img => img.id !== tempId));
+            setIsGenerating(false);
+            ws.close();
+            return;
+          }
+          
+          if (response.data) {
+            response.data.forEach((item: any) => {
+              if (item.taskType === "authentication") {
+                console.log('Authentication successful');
+                // Authentification réussie, envoyer la demande de génération
+                const generateMessage = [{
+                  taskType: "imageInference",
+                  taskUUID: tempId,
+                  positivePrompt: prompt,
+                  model: "runware:100@1",
+                  width: 1024,
+                  height: 1024,
+                  numberResults: 1,
+                  outputFormat: "WEBP",
+                  CFGScale: 1,
+                  scheduler: "FlowMatchEulerDiscreteScheduler",
+                  steps: 4
+                }];
+                console.log('Sending generation request:', generateMessage);
+                ws.send(JSON.stringify(generateMessage));
+              } else if (item.taskType === "imageInference" && item.taskUUID === tempId) {
+                console.log('Image generated:', item);
+                // Image générée avec succès
+                if (item.imageURL) {
+                  setGeneratedImages(prev => 
+                    prev.map(img => 
+                      img.id === tempId 
+                        ? { ...img, url: item.imageURL, isGenerating: false }
+                        : img
+                    )
+                  );
+                  toast.success('Image générée avec succès !');
+                } else {
+                  toast.error('Erreur: URL d\'image manquante');
+                  setGeneratedImages(prev => prev.filter(img => img.id !== tempId));
+                }
+                setIsGenerating(false);
+                ws.close();
+              }
+            });
+          }
+        } catch (error) {
+          console.error('Error parsing WebSocket message:', error);
+          toast.error('Erreur de communication');
+          setGeneratedImages(prev => prev.filter(img => img.id !== tempId));
+          setIsGenerating(false);
+          ws.close();
         }
       };
 
-      ws.onerror = () => {
-        toast.error('Erreur lors de la génération de l\'image');
+      ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        toast.error('Erreur de connexion WebSocket');
         setGeneratedImages(prev => prev.filter(img => img.id !== tempId));
         setIsGenerating(false);
+      };
+
+      ws.onclose = (event) => {
+        console.log('WebSocket closed:', event.code, event.reason);
+        if (!event.wasClean) {
+          toast.error('Connexion fermée de manière inattendue');
+          setGeneratedImages(prev => prev.filter(img => img.id !== tempId));
+          setIsGenerating(false);
+        }
       };
 
     } catch (error) {
