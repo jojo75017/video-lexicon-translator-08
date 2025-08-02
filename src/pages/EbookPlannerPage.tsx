@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import EbookImageBank from '@/components/ebook/EbookImageBank';
 import { EbookMarketing } from '@/components/ebook/EbookMarketing';
+import { EbookMonetization } from '@/components/ebook/EbookMonetization';
 import {
   DndContext,
   closestCenter,
@@ -520,7 +521,7 @@ Réponds uniquement au format JSON:
         <div className="mb-8">
           <Tabs defaultValue="planner" className="space-y-6">
             <div className="gradient-card rounded-2xl p-2 mb-8 glow-effect">
-              <TabsList className="grid w-full grid-cols-11 bg-transparent gap-1">
+              <TabsList className="grid w-full grid-cols-12 bg-transparent gap-1">
                 <TabsTrigger value="planner" className="text-sm gradient-primary text-white data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-xl">
                   📝 Planificateur
                 </TabsTrigger>
@@ -541,6 +542,9 @@ Réponds uniquement au format JSON:
                 </TabsTrigger>
                 <TabsTrigger value="marketing" className="text-sm bg-gradient-to-r from-blue-500 to-purple-500 text-white data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-xl">
                   📢 Marketing
+                </TabsTrigger>
+                <TabsTrigger value="monetization" className="text-sm bg-gradient-to-r from-green-500 to-emerald-500 text-white data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-xl">
+                  💰 Monétisation
                 </TabsTrigger>
                 <TabsTrigger value="export" className="text-sm bg-vibrant-cyan text-white data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-xl">
                   📤 Export
@@ -1091,6 +1095,10 @@ ${seoData.hashtags.join(' ')}
               apiKey={apiKey}
               isGenerating={isGenerating}
             />
+          </TabsContent>
+
+          <TabsContent value="monetization" className="space-y-6">
+            <EbookMonetization />
           </TabsContent>
 
           </Tabs>
