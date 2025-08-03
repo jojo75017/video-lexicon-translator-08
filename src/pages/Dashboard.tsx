@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BarChart3, Search, Globe, TrendingUp, Users, Lightbulb, BookOpen, Target } from 'lucide-react';
+import { BarChart3, Search, Globe, TrendingUp, Users, Lightbulb, BookOpen, Target, MessageCircle, Image, Mail } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Dashboard: React.FC = () => {
@@ -91,6 +91,27 @@ const Dashboard: React.FC = () => {
       icon: Target,
       path: '/prompts-generator',
       color: 'from-orange-500 to-red-600'
+    },
+    {
+      title: '💬 Quora Marketing',
+      description: 'Générez des réponses optimisées pour Quora et buildez votre autorité',
+      icon: MessageCircle,
+      path: '/quora',
+      color: 'from-red-500 to-pink-600'
+    },
+    {
+      title: '📌 Pinterest Generator',
+      description: 'Créez des épingles et du contenu viral pour Pinterest',
+      icon: Image,
+      path: '/pinterest',
+      color: 'from-pink-500 to-purple-600'
+    },
+    {
+      title: '✉️ Signatures Email',
+      description: 'Générateur de signatures email professionnelles',
+      icon: Mail,
+      path: '/signature',
+      color: 'from-blue-500 to-indigo-600'
     }
   ];
 
