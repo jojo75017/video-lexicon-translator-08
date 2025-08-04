@@ -21,6 +21,7 @@ import CrawlerPage from './pages/CrawlerPage';
 import EbookPlannerPage from './pages/EbookPlannerPage';
 import EbookIdeasPage from './pages/EbookIdeasPage';
 import PromptsGeneratorPage from './pages/PromptsGeneratorPage';
+import EmailMarketingPage from './pages/EmailMarketingPage';
 
 const queryClient = new QueryClient();
 
@@ -48,6 +49,7 @@ const App = () => (
         <Route path="/ebook-planner" element={<EbookPlannerPage />} />
         <Route path="/ebook-ideas" element={<EbookIdeasPage />} />
         <Route path="/prompts-generator" element={<PromptsGeneratorPage />} />
+        <Route path="/email-marketing" element={<EmailMarketingPage />} />
       </Routes>
       <Toaster />
     </TooltipProvider>

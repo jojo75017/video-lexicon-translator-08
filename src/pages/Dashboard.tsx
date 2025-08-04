@@ -112,6 +112,13 @@ const Dashboard: React.FC = () => {
       icon: Mail,
       path: '/signature',
       color: 'from-blue-500 to-indigo-600'
+    },
+    {
+      title: '📧 Email Marketing SEO',
+      description: 'Subject lines optimisés, templates, audit spam et newsletters SEO',
+      icon: Mail,
+      path: '/email-marketing',
+      color: 'from-green-500 to-teal-600'
     }
   ];
 
