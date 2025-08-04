@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 import { 
   Mail, 
   Zap, 
@@ -16,14 +17,20 @@ import {
   Download,
   AlertTriangle,
   CheckCircle,
-  TrendingUp
+  TrendingUp,
+  ArrowLeft
 } from 'lucide-react';
 
 const EmailMarketingPage = () => {
+  const navigate = useNavigate();
   const [subjectLine, setSubjectLine] = useState('');
   const [emailContent, setEmailContent] = useState('');
   const [spamScore, setSpamScore] = useState(0);
   const [generatedSubjects, setGeneratedSubjects] = useState<string[]>([]);
+
+  // Compteur de mots/caractères
+  const wordCount = emailContent.trim() ? emailContent.trim().split(/\s+/).length : 0;
+  const charCount = emailContent.length;
 
   const subjectLineTemplates = [
     "🔥 [Prénom], votre guide SEO arrive !",
@@ -68,9 +75,114 @@ const EmailMarketingPage = () => {
     toast.success('Copié dans le presse-papier !');
   };
 
+  const newsletterTemplate = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newsletter SEO Pro</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; background: #fff; }
+        .header { background: linear-gradient(135deg, #16a085, #27ae60); color: white; padding: 20px; text-align: center; }
+        .content { padding: 20px; }
+        .cta-button { background: #27ae60; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; }
+        .footer { background: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Newsletter SEO Pro</h1>
+            <p>Les dernières tendances SEO pour booster votre trafic</p>
+        </div>
+        <div class="content">
+            <h2>📈 Cette semaine en SEO</h2>
+            <p>Découvrez les stratégies qui font la différence en 2024...</p>
+            
+            <h3>💡 Astuce de la semaine</h3>
+            <p>L'optimisation Core Web Vitals est maintenant...</p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="#" class="cta-button">Lire l'article complet</a>
+            </div>
+        </div>
+        <div class="footer">
+            <p>© 2024 SEO Pro - <a href="#">Se désabonner</a></p>
+        </div>
+    </div>
+</body>
+</html>`;
+
+  const promotionalTemplate = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offre Spéciale SEO</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 0 auto; background: #fff; }
+        .header { background: linear-gradient(135deg, #e74c3c, #f39c12); color: white; padding: 30px 20px; text-align: center; }
+        .urgent-banner { background: #ff4757; color: white; padding: 10px; text-align: center; font-weight: bold; }
+        .content { padding: 30px 20px; }
+        .highlight-box { background: #fff3cd; border-left: 4px solid #ffc107; padding: 20px; margin: 20px 0; }
+        .big-cta { background: #28a745; color: white; padding: 20px 40px; text-decoration: none; border-radius: 8px; display: inline-block; font-size: 18px; font-weight: bold; }
+        .footer { background: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="urgent-banner">
+            ⏰ OFFRE LIMITÉE - Plus que 24h !
+        </div>
+        <div class="header">
+            <h1>🔥 -50% Formation SEO Expert</h1>
+            <p>Transformez votre site en machine à trafic</p>
+        </div>
+        <div class="content">
+            <h2>Bonjour [PRÉNOM],</h2>
+            <p>Vous avez manqué ma dernière formation ? Pas de panique !</p>
+            
+            <div class="highlight-box">
+                <h3>🎯 Ce que vous allez apprendre :</h3>
+                <ul>
+                    <li>✅ Audit SEO complet en 30 min</li>
+                    <li>✅ Stratégie mots-clés gagnante</li>
+                    <li>✅ Techniques de linking avancées</li>
+                    <li>✅ Optimisation technique</li>
+                </ul>
+            </div>
+            
+            <div style="text-align: center; margin: 40px 0;">
+                <a href="#" class="big-cta">🚀 J'accède à la formation</a>
+            </div>
+            
+            <p style="text-align: center; font-size: 14px; color: #666;">
+                Offre valable jusqu'au [DATE] - Code promo : SEO50
+            </p>
+        </div>
+        <div class="footer">
+            <p>© 2024 Formation SEO - <a href="#">Se désabonner</a></p>
+        </div>
+    </div>
+</body>
+</html>`;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-green-50/30 p-6">
       <div className="container mx-auto max-w-6xl">
+        <div className="flex items-center justify-between mb-8">
+          <Button
+            variant="outline"
+            onClick={() => navigate('/')}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Retour au tableau de bord
+          </Button>
+        </div>
+
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent">
             📧 Email Marketing SEO
@@ -176,11 +288,15 @@ const EmailMarketingPage = () => {
                     <p className="text-sm text-gray-600">Template responsive HTML avec sections optimisées SEO</p>
                   </div>
                   <div className="flex gap-2">
-                    <Button variant="outline" className="flex-1">
+                    <Button 
+                      variant="outline" 
+                      className="flex-1"
+                      onClick={() => copyToClipboard(newsletterTemplate)}
+                    >
                       <Copy className="w-4 h-4 mr-2" />
-                      Copier
+                      Copier HTML
                     </Button>
-                    <Button variant="outline">
+                    <Button variant="outline" title="Télécharger le template">
                       <Download className="w-4 h-4" />
                     </Button>
                   </div>
@@ -199,11 +315,15 @@ const EmailMarketingPage = () => {
                     <p className="text-sm text-gray-600">Template pour campagnes promotionnelles avec CTA optimisés</p>
                   </div>
                   <div className="flex gap-2">
-                    <Button variant="outline" className="flex-1">
+                    <Button 
+                      variant="outline" 
+                      className="flex-1"
+                      onClick={() => copyToClipboard(promotionalTemplate)}
+                    >
                       <Copy className="w-4 h-4 mr-2" />
-                      Copier
+                      Copier HTML
                     </Button>
-                    <Button variant="outline">
+                    <Button variant="outline" title="Télécharger le template">
                       <Download className="w-4 h-4" />
                     </Button>
                   </div>
@@ -222,7 +342,12 @@ const EmailMarketingPage = () => {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Contenu de votre email</label>
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="block text-sm font-medium">Contenu de votre email</label>
+                    <div className="text-sm text-gray-500">
+                      {charCount} caractères • {wordCount} mots
+                    </div>
+                  </div>
                   <Textarea
                     placeholder="Collez ici le contenu de votre email pour analyser le score spam..."
                     value={emailContent}
