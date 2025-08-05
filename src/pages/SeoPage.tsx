@@ -79,6 +79,20 @@ const SeoPage: React.FC = () => {
         'où apprendre le référencement naturel',
         'référencement naturel vs payant'
       ]
+    },
+    technical: {
+      issues: [
+        'Optimiser les images (alt text manquant)',
+        'Améliorer la vitesse de chargement',
+        'Vérifier la compatibilité mobile',
+        'Ajouter des données structurées Schema.org'
+      ],
+      opportunities: [
+        'Créer des pages piliers pour le cocon sémantique',
+        'Développer du contenu sur les mots-clés connexes',
+        'Mettre en place une stratégie de maillage interne',
+        'Optimiser pour la recherche vocale'
+      ]
     }
   });
   const [activeTab, setActiveTab] = useState<'analyze' | 'optimize' | 'content' | 'meta' | 'keywords' | 'audit'>('analyze');
