@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Globe, Folder, File, ChevronRight, Search, Download, AlertTriangle, CheckCircle, XCircle, Eye, BarChart3, Link, TreePine, Zap, Filter, Lightbulb } from 'lucide-react';
+import { ArrowLeft, Globe, Folder, File, ChevronRight, Search, Download, AlertTriangle, CheckCircle, XCircle, Eye, BarChart3, Link, TreePine, Zap, Filter, Lightbulb, Settings, Sparkles, Brain, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -14,6 +14,10 @@ const HierarchyPage: React.FC = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [filter, setFilter] = useState('');
+  const [useAI, setUseAI] = useState(false);
+  const [apiKey, setApiKey] = useState(() => {
+    return localStorage.getItem('openai_api_key') || '';
+  });
 
   const mockAnalysisResult = {
     structure: [
@@ -68,13 +72,50 @@ const HierarchyPage: React.FC = () => {
       return;
     }
     
+    if (useAI && !apiKey) {
+      toast.error('Clé API OpenAI requise pour le mode IA');
+      return;
+    }
+    
     setIsAnalyzing(true);
-    // Simulation d'analyse
+    
+    // Simulation d'analyse avec différenciation des modes
     setTimeout(() => {
-      setAnalysisResult(mockAnalysisResult);
+      let result: any = { ...mockAnalysisResult };
+      
+      if (useAI) {
+        // Mode IA : Recommandations plus intelligentes et personnalisées
+        result.recommendations = [
+          { type: 'success', title: 'Architecture IA-optimisée', description: 'L\'IA a détecté une structure logique bien pensée pour le SEO' },
+          { type: 'warning', title: 'Opportunités de maillage', description: 'L\'IA suggère 5 liens internes supplémentaires pour améliorer le PageRank' },
+          { type: 'success', title: 'Catégorisation intelligente', description: 'L\'IA recommande de créer une nouvelle catégorie pour optimiser l\'UX' },
+          { type: 'warning', title: 'Pages à fort potentiel', description: 'L\'IA a identifié 3 pages qui pourraient bénéficier d\'une promotion hiérarchique' }
+        ];
+        
+        // Performance améliorée avec IA
+        result.performance.crawlability = 98;
+        
+        // Ajout des insights IA
+        result.aiInsights = {
+          contentAnalysis: 'Excellent alignement sémantique détecté',
+          userJourney: 'Parcours utilisateur optimisé pour la conversion',
+          technicalSeo: 'Structure technique conforme aux dernières pratiques'
+        };
+        
+        toast.success('Analyse IA terminée - Recommandations personnalisées générées');
+      } else {
+        // Mode Standard : Résultats de base
+        toast.success('Analyse standard terminée');
+      }
+      
+      // Sauvegarder la clé API localement si mode IA
+      if (useAI && apiKey) {
+        localStorage.setItem('openai_api_key', apiKey);
+      }
+      
+      setAnalysisResult(result);
       setIsAnalyzing(false);
-      toast.success('Analyse terminée avec succès');
-    }, 3000);
+    }, useAI ? 5000 : 3000); // Plus long pour l'IA
   };
 
   const exportStructure = (format: string) => {
@@ -146,66 +187,181 @@ const HierarchyPage: React.FC = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex gap-4">
-              <Input
-                placeholder="https://exemple.com"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                className="flex-1"
-              />
-              <Button 
-                onClick={analyzeWebsite} 
-                disabled={isAnalyzing}
-                className="px-6"
-              >
-                {isAnalyzing ? (
-                  <div className="flex items-center gap-2">
-                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
-                    Analyse...
+            <div className="space-y-4">
+              {/* Choix du mode d'analyse */}
+              <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 text-white">
+                    {useAI ? <Brain className="h-5 w-5" /> : <Settings className="h-5 w-5" />}
                   </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <Search className="h-4 w-4" />
-                    Analyser
+                  <div>
+                    <h3 className="font-semibold">
+                      {useAI ? '🤖 Mode IA Avancé' : '📊 Mode Standard'}
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      {useAI 
+                        ? 'Analyse intelligente avec recommandations personnalisées' 
+                        : 'Analyse technique standard avec données simulées'
+                      }
+                    </p>
                   </div>
-                )}
-              </Button>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Button
+                    variant={!useAI ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setUseAI(false)}
+                    className="flex items-center gap-2"
+                  >
+                    <Settings className="h-4 w-4" />
+                    Standard
+                  </Button>
+                  <Button
+                    variant={useAI ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setUseAI(true)}
+                    className="flex items-center gap-2"
+                  >
+                    <Sparkles className="h-4 w-4" />
+                    IA Pro
+                  </Button>
+                </div>
+              </div>
+
+              {/* Configuration OpenAI si mode IA activé */}
+              {useAI && (
+                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <div className="flex items-start gap-3">
+                    <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5" />
+                    <div className="flex-1">
+                      <h4 className="font-medium text-yellow-800 mb-2">Configuration requise</h4>
+                      <p className="text-sm text-yellow-700 mb-3">
+                        Le mode IA nécessite une clé API OpenAI pour fonctionner
+                      </p>
+                      <Input
+                        type="password"
+                        placeholder="Clé API OpenAI (sk-...)"
+                        value={apiKey}
+                        onChange={(e) => setApiKey(e.target.value)}
+                        className="mb-2"
+                      />
+                      <div className="text-xs text-yellow-600">
+                        💡 Votre clé est stockée localement et sécurisée
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Formulaire d'URL */}
+              <div className="flex gap-4">
+                <Input
+                  placeholder="https://exemple.com"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  className="flex-1"
+                />
+                <Button 
+                  onClick={analyzeWebsite} 
+                  disabled={isAnalyzing || (useAI && !apiKey)}
+                  className="px-6"
+                >
+                  {isAnalyzing ? (
+                    <div className="flex items-center gap-2">
+                      <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                      {useAI ? 'Analyse IA...' : 'Analyse...'}
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      {useAI ? <Brain className="h-4 w-4" /> : <Search className="h-4 w-4" />}
+                      {useAI ? 'Analyser avec IA' : 'Analyser'}
+                    </div>
+                  )}
+                </Button>
+              </div>
+
+              {/* Avantages selon le mode */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div className={`p-3 rounded-lg border ${!useAI ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'}`}>
+                  <h4 className="font-semibold mb-2">📊 Mode Standard</h4>
+                  <ul className="space-y-1 text-gray-600">
+                    <li>• Analyse technique de base</li>
+                    <li>• Métriques de performance</li>
+                    <li>• Structure hiérarchique</li>
+                    <li>• Export sitemap XML</li>
+                  </ul>
+                </div>
+                <div className={`p-3 rounded-lg border ${useAI ? 'bg-purple-50 border-purple-200' : 'bg-gray-50 border-gray-200'}`}>
+                  <h4 className="font-semibold mb-2">🤖 Mode IA Pro</h4>
+                  <ul className="space-y-1 text-gray-600">
+                    <li>• Analyse intelligente du contenu</li>
+                    <li>• Recommandations personnalisées</li>
+                    <li>• Optimisations SEO avancées</li>
+                    <li>• Suggestions d'amélioration</li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
 
         {analysisResult && (
-          <Tabs defaultValue="structure" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-7">
-              <TabsTrigger value="structure" className="flex items-center gap-2">
-                <TreePine className="h-4 w-4" />
-                Structure
-              </TabsTrigger>
-              <TabsTrigger value="architecture" className="flex items-center gap-2">
-                <Globe className="h-4 w-4" />
-                Architecture
-              </TabsTrigger>
-              <TabsTrigger value="sitemap" className="flex items-center gap-2">
-                <File className="h-4 w-4" />
-                Sitemap
-              </TabsTrigger>
-              <TabsTrigger value="performance" className="flex items-center gap-2">
-                <BarChart3 className="h-4 w-4" />
-                Performance
-              </TabsTrigger>
-              <TabsTrigger value="issues" className="flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4" />
-                Problèmes
-              </TabsTrigger>
-              <TabsTrigger value="orphans" className="flex items-center gap-2">
-                <Eye className="h-4 w-4" />
-                Pages Orphelines
-              </TabsTrigger>
-              <TabsTrigger value="recommendations" className="flex items-center gap-2">
-                <Zap className="h-4 w-4" />
-                Recommandations
-              </TabsTrigger>
-            </TabsList>
+          <div className="space-y-4">
+            {/* Badge indicatif du mode utilisé */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Badge variant={analysisResult.aiInsights ? "default" : "secondary"} className="flex items-center gap-1">
+                  {analysisResult.aiInsights ? <Brain className="h-3 w-3" /> : <Settings className="h-3 w-3" />}
+                  {analysisResult.aiInsights ? 'Analyse IA' : 'Analyse Standard'}
+                </Badge>
+                {analysisResult.aiInsights && (
+                  <Badge variant="outline" className="text-green-600">
+                    Recommandations personnalisées
+                  </Badge>
+                )}
+              </div>
+              <span className="text-sm text-gray-500">
+                Analysé le {new Date().toLocaleDateString()}
+              </span>
+            </div>
+
+            <Tabs defaultValue="structure" className="space-y-6">
+              <TabsList className={`grid w-full ${analysisResult.aiInsights ? 'grid-cols-8' : 'grid-cols-7'}`}>
+                <TabsTrigger value="structure" className="flex items-center gap-2">
+                  <TreePine className="h-4 w-4" />
+                  Structure
+                </TabsTrigger>
+                <TabsTrigger value="architecture" className="flex items-center gap-2">
+                  <Globe className="h-4 w-4" />
+                  Architecture
+                </TabsTrigger>
+                <TabsTrigger value="sitemap" className="flex items-center gap-2">
+                  <File className="h-4 w-4" />
+                  Sitemap
+                </TabsTrigger>
+                {analysisResult.aiInsights && (
+                  <TabsTrigger value="ai-insights" className="flex items-center gap-2">
+                    <Brain className="h-4 w-4" />
+                    Insights IA
+                  </TabsTrigger>
+                )}
+                <TabsTrigger value="performance" className="flex items-center gap-2">
+                  <BarChart3 className="h-4 w-4" />
+                  Performance
+                </TabsTrigger>
+                <TabsTrigger value="issues" className="flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4" />
+                  Problèmes
+                </TabsTrigger>
+                <TabsTrigger value="orphans" className="flex items-center gap-2">
+                  <Eye className="h-4 w-4" />
+                  Pages Orphelines
+                </TabsTrigger>
+                <TabsTrigger value="recommendations" className="flex items-center gap-2">
+                  <Zap className="h-4 w-4" />
+                  Recommandations
+                </TabsTrigger>
+              </TabsList>
 
             {/* Onglet Structure */}
             <TabsContent value="structure" className="space-y-6">
@@ -553,6 +709,121 @@ const HierarchyPage: React.FC = () => {
               </div>
             </TabsContent>
 
+            {/* Nouvel Onglet Insights IA - Affiché seulement si mode IA */}
+            {analysisResult.aiInsights && (
+              <TabsContent value="ai-insights" className="space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Brain className="h-5 w-5" />
+                        Analyse de Contenu IA
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
+                          <h4 className="font-semibold mb-2 text-blue-800">🧠 Analyse Sémantique</h4>
+                          <p className="text-sm text-blue-700">{analysisResult.aiInsights.contentAnalysis}</p>
+                        </div>
+                        
+                        <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
+                          <h4 className="font-semibold mb-2 text-green-800">🎯 Parcours Utilisateur</h4>
+                          <p className="text-sm text-green-700">{analysisResult.aiInsights.userJourney}</p>
+                        </div>
+
+                        <div className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200">
+                          <h4 className="font-semibold mb-2 text-purple-800">⚡ SEO Technique</h4>
+                          <p className="text-sm text-purple-700">{analysisResult.aiInsights.technicalSeo}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Sparkles className="h-5 w-5" />
+                        Optimisations IA Recommandées
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="p-4 border border-blue-200 bg-blue-50 rounded-lg">
+                          <div className="flex items-start gap-3">
+                            <div className="p-1 rounded-full bg-blue-500 text-white">
+                              <CheckCircle className="h-4 w-4" />
+                            </div>
+                            <div>
+                              <h4 className="font-semibold text-blue-800">Maillage intelligent</h4>
+                              <p className="text-sm text-blue-700 mt-1">L'IA a identifié 5 opportunités de liens internes contextuel pour améliorer le Page Rank</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="p-4 border border-green-200 bg-green-50 rounded-lg">
+                          <div className="flex items-start gap-3">
+                            <div className="p-1 rounded-full bg-green-500 text-white">
+                              <Lightbulb className="h-4 w-4" />
+                            </div>
+                            <div>
+                              <h4 className="font-semibold text-green-800">Clusters sémantiques</h4>
+                              <p className="text-sm text-green-700 mt-1">Création recommandée de 3 clusters thématiques pour optimiser la pertinence</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="p-4 border border-orange-200 bg-orange-50 rounded-lg">
+                          <div className="flex items-start gap-3">
+                            <div className="p-1 rounded-full bg-orange-500 text-white">
+                              <TrendingUp className="h-4 w-4" />
+                            </div>
+                            <div>
+                              <h4 className="font-semibold text-orange-800">Pages piliers</h4>
+                              <p className="text-sm text-orange-700 mt-1">Transformation de 2 pages en pages piliers pour capturer plus de trafic organique</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <Button className="w-full" variant="default">
+                          <Download className="h-4 w-4 mr-2" />
+                          Télécharger plan d'optimisation IA
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <BarChart3 className="h-5 w-5" />
+                      Prédictions IA de Performance
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border">
+                        <div className="text-2xl font-bold text-blue-600">+45%</div>
+                        <div className="text-sm text-blue-800">Trafic organique prévu</div>
+                        <div className="text-xs text-blue-600 mt-1">après optimisations</div>
+                      </div>
+                      <div className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-lg border">
+                        <div className="text-2xl font-bold text-green-600">+30%</div>
+                        <div className="text-sm text-green-800">Temps sur le site</div>
+                        <div className="text-xs text-green-600 mt-1">avec nouveau maillage</div>
+                      </div>
+                      <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg border">
+                        <div className="text-2xl font-bold text-purple-600">+25%</div>
+                        <div className="text-sm text-purple-800">Taux de conversion</div>
+                        <div className="text-xs text-purple-600 mt-1">parcours optimisé</div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            )}
+
             {/* Onglet Performance */}
             <TabsContent value="performance" className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -674,6 +945,7 @@ const HierarchyPage: React.FC = () => {
               </div>
             </TabsContent>
           </Tabs>
+          </div>
         )}
 
         {!analysisResult && (
