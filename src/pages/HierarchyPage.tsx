@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Globe, Folder, File, ChevronRight, Search, Download, AlertTriangle, CheckCircle, XCircle, Eye, BarChart3, Link, TreePine, Zap, Filter, Lightbulb, Settings, Sparkles, Brain, TrendingUp, Code, Database, Shield, Gauge, Network, Target, BookOpen, MapPin, Layout, Layers, FileText, Share2 } from 'lucide-react';
+import { ArrowLeft, Globe, Folder, File, ChevronRight, Search, Download, AlertTriangle, CheckCircle, XCircle, Eye, BarChart3, Link, TreePine, Zap, Filter, Lightbulb, Settings, Sparkles, Brain, TrendingUp, Code, Database, Shield, Gauge, Network, Target, BookOpen, MapPin, Layout, Layers, FileText, Share2, Check, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -890,15 +890,108 @@ const HierarchyPage: React.FC = () => {
               </Card>
             </TabsContent>
 
-            <TabsContent value="donnees-structurees" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Données Structurées</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">Analyse des données structurées Schema.org...</p>
-                </CardContent>
-              </Card>
+            <TabsContent value="donnees-structurees">
+              <div className="space-y-6">
+                {/* Description */}
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <p className="text-sm text-blue-800">
+                    Les données structurées sont particulièrement utiles pour aider Google et les IA à mieux comprendre vos pages. Avec des données structurées, 
+                    vous leur fournissez des informations précises telles que l'auteur de la page, le prix d'un produit, sa notation, les étapes d'une recette de cuisine et bien d'autres. Surtout, vous gagnez des chances d'être cité ou mis en avant !
+                  </p>
+                </div>
+
+                {/* Entités de base */}
+                <div className="bg-card rounded-lg p-6 border">
+                  <h3 className="text-lg font-semibold mb-4">Entités de base</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm">Usage des données structurées sur la page</span>
+                      <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded flex items-center gap-1">
+                        <Check className="h-3 w-3" />
+                        Valide
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm">Présence des données structurées essentielles</span>
+                      <span className="text-xs text-orange-600 bg-orange-50 px-2 py-1 rounded flex items-center gap-1">
+                        <AlertTriangle className="h-3 w-3" />
+                        Avertissement <span className="bg-orange-600 text-white rounded-full w-4 h-4 text-xs flex items-center justify-center">1</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Entités spécifiques */}
+                <div className="bg-card rounded-lg p-6 border">
+                  <h3 className="text-lg font-semibold mb-4">Entités spécifiques</h3>
+                  <div className="space-y-4">
+                    <p className="text-sm">
+                      Cette page a été identifiée comme une page de type <strong>Accueil d'un blog</strong> 🔗. 
+                      Les conseils ci-dessous visent à adapter les données structurées pour ce type de pages.
+                    </p>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm">Données structurées essentielles</span>
+                        <span className="text-xs text-orange-600 bg-orange-50 px-2 py-1 rounded flex items-center gap-1">
+                          <AlertTriangle className="h-3 w-3" />
+                          Avertissement <span className="bg-orange-600 text-white rounded-full w-4 h-4 text-xs flex items-center justify-center">1</span>
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm">Données structurées suggérées</span>
+                        <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded flex items-center gap-1">
+                          <Check className="h-3 w-3" />
+                          Valide
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Visualisation */}
+                <div className="bg-card rounded-lg p-6 border">
+                  <h3 className="text-lg font-semibold mb-4">Visualisation</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Page web 1 */}
+                    <div className="border rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <FileText className="h-4 w-4 text-green-600" />
+                        <span className="text-sm font-medium text-green-600">Page web</span>
+                        <Info className="h-3 w-3 text-gray-400" />
+                      </div>
+                      <p className="text-sm font-medium">Voyages en Europe & Asie - Bons plans exclusifs | BusterTravel</p>
+                    </div>
+
+                    {/* Page web 2 */}
+                    <div className="border rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <FileText className="h-4 w-4 text-green-600" />
+                        <span className="text-sm font-medium text-green-600">Page web</span>
+                        <Info className="h-3 w-3 text-gray-400" />
+                      </div>
+                      <div className="flex justify-center">
+                        <span className="text-xs bg-gray-100 px-2 py-1 rounded">microdata</span>
+                      </div>
+                    </div>
+
+                    {/* Site web */}
+                    <div className="border rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Globe className="h-4 w-4 text-green-600" />
+                        <span className="text-sm font-medium text-green-600">Site web</span>
+                        <Info className="h-3 w-3 text-gray-400" />
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-xs italic">Mes itinéraires malins à travers l'Europe et l'Asie.</p>
+                        <p className="text-xs">
+                          URL : <a href="https://bustertravel.com/" className="text-blue-600 hover:underline">https://bustertravel.com/</a>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </TabsContent>
 
             <TabsContent value="http-reseau" className="space-y-4">
