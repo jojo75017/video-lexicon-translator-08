@@ -6,9 +6,12 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ArrowLeft, Search, Target, TrendingUp, Copy, Download, Globe, Brain, Filter, BarChart3, Users, Smartphone, ShoppingCart, Mic, Map, ChevronDown, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Search, Target, TrendingUp, Copy, Download, Globe, Brain, Filter, BarChart3, Users, Smartphone, ShoppingCart, Mic, Map, ChevronDown, RefreshCw, Settings } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { OpenAIConfigPanel } from '@/components/shared/OpenAIConfigPanel';
+import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
+import { UniversalOpenAIService } from '@/services/openai/universalOpenAIService';
 
 interface KeywordData {
   keyword: string;
@@ -36,6 +39,7 @@ interface ClusterData {
 
 const KeywordGeneratorPage: React.FC = () => {
   const navigate = useNavigate();
+  const openAIConfig = useOpenAIConfig();
   
   // États principaux
   const [seedKeyword, setSeedKeyword] = useState('');
@@ -74,7 +78,7 @@ const KeywordGeneratorPage: React.FC = () => {
     return features.slice(0, Math.floor(Math.random() * 4) + 1);
   };
 
-  const generateAdvancedKeywords = () => {
+  const generateAdvancedKeywords = async () => {
     if (!seedKeyword.trim()) {
       toast.error('Veuillez entrer un mot-clé');
       return;
@@ -82,11 +86,34 @@ const KeywordGeneratorPage: React.FC = () => {
 
     setIsLoading(true);
 
-    // Simulation avancée de génération de mots-clés
-    setTimeout(() => {
-      const prefixes = ['meilleur', 'comment', 'pourquoi', 'guide', 'prix', 'avis', 'comparatif', 'pas cher', 'top', 'acheter'];
-      const suffixes = ['2024', 'france', 'gratuit', 'en ligne', 'débutant', 'professionnel', 'facile', 'rapide', 'pas cher', 'premium'];
-      const questions = ['que', 'quel', 'comment', 'pourquoi', 'où', 'quand', 'qui'];
+    try {
+      // Utiliser l'API OpenAI si disponible, sinon données de démonstration
+      let aiKeywords: string[] = [];
+      
+      if (openAIConfig.hasValidApiKey()) {
+        try {
+          aiKeywords = await UniversalOpenAIService.getInstance().generateKeywords(
+            seedKeyword, 
+            openAIConfig.getConfig(),
+            20
+          );
+          toast.success('Mots-clés générés avec l\'API OpenAI !');
+        } catch (error) {
+          console.error('Erreur API OpenAI:', error);
+          toast.warning('Utilisation des données de démonstration');
+        }
+      } else {
+        toast.info('Configuration OpenAI manquante - Utilisation des données de démonstration');
+      }
+
+      // Génération avancée combinant IA et règles métier
+      setTimeout(() => {
+        const prefixes = ['meilleur', 'comment', 'pourquoi', 'guide', 'prix', 'avis', 'comparatif', 'pas cher', 'top', 'acheter'];
+        const suffixes = ['2024', 'france', 'gratuit', 'en ligne', 'débutant', 'professionnel', 'facile', 'rapide', 'pas cher', 'premium'];
+        const questions = ['que', 'quel', 'comment', 'pourquoi', 'où', 'quand', 'qui'];
+        
+        // Combiner mots-clés IA et mots-clés générés par règles
+        const combinedKeywords = [...aiKeywords, ...prefixes.map(p => `${p} ${seedKeyword}`), ...suffixes.map(s => `${seedKeyword} ${s}`)];
       
       const generatedKeywords: KeywordData[] = [
         // Mot-clé principal
@@ -228,9 +255,14 @@ const KeywordGeneratorPage: React.FC = () => {
       // Générer des suggestions IA
       generateAISuggestions(seedKeyword);
       
+        setIsLoading(false);
+        toast.success(`${filteredKeywords.length} mots-clés générés avec métriques avancées !`);
+      }, 2500);
+    } catch (error) {
       setIsLoading(false);
-      toast.success(`${filteredKeywords.length} mots-clés générés avec métriques avancées !`);
-    }, 2500);
+      toast.error('Erreur lors de la génération');
+      console.error('Erreur génération:', error);
+    }
   };
 
   const generateClusters = (keywordsList: KeywordData[]) => {
@@ -254,16 +286,37 @@ const KeywordGeneratorPage: React.FC = () => {
     setClusters(clustersData);
   };
 
-  const generateAISuggestions = (keyword: string) => {
-    const suggestions = [
-      `${keyword} tendances 2024`,
-      `${keyword} vs alternatives`,
-      `${keyword} pour débutants`,
-      `erreurs ${keyword}`,
-      `${keyword} ROI`,
-      `futur du ${keyword}`
-    ];
-    setSuggestions(suggestions);
+  const generateAISuggestions = async (keyword: string) => {
+    try {
+      if (openAIConfig.hasValidApiKey()) {
+        const aiSuggestions = await UniversalOpenAIService.getInstance().generateSuggestions(
+          keyword,
+          openAIConfig.getConfig(),
+          'keywords'
+        );
+        setSuggestions(aiSuggestions);
+      } else {
+        // Suggestions par défaut
+        const suggestions = [
+          `${keyword} tendances 2024`,
+          `${keyword} vs alternatives`,
+          `${keyword} pour débutants`,
+          `erreurs ${keyword}`,
+          `${keyword} ROI`,
+          `futur du ${keyword}`
+        ];
+        setSuggestions(suggestions);
+      }
+    } catch (error) {
+      console.error('Erreur suggestions IA:', error);
+      // Fallback suggestions
+      const suggestions = [
+        `${keyword} tendances 2024`,
+        `${keyword} vs alternatives`,
+        `${keyword} pour débutants`
+      ];
+      setSuggestions(suggestions);
+    }
   };
 
   const analyzeCompetitors = () => {
@@ -418,7 +471,7 @@ const KeywordGeneratorPage: React.FC = () => {
         </div>
 
         <Tabs defaultValue="generator" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="generator" className="flex items-center gap-2">
               <Search className="h-4 w-4" />
               Générateur
@@ -438,6 +491,10 @@ const KeywordGeneratorPage: React.FC = () => {
             <TabsTrigger value="analytics" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
               Analytics
+            </TabsTrigger>
+            <TabsTrigger value="config" className="flex items-center gap-2">
+              <Settings className="h-4 w-4" />
+              Configuration
             </TabsTrigger>
           </TabsList>
 
@@ -889,6 +946,10 @@ const KeywordGeneratorPage: React.FC = () => {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+          
+          <TabsContent value="config" className="mt-6">
+            <OpenAIConfigPanel />
           </TabsContent>
         </Tabs>
       </div>
