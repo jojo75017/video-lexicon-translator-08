@@ -994,15 +994,74 @@ const HierarchyPage: React.FC = () => {
               </div>
             </TabsContent>
 
-            <TabsContent value="http-reseau" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>HTTP & Réseau</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">Analyse des performances réseau...</p>
-                </CardContent>
-              </Card>
+            <TabsContent value="http-reseau">
+              <div className="space-y-6">
+                {/* HTTP */}
+                <div className="bg-card rounded-lg p-6 border">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <Globe className="h-5 w-5" />
+                    HTTP
+                  </h3>
+                  <div className="space-y-4">
+                    <Button variant="outline" className="flex items-center gap-2">
+                      <Code className="h-4 w-4" />
+                      Réponse et requête HTTP
+                    </Button>
+                    
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Sécurité</h4>
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs text-orange-600 bg-orange-50 px-2 py-1 rounded flex items-center gap-1">
+                          <AlertTriangle className="h-3 w-3" />
+                          Avertissement <span className="bg-orange-600 text-white rounded-full w-4 h-4 text-xs flex items-center justify-center">1</span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Vitesse */}
+                <div className="bg-card rounded-lg p-6 border">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <Gauge className="h-5 w-5" />
+                    Vitesse
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm">Poids de la page</span>
+                      <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded flex items-center gap-1">
+                        <Check className="h-3 w-3" />
+                        Valide
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm">Réactivité</span>
+                      <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded flex items-center gap-1">
+                        <Check className="h-3 w-3" />
+                        Valide
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Réseau */}
+                <div className="bg-card rounded-lg p-6 border">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <Network className="h-5 w-5" />
+                    Réseau
+                  </h3>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-gray-400 rounded-full"></span>
+                      <span className="text-sm">Adresse IP : <strong>194.36.186.160</strong></span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-gray-400 rounded-full"></span>
+                      <span className="text-sm">Reverse IP : <strong>194.36.186.160</strong></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </TabsContent>
             </Tabs>
           </div>
