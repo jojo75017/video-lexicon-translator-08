@@ -73,14 +73,71 @@ const SeoGeneratorPage: React.FC = () => {
   });
 
   // Résultats générés
-  const [generatedContent, setGeneratedContent] = useState<any>(null);
+  const [generatedContent, setGeneratedContent] = useState<any>({
+    title: '',
+    metaDescription: '',
+    structure: [],
+    content: '',
+    seoScore: 0,
+    readabilityScore: 0,
+    wordCount: 0,
+    estimatedReadTime: 0,
+    keywords: [],
+    images: [],
+    faq: [],
+    competitorAnalysis: {
+      topCompetitors: [],
+      opportunities: []
+    },
+    technicalSEO: {
+      pagespeed: {
+        mobile: 0,
+        desktop: 0
+      },
+      mobileOptimization: {
+        score: 0
+      }
+    }
+  });
 
   // Fonction pour générer le contenu dynamiquement
-  const generateContent = (keyword: string) => {
+  const generateContentForKeyword = (keyword: string) => {
     const isTravel = keyword.toLowerCase().includes('voyage') || keyword.toLowerCase().includes('sénégal') || keyword.toLowerCase().includes('senegal');
     
+    const baseContent = {
+      seoScore: 85,
+      readabilityScore: 78,
+      wordCount: 2000,
+      estimatedReadTime: 10,
+      keywords: [
+        { keyword: keyword, difficulty: 45, volume: 1200, intent: 'informational', position: 5 },
+        { keyword: `guide ${keyword}`, difficulty: 35, volume: 800, intent: 'informational', position: 8 },
+        { keyword: `${keyword} prix`, difficulty: 55, volume: 600, intent: 'commercial', position: 12 }
+      ],
+      images: [
+        { title: `Photo de ${keyword}`, alt: `Photo de ${keyword}`, suggestion: `Créer une image représentant ${keyword}`, priority: 'high' },
+        { title: `Destination ${keyword}`, alt: `Destination ${keyword}`, suggestion: `Image de destination pour ${keyword}`, priority: 'medium' }
+      ],
+      faq: [
+        { question: `Quelle est la meilleure période pour ${keyword} ?`, answer: `La meilleure période dépend de vos préférences...`, category: 'timing', priority: 'high' },
+        { question: `Quel budget prévoir pour ${keyword} ?`, answer: `Le budget varie selon le type souhaité...`, category: 'budget', priority: 'high' }
+      ],
+      competitorAnalysis: {
+        topCompetitors: [
+          { domain: `guide-${keyword.replace(/\s+/g, '-')}.com`, authority: 75, backlinks: '50K', traffic: '200K', topKeywords: 150 },
+          { domain: `voyage-${keyword.replace(/\s+/g, '-')}.fr`, authority: 68, backlinks: '30K', traffic: '150K', topKeywords: 120 }
+        ],
+        opportunities: ['Manque de guides pratiques détaillés', 'Peu de contenu sur le budget']
+      },
+      technicalSEO: {
+        pagespeed: { mobile: 78, desktop: 92 },
+        mobileOptimization: { score: 85 }
+      }
+    };
+
     if (isTravel) {
       return {
+        ...baseContent,
         title: `${keyword} : Guide Complet et Conseils de Voyage | Découvrez ${keyword}`,
         metaDescription: `Planifiez votre ${keyword} avec notre guide expert. Conseils pratiques, meilleures destinations, budget et itinéraires pour un voyage inoubliable.`,
         structure: [
@@ -126,18 +183,19 @@ Immergez-vous dans la culture locale pour enrichir votre expérience de voyage..
     } else {
       // Contenu SEO par défaut
       return {
+        ...baseContent,
         title: `${keyword || 'SEO 2024'} : Guide Complet | Stratégies Avancées`,
         metaDescription: `Découvrez tout sur ${keyword || 'le SEO 2024'}. Guide expert avec stratégies avancées, conseils pratiques et techniques pour optimiser votre référencement.`,
-    structure: [
-      { level: 1, title: 'Introduction au SEO en 2024', wordCount: 200, status: 'optimized' },
-      { level: 2, title: 'Les Fondamentaux du Référencement', wordCount: 400, status: 'good' },
-      { level: 2, title: 'Optimisation On-Page Avancée', wordCount: 500, status: 'optimized' },
-      { level: 3, title: 'Balises Meta et Structure HTML', wordCount: 250, status: 'warning' },
-      { level: 3, title: 'Optimisation des Images et Médias', wordCount: 250, status: 'good' },
-      { level: 2, title: 'Stratégies de Contenu SEO', wordCount: 600, status: 'optimized' },
-      { level: 2, title: 'SEO Technique et Performance', wordCount: 400, status: 'good' },
-      { level: 1, title: 'Conclusion et Actions Prioritaires', wordCount: 150, status: 'optimized' }
-    ],
+        structure: [
+          { level: 1, title: 'Introduction au SEO en 2024', wordCount: 200, status: 'optimized' },
+          { level: 2, title: 'Les Fondamentaux du Référencement', wordCount: 400, status: 'good' },
+          { level: 2, title: 'Optimisation On-Page Avancée', wordCount: 500, status: 'optimized' },
+          { level: 3, title: 'Balises Meta et Structure HTML', wordCount: 250, status: 'warning' },
+          { level: 3, title: 'Optimisation des Images et Médias', wordCount: 250, status: 'good' },
+          { level: 2, title: 'Stratégies de Contenu SEO', wordCount: 600, status: 'optimized' },
+          { level: 2, title: 'SEO Technique et Performance', wordCount: 400, status: 'good' },
+          { level: 1, title: 'Conclusion et Actions Prioritaires', wordCount: 150, status: 'optimized' }
+        ],
         content: `# ${keyword || 'SEO 2024'} : Guide Complet
 
 ## Introduction 
@@ -174,112 +232,9 @@ Voici les éléments essentiels à connaître sur ${keyword || 'ce sujet'}...`
   // Effet pour générer le contenu quand le keyword change
   useEffect(() => {
     if (contentConfig.keyword) {
-      setGeneratedContent(generateContent(contentConfig.keyword));
+      setGeneratedContent(generateContentForKeyword(contentConfig.keyword));
     }
   }, [contentConfig.keyword]);
-
-  const sampleContent = generatedContent || {
-    title: 'Contenu SEO en cours de génération...',
-    metaDescription: 'Veuillez entrer un mot-clé pour générer du contenu optimisé',
-    structure: [],
-    content: 'Aucun contenu généré pour le moment.',
-    seoScore: 0,
-    readabilityScore: 0,
-    wordCount: 0,
-    estimatedReadTime: 0,
-    keywords: [
-      { keyword: 'SEO 2024', volume: 8100, difficulty: 65, intent: 'informationnel', cpc: 3.20, trend: 'rising', position: 5 },
-      { keyword: 'référencement naturel', volume: 12400, difficulty: 68, intent: 'informationnel', cpc: 2.80, trend: 'stable', position: 8 },
-      { keyword: 'optimisation SEO', volume: 3600, difficulty: 72, intent: 'commercial', cpc: 4.50, trend: 'rising', position: 12 },
-      { keyword: 'stratégie SEO', volume: 1900, difficulty: 58, intent: 'informationnel', cpc: 3.90, trend: 'stable', position: 15 },
-      { keyword: 'guide SEO complet', volume: 1600, difficulty: 55, intent: 'informationnel', cpc: 2.10, trend: 'rising', position: 7 },
-      { keyword: 'Core Web Vitals', volume: 2200, difficulty: 61, intent: 'technique', cpc: 5.20, trend: 'rising', position: 3 },
-      { keyword: 'mots-clés SEO', volume: 2800, difficulty: 59, intent: 'informationnel', cpc: 3.40, trend: 'stable', position: 9 },
-      { keyword: 'contenu SEO optimisé', volume: 1400, difficulty: 64, intent: 'commercial', cpc: 4.80, trend: 'rising', position: 11 }
-    ],
-    images: [
-      { 
-        title: 'Diagramme des facteurs SEO 2024', 
-        alt: 'Infographie des principaux facteurs de référencement naturel en 2024',
-        suggestion: 'Créer une infographie montrant les piliers du SEO : technique, contenu, popularité, UX',
-        priority: 'high'
-      },
-      { 
-        title: 'Évolution du trafic organique', 
-        alt: 'Graphique montrant l\'évolution du trafic SEO sur 12 mois',
-        suggestion: 'Graphique en courbes avec données de performance mensuelle',
-        priority: 'medium'
-      },
-      { 
-        title: 'Checklist SEO technique', 
-        alt: 'Liste visuelle des optimisations techniques SEO prioritaires',
-        suggestion: 'Checklist interactive avec cases à cocher et statuts',
-        priority: 'high'
-      },
-      { 
-        title: 'Comparatif outils SEO', 
-        alt: 'Tableau comparatif des meilleurs outils SEO 2024',
-        suggestion: 'Tableau détaillé avec prix, fonctionnalités et notes',
-        priority: 'medium'
-      }
-    ],
-    faq: [
-      {
-        question: 'Combien de temps faut-il pour voir les résultats SEO en 2024 ?',
-        answer: 'Les premiers résultats SEO apparaissent généralement entre 3 et 6 mois, selon la concurrence et la qualité des optimisations. Les Core Web Vitals peuvent avoir un impact plus rapide (1-2 mois).',
-        category: 'délais',
-        priority: 'high'
-      },
-      {
-        question: 'Quelle est la différence entre SEO et SEA en 2024 ?',
-        answer: 'Le SEO (référencement naturel) est gratuit mais nécessite 3-6 mois pour être efficace, tandis que le SEA (référencement payant) est immédiat mais coûteux. Le ROI du SEO est généralement supérieur sur le long terme.',
-        category: 'stratégie',
-        priority: 'high'
-      },
-      {
-        question: 'Comment mesurer le ROI du SEO précisément ?',
-        answer: 'Mesurez le trafic organique qualifié, les conversions attribuées au SEO, le CA généré et comparez aux coûts d\'optimisation. Utilisez Google Analytics 4 et Search Console pour un tracking précis.',
-        category: 'mesure',
-        priority: 'medium'
-      }
-    ],
-    competitorAnalysis: {
-      topCompetitors: [
-        { domain: 'semrush.com', authority: 91, backlinks: '2.1M', traffic: '45M', topKeywords: 1200 },
-        { domain: 'ahrefs.com', authority: 90, backlinks: '1.8M', traffic: '38M', topKeywords: 980 },
-        { domain: 'moz.com', authority: 88, backlinks: '1.2M', traffic: '12M', topKeywords: 450 }
-      ],
-      opportunities: [
-        'Créer du contenu sur "SEO local 2024" (faible concurrence)',
-        'Développer des guides sectoriels spécialisés',
-        'Optimiser pour les featured snippets sur les questions techniques'
-      ]
-    },
-    technicalSEO: {
-      pagespeed: {
-        mobile: 78,
-        desktop: 92,
-        recommendations: [
-          'Optimiser les images WebP',
-          'Minifier le CSS et JavaScript',
-          'Implémenter le lazy loading'
-        ]
-      },
-      indexability: {
-        indexablePages: 89,
-        blockedPages: 3,
-        errors: 2,
-        warnings: 5
-      },
-      mobileOptimization: {
-        score: 85,
-        issues: [
-          'Améliorer la taille des boutons tactiles',
-          'Optimiser les polices pour mobile'
-        ]
-      }
-    }
-  };
 
   const contentTypes = [
     { value: 'article', label: 'Article de blog', icon: FileText, description: 'Articles informatifs et guides' },
@@ -318,6 +273,8 @@ Voici les éléments essentiels à connaître sur ${keyword || 'ce sujet'}...`
         toast.loading(step.message, { id: 'generation-progress' });
       }
 
+      // Génération du contenu selon le mot-clé
+      setGeneratedContent(generateContentForKeyword(contentConfig.keyword));
       toast.success('✅ Contenu SEO professionnel généré !', { id: 'generation-progress' });
 
     } catch (error) {
@@ -412,7 +369,7 @@ Généré le ${new Date().toLocaleDateString('fr-FR')} avec le Générateur SEO 
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Mot-clé principal *</label>
                   <Input
-                    placeholder="Ex: SEO 2024, Marketing automation..."
+                    placeholder="Ex: voyage au sénégal, SEO 2024..."
                     value={contentConfig.keyword}
                     onChange={(e) => setContentConfig(prev => ({ ...prev, keyword: e.target.value }))}
                   />
@@ -517,90 +474,21 @@ Généré le ${new Date().toLocaleDateString('fr-FR')} avec le Générateur SEO 
 
               {/* Onglet Contenu */}
               <TabsContent value="content" className="space-y-6">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  <Card className="lg:col-span-2">
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="flex items-center gap-2">
-                          <FileText className="h-5 w-5 text-blue-500" />
-                          Contenu Généré
-                        </CardTitle>
-                        <div className="flex items-center gap-2">
-                          <Button variant="outline" size="sm" onClick={() => copyToClipboard(generatedContent.content, 'Contenu')}>
-                            <Copy className="h-4 w-4" />
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="bg-gray-50 p-4 rounded-lg max-h-96 overflow-y-auto">
-                        <pre className="whitespace-pre-wrap text-sm font-mono">
-                          {generatedContent.content.substring(0, 1500)}...
-                        </pre>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <div className="space-y-4">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-lg">Performance</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm">Score SEO Global</span>
-                          <div className="flex items-center gap-2">
-                            <Progress value={generatedContent.seoScore} className="w-16 h-2" />
-                            <Badge variant="default">
-                              {generatedContent.seoScore}%
-                            </Badge>
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm">Lisibilité</span>
-                          <div className="flex items-center gap-2">
-                            <Progress value={generatedContent.readabilityScore} className="w-16 h-2" />
-                            <Badge variant="default">
-                              {generatedContent.readabilityScore}%
-                            </Badge>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm">Optimisation mobile</span>
-                          <div className="flex items-center gap-2">
-                            <Progress value={generatedContent.technicalSEO.mobileOptimization.score} className="w-16 h-2" />
-                            <Badge variant="outline">{generatedContent.technicalSEO.mobileOptimization.score}%</Badge>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-lg">Actions Rapides</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-2">
-                        <Button variant="outline" size="sm" className="w-full justify-start">
-                          <Edit className="h-4 w-4 mr-2" />
-                          Éditer le contenu
-                        </Button>
-                        <Button variant="outline" size="sm" className="w-full justify-start">
-                          <Eye className="h-4 w-4 mr-2" />
-                          Prévisualiser
-                        </Button>
-                        <Button variant="outline" size="sm" className="w-full justify-start">
-                          <RefreshCw className="h-4 w-4 mr-2" />
-                          Régénérer
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </div>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <FileText className="h-5 w-5 text-blue-500" />
+                      Contenu Généré
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="bg-gray-50 p-4 rounded-lg max-h-96 overflow-y-auto">
+                      <pre className="whitespace-pre-wrap text-sm font-mono">
+                        {generatedContent.content || 'Aucun contenu généré pour le moment. Saisissez un mot-clé et cliquez sur "Générer".'}
+                      </pre>
+                    </div>
+                  </CardContent>
+                </Card>
               </TabsContent>
 
               {/* Onglet SEO */}
@@ -618,16 +506,16 @@ Généré le ${new Date().toLocaleDateString('fr-FR')} avec le Générateur SEO 
                         <div className="flex items-center justify-between mb-2">
                           <label className="text-sm font-medium">Titre SEO</label>
                           <Badge variant="outline" className="text-xs">
-                            {generatedContent.title.length}/60 caractères
+                            {generatedContent.title?.length || 0}/60 caractères
                           </Badge>
                         </div>
                         <div className="p-3 bg-gray-50 rounded border relative">
-                          <p className="text-sm pr-8">{generatedContent.title}</p>
+                          <p className="text-sm pr-8">{generatedContent.title || 'Titre non généré'}</p>
                           <Button 
                             variant="ghost" 
                             size="sm" 
                             className="absolute top-1 right-1"
-                            onClick={() => copyToClipboard(generatedContent.title, 'Titre')}
+                            onClick={() => copyToClipboard(generatedContent.title || '', 'Titre')}
                           >
                             <Copy className="h-3 w-3" />
                           </Button>
@@ -638,53 +526,19 @@ Généré le ${new Date().toLocaleDateString('fr-FR')} avec le Générateur SEO 
                         <div className="flex items-center justify-between mb-2">
                           <label className="text-sm font-medium">Meta Description</label>
                           <Badge variant="outline" className="text-xs">
-                            {generatedContent.metaDescription.length}/160 caractères
+                            {generatedContent.metaDescription?.length || 0}/160 caractères
                           </Badge>
                         </div>
                         <div className="p-3 bg-gray-50 rounded border relative">
-                          <p className="text-sm pr-8">{generatedContent.metaDescription}</p>
+                          <p className="text-sm pr-8">{generatedContent.metaDescription || 'Meta description non générée'}</p>
                           <Button 
                             variant="ghost" 
                             size="sm" 
                             className="absolute top-1 right-1"
-                            onClick={() => copyToClipboard(generatedContent.metaDescription, 'Meta description')}
+                            onClick={() => copyToClipboard(generatedContent.metaDescription || '', 'Meta description')}
                           >
                             <Copy className="h-3 w-3" />
                           </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <CheckCircle className="h-5 w-5 text-blue-500" />
-                        Analyse SEO Détaillée
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-3 p-3 rounded-lg bg-green-50">
-                          <CheckCircle className="h-4 w-4 text-green-500" />
-                          <div>
-                            <div className="text-sm font-medium">Titre optimisé</div>
-                            <div className="text-xs text-muted-foreground">Longueur et mots-clés parfaits</div>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3 p-3 rounded-lg bg-green-50">
-                          <CheckCircle className="h-4 w-4 text-green-500" />
-                          <div>
-                            <div className="text-sm font-medium">Meta description optimisée</div>
-                            <div className="text-xs text-muted-foreground">Call-to-action inclus</div>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3 p-3 rounded-lg bg-yellow-50">
-                          <AlertCircle className="h-4 w-4 text-yellow-500" />
-                          <div>
-                            <div className="text-sm font-medium">Ajouter des liens internes</div>
-                            <div className="text-xs text-muted-foreground">3-5 liens contextuels recommandés</div>
-                          </div>
                         </div>
                       </div>
                     </CardContent>
@@ -703,28 +557,34 @@ Généré le ${new Date().toLocaleDateString('fr-FR')} avec le Générateur SEO 
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      {generatedContent.structure.map((item: any, index: number) => (
-                        <div key={index} className="flex items-center gap-4 p-4 border rounded-lg hover:bg-gray-50">
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold ${
-                            item.level === 1 ? 'bg-red-500' : 
-                            item.level === 2 ? 'bg-orange-500' : 
-                            'bg-yellow-500'
-                          }`}>
-                            H{item.level}
-                          </div>
-                          <div className="flex-1">
-                            <p className="font-medium">{item.title}</p>
-                            <div className="flex items-center gap-4 mt-1">
-                              <p className="text-sm text-muted-foreground">{item.wordCount} mots</p>
-                              <Badge variant="outline" className="text-xs">
-                                {item.status === 'optimized' ? '✓ Optimisé' :
-                                 item.status === 'good' ? '○ Bon' :
-                                 '△ À améliorer'}
-                              </Badge>
+                      {generatedContent.structure && generatedContent.structure.length > 0 ? (
+                        generatedContent.structure.map((item: any, index: number) => (
+                          <div key={index} className="flex items-center gap-4 p-4 border rounded-lg hover:bg-gray-50">
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold ${
+                              item.level === 1 ? 'bg-red-500' : 
+                              item.level === 2 ? 'bg-orange-500' : 
+                              'bg-yellow-500'
+                            }`}>
+                              H{item.level}
+                            </div>
+                            <div className="flex-1">
+                              <p className="font-medium">{item.title}</p>
+                              <div className="flex items-center gap-4 mt-1">
+                                <p className="text-sm text-muted-foreground">{item.wordCount} mots</p>
+                                <Badge variant="outline" className="text-xs">
+                                  {item.status === 'optimized' ? '✓ Optimisé' :
+                                   item.status === 'good' ? '○ Bon' :
+                                   '△ À améliorer'}
+                                </Badge>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))
+                      ) : (
+                        <p className="text-muted-foreground text-center py-8">
+                          Aucune structure générée. Saisissez un mot-clé et générez du contenu.
+                        </p>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -741,35 +601,41 @@ Généré le ${new Date().toLocaleDateString('fr-FR')} avec le Générateur SEO 
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {generatedContent.keywords.map((kw: any, index: number) => (
-                        <div key={index} className="p-4 border rounded-lg hover:shadow-md transition-shadow">
-                          <div className="flex items-center justify-between mb-3">
-                            <h3 className="font-medium text-sm">{kw.keyword}</h3>
-                            <Badge variant="outline" className="text-xs">
-                              {kw.intent}
-                            </Badge>
-                          </div>
-                          <div className="space-y-2 text-xs">
-                            <div className="flex justify-between">
-                              <span className="text-muted-foreground">Volume:</span>
-                              <span className="font-medium">{kw.volume.toLocaleString()}/mois</span>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-muted-foreground">Difficulté:</span>
-                              <div className="flex items-center gap-1">
-                                <Progress value={kw.difficulty} className="w-12 h-1" />
-                                <span className="font-medium">{kw.difficulty}%</span>
-                              </div>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-muted-foreground">Position:</span>
+                      {generatedContent.keywords && generatedContent.keywords.length > 0 ? (
+                        generatedContent.keywords.map((kw: any, index: number) => (
+                          <div key={index} className="p-4 border rounded-lg hover:shadow-md transition-shadow">
+                            <div className="flex items-center justify-between mb-3">
+                              <h3 className="font-medium text-sm">{kw.keyword}</h3>
                               <Badge variant="outline" className="text-xs">
-                                #{kw.position}
+                                {kw.intent}
                               </Badge>
                             </div>
+                            <div className="space-y-2 text-xs">
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">Volume:</span>
+                                <span className="font-medium">{kw.volume?.toLocaleString()}/mois</span>
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <span className="text-muted-foreground">Difficulté:</span>
+                                <div className="flex items-center gap-1">
+                                  <Progress value={kw.difficulty} className="w-12 h-1" />
+                                  <span className="font-medium">{kw.difficulty}%</span>
+                                </div>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">Position:</span>
+                                <Badge variant="outline" className="text-xs">
+                                  #{kw.position}
+                                </Badge>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        ))
+                      ) : (
+                        <p className="text-muted-foreground text-center py-8 col-span-3">
+                          Aucun mot-clé analysé. Générez du contenu pour voir l'analyse.
+                        </p>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -786,32 +652,38 @@ Généré le ${new Date().toLocaleDateString('fr-FR')} avec le Générateur SEO 
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {generatedContent.competitorAnalysis.topCompetitors.map((comp: any, index: number) => (
-                        <div key={index} className="p-4 border rounded-lg">
-                          <div className="flex items-center justify-between mb-3">
-                            <h3 className="font-medium">{comp.domain}</h3>
-                            <Badge variant="outline">Concurrent #{index + 1}</Badge>
+                      {generatedContent.competitorAnalysis?.topCompetitors && generatedContent.competitorAnalysis.topCompetitors.length > 0 ? (
+                        generatedContent.competitorAnalysis.topCompetitors.map((comp: any, index: number) => (
+                          <div key={index} className="p-4 border rounded-lg">
+                            <div className="flex items-center justify-between mb-3">
+                              <h3 className="font-medium">{comp.domain}</h3>
+                              <Badge variant="outline">Concurrent #{index + 1}</Badge>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                              <div>
+                                <span className="text-muted-foreground">Authority:</span>
+                                <div className="font-medium">{comp.authority}</div>
+                              </div>
+                              <div>
+                                <span className="text-muted-foreground">Backlinks:</span>
+                                <div className="font-medium">{comp.backlinks}</div>
+                              </div>
+                              <div>
+                                <span className="text-muted-foreground">Trafic:</span>
+                                <div className="font-medium">{comp.traffic}</div>
+                              </div>
+                              <div>
+                                <span className="text-muted-foreground">Top Keywords:</span>
+                                <div className="font-medium">{comp.topKeywords}</div>
+                              </div>
+                            </div>
                           </div>
-                          <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div>
-                              <span className="text-muted-foreground">Authority:</span>
-                              <div className="font-medium">{comp.authority}</div>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Backlinks:</span>
-                              <div className="font-medium">{comp.backlinks}</div>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Trafic:</span>
-                              <div className="font-medium">{comp.traffic}</div>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Top Keywords:</span>
-                              <div className="font-medium">{comp.topKeywords}</div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
+                        ))
+                      ) : (
+                        <p className="text-muted-foreground text-center py-8">
+                          Aucune analyse concurrentielle disponible. Générez du contenu pour voir l'analyse.
+                        </p>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -829,18 +701,24 @@ Généré le ${new Date().toLocaleDateString('fr-FR')} avec le Générateur SEO 
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
-                        {generatedContent.images.map((img: any, index: number) => (
-                          <div key={index} className="p-3 border rounded-lg">
-                            <div className="flex items-center justify-between mb-2">
-                              <h4 className="font-medium text-sm">{img.title}</h4>
-                              <Badge variant="outline" className="text-xs">
-                                {img.priority}
-                              </Badge>
+                        {generatedContent.images && generatedContent.images.length > 0 ? (
+                          generatedContent.images.map((img: any, index: number) => (
+                            <div key={index} className="p-3 border rounded-lg">
+                              <div className="flex items-center justify-between mb-2">
+                                <h4 className="font-medium text-sm">{img.title}</h4>
+                                <Badge variant="outline" className="text-xs">
+                                  {img.priority}
+                                </Badge>
+                              </div>
+                              <p className="text-xs text-muted-foreground mb-2">{img.alt}</p>
+                              <p className="text-xs bg-blue-50 p-2 rounded">{img.suggestion}</p>
                             </div>
-                            <p className="text-xs text-muted-foreground mb-2">{img.alt}</p>
-                            <p className="text-xs bg-blue-50 p-2 rounded">{img.suggestion}</p>
-                          </div>
-                        ))}
+                          ))
+                        ) : (
+                          <p className="text-muted-foreground text-center py-8">
+                            Aucune suggestion d'image disponible.
+                          </p>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
@@ -854,20 +732,26 @@ Généré le ${new Date().toLocaleDateString('fr-FR')} avec le Générateur SEO 
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
-                        {generatedContent.faq.map((item: any, index: number) => (
-                          <div key={index} className="border-l-4 border-green-500 pl-4 pb-3 border-b border-gray-100 last:border-b-0">
-                            <div className="flex items-center justify-between mb-2">
-                              <Badge variant="outline" className="text-xs">
-                                {item.category}
-                              </Badge>
-                              <Badge variant="outline" className="text-xs">
-                                {item.priority}
-                              </Badge>
+                        {generatedContent.faq && generatedContent.faq.length > 0 ? (
+                          generatedContent.faq.map((item: any, index: number) => (
+                            <div key={index} className="border-l-4 border-green-500 pl-4 pb-3 border-b border-gray-100 last:border-b-0">
+                              <div className="flex items-center justify-between mb-2">
+                                <Badge variant="outline" className="text-xs">
+                                  {item.category}
+                                </Badge>
+                                <Badge variant="outline" className="text-xs">
+                                  {item.priority}
+                                </Badge>
+                              </div>
+                              <h4 className="font-medium text-sm mb-2">{item.question}</h4>
+                              <p className="text-xs text-muted-foreground">{item.answer}</p>
                             </div>
-                            <h4 className="font-medium text-sm mb-2">{item.question}</h4>
-                            <p className="text-xs text-muted-foreground">{item.answer}</p>
-                          </div>
-                        ))}
+                          ))
+                        ) : (
+                          <p className="text-muted-foreground text-center py-8">
+                            Aucune FAQ générée.
+                          </p>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
