@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Globe, Folder, File, ChevronRight, Search, Download, AlertTriangle, CheckCircle, XCircle, Eye, BarChart3, Link, TreePine, Zap, Filter, Lightbulb, Settings, Sparkles, Brain, TrendingUp } from 'lucide-react';
+import { ArrowLeft, Globe, Folder, File, ChevronRight, Search, Download, AlertTriangle, CheckCircle, XCircle, Eye, BarChart3, Link, TreePine, Zap, Filter, Lightbulb, Settings, Sparkles, Brain, TrendingUp, Code, Database, Shield, Gauge, Network, Target, BookOpen, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -162,53 +162,58 @@ const HierarchyPage: React.FC = () => {
   const filteredStructure = analysisResult?.structure || [];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-orange-50/30 to-red-50/30 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 p-6">
       <div className="container mx-auto max-w-7xl">
-        <div className="flex items-center mb-8">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate('/dashboard')}
-            className="mr-4"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Retour
-          </Button>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-            🌐 Analyse de Hiérarchie
-          </h1>
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center">
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate('/dashboard')}
+              className="mr-4 hover:bg-primary/10"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Retour
+            </Button>
+            <div>
+              <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
+                  <TreePine className="h-6 w-6" />
+                </div>
+                Architecture & Hiérarchie
+              </h1>
+              <p className="text-muted-foreground mt-1">Analysez et optimisez la structure de votre site web</p>
+            </div>
+          </div>
+          
+          {/* Indicateurs rapides */}
+          <div className="hidden md:flex items-center gap-4">
+            <Badge variant="outline" className="flex items-center gap-2">
+              <Globe className="h-3 w-3" />
+              Analyse complète
+            </Badge>
+            <Badge variant="outline" className="flex items-center gap-2">
+              <Brain className="h-3 w-3" />
+              IA intégrée
+            </Badge>
+          </div>
         </div>
 
-        {/* Formulaire d'analyse */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Search className="h-5 w-5" />
-              Analyser un site web
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {/* Choix du mode d'analyse */}
-              <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 text-white">
-                    {useAI ? <Brain className="h-5 w-5" /> : <Settings className="h-5 w-5" />}
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">
-                      {useAI ? '🤖 Mode IA Avancé' : '📊 Mode Standard'}
-                    </h3>
-                    <p className="text-sm text-gray-600">
-                      {useAI 
-                        ? 'Analyse intelligente avec recommandations personnalisées' 
-                        : 'Analyse technique standard avec données simulées'
-                      }
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
+        {/* Formulaire d'analyse compacte */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          {/* Panneau principal d'analyse */}
+          <div className="lg:col-span-2">
+            <Card className="border-2 border-primary/20">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Search className="h-5 w-5 text-primary" />
+                  Analyse d'Architecture
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Sélecteur de mode compact */}
+                <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
                   <Button
-                    variant={!useAI ? "default" : "outline"}
+                    variant={!useAI ? "default" : "ghost"}
                     size="sm"
                     onClick={() => setUseAI(false)}
                     className="flex items-center gap-2"
@@ -217,177 +222,192 @@ const HierarchyPage: React.FC = () => {
                     Standard
                   </Button>
                   <Button
-                    variant={useAI ? "default" : "outline"}
+                    variant={useAI ? "default" : "ghost"}
                     size="sm"
                     onClick={() => setUseAI(true)}
                     className="flex items-center gap-2"
                   >
-                    <Sparkles className="h-4 w-4" />
+                    <Brain className="h-4 w-4" />
                     IA Pro
                   </Button>
+                  
+                  {useAI && (
+                    <Input
+                      type="password"
+                      placeholder="Clé API OpenAI"
+                      value={apiKey}
+                      onChange={(e) => setApiKey(e.target.value)}
+                      className="ml-2 h-8"
+                    />
+                  )}
                 </div>
-              </div>
 
-              {/* Configuration OpenAI si mode IA activé */}
-              {useAI && (
-                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <div className="flex items-start gap-3">
-                    <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5" />
-                    <div className="flex-1">
-                      <h4 className="font-medium text-yellow-800 mb-2">Configuration requise</h4>
-                      <p className="text-sm text-yellow-700 mb-3">
-                        Le mode IA nécessite une clé API OpenAI pour fonctionner
-                      </p>
-                      <Input
-                        type="password"
-                        placeholder="Clé API OpenAI (sk-...)"
-                        value={apiKey}
-                        onChange={(e) => setApiKey(e.target.value)}
-                        className="mb-2"
-                      />
-                      <div className="text-xs text-yellow-600">
-                        💡 Votre clé est stockée localement et sécurisée
+                {/* URL et bouton d'analyse */}
+                <div className="flex gap-3">
+                  <Input
+                    placeholder="https://exemple.com"
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    className="flex-1"
+                  />
+                  <Button 
+                    onClick={analyzeWebsite} 
+                    disabled={isAnalyzing || (useAI && !apiKey)}
+                    className="px-6 bg-primary hover:bg-primary/90"
+                  >
+                    {isAnalyzing ? (
+                      <div className="flex items-center gap-2">
+                        <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                        Analyse...
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        {useAI ? <Brain className="h-4 w-4" /> : <Search className="h-4 w-4" />}
+                        Analyser
+                      </div>
+                    )}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Guide rapide */}
+          <Card className="h-fit">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <BookOpen className="h-4 w-4" />
+                Guide Rapide
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm">
+              <div className="space-y-2">
+                <h4 className="font-medium flex items-center gap-2">
+                  <Settings className="h-3 w-3" />
+                  Mode Standard
+                </h4>
+                <ul className="text-muted-foreground space-y-1 text-xs">
+                  <li>• Structure hiérarchique</li>
+                  <li>• Pages orphelines</li>
+                  <li>• Liens cassés</li>
+                  <li>• Métriques techniques</li>
+                </ul>
+              </div>
+              
+              <div className="space-y-2">
+                <h4 className="font-medium flex items-center gap-2">
+                  <Brain className="h-3 w-3" />
+                  Mode IA Pro
+                </h4>
+                <ul className="text-muted-foreground space-y-1 text-xs">
+                  <li>• Analyse contextuelle</li>
+                  <li>• Recommandations IA</li>
+                  <li>• Optimisations SEO</li>
+                  <li>• Insights avancés</li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+
+        {analysisResult && (
+          <div className="space-y-6">
+            {/* Header des résultats */}
+            <Card className="border-primary/20">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
+                      {analysisResult.aiInsights ? <Brain className="h-6 w-6" /> : <Gauge className="h-6 w-6" />}
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold">Résultats d'Analyse</h2>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge variant={analysisResult.aiInsights ? "default" : "secondary"}>
+                          {analysisResult.aiInsights ? 'Mode IA Pro' : 'Mode Standard'}
+                        </Badge>
+                        <span className="text-sm text-muted-foreground">
+                          {new Date().toLocaleDateString('fr-FR')}
+                        </span>
                       </div>
                     </div>
                   </div>
-                </div>
-              )}
-
-              {/* Formulaire d'URL */}
-              <div className="flex gap-4">
-                <Input
-                  placeholder="https://exemple.com"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  className="flex-1"
-                />
-                <Button 
-                  onClick={analyzeWebsite} 
-                  disabled={isAnalyzing || (useAI && !apiKey)}
-                  className="px-6"
-                >
-                  {isAnalyzing ? (
-                    <div className="flex items-center gap-2">
-                      <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
-                      {useAI ? 'Analyse IA...' : 'Analyse...'}
+                  
+                  {/* Métriques rapides */}
+                  <div className="grid grid-cols-3 gap-4 text-center">
+                    <div>
+                      <div className="text-2xl font-bold text-primary">{analysisResult.performance.totalPages}</div>
+                      <div className="text-xs text-muted-foreground">Pages</div>
                     </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      {useAI ? <Brain className="h-4 w-4" /> : <Search className="h-4 w-4" />}
-                      {useAI ? 'Analyser avec IA' : 'Analyser'}
+                    <div>
+                      <div className="text-2xl font-bold text-primary">{analysisResult.performance.avgDepth}</div>
+                      <div className="text-xs text-muted-foreground">Profondeur moy.</div>
                     </div>
-                  )}
-                </Button>
-              </div>
-
-              {/* Avantages selon le mode */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div className={`p-3 rounded-lg border ${!useAI ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'}`}>
-                  <h4 className="font-semibold mb-2">📊 Mode Standard</h4>
-                  <ul className="space-y-1 text-gray-600">
-                    <li>• Analyse technique de base</li>
-                    <li>• Métriques de performance</li>
-                    <li>• Structure hiérarchique</li>
-                    <li>• Export sitemap XML</li>
-                  </ul>
+                    <div>
+                      <div className="text-2xl font-bold text-primary">{analysisResult.performance.crawlability}%</div>
+                      <div className="text-xs text-muted-foreground">Crawlabilité</div>
+                    </div>
+                  </div>
                 </div>
-                <div className={`p-3 rounded-lg border ${useAI ? 'bg-purple-50 border-purple-200' : 'bg-gray-50 border-gray-200'}`}>
-                  <h4 className="font-semibold mb-2">🤖 Mode IA Pro</h4>
-                  <ul className="space-y-1 text-gray-600">
-                    <li>• Analyse intelligente du contenu</li>
-                    <li>• Recommandations personnalisées</li>
-                    <li>• Optimisations SEO avancées</li>
-                    <li>• Suggestions d'amélioration</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {analysisResult && (
-          <div className="space-y-4">
-            {/* Badge indicatif du mode utilisé */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Badge variant={analysisResult.aiInsights ? "default" : "secondary"} className="flex items-center gap-1">
-                  {analysisResult.aiInsights ? <Brain className="h-3 w-3" /> : <Settings className="h-3 w-3" />}
-                  {analysisResult.aiInsights ? 'Analyse IA' : 'Analyse Standard'}
-                </Badge>
-                {analysisResult.aiInsights && (
-                  <Badge variant="outline" className="text-green-600">
-                    Recommandations personnalisées
-                  </Badge>
-                )}
-              </div>
-              <span className="text-sm text-gray-500">
-                Analysé le {new Date().toLocaleDateString()}
-              </span>
-            </div>
+              </CardContent>
+            </Card>
 
             <Tabs defaultValue="structure" className="space-y-6">
-              <TabsList className={`grid w-full ${analysisResult.aiInsights ? 'grid-cols-8' : 'grid-cols-7'}`}>
-                <TabsTrigger value="structure" className="flex items-center gap-2">
-                  <TreePine className="h-4 w-4" />
-                  Structure
-                </TabsTrigger>
-                <TabsTrigger value="architecture" className="flex items-center gap-2">
-                  <Globe className="h-4 w-4" />
-                  Architecture
-                </TabsTrigger>
-                <TabsTrigger value="sitemap" className="flex items-center gap-2">
-                  <File className="h-4 w-4" />
-                  Sitemap
-                </TabsTrigger>
-                {analysisResult.aiInsights && (
-                  <TabsTrigger value="ai-insights" className="flex items-center gap-2">
-                    <Brain className="h-4 w-4" />
-                    Insights IA
-                  </TabsTrigger>
-                )}
-                <TabsTrigger value="performance" className="flex items-center gap-2">
-                  <BarChart3 className="h-4 w-4" />
-                  Performance
-                </TabsTrigger>
-                <TabsTrigger value="issues" className="flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4" />
-                  Problèmes
-                </TabsTrigger>
-                <TabsTrigger value="orphans" className="flex items-center gap-2">
-                  <Eye className="h-4 w-4" />
-                  Pages Orphelines
-                </TabsTrigger>
-                <TabsTrigger value="recommendations" className="flex items-center gap-2">
-                  <Zap className="h-4 w-4" />
-                  Recommandations
-                </TabsTrigger>
-              </TabsList>
+              <div className="border-b border-border">
+                <div className="flex flex-wrap gap-1 p-1">
+                  <TabsList className="grid grid-cols-4 lg:grid-cols-6 w-full bg-transparent">
+                    <TabsTrigger value="structure" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                      <TreePine className="h-4 w-4 mr-2" />
+                      Structure
+                    </TabsTrigger>
+                    <TabsTrigger value="performance" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                      <Gauge className="h-4 w-4 mr-2" />
+                      Performance
+                    </TabsTrigger>
+                    <TabsTrigger value="issues" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                      <AlertTriangle className="h-4 w-4 mr-2" />
+                      Problèmes
+                    </TabsTrigger>
+                    <TabsTrigger value="orphans" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                      <Eye className="h-4 w-4 mr-2" />
+                      Orphelines
+                    </TabsTrigger>
+                    <TabsTrigger value="recommendations" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                      <Target className="h-4 w-4 mr-2" />
+                      Recommandations
+                    </TabsTrigger>
+                    {analysisResult.aiInsights && (
+                      <TabsTrigger value="ai-insights" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                        <Brain className="h-4 w-4 mr-2" />
+                        IA Insights
+                      </TabsTrigger>
+                    )}
+                  </TabsList>
+                </div>
+              </div>
 
             {/* Onglet Structure */}
-            <TabsContent value="structure" className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2">
+            <TabsContent value="structure" className="space-y-4">
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <div className="lg:col-span-3">
                   <Card>
-                    <CardHeader>
+                    <CardHeader className="pb-4">
                       <div className="flex items-center justify-between">
-                        <CardTitle className="flex items-center gap-2">
-                          <TreePine className="h-5 w-5" />
+                        <CardTitle className="flex items-center gap-2 text-lg">
+                          <TreePine className="h-5 w-5 text-primary" />
                           Arborescence du Site
                         </CardTitle>
-                        <div className="flex gap-2">
+                        <div className="flex items-center gap-2">
                           <Input
                             placeholder="Filtrer..."
                             value={filter}
                             onChange={(e) => setFilter(e.target.value)}
-                            className="w-40"
+                            className="w-32 h-8"
                           />
                           <Button variant="outline" size="sm" onClick={() => exportStructure('json')}>
-                            <Download className="h-4 w-4 mr-1" />
+                            <Download className="h-3 w-3 mr-1" />
                             JSON
-                          </Button>
-                          <Button variant="outline" size="sm" onClick={() => exportStructure('xml')}>
-                            <Download className="h-4 w-4 mr-1" />
-                            XML
                           </Button>
                         </div>
                       </div>
