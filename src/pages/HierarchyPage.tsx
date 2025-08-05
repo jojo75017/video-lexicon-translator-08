@@ -518,41 +518,203 @@ const HierarchyPage: React.FC = () => {
 
             {/* Onglet Rédaction */}
             <TabsContent value="redaction" className="space-y-4">
-              <div className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Code className="h-5 w-5 text-orange-500" />
-                      Problèmes de Rédaction (2)
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="p-3 border border-orange-200 bg-orange-50 rounded-lg">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <h4 className="font-medium text-orange-800 mb-1">Meta description manquante</h4>
-                            <p className="text-sm text-orange-700">La page d'accueil n'a pas de meta description</p>
-                          </div>
-                          <Badge variant="outline" className="text-orange-700 border-orange-300">
-                            À corriger
-                          </Badge>
-                        </div>
-                      </div>
-                      <div className="p-3 border border-orange-200 bg-orange-50 rounded-lg">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <h4 className="font-medium text-orange-800 mb-1">Titre H1 trop long</h4>
-                            <p className="text-sm text-orange-700">Le titre H1 de la page Services dépasse 60 caractères</p>
-                          </div>
-                          <Badge variant="outline" className="text-orange-700 border-orange-300">
-                            À optimiser
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+              <div className="space-y-6">
+                {/* Header avec nombre de mots */}
+                <div className="flex items-center gap-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium">Nombre de mots :</span>
+                    <span className="font-bold text-blue-700">1157</span>
+                    <span className="text-gray-500">/</span>
+                    <span className="text-gray-600">1058</span>
+                    <Info className="h-4 w-4 text-blue-500" />
+                  </div>
+                </div>
+
+                {/* Évaluation de la rédaction */}
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="flex items-start gap-2">
+                    <Info className="h-4 w-4 text-blue-500 mt-0.5" />
+                    <p className="text-sm text-blue-800">
+                      La rédaction semble correcte, avec une approche axée sur l'inspiration et les conseils pratiques. On retrouve des éléments de réassurance comme la présentation des auteu...
+                      <button className="text-blue-600 hover:underline ml-1">+</button>
+                    </p>
+                  </div>
+                </div>
+
+                {/* Boutons d'actions */}
+                <div className="flex gap-2">
+                  <Button variant="default" className="bg-blue-600 hover:bg-blue-700 text-white">
+                    <BarChart3 className="h-4 w-4 mr-2" />
+                    Mots-clés
+                  </Button>
+                  <Button variant="outline" className="border-orange-200 text-orange-700 hover:bg-orange-50">
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Améliorer
+                    <Badge className="ml-2 bg-orange-500 text-white text-xs">NEW</Badge>
+                  </Button>
+                </div>
+
+                {/* Sous-onglets */}
+                <div className="border-b">
+                  <div className="flex gap-6">
+                    <button className="pb-2 border-b-2 border-blue-500 text-blue-600 font-medium">
+                      Classement
+                    </button>
+                    <button className="pb-2 text-gray-600 hover:text-blue-600">
+                      Associations
+                    </button>
+                    <button className="pb-2 text-gray-600 hover:text-blue-600 flex items-center gap-1">
+                      Suggestions
+                      <Badge className="bg-orange-500 text-white text-xs">NEW</Badge>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Options d'affichage */}
+                <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
+                  <span className="text-sm">Afficher les expressions composées de :</span>
+                  <div className="flex items-center gap-4">
+                    <label className="flex items-center gap-1 text-sm">
+                      <input type="checkbox" defaultChecked className="rounded" />
+                      1 mot
+                    </label>
+                    <label className="flex items-center gap-1 text-sm">
+                      <input type="checkbox" defaultChecked className="rounded" />
+                      2 mots
+                    </label>
+                    <label className="flex items-center gap-1 text-sm">
+                      <input type="checkbox" defaultChecked className="rounded" />
+                      3 mots et plus
+                    </label>
+                  </div>
+                  <div className="ml-auto flex gap-2">
+                    <Button variant="outline" size="sm">
+                      <Target className="h-4 w-4 mr-1" />
+                      Identifier les entités
+                    </Button>
+                    <Input 
+                      placeholder="Rechercher une expression" 
+                      className="w-48"
+                    />
+                  </div>
+                </div>
+
+                {/* Tableau des mots-clés */}
+                <div className="bg-card rounded-lg border">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b bg-gray-50">
+                          <th className="text-left p-3 text-sm font-medium">N.</th>
+                          <th className="text-left p-3 text-sm font-medium">Expressions / Pertinence</th>
+                          <th className="text-left p-3 text-sm font-medium">Densité pondérée (%)</th>
+                          <th className="text-left p-3 text-sm font-medium">Densité brute (%)</th>
+                          <th className="text-left p-3 text-sm font-medium">Occ.</th>
+                          <th className="text-left p-3 text-sm font-medium">Trouvée dans les balises suivantes</th>
+                          <th className="text-left p-3 text-sm font-medium"></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr className="border-b hover:bg-gray-50">
+                          <td className="p-3 text-sm">1</td>
+                          <td className="p-3 text-sm font-medium">bustertravel</td>
+                          <td className="p-3 text-sm">
+                            <div className="flex items-center gap-2">
+                              <div className="w-6 h-6 rounded-full bg-green-500 text-white text-xs flex items-center justify-center">7</div>
+                              <span className="text-orange-600">21.89</span>
+                            </div>
+                          </td>
+                          <td className="p-3 text-sm text-orange-600">1.73</td>
+                          <td className="p-3 text-sm">20</td>
+                          <td className="p-3 text-xs">
+                            <div className="flex flex-wrap gap-1">
+                              <span className="bg-blue-100 px-1 rounded">url:host</span>
+                              <span className="bg-blue-100 px-1 rounded">title</span>
+                              <span className="bg-blue-100 px-1 rounded">meta:description</span>
+                              <span className="bg-blue-100 px-1 rounded">header/a</span>
+                              <span className="bg-blue-100 px-1 rounded">main/title</span>
+                              <span className="bg-blue-100 px-1 rounded">main/h1</span>
+                              <span className="bg-blue-100 px-1 rounded">main/h2</span>
+                              <span className="bg-blue-100 px-1 rounded">main/strong</span>
+                              <span className="bg-blue-100 px-1 rounded">main</span>
+                              <span className="bg-blue-100 px-1 rounded">main/h3</span>
+                              <span className="bg-blue-100 px-1 rounded">footer/h</span>
+                              <span className="bg-blue-100 px-1 rounded">footer</span>
+                            </div>
+                          </td>
+                          <td className="p-3">
+                            <div className="flex gap-1">
+                              <Button variant="ghost" size="sm"><Eye className="h-3 w-3" /></Button>
+                              <Button variant="ghost" size="sm"><Search className="h-3 w-3" /></Button>
+                              <Button variant="ghost" size="sm"><Target className="h-3 w-3" /></Button>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr className="border-b hover:bg-gray-50">
+                          <td className="p-3 text-sm">2</td>
+                          <td className="p-3 text-sm font-medium">bons plans</td>
+                          <td className="p-3 text-sm">
+                            <div className="flex items-center gap-2">
+                              <div className="w-6 h-6 rounded-full bg-green-500 text-white text-xs flex items-center justify-center">6</div>
+                              <span>6.64</span>
+                            </div>
+                          </td>
+                          <td className="p-3 text-sm">1.73</td>
+                          <td className="p-3 text-sm">10</td>
+                          <td className="p-3 text-xs">
+                            <div className="flex flex-wrap gap-1">
+                              <span className="bg-blue-100 px-1 rounded">title</span>
+                              <span className="bg-blue-100 px-1 rounded">meta:description</span>
+                              <span className="bg-blue-100 px-1 rounded">main/a</span>
+                              <span className="bg-blue-100 px-1 rounded">main/h3</span>
+                              <span className="bg-blue-100 px-1 rounded">main</span>
+                              <span className="bg-blue-100 px-1 rounded">footer</span>
+                            </div>
+                          </td>
+                          <td className="p-3">
+                            <div className="flex gap-1">
+                              <Button variant="ghost" size="sm"><Eye className="h-3 w-3" /></Button>
+                              <Button variant="ghost" size="sm"><Search className="h-3 w-3" /></Button>
+                              <Button variant="ghost" size="sm"><Target className="h-3 w-3" /></Button>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr className="border-b hover:bg-gray-50">
+                          <td className="p-3 text-sm">3</td>
+                          <td className="p-3 text-sm font-medium">voyage</td>
+                          <td className="p-3 text-sm">
+                            <div className="flex items-center gap-2">
+                              <div className="w-6 h-6 rounded-full bg-yellow-500 text-white text-xs flex items-center justify-center">4</div>
+                              <span>6</span>
+                            </div>
+                          </td>
+                          <td className="p-3 text-sm">1.64</td>
+                          <td className="p-3 text-sm">19</td>
+                          <td className="p-3 text-xs">
+                            <div className="flex flex-wrap gap-1">
+                              <span className="bg-blue-100 px-1 rounded">meta:description</span>
+                              <span className="bg-blue-100 px-1 rounded">main/title</span>
+                              <span className="bg-blue-100 px-1 rounded">main</span>
+                              <span className="bg-blue-100 px-1 rounded">main/h2</span>
+                              <span className="bg-blue-100 px-1 rounded">main/strong</span>
+                              <span className="bg-blue-100 px-1 rounded">main/a</span>
+                              <span className="bg-blue-100 px-1 rounded">main/img:alt</span>
+                              <span className="bg-blue-100 px-1 rounded">main/noscript/img:alt</span>
+                              <span className="bg-blue-100 px-1 rounded">footer</span>
+                            </div>
+                          </td>
+                          <td className="p-3">
+                            <div className="flex gap-1">
+                              <Button variant="ghost" size="sm"><Eye className="h-3 w-3" /></Button>
+                              <Button variant="ghost" size="sm"><Search className="h-3 w-3" /></Button>
+                              <Button variant="ghost" size="sm"><Target className="h-3 w-3" /></Button>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               </div>
             </TabsContent>
 
