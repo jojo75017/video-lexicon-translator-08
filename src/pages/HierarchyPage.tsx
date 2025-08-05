@@ -184,8 +184,48 @@ const HierarchyPage: React.FC = () => {
           technicalSeo: 'Structure technique conforme aux dernières pratiques'
         };
         
+        // Données enrichies en mode IA
+        result.redactionProblems = [
+          { title: 'Meta description générée par IA', description: 'L\'IA suggère une meta description optimisée pour le CTR', priority: 'Haute', aiGenerated: true },
+          { title: 'Titre H1 optimisé par IA', description: 'L\'IA propose une version plus percutante du titre principal', priority: 'Moyenne', aiGenerated: true },
+          { title: 'Contenu dupliqué détecté', description: 'L\'IA a identifié du contenu similaire sur 2 pages', priority: 'Haute', aiGenerated: true }
+        ];
+        
+        result.optimisationOpportunities = [
+          { title: 'Mots-clés LSI suggérés par IA', priority: 'Haute', impact: 'Fort', aiGenerated: true },
+          { title: 'Structure de contenu optimisée', priority: 'Haute', impact: 'Fort', aiGenerated: true },
+          { title: 'Stratégie de maillage intelligent', priority: 'Moyenne', impact: 'Moyen', aiGenerated: true },
+          { title: 'Optimisation sémantique avancée', priority: 'Moyenne', impact: 'Moyen', aiGenerated: true },
+          { title: 'Cluster de mots-clés', priority: 'Basse', impact: 'Moyen', aiGenerated: true },
+          { title: 'Analyse concurrentielle IA', priority: 'Moyenne', impact: 'Fort', aiGenerated: true },
+          { title: 'Recommandations UX/SEO', priority: 'Haute', impact: 'Fort', aiGenerated: true },
+          { title: 'Optimisation vocale', priority: 'Basse', impact: 'Moyen', aiGenerated: true },
+          { title: 'Intent utilisateur avancé', priority: 'Moyenne', impact: 'Fort', aiGenerated: true },
+          { title: 'Score E-A-T amélioré', priority: 'Haute', impact: 'Fort', aiGenerated: true },
+          { title: 'Featured snippets potentiels', priority: 'Moyenne', impact: 'Moyen', aiGenerated: true },
+          { title: 'Entités nommées manquantes', priority: 'Basse', impact: 'Faible', aiGenerated: true }
+        ];
+        
         toast.success('Analyse IA terminée - Recommandations personnalisées générées');
       } else {
+        // Mode Standard : Données de base
+        result.redactionProblems = [
+          { title: 'Meta description manquante', description: 'La page d\'accueil n\'a pas de meta description', priority: 'Moyenne', aiGenerated: false },
+          { title: 'Titre H1 trop long', description: 'Le titre H1 de la page Services dépasse 60 caractères', priority: 'Faible', aiGenerated: false }
+        ];
+        
+        result.optimisationOpportunities = [
+          { title: 'Optimiser les images', priority: 'Haute', impact: 'Fort', aiGenerated: false },
+          { title: 'Améliorer la vitesse', priority: 'Haute', impact: 'Fort', aiGenerated: false },
+          { title: 'Mots-clés longue traîne', priority: 'Moyenne', impact: 'Moyen', aiGenerated: false },
+          { title: 'Maillage interne', priority: 'Moyenne', impact: 'Moyen', aiGenerated: false },
+          { title: 'Schema markup', priority: 'Basse', impact: 'Faible', aiGenerated: false },
+          { title: 'Compression GZIP', priority: 'Moyenne', impact: 'Moyen', aiGenerated: false },
+          { title: 'Mise en cache browser', priority: 'Basse', impact: 'Moyen', aiGenerated: false },
+          { title: 'Redirections 301', priority: 'Faible', impact: 'Faible', aiGenerated: false },
+          { title: 'Sitemap optimization', priority: 'Basse', impact: 'Faible', aiGenerated: false }
+        ];
+        
         // Mode Standard : Résultats de base
         toast.success('Analyse standard terminée');
       }
@@ -471,30 +511,43 @@ const HierarchyPage: React.FC = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      <div className="p-3 border border-orange-200 bg-orange-50 rounded-lg">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <h4 className="font-medium text-orange-800 mb-1">Meta description manquante</h4>
-                            <p className="text-sm text-orange-700">La page d'accueil n'a pas de meta description</p>
-                            <div className="text-xs text-orange-600 mt-1">Impact SEO: Moyen</div>
+                      {analysisResult.redactionProblems?.map((problem: any, index: number) => (
+                        <div key={index} className={`p-3 border rounded-lg ${
+                          problem.aiGenerated ? 'border-purple-200 bg-purple-50' : 'border-orange-200 bg-orange-50'
+                        }`}>
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h4 className={`font-medium ${
+                                  problem.aiGenerated ? 'text-purple-800' : 'text-orange-800'
+                                }`}>
+                                  {problem.title}
+                                </h4>
+                                {problem.aiGenerated && (
+                                  <Badge variant="outline" className="text-purple-700 border-purple-300 text-xs">
+                                    IA
+                                  </Badge>
+                                )}
+                              </div>
+                              <p className={`text-sm ${
+                                problem.aiGenerated ? 'text-purple-700' : 'text-orange-700'
+                              }`}>
+                                {problem.description}
+                              </p>
+                              <div className={`text-xs mt-1 ${
+                                problem.aiGenerated ? 'text-purple-600' : 'text-orange-600'
+                              }`}>
+                                Priorité: {problem.priority}
+                              </div>
+                            </div>
+                            <Badge variant="outline" className={
+                              problem.aiGenerated ? 'text-purple-700 border-purple-300' : 'text-orange-700 border-orange-300'
+                            }>
+                              {problem.aiGenerated ? 'IA Suggéré' : 'À corriger'}
+                            </Badge>
                           </div>
-                          <Badge variant="outline" className="text-orange-700 border-orange-300">
-                            À corriger
-                          </Badge>
                         </div>
-                      </div>
-                      <div className="p-3 border border-orange-200 bg-orange-50 rounded-lg">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <h4 className="font-medium text-orange-800 mb-1">Titre H1 trop long</h4>
-                            <p className="text-sm text-orange-700">Le titre H1 de la page Services dépasse 60 caractères</p>
-                            <div className="text-xs text-orange-600 mt-1">Impact SEO: Faible</div>
-                          </div>
-                          <Badge variant="outline" className="text-orange-700 border-orange-300">
-                            À optimiser
-                          </Badge>
-                        </div>
-                      </div>
+                      ))}
                     </div>
                   </CardContent>
                 </Card>
@@ -544,19 +597,30 @@ const HierarchyPage: React.FC = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
-                      {[
-                        { title: 'Optimiser les images', priority: 'Haute', impact: 'Fort' },
-                        { title: 'Améliorer la vitesse', priority: 'Haute', impact: 'Fort' },
-                        { title: 'Mots-clés longue traîne', priority: 'Moyenne', impact: 'Moyen' },
-                        { title: 'Maillage interne', priority: 'Moyenne', impact: 'Moyen' },
-                        { title: 'Schema markup', priority: 'Basse', impact: 'Faible' }
-                      ].map((item, index) => (
-                        <div key={index} className="flex items-center justify-between p-2 border rounded">
-                          <span className="text-sm">{item.title}</span>
+                      {analysisResult.optimisationOpportunities?.slice(0, useAI ? 12 : 9).map((item: any, index: number) => (
+                        <div key={index} className={`flex items-center justify-between p-2 border rounded ${
+                          item.aiGenerated ? 'border-purple-200 bg-purple-50' : 'border-gray-200'
+                        }`}>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm">{item.title}</span>
+                            {item.aiGenerated && (
+                              <Badge variant="outline" className="text-purple-700 border-purple-300 text-xs">
+                                IA
+                              </Badge>
+                            )}
+                          </div>
                           <div className="flex gap-1">
-                            <Badge variant={item.priority === 'Haute' ? 'destructive' : item.priority === 'Moyenne' ? 'secondary' : 'outline'} className="text-xs">
+                            <Badge variant={
+                              item.priority === 'Haute' ? 'destructive' : 
+                              item.priority === 'Moyenne' ? 'secondary' : 'outline'
+                            } className="text-xs">
                               {item.priority}
                             </Badge>
+                            {item.aiGenerated && (
+                              <Badge variant="default" className="text-xs bg-purple-600">
+                                Impact: {item.impact}
+                              </Badge>
+                            )}
                           </div>
                         </div>
                       ))}
@@ -566,37 +630,57 @@ const HierarchyPage: React.FC = () => {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-base">Performance Scores</CardTitle>
+                    <CardTitle className="text-base flex items-center gap-2">
+                      Performance Scores
+                      {analysisResult.aiInsights && (
+                        <Badge variant="outline" className="text-purple-700 border-purple-300 text-xs">
+                          IA Enhanced
+                        </Badge>
+                      )}
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
                       <div className="flex justify-between items-center">
-                        <span className="text-sm">SEO Score</span>
+                        <span className="text-sm">SEO Score {analysisResult.aiInsights ? '(IA)' : ''}</span>
                         <div className="flex items-center gap-2">
                           <div className="w-20 bg-gray-200 rounded-full h-2">
-                            <div className="bg-blue-600 h-2 rounded-full" style={{width: '78%'}}></div>
+                            <div className={`h-2 rounded-full ${analysisResult.aiInsights ? 'bg-purple-600' : 'bg-blue-600'}`} 
+                                 style={{width: analysisResult.aiInsights ? '89%' : '78%'}}></div>
                           </div>
-                          <span className="text-sm font-medium">78%</span>
+                          <span className="text-sm font-medium">{analysisResult.aiInsights ? '89%' : '78%'}</span>
                         </div>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-sm">Performance</span>
+                        <span className="text-sm">Performance {analysisResult.aiInsights ? '(Optimisée)' : ''}</span>
                         <div className="flex items-center gap-2">
                           <div className="w-20 bg-gray-200 rounded-full h-2">
-                            <div className="bg-orange-600 h-2 rounded-full" style={{width: '65%'}}></div>
+                            <div className={`h-2 rounded-full ${analysisResult.aiInsights ? 'bg-green-600' : 'bg-orange-600'}`} 
+                                 style={{width: analysisResult.aiInsights ? '82%' : '65%'}}></div>
                           </div>
-                          <span className="text-sm font-medium">65%</span>
+                          <span className="text-sm font-medium">{analysisResult.aiInsights ? '82%' : '65%'}</span>
                         </div>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-sm">Accessibilité</span>
+                        <span className="text-sm">Accessibilité {analysisResult.aiInsights ? '(Analysée)' : ''}</span>
                         <div className="flex items-center gap-2">
                           <div className="w-20 bg-gray-200 rounded-full h-2">
-                            <div className="bg-green-600 h-2 rounded-full" style={{width: '92%'}}></div>
+                            <div className="bg-green-600 h-2 rounded-full" style={{width: analysisResult.aiInsights ? '96%' : '92%'}}></div>
                           </div>
-                          <span className="text-sm font-medium">92%</span>
+                          <span className="text-sm font-medium">{analysisResult.aiInsights ? '96%' : '92%'}</span>
                         </div>
                       </div>
+                      {analysisResult.aiInsights && (
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Intent Matching (IA)</span>
+                          <div className="flex items-center gap-2">
+                            <div className="w-20 bg-gray-200 rounded-full h-2">
+                              <div className="bg-purple-600 h-2 rounded-full" style={{width: '91%'}}></div>
+                            </div>
+                            <span className="text-sm font-medium">91%</span>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
