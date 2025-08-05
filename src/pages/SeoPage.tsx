@@ -13,13 +13,74 @@ import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
 
 const SeoPage: React.FC = () => {
   const navigate = useNavigate();
-  const [url, setUrl] = useState('');
-  const [content, setContent] = useState('');
-  const [keyword, setKeyword] = useState('');
+  const [url, setUrl] = useState('https://exemple.com');
+  const [content, setContent] = useState('Votre contenu SEO ici. Ajoutez du texte pour voir les recommandations d\'optimisation...');
+  const [keyword, setKeyword] = useState('référencement naturel');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isOptimizing, setIsOptimizing] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState<any>(null);
-  const [optimizationResult, setOptimizationResult] = useState<any>(null);
+  const [analysisResult, setAnalysisResult] = useState<any>({
+    headings: {
+      h1: [{ text: "Guide Complet SEO 2024", level: 1 }],
+      h2: [
+        { text: "Introduction au SEO", level: 2 },
+        { text: "Optimisation On-Page", level: 2 },
+        { text: "Stratégies Avancées", level: 2 }
+      ],
+      h3: [
+        { text: "Recherche de mots-clés", level: 3 },
+        { text: "Optimisation technique", level: 3 },
+        { text: "Création de contenu", level: 3 }
+      ]
+    },
+    analysis: {
+      h1Count: 1,
+      h2Count: 3,
+      h3Count: 3,
+      totalHeadings: 7,
+      seoScore: 85
+    },
+    recommendations: [
+      { type: 'success', title: 'Structure H1 Correcte', description: 'Une seule balise H1 détectée' },
+      { type: 'warning', title: 'Contenu Court', description: 'Ajoutez plus de contenu textuel' },
+      { type: 'success', title: 'Hiérarchie Respectée', description: 'La structure des titres est cohérente' }
+    ]
+  });
+  const [optimizationResult, setOptimizationResult] = useState<any>({
+    seoScore: 87,
+    improvements: [
+      {
+        type: 'title',
+        current: 'Titre actuel sans optimisation',
+        optimized: 'Référencement Naturel - Guide Complet 2024 | Expertise & Conseils',
+        impact: 'high',
+        reason: 'Inclusion du mot-clé principal et mots d\'accroche'
+      },
+      {
+        type: 'meta-description',
+        current: 'Description trop courte',
+        optimized: 'Découvrez tout sur le référencement naturel. Guide expert avec conseils pratiques, astuces et recommandations 2024. ✓ Information fiable ✓ Mise à jour régulière',
+        impact: 'high',
+        reason: 'Longueur optimale (155 caractères) avec mot-clé et émojis'
+      }
+    ],
+    keywords: {
+      primary: 'référencement naturel',
+      secondary: [
+        'meilleur référencement naturel',
+        'référencement naturel 2024',
+        'guide référencement naturel',
+        'référencement naturel expert',
+        'conseils référencement naturel'
+      ],
+      longTail: [
+        'comment améliorer son référencement naturel',
+        'référencement naturel pour débutants',
+        'techniques référencement naturel',
+        'où apprendre le référencement naturel',
+        'référencement naturel vs payant'
+      ]
+    }
+  });
   const [activeTab, setActiveTab] = useState<'analyze' | 'optimize' | 'content' | 'meta' | 'keywords' | 'audit'>('analyze');
   const { apiKey, model, hasValidApiKey, getConfig } = useOpenAIConfig();
 
