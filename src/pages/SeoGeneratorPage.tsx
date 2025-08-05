@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -56,8 +56,8 @@ const SeoGeneratorPage: React.FC = () => {
   
   // Configuration du contenu
   const [contentConfig, setContentConfig] = useState({
-    topic: 'référencement naturel SEO',
-    keyword: 'SEO 2024',
+    topic: '',
+    keyword: '',
     contentType: 'article',
     targetLength: 2000,
     tone: 'professionnel',
@@ -72,10 +72,62 @@ const SeoGeneratorPage: React.FC = () => {
     targetCountry: 'France'
   });
 
-  // Résultats générés avec données de démonstration
-  const [generatedContent] = useState<any>({
-    title: 'SEO 2024 : Guide Complet du Référencement Naturel | Stratégies Avancées',
-    metaDescription: 'Découvrez les meilleures techniques SEO 2024. Guide expert avec stratégies avancées, outils indispensables et conseils pratiques pour optimiser votre référencement naturel.',
+  // Résultats générés
+  const [generatedContent, setGeneratedContent] = useState<any>(null);
+
+  // Fonction pour générer le contenu dynamiquement
+  const generateContent = (keyword: string) => {
+    const isTravel = keyword.toLowerCase().includes('voyage') || keyword.toLowerCase().includes('sénégal') || keyword.toLowerCase().includes('senegal');
+    
+    if (isTravel) {
+      return {
+        title: `${keyword} : Guide Complet et Conseils de Voyage | Découvrez ${keyword}`,
+        metaDescription: `Planifiez votre ${keyword} avec notre guide expert. Conseils pratiques, meilleures destinations, budget et itinéraires pour un voyage inoubliable.`,
+        structure: [
+          { level: 1, title: `Préparer votre ${keyword}`, wordCount: 200, status: 'optimized' },
+          { level: 2, title: 'Meilleures destinations à visiter', wordCount: 400, status: 'good' },
+          { level: 2, title: 'Budget et coût du voyage', wordCount: 500, status: 'optimized' },
+          { level: 3, title: 'Hébergement et logement', wordCount: 250, status: 'warning' },
+          { level: 3, title: 'Transport et déplacements', wordCount: 250, status: 'good' },
+          { level: 2, title: 'Culture et traditions locales', wordCount: 600, status: 'optimized' },
+          { level: 2, title: 'Conseils pratiques et sécurité', wordCount: 400, status: 'good' },
+          { level: 1, title: 'Conclusion et recommandations', wordCount: 150, status: 'optimized' }
+        ],
+        content: `# ${keyword} : Guide Complet
+
+## Préparer votre ${keyword}
+
+Organiser un ${keyword} demande une préparation minutieuse pour vivre une expérience inoubliable. Ce guide vous accompagne dans toutes les étapes de votre projet de voyage.
+
+### Les étapes essentielles
+
+- **Passeport et visas** : Vérifiez les exigences administratives
+- **Vaccinations** : Consultez un centre de médecine du voyage
+- **Assurance voyage** : Protection indispensable pour votre séjour
+- **Budget prévisionnel** : Estimez vos dépenses sur place
+
+## Meilleures destinations à visiter
+
+### Sites incontournables
+Découvrez les lieux emblématiques qui font la richesse de cette destination...
+
+## Culture et traditions locales
+
+Immergez-vous dans la culture locale pour enrichir votre expérience de voyage...
+
+## Conseils pratiques et sécurité
+
+### Recommandations importantes
+- Respectez les coutumes locales
+- Gardez vos documents en sécurité
+- Informez-vous sur la situation locale
+- Préparez une trousse de premiers secours`
+      };
+    } else {
+      // Contenu SEO par défaut
+      return {
+        title: `${keyword || 'SEO 2024'} : Guide Complet | Stratégies Avancées`,
+        metaDescription: `Découvrez tout sur ${keyword || 'le SEO 2024'}. Guide expert avec stratégies avancées, conseils pratiques et techniques pour optimiser votre référencement.`,
     structure: [
       { level: 1, title: 'Introduction au SEO en 2024', wordCount: 200, status: 'optimized' },
       { level: 2, title: 'Les Fondamentaux du Référencement', wordCount: 400, status: 'good' },
@@ -86,11 +138,11 @@ const SeoGeneratorPage: React.FC = () => {
       { level: 2, title: 'SEO Technique et Performance', wordCount: 400, status: 'good' },
       { level: 1, title: 'Conclusion et Actions Prioritaires', wordCount: 150, status: 'optimized' }
     ],
-    content: `# SEO 2024 : Guide Complet du Référencement Naturel
+        content: `# ${keyword || 'SEO 2024'} : Guide Complet
 
-## Introduction au SEO en 2024
+## Introduction 
 
-Le référencement naturel (SEO) évolue constamment avec les mises à jour des algorithmes de Google. En 2024, l'intelligence artificielle et l'expérience utilisateur sont devenues centrales dans les stratégies SEO efficaces.
+Ce guide complet vous présente tout ce que vous devez savoir sur ${keyword || 'le SEO'}. Découvrez les meilleures pratiques et stratégies pour optimiser votre présence en ligne.
 
 ### Les Enjeux du SEO Moderne
 
@@ -110,151 +162,31 @@ Les statistiques parlent d'elles-mêmes :
 - **75% des utilisateurs** ne dépassent jamais la première page
 - **Coût d'acquisition** 6 fois inférieur au SEA sur le long terme
 
-## Les Fondamentaux du Référencement
+## Les Fondamentaux 
 
-### 1. Recherche de Mots-clés Nouvelle Génération
+### Points clés à retenir
 
-La recherche de mots-clés en 2024 va bien au-delà du volume de recherche :
+Voici les éléments essentiels à connaître sur ${keyword || 'ce sujet'}...`
+      };
+    }
+  };
 
-#### Analyse Intentionnelle Avancée
-- **Intention informationnelle** : Questions, guides, définitions
-- **Intention navigationnelle** : Recherche de marques spécifiques
-- **Intention commerciale** : Comparaisons, avis, "meilleur"
-- **Intention transactionnelle** : Achat, réservation, contact
+  // Effet pour générer le contenu quand le keyword change
+  useEffect(() => {
+    if (contentConfig.keyword) {
+      setGeneratedContent(generateContent(contentConfig.keyword));
+    }
+  }, [contentConfig.keyword]);
 
-#### Métriques Essentielles
-- **Keyword Difficulty (KD)** : Évaluation de la concurrence
-- **Search Intent Match** : Correspondance avec l'intention utilisateur
-- **SERP Features** : Présence de rich snippets, PAA, images
-- **Seasonal Trends** : Variations saisonnières et tendances
-
-### 2. Analyse Concurrentielle Intelligente
-
-Une approche méthodique de l'analyse concurrentielle :
-
-#### Audit des Concurrents Directs
-1. **Identification des top performers** dans votre niche
-2. **Analyse des gaps de contenu** et opportunités manquées
-3. **Étude des backlinks** et stratégies de netlinking
-4. **Benchmark des performances** techniques et UX
-
-#### Outils d'Analyse Recommandés
-- **Ahrefs/SEMrush** : Analyse complète des concurrents
-- **SimilarWeb** : Données de trafic et audience
-- **Screaming Frog** : Audit technique comparatif
-- **PageSpeed Insights** : Performance et Core Web Vitals
-
-## Optimisation On-Page Avancée
-
-### Architecture de l'Information SEO
-
-#### Structure HTML Optimisée
-\`\`\`html
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <title>Mot-clé Principal | Marque - Proposition de Valeur</title>
-    <meta name="description" content="Description optimisée 150-160 caractères">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="canonical" href="https://example.com/page">
-</head>
-\`\`\`
-
-#### Hiérarchie des Titres Logique
-- **H1 unique** : Titre principal avec mot-clé
-- **H2 thématiques** : Sections principales du contenu
-- **H3-H6 structurants** : Sous-sections et détails
-
-### Optimisation du Contenu
-
-#### Densité et Distribution des Mots-clés
-- **Mot-clé principal** : 1-2% de densité naturelle
-- **Mots-clés secondaires** : Intégration sémantique
-- **Synonymes et variantes** : Enrichissement du champ lexical
-- **Questions fréquentes** : Optimisation pour Position 0
-
-#### Longueur et Profondeur
-- **Articles informatifs** : 1500-3000 mots minimum
-- **Pages commerciales** : 800-1500 mots optimisés
-- **Contenu pilier** : 3000-5000 mots complets
-- **Mise à jour régulière** : Fraîcheur du contenu
-
-## Stratégies de Contenu SEO
-
-### Content Marketing Intégré
-
-#### Création de Contenu E-A-T
-Google privilégie les contenus démontrant :
-
-1. **Expertise (E)** : Compétences reconnues dans le domaine
-2. **Authoritativeness (A)** : Autorité et reconnaissance par les pairs
-3. **Trustworthiness (T)** : Fiabilité et transparence
-4. **Experience (E)** : Expérience pratique du sujet traité
-
-#### Types de Contenu Performants
-- **Guides complets** : Ressources exhaustives sur un sujet
-- **Études de cas** : Preuves sociales et exemples concrets
-- **Comparatifs détaillés** : Analyses objectives de solutions
-- **Tutoriels step-by-step** : Instructions pratiques illustrées
-
-### Optimisation Sémantique
-
-#### Enrichissement du Contenu
-- **Entités nommées** : Personnes, lieux, organisations liées
-- **Cooccurrences** : Termes fréquemment associés
-- **Graphe de connaissances** : Connexions thématiques
-- **Intent clustering** : Regroupement d'intentions similaires
-
-## SEO Technique et Performance
-
-### Core Web Vitals Optimisés
-
-#### Métriques Prioritaires 2024
-1. **LCP (Largest Contentful Paint)** : < 2.5 secondes
-2. **FID (First Input Delay)** : < 100 millisecondes  
-3. **CLS (Cumulative Layout Shift)** : < 0.1
-4. **INP (Interaction to Next Paint)** : < 200ms (nouveau métrique)
-
-#### Optimisations Techniques
-- **Lazy loading** : Chargement différé des images
-- **Critical CSS** : Styles critiques inline
-- **Code splitting** : Division du JavaScript
-- **CDN global** : Distribution géographique du contenu
-
-### Architecture et Maillage Interne
-
-#### Structure Logique du Site
-- **Profondeur maximale** : 3 clics depuis l'accueil
-- **Liens contextuels** : Ancres optimisées et pertinentes
-- **Breadcrumbs** : Navigation claire et indexable
-- **Sitemap XML** : Plan de site à jour automatiquement
-
-#### Stratégies de Maillage Interne
-- **Topic clusters** : Organisation thématique du contenu
-- **Pillar pages** : Pages principales comprehensive
-- **Supporting content** : Contenu de support spécialisé
-- **Internal link velocity** : Rythme de création de liens
-
-## Conclusion et Perspectives
-
-### Synthèse des Points Clés
-
-Le SEO en 2024 nécessite une approche professionnelle alliant :
-
-1. **Expertise technique** : Maîtrise des outils et méthodes
-2. **Vision stratégique** : Alignement avec les objectifs business
-3. **Exécution rigoureuse** : Respect des processus et standards
-4. **Amélioration continue** : Optimisation permanente
-
-### Tendances et Évolution
-
-#### Évolutions Majeures à Anticiper
-- **Intelligence artificielle** : Automatisation avancée
-- **Analytics prédictifs** : Anticipation des besoins
-- **Personnalisation** : Adaptation aux utilisateurs
-- **Durabilité** : Optimisation énergétique
-
-Le SEO en 2024 demande une approche holistique combinant expertise technique, créativité éditoriale et vision stratégique.`,
+  const sampleContent = generatedContent || {
+    title: 'Contenu SEO en cours de génération...',
+    metaDescription: 'Veuillez entrer un mot-clé pour générer du contenu optimisé',
+    structure: [],
+    content: 'Aucun contenu généré pour le moment.',
+    seoScore: 0,
+    readabilityScore: 0,
+    wordCount: 0,
+    estimatedReadTime: 0,
     keywords: [
       { keyword: 'SEO 2024', volume: 8100, difficulty: 65, intent: 'informationnel', cpc: 3.20, trend: 'rising', position: 5 },
       { keyword: 'référencement naturel', volume: 12400, difficulty: 68, intent: 'informationnel', cpc: 2.80, trend: 'stable', position: 8 },
@@ -265,10 +197,6 @@ Le SEO en 2024 demande une approche holistique combinant expertise technique, cr
       { keyword: 'mots-clés SEO', volume: 2800, difficulty: 59, intent: 'informationnel', cpc: 3.40, trend: 'stable', position: 9 },
       { keyword: 'contenu SEO optimisé', volume: 1400, difficulty: 64, intent: 'commercial', cpc: 4.80, trend: 'rising', position: 11 }
     ],
-    seoScore: 94,
-    readabilityScore: 82,
-    wordCount: 2847,
-    estimatedReadTime: 14,
     images: [
       { 
         title: 'Diagramme des facteurs SEO 2024', 
@@ -351,7 +279,7 @@ Le SEO en 2024 demande une approche holistique combinant expertise technique, cr
         ]
       }
     }
-  });
+  };
 
   const contentTypes = [
     { value: 'article', label: 'Article de blog', icon: FileText, description: 'Articles informatifs et guides' },
@@ -360,7 +288,7 @@ Le SEO en 2024 demande une approche holistique combinant expertise technique, cr
     { value: 'social', label: 'Contenu social', icon: Users, description: 'Posts réseaux sociaux' }
   ];
 
-  const generateContent = async () => {
+  const handleGenerateContent = async () => {
     if (!hasValidApiKey) {
       toast.error('Veuillez configurer votre clé API OpenAI');
       return;
@@ -512,7 +440,7 @@ Généré le ${new Date().toLocaleDateString('fr-FR')} avec le Générateur SEO 
 
               <div className="mt-6 flex items-center gap-4">
                 <Button 
-                  onClick={generateContent} 
+                  onClick={handleGenerateContent} 
                   disabled={isGenerating || !hasValidApiKey}
                   className="flex-1 md:flex-none"
                   size="lg"
