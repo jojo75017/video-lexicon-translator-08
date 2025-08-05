@@ -1041,15 +1041,180 @@ const HierarchyPage: React.FC = () => {
               </div>
             </TabsContent>
 
-            <TabsContent value="images" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Optimisation des Images</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">Analyse des images et de leur optimisation...</p>
-                </CardContent>
-              </Card>
+            <TabsContent value="images">
+              <div className="space-y-6">
+                {/* Intégration des images */}
+                <div className="bg-card rounded-lg p-6 border">
+                  <h3 className="text-lg font-semibold mb-4">Intégration des images</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm">Attribut alt</span>
+                      <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded flex items-center gap-1">
+                        <Check className="h-3 w-3" />
+                        Valide
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm">Nom des fichiers images</span>
+                      <span className="text-xs text-orange-600 bg-orange-50 px-2 py-1 rounded flex items-center gap-1">
+                        <AlertTriangle className="h-3 w-3" />
+                        Avertissement <span className="bg-orange-600 text-white rounded-full w-4 h-4 text-xs flex items-center justify-center">1</span>
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm">Attributs alt dupliqués</span>
+                      <span className="text-xs text-orange-600 bg-orange-50 px-2 py-1 rounded flex items-center gap-1">
+                        <AlertTriangle className="h-3 w-3" />
+                        Avertissement <span className="bg-orange-600 text-white rounded-full w-4 h-4 text-xs flex items-center justify-center">1</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Liste des images */}
+                <div className="bg-card rounded-lg p-6 border">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold">Liste des images</h3>
+                    <Button variant="outline" size="sm">
+                      <Search className="h-4 w-4 mr-2" />
+                      Rechercher
+                    </Button>
+                  </div>
+                  
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b bg-gray-50">
+                          <th className="text-left p-3 text-sm font-medium">Source</th>
+                          <th className="text-left p-3 text-sm font-medium">Occ.</th>
+                          <th className="text-left p-3 text-sm font-medium">Alt</th>
+                          <th className="text-left p-3 text-sm font-medium">Title</th>
+                          <th className="text-left p-3 text-sm font-medium">Erreur</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr className="border-b hover:bg-gray-50">
+                          <td className="p-3 text-xs max-w-xs">
+                            <div className="truncate">
+                              data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20640%20443'%3E%3C/svg%3E
+                            </div>
+                          </td>
+                          <td className="p-3 text-sm text-center">1</td>
+                          <td className="p-3 text-sm">Voyager en Europe</td>
+                          <td className="p-3 text-sm"></td>
+                          <td className="p-3 text-sm"></td>
+                        </tr>
+                        <tr className="border-b hover:bg-gray-50">
+                          <td className="p-3 text-xs max-w-xs">
+                            <div className="truncate text-blue-600">
+                              https://bustertravel.com/wp-content/uploads/2025/07/forme-1799670_640-1.jpg
+                            </div>
+                          </td>
+                          <td className="p-3 text-sm text-center">1</td>
+                          <td className="p-3 text-sm">Voyager en Europe</td>
+                          <td className="p-3 text-sm"></td>
+                          <td className="p-3 text-sm">
+                            <div className="flex items-center gap-1 text-orange-600">
+                              <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                              <span className="text-xs">Nom du fichier image non optimisé pour le référencement</span>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr className="border-b hover:bg-gray-50">
+                          <td className="p-3 text-xs max-w-xs">
+                            <div className="truncate">
+                              data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20640%20427'%3E%3C/svg%3E
+                            </div>
+                          </td>
+                          <td className="p-3 text-sm text-center">3</td>
+                          <td className="p-3 text-sm">
+                            <div>Voyager en Asie</div>
+                            <div>Voyager malin</div>
+                            <div>Paysages du Vietnam</div>
+                          </td>
+                          <td className="p-3 text-sm"></td>
+                          <td className="p-3 text-sm"></td>
+                        </tr>
+                        <tr className="border-b hover:bg-gray-50">
+                          <td className="p-3 text-xs max-w-xs">
+                            <div className="truncate text-blue-600">
+                              https://bustertravel.com/wp-content/uploads/2025/07/farm-6948514_640-1.jpg
+                            </div>
+                          </td>
+                          <td className="p-3 text-sm text-center">1</td>
+                          <td className="p-3 text-sm">Voyager en Asie</td>
+                          <td className="p-3 text-sm"></td>
+                          <td className="p-3 text-sm">
+                            <div className="flex items-center gap-1 text-orange-600">
+                              <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                              <span className="text-xs">Nom du fichier image non optimisé pour le référencement</span>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr className="border-b hover:bg-gray-50">
+                          <td className="p-3 text-xs max-w-xs">
+                            <div className="truncate text-blue-600">
+                              https://bustertravel.com/wp-content/uploads/2025/07/1040x575_vtc_0-1-1.jpg
+                            </div>
+                          </td>
+                          <td className="p-3 text-sm text-center">1</td>
+                          <td className="p-3 text-sm">Voyager malin</td>
+                          <td className="p-3 text-sm"></td>
+                          <td className="p-3 text-sm">
+                            <div className="flex items-center gap-1 text-orange-600">
+                              <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                              <span className="text-xs">Nom du fichier image non optimisé pour le référencement</span>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr className="border-b hover:bg-gray-50">
+                          <td className="p-3 text-xs max-w-xs">
+                            <div className="truncate text-blue-600">
+                              https://bustertravel.com/wp-content/uploads/2025/07/boats-7022165_640-1.jpg
+                            </div>
+                          </td>
+                          <td className="p-3 text-sm text-center">1</td>
+                          <td className="p-3 text-sm">Paysages du Vietnam</td>
+                          <td className="p-3 text-sm"></td>
+                          <td className="p-3 text-sm">
+                            <div className="flex items-center gap-1 text-orange-600">
+                              <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                              <span className="text-xs">Nom du fichier image non optimisé pour le référencement</span>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr className="border-b hover:bg-gray-50">
+                          <td className="p-3 text-xs max-w-xs">
+                            <div className="truncate">
+                              data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20640%20424'%3E%3C/svg%3E
+                            </div>
+                          </td>
+                          <td className="p-3 text-sm text-center">1</td>
+                          <td className="p-3 text-sm">Ambiance andalouse</td>
+                          <td className="p-3 text-sm"></td>
+                          <td className="p-3 text-sm"></td>
+                        </tr>
+                        <tr className="border-b hover:bg-gray-50">
+                          <td className="p-3 text-xs max-w-xs">
+                            <div className="truncate text-blue-600">
+                              https://bustertravel.com/wp-content/uploads/2025/07/spain-7346597_640-1.jpg
+                            </div>
+                          </td>
+                          <td className="p-3 text-sm text-center">1</td>
+                          <td className="p-3 text-sm">Ambiance andalouse</td>
+                          <td className="p-3 text-sm"></td>
+                          <td className="p-3 text-sm">
+                            <div className="flex items-center gap-1 text-orange-600">
+                              <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                              <span className="text-xs">Nom du fichier image non optimisé pour le référencement</span>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
             </TabsContent>
 
             <TabsContent value="donnees-structurees">
