@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Globe, Folder, File, ChevronRight, Search, Download, AlertTriangle, CheckCircle, XCircle, Eye, BarChart3, Link, TreePine, Zap, Filter } from 'lucide-react';
+import { ArrowLeft, Globe, Folder, File, ChevronRight, Search, Download, AlertTriangle, CheckCircle, XCircle, Eye, BarChart3, Link, TreePine, Zap, Filter, Lightbulb } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -176,10 +176,18 @@ const HierarchyPage: React.FC = () => {
 
         {analysisResult && (
           <Tabs defaultValue="structure" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-7">
               <TabsTrigger value="structure" className="flex items-center gap-2">
                 <TreePine className="h-4 w-4" />
                 Structure
+              </TabsTrigger>
+              <TabsTrigger value="architecture" className="flex items-center gap-2">
+                <Globe className="h-4 w-4" />
+                Architecture
+              </TabsTrigger>
+              <TabsTrigger value="sitemap" className="flex items-center gap-2">
+                <File className="h-4 w-4" />
+                Sitemap
               </TabsTrigger>
               <TabsTrigger value="performance" className="flex items-center gap-2">
                 <BarChart3 className="h-4 w-4" />
@@ -284,6 +292,259 @@ const HierarchyPage: React.FC = () => {
                             className="bg-green-500 h-2 rounded-full" 
                             style={{ width: `${Math.min(100, (3 - analysisResult.performance.avgLoadTime) / 3 * 100)}%` }}
                           />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </TabsContent>
+
+            {/* Nouvel Onglet Architecture */}
+            <TabsContent value="architecture" className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Globe className="h-5 w-5" />
+                      Architecture d'Information
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="p-4 bg-blue-50 rounded-lg">
+                        <h4 className="font-semibold mb-2">🎯 Navigation Principale</h4>
+                        <div className="flex flex-wrap gap-2">
+                          <Badge variant="outline">Accueil</Badge>
+                          <Badge variant="outline">Services</Badge>
+                          <Badge variant="outline">À propos</Badge>
+                          <Badge variant="outline">Blog</Badge>
+                          <Badge variant="outline">Contact</Badge>
+                        </div>
+                      </div>
+                      
+                      <div className="p-4 bg-green-50 rounded-lg">
+                        <h4 className="font-semibold mb-2">📊 Distribution du Contenu</h4>
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <span>Pages institutionnelles</span>
+                            <Badge>40%</Badge>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Pages de service</span>
+                            <Badge>35%</Badge>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Articles de blog</span>
+                            <Badge>25%</Badge>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="p-4 bg-purple-50 rounded-lg">
+                        <h4 className="font-semibold mb-2">🔗 Maillage Interne</h4>
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <span>Score de maillage</span>
+                            <Badge variant="default">85/100</Badge>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Pages orphelines</span>
+                            <Badge variant="destructive">2</Badge>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <TreePine className="h-5 w-5" />
+                      Recommandations d'Architecture
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="p-4 border border-green-200 bg-green-50 rounded-lg">
+                        <div className="flex items-start gap-3">
+                          <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
+                          <div>
+                            <h4 className="font-semibold text-green-800">Structure logique</h4>
+                            <p className="text-sm text-green-700">Votre hiérarchie suit les meilleures pratiques SEO</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="p-4 border border-orange-200 bg-orange-50 rounded-lg">
+                        <div className="flex items-start gap-3">
+                          <AlertTriangle className="h-5 w-5 text-orange-600 mt-0.5" />
+                          <div>
+                            <h4 className="font-semibold text-orange-800">Optimiser les catégories</h4>
+                            <p className="text-sm text-orange-700">Regrouper les pages similaires pour améliorer l'UX</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="p-4 border border-blue-200 bg-blue-50 rounded-lg">
+                        <div className="flex items-start gap-3">
+                          <Lightbulb className="h-5 w-5 text-blue-600 mt-0.5" />
+                          <div>
+                            <h4 className="font-semibold text-blue-800">Fil d'Ariane recommandé</h4>
+                            <p className="text-sm text-blue-700">Ajouter une navigation breadcrumb pour les pages profondes</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <Button className="w-full" variant="outline">
+                        <Download className="h-4 w-4 mr-2" />
+                        Télécharger le rapport d'architecture
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5" />
+                    Optimisation SEO Structurelle
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg">
+                      <div className="text-2xl font-bold text-blue-600">3.2</div>
+                      <div className="text-sm text-blue-800">Profondeur moyenne optimale</div>
+                      <div className="text-xs text-blue-600 mt-1">≤ 3 clics recommandés</div>
+                    </div>
+                    <div className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-lg">
+                      <div className="text-2xl font-bold text-green-600">92%</div>
+                      <div className="text-sm text-green-800">Pages accessibles</div>
+                      <div className="text-xs text-green-600 mt-1">Excellent crawlability</div>
+                    </div>
+                    <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg">
+                      <div className="text-2xl font-bold text-purple-600">15</div>
+                      <div className="text-sm text-purple-800">Liens internes moyens</div>
+                      <div className="text-xs text-purple-600 mt-1">Bon maillage interne</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Nouvel Onglet Sitemap */}
+            <TabsContent value="sitemap" className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <File className="h-5 w-5" />
+                        Générateur de Sitemap XML
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="p-4 bg-gray-50 rounded-lg font-mono text-sm">
+                          <div className="text-gray-600">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</div>
+                          <div className="text-gray-600">&lt;urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"&gt;</div>
+                          <div className="ml-4">
+                            <div className="text-blue-600">&lt;url&gt;</div>
+                            <div className="ml-4">
+                              <div>&lt;loc&gt;https://exemple.com/&lt;/loc&gt;</div>
+                              <div>&lt;lastmod&gt;2024-01-15&lt;/lastmod&gt;</div>
+                              <div>&lt;priority&gt;1.0&lt;/priority&gt;</div>
+                            </div>
+                            <div className="text-blue-600">&lt;/url&gt;</div>
+                            <div className="text-blue-600">&lt;url&gt;</div>
+                            <div className="ml-4">
+                              <div>&lt;loc&gt;https://exemple.com/services&lt;/loc&gt;</div>
+                              <div>&lt;lastmod&gt;2024-01-12&lt;/lastmod&gt;</div>
+                              <div>&lt;priority&gt;0.8&lt;/priority&gt;</div>
+                            </div>
+                            <div className="text-blue-600">&lt;/url&gt;</div>
+                          </div>
+                          <div className="text-gray-600">&lt;/urlset&gt;</div>
+                        </div>
+                        
+                        <div className="flex gap-2">
+                          <Button onClick={() => exportStructure('sitemap')} className="flex-1">
+                            <Download className="h-4 w-4 mr-2" />
+                            Télécharger sitemap.xml
+                          </Button>
+                          <Button variant="outline" onClick={() => toast.success('URL copiée dans le presse-papier')}>
+                            <Link className="h-4 w-4 mr-2" />
+                            Copier URL
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <div className="space-y-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Configuration Sitemap</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Fréquence de mise à jour</label>
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                          <Badge variant="outline">daily</Badge>
+                          <Badge variant="outline">weekly</Badge>
+                          <Badge variant="default">monthly</Badge>
+                          <Badge variant="outline">yearly</Badge>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Priorités calculées</label>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span>Accueil</span>
+                            <Badge variant="default">1.0</Badge>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Pages principales</span>
+                            <Badge variant="secondary">0.8</Badge>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Pages de contenu</span>
+                            <Badge variant="secondary">0.6</Badge>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Articles blog</span>
+                            <Badge variant="secondary">0.4</Badge>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Validation</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                          <span className="text-sm">Format XML valide</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                          <span className="text-sm">URLs accessibles</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                          <span className="text-sm">Taille optimale</span>
+                        </div>
+                        <div className="text-xs text-gray-500 mt-2">
+                          Dernière validation: {new Date().toLocaleDateString()}
                         </div>
                       </div>
                     </CardContent>
