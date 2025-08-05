@@ -36,7 +36,12 @@ const TitleGeneratorPage: React.FC = () => {
     { id: 'permaculture', name: 'Permaculture', icon: '🌾', color: 'bg-green-700' },
     { id: 'potager', name: 'Potager', icon: '🥕', color: 'bg-orange-600' },
     { id: 'ecologie', name: 'Écologie', icon: '🌍', color: 'bg-teal-600' },
-    { id: 'plantes', name: 'Plantes d\'intérieur', icon: '🪴', color: 'bg-green-400' }
+    { id: 'plantes', name: 'Plantes d\'intérieur', icon: '🪴', color: 'bg-green-400' },
+    { id: 'bricolage-interieur', name: 'Bricolage Intérieur', icon: '🏠', color: 'bg-amber-700' },
+    { id: 'bricolage-exterieur', name: 'Bricolage Extérieur', icon: '🔨', color: 'bg-stone-600' },
+    { id: 'aquariophilie-eau-mer', name: 'Aquariophilie Eau de Mer', icon: '🐠', color: 'bg-blue-700' },
+    { id: 'aquariophilie-eau-douce', name: 'Aquariophilie Eau Douce', icon: '🐟', color: 'bg-cyan-600' },
+    { id: 'jardinage-vertical', name: 'Jardinage Vertical', icon: '🌱', color: 'bg-emerald-600' }
   ];
 
   const titleTemplates = {
@@ -179,6 +184,41 @@ const TitleGeneratorPage: React.FC = () => {
       "{keyword} dépolluantes : Purifier air naturellement",
       "Bouturage {keyword} : Multiplier collection gratuitement",
       "Problèmes {keyword} : Diagnostic et solutions rapides"
+    ],
+    'bricolage-interieur': [
+      "Rénover {keyword} : Guide DIY complet débutants",
+      "{keyword} sur mesure : Économiser 60% avec bricolage",
+      "Installation {keyword} : Tutoriel étape par étape",
+      "Décoration {keyword} : Relooking petit budget",
+      "Réparation {keyword} : Techniques pro révélées"
+    ],
+    'bricolage-exterieur': [
+      "Construction {keyword} : Plans et matériaux optimaux",
+      "Aménagement {keyword} : Transformer espace extérieur",
+      "{keyword} résistant : Matériaux anti-intempéries",
+      "Entretien {keyword} : Préserver longévité structures",
+      "Budget {keyword} : Réaliser projet sans se ruiner"
+    ],
+    'aquariophilie-eau-mer': [
+      "Aquarium {keyword} : Setup récifal pour débutants",
+      "Coraux {keyword} : Maintenance et croissance optimale",
+      "Poissons {keyword} : Espèces faciles compatibles",
+      "Cycle azote {keyword} : Équilibre chimique parfait",
+      "Éclairage {keyword} : LED vs T5 comparatif détaillé"
+    ],
+    'aquariophilie-eau-douce': [
+      "Aquarium {keyword} : Communautaire sans conflits",
+      "Plantes {keyword} : Aquascaping naturel réussi",
+      "Reproduction {keyword} : Élevage alevins techniques",
+      "Filtration {keyword} : Eau cristalline garantie",
+      "Crevettes {keyword} : Micro-faune bénéfique aquarium"
+    ],
+    'jardinage-vertical': [
+      "Mur végétal {keyword} : Installation sans dégâts",
+      "{keyword} balcon : Optimiser espace restreint",
+      "Système {keyword} : Arrosage automatique économique",
+      "Légumes {keyword} : Production urbaine maximale",
+      "Entretien {keyword} : Fertilisation et taille adaptées"
     ]
   };
 
