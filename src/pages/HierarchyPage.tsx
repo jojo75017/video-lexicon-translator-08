@@ -184,48 +184,8 @@ const HierarchyPage: React.FC = () => {
           technicalSeo: 'Structure technique conforme aux dernières pratiques'
         };
         
-        // Données enrichies en mode IA
-        result.redactionProblems = [
-          { title: 'Meta description générée par IA', description: 'L\'IA suggère une meta description optimisée pour le CTR', priority: 'Haute', aiGenerated: true },
-          { title: 'Titre H1 optimisé par IA', description: 'L\'IA propose une version plus percutante du titre principal', priority: 'Moyenne', aiGenerated: true },
-          { title: 'Contenu dupliqué détecté', description: 'L\'IA a identifié du contenu similaire sur 2 pages', priority: 'Haute', aiGenerated: true }
-        ];
-        
-        result.optimisationOpportunities = [
-          { title: 'Mots-clés LSI suggérés par IA', priority: 'Haute', impact: 'Fort', aiGenerated: true },
-          { title: 'Structure de contenu optimisée', priority: 'Haute', impact: 'Fort', aiGenerated: true },
-          { title: 'Stratégie de maillage intelligent', priority: 'Moyenne', impact: 'Moyen', aiGenerated: true },
-          { title: 'Optimisation sémantique avancée', priority: 'Moyenne', impact: 'Moyen', aiGenerated: true },
-          { title: 'Cluster de mots-clés', priority: 'Basse', impact: 'Moyen', aiGenerated: true },
-          { title: 'Analyse concurrentielle IA', priority: 'Moyenne', impact: 'Fort', aiGenerated: true },
-          { title: 'Recommandations UX/SEO', priority: 'Haute', impact: 'Fort', aiGenerated: true },
-          { title: 'Optimisation vocale', priority: 'Basse', impact: 'Moyen', aiGenerated: true },
-          { title: 'Intent utilisateur avancé', priority: 'Moyenne', impact: 'Fort', aiGenerated: true },
-          { title: 'Score E-A-T amélioré', priority: 'Haute', impact: 'Fort', aiGenerated: true },
-          { title: 'Featured snippets potentiels', priority: 'Moyenne', impact: 'Moyen', aiGenerated: true },
-          { title: 'Entités nommées manquantes', priority: 'Basse', impact: 'Faible', aiGenerated: true }
-        ];
-        
         toast.success('Analyse IA terminée - Recommandations personnalisées générées');
       } else {
-        // Mode Standard : Données de base
-        result.redactionProblems = [
-          { title: 'Meta description manquante', description: 'La page d\'accueil n\'a pas de meta description', priority: 'Moyenne', aiGenerated: false },
-          { title: 'Titre H1 trop long', description: 'Le titre H1 de la page Services dépasse 60 caractères', priority: 'Faible', aiGenerated: false }
-        ];
-        
-        result.optimisationOpportunities = [
-          { title: 'Optimiser les images', priority: 'Haute', impact: 'Fort', aiGenerated: false },
-          { title: 'Améliorer la vitesse', priority: 'Haute', impact: 'Fort', aiGenerated: false },
-          { title: 'Mots-clés longue traîne', priority: 'Moyenne', impact: 'Moyen', aiGenerated: false },
-          { title: 'Maillage interne', priority: 'Moyenne', impact: 'Moyen', aiGenerated: false },
-          { title: 'Schema markup', priority: 'Basse', impact: 'Faible', aiGenerated: false },
-          { title: 'Compression GZIP', priority: 'Moyenne', impact: 'Moyen', aiGenerated: false },
-          { title: 'Mise en cache browser', priority: 'Basse', impact: 'Moyen', aiGenerated: false },
-          { title: 'Redirections 301', priority: 'Faible', impact: 'Faible', aiGenerated: false },
-          { title: 'Sitemap optimization', priority: 'Basse', impact: 'Faible', aiGenerated: false }
-        ];
-        
         // Mode Standard : Résultats de base
         toast.success('Analyse standard terminée');
       }
@@ -455,7 +415,7 @@ const HierarchyPage: React.FC = () => {
                         </Badge>
                       </div>
                     </TabsTrigger>
-                    <TabsTrigger value="optimisation" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                    <TabsTrigger value="optimisation" className="data-[state=active]:bg-green-600 data-[state=active]:text-white relative">
                       <div className="flex items-center gap-2">
                         <span>Optimisation</span>
                         <Badge variant="secondary" className="bg-blue-100 text-blue-800 text-xs">
@@ -552,55 +512,13 @@ const HierarchyPage: React.FC = () => {
                     <div className="ml-12 text-gray-600">&lt;h4&gt;Informations légales</div>
                     <div className="ml-12 text-gray-600">&lt;h4&gt;Newsletter</div>
                   </div>
-                  
-                  {/* Statistiques de la structure */}
-                  <div className="mt-4 grid grid-cols-2 md:grid-cols-6 gap-4">
-                    <div className="text-center p-3 bg-blue-50 rounded-lg">
-                      <div className="text-lg font-bold text-blue-600">1</div>
-                      <div className="text-xs text-blue-600">H1</div>
-                    </div>
-                    <div className="text-center p-3 bg-green-50 rounded-lg">
-                      <div className="text-lg font-bold text-green-600">8</div>
-                      <div className="text-xs text-green-600">H2</div>
-                    </div>
-                    <div className="text-center p-3 bg-yellow-50 rounded-lg">
-                      <div className="text-lg font-bold text-yellow-600">9</div>
-                      <div className="text-xs text-yellow-600">H3</div>
-                    </div>
-                    <div className="text-center p-3 bg-purple-50 rounded-lg">
-                      <div className="text-lg font-bold text-purple-600">8</div>
-                      <div className="text-xs text-purple-600">H4</div>
-                    </div>
-                    <div className="text-center p-3 bg-red-50 rounded-lg">
-                      <div className="text-lg font-bold text-red-600">0</div>
-                      <div className="text-xs text-red-600">H5</div>
-                    </div>
-                    <div className="text-center p-3 bg-indigo-50 rounded-lg">
-                      <div className="text-lg font-bold text-indigo-600">0</div>
-                      <div className="text-xs text-indigo-600">H6</div>
-                    </div>
-                  </div>
-
-                  {/* Analyse de la hiérarchie */}
-                  <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <CheckCircle className="h-4 w-4 text-green-500" />
-                      <span className="font-medium text-green-800">Structure hiérarchique valide</span>
-                    </div>
-                    <ul className="text-sm text-green-700 space-y-1">
-                      <li>• Un seul H1 par page ✓</li>
-                      <li>• Hiérarchie logique respectée ✓</li>
-                      <li>• Profondeur maximale de 4 niveaux ✓</li>
-                      <li>• Titres descriptifs et optimisés ✓</li>
-                    </ul>
-                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
 
             {/* Onglet Rédaction */}
             <TabsContent value="redaction" className="space-y-4">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="space-y-4">
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -610,74 +528,28 @@ const HierarchyPage: React.FC = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      {analysisResult.redactionProblems?.map((problem: any, index: number) => (
-                        <div key={index} className={`p-3 border rounded-lg ${
-                          problem.aiGenerated ? 'border-purple-200 bg-purple-50' : 'border-orange-200 bg-orange-50'
-                        }`}>
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <h4 className={`font-medium ${
-                                  problem.aiGenerated ? 'text-purple-800' : 'text-orange-800'
-                                }`}>
-                                  {problem.title}
-                                </h4>
-                                {problem.aiGenerated && (
-                                  <Badge variant="outline" className="text-purple-700 border-purple-300 text-xs">
-                                    IA
-                                  </Badge>
-                                )}
-                              </div>
-                              <p className={`text-sm ${
-                                problem.aiGenerated ? 'text-purple-700' : 'text-orange-700'
-                              }`}>
-                                {problem.description}
-                              </p>
-                              <div className={`text-xs mt-1 ${
-                                problem.aiGenerated ? 'text-purple-600' : 'text-orange-600'
-                              }`}>
-                                Priorité: {problem.priority}
-                              </div>
-                            </div>
-                            <Badge variant="outline" className={
-                              problem.aiGenerated ? 'text-purple-700 border-purple-300' : 'text-orange-700 border-orange-300'
-                            }>
-                              {problem.aiGenerated ? 'IA Suggéré' : 'À corriger'}
-                            </Badge>
+                      <div className="p-3 border border-orange-200 bg-orange-50 rounded-lg">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <h4 className="font-medium text-orange-800 mb-1">Meta description manquante</h4>
+                            <p className="text-sm text-orange-700">La page d'accueil n'a pas de meta description</p>
                           </div>
+                          <Badge variant="outline" className="text-orange-700 border-orange-300">
+                            À corriger
+                          </Badge>
                         </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <TreePine className="h-5 w-5 text-primary" />
-                      Structure des Titres
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      {Object.entries(analysisResult.headings || {}).map(([level, headings]: [string, any[]]) => (
-                        <div key={level} className="flex items-center justify-between p-2 bg-muted/30 rounded">
-                          <div className="flex items-center gap-2">
-                            <Badge variant="outline" className="text-xs">
-                              {level.toUpperCase()}
-                            </Badge>
-                            <span className="text-sm">{headings.length} titre{headings.length > 1 ? 's' : ''}</span>
+                      </div>
+                      <div className="p-3 border border-orange-200 bg-orange-50 rounded-lg">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <h4 className="font-medium text-orange-800 mb-1">Titre H1 trop long</h4>
+                            <p className="text-sm text-orange-700">Le titre H1 de la page Services dépasse 60 caractères</p>
                           </div>
-                          <div className="text-xs text-muted-foreground">
-                            {headings.length === 1 && level === 'h1' ? 
-                              <CheckCircle className="h-4 w-4 text-green-500" /> : 
-                              headings.length > 1 && level === 'h1' ?
-                              <AlertTriangle className="h-4 w-4 text-orange-500" /> :
-                              <CheckCircle className="h-4 w-4 text-green-500" />
-                            }
-                          </div>
+                          <Badge variant="outline" className="text-orange-700 border-orange-300">
+                            À optimiser
+                          </Badge>
                         </div>
-                      ))}
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -686,877 +558,208 @@ const HierarchyPage: React.FC = () => {
 
             {/* Onglet Optimisation */}
             <TabsContent value="optimisation" className="space-y-4">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <TrendingUp className="h-5 w-5 text-blue-500" />
-                      Opportunités SEO (9)
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      {analysisResult.optimisationOpportunities?.slice(0, useAI ? 12 : 9).map((item: any, index: number) => (
-                        <div key={index} className={`flex items-center justify-between p-2 border rounded ${
-                          item.aiGenerated ? 'border-purple-200 bg-purple-50' : 'border-gray-200'
-                        }`}>
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm">{item.title}</span>
-                            {item.aiGenerated && (
-                              <Badge variant="outline" className="text-purple-700 border-purple-300 text-xs">
-                                IA
-                              </Badge>
-                            )}
-                          </div>
-                          <div className="flex gap-1">
-                            <Badge variant={
-                              item.priority === 'Haute' ? 'destructive' : 
-                              item.priority === 'Moyenne' ? 'secondary' : 'outline'
-                            } className="text-xs">
-                              {item.priority}
-                            </Badge>
-                            {item.aiGenerated && (
-                              <Badge variant="default" className="text-xs bg-purple-600">
-                                Impact: {item.impact}
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base flex items-center gap-2">
-                      Performance Scores
-                      {analysisResult.aiInsights && (
-                        <Badge variant="outline" className="text-purple-700 border-purple-300 text-xs">
-                          IA Enhanced
-                        </Badge>
-                      )}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm">SEO Score {analysisResult.aiInsights ? '(IA)' : ''}</span>
-                        <div className="flex items-center gap-2">
-                          <div className="w-20 bg-gray-200 rounded-full h-2">
-                            <div className={`h-2 rounded-full ${analysisResult.aiInsights ? 'bg-purple-600' : 'bg-blue-600'}`} 
-                                 style={{width: analysisResult.aiInsights ? '89%' : '78%'}}></div>
-                          </div>
-                          <span className="text-sm font-medium">{analysisResult.aiInsights ? '89%' : '78%'}</span>
-                        </div>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm">Performance {analysisResult.aiInsights ? '(Optimisée)' : ''}</span>
-                        <div className="flex items-center gap-2">
-                          <div className="w-20 bg-gray-200 rounded-full h-2">
-                            <div className={`h-2 rounded-full ${analysisResult.aiInsights ? 'bg-green-600' : 'bg-orange-600'}`} 
-                                 style={{width: analysisResult.aiInsights ? '82%' : '65%'}}></div>
-                          </div>
-                          <span className="text-sm font-medium">{analysisResult.aiInsights ? '82%' : '65%'}</span>
-                        </div>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm">Accessibilité {analysisResult.aiInsights ? '(Analysée)' : ''}</span>
-                        <div className="flex items-center gap-2">
-                          <div className="w-20 bg-gray-200 rounded-full h-2">
-                            <div className="bg-green-600 h-2 rounded-full" style={{width: analysisResult.aiInsights ? '96%' : '92%'}}></div>
-                          </div>
-                          <span className="text-sm font-medium">{analysisResult.aiInsights ? '96%' : '92%'}</span>
-                        </div>
-                      </div>
-                      {analysisResult.aiInsights && (
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm">Intent Matching (IA)</span>
-                          <div className="flex items-center gap-2">
-                            <div className="w-20 bg-gray-200 rounded-full h-2">
-                              <div className="bg-purple-600 h-2 rounded-full" style={{width: '91%'}}></div>
-                            </div>
-                            <span className="text-sm font-medium">91%</span>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base">Actions Recommandées</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                        <span>Compresser les images</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                        <span>Minifier le CSS/JS</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <AlertTriangle className="h-4 w-4 text-orange-500" />
-                        <span>Optimiser les fonts</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <AlertTriangle className="h-4 w-4 text-orange-500" />
-                        <span>Mise en cache browser</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-
-            {/* Onglet Configuration */}
-            <TabsContent value="configuration" className="space-y-4">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Settings className="h-5 w-5 text-yellow-500" />
-                      Configuration Technique (2)
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="p-3 border border-yellow-200 bg-yellow-50 rounded-lg">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <h4 className="font-medium text-yellow-800 mb-1">Robots.txt manquant</h4>
-                            <p className="text-sm text-yellow-700">Aucun fichier robots.txt détecté</p>
-                          </div>
-                          <Badge variant="outline" className="text-yellow-700 border-yellow-300">
-                            À configurer
-                          </Badge>
-                        </div>
-                      </div>
-                      <div className="p-3 border border-yellow-200 bg-yellow-50 rounded-lg">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <h4 className="font-medium text-yellow-800 mb-1">Sitemap non optimisé</h4>
-                            <p className="text-sm text-yellow-700">Le sitemap XML pourrait être amélioré</p>
-                          </div>
-                          <Badge variant="outline" className="text-yellow-700 border-yellow-300">
-                            À optimiser
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Shield className="h-5 w-5 text-primary" />
-                      Sécurité & Headers
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">HTTPS</span>
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Security Headers</span>
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">SSL Certificate</span>
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-
-            {/* Onglet Liens */}
-            <TabsContent value="liens" className="space-y-4">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <XCircle className="h-5 w-5 text-red-500" />
-                      Liens Cassés (1)
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      {analysisResult.brokenLinks?.map((link: any, index: number) => (
-                        <div key={index} className="p-3 border border-red-200 bg-red-50 rounded-lg">
-                          <div className="font-medium text-sm text-red-800">{link.target}</div>
-                          <div className="text-xs text-red-600">Source: {link.source}</div>
-                          <Badge variant="destructive" className="text-xs mt-1">
-                            {link.error}
-                          </Badge>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Link className="h-5 w-5 text-primary" />
-                      Analyse des Liens
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="flex justify-between">
-                        <span className="text-sm">Liens internes</span>
-                        <Badge variant="secondary">{analysisResult.performance?.totalInternalLinks}</Badge>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm">Liens externes</span>
-                        <Badge variant="secondary">{analysisResult.performance?.totalExternalLinks}</Badge>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm">Liens nofollow</span>
-                        <Badge variant="outline">5</Badge>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-
-            {/* Onglet Images */}
-            <TabsContent value="images" className="space-y-4">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <AlertTriangle className="h-5 w-5 text-purple-500" />
-                      Problèmes Images (2)
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      {analysisResult.images?.filter((img: any) => !img.hasAlt).map((img: any, index: number) => (
-                        <div key={index} className="p-3 border border-purple-200 bg-purple-50 rounded-lg">
-                          <div className="font-medium text-sm text-purple-800">Attribut ALT manquant</div>
-                          <div className="text-xs text-purple-600">{img.src}</div>
-                          <Badge variant="outline" className="text-purple-700 border-purple-300 text-xs mt-1">
-                            Accessibilité
-                          </Badge>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Eye className="h-5 w-5 text-primary" />
-                      Optimisation Images
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="text-sm">
-                        <div className="flex justify-between mb-2">
-                          <span>Images avec ALT</span>
-                          <span className="font-medium">2/4</span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div className="bg-green-600 h-2 rounded-full" style={{width: '50%'}}></div>
-                        </div>
-                      </div>
-                      <div className="text-sm">
-                        <div className="flex justify-between mb-2">
-                          <span>Images avec titre</span>
-                          <span className="font-medium">3/4</span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div className="bg-blue-600 h-2 rounded-full" style={{width: '75%'}}></div>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-
-            {/* Onglet Données structurées */}
-            <TabsContent value="donnees-structurees" className="space-y-4">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Database className="h-5 w-5 text-green-500" />
-                      Schema.org Détecté (2)
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      {analysisResult.technicalSeo?.schemaOrg?.map((schema: string, index: number) => (
-                        <div key={index} className="p-3 border border-green-200 bg-green-50 rounded-lg">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <div className="font-medium text-green-800">{schema}</div>
-                              <div className="text-xs text-green-600">Correctement implémenté</div>
-                            </div>
-                            <CheckCircle className="h-4 w-4 text-green-500" />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Code className="h-5 w-5 text-primary" />
-                      Open Graph & Twitter
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Open Graph</span>
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Twitter Cards</span>
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm">Meta Tags</span>
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-
-            {/* Onglet HTTP & réseau */}
-            <TabsContent value="http-reseau" className="space-y-4">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Network className="h-5 w-5 text-indigo-500" />
-                      Problèmes Réseau (1)
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="p-3 border border-indigo-200 bg-indigo-50 rounded-lg">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <h4 className="font-medium text-indigo-800 mb-1">Temps de réponse élevé</h4>
-                            <p className="text-sm text-indigo-700">Le serveur met plus de 2 secondes à répondre</p>
-                          </div>
-                          <Badge variant="outline" className="text-indigo-700 border-indigo-300">
-                            Performance
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Gauge className="h-5 w-5 text-primary" />
-                      Métriques Réseau
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div className="flex justify-between">
-                        <span className="text-sm">Temps de réponse</span>
-                        <Badge variant="secondary">{analysisResult.performance?.avgLoadTime}s</Badge>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm">Compression GZIP</span>
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm">Keep-Alive</span>
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-            <TabsContent value="structure" className="space-y-4">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="space-y-6">
                 
-                {/* Informations de la page */}
+                {/* Analyse textuelle */}
                 <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="flex items-center gap-2 text-base">
-                      <Code className="h-4 w-4 text-primary" />
-                      Informations Page
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3 text-sm">
-                    <div>
-                      <div className="font-medium mb-1">Titre (Title)</div>
-                      <div className="text-muted-foreground text-xs p-2 bg-muted/50 rounded">
-                        {analysisResult.pageStructure?.title || 'Non défini'}
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <div className="font-medium mb-1">Meta Description</div>
-                      <div className="text-muted-foreground text-xs p-2 bg-muted/50 rounded">
-                        {analysisResult.pageStructure?.metaDescription || 'Non définie'}
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div>
-                        <span className="font-medium">Langue:</span>
-                        <div className="text-muted-foreground">{analysisResult.pageStructure?.lang}</div>
-                      </div>
-                      <div>
-                        <span className="font-medium">Robots:</span>
-                        <div className="text-muted-foreground">{analysisResult.pageStructure?.robots}</div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Structure des titres */}
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="flex items-center gap-2 text-base">
-                      <TreePine className="h-4 w-4 text-primary" />
-                      Hiérarchie Titres
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <TrendingUp className="h-5 w-5 text-blue-500" />
+                      Analyse textuelle
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    {Object.entries(analysisResult.headings || {}).map(([level, headings]: [string, any[]]) => (
-                      <div key={level} className="space-y-1">
-                        <div className="font-medium text-sm flex items-center gap-2">
-                          <Badge variant="outline" className="text-xs">
-                            {level.toUpperCase()}
-                          </Badge>
-                          <span>{headings.length}</span>
-                        </div>
-                        <div className="space-y-1">
-                          {headings.map((heading, index) => (
-                            <div key={index} className="text-xs p-2 bg-muted/30 rounded border-l-2 border-primary/20">
-                              {heading.text}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
-
-                {/* Métriques techniques */}
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="flex items-center gap-2 text-base">
-                      <Database className="h-4 w-4 text-primary" />
-                      Métriques Techniques
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3 text-sm">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="text-center p-2 bg-primary/5 rounded">
-                        <div className="text-lg font-bold text-primary">{analysisResult.performance?.totalPages}</div>
-                        <div className="text-xs text-muted-foreground">Pages totales</div>
-                      </div>
-                      <div className="text-center p-2 bg-primary/5 rounded">
-                        <div className="text-lg font-bold text-primary">{analysisResult.performance?.totalInternalLinks}</div>
-                        <div className="text-xs text-muted-foreground">Liens internes</div>
-                      </div>
-                      <div className="text-center p-2 bg-primary/5 rounded">
-                        <div className="text-lg font-bold text-primary">{analysisResult.performance?.avgDepth}</div>
-                        <div className="text-xs text-muted-foreground">Profondeur moy.</div>
-                      </div>
-                      <div className="text-center p-2 bg-primary/5 rounded">
-                        <div className="text-lg font-bold text-primary">{analysisResult.performance?.crawlability}%</div>
-                        <div className="text-xs text-muted-foreground">Crawlabilité</div>
-                      </div>
-                    </div>
-                    
-                    {analysisResult.technicalSeo && (
-                      <div className="space-y-2 pt-2 border-t">
-                        <div className="font-medium">SEO Technique</div>
-                        <div className="grid grid-cols-2 gap-2 text-xs">
-                          <div className="flex items-center gap-1">
-                            {analysisResult.technicalSeo.https ? 
-                              <CheckCircle className="h-3 w-3 text-green-500" /> : 
-                              <XCircle className="h-3 w-3 text-red-500" />
-                            }
-                            HTTPS
-                          </div>
-                          <div className="flex items-center gap-1">
-                            {analysisResult.technicalSeo.mobileFriendly ? 
-                              <CheckCircle className="h-3 w-3 text-green-500" /> : 
-                              <XCircle className="h-3 w-3 text-red-500" />
-                            }
-                            Mobile
-                          </div>
-                          <div className="flex items-center gap-1">
-                            {analysisResult.technicalSeo.structured ? 
-                              <CheckCircle className="h-3 w-3 text-green-500" /> : 
-                              <XCircle className="h-3 w-3 text-red-500" />
-                            }
-                            Schema.org
-                          </div>
-                          <div className="flex items-center gap-1">
-                            {analysisResult.technicalSeo.openGraph ? 
-                              <CheckCircle className="h-3 w-3 text-green-500" /> : 
-                              <XCircle className="h-3 w-3 text-red-500" />
-                            }
-                            Open Graph
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Section complète des liens */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                
-                {/* Liens internes */}
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                      <Link className="h-5 w-5 text-primary" />
-                      Liens Internes ({analysisResult.internalLinks?.length || 0})
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2 max-h-64 overflow-y-auto">
-                      {analysisResult.internalLinks?.map((link: any, index: number) => (
-                        <div key={index} className="p-3 border rounded-lg hover:bg-muted/30 transition-colors">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="font-medium text-sm mb-1">{link.text}</div>
-                              <div className="text-xs text-muted-foreground mb-1">{link.url}</div>
-                              <div className="flex items-center gap-2">
-                                <Badge variant="outline" className="text-xs">
-                                  {link.context}
-                                </Badge>
-                                {link.anchor && (
-                                  <Badge variant="secondary" className="text-xs">
-                                    #{link.anchor}
-                                  </Badge>
-                                )}
-                                {link.nofollow && (
-                                  <Badge variant="destructive" className="text-xs">
-                                    nofollow
-                                  </Badge>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Liens externes */}
-                <Card>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="flex items-center gap-2 text-lg">
-                      <Globe className="h-5 w-5 text-primary" />
-                      Liens Externes ({analysisResult.externalLinks?.length || 0})
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2 max-h-64 overflow-y-auto">
-                      {analysisResult.externalLinks?.map((link: any, index: number) => (
-                        <div key={index} className="p-3 border rounded-lg hover:bg-muted/30 transition-colors">
-                          <div className="font-medium text-sm mb-1">{link.text}</div>
-                          <div className="text-xs text-muted-foreground mb-1">{link.url}</div>
-                          <div className="flex items-center gap-2">
-                            <Badge variant="outline" className="text-xs">
-                              {link.context}
-                            </Badge>
-                            {link.nofollow ? (
-                              <Badge variant="secondary" className="text-xs">
-                                nofollow
-                              </Badge>
-                            ) : (
-                              <Badge variant="destructive" className="text-xs">
-                                dofollow
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Structure DOM */}
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <TreePine className="h-5 w-5 text-primary" />
-                    Structure DOM de la Page
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {analysisResult.structure?.map((section: any, index: number) => (
-                      <div key={index} className="border rounded-lg p-4 hover:bg-muted/20 transition-colors">
-                        <div className="flex items-center gap-2 mb-3">
-                          <Badge variant="default" className="text-xs">
-                            {section.type}
-                          </Badge>
-                          <span className="font-medium">{section.name}</span>
-                        </div>
-                        <div className="space-y-2">
-                          {section.elements?.map((element: any, elemIndex: number) => (
-                            <div key={elemIndex} className="flex items-center gap-3 text-sm">
-                              <Badge variant="outline" className="text-xs min-w-fit">
-                                {element.tag}
-                              </Badge>
-                              <span className="text-muted-foreground flex-1">{element.content}</span>
-                              {element.links && (
-                                <Badge variant="secondary" className="text-xs">
-                                  {element.links} liens
-                                </Badge>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* Onglet Performance */}
-            <TabsContent value="performance" className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-primary">{analysisResult.performance?.totalPages}</div>
-                      <div className="text-sm text-muted-foreground">Pages totales</div>
-                    </div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-primary">{analysisResult.performance?.avgLoadTime}s</div>
-                      <div className="text-sm text-muted-foreground">Temps de charge moyen</div>
-                    </div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-primary">{analysisResult.performance?.crawlability}%</div>
-                      <div className="text-sm text-muted-foreground">Crawlabilité</div>
-                    </div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-primary">{analysisResult.performance?.indexability}%</div>
-                      <div className="text-sm text-muted-foreground">Indexabilité</div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-
-            {/* Onglet Problèmes */}
-            <TabsContent value="issues" className="space-y-4">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <XCircle className="h-5 w-5 text-red-500" />
-                      Liens Cassés
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      {analysisResult.brokenLinks?.map((link: any, index: number) => (
-                        <div key={index} className="p-3 border border-red-200 bg-red-50 rounded-lg">
-                          <div className="font-medium text-sm">{link.target}</div>
-                          <div className="text-xs text-muted-foreground">Source: {link.source}</div>
-                          <Badge variant="destructive" className="text-xs mt-1">
-                            {link.error}
-                          </Badge>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <AlertTriangle className="h-5 w-5 text-yellow-500" />
-                      Images sans ALT
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      {analysisResult.images?.filter((img: any) => !img.hasAlt).map((img: any, index: number) => (
-                        <div key={index} className="p-3 border border-yellow-200 bg-yellow-50 rounded-lg">
-                          <div className="font-medium text-sm">{img.src}</div>
-                          <div className="text-xs text-muted-foreground">
-                            {img.hasTitle ? `Titre: ${img.title}` : 'Aucun titre défini'}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-
-            {/* Onglet Pages Orphelines */}
-            <TabsContent value="orphans" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Eye className="h-5 w-5" />
-                    Pages Orphelines Détectées
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {analysisResult.orphanPages?.map((page: any, index: number) => (
-                      <div key={index} className="p-4 border rounded-lg hover:bg-muted/30 transition-colors">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="font-medium mb-1">{page.name}</div>
-                            <div className="text-sm text-muted-foreground mb-2">{page.path}</div>
-                            <div className="text-xs text-muted-foreground">
-                              Dernier accès: {page.lastAccess}
-                            </div>
-                            {page.recommendations && (
-                              <div className="mt-3 space-y-1">
-                                <div className="text-sm font-medium">Recommandations:</div>
-                                {page.recommendations.map((rec: string, recIndex: number) => (
-                                  <div key={recIndex} className="text-xs text-muted-foreground flex items-center gap-1">
-                                    <Target className="h-3 w-3" />
-                                    {rec}
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                          <Badge variant="outline">
-                            Orpheline
-                          </Badge>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* Onglet Recommandations */}
-            <TabsContent value="recommendations" className="space-y-4">
-              <div className="space-y-4">
-                {analysisResult.recommendations?.map((rec: any, index: number) => (
-                  <Card key={index} className={`border-l-4 ${
-                    rec.type === 'error' ? 'border-l-red-500 bg-red-50' :
-                    rec.type === 'warning' ? 'border-l-yellow-500 bg-yellow-50' :
-                    'border-l-green-500 bg-green-50'
-                  }`}>
-                    <CardContent className="pt-6">
-                      <div className="flex items-start gap-3">
-                        {rec.type === 'error' ? <XCircle className="h-5 w-5 text-red-500 mt-0.5" /> :
-                         rec.type === 'warning' ? <AlertTriangle className="h-5 w-5 text-yellow-500 mt-0.5" /> :
-                         <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />}
-                        <div className="flex-1">
-                          <h3 className="font-semibold mb-1">{rec.title}</h3>
-                          <p className="text-sm text-muted-foreground">{rec.description}</p>
-                        </div>
-                        <Badge variant={
-                          rec.type === 'error' ? 'destructive' :
-                          rec.type === 'warning' ? 'secondary' :
-                          'default'
-                        }>
-                          {rec.type === 'error' ? 'Critique' :
-                           rec.type === 'warning' ? 'Important' :
-                           'Optimisé'}
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <span className="font-medium">Nombre de mots</span>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                          Valide
                         </Badge>
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                    </div>
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <span className="font-medium">Fréquence de répétition</span>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                          Valide
+                        </Badge>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Présentation de la page */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Eye className="h-5 w-5 text-blue-500" />
+                      Présentation de la page
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <span className="font-medium">Titre</span>
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4 text-blue-500" />
+                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 flex items-center gap-1">
+                          Notification
+                          <Badge variant="default" className="bg-blue-600 text-white text-xs ml-1">1</Badge>
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <span className="font-medium">Meta description</span>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                          Valide
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <span className="font-medium">Adresse de la page</span>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                          Valide
+                        </Badge>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Structure de la page */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <TreePine className="h-5 w-5 text-blue-500" />
+                      Structure de la page
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <span className="font-medium">Utilisation des titres hiérarchiques</span>
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4 text-blue-500" />
+                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 flex items-center gap-1">
+                          Notification
+                          <Badge variant="default" className="bg-blue-600 text-white text-xs ml-1">1</Badge>
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <span className="font-medium">Plan de la page</span>
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4 text-blue-500" />
+                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 flex items-center gap-1">
+                          Notification
+                          <Badge variant="default" className="bg-blue-600 text-white text-xs ml-1">1</Badge>
+                        </Badge>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Technique */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Settings className="h-5 w-5 text-blue-500" />
+                      Technique
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <span className="font-medium">Rapport texte/code</span>
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4 text-blue-500" />
+                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 flex items-center gap-1">
+                          Notification
+                          <Badge variant="default" className="bg-blue-600 text-white text-xs ml-1">1</Badge>
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <span className="font-medium">Style et Javascript</span>
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4 text-blue-500" />
+                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 flex items-center gap-1">
+                          Notification
+                          <Badge variant="default" className="bg-blue-600 text-white text-xs ml-1">2</Badge>
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <span className="font-medium">Frames et iFrames</span>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                          Valide
+                        </Badge>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             </TabsContent>
 
-            {/* Onglet IA Insights (si disponible) */}
-            {analysisResult.aiInsights && (
-              <TabsContent value="ai-insights" className="space-y-4">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  <Card className="border-2 border-primary/20">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-lg">
-                        <Brain className="h-5 w-5 text-primary" />
-                        Analyse de Contenu
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground">
-                        {analysisResult.aiInsights.contentAnalysis}
-                      </p>
-                    </CardContent>
-                  </Card>
+            {/* Autres onglets simplifiés */}
+            <TabsContent value="configuration" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Configuration Technique</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">Analyse de la configuration technique...</p>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-                  <Card className="border-2 border-primary/20">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-lg">
-                        <MapPin className="h-5 w-5 text-primary" />
-                        Parcours Utilisateur
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground">
-                        {analysisResult.aiInsights.userJourney}
-                      </p>
-                    </CardContent>
-                  </Card>
+            <TabsContent value="liens" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Analyse des Liens</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">Analyse des liens internes et externes...</p>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-                  <Card className="border-2 border-primary/20">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-lg">
-                        <TrendingUp className="h-5 w-5 text-primary" />
-                        SEO Technique
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground">
-                        {analysisResult.aiInsights.technicalSeo}
-                      </p>
-                    </CardContent>
-                  </Card>
-                </div>
-              </TabsContent>
-            )}
+            <TabsContent value="images" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Optimisation des Images</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">Analyse des images et de leur optimisation...</p>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="donnees-structurees" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Données Structurées</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">Analyse des données structurées Schema.org...</p>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="http-reseau" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>HTTP & Réseau</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">Analyse des performances réseau...</p>
+                </CardContent>
+              </Card>
+            </TabsContent>
             </Tabs>
           </div>
         )}
