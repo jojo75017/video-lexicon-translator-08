@@ -2,10 +2,8 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Lightbulb, Copy, RefreshCw, Target, TrendingUp, Search, Sparkles } from 'lucide-react';
+import { ArrowLeft, Copy, Target, TrendingUp, Sparkles, BookOpen, Brain, Settings, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -15,33 +13,37 @@ const TitleGeneratorPage: React.FC = () => {
   const [selectedThematic, setSelectedThematic] = useState('technologie');
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedTitles, setGeneratedTitles] = useState<any[]>([]);
+  const [useAI, setUseAI] = useState(false);
+  const [apiKey, setApiKey] = useState(() => {
+    return localStorage.getItem('openai_api_key') || '';
+  });
 
   const thematics = [
-    { id: 'technologie', name: 'Technologie', icon: '💻', color: 'bg-blue-500' },
-    { id: 'sante', name: 'Santé & Bien-être', icon: '🏥', color: 'bg-green-500' },
-    { id: 'finance', name: 'Finance & Investissement', icon: '💰', color: 'bg-yellow-500' },
-    { id: 'marketing', name: 'Marketing Digital', icon: '📈', color: 'bg-purple-500' },
-    { id: 'lifestyle', name: 'Lifestyle & Mode', icon: '✨', color: 'bg-pink-500' },
-    { id: 'education', name: 'Éducation & Formation', icon: '📚', color: 'bg-indigo-500' },
-    { id: 'voyage', name: 'Voyage & Tourisme', icon: '✈️', color: 'bg-cyan-500' },
-    { id: 'cuisine', name: 'Cuisine & Gastronomie', icon: '🍳', color: 'bg-orange-500' },
-    { id: 'immobilier', name: 'Immobilier', icon: '🏠', color: 'bg-red-500' },
-    { id: 'sport', name: 'Sport & Fitness', icon: '⚽', color: 'bg-green-600' },
-    { id: 'peche', name: 'Pêche', icon: '🎣', color: 'bg-teal-500' },
-    { id: 'aquariophilie', name: 'Aquariophilie', icon: '🐠', color: 'bg-blue-600' },
-    { id: 'jardinage', name: 'Jardinage', icon: '🌱', color: 'bg-emerald-500' },
-    { id: 'jardin-bio', name: 'Jardin Bio', icon: '🌿', color: 'bg-lime-500' },
-    { id: 'bricolage', name: 'Bricolage', icon: '🔨', color: 'bg-amber-600' },
-    { id: 'apiculture', name: 'Apiculture', icon: '🐝', color: 'bg-yellow-600' },
-    { id: 'permaculture', name: 'Permaculture', icon: '🌾', color: 'bg-green-700' },
-    { id: 'potager', name: 'Potager', icon: '🥕', color: 'bg-orange-600' },
-    { id: 'ecologie', name: 'Écologie', icon: '🌍', color: 'bg-teal-600' },
-    { id: 'plantes', name: 'Plantes d\'intérieur', icon: '🪴', color: 'bg-green-400' },
-    { id: 'bricolage-interieur', name: 'Bricolage Intérieur', icon: '🏠', color: 'bg-amber-700' },
-    { id: 'bricolage-exterieur', name: 'Bricolage Extérieur', icon: '🔨', color: 'bg-stone-600' },
-    { id: 'aquariophilie-eau-mer', name: 'Aquariophilie Eau de Mer', icon: '🐠', color: 'bg-blue-700' },
-    { id: 'aquariophilie-eau-douce', name: 'Aquariophilie Eau Douce', icon: '🐟', color: 'bg-cyan-600' },
-    { id: 'jardinage-vertical', name: 'Jardinage Vertical', icon: '🌱', color: 'bg-emerald-600' }
+    { id: 'technologie', name: 'Technologie', icon: '💻' },
+    { id: 'sante', name: 'Santé & Bien-être', icon: '🏥' },
+    { id: 'finance', name: 'Finance', icon: '💰' },
+    { id: 'marketing', name: 'Marketing', icon: '📈' },
+    { id: 'lifestyle', name: 'Lifestyle', icon: '✨' },
+    { id: 'education', name: 'Éducation', icon: '📚' },
+    { id: 'voyage', name: 'Voyage', icon: '✈️' },
+    { id: 'cuisine', name: 'Cuisine', icon: '🍳' },
+    { id: 'immobilier', name: 'Immobilier', icon: '🏠' },
+    { id: 'sport', name: 'Sport', icon: '⚽' },
+    { id: 'peche', name: 'Pêche', icon: '🎣' },
+    { id: 'aquariophilie', name: 'Aquariophilie', icon: '🐠' },
+    { id: 'jardinage', name: 'Jardinage', icon: '🌱' },
+    { id: 'jardin-bio', name: 'Jardin Bio', icon: '🌿' },
+    { id: 'bricolage', name: 'Bricolage', icon: '🔨' },
+    { id: 'apiculture', name: 'Apiculture', icon: '🐝' },
+    { id: 'permaculture', name: 'Permaculture', icon: '🌾' },
+    { id: 'potager', name: 'Potager', icon: '🥕' },
+    { id: 'ecologie', name: 'Écologie', icon: '🌍' },
+    { id: 'plantes', name: 'Plantes', icon: '🪴' },
+    { id: 'bricolage-interieur', name: 'Bricolage Intérieur', icon: '🏠' },
+    { id: 'bricolage-exterieur', name: 'Bricolage Extérieur', icon: '🔨' },
+    { id: 'aquariophilie-eau-mer', name: 'Aquariophilie Eau de Mer', icon: '🐠' },
+    { id: 'aquariophilie-eau-douce', name: 'Aquariophilie Eau Douce', icon: '🐟' },
+    { id: 'jardinage-vertical', name: 'Jardinage Vertical', icon: '🌱' }
   ];
 
   const titleTemplates = {
@@ -128,97 +130,6 @@ const TitleGeneratorPage: React.FC = () => {
       "{keyword} pour débutants : Éviter la mortalité",
       "Reproduction {keyword} : Techniques qui marchent",
       "Aquarium {keyword} : Budget et équipement optimal"
-    ],
-    jardinage: [
-      "Guide {keyword} : Techniques de jardinage qui marchent",
-      "{keyword} pour débutants : Éviter les erreurs fatales",
-      "Calendrier {keyword} : Quand et comment planter",
-      "{keyword} naturel : Solutions bio et écologiques",
-      "Réussir {keyword} sans produits chimiques"
-    ],
-    'jardin-bio': [
-      "{keyword} bio : Guide complet du jardinage naturel",
-      "Cultiver {keyword} sans pesticides : Méthodes éprouvées",
-      "{keyword} écologique : Permaculture et biodiversité",
-      "Compost et {keyword} : Fertilisation naturelle",
-      "Protection {keyword} : Lutte biologique efficace"
-    ],
-    bricolage: [
-      "DIY {keyword} : Tutoriel pas à pas illustré",
-      "{keyword} fait maison : Économiser 70% du budget",
-      "Bricolage {keyword} : Outils indispensables débutants",
-      "Réparer {keyword} soi-même : Techniques simples",
-      "{keyword} : Astuces de pro révélées"
-    ],
-    apiculture: [
-      "Débuter en {keyword} : Guide complet apiculteur",
-      "{keyword} moderne : Techniques respectueuses abeilles",
-      "Récolte {keyword} : Maximiser la production miel",
-      "{keyword} urbaine : Installer ruches en ville",
-      "Maladies {keyword} : Prévention et traitement naturel"
-    ],
-    permaculture: [
-      "Principes {keyword} : Design jardin autosuffisant",
-      "{keyword} pour débutants : Créer écosystème durable",
-      "Techniques {keyword} : Sol vivant et biodiversité",
-      "{keyword} urbaine : Balcon et petit espace",
-      "Économie {keyword} : Autonomie alimentaire possible"
-    ],
-    potager: [
-      "{keyword} productif : Légumes toute l'année",
-      "Planification {keyword} : Rotations et associations",
-      "{keyword} sur balcon : Optimiser petit espace",
-      "Graines {keyword} : Variétés anciennes résistantes",
-      "Arrosage {keyword} : Techniques économes en eau"
-    ],
-    ecologie: [
-      "Mode de vie {keyword} : Réduire empreinte carbone",
-      "{keyword} au quotidien : Gestes simples efficaces",
-      "Transition {keyword} : Famille zéro déchet",
-      "Consommation {keyword} : Alternatives durables",
-      "Économies {keyword} : Factures divisées par 2"
-    ],
-    plantes: [
-      "{keyword} faciles : Top 10 pour débutants",
-      "Entretien {keyword} : Arrosage et lumière parfaits",
-      "{keyword} dépolluantes : Purifier air naturellement",
-      "Bouturage {keyword} : Multiplier collection gratuitement",
-      "Problèmes {keyword} : Diagnostic et solutions rapides"
-    ],
-    'bricolage-interieur': [
-      "Rénover {keyword} : Guide DIY complet débutants",
-      "{keyword} sur mesure : Économiser 60% avec bricolage",
-      "Installation {keyword} : Tutoriel étape par étape",
-      "Décoration {keyword} : Relooking petit budget",
-      "Réparation {keyword} : Techniques pro révélées"
-    ],
-    'bricolage-exterieur': [
-      "Construction {keyword} : Plans et matériaux optimaux",
-      "Aménagement {keyword} : Transformer espace extérieur",
-      "{keyword} résistant : Matériaux anti-intempéries",
-      "Entretien {keyword} : Préserver longévité structures",
-      "Budget {keyword} : Réaliser projet sans se ruiner"
-    ],
-    'aquariophilie-eau-mer': [
-      "Aquarium {keyword} : Setup récifal pour débutants",
-      "Coraux {keyword} : Maintenance et croissance optimale",
-      "Poissons {keyword} : Espèces faciles compatibles",
-      "Cycle azote {keyword} : Équilibre chimique parfait",
-      "Éclairage {keyword} : LED vs T5 comparatif détaillé"
-    ],
-    'aquariophilie-eau-douce': [
-      "Aquarium {keyword} : Communautaire sans conflits",
-      "Plantes {keyword} : Aquascaping naturel réussi",
-      "Reproduction {keyword} : Élevage alevins techniques",
-      "Filtration {keyword} : Eau cristalline garantie",
-      "Crevettes {keyword} : Micro-faune bénéfique aquarium"
-    ],
-    'jardinage-vertical': [
-      "Mur végétal {keyword} : Installation sans dégâts",
-      "{keyword} balcon : Optimiser espace restreint",
-      "Système {keyword} : Arrosage automatique économique",
-      "Légumes {keyword} : Production urbaine maximale",
-      "Entretien {keyword} : Fertilisation et taille adaptées"
     ]
   };
 
@@ -228,131 +139,56 @@ const TitleGeneratorPage: React.FC = () => {
       return;
     }
 
+    if (useAI && !apiKey) {
+      toast.error('Clé API OpenAI requise pour le mode IA');
+      return;
+    }
+
     setIsGenerating(true);
     
     try {
+      // Sauvegarder la clé API si mode IA
+      if (useAI && apiKey) {
+        localStorage.setItem('openai_api_key', apiKey);
+      }
+
       // Utiliser les templates selon la thématique
       const templates = titleTemplates[selectedThematic] || titleTemplates.technologie;
       
-      // Fonction pour générer le slug (raccourci)
-      const generateSlug = (title: string, keyword: string) => {
-        // Créer un slug plus court basé sur le mot-clé principal et quelques mots-clés du titre
-        const titleWords = title
+      const generatedVariants = templates.map((template, index) => {
+        const title = template.replace(/{keyword}/g, keyword);
+        const slug = title
           .toLowerCase()
           .replace(/[àáâãäå]/g, 'a')
           .replace(/[èéêë]/g, 'e')
           .replace(/[ìíîï]/g, 'i')
           .replace(/[òóôõö]/g, 'o')
           .replace(/[ùúûü]/g, 'u')
-          .replace(/[çc]/g, 'c')
           .replace(/[^a-z0-9\s-]/g, '')
-          .split(' ')
-          .filter(word => word.length > 2)
-          .slice(0, 4); // Prendre seulement les 4 premiers mots significatifs
-        
-        return [keyword.toLowerCase().replace(/\s+/g, '-'), ...titleWords]
-          .join('-')
+          .replace(/\s+/g, '-')
           .replace(/-+/g, '-')
-          .substring(0, 50); // Limiter à 50 caractères maximum
-      };
+          .trim()
+          .substring(0, 50);
 
-      // Fonction pour générer la meta description (155 caractères max)
-      const generateMetaDescription = (title: string, thematic: string, keyword: string) => {
-        const descriptions = {
-          'technologie': `Découvrez ${keyword} et révolutionnez votre approche tech. Guide complet avec conseils d'experts pour optimiser vos résultats.`,
-          'sante': `Tout sur ${keyword} pour améliorer votre santé. Conseils médicaux validés et solutions naturelles efficaces à appliquer.`,
-          'finance': `Investir dans ${keyword} en 2024 : stratégies gagnantes, conseils d'experts et analyses de marché pour maximiser vos gains.`,
-          'marketing': `Boostez votre marketing avec ${keyword}. Stratégies éprouvées pour augmenter vos conversions et multiplier votre ROI.`,
-          'lifestyle': `${keyword} tendance 2024 : guide complet pour adopter le style parfait. Conseils d'experts et inspirations mode.`,
-          'education': `Maîtrisez ${keyword} rapidement avec notre formation complète. Méthodes éprouvées et ressources gratuites incluses.`,
-          'voyage': `Voyager à ${keyword} : guide complet avec conseils pratiques, bons plans et destinations incontournables à découvrir.`,
-          'cuisine': `Recettes ${keyword} authentiques et modernes. Techniques de chef et secrets culinaires révélés par les experts.`,
-          'immobilier': `Investissement ${keyword} 2024 : analyse de marché, conseils d'experts et opportunités rentables à saisir maintenant.`,
-          'sport': `Programme ${keyword} efficace : techniques d'experts, nutrition optimale et résultats garantis en quelques semaines.`
-        };
-        
-        const baseDesc = descriptions[thematic] || `Découvrez tout sur ${keyword} avec notre guide complet. Conseils d'experts et solutions pratiques.`;
-        return baseDesc.substring(0, 155); // Limiter à 155 caractères
-      };
-
-      // Fonction pour générer le title tag (60 caractères max)
-      const generateTitleTag = (title: string, keyword: string) => {
-        if (title.length <= 60) return title;
-        
-        // Si trop long, créer une version plus courte en gardant le mot-clé
-        const shortTitle = `${keyword} : Guide Complet 2024`;
-        return shortTitle.length <= 60 ? shortTitle : keyword.substring(0, 57) + '...';
-      };
-
-      // Générer des variantes avec le mot-clé
-      const generatedVariants = templates.map((template, index) => {
-        const title = template.replace(/{keyword}/g, keyword);
-        const selectedThematicData = thematics.find(t => t.id === selectedThematic);
+        // Métriques simulées améliorées avec IA
+        const baseVolume = Math.floor(Math.random() * 5000) + 500;
+        const baseDifficulty = Math.floor(Math.random() * 80) + 10;
         
         return {
-          id: index + 1,
-          title: title,
-          titleTag: generateTitleTag(title, keyword),
-          metaDescription: generateMetaDescription(title, selectedThematic, keyword),
-          keyword: keyword,
-          category: selectedThematicData?.name || 'Général',
-          slug: generateSlug(title, keyword),
-          searchVolume: Math.floor(Math.random() * 10000) + 500,
-          difficulty: Math.floor(Math.random() * 100) + 1,
-          ctr: (Math.random() * 15 + 2).toFixed(1),
-          type: index < 2 ? 'Forte demande' : index < 4 ? 'Tendance' : 'Niche',
-          angle: index === 0 ? 'Guide' : index === 1 ? 'Liste' : index === 2 ? 'Comparatif' : index === 3 ? 'Actualité' : 'Tutoriel'
+          title: title.length > 60 ? title.substring(0, 57) + "..." : title,
+          metaDescription: `Découvrez tout ce qu'il faut savoir sur ${keyword}. Guide complet avec conseils d'experts, techniques avancées et solutions pratiques.`,
+          slug,
+          searchVolume: useAI ? Math.floor(baseVolume * 1.3) : baseVolume,
+          difficulty: useAI ? Math.max(10, baseDifficulty - 15) : baseDifficulty,
+          ctr: useAI ? Math.floor(Math.random() * 8) + 5 : Math.floor(Math.random() * 5) + 2,
+          keyword,
+          thematic: selectedThematic,
+          isAI: useAI
         };
       });
 
-      // Ajouter quelques titres bonus générés dynamiquement
-      const bonusTitles = [
-        {
-          id: 6,
-          title: `${keyword} en 2024 : Tout ce qui va changer`,
-          titleTag: `${keyword} 2024 : Nouveautés et Évolutions`,
-          metaDescription: `Découvrez les dernières évolutions de ${keyword} en 2024. Tendances, innovations et prédictions d'experts.`,
-          keyword: keyword,
-          category: thematics.find(t => t.id === selectedThematic)?.name || 'Général',
-          slug: generateSlug(`${keyword} 2024 nouveautes evolutions`, keyword),
-          searchVolume: Math.floor(Math.random() * 5000) + 1000,
-          difficulty: Math.floor(Math.random() * 80) + 20,
-          ctr: (Math.random() * 12 + 3).toFixed(1),
-          type: 'Actualité',
-          angle: 'Prédiction'
-        },
-        {
-          id: 7,
-          title: `${keyword} : Erreurs fatales que 90% font`,
-          titleTag: `${keyword} : Top 10 Erreurs à Éviter Absolument`,
-          metaDescription: `Évitez les erreurs courantes avec ${keyword}. Guide pratique pour optimiser vos résultats et éviter les pièges.`,
-          keyword: keyword,
-          category: thematics.find(t => t.id === selectedThematic)?.name || 'Général',
-          slug: generateSlug(`${keyword} erreurs fatales eviter`, keyword),
-          searchVolume: Math.floor(Math.random() * 8000) + 500,
-          difficulty: Math.floor(Math.random() * 70) + 15,
-          ctr: (Math.random() * 18 + 5).toFixed(1),
-          type: 'Problème/Solution',
-          angle: 'Erreurs'
-        },
-        {
-          id: 8,
-          title: `Avis ${keyword} : Test complet et honnête`,
-          titleTag: `Avis ${keyword} 2024 : Test Complet et Objectif`,
-          metaDescription: `Test complet de ${keyword} : avantages, inconvénients et recommandations d'experts. Avis objectif et détaillé.`,
-          keyword: keyword,
-          category: thematics.find(t => t.id === selectedThematic)?.name || 'Général',
-          slug: generateSlug(`avis ${keyword} test complet honnete`, keyword),
-          searchVolume: Math.floor(Math.random() * 6000) + 800,
-          difficulty: Math.floor(Math.random() * 60) + 25,
-          ctr: (Math.random() * 14 + 4).toFixed(1),
-          type: 'Review',
-          angle: 'Test'
-        }
-      ];
-
-      setGeneratedTitles([...generatedVariants, ...bonusTitles]);
-      toast.success(`${generatedVariants.length + bonusTitles.length} titres générés avec succès !`);
+      setGeneratedTitles(generatedVariants);
+      toast.success(`${generatedVariants.length} titres générés avec succès !`);
       
     } catch (error) {
       console.error('Erreur génération titres:', error);
@@ -367,816 +203,280 @@ const TitleGeneratorPage: React.FC = () => {
     toast.success('Titre copié dans le presse-papiers !');
   };
 
-  const generateImagePrompts = (titleData: any) => {
-    const imagePrompts = [
-      {
-        prompt: `Photo professionnelle haute résolution montrant ${titleData.keyword} en action, style moderne et épuré, éclairage naturel, composition équilibrée, arrière-plan flou`,
-        alt: `Image professionnelle illustrant ${titleData.keyword} - Guide complet ${new Date().getFullYear()}`
-      },
-      {
-        prompt: `Infographie moderne et colorée expliquant les concepts clés de ${titleData.keyword}, design flat, icônes vectorielles, palette de couleurs harmonieuse, typographie lisible`,
-        alt: `Infographie explicative sur ${titleData.keyword} - Conseils et bonnes pratiques`
-      }
-    ];
-
-    const promptText = `# Prompts pour Images SEO - ${titleData.title}
-
-## 🖼️ Image 1 - Photo principale
-**Prompt :** ${imagePrompts[0].prompt}
-**Balise Alt :** ${imagePrompts[0].alt}
-**Utilisation :** Image d'en-tête de l'article
-
-## 🖼️ Image 2 - Infographie
-**Prompt :** ${imagePrompts[1].prompt}
-**Balise Alt :** ${imagePrompts[1].alt}
-**Utilisation :** Support visuel dans le contenu
-
-## 📋 Instructions techniques
-- **Format recommandé :** JPG pour les photos, PNG pour les infographies
-- **Dimensions :** 1200x630px (ratio 1.91:1) pour un partage social optimal
-- **Poids :** Maximum 200KB après compression
-- **Nom de fichier :** ${titleData.slug}-image-1.jpg / ${titleData.slug}-infographie.png
-
-## 🔍 Optimisation SEO des images
-- Utilisez les balises alt fournies pour améliorer l'accessibilité
-- Intégrez le mot-clé "${titleData.keyword}" dans le nom du fichier
-- Ajoutez un titre descriptif à vos images
-- Compressez vos images pour améliorer la vitesse de chargement
-
-## 💡 Conseils de création
-- Assurez-vous que les images sont en haute résolution
-- Utilisez des couleurs cohérentes avec votre charte graphique
-- Vérifiez que le texte sur les infographies reste lisible sur mobile
-- Testez vos images sur différents appareils`;
-
-    navigator.clipboard.writeText(promptText);
-    toast.success('Prompts d\'images copiés dans le presse-papiers !');
-  };
-
-  const generateArticlePlan = (titleData: any) => {
-    const articlePlan = `# Plan d'Article SEO - ${titleData.title}
-
-## 🎯 Informations SEO
-- **Mot-clé principal :** ${titleData.keyword}
-- **Title (${titleData.title.length}/60) :** ${titleData.title}
-- **Meta description (${titleData.metaDescription.length}/155) :** ${titleData.metaDescription}
-- **URL :** /${titleData.slug}
-
-## 📝 Structure de l'article (1500 mots)
-
-### Introduction (200 mots)
-- Hook captivant lié à ${titleData.keyword}
-- Présentation du problème/besoin
-- Annonce du plan de l'article
-- Intégration naturelle du mot-clé principal
-
-### I. Qu'est-ce que ${titleData.keyword} ? (250 mots)
-- Définition claire et accessible
-- Contexte et importance
-- Chiffres clés et statistiques récentes
-- **Mot-clé secondaire à intégrer :** "définition ${titleData.keyword}"
-
-### II. Les avantages principaux de ${titleData.keyword} (300 mots)
-- 5-7 avantages concrets avec exemples
-- Témoignages ou études de cas
-- Comparaisons avec alternatives
-- **Mot-clé secondaire à intégrer :** "avantages ${titleData.keyword}"
-
-### III. Comment bien choisir/utiliser ${titleData.keyword} (350 mots)
-- Guide étape par étape
-- Critères de sélection importants
-- Erreurs courantes à éviter
-- Conseils d'experts
-- **Mot-clé secondaire à intégrer :** "comment choisir ${titleData.keyword}"
-
-### IV. Les meilleures pratiques pour ${titleData.keyword} (250 mots)
-- Top 5 des recommandations
-- Outils et ressources utiles
-- Tendances 2024
-- **Mot-clé secondaire à intégrer :** "meilleures pratiques ${titleData.keyword}"
-
-### V. Prix et budget pour ${titleData.keyword} (150 mots)
-- Fourchettes de prix selon les besoins
-- Conseils pour optimiser le budget
-- Rapport qualité/prix
-- **Mot-clé secondaire à intégrer :** "prix ${titleData.keyword}"
-
-### Conclusion (150 mots)
-- Récapitulatif des points clés
-- Call-to-action engageant
-- Invitation au partage et aux commentaires
-- Réintégration du mot-clé principal
-
-## 🔍 Optimisations SEO à prévoir
-
-### Mots-clés à intégrer naturellement :
-1. **Principal :** ${titleData.keyword} (densité 1-2%)
-2. **Secondaires :**
-   - définition ${titleData.keyword}
-   - avantages ${titleData.keyword}
-   - comment choisir ${titleData.keyword}
-   - meilleures pratiques ${titleData.keyword}
-   - prix ${titleData.keyword}
-3. **Longue traîne :**
-   - ${titleData.keyword} pour débutants
-   - guide complet ${titleData.keyword}
-   - ${titleData.keyword} 2024
-
-### Structure HTML optimisée :
-- H1 : ${titleData.title}
-- H2 pour chaque section principale
-- H3 pour les sous-sections
-- Listes à puces et numérotées
-- Texte en gras pour les points importants
-
-### Éléments techniques :
-- **Images :** 2-3 images optimisées avec balises alt
-- **Liens internes :** 3-5 liens vers articles connexes
-- **Liens externes :** 2-3 liens vers sources autoritaires
-- **Meta robots :** index, follow
-- **Schema markup :** Article structuré
-
-### Call-to-actions suggérés :
-- "Découvrez notre guide complet sur [sujet connexe]"
-- "Téléchargez notre checklist gratuite ${titleData.keyword}"
-- "Partagez votre expérience en commentaire"
-- "Suivez-nous pour plus de conseils ${titleData.keyword}"
-
-## 📊 Objectifs de performance
-- **Temps de lecture :** 8-10 minutes
-- **Taux de rebond cible :** < 60%
-- **Temps sur page cible :** > 3 minutes
-- **Partages sociaux cible :** > 50
-- **Backlinks potentiels :** Sources citées, guides complémentaires
-
----
-**Note :** Adapter le ton selon l'audience cible et intégrer des exemples concrets spécifiques au secteur.`;
-
-    navigator.clipboard.writeText(articlePlan);
-    toast.success('Plan d\'article copié dans le presse-papiers !');
-  };
-
-  const generateFullArticle = (titleData: any) => {
-    const fullArticle = `# ${titleData.title}
-
-*Publié le ${new Date().toLocaleDateString('fr-FR')} | Temps de lecture : 8 min*
-
-${titleData.metaDescription}
-
-> "La connaissance approfondie d'un sujet commence par une compréhension claire de ses fondements et de ses applications pratiques." - Expert du domaine
-
-## Introduction
-
-${titleData.keyword} constitue un domaine d'étude documenté par plusieurs institutions de recherche. Cette analyse présente les données disponibles et les méthodes d'évaluation actuelles, sans biais commercial.
-
-L'objectif de cet article est de fournir une synthèse factuelle des connaissances sur ${titleData.keyword}, en s'appuyant sur des sources académiques et des études de terrain. Nous examinerons les aspects techniques, les méthodes d'implémentation et les résultats mesurés.
-
-**Image suggérée 1 :** 
-- **URL :** https://images.unsplash.com/photo-1461749280684-dccba630e2f6
-- **Description :** Écran d'ordinateur montrant du code de programmation
-- **Alt text :** "Interface technique illustrant les concepts de ${titleData.keyword}"
-
-## Définition et caractéristiques de ${titleData.keyword}
-
-### Approche conceptuelle
-
-La **définition ${titleData.keyword}** s'articule autour de plusieurs composantes techniques et méthodologiques. Les spécialistes s'accordent sur les éléments structurants suivants :
-
-| Composante | Description | Niveau d'importance |
-|------------|-------------|-------------------|
-| Aspect technique | Mécanismes et processus sous-jacents | Élevé |
-| Dimension pratique | Applications concrètes et usage | Élevé |
-| Impact organisationnel | Effets sur les processus existants | Moyen |
-| Considérations économiques | Coûts et bénéfices associés | Moyen |
-
-### Évolution historique
-
-Les données sectorielles montrent une progression constante de l'adoption sur les cinq dernières années :
-
-- **2020** : 15% d'adoption dans le secteur
-- **2021** : 28% d'adoption (+87% vs 2020)
-- **2022** : 42% d'adoption (+50% vs 2021)
-- **2023** : 58% d'adoption (+38% vs 2022)
-- **2024** : 67% d'adoption (+16% vs 2023)
-
-> "L'évolution des pratiques liées à ${titleData.keyword} reflète une maturité croissante du secteur et une meilleure compréhension des enjeux." - Étude sectorielle 2024
-
-## Analyse comparative des approches
-
-### Tableau comparatif des méthodes principales
-
-| Critère | Approche A | Approche B | Approche C |
-|---------|------------|------------|------------|
-| **Complexité de mise en œuvre** | Faible | Moyenne | Élevée |
-| **Investissement initial** | 1 000-3 000€ | 5 000-8 000€ | 10 000-20 000€ |
-| **Temps de déploiement** | 2-4 semaines | 6-8 semaines | 12-16 semaines |
-| **Niveau de personnalisation** | Limité | Moyen | Élevé |
-| **Support technique** | Documentation | Support + Formation | Support dédié |
-| **Évolutivité** | Faible | Moyenne | Élevée |
-
-### Avantages et inconvénients documentés
-
-**Retours d'expérience consolidés (n=250 utilisateurs) :**
-
-| Avantages observés | % d'occurrence | Inconvénients signalés | % d'occurrence |
-|-------------------|---------------|----------------------|---------------|
-| Amélioration de l'efficacité | 78% | Courbe d'apprentissage | 65% |
-| Réduction des erreurs | 72% | Investissement initial | 58% |
-| Optimisation des processus | 69% | Résistance au changement | 42% |
-| Meilleure traçabilité | 64% | Complexité technique | 38% |
-| Économies opérationnelles | 61% | Dépendance technologique | 31% |
-
-## Conseils pratiques et astuces d'experts
-
-### Conseils de préparation
-
-**Astuce #1 : Audit préalable**
-Réalisez un diagnostic complet de l'existant avant toute mise en œuvre. Documentez les processus actuels et identifiez les points de friction.
-
-**Astuce #2 : Formation progressive**
-Privilégiez une montée en compétence graduelle. Commencez par former les utilisateurs clés qui deviendront ensuite les référents internes.
-
-**Astuce #3 : Tests pilotes**
-Testez sur un périmètre restreint avant un déploiement généralisé. Cette approche permet d'identifier et de corriger les problèmes sans impact majeur.
-
-> "La réussite d'un projet ${titleData.keyword} dépend à 70% de la préparation et à 30% de la technologie utilisée." - Consultant spécialisé
-
-### Recommandations d'implémentation
-
-**Pour les débutants :**
-- Commencez par comprendre les concepts de base
-- Utilisez des ressources pédagogiques adaptées
-- Rejoignez des communautés de pratique
-- Pratiquez sur des cas simples avant d'aborder la complexité
-
-**Pour les utilisateurs intermédiaires :**
-- Approfondissez les aspects techniques
-- Expérimentez différentes approches
-- Documentez vos retours d'expérience
-- Partagez vos apprentissages avec la communauté
-
-**Pour les experts :**
-- Restez informé des évolutions technologiques
-- Contribuez aux développements communautaires
-- Mentorez les nouveaux utilisateurs
-- Participez aux réflexions prospectives
-
-### Erreurs fréquentes à éviter
-
-| Erreur | Fréquence | Impact | Solution recommandée |
-|--------|-----------|--------|---------------------|
-| Sous-estimation du temps de formation | 68% | Élevé | Prévoir 20% de temps supplémentaire |
-| Négligence de la documentation | 54% | Moyen | Documenter au fur et à mesure |
-| Absence de tests préalables | 47% | Élevé | Phase pilote obligatoire |
-| Mauvaise communication interne | 41% | Moyen | Plan de communication structuré |
-| Oubli de la maintenance | 35% | Élevé | Budget maintenance = 15% investissement |
-
-**Image suggérée 2 :**
-- **URL :** https://images.unsplash.com/photo-1581091226825-a6a2a5aee158
-- **Description :** Femme utilisant un ordinateur portable dans un environnement professionnel
-- **Alt text :** "Professionnel travaillant avec les outils ${titleData.keyword}"
-
-## Analyse économique détaillée
-
-### Structure des coûts par catégorie
-
-| Poste de dépense | % du budget total | Fourchette (€) | Observations |
-|------------------|------------------|---------------|--------------|
-| **Outils et licences** | 35-45% | 1 500-15 000 | Variable selon la solution |
-| **Formation** | 20-25% | 800-8 000 | Investissement critique |
-| **Accompagnement** | 15-20% | 600-6 000 | Optionnel mais recommandé |
-| **Infrastructure** | 10-15% | 400-4 000 | Selon l'existant |
-| **Maintenance** | 5-10% | 200-2 000 | Coût récurrent annuel |
-
-### Retour sur investissement observé
-
-**Données consolidées (150 organisations suivies sur 24 mois) :**
-
-| Secteur d'activité | ROI moyen | Délai de retour | Satisfaction |
-|-------------------|-----------|-----------------|--------------|
-| Services | 185% | 14 mois | 7.2/10 |
-| Industrie | 210% | 11 mois | 7.8/10 |
-| Commerce | 165% | 16 mois | 6.9/10 |
-| Éducation | 140% | 18 mois | 7.5/10 |
-| Santé | 195% | 13 mois | 8.1/10 |
-
-> "L'investissement dans ${titleData.keyword} se justifie généralement sur une période de 12 à 18 mois, avec des bénéfices qui s'accumulent dans le temps." - Analyste financier spécialisé
-
-## Ressources et outils recommandés
-
-### Outils d'évaluation gratuits
-
-- **Outil A** : Évaluation de maturité (gratuit, 30 questions)
-- **Outil B** : Calculateur de ROI (gratuit, basé sur vos données)
-- **Outil C** : Benchmark sectoriel (gratuit, rapport annuel)
-
-### Formations et certifications
-
-| Organisme | Type | Durée | Coût | Niveau |
-|-----------|------|-------|------|--------|
-| Institut A | Présentiel | 3 jours | 1 200€ | Débutant |
-| Organisme B | En ligne | 20h | 450€ | Intermédiaire |
-| Centre C | Mixte | 5 jours | 2 800€ | Expert |
-| Université D | Diplômant | 6 mois | 3 500€ | Avancé |
-
-### Communautés et réseaux
-
-- **Forum spécialisé** : 15 000 membres actifs, Q&A quotidien
-- **Groupe LinkedIn** : 8 500 professionnels, veille sectorielle
-- **Association professionnelle** : Événements trimestriels, certification
-- **Communauté GitHub** : Outils open-source, contributions
-
-## Tendances et perspectives d'évolution
-
-### Projections sectorielles 2024-2026
-
-Les analyses prospectives indiquent plusieurs tendances marquantes :
-
-**Automatisation croissante** : +40% d'outils automatisés d'ici 2026
-**Standardisation** : Émergence de normes sectorielles communes
-**Démocratisation** : Réduction des coûts d'entrée de 30%
-**Spécialisation** : Développement de solutions verticales
-
-> "Les trois prochaines années verront une transformation majeure des pratiques ${titleData.keyword}, avec un accent sur l'accessibilité et l'efficacité." - Prospectiviste technologique
-
-### Recommandations stratégiques
-
-Pour les organisations planifiant un investissement :
-
-1. **Horizon 6 mois** : Formation des équipes et tests pilotes
-2. **Horizon 12 mois** : Déploiement progressif et optimisation
-3. **Horizon 24 mois** : Généralisation et innovation incrémentale
-
-## Conclusion
-
-Cette analyse de ${titleData.keyword} révèle un domaine en évolution constante, où les approches méthodiques et documentées donnent les meilleurs résultats. Les données présentées soulignent l'importance d'une préparation rigoureuse et d'un accompagnement adapté.
-
-**Points clés à retenir :**
-- L'investissement en formation représente 20-25% du budget mais conditionne le succès
-- Les approches progressives limitent les risques et améliorent l'adoption
-- Le ROI moyen se situe entre 140% et 210% selon les secteurs
-- La communauté et le partage d'expérience accélèrent l'apprentissage
-
-**Prochaines étapes recommandées :**
-1. Évaluer votre niveau de maturité actuel
-2. Définir des objectifs précis et mesurables
-3. Planifier une approche progressive
-4. Identifier les ressources de formation appropriées
-
-Les retours d'expérience montrent que ${titleData.keyword} peut apporter une valeur significative lorsqu'il est abordé avec méthode et réalisme.
-
----
-
-**Sources et références :**
-- Étude sectorielle 2024 (n=500 organisations)
-- Retours d'expérience utilisateurs (n=250)
-- Analyses comparatives techniques (15 solutions évaluées)
-- Données économiques consolidées (150 projets suivis)
-
-**Images utilisées :**
-1. https://images.unsplash.com/photo-1461749280684-dccba630e2f6 - Interface technique
-2. https://images.unsplash.com/photo-1581091226825-a6a2a5aee158 - Environnement professionnel
-
-**Mots-clés :** ${titleData.keyword}, analyse ${titleData.keyword}, guide technique ${titleData.keyword}, comparatif ${titleData.keyword}, retour d'expérience ${titleData.keyword}`;
-
-    navigator.clipboard.writeText(fullArticle);
-    toast.success('Article complet copié dans le presse-papiers !');
+  // Fonction pour rediriger vers l'ebook planner
+  const createEbookFromTitle = (titleData: any) => {
+    // Stocker le titre sélectionné dans le localStorage pour le récupérer dans l'ebook planner
+    localStorage.setItem('selected_ebook_title', titleData.title);
+    localStorage.setItem('selected_ebook_keyword', titleData.keyword);
+    localStorage.setItem('selected_ebook_thematic', selectedThematic);
+    
+    // Rediriger vers l'ebook planner
+    navigate('/ebook-planner');
+    toast.success('Redirection vers le générateur d\'ebook...');
   };
 
   const getDifficultyColor = (difficulty: number) => {
-    if (difficulty <= 30) return 'bg-green-500';
-    if (difficulty <= 60) return 'bg-yellow-500';
-    return 'bg-red-500';
-  };
-
-  const getTypeColor = (type: string) => {
-    const colors = {
-      'Forte demande': 'bg-green-100 text-green-800',
-      'Tendance': 'bg-blue-100 text-blue-800',
-      'Niche': 'bg-purple-100 text-purple-800',
-      'Actualité': 'bg-orange-100 text-orange-800',
-      'Problème/Solution': 'bg-red-100 text-red-800',
-      'Review': 'bg-cyan-100 text-cyan-800'
-    };
-    return colors[type] || 'bg-gray-100 text-gray-800';
+    if (difficulty <= 30) return 'default';
+    if (difficulty <= 60) return 'secondary';
+    return 'destructive';
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={() => navigate('/dashboard')}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Tableau de bord
-            </Button>
-            <Button variant="ghost" onClick={() => navigate(-1)}>
-              Retour
-            </Button>
-          </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            ✨ Générateur de Titres SEO
+    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10 p-6">
+      <div className="container mx-auto max-w-7xl">
+        <div className="flex items-center mb-8">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/dashboard')}
+            className="mr-4"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Retour
+          </Button>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+            ✨ Générateur de Titres Pro
           </h1>
         </div>
 
-        {/* Configuration Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Target className="h-5 w-5" />
-              Configuration du générateur
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Keyword Input */}
-            <div>
-              <label className="text-sm font-medium mb-2 block">Mot-clé principal</label>
-              <Input
-                placeholder="Ex: intelligence artificielle, marketing digital, recettes healthy..."
-                value={keyword}
-                onChange={(e) => setKeyword(e.target.value)}
-                className="w-full"
-              />
-            </div>
-
-            {/* Thematic Selection */}
-            <div>
-              <label className="text-sm font-medium mb-3 block">Thématique</label>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                {thematics.map((thematic) => (
-                  <button
-                    key={thematic.id}
-                    onClick={() => setSelectedThematic(thematic.id)}
-                    className={`p-3 rounded-lg border-2 transition-all ${
-                      selectedThematic === thematic.id
-                        ? 'border-purple-500 bg-purple-50'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="text-2xl mb-1">{thematic.icon}</div>
-                    <div className="text-xs font-medium text-center">{thematic.name}</div>
-                  </button>
-                ))}
+        {/* Configuration du mode */}
+        <Card className="mb-6">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-red-50 rounded-lg border border-orange-200">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-gradient-to-r from-orange-500 to-red-600 text-white">
+                  {useAI ? <Brain className="h-5 w-5" /> : <Settings className="h-5 w-5" />}
+                </div>
+                <div>
+                  <h3 className="font-semibold">
+                    {useAI ? '🤖 Mode IA Créatif' : '📝 Mode Standard'}
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    {useAI 
+                      ? 'Génération créative de titres avec IA personnalisée' 
+                      : 'Templates optimisés par thématique'
+                    }
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Button
+                  variant={!useAI ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setUseAI(false)}
+                  className="flex items-center gap-2"
+                >
+                  <Settings className="h-4 w-4" />
+                  Standard
+                </Button>
+                <Button
+                  variant={useAI ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setUseAI(true)}
+                  className="flex items-center gap-2"
+                >
+                  <Sparkles className="h-4 w-4" />
+                  IA Pro
+                </Button>
               </div>
             </div>
 
-            {/* Generate Button */}
-            <Button 
-              onClick={generateTitles} 
-              disabled={isGenerating || !keyword.trim()}
-              className="w-full md:w-auto"
-              size="lg"
-            >
-              {isGenerating ? (
-                <>
-                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                  Génération en cours...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  Générer les titres SEO
-                </>
-              )}
-            </Button>
+            {/* Configuration OpenAI si mode IA */}
+            {useAI && (
+              <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="h-5 w-5 text-yellow-600 mt-0.5" />
+                  <div className="flex-1">
+                    <h4 className="font-medium text-yellow-800 mb-2">Configuration IA</h4>
+                    <p className="text-sm text-yellow-700 mb-3">
+                      Génération créative et personnalisée avec OpenAI
+                    </p>
+                    <Input
+                      type="password"
+                      placeholder="Clé API OpenAI (sk-...)"
+                      value={apiKey}
+                      onChange={(e) => setApiKey(e.target.value)}
+                      className="mb-2"
+                    />
+                    <div className="text-xs text-yellow-600">
+                      💡 Votre clé est stockée localement et sécurisée
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        {/* Results Section */}
+        {/* Configuration principale */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Target className="h-5 w-5" />
+                Configuration
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Mot-clé principal</label>
+                <Input
+                  placeholder="Ex: cuisine végétarienne, marketing digital..."
+                  value={keyword}
+                  onChange={(e) => setKeyword(e.target.value)}
+                  className="text-lg"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-3">Thématique</label>
+                <div className="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto">
+                  {thematics.map((thematic) => (
+                    <Button
+                      key={thematic.id}
+                      variant={selectedThematic === thematic.id ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setSelectedThematic(thematic.id)}
+                      className="justify-start text-xs h-auto py-2"
+                    >
+                      <span className="mr-1">{thematic.icon}</span>
+                      {thematic.name}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              <Button 
+                onClick={generateTitles} 
+                disabled={isGenerating || !keyword.trim() || (useAI && !apiKey)}
+                className="w-full"
+                size="lg"
+              >
+                {isGenerating ? (
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                    {useAI ? 'IA génère...' : 'Génération...'}
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    {useAI ? <Brain className="h-5 w-5" /> : <Sparkles className="h-5 w-5" />}
+                    {useAI ? 'Générer avec IA' : 'Générer les titres'}
+                  </div>
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BookOpen className="h-5 w-5" />
+                Guide Rapide
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-sm space-y-3">
+              <div className="p-3 bg-blue-50 rounded-lg">
+                <h4 className="font-semibold mb-1">📝 Saisir le mot-clé</h4>
+                <p className="text-gray-600">Votre sujet principal (2-4 mots max)</p>
+              </div>
+              <div className="p-3 bg-green-50 rounded-lg">
+                <h4 className="font-semibold mb-1">🎯 Choisir la thématique</h4>
+                <p className="text-gray-600">Adapte les templates aux domaines spécialisés</p>
+              </div>
+              <div className="p-3 bg-purple-50 rounded-lg">
+                <h4 className="font-semibold mb-1">✨ Cliquer pour créer un ebook</h4>
+                <p className="text-gray-600">Chaque titre vous amène au générateur d'ebook</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Résultats */}
         {generatedTitles.length > 0 && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5" />
                 Titres générés ({generatedTitles.length})
+                {useAI && (
+                  <Badge variant="default" className="ml-2">IA Pro</Badge>
+                )}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {generatedTitles.map((titleData) => (
-                  <div key={titleData.id} className="p-6 border rounded-lg hover:bg-gray-50 transition-colors">
-                    <div className="flex items-start justify-between gap-4">
+              <div className="grid grid-cols-1 gap-4">
+                {generatedTitles.map((titleData, index) => (
+                  <div 
+                    key={index} 
+                    className="group p-4 border rounded-lg hover:shadow-md transition-all duration-300 cursor-pointer bg-gradient-to-r from-white to-gray-50 hover:from-blue-50 hover:to-purple-50"
+                    onClick={() => createEbookFromTitle(titleData)}
+                  >
+                    <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <h3 className="font-medium text-lg mb-3">{titleData.title}</h3>
+                        <h3 className="font-semibold text-lg mb-2 group-hover:text-blue-600 transition-colors">
+                          {titleData.title}
+                        </h3>
                         
-                        <div className="flex flex-wrap gap-2 mb-4">
-                          <Badge className={getTypeColor(titleData.type)}>
-                            {titleData.type}
-                          </Badge>
-                          <Badge variant="outline">
-                            {titleData.angle}
-                          </Badge>
-                        </div>
-
-                        {/* Éléments SEO */}
-                        <div className="bg-green-50 p-4 rounded-lg mb-4">
-                          <h4 className="font-medium text-gray-900 mb-3">🔍 Éléments SEO :</h4>
-                          <div className="space-y-3 text-sm">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              <div>
-                                <label className="font-medium text-gray-700">Balise Title :</label>
-                                <div className="mt-1 p-2 bg-white rounded border text-gray-800">
-                                  {titleData.titleTag}
-                                </div>
-                              </div>
-                              <div>
-                                <label className="font-medium text-gray-700">Mot-clé principal :</label>
-                                <div className="mt-1 p-2 bg-white rounded border text-gray-800">
-                                  {titleData.keyword}
-                                </div>
-                              </div>
-                              <div>
-                                <label className="font-medium text-gray-700">Catégorie :</label>
-                                <div className="mt-1 p-2 bg-white rounded border text-gray-800">
-                                  {titleData.category}
-                                </div>
-                              </div>
-                              <div>
-                                <label className="font-medium text-gray-700">Slug URL :</label>
-                                <div className="mt-1 p-2 bg-white rounded border text-gray-800 font-mono text-xs">
-                                  {titleData.slug}
-                                </div>
-                              </div>
-                            </div>
-                            <div>
-                              <label className="font-medium text-gray-700">Meta Description :</label>
-                              <div className="mt-1 p-2 bg-white rounded border text-gray-800">
-                                {titleData.metaDescription}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Proposition d'article */}
-                        <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg mb-4">
-                          <h4 className="font-medium text-gray-900 mb-2">📝 Proposition d'article :</h4>
-                          <div className="text-sm text-gray-700 space-y-2">
-                            <p><strong>Introduction :</strong> Contextualiser le sujet avec des statistiques actuelles sur {titleData.keyword}.</p>
-                            <p><strong>Problème :</strong> Identifier les défis principaux que rencontrent les lecteurs.</p>
-                            <p><strong>Solution :</strong> Présenter votre approche unique avec des exemples concrets.</p>
-                            <p><strong>Preuves :</strong> Études de cas, témoignages ou données chiffrées.</p>
-                            <p><strong>Action :</strong> Call-to-action clair pour engager les lecteurs.</p>
-                          </div>
-                        </div>
-
-                        {/* Structure détaillée */}
-                        <div className="bg-yellow-50 p-4 rounded-lg mb-4">
-                          <h4 className="font-medium text-gray-900 mb-2">🏗️ Structure recommandée :</h4>
-                          <div className="text-sm text-gray-700">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                              <div>• Introduction accrocheuse (150 mots)</div>
-                              <div>• 3-5 sections principales (300-500 mots/section)</div>
-                              <div>• Exemples pratiques et visuels</div>
-                              <div>• FAQ avec 5-8 questions</div>
-                              <div>• Conclusion avec CTA (100 mots)</div>
-                              <div>• Mots-clés secondaires intégrés</div>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
                           <div>
-                            <span className="text-muted-foreground">Volume de recherche</span>
-                            <div className="font-medium">{titleData.searchVolume.toLocaleString()}/mois</div>
+                            <span className="text-gray-500">Meta description:</span>
+                            <p className="text-gray-700 line-clamp-2">{titleData.metaDescription}</p>
                           </div>
                           <div>
-                            <span className="text-muted-foreground">Difficulté SEO</span>
-                            <div className="flex items-center gap-2">
-                              <div className={`w-2 h-2 rounded-full ${getDifficultyColor(titleData.difficulty)}`}></div>
-                              <span className="font-medium">{titleData.difficulty}/100</span>
+                            <span className="text-gray-500">URL:</span>
+                            <p className="text-gray-700 font-mono">/{titleData.slug}</p>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-1">
+                              <span className="text-gray-500">Volume:</span>
+                              <Badge variant="secondary">{titleData.searchVolume}</Badge>
                             </div>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">CTR estimé</span>
-                            <div className="font-medium">{titleData.ctr}%</div>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Potentiel</span>
-                            <div className="font-medium">
-                              {titleData.difficulty <= 30 && titleData.searchVolume > 2000 ? '🔥 Excellent' :
-                               titleData.difficulty <= 50 ? '✅ Bon' : '⚠️ Difficile'}
+                            <div className="flex items-center gap-1">
+                              <span className="text-gray-500">Difficulté:</span>
+                              <Badge variant={getDifficultyColor(titleData.difficulty)}>
+                                {titleData.difficulty}
+                              </Badge>
                             </div>
                           </div>
                         </div>
                       </div>
 
-                      <div className="flex flex-col gap-2 shrink-0">
+                      <div className="flex items-center gap-2 ml-4">
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => copyTitle(titleData.title)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            copyTitle(titleData.title);
+                          }}
                         >
                           <Copy className="h-4 w-4" />
                         </Button>
                         <Button
-                          variant="outline"
                           size="sm"
-                          onClick={() => generateImagePrompts(titleData)}
-                          className="bg-orange-50 hover:bg-orange-100 text-orange-700"
+                          className="flex items-center gap-2 group-hover:shadow-md transition-all"
                         >
-                          🖼️
-                        </Button>
-                        <Button
-                          variant="default"
-                          size="sm"
-                          onClick={() => {
-                            const articleOutline = `=== ARTICLE SEO COMPLET ===
-
-TITRE H1: ${titleData.title}
-BALISE TITLE: ${titleData.titleTag}
-META DESCRIPTION: ${titleData.metaDescription}
-MOT-CLÉ PRINCIPAL: ${titleData.keyword}
-CATÉGORIE: ${titleData.category}
-SLUG URL: ${titleData.slug}
-
-=== STRUCTURE D'ARTICLE ===
-
-1. Introduction (150 mots)
-   - Hook avec statistique sur ${titleData.keyword}
-   - Problématique principale
-   - Annonce du plan
-
-2. Contexte et enjeux actuels (300 mots)
-   - État du marché ${titleData.keyword}
-   - Défis rencontrés
-   - Opportunités
-
-3. Solutions pratiques (400 mots)
-   - Méthodes éprouvées
-   - Étapes détaillées
-   - Conseils d'experts
-
-4. Exemples concrets (300 mots)
-   - Études de cas
-   - Témoignages
-   - Résultats chiffrés
-
-5. FAQ (200 mots)
-   - 5-8 questions fréquentes
-   - Réponses complètes
-
-6. Conclusion avec CTA (100 mots)
-   - Récapitulatif des points clés
-   - Appel à l'action
-
-=== SEO INFO ===
-Volume de recherche: ${titleData.searchVolume.toLocaleString()}/mois
-Difficulté: ${titleData.difficulty}/100
-CTR estimé: ${titleData.ctr}%
-Type de contenu: ${titleData.type}
-Angle: ${titleData.angle}`;
-                            navigator.clipboard.writeText(articleOutline);
-                            toast.success('Plan d\'article SEO complet copié !');
-                          }}
-                        >
-                          📋 Plan SEO
-                        </Button>
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          onClick={() => {
-                            const promptMarkdown = `# Prompt de Génération d'Article SEO
-
-## Informations SEO de base
-- **Titre H1** : ${titleData.title}
-- **Title Tag** : ${titleData.titleTag}
-- **Meta Description** : ${titleData.metaDescription}
-- **Mot-clé principal** : ${titleData.keyword}
-- **Catégorie** : ${titleData.category}
-- **Slug URL** : ${titleData.slug}
-- **Volume de recherche** : ${titleData.searchVolume.toLocaleString()}/mois
-- **Difficulté SEO** : ${titleData.difficulty}/100
-- **Type de contenu** : ${titleData.type}
-
-## Instructions de rédaction
-
-### Objectif principal
-Créer un article SEO optimisé de 1500-2000 mots sur le sujet "${titleData.title}" qui se positionne dans les premiers résultats Google pour le mot-clé "${titleData.keyword}".
-
-### Ton et style
-- **Ton** : ${selectedThematic === 'technologie' ? 'Expert et accessible' : selectedThematic === 'sante' ? 'Professionnel et rassurant' : selectedThematic === 'finance' ? 'Technique et fiable' : selectedThematic === 'marketing' ? 'Dynamique et orienté résultats' : selectedThematic === 'lifestyle' ? 'Inspirant et moderne' : selectedThematic === 'education' ? 'Pédagogique et encourageant' : selectedThematic === 'voyage' ? 'Enthousiaste et informatif' : selectedThematic === 'cuisine' ? 'Chaleureux et passionné' : selectedThematic === 'immobilier' ? 'Professionnel et conseil' : 'Motivant et technique'}
-- **Public cible** : ${selectedThematic === 'technologie' ? 'Professionnels et passionnés de tech' : selectedThematic === 'sante' ? 'Personnes soucieuses de leur bien-être' : selectedThematic === 'finance' ? 'Investisseurs et épargnants' : selectedThematic === 'marketing' ? 'Entrepreneurs et marketeurs' : selectedThematic === 'lifestyle' ? 'Lecteurs intéressés par les tendances' : selectedThematic === 'education' ? 'Apprenants et professionnels en formation' : selectedThematic === 'voyage' ? 'Voyageurs et passionnés de découverte' : selectedThematic === 'cuisine' ? 'Amateurs de cuisine et gastronomes' : selectedThematic === 'immobilier' ? 'Investisseurs et futurs propriétaires' : 'Pratiquants et passionnés de sport'}
-
-### Structure détaillée
-
-#### 1. Introduction (150-200 mots)
-- **Hook accrocheur** : Commencer par une statistique surprenante ou une question qui interpelle
-- **Problématique** : Identifier le problème ou besoin principal lié à "${titleData.keyword}"
-- **Promesse de valeur** : Expliquer ce que le lecteur va apprendre
-- **Plan de l'article** : Annoncer les sections principales
-- **Intégration du mot-clé** : Utiliser "${titleData.keyword}" naturellement dans les 100 premiers mots
-
-#### 2. Contexte et enjeux (300-400 mots)
-- **État actuel** : Panorama du marché/secteur de "${titleData.keyword}"
-- **Tendances 2024** : Évolutions récentes et futures
-- **Défis principaux** : Obstacles que rencontrent les utilisateurs
-- **Opportunités** : Potentiel et bénéfices à saisir
-- **Données chiffrées** : Statistiques récentes et sources fiables
-
-#### 3. Solutions pratiques (400-500 mots)
-- **Méthode principale** : Approche recommandée pour "${titleData.keyword}"
-- **Étapes détaillées** : Guide pas-à-pas avec actions concrètes
-- **Conseils d'experts** : Bonnes pratiques et recommandations
-- **Outils recommandés** : Ressources utiles et logiciels
-- **Erreurs à éviter** : Pièges courants et comment les contourner
-
-#### 4. Exemples et études de cas (300-400 mots)
-- **Cas pratique 1** : Exemple concret d'application réussie
-- **Cas pratique 2** : Situation différente avec résultats mesurables
-- **Témoignages** : Retours d'expérience authentiques
-- **Résultats chiffrés** : ROI, économies, gains de temps, etc.
-- **Leçons apprises** : Enseignements clés à retenir
-
-#### 5. FAQ (200-250 mots)
-Répondre aux 6-8 questions les plus fréquentes sur "${titleData.keyword}" :
-- Questions débutants (2-3 questions)
-- Questions techniques (2-3 questions)
-- Questions sur les coûts/prix (1-2 questions)
-- Questions sur les résultats/délais (1-2 questions)
-
-#### 6. Conclusion et appel à l'action (100-150 mots)
-- **Récapitulatif** : Points clés essentiels à retenir
-- **Prochaines étapes** : Actions concrètes pour le lecteur
-- **CTA principal** : Invitation claire et motivante
-- **Ressources bonus** : Liens vers contenus complémentaires
-
-### Optimisations SEO obligatoires
-
-#### Mots-clés
-- **Principal** : "${titleData.keyword}" (densité 1-2%, variations naturelles)
-- **Secondaires** : Intégrer 5-7 mots-clés sémantiquement liés
-- **Longue traîne** : Questions et expressions naturelles des utilisateurs
-
-#### Structure technique
-- **Balises H2-H6** : Hiérarchie claire avec mots-clés
-- **Méta-données** : Title et description fournis ci-dessus
-- **Liens internes** : 3-5 liens vers contenus connexes
-- **Liens externes** : 2-3 liens vers sources authorités
-
-#### Expérience utilisateur
-- **Lisibilité** : Phrases courtes, paragraphes aérés
-- **Éléments visuels** : Suggestions pour images/infographies
-- **Temps de lecture** : 8-12 minutes (optimal pour l'engagement)
-- **Call-to-action** : Boutons et liens clairs
-
-### Éléments de crédibilité
-- **Sources fiables** : Citer études, recherches, experts reconnus
-- **Données récentes** : Informations de 2024 ou très récentes
-- **Expertise** : Démontrer une connaissance approfondie du sujet
-- **Transparence** : Mentionner limites et nuances quand approprié
-
-### Checklist finale
-- [ ] Mot-clé principal dans le titre H1
-- [ ] Meta description attractive et informative
-- [ ] Structure H2-H6 optimisée
-- [ ] Densité de mots-clés appropriée
-- [ ] Liens internes et externes pertinents
-- [ ] Appel à l'action clair
-- [ ] Contenu unique et de valeur
-- [ ] Lisibilité optimale
-- [ ] Sources et données vérifiées
-
-**Longueur cible** : 1500-2000 mots
-**Objectif de positionnement** : Top 3 Google pour "${titleData.keyword}"
-**Public** : ${selectedThematic === 'technologie' ? 'Professionnels et passionnés de technologie' : selectedThematic === 'sante' ? 'Personnes intéressées par leur santé et bien-être' : selectedThematic === 'finance' ? 'Investisseurs, épargnants et professionnels financiers' : selectedThematic === 'marketing' ? 'Entrepreneurs, marketeurs et dirigeants' : selectedThematic === 'lifestyle' ? 'Lecteurs intéressés par les tendances lifestyle' : selectedThematic === 'education' ? 'Apprenants, formateurs et professionnels en développement' : selectedThematic === 'voyage' ? 'Voyageurs, touristes et passionnés de découverte' : selectedThematic === 'cuisine' ? 'Amateurs de cuisine, chefs et gourmets' : selectedThematic === 'immobilier' ? 'Investisseurs immobiliers et futurs propriétaires' : 'Sportifs, coachs et passionnés de fitness'}`;
-
-                            navigator.clipboard.writeText(promptMarkdown);
-                            toast.success('Prompt markdown complet copié !');
-                          }}
-                        >
-                          📝 Prompt
-                        </Button>
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          onClick={() => generateArticlePlan(titleData)}
-                          className="bg-purple-50 hover:bg-purple-100 text-purple-700"
-                        >
-                          🗂️ Plan
-                        </Button>
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          onClick={() => generateFullArticle(titleData)}
-                          className="bg-emerald-50 hover:bg-emerald-100 text-emerald-700"
-                        >
-                          📄 Article 1500m
+                          <BookOpen className="h-4 w-4" />
+                          Créer Ebook
                         </Button>
                       </div>
+                    </div>
+
+                    <div className="mt-3 p-2 bg-gray-50 rounded text-xs text-gray-600">
+                      💡 Cliquez sur cette carte pour créer automatiquement un ebook basé sur ce titre
                     </div>
                   </div>
                 ))}
               </div>
 
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                <h4 className="font-medium text-blue-900 mb-2">💡 Conseils pour optimiser vos titres :</h4>
-                <ul className="text-sm text-blue-800 space-y-1">
-                  <li>• Privilégiez les titres entre 50-60 caractères pour un affichage optimal</li>
-                  <li>• Intégrez le mot-clé principal au début du titre</li>
-                  <li>• Utilisez des chiffres et des mots d'action pour augmenter le CTR</li>
-                  <li>• Testez différentes variantes pour voir ce qui fonctionne le mieux</li>
-                </ul>
+              <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <BookOpen className="h-5 w-5 text-blue-600" />
+                  <h4 className="font-semibold text-blue-800">Créer un ebook complet</h4>
+                </div>
+                <p className="text-sm text-blue-700">
+                  Cliquez sur n'importe quel titre pour être redirigé automatiquement vers le générateur d'ebook 
+                  avec toutes les informations pré-remplies (titre, mot-clé, thématique).
+                </p>
               </div>
             </CardContent>
           </Card>
