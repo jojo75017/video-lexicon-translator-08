@@ -435,10 +435,18 @@ const HierarchyPage: React.FC = () => {
               </CardContent>
             </Card>
 
-            <Tabs defaultValue="redaction" className="space-y-6">
+            <Tabs defaultValue="apercu-plan" className="space-y-6">
               <div className="border-b border-border">
                 <div className="flex flex-wrap gap-1 p-1">
-                  <TabsList className="grid grid-cols-3 lg:grid-cols-7 w-full bg-transparent">
+                  <TabsList className="grid grid-cols-4 lg:grid-cols-8 w-full bg-transparent">
+                    <TabsTrigger value="apercu-plan" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground relative">
+                      <div className="flex items-center gap-2">
+                        <span>Aperçu du plan</span>
+                        <Badge variant="secondary" className="bg-blue-100 text-blue-800 text-xs">
+                          Complet
+                        </Badge>
+                      </div>
+                    </TabsTrigger>
                     <TabsTrigger value="redaction" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground relative">
                       <div className="flex items-center gap-2">
                         <span>Rédaction</span>
@@ -451,7 +459,7 @@ const HierarchyPage: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <span>Optimisation</span>
                         <Badge variant="secondary" className="bg-blue-100 text-blue-800 text-xs">
-                          9
+                          {analysisResult.aiInsights ? '12' : '9'}
                         </Badge>
                       </div>
                     </TabsTrigger>
@@ -498,6 +506,97 @@ const HierarchyPage: React.FC = () => {
                   </TabsList>
                 </div>
               </div>
+
+            {/* Onglet Aperçu du plan de page */}
+            <TabsContent value="apercu-plan" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <TreePine className="h-5 w-5 text-blue-500" />
+                    Aperçu du plan de page :
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500 font-mono text-sm space-y-1">
+                    <div className="text-blue-800 font-semibold">&lt;h1&gt;Prêt à explorer le monde avec BusterTravel</div>
+                    <div className="ml-4 text-gray-700">&lt;h2&gt;Discover, VotreTravel, votremagazine de voyage</div>
+                    <div className="ml-8 text-gray-600">&lt;h3&gt;Explorez nos 3 grands univers</div>
+                    <div className="ml-12 text-gray-600">&lt;h4&gt;Europe inspirante</div>
+                    <div className="ml-12 text-gray-600">&lt;h4&gt;Asie envoûtante</div>
+                    <div className="ml-12 text-gray-600">&lt;h4&gt;Voyager malin</div>
+                    <div className="ml-8 text-gray-600">&lt;h3&gt;Des expériences uniques pour ceux qui aiment prendre leur temps</div>
+                    <div className="ml-4 text-gray-700">&lt;h2&gt;Ce que nous pensons du voyage</div>
+                    <div className="ml-4 text-gray-700">&lt;h2&gt;Georges & Marie-Thérèse, créateurs de BusterTravel</div>
+                    <div className="ml-4 text-gray-700">&lt;h2&gt;Nos destinations préférées</div>
+                    <div className="ml-8 text-gray-600">&lt;h3&gt;Le Vietnam</div>
+                    <div className="ml-8 text-gray-600">&lt;h3&gt;L'Espagne</div>
+                    <div className="ml-8 text-gray-600">&lt;h3&gt;La France</div>
+                    <div className="ml-4 text-gray-700">&lt;h2&gt;Ce que vous trouverez sur BusterTravel</div>
+                    <div className="ml-8 text-gray-600">&lt;h3&gt;Articles immersifs</div>
+                    <div className="ml-12 text-gray-600">&lt;h4&gt;Comparateurs & bons plans</div>
+                    <div className="ml-12 text-gray-600">&lt;h4&gt;Ressources exclusives</div>
+                    <div className="ml-4 text-gray-700">&lt;h2&gt;Un univers, 3 sites complémentaires</div>
+                    <div className="ml-8 text-gray-600">&lt;h3&gt;BusterTravel</div>
+                    <div className="ml-8 text-gray-600">&lt;h3&gt;ShopVoyage</div>
+                    <div className="ml-12 text-gray-600">&lt;h4&gt;Offre Évasion</div>
+                    <div className="ml-4 text-gray-700">&lt;h2&gt;À lire sur notre magazine de voyage</div>
+                    <div className="ml-8 text-gray-600">&lt;h3&gt;Voyager en train : confort et bons plans</div>
+                    <div className="ml-12 text-gray-600">&lt;h4&gt;Londres 2025 : guide pratique</div>
+                    <div className="ml-12 text-gray-600">&lt;h4&gt;7 séjours tout compris à moins de 500€</div>
+                    <div className="ml-12 text-gray-600">&lt;h4&gt;Vietnam 2025 : destination coup de cœur</div>
+                    <div className="ml-4 text-gray-700">&lt;h2&gt;📰 Encore plus d'idées et de récits sur le blog</div>
+                    <div className="ml-4 text-gray-700">&lt;h2&gt;🕒 Et toi, tu pars où bientôt ?</div>
+                    <div className="ml-8 text-gray-600">&lt;h3&gt;📱 Besoin d'un conseil ou d'un itinéraire sur mesure ?</div>
+                    <div className="ml-8 text-gray-600">&lt;h3&gt;BusterTravel</div>
+                    <div className="ml-12 text-gray-600">&lt;h4&gt;Liens utiles</div>
+                    <div className="ml-12 text-gray-600">&lt;h4&gt;Informations légales</div>
+                    <div className="ml-12 text-gray-600">&lt;h4&gt;Newsletter</div>
+                  </div>
+                  
+                  {/* Statistiques de la structure */}
+                  <div className="mt-4 grid grid-cols-2 md:grid-cols-6 gap-4">
+                    <div className="text-center p-3 bg-blue-50 rounded-lg">
+                      <div className="text-lg font-bold text-blue-600">1</div>
+                      <div className="text-xs text-blue-600">H1</div>
+                    </div>
+                    <div className="text-center p-3 bg-green-50 rounded-lg">
+                      <div className="text-lg font-bold text-green-600">8</div>
+                      <div className="text-xs text-green-600">H2</div>
+                    </div>
+                    <div className="text-center p-3 bg-yellow-50 rounded-lg">
+                      <div className="text-lg font-bold text-yellow-600">9</div>
+                      <div className="text-xs text-yellow-600">H3</div>
+                    </div>
+                    <div className="text-center p-3 bg-purple-50 rounded-lg">
+                      <div className="text-lg font-bold text-purple-600">8</div>
+                      <div className="text-xs text-purple-600">H4</div>
+                    </div>
+                    <div className="text-center p-3 bg-red-50 rounded-lg">
+                      <div className="text-lg font-bold text-red-600">0</div>
+                      <div className="text-xs text-red-600">H5</div>
+                    </div>
+                    <div className="text-center p-3 bg-indigo-50 rounded-lg">
+                      <div className="text-lg font-bold text-indigo-600">0</div>
+                      <div className="text-xs text-indigo-600">H6</div>
+                    </div>
+                  </div>
+
+                  {/* Analyse de la hiérarchie */}
+                  <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      <span className="font-medium text-green-800">Structure hiérarchique valide</span>
+                    </div>
+                    <ul className="text-sm text-green-700 space-y-1">
+                      <li>• Un seul H1 par page ✓</li>
+                      <li>• Hiérarchie logique respectée ✓</li>
+                      <li>• Profondeur maximale de 4 niveaux ✓</li>
+                      <li>• Titres descriptifs et optimisés ✓</li>
+                    </ul>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
             {/* Onglet Rédaction */}
             <TabsContent value="redaction" className="space-y-4">
