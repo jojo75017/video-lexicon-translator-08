@@ -806,15 +806,77 @@ const HierarchyPage: React.FC = () => {
               </div>
             </TabsContent>
 
-            <TabsContent value="liens" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Analyse des Liens</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">Analyse des liens internes et externes...</p>
-                </CardContent>
-              </Card>
+            <TabsContent value="liens">
+              <div className="space-y-6">
+                {/* Audit des liens */}
+                <div className="bg-card rounded-lg p-6 border">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <Link className="h-5 w-5" />
+                    Audit des liens
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                      <span className="text-sm">Pertinence des liens</span>
+                      <span className="text-xs text-orange-600 bg-orange-50 px-2 py-1 rounded flex items-center gap-1">
+                        Avertissement <span className="bg-orange-600 text-white rounded-full w-4 h-4 text-xs flex items-center justify-center">1</span>
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className="text-sm">Suivi des liens</span>
+                      <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">Valide</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className="text-sm">Sécurité</span>
+                      <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">Valide</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Statistiques */}
+                <div className="bg-card rounded-lg p-6 border">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5" />
+                    Statistiques
+                  </h3>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Nombre de liens :</span>
+                      <span className="font-semibold text-blue-600">63</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Nombre de liens uniques (menant vers la même URL) :</span>
+                      <span className="font-semibold text-blue-600">35</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Nombre de liens uniques internes :</span>
+                      <span className="font-semibold text-blue-600">28</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Nombre de liens uniques externes :</span>
+                      <span className="font-semibold text-blue-600">7</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Boutons d'actions */}
+                <div className="flex gap-2 flex-wrap">
+                  <Button variant="default" className="bg-blue-600 hover:bg-blue-700 text-white">
+                    <Link className="h-4 w-4 mr-2" />
+                    Liens internes
+                  </Button>
+                  <Button variant="outline">
+                    <Network className="h-4 w-4 mr-2" />
+                    Liens externes
+                  </Button>
+                  <Button variant="outline">
+                    <Target className="h-4 w-4 mr-2" />
+                    Liens spéciaux
+                  </Button>
+                </div>
+              </div>
             </TabsContent>
 
             <TabsContent value="images" className="space-y-4">
