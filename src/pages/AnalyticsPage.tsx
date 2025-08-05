@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { OpenAIConfigPanel } from '@/components/shared/OpenAIConfigPanel';
 import { ArrowLeft, BarChart3, TrendingUp, Users, Eye, Globe, Smartphone, Monitor, Download, Calendar, Clock, Target, MousePointer, Search, Share2, FileText, Zap, Activity } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
@@ -102,6 +103,15 @@ const AnalyticsPage: React.FC = () => {
               Export PDF
             </Button>
           </div>
+        </div>
+
+        {/* Configuration OpenAI */}
+        <div className="mb-6">
+          <OpenAIConfigPanel 
+            title="🤖 Configuration IA - Module Analytics"
+            description="Configurez OpenAI pour des analyses avancées avec l'IA ou utilisez des données de démonstration"
+            compact={true}
+          />
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">

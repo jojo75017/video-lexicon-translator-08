@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
+import { OpenAIConfigPanel } from '@/components/shared/OpenAIConfigPanel';
 import { 
   ArrowLeft, 
   Target, 
@@ -341,6 +342,14 @@ const CompetitorAnalysisPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10 p-6">
       <div className="container mx-auto max-w-7xl">
+        {/* Configuration OpenAI */}
+        <div className="mb-6">
+          <OpenAIConfigPanel 
+            title="🤖 Configuration IA - Analyse Concurrentielle"
+            description="Configurez OpenAI pour des analyses concurrentielles avancées avec l'IA ou utilisez des données de démonstration"
+            compact={true}
+          />
+        </div>
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center">
