@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Globe, Folder, File, ChevronRight, Search, Download, AlertTriangle, CheckCircle, XCircle, Eye, BarChart3, Link, TreePine, Zap, Filter, Lightbulb, Settings, Sparkles, Brain, TrendingUp, Code, Database, Shield, Gauge, Network, Target, BookOpen, MapPin } from 'lucide-react';
+import { ArrowLeft, Globe, Folder, File, ChevronRight, Search, Download, AlertTriangle, CheckCircle, XCircle, Eye, BarChart3, Link, TreePine, Zap, Filter, Lightbulb, Settings, Sparkles, Brain, TrendingUp, Code, Database, Shield, Gauge, Network, Target, BookOpen, MapPin, Layout, Layers, FileText, Share2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -705,16 +705,105 @@ const HierarchyPage: React.FC = () => {
               </div>
             </TabsContent>
 
-            {/* Autres onglets simplifiés */}
-            <TabsContent value="configuration" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Configuration Technique</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">Analyse de la configuration technique...</p>
-                </CardContent>
-              </Card>
+            {/* Onglet Configuration */}
+            <TabsContent value="configuration">
+              <div className="space-y-6">
+                {/* Définitions */}
+                <div className="bg-card rounded-lg p-6 border">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <Settings className="h-5 w-5" />
+                    Définitions
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className="text-sm">Langue</span>
+                      <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">Valide</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className="text-sm">Encoding</span>
+                      <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">Valide</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className="text-sm">URL canonique</span>
+                      <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">Valide</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className="text-sm">Compatibilité mobile</span>
+                      <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">Valide</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className="text-sm">Favicon</span>
+                      <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">Valide</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Moteurs de recherche */}
+                <div className="bg-card rounded-lg p-6 border">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <Search className="h-5 w-5" />
+                    Moteurs de recherche
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className="text-sm">Indexation</span>
+                      <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">Valide</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className="text-sm">Exploration</span>
+                      <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">Valide</span>
+                    </div>
+                    
+                    <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                      <button className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800">
+                        <FileText className="h-4 w-4" />
+                        Vérifier le fichier robots.txt pour cette page
+                      </button>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      <span className="text-sm">IA et data mining</span>
+                      <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded flex items-center gap-1">
+                        Notification <span className="bg-blue-600 text-white rounded-full w-4 h-4 text-xs flex items-center justify-center">2</span>
+                      </span>
+                    </div>
+
+                    <div className="mt-2 p-3 bg-gray-50 rounded-lg">
+                      <button className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800">
+                        <FileText className="h-4 w-4" />
+                        Vérifier le fichier tdmrep.json
+                      </button>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className="text-sm">Affichage</span>
+                      <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">Valide</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Réseaux sociaux */}
+                <div className="bg-card rounded-lg p-6 border">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <Share2 className="h-5 w-5" />
+                    Réseaux sociaux
+                  </h3>
+                  <div className="p-3 bg-gray-50 rounded-lg">
+                    <p className="text-sm text-gray-700">
+                      Il est possible de contrôler la manière dont une page web apparaît lorsqu'elle est partagée sur les réseaux sociaux.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </TabsContent>
 
             <TabsContent value="liens" className="space-y-4">
