@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Shield, CheckCircle, XCircle, AlertTriangle, Search, Bot, Eye, ArrowLeft } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Shield, CheckCircle, XCircle, AlertTriangle, Search, Bot, Eye, ArrowLeft, Download, Lightbulb, Settings, FileText, BarChart3, Filter, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
@@ -186,6 +187,129 @@ Allow: /public/`;
     toast.success("Un exemple de robots.txt a été chargé");
   };
 
+  // Templates prédéfinis
+  const templates = {
+    ecommerce: `User-agent: *
+Disallow: /admin/
+Disallow: /cart/
+Disallow: /checkout/
+Disallow: /account/
+Disallow: /search?
+Allow: /products/
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: GPTBot
+Disallow: /
+
+Sitemap: https://example.com/sitemap.xml`,
+
+    blog: `User-agent: *
+Disallow: /wp-admin/
+Disallow: /wp-includes/
+Disallow: /wp-content/plugins/
+Allow: /wp-content/uploads/
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+Sitemap: https://example.com/sitemap.xml`,
+
+    corporate: `User-agent: *
+Disallow: /admin/
+Disallow: /private/
+Disallow: /internal/
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: SemrushBot
+Allow: /
+
+User-agent: GPTBot
+Disallow: /private/
+Allow: /
+
+Sitemap: https://example.com/sitemap.xml`,
+
+    strict: `User-agent: *
+Disallow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: GPTBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /`
+  };
+
+  const loadTemplate = (templateName: keyof typeof templates) => {
+    setRobotsTxt(templates[templateName]);
+    toast.success(`Template ${templateName} chargé`);
+  };
+
+  const analyzeRobotsTxt = () => {
+    if (!robotsTxt.trim()) {
+      return { score: 0, issues: ['Aucun contenu'], suggestions: [] };
+    }
+
+    const lines = robotsTxt.split('\n');
+    let score = 100;
+    const issues: string[] = [];
+    const suggestions: string[] = [];
+
+    // Vérifier la présence d'un sitemap
+    if (!robotsTxt.toLowerCase().includes('sitemap:')) {
+      score -= 20;
+      issues.push('Aucun sitemap défini');
+      suggestions.push('Ajouter une ligne Sitemap: pour aider les moteurs de recherche');
+    }
+
+    // Vérifier les bots IA
+    const hasAiBotRules = robotsTxt.toLowerCase().includes('gptbot') || 
+                         robotsTxt.toLowerCase().includes('chatgpt') ||
+                         robotsTxt.toLowerCase().includes('bard');
+    if (!hasAiBotRules) {
+      score -= 15;
+      issues.push('Aucune règle pour les bots IA');
+      suggestions.push('Définir des règles pour GPTBot, ChatGPT et autres bots IA');
+    }
+
+    // Vérifier la sécurité
+    const hasAdminProtection = robotsTxt.toLowerCase().includes('/admin') ||
+                              robotsTxt.toLowerCase().includes('/wp-admin');
+    if (!hasAdminProtection) {
+      score -= 10;
+      suggestions.push('Protéger les répertoires admin des crawlers');
+    }
+
+    return { score: Math.max(0, score), issues, suggestions };
+  };
+
+  const exportRobotsTxt = () => {
+    const blob = new Blob([robotsTxt], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'robots.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success('robots.txt téléchargé');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30 p-6">
       <div className="container mx-auto max-w-6xl">
@@ -209,128 +333,655 @@ Allow: /public/`;
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* Configuration du robots.txt */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5" />
-                Contenu du robots.txt
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex gap-2">
-                <Button onClick={loadSampleRobotsTxt} variant="outline" size="sm">
-                  Charger un exemple
-                </Button>
-              </div>
-              <Textarea
-                placeholder="User-agent: *&#10;Disallow: /admin/&#10;Allow: /public/"
-                value={robotsTxt}
-                onChange={(e) => setRobotsTxt(e.target.value)}
-                className="min-h-[300px] font-mono text-sm"
-              />
-            </CardContent>
-          </Card>
+        <Tabs defaultValue="editor" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="editor" className="flex items-center gap-2">
+              <Settings className="h-4 w-4" />
+              Éditeur
+            </TabsTrigger>
+            <TabsTrigger value="templates" className="flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              Templates
+            </TabsTrigger>
+            <TabsTrigger value="test" className="flex items-center gap-2">
+              <Search className="h-4 w-4" />
+              Test URLs
+            </TabsTrigger>
+            <TabsTrigger value="analysis" className="flex items-center gap-2">
+              <BarChart3 className="h-4 w-4" />
+              Analyse
+            </TabsTrigger>
+            <TabsTrigger value="bots" className="flex items-center gap-2">
+              <Bot className="h-4 w-4" />
+              Base de Bots
+            </TabsTrigger>
+          </TabsList>
 
-          {/* URLs à tester */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Search className="h-5 w-5" />
-                URLs à tester
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                Entrez une ou plusieurs URLs (une par ligne)
-              </p>
-              <Textarea
-                placeholder="https://example.com/&#10;https://example.com/admin/&#10;https://example.com/public/page"
-                value={urlsToTest}
-                onChange={(e) => setUrlsToTest(e.target.value)}
-                className="min-h-[250px]"
-              />
-              <Button 
-                onClick={handleTest} 
-                className="w-full" 
-                disabled={loading}
-              >
-                {loading ? 'Test en cours...' : 'Tester les URLs'}
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Résultats */}
-        {testResults.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Résultats du test</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {testResults.map((result, index) => (
-                  <div key={index} className="p-4 border rounded-lg">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="font-medium truncate">{result.url}</span>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {/* Indexable par moteurs de recherche */}
-                      <div className="flex items-center gap-2">
-                        <Eye className="h-4 w-4" />
-                        <span className="text-sm">Indexable :</span>
-                        <Badge variant={result.isIndexable ? "default" : "destructive"}>
-                          {result.isIndexable ? (
-                            <CheckCircle className="h-3 w-3 mr-1" />
-                          ) : (
-                            <XCircle className="h-3 w-3 mr-1" />
-                          )}
-                          {result.isIndexable ? 'Oui' : 'Non'}
-                        </Badge>
-                      </div>
-
-                      {/* Bots IA autorisés */}
-                      <div className="flex items-center gap-2">
-                        <Bot className="h-4 w-4" />
-                        <span className="text-sm">Bots IA :</span>
-                        <Badge variant={result.isAiBotAllowed ? "default" : "destructive"}>
-                          {result.isAiBotAllowed ? (
-                            <CheckCircle className="h-3 w-3 mr-1" />
-                          ) : (
-                            <XCircle className="h-3 w-3 mr-1" />
-                          )}
-                          {result.isAiBotAllowed ? 'Autorisés' : 'Bloqués'}
-                        </Badge>
-                      </div>
-
-                      {/* Outils SEO autorisés */}
-                      <div className="flex items-center gap-2">
-                        <Search className="h-4 w-4" />
-                        <span className="text-sm">Outils SEO :</span>
-                        <Badge variant={result.isSeoToolAllowed ? "default" : "destructive"}>
-                          {result.isSeoToolAllowed ? (
-                            <CheckCircle className="h-3 w-3 mr-1" />
-                          ) : (
-                            <XCircle className="h-3 w-3 mr-1" />
-                          )}
-                          {result.isSeoToolAllowed ? 'Autorisés' : 'Bloqués'}
-                        </Badge>
-                      </div>
-                    </div>
-
-                    {result.matchedRule && (
-                      <div className="mt-3 p-2 bg-muted rounded text-sm">
-                        <span className="font-medium">Règle appliquée :</span> {result.matchedRule}
-                      </div>
-                    )}
+          {/* Onglet Éditeur */}
+          <TabsContent value="editor" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Shield className="h-5 w-5" />
+                    Éditeur robots.txt
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex gap-2">
+                    <Button onClick={loadSampleRobotsTxt} variant="outline" size="sm">
+                      Exemple simple
+                    </Button>
+                    <Button onClick={exportRobotsTxt} variant="outline" size="sm">
+                      <Download className="h-4 w-4 mr-1" />
+                      Télécharger
+                    </Button>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
+                  <Textarea
+                    placeholder="User-agent: *&#10;Disallow: /admin/&#10;Allow: /public/"
+                    value={robotsTxt}
+                    onChange={(e) => setRobotsTxt(e.target.value)}
+                    className="min-h-[400px] font-mono text-sm"
+                  />
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Lightbulb className="h-5 w-5" />
+                    Aide & Syntaxe
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4 text-sm">
+                    <div className="p-3 bg-blue-50 rounded-lg">
+                      <h4 className="font-semibold mb-2">📝 Directives de base</h4>
+                      <div className="space-y-1 font-mono text-xs">
+                        <div><strong>User-agent:</strong> spécifie le bot</div>
+                        <div><strong>Disallow:</strong> interdit l'accès</div>
+                        <div><strong>Allow:</strong> autorise l'accès</div>
+                        <div><strong>Sitemap:</strong> localisation du sitemap</div>
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-green-50 rounded-lg">
+                      <h4 className="font-semibold mb-2">🎯 Bons exemples</h4>
+                      <div className="space-y-1 font-mono text-xs">
+                        <div>User-agent: *</div>
+                        <div>Disallow: /admin/</div>
+                        <div>Allow: /public/</div>
+                        <div>Sitemap: /sitemap.xml</div>
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-orange-50 rounded-lg">
+                      <h4 className="font-semibold mb-2">⚠️ Bonnes pratiques</h4>
+                      <ul className="text-xs space-y-1">
+                        <li>• Une directive par ligne</li>
+                        <li>• Paths avec slash final pour dossiers</li>
+                        <li>• Wildcards : * pour tout</li>
+                        <li>• Tester régulièrement</li>
+                      </ul>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Onglet Templates */}
+          <TabsContent value="templates" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Templates E-commerce
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                      Optimisé pour les boutiques en ligne
+                    </p>
+                    <div className="p-3 bg-gray-50 rounded font-mono text-xs">
+                      <div>User-agent: *</div>
+                      <div>Disallow: /admin/</div>
+                      <div>Disallow: /cart/</div>
+                      <div>Disallow: /checkout/</div>
+                      <div>Allow: /products/</div>
+                    </div>
+                    <Button onClick={() => loadTemplate('ecommerce')} className="w-full" size="sm">
+                      Utiliser ce template
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Templates Blog/WordPress
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                      Spécialement conçu pour WordPress
+                    </p>
+                    <div className="p-3 bg-gray-50 rounded font-mono text-xs">
+                      <div>User-agent: *</div>
+                      <div>Disallow: /wp-admin/</div>
+                      <div>Disallow: /wp-includes/</div>
+                      <div>Allow: /wp-content/uploads/</div>
+                    </div>
+                    <Button onClick={() => loadTemplate('blog')} className="w-full" size="sm">
+                      Utiliser ce template
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Templates Entreprise
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                      Pour sites corporate et institutionnels
+                    </p>
+                    <div className="p-3 bg-gray-50 rounded font-mono text-xs">
+                      <div>User-agent: *</div>
+                      <div>Disallow: /admin/</div>
+                      <div>Disallow: /private/</div>
+                      <div>Allow: /</div>
+                    </div>
+                    <Button onClick={() => loadTemplate('corporate')} className="w-full" size="sm">
+                      Utiliser ce template
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Shield className="h-5 w-5" />
+                    Templates Strict (Sécurisé)
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                      Bloque tout sauf moteurs principaux
+                    </p>
+                    <div className="p-3 bg-gray-50 rounded font-mono text-xs">
+                      <div>User-agent: *</div>
+                      <div>Disallow: /</div>
+                      <div>User-agent: Googlebot</div>
+                      <div>Allow: /</div>
+                    </div>
+                    <Button onClick={() => loadTemplate('strict')} className="w-full" size="sm">
+                      Utiliser ce template
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Onglet Test URLs */}
+          <TabsContent value="test" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Search className="h-5 w-5" />
+                    URLs à tester
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Entrez une ou plusieurs URLs (une par ligne)
+                  </p>
+                  <Textarea
+                    placeholder="https://example.com/&#10;https://example.com/admin/&#10;https://example.com/public/page"
+                    value={urlsToTest}
+                    onChange={(e) => setUrlsToTest(e.target.value)}
+                    className="min-h-[300px]"
+                  />
+                  <Button 
+                    onClick={handleTest} 
+                    className="w-full" 
+                    disabled={loading || !robotsTxt.trim()}
+                  >
+                    {loading ? 'Test en cours...' : 'Tester les URLs'}
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>URLs de test rapide</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Cliquez pour ajouter des URLs types :
+                    </p>
+                    
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setUrlsToTest(prev => prev + (prev ? '\n' : '') + 'https://example.com/')}
+                      >
+                        Page d'accueil
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setUrlsToTest(prev => prev + (prev ? '\n' : '') + 'https://example.com/admin/')}
+                      >
+                        Page admin
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setUrlsToTest(prev => prev + (prev ? '\n' : '') + 'https://example.com/blog/')}
+                      >
+                        Section blog
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setUrlsToTest(prev => prev + (prev ? '\n' : '') + 'https://example.com/products/')}
+                      >
+                        Produits
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setUrlsToTest(prev => prev + (prev ? '\n' : '') + 'https://example.com/api/')}
+                      >
+                        API endpoint
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setUrlsToTest(prev => prev + (prev ? '\n' : '') + 'https://example.com/private/')}
+                      >
+                        Zone privée
+                      </Button>
+                    </div>
+
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setUrlsToTest('')}
+                      className="w-full mt-4"
+                    >
+                      Vider la liste
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Résultats des tests */}
+            {testResults.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Résultats du test</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {testResults.map((result, index) => (
+                      <div key={index} className="p-4 border rounded-lg">
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="font-medium truncate">{result.url}</span>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="flex items-center gap-2">
+                            <Eye className="h-4 w-4" />
+                            <span className="text-sm">Indexable :</span>
+                            <Badge variant={result.isIndexable ? "default" : "destructive"}>
+                              {result.isIndexable ? (
+                                <CheckCircle className="h-3 w-3 mr-1" />
+                              ) : (
+                                <XCircle className="h-3 w-3 mr-1" />
+                              )}
+                              {result.isIndexable ? 'Oui' : 'Non'}
+                            </Badge>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <Bot className="h-4 w-4" />
+                            <span className="text-sm">Bots IA :</span>
+                            <Badge variant={result.isAiBotAllowed ? "default" : "destructive"}>
+                              {result.isAiBotAllowed ? (
+                                <CheckCircle className="h-3 w-3 mr-1" />
+                              ) : (
+                                <XCircle className="h-3 w-3 mr-1" />
+                              )}
+                              {result.isAiBotAllowed ? 'Autorisés' : 'Bloqués'}
+                            </Badge>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <Search className="h-4 w-4" />
+                            <span className="text-sm">Outils SEO :</span>
+                            <Badge variant={result.isSeoToolAllowed ? "default" : "destructive"}>
+                              {result.isSeoToolAllowed ? (
+                                <CheckCircle className="h-3 w-3 mr-1" />
+                              ) : (
+                                <XCircle className="h-3 w-3 mr-1" />
+                              )}
+                              {result.isSeoToolAllowed ? 'Autorisés' : 'Bloqués'}
+                            </Badge>
+                          </div>
+                        </div>
+
+                        {result.matchedRule && (
+                          <div className="mt-3 p-2 bg-muted rounded text-sm">
+                            <span className="font-medium">Règle appliquée :</span> {result.matchedRule}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
+          {/* Onglet Analyse */}
+          <TabsContent value="analysis" className="space-y-6">
+            {(() => {
+              const analysis = analyzeRobotsTxt();
+              return (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <BarChart3 className="h-5 w-5" />
+                        Score de Qualité
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-center mb-6">
+                        <div className={`text-6xl font-bold ${
+                          analysis.score >= 80 ? 'text-green-600' : 
+                          analysis.score >= 60 ? 'text-orange-600' : 'text-red-600'
+                        }`}>
+                          {analysis.score}
+                        </div>
+                        <div className="text-lg text-muted-foreground">/ 100</div>
+                      </div>
+
+                      <div className="space-y-3">
+                        {analysis.score >= 80 && (
+                          <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                            <div className="flex items-center gap-2">
+                              <CheckCircle className="h-4 w-4 text-green-600" />
+                              <span className="text-green-800 font-medium">Excellent robots.txt</span>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {analysis.score >= 60 && analysis.score < 80 && (
+                          <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                            <div className="flex items-center gap-2">
+                              <AlertTriangle className="h-4 w-4 text-orange-600" />
+                              <span className="text-orange-800 font-medium">Correct, mais améliorable</span>
+                            </div>
+                          </div>
+                        )}
+
+                        {analysis.score < 60 && (
+                          <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                            <div className="flex items-center gap-2">
+                              <XCircle className="h-4 w-4 text-red-600" />
+                              <span className="text-red-800 font-medium">Nécessite des améliorations</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Zap className="h-5 w-5" />
+                        Problèmes détectés
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        {analysis.issues.length === 0 ? (
+                          <div className="p-3 bg-green-50 rounded-lg text-center">
+                            <CheckCircle className="h-6 w-6 text-green-600 mx-auto mb-2" />
+                            <span className="text-green-800">Aucun problème détecté</span>
+                          </div>
+                        ) : (
+                          analysis.issues.map((issue, index) => (
+                            <div key={index} className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                              <div className="flex items-start gap-2">
+                                <XCircle className="h-4 w-4 text-red-600 mt-0.5" />
+                                <span className="text-red-800 text-sm">{issue}</span>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <div className="lg:col-span-2">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Lightbulb className="h-5 w-5" />
+                          Suggestions d'amélioration
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          {analysis.suggestions.length === 0 ? (
+                            <div className="p-3 bg-green-50 rounded-lg text-center">
+                              <span className="text-green-800">Votre robots.txt est parfaitement configuré</span>
+                            </div>
+                          ) : (
+                            analysis.suggestions.map((suggestion, index) => (
+                              <div key={index} className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                <div className="flex items-start gap-2">
+                                  <Lightbulb className="h-4 w-4 text-blue-600 mt-0.5" />
+                                  <span className="text-blue-800 text-sm">{suggestion}</span>
+                                </div>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              );
+            })()}
+          </TabsContent>
+
+          {/* Onglet Base de Bots */}
+          <TabsContent value="bots" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Bot className="h-5 w-5" />
+                  Base de données des Bots
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  
+                  {/* Moteurs de recherche */}
+                  <div className="p-4 border rounded-lg">
+                    <h4 className="font-semibold mb-3 text-green-800">🔍 Moteurs de recherche</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span>Googlebot</span>
+                        <Badge variant="default">✅ Autoriser</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Bingbot</span>
+                        <Badge variant="default">✅ Autoriser</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>YandexBot</span>
+                        <Badge variant="default">✅ Autoriser</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>DuckDuckBot</span>
+                        <Badge variant="default">✅ Autoriser</Badge>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Bots IA */}
+                  <div className="p-4 border rounded-lg">
+                    <h4 className="font-semibold mb-3 text-purple-800">🤖 Bots IA</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span>GPTBot</span>
+                        <Badge variant="destructive">❌ Bloquer</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>ChatGPT-User</span>
+                        <Badge variant="destructive">❌ Bloquer</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>ClaudeBot</span>
+                        <Badge variant="destructive">❌ Bloquer</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Google-Bard</span>
+                        <Badge variant="secondary">⚠️ Évaluer</Badge>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Outils SEO */}
+                  <div className="p-4 border rounded-lg">
+                    <h4 className="font-semibold mb-3 text-blue-800">📊 Outils SEO</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span>SemrushBot</span>
+                        <Badge variant="default">✅ Autoriser</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>AhrefsBot</span>
+                        <Badge variant="secondary">⚠️ Modérer</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>MJ12bot</span>
+                        <Badge variant="destructive">❌ Bloquer</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>ScreamingFrog</span>
+                        <Badge variant="default">✅ Autoriser</Badge>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Bots malveillants */}
+                  <div className="p-4 border rounded-lg">
+                    <h4 className="font-semibold mb-3 text-red-800">🚫 Bots malveillants</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span>SiteBot</span>
+                        <Badge variant="destructive">❌ Bloquer</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>SpamBot</span>
+                        <Badge variant="destructive">❌ Bloquer</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>BadBot</span>
+                        <Badge variant="destructive">❌ Bloquer</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>EmailSiphon</span>
+                        <Badge variant="destructive">❌ Bloquer</Badge>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Réseaux sociaux */}
+                  <div className="p-4 border rounded-lg">
+                    <h4 className="font-semibold mb-3 text-pink-800">📱 Réseaux sociaux</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span>facebookexternalhit</span>
+                        <Badge variant="default">✅ Autoriser</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Twitterbot</span>
+                        <Badge variant="default">✅ Autoriser</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>LinkedInBot</span>
+                        <Badge variant="default">✅ Autoriser</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>WhatsApp</span>
+                        <Badge variant="default">✅ Autoriser</Badge>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Surveillance */}
+                  <div className="p-4 border rounded-lg">
+                    <h4 className="font-semibold mb-3 text-orange-800">👁️ Surveillance</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span>UptimeRobot</span>
+                        <Badge variant="default">✅ Autoriser</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Pingdom</span>
+                        <Badge variant="default">✅ Autoriser</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>StatusCake</span>
+                        <Badge variant="default">✅ Autoriser</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>GTmetrix</span>
+                        <Badge variant="default">✅ Autoriser</Badge>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                  <h4 className="font-semibold mb-2">💡 Recommandations générales</h4>
+                  <ul className="text-sm space-y-1">
+                    <li>• <strong>Toujours autoriser</strong> les moteurs de recherche principaux</li>
+                    <li>• <strong>Évaluer soigneusement</strong> les bots IA selon votre stratégie</li>
+                    <li>• <strong>Bloquer systématiquement</strong> les bots malveillants</li>
+                    <li>• <strong>Autoriser les outils SEO</strong> que vous utilisez</li>
+                    <li>• <strong>Mettre à jour régulièrement</strong> votre liste de bots</li>
+                  </ul>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
