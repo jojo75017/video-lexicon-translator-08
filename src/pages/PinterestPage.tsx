@@ -126,7 +126,7 @@ ${pin.hashtags.join(' ')} #inspiration #guide #conseils`;
             Retour
           </Button>
           <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">
-            📌 Générateur Pinterest
+            📌 Pinterest Generator Pro
           </h1>
         </div>
 
