@@ -4,263 +4,626 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Image, Palette, Download, Copy } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ArrowLeft, Palette, Copy, Download, Hash, Image, Upload, Settings, History, Search, Filter } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { PinterestPin, PinterestImage } from '@/types/pinterest';
+import { usePinterestGenerator } from '@/hooks/usePinterestGenerator';
+import { useSocialContent } from '@/hooks/useSocialContent';
+import { usePinHistory } from '@/hooks/usePinHistory';
+
+const defaultPin: PinterestPin = {
+  title: '',
+  description: '',
+  globalDescription: '',
+  hashtags: [],
+  tags: [],
+  callToAction: '',
+  image: null,
+  uploadedImage: null,
+  design: null,
+  showHashtags: true
+};
 
 const PinterestPage: React.FC = () => {
   const navigate = useNavigate();
-  const [topic, setTopic] = useState('');
-  const [pins, setPins] = useState<any[]>([]);
-  const [selectedPin, setSelectedPin] = useState<any>(null);
-  const [generatedDescription, setGeneratedDescription] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const { history, addPin, removePin, clearHistory } = usePinHistory();
+  
+  const {
+    pin,
+    updatePin,
+    activeTab,
+    setActiveTab,
+    historyVisible,
+    setHistoryVisible,
+    searchQuery,
+    setSearchQuery,
+    selectedImageCategory,
+    setSelectedImageCategory,
+    imageSource,
+    setImageSource,
+    images,
+    loading,
+    customHashtag,
+    setCustomHashtag,
+    instagramApiKey,
+    setInstagramApiKey,
+    handleSearch,
+    handleFilterImages,
+    handleSaveInstagramApiKey,
+    handleImageUpload,
+    handleSelectImage,
+    resetPin
+  } = usePinterestGenerator(defaultPin);
 
-  const generatePins = () => {
-    if (!topic.trim()) {
-      toast.error('Veuillez entrer un sujet');
+  const { generateSocialContent } = useSocialContent({ updatePin, setActiveTab });
+
+  const handleSavePin = () => {
+    if (!pin.title || !pin.description) {
+      toast.error('Veuillez remplir au moins le titre et la description');
       return;
     }
-
-    setIsLoading(true);
-
-    // Simulation de génération d'épingles Pinterest Generator Pro
-    setTimeout(() => {
-      const mockPins = [
-        {
-          title: `Guide ultime ${topic} 2024`,
-          description: `Découvrez tout ce qu'il faut savoir sur ${topic}`,
-          category: 'Guide',
-          hashtags: [`#${topic}`, '#guide', '#conseils', '#2024'],
-          format: 'Infographie verticale',
-          colors: ['#E74C3C', '#F39C12', '#FFFFFF']
-        },
-        {
-          title: `10 conseils ${topic} pour débutants`,
-          description: `Commencez ${topic} avec ces astuces simples`,
-          category: 'Liste',
-          hashtags: [`#${topic}`, '#débutant', '#astuces', '#facile'],
-          format: 'Liste numérotée',
-          colors: ['#3498DB', '#2ECC71', '#FFFFFF']
-        },
-        {
-          title: `Inspiration ${topic} - Idées créatives`,
-          description: `Sources d'inspiration pour votre ${topic}`,
-          category: 'Inspiration',
-          hashtags: [`#${topic}`, '#inspiration', '#créatif', '#idées'],
-          format: 'Moodboard',
-          colors: ['#9B59B6', '#E67E22', '#FFFFFF']
-        },
-        {
-          title: `${topic} : erreurs à éviter`,
-          description: `Évitez ces erreurs courantes en ${topic}`,
-          category: 'Conseils',
-          hashtags: [`#${topic}`, '#erreurs', '#conseils', '#amélioration'],
-          format: 'Checklist',
-          colors: ['#E74C3C', '#34495E', '#FFFFFF']
-        },
-        {
-          title: `DIY ${topic} - Tutoriel pas à pas`,
-          description: `Créez votre propre ${topic} facilement`,
-          category: 'DIY',
-          hashtags: [`#${topic}`, '#DIY', '#tutoriel', '#facile'],
-          format: 'Étapes illustrées',
-          colors: ['#F1C40F', '#E67E22', '#FFFFFF']
-        }
-      ];
-
-      setPins(mockPins);
-      setIsLoading(false);
-      toast.success(`${mockPins.length} épingles générées !`);
-    }, 1500);
+    
+    addPin(pin);
+    toast.success('Pin sauvegardé dans l\'historique');
   };
 
-  const generateDescription = (pin: any) => {
-    const description = `🌟 ${pin.title}
-
-${pin.description}. Ce guide complet vous accompagne étape par étape pour maîtriser ${topic}.
-
-✨ Ce que vous découvrirez :
-• Les techniques essentielles
-• Les erreurs à éviter
-• Des conseils d'experts
-• Des exemples concrets
-
-💡 Parfait pour les débutants comme les experts !
-
-Enregistrez cette épingle pour ne pas la perdre et partagez-la avec vos amis ! 📌
-
-${pin.hashtags.join(' ')} #inspiration #guide #conseils`;
-
-    setGeneratedDescription(description);
-    setSelectedPin(pin);
-    toast.success('Description générée !');
+  const handleLoadFromHistory = (historicalPin: PinterestPin) => {
+    Object.keys(historicalPin).forEach(key => {
+      updatePin(key as keyof PinterestPin, historicalPin[key as keyof PinterestPin]);
+    });
+    setHistoryVisible(false);
+    toast.success('Pin chargé depuis l\'historique');
   };
 
-  const copyDescription = () => {
-    navigator.clipboard.writeText(generatedDescription);
-    toast.success('Description copiée !');
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success(`${label} copié dans le presse-papier`);
   };
 
-  const getCategoryColor = (category: string) => {
-    const colors: { [key: string]: string } = {
-      'Guide': 'bg-blue-100 text-blue-800',
-      'Liste': 'bg-green-100 text-green-800',
-      'Inspiration': 'bg-purple-100 text-purple-800',
-      'Conseils': 'bg-yellow-100 text-yellow-800',
-      'DIY': 'bg-orange-100 text-orange-800'
-    };
-    return colors[category] || 'bg-gray-100 text-gray-800';
+  const addCustomHashtag = () => {
+    if (customHashtag && !pin.hashtags.includes(customHashtag)) {
+      const newHashtag = customHashtag.startsWith('#') ? customHashtag : `#${customHashtag}`;
+      updatePin('hashtags', [...pin.hashtags, newHashtag]);
+      setCustomHashtag('');
+      toast.success('Hashtag ajouté');
+    }
+  };
+
+  const removeHashtag = (index: number) => {
+    const newHashtags = pin.hashtags.filter((_, i) => i !== index);
+    updatePin('hashtags', newHashtags);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-pink-50/30 to-rose-50/30 p-6">
-      <div className="container mx-auto max-w-6xl">
-        <div className="flex items-center mb-8">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate('/dashboard')}
-            className="mr-4"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Retour
-          </Button>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">
-            📌 Pinterest Generator Pro
-          </h1>
+    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10 p-6">
+      <div className="container mx-auto max-w-7xl">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center">
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate('/dashboard')}
+              className="mr-4"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Retour
+            </Button>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">
+              📌 Pinterest Generator Pro
+            </h1>
+          </div>
+          
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setHistoryVisible(!historyVisible)}
+              className="gap-2"
+            >
+              <History className="h-4 w-4" />
+              Historique ({history.length})
+            </Button>
+            <Button onClick={handleSavePin} className="gap-2">
+              <Download className="h-4 w-4" />
+              Sauvegarder
+            </Button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Image className="h-5 w-5" />
-                Génération d'Épingles
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="text-sm font-medium mb-2 block">Sujet / Thématique</label>
-                <Input
-                  placeholder="cuisine, décoration, voyage, fitness..."
-                  value={topic}
-                  onChange={(e) => setTopic(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && generatePins()}
-                />
-              </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Panel principal */}
+          <div className="lg:col-span-2">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="content">Contenu</TabsTrigger>
+                <TabsTrigger value="images">Images</TabsTrigger>
+                <TabsTrigger value="design">Design</TabsTrigger>
+                <TabsTrigger value="settings">Paramètres</TabsTrigger>
+              </TabsList>
 
-              <Button onClick={generatePins} disabled={isLoading} className="w-full">
-                {isLoading ? 'Génération...' : 'Générer des idées d\'épingles'}
-              </Button>
-
-              {pins.length > 0 && (
-                <div className="space-y-3">
-                  <h4 className="font-medium">Idées d'épingles ({pins.length})</h4>
-                  {pins.map((pin, index) => (
-                    <div key={index} className="border rounded-lg p-3 hover:bg-gray-50 transition-colors">
-                      <div className="flex items-start justify-between mb-2">
-                        <span className="font-medium text-sm">{pin.title}</span>
-                        <Badge variant="outline" className={getCategoryColor(pin.category)}>
-                          {pin.category}
-                        </Badge>
-                      </div>
-                      
-                      <p className="text-sm text-gray-600 mb-2">{pin.description}</p>
-                      
-                      <div className="flex items-center gap-2 mb-2">
-                        <Palette className="h-3 w-3 text-gray-400" />
-                        <div className="flex gap-1">
-                          {pin.colors.map((color: string, i: number) => (
-                            <div 
-                              key={i}
-                              className="w-4 h-4 rounded-full border" 
-                              style={{ backgroundColor: color }}
-                            />
-                          ))}
-                        </div>
-                        <span className="text-xs text-gray-500 ml-2">{pin.format}</span>
-                      </div>
-
-                      <div className="flex flex-wrap gap-1 mb-2">
-                        {pin.hashtags.map((tag: string, i: number) => (
-                          <Badge key={i} variant="secondary" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => generateDescription(pin)}
-                        className="w-full"
+              <TabsContent value="content" className="space-y-6">
+                {/* Génération rapide */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>🚀 Génération Rapide</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => generateSocialContent('pinterest')}
+                        className="text-xs"
                       >
-                        Générer la description
+                        Pinterest
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => generateSocialContent('instagram')}
+                        className="text-xs"
+                      >
+                        Instagram
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => generateSocialContent('facebook')}
+                        className="text-xs"
+                      >
+                        Facebook
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => generateSocialContent('linkedin')}
+                        className="text-xs"
+                      >
+                        LinkedIn
                       </Button>
                     </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                  </CardContent>
+                </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Download className="h-5 w-5" />
-                Description optimisée
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {selectedPin ? (
-                <>
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Épingle sélectionnée</label>
-                    <div className="p-3 bg-pink-50 rounded border">
-                      <div className="font-medium">{selectedPin.title}</div>
-                      <div className="text-sm text-gray-600">{selectedPin.category} • {selectedPin.format}</div>
+                {/* Titre */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Hash className="h-5 w-5" />
+                      Titre de l'épingle
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <Input
+                        placeholder="Entrez le titre de votre épingle..."
+                        value={pin.title}
+                        onChange={(e) => updatePin('title', e.target.value)}
+                        className="text-lg font-medium"
+                      />
+                      <div className="text-sm text-muted-foreground">
+                        {pin.title.length}/100 caractères
+                      </div>
+                      {pin.title && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => copyToClipboard(pin.title, 'Titre')}
+                          className="gap-2"
+                        >
+                          <Copy className="h-4 w-4" />
+                          Copier le titre
+                        </Button>
+                      )}
                     </div>
-                  </div>
+                  </CardContent>
+                </Card>
 
-                  {generatedDescription && (
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <label className="text-sm font-medium">Description générée</label>
-                        <Button variant="outline" size="sm" onClick={copyDescription}>
-                          <Copy className="h-4 w-4 mr-2" />
-                          Copier
+                {/* Description */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>📝 Description</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <Textarea
+                        placeholder="Rédigez une description engageante pour votre épingle..."
+                        value={pin.description}
+                        onChange={(e) => updatePin('description', e.target.value)}
+                        rows={4}
+                        className="resize-none"
+                      />
+                      <div className="text-sm text-muted-foreground">
+                        {pin.description.length}/500 caractères
+                      </div>
+                      {pin.description && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => copyToClipboard(pin.description, 'Description')}
+                          className="gap-2"
+                        >
+                          <Copy className="h-4 w-4" />
+                          Copier la description
+                        </Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Description globale */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>🌍 Description Globale</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <Textarea
+                        placeholder="Description générale de votre contenu..."
+                        value={pin.globalDescription}
+                        onChange={(e) => updatePin('globalDescription', e.target.value)}
+                        rows={3}
+                      />
+                      <div className="text-sm text-muted-foreground">
+                        {pin.globalDescription.length}/300 caractères
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Hashtags */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Hash className="h-5 w-5" />
+                      Hashtags
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Ajouter un hashtag..."
+                          value={customHashtag}
+                          onChange={(e) => setCustomHashtag(e.target.value)}
+                          onKeyPress={(e) => e.key === 'Enter' && addCustomHashtag()}
+                        />
+                        <Button onClick={addCustomHashtag} size="sm">
+                          Ajouter
                         </Button>
                       </div>
-                      <Textarea
-                        value={generatedDescription}
-                        onChange={(e) => setGeneratedDescription(e.target.value)}
-                        rows={10}
-                        className="text-sm"
+                      
+                      {pin.hashtags.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {pin.hashtags.map((hashtag, index) => (
+                            <Badge
+                              key={index}
+                              variant="secondary"
+                              className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground"
+                              onClick={() => removeHashtag(index)}
+                            >
+                              {hashtag} ×
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                      
+                      <div className="text-sm text-muted-foreground">
+                        {pin.hashtags.length}/30 hashtags
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="images" className="space-y-6">
+                {/* Upload d'image */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Upload className="h-5 w-5" />
+                      Upload votre image
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="cursor-pointer"
                       />
-                      <div className="mt-2 text-xs text-gray-500">
-                        Caractères: {generatedDescription.length}/500
+                      {pin.uploadedImage && (
+                        <div className="relative">
+                          <img
+                            src={pin.uploadedImage}
+                            alt="Image uploadée"
+                            className="w-full max-w-sm mx-auto rounded-lg shadow-lg"
+                          />
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => updatePin('uploadedImage', null)}
+                            className="absolute top-2 right-2"
+                          >
+                            ×
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Banque d'images */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Image className="h-5 w-5" />
+                      Banque d'images
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Rechercher des images..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                        />
+                        <Button onClick={handleSearch} disabled={loading}>
+                          <Search className="h-4 w-4" />
+                        </Button>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <Button
+                          variant={selectedImageCategory === 'all' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => {
+                            setSelectedImageCategory('all');
+                            handleFilterImages('all');
+                          }}
+                        >
+                          Toutes
+                        </Button>
+                        <Button
+                          variant={selectedImageCategory === 'monde' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => {
+                            setSelectedImageCategory('monde');
+                            handleFilterImages('monde');
+                          }}
+                        >
+                          Monde
+                        </Button>
+                        <Button
+                          variant={selectedImageCategory === 'europe' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => {
+                            setSelectedImageCategory('europe');
+                            handleFilterImages('europe');
+                          }}
+                        >
+                          Europe
+                        </Button>
+                        <Button
+                          variant={selectedImageCategory === 'france' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => {
+                            setSelectedImageCategory('france');
+                            handleFilterImages('france');
+                          }}
+                        >
+                          France
+                        </Button>
+                      </div>
+
+                      {images.length > 0 && (
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
+                          {images.map((image, index) => (
+                            <div
+                              key={index}
+                              className={`relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all hover:shadow-lg ${
+                                pin.image?.id === image.id ? 'border-primary ring-2 ring-primary/20' : 'border-gray-200'
+                              }`}
+                              onClick={() => handleSelectImage(image)}
+                            >
+                              <img
+                                src={image.src}
+                                alt={image.title}
+                                className="w-full h-32 object-cover"
+                              />
+                              <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white p-2">
+                                <p className="text-xs truncate">{image.title}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="design" className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Palette className="h-5 w-5" />
+                      Templates de Design
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-center text-muted-foreground py-8">
+                      <Palette className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                      <p>Templates de design à venir...</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="settings" className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Settings className="h-5 w-5" />
+                      Paramètres
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">
+                          Clé API Instagram (optionnel)
+                        </label>
+                        <div className="flex gap-2">
+                          <Input
+                            type="password"
+                            placeholder="Votre clé API Instagram..."
+                            value={instagramApiKey}
+                            onChange={(e) => setInstagramApiKey(e.target.value)}
+                          />
+                          <Button onClick={handleSaveInstagramApiKey} size="sm">
+                            Sauvegarder
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      <Button
+                        variant="outline"
+                        onClick={resetPin}
+                        className="w-full"
+                      >
+                        Réinitialiser le formulaire
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </div>
+
+          {/* Sidebar - Aperçu et Historique */}
+          <div className="space-y-6">
+            {/* Aperçu */}
+            <Card>
+              <CardHeader>
+                <CardTitle>👁️ Aperçu</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {(pin.image || pin.uploadedImage) && (
+                    <div className="relative">
+                      <img
+                        src={pin.uploadedImage || pin.image?.src}
+                        alt="Aperçu"
+                        className="w-full rounded-lg shadow-md"
+                      />
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 rounded-b-lg">
+                        <h3 className="text-white font-bold text-sm">
+                          {pin.title || 'Titre de l\'épingle'}
+                        </h3>
                       </div>
                     </div>
                   )}
-
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-medium">Conseils Pinterest Generator Pro</h4>
-                    <div className="text-sm text-gray-600 space-y-1">
-                      <div>• Utilisez un format vertical (2:3 ou 1000x1500px)</div>
-                      <div>• Ajoutez du texte lisible sur l'image</div>
-                      <div>• Utilisez des couleurs vives et contrastées</div>
-                      <div>• Incluez votre logo discrètement</div>
-                      <div>• Optimisez pour mobile</div>
+                  
+                  {pin.title && (
+                    <div>
+                      <h3 className="font-semibold text-lg">{pin.title}</h3>
                     </div>
-                  </div>
-                </>
-              ) : (
-                <div className="text-center text-gray-500 py-8">
-                  Sélectionnez une épingle à gauche pour générer sa description optimisée
+                  )}
+                  
+                  {pin.description && (
+                    <p className="text-sm text-muted-foreground">{pin.description}</p>
+                  )}
+                  
+                  {pin.hashtags.length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                      {pin.hashtags.slice(0, 10).map((hashtag, index) => (
+                        <Badge key={index} variant="secondary" className="text-xs">
+                          {hashtag}
+                        </Badge>
+                      ))}
+                      {pin.hashtags.length > 10 && (
+                        <Badge variant="outline" className="text-xs">
+                          +{pin.hashtags.length - 10}
+                        </Badge>
+                      )}
+                    </div>
+                  )}
                 </div>
-              )}
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+
+            {/* Historique */}
+            {historyVisible && (
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="flex items-center gap-2">
+                      <History className="h-5 w-5" />
+                      Historique
+                    </CardTitle>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={clearHistory}
+                      disabled={history.length === 0}
+                    >
+                      Vider
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                    {history.length === 0 ? (
+                      <p className="text-sm text-muted-foreground text-center py-4">
+                        Aucun pin dans l'historique
+                      </p>
+                    ) : (
+                      history.map((historicalPin, index) => (
+                        <div
+                          key={index}
+                          className="border rounded-lg p-3 cursor-pointer hover:bg-muted transition-colors"
+                          onClick={() => handleLoadFromHistory(historicalPin)}
+                        >
+                          <h4 className="font-medium text-sm truncate">
+                            {historicalPin.title || 'Sans titre'}
+                          </h4>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {historicalPin.description || 'Sans description'}
+                          </p>
+                          <div className="flex gap-1 mt-2">
+                            {historicalPin.hashtags.slice(0, 3).map((tag, i) => (
+                              <Badge key={i} variant="outline" className="text-xs">
+                                {tag}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Conseils */}
+            <Card>
+              <CardHeader>
+                <CardTitle>💡 Conseils Pinterest Generator Pro</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-sm space-y-2">
+                  <div>• Format optimal : 1000x1500px (ratio 2:3)</div>
+                  <div>• Texte lisible et contrasté</div>
+                  <div>• Maximum 30 hashtags</div>
+                  <div>• Titre accrocheur de 100 caractères max</div>
+                  <div>• Description détaillée de 500 caractères max</div>
+                  <div>• Utilisez des couleurs vives</div>
+                  <div>• Ajoutez votre logo discrètement</div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>
