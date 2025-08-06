@@ -18,7 +18,12 @@ export const usePinterestGenerator = (initialPin: PinterestPin) => {
   const [instagramApiKey, setInstagramApiKey] = useState(localStorage.getItem('instagramApiKey') || '');
 
   const updatePin = (field: keyof PinterestPin, value: any) => {
-    setPin(prev => ({ ...prev, [field]: value }));
+    console.log('Updating pin field:', field, 'with value:', value);
+    setPin(prev => {
+      const newPin = { ...prev, [field]: value };
+      console.log('New pin state:', newPin);
+      return newPin;
+    });
   };
 
   const handleSearch = () => {
