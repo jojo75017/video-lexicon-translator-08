@@ -24,7 +24,7 @@ const PinterestPage: React.FC = () => {
 
     setIsLoading(true);
 
-    // Simulation de génération d'épingles Pinterest
+    // Simulation de génération d'épingles Pinterest Generator Pro
     setTimeout(() => {
       const mockPins = [
         {
@@ -244,7 +244,7 @@ ${pin.hashtags.join(' ')} #inspiration #guide #conseils`;
                   )}
 
                   <div className="space-y-2">
-                    <h4 className="text-sm font-medium">Conseils Pinterest</h4>
+                    <h4 className="text-sm font-medium">Conseils Pinterest Generator Pro</h4>
                     <div className="text-sm text-gray-600 space-y-1">
                       <div>• Utilisez un format vertical (2:3 ou 1000x1500px)</div>
                       <div>• Ajoutez du texte lisible sur l'image</div>

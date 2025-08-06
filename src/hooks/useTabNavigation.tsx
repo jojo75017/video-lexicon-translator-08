@@ -50,7 +50,7 @@ export const useTabNavigation = () => {
     {id: 'performance', label: 'Performance'},
     {id: 'analytics', label: 'Analytics'},
     {id: 'signature', label: 'Signature'},
-    {id: 'pinterest', label: 'Pinterest'},
+    {id: 'pinterest', label: 'Pinterest Generator Pro'},
     {id: 'quora', label: 'Quora'}
   ];
   
