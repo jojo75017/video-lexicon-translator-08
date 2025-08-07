@@ -203,16 +203,149 @@ const TitleGeneratorPage: React.FC = () => {
     toast.success('Titre copié dans le presse-papiers !');
   };
 
-  // Fonction pour rediriger vers l'ebook planner
-  const createEbookFromTitle = (titleData: any) => {
-    // Stocker le titre sélectionné dans le localStorage pour le récupérer dans l'ebook planner
-    localStorage.setItem('selected_ebook_title', titleData.title);
-    localStorage.setItem('selected_ebook_keyword', titleData.keyword);
-    localStorage.setItem('selected_ebook_thematic', selectedThematic);
+  // États pour le prompt et le plan
+  const [selectedTitle, setSelectedTitle] = useState<any>(null);
+  const [generatedPrompt, setGeneratedPrompt] = useState('');
+  const [generatedPlan, setGeneratedPlan] = useState('');
+  const [isGeneratingContent, setIsGeneratingContent] = useState(false);
+
+  // Fonction pour générer le prompt et le plan
+  const generatePromptAndPlan = async (titleData: any) => {
+    setSelectedTitle(titleData);
+    setIsGeneratingContent(true);
     
-    // Rediriger vers l'ebook planner
-    navigate('/ebook-planner');
-    toast.success('Redirection vers le générateur d\'ebook...');
+    try {
+      if (useAI && apiKey) {
+        // Générer le prompt avec IA
+        const promptResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'gpt-3.5-turbo',
+            messages: [
+              {
+                role: 'system',
+                content: 'Tu es un expert en création de contenu SEO. Génère un prompt détaillé et professionnel pour créer du contenu optimisé.'
+              },
+              {
+                role: 'user',
+                content: `Crée un prompt professionnel pour générer du contenu sur le titre "${titleData.title}" dans la thématique ${selectedThematic}. Le prompt doit être précis, actionnable et orienté SEO.`
+              }
+            ],
+            temperature: 0.7,
+            max_tokens: 500
+          }),
+        });
+
+        const promptData = await promptResponse.json();
+        const prompt = promptData.choices?.[0]?.message?.content || '';
+
+        // Générer le plan avec IA
+        const planResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'gpt-3.5-turbo',
+            messages: [
+              {
+                role: 'system',
+                content: 'Tu es un expert en structuration de contenu. Crée des plans détaillés et bien organisés.'
+              },
+              {
+                role: 'user',
+                content: `Crée un plan détaillé pour le contenu "${titleData.title}" dans la thématique ${selectedThematic}. Structure avec des titres H2, H3 et sous-points. Min 8 sections principales.`
+              }
+            ],
+            temperature: 0.7,
+            max_tokens: 800
+          }),
+        });
+
+        const planData = await planResponse.json();
+        const plan = planData.choices?.[0]?.message?.content || '';
+
+        setGeneratedPrompt(prompt);
+        setGeneratedPlan(plan);
+      } else {
+        // Version template sans IA
+        const prompt = `Créez un contenu complet et optimisé SEO sur "${titleData.title}".
+
+🎯 OBJECTIF : Rédiger un article de qualité qui répond aux intentions de recherche des utilisateurs recherchant "${titleData.keyword}".
+
+📝 INSTRUCTIONS :
+- Utilisez le mot-clé principal "${titleData.keyword}" naturellement (densité 1-2%)
+- Rédigez minimum 1500 mots
+- Adoptez un ton ${selectedThematic === 'technologie' ? 'professionnel et technique' : selectedThematic === 'sante' ? 'rassurant et informatif' : selectedThematic === 'finance' ? 'expert et fiable' : 'engageant et accessible'}
+- Incluez des exemples concrets et des conseils pratiques
+- Structurez avec des sous-titres H2 et H3
+- Ajoutez une conclusion avec call-to-action
+
+🔍 SEO : Optimisez pour les requêtes liées à "${titleData.keyword}" et la thématique ${selectedThematic}.`;
+
+        const plan = `📋 PLAN DÉTAILLÉ : ${titleData.title}
+
+## I. Introduction (200 mots)
+- Accroche sur l'importance de ${titleData.keyword}
+- Annonce du plan
+- Promesse de valeur pour le lecteur
+
+## II. Contexte et enjeux (300 mots)
+- État actuel du ${selectedThematic}
+- Pourquoi ${titleData.keyword} est important
+- Statistiques et tendances
+
+## III. Les fondamentaux (400 mots)
+- Définition de ${titleData.keyword}
+- Concepts clés à maîtriser
+- Erreurs courantes à éviter
+
+## IV. Guide pratique (500 mots)
+- Étapes concrètes
+- Conseils d'experts
+- Outils recommandés
+
+## V. Cas d'usage et exemples (300 mots)
+- Études de cas réels
+- Témoignages
+- Résultats mesurables
+
+## VI. Conseils avancés (250 mots)
+- Techniques expertes
+- Optimisations
+- Bonnes pratiques
+
+## VII. Conclusion (150 mots)
+- Récapitulatif des points clés
+- Prochaines étapes
+- Call-to-action
+
+📊 MÉTRIQUES CIBLES :
+- Volume de recherche : ${titleData.searchVolume}/mois
+- Difficulté : ${titleData.difficulty}/100
+- CTR attendu : ${titleData.ctr}%`;
+
+        setGeneratedPrompt(prompt);
+        setGeneratedPlan(plan);
+      }
+      
+      toast.success('Prompt et plan générés avec succès !');
+    } catch (error) {
+      console.error('Erreur génération:', error);
+      toast.error('Erreur lors de la génération du contenu');
+    } finally {
+      setIsGeneratingContent(false);
+    }
+  };
+
+  const copyToClipboard = (text: string, type: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success(`${type} copié dans le presse-papiers !`);
   };
 
   const getDifficultyColor = (difficulty: number) => {
@@ -383,8 +516,8 @@ const TitleGeneratorPage: React.FC = () => {
                 <p className="text-gray-600">Adapte les templates aux domaines spécialisés</p>
               </div>
               <div className="p-3 bg-purple-50 rounded-lg">
-                <h4 className="font-semibold mb-1">✨ Cliquer pour créer un ebook</h4>
-                <p className="text-gray-600">Chaque titre vous amène au générateur d'ebook</p>
+                <h4 className="font-semibold mb-1">📋 Générer le prompt et plan</h4>
+                <p className="text-gray-600">Cliquer sur un titre pour obtenir le prompt et plan détaillé</p>
               </div>
             </CardContent>
           </Card>
@@ -408,7 +541,7 @@ const TitleGeneratorPage: React.FC = () => {
                   <div 
                     key={index} 
                     className="group p-4 border rounded-lg hover:shadow-md transition-all duration-300 cursor-pointer bg-gradient-to-r from-white to-gray-50 hover:from-blue-50 hover:to-purple-50"
-                    onClick={() => createEbookFromTitle(titleData)}
+                    onClick={() => generatePromptAndPlan(titleData)}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -454,15 +587,20 @@ const TitleGeneratorPage: React.FC = () => {
                         <Button
                           size="sm"
                           className="flex items-center gap-2 group-hover:shadow-md transition-all"
+                          disabled={isGeneratingContent}
                         >
-                          <BookOpen className="h-4 w-4" />
-                          Créer Ebook
+                          {isGeneratingContent ? (
+                            <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                          ) : (
+                            <Brain className="h-4 w-4" />
+                          )}
+                          {isGeneratingContent ? 'Génération...' : 'Prompt & Plan'}
                         </Button>
                       </div>
                     </div>
 
                     <div className="mt-3 p-2 bg-gray-50 rounded text-xs text-gray-600">
-                      💡 Cliquez sur cette carte pour créer automatiquement un ebook basé sur ce titre
+                      💡 Cliquez sur cette carte pour générer automatiquement le prompt et plan détaillé
                     </div>
                   </div>
                 ))}
@@ -470,16 +608,98 @@ const TitleGeneratorPage: React.FC = () => {
 
               <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
-                  <BookOpen className="h-5 w-5 text-blue-600" />
-                  <h4 className="font-semibold text-blue-800">Créer un ebook complet</h4>
+                  <Brain className="h-5 w-5 text-blue-600" />
+                  <h4 className="font-semibold text-blue-800">Générer le prompt et plan détaillé</h4>
                 </div>
                 <p className="text-sm text-blue-700">
-                  Cliquez sur n'importe quel titre pour être redirigé automatiquement vers le générateur d'ebook 
-                  avec toutes les informations pré-remplies (titre, mot-clé, thématique).
+                  Cliquez sur n'importe quel titre pour obtenir automatiquement un prompt professionnel et un plan structuré pour la création de contenu SEO.
                 </p>
               </div>
             </CardContent>
           </Card>
+        )}
+
+        {/* Affichage du prompt et plan générés */}
+        {selectedTitle && (generatedPrompt || generatedPlan) && (
+          <div className="mt-8 space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Brain className="h-5 w-5" />
+                  Contenu généré pour : {selectedTitle.title}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Prompt */}
+                  {generatedPrompt && (
+                    <div>
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-lg font-semibold">📝 Prompt Professionnel</h3>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => copyToClipboard(generatedPrompt, 'Prompt')}
+                        >
+                          <Copy className="h-4 w-4 mr-2" />
+                          Copier
+                        </Button>
+                      </div>
+                      <div className="bg-gray-50 p-4 rounded-lg border">
+                        <pre className="whitespace-pre-wrap text-sm text-gray-700">
+                          {generatedPrompt}
+                        </pre>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Plan */}
+                  {generatedPlan && (
+                    <div>
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-lg font-semibold">📋 Plan Détaillé</h3>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => copyToClipboard(generatedPlan, 'Plan')}
+                        >
+                          <Copy className="h-4 w-4 mr-2" />
+                          Copier
+                        </Button>
+                      </div>
+                      <div className="bg-gray-50 p-4 rounded-lg border">
+                        <pre className="whitespace-pre-wrap text-sm text-gray-700">
+                          {generatedPlan}
+                        </pre>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Actions */}
+                <div className="mt-6 flex flex-wrap gap-3 justify-center">
+                  <Button
+                    variant="outline"
+                    onClick={() => copyToClipboard(`${generatedPrompt}\n\n${generatedPlan}`, 'Prompt et Plan')}
+                    disabled={!generatedPrompt || !generatedPlan}
+                  >
+                    <Copy className="h-4 w-4 mr-2" />
+                    Copier Tout
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setSelectedTitle(null);
+                      setGeneratedPrompt('');
+                      setGeneratedPlan('');
+                    }}
+                  >
+                    Nouveau Contenu
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         )}
       </div>
     </div>
