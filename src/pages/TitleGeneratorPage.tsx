@@ -203,6 +203,11 @@ const TitleGeneratorPage: React.FC = () => {
     toast.success('Titre copié dans le presse-papiers !');
   };
 
+  const copyToClipboard = (content: string, type: string) => {
+    navigator.clipboard.writeText(content);
+    toast.success(`${type} copié dans le presse-papiers !`);
+  };
+
   // États pour le prompt et le plan
   const [selectedTitle, setSelectedTitle] = useState<any>(null);
   const [generatedPrompt, setGeneratedPrompt] = useState('');
@@ -489,10 +494,6 @@ Le plan doit inclure:
     }
   };
 
-  const copyToClipboard = (text: string, type: string) => {
-    navigator.clipboard.writeText(text);
-    toast.success(`${type} copié dans le presse-papiers !`);
-  };
 
   const getDifficultyColor = (difficulty: number) => {
     if (difficulty <= 30) return 'default';
