@@ -1,20 +1,117 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Target, Download, Copy, CheckCircle } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { ArrowLeft, Target, Download, Copy, CheckCircle, Wand2, Filter, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
+import { OpenAIConfigPanel } from '@/components/shared/OpenAIConfigPanel';
 
 const PromptsGeneratorPage: React.FC = () => {
   const navigate = useNavigate();
   const [isGenerating, setIsGenerating] = useState(false);
   const [prompts, setPrompts] = useState<string[]>([]);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [customTopic, setCustomTopic] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showCustomGeneration, setShowCustomGeneration] = useState(false);
+  
+  const { apiKey, model, hasValidApiKey, getConfig } = useOpenAIConfig();
+
+  const categories = [
+    { id: 'all', name: 'Tous', emoji: '🌟' },
+    { id: 'business', name: 'Business', emoji: '🟣' },
+    { id: 'marketing', name: 'Marketing', emoji: '🔵' },
+    { id: 'voyage', name: 'Voyage', emoji: '🟡' },
+    { id: 'personnel', name: 'Personnel', emoji: '🟢' },
+    { id: 'aquariophilie', name: 'Aquariophilie', emoji: '🐠' }
+  ];
+
+  const generateCustomPrompts = async () => {
+    if (!hasValidApiKey()) {
+      toast.error("Clé API OpenAI requise pour la génération personnalisée");
+      return;
+    }
+
+    if (!customTopic.trim()) {
+      toast.error("Veuillez saisir un sujet pour générer des prompts personnalisés");
+      return;
+    }
+
+    setIsGenerating(true);
+    
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: model,
+          messages: [
+            {
+              role: 'system',
+              content: `Vous êtes un expert en création de prompts professionnels. Créez 10 prompts détaillés et spécialisés sur le sujet demandé. Chaque prompt doit inclure :
+              - Un emoji thématique
+              - Un titre clair
+              - Une demande précise
+              - Un rôle d'expert
+              - Une mission détaillée
+              - Une structure attendue (5-7 points)
+              - Un style de réponse
+
+              Format exactement comme ceci :
+              🎯 Prompt X : [Titre]
+              Demande : [Description claire]
+              Rôle : [Expert spécialisé]
+              Mission : [Objectif précis]
+              Structure attendue :
+              • Point 1
+              • Point 2
+              • Point 3
+              • Point 4
+              • Point 5
+              Style : [Ton et approche]`
+            },
+            {
+              role: 'user',
+              content: `Créez 10 prompts professionnels sur le sujet : "${customTopic}"`
+            }
+          ],
+          temperature: 0.8,
+          max_tokens: 4000
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur API: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const content = data.choices[0]?.message?.content || '';
+      
+      // Diviser le contenu en prompts individuels
+      const generatedPrompts = content.split(/(?=🎯|📝|🚀|💡|⭐|🔥|✨|🎨|🏆|💎)/).filter(p => p.trim());
+      
+      setPrompts(generatedPrompts);
+      toast.success(`${generatedPrompts.length} prompts générés avec succès !`);
+      
+    } catch (error) {
+      console.error('Erreur lors de la génération:', error);
+      toast.error("Erreur lors de la génération des prompts personnalisés");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const generatePrompts = async () => {
     setIsGenerating(true);
     
-    // Simulation de génération des prompts
+    // Simulation de génération des prompts pré-définis
     const generatedPrompts = [
       // BUSINESS & ENTREPRENEURIAT (5 prompts)
       `🟣 Prompt 1 : Créer une feuille de route pour débutant entrepreneur
@@ -412,13 +509,27 @@ Structure attendue :
 Style : [Business, pragmatique, orienté rentabilité]`
     ];
 
-    // Simuler un délai de génération
+    // Attendre 2 secondes pour simuler la génération
     await new Promise(resolve => setTimeout(resolve, 2000));
     
     setPrompts(generatedPrompts);
     setIsGenerating(false);
-    toast.success("30 prompts professionnels générés avec succès !");
+    toast.success("30 prompts professionnels générés !");
   };
+
+  const filteredPrompts = prompts.filter(prompt => {
+    const matchesCategory = selectedCategory === 'all' || 
+      (selectedCategory === 'business' && prompt.includes('🟣')) ||
+      (selectedCategory === 'marketing' && prompt.includes('🔵')) ||
+      (selectedCategory === 'voyage' && prompt.includes('🟡')) ||
+      (selectedCategory === 'personnel' && prompt.includes('🟢')) ||
+      (selectedCategory === 'aquariophilie' && prompt.includes('🐠'));
+    
+    const matchesSearch = searchTerm === '' || 
+      prompt.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    return matchesCategory && matchesSearch;
+  });
 
   const copyPrompt = async (prompt: string, index: number) => {
     try {
@@ -437,136 +548,314 @@ Style : [Business, pragmatique, orienté rentabilité]`
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'pack-20-prompts-professionnels.txt';
+    link.download = 'prompts-professionnels.txt';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    toast.success("Pack de prompts téléchargé !");
+    toast.success("Prompts téléchargés avec succès !");
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center gap-3 mb-6">
-        <Button 
-          onClick={() => navigate('/ebook-ideas')} 
-          variant="outline" 
-          size="sm"
-          className="flex items-center gap-2"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Retour aux idées
-        </Button>
-        <Target className="h-8 w-8 text-primary" />
-        <h1 className="text-3xl font-bold">🎯 Générateur de Prompts Professionnels</h1>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/5 p-4">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/dashboard')}
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Retour au Dashboard
+          </Button>
+        </div>
 
-      <div className="text-center mb-8">
-        <p className="text-lg text-muted-foreground">
-          Générez un pack de 30 prompts IA professionnels, formatés et prêts à vendre
-        </p>
-        <p className="text-sm text-muted-foreground mt-2">
-          Regroupés en catégories : Business, Copywriting, Voyage, Développement personnel, Aquariophilie...
-        </p>
-      </div>
+        {/* Titre et description */}
+        <div className="text-center mb-12">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="p-3 rounded-2xl bg-gradient-primary">
+              <Target className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+              Générateur de Prompts Pro
+            </h1>
+          </div>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            Découvrez 30 prompts professionnels ou générez des prompts personnalisés avec l'IA
+          </p>
+        </div>
 
-      {prompts.length === 0 ? (
-        <Card className="bg-gradient-to-r from-orange-50 to-red-50 border-orange-200">
-          <CardContent className="p-8 text-center">
-            <Target className="h-16 w-16 text-orange-600 mx-auto mb-4" />
-            <h3 className="text-2xl font-bold mb-4">Prêt à générer vos prompts ?</h3>
-            <div className="bg-white/50 p-6 rounded-lg mb-6 text-left max-w-2xl mx-auto">
-              <h4 className="font-semibold mb-3">✨ Votre pack contiendra :</h4>
-              <ul className="space-y-2 text-muted-foreground">
-                <li>• 🟣 5 prompts Business & Entrepreneuriat</li>
-                <li>• 🔵 5 prompts Copywriting & Marketing</li>
-                <li>• 🟡 5 prompts Voyage & Aventure</li>
-                <li>• 🟢 5 prompts Développement Personnel</li>
-                <li>• 🐠 10 prompts Aquariophilie</li>
-              </ul>
-              <div className="mt-4 p-3 bg-orange-100 rounded-lg">
-                <p className="text-sm font-medium">Format professionnel avec :</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Titre coloré • Demande • Rôle • Mission • Structure • Style
+        {/* Configuration OpenAI pour génération personnalisée */}
+        {showCustomGeneration && (
+          <Card className="mb-8 border-2 border-primary/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Wand2 className="w-5 h-5 text-primary" />
+                Génération Personnalisée avec IA
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <OpenAIConfigPanel />
+              <div className="mt-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Sujet pour vos prompts personnalisés</label>
+                  <Input
+                    placeholder="Ex: Marketing digital, Photographie, Cuisine végétarienne..."
+                    value={customTopic}
+                    onChange={(e) => setCustomTopic(e.target.value)}
+                    className="w-full"
+                  />
+                </div>
+                <Button
+                  onClick={generateCustomPrompts}
+                  disabled={isGenerating || !hasValidApiKey() || !customTopic.trim()}
+                  className="w-full bg-gradient-primary hover:opacity-90"
+                >
+                  {isGenerating ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Génération IA en cours...
+                    </>
+                  ) : (
+                    <>
+                      <Wand2 className="w-4 h-4 mr-2" />
+                      Générer des Prompts Personnalisés
+                    </>
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {prompts.length === 0 ? (
+          // Vue génération
+          <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+            {/* Prompts Prédéfinis */}
+            <Card className="h-fit">
+              <CardHeader>
+                <CardTitle className="text-center flex items-center justify-center gap-2">
+                  <Target className="w-6 h-6 text-primary" />
+                  Prompts Professionnels Prêts
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  <div className="text-center">
+                    <p className="text-muted-foreground mb-6">
+                      30 prompts professionnels organisés par catégories
+                    </p>
+                    <div className="grid grid-cols-2 gap-3 mb-6">
+                      {categories.slice(1).map(category => (
+                        <div key={category.id} className="p-3 bg-card/50 rounded-lg border">
+                          <div className="text-xl mb-1">{category.emoji}</div>
+                          <div className="font-medium text-sm">{category.name}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {category.id === 'aquariophilie' ? '10 prompts' : '5 prompts'}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <Button
+                    onClick={generatePrompts}
+                    disabled={isGenerating}
+                    className="w-full bg-gradient-primary hover:opacity-90 py-3"
+                  >
+                    {isGenerating ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Génération en cours...
+                      </>
+                    ) : (
+                      <>
+                        <Target className="w-4 h-4 mr-2" />
+                        Générer 30 Prompts Professionnels
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Génération Personnalisée */}
+            <Card className="h-fit">
+              <CardHeader>
+                <CardTitle className="text-center flex items-center justify-center gap-2">
+                  <Wand2 className="w-6 h-6 text-primary" />
+                  Génération Personnalisée IA
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  <div className="text-center">
+                    <p className="text-muted-foreground mb-6">
+                      Créez des prompts sur mesure avec l'IA selon votre domaine d'expertise
+                    </p>
+                    <div className="grid grid-cols-1 gap-3 mb-6">
+                      <div className="p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border border-primary/20">
+                        <div className="text-2xl mb-2">🎯</div>
+                        <div className="font-medium">Prompts Personnalisés</div>
+                        <div className="text-sm text-muted-foreground mt-1">
+                          Générez 10 prompts adaptés à votre domaine
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <Button
+                    onClick={() => setShowCustomGeneration(true)}
+                    className="w-full bg-gradient-to-r from-primary to-primary/80 hover:opacity-90 py-3"
+                  >
+                    <Wand2 className="w-4 h-4 mr-2" />
+                    Activer la Génération IA
+                  </Button>
+                  
+                  <div className="text-xs text-muted-foreground text-center">
+                    Nécessite une clé API OpenAI
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        ) : (
+          // Vue des prompts générés
+          <div>
+            {/* Header avec actions */}
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
+              <div>
+                <h2 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
+                  Prompts Professionnels
+                </h2>
+                <p className="text-muted-foreground">
+                  {filteredPrompts.length} prompts {filteredPrompts.length !== prompts.length ? `(${prompts.length} au total)` : 'disponibles'}
                 </p>
               </div>
+              
+              <div className="flex flex-wrap gap-3">
+                <Button
+                  onClick={() => {
+                    setPrompts([]);
+                    setCopiedIndex(null);
+                    setSearchTerm('');
+                    setSelectedCategory('all');
+                    setShowCustomGeneration(false);
+                  }}
+                  variant="outline"
+                  className="flex items-center gap-2"
+                >
+                  <Target className="w-4 h-4" />
+                  Nouveaux Prompts
+                </Button>
+                
+                <Button
+                  onClick={() => setShowCustomGeneration(!showCustomGeneration)}
+                  variant="outline"
+                  className="flex items-center gap-2"
+                >
+                  <Wand2 className="w-4 h-4" />
+                  Génération IA
+                </Button>
+                
+                <Button
+                  onClick={downloadAllPrompts}
+                  className="flex items-center gap-2 bg-gradient-primary hover:opacity-90"
+                >
+                  <Download className="w-4 h-4" />
+                  Télécharger
+                </Button>
+              </div>
             </div>
-            <Button 
-              onClick={generatePrompts}
-              disabled={isGenerating}
-              size="lg"
-              className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700"
-            >
-              {isGenerating ? (
-                <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
-                  Génération en cours...
-                </>
+
+            {/* Filtres et recherche */}
+            <div className="flex flex-col lg:flex-row gap-4 mb-8">
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                  <Input
+                    placeholder="Rechercher dans les prompts..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex gap-2 flex-wrap">
+                {categories.map(category => (
+                  <Badge
+                    key={category.id}
+                    variant={selectedCategory === category.id ? "default" : "outline"}
+                    className={`cursor-pointer px-3 py-1 ${
+                      selectedCategory === category.id 
+                        ? "bg-gradient-primary text-white" 
+                        : "hover:bg-primary/10"
+                    }`}
+                    onClick={() => setSelectedCategory(category.id)}
+                  >
+                    <span className="mr-1">{category.emoji}</span>
+                    {category.name}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            {/* Liste des prompts */}
+            <div className="grid gap-6">
+              {filteredPrompts.length === 0 ? (
+                <Card className="text-center py-12">
+                  <CardContent>
+                    <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-medium mb-2">Aucun prompt trouvé</h3>
+                    <p className="text-muted-foreground">
+                      Essayez de modifier vos filtres ou votre recherche
+                    </p>
+                  </CardContent>
+                </Card>
               ) : (
-                <>
-                  <Target className="h-5 w-5 mr-2" />
-                  Générer mes 30 prompts
-                </>
+                filteredPrompts.map((prompt, index) => (
+                  <Card key={index} className="group hover:shadow-lg transition-all duration-300 border border-border/50 hover:border-primary/30">
+                    <CardContent className="p-6">
+                      <div className="flex justify-between items-start gap-4">
+                        <div className="flex-1">
+                          <pre className="whitespace-pre-wrap text-sm leading-relaxed text-foreground font-mono">
+                            {prompt}
+                          </pre>
+                        </div>
+                        
+                        <Button
+                          onClick={() => copyPrompt(prompt, index)}
+                          variant="outline"
+                          size="sm"
+                          className={`ml-4 flex-shrink-0 transition-all duration-200 ${
+                            copiedIndex === index
+                              ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-300 dark:border-green-800'
+                              : 'hover:bg-primary/10 hover:border-primary/30'
+                          }`}
+                        >
+                          {copiedIndex === index ? (
+                            <>
+                              <CheckCircle className="w-4 h-4 mr-2" />
+                              Copié !
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-4 h-4 mr-2" />
+                              Copier
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
               )}
-            </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold">Vos 30 Prompts Professionnels</h2>
-            <Button onClick={downloadAllPrompts} className="flex items-center gap-2">
-              <Download className="h-4 w-4" />
-              Télécharger tout
-            </Button>
+            </div>
           </div>
-
-          <div className="grid gap-4">
-            {prompts.map((prompt, index) => (
-              <Card key={index} className="group hover:shadow-lg transition-all duration-300">
-                <CardHeader className="pb-3">
-                  <div className="flex justify-between items-start">
-                    <CardTitle className="text-lg">
-                      {prompt.split('\n')[0]}
-                    </CardTitle>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => copyPrompt(prompt, index)}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      {copiedIndex === index ? (
-                        <CheckCircle className="h-4 w-4 text-green-600" />
-                      ) : (
-                        <Copy className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <pre className="whitespace-pre-wrap text-sm font-mono bg-muted p-4 rounded-lg overflow-x-auto">
-                    {prompt}
-                  </pre>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          <div className="text-center mt-8">
-            <Button 
-              onClick={() => {
-                setPrompts([]);
-                generatePrompts();
-              }}
-              variant="outline"
-              size="lg"
-            >
-              <Target className="h-5 w-5 mr-2" />
-              Générer un nouveau pack
-            </Button>
-          </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
