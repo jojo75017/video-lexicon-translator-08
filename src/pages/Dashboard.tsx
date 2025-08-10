@@ -29,6 +29,25 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
+// Import des icônes personnalisées des bots
+import DashBotIcon from '@/assets/icons/dash-bot.png';
+import RivalAiIcon from '@/assets/icons/rival-ai.png';
+import CrawlBotIcon from '@/assets/icons/crawl-bot.png';
+import KeywOrdIcon from '@/assets/icons/keyw-ord.png';
+import SerpBotIcon from '@/assets/icons/serp-bot.png';
+import OptiMaxIcon from '@/assets/icons/opti-max.png';
+import ContEntIcon from '@/assets/icons/cont-ent.png';
+import TitleGenIcon from '@/assets/icons/title-gen.png';
+import ArchBotIcon from '@/assets/icons/arch-bot.png';
+import RoboTxtIcon from '@/assets/icons/robo-txt.png';
+import EbookAiIcon from '@/assets/icons/ebook-ai.png';
+import IdeaBotIcon from '@/assets/icons/idea-bot.png';
+import PromptProIcon from '@/assets/icons/prompt-pro.png';
+import QuoraBotIcon from '@/assets/icons/quora-bot.png';
+import PinBotIcon from '@/assets/icons/pin-bot.png';
+import SignBotIcon from '@/assets/icons/sign-bot.png';
+import MailBotIcon from '@/assets/icons/mail-bot.png';
+
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState('all');
@@ -54,8 +73,10 @@ const Dashboard: React.FC = () => {
   const features = [
     {
       title: 'Dashboard & Analytics',
+      botName: 'DASH-BOT',
       description: 'Vue d\'ensemble et métriques de performance',
       icon: BarChart3,
+      customIcon: DashBotIcon,
       path: '/analytics',
       color: 'from-blue-500 to-blue-600',
       category: 'core',
@@ -64,8 +85,10 @@ const Dashboard: React.FC = () => {
     },
     {
       title: 'Analyse Concurrentielle Pro',
+      botName: 'RIVAL-AI',
       description: 'Intelligence concurrentielle avancée',
       icon: Users,
+      customIcon: RivalAiIcon,
       path: '/competitor-analysis',
       color: 'from-red-500 to-red-600',
       category: 'analysis',
@@ -74,8 +97,10 @@ const Dashboard: React.FC = () => {
     },
     {
       title: 'Crawler SEO Avancé',
+      botName: 'CRAWL-BOT',
       description: 'Audit technique complet de site web',
       icon: Globe,
+      customIcon: CrawlBotIcon,
       path: '/crawler',
       color: 'from-emerald-500 to-emerald-600',
       category: 'analysis',
@@ -84,8 +109,10 @@ const Dashboard: React.FC = () => {
     },
     {
       title: 'Générateur de Mots-clés Pro',
+      botName: 'KEYW-ORD',
       description: 'Research avancée avec métriques et clustering',
       icon: Search,
+      customIcon: KeywOrdIcon,
       path: '/keyword-generator',
       color: 'from-purple-500 to-purple-600',
       category: 'keywords',
@@ -94,8 +121,10 @@ const Dashboard: React.FC = () => {
     },
     {
       title: 'Générateur SERP',
+      botName: 'SERP-BOT',
       description: 'Générez des URLs pour les sites français',
       icon: Search,
+      customIcon: SerpBotIcon,
       path: '/serp-generator',
       color: 'from-indigo-500 to-indigo-600',
       category: 'keywords',
@@ -104,8 +133,10 @@ const Dashboard: React.FC = () => {
     },
     {
       title: 'Optimiseur SEO',
+      botName: 'OPTI-MAX',
       description: 'Optimisation complète de contenu',
       icon: TrendingUp,
+      customIcon: OptiMaxIcon,
       path: '/seo',
       color: 'from-green-500 to-green-600',
       category: 'optimization',
@@ -114,8 +145,10 @@ const Dashboard: React.FC = () => {
     },
     {
       title: 'Générateur SEO Content',
+      botName: 'CONT-ENT',
       description: 'Création de contenu SEO optimisé',
       icon: TrendingUp,
+      customIcon: ContEntIcon,
       path: '/seo-generator',
       color: 'from-orange-500 to-orange-600',
       category: 'content',
@@ -124,8 +157,10 @@ const Dashboard: React.FC = () => {
     },
     {
       title: 'Générateur de Titres Pro',
+      botName: 'TITLE-GEN',
       description: 'Titres SEO optimisés par thématique',
       icon: Lightbulb,
+      customIcon: TitleGenIcon,
       path: '/title-generator',
       color: 'from-yellow-500 to-orange-600',
       category: 'content',
@@ -134,8 +169,10 @@ const Dashboard: React.FC = () => {
     },
     {
       title: 'Architecture & Hiérarchie',
+      botName: 'ARCH-BOT',
       description: 'Structure optimale de votre site',
       icon: Globe,
+      customIcon: ArchBotIcon,
       path: '/hierarchy',
       color: 'from-cyan-500 to-cyan-600',
       category: 'technical',
@@ -144,8 +181,10 @@ const Dashboard: React.FC = () => {
     },
     {
       title: 'Test Robots.txt',
+      botName: 'ROBO-TXT',
       description: 'Validation et test de robots.txt',
       icon: Search,
+      customIcon: RoboTxtIcon,
       path: '/robots-txt',
       color: 'from-slate-500 to-slate-600',
       category: 'technical',
@@ -154,8 +193,10 @@ const Dashboard: React.FC = () => {
     },
     {
       title: 'Générateur d\'Ebook Pro',
+      botName: 'EBOOK-AI',
       description: 'Création complète d\'ebooks avec export',
       icon: BookOpen,
+      customIcon: EbookAiIcon,
       path: '/ebook-planner',
       color: 'from-purple-500 to-purple-600',
       category: 'content',
@@ -164,8 +205,10 @@ const Dashboard: React.FC = () => {
     },
     {
       title: 'Idées de Titres d\'Ebook',
+      botName: 'IDEA-BOT',
       description: 'Inspiration et génération de titres',
       icon: Lightbulb,
+      customIcon: IdeaBotIcon,
       path: '/ebook-ideas',
       color: 'from-pink-500 to-rose-600',
       category: 'content',
@@ -174,8 +217,10 @@ const Dashboard: React.FC = () => {
     },
     {
       title: 'Pack Prompts Professionnels',
+      botName: 'PROMPT-PRO',
       description: 'Génération de prompts IA premium',
       icon: Target,
+      customIcon: PromptProIcon,
       path: '/prompts-generator',
       color: 'from-orange-500 to-red-600',
       category: 'ai',
@@ -184,8 +229,10 @@ const Dashboard: React.FC = () => {
     },
     {
       title: 'Quora Marketing Pro',
+      botName: 'QUORA-BOT',
       description: 'Stratégie complète pour Quora',
       icon: MessageCircle,
+      customIcon: QuoraBotIcon,
       path: '/quora',
       color: 'from-red-500 to-pink-600',
       category: 'marketing',
@@ -194,8 +241,10 @@ const Dashboard: React.FC = () => {
     },
     {
       title: 'Pinterest Generator Pro',
+      botName: 'PIN-BOT',
       description: 'Création de contenu viral Pinterest',
       icon: Image,
+      customIcon: PinBotIcon,
       path: '/pinterest',
       color: 'from-pink-500 to-purple-600',
       category: 'marketing',
@@ -204,8 +253,10 @@ const Dashboard: React.FC = () => {
     },
     {
       title: 'Signatures Email Pro',
+      botName: 'SIGN-BOT',
       description: 'Générateur de signatures professionnelles',
       icon: Mail,
+      customIcon: SignBotIcon,
       path: '/signature',
       color: 'from-blue-500 to-indigo-600',
       category: 'marketing',
@@ -214,8 +265,10 @@ const Dashboard: React.FC = () => {
     },
     {
       title: 'Email Marketing SEO',
+      botName: 'MAIL-BOT',
       description: 'Optimisation complète d\'emails',
       icon: Mail,
+      customIcon: MailBotIcon,
       path: '/email-marketing',
       color: 'from-green-500 to-teal-600',
       category: 'marketing',
@@ -376,12 +429,23 @@ const Dashboard: React.FC = () => {
               const StatusIcon = getStatusIcon(feature.status);
               
               return (
-                <Card key={feature.title} className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-2 hover:border-primary/20">
+                <Card key={feature.title} className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-2 hover:border-primary/20 relative overflow-hidden">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3 flex-1">
-                        <div className={`p-3 rounded-lg bg-gradient-to-r ${feature.color} text-white shadow-md`}>
-                          <feature.icon className="h-6 w-6" />
+                        <div className="relative">
+                          {/* Icône bot personnalisée */}
+                          <div className="w-16 h-16 rounded-xl overflow-hidden shadow-lg border-2 border-white/50">
+                            <img 
+                              src={feature.customIcon} 
+                              alt={feature.botName}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          {/* Badge du nom du bot */}
+                          <div className="absolute -bottom-1 -right-1 bg-gradient-to-r from-primary to-secondary text-white text-xs font-bold px-2 py-1 rounded-full shadow-md">
+                            {feature.botName}
+                          </div>
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
