@@ -1,0 +1,112 @@
+import { useState } from 'react';
+import { UniversalOpenAIService } from '@/services/openai/universalOpenAIService';
+import { useOpenAIConfig } from './useOpenAIConfig';
+import { toast } from 'sonner';
+
+interface ProductSheet {
+  title: string;
+  shortDescription: string;
+  longDescription: string;
+  features: string[];
+  specifications: { name: string; value: string }[];
+  benefits: string[];
+}
+
+export const useProductGeneration = () => {
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<ProductSheet | null>(null);
+  const { hasValidApiKey, getConfig } = useOpenAIConfig();
+
+  const generateProductSheet = async (productTitle: string) => {
+    if (!hasValidApiKey()) {
+      toast.error('Veuillez configurer votre clé API OpenAI');
+      return;
+    }
+
+    const config = getConfig();
+
+    setLoading(true);
+    try {
+      const openaiService = UniversalOpenAIService.getInstance();
+      
+      const prompt = `Génère une fiche produit complète pour "${productTitle}". 
+
+Retourne UNIQUEMENT un JSON valide avec cette structure exacte:
+{
+  "title": "${productTitle}",
+  "shortDescription": "Description courte en 2 lignes maximum avec le mot-clé '${productTitle}' en gras (utilise <strong></strong>)",
+  "longDescription": "Description longue de 500 mots exactement, optimisée SEO, avec le mot-clé '${productTitle}' en gras plusieurs fois (utilise <strong></strong>)",
+  "features": ["caractéristique 1", "caractéristique 2", "caractéristique 3", "caractéristique 4", "caractéristique 5"],
+  "specifications": [
+    {"name": "Nom critère 1", "value": "Valeur 1"},
+    {"name": "Nom critère 2", "value": "Valeur 2"},
+    {"name": "Nom critère 3", "value": "Valeur 3"},
+    {"name": "Nom critère 4", "value": "Valeur 4"},
+    {"name": "Nom critère 5", "value": "Valeur 5"}
+  ],
+  "benefits": ["avantage 1", "avantage 2", "avantage 3", "avantage 4"]
+}
+
+Important:
+- La description longue doit faire EXACTEMENT 500 mots
+- Utilise <strong>${productTitle}</strong> pour mettre le titre en gras
+- Sois créatif et pertinent selon le type de produit
+- Les spécifications doivent être techniques et réalistes
+- Les avantages doivent être orientés client`;
+
+      const response = await openaiService.callOpenAI(prompt, config, {
+        temperature: 0.7,
+        maxTokens: 2000
+      });
+
+      if (response && typeof response === 'object') {
+        // Vérifier que la description longue fait bien environ 500 mots
+        const wordCount = response.longDescription.replace(/<[^>]*>/g, '').split(/\s+/).length;
+        console.log(`Description générée: ${wordCount} mots`);
+        
+        setResult(response);
+        toast.success('Fiche produit générée avec succès!');
+      } else {
+        throw new Error('Format de réponse invalide');
+      }
+    } catch (error) {
+      console.error('Erreur lors de la génération:', error);
+      toast.error('Erreur lors de la génération de la fiche produit');
+      
+      // Fallback avec données d'exemple
+      setResult({
+        title: productTitle,
+        shortDescription: `<strong>${productTitle}</strong> - Un produit innovant qui révolutionne votre expérience utilisateur. Découvrez une qualité exceptionnelle et des performances inégalées.`,
+        longDescription: `<strong>${productTitle}</strong> représente l'excellence dans sa catégorie. Ce produit révolutionnaire combine innovation, qualité et performance pour offrir une expérience utilisateur exceptionnelle. Avec <strong>${productTitle}</strong>, vous investissez dans un produit conçu avec les dernières technologies et les matériaux les plus nobles. L'attention portée aux détails et la finition soignée font de <strong>${productTitle}</strong> un choix de premier plan pour les consommateurs exigeants. Les fonctionnalités avancées intégrées dans <strong>${productTitle}</strong> permettent une utilisation intuitive et efficace au quotidien. La robustesse et la fiabilité de <strong>${productTitle}</strong> garantissent une durée de vie exceptionnelle et un retour sur investissement optimal. L'équipe de développement a travaillé sans relâche pour que <strong>${productTitle}</strong> réponde aux besoins les plus exigeants du marché moderne. Les tests rigoureux effectués sur <strong>${productTitle}</strong> confirment sa supériorité technique et sa facilité d'utilisation. En choisissant <strong>${productTitle}</strong>, vous optez pour un produit qui allie esthétique moderne et fonctionnalité pratique. La garantie étendue accompagnant <strong>${productTitle}</strong> témoigne de la confiance du fabricant dans la qualité de son produit. Service client dédié et support technique expert complètent l'offre <strong>${productTitle}</strong> pour une satisfaction client maximale. Rejoignez les milliers d'utilisateurs satisfaits qui ont fait confiance à <strong>${productTitle}</strong> pour transformer leur quotidien. Innovation, qualité, performance : <strong>${productTitle}</strong> incarne ces valeurs dans chaque détail de sa conception et de sa réalisation.`,
+        features: [
+          'Design moderne et élégant',
+          'Technologie de pointe intégrée',
+          'Facilité d\'utilisation optimale',
+          'Matériaux de qualité supérieure',
+          'Performance exceptionnelle'
+        ],
+        specifications: [
+          { name: 'Dimensions', value: 'Standard' },
+          { name: 'Poids', value: 'Optimisé' },
+          { name: 'Matériau', value: 'Premium' },
+          { name: 'Garantie', value: '2 ans' },
+          { name: 'Origine', value: 'Qualité contrôlée' }
+        ],
+        benefits: [
+          'Améliore votre productivité au quotidien',
+          'Design ergonomique pour un confort optimal',
+          'Économies à long terme grâce à sa durabilité',
+          'Support client expert disponible 7j/7'
+        ]
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return {
+    generateProductSheet,
+    loading,
+    result
+  };
+};

@@ -47,6 +47,7 @@ import QuoraBotIcon from '@/assets/icons/quora-bot.png';
 import PinBotIcon from '@/assets/icons/pin-bot.png';
 import SignBotIcon from '@/assets/icons/sign-bot.png';
 import MailBotIcon from '@/assets/icons/mail-bot.png';
+import ProdBotIcon from '@/assets/icons/prod-bot.png';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -274,6 +275,18 @@ const Dashboard: React.FC = () => {
       category: 'marketing',
       priority: 'medium',
       status: 'updated'
+    },
+    {
+      title: 'Générateur de Fiches Produits',
+      botName: 'PROD-BOT',
+      description: 'Fiches produits complètes avec IA - 500 mots optimisés',
+      icon: Target,
+      customIcon: ProdBotIcon,
+      path: '/product-generator',
+      color: 'from-blue-500 to-cyan-600',
+      category: 'content',
+      priority: 'high',
+      status: 'complete'
     }
   ];
 
