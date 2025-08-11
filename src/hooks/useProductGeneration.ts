@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { UniversalOpenAIService } from '@/services/openai/universalOpenAIService';
 import { useOpenAIConfig } from './useOpenAIConfig';
 import { toast } from 'sonner';
 
@@ -27,9 +26,22 @@ export const useProductGeneration = () => {
 
     setLoading(true);
     try {
-      const openaiService = UniversalOpenAIService.getInstance();
-      
-      const prompt = `Génère une fiche produit complète pour "${productTitle}". 
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${config.apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: config.model,
+          messages: [
+            {
+              role: 'system',
+              content: 'Tu es un expert en marketing produit. Réponds uniquement avec du JSON valide.'
+            },
+            {
+              role: 'user',
+              content: `Génère une fiche produit complète pour "${productTitle}". 
 
 Retourne UNIQUEMENT un JSON valide avec cette structure exacte:
 {
@@ -52,19 +64,33 @@ Important:
 - Utilise <strong>${productTitle}</strong> pour mettre le titre en gras
 - Sois créatif et pertinent selon le type de produit
 - Les spécifications doivent être techniques et réalistes
-- Les avantages doivent être orientés client`;
-
-      const response = await openaiService.callOpenAI(prompt, config, {
-        temperature: 0.7,
-        maxTokens: 2000
+- Les avantages doivent être orientés client`
+            }
+          ],
+          temperature: 0.7,
+          max_tokens: 2000
+        }),
       });
 
-      if (response && typeof response === 'object') {
+      if (!response.ok) {
+        throw new Error(`Erreur API: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const content = data.choices[0]?.message?.content;
+      
+      if (!content) {
+        throw new Error('Pas de contenu dans la réponse');
+      }
+
+      const jsonResponse = JSON.parse(content);
+
+      if (jsonResponse && typeof jsonResponse === 'object') {
         // Vérifier que la description longue fait bien environ 500 mots
-        const wordCount = response.longDescription.replace(/<[^>]*>/g, '').split(/\s+/).length;
+        const wordCount = jsonResponse.longDescription.replace(/<[^>]*>/g, '').split(/\s+/).length;
         console.log(`Description générée: ${wordCount} mots`);
         
-        setResult(response);
+        setResult(jsonResponse);
         toast.success('Fiche produit générée avec succès!');
       } else {
         throw new Error('Format de réponse invalide');

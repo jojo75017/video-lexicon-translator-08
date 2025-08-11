@@ -6,12 +6,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { useProductGeneration } from '@/hooks/useProductGeneration';
 import { OpenAIConfigPanel } from '@/components/shared/OpenAIConfigPanel';
-import { ShoppingBag, Package, Star, Copy, Download } from 'lucide-react';
+import { ShoppingBag, Package, Star, Copy, Download, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 const ProductGeneratorPage = () => {
   const [productTitle, setProductTitle] = useState('');
   const { generateProductSheet, loading, result } = useProductGeneration();
+  const navigate = useNavigate();
 
   const handleGenerate = async () => {
     if (!productTitle.trim()) {
@@ -62,8 +64,20 @@ ${result.benefits.map(benefit => `• ${benefit}`).join('\n')}
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-4">
       <div className="max-w-6xl mx-auto space-y-6">
-        {/* Header */}
+        {/* Header with Back Button */}
         <div className="text-center space-y-4">
+          <div className="flex items-center justify-between mb-4">
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/')}
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Retour au Dashboard
+            </Button>
+            <div className="flex-1" />
+          </div>
+          
           <div className="flex items-center justify-center gap-3">
             <div className="p-3 rounded-xl bg-primary/10">
               <Package className="h-8 w-8 text-primary" />
