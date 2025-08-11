@@ -17,6 +17,8 @@ export const useOpenAIConfig = () => {
     
     if (savedApiKey) {
       setApiKey(savedApiKey);
+      // Valider automatiquement la clé sauvegardée
+      setTimeout(() => validateApiKey(savedApiKey), 100);
     }
     if (savedModel) {
       setModel(savedModel);
