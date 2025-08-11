@@ -41,30 +41,35 @@ export const useProductGeneration = () => {
             },
             {
               role: 'user',
-              content: `Génère une fiche produit complète pour "${productTitle}". 
+              content: (() => {
+                // Extraire le mot-clé principal du titre (généralement les 2-3 premiers mots)
+                const mainKeyword = productTitle.split(' ').slice(0, 3).join(' ');
+                
+                return `Génère une fiche produit complète pour "${productTitle}". 
 
 Retourne UNIQUEMENT un JSON valide avec cette structure exacte:
 {
   "title": "${productTitle}",
-  "shortDescription": "Description courte en 2 lignes maximum avec le mot-clé '${productTitle}' en gras (utilise <strong></strong>)",
-  "longDescription": "Description longue de 500 mots exactement, optimisée SEO, avec le mot-clé '${productTitle}' en gras plusieurs fois (utilise <strong></strong>)",
+  "shortDescription": "Description courte en 2 lignes maximum avec le mot-clé principal '${mainKeyword}' en gras UNE SEULE FOIS (utilise <strong></strong>)",
+  "longDescription": "Description longue de 500 mots exactement, optimisée SEO, avec le mot-clé principal '${mainKeyword}' en gras 2-3 fois maximum, réparties naturellement dans le texte (utilise <strong></strong>)",
   "features": ["caractéristique 1", "caractéristique 2", "caractéristique 3", "caractéristique 4", "caractéristique 5"],
   "specifications": [
-    {"name": "Nom critère 1", "value": "Valeur 1"},
-    {"name": "Nom critère 2", "value": "Valeur 2"},
-    {"name": "Nom critère 3", "value": "Valeur 3"},
-    {"name": "Nom critère 4", "value": "Valeur 4"},
-    {"name": "Nom critère 5", "value": "Valeur 5"}
+    {"name": "Nom technique précis", "value": "Valeur mesurable avec unité"},
+    {"name": "Autre donnée technique", "value": "Valeur chiffrée précise"},
+    {"name": "Critère technique", "value": "Spécification quantifiée"},
+    {"name": "Donnée technique", "value": "Mesure ou norme technique"},
+    {"name": "Spécification technique", "value": "Valeur technique concrète"}
   ],
-  "benefits": ["avantage 1", "avantage 2", "avantage 3", "avantage 4"]
+  "benefits": ["Bénéfice client clair et direct", "Avantage pratique concret pour l'utilisateur", "Bénéfice économique ou gain de temps", "Avantage qualité ou sécurité"]
 }
 
 Important:
 - La description longue doit faire EXACTEMENT 500 mots
-- Utilise <strong>${productTitle}</strong> pour mettre le titre en gras
-- Sois créatif et pertinent selon le type de produit
-- Les spécifications doivent être techniques et réalistes
-- Les avantages doivent être orientés client`
+- Le mot-clé principal "${mainKeyword}" en gras maximum 2-3 fois dans la description longue
+- Les spécifications doivent être TECHNIQUES et MESURABLES : dimensions exactes, poids, matériaux, performances chiffrées, certifications, normes, etc.
+- Les avantages doivent être CONCRETS et ORIENTÉS CLIENT : économies réelles, gain de temps précis, sécurité renforcée, facilité d'usage, etc.
+- Sois créatif et pertinent selon le type de produit`;
+              })()
             }
           ],
           temperature: 0.7,
