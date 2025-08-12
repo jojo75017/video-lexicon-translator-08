@@ -33,20 +33,28 @@ const ProductGeneratorPage = () => {
     
     const content = `FICHE PRODUIT - ${result.title}
 
-DESCRIPTION COURTE:
-${result.shortDescription}
+## ${result.h2Section.title}
+${result.h2Section.content}
 
-DESCRIPTION LONGUE:
-${result.longDescription}
+### ${result.h3Section.title}
+${result.h3Section.content}
 
-CARACTÉRISTIQUES:
-${result.features.map(feature => `• ${feature}`).join('\n')}
+${result.h3Section.bulletPoints.map(point => `• ${point}`).join('\n')}
 
-CRITÈRES TECHNIQUES:
-${result.specifications.map(spec => `• ${spec.name}: ${spec.value}`).join('\n')}
+## Témoignage
+${result.testimonial}
 
-AVANTAGES:
-${result.benefits.map(benefit => `• ${benefit}`).join('\n')}
+## À quoi cela sert
+${result.whatItDoesFor}
+
+## Où le trouver
+${result.whereToFind}
+
+## FAQ
+${result.faq.map(item => `Q: ${item.question}\nR: ${item.answer}`).join('\n\n')}
+
+## Caractéristiques
+${result.characteristics.map(char => `• ${char}`).join('\n')}
 `;
 
     const blob = new Blob([content], { type: 'text/plain' });
@@ -128,99 +136,117 @@ ${result.benefits.map(benefit => `• ${benefit}`).join('\n')}
 
         {/* Résultats */}
         {result && (
-          <div className="grid gap-6 md:grid-cols-2">
-            {/* Description courte */}
+          <div className="space-y-6">
+            {/* Section H2 */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  Description Courte
+                <CardTitle className="flex items-center justify-between text-foreground">
+                  {result.h2Section.title}
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => copyToClipboard(result.shortDescription)}
+                    onClick={() => copyToClipboard(`## ${result.h2Section.title}\n${result.h2Section.content}`)}
                   >
                     <Copy className="h-4 w-4" />
                   </Button>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div 
-                  className="prose prose-sm max-w-none"
-                  dangerouslySetInnerHTML={{ __html: result.shortDescription }}
-                />
+                <p className="text-foreground leading-relaxed">{result.h2Section.content}</p>
               </CardContent>
             </Card>
 
-            {/* Description longue */}
+            {/* Section H3 avec listes à puces */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  Description Longue (500 mots)
+                <CardTitle className="flex items-center justify-between text-foreground">
+                  {result.h3Section.title}
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => copyToClipboard(result.longDescription)}
+                    onClick={() => copyToClipboard(`### ${result.h3Section.title}\n${result.h3Section.content}\n\n${result.h3Section.bulletPoints.map(point => `• ${point}`).join('\n')}`)}
                   >
                     <Copy className="h-4 w-4" />
                   </Button>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div 
-                  className="prose prose-sm max-w-none text-justify"
-                  dangerouslySetInnerHTML={{ __html: result.longDescription }}
-                />
-              </CardContent>
-            </Card>
-
-            {/* Caractéristiques */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Caractéristiques Principales</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {result.features.map((feature, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <Star className="h-4 w-4 text-primary" />
-                      <span className="text-sm">{feature}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Spécifications techniques */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Spécifications Techniques</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {result.specifications.map((spec, index) => (
-                    <div key={index} className="flex justify-between items-center border-b pb-2">
-                      <span className="font-medium text-sm">{spec.name}</span>
-                      <Badge variant="secondary">{spec.value}</Badge>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Avantages */}
-            <Card className="md:col-span-2">
-              <CardHeader>
-                <CardTitle>Avantages du Produit</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-3 md:grid-cols-2">
-                  {result.benefits.map((benefit, index) => (
-                    <div key={index} className="flex items-start gap-2 p-3 bg-muted/50 rounded-lg">
+              <CardContent className="space-y-4">
+                <p className="text-foreground leading-relaxed">{result.h3Section.content}</p>
+                <ul className="space-y-2">
+                  {result.h3Section.bulletPoints.map((point, index) => (
+                    <li key={index} className="flex items-start gap-2">
                       <Star className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                      <span className="text-sm">{benefit}</span>
-                    </div>
+                      <span className="text-foreground">{point}</span>
+                    </li>
                   ))}
-                </div>
+                </ul>
+              </CardContent>
+            </Card>
+
+            <div className="grid gap-6 md:grid-cols-2">
+              {/* Témoignage */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-foreground">Témoignage</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="bg-muted/50 p-4 rounded-lg border-l-4 border-primary">
+                    <p className="text-foreground italic">"{result.testimonial}"</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* À quoi cela sert */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-foreground">À quoi cela sert</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-foreground leading-relaxed">{result.whatItDoesFor}</p>
+                </CardContent>
+              </Card>
+
+              {/* Où le trouver */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-foreground">Où le trouver</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-foreground leading-relaxed">{result.whereToFind}</p>
+                </CardContent>
+              </Card>
+
+              {/* Caractéristiques */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-foreground">Caractéristiques</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2">
+                    {result.characteristics.map((char, index) => (
+                      <li key={index} className="flex items-center gap-2">
+                        <Star className="h-4 w-4 text-primary" />
+                        <span className="text-foreground">{char}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* FAQ */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-foreground">Questions Fréquentes</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {result.faq.map((item, index) => (
+                  <div key={index} className="space-y-2">
+                    <h4 className="font-semibold text-foreground">{item.question}</h4>
+                    <p className="text-muted-foreground leading-relaxed">{item.answer}</p>
+                    {index < result.faq.length - 1 && <hr className="border-muted" />}
+                  </div>
+                ))}
               </CardContent>
             </Card>
           </div>

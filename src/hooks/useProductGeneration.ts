@@ -4,11 +4,13 @@ import { toast } from 'sonner';
 
 interface ProductSheet {
   title: string;
-  shortDescription: string;
-  longDescription: string;
-  features: string[];
-  specifications: { name: string; value: string }[];
-  benefits: string[];
+  h2Section: { title: string; content: string };
+  h3Section: { title: string; content: string; bulletPoints: string[] };
+  testimonial: string;
+  whatItDoesFor: string;
+  whereToFind: string;
+  faq: { question: string; answer: string }[];
+  characteristics: string[];
 }
 
 export const useProductGeneration = () => {
@@ -41,35 +43,53 @@ export const useProductGeneration = () => {
             },
             {
               role: 'user',
-              content: (() => {
-                // Extraire le mot-clé principal du titre (généralement les 2-3 premiers mots)
-                const mainKeyword = productTitle.split(' ').slice(0, 3).join(' ');
-                
-                return `Génère une fiche produit complète pour "${productTitle}". 
+              content: `Génère une fiche produit complète pour "${productTitle}". 
 
 Retourne UNIQUEMENT un JSON valide avec cette structure exacte:
 {
   "title": "${productTitle}",
-  "shortDescription": "Description courte en 2 lignes maximum avec le mot-clé principal '${mainKeyword}' en gras UNE SEULE FOIS (utilise <strong></strong>)",
-  "longDescription": "Description longue de 500 mots exactement, optimisée SEO, avec le mot-clé principal '${mainKeyword}' en gras 2-3 fois maximum, réparties naturellement dans le texte (utilise <strong></strong>)",
-  "features": ["caractéristique 1", "caractéristique 2", "caractéristique 3", "caractéristique 4", "caractéristique 5"],
-  "specifications": [
-    {"name": "Nom technique précis", "value": "Valeur mesurable avec unité"},
-    {"name": "Autre donnée technique", "value": "Valeur chiffrée précise"},
-    {"name": "Critère technique", "value": "Spécification quantifiée"},
-    {"name": "Donnée technique", "value": "Mesure ou norme technique"},
-    {"name": "Spécification technique", "value": "Valeur technique concrète"}
+  "h2Section": {
+    "title": "Découvrez ${productTitle}",
+    "content": "Texte d'introduction de 150 mots environ présentant le produit de manière engageante"
+  },
+  "h3Section": {
+    "title": "Pourquoi choisir ${productTitle} ?",
+    "content": "Texte explicatif de 100 mots environ",
+    "bulletPoints": [
+      "Point clé 1 avec bénéfice concret",
+      "Point clé 2 avec avantage pratique", 
+      "Point clé 3 avec valeur ajoutée",
+      "Point clé 4 avec différenciation"
+    ]
+  },
+  "testimonial": "Témoignage réaliste d'un client satisfait de 2-3 phrases avec son prénom et profession",
+  "whatItDoesFor": "Explication claire de ce que ce produit apporte concrètement à l'utilisateur en 2-3 phrases",
+  "whereToFind": "Indications sur où acheter ou se procurer ce produit en 1-2 phrases",
+  "faq": [
+    {
+      "question": "Question fréquente pertinente sur le produit ?",
+      "answer": "Réponse claire et utile de 2-3 phrases"
+    },
+    {
+      "question": "Autre question importante que se posent les clients ?", 
+      "answer": "Réponse détaillée et rassurante de 2-3 phrases"
+    }
   ],
-  "benefits": ["Bénéfice client clair et direct", "Avantage pratique concret pour l'utilisateur", "Bénéfice économique ou gain de temps", "Avantage qualité ou sécurité"]
+  "characteristics": [
+    "Caractéristique technique précise 1",
+    "Caractéristique technique précise 2", 
+    "Caractéristique technique précise 3",
+    "Caractéristique technique précise 4",
+    "Caractéristique technique précise 5"
+  ]
 }
 
 Important:
-- La description longue doit faire EXACTEMENT 500 mots
-- Le mot-clé principal "${mainKeyword}" en gras maximum 2-3 fois dans la description longue
-- Les spécifications doivent être TECHNIQUES et MESURABLES : dimensions exactes, poids, matériaux, performances chiffrées, certifications, normes, etc.
-- Les avantages doivent être CONCRETS et ORIENTÉS CLIENT : économies réelles, gain de temps précis, sécurité renforcée, facilité d'usage, etc.
-- Sois créatif et pertinent selon le type de produit`;
-              })()
+- Le contenu doit être professionnel et crédible
+- Les caractéristiques doivent être techniques et spécifiques au produit
+- Le témoignage doit sembler authentique
+- Adapte le contenu au type de produit (technologie, mode, maison, etc.)
+- Évite les superlatifs excessifs`
             }
           ],
           temperature: 0.7,
@@ -107,27 +127,39 @@ Important:
       // Fallback avec données d'exemple
       setResult({
         title: productTitle,
-        shortDescription: `<strong>${productTitle}</strong> - Un produit innovant qui révolutionne votre expérience utilisateur. Découvrez une qualité exceptionnelle et des performances inégalées.`,
-        longDescription: `<strong>${productTitle}</strong> représente l'excellence dans sa catégorie. Ce produit révolutionnaire combine innovation, qualité et performance pour offrir une expérience utilisateur exceptionnelle. Avec <strong>${productTitle}</strong>, vous investissez dans un produit conçu avec les dernières technologies et les matériaux les plus nobles. L'attention portée aux détails et la finition soignée font de <strong>${productTitle}</strong> un choix de premier plan pour les consommateurs exigeants. Les fonctionnalités avancées intégrées dans <strong>${productTitle}</strong> permettent une utilisation intuitive et efficace au quotidien. La robustesse et la fiabilité de <strong>${productTitle}</strong> garantissent une durée de vie exceptionnelle et un retour sur investissement optimal. L'équipe de développement a travaillé sans relâche pour que <strong>${productTitle}</strong> réponde aux besoins les plus exigeants du marché moderne. Les tests rigoureux effectués sur <strong>${productTitle}</strong> confirment sa supériorité technique et sa facilité d'utilisation. En choisissant <strong>${productTitle}</strong>, vous optez pour un produit qui allie esthétique moderne et fonctionnalité pratique. La garantie étendue accompagnant <strong>${productTitle}</strong> témoigne de la confiance du fabricant dans la qualité de son produit. Service client dédié et support technique expert complètent l'offre <strong>${productTitle}</strong> pour une satisfaction client maximale. Rejoignez les milliers d'utilisateurs satisfaits qui ont fait confiance à <strong>${productTitle}</strong> pour transformer leur quotidien. Innovation, qualité, performance : <strong>${productTitle}</strong> incarne ces valeurs dans chaque détail de sa conception et de sa réalisation.`,
-        features: [
-          'Design moderne et élégant',
-          'Technologie de pointe intégrée',
-          'Facilité d\'utilisation optimale',
-          'Matériaux de qualité supérieure',
-          'Performance exceptionnelle'
+        h2Section: {
+          title: `Découvrez ${productTitle}`,
+          content: `${productTitle} représente l'innovation dans sa catégorie. Ce produit combine qualité et performance pour offrir une expérience utilisateur exceptionnelle. Conçu avec les dernières technologies, il répond aux besoins les plus exigeants du marché moderne.`
+        },
+        h3Section: {
+          title: `Pourquoi choisir ${productTitle} ?`,
+          content: `Ce produit se distingue par sa conception soignée et ses fonctionnalités avancées qui garantissent une utilisation optimale au quotidien.`,
+          bulletPoints: [
+            'Design ergonomique pour un confort optimal',
+            'Technologie de pointe intégrée',
+            'Facilité d\'utilisation maximale',
+            'Durabilité et fiabilité exceptionnelles'
+          ]
+        },
+        testimonial: `"${productTitle} a vraiment changé ma façon de travailler. La qualité est au rendez-vous !" - Marie, Consultante`,
+        whatItDoesFor: `${productTitle} améliore votre productivité au quotidien grâce à ses fonctionnalités avancées et son design pensé pour l'utilisateur. Il vous fait gagner du temps tout en offrant une qualité exceptionnelle.`,
+        whereToFind: `Disponible chez les revendeurs agréés et sur les plateformes de vente en ligne spécialisées. Livraison rapide partout en France.`,
+        faq: [
+          {
+            question: `Quelle est la garantie pour ${productTitle} ?`,
+            answer: `Le produit bénéficie d'une garantie constructeur de 2 ans couvrant tous les défauts de fabrication. Un service client dédié est disponible pour vous accompagner.`
+          },
+          {
+            question: `${productTitle} est-il facile à utiliser ?`,
+            answer: `Absolument ! Le produit a été conçu pour être intuitif dès la première utilisation. Un guide de démarrage rapide est inclus pour vous aider.`
+          }
         ],
-        specifications: [
-          { name: 'Dimensions', value: 'Standard' },
-          { name: 'Poids', value: 'Optimisé' },
-          { name: 'Matériau', value: 'Premium' },
-          { name: 'Garantie', value: '2 ans' },
-          { name: 'Origine', value: 'Qualité contrôlée' }
-        ],
-        benefits: [
-          'Améliore votre productivité au quotidien',
-          'Design ergonomique pour un confort optimal',
-          'Économies à long terme grâce à sa durabilité',
-          'Support client expert disponible 7j/7'
+        characteristics: [
+          'Matériaux de qualité premium',
+          'Design moderne et élégant', 
+          'Performance optimisée',
+          'Installation simple et rapide',
+          'Compatible avec tous les standards'
         ]
       });
     } finally {
