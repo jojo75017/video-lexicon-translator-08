@@ -49,47 +49,47 @@ Retourne UNIQUEMENT un JSON valide avec cette structure exacte:
 {
   "title": "${productTitle}",
   "h2Section": {
-    "title": "Découvrez ${productTitle}",
-    "content": "Texte d'introduction de 150 mots environ présentant le produit de manière engageante"
+    "title": "Présentation de ${productTitle}",
+    "content": "Description factuelle de 120 mots décrivant objectivement le produit, ses fonctions principales et son utilisation"
   },
   "h3Section": {
-    "title": "Pourquoi choisir ${productTitle} ?",
-    "content": "Texte explicatif de 100 mots environ",
+    "title": "Fonctionnalités principales",
+    "content": "Texte de 80 mots décrivant les fonctions concrètes du produit",
     "bulletPoints": [
-      "Point clé 1 avec bénéfice concret",
-      "Point clé 2 avec avantage pratique", 
-      "Point clé 3 avec valeur ajoutée",
-      "Point clé 4 avec différenciation"
+      "Fonction technique précise 1",
+      "Fonction technique précise 2", 
+      "Fonction technique précise 3",
+      "Fonction technique précise 4"
     ]
   },
-  "testimonial": "Témoignage réaliste d'un client satisfait de 2-3 phrases avec son prénom et profession",
-  "whatItDoesFor": "Explication claire de ce que ce produit apporte concrètement à l'utilisateur en 2-3 phrases",
-  "whereToFind": "Indications sur où acheter ou se procurer ce produit en 1-2 phrases",
+  "testimonial": "Avis factuel d'un utilisateur en 2 phrases courtes avec prénom et contexte d'usage",
+  "whatItDoesFor": "Explication factuelle en 2 phrases de l'utilité concrète du produit",
+  "whereToFind": "Information factuelle sur les lieux de vente ou d'achat en 1-2 phrases simples",
   "faq": [
     {
-      "question": "Question fréquente pertinente sur le produit ?",
-      "answer": "Réponse claire et utile de 2-3 phrases"
+      "question": "Question technique pratique sur l'utilisation ?",
+      "answer": "Réponse factuelle et précise en 2 phrases"
     },
     {
-      "question": "Autre question importante que se posent les clients ?", 
-      "answer": "Réponse détaillée et rassurante de 2-3 phrases"
+      "question": "Question sur la compatibilité ou installation ?", 
+      "answer": "Réponse technique claire en 2 phrases"
     }
   ],
   "characteristics": [
-    "Caractéristique technique précise 1",
-    "Caractéristique technique précise 2", 
-    "Caractéristique technique précise 3",
-    "Caractéristique technique précise 4",
-    "Caractéristique technique précise 5"
+    "Donnée technique mesurable (dimensions, poids, matériau, etc.)",
+    "Spécification technique précise (puissance, capacité, etc.)", 
+    "Norme ou certification technique",
+    "Compatibilité technique factuelle",
+    "Caractéristique physique mesurable"
   ]
 }
 
-Important:
-- Le contenu doit être professionnel et crédible
-- Les caractéristiques doivent être techniques et spécifiques au produit
-- Le témoignage doit sembler authentique
-- Adapte le contenu au type de produit (technologie, mode, maison, etc.)
-- Évite les superlatifs excessifs`
+IMPORTANT:
+- ZERO marketing, ZERO superlatifs (évite "exceptionnel", "révolutionnaire", etc.)
+- Les caractéristiques doivent être UNIQUEMENT des données techniques FACTUELLES
+- Pas de "qualité premium" ou "design moderne" - seulement des MESURES et SPECS
+- Contenu informatif et objectif uniquement
+- Adapte les specs techniques au type de produit réel`
             }
           ],
           temperature: 0.7,
@@ -128,38 +128,38 @@ Important:
       setResult({
         title: productTitle,
         h2Section: {
-          title: `Découvrez ${productTitle}`,
-          content: `${productTitle} représente l'innovation dans sa catégorie. Ce produit combine qualité et performance pour offrir une expérience utilisateur exceptionnelle. Conçu avec les dernières technologies, il répond aux besoins les plus exigeants du marché moderne.`
+          title: `Présentation de ${productTitle}`,
+          content: `${productTitle} est un produit conçu pour répondre à des besoins spécifiques. Il intègre des composants sélectionnés pour assurer son fonctionnement. Le produit est destiné à un usage défini et suit les standards de sa catégorie.`
         },
         h3Section: {
-          title: `Pourquoi choisir ${productTitle} ?`,
-          content: `Ce produit se distingue par sa conception soignée et ses fonctionnalités avancées qui garantissent une utilisation optimale au quotidien.`,
+          title: `Fonctionnalités principales`,
+          content: `Ce produit dispose de fonctions intégrées pour son utilisation standard. Les composants sont assemblés selon les spécifications techniques requises.`,
           bulletPoints: [
-            'Design ergonomique pour un confort optimal',
-            'Technologie de pointe intégrée',
-            'Facilité d\'utilisation maximale',
-            'Durabilité et fiabilité exceptionnelles'
+            'Interface utilisateur standard',
+            'Connectivité selon normes établies',
+            'Mécanisme de fonctionnement adapté',
+            'Système de contrôle intégré'
           ]
         },
-        testimonial: `"${productTitle} a vraiment changé ma façon de travailler. La qualité est au rendez-vous !" - Marie, Consultante`,
-        whatItDoesFor: `${productTitle} améliore votre productivité au quotidien grâce à ses fonctionnalités avancées et son design pensé pour l'utilisateur. Il vous fait gagner du temps tout en offrant une qualité exceptionnelle.`,
-        whereToFind: `Disponible chez les revendeurs agréés et sur les plateformes de vente en ligne spécialisées. Livraison rapide partout en France.`,
+        testimonial: `"J'utilise ${productTitle} depuis 6 mois dans mon travail quotidien. Il remplit sa fonction correctement." - Pierre, Technicien`,
+        whatItDoesFor: `${productTitle} permet d'effectuer les tâches pour lesquelles il a été conçu. Il s'intègre dans un environnement de travail standard.`,
+        whereToFind: `Disponible chez les distributeurs agréés et magasins spécialisés. Vente également possible en ligne sur les plateformes habituelles.`,
         faq: [
           {
-            question: `Quelle est la garantie pour ${productTitle} ?`,
-            answer: `Le produit bénéficie d'une garantie constructeur de 2 ans couvrant tous les défauts de fabrication. Un service client dédié est disponible pour vous accompagner.`
+            question: `Quelle est la durée de garantie de ${productTitle} ?`,
+            answer: `Le produit est couvert par une garantie constructeur standard. Les conditions sont précisées dans la documentation fournie.`
           },
           {
-            question: `${productTitle} est-il facile à utiliser ?`,
-            answer: `Absolument ! Le produit a été conçu pour être intuitif dès la première utilisation. Un guide de démarrage rapide est inclus pour vous aider.`
+            question: `${productTitle} nécessite-t-il une installation particulière ?`,
+            answer: `L'installation suit une procédure standard. Un manuel d'utilisation détaille les étapes à suivre.`
           }
         ],
         characteristics: [
-          'Matériaux de qualité premium',
-          'Design moderne et élégant', 
-          'Performance optimisée',
-          'Installation simple et rapide',
-          'Compatible avec tous les standards'
+          'Dimensions: selon spécifications standard',
+          'Poids: conforme aux normes de transport', 
+          'Matériaux: conformes aux réglementations',
+          'Alimentation: selon standards électriques',
+          'Température de fonctionnement: plage normale'
         ]
       });
     } finally {
