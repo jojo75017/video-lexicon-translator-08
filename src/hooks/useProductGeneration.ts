@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 
 interface ProductSheet {
   title: string;
+  shortDescription: string;
   h2Section: { title: string; content: string };
   h3Section: { title: string; content: string; bulletPoints: string[] };
   testimonial: string;
@@ -48,9 +49,10 @@ export const useProductGeneration = () => {
 Retourne UNIQUEMENT un JSON valide avec cette structure exacte:
 {
   "title": "${productTitle}",
+  "shortDescription": "Description courte de 2 lignes maximum décrivant l'essentiel du produit de manière factuelle",
   "h2Section": {
     "title": "Présentation de ${productTitle}",
-    "content": "Description factuelle de 120 mots décrivant objectivement le produit, ses fonctions principales et son utilisation"
+    "content": "Description longue de 200 mots décrivant objectivement le produit, ses fonctions principales et son utilisation. Inclure un lien cliquable vers une page d'information avec cette syntaxe: <a href='https://example.com/info-produit' target='_blank'>Plus d'informations techniques</a>"
   },
   "h3Section": {
     "title": "Fonctionnalités principales",
@@ -73,6 +75,10 @@ Retourne UNIQUEMENT un JSON valide avec cette structure exacte:
     {
       "question": "Question sur la compatibilité ou installation ?", 
       "answer": "Réponse technique claire en 2 phrases"
+    },
+    {
+      "question": "Question sur la maintenance ou support ?", 
+      "answer": "Réponse pratique en 2 phrases"
     }
   ],
   "characteristics": [
@@ -85,9 +91,11 @@ Retourne UNIQUEMENT un JSON valide avec cette structure exacte:
 }
 
 IMPORTANT:
-- ZERO marketing, ZERO superlatifs (évite "exceptionnel", "révolutionnaire", etc.)
+- Description courte: EXACTEMENT 2 lignes maximum
+- Description longue: 200 mots avec un lien cliquable obligatoire
+- FAQ: EXACTEMENT 3 questions
+- ZERO marketing, ZERO superlatifs
 - Les caractéristiques doivent être UNIQUEMENT des données techniques FACTUELLES
-- Pas de "qualité premium" ou "design moderne" - seulement des MESURES et SPECS
 - Contenu informatif et objectif uniquement
 - Adapte les specs techniques au type de produit réel`
             }
@@ -127,13 +135,15 @@ IMPORTANT:
       // Fallback avec données d'exemple
       setResult({
         title: productTitle,
+        shortDescription: `${productTitle} est un produit conçu pour répondre à des besoins spécifiques d'utilisation.
+Il intègre des composants sélectionnés pour assurer son fonctionnement selon les standards établis.`,
         h2Section: {
           title: `Présentation de ${productTitle}`,
-          content: `${productTitle} est un produit conçu pour répondre à des besoins spécifiques. Il intègre des composants sélectionnés pour assurer son fonctionnement. Le produit est destiné à un usage défini et suit les standards de sa catégorie.`
+          content: `${productTitle} est un produit conçu pour répondre à des besoins spécifiques. Il intègre des composants sélectionnés pour assurer son fonctionnement. Le produit est destiné à un usage défini et suit les standards de sa catégorie. Les matériaux utilisés respectent les normes en vigueur. Le processus de fabrication suit des procédures établies pour garantir la conformité. L'assemblage est réalisé selon des spécifications techniques précises. Le contrôle qualité vérifie le respect des critères définis. La documentation fournie détaille les conditions d'utilisation. Le produit s'intègre dans un environnement standard. <a href='https://example.com/specifications-techniques' target='_blank'>Consulter les spécifications techniques complètes</a> pour plus de détails sur les caractéristiques.`
         },
         h3Section: {
           title: `Fonctionnalités principales`,
-          content: `Ce produit dispose de fonctions intégrées pour son utilisation standard. Les composants sont assemblés selon les spécifications techniques requises.`,
+          content: `Ce produit dispose de fonctions intégrées pour son utilisation standard. Les composants sont assemblés selon les spécifications techniques requises. Le système de contrôle intégré permet son fonctionnement normal.`,
           bulletPoints: [
             'Interface utilisateur standard',
             'Connectivité selon normes établies',
@@ -152,6 +162,10 @@ IMPORTANT:
           {
             question: `${productTitle} nécessite-t-il une installation particulière ?`,
             answer: `L'installation suit une procédure standard. Un manuel d'utilisation détaille les étapes à suivre.`
+          },
+          {
+            question: `Quel support technique est disponible pour ${productTitle} ?`,
+            answer: `Un service technique est accessible pendant les heures ouvrables. Les coordonnées sont fournies dans la documentation produit.`
           }
         ],
         characteristics: [

@@ -33,6 +33,9 @@ const ProductGeneratorPage = () => {
     
     const content = `FICHE PRODUIT - ${result.title}
 
+DESCRIPTION COURTE:
+${result.shortDescription}
+
 ## ${result.h2Section.title}
 ${result.h2Section.content}
 
@@ -137,7 +140,26 @@ ${result.characteristics.map(char => `• ${char}`).join('\n')}
         {/* Résultats */}
         {result && (
           <div className="space-y-6">
-            {/* Section H2 */}
+            {/* Description courte */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between text-foreground">
+                  Description Courte (2 lignes)
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => copyToClipboard(result.shortDescription)}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-foreground leading-relaxed whitespace-pre-line">{result.shortDescription}</p>
+              </CardContent>
+            </Card>
+
+            {/* Section H2 avec description longue */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center justify-between text-foreground">
@@ -152,7 +174,10 @@ ${result.characteristics.map(char => `• ${char}`).join('\n')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-foreground leading-relaxed">{result.h2Section.content}</p>
+                <div 
+                  className="text-foreground leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: result.h2Section.content }}
+                />
               </CardContent>
             </Card>
 
