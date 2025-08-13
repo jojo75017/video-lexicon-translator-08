@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { PinterestPin, PinterestImage } from '@/types/pinterest';
 import { pinterestDesigns, worldImages, europeImages, franceImages, allImages } from '@/data/pinterestImages';
 import { searchImagesByKeyword, filterImagesByCategory } from '@/services/imageService';
+import { generateContentFromImage, extractTagsFromImage } from '@/services/imageService';
 import { toast } from 'sonner';
 
 export const usePinterestGenerator = (initialPin: PinterestPin) => {
@@ -92,12 +93,71 @@ export const usePinterestGenerator = (initialPin: PinterestPin) => {
   const handleSelectImage = (image: PinterestImage) => {
     updatePin('image', image);
     updatePin('uploadedImage', null);
+    
+    // Auto-génération du contenu basé sur l'image
+    try {
+      const generatedContent = generateContentFromImage(image);
+      const extractedTags = extractTagsFromImage(image);
+      
+      if (!pin.title) {
+        updatePin('title', generatedContent.title);
+      }
+      
+      if (!pin.description) {
+        updatePin('description', generatedContent.description);
+      }
+      
+      // Ajouter les tags extraits comme hashtags
+      const newHashtags = extractedTags.map(tag => `#${tag}`).slice(0, 10);
+      updatePin('hashtags', [...pin.hashtags, ...newHashtags].slice(0, 30));
+      
+      toast.success('Image sélectionnée et contenu généré !');
+    } catch (error) {
+      console.error('Erreur lors de la génération du contenu:', error);
+      toast.warning('Image sélectionnée, mais impossible de générer le contenu automatiquement');
+    }
   };
 
   const resetPin = () => {
     setPin(initialPin);
-    updatePin('image', null);
-    updatePin('uploadedImage', null);
+    setSearchQuery('');
+    setCustomHashtag('');
+    setSelectedImageCategory('all');
+    setImages(allImages as unknown as PinterestImage[]);
+    toast.success('Pin réinitialisé');
+  };
+
+  const generateQuickContent = (theme: string) => {
+    const templates = {
+      'inspiration': {
+        title: 'Inspiration du jour ✨',
+        description: 'Découvrez cette inspiration incroyable qui va transformer votre journée ! 💫 Partagez votre motivation et inspirez les autres.',
+        hashtags: ['#inspiration', '#motivation', '#lifestyle', '#positivevibes', '#mindset']
+      },
+      'diy': {
+        title: 'DIY Créatif 🎨',
+        description: 'Tutoriel DIY facile à réaliser ! Matériaux simples, résultat bluffant. Parfait pour un weekend créatif en famille.',
+        hashtags: ['#diy', '#tuto', '#handmade', '#creative', '#crafting']
+      },
+      'cuisine': {
+        title: 'Recette Délicieuse 🍴',
+        description: 'Une recette simple et savoureuse qui va régaler toute la famille ! Ingrédients faciles à trouver, préparation rapide.',
+        hashtags: ['#recette', '#cuisine', '#food', '#cooking', '#delicious']
+      },
+      'voyage': {
+        title: 'Destination de Rêve ✈️',
+        description: 'Découvrez cette destination incontournable ! Conseils, bons plans et spots secrets pour un voyage inoubliable.',
+        hashtags: ['#voyage', '#travel', '#destination', '#adventure', '#wanderlust']
+      }
+    };
+
+    const template = templates[theme as keyof typeof templates];
+    if (template) {
+      updatePin('title', template.title);
+      updatePin('description', template.description);
+      updatePin('hashtags', template.hashtags);
+      toast.success(`Contenu ${theme} généré !`);
+    }
   };
 
   return {
@@ -124,6 +184,7 @@ export const usePinterestGenerator = (initialPin: PinterestPin) => {
     handleSaveInstagramApiKey,
     handleImageUpload,
     handleSelectImage,
-    resetPin
+    resetPin,
+    generateQuickContent
   };
 };

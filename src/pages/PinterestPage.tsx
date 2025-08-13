@@ -54,7 +54,8 @@ const PinterestPage: React.FC = () => {
     handleSaveInstagramApiKey,
     handleImageUpload,
     handleSelectImage,
-    resetPin
+    resetPin,
+    generateQuickContent
   } = usePinterestGenerator(defaultPin);
 
   const { generateSocialContent } = useSocialContent({ updatePin, setActiveTab });
@@ -149,35 +150,75 @@ const PinterestPage: React.FC = () => {
                     <CardTitle>🚀 Génération Rapide</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                      <Button
-                        variant="outline"
-                        onClick={() => generateSocialContent('pinterest')}
-                        className="text-xs"
-                      >
-                        Pinterest
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => generateSocialContent('instagram')}
-                        className="text-xs"
-                      >
-                        Instagram
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => generateSocialContent('facebook')}
-                        className="text-xs"
-                      >
-                        Facebook
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => generateSocialContent('linkedin')}
-                        className="text-xs"
-                      >
-                        LinkedIn
-                      </Button>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        <Button
+                          variant="outline"
+                          onClick={() => generateSocialContent('pinterest')}
+                          className="text-xs"
+                        >
+                          Pinterest
+                        </Button>
+                        <Button
+                          variant="outline"
+                          onClick={() => generateSocialContent('instagram')}
+                          className="text-xs"
+                        >
+                          Instagram
+                        </Button>
+                        <Button
+                          variant="outline"
+                          onClick={() => generateSocialContent('facebook')}
+                          className="text-xs"
+                        >
+                          Facebook
+                        </Button>
+                        <Button
+                          variant="outline"
+                          onClick={() => generateSocialContent('linkedin')}
+                          className="text-xs"
+                        >
+                          LinkedIn
+                        </Button>
+                      </div>
+                      
+                      <div className="border-t pt-4">
+                        <h4 className="font-medium mb-2 text-sm">Templates thématiques</h4>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => generateQuickContent('inspiration')}
+                            className="text-xs h-8"
+                          >
+                            ✨ Inspiration
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => generateQuickContent('diy')}
+                            className="text-xs h-8"
+                          >
+                            🎨 DIY
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => generateQuickContent('cuisine')}
+                            className="text-xs h-8"
+                          >
+                            🍴 Cuisine
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => generateQuickContent('voyage')}
+                            className="text-xs h-8"
+                          >
+                            ✈️ Voyage
+                          </Button>
+                        </div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
