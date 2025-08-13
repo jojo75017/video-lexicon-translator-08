@@ -233,14 +233,31 @@ const PinterestPage: React.FC = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      <Input
-                        placeholder="Entrez le titre de votre épingle..."
-                        value={pin.title}
-                        onChange={(e) => updatePin('title', e.target.value)}
-                        className="text-lg font-medium"
-                      />
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Entrez le titre de votre épingle..."
+                          value={pin.title}
+                          onChange={(e) => {
+                            updatePin('title', e.target.value);
+                            // Auto-génération après 3 caractères
+                            if (e.target.value.length >= 3 && !pin.description && !pin.hashtags.length) {
+                              generateSocialContent('pinterest');
+                            }
+                          }}
+                          className="text-lg font-medium flex-1"
+                        />
+                        <Button
+                          variant="outline"
+                          onClick={() => generateSocialContent('pinterest')}
+                          disabled={!pin.title}
+                          className="gap-2"
+                        >
+                          <Palette className="h-4 w-4" />
+                          Générer
+                        </Button>
+                      </div>
                       <div className="text-sm text-muted-foreground">
-                        {pin.title.length}/100 caractères
+                        {pin.title.length}/100 caractères - La génération automatique se déclenche après 3 caractères
                       </div>
                       {pin.title && (
                         <Button
@@ -506,25 +523,48 @@ const PinterestPage: React.FC = () => {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Settings className="h-5 w-5" />
-                      Paramètres
+                      Configuration API
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                       <div>
-                        <label className="text-sm font-medium mb-2 block">
-                          Clé API Instagram (optionnel)
-                        </label>
+                        <label className="text-sm font-medium mb-2 block">Clé API OpenAI</label>
                         <div className="flex gap-2">
                           <Input
                             type="password"
-                            placeholder="Votre clé API Instagram..."
+                            placeholder="sk-..."
                             value={instagramApiKey}
                             onChange={(e) => setInstagramApiKey(e.target.value)}
                           />
                           <Button onClick={handleSaveInstagramApiKey} size="sm">
                             Sauvegarder
                           </Button>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Utilisée pour la génération automatique de contenu Pinterest optimisé
+                        </p>
+                      </div>
+                      
+                      <div className="border-t pt-4">
+                        <h4 className="font-medium mb-3">Options de génération automatique</h4>
+                        <div className="space-y-2 text-sm text-muted-foreground">
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                            <span>Génération automatique après 3 caractères dans le titre</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                            <span>Auto-génération basée sur l'image sélectionnée</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            <span>Templates thématiques prédéfinis disponibles</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                            <span>Optimisation SEO automatique pour Pinterest</span>
+                          </div>
                         </div>
                       </div>
                       
