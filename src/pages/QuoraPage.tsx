@@ -97,6 +97,7 @@ const QuoraPage: React.FC = () => {
     // Utilisation du générateur de contenu Quora
     setTimeout(() => {
       try {
+        console.log('Génération du contenu Quora avec:', { keyword, minWordCount, responseStyle });
         const content = generateQuoraContent(
           keyword,
           minWordCount,
@@ -104,12 +105,13 @@ const QuoraPage: React.FC = () => {
           responseStyle
         );
         
+        console.log('Contenu généré:', content);
         setGeneratedContent(content);
         setActiveTab('answer');
         toast.success('Contenu Quora généré avec succès !');
       } catch (error) {
         toast.error('Erreur lors de la génération du contenu');
-        console.error(error);
+        console.error('Erreur génération Quora:', error);
       } finally {
         setIsGeneratingAnswer(false);
       }
