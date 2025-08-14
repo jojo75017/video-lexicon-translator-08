@@ -35,27 +35,27 @@ export const useSocialContent = ({ updatePin, setActiveTab }: UseSocialContentPr
     const descriptions = [
       `Découvrez ${title} ! Cette épingle unique vous emmène dans un univers d'inspiration sans limite. Que vous soyez passionné de ${mainKeyword} ou simplement à la recherche de nouvelles idées créatives, ce contenu est fait pour vous.
       
-      Notre expertise nous permet de vous proposer des conseils pratiques et des astuces innovantes qui transformeront votre approche de ${mainKeyword}. Avec plus de 10 ans d'expérience dans le domaine, nous avons compilé les meilleures stratégies pour vous aider à réussir.
+      Cette collection exceptionnelle regroupe des techniques éprouvées, des exemples concrets et des méthodes faciles à suivre. Chaque conseil a été soigneusement sélectionné pour vous aider à réussir vos projets.
       
-      Dans cette collection exceptionnelle, vous trouverez des techniques éprouvées, des exemples concrets et des méthodes step-by-step faciles à suivre. Chaque conseil a été testé et validé par notre communauté de créateurs passionnés.
+      Dans cette ressource complète, vous trouverez des astuces pratiques, des inspirations créatives et des solutions innovantes. Tout est conçu pour stimuler votre créativité et vous donner de nouvelles perspectives.
       
-      Les tendances actuelles en matière de ${mainKeyword} évoluent rapidement, et nous restons à la pointe de l'innovation pour vous offrir un contenu toujours d'actualité. Notre approche combine tradition et modernité pour des résultats exceptionnels.
+      Les tendances actuelles en matière de ${mainKeyword} évoluent rapidement, et cette épingle vous tient au courant des dernières nouveautés. Une approche moderne qui combine tradition et innovation pour des résultats exceptionnels.
       
-      Enregistrez cette épingle pour ne rien manquer de nos futures publications. Partagez avec vos amis et rejoignez notre communauté grandissante de passionnés. Ensemble, créons quelque chose d'extraordinaire !
+      Enregistrez cette épingle pour ne rien manquer de vos futures découvertes. Partagez avec vos amis et explorez encore plus d'inspiration. Ensemble, créons quelque chose d'extraordinaire !
       
-      N'hésitez pas à explorer nos autres épingles pour découvrir encore plus d'inspiration. Votre créativité n'a pas de limites, et nous sommes là pour vous accompagner dans cette belle aventure. Prêt à commencer votre transformation ?`,
+      N'hésitez pas à explorer d'autres épingles similaires pour découvrir encore plus d'idées. Votre créativité n'a pas de limites, et ces ressources sont là pour vous accompagner. Prêt à commencer votre transformation ?`,
       
-      `Plongez dans l'univers fascinant de ${title} avec cette épingle exceptionnelle ! Notre équipe d'experts a soigneusement sélectionné les meilleures ressources pour enrichir votre parcours créatif.
+      `Plongez dans l'univers fascinant de ${title} avec cette épingle exceptionnelle ! Cette collection a été soigneusement assemblée pour enrichir votre parcours créatif avec les meilleures ressources disponibles.
       
-      Le monde de ${mainKeyword} regorge d'opportunités inexploitées. Grâce à nos années de recherche et d'expérimentation, nous avons développé une méthode unique qui garantit des résultats spectaculaires. Cette approche révolutionnaire change la donne.
+      Le monde de ${mainKeyword} regorge d'opportunités inexploitées. Grâce à cette sélection unique, vous découvrirez des techniques avancées et des stratégies efficaces. Cette approche vous change la donne.
       
-      Vous découvrirez des secrets bien gardés, des techniques avancées et des stratégies gagnantes utilisées par les professionnels du secteur. Chaque élément de ce contenu a été pensé pour maximiser votre potentiel créatif et vous faire gagner un temps précieux.
+      Vous découvrirez des conseils pratiques, des techniques détaillées et des stratégies gagnantes utilisées par les passionnés du domaine. Chaque élément de ce contenu a été pensé pour maximiser votre potentiel créatif.
       
-      Notre communauté de plus de 50 000 créateurs partage régulièrement ses succès et ses découvertes. En rejoignant ce mouvement, vous accédez à un réseau exceptionnel de personnes partageant les mêmes passions et ambitions que vous.
+      Cette ressource vous donne accès à un réseau d'inspiration exceptionnel. En explorant ce contenu, vous rejoignez une communauté de personnes partageant les mêmes passions et ambitions que vous.
       
-      Les transformations obtenues grâce à nos méthodes sont remarquables. Témoignages, études de cas et résultats concrets attestent de l'efficacité de notre approche. Votre succès est notre priorité absolue.
+      Les transformations obtenues grâce à ces méthodes sont remarquables. Des résultats concrets et des témoignages attestent de l'efficacité de cette approche. Votre succès créatif est à portée de main.
       
-      Sauvegardez cette épingle dans votre tableau favori et commencez dès aujourd'hui votre parcours vers l'excellence. Le changement commence maintenant, et nous serons vos guides fidèles tout au long de cette aventure extraordinaire !`
+      Sauvegardez cette épingle dans votre tableau favori et commencez dès aujourd'hui votre parcours vers l'excellence créative. Le changement commence maintenant, avec ces ressources exceptionnelles !`
     ];
     
     return descriptions[Math.floor(Math.random() * descriptions.length)];
