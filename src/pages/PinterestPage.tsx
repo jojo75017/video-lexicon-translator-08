@@ -240,7 +240,7 @@ const PinterestPage: React.FC = () => {
                           onChange={(e) => {
                             updatePin('title', e.target.value);
                             // Auto-génération après 3 caractères
-                            if (e.target.value.length >= 3 && !pin.description && !pin.hashtags.length) {
+                            if (e.target.value.length >= 3) {
                               generateSocialContent('pinterest');
                             }
                           }}
