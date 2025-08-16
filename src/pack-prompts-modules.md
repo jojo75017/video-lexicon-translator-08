@@ -1,36 +1,260 @@
-# 🚀 PACK DE 10 PROMPTS PROFESSIONNELS UNIVERSELS
+# 🚀 PACK DE 10 PROMPTS MARKETING & SEO PROFESSIONNELS
 ## Lead Magnet Premium - Récupération d'emails
 
 ---
 
-## 📱 PROMPT 1 - CRÉATION DE CONTENU VIRAL
+## 🟣 Prompt 1 : Stratégie SEO complète pour nouveaux sites web
 
-**Objectif :** Maximiser l'engagement et la viralité
+**Demande :** [Créer une stratégie SEO complète de A à Z pour un nouveau site web dans [votre secteur]]
 
-**Prompt à copier :**
+**Rôle :** [Vous êtes un expert SEO senior avec 10+ années d'expérience et consultant pour des entreprises Fortune 500.]
 
-Génère 20 idées de contenu viral pour [ton secteur] avec :
+**Mission :** [Développer une stratégie SEO holistique sur 12 mois pour propulser un nouveau site dans le top 3 des résultats de recherche.]
 
-📋 STRUCTURE DEMANDÉE :
-• Hook accrocheur (première phrase qui capte l'attention)
-• Angle original et différenciant
-• Call-to-action spécifique et actionnable
-• Format optimisé (carousel, vidéo, post simple)
-• Meilleur timing de publication
-• 10 hashtags stratégiques par idée
-• Estimation du potentiel viral (score 1-10)
+**Structure attendue :**
+• Audit technique complet (vitesse, mobile, structure, indexation)
+• Recherche de mots-clés stratégique (volume, difficulté, intention)
+• Architecture de contenu optimisée (silos thématiques, maillage interne)
+• Calendrier de publication de contenu (fréquence, types, optimisation)
+• Stratégie de netlinking (autorité, diversité, ancres naturelles)
+• KPIs et métriques de suivi (trafic organique, positions, conversions)
+• Planning d'exécution avec jalons mensuels
 
-🎯 CRITÈRES DE VIRALITÉ :
-- Émotion forte (surprise, joie, curiosité)
-- Valeur ajoutée immédiate
-- Facilité de partage
-- Tendance du moment
+**Sections formatées :** `<seo_audit>` `<keyword_strategy>` `<content_architecture>` `<link_building>` `<kpi_tracking>` `<execution_roadmap>`
 
-📊 LIVRABLES :
-1. Tableau récapitulatif des 20 idées
-2. Top 5 avec scripts détaillés
-3. Calendrier de publication optimisé
-4. Métriques à suivre pour chaque post
+**Style :** [Technique mais accessible, avec données chiffrées, exemples concrets et outils recommandés]
+
+---
+
+## 🟣 Prompt 2 : Campagne Google Ads haute performance
+
+**Demande :** [Concevoir une campagne Google Ads rentable avec ROI de 300%+ pour [votre produit/service]]
+
+**Rôle :** [Vous êtes un spécialiste Google Ads certifié avec expertise en e-commerce et lead generation.]
+
+**Mission :** [Créer une campagne Google Ads multi-niveaux optimisée pour maximiser les conversions tout en minimisant le CPC.]
+
+**Structure attendue :**
+• Analyse concurrentielle et positionnement (enchères, annonces, landing pages)
+• Structure de campagne optimale (Search, Display, Shopping, YouTube)
+• Recherche de mots-clés par intention (navigation, information, transaction)
+• Rédaction d'annonces persuasives (headlines, descriptions, extensions)
+• Optimisation landing pages (correspondance message, UX, conversion)
+• Stratégies d'enchères automatisées (Target CPA, ROAS, Maximize conversions)
+• Tests A/B systématiques et optimisations continues
+
+**Sections formatées :** `<competitor_analysis>` `<campaign_structure>` `<ad_copy>` `<landing_optimization>` `<bidding_strategy>` `<testing_framework>`
+
+**Style :** [Orienté performance, avec métriques précises, budgets réalistes et optimisations tactiques]
+
+---
+
+## 🟣 Prompt 3 : Stratégie de contenu viral pour réseaux sociaux
+
+**Demande :** [Développer une stratégie de contenu viral sur [plateforme] pour atteindre 100K followers en 6 mois]
+
+**Rôle :** [Vous êtes un expert en marketing viral et growth hacking, créateur de contenus ayant généré 50M+ de vues.]
+
+**Mission :** [Concevoir un système de création de contenu viral reproductible avec mécanismes d'amplification naturelle.]
+
+**Structure attendue :**
+• Analyse des tendances et algorithmes (timing, formats, engagement patterns)
+• Personas d'audience ultra-précis (démographie, psychographie, comportements)
+• Piliers de contenu stratégiques (éducation, divertissement, inspiration, actualité)
+• Calendrier éditorial optimisé (fréquence, horaires, saisonnalité)
+• Techniques de viralité (hooks, storytelling, appels à l'action, challenges)
+• Stratégies d'amplification croisée (cross-promotion, collaborations, UGC)
+• Métriques de viralité et KPIs d'engagement
+
+**Sections formatées :** `<viral_mechanics>` `<content_pillars>` `<editorial_calendar>` `<amplification_strategy>` `<engagement_optimization>`
+
+**Style :** [Créatif et data-driven, avec exemples viraux récents, techniques psychologiques et métriques d'engagement]
+
+---
+
+## 🟣 Prompt 4 : Funnel de conversion e-commerce optimisé
+
+**Demande :** [Construire un funnel de vente e-commerce avec taux de conversion de 5%+ pour [type de produit]]
+
+**Rôle :** [Vous êtes un expert en optimisation de conversion (CRO) spécialisé e-commerce avec track record de +200% d'amélioration.]
+
+**Mission :** [Créer un funnel de conversion scientifiquement optimisé de la découverte à l'achat répété.]
+
+**Structure attendue :**
+• Mapping du parcours client complet (awareness, consideration, purchase, retention)
+• Optimisation de chaque étape (landing pages, fiches produits, checkout, post-achat)
+• Techniques de persuasion avancées (preuve sociale, urgence, réciprocité, autorité)
+• Stratégies d'abandon de panier (emails, retargeting, offres incitatives)
+• Personnalisation dynamique (recommandations, prix, contenu adaptatif)
+• Tests A/B systématiques (headlines, CTA, layouts, prix)
+• Métriques de conversion et attribution multi-touch
+
+**Sections formatées :** `<conversion_mapping>` `<page_optimization>` `<persuasion_techniques>` `<abandonment_recovery>` `<personalization>` `<ab_testing>`
+
+**Style :** [Analytique et orienté résultats, avec données de conversion, heatmaps et cas d'études e-commerce]
+
+---
+
+## 🟣 Prompt 5 : Stratégie d'email marketing automatisée
+
+**Demande :** [Créer un système d'email marketing automatisé générant 40€ de ROI par euro investi pour [secteur d'activité]]
+
+**Rôle :** [Vous êtes un spécialiste en marketing automation et email marketing avec expertise en segmentation comportementale.]
+
+**Mission :** [Développer un écosystème d'emails automatisés hyper-personnalisés pour maximiser la lifetime value client.]
+
+**Structure attendue :**
+• Stratégie de capture d'emails (lead magnets, opt-ins, formulaires optimisés)
+• Segmentation avancée (comportementale, démographique, transactionnelle, lifecycle)
+• Séquences automatisées (welcome, nurturing, activation, retention, winback)
+• Personnalisation dynamique (contenu, timing, fréquence, produits)
+• Optimisation de la délivrabilité (authentification, réputation, engagement)
+• A/B testing systématique (objets, contenu, CTA, timing)
+• Métriques avancées et attribution revenue
+
+**Sections formatées :** `<lead_capture>` `<segmentation_strategy>` `<automation_sequences>` `<personalization>` `<deliverability>` `<performance_tracking>`
+
+**Style :** [Technique et orienté ROI, avec exemples de séquences, templates et métriques de performance email]
+
+---
+
+## 🟣 Prompt 6 : Stratégie de link building éthique et efficace
+
+**Demande :** [Développer une stratégie de netlinking white-hat pour obtenir 50+ backlinks de qualité en 3 mois pour [votre niche]]
+
+**Rôle :** [Vous êtes un expert en link building éthique et relations presse digitales avec réseau étendu de sites autoritaires.]
+
+**Mission :** [Créer un système reproductible d'acquisition de liens de haute qualité respectant les guidelines Google.]
+
+**Structure attendue :**
+• Audit du profil de liens existant (qualité, diversité, ancres, toxicité)
+• Recherche de prospects link building (DR/DA élevé, pertinence thématique, qualité éditoriale)
+• Stratégies d'outreach personnalisées (guest posting, broken link building, resource pages)
+• Création de contenu linkable (études, infographies, outils, guides experts)
+• Techniques de relation building (networking, partnerships, mentions)
+• Monitoring et suivi des acquisitions (nouveaux liens, métriques d'autorité)
+• Protection contre negative SEO et désaveu si nécessaire
+
+**Sections formatées :** `<link_audit>` `<prospect_research>` `<outreach_strategy>` `<linkable_content>` `<relationship_building>` `<monitoring_protection>`
+
+**Style :** [Éthique et stratégique, avec templates d'outreach, critères de qualité et métriques d'autorité]
+
+---
+
+## 🟣 Prompt 7 : Optimisation locale SEO pour entreprises physiques
+
+**Demande :** [Dominer les recherches locales et Google My Business pour [type d'entreprise locale] dans [ville/région]]
+
+**Rôle :** [Vous êtes un expert en SEO local et marketing de proximité avec spécialisation Google My Business et citations locales.]
+
+**Mission :** [Positionner l'entreprise #1 sur toutes les requêtes locales pertinentes et maximiser les appels/visites.]
+
+**Structure attendue :**
+• Optimisation Google My Business complète (profil, photos, posts, Q&A, avis)
+• Stratégie de citations locales (NAP consistency, annuaires spécialisés, autorité locale)
+• SEO on-page local (balises géo, schema markup local, pages de service locales)
+• Stratégie d'avis clients (génération, gestion, réponses optimisées)
+• Contenu hyperlocal (événements, actualités, partenariats communautaires)
+• Link building local (chambres de commerce, associations, partenaires locaux)
+• Tracking et reporting local (rankings locaux, appels, directions, réservations)
+
+**Sections formatées :** `<gmb_optimization>` `<local_citations>` `<local_onpage>` `<review_strategy>` `<hyperlocal_content>` `<local_linking>` `<local_tracking>`
+
+**Style :** [Pragmatique et actionnable, avec checklist d'optimisation, outils locaux et études de cas géographiques]
+
+---
+
+## 🟣 Prompt 8 : Stratégie de personal branding digital
+
+**Demande :** [Construire une autorité digitale reconnue dans [votre domaine] et devenir la référence incontournable en 12 mois]
+
+**Rôle :** [Vous êtes un consultant en personal branding digital et influence marketing avec portfolio de leaders d'opinion établis.]
+
+**Mission :** [Développer une présence digitale autoritaire qui génère opportunités business et reconnaissance professionnelle.]
+
+**Structure attendue :**
+• Audit de présence actuelle (réseaux sociaux, mentions, réputation online)
+• Définition du positionnement unique (expertise, différenciation, valeur apportée)
+• Stratégie de contenu thought leadership (articles, vidéos, podcasts, interventions)
+• Optimisation des profils sociaux (LinkedIn, Twitter, YouTube selon stratégie)
+• Networking digital stratégique (influenceurs, médias, communautés)
+• Relations presse et médias (pitch, interviews, citations, awards)
+• Mesure de l'influence et autorité (mentions, partages, invitations, business impact)
+
+**Sections formatées :** `<authority_audit>` `<positioning_strategy>` `<thought_leadership>` `<profile_optimization>` `<digital_networking>` `<media_relations>` `<influence_metrics>`
+
+**Style :** [Professionnel et ambitieux, avec roadmap de visibilité, exemples d'autorité et métriques d'influence]
+
+---
+
+## 🟣 Prompt 9 : Stratégie de contenu SEO pilotée par l'IA
+
+**Demande :** [Créer un système de production de contenu SEO à grande échelle utilisant l'IA pour [thématique] avec 100+ articles/mois]
+
+**Rôle :** [Vous êtes un expert en content marketing et IA appliquée au SEO avec maîtrise des outils d'automatisation de contenu.]
+
+**Mission :** [Développer une machine à contenu SEO alimentée par l'IA produisant un contenu de qualité à volume industriel.]
+
+**Structure attendue :**
+• Architecture de contenu sémantique (clusters thématiques, cocons sémantiques, intentions de recherche)
+• Workflow de production IA (research, outline, rédaction, optimisation, publication)
+• Outils et prompts IA optimisés (ChatGPT, Claude, Copy.ai, Jasper selon usage)
+• Processus de qualité et fact-checking (relecture humaine, vérification sources, plagiat)
+• Optimisation SEO automatisée (mots-clés, méta-descriptions, structure H1-H6)
+• Distribution et promotion automatisée (réseaux sociaux, newsletters, syndication)
+• Métriques de performance contenu (rankings, trafic, engagement, conversions)
+
+**Sections formatées :** `<content_architecture>` `<ai_workflow>` `<ai_tools_prompts>` `<quality_control>` `<seo_automation>` `<distribution_automation>` `<content_analytics>`
+
+**Style :** [Innovant et efficace, avec workflows détaillés, prompts IA optimisés et métriques de production]
+
+---
+
+## 🟣 Prompt 10 : Stratégie de remarketing multi-canal avancée
+
+**Demande :** [Créer un système de remarketing sophistiqué récupérant 25%+ des visiteurs perdus sur [type de site web]]
+
+**Rôle :** [Vous êtes un spécialiste en remarketing et marketing automation avec expertise cross-canal et attribution avancée.]
+
+**Mission :** [Développer un écosystème de re-engagement multi-touch maximisant la récupération et conversion des prospects tièdes.]
+
+**Structure attendue :**
+• Segmentation comportementale avancée (pages vues, temps passé, actions, intent scoring)
+• Stratégie remarketing display (créatifs dynamiques, fréquence optimale, suppression audiences)
+• Remarketing search (RLSA, customer match, similar audiences, bid adjustments)
+• Email remarketing automatisé (abandon panier, browse abandonment, category specific)
+• Remarketing social media (Facebook/Instagram pixels, LinkedIn retargeting, YouTube)
+• SMS et notifications push (timing optimal, personnalisation, opt-out management)
+• Attribution et measurement (cross-device, view-through, assisted conversions)
+
+**Sections formatées :** `<audience_segmentation>` `<display_remarketing>` `<search_remarketing>` `<email_automation>` `<social_retargeting>` `<mobile_remarketing>` `<attribution_measurement>`
+
+**Style :** [Technique et orienté performance, avec audiences précises, créatifs efficaces et modèles d'attribution]
+
+---
+
+## 🎁 **BONUS - INSTRUCTIONS D'UTILISATION**
+
+### 📋 Guide d'utilisation optimale :
+
+✅ **Personnalisez chaque prompt** en remplaçant [votre secteur/produit/service] par vos informations spécifiques
+✅ **Copiez-collez directement** dans votre outil IA préféré (ChatGPT-4, Claude, Gemini)
+✅ **Suivez les sections formatées** pour obtenir une réponse structurée et complète
+✅ **Adaptez le style** selon vos besoins (plus technique, plus créatif, plus commercial)
+✅ **Combinez plusieurs prompts** pour créer des stratégies marketing globales
+✅ **Itérez et affinez** les résultats selon vos spécificités métier
+✅ **Mesurez les résultats** et ajustez les stratégies selon les performances
+
+### 🚀 **Prochaines étapes :**
+1. Choisissez le prompt le plus pertinent pour votre besoin actuel
+2. Personnalisez-le avec vos informations spécifiques  
+3. Lancez-le dans votre outil IA favori
+4. Implémentez les recommandations étape par étape
+5. Mesurez les résultats et optimisez continuellement
+
+---
+
+*© Pack Prompts Marketing & SEO - Lead Magnet Premium pour la capture d'emails*
 
 ---
 
