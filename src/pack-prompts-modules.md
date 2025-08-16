@@ -3,11 +3,12 @@
 
 ---
 
-## 📱 **PROMPT 1 - CRÉATION DE CONTENU VIRAL**
+## 📱 PROMPT 1 - CRÉATION DE CONTENU VIRAL
 
-### 🎯 Objectif : Maximiser l'engagement et la viralité
+**Objectif :** Maximiser l'engagement et la viralité
 
-```
+**Prompt à copier :**
+
 Génère 20 idées de contenu viral pour [ton secteur] avec :
 
 📋 STRUCTURE DEMANDÉE :
@@ -30,7 +31,6 @@ Génère 20 idées de contenu viral pour [ton secteur] avec :
 2. Top 5 avec scripts détaillés
 3. Calendrier de publication optimisé
 4. Métriques à suivre pour chaque post
-```
 
 ---
 
