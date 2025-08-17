@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { EmailGeneratorService, EmailTemplate } from '@/services/emailGeneratorService';
 import { 
   Mail, 
   Zap, 
@@ -18,55 +19,68 @@ import {
   AlertTriangle,
   CheckCircle,
   TrendingUp,
-  ArrowLeft
+  ArrowLeft,
+  Send,
+  Clock,
+  Target
 } from 'lucide-react';
 
 const EmailMarketingPage = () => {
   const navigate = useNavigate();
-  const [subjectLine, setSubjectLine] = useState('');
+  const [niche, setNiche] = useState('');
   const [emailContent, setEmailContent] = useState('');
-  const [spamScore, setSpamScore] = useState(0);
   const [generatedSubjects, setGeneratedSubjects] = useState<string[]>([]);
+  const [generatedEmails, setGeneratedEmails] = useState<EmailTemplate[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState<any>(null);
 
   // Compteur de mots/caractères
   const wordCount = emailContent.trim() ? emailContent.trim().split(/\s+/).length : 0;
   const charCount = emailContent.length;
 
-  const subjectLineTemplates = [
-    "🔥 [Prénom], votre guide SEO arrive !",
-    "⚡ Dernières heures : -50% sur votre formation",
-    "📈 [Prénom], doublez votre trafic en 30 jours",
-    "🚀 URGENT : Votre place est réservée jusqu'à minuit",
-    "💡 [Prénom], la méthode secrète des pros SEO",
-    "🎯 Comment [concurrent] génère 10k visiteurs/mois",
-    "📊 Vos 3 erreurs SEO les plus coûteuses",
-    "⭐ [Prénom], votre audit gratuit est prêt",
-    "🔑 La stratégie que Google ne veut pas que vous connaissiez",
-    "💰 [Prénom], transformez vos visiteurs en clients"
-  ];
+  const generateEmailCampaign = async () => {
+    if (!niche.trim()) {
+      toast.error('Veuillez saisir votre niche/secteur');
+      return;
+    }
 
-  const generateSubjectLines = (niche: string) => {
-    const subjects = subjectLineTemplates.map(template => 
-      template.replace('[concurrent]', niche).replace('SEO', niche)
-    );
+    setIsGenerating(true);
+    toast.loading('Génération de votre campagne email...', { id: 'email-generation' });
+
+    try {
+      // Simulation d'un délai de génération réaliste
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      const emails = EmailGeneratorService.generateEmailCampaign(niche, ['newsletter', 'promotional', 'welcome']);
+      setGeneratedEmails(emails);
+      
+      toast.success(`${emails.length} emails générés avec succès !`, { id: 'email-generation' });
+    } catch (error) {
+      toast.error('Erreur lors de la génération', { id: 'email-generation' });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const generateSubjectLines = () => {
+    if (!niche.trim()) {
+      toast.error('Veuillez saisir votre niche/secteur');
+      return;
+    }
+
+    const subjects = EmailGeneratorService.generateSubjectLines(niche, 10);
     setGeneratedSubjects(subjects);
     toast.success('Subject lines générés avec succès !');
   };
 
-  const analyzeSpamScore = (content: string) => {
-    let score = 0;
-    const spamWords = ['gratuit', 'urgent', 'offre limitée', 'argent', 'promotion'];
-    const exclamationCount = (content.match(/!/g) || []).length;
-    const capsCount = (content.match(/[A-Z]/g) || []).length;
-    
-    spamWords.forEach(word => {
-      if (content.toLowerCase().includes(word)) score += 2;
-    });
-    
-    if (exclamationCount > 3) score += 3;
-    if (capsCount > content.length * 0.3) score += 4;
-    
-    setSpamScore(Math.min(score, 10));
+  const analyzeSpamScore = () => {
+    if (!emailContent.trim()) {
+      toast.error('Veuillez saisir du contenu à analyser');
+      return;
+    }
+
+    const result = EmailGeneratorService.analyzeEmailContent(emailContent);
+    setAnalysisResult(result);
     toast.success('Analyse spam terminée !');
   };
 
@@ -192,8 +206,12 @@ const EmailMarketingPage = () => {
           </p>
         </div>
 
-        <Tabs defaultValue="subject-lines" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+        <Tabs defaultValue="campaign-generator" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="campaign-generator" className="flex items-center gap-2">
+              <Send className="w-4 h-4" />
+              Générateur
+            </TabsTrigger>
             <TabsTrigger value="subject-lines" className="flex items-center gap-2">
               <Zap className="w-4 h-4" />
               Subject Lines
@@ -212,6 +230,123 @@ const EmailMarketingPage = () => {
             </TabsTrigger>
           </TabsList>
 
+          <TabsContent value="campaign-generator">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Send className="w-5 h-5 text-green-600" />
+                  Générateur de Campagne Email Complète
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Votre niche/secteur</label>
+                    <Input
+                      placeholder="Ex: SEO, Marketing Digital, E-commerce, Fitness..."
+                      value={niche}
+                      onChange={(e) => setNiche(e.target.value)}
+                    />
+                    <Button 
+                      onClick={generateEmailCampaign}
+                      className="w-full mt-4"
+                      disabled={!niche || isGenerating}
+                    >
+                      {isGenerating ? 'Génération en cours...' : 'Générer 4 Emails Complets'}
+                    </Button>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-green-50 to-blue-50 p-4 rounded-lg">
+                    <h3 className="font-semibold mb-3 flex items-center gap-2">
+                      <Target className="w-4 h-4 text-green-600" />
+                      Ce que vous obtenez :
+                    </h3>
+                    <ul className="text-sm space-y-2 text-gray-700">
+                      <li>• 🎯 2-3 Emails newsletters engageants</li>
+                      <li>• 💰 1-2 Emails promotionnels optimisés</li>
+                      <li>• 🎉 Email de bienvenue personnalisé</li>
+                      <li>• ⏰ Temps de lecture estimé</li>
+                      <li>• 🚀 CTA optimisés pour la conversion</li>
+                    </ul>
+                  </div>
+                </div>
+
+                {generatedEmails.length > 0 && (
+                  <div>
+                    <h3 className="font-semibold mb-4 flex items-center gap-2">
+                      <Mail className="w-5 h-5 text-green-600" />
+                      Campagne Email Générée ({generatedEmails.length} emails)
+                    </h3>
+                    <div className="space-y-4">
+                      {generatedEmails.map((email, index) => (
+                        <Card key={email.id} className="border-l-4 border-l-green-500">
+                          <CardHeader className="pb-3">
+                            <div className="flex items-center justify-between">
+                              <CardTitle className="text-lg flex items-center gap-2">
+                                <Badge variant={email.type === 'newsletter' ? 'default' : email.type === 'promotional' ? 'destructive' : 'secondary'}>
+                                  {email.type === 'newsletter' ? '📰 Newsletter' : 
+                                   email.type === 'promotional' ? '💰 Promo' : 
+                                   '🎉 Welcome'}
+                                </Badge>
+                                <span className="text-sm font-normal text-gray-500">#{index + 1}</span>
+                              </CardTitle>
+                              <div className="flex items-center gap-2 text-sm text-gray-500">
+                                <Clock className="w-4 h-4" />
+                                {email.estimatedReadTime}
+                              </div>
+                            </div>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-3">
+                              <div>
+                                <label className="text-sm font-medium text-gray-600">Subject Line :</label>
+                                <div className="bg-gray-50 p-2 rounded border flex items-center justify-between">
+                                  <span className="text-sm">{email.subject}</span>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => copyToClipboard(email.subject)}
+                                  >
+                                    <Copy className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                              </div>
+                              
+                              <div>
+                                <label className="text-sm font-medium text-gray-600">Contenu :</label>
+                                <div className="bg-white border rounded p-3 max-h-40 overflow-y-auto">
+                                  <pre className="text-sm whitespace-pre-wrap text-gray-700">
+                                    {email.content}
+                                  </pre>
+                                </div>
+                              </div>
+                              
+                              <div className="flex items-center justify-between pt-2">
+                                <Badge variant="outline" className="text-xs">
+                                  CTA: {email.cta}
+                                </Badge>
+                                <div className="flex gap-2">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => copyToClipboard(`Subject: ${email.subject}\n\n${email.content}`)}
+                                  >
+                                    <Copy className="w-4 h-4 mr-1" />
+                                    Copier Email
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           <TabsContent value="subject-lines">
             <Card>
               <CardHeader>
@@ -226,13 +361,13 @@ const EmailMarketingPage = () => {
                     <label className="block text-sm font-medium mb-2">Votre niche/secteur</label>
                     <Input
                       placeholder="Ex: SEO, Marketing Digital, E-commerce..."
-                      value={subjectLine}
-                      onChange={(e) => setSubjectLine(e.target.value)}
+                      value={niche}
+                      onChange={(e) => setNiche(e.target.value)}
                     />
                     <Button 
-                      onClick={() => generateSubjectLines(subjectLine)}
+                      onClick={generateSubjectLines}
                       className="w-full mt-4"
-                      disabled={!subjectLine}
+                      disabled={!niche}
                     >
                       Générer 10 Subject Lines
                     </Button>
@@ -355,7 +490,7 @@ const EmailMarketingPage = () => {
                     className="min-h-32"
                   />
                   <Button 
-                    onClick={() => analyzeSpamScore(emailContent)}
+                    onClick={analyzeSpamScore}
                     className="mt-4"
                     disabled={!emailContent}
                   >
@@ -363,41 +498,54 @@ const EmailMarketingPage = () => {
                   </Button>
                 </div>
 
-                {spamScore > 0 && (
+                {analysisResult && (
                   <div className="bg-white border rounded-lg p-6">
                     <div className="flex items-center gap-4 mb-4">
                       <div className="text-center">
-                        <div className={`text-3xl font-bold ${spamScore <= 3 ? 'text-green-600' : spamScore <= 6 ? 'text-yellow-600' : 'text-red-600'}`}>
-                          {spamScore}/10
+                        <div className={`text-3xl font-bold ${analysisResult.spamScore <= 3 ? 'text-green-600' : analysisResult.spamScore <= 6 ? 'text-yellow-600' : 'text-red-600'}`}>
+                          {analysisResult.spamScore}/10
                         </div>
                         <div className="text-sm text-gray-600">Score Spam</div>
                       </div>
                       <div className="flex-1">
-                        <div className={`flex items-center gap-2 ${spamScore <= 3 ? 'text-green-600' : spamScore <= 6 ? 'text-yellow-600' : 'text-red-600'}`}>
-                          {spamScore <= 3 ? <CheckCircle className="w-5 h-5" /> : <AlertTriangle className="w-5 h-5" />}
+                        <div className={`flex items-center gap-2 ${analysisResult.spamScore <= 3 ? 'text-green-600' : analysisResult.spamScore <= 6 ? 'text-yellow-600' : 'text-red-600'}`}>
+                          {analysisResult.spamScore <= 3 ? <CheckCircle className="w-5 h-5" /> : <AlertTriangle className="w-5 h-5" />}
                           <span className="font-semibold">
-                            {spamScore <= 3 ? 'Excellent' : spamScore <= 6 ? 'Attention' : 'Risque élevé'}
+                            {analysisResult.spamScore <= 3 ? 'Excellent' : analysisResult.spamScore <= 6 ? 'Attention' : 'Risque élevé'}
                           </span>
                         </div>
                         <p className="text-sm text-gray-600 mt-1">
-                          {spamScore <= 3 
-                            ? 'Votre email a de bonnes chances de passer les filtres' 
-                            : spamScore <= 6 
-                            ? 'Quelques améliorations recommandées'
-                            : 'Révision nécessaire pour éviter le dossier spam'
-                          }
+                          Délivrabilité estimée : {analysisResult.deliverabilityScore}%
                         </p>
                       </div>
                     </div>
                     
+                    {analysisResult.issues.length > 0 && (
+                      <div className="mb-4">
+                        <h4 className="font-semibold mb-2 text-red-600">⚠️ Problèmes détectés :</h4>
+                        <ul className="text-sm space-y-1 text-red-600 ml-4">
+                          {analysisResult.issues.map((issue: string, index: number) => (
+                            <li key={index}>• {issue}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
                     <div className="bg-gray-50 p-4 rounded-lg">
-                      <h4 className="font-semibold mb-2">Recommandations :</h4>
+                      <h4 className="font-semibold mb-2">💡 Recommandations :</h4>
                       <ul className="text-sm space-y-1 text-gray-600">
-                        <li>• Évitez les mots "gratuit", "urgent", "promotion"</li>
-                        <li>• Limitez les exclamations (max 2-3 par email)</li>
-                        <li>• Équilibrez majuscules et minuscules</li>
-                        <li>• Incluez du texte ET des images</li>
-                        <li>• Ajoutez un lien de désinscription visible</li>
+                        {analysisResult.recommendations.length > 0 ? (
+                          analysisResult.recommendations.map((rec: string, index: number) => (
+                            <li key={index}>• {rec}</li>
+                          ))
+                        ) : (
+                          <>
+                            <li>• Incluez du texte ET des images</li>
+                            <li>• Ajoutez un lien de désinscription visible</li>
+                            <li>• Testez l'affichage sur mobile</li>
+                            <li>• Personnalisez le contenu</li>
+                          </>
+                        )}
                       </ul>
                     </div>
                   </div>
