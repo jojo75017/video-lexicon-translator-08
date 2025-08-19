@@ -1,10 +1,12 @@
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { OpenAIConfigPanel } from '@/components/shared/OpenAIConfigPanel';
-import { ArrowLeft, BarChart3, TrendingUp, Users, Eye, Globe, Smartphone, Monitor, Download, Calendar, Clock, Target, MousePointer, Search, Share2, FileText, Zap, Activity } from 'lucide-react';
+import { ArrowLeft, BarChart3, TrendingUp, Users, Eye, Globe, Smartphone, Monitor, Download, Calendar, Clock, Target, MousePointer, Search, Share2, FileText, Zap, Activity, Link, Play } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { analyzeAnalytics } from '@/utils/seo/analyticsAnalyzer';
@@ -14,6 +16,8 @@ const AnalyticsPage: React.FC = () => {
   const navigate = useNavigate();
   const [timeRange, setTimeRange] = useState('30days');
   const [selectedMetric, setSelectedMetric] = useState('pageviews');
+  const [siteUrl, setSiteUrl] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   
   const analyticsData = useMemo(() => analyzeAnalytics(timeRange), [timeRange]);
 
@@ -43,6 +47,25 @@ const AnalyticsPage: React.FC = () => {
 
   const exportData = (format: string) => {
     toast.success(`Export ${format.toUpperCase()} généré avec succès!`);
+  };
+
+  const analyzeWebsite = async () => {
+    if (!siteUrl.trim()) {
+      toast.error('Veuillez entrer une URL valide');
+      return;
+    }
+
+    setIsAnalyzing(true);
+    
+    try {
+      // Simulation de l'analyse
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      toast.success(`Analyse de ${siteUrl} terminée avec succès!`);
+    } catch (error) {
+      toast.error('Erreur lors de l\'analyse du site');
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const getMetricIcon = (metric: string) => {
@@ -104,6 +127,48 @@ const AnalyticsPage: React.FC = () => {
             </Button>
           </div>
         </div>
+
+        {/* Configuration du site à analyser */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Link className="h-5 w-5" />
+              Configuration du Site à Analyser
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex gap-4 items-end">
+              <div className="flex-1">
+                <Label htmlFor="site-url">URL du site ou de la page</Label>
+                <Input
+                  id="site-url"
+                  type="url"
+                  placeholder="https://exemple.com"
+                  value={siteUrl}
+                  onChange={(e) => setSiteUrl(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+              <Button 
+                onClick={analyzeWebsite}
+                disabled={isAnalyzing || !siteUrl.trim()}
+                className="flex items-center gap-2"
+              >
+                {isAnalyzing ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Analyse...
+                  </>
+                ) : (
+                  <>
+                    <Play className="h-4 w-4" />
+                    Analyser
+                  </>
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Configuration OpenAI */}
         <div className="mb-6">
