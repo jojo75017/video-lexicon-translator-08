@@ -25,6 +25,7 @@ import EmailMarketingPage from './pages/EmailMarketingPage';
 import ProductGeneratorPage from './pages/ProductGeneratorPage';
 import ProductLandingPage from './pages/ProductLandingPage';
 import PromptsCapturePage from './pages/PromptsCapturePage';
+import SiteClonerPage from './pages/SiteClonerPage';
 
 const queryClient = new QueryClient();
 
@@ -56,6 +57,7 @@ const App = () => (
         <Route path="/product-generator" element={<ProductGeneratorPage />} />
         <Route path="/product-landing" element={<ProductLandingPage />} />
         <Route path="/prompts-capture" element={<PromptsCapturePage />} />
+        <Route path="/site-cloner" element={<SiteClonerPage />} />
       </Routes>
       <Toaster />
     </TooltipProvider>

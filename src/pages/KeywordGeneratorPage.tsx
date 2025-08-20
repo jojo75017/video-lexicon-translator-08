@@ -987,11 +987,11 @@ const KeywordGeneratorPage: React.FC = () => {
                       {suggestions.map((suggestion, index) => (
                         <div 
                           key={index} 
-                          className="p-3 bg-blue-50 rounded-lg cursor-pointer hover:bg-blue-100 transition-colors"
+                          className="p-3 bg-primary/10 rounded-lg cursor-pointer hover:bg-primary/20 transition-colors"
                           onClick={() => setSeedKeyword(suggestion)}
                         >
-                          <div className="font-medium text-blue-800">{suggestion}</div>
-                          <div className="text-sm text-blue-600">Cliquez pour analyser</div>
+                          <div className="font-medium text-primary">{suggestion}</div>
+                          <div className="text-sm text-primary/80">Cliquez pour analyser</div>
                         </div>
                       ))}
                     </div>
