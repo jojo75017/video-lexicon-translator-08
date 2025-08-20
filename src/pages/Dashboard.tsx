@@ -287,6 +287,18 @@ const Dashboard: React.FC = () => {
       category: 'content',
       priority: 'high',
       status: 'complete'
+    },
+    {
+      title: 'Clonage de Site',
+      botName: 'CLONE-BOT',
+      description: 'Clonez n\'importe quel site web en entrant son URL',
+      icon: Globe,
+      customIcon: CrawlBotIcon, // Réutilise l'icône du crawler
+      path: '/site-cloner',
+      color: 'from-violet-500 to-violet-600',
+      category: 'technical',
+      priority: 'high',
+      status: 'new'
     }
   ];
 
@@ -294,6 +306,7 @@ const Dashboard: React.FC = () => {
     switch (status) {
       case 'complete': return 'bg-green-500';
       case 'updated': return 'bg-blue-500';
+      case 'new': return 'bg-violet-500';
       case 'active': return 'bg-gray-500';
       default: return 'bg-gray-400';
     }
@@ -303,6 +316,7 @@ const Dashboard: React.FC = () => {
     switch (status) {
       case 'complete': return CheckCircle;
       case 'updated': return Star;
+      case 'new': return Zap;
       case 'active': return Activity;
       default: return Info;
     }
