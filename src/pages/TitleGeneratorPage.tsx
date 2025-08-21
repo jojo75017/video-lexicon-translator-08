@@ -216,7 +216,11 @@ const TitleGeneratorPage: React.FC = () => {
 
   // Fonctions pour générer le prompt et le plan séparément
   const generatePrompt = async (titleData: any) => {
-    setSelectedTitle(titleData);
+    // Si on change de titre, on remet à zéro tout le contenu
+    if (!selectedTitle || selectedTitle.title !== titleData.title) {
+      setSelectedTitle(titleData);
+      setGeneratedPlan(''); // Reset plan si nouveau titre
+    }
     setIsGeneratingContent(true);
     
     try {
@@ -275,7 +279,11 @@ const TitleGeneratorPage: React.FC = () => {
   };
 
   const generatePlan = async (titleData: any) => {
-    setSelectedTitle(titleData);
+    // Si on change de titre, on remet à zéro tout le contenu  
+    if (!selectedTitle || selectedTitle.title !== titleData.title) {
+      setSelectedTitle(titleData);
+      setGeneratedPrompt(''); // Reset prompt si nouveau titre
+    }
     setIsGeneratingContent(true);
     
     try {
