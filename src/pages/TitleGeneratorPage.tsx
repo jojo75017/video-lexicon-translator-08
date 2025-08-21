@@ -130,6 +130,97 @@ const TitleGeneratorPage: React.FC = () => {
       "{keyword} pour débutants : Éviter la mortalité",
       "Reproduction {keyword} : Techniques qui marchent",
       "Aquarium {keyword} : Budget et équipement optimal"
+    ],
+    jardinage: [
+      "Guide {keyword} : Techniques professionnelles révélées",
+      "{keyword} bio : Cultivez sans pesticides",
+      "Calendrier {keyword} : Quand planter pour réussir",
+      "{keyword} en permaculture : Méthodes durables",
+      "Problèmes {keyword} : Solutions naturelles efficaces"
+    ],
+    'jardin-bio': [
+      "{keyword} bio : Guide complet du jardinier éco",
+      "Cultiver {keyword} sans produits chimiques",
+      "{keyword} : Engrais naturels qui fonctionnent",
+      "Permaculture et {keyword} : Techniques avancées",
+      "Compost pour {keyword} : Recettes de pros"
+    ],
+    bricolage: [
+      "DIY {keyword} : Tutoriel complet étape par étape",
+      "{keyword} fait maison : Économisez 70%",
+      "Outils {keyword} : Guide d'achat expert",
+      "Techniques {keyword} : Secrets des professionnels",
+      "Réparation {keyword} : Diagnostic et solutions"
+    ],
+    apiculture: [
+      "Apiculture {keyword} : Guide du débutant à l'expert",
+      "{keyword} et abeilles : Symbiose parfaite",
+      "Ruche {keyword} : Installation et entretien",
+      "Miel de {keyword} : Production et valorisation",
+      "Maladies {keyword} : Prévention naturelle"
+    ],
+    permaculture: [
+      "Permaculture {keyword} : Principes et applications",
+      "Design {keyword} : Créer votre système durable",
+      "{keyword} en permaculture : Rendements optimaux",
+      "Sol vivant et {keyword} : Techniques régénératives",
+      "Biodiversité {keyword} : Écosystème équilibré"
+    ],
+    potager: [
+      "Potager {keyword} : De la graine à l'assiette",
+      "{keyword} : Variétés résistantes et productives",
+      "Semis {keyword} : Réussir à tous les coups",
+      "Récolte {keyword} : Timing et conservation",
+      "Rotation {keyword} : Planifier sur 4 ans"
+    ],
+    ecologie: [
+      "Écologie et {keyword} : Impact environnemental",
+      "{keyword} durable : Solutions pour la planète",
+      "Bilan carbone {keyword} : Réduire son empreinte",
+      "{keyword} zéro déchet : Guide pratique",
+      "Biodiversité {keyword} : Protéger notre écosystème"
+    ],
+    plantes: [
+      "Plantes {keyword} : Guide d'identification complet",
+      "Cultiver {keyword} : Conditions optimales",
+      "{keyword} d'intérieur : Soins et entretien",
+      "Multiplication {keyword} : Techniques de propagation",
+      "Maladies {keyword} : Diagnostiquer et traiter"
+    ],
+    'bricolage-interieur': [
+      "Rénovation {keyword} : Techniques professionnelles",
+      "{keyword} moderne : Tendances 2024",
+      "Budget {keyword} : Optimiser ses coûts",
+      "Outils {keyword} : Indispensables du bricoleur",
+      "Sécurité {keyword} : Normes et précautions"
+    ],
+    'bricolage-exterieur': [
+      "Aménagement {keyword} : Créer votre espace",
+      "{keyword} résistant : Matériaux durables",
+      "Terrasse {keyword} : Construction étape par étape",
+      "Entretien {keyword} : Maintenir dans le temps",
+      "Éclairage {keyword} : Illuminer votre extérieur"
+    ],
+    'aquariophilie-eau-mer': [
+      "Aquarium marin {keyword} : Setup complet",
+      "{keyword} eau salée : Paramètres critiques",
+      "Poissons {keyword} : Espèces compatibles",
+      "Coraux {keyword} : Maintenance experte",
+      "Équipement {keyword} : Investissement optimal"
+    ],
+    'aquariophilie-eau-douce': [
+      "Aquarium {keyword} : Configuration idéale",
+      "{keyword} communautaire : Cohabitation réussie",
+      "Plantes {keyword} : Aquascaping naturel",
+      "Filtration {keyword} : Système efficace",
+      "Reproduction {keyword} : Conditions optimales"
+    ],
+    'jardinage-vertical': [
+      "Jardin vertical {keyword} : Maximiser l'espace",
+      "{keyword} en hauteur : Structures et supports",
+      "Mur végétal {keyword} : Installation complète",
+      "Irrigation {keyword} : Systèmes automatisés",
+      "Espèces {keyword} : Sélection adaptée"
     ]
   };
 
@@ -147,13 +238,20 @@ const TitleGeneratorPage: React.FC = () => {
     setIsGenerating(true);
     
     try {
+      console.log('Génération des titres...', { keyword, selectedThematic, useAI });
+      
       // Sauvegarder la clé API si mode IA
       if (useAI && apiKey) {
         localStorage.setItem('openai_api_key', apiKey);
       }
 
-      // Utiliser les templates selon la thématique
+      // Utiliser les templates selon la thématique avec fallback
       const templates = titleTemplates[selectedThematic] || titleTemplates.technologie;
+      console.log('Templates utilisés:', templates);
+      
+      if (!templates || templates.length === 0) {
+        throw new Error('Aucun template trouvé pour cette thématique');
+      }
       
       const generatedVariants = templates.map((template, index) => {
         const title = template.replace(/{keyword}/g, keyword);
@@ -187,12 +285,13 @@ const TitleGeneratorPage: React.FC = () => {
         };
       });
 
+      console.log('Titres générés:', generatedVariants);
       setGeneratedTitles(generatedVariants);
       toast.success(`${generatedVariants.length} titres générés avec succès !`);
       
     } catch (error) {
       console.error('Erreur génération titres:', error);
-      toast.error('Erreur lors de la génération des titres');
+      toast.error(`Erreur lors de la génération des titres: ${error.message}`);
     } finally {
       setIsGenerating(false);
     }
