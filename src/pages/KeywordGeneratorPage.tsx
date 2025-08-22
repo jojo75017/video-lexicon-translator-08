@@ -101,6 +101,7 @@ const KeywordGeneratorPage: React.FC = () => {
       return;
     }
 
+    console.log('🔍 Début génération mots-clés pour:', seedKeyword);
     setIsLoading(true);
 
     try {
@@ -110,6 +111,7 @@ const KeywordGeneratorPage: React.FC = () => {
       
       if (openAIConfig.hasValidApiKey()) {
         try {
+          console.log('📡 Génération avec IA...');
           // Génération de mots-clés avec l'IA
           aiKeywords = await UniversalOpenAIService.getInstance().generateKeywords(
             seedKeyword, 
@@ -117,22 +119,27 @@ const KeywordGeneratorPage: React.FC = () => {
             50
           );
 
+          console.log('✅ Mots-clés IA générés:', aiKeywords.length);
+          
           // Données réelles via API
           realVolumeData = await fetchRealKeywordData(aiKeywords);
           
           toast.success('Mots-clés générés avec des données réelles via IA !');
         } catch (error) {
-          console.error('Erreur API OpenAI:', error);
+          console.error('❌ Erreur API OpenAI:', error);
           toast.warning('Retour aux données avancées simulées');
         }
       } else {
+        console.log('⚠️ Pas de clé OpenAI, utilisation de données simulées');
         toast.info('Configurez OpenAI pour des données 100% réelles');
       }
 
       // Génération avancée avec sources multiples
+      console.log('🔄 Génération de sources multiples...');
       const enhancedGeneration = await generateFromMultipleSources(seedKeyword, aiKeywords);
       
       setTimeout(() => {
+        console.log('⚙️ Génération des métriques avancées...');
         // Génération sophistiquée type Sistrix
         const prefixes = ['meilleur', 'comment', 'pourquoi', 'guide', 'prix', 'avis', 'comparatif', 'pas cher', 'top', 'acheter', 'choisir', 'trouver', 'utiliser', 'définition'];
         const suffixes = ['2024', 'france', 'gratuit', 'en ligne', 'débutant', 'professionnel', 'facile', 'rapide', 'pas cher', 'premium', 'expert', 'guide', 'conseil', 'astuce'];

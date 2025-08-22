@@ -41,9 +41,11 @@ const PromptsGeneratorPage: React.FC = () => {
       return;
     }
 
+    console.log('🚀 Début génération prompts personnalisés pour:', customTopic);
     setIsGenerating(true);
     
     try {
+      console.log('📡 Appel API OpenAI...');
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -91,24 +93,28 @@ const PromptsGeneratorPage: React.FC = () => {
         throw new Error(`Erreur API: ${response.status}`);
       }
 
+      console.log('✅ Réponse API reçue');
       const data = await response.json();
       const content = data.choices[0]?.message?.content || '';
       
       // Diviser le contenu en prompts individuels
       const generatedPrompts = content.split(/(?=🎯|📝|🚀|💡|⭐|🔥|✨|🎨|🏆|💎)/).filter(p => p.trim());
       
+      console.log('📝 Prompts générés:', generatedPrompts.length);
       setPrompts(generatedPrompts);
       toast.success(`${generatedPrompts.length} prompts générés avec succès !`);
       
     } catch (error) {
-      console.error('Erreur lors de la génération:', error);
+      console.error('❌ Erreur lors de la génération:', error);
       toast.error("Erreur lors de la génération des prompts personnalisés");
     } finally {
       setIsGenerating(false);
+      console.log('🏁 Fin génération prompts');
     }
   };
 
   const generatePrompts = async () => {
+    console.log('📋 Génération des prompts pré-définis...');
     setIsGenerating(true);
     
     // Simulation de génération des prompts pré-définis

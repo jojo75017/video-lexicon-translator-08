@@ -315,12 +315,15 @@ const TitleGeneratorPage: React.FC = () => {
 
   // Fonctions pour générer le prompt et le plan séparément
   const generatePrompt = async (titleData: any) => {
+    console.log('🚀 Début génération prompt pour:', titleData.title);
+    
     // Si on change de titre, on garde les deux contenus visibles
     setSelectedTitle(titleData);
     setIsGeneratingContent(true);
     
     try {
       if (useAI && apiKey) {
+        console.log('📡 Appel API OpenAI pour prompt...');
         const promptResponse = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
           headers: {
@@ -344,8 +347,13 @@ const TitleGeneratorPage: React.FC = () => {
           }),
         });
 
+        if (!promptResponse.ok) {
+          throw new Error('Erreur API OpenAI');
+        }
+
         const promptData = await promptResponse.json();
         const prompt = promptData.choices?.[0]?.message?.content || '';
+        console.log('✅ Prompt IA généré:', prompt.substring(0, 100) + '...');
         setGeneratedPrompt(prompt);
       } else {
         const prompt = `Créez un contenu complet et optimisé SEO sur "${titleData.title}".
@@ -362,25 +370,31 @@ const TitleGeneratorPage: React.FC = () => {
 
 🔍 SEO : Optimisez pour les requêtes liées à "${titleData.keyword}" et la thématique ${selectedThematic}.`;
 
+        console.log('✅ Prompt standard généré:', prompt.substring(0, 100) + '...');
         setGeneratedPrompt(prompt);
       }
       
+      console.log('📝 Prompt définitivement stocké dans l\'état');
       toast.success('Prompt généré avec succès !');
     } catch (error) {
-      console.error('Erreur génération prompt:', error);
+      console.error('❌ Erreur génération prompt:', error);
       toast.error('Erreur lors de la génération du prompt');
     } finally {
       setIsGeneratingContent(false);
+      console.log('🏁 Fin génération prompt');
     }
   };
 
   const generatePlan = async (titleData: any) => {
+    console.log('📋 Début génération plan pour:', titleData.title);
+    
     // Si on change de titre, on garde les deux contenus visibles
     setSelectedTitle(titleData);
     setIsGeneratingContent(true);
     
     try {
       if (useAI && apiKey) {
+        console.log('📡 Appel API OpenAI pour plan...');
         const planResponse = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
           headers: {
@@ -414,8 +428,13 @@ Le plan doit inclure:
           }),
         });
 
+        if (!planResponse.ok) {
+          throw new Error('Erreur API OpenAI');
+        }
+
         const planData = await planResponse.json();
         const plan = planData.choices?.[0]?.message?.content || '';
+        console.log('✅ Plan IA généré:', plan.substring(0, 100) + '...');
         setGeneratedPlan(plan);
       } else {
         const plan = `📋 PLAN DÉTAILLÉ COMPLET : ${titleData.title}
@@ -583,15 +602,18 @@ Le plan doit inclure:
 - Trafic organique qualifié
 - Engagement et partages sociaux`;
 
+        console.log('✅ Plan standard généré:', plan.substring(0, 100) + '...');
         setGeneratedPlan(plan);
       }
       
+      console.log('📋 Plan définitivement stocké dans l\'état');
       toast.success('Plan détaillé généré avec succès !');
     } catch (error) {
-      console.error('Erreur génération plan:', error);
+      console.error('❌ Erreur génération plan:', error);
       toast.error('Erreur lors de la génération du plan');
     } finally {
       setIsGeneratingContent(false);
+      console.log('🏁 Fin génération plan');
     }
   };
 
@@ -981,6 +1003,17 @@ Le plan doit inclure:
                 </div>
               </CardContent>
             </Card>
+          </div>
+        )}
+
+        {/* Debug info en développement */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="mt-4 p-4 bg-gray-100 rounded-lg text-xs font-mono">
+            <p><strong>Debug:</strong></p>
+            <p>selectedTitle: {selectedTitle ? 'OUI' : 'NON'}</p>
+            <p>generatedPrompt: {generatedPrompt ? 'OUI (' + generatedPrompt.length + ' chars)' : 'NON'}</p>
+            <p>generatedPlan: {generatedPlan ? 'OUI (' + generatedPlan.length + ' chars)' : 'NON'}</p>
+            <p>isGeneratingContent: {isGeneratingContent ? 'OUI' : 'NON'}</p>
           </div>
         )}
       </div>
