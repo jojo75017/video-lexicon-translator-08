@@ -38,7 +38,7 @@ export const useEbookGeneration = () => {
           'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-4.1-2025-04-14',
           messages: [{
             role: 'user',
             content: `Rédige un chapitre complet de 350 mots exactement sur le sujet : "${chapter.title}".
@@ -118,7 +118,7 @@ Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajo
           'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-4.1-2025-04-14',
           messages: [{
             role: 'user',
             content: `Rédige un sous-chapitre complet de 300 mots exactement sur le sujet : "${subChapter.title}".
@@ -134,7 +134,7 @@ Le contenu doit être :
 Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajoutée aux lecteurs sur ce sujet spécifique.`
           }],
           temperature: 0.7,
-          max_tokens: 350
+          max_tokens: 500
         })
       });
 
@@ -173,31 +173,31 @@ Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajo
           'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-4.1-2025-04-14',
           messages: [{
             role: 'user',
-            content: `Crée un plan détaillé d'ebook sur le sujet: "${ebookTitle}" spécifiquement axé sur l'AQUARIOPHILIE. 
+            content: `Crée un plan détaillé d'ebook sur le sujet: "${ebookTitle}". 
             
             Génère:
             1. ${authorName ? `Garde le nom d'auteur: "${authorName}"` : 'Un nom d\'auteur approprié'}
-            2. Une préface d'au moins 500 caractères sur l'aquariophilie, engageante et professionnelle
-            3. Exactement ${numberOfChapters} chapitres avec des titres liés à l'aquariophilie
-            4. 2-4 sous-chapitres pour chaque chapitre, tous liés à l'aquariophilie
-            5. Une conclusion sur l'aquariophilie de 350 mots minimum
+            2. Une préface d'au moins 500 caractères sur "${ebookTitle}", engageante et professionnelle
+            3. Exactement ${numberOfChapters} chapitres avec des titres liés au sujet "${ebookTitle}"
+            4. 2-4 sous-chapitres pour chaque chapitre, tous liés au sujet principal
+            5. Une conclusion sur "${ebookTitle}" de 350 mots minimum
 
-            IMPORTANT: Tous les titres et contenus doivent être liés à l'aquariophilie : poissons, plantes aquatiques, équipements d'aquarium, entretien, soins, paramètres de l'eau, etc.
+            IMPORTANT: Tous les titres et contenus doivent être cohérents avec le sujet principal "${ebookTitle}".
 
             Réponds uniquement au format JSON suivant (SANS balises markdown):
             {
               "author": "Nom de l'auteur",
-              "preface": "Préface complète sur l'aquariophilie...",
+              "preface": "Préface complète sur le sujet...",
               "chapters": [
                 {
-                  "title": "Titre du chapitre lié à l'aquariophilie",
-                  "subChapters": ["Sous-chapitre aquariophilie 1", "Sous-chapitre aquariophilie 2"]
+                  "title": "Titre du chapitre lié au sujet",
+                  "subChapters": ["Sous-chapitre 1", "Sous-chapitre 2"]
                 }
               ],
-              "conclusion": "Conclusion complète sur l'aquariophilie..."
+              "conclusion": "Conclusion complète sur le sujet..."
             }`
           }],
           temperature: 0.7,
@@ -244,7 +244,7 @@ Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajo
           'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-4.1-2025-04-14',
           messages: [{
             role: 'user',
             content: `Analyse ce contenu de chapitre et propose une division logique en sous-chapitres :
@@ -314,7 +314,7 @@ Réponds uniquement au format JSON:
           'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-4.1-2025-04-14',
           messages: [{
             role: 'user',
             content: `Créé un résumé engageant de 150-200 mots pour cet ebook intitulé "${ebookTitle}" basé sur ces chapitres:
@@ -365,7 +365,7 @@ Le résumé doit:
           'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-4.1-2025-04-14',
           messages: [{
             role: 'user',
             content: `Génère 5 concepts visuels créatifs pour la couverture d'un ebook intitulé "${ebookTitle}".
@@ -425,7 +425,7 @@ Ambiance: ...`
           'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-4.1-2025-04-14',
           messages: [{
             role: 'user',
             content: `Optimise ce titre d'ebook pour le SEO: "${ebookTitle}" avec ces chapitres: ${chaptersText}
@@ -498,7 +498,7 @@ Critères:
           'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-4.1-2025-04-14',
           messages: [{ role: 'user', content: prompt }],
           temperature: 0.7,
           max_tokens: 1200
@@ -550,7 +550,7 @@ Critères:
           'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-4.1-2025-04-14',
           messages: [{ role: 'user', content: prompt }],
           temperature: 0.7,
           max_tokens: 500
@@ -604,7 +604,7 @@ Critères:
           'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-4.1-2025-04-14',
           messages: [{ role: 'user', content: prompt }],
           temperature: 0.7,
           max_tokens: 400

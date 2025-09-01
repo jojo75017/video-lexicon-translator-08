@@ -331,7 +331,7 @@ const EbookPlannerPage: React.FC = () => {
           'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-4.1-2025-04-14',
           messages: [{
             role: 'user',
             content: `Analyse ce texte et suggère une structure de chapitres et sous-chapitres :

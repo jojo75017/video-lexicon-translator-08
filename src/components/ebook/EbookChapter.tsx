@@ -179,7 +179,7 @@ export const EbookChapter: React.FC<EbookChapterProps> = ({
         ) : (
           <Textarea
             placeholder="Contenu du chapitre (optionnel, pour la division automatique)"
-            value=""
+            value={chapter.content || ''}
             onChange={(e) => onUpdateContent(chapter.id, e.target.value)}
             rows={3}
             className="mb-3"
@@ -189,36 +189,58 @@ export const EbookChapter: React.FC<EbookChapterProps> = ({
       
       <div className="ml-6 space-y-2">
         {chapter.subChapters.map((subChapter, subIndex) => (
-          <div key={subChapter.id} className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm text-muted-foreground">
-              {index + 1}.{subIndex + 1}:
-            </span>
-            <Input
-              placeholder="Titre du sous-chapitre"
-              value={subChapter.title}
-              onChange={(e) => onUpdateSubChapterTitle(chapter.id, subChapter.id, e.target.value)}
-              className="flex-1 min-w-[200px]"
-            />
-            <Button
-              variant="default"
-              size="sm"
-              onClick={() => onGenerateSubChapterContent(chapter.id, subChapter.id)}
-              disabled={isGenerating || !apiKey || !subChapter.title}
-              title="Rédiger le sous-chapitre (200 mots)"
-              className="bg-green-600 hover:bg-green-700 text-white"
-            >
-              <FileText className="h-3 w-3 mr-1" />
-              {isGenerating ? 'Génération...' : 'Rédiger'}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onRemoveSubChapter(chapter.id, subChapter.id)}
-              title="Supprimer le sous-chapitre"
-            >
-              <Trash2 className="h-3 w-3 mr-1" />
-              Supprimer
-            </Button>
+          <div key={subChapter.id} className="space-y-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-sm text-muted-foreground">
+                {index + 1}.{subIndex + 1}:
+              </span>
+              <Input
+                placeholder="Titre du sous-chapitre"
+                value={subChapter.title}
+                onChange={(e) => onUpdateSubChapterTitle(chapter.id, subChapter.id, e.target.value)}
+                className="flex-1 min-w-[200px]"
+              />
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => onGenerateSubChapterContent(chapter.id, subChapter.id)}
+                disabled={isGenerating || !apiKey || !subChapter.title}
+                title="Rédiger le sous-chapitre (300 mots)"
+                className="bg-green-600 hover:bg-green-700 text-white"
+              >
+                <FileText className="h-3 w-3 mr-1" />
+                {isGenerating ? 'Génération...' : 'Rédiger'}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onRemoveSubChapter(chapter.id, subChapter.id)}
+                title="Supprimer le sous-chapitre"
+              >
+                <Trash2 className="h-3 w-3 mr-1" />
+                Supprimer
+              </Button>
+            </div>
+            {subChapter.content && (
+              <div className="ml-8 bg-muted/50 p-3 rounded-lg text-sm leading-relaxed whitespace-pre-wrap">
+                {subChapter.content.split('\n').map((line, lineIndex) => (
+                  <p key={lineIndex} className="mb-2">
+                    {line.split(/(\*[^*]+\*|"[^"]+"|(\([^)]+\)))/).map((part, partIndex) => {
+                      if (part && part.startsWith && part.startsWith('*') && part.endsWith('*')) {
+                        return <em key={partIndex} className="font-medium text-primary">{part.slice(1, -1)}</em>;
+                      }
+                      if (part && part.startsWith && part.startsWith('"') && part.endsWith('"')) {
+                        return <span key={partIndex} className="text-accent-foreground font-medium">"{part.slice(1, -1)}"</span>;
+                      }
+                      if (part && part.startsWith && part.startsWith('(') && part.endsWith(')')) {
+                        return <span key={partIndex} className="text-muted-foreground italic">{part}</span>;
+                      }
+                      return part;
+                    })}
+                  </p>
+                ))}
+              </div>
+            )}
           </div>
         ))}
         <Button
