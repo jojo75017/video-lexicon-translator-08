@@ -377,15 +377,15 @@ const EbookIdeasPage: React.FC = () => {
           <div className="absolute inset-0 bg-gradient-primary opacity-10"></div>
           <div className="relative z-10">
             <div className="flex items-center gap-4 mb-4">
-              <Button 
-                onClick={() => navigate('/')} 
-                variant="outline" 
-                size="sm"
-                className="backdrop-blur-sm bg-white/10 border-white/20 text-foreground hover:bg-white/20 transition-all"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Retour au tableau de bord
-              </Button>
+          <Button 
+            onClick={() => navigate('/ebook-planner')} 
+            variant="outline" 
+            size="sm"
+            className="backdrop-blur-sm bg-white/10 border-white/20 text-foreground hover:bg-white/20 transition-all"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Créer mon ebook
+          </Button>
             </div>
             
             <div className="flex items-center gap-4 mb-6">

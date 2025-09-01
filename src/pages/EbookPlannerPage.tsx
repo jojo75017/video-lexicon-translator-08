@@ -481,11 +481,11 @@ Réponds uniquement au format JSON:
         <div className="relative container mx-auto px-4 py-16 text-center">
           <Button
             variant="ghost"
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate('/ebook-ideas')}
             className="absolute top-4 left-4 text-white hover:bg-white/20"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Retour
+            Idées d'ebook
           </Button>
           <div className="floating-animation inline-block mb-6">
             <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
