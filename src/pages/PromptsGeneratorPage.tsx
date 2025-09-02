@@ -21,6 +21,13 @@ const PromptsGeneratorPage: React.FC = () => {
   
   const { apiKey, model, hasValidApiKey, getConfig } = useOpenAIConfig();
 
+  // Charger les prompts prédéfinis au démarrage
+  React.useEffect(() => {
+    if (prompts.length === 0) {
+      generatePrompts();
+    }
+  }, []);
+
   const categories = [
     { id: 'all', name: 'Tous', emoji: '🌟' },
     { id: 'business', name: 'Business', emoji: '🟣' },
