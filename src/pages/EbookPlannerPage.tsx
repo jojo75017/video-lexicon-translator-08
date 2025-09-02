@@ -9,7 +9,7 @@ import {
   BookOpen, Plus, Wand2, RotateCcw, ArrowLeft, Merge, Sparkles, Eye, Search, Palette
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import EbookImageBank from '@/components/ebook/EbookImageBank';
 import { EbookMarketing } from '@/components/ebook/EbookMarketing';
 import { EbookMonetization } from '@/components/ebook/EbookMonetization';
@@ -44,10 +44,11 @@ import { ebookTemplates } from '@/data/ebookTemplates';
 
 const EbookPlannerPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { isGenerating, generateChapterContent, generateSubChapterContent, generateEbookPlan, splitChapterAutomatically, generateBookSummary, generateEbookCover, optimizeForSEO, generateKDPDescription, generateKDPKeywords, generateKDPCategories } = useEbookGeneration();
   
   // États principaux
-  const [ebookTitle, setEbookTitle] = useState('');
+  const [ebookTitle, setEbookTitle] = useState(location.state?.suggestedTitle || '');
   const [authorName, setAuthorName] = useState('');
   const [preface, setPreface] = useState('');
   const [conclusion, setConclusion] = useState('');
