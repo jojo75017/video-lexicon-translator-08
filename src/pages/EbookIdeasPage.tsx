@@ -521,7 +521,7 @@ const EbookIdeasPage: React.FC = () => {
               </div>
               
               <Button 
-                onClick={() => navigate('/prompts-generator')}
+                onClick={() => navigate('/prompts-generator?pro=true')}
                 size="lg"
                 className="bg-gradient-secondary text-white hover:opacity-90 w-full"
               >

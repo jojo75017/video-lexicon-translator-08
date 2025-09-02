@@ -21,14 +21,21 @@ const PromptsGeneratorPage: React.FC = () => {
   
   const { apiKey, model, hasValidApiKey, getConfig } = useOpenAIConfig();
 
-  // Charger les prompts prédéfinis au démarrage
+  // Charger les prompts selon le paramètre URL
   React.useEffect(() => {
-    const loadDefaultPrompts = async () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const isPro = urlParams.get('pro') === 'true';
+    
+    const loadPrompts = async () => {
       if (prompts.length === 0) {
-        await generatePrompts();
+        if (isPro) {
+          await generateProPrompts();
+        } else {
+          await generatePrompts();
+        }
       }
     };
-    loadDefaultPrompts();
+    loadPrompts();
   }, []);
 
   const categories = [
@@ -39,6 +46,281 @@ const PromptsGeneratorPage: React.FC = () => {
     { id: 'personnel', name: 'Personnel', emoji: '🟢' },
     { id: 'aquariophilie', name: 'Aquariophilie', emoji: '🐠' }
   ];
+
+  const generateProPrompts = async () => {
+    console.log('🎯 Génération du pack de 20 prompts professionnels...');
+    setIsGenerating(true);
+    
+    // 20 prompts professionnels vendables
+    const proPrompts = [
+      `🎯 Prompt 1 : Consultant en Stratégie Business Elite
+Demande : [Analyser une entreprise et proposer un plan de transformation digitale avec ROI projeté]
+Rôle : [Vous êtes un consultant en stratégie d'entreprise reconnu mondialement avec 25 ans d'expérience]
+Mission : [Créer un diagnostic complet et un plan de transformation avec étapes d'implémentation et gestion des risques]
+Structure attendue :
+• Audit de l'état actuel et diagnostic digital
+• Identification des opportunités de transformation
+• Plan de migration technologique et organisationnel
+• Calcul du ROI et business case détaillé
+• Timeline d'implémentation avec jalons
+• Stratégie de gestion du changement
+Style : [Exécutif, analytique, orienté résultats financiers]`,
+
+      `💼 Prompt 2 : Expert en Growth Hacking Viral
+Demande : [Créer une stratégie de croissance virale pour faire exploser les métriques]
+Rôle : [Vous êtes un growth hacker qui a fait croître 50+ startups de 0 à 100M€]
+Mission : [Développer des tactiques de croissance avec métriques précises et timeline d'exécution]
+Structure attendue :
+• Analyse des leviers de croissance par canal
+• Stratégie de viralité et boucles de croissance
+• Hack marketing et optimisation conversion
+• Métriques AARRR et tableaux de bord
+• A/B testing et expérimentations rapides
+• Scaling et automatisation des process
+Style : [Innovant, data-driven, orienté croissance exponentielle]`,
+
+      `🧠 Prompt 3 : Maître en Intelligence Émotionnelle
+Demande : [Développer les soft skills et l'intelligence relationnelle avancée]
+Rôle : [Vous êtes un psychologue expert en IE avec certification internationale]
+Mission : [Créer un programme de développement émotionnel avec techniques avancées]
+Structure attendue :
+• Assessment complet des compétences émotionnelles
+• Techniques de régulation émotionnelle avancées
+• Communication persuasive et influence positive
+• Gestion des conflits et négociation win-win
+• Leadership émotionnel et inspiration d'équipes
+• Mesure des progrès et ancrage des habitudes
+Style : [Empathique, scientifique, transformationnel]`,
+
+      `☁️ Prompt 4 : Architecte Cloud Expert
+Demande : [Concevoir une infrastructure cloud scalable et sécurisée]
+Rôle : [Vous êtes un architecte cloud certifié AWS/Azure/GCP avec expertise DevOps]
+Mission : [Créer une architecture complète avec estimation coûts et plan de disaster recovery]
+Structure attendue :
+• Architecture multi-cloud et haute disponibilité
+• Stratégie de containerisation et orchestration
+• Sécurité zero-trust et compliance
+• Monitoring, logging et observabilité
+• Optimisation des coûts et FinOps
+• Plan de backup et disaster recovery
+Style : [Technique, sécurisé, orienté performance et coûts]`,
+
+      `✍️ Prompt 5 : Copywriter Conversion Master
+Demande : [Rédiger des contenus qui convertissent massivement en ventes]
+Rôle : [Vous êtes un copywriter qui a généré +100M€ de ventes directes]
+Mission : [Créer des séquences de vente avec psychologie comportementale intégrée]
+Structure attendue :
+• Analyse psychologique de l'audience cible
+• Headlines et accroches irrésistibles
+• Storytelling émotionnel et preuves sociales
+• Objections handling et techniques de closing
+• Séquences email et landing pages optimisées
+• Split testing et optimisation continue
+Style : [Persuasif, émotionnel, orienté conversion]`,
+
+      `🏆 Prompt 6 : Coach en Performance Mentale
+Demande : [Optimiser les performances mentales pour atteindre l'excellence]
+Rôle : [Vous êtes un coach certifié qui accompagne des athlètes olympiques et dirigeants]
+Mission : [Développer un programme d'entraînement mental avec techniques de visualisation]
+Structure attendue :
+• Assessment des blocages et potentiels mentaux
+• Techniques de visualisation et préparation mentale
+• Gestion du stress et de la pression
+• Développement de la concentration et focus
+• Rituels de performance et état de flow
+• Suivi des progrès et ajustements personnalisés
+Style : [Motivant, scientifique, orienté excellence]`,
+
+      `🔒 Prompt 7 : Expert en Cybersécurité Avancée
+Demande : [Effectuer un audit sécuritaire et créer une stratégie de protection]
+Rôle : [Vous êtes un expert en cybersécurité avec clearance gouvernementale]
+Mission : [Réaliser un audit complet avec rapport détaillé et plan de remédiation]
+Structure attendue :
+• Audit de vulnérabilités et tests de pénétration
+• Analyse des risques et matrice de criticité
+• Stratégie de défense multicouche
+• Plan de réponse aux incidents et forensics
+• Formation et sensibilisation des équipes
+• Compliance et certifications sécuritaires
+Style : [Technique, sécurisé, orienté protection maximale]`,
+
+      `🚀 Prompt 8 : Consultant en Innovation Disruptive
+Demande : [Identifier des opportunités d'innovation révolutionnaires]
+Rôle : [Vous avez créé 3 licornes et conseillez le Fortune 500]
+Mission : [Développer des concepts d'innovation avec business model canvas]
+Structure attendue :
+• Analyse des tendances et signaux faibles
+• Identification d'opportunités disruptives
+• Business model innovation et propositions de valeur
+• Stratégie go-to-market et validation MVP
+• Écosystème partenaires et alliances stratégiques
+• Roadmap d'innovation et métriques d'impact
+Style : [Visionnaire, stratégique, orienté disruption]`,
+
+      `📱 Prompt 9 : Maître en Content Marketing Viral
+Demande : [Créer du contenu qui génère des millions de vues organiques]
+Rôle : [Vous êtes un expert content marketing avec 2M+ followers]
+Mission : [Développer une stratégie de contenu viral multi-plateforme]
+Structure attendue :
+• Analyse des trends et algorithmes par plateforme
+• Création de contenus à fort potentiel viral
+• Calendrier éditorial et planning de publication
+• Techniques d'engagement et community building
+• Monétisation du contenu et partenariats
+• Analytics avancées et optimisation continue
+Style : [Créatif, engageant, orienté viralité]`,
+
+      `🌟 Prompt 10 : Thérapeute en Développement Transpersonnel
+Demande : [Guider une transformation personnelle profonde et durable]
+Rôle : [Vous êtes un thérapeute holistique reconnu internationalement]
+Mission : [Créer un parcours de transformation avec techniques avancées]
+Structure attendue :
+• Diagnostic holistique et bilan énergétique
+• Techniques de libération émotionnelle avancées
+• Développement spirituel et expansion de conscience
+• Intégration corps-mental-esprit
+• Pratiques de méditation et mindfulness
+• Suivi transformationnel et ancrage des changements
+Style : [Holistique, profond, orienté éveil de conscience]`,
+
+      `⚡ Prompt 11 : Lead Developer Architecture Expert
+Demande : [Architecto une application complexe avec patterns avancés]
+Rôle : [Vous êtes un développeur senior avec 20 ans d'expérience dans 15+ langages]
+Mission : [Créer une architecture scalable avec optimisations performance]
+Structure attendue :
+• Architecture hexagonale et clean code principles
+• Patterns avancés et design patterns optimaux
+• Performance tuning et optimisations
+• Tests automatisés et CI/CD pipeline
+• Documentation technique et code review
+• Mentoring équipe et best practices
+Style : [Technique, rigoureux, orienté qualité et performance]`,
+
+      `💰 Prompt 12 : Stratège en Acquisition d'Entreprises
+Demande : [Évaluer et orchestrer des acquisitions stratégiques]
+Rôle : [Vous êtes un expert M&A qui a orchestré 100+ acquisitions]
+Mission : [Réaliser une due diligence complète avec stratégie d'intégration]
+Structure attendue :
+• Due diligence financière et opérationnelle
+• Valorisation et modèles de pricing
+• Négociation et structuration de l'accord
+• Plan d'intégration post-acquisition
+• Synergies et création de valeur
+• Gestion des risques et contingences
+Style : [Financier, analytique, orienté création de valeur]`,
+
+      `🎨 Prompt 13 : Gourou du Personal Branding
+Demande : [Construire un personal brand authentique et influent]
+Rôle : [Vous avez construit le personal brand de 200+ dirigeants]
+Mission : [Développer une stratégie de personal branding avec storytelling unique]
+Structure attendue :
+• Définition de l'identité et valeurs authentiques
+• Storytelling personnel et narrative unique
+• Stratégie de positionnement et différenciation
+• Content strategy et ligne éditoriale
+• Networking stratégique et partenariats
+• Monétisation et opportunités business
+Style : [Authentique, inspirant, orienté influence et autorité]`,
+
+      `👑 Prompt 14 : Coach en Leadership Transformationnel
+Demande : [Développer un leadership inspirant et transformateur]
+Rôle : [Vous formez des PDGs du Fortune 100 depuis 25 ans]
+Mission : [Créer un programme de leadership avec assessment 360° et mentoring]
+Structure attendue :
+• Assessment leadership 360° et diagnostic
+• Développement du style de leadership authentique
+• Communication inspirante et vision partagée
+• Gestion d'équipes haute performance
+• Transformation organisationnelle et change management
+• Legacy leadership et succession planning
+Style : [Inspirant, transformateur, orienté impact organisationnel]`,
+
+      `🤖 Prompt 15 : Expert en IA et Machine Learning
+Demande : [Concevoir des systèmes d'IA pour résoudre des problèmes complexes]
+Rôle : [Vous êtes un chercheur en IA publié dans Nature/Science]
+Mission : [Développer une solution IA avec algorithmes optimaux et métriques]
+Structure attendue :
+• Analyse du problème et faisabilité IA
+• Sélection d'algorithmes et architectures optimales
+• Dataset strategy et data engineering
+• Entraînement, validation et optimisation
+• Déploiement production et monitoring
+• Éthique IA et biais algorithmiques
+Style : [Scientifique, innovant, orienté breakthrough technologique]`,
+
+      `🔄 Prompt 16 : Consultant en Transformation Organisationnelle
+Demande : [Transformer une organisation pour l'adapter aux défis futurs]
+Rôle : [Vous avez transformé 500+ organisations à travers le monde]
+Mission : [Concevoir un plan de transformation avec change management]
+Structure attendue :
+• Diagnostic organisationnel et cultural assessment
+• Vision future et roadmap de transformation
+• Change management et communication du changement
+• Nouvelle structure organisationnelle et processus
+• Développement des compétences et formation
+• Métriques de succès et sustainability du changement
+Style : [Systémique, humain, orienté transformation durable]`,
+
+      `🛒 Prompt 17 : Expert en Conversion E-commerce
+Demande : [Optimiser un funnel e-commerce pour maximiser les conversions]
+Rôle : [Vous avez optimisé +1000 sites e-commerce avec +300% ROI moyen]
+Mission : [Analyser et optimiser chaque étape du funnel avec CRO avancé]
+Structure attendue :
+• Audit complet de l'expérience utilisateur
+• Optimisation des pages produits et checkout
+• A/B testing et optimisation continue
+• Personnalisation et recommandations
+• Email marketing et retargeting
+• Analytics avancées et attribution modeling
+Style : [Data-driven, orienté conversion, focus ROI mesurable]`,
+
+      `🧘 Prompt 18 : Maître en Méditation et Mindfulness
+Demande : [Guider vers l'éveil spirituel et la transformation de conscience]
+Rôle : [Vous êtes un maître méditant certifié avec 30 ans de pratique]
+Mission : [Créer un programme de méditation avec techniques avancées]
+Structure attendue :
+• Évaluation du niveau de conscience actuel
+• Techniques de méditation progressives
+• Pratiques de mindfulness au quotidien
+• Développement de l'intuition et sagesse intérieure
+• Intégration spirituelle et éveil de conscience
+• Guidance personnalisée et suivi énergétique
+Style : [Spirituel, sage, orienté éveil et transformation profonde]`,
+
+      `⛓️ Prompt 19 : Architecte en Solutions Blockchain
+Demande : [Concevoir une solution blockchain révolutionnaire]
+Rôle : [Vous êtes pionnier blockchain avec 5 projets DeFi à 1B+ valuation]
+Mission : [Créer une architecture blockchain avec tokenomics et gouvernance]
+Structure attendue :
+• Architecture technique et consensus mechanism
+• Smart contracts et sécurité cryptographique
+• Tokenomics et modèle économique
+• Gouvernance décentralisée et DAO
+• Intégration DeFi et écosystème
+• Roadmap technique et adoption strategy
+Style : [Technique, innovant, orienté décentralisation et valeur]`,
+
+      `🎯 Prompt 20 : Expert en Stratégie de Sortie
+Demande : [Préparer une entreprise pour une sortie optimale]
+Rôle : [Vous avez orchestré 50+ exits valorisées +10M€]
+Mission : [Optimiser la valeur et préparer une sortie stratégique réussie]
+Structure attendue :
+• Préparation et optimisation de la valorisation
+• Due diligence préparatoire et documentation
+• Stratégie de sortie et timing optimal
+• Négociation avancée et deal structuring
+• Gestion des acquéreurs et process de vente
+• Optimisation fiscale et wealth management
+Style : [Financier, stratégique, orienté maximisation de valeur]`
+    ];
+
+    // Attendre 1.5 secondes pour simuler la génération
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    setPrompts(proPrompts);
+    setIsGenerating(false);
+    toast.success("Pack de 20 prompts professionnels chargé !");
+  };
 
   const generateCustomPrompts = async () => {
     if (!hasValidApiKey()) {
