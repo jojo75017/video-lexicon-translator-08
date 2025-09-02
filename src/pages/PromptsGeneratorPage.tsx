@@ -23,9 +23,12 @@ const PromptsGeneratorPage: React.FC = () => {
 
   // Charger les prompts prédéfinis au démarrage
   React.useEffect(() => {
-    if (prompts.length === 0) {
-      generatePrompts();
-    }
+    const loadDefaultPrompts = async () => {
+      if (prompts.length === 0) {
+        await generatePrompts();
+      }
+    };
+    loadDefaultPrompts();
   }, []);
 
   const categories = [
