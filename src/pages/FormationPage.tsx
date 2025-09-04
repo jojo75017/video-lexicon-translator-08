@@ -1,0 +1,581 @@
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Copy, Download, BookOpen, ChevronRight } from 'lucide-react';
+import { toast } from 'sonner';
+
+const FormationPage = () => {
+  const [selectedModule, setSelectedModule] = useState<number | null>(null);
+
+  const modules = [
+    {
+      id: 1,
+      title: "Configuration et Démarrage",
+      description: "Installation, configuration API OpenAI, générateur d'idées",
+      content: `# Module 1 : Configuration et Démarrage
+
+## 1.1 Installation et Configuration Initiale
+
+**Fonctionnalités principales :**
+- Configuration de l'API OpenAI
+- Paramétrage des préférences utilisateur
+- Interface de navigation intuitive
+
+**Actions à effectuer :**
+1. Saisir votre clé API OpenAI
+2. Configurer le nombre de chapitres par défaut
+3. Paramétrer vos préférences de génération
+
+### Captures d'écran à inclure :
+- Écran de configuration API
+- Panneau de paramètres utilisateur
+- Interface de navigation principale
+
+## 1.2 Générateur d'Idées d'Ebooks
+
+**Fonctionnalités principales :**
+- 50+ idées d'ebooks pré-générées
+- Catégories diversifiées : Business, Santé, Technologie, Finance
+- Système de génération automatique de nouveaux concepts
+
+**Actions à effectuer :**
+1. Explorer les catégories d'idées
+2. Sélectionner une idée qui vous inspire
+3. Transférer automatiquement vers le planificateur
+
+### Captures d'écran à inclure :
+- Grille des idées d'ebooks
+- Catégories colorées par domaine
+- Boutons d'action pour chaque idée
+- Page de détail d'une idée sélectionnée`
+    },
+    {
+      id: 2,
+      title: "Planificateur d'Ebook",
+      description: "Création du plan, gestion des chapitres, structure",
+      content: `# Module 2 : Planificateur d'Ebook
+
+## 2.1 Création du Plan Initial
+
+**Fonctionnalités principales :**
+- Génération automatique de structure
+- Personnalisation du titre et de l'auteur
+- Création de préface et conclusion
+- Système de chapitres et sous-chapitres
+
+**Actions à effectuer :**
+1. Saisir le titre de l'ebook
+2. Renseigner le nom de l'auteur
+3. Générer la structure automatiquement
+4. Personnaliser la préface et la conclusion
+
+### Captures d'écran à inclure :
+- Formulaire de création d'ebook
+- Génération automatique de la structure
+- Interface de modification des chapitres
+- Aperçu de la structure générée
+
+## 2.2 Gestion Avancée des Chapitres
+
+**Fonctionnalités principales :**
+- Drag & Drop pour réorganiser
+- Fusion et division de chapitres
+- Duplication de chapitres
+- Ajout de sous-chapitres
+- Suppression et modification
+
+**Actions à effectuer :**
+1. Réorganiser les chapitres par glisser-déposer
+2. Diviser un chapitre en plusieurs parties
+3. Fusionner des chapitres similaires
+4. Ajouter des sous-chapitres détaillés
+
+### Captures d'écran à inclure :
+- Interface de drag & drop
+- Outils de gestion des chapitres
+- Édition de chapitre en cours
+- Prévisualisation de la structure`
+    },
+    {
+      id: 3,
+      title: "Templates Professionnels",
+      description: "Galerie de templates, personnalisation",
+      content: `# Module 3 : Templates Professionnels
+
+## 3.1 Galerie de Templates
+
+**Templates disponibles :**
+- **Business** : Guides entrepreneuriaux, stratégies
+- **Fiction** : Romans, nouvelles, récits
+- **Mémoires** : Autobiographies, témoignages
+- **Guides** : Tutoriels, formations
+
+**Actions à effectuer :**
+1. Parcourir la galerie de templates
+2. Prévisualiser les structures
+3. Appliquer un template à votre ebook
+4. Personnaliser selon vos besoins
+
+### Captures d'écran à inclure :
+- Galerie complète des templates
+- Aperçu de chaque type de template
+- Application d'un template
+- Interface de personnalisation
+
+## 3.2 Personnalisation des Templates
+
+**Fonctionnalités principales :**
+- Modification de la structure
+- Adaptation du contenu
+- Personnalisation des styles
+- Sauvegarde de templates personnalisés`
+    },
+    {
+      id: 4,
+      title: "Génération de Contenu IA",
+      description: "Rédaction automatique, outils d'écriture avancés",
+      content: `# Module 4 : Génération de Contenu IA
+
+## 4.1 Rédaction Automatique
+
+**Fonctionnalités principales :**
+- Génération de contenu par chapitre
+- Génération de sous-chapitres détaillés
+- Amélioration du style d'écriture
+- Optimisation SEO automatique
+
+**Actions à effectuer :**
+1. Générer le contenu d'un chapitre
+2. Améliorer le style d'écriture
+3. Optimiser pour le SEO
+4. Réviser et affiner le contenu
+
+### Captures d'écran à inclure :
+- Interface de génération de contenu
+- Progression de la génération IA
+- Éditeur de contenu intégré
+- Options d'amélioration du style
+
+## 4.2 Outils d'Écriture Avancés
+
+**Fonctionnalités principales :**
+- Analyse de texte existant
+- Génération de table des matières
+- Compteur de mots automatique
+- Sauvegarde automatique`
+    },
+    {
+      id: 5,
+      title: "Outils Avancés",
+      description: "Générateur de couverture IA, outils de productivité",
+      content: `# Module 5 : Outils Avancés
+
+## 5.1 Générateur de Couverture IA
+
+**Fonctionnalités principales :**
+- Création automatique de couvertures
+- Styles variés et professionnels
+- Personnalisation des couleurs
+- Export haute résolution
+
+**Actions à effectuer :**
+1. Générer une couverture automatiquement
+2. Choisir parmi plusieurs styles
+3. Personnaliser les couleurs
+4. Télécharger en haute résolution
+
+### Captures d'écran à inclure :
+- Interface de génération de couverture
+- Galerie de styles disponibles
+- Options de personnalisation
+- Résultat final de la couverture
+
+## 5.2 Outils de Productivité
+
+**Fonctionnalités principales :**
+- Sauvegarde automatique
+- Statistiques détaillées
+- Historique des modifications
+- Export de brouillons`
+    },
+    {
+      id: 6,
+      title: "Banque d'Images IA",
+      description: "Génération d'illustrations, optimisation visuelle",
+      content: `# Module 6 : Banque d'Images IA
+
+## 6.1 Génération d'Illustrations
+
+**Fonctionnalités principales :**
+- Génération d'images personnalisées
+- Styles variés (réaliste, artistique, cartoon)
+- Optimisation automatique des formats
+- Intégration directe dans l'ebook
+
+**Actions à effectuer :**
+1. Créer des illustrations pour chaque chapitre
+2. Générer des images de couverture
+3. Optimiser les images pour différents formats
+4. Intégrer automatiquement dans l'ebook
+
+### Captures d'écran à inclure :
+- Interface de génération d'images
+- Galerie d'images générées
+- Options de style et personnalisation
+- Intégration dans l'ebook
+
+## 6.2 Optimisation Visuelle
+
+**Fonctionnalités principales :**
+- Redimensionnement automatique
+- Compression intelligente
+- Formats multiples (JPEG, PNG, WebP)
+- Métadonnées SEO`
+    },
+    {
+      id: 7,
+      title: "Optimisation KDP",
+      description: "Préparation Amazon KDP, analyse concurrentielle",
+      content: `# Module 7 : Optimisation KDP
+
+## 7.1 Préparation pour Amazon KDP
+
+**Fonctionnalités principales :**
+- Génération de description KDP
+- Recherche de mots-clés optimisés
+- Sélection de catégories appropriées
+- Conseils de prix dynamiques
+
+**Actions à effectuer :**
+1. Générer une description accrocheuse
+2. Rechercher les meilleurs mots-clés
+3. Sélectionner les catégories optimales
+4. Définir le prix de vente
+
+### Captures d'écran à inclure :
+- Interface d'optimisation KDP
+- Générateur de descriptions
+- Outil de recherche de mots-clés
+- Sélecteur de catégories
+
+## 7.2 Analyse Concurrentielle
+
+**Fonctionnalités principales :**
+- Analyse des concurrents directs
+- Étude des prix du marché
+- Identification des niches rentables
+- Recommandations stratégiques`
+    },
+    {
+      id: 8,
+      title: "Marketing et Promotion",
+      description: "Réseaux sociaux, email marketing, landing pages",
+      content: `# Module 8 : Marketing et Promotion
+
+## 8.1 Contenu pour Réseaux Sociaux
+
+**Fonctionnalités principales :**
+- Posts Facebook automatiques
+- Tweets promotionnels
+- Stories Instagram
+- Publications LinkedIn
+
+**Actions à effectuer :**
+1. Générer du contenu pour chaque réseau
+2. Planifier les publications
+3. Créer des visuels attractifs
+4. Suivre les performances
+
+### Captures d'écran à inclure :
+- Interface de génération social media
+- Exemples de posts générés
+- Calendrier de publication
+- Statistiques de performance
+
+## 8.2 Email Marketing
+
+**Fonctionnalités principales :**
+- Campagnes email automatisées
+- Templates d'emails professionnels
+- Séquences de lancement
+- Emails de suivi
+
+## 8.3 Landing Pages
+
+**Fonctionnalités principales :**
+- Création de pages de vente
+- Optimisation des conversions
+- A/B testing intégré
+- Analytics détaillés`
+    },
+    {
+      id: 9,
+      title: "Monétisation",
+      description: "Stratégies de prix, diversification des revenus",
+      content: `# Module 9 : Monétisation
+
+## 9.1 Stratégies de Prix
+
+**Fonctionnalités principales :**
+- Calculateur de ROI
+- Prix dynamiques
+- Stratégies de bundle
+- Programmes d'affiliation
+
+**Actions à effectuer :**
+1. Calculer le ROI optimal
+2. Définir une stratégie de prix
+3. Créer des bundles attractifs
+4. Mettre en place l'affiliation
+
+### Captures d'écran à inclure :
+- Calculateur de ROI
+- Interface de gestion des prix
+- Création de bundles
+- Tableau de bord affiliés
+
+## 9.2 Diversification des Revenus
+
+**Fonctionnalités principales :**
+- Vente multi-plateformes
+- Licences et droits d'auteur
+- Formations complémentaires
+- Services de consulting`
+    },
+    {
+      id: 10,
+      title: "Export Multi-Format",
+      description: "Formats disponibles, optimisation par format",
+      content: `# Module 10 : Export Multi-Format
+
+## 10.1 Formats Disponibles
+
+**Formats supportés :**
+- **PDF** : Version imprimable haute qualité
+- **EPUB** : Compatible liseuses électroniques
+- **MOBI** : Format Kindle
+- **DOCX** : Édition Microsoft Word
+- **HTML** : Version web interactive
+
+**Actions à effectuer :**
+1. Choisir le format d'export
+2. Configurer les options avancées
+3. Générer l'ebook final
+4. Télécharger et vérifier
+
+### Captures d'écran à inclure :
+- Interface de sélection de format
+- Options d'export avancées
+- Progression de génération
+- Aperçu des fichiers générés
+
+## 10.2 Optimisation par Format
+
+**Fonctionnalités principales :**
+- Mise en page automatique
+- Métadonnées optimisées
+- Table des matières interactive
+- Index automatique`
+    },
+    {
+      id: 11,
+      title: "Stratégies Avancées",
+      description: "Automatisation, scaling et growth hacking",
+      content: `# Module 11 : Stratégies Avancées
+
+## 11.1 Automatisation Complète
+
+**Fonctionnalités principales :**
+- Workflows automatisés
+- Génération en masse
+- Planification de contenu
+- Monitoring des performances
+
+## 11.2 Scaling et Growth Hacking
+
+**Stratégies couvertes :**
+- Multiplication des niches
+- Partenariats stratégiques
+- Optimisation continue
+- Expansion internationale
+
+### Captures d'écran à inclure :
+- Dashboard de performance
+- Outils d'automatisation
+- Métriques de croissance
+- Interface de scaling`
+    }
+  ];
+
+  const copyToClipboard = (content: string) => {
+    navigator.clipboard.writeText(content);
+    toast.success('Contenu copié dans le presse-papiers !');
+  };
+
+  const copyAllModules = () => {
+    const fullContent = `# Formation Complète : Générateur d'Ebook IA 📚
+
+## Table des Matières
+
+${modules.map((module, index) => `${index + 1}. [${module.title}](#module-${index + 1}-${module.title.toLowerCase().replace(/\s+/g, '-')})`).join('\n')}
+
+---
+
+${modules.map((module, index) => `## Module ${index + 1} : ${module.title}
+
+${module.content}
+
+---`).join('\n\n')}
+
+## Conclusion et Certification
+
+### Récapitulatif des Compétences Acquises
+
+✅ Maîtrise complète du générateur d'ebook IA  
+✅ Création d'ebooks professionnels en minutes  
+✅ Optimisation pour Amazon KDP  
+✅ Stratégies de marketing digital  
+✅ Techniques de monétisation avancées  
+✅ Export multi-format professionnel  
+✅ Automatisation des processus  
+
+### Prochaines Étapes
+
+1. **Créer votre premier ebook** avec les templates fournis
+2. **Publier sur Amazon KDP** en suivant les optimisations
+3. **Développer votre marketing** avec les outils intégrés
+4. **Scaler votre business** avec l'automatisation
+
+© Formation Générateur d'Ebook IA - Tous droits réservés`;
+
+    copyToClipboard(fullContent);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background to-muted/50 p-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <BookOpen className="h-10 w-10 text-primary" />
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              Formation Complète
+            </h1>
+          </div>
+          <p className="text-xl text-muted-foreground mb-6">
+            Générateur d'Ebook IA - Toutes les fonctionnalités
+          </p>
+          
+          <div className="flex gap-4 justify-center">
+            <Button onClick={copyAllModules} size="lg" className="gap-2">
+              <Copy className="h-4 w-4" />
+              Copier la Formation Complète
+            </Button>
+            <Button variant="outline" size="lg" className="gap-2">
+              <Download className="h-4 w-4" />
+              Télécharger PDF
+            </Button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
+          {modules.map((module) => (
+            <Card 
+              key={module.id} 
+              className="cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-105 border-2 hover:border-primary/50"
+              onClick={() => setSelectedModule(selectedModule === module.id ? null : module.id)}
+            >
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <Badge variant="secondary" className="text-xs">
+                    Module {module.id}
+                  </Badge>
+                  <ChevronRight 
+                    className={`h-4 w-4 transition-transform ${
+                      selectedModule === module.id ? 'rotate-90' : ''
+                    }`} 
+                  />
+                </div>
+                <CardTitle className="text-lg">{module.title}</CardTitle>
+                <p className="text-sm text-muted-foreground">{module.description}</p>
+              </CardHeader>
+            </Card>
+          ))}
+        </div>
+
+        {selectedModule && (
+          <Card className="mb-8">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-2xl">
+                  Module {selectedModule} : {modules.find(m => m.id === selectedModule)?.title}
+                </CardTitle>
+                <Button 
+                  onClick={() => copyToClipboard(modules.find(m => m.id === selectedModule)?.content || '')}
+                  size="sm"
+                  className="gap-2"
+                >
+                  <Copy className="h-4 w-4" />
+                  Copier ce module
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="prose prose-slate max-w-none">
+                <pre className="whitespace-pre-wrap text-sm leading-relaxed">
+                  {modules.find(m => m.id === selectedModule)?.content}
+                </pre>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Checklist de Lancement d'Ebook</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h4 className="font-semibold mb-3">Pré-production :</h4>
+                <ul className="space-y-2 text-sm">
+                  <li>☐ Idée validée et recherche effectuée</li>
+                  <li>☐ Structure détaillée créée</li>
+                  <li>☐ Template sélectionné et personnalisé</li>
+                </ul>
+                
+                <h4 className="font-semibold mb-3 mt-6">Production :</h4>
+                <ul className="space-y-2 text-sm">
+                  <li>☐ Contenu généré et optimisé</li>
+                  <li>☐ Couverture créée et finalisée</li>
+                  <li>☐ Images intégrées et optimisées</li>
+                  <li>☐ Relecture et corrections effectuées</li>
+                </ul>
+              </div>
+              
+              <div>
+                <h4 className="font-semibold mb-3">Optimisation KDP :</h4>
+                <ul className="space-y-2 text-sm">
+                  <li>☐ Description accrocheuse rédigée</li>
+                  <li>☐ Mots-clés recherchés et sélectionnés</li>
+                  <li>☐ Catégories optimales choisies</li>
+                  <li>☐ Prix compétitif défini</li>
+                </ul>
+                
+                <h4 className="font-semibold mb-3 mt-6">Marketing :</h4>
+                <ul className="space-y-2 text-sm">
+                  <li>☐ Contenu social media préparé</li>
+                  <li>☐ Campagne email configurée</li>
+                  <li>☐ Landing page créée</li>
+                  <li>☐ Stratégie de lancement planifiée</li>
+                </ul>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+export default FormationPage;
