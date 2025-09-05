@@ -21,16 +21,6 @@ const PromptsGeneratorPage: React.FC = () => {
   
   const { apiKey, model, hasValidApiKey, getConfig } = useOpenAIConfig();
 
-  // Charger les prompts selon le paramètre URL
-  React.useEffect(() => {
-    const loadPrompts = async () => {
-      if (prompts.length === 0) {
-        await generatePrompts();
-      }
-    };
-    loadPrompts();
-  }, []);
-
   const categories = [
     { id: 'all', name: 'Tous', emoji: '🌟' },
     { id: 'business', name: 'Business', emoji: '🟣' },
@@ -40,338 +30,320 @@ const PromptsGeneratorPage: React.FC = () => {
     { id: 'aquariophilie', name: 'Aquariophilie', emoji: '🐠' }
   ];
 
-
   const generateCustomPrompts = async () => {
-    if (!hasValidApiKey()) {
-      toast.error("Clé API OpenAI requise pour la génération personnalisée");
+    if (!hasValidApiKey() || !customTopic.trim()) {
+      toast.error("Veuillez configurer votre clé API OpenAI et saisir un sujet");
       return;
     }
 
-    if (!customTopic.trim()) {
-      toast.error("Veuillez saisir un sujet pour générer des prompts personnalisés");
-      return;
-    }
-
-    console.log('🚀 Début génération prompts personnalisés pour:', customTopic);
     setIsGenerating(true);
     
     try {
-      console.log('📡 Appel API OpenAI...');
+      const config = getConfig();
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${config.apiKey}`
         },
         body: JSON.stringify({
-          model: 'gpt-4.1-2025-04-14',
+          model: config.model,
           messages: [
             {
               role: 'system',
-              content: `Vous êtes un expert en création de prompts professionnels. Créez 10 prompts détaillés et spécialisés sur le sujet demandé. Chaque prompt doit inclure :
-              - Un emoji thématique
-              - Un titre clair
-              - Une demande précise
-              - Un rôle d'expert
-              - Une mission détaillée
-              - Une structure attendue (5-7 points)
-              - Un style de réponse
+              content: `Tu es un expert en création de prompts professionnels. Tu dois créer 10 prompts détaillés et professionnels sur le sujet demandé. Chaque prompt doit suivre cette structure exacte :
 
-              Format exactement comme ceci :
-              🎯 Prompt X : [Titre]
-              Demande : [Description claire]
-              Rôle : [Expert spécialisé]
-              Mission : [Objectif précis]
-              Structure attendue :
-              • Point 1
-              • Point 2
-              • Point 3
-              • Point 4
-              • Point 5
-              Style : [Ton et approche]`
+🎯 Prompt [numéro] : [Titre accrocheur]
+Demande : [Description claire de ce qui est demandé]
+Rôle : [Tu es un expert en...]
+Mission : [Objectif précis à accomplir]
+Structure attendue :
+• Point 1
+• Point 2
+• Point 3
+• Point 4
+• Point 5
+• Point 6
+Style : [Ton et approche à adopter]
+
+Les prompts doivent être variés, couvrir différents aspects du sujet, et être immédiatement utilisables.`
             },
             {
               role: 'user',
-              content: `Créez 10 prompts professionnels sur le sujet : "${customTopic}"`
+              content: `Crée 10 prompts professionnels détaillés sur le sujet : "${customTopic}"`
             }
           ],
           temperature: 0.8,
           max_tokens: 4000
-        }),
+        })
       });
 
       if (!response.ok) {
         throw new Error(`Erreur API: ${response.status}`);
       }
 
-      console.log('✅ Réponse API reçue');
       const data = await response.json();
-      const content = data.choices[0]?.message?.content || '';
+      const generatedContent = data.choices[0].message.content;
       
-      // Diviser le contenu en prompts individuels
-      const generatedPrompts = content.split(/(?=🎯|📝|🚀|💡|⭐|🔥|✨|🎨|🏆|💎)/).filter(p => p.trim());
+      // Séparer les prompts générés
+      const generatedPrompts = generatedContent.split(/🎯 Prompt \d+/).filter(p => p.trim()).map((prompt, index) => `🎯 Prompt ${index + 1}${prompt.trim()}`);
       
-      console.log('📝 Prompts générés:', generatedPrompts.length);
       setPrompts(generatedPrompts);
-      toast.success(`${generatedPrompts.length} prompts générés avec succès !`);
-      
+      toast.success(`${generatedPrompts.length} prompts personnalisés générés !`);
     } catch (error) {
-      console.error('❌ Erreur lors de la génération:', error);
-      toast.error("Erreur lors de la génération des prompts personnalisés");
+      console.error('Erreur lors de la génération:', error);
+      toast.error("Erreur lors de la génération des prompts");
     } finally {
       setIsGenerating(false);
-      console.log('🏁 Fin génération prompts');
     }
   };
 
   const generatePrompts = async () => {
-    console.log('📋 Génération des prompts pré-définis...');
     setIsGenerating(true);
     
-    // Simulation de génération des prompts pré-définis
     const generatedPrompts = [
-      // BUSINESS & ENTREPRENEURIAT (5 prompts)
-      `🟣 Prompt 1 : Créer une feuille de route pour débutant entrepreneur
-Demande : [Fournir un guide étape par étape pour les débutants contenant des idées de projets qui peuvent se transformer en entreprise]
-Rôle : [Vous êtes un coach expérimenté en entrepreneuriat et consultant en innovation.]
-Mission : [Créer une feuille de route stratégique avec 3 à 5 idées de projets innovants à potentiel entrepreneurial réel, adaptée au profil de l'utilisateur.]
+      // BUSINESS (5 prompts)
+      `🟣 Prompt 1 : Stratégie de croissance pour PME
+Demande : [Développer une stratégie de croissance complète pour une PME en phase d'expansion]
+Rôle : [Vous êtes un consultant en stratégie d'entreprise avec 15 ans d'expérience.]
+Mission : [Concevoir un plan de croissance sur 3 ans avec objectifs chiffrés et étapes concrètes.]
 Structure attendue :
-• Évaluation initiale (compétences, intérêts, ressources)
-• Génération d'idées via l'intersection technologie/problème/impact
-• Évaluation (marché, barrière, alignement, budget, revenus)
-• Détails par projet (MVP, calendrier, financement, jalons)
-• Sections formatées : <roadmap> <entrepreneur_profile> <project_ideas> <detailed_project_breakdown> <recommended_next_steps>
-Style : [Clair, accessible, pragmatique, avec exemples concrets]`,
+• Analyse de la position concurrentielle actuelle
+• Identification des opportunités de marché
+• Plan d'investissement et ressources nécessaires
+• Stratégie marketing et commerciale
+• Indicateurs de performance et suivi
+• Gestion des risques et plan de contingence
+Style : [Professionnel, orienté résultats, basé sur des données]`,
 
-      `🟣 Prompt 2 : Analyse de marché et positionnement concurrentiel
-Demande : [Analyser un marché spécifique et définir un positionnement unique face à la concurrence]
-Rôle : [Vous êtes un consultant en stratégie d'entreprise et expert en analyse de marché.]
-Mission : [Fournir une analyse complète du marché avec recommandations de positionnement différenciant.]
+      `🟣 Prompt 2 : Optimisation des processus internes
+Demande : [Améliorer l'efficacité opérationnelle et réduire les coûts de 20%]
+Rôle : [Vous êtes un expert en lean management et optimisation des processus.]
+Mission : [Identifier les goulots d'étranglement et proposer des solutions d'amélioration continue.]
 Structure attendue :
-• Analyse des segments de marché et opportunités
-• Cartographie concurrentielle détaillée
-• Identification des gaps et niches disponibles
-• Stratégie de positionnement unique
-• Plan d'action pour se démarquer
-• Métriques de succès et KPIs à suivre
-Style : [Analytique, factuel, orienté action stratégique]`,
+• Cartographie des processus actuels
+• Identification des inefficacités et gaspillages
+• Solutions d'automatisation et digitalisation
+• Plan de formation des équipes
+• Métriques de performance et ROI
+• Calendrier de mise en œuvre
+Style : [Analytique, pragmatique, orienté amélioration continue]`,
 
-      `🟣 Prompt 3 : Plan de financement startup
-Demande : [Créer un plan de financement complet pour lever des fonds]
-Rôle : [Vous êtes un expert en financement de startups et relations investisseurs.]
-Mission : [Concevoir une stratégie de levée de fonds avec pitch deck et projections financières.]
+      `🟣 Prompt 3 : Transformation digitale d'entreprise
+Demande : [Accompagner une entreprise traditionnelle dans sa transformation numérique]
+Rôle : [Vous êtes un consultant en transformation digitale et innovation.]
+Mission : [Élaborer une roadmap de digitalisation adaptée aux enjeux et ressources de l'entreprise.]
 Structure attendue :
-• Évaluation des besoins de financement
-• Identification des sources de financement adaptées
-• Pitch deck professionnel (10-15 slides)
-• Projections financières sur 3-5 ans
-• Stratégie d'approche des investisseurs
-• Négociation et termes de l'accord
-Style : [Professionnel, convaincant, basé sur des données]`,
+• Audit digital et maturité technologique
+• Définition de la vision et objectifs digitaux
+• Sélection des outils et technologies
+• Plan de conduite du changement
+• Formation et accompagnement des équipes
+• Mesure de l'impact et ajustements
+Style : [Innovant, pédagogique, centré sur l'humain]`,
 
-      `🟣 Prompt 4 : Automatisation de processus business
-Demande : [Identifier et automatiser les processus répétitifs pour gagner en efficacité]
-Rôle : [Vous êtes un consultant en optimisation des processus et automatisation.]
-Mission : [Créer un plan d'automatisation personnalisé pour optimiser les opérations.]
+      `🟣 Prompt 4 : Gestion de crise et continuité d'activité
+Demande : [Préparer l'entreprise à gérer efficacement les crises et maintenir son activité]
+Rôle : [Vous êtes un expert en gestion de crise et continuité d'activité.]
+Mission : [Développer un plan de continuité robuste et des procédures de gestion de crise.]
 Structure attendue :
-• Audit des processus actuels et identification des goulots
-• Cartographie des tâches automatisables
-• Sélection d'outils et technologies adaptés
-• Plan de mise en œuvre par priorité
-• Formation et accompagnement au changement
-• ROI et mesure de l'impact
-Style : [Technique, pratique, orienté résultats mesurables]`,
+• Analyse des risques et scénarios de crise
+• Plan de continuité d'activité (PCA)
+• Procédures d'urgence et communication de crise
+• Organisation de la cellule de crise
+• Tests et simulations régulières
+• Retour d'expérience et amélioration continue
+Style : [Rigoureux, anticipatif, orienté résilience]`,
 
-      `🟣 Prompt 5 : Stratégie de croissance et scaling
-Demande : [Développer une stratégie pour faire passer son business à l'échelle supérieure]
-Rôle : [Vous êtes un expert en croissance d'entreprise et scaling de business models.]
-Mission : [Concevoir un plan de croissance structuré avec étapes et ressources nécessaires.]
+      `🟣 Prompt 5 : Développement du leadership et management
+Demande : [Former les managers à développer leur leadership et motiver leurs équipes]
+Rôle : [Vous êtes un coach en leadership et développement managérial.]
+Mission : [Créer un programme de développement du leadership adapté aux enjeux actuels.]
 Structure attendue :
-• Diagnostic de la situation actuelle et potentiel
-• Identification des leviers de croissance prioritaires
-• Stratégie de scaling (équipe, processus, tech)
-• Plan de développement commercial et marketing
-• Gestion des ressources et financement de la croissance
-• Métriques de performance et tableaux de bord
-Style : [Stratégique, ambitieux, réaliste et actionnable]`,
+• Évaluation des compétences managériales actuelles
+• Modules de formation au leadership situationnel
+• Techniques de motivation et engagement des équipes
+• Communication efficace et feedback constructif
+• Gestion des conflits et médiation
+• Plan de développement personnel et suivi
+Style : [Inspirant, pratique, basé sur l'expérience]`,
 
-      // COPYWRITING & MARKETING (5 prompts)
-      `🔵 Prompt 6 : Page de vente haute conversion
-Demande : [Créer une page de vente percutante qui convertit les visiteurs en clients]
-Rôle : [Vous êtes un copywriter expert spécialisé dans les pages de vente haute conversion.]
-Mission : [Rédiger une page de vente complète utilisant les techniques de persuasion les plus efficaces.]
+      // MARKETING (5 prompts)
+      `🔵 Prompt 6 : Stratégie de contenu et storytelling de marque
+Demande : [Développer une stratégie de contenu qui raconte l'histoire de la marque et engage l'audience]
+Rôle : [Vous êtes un expert en marketing de contenu et storytelling.]
+Mission : [Créer une stratégie narrative cohérente sur tous les canaux de communication.]
 Structure attendue :
-• Titre accrocheur avec promesse claire
-• Identification du problème et empathie
-• Présentation de la solution unique
-• Preuves sociales et témoignages
-• Offre irrésistible avec urgence/rareté
-• FAQ pour lever les objections
-• Call-to-action puissant
-Style : [Persuasif, émotionnel, orienté bénéfices clients]`,
+• Définition de l'identité et des valeurs de marque
+• Création du storytelling principal et déclinaisons
+• Calendrier éditorial multi-canaux
+• Formats de contenu adaptés à chaque plateforme
+• Métriques d'engagement et performance
+• Optimisation continue basée sur les données
+Style : [Créatif, authentique, orienté engagement]`,
 
-      `🔵 Prompt 7 : Campagne email marketing séquentielle
-Demande : [Créer une séquence d'emails automatisée pour nurturing et conversion]
-Rôle : [Vous êtes un expert en email marketing et automation.]
-Mission : [Concevoir une séquence d'emails engageante qui guide le prospect vers l'achat.]
+      `🔵 Prompt 7 : Marketing d'influence et partenariats stratégiques
+Demande : [Développer une stratégie d'influence marketing pour augmenter la notoriété de 50%]
+Rôle : [Vous êtes un spécialiste en marketing d'influence et partenariats.]
+Mission : [Identifier et collaborer avec les bons influenceurs pour maximiser l'impact.]
 Structure attendue :
-• Email de bienvenue et présentation de valeur
-• Séquence éducative (3-5 emails de contenu)
-• Emails de social proof et témoignages
-• Offre commerciale progressive
-• Emails de relance et urgence
-• Suivi post-achat et fidélisation
-Style : [Conversationnel, utile, progressivement commercial]`,
+• Mapping des influenceurs pertinents par segment
+• Critères de sélection et grille d'évaluation
+• Stratégie de collaboration et types de partenariats
+• Négociation et contractualisation
+• Suivi des performances et ROI
+• Développement de relations long terme
+Style : [Relationnel, stratégique, orienté performance]`,
 
-      `🔵 Prompt 8 : Stratégie de contenu viral sur réseaux sociaux
-Demande : [Créer du contenu engageant qui génère du reach organique massif]
-Rôle : [Vous êtes un expert en marketing digital et viralité sur les réseaux sociaux.]
-Mission : [Développer une stratégie de contenu viral adaptée à chaque plateforme.]
+      `🔵 Prompt 8 : Marketing automation et nurturing leads
+Demande : [Automatiser le parcours client pour convertir 30% de leads supplémentaires]
+Rôle : [Vous êtes un expert en marketing automation et CRM.]
+Mission : [Concevoir des workflows automatisés pour optimiser la conversion.]
 Structure attendue :
-• Analyse des tendances et algorithmes par plateforme
-• Types de contenu à fort potentiel viral
-• Calendrier éditorial optimisé
-• Techniques d'engagement et interaction
-• Stratégie de hashtags et timing
-• Mesure des performances et ajustements
-Style : [Créatif, tendance, orienté engagement maximal]`,
+• Mapping du parcours client et points de contact
+• Segmentation avancée et personas détaillés
+• Création de workflows de nurturing personnalisés
+• Contenus adaptés à chaque étape du funnel
+• Scoring des leads et déclencheurs automatiques
+• Analyse des performances et optimisation
+Style : [Technique, orienté données, centré sur la conversion]`,
 
-      `🔵 Prompt 9 : Funnel de vente complet multicanal
-Demande : [Concevoir un funnel de vente intégré sur plusieurs canaux de communication]
-Rôle : [Vous êtes un architecte de funnels de vente et expert en customer journey.]
-Mission : [Créer un parcours client optimisé de la découverte à la fidélisation.]
+      `🔵 Prompt 9 : Stratégie omnicanale et expérience client
+Demande : [Créer une expérience client fluide et cohérente sur tous les points de contact]
+Rôle : [Vous êtes un expert en expérience client et stratégie omnicanale.]
+Mission : [Harmoniser tous les canaux pour offrir une expérience client exceptionnelle.]
 Structure attendue :
-• Mapping du customer journey complet
-• Points de contact et canaux à chaque étape
-• Contenus et messages adaptés par phase
-• Outils et technologies nécessaires
-• Métriques de conversion par étape
-• Optimisation continue et A/B testing
-Style : [Structuré, data-driven, centré client]`,
+• Cartographie de l'expérience client actuelle
+• Identification des points de friction et opportunités
+• Stratégie d'intégration des canaux online/offline
+• Personnalisation de l'expérience par segment
+• Outils de mesure de satisfaction et NPS
+• Plan d'amélioration continue de l'expérience
+Style : [Centré client, holistique, orienté satisfaction]`,
 
-      `🔵 Prompt 10 : Personal branding et influence digitale
-Demande : [Construire une marque personnelle forte qui génère autorité et opportunités]
-Rôle : [Vous êtes un expert en personal branding et influence digitale.]
-Mission : [Développer une stratégie complète de personal branding sur le digital.]
+      `🔵 Prompt 10 : Growth hacking et croissance virale
+Demande : [Implémenter des techniques de growth hacking pour une croissance exponentielle]
+Rôle : [Vous êtes un growth hacker expérimenté et expert en croissance virale.]
+Mission : [Identifier et exploiter les leviers de croissance les plus efficaces.]
 Structure attendue :
-• Définition de l'identité et positionnement unique
-• Stratégie de contenu et ligne éditoriale
-• Optimisation des profils et présence en ligne
-• Networking et partenariats stratégiques
-• Monétisation de l'influence
-• Protection et gestion de la réputation
-Style : [Authentique, professionnel, orienté autorité]`,
+• Analyse des métriques AARRR (Acquisition, Activation, Rétention, Referral, Revenue)
+• Identification des quick wins et expérimentations
+• Mécaniques de viralité et programmes de parrainage
+• Optimisation du funnel de conversion
+• Tests A/B et itérations rapides
+• Scaling des tactiques qui fonctionnent
+Style : [Expérimental, data-driven, orienté croissance rapide]`,
 
-      // VOYAGE & AVENTURE (5 prompts)
-      `🟡 Prompt 11 : Itinéraire de voyage personnalisé optimisé
-Demande : [Concevoir un itinéraire de voyage sur mesure avec budget et préférences]
-Rôle : [Vous êtes un agent de voyage expert et planificateur d'expériences uniques.]
-Mission : [Créer un plan de voyage détaillé et personnalisé incluant logistique, budget et expériences authentiques.]
+      // VOYAGE (5 prompts)
+      `🟡 Prompt 11 : Planification de voyage sur mesure et budget optimisé
+Demande : [Organiser un voyage personnalisé en optimisant le budget et les expériences]
+Rôle : [Vous êtes un travel planner expert avec 10 ans d'expérience mondiale.]
+Mission : [Créer un itinéraire détaillé qui maximise les expériences tout en respectant le budget.]
 Structure attendue :
-• Analyse des préférences et contraintes
-• Itinéraire jour par jour optimisé
-• Réservations prioritaires et alternatives
-• Budget détaillé par catégorie
-• Conseils locaux et expériences cachées
-• Kit de voyage (documents, apps, contacts)
-Style : [Inspirant, pratique, riche en détails locaux]`,
+• Analyse des préférences et contraintes du voyageur
+• Recherche et sélection des destinations optimales
+• Planification détaillée jour par jour
+• Optimisation des coûts (transport, hébergement, activités)
+• Conseils pratiques et préparatifs
+• Plan B et alternatives en cas d'imprévus
+Style : [Personnalisé, pratique, orienté expérience]`,
 
-      `🟡 Prompt 12 : Guide de voyage digital nomad
-Demande : [Créer un guide complet pour travailler tout en voyageant]
-Rôle : [Vous êtes un digital nomad expérimenté et consultant en remote work.]
-Mission : [Fournir un guide pratique pour réussir sa transition vers le nomadisme digital.]
+      `🟡 Prompt 12 : Guide de voyage responsable et écotourisme
+Demande : [Voyager de manière responsable en minimisant l'impact environnemental]
+Rôle : [Vous êtes un expert en tourisme durable et écotourisme.]
+Mission : [Concevoir des voyages qui respectent l'environnement et les communautés locales.]
 Structure attendue :
-• Préparation et planification de la transition
-• Destinations nomad-friendly et coworking spaces
-• Outils et équipements indispensables
-• Gestion des aspects légaux et fiscaux
-• Maintien de la productivité en voyage
-• Communauté et networking nomade
-Style : [Pratique, basé sur l'expérience, actionnable]`,
+• Sélection de destinations et prestataires éco-responsables
+• Moyens de transport à faible empreinte carbone
+• Hébergements durables et certifiés
+• Activités respectueuses de l'environnement
+• Interaction positive avec les communautés locales
+• Compensation carbone et actions concrètes
+Style : [Conscient, respectueux, orienté impact positif]`,
 
-      `🟡 Prompt 13 : Voyage d'aventure et activités extrêmes
-Demande : [Planifier un voyage d'aventure avec activités outdoor et sensations fortes]
-Rôle : [Vous êtes un guide d'aventure professionnel et expert en tourisme d'aventure.]
-Mission : [Concevoir un séjour d'aventure sécurisé avec activités adaptées au niveau.]
+      `🟡 Prompt 13 : Voyage d'affaires efficace et networking
+Demande : [Optimiser les déplacements professionnels pour maximiser les opportunités business]
+Rôle : [Vous êtes un consultant en voyages d'affaires et networking professionnel.]
+Mission : [Transformer chaque voyage d'affaires en opportunité de développement business.]
 Structure attendue :
-• Évaluation du niveau et préparation physique
-• Sélection d'activités et destinations adaptées
-• Équipement et matériel nécessaire
-• Mesures de sécurité et assurances
-• Guides locaux et prestataires fiables
-• Plan B et gestion des imprévus
-Style : [Sécuritaire, passionnant, détaillé sur les risques]`,
+• Planification stratégique des déplacements
+• Optimisation du temps et des rencontres
+• Techniques de networking efficace
+• Gestion du jet lag et maintien de la performance
+• Outils digitaux pour rester productif
+• Suivi et capitalisation sur les contacts
+Style : [Professionnel, efficace, orienté ROI]`,
 
-      `🟡 Prompt 14 : Voyage culinaire et découvertes gastronomiques
-Demande : [Organiser un voyage centré sur la gastronomie locale et les expériences culinaires]
-Rôle : [Vous êtes un critique gastronomique et organisateur de voyages culinaires.]
-Mission : [Créer un parcours gastronomique authentique avec expériences culinaires uniques.]
+      `🟡 Prompt 14 : Voyage solo sécurisé et enrichissant
+Demande : [Partir seul en voyage en toute sécurité tout en vivant des expériences authentiques]
+Rôle : [Vous êtes un expert en voyage solo et sécurité des voyageurs.]
+Mission : [Préparer un voyage solo mémorable en minimisant les risques.]
 Structure attendue :
-• Recherche des spécialités et traditions locales
-• Sélection de restaurants et expériences authentiques
-• Cours de cuisine et rencontres avec chefs
-• Marchés locaux et producteurs
-• Dégustation de vins et spiritueux régionaux
-• Carnet de voyage gastronomique
-Style : [Gourmand, culturel, respectueux des traditions]`,
+• Évaluation des risques par destination
+• Préparation sécuritaire et documents essentiels
+• Stratégies pour rencontrer des locaux et autres voyageurs
+• Gestion de la solitude et du mal du pays
+• Applications et outils de sécurité
+• Développement personnel à travers le voyage
+Style : [Sécuritaire, encourageant, orienté découverte de soi]`,
 
-      `🟡 Prompt 15 : Road trip parfait avec van aménagé
-Demande : [Planifier un road trip en van avec itinéraire et équipements optimaux]
-Rôle : [Vous êtes un expert en van life et road trips longue durée.]
-Mission : [Concevoir un road trip complet avec préparation du véhicule et itinéraire adapté.]
+      `🟡 Prompt 15 : Voyage culinaire et découverte gastronomique
+Demande : [Explorer une destination à travers sa gastronomie et ses traditions culinaires]
+Rôle : [Vous êtes un expert en tourisme culinaire et critique gastronomique.]
+Mission : [Créer un parcours gastronomique authentique qui révèle l'âme d'une destination.]
 Structure attendue :
-• Choix et aménagement du véhicule
-• Itinéraire optimisé avec étapes clés
-• Spots de stationnement et aires de service
-• Équipements et provisions nécessaires
-• Gestion de l'autonomie (eau, électricité)
-• Réglementation et autorisations par pays
-Style : [Aventurier, pratique, sécuritaire]`,
+• Recherche des spécialités locales et restaurants authentiques
+• Expériences culinaires immersives (cours de cuisine, marchés)
+• Rencontres avec des producteurs et artisans locaux
+• Dégustation de vins et accords mets-vins
+• Documentation et partage de l'expérience
+• Reproduction des recettes à la maison
+Style : [Gourmand, authentique, orienté découverte culturelle]`,
 
-      // DÉVELOPPEMENT PERSONNEL (5 prompts)
-      `🟢 Prompt 16 : Programme de développement personnel 30 jours
-Demande : [Créer un programme de transformation personnelle avec actions quotidiennes]
-Rôle : [Vous êtes un coach de vie certifié et expert en psychologie positive.]
-Mission : [Concevoir un programme de 30 jours avec exercices pratiques pour atteindre un objectif de développement personnel.]
+      // PERSONNEL (5 prompts)
+      `🟢 Prompt 16 : Développement personnel et confiance en soi
+Demande : [Renforcer l'estime de soi et développer une confiance durable]
+Rôle : [Vous êtes un coach en développement personnel certifié.]
+Mission : [Accompagner la transformation personnelle vers plus de confiance et d'épanouissement.]
 Structure attendue :
-• Évaluation initiale et fixation d'objectifs SMART
-• Plan hebdomadaire avec thèmes progressifs
-• Exercices quotidiens (réflexion, action, mesure)
-• Outils de suivi et d'évaluation
-• Stratégies de motivation et résilience
-• Plan de maintien post-programme
-Style : [Bienveillant, motivant, scientifiquement fondé]`,
+• Évaluation de l'estime de soi et identification des blocages
+• Techniques de reprogrammation mentale positive
+• Exercices pratiques de sortie de zone de confort
+• Développement de l'assertivité et communication
+• Gestion des émotions et du stress
+• Plan d'action personnalisé et suivi des progrès
+Style : [Bienveillant, motivant, orienté transformation]`,
 
-      `🟢 Prompt 17 : Gestion du stress et bien-être mental
-Demande : [Développer des stratégies efficaces pour gérer le stress et améliorer le bien-être]
-Rôle : [Vous êtes un psychologue spécialisé en gestion du stress et bien-être mental.]
-Mission : [Créer un programme personnalisé de gestion du stress avec techniques éprouvées.]
+      `🟢 Prompt 17 : Gestion du temps et productivité personnelle
+Demande : [Optimiser son organisation personnelle pour gagner 2h par jour]
+Rôle : [Vous êtes un expert en productivité et gestion du temps.]
+Mission : [Développer un système d'organisation personnel efficace et durable.]
 Structure attendue :
-• Diagnostic des sources de stress personnelles
-• Techniques de relaxation et méditation
-• Restructuration cognitive et pensée positive
-• Gestion du temps et des priorités
-• Activités physiques et hygiène de vie
-• Suivi et ajustements du programme
-Style : [Empathique, scientifique, rassurant]`,
+• Audit de l'utilisation actuelle du temps
+• Identification des priorités et objectifs personnels
+• Méthodes de planification et outils adaptés
+• Techniques de concentration et élimination des distractions
+• Automatisation des tâches récurrentes
+• Équilibre vie professionnelle/personnelle
+Style : [Pragmatique, systémique, orienté efficacité]`,
 
-      `🟢 Prompt 18 : Développement de la confiance en soi
-Demande : [Construire une confiance en soi solide et durable dans tous les domaines]
-Rôle : [Vous êtes un coach en développement personnel spécialisé en confiance et estime de soi.]
-Mission : [Élaborer un plan d'action pour développer une confiance authentique et stable.]
+      `🟢 Prompt 18 : Reconversion professionnelle réussie
+Demande : [Changer de carrière en sécurisant la transition et maximisant les chances de succès]
+Rôle : [Vous êtes un conseiller en évolution professionnelle et coach de carrière.]
+Mission : [Accompagner une reconversion professionnelle stratégique et épanouissante.]
 Structure attendue :
-• Évaluation du niveau de confiance actuel
-• Identification des croyances limitantes
-• Exercices de renforcement positif quotidiens
-• Techniques de sortie de zone de confort
-• Célébration des succès et apprentissage des échecs
-• Maintien de la confiance à long terme
-Style : [Encourageant, progressif, basé sur l'action]`,
+• Bilan de compétences et identification des motivations
+• Exploration des métiers et secteurs d'avenir
+• Plan de formation et développement des compétences
+• Stratégie de transition financière et temporelle
+• Réseau professionnel et recherche d'opportunités
+• Préparation mentale et gestion du changement
+Style : [Stratégique, rassurant, orienté réussite]`,
 
-      `🟢 Prompt 19 : Amélioration des relations interpersonnelles
-Demande : [Développer des compétences relationnelles pour des relations plus épanouissantes]
-Rôle : [Vous êtes un thérapeute relationnel et expert en communication interpersonnelle.]
-Mission : [Créer un guide pratique pour améliorer la qualité de toutes ses relations.]
+      `🟢 Prompt 19 : Relations interpersonnelles et communication
+Demande : [Améliorer ses relations personnelles et professionnelles]
+Rôle : [Vous êtes un thérapeute spécialisé en relations humaines et communication.]
+Mission : [Développer des compétences relationnelles pour des interactions plus harmonieuses.]
 Structure attendue :
 • Diagnostic des patterns relationnels actuels
 • Techniques de communication efficace
@@ -534,30 +506,45 @@ Style : [Business, pragmatique, orienté rentabilité]`
     toast.success("30 prompts professionnels générés !");
   };
 
-  const filteredPrompts = prompts.filter(prompt => {
-    const matchesCategory = selectedCategory === 'all' || 
-      (selectedCategory === 'business' && prompt.includes('🟣')) ||
-      (selectedCategory === 'marketing' && prompt.includes('🔵')) ||
-      (selectedCategory === 'voyage' && prompt.includes('🟡')) ||
-      (selectedCategory === 'personnel' && prompt.includes('🟢')) ||
-      (selectedCategory === 'aquariophilie' && prompt.includes('🐠'));
-    
-    const matchesSearch = searchTerm === '' || 
-      prompt.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    return matchesCategory && matchesSearch;
-  });
+  const exportAllPrompts = () => {
+    const content = prompts.join('\n\n' + '='.repeat(50) + '\n\n');
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `prompts-${selectedCategory}-${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success('Prompts exportés avec succès !');
+  };
 
-  const copyPrompt = async (prompt: string, index: number) => {
+  const copyPrompt = async (text: string, index: number) => {
     try {
-      await navigator.clipboard.writeText(prompt);
+      await navigator.clipboard.writeText(text);
       setCopiedIndex(index);
-      toast.success("Prompt copié dans le presse-papiers !");
       setTimeout(() => setCopiedIndex(null), 2000);
+      toast.success('Prompt copié !');
     } catch (err) {
-      toast.error("Erreur lors de la copie");
+      toast.error('Erreur lors de la copie');
     }
   };
+
+  const filteredPrompts = prompts.filter(prompt => {
+    const matchesSearch = prompt.toLowerCase().includes(searchTerm.toLowerCase());
+    if (selectedCategory === 'all') return matchesSearch;
+    
+    const categoryEmojis = {
+      business: '🟣',
+      marketing: '🔵', 
+      voyage: '🟡',
+      personnel: '🟢',
+      aquariophilie: '🐠'
+    };
+    
+    return matchesSearch && prompt.includes(categoryEmojis[selectedCategory as keyof typeof categoryEmojis]);
+  });
 
   const downloadAllPrompts = () => {
     const content = prompts.join('\n\n---\n\n');
