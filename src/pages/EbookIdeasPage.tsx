@@ -492,44 +492,6 @@ const EbookIdeasPage: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card className="relative overflow-hidden border-0 bg-gradient-card">
-            <div className="absolute inset-0 bg-gradient-secondary opacity-5"></div>
-            <CardContent className="p-8 relative z-10">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="p-3 rounded-xl bg-gradient-secondary text-white">
-                  <Target className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold">Pack de Prompts Pro</h3>
-                  <p className="text-muted-foreground">20 prompts IA prêts à vendre</p>
-                </div>
-              </div>
-              
-              <div className="space-y-3 mb-6">
-                <div className="flex items-center gap-2 text-sm">
-                  <div className="w-2 h-2 rounded-full bg-primary"></div>
-                  <span>Prompts originaux et testés</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <div className="w-2 h-2 rounded-full bg-primary"></div>
-                  <span>Format professionnel vendable</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <div className="w-2 h-2 rounded-full bg-primary"></div>
-                  <span>5 catégories thématiques</span>
-                </div>
-              </div>
-              
-              <Button 
-                onClick={() => navigate('/prompts-generator?pro=true')}
-                size="lg"
-                className="bg-gradient-secondary text-white hover:opacity-90 w-full"
-              >
-                <Target className="h-5 w-5 mr-2" />
-                Créer mes prompts pro
-              </Button>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </div>
