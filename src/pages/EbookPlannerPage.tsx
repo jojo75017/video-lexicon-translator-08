@@ -475,101 +475,170 @@ Réponds uniquement au format JSON:
   };
 
   return (
-    <div className="min-h-screen">
-      {/* Hero Section avec gradient coloré */}
-      <div className="relative overflow-hidden gradient-hero">
-        <div className="absolute inset-0 bg-black/10"></div>
-        <div className="relative container mx-auto px-4 py-16 text-center">
+    <div className="min-h-screen bg-gradient-to-br from-background via-slate-50 to-blue-50">
+      {/* Hero Section Professionnel */}
+      <div className="relative overflow-hidden bg-gradient-to-r from-primary/95 via-primary to-primary/90">
+        <div className="absolute inset-0 bg-grid-white/10"></div>
+        <div className="relative container mx-auto px-6 py-20">
           <Button
             variant="ghost"
             onClick={() => navigate('/ebook-ideas')}
-            className="absolute top-4 left-4 text-white hover:bg-white/20"
+            className="absolute top-6 left-6 text-white/90 hover:text-white hover:bg-white/10 transition-all duration-200"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Idées d'ebook
+            Retour aux idées
           </Button>
-          <div className="floating-animation inline-block mb-6">
-            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-              <BookOpen className="w-10 h-10 text-white" />
+          
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 mb-8 rounded-2xl bg-white/10 backdrop-blur-sm">
+              <BookOpen className="w-8 h-8 text-white" />
             </div>
-          </div>
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 text-white drop-shadow-lg">
-            Créez votre Ebook
-            <span className="block text-4xl md:text-5xl bg-white/20 backdrop-blur-sm rounded-2xl px-6 py-2 mt-4 inline-block">
-              avec l'IA ✨
-            </span>
-          </h1>
-          <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-3xl mx-auto">
-            Transformez vos idées en livre numérique professionnel en quelques clics
-          </p>
-          <div className="flex flex-wrap gap-4 justify-center">
-            <div className="bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 text-white font-medium">
-              🚀 Génération IA
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 text-white font-medium">
-              📖 Export PDF
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 text-white font-medium">
-              🎯 Outils KDP
+            
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-white">
+              Générateur d'Ebook
+              <span className="block text-3xl md:text-4xl lg:text-5xl text-white/80 font-medium mt-2">
+                Professionnel
+              </span>
+            </h1>
+            
+            <p className="text-lg md:text-xl text-white/90 mb-10 max-w-2xl mx-auto leading-relaxed">
+              Créez des livres numériques de qualité professionnelle avec l'intelligence artificielle. 
+              De l'idée à la publication sur Amazon KDP.
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto">
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3 border border-white/20">
+                <div className="flex items-center justify-center gap-2 text-white font-medium">
+                  <Wand2 className="h-4 w-4" />
+                  <span>IA Avancée</span>
+                </div>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3 border border-white/20">
+                <div className="flex items-center justify-center gap-2 text-white font-medium">
+                  <BookOpen className="h-4 w-4" />
+                  <span>Export PDF</span>
+                </div>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3 border border-white/20">
+                <div className="flex items-center justify-center gap-2 text-white font-medium">
+                  <Sparkles className="h-4 w-4" />
+                  <span>Outils KDP</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8 -mt-8 relative z-10">
-
-        {/* Navigation avec design moderne */}
-        <div className="mb-8">
-          <Tabs defaultValue="planner" className="space-y-6">
-            <div className="gradient-card rounded-2xl p-2 mb-8 glow-effect">
-              <TabsList className="grid w-full grid-cols-12 bg-transparent gap-1">
-                <TabsTrigger value="planner" className="text-sm gradient-primary text-white data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-xl">
-                  📝 Planificateur
+      <div className="container mx-auto px-6 -mt-10 relative z-10">
+        {/* Navigation Professionnelle */}
+        <div className="mb-12">
+          <Tabs defaultValue="planner" className="space-y-8">
+            <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-1 shadow-lg border border-white/20">
+              <TabsList className="grid w-full grid-cols-6 lg:grid-cols-12 bg-transparent gap-1 p-1">
+                <TabsTrigger 
+                  value="planner" 
+                  className="text-xs lg:text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm rounded-lg transition-all duration-200 hover:bg-gray-100"
+                >
+                  <span className="hidden lg:inline">📝 Planificateur</span>
+                  <span className="lg:hidden">📝 Plan</span>
                 </TabsTrigger>
-                <TabsTrigger value="templates" className="text-sm gradient-secondary text-white data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-xl">
-                  📋 Templates
+                <TabsTrigger 
+                  value="templates" 
+                  className="text-xs lg:text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm rounded-lg transition-all duration-200 hover:bg-gray-100"
+                >
+                  <span className="hidden lg:inline">📋 Templates</span>
+                  <span className="lg:hidden">📋 Mod.</span>
                 </TabsTrigger>
-                <TabsTrigger value="writing" className="text-sm gradient-accent text-white data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-xl">
-                  ✍️ Rédaction
+                <TabsTrigger 
+                  value="writing" 
+                  className="text-xs lg:text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm rounded-lg transition-all duration-200 hover:bg-gray-100"
+                >
+                  <span className="hidden lg:inline">✍️ Rédaction</span>
+                  <span className="lg:hidden">✍️ Écr.</span>
                 </TabsTrigger>
-                <TabsTrigger value="tools" className="text-sm gradient-success text-white data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-xl">
-                  🚀 Outils
+                <TabsTrigger 
+                  value="tools" 
+                  className="text-xs lg:text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm rounded-lg transition-all duration-200 hover:bg-gray-100"
+                >
+                  <span className="hidden lg:inline">🛠️ Outils</span>
+                  <span className="lg:hidden">🛠️ Out.</span>
                 </TabsTrigger>
-                <TabsTrigger value="kdp" className="text-sm bg-vibrant-purple text-white data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-xl">
-                  📖 KDP
+                <TabsTrigger 
+                  value="kdp" 
+                  className="text-xs lg:text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm rounded-lg transition-all duration-200 hover:bg-gray-100"
+                >
+                  <span className="hidden lg:inline">📖 KDP</span>
+                  <span className="lg:hidden">📖 KDP</span>
                 </TabsTrigger>
-                <TabsTrigger value="advanced" className="text-sm bg-vibrant-pink text-white data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-xl">
-                  💼 Business
+                <TabsTrigger 
+                  value="advanced" 
+                  className="text-xs lg:text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm rounded-lg transition-all duration-200 hover:bg-gray-100"
+                >
+                  <span className="hidden lg:inline">💼 Business</span>
+                  <span className="lg:hidden">💼 Biz</span>
                 </TabsTrigger>
-                <TabsTrigger value="marketing" className="text-sm bg-gradient-to-r from-blue-500 to-purple-500 text-white data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-xl">
-                  📢 Marketing
+                <TabsTrigger 
+                  value="marketing" 
+                  className="text-xs lg:text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm rounded-lg transition-all duration-200 hover:bg-gray-100"
+                >
+                  <span className="hidden lg:inline">📢 Marketing</span>
+                  <span className="lg:hidden">📢 Mrk</span>
                 </TabsTrigger>
-                <TabsTrigger value="monetization" className="text-sm bg-gradient-to-r from-green-500 to-emerald-500 text-white data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-xl">
-                  💰 Monétisation
+                <TabsTrigger 
+                  value="monetization" 
+                  className="text-xs lg:text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm rounded-lg transition-all duration-200 hover:bg-gray-100"
+                >
+                  <span className="hidden lg:inline">💰 Monétisation</span>
+                  <span className="lg:hidden">💰 Mon</span>
                 </TabsTrigger>
-                <TabsTrigger value="export" className="text-sm bg-vibrant-cyan text-white data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-xl">
-                  📤 Export
+                <TabsTrigger 
+                  value="export" 
+                  className="text-xs lg:text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm rounded-lg transition-all duration-200 hover:bg-gray-100"
+                >
+                  <span className="hidden lg:inline">📤 Export</span>
+                  <span className="lg:hidden">📤 Exp</span>
                 </TabsTrigger>
-                <TabsTrigger value="toc" className="text-sm bg-vibrant-green text-white data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-xl">
-                  📚 Sommaire
+                <TabsTrigger 
+                  value="toc" 
+                  className="text-xs lg:text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm rounded-lg transition-all duration-200 hover:bg-gray-100"
+                >
+                  <span className="hidden lg:inline">📚 Sommaire</span>
+                  <span className="lg:hidden">📚 Som</span>
                 </TabsTrigger>
-                <TabsTrigger value="images" className="text-sm gradient-success text-white data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-xl">
-                  🎨 Images IA
+                <TabsTrigger 
+                  value="images" 
+                  className="text-xs lg:text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm rounded-lg transition-all duration-200 hover:bg-gray-100"
+                >
+                  <span className="hidden lg:inline">🎨 Images</span>
+                  <span className="lg:hidden">🎨 Img</span>
                 </TabsTrigger>
-                <TabsTrigger value="settings" className="text-sm gradient-primary text-white data-[state=active]:bg-white data-[state=active]:text-gray-900 rounded-xl">
-                  ⚙️ Paramètres
+                <TabsTrigger 
+                  value="settings" 
+                  className="text-xs lg:text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm rounded-lg transition-all duration-200 hover:bg-gray-100"
+                >
+                  <span className="hidden lg:inline">⚙️ Paramètres</span>
+                  <span className="lg:hidden">⚙️ Cfg</span>
                 </TabsTrigger>
               </TabsList>
             </div>
 
-          <TabsContent value="planner" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>📚 Informations générales</CardTitle>
+          <TabsContent value="planner" className="space-y-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2 space-y-8">
+                <Card className="shadow-lg border-0 bg-white/95 backdrop-blur-sm">
+                  <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 rounded-t-lg">
+                    <CardTitle className="flex items-center gap-3 text-xl font-bold text-primary">
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <BookOpen className="h-5 w-5 text-primary" />
+                      </div>
+                      Informations générales
+                    </CardTitle>
+                    <CardDescription>
+                      Définissez les informations de base de votre ebook
+                    </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-6 p-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="title">Titre de l'ebook</Label>
@@ -633,10 +702,15 @@ Réponds uniquement au format JSON:
                   </CardContent>
                 </Card>
 
-                <Card>
-                  <CardHeader>
+                <Card className="shadow-lg border-0 bg-white/95 backdrop-blur-sm">
+                  <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 rounded-t-lg">
                     <div className="flex items-center justify-between">
-                      <CardTitle>📑 Structure des chapitres</CardTitle>
+                      <CardTitle className="flex items-center gap-3 text-xl font-bold text-primary">
+                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                          <BookOpen className="h-5 w-5 text-primary" />
+                        </div>
+                        Structure des chapitres
+                      </CardTitle>
                       <div className="flex gap-2">
                         {selectedChapters.length > 1 && (
                           <Button
@@ -700,57 +774,94 @@ Réponds uniquement au format JSON:
                 </Card>
               </div>
 
-              <div className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>👁️ Aperçu du plan</CardTitle>
+              <div className="space-y-6 sticky top-8">
+                <Card className="shadow-xl border-0 bg-gradient-to-br from-white via-blue-50/50 to-indigo-50/30 backdrop-blur-sm">
+                  <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-t-lg">
+                    <CardTitle className="flex items-center gap-3 text-lg font-bold text-primary">
+                      <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
+                        <Eye className="h-4 w-4 text-primary" />
+                      </div>
+                      Aperçu du plan
+                    </CardTitle>
+                    <CardDescription>
+                      Prévisualisation en temps réel de votre ebook
+                    </CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="p-6">
                     <div className="text-sm">
                       {ebookTitle || authorName || chapters.length > 0 ? (
-                        <div className="space-y-3">
+                        <div className="space-y-6">
                           {ebookTitle && (
-                            <div>
-                              <div className="font-bold text-lg">{ebookTitle}</div>
-                              {authorName && <div className="text-muted-foreground">par {authorName}</div>}
+                            <div className="text-center pb-4 border-b border-primary/20">
+                              <div className="font-bold text-xl text-primary mb-1">{ebookTitle}</div>
+                              {authorName && <div className="text-muted-foreground font-medium">par {authorName}</div>}
                             </div>
                           )}
 
                           {preface && (
-                            <div className="mt-4">
-                              <div className="font-bold">📝 PRÉFACE</div>
-                              <div className="text-xs mt-1">{preface.substring(0, 100)}...</div>
+                            <div className="bg-blue-50/50 rounded-lg p-4">
+                              <div className="flex items-center gap-2 font-semibold text-primary mb-2">
+                                <div className="w-6 h-6 rounded bg-primary/20 flex items-center justify-center">
+                                  <span className="text-xs">📝</span>
+                                </div>
+                                PRÉFACE
+                              </div>
+                              <div className="text-xs text-gray-600 leading-relaxed">{preface.substring(0, 150)}...</div>
                             </div>
                           )}
 
                           {chapters.length > 0 && (
-                            <div className="mt-4">
-                              <div className="font-bold">📖 CHAPITRES</div>
-                              {chapters.map((chapter, index) => (
-                                <div key={chapter.id} className="mt-2">
-                                  <div className="text-sm font-medium">
-                                    {index + 1}. {chapter.title || 'Titre du chapitre'}
-                                  </div>
-                                  {chapter.subChapters.map((subChapter, subIndex) => (
-                                    <div key={subChapter.id} className="ml-4 text-xs">
-                                      {index + 1}.{subIndex + 1}. {subChapter.title || 'Titre du sous-chapitre'}
-                                    </div>
-                                  ))}
+                            <div className="space-y-3">
+                              <div className="flex items-center gap-2 font-semibold text-primary mb-3">
+                                <div className="w-6 h-6 rounded bg-primary/20 flex items-center justify-center">
+                                  <span className="text-xs">📖</span>
                                 </div>
-                              ))}
+                                CHAPITRES ({chapters.length})
+                              </div>
+                              <div className="space-y-2 max-h-80 overflow-y-auto">
+                                {chapters.map((chapter, index) => (
+                                  <div key={chapter.id} className="bg-white/70 rounded-lg p-3 border border-primary/10">
+                                    <div className="font-medium text-sm text-gray-800 mb-1">
+                                      {index + 1}. {chapter.title || 'Titre du chapitre'}
+                                    </div>
+                                    {chapter.subChapters.length > 0 && (
+                                      <div className="ml-3 space-y-1">
+                                        {chapter.subChapters.map((subChapter, subIndex) => (
+                                          <div key={subChapter.id} className="text-xs text-gray-600">
+                                            {index + 1}.{subIndex + 1}. {subChapter.title || 'Titre du sous-chapitre'}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
                             </div>
                           )}
 
                           {conclusion && (
-                            <div className="mt-4">
-                              <div className="font-bold">🎯 MOT DE LA FIN</div>
-                              <div className="text-xs mt-1">{conclusion.substring(0, 100)}...</div>
+                            <div className="bg-green-50/50 rounded-lg p-4">
+                              <div className="flex items-center gap-2 font-semibold text-primary mb-2">
+                                <div className="w-6 h-6 rounded bg-primary/20 flex items-center justify-center">
+                                  <span className="text-xs">🎯</span>
+                                </div>
+                                CONCLUSION
+                              </div>
+                              <div className="text-xs text-gray-600 leading-relaxed">{conclusion.substring(0, 150)}...</div>
                             </div>
                           )}
                         </div>
                       ) : (
-                        <div className="text-muted-foreground text-center">
-                          ✏️ Remplissez les informations pour voir l'aperçu du plan
+                        <div className="text-center py-12">
+                          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+                            <BookOpen className="h-8 w-8 text-primary/50" />
+                          </div>
+                          <div className="text-muted-foreground font-medium">
+                            Commencez à remplir les informations
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            L'aperçu apparaîtra ici en temps réel
+                          </div>
                         </div>
                       )}
                     </div>
