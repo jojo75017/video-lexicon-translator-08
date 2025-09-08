@@ -20,6 +20,24 @@ export interface EbookTemplate {
 }
 
 export const ebookTemplates: Record<string, EbookTemplate> = {
+  aquariophilie: {
+    id: 'aquariophilie',
+    title: "Guide de l'Aquariophilie",
+    author: "Expert Aquariophile",
+    preface: "L'aquariophilie est un art passionnant qui allie science et beauté. Ce guide vous accompagne dans la création et l'entretien de votre écosystème aquatique.",
+    conclusion: "Votre aquarium est maintenant un écosystème équilibré. Continuez à observer, apprendre et profiter de ce merveilleux hobby !",
+    chapters: [
+      { title: "Débuter en aquariophilie", subChapters: ["Choix de l'aquarium", "Équipement essentiel", "Cycle de l'azote"] },
+      { title: "Paramètres et entretien", subChapters: ["Qualité de l'eau", "Filtration", "Maintenance régulière"] },
+      { title: "Population et cohabitation", subChapters: ["Sélection des poissons", "Compatibilité", "Introduction progressive"] },
+      { title: "Plantes et décoration", subChapters: ["Plantes aquatiques", "Hardscape", "Éclairage adapté"] },
+      { title: "Problèmes et solutions", subChapters: ["Maladies courantes", "Algues", "Dépannage technique"] }
+    ],
+    image: templateGuide,
+    description: "Guide complet pour aquariophiles débutants et confirmés",
+    borderColor: "border-l-cyan-500",
+    icon: "🐠"
+  },
   business: {
     id: 'business',
     title: "Stratégie Business Efficace",
@@ -38,58 +56,40 @@ export const ebookTemplates: Record<string, EbookTemplate> = {
     borderColor: "border-l-blue-500",
     icon: "💼"
   },
-  guide: {
-    id: 'guide',
-    title: "Guide Pratique Complet",
-    author: "Guide Expert",
-    preface: "Ce guide pratique vous accompagne étape par étape pour maîtriser votre sujet. Découvrez les méthodes qui fonctionnent vraiment.",
-    conclusion: "Félicitations ! Vous avez maintenant toutes les compétences nécessaires. Passez à l'action et observez les résultats.",
+  travel: {
+    id: 'travel',
+    title: "Guide de Voyage Ultime",
+    author: "Voyageur Expert",
+    preface: "Voyager, c'est découvrir le monde et se découvrir soi-même. Ce guide vous livre tous les secrets pour des voyages inoubliables.",
+    conclusion: "Le monde vous attend ! Avec ces conseils, partez à l'aventure en toute confiance et créez des souvenirs mémorables.",
     chapters: [
-      { title: "Les fondamentaux à connaître", subChapters: ["Concepts de base", "Erreurs à éviter", "Prérequis essentiels"] },
-      { title: "Préparation et planification", subChapters: ["Définir ses objectifs", "Créer un plan d'action", "Organiser ses ressources"] },
-      { title: "Mise en pratique étape par étape", subChapters: ["Première étape", "Techniques avancées", "Optimisation"] },
-      { title: "Résolution des problèmes courants", subChapters: ["Diagnostic des difficultés", "Solutions pratiques", "Cas d'étude"] },
-      { title: "Perfectionnement et évolution", subChapters: ["Techniques avancées", "Veille et actualisation", "Communauté et ressources"] }
-    ],
-    image: templateGuide,
-    description: "Méthodes étape par étape et conseils pratiques",
-    borderColor: "border-l-green-500",
-    icon: "📚"
-  },
-  fiction: {
-    id: 'fiction',
-    title: "Histoire Captivante",
-    author: "Auteur Fiction",
-    preface: "Plongez dans une aventure extraordinaire où chaque page vous réserve des surprises. Laissez-vous emporter par cette histoire unique.",
-    conclusion: "Cette aventure touche à sa fin, mais les émotions et les leçons resteront gravées. Merci de m'avoir accompagné dans ce voyage.",
-    chapters: [
-      { title: "Le commencement", subChapters: ["Présentation des personnages", "Le décor", "L'élément déclencheur"] },
-      { title: "Premiers défis", subChapters: ["La découverte", "Les obstacles", "Les alliés inattendus"] },
-      { title: "Le tournant", subChapters: ["La révélation", "Le conflit majeur", "Les enjeux grandissent"] },
-      { title: "L'épreuve finale", subChapters: ["La confrontation", "Le sacrifice", "La résolution"] },
-      { title: "L'épilogue", subChapters: ["Les conséquences", "Les nouveaux équilibres", "L'ouverture vers l'avenir"] }
-    ],
-    image: templateFiction,
-    description: "Structure narrative pour romans et nouvelles",
-    borderColor: "border-l-purple-500",
-    icon: "📖"
-  },
-  memoir: {
-    id: 'memoir',
-    title: "Mon Parcours de Vie",
-    author: "Votre Nom",
-    preface: "Partager son histoire, c'est offrir un morceau de son âme. Ces pages retracent un parcours unique fait de joies, d'épreuves et d'apprentissages.",
-    conclusion: "Chaque vie est une histoire unique qui mérite d'être racontée. J'espère que mon parcours vous inspirera dans le vôtre.",
-    chapters: [
-      { title: "Les origines", subChapters: ["Enfance", "Famille", "Premiers souvenirs"] },
-      { title: "Formation et découvertes", subChapters: ["Études", "Premières passions", "Rencontres marquantes"] },
-      { title: "Les défis de l'âge adulte", subChapters: ["Premiers emplois", "Relations importantes", "Épreuves surmontées"] },
-      { title: "Accomplissements et leçons", subChapters: ["Réussites professionnelles", "Vie familiale", "Sagesse acquise"] },
-      { title: "Réflexions et perspective", subChapters: ["Bilan de vie", "Valeurs importantes", "Messages aux générations futures"] }
+      { title: "Préparation du voyage", subChapters: ["Choix de destination", "Budget et financement", "Documents et assurances"] },
+      { title: "Logistique et réservations", subChapters: ["Transport", "Hébergement", "Activités"] },
+      { title: "Voyage responsable", subChapters: ["Écotourisme", "Respect des cultures", "Impact environnemental"] },
+      { title: "Sécurité et santé", subChapters: ["Précautions sanitaires", "Sécurité personnelle", "Gestion des urgences"] },
+      { title: "Optimiser son expérience", subChapters: ["Immersion culturelle", "Photography de voyage", "Carnet de voyage"] }
     ],
     image: templateMemoir,
-    description: "Parcours de vie et accomplissements",
-    borderColor: "border-l-orange-500",
-    icon: "✍️"
+    description: "Conseils et astuces pour voyageurs indépendants",
+    borderColor: "border-l-emerald-500",
+    icon: "✈️"
+  },
+  roman: {
+    id: 'roman',
+    title: "Roman Contemporain",
+    author: "Auteur Contemporain",
+    preface: "Cette histoire explore les méandres de l'âme humaine dans notre société moderne. Une intrigue captivante vous attend.",
+    conclusion: "Les personnages continuent leur vie au-delà de ces pages. Leur histoire résonne encore, comme un écho de nos propres questionnements.",
+    chapters: [
+      { title: "Rencontres et destins", subChapters: ["Présentation des protagonistes", "Le cadre contemporain", "Premières interactions"] },
+      { title: "Complications et tensions", subChapters: ["Conflits émergents", "Secrets révélés", "Relations complexes"] },
+      { title: "Développements et révélations", subChapters: ["Approfondissement psychologique", "Tournants majeurs", "Enjeux personnels"] },
+      { title: "Climax et confrontations", subChapters: ["Moment de vérité", "Choix décisifs", "Conséquences"] },
+      { title: "Résolution et nouveaux horizons", subChapters: ["Dénouement", "Transformation des personnages", "Ouverture"] }
+    ],
+    image: templateFiction,
+    description: "Structure narrative pour roman contemporain",
+    borderColor: "border-l-rose-500",
+    icon: "📚"
   }
 };
