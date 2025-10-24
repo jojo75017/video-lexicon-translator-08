@@ -37,6 +37,7 @@ import { EbookSettings } from '@/components/ebook/EbookSettings';
 import { EbookExporter } from '@/components/ebook/EbookExporter';
 import { EbookAdvancedFeatures } from '@/components/ebook/EbookAdvancedFeatures';
 import { EbookKdpTools } from '@/components/ebook/EbookKdpTools';
+import { EbookPreview } from '@/components/ebook/EbookPreview';
 
 // Hooks et données
 import { useEbookGeneration, Chapter, SubChapter } from '@/hooks/useEbookGeneration';
@@ -86,57 +87,57 @@ const EbookPlannerPage: React.FC = () => {
     })
   );
 
-  // Gestion des chapitres
-  const addChapter = () => {
+  // Gestion des chapitres (optimisée avec useCallback)
+  const addChapter = React.useCallback(() => {
     const newChapter: Chapter = {
       id: Date.now().toString(),
       title: '',
       subChapters: [],
       content: ''
     };
-    setChapters([...chapters, newChapter]);
-  };
+    setChapters(prev => [...prev, newChapter]);
+  }, []);
 
-  const removeChapter = (chapterId: string) => {
-    setChapters(chapters.filter(chapter => chapter.id !== chapterId));
-    setSelectedChapters(selectedChapters.filter(id => id !== chapterId));
-  };
+  const removeChapter = React.useCallback((chapterId: string) => {
+    setChapters(prev => prev.filter(chapter => chapter.id !== chapterId));
+    setSelectedChapters(prev => prev.filter(id => id !== chapterId));
+  }, []);
 
-  const updateChapterTitle = (chapterId: string, title: string) => {
-    setChapters(chapters.map(chapter => 
+  const updateChapterTitle = React.useCallback((chapterId: string, title: string) => {
+    setChapters(prev => prev.map(chapter => 
       chapter.id === chapterId ? { ...chapter, title } : chapter
     ));
-  };
+  }, []);
 
-  const updateChapterContent = (chapterId: string, content: string) => {
-    setChapters(chapters.map(chapter => 
+  const updateChapterContent = React.useCallback((chapterId: string, content: string) => {
+    setChapters(prev => prev.map(chapter => 
       chapter.id === chapterId ? { ...chapter, content } : chapter
     ));
-  };
+  }, []);
 
-  const addSubChapter = (chapterId: string) => {
+  const addSubChapter = React.useCallback((chapterId: string) => {
     const newSubChapter: SubChapter = {
       id: Date.now().toString(),
       title: '',
       content: ''
     };
-    setChapters(chapters.map(chapter => 
+    setChapters(prev => prev.map(chapter => 
       chapter.id === chapterId 
         ? { ...chapter, subChapters: [...chapter.subChapters, newSubChapter] }
         : chapter
     ));
-  };
+  }, []);
 
-  const removeSubChapter = (chapterId: string, subChapterId: string) => {
-    setChapters(chapters.map(chapter => 
+  const removeSubChapter = React.useCallback((chapterId: string, subChapterId: string) => {
+    setChapters(prev => prev.map(chapter => 
       chapter.id === chapterId 
         ? { ...chapter, subChapters: chapter.subChapters.filter(sub => sub.id !== subChapterId) }
         : chapter
     ));
-  };
+  }, []);
 
-  const updateSubChapterTitle = (chapterId: string, subChapterId: string, title: string) => {
-    setChapters(chapters.map(chapter => 
+  const updateSubChapterTitle = React.useCallback((chapterId: string, subChapterId: string, title: string) => {
+    setChapters(prev => prev.map(chapter => 
       chapter.id === chapterId 
         ? { 
             ...chapter, 
@@ -146,10 +147,10 @@ const EbookPlannerPage: React.FC = () => {
           }
         : chapter
     ));
-  };
+  }, []);
 
-  const updateSubChapterContent = (chapterId: string, subChapterId: string, content: string) => {
-    setChapters(chapters.map(c => 
+  const updateSubChapterContent = React.useCallback((chapterId: string, subChapterId: string, content: string) => {
+    setChapters(prev => prev.map(c => 
       c.id === chapterId 
         ? {
             ...c,
@@ -159,7 +160,7 @@ const EbookPlannerPage: React.FC = () => {
           }
         : c
     ));
-  };
+  }, []);
 
   // Glisser-déposer pour réorganiser les chapitres
   const handleDragEnd = (event: DragEndEvent) => {
@@ -775,98 +776,13 @@ Réponds uniquement au format JSON:
               </div>
 
               <div className="space-y-6 sticky top-8">
-                <Card className="shadow-xl border-0 bg-gradient-to-br from-white via-blue-50/50 to-indigo-50/30 backdrop-blur-sm">
-                  <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-t-lg">
-                    <CardTitle className="flex items-center gap-3 text-lg font-bold text-primary">
-                      <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
-                        <Eye className="h-4 w-4 text-primary" />
-                      </div>
-                      Aperçu du plan
-                    </CardTitle>
-                    <CardDescription>
-                      Prévisualisation en temps réel de votre ebook
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="p-6">
-                    <div className="text-sm">
-                      {ebookTitle || authorName || chapters.length > 0 ? (
-                        <div className="space-y-6">
-                          {ebookTitle && (
-                            <div className="text-center pb-4 border-b border-primary/20">
-                              <div className="font-bold text-xl text-primary mb-1">{ebookTitle}</div>
-                              {authorName && <div className="text-muted-foreground font-medium">par {authorName}</div>}
-                            </div>
-                          )}
-
-                          {preface && (
-                            <div className="bg-blue-50/50 rounded-lg p-4">
-                              <div className="flex items-center gap-2 font-semibold text-primary mb-2">
-                                <div className="w-6 h-6 rounded bg-primary/20 flex items-center justify-center">
-                                  <span className="text-xs">📝</span>
-                                </div>
-                                PRÉFACE
-                              </div>
-                              <div className="text-xs text-gray-600 leading-relaxed">{preface.substring(0, 150)}...</div>
-                            </div>
-                          )}
-
-                          {chapters.length > 0 && (
-                            <div className="space-y-3">
-                              <div className="flex items-center gap-2 font-semibold text-primary mb-3">
-                                <div className="w-6 h-6 rounded bg-primary/20 flex items-center justify-center">
-                                  <span className="text-xs">📖</span>
-                                </div>
-                                CHAPITRES ({chapters.length})
-                              </div>
-                              <div className="space-y-2 max-h-80 overflow-y-auto">
-                                {chapters.map((chapter, index) => (
-                                  <div key={chapter.id} className="bg-white/70 rounded-lg p-3 border border-primary/10">
-                                    <div className="font-medium text-sm text-gray-800 mb-1">
-                                      {index + 1}. {chapter.title || 'Titre du chapitre'}
-                                    </div>
-                                    {chapter.subChapters.length > 0 && (
-                                      <div className="ml-3 space-y-1">
-                                        {chapter.subChapters.map((subChapter, subIndex) => (
-                                          <div key={subChapter.id} className="text-xs text-gray-600">
-                                            {index + 1}.{subIndex + 1}. {subChapter.title || 'Titre du sous-chapitre'}
-                                          </div>
-                                        ))}
-                                      </div>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {conclusion && (
-                            <div className="bg-green-50/50 rounded-lg p-4">
-                              <div className="flex items-center gap-2 font-semibold text-primary mb-2">
-                                <div className="w-6 h-6 rounded bg-primary/20 flex items-center justify-center">
-                                  <span className="text-xs">🎯</span>
-                                </div>
-                                CONCLUSION
-                              </div>
-                              <div className="text-xs text-gray-600 leading-relaxed">{conclusion.substring(0, 150)}...</div>
-                            </div>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="text-center py-12">
-                          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-                            <BookOpen className="h-8 w-8 text-primary/50" />
-                          </div>
-                          <div className="text-muted-foreground font-medium">
-                            Commencez à remplir les informations
-                          </div>
-                          <div className="text-xs text-muted-foreground mt-1">
-                            L'aperçu apparaîtra ici en temps réel
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
+                <EbookPreview
+                  ebookTitle={ebookTitle}
+                  authorName={authorName}
+                  preface={preface}
+                  conclusion={conclusion}
+                  chapters={chapters}
+                />
               </div>
             </div>
           </TabsContent>
