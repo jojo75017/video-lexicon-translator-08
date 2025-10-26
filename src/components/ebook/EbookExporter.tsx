@@ -25,11 +25,12 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
   conclusion,
   chapters
 }) => {
-  const [exportFormat, setExportFormat] = useState<'pdf' | 'docx' | 'txt' | 'html'>('pdf');
+  const [exportFormat, setExportFormat] = useState<'pdf' | 'docx' | 'txt' | 'html' | 'epub'>('pdf');
   const [includeTableOfContents, setIncludeTableOfContents] = useState(true);
   const [includePageNumbers, setIncludePageNumbers] = useState(true);
   const [includeCoverPage, setIncludeCoverPage] = useState(true);
   const [isExporting, setIsExporting] = useState(false);
+  const [generateKdpMetadata, setGenerateKdpMetadata] = useState(false);
 
   const generateEbookContent = () => {
     let content = '';
@@ -450,6 +451,79 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
     toast.success('Ebook exporté en format HTML !');
   };
 
+  const exportKdpMetadata = () => {
+    const metadata = `
+═══════════════════════════════════════════════════════════
+          MÉTADONNÉES AMAZON KDP - ${ebookTitle}
+═══════════════════════════════════════════════════════════
+
+📖 INFORMATIONS DU LIVRE
+─────────────────────────────────────────────────────────
+Titre: ${ebookTitle}
+Auteur: ${authorName || 'À compléter'}
+Nombre de mots: ${getStats().totalWords}
+Pages estimées: ${getStats().estimatedPages}
+
+📝 DESCRIPTION COURTE (pour Amazon)
+─────────────────────────────────────────────────────────
+${preface.substring(0, 200)}...
+
+🎯 MOTS-CLÉS SUGGÉRÉS (max 7 pour KDP)
+─────────────────────────────────────────────────────────
+1. ${ebookTitle.split(' ')[0].toLowerCase()}
+2. guide pratique
+3. développement personnel
+4. success
+5. transformation
+6. méthode
+7. stratégie
+
+📚 CATÉGORIES SUGGÉRÉES
+─────────────────────────────────────────────────────────
+- Non-fiction > Auto-assistance
+- Business & Money > Skills
+- Self-Help > Personal Transformation
+
+💰 PRIX SUGGÉRÉS
+─────────────────────────────────────────────────────────
+Kindle: 2.99€ - 9.99€ (70% royalties entre 2.99€ et 9.99€)
+Paperback: 9.99€ - 19.99€
+
+🌐 MARCHÉS RECOMMANDÉS
+─────────────────────────────────────────────────────────
+✓ Amazon.fr (France)
+✓ Amazon.com (USA)
+✓ Amazon.co.uk (UK)
+✓ Amazon.de (Allemagne)
+✓ Amazon.es (Espagne)
+✓ Amazon.it (Italie)
+
+📋 CHECKLIST PRE-PUBLICATION
+─────────────────────────────────────────────────────────
+□ Relecture complète
+□ Correction orthographique
+□ Vérification des liens (si applicable)
+□ Couverture au format 2560x1600 minimum
+□ ISBN (optionnel pour Kindle, requis pour paperback)
+□ Compte KDP créé
+□ Informations fiscales complétées
+
+═══════════════════════════════════════════════════════════
+          Généré le ${new Date().toLocaleDateString()}
+═══════════════════════════════════════════════════════════
+`;
+
+    const blob = new Blob([metadata], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${ebookTitle.replace(/[^a-z0-9]/gi, '_')}_METADATA_KDP.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   const handleExport = async () => {
     if (!ebookTitle) {
       toast.error('Veuillez ajouter un titre à votre ebook');
@@ -464,6 +538,11 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
     setIsExporting(true);
 
     try {
+      // Exporter les métadonnées KDP si demandé
+      if (generateKdpMetadata) {
+        exportKdpMetadata();
+      }
+
       switch (exportFormat) {
         case 'txt':
           exportAsText();
@@ -475,8 +554,22 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
           exportAsPDF();
           break;
         case 'docx':
-          toast.info(`Export DOCX sera disponible prochainement. Utilisez PDF pour l'instant.`);
-          exportAsPDF();
+          // Export simple TXT formaté pour conversion
+          const docContent = generateEbookContent();
+          const docBlob = new Blob([docContent], { type: 'application/msword' });
+          const docUrl = URL.createObjectURL(docBlob);
+          const docLink = document.createElement('a');
+          docLink.href = docUrl;
+          docLink.download = `${ebookTitle || 'Mon-Ebook'}.doc`;
+          document.body.appendChild(docLink);
+          docLink.click();
+          document.body.removeChild(docLink);
+          URL.revokeObjectURL(docUrl);
+          toast.success('Fichier .doc créé (ouvrez-le dans Word pour le convertir en DOCX)');
+          break;
+        case 'epub':
+          toast.info('Export EPUB: Utilisez Calibre ou un service en ligne pour convertir votre PDF/HTML en EPUB');
+          exportAsHTML();
           break;
         default:
           exportAsText();
@@ -530,10 +623,11 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
                 <SelectValue placeholder="Choisir un format" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="pdf">📄 PDF (Recommandé)</SelectItem>
-                <SelectItem value="html">📄 HTML</SelectItem>
+                <SelectItem value="pdf">📄 PDF (Recommandé pour KDP)</SelectItem>
+                <SelectItem value="html">📄 HTML (Web)</SelectItem>
                 <SelectItem value="txt">📝 Texte (.txt)</SelectItem>
-                <SelectItem value="docx">📄 Word (.docx) (Bientôt disponible)</SelectItem>
+                <SelectItem value="docx">📄 Word (.doc)</SelectItem>
+                <SelectItem value="epub">📘 EPUB (Info uniquement)</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -567,7 +661,24 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
               />
               <Label htmlFor="pages">Inclure la numérotation des pages</Label>
             </div>
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="kdp-metadata"
+                checked={generateKdpMetadata}
+                onCheckedChange={(checked) => setGenerateKdpMetadata(checked === true)}
+              />
+              <Label htmlFor="kdp-metadata">Générer fichier métadonnées KDP</Label>
+            </div>
           </div>
+
+          {generateKdpMetadata && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+              <p className="text-xs text-yellow-800">
+                📋 Un fichier texte avec vos métadonnées KDP (titre, auteur, mots-clés suggérés) sera créé lors de l'export.
+              </p>
+            </div>
+          )}
 
           <div className="bg-muted p-4 rounded-lg">
             <h4 className="font-semibold mb-2">📊 Statistiques de l'ebook</h4>

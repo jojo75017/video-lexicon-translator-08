@@ -38,6 +38,8 @@ import { EbookExporter } from '@/components/ebook/EbookExporter';
 import { EbookAdvancedFeatures } from '@/components/ebook/EbookAdvancedFeatures';
 import { EbookKdpTools } from '@/components/ebook/EbookKdpTools';
 import { EbookPreview } from '@/components/ebook/EbookPreview';
+import { EbookCoverGenerator } from '@/components/ebook/EbookCoverGenerator';
+import { EbookWritingAssistant } from '@/components/ebook/EbookWritingAssistant';
 
 // Hooks et données
 import { useEbookGeneration, Chapter, SubChapter } from '@/hooks/useEbookGeneration';
@@ -800,8 +802,25 @@ Réponds uniquement au format JSON:
           </TabsContent>
 
           <TabsContent value="tools" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               
+              {/* Générateur de couverture IA */}
+              <div className="lg:col-span-2">
+                <EbookCoverGenerator
+                  ebookTitle={ebookTitle}
+                  authorName={authorName}
+                  apiKey={apiKey}
+                />
+              </div>
+
+              {/* Assistant d'écriture */}
+              <div className="lg:col-span-2">
+                <EbookWritingAssistant
+                  ebookTitle={ebookTitle}
+                  apiKey={apiKey}
+                />
+              </div>
+
               {/* Résumé automatique */}
               <Card>
                 <CardHeader>
