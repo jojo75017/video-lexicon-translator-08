@@ -61,6 +61,11 @@ const EbookPlannerPage: React.FC = () => {
   const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
   const [importText, setImportText] = useState('');
   const [ebookImages, setEbookImages] = useState<Array<{url: string, title: string, chapterIndex?: number}>>([]);
+  
+  // États pour les résultats des outils
+  const [bookSummary, setBookSummary] = useState('');
+  const [coverConcepts, setCoverConcepts] = useState('');
+  const [seoOptimization, setSeoOptimization] = useState('');
 
   // Charger la clé API au démarrage
   React.useEffect(() => {
@@ -832,13 +837,13 @@ Réponds uniquement au format JSON:
                     Génère un résumé attractif pour votre ebook
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-4">
                   <Button 
                     onClick={async () => {
                       const summary = await generateBookSummary(chapters, ebookTitle, apiKey);
                       if (summary) {
-                        navigator.clipboard.writeText(summary);
-                        toast.success('Résumé copié dans le presse-papiers !');
+                        setBookSummary(summary);
+                        toast.success('Résumé généré !');
                       }
                     }}
                     disabled={!ebookTitle || chapters.length === 0 || isGenerating}
@@ -847,9 +852,27 @@ Réponds uniquement au format JSON:
                     <Eye className="h-4 w-4 mr-2" />
                     Générer le résumé
                   </Button>
-                  <p className="text-xs text-muted-foreground mt-2">
+                  <p className="text-xs text-muted-foreground">
                     Parfait pour la 4ème de couverture ou description en ligne
                   </p>
+                  
+                  {bookSummary && (
+                    <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
+                      <div className="flex justify-between items-start gap-2">
+                        <pre className="whitespace-pre-wrap text-sm flex-1">{bookSummary}</pre>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            navigator.clipboard.writeText(bookSummary);
+                            toast.success('Copié dans le presse-papier !');
+                          }}
+                        >
+                          Copier
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
@@ -864,13 +887,13 @@ Réponds uniquement au format JSON:
                     5 idées créatives pour votre couverture
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-4">
                   <Button 
                     onClick={async () => {
                       const concepts = await generateEbookCover(ebookTitle, apiKey);
                       if (concepts) {
-                        navigator.clipboard.writeText(concepts);
-                        toast.success('Concepts copiés dans le presse-papiers !');
+                        setCoverConcepts(concepts);
+                        toast.success('Concepts générés !');
                       }
                     }}
                     disabled={!ebookTitle || isGenerating}
@@ -879,9 +902,27 @@ Réponds uniquement au format JSON:
                     <Palette className="h-4 w-4 mr-2" />
                     Générer les concepts
                   </Button>
-                  <p className="text-xs text-muted-foreground mt-2">
+                  <p className="text-xs text-muted-foreground">
                     Descriptions détaillées pour votre designer
                   </p>
+                  
+                  {coverConcepts && (
+                    <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
+                      <div className="flex justify-between items-start gap-2">
+                        <pre className="whitespace-pre-wrap text-sm flex-1">{coverConcepts}</pre>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            navigator.clipboard.writeText(coverConcepts);
+                            toast.success('Copié dans le presse-papier !');
+                          }}
+                        >
+                          Copier
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
@@ -896,7 +937,7 @@ Réponds uniquement au format JSON:
                     Mots-clés, titres alternatifs et meta descriptions
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-4">
                   <Button 
                     onClick={async () => {
                       const seoData = await optimizeForSEO(ebookTitle, chapters, apiKey);
@@ -917,8 +958,8 @@ ${seoData.metaDescription}
 #️⃣ HASHTAGS:
 ${seoData.hashtags.join(' ')}
                         `;
-                        navigator.clipboard.writeText(formatted);
-                        toast.success('Données SEO copiées dans le presse-papiers !');
+                        setSeoOptimization(formatted);
+                        toast.success('Optimisation SEO générée !');
                       }
                     }}
                     disabled={!ebookTitle || chapters.length === 0 || isGenerating}
@@ -928,9 +969,27 @@ ${seoData.hashtags.join(' ')}
                     <Search className="h-4 w-4 mr-2" />
                     Analyser et optimiser pour le SEO
                   </Button>
-                  <p className="text-sm text-muted-foreground mt-2">
+                  <p className="text-sm text-muted-foreground">
                     Obtenez des titres alternatifs, mots-clés et hashtags optimisés pour la visibilité
                   </p>
+                  
+                  {seoOptimization && (
+                    <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
+                      <div className="flex justify-between items-start gap-2">
+                        <pre className="whitespace-pre-wrap text-sm flex-1">{seoOptimization}</pre>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            navigator.clipboard.writeText(seoOptimization);
+                            toast.success('Copié dans le presse-papier !');
+                          }}
+                        >
+                          Copier
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
