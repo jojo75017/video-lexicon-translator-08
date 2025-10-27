@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   Image, TrendingUp, DollarSign, Users, Target, BarChart3, 
-  PieChart, MessageSquare, Lightbulb, Crown 
+  PieChart, MessageSquare, Lightbulb, Crown, Copy 
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Chapter } from '@/hooks/useEbookGeneration';
@@ -29,6 +29,13 @@ export const EbookAdvancedFeatures: React.FC<EbookAdvancedFeaturesProps> = ({
   const [targetAudience, setTargetAudience] = useState('');
   const [priceRange, setPriceRange] = useState<'budget' | 'premium' | 'luxury'>('budget');
   const [marketingBudget, setMarketingBudget] = useState('');
+  
+  // États pour stocker les résultats
+  const [competitionAnalysis, setCompetitionAnalysis] = useState('');
+  const [marketingPlan, setMarketingPlan] = useState('');
+  const [pricingAnalysis, setPricingAnalysis] = useState('');
+  const [readerSurvey, setReaderSurvey] = useState('');
+  const [trailerScript, setTrailerScript] = useState('');
 
   const generateBookCover = async () => {
     if (!apiKey) {
@@ -105,8 +112,8 @@ Format de réponse structuré et détaillé.`
       const data = await response.json();
       const analysis = data.choices[0].message.content;
       
-      navigator.clipboard.writeText(analysis);
-      toast.success('Analyse concurrentielle copiée dans le presse-papiers !');
+      setCompetitionAnalysis(analysis);
+      toast.success('Analyse concurrentielle générée !');
       
     } catch (error) {
       console.error('Erreur:', error);
@@ -160,8 +167,8 @@ Format détaillé et actionnable.`
       const data = await response.json();
       const plan = data.choices[0].message.content;
       
-      navigator.clipboard.writeText(plan);
-      toast.success('Plan marketing copié dans le presse-papiers !');
+      setMarketingPlan(plan);
+      toast.success('Plan marketing généré !');
       
     } catch (error) {
       console.error('Erreur:', error);
@@ -221,8 +228,8 @@ Présente sous forme de rapport détaillé.`
       const data = await response.json();
       const pricing = data.choices[0].message.content;
       
-      navigator.clipboard.writeText(pricing);
-      toast.success('Analyse tarifaire copiée dans le presse-papiers !');
+      setPricingAnalysis(pricing);
+      toast.success('Analyse tarifaire générée !');
       
     } catch (error) {
       console.error('Erreur:', error);
@@ -268,8 +275,8 @@ Mélange questions ouvertes et fermées, soyez stratégique pour maximiser les r
       const data = await response.json();
       const survey = data.choices[0].message.content;
       
-      navigator.clipboard.writeText(survey);
-      toast.success('Questionnaire lecteur copié dans le presse-papiers !');
+      setReaderSurvey(survey);
+      toast.success('Questionnaire lecteur généré !');
       
     } catch (error) {
       console.error('Erreur:', error);
@@ -316,8 +323,8 @@ Format professionnel prêt pour production.`
       const data = await response.json();
       const script = data.choices[0].message.content;
       
-      navigator.clipboard.writeText(script);
-      toast.success('Script de bande-annonce copié dans le presse-papiers !');
+      setTrailerScript(script);
+      toast.success('Script de bande-annonce généré !');
       
     } catch (error) {
       console.error('Erreur:', error);
@@ -325,10 +332,15 @@ Format professionnel prêt pour production.`
     }
   };
 
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success('Copié dans le presse-papier !');
+  };
+
   return (
     <div className="space-y-6">
       {/* Configuration */}
-      <Card>
+      <Card className="bg-gradient-to-r from-violet-500/10 to-purple-500/10 border-violet-200/50">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Target className="h-5 w-5" />
@@ -399,17 +411,17 @@ Format professionnel prêt pour production.`
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border-blue-200/50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5" />
+              <BarChart3 className="h-5 w-5 text-blue-600" />
               Analyse Concurrence
             </CardTitle>
             <CardDescription>
               Étudiez vos concurrents
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <Button 
               onClick={analyzeCompetition}
               disabled={!apiKey || !ebookTitle || isGenerating}
@@ -418,20 +430,35 @@ Format professionnel prêt pour production.`
               <BarChart3 className="h-4 w-4 mr-2" />
               📊 Analyser la concurrence
             </Button>
+            
+            {competitionAnalysis && (
+              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="flex justify-between items-start gap-2">
+                  <pre className="whitespace-pre-wrap text-sm flex-1">{competitionAnalysis}</pre>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => copyToClipboard(competitionAnalysis)}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-green-200/50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
+              <TrendingUp className="h-5 w-5 text-green-600" />
               Plan Marketing
             </CardTitle>
             <CardDescription>
               Stratégie de lancement complète
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <Button 
               onClick={generateMarketingPlan}
               disabled={!apiKey || !ebookTitle || isGenerating}
@@ -440,20 +467,35 @@ Format professionnel prêt pour production.`
               <TrendingUp className="h-4 w-4 mr-2" />
               🚀 Créer le plan marketing
             </Button>
+            
+            {marketingPlan && (
+              <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                <div className="flex justify-between items-start gap-2">
+                  <pre className="whitespace-pre-wrap text-sm flex-1">{marketingPlan}</pre>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => copyToClipboard(marketingPlan)}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gradient-to-r from-orange-500/10 to-red-500/10 border-orange-200/50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5" />
+              <DollarSign className="h-5 w-5 text-orange-600" />
               Prix Optimal
             </CardTitle>
             <CardDescription>
               Calcul automatique des prix
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <Button 
               onClick={calculateOptimalPrice}
               disabled={!apiKey || !ebookTitle || isGenerating}
@@ -462,20 +504,35 @@ Format professionnel prêt pour production.`
               <DollarSign className="h-4 w-4 mr-2" />
               💰 Calculer le prix optimal
             </Button>
+            
+            {pricingAnalysis && (
+              <div className="p-4 bg-orange-50 rounded-lg border border-orange-200">
+                <div className="flex justify-between items-start gap-2">
+                  <pre className="whitespace-pre-wrap text-sm flex-1">{pricingAnalysis}</pre>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => copyToClipboard(pricingAnalysis)}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-purple-200/50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <MessageSquare className="h-5 w-5" />
+              <MessageSquare className="h-5 w-5 text-purple-600" />
               Questionnaire Lecteur
             </CardTitle>
             <CardDescription>
               Feedback et validation d'idées
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <Button 
               onClick={generateReaderSurvey}
               disabled={!apiKey || !ebookTitle || isGenerating}
@@ -484,20 +541,35 @@ Format professionnel prêt pour production.`
               <MessageSquare className="h-4 w-4 mr-2" />
               📋 Créer le questionnaire
             </Button>
+            
+            {readerSurvey && (
+              <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
+                <div className="flex justify-between items-start gap-2">
+                  <pre className="whitespace-pre-wrap text-sm flex-1">{readerSurvey}</pre>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => copyToClipboard(readerSurvey)}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border-amber-200/50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Crown className="h-5 w-5" />
+              <Crown className="h-5 w-5 text-amber-600" />
               Bande-annonce
             </CardTitle>
             <CardDescription>
               Script vidéo promotionnelle
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <Button 
               onClick={generateBookTrailer}
               disabled={!apiKey || !ebookTitle || isGenerating}
@@ -506,6 +578,21 @@ Format professionnel prêt pour production.`
               <Crown className="h-4 w-4 mr-2" />
               🎬 Script bande-annonce
             </Button>
+            
+            {trailerScript && (
+              <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
+                <div className="flex justify-between items-start gap-2">
+                  <pre className="whitespace-pre-wrap text-sm flex-1">{trailerScript}</pre>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => copyToClipboard(trailerScript)}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
