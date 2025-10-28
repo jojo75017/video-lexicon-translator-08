@@ -66,6 +66,9 @@ const EbookPlannerPage: React.FC = () => {
   const [bookSummary, setBookSummary] = useState('');
   const [coverConcepts, setCoverConcepts] = useState('');
   const [seoOptimization, setSeoOptimization] = useState('');
+  const [kdpDescription, setKdpDescription] = useState('');
+  const [kdpKeywords, setKdpKeywords] = useState('');
+  const [kdpCategories, setKdpCategories] = useState('');
 
   // Charger la clé API au démarrage
   React.useEffect(() => {
@@ -1003,14 +1006,14 @@ ${seoData.hashtags.join(' ')}
                     Optimisez votre ebook pour la publication sur Amazon KDP
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <Button 
                       onClick={async () => {
                         const description = await generateKDPDescription(ebookTitle, chapters, apiKey);
                         if (description) {
-                          navigator.clipboard.writeText(description);
-                          toast.success('Description KDP copiée !');
+                          setKdpDescription(description);
+                          toast.success('Description KDP générée !');
                         }
                       }}
                       disabled={!ebookTitle || chapters.length === 0 || isGenerating}
@@ -1022,8 +1025,9 @@ ${seoData.hashtags.join(' ')}
                       onClick={async () => {
                         const keywords = await generateKDPKeywords(ebookTitle, chapters, apiKey);
                         if (keywords) {
-                          navigator.clipboard.writeText(keywords.join(', '));
-                          toast.success('Mots-clés KDP copiés !');
+                          const text = Array.isArray(keywords) ? keywords.join('\n') : String(keywords);
+                          setKdpKeywords(text);
+                          toast.success('Mots-clés KDP générés !');
                         }
                       }}
                       disabled={!ebookTitle || chapters.length === 0 || isGenerating}
@@ -1035,8 +1039,9 @@ ${seoData.hashtags.join(' ')}
                       onClick={async () => {
                         const categories = await generateKDPCategories(ebookTitle, chapters, apiKey);
                         if (categories) {
-                          navigator.clipboard.writeText(categories.join('\n'));
-                          toast.success('Catégories KDP copiées !');
+                          const text = Array.isArray(categories) ? categories.join('\n') : String(categories);
+                          setKdpCategories(text);
+                          toast.success('Catégories KDP générées !');
                         }
                       }}
                       disabled={!ebookTitle || chapters.length === 0 || isGenerating}
@@ -1045,7 +1050,62 @@ ${seoData.hashtags.join(' ')}
                       📂 Catégories KDP
                     </Button>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-4 text-center">
+
+                  {kdpDescription && (
+                    <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
+                      <div className="flex justify-between items-start gap-2">
+                        <pre className="whitespace-pre-wrap text-sm flex-1">{kdpDescription}</pre>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            navigator.clipboard.writeText(kdpDescription);
+                            toast.success('Copié dans le presse-papier !');
+                          }}
+                        >
+                          Copier
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {kdpKeywords && (
+                    <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
+                      <div className="flex justify-between items-start gap-2">
+                        <pre className="whitespace-pre-wrap text-sm flex-1">{kdpKeywords}</pre>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            navigator.clipboard.writeText(kdpKeywords);
+                            toast.success('Copié dans le presse-papier !');
+                          }}
+                        >
+                          Copier
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {kdpCategories && (
+                    <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
+                      <div className="flex justify-between items-start gap-2">
+                        <pre className="whitespace-pre-wrap text-sm flex-1">{kdpCategories}</pre>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            navigator.clipboard.writeText(kdpCategories);
+                            toast.success('Copié dans le presse-papier !');
+                          }}
+                        >
+                          Copier
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  <p className="text-xs text-muted-foreground mt-2 text-center">
                     Générez description, mots-clés et catégories optimisés pour Amazon KDP
                   </p>
                 </CardContent>
