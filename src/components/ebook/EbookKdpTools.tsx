@@ -28,6 +28,12 @@ export const EbookKdpTools: React.FC<EbookKdpToolsProps> = ({
   const [targetLanguage, setTargetLanguage] = useState('français');
   const [genre, setGenre] = useState('');
   const [targetAge, setTargetAge] = useState('');
+  const [kdpDescription, setKdpDescription] = useState('');
+  const [kdpKeywords, setKdpKeywords] = useState('');
+  const [kdpCategories, setKdpCategories] = useState('');
+  const [pricingStrategy, setPricingStrategy] = useState('');
+  const [launchPlan, setLaunchPlan] = useState('');
+  const [authorBio, setAuthorBio] = useState('');
 
   const generateKdpDescription = async () => {
     if (!apiKey || !ebookTitle) {
@@ -73,8 +79,8 @@ Format HTML basique autorisé pour KDP.`
       const data = await response.json();
       const description = data.choices[0].message.content;
       
-      navigator.clipboard.writeText(description);
-      toast.success('Description KDP copiée dans le presse-papiers !');
+      setKdpDescription(description);
+      toast.success('Description KDP générée !');
       
     } catch (error) {
       console.error('Erreur:', error);
@@ -124,8 +130,8 @@ Ajoute aussi 10 mots-clés secondaires pour backup.`
       const data = await response.json();
       const keywords = data.choices[0].message.content;
       
-      navigator.clipboard.writeText(keywords);
-      toast.success('Mots-clés KDP copiés dans le presse-papiers !');
+      setKdpKeywords(keywords);
+      toast.success('Mots-clés KDP générés !');
       
     } catch (error) {
       console.error('Erreur:', error);
@@ -175,8 +181,8 @@ Donne les chemins complets des catégories KDP.`
       const data = await response.json();
       const categories = data.choices[0].message.content;
       
-      navigator.clipboard.writeText(categories);
-      toast.success('Catégories KDP copiées dans le presse-papiers !');
+      setKdpCategories(categories);
+      toast.success('Catégories KDP générées !');
       
     } catch (error) {
       console.error('Erreur:', error);
@@ -238,8 +244,8 @@ Format détaillé avec justifications.`
       const data = await response.json();
       const strategy = data.choices[0].message.content;
       
-      navigator.clipboard.writeText(strategy);
-      toast.success('Stratégie de prix KDP copiée dans le presse-papiers !');
+      setPricingStrategy(strategy);
+      toast.success('Stratégie de prix KDP générée !');
       
     } catch (error) {
       console.error('Erreur:', error);
@@ -301,8 +307,8 @@ Format actionnable avec dates précises.`
       const data = await response.json();
       const plan = data.choices[0].message.content;
       
-      navigator.clipboard.writeText(plan);
-      toast.success('Plan de lancement copié dans le presse-papiers !');
+      setLaunchPlan(plan);
+      toast.success('Plan de lancement généré !');
       
     } catch (error) {
       console.error('Erreur:', error);
@@ -355,8 +361,8 @@ Adapte le ton au public ${targetAge || 'général'}.`
       const data = await response.json();
       const bio = data.choices[0].message.content;
       
-      navigator.clipboard.writeText(bio);
-      toast.success('Biographies d\'auteur copiées dans le presse-papiers !');
+      setAuthorBio(bio);
+      toast.success('Biographies d\'auteur générées !');
       
     } catch (error) {
       console.error('Erreur:', error);
@@ -431,7 +437,7 @@ Adapte le ton au public ${targetAge || 'général'}.`
               Description optimisée pour Amazon
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <Button 
               onClick={generateKdpDescription}
               disabled={!apiKey || !ebookTitle || isGenerating}
@@ -440,6 +446,24 @@ Adapte le ton au public ${targetAge || 'général'}.`
               <BookOpen className="h-4 w-4 mr-2" />
               📝 Générer description
             </Button>
+            
+            {kdpDescription && (
+              <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                <div className="flex justify-between items-start gap-2">
+                  <pre className="whitespace-pre-wrap text-sm flex-1">{kdpDescription}</pre>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      navigator.clipboard.writeText(kdpDescription);
+                      toast.success('Copié dans le presse-papier !');
+                    }}
+                  >
+                    Copier
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -453,7 +477,7 @@ Adapte le ton au public ${targetAge || 'général'}.`
               7 mots-clés optimaux pour le SEO
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <Button 
               onClick={generateKdpKeywords}
               disabled={!apiKey || !ebookTitle || isGenerating}
@@ -462,6 +486,24 @@ Adapte le ton au public ${targetAge || 'général'}.`
               <Tag className="h-4 w-4 mr-2" />
               🏷️ Générer mots-clés
             </Button>
+            
+            {kdpKeywords && (
+              <div className="p-4 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
+                <div className="flex justify-between items-start gap-2">
+                  <pre className="whitespace-pre-wrap text-sm flex-1">{kdpKeywords}</pre>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      navigator.clipboard.writeText(kdpKeywords);
+                      toast.success('Copié dans le presse-papier !');
+                    }}
+                  >
+                    Copier
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -475,7 +517,7 @@ Adapte le ton au public ${targetAge || 'général'}.`
               Placement optimal dans les catégories
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <Button 
               onClick={generateKdpCategories}
               disabled={!apiKey || !ebookTitle || isGenerating}
@@ -484,6 +526,24 @@ Adapte le ton au public ${targetAge || 'général'}.`
               <BarChart3 className="h-4 w-4 mr-2" />
               📊 Analyser catégories
             </Button>
+            
+            {kdpCategories && (
+              <div className="p-4 bg-purple-50 dark:bg-purple-950/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                <div className="flex justify-between items-start gap-2">
+                  <pre className="whitespace-pre-wrap text-sm flex-1">{kdpCategories}</pre>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      navigator.clipboard.writeText(kdpCategories);
+                      toast.success('Copié dans le presse-papier !');
+                    }}
+                  >
+                    Copier
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -497,7 +557,7 @@ Adapte le ton au public ${targetAge || 'général'}.`
               Prix optimal et planning promotions
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <Button 
               onClick={generateKdpPricingStrategy}
               disabled={!apiKey || !ebookTitle || isGenerating}
@@ -506,6 +566,24 @@ Adapte le ton au public ${targetAge || 'général'}.`
               <DollarSign className="h-4 w-4 mr-2" />
               💰 Calculer prix optimal
             </Button>
+            
+            {pricingStrategy && (
+              <div className="p-4 bg-yellow-50 dark:bg-yellow-950/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                <div className="flex justify-between items-start gap-2">
+                  <pre className="whitespace-pre-wrap text-sm flex-1">{pricingStrategy}</pre>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      navigator.clipboard.writeText(pricingStrategy);
+                      toast.success('Copié dans le presse-papier !');
+                    }}
+                  >
+                    Copier
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -519,7 +597,7 @@ Adapte le ton au public ${targetAge || 'général'}.`
               Stratégie complète sur 90 jours
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <Button 
               onClick={generateLaunchPlan}
               disabled={!apiKey || !ebookTitle || isGenerating}
@@ -528,6 +606,24 @@ Adapte le ton au public ${targetAge || 'général'}.`
               <Calendar className="h-4 w-4 mr-2" />
               🚀 Plan de lancement
             </Button>
+            
+            {launchPlan && (
+              <div className="p-4 bg-orange-50 dark:bg-orange-950/20 rounded-lg border border-orange-200 dark:border-orange-800">
+                <div className="flex justify-between items-start gap-2">
+                  <pre className="whitespace-pre-wrap text-sm flex-1">{launchPlan}</pre>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      navigator.clipboard.writeText(launchPlan);
+                      toast.success('Copié dans le presse-papier !');
+                    }}
+                  >
+                    Copier
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -541,7 +637,7 @@ Adapte le ton au public ${targetAge || 'général'}.`
               3 versions de bio professionnelle
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <Button 
               onClick={generateAuthorBio}
               disabled={!apiKey || isGenerating}
@@ -550,6 +646,24 @@ Adapte le ton au public ${targetAge || 'général'}.`
               <Users className="h-4 w-4 mr-2" />
               👤 Créer biographie
             </Button>
+            
+            {authorBio && (
+              <div className="p-4 bg-pink-50 dark:bg-pink-950/20 rounded-lg border border-pink-200 dark:border-pink-800">
+                <div className="flex justify-between items-start gap-2">
+                  <pre className="whitespace-pre-wrap text-sm flex-1">{authorBio}</pre>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      navigator.clipboard.writeText(authorBio);
+                      toast.success('Copié dans le presse-papier !');
+                    }}
+                  >
+                    Copier
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
