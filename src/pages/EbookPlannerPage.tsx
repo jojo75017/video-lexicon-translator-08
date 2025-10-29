@@ -1016,7 +1016,7 @@ ${seoData.hashtags.join(' ')}
                           toast.success('Description KDP générée !');
                         }
                       }}
-                      disabled={!ebookTitle || chapters.length === 0 || isGenerating}
+                      disabled={!ebookTitle || !apiKey || isGenerating}
                       className="w-full"
                     >
                       📝 Description KDP
@@ -1030,7 +1030,7 @@ ${seoData.hashtags.join(' ')}
                           toast.success('Mots-clés KDP générés !');
                         }
                       }}
-                      disabled={!ebookTitle || chapters.length === 0 || isGenerating}
+                      disabled={!ebookTitle || !apiKey || isGenerating}
                       className="w-full"
                     >
                       🔑 Mots-clés KDP
@@ -1044,7 +1044,7 @@ ${seoData.hashtags.join(' ')}
                           toast.success('Catégories KDP générées !');
                         }
                       }}
-                      disabled={!ebookTitle || chapters.length === 0 || isGenerating}
+                      disabled={!ebookTitle || !apiKey || isGenerating}
                       className="w-full"
                     >
                       📂 Catégories KDP
