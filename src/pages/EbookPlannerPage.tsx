@@ -849,7 +849,7 @@ Réponds uniquement au format JSON:
                         toast.success('Résumé généré !');
                       }
                     }}
-                    disabled={!ebookTitle || chapters.length === 0 || isGenerating}
+                    disabled={!ebookTitle || !authorName || !apiKey || isGenerating}
                     className="w-full"
                   >
                     <Eye className="h-4 w-4 mr-2" />
@@ -899,7 +899,7 @@ Réponds uniquement au format JSON:
                         toast.success('Concepts générés !');
                       }
                     }}
-                    disabled={!ebookTitle || isGenerating}
+                    disabled={!ebookTitle || !authorName || !apiKey || isGenerating}
                     className="w-full"
                   >
                     <Palette className="h-4 w-4 mr-2" />
@@ -965,7 +965,7 @@ ${seoData.hashtags.join(' ')}
                         toast.success('Optimisation SEO générée !');
                       }
                     }}
-                    disabled={!ebookTitle || chapters.length === 0 || isGenerating}
+                    disabled={!ebookTitle || !authorName || !apiKey || isGenerating}
                     className="w-full"
                     size="lg"
                   >
