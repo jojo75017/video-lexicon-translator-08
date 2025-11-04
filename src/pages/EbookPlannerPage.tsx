@@ -852,7 +852,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail, su
   };
 
   return (
-    <div className="min-h-screen bg-cream flex">
+    <div className="min-h-screen bg-gradient-to-br from-cream via-background to-cream/50 flex">
       {/* Magazine Sidebar */}
       <MagazineSidebar 
         activeTab={activeTab}
@@ -864,7 +864,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail, su
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
         {/* Hero Header */}
-        <div className="relative overflow-hidden bg-gradient-magazine">
+        <div className="relative overflow-hidden bg-gradient-to-br from-primary via-accent to-primary/80">
           <div className="absolute inset-0 bg-grid-white/10"></div>
           {/* Image décorative du tableau de bord */}
           <img
@@ -888,8 +888,8 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail, su
             </Button>
             
             <div className="max-w-4xl mx-auto text-center mt-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 mb-6 rounded-2xl bg-white/10 backdrop-blur-sm">
-                <BookOpen className="w-8 h-8 text-white" />
+              <div className="inline-flex items-center justify-center w-16 h-16 mb-6 rounded-2xl bg-gradient-to-br from-accent/30 to-primary/30 backdrop-blur-sm border border-white/20 shadow-lg">
+                <BookOpen className="w-8 h-8 text-white drop-shadow-lg" />
               </div>
               
               <h1 className="font-playfair text-4xl md:text-5xl font-bold mb-4 text-white">
