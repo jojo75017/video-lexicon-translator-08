@@ -34,6 +34,7 @@ import { EbookTemplates } from '@/components/ebook/EbookTemplates';
 import { EbookChapter } from '@/components/ebook/EbookChapter';
 import { EbookWriting } from '@/components/ebook/EbookWriting';
 import { EbookSettings } from '@/components/ebook/EbookSettings';
+import { EbookChapterImageGenerator } from '@/components/ebook/EbookChapterImageGenerator';
 import { EbookExporter } from '@/components/ebook/EbookExporter';
 import { EbookAdvancedFeatures } from '@/components/ebook/EbookAdvancedFeatures';
 import { EbookKdpTools } from '@/components/ebook/EbookKdpTools';
@@ -845,6 +846,14 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail, su
             onUpdateImportText={setImportText}
             onAnalyzeImportedText={generateAutomaticPlan}
             isGenerating={isGenerating}
+          />
+        );
+      
+      case 'images':
+        return (
+          <EbookChapterImageGenerator
+            ebookTitle={ebookTitle}
+            chapters={chapters}
           />
         );
       
