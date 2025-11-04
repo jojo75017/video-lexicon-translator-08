@@ -216,11 +216,12 @@ export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = (
               {selectedCover !== null && (
                 <div className="space-y-2">
                   <Label>Aperçu de la couverture sélectionnée</Label>
-                  <div className="relative w-full max-w-sm mx-auto">
+                  <div className="relative w-full max-w-sm mx-auto bg-gradient-to-br from-gray-100 to-gray-200 p-4 rounded-lg">
                     <img
                       src={coverImages[selectedCover]}
                       alt={`Couverture ${selectedCover + 1}`}
-                      className="w-full rounded-lg shadow-lg border-2 border-purple-200"
+                      className="w-full rounded shadow-2xl"
+                      style={{ objectFit: 'contain', aspectRatio: '2/3' }}
                     />
                   </div>
                 </div>

@@ -22,11 +22,11 @@ serve(async (req) => {
       );
     }
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
-      console.error('LOVABLE_API_KEY not configured');
+    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+    if (!OPENAI_API_KEY) {
+      console.error('OPENAI_API_KEY not configured');
       return new Response(
-        JSON.stringify({ error: 'Configuration manquante' }),
+        JSON.stringify({ error: 'Configuration manquante - Clé OpenAI requise' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -44,38 +44,39 @@ serve(async (req) => {
     
     const currentStyle = styleVariations[(variationNum - 1) % 3];
     
-    const imagePrompt = `Créez une couverture de livre ${currentStyle} pour un ebook ${genreText} intitulé "${ebookTitle}" par ${authorName || 'Auteur'}. 
-    
-La couverture doit :
-- Être professionnelle et attrayante pour Amazon KDP
-- Inclure le titre "${ebookTitle}" de manière lisible et élégante au centre
-- Inclure l'auteur "${authorName}" de façon discrète en bas
-- Avoir un design moderne et vendeur
-- Utiliser des couleurs harmonieuses et professionnelles
-- Être optimisée pour une miniature Amazon (format portrait 6:9)
-- Style : ${currentStyle}
-- Version : ${variationNum}
+    const imagePrompt = `Create a professional book cover in ${currentStyle} style for a ${genreText} ebook titled "${ebookTitle}" by ${authorName || 'Author'}. 
 
-Format : Portrait vertical (1600x2400 pixels), haute qualité, style ${genreText}.
-IMPORTANT : Le texte doit être LISIBLE et CLAIR sur la couverture.`;
+Requirements:
+- Professional and eye-catching design suitable for Amazon KDP
+- Title "${ebookTitle}" clearly visible and elegant in the center
+- Author name "${authorName}" subtly placed at the bottom
+- Modern and sales-oriented design
+- Harmonious and professional color palette
+- Optimized for Amazon thumbnail (portrait 6:9 ratio)
+- Style: ${currentStyle}
+- Variation: ${variationNum}
+- FULL BLEED: The design must extend to all edges with NO WHITE BORDERS or margins
+- The entire canvas should be filled with the design
 
-    console.log('Generating cover image with prompt for variation', variationNum);
+Portrait format, high quality, ${genreText} style.
+CRITICAL: Text must be READABLE and CLEAR. NO white borders or empty margins around the cover.`;
 
-    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    console.log('Generating cover image with OpenAI for variation', variationNum);
+
+    const aiResponse = await fetch('https://api.openai.com/v1/images/generations', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash-image-preview',
-        messages: [
-          {
-            role: 'user',
-            content: imagePrompt
-          }
-        ],
-        modalities: ['image', 'text']
+        model: 'gpt-image-1',
+        prompt: imagePrompt,
+        n: 1,
+        size: '1024x1536',
+        quality: 'high',
+        output_format: 'png',
+        background: 'opaque'
       }),
     });
 
@@ -103,16 +104,20 @@ IMPORTANT : Le texte doit être LISIBLE et CLAIR sur la couverture.`;
     }
 
     const data = await aiResponse.json();
-    const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+    console.log('OpenAI response received:', data);
+    
+    // OpenAI returns base64 for gpt-image-1
+    const imageB64 = data.data?.[0]?.b64_json;
 
-    if (!imageUrl) {
-      console.error('No image URL in response:', JSON.stringify(data));
+    if (!imageB64) {
+      console.error('No image in response:', JSON.stringify(data));
       return new Response(
         JSON.stringify({ error: 'Aucune image générée' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
+    const imageUrl = `data:image/png;base64,${imageB64}`;
     console.log('Cover image generated successfully');
 
     return new Response(
