@@ -40,6 +40,7 @@ import { EbookKdpTools } from '@/components/ebook/EbookKdpTools';
 import { EbookPreview } from '@/components/ebook/EbookPreview';
 import { EbookCoverGenerator } from '@/components/ebook/EbookCoverGenerator';
 import { EbookWritingAssistant } from '@/components/ebook/EbookWritingAssistant';
+import heroEbook from '@/assets/icons/ebook-ai.png';
 
 // Hooks et données
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
@@ -865,6 +866,14 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail, su
         {/* Hero Header */}
         <div className="relative overflow-hidden bg-gradient-magazine">
           <div className="absolute inset-0 bg-grid-white/10"></div>
+          {/* Image décorative du tableau de bord */}
+          <img
+            src={heroEbook}
+            alt="Illustration du tableau de bord ebook - Studio de Création"
+            loading="lazy"
+            aria-hidden="true"
+            className="pointer-events-none select-none absolute right-0 bottom-0 w-[520px] opacity-20 hidden md:block"
+          />
           <div className="relative container mx-auto px-6 py-12">
             <Button
               variant="ghost"
