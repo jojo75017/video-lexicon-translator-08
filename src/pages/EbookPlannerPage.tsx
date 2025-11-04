@@ -872,7 +872,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail, su
             alt="Illustration du tableau de bord ebook - Studio de Création"
             loading="lazy"
             aria-hidden="true"
-            className="pointer-events-none select-none absolute right-0 bottom-0 w-[520px] opacity-20 hidden md:block"
+            className="pointer-events-none select-none absolute right-8 top-1/2 -translate-y-1/2 w-[400px] h-auto opacity-25 hidden lg:block"
           />
           <div className="relative container mx-auto px-6 py-12">
             <Button
