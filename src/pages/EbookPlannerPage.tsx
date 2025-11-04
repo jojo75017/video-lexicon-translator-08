@@ -826,15 +826,6 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail, su
           </Card>
         );
       
-      case 'images':
-        return (
-          <EbookImageBank
-            onImageSelect={handleImageSelect}
-            ebookTitle={ebookTitle}
-            chapters={chapters}
-          />
-        );
-      
       case 'settings':
         return (
           <EbookSettings
