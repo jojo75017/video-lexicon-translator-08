@@ -40,6 +40,20 @@
     --vibrant-cyan: 190 85% 65%;
     --vibrant-green: 150 75% 60%;
     
+    /* Couleurs Magazine Premium */
+    --coral-pink: 345 100% 70%;
+    --cobalt-blue: 210 77% 60%;
+    --honey-gold: 43 98% 64%;
+    --royal-purple: 258 90% 66%;
+    --navy-deep: 237 37% 14%;
+    --gray-cool: 215 16% 47%;
+    --cream: 210 17% 98%;
+    
+    /* Gradients Magazine */
+    --gradient-magazine-hero: linear-gradient(135deg, hsl(var(--coral-pink)) 0%, hsl(var(--royal-purple)) 100%);
+    --gradient-magazine-card: linear-gradient(145deg, hsl(var(--cobalt-blue)) 0%, hsl(190 85% 65%) 100%);
+    --gradient-magazine-success: linear-gradient(120deg, hsl(150 75% 60%) 0%, hsl(var(--honey-gold)) 100%);
+    
     /* Ombres colorées */
     --shadow-blue: 0 20px 40px -10px rgba(102, 126, 234, 0.3);
     --shadow-purple: 0 20px 40px -10px rgba(118, 75, 162, 0.3);
@@ -193,4 +207,43 @@ button, .button, a[href], .card {
 
 .fade-in {
   animation: fade-in 0.3s ease-out;
+}
+
+/* Magazine Styles */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+}
+
+.scrollbar-thumb-gray-300::-webkit-scrollbar-thumb {
+  background-color: #d1d5db;
+  border-radius: 10px;
+}
+
+.scrollbar-track-transparent::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
 }

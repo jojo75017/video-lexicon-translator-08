@@ -1,19 +1,30 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Lightbulb, BookOpen, TrendingUp, Heart, Brain, Briefcase, Fish, Target, Sparkles } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { MasonryGrid } from '@/components/ui/masonry-grid';
+import { 
+  ArrowLeft, Lightbulb, BookOpen, TrendingUp, Heart, Brain, 
+  Briefcase, Fish, Target, Sparkles, Search, Star, Trophy, Crown,
+  Zap, Flame, Users, BarChart3
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const EbookIdeasPage: React.FC = () => {
   const navigate = useNavigate();
-  const [selectedTheme, setSelectedTheme] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const themes = [
     {
       category: 'Romans & Fiction Populaires',
       icon: BookOpen,
-      gradient: 'bg-gradient-to-br from-vibrant-pink to-rose-500',
-      shadow: 'shadow-pink',
+      gradient: 'bg-gradient-to-br from-coral-pink to-rose-600',
+      badge: '🔥 Trending',
+      difficulty: '⭐⭐⭐',
+      potential: '💰💰💰',
+      pages: '200-300',
       ideas: [
         'La Dernière Héritière : Romance Fantasy',
         'Secrets de Minuit : Thriller Psychologique',
@@ -45,8 +56,11 @@ const EbookIdeasPage: React.FC = () => {
     {
       category: 'Développement Personnel',
       icon: Brain,
-      gradient: 'bg-gradient-to-br from-vibrant-purple to-purple-600',
-      shadow: 'shadow-purple',
+      gradient: 'bg-gradient-to-br from-royal-purple to-purple-600',
+      badge: '👑 Bestseller',
+      difficulty: '⭐⭐',
+      potential: '💰💰💰💰',
+      pages: '150-200',
       ideas: [
         'Comment développer sa confiance en soi en 30 jours',
         'Les 7 habitudes des personnes qui réussissent',
@@ -63,8 +77,11 @@ const EbookIdeasPage: React.FC = () => {
     {
       category: 'Business & Entrepreneuriat',
       icon: Briefcase,
-      gradient: 'bg-gradient-to-br from-vibrant-blue to-blue-600',
-      shadow: 'shadow-blue',
+      gradient: 'bg-gradient-to-br from-cobalt-blue to-cyan-600',
+      badge: '⚡ Populaire',
+      difficulty: '⭐⭐⭐',
+      potential: '💰💰💰💰💰',
+      pages: '180-250',
       ideas: [
         'Créer son business en ligne sans budget',
         'Le guide du freelance qui cartonne',
@@ -93,8 +110,11 @@ const EbookIdeasPage: React.FC = () => {
     {
       category: 'Santé & Bien-être',
       icon: Heart,
-      gradient: 'bg-gradient-to-br from-vibrant-green to-emerald-600',
-      shadow: 'shadow-purple',
+      gradient: 'bg-gradient-to-br from-emerald-500 to-green-600',
+      badge: '✨ Débutant',
+      difficulty: '⭐',
+      potential: '💰💰💰',
+      pages: '120-180',
       ideas: [
         'Perdre du poids durablement sans régime',
         'Méditation : guide du débutant',
@@ -104,108 +124,109 @@ const EbookIdeasPage: React.FC = () => {
       ]
     },
     {
-      category: 'Finance & Investissement',
-      icon: TrendingUp,
-      gradient: 'bg-gradient-to-br from-amber-500 to-orange-600',
-      shadow: 'shadow-blue',
-      ideas: [
-        'Investir en bourse pour les nuls',
-        'Créer ses sources de revenus passifs',
-        'Gérer son budget comme un pro',
-        'Immobilier locatif : guide du débutant',
-        'Cryptomonnaies : investir intelligemment'
-      ]
-    },
-    {
-      category: 'Technologie & Digital',
-      icon: Brain,
-      gradient: 'bg-gradient-to-br from-vibrant-cyan to-indigo-600',
-      shadow: 'shadow-blue',
-      ideas: [
-        'Intelligence Artificielle pour tous',
-        'Créer son site web sans coder',
-        'Maîtriser les réseaux sociaux professionnels',
-        'Cybersécurité : protéger ses données',
-        'Productivité digitale : outils et méthodes'
-      ]
-    },
-    {
-      category: 'Créativité & Arts',
-      icon: Lightbulb,
-      gradient: 'bg-gradient-to-br from-vibrant-pink to-rose-600',
-      shadow: 'shadow-pink',
-      ideas: [
-        'Débloquer sa créativité en 10 étapes',
-        'Photographie mobile : techniques avancées',
-        'Écrire son premier roman',
-        'Dessiner : de débutant à artiste',
-        'Créer des vidéos virales sur les réseaux'
-      ]
-    },
-    {
-      category: 'Relations & Famille',
-      icon: Heart,
-      gradient: 'bg-gradient-to-br from-rose-500 to-red-600',
-      shadow: 'shadow-pink',
-      ideas: [
-        'Construire des relations durables',
-        'Éduquer ses enfants avec bienveillance',
-        'Communication dans le couple',
-        'Gérer les conflits familiaux',
-        'Trouver l\'amour à l\'ère du digital'
-      ]
-    },
-    {
       category: 'Cuisine & Gastronomie',
-      icon: BookOpen,
-      gradient: 'bg-gradient-to-br from-orange-500 to-orange-600',
-      shadow: 'shadow-blue',
+      icon: Flame,
+      gradient: 'bg-gradient-to-br from-orange-500 to-red-600',
+      badge: '🌶️ Tendance',
+      difficulty: '⭐⭐',
+      potential: '💰💰💰',
+      pages: '100-150',
       ideas: [
-        'Cuisine healthy : 50 recettes faciles',
-        'Batch cooking : organisez vos repas',
-        'Pâtisserie sans gluten',
-        'Cuisine végétarienne pour carnivores',
-        'Apéros et cocktails maison'
+        'Recettes véganes faciles et rapides',
+        'Les secrets de la cuisine italienne',
+        'Pâtisserie pour les nuls',
+        'Cuisine du monde : voyage culinaire',
+        'Les meilleurs cocktails pour vos soirées'
       ]
     },
     {
-      category: 'Voyage & Aventure',
-      icon: TrendingUp,
-      gradient: 'bg-gradient-to-br from-vibrant-cyan to-teal-600',
-      shadow: 'shadow-blue',
+      category: 'Technologie & Gadgets',
+      icon: Zap,
+      gradient: 'bg-gradient-to-br from-yellow-500 to-yellow-600',
+      badge: '🤖 Futuriste',
+      difficulty: '⭐⭐⭐',
+      potential: '💰💰💰💰',
+      pages: '160-220',
       ideas: [
-        'Voyager avec un petit budget',
-        'Road trip : guide de préparation',
-        'Voyage solo en sécurité',
-        'Destinations secrètes d\'Europe',
-        'Digital nomad : travailler en voyageant',
-        'Guide ultime de l\'Europe en train',
-        'Asie du Sud-Est : itinéraire parfait',
-        'Voyager malin : 50 astuces d\'expert',
-        'Europe de l\'Est : trésors cachés',
-        'Japon : guide du voyageur indépendant',
-        'Thaïlande : au-delà des sentiers battus',
-        'Interrail : traverser l\'Europe en liberté',
-        'Voyage d\'affaires : optimiser ses déplacements',
-        'Backpacking en Asie : guide survie',
-        'Capitales européennes en week-end',
-        'Vietnam : de Hanoï à Ho Chi Minh',
-        'Portugal secret : 15 lieux magiques',
-        'Corée du Sud : culture et modernité',
-        'Balkans : découvrir les perles cachées',
-        'Inde : voyage spirituel et culturel',
-        'Islande : terre de feu et de glace',
-        'Singapour et Malaisie : citytrip parfait',
-        'Scandinavie : fjords et aurores boréales',
-        'Camping-car en Europe : liberté totale',
-        'Voyager responsable et éco-friendly'
+        'Les dernières tendances en IA',
+        'Guide des meilleurs gadgets connectés',
+        'Comment créer son site web en 2024',
+        'Sécurité informatique : protéger ses données',
+        'Les métiers du futur dans la tech'
+      ]
+    },
+    {
+      category: 'Voyages & Aventure',
+      icon: Target,
+      gradient: 'bg-gradient-to-br from-sky-500 to-blue-600',
+      badge: '🌍 Explorateur',
+      difficulty: '⭐⭐',
+      potential: '💰💰💰',
+      pages: '140-200',
+      ideas: [
+        'Les destinations secrètes en Europe',
+        'Road trip : guide ultime',
+        'Voyager seul : conseils et astuces',
+        'Les plus belles randonnées du monde',
+        'Comment voyager avec un petit budget'
+      ]
+    },
+    {
+      category: 'Animaux de compagnie',
+      icon: Fish,
+      gradient: 'bg-gradient-to-br from-pink-500 to-pink-600',
+      badge: '🐾 Adorable',
+      difficulty: '⭐',
+      potential: '💰💰💰',
+      pages: '100-150',
+      ideas: [
+        'Comment éduquer son chiot',
+        'Les secrets du bien-être félin',
+        'Guide des races de chiens',
+        'Alimentation saine pour animaux',
+        'Soins et hygiène pour animaux'
+      ]
+    },
+    {
+      category: 'Parentalité & Éducation',
+      icon: Users,
+      gradient: 'bg-gradient-to-br from-lime-500 to-green-600',
+      badge: '👶 Expert',
+      difficulty: '⭐⭐',
+      potential: '💰💰💰💰',
+      pages: '150-200',
+      ideas: [
+        'L\'éducation positive pour les nuls',
+        'Comment gérer les crises de colère',
+        'Activités créatives pour enfants',
+        'Les secrets d\'une communication parent-enfant',
+        'Préparer son enfant à l\'école'
+      ]
+    },
+    {
+      category: 'Finance & Investissement',
+      icon: BarChart3,
+      gradient: 'bg-gradient-to-br from-honey-gold to-orange-600',
+      badge: '📈 Pro',
+      difficulty: '⭐⭐⭐',
+      potential: '💰💰💰💰💰',
+      pages: '180-250',
+      ideas: [
+        'Investir en bourse pour les débutants',
+        'Comment gérer son budget personnel',
+        'Les secrets de l\'investissement immobilier',
+        'Préparer sa retraite sereinement',
+        'Les meilleures stratégies d\'épargne'
       ]
     },
     {
       category: 'Mode & Style',
-      icon: Heart,
-      gradient: 'bg-gradient-to-br from-vibrant-purple to-pink-600',
-      shadow: 'shadow-purple',
+      icon: Sparkles,
+      gradient: 'bg-gradient-to-br from-royal-purple to-pink-600',
+      badge: '💎 En vogue',
+      difficulty: '⭐⭐',
+      potential: '💰💰💰',
+      pages: '120-180',
       ideas: [
         'Créer son style personnel',
         'Garde-robe minimaliste et chic',
@@ -217,8 +238,11 @@ const EbookIdeasPage: React.FC = () => {
     {
       category: 'Spiritualité & Philosophie',
       icon: Brain,
-      gradient: 'bg-gradient-to-br from-violet-500 to-violet-600',
-      shadow: 'shadow-purple',
+      gradient: 'bg-gradient-to-br from-violet-500 to-indigo-600',
+      badge: '🧘 Zen',
+      difficulty: '⭐⭐',
+      potential: '💰💰💰',
+      pages: '150-200',
       ideas: [
         'Trouver son sens de la vie',
         'Méditation et pleine conscience',
@@ -229,9 +253,12 @@ const EbookIdeasPage: React.FC = () => {
     },
     {
       category: 'Sport & Fitness',
-      icon: TrendingUp,
-      gradient: 'bg-gradient-to-br from-vibrant-green to-emerald-600',
-      shadow: 'shadow-purple',
+      icon: Trophy,
+      gradient: 'bg-gradient-to-br from-emerald-500 to-lime-600',
+      badge: '💪 Actif',
+      difficulty: '⭐⭐',
+      potential: '💰💰💰💰',
+      pages: '140-200',
       ideas: [
         'Musculation à la maison sans matériel',
         'Course à pied : du canapé au marathon',
@@ -241,23 +268,13 @@ const EbookIdeasPage: React.FC = () => {
       ]
     },
     {
-      category: 'Éducation & Apprentissage',
-      icon: BookOpen,
-      gradient: 'bg-gradient-to-br from-vibrant-blue to-cyan-600',
-      shadow: 'shadow-blue',
-      ideas: [
-        'Apprendre une langue rapidement',
-        'Techniques de mémorisation efficaces',
-        'Étudier sans stress',
-        'Développer son esprit critique',
-        'Formation continue à l\'ère digitale'
-      ]
-    },
-    {
       category: 'Écologie & Durabilité',
       icon: Heart,
-      gradient: 'bg-gradient-to-br from-vibrant-green to-lime-600',
-      shadow: 'shadow-purple',
+      gradient: 'bg-gradient-to-br from-green-500 to-lime-600',
+      badge: '🌱 Eco',
+      difficulty: '⭐',
+      potential: '💰💰💰',
+      pages: '100-150',
       ideas: [
         'Zéro déchet : guide pratique',
         'Maison écologique et économique',
@@ -267,23 +284,13 @@ const EbookIdeasPage: React.FC = () => {
       ]
     },
     {
-      category: 'Parentalité',
-      icon: Heart,
-      gradient: 'bg-gradient-to-br from-rose-500 to-pink-600',
-      shadow: 'shadow-pink',
-      ideas: [
-        'Éducation positive pour enfants épanouis',
-        'Gérer les écrans chez les enfants',
-        'Activités créatives en famille',
-        'Préparer son enfant à l\'école',
-        'Adolescence : comprendre et accompagner'
-      ]
-    },
-    {
       category: 'Reconversion Professionnelle',
       icon: Briefcase,
       gradient: 'bg-gradient-to-br from-amber-500 to-orange-600',
-      shadow: 'shadow-blue',
+      badge: '🔄 Nouveau départ',
+      difficulty: '⭐⭐⭐',
+      potential: '💰💰💰💰',
+      pages: '180-250',
       ideas: [
         'Changer de métier après 40 ans',
         'Bilan de compétences DIY',
@@ -295,203 +302,226 @@ const EbookIdeasPage: React.FC = () => {
     {
       category: 'Aquariophilie & Poissons',
       icon: Fish,
-      gradient: 'bg-gradient-to-br from-vibrant-cyan to-blue-600',
-      shadow: 'shadow-blue',
+      gradient: 'bg-gradient-to-br from-cobalt-blue to-cyan-600',
+      badge: '🐠 Passion',
+      difficulty: '⭐⭐',
+      potential: '💰💰',
+      pages: '120-180',
       ideas: [
         'Aquarium débutant : guide complet',
         'Poissons tropicaux : espèces et soins',
         'Aquascaping : créer un paysage aquatique',
         'Eau douce vs eau de mer : faire son choix',
-        'Filtration d\'aquarium : système parfait',
-        'Reproduction des poissons d\'ornement',
-        'Plantes aquatiques : guide du débutant',
-        'Cichlidés africains : guide d\'élevage',
-        'Aquarium récifal : coraux et invertébrés',
-        'Maladies des poissons : prévenir et guérir',
-        'Discus : roi de l\'aquarium d\'eau douce',
-        'Nano-aquarium : petit mais parfait',
-        'Éclairage LED pour aquarium',
-        'Poissons rouges : au-delà du bocal',
-        'Betta splendens : guide complet',
-        'Aquarium biotope : recréer la nature',
-        'Maintenance aquarium : planning annuel',
-        'Poissons d\'eau froide sans chauffage',
-        'Aquaterrarium : terre et eau réunies',
-        'Crevettes d\'aquarium : guide d\'élevage',
-        'Aquarium communautaire harmonieux',
-        'Chimie de l\'eau : maîtriser les paramètres',
-        'Aquarium marin pour débutants',
-        'Poissons carnivores : nourrir et élever',
-        'Aquarium low-tech : simplicité efficace'
-      ]
-    },
-    {
-      category: 'Enfants 6-10 ans 🧸',
-      icon: Heart,
-      gradient: 'bg-gradient-to-br from-pink-400 to-purple-500',
-      shadow: 'shadow-pink',
-      ideas: [
-        'Luna et le Dragon Magique',
-        'L\'École des Petits Sorciers',
-        'Les Aventures de Mimi la Souris',
-        'Le Secret du Jardin Enchanté',
-        'Tom et le Trésor des Pirates',
-        'La Princesse qui Aimait les Insectes',
-        'Les Amis de la Forêt Mystérieuse',
-        'Charlie et son Chat Volant',
-        'L\'Île aux Mille Couleurs',
-        'Les Super-Pouvoirs de Nina',
-        'Le Petit Robot qui Rêvait',
-        'Les Jumeaux et la Machine à Temps',
-        'L\'Ours qui ne Savait pas Hiberner',
-        'La Fée des Dents Perdues',
-        'Max et le Monstre Gentil',
-        'Les Créatures du Lac Cristal',
-        'Léa et les Animaux Parlants',
-        'Le Livre qui S\'écrivait Tout Seul',
-        'Les Gardiens de l\'Arc-en-Ciel',
-        'Le Petit Chef Cuisinier',
-        'L\'Astronaute de 8 ans',
-        'La Maison dans les Nuages',
-        'Sophie et le Pinceau Magique',
-        'Le Club des Détectives Juniors',
-        'Les Vacances Extraordinaires',
-        'Le Phare aux Histoires',
-        'Romain et son Dragon de Poche',
-        'La Bibliothèque Secrète',
-        'Les Superhéros du Quartier',
-        'L\'Arbre qui Chantait des Berceuses'
+        'Filtration d\'aquarium : système parfait'
       ]
     }
   ];
+
+  const filteredThemes = themes.filter(theme => {
+    const matchesSearch = searchQuery === "" || 
+      theme.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      theme.ideas.some(idea => idea.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    const matchesCategory = !selectedCategory || theme.category === selectedCategory;
+    
+    return matchesSearch && matchesCategory;
+  });
+
+  const allCategories = themes.map(t => t.category);
 
   const handleGoToPlanner = (title: string) => {
     navigate('/ebook-planner', { state: { suggestedTitle: title } });
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
-      <div className="container mx-auto p-6 space-y-8">
-        {/* Header avec effet de glassmorphisme */}
-        <div className="relative overflow-hidden rounded-2xl gradient-card p-8 mb-8">
-          <div className="absolute inset-0 bg-gradient-primary opacity-10"></div>
-          <div className="relative z-10">
-            <div className="flex items-center gap-4 mb-4">
+    <div className="min-h-screen bg-gradient-to-br from-cream via-background to-cream/50 font-inter">
+      {/* Hero Section - Magazine Style */}
+      <div className="relative overflow-hidden bg-gradient-magazine-hero text-white">
+        <div className="absolute inset-0 bg-grid-white/10"></div>
+        <div className="container mx-auto px-6 py-16 relative z-10">
           <Button 
             onClick={() => navigate('/ebook-planner')} 
             variant="outline" 
             size="sm"
-            className="backdrop-blur-sm bg-white/10 border-white/20 text-foreground hover:bg-white/20 transition-all"
+            className="mb-8 bg-white/10 border-white/30 text-white hover:bg-white/20 backdrop-blur-sm"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Créer mon ebook
           </Button>
+
+          <div className="max-w-4xl">
+            <h1 className="text-6xl md:text-7xl font-playfair font-bold mb-6 leading-tight">
+              300+ Idées de<br />Bestsellers à Créer
+            </h1>
+            <p className="text-xl md:text-2xl text-white/90 mb-8 font-light">
+              Trouvez l'inspiration parfaite pour votre prochain ebook. De la fiction aux guides pratiques, découvrez des titres qui cartonnent.
+            </p>
+
+            {/* Search Bar */}
+            <div className="relative max-w-2xl">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-cool" />
+              <Input
+                placeholder="Rechercher une idée, un thème..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-12 pr-4 py-6 text-lg bg-white/95 backdrop-blur-sm border-0 shadow-lg rounded-2xl"
+              />
             </div>
-            
-            <div className="flex items-center gap-4 mb-6">
-              <div className="p-4 rounded-2xl bg-gradient-primary text-white glow-effect">
-                <Sparkles className="h-8 w-8" />
-              </div>
-              <div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-vibrant-purple bg-clip-text text-transparent">
-                  Idées de Titres d'Ebook
-                </h1>
-                <p className="text-muted-foreground text-lg mt-2">
-                  Plus de 300 idées créatives pour votre prochain bestseller
-                </p>
-              </div>
-            </div>
-            
+          </div>
+
+          {/* Stats Section */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12">
             <div className="text-center">
-              <div className="inline-flex items-center gap-2 px-6 py-3 bg-white/20 rounded-full backdrop-blur-sm border border-white/30">
-                <Target className="h-5 w-5 text-primary" />
-                <span className="text-sm font-medium">Cliquez sur un titre pour générer votre ebook</span>
-              </div>
+              <div className="text-4xl font-bold mb-2">300+</div>
+              <div className="text-white/80 text-sm">Idées disponibles</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-bold mb-2">50k+</div>
+              <div className="text-white/80 text-sm">Ebooks créés</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-bold mb-2">15+</div>
+              <div className="text-white/80 text-sm">Catégories</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-bold mb-2">4.9⭐</div>
+              <div className="text-white/80 text-sm">Note moyenne</div>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Grille des thèmes */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {themes.map((theme, index) => (
-            <Card key={index} className={`group relative overflow-hidden border-0 transition-all duration-500 hover:scale-[1.02] hover:${theme.shadow} glow-effect`}>
-              <div className="absolute inset-0 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm"></div>
-              <div className="relative z-10">
-                <CardHeader className="pb-4">
-                  <div className="flex items-center gap-4">
-                    <div className={`p-4 rounded-xl ${theme.gradient} text-white shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                      <theme.icon className="h-6 w-6" />
-                    </div>
-                    <div className="flex-1">
-                      <CardTitle className="text-xl group-hover:text-primary transition-colors duration-300">
-                        {theme.category}
-                      </CardTitle>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-sm text-muted-foreground">
-                          {theme.ideas.length} idées disponibles
-                        </span>
-                        <div className="h-1 w-1 rounded-full bg-primary"></div>
-                        <span className="text-xs text-primary font-medium">Populaire</span>
-                      </div>
-                    </div>
+      {/* Category Filters */}
+      <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b shadow-sm">
+        <div className="container mx-auto px-6 py-4">
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+            <Button
+              onClick={() => setSelectedCategory(null)}
+              variant={!selectedCategory ? "default" : "outline"}
+              size="sm"
+              className="rounded-full whitespace-nowrap"
+            >
+              Toutes les catégories
+            </Button>
+            {allCategories.slice(0, 8).map((cat) => (
+              <Button
+                key={cat}
+                onClick={() => setSelectedCategory(cat === selectedCategory ? null : cat)}
+                variant={cat === selectedCategory ? "default" : "outline"}
+                size="sm"
+                className="rounded-full whitespace-nowrap"
+              >
+                {cat}
+              </Button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="container mx-auto px-6 py-12">
+        <MasonryGrid columns={{ sm: 1, md: 2, lg: 3 }} gap="gap-8">
+          {filteredThemes.map((theme, index) => (
+            <Card 
+              key={index} 
+              className="group relative overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white"
+            >
+              {/* Gradient Overlay on Hover */}
+              <div className={`absolute inset-0 ${theme.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}></div>
+              
+              <CardHeader className="pb-4 relative z-10">
+                <div className="flex items-start justify-between mb-4">
+                  <div className={`p-4 rounded-2xl ${theme.gradient} text-white shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                    <theme.icon className="h-7 w-7" />
                   </div>
-                </CardHeader>
-                
-                <CardContent className="pt-0">
-                  <div className="space-y-2 max-h-80 overflow-y-auto">
-                    {theme.ideas.map((idea, ideaIndex) => (
-                      <Button
-                        key={ideaIndex}
-                        variant="ghost"
-                        className="w-full text-left justify-start h-auto p-4 rounded-xl hover:bg-gradient-to-r hover:from-primary/5 hover:to-transparent transition-all duration-300 group/item"
-                        onClick={() => handleGoToPlanner(idea)}
-                      >
-                        <div className="flex items-center gap-3 w-full">
-                          <div className="w-2 h-2 rounded-full bg-primary opacity-60 group-hover/item:opacity-100 transition-opacity"></div>
-                          <div className="flex-1 text-sm leading-6 group-hover/item:text-primary transition-colors">
-                            {idea}
-                          </div>
-                          <Sparkles className="h-4 w-4 opacity-0 group-hover/item:opacity-100 text-primary transition-all duration-300 transform group-hover/item:translate-x-1" />
-                        </div>
-                      </Button>
-                    ))}
+                  <Badge className="bg-white/90 text-navy-deep border-0 font-semibold">
+                    {theme.badge}
+                  </Badge>
+                </div>
+
+                <CardTitle className="text-2xl font-playfair mb-3 group-hover:text-coral-pink transition-colors">
+                  {theme.category}
+                </CardTitle>
+
+                {/* Meta Info */}
+                <div className="flex flex-wrap gap-3 text-sm text-gray-cool">
+                  <div className="flex items-center gap-1">
+                    <Star className="h-4 w-4" />
+                    <span>{theme.difficulty}</span>
                   </div>
-                </CardContent>
-              </div>
+                  <div className="flex items-center gap-1">
+                    <Trophy className="h-4 w-4" />
+                    <span>{theme.potential}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <BookOpen className="h-4 w-4" />
+                    <span>{theme.pages} pages</span>
+                  </div>
+                </div>
+
+                <div className="mt-3 text-sm text-muted-foreground">
+                  <strong>{theme.ideas.length}</strong> idées disponibles
+                </div>
+              </CardHeader>
+
+              <CardContent className="pt-0 relative z-10">
+                <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+                  {theme.ideas.map((idea, ideaIndex) => (
+                    <Button
+                      key={ideaIndex}
+                      onClick={() => handleGoToPlanner(idea)}
+                      variant="ghost"
+                      className="w-full justify-start text-left h-auto py-3 px-4 hover:bg-gradient-to-r hover:from-coral-pink/10 hover:to-royal-purple/10 transition-all duration-300 rounded-xl group/btn"
+                    >
+                      <Sparkles className="h-4 w-4 mr-3 text-coral-pink opacity-0 group-hover/btn:opacity-100 transition-opacity flex-shrink-0" />
+                      <span className="text-sm group-hover/btn:text-coral-pink transition-colors line-clamp-2">
+                        {idea}
+                      </span>
+                    </Button>
+                  ))}
+                </div>
+
+                <Button 
+                  onClick={() => handleGoToPlanner(theme.ideas[0])}
+                  className={`w-full mt-4 ${theme.gradient} text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300`}
+                >
+                  <Zap className="h-4 w-4 mr-2" />
+                  Créer maintenant
+                </Button>
+              </CardContent>
             </Card>
           ))}
-        </div>
+        </MasonryGrid>
 
-        {/* Call-to-Actions */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-16">
-          <Card className="relative overflow-hidden border-0 bg-gradient-card">
-            <div className="absolute inset-0 bg-gradient-primary opacity-5"></div>
-            <CardContent className="p-8 relative z-10">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="p-3 rounded-xl bg-gradient-primary text-white">
-                  <BookOpen className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold">Créer votre ebook</h3>
-                  <p className="text-muted-foreground">Planifiez et structurez votre contenu</p>
-                </div>
-              </div>
-              
-              <p className="text-muted-foreground mb-6">
-                Utilisez notre générateur intelligent pour créer un plan détaillé et commencer la rédaction de votre ebook dès maintenant.
-              </p>
-              
-              <Button 
-                onClick={() => navigate('/ebook-planner')}
-                size="lg"
-                className="btn-gradient w-full"
-              >
-                <BookOpen className="h-5 w-5 mr-2" />
-                Générer mon ebook maintenant
-              </Button>
-            </CardContent>
-          </Card>
+        {filteredThemes.length === 0 && (
+          <div className="text-center py-20">
+            <div className="text-6xl mb-4">🔍</div>
+            <h3 className="text-2xl font-playfair font-bold mb-2">Aucun résultat</h3>
+            <p className="text-muted-foreground">
+              Essayez de modifier votre recherche ou vos filtres
+            </p>
+          </div>
+        )}
+      </div>
 
+      {/* CTA Section */}
+      <div className="bg-gradient-to-r from-royal-purple to-coral-pink text-white py-20">
+        <div className="container mx-auto px-6 text-center">
+          <Crown className="h-16 w-16 mx-auto mb-6" />
+          <h2 className="text-4xl md:text-5xl font-playfair font-bold mb-6">
+            Prêt à écrire votre bestseller ?
+          </h2>
+          <p className="text-xl mb-8 text-white/90 max-w-2xl mx-auto">
+            Choisissez votre idée et laissez notre IA générer un plan complet en quelques secondes
+          </p>
+          <Button 
+            onClick={() => navigate('/ebook-planner')}
+            size="lg"
+            className="bg-white text-royal-purple hover:bg-white/90 text-lg px-8 py-6 rounded-full shadow-2xl"
+          >
+            <Sparkles className="h-5 w-5 mr-2" />
+            Commencer maintenant
+          </Button>
         </div>
       </div>
     </div>

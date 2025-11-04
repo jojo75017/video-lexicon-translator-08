@@ -26,6 +26,15 @@ export default {
         "vibrant-pink": "hsl(var(--vibrant-pink))",
         "vibrant-cyan": "hsl(var(--vibrant-cyan))",
         "vibrant-green": "hsl(var(--vibrant-green))",
+        
+        // Couleurs Magazine Premium
+        "coral-pink": "hsl(var(--coral-pink))",
+        "cobalt-blue": "hsl(var(--cobalt-blue))",
+        "honey-gold": "hsl(var(--honey-gold))",
+        "royal-purple": "hsl(var(--royal-purple))",
+        "navy-deep": "hsl(var(--navy-deep))",
+        "gray-cool": "hsl(var(--gray-cool))",
+        "cream": "hsl(var(--cream))",
         primary: {
           DEFAULT: "#1EAEDB", // Bleu Systeme.io
           foreground: "#ffffff",
@@ -89,6 +98,14 @@ export default {
         'gradient-success': 'var(--gradient-success)',
         'gradient-hero': 'var(--gradient-hero)',
         'gradient-card': 'var(--gradient-card)',
+        'gradient-magazine-hero': 'var(--gradient-magazine-hero)',
+        'gradient-magazine-card': 'var(--gradient-magazine-card)',
+        'gradient-magazine-success': 'var(--gradient-magazine-success)',
+      },
+      fontFamily: {
+        'playfair': ['Playfair Display', 'serif'],
+        'inter': ['Inter', 'sans-serif'],
+        'caveat': ['Caveat', 'cursive'],
       },
       boxShadow: {
         'glow': 'var(--shadow-glow)',
