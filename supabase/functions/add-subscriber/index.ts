@@ -26,6 +26,18 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    // Générer un code d'accès unique
+    const generateAccessCode = () => {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let code = 'EBK-';
+      for (let i = 0; i < 6; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return code;
+    };
+
+    const accessCode = generateAccessCode();
+
     // Vérifier si l'abonné existe déjà
     const { data: existing } = await supabase
       .from('subscribers')
@@ -34,7 +46,7 @@ serve(async (req) => {
       .single();
 
     if (existing) {
-      // Mettre à jour l'abonné existant
+      // Mettre à jour l'abonné existant (ne pas changer le code d'accès)
       const { data, error } = await supabase
         .from('subscribers')
         .update({
@@ -56,12 +68,17 @@ serve(async (req) => {
 
       console.log('Subscriber updated');
       return new Response(
-        JSON.stringify({ success: true, subscriber: data, message: 'Abonnement réactivé' }),
+        JSON.stringify({ 
+          success: true, 
+          subscriber: data, 
+          message: 'Abonnement réactivé',
+          access_code: data.access_code 
+        }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Créer un nouvel abonné
+    // Créer un nouvel abonné avec code d'accès
     const { data, error } = await supabase
       .from('subscribers')
       .insert({
@@ -69,6 +86,7 @@ serve(async (req) => {
         plan_type,
         status: 'active',
         expires_at: expires_at || null,
+        access_code: accessCode,
       })
       .select()
       .single();
@@ -81,9 +99,14 @@ serve(async (req) => {
       );
     }
 
-    console.log('Subscriber created');
+    console.log('Subscriber created with access code:', accessCode);
     return new Response(
-      JSON.stringify({ success: true, subscriber: data, message: 'Abonnement créé' }),
+      JSON.stringify({ 
+        success: true, 
+        subscriber: data, 
+        message: 'Abonnement créé',
+        access_code: accessCode 
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 

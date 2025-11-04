@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       subscribers: {
         Row: {
+          access_code: string | null
           chapters_generated: number
           covers_generated: number
           created_at: string
@@ -29,6 +30,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          access_code?: string | null
           chapters_generated?: number
           covers_generated?: number
           created_at?: string
@@ -42,6 +44,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          access_code?: string | null
           chapters_generated?: number
           covers_generated?: number
           created_at?: string

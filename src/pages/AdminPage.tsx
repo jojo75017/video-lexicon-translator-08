@@ -11,6 +11,7 @@ export const AdminPage = () => {
   const [email, setEmail] = useState('');
   const [planType, setPlanType] = useState('starter');
   const [isLoading, setIsLoading] = useState(false);
+  const [generatedCode, setGeneratedCode] = useState('');
   const navigate = useNavigate();
 
   const handleAddSubscriber = async (e: React.FormEvent) => {
@@ -31,6 +32,7 @@ export const AdminPage = () => {
       if (error) throw error;
 
       if (data.success) {
+        setGeneratedCode(data.access_code);
         toast.success(data.message || 'Abonné ajouté avec succès !');
         setEmail('');
       } else {
@@ -102,6 +104,31 @@ export const AdminPage = () => {
               {isLoading ? 'Ajout en cours...' : 'Ajouter l\'abonné'}
             </Button>
           </form>
+
+          {generatedCode && (
+            <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <Shield className="w-5 h-5 text-green-600" />
+                <h3 className="font-semibold text-green-900">Code d'accès généré</h3>
+              </div>
+              <div className="bg-white p-3 rounded border border-green-300 font-mono text-2xl text-center text-green-800 font-bold">
+                {generatedCode}
+              </div>
+              <p className="text-sm text-green-700 mt-2">
+                Envoyez ce code au client avec son email pour qu'il puisse se connecter.
+              </p>
+              <Button
+                onClick={() => {
+                  navigator.clipboard.writeText(generatedCode);
+                  toast.success('Code copié !');
+                }}
+                variant="outline"
+                className="w-full mt-3"
+              >
+                Copier le code
+              </Button>
+            </div>
+          )}
         </Card>
 
         <Card className="p-6">

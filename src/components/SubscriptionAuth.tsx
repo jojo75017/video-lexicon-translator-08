@@ -13,15 +13,22 @@ interface SubscriptionAuthProps {
 
 export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => {
   const [email, setEmail] = useState('');
+  const [accessCode, setAccessCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     const normalizedEmail = email.trim().toLowerCase();
+    const normalizedCode = accessCode.trim().toUpperCase();
     
     if (!normalizedEmail || !normalizedEmail.includes('@')) {
       toast.error('Veuillez entrer une adresse email valide');
+      return;
+    }
+
+    if (!normalizedCode) {
+      toast.error('Veuillez entrer votre code d\'accès');
       return;
     }
 
@@ -29,7 +36,10 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
     
     try {
       const { data, error } = await supabase.functions.invoke('validate-subscription', {
-        body: { email: normalizedEmail }
+        body: { 
+          email: normalizedEmail,
+          access_code: normalizedCode 
+        }
       });
 
       if (error) throw error;
@@ -82,7 +92,26 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
             </div>
           </div>
 
-          <Button 
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Code d'accès</label>
+            <div className="relative">
+              <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="EBK-XXXXXX"
+                value={accessCode}
+                onChange={(e) => setAccessCode(e.target.value.toUpperCase())}
+                className="pl-10 font-mono"
+                disabled={isLoading}
+                maxLength={10}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Le code d'accès vous a été fourni lors de votre inscription
+            </p>
+          </div>
+
+          <Button
             type="submit" 
             className="w-full"
             disabled={isLoading}

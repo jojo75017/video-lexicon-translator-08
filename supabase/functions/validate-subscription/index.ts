@@ -12,8 +12,15 @@ serve(async (req) => {
   }
 
   try {
-    const { email } = await req.json();
+    const { email, access_code } = await req.json();
     console.log('Validating subscription for:', email);
+
+    if (!access_code) {
+      return new Response(
+        JSON.stringify({ valid: false, message: 'Code d\'accès requis' }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -23,12 +30,13 @@ serve(async (req) => {
       .from('subscribers')
       .select('*')
       .eq('email', email)
+      .eq('access_code', access_code)
       .single();
 
     if (error || !subscriber) {
-      console.log('Subscriber not found');
+      console.log('Subscriber not found or invalid access code');
       return new Response(
-        JSON.stringify({ valid: false, message: 'Abonnement non trouvé' }),
+        JSON.stringify({ valid: false, message: 'Email ou code d\'accès incorrect' }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
