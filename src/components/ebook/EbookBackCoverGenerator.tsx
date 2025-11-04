@@ -32,20 +32,27 @@ export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = (
   const [authorBio, setAuthorBio] = useState<string>('');
 
   const handleGenerate = async () => {
+    console.log('[BackCover] handleGenerate called', { ebookTitle, authorName, chaptersLength: chapters.length });
+    
     if (!ebookTitle || !authorName || chapters.length === 0) {
+      console.log('[BackCover] Missing data:', { ebookTitle, authorName, chaptersLength: chapters.length });
       toast.error('Veuillez remplir le titre, l\'auteur et ajouter des chapitres');
       return;
     }
 
+    console.log('[BackCover] Starting generation with:', { tone, audience, highlights });
     const versions: string[] = [];
     
     for (let i = 0; i < 3; i++) {
+      console.log(`[BackCover] Generating version ${i + 1}/3`);
       const result = await onGenerate(tone, audience, highlights);
+      console.log(`[BackCover] Version ${i + 1} result:`, result ? 'Success' : 'Failed');
       if (result) {
         versions.push(result);
       }
     }
 
+    console.log('[BackCover] Total versions generated:', versions.length);
     if (versions.length > 0) {
       setGeneratedVersions(versions);
       setSelectedVersion(0);

@@ -236,6 +236,15 @@ Réponds avec un tableau JSON de catégories : ["catégorie1", "catégorie2",...
     audience: string, 
     highlights: string
   ) => {
+    console.log('[useSubscriptionGeneration] generateBackCover called with:', { 
+      ebookTitle, 
+      authorName, 
+      chaptersCount: chapters.length, 
+      tone, 
+      audience, 
+      highlights 
+    });
+    
     const chaptersText = chapters.map(c => c.title).join(', ');
     const highlightsText = highlights ? `Points forts à mettre en avant : ${highlights}` : '';
     
@@ -263,7 +272,10 @@ Contraintes :
 
 Réponds avec la description complète uniquement, sans titre de section.`;
 
+    console.log('[useSubscriptionGeneration] Calling generate-content function...');
     const content = await callGenerateContent('covers_generated', prompt);
+    console.log('[useSubscriptionGeneration] Content received:', content ? 'Success' : 'Failed');
+    
     if (content) {
       toast.success('4ème de couverture générée !');
     }
