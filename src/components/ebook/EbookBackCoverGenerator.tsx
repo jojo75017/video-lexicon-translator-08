@@ -4,9 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileText, Copy, Download, RefreshCw, Sparkles } from 'lucide-react';
+import { FileText, Copy, Download, RefreshCw, Sparkles, Image as ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { Chapter } from '@/hooks/useSubscriptionGeneration';
+import { supabase } from '@/integrations/supabase/client';
 
 interface EbookBackCoverGeneratorProps {
   ebookTitle: string;
@@ -30,6 +31,9 @@ export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = (
   const [selectedVersion, setSelectedVersion] = useState<number | null>(null);
   const [shortVersion, setShortVersion] = useState<string>('');
   const [authorBio, setAuthorBio] = useState<string>('');
+  const [coverImage, setCoverImage] = useState<string>('');
+  const [isGeneratingCover, setIsGeneratingCover] = useState(false);
+  const [coverStyle, setCoverStyle] = useState<string>('moderne');
 
   const handleGenerate = async () => {
     console.log('[BackCover] handleGenerate called', { ebookTitle, authorName, chaptersLength: chapters.length });
@@ -82,11 +86,105 @@ export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = (
     toast.success('Téléchargement en cours...');
   };
 
+  const handleGenerateCover = async () => {
+    if (!ebookTitle || !authorName) {
+      toast.error('Veuillez remplir le titre et l\'auteur');
+      return;
+    }
+
+    setIsGeneratingCover(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-cover-image', {
+        body: {
+          ebookTitle,
+          authorName,
+          style: coverStyle,
+          genre: 'non-fiction'
+        }
+      });
+
+      if (error) throw error;
+
+      if (data?.imageUrl) {
+        setCoverImage(data.imageUrl);
+        toast.success('Couverture générée !');
+      }
+    } catch (error) {
+      console.error('Error generating cover:', error);
+      toast.error('Erreur lors de la génération de la couverture');
+    } finally {
+      setIsGeneratingCover(false);
+    }
+  };
+
   const selectedText = selectedVersion !== null ? generatedVersions[selectedVersion] : '';
   const charCount = selectedText.length;
 
   return (
     <div className="space-y-6">
+      {/* Génération de couverture */}
+      <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-indigo-50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <ImageIcon className="w-5 h-5 text-purple-600" />
+            Générateur de Couverture IA
+          </CardTitle>
+          <CardDescription>
+            Créez une image de couverture professionnelle avec l'IA
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="coverStyle">Style de couverture</Label>
+              <Select value={coverStyle} onValueChange={setCoverStyle}>
+                <SelectTrigger id="coverStyle">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="moderne">Moderne</SelectItem>
+                  <SelectItem value="minimaliste">Minimaliste</SelectItem>
+                  <SelectItem value="elegant">Élégant</SelectItem>
+                  <SelectItem value="dynamique">Dynamique</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-end">
+              <Button
+                onClick={handleGenerateCover}
+                disabled={isGeneratingCover || !ebookTitle || !authorName}
+                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+              >
+                {isGeneratingCover ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                    Génération...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Générer Couverture
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+
+          {coverImage && (
+            <div className="mt-4 space-y-2">
+              <Label>Aperçu de la couverture</Label>
+              <div className="relative w-full max-w-sm mx-auto">
+                <img
+                  src={coverImage}
+                  alt="Couverture générée"
+                  className="w-full rounded-lg shadow-lg border-2 border-purple-200"
+                />
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Configuration */}
       <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50">
         <CardHeader>
