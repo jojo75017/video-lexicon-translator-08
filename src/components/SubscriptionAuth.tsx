@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Mail, Lock, Unlock } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface SubscriptionAuthProps {
   onAuthenticated: (email: string, subscriber: any) => void;
@@ -94,7 +95,7 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
           </Button>
         </form>
 
-        <div className="text-center text-sm text-muted-foreground">
+        <div className="text-center text-sm text-muted-foreground space-y-2">
           <p>Pas encore abonné ?</p>
           <a 
             href="https://votre-tunnel-systeme.io" 
@@ -104,6 +105,14 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
           >
             Souscrire maintenant
           </a>
+          <div className="pt-2">
+            <Link 
+              to="/admin"
+              className="text-xs text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+            >
+              Administration
+            </Link>
+          </div>
         </div>
       </Card>
     </div>
