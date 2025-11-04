@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Mail, Lock, Unlock } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface SubscriptionAuthProps {
   onAuthenticated: (email: string, subscriber: any) => void;
@@ -14,11 +14,13 @@ interface SubscriptionAuthProps {
 export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    const normalizedEmail = email.trim().toLowerCase();
     
-    if (!email || !email.includes('@')) {
+    if (!normalizedEmail || !normalizedEmail.includes('@')) {
       toast.error('Veuillez entrer une adresse email valide');
       return;
     }
@@ -27,16 +29,17 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
     
     try {
       const { data, error } = await supabase.functions.invoke('validate-subscription', {
-        body: { email }
+        body: { email: normalizedEmail }
       });
 
       if (error) throw error;
 
       if (data.valid) {
-        localStorage.setItem('subscriber_email', email);
+        localStorage.setItem('subscriber_email', normalizedEmail);
         localStorage.setItem('subscriber_data', JSON.stringify(data.subscriber));
         toast.success(`Bienvenue ! Plan ${data.subscriber.plan_type}`);
-        onAuthenticated(email, data.subscriber);
+        onAuthenticated(normalizedEmail, data.subscriber);
+        navigate('/ebook-planner');
       } else {
         toast.error(data.message || 'Abonnement non trouvé');
       }
