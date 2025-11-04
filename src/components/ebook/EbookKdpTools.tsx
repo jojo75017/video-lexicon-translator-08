@@ -227,7 +227,7 @@ export const EbookKdpTools: React.FC<EbookKdpToolsProps> = ({
           <CardContent className="space-y-4">
             <Button 
               onClick={generateKdpCategories}
-              disabled={!apiKey || !ebookTitle || isGenerating}
+              disabled={!ebookTitle || isGenerating}
               className="w-full"
             >
               <BarChart3 className="h-4 w-4 mr-2" />
@@ -267,7 +267,7 @@ export const EbookKdpTools: React.FC<EbookKdpToolsProps> = ({
           <CardContent className="space-y-4">
             <Button 
               onClick={generateKdpPricingStrategy}
-              disabled={!apiKey || !ebookTitle || isGenerating}
+              disabled={!ebookTitle || isGenerating}
               className="w-full"
             >
               <DollarSign className="h-4 w-4 mr-2" />
@@ -307,7 +307,7 @@ export const EbookKdpTools: React.FC<EbookKdpToolsProps> = ({
           <CardContent className="space-y-4">
             <Button 
               onClick={generateLaunchPlan}
-              disabled={!apiKey || !ebookTitle || isGenerating}
+              disabled={!ebookTitle || isGenerating}
               className="w-full"
             >
               <Calendar className="h-4 w-4 mr-2" />
@@ -347,7 +347,7 @@ export const EbookKdpTools: React.FC<EbookKdpToolsProps> = ({
           <CardContent className="space-y-4">
             <Button 
               onClick={generateAuthorBio}
-              disabled={!apiKey || isGenerating}
+              disabled={isGenerating}
               className="w-full"
             >
               <Users className="h-4 w-4 mr-2" />

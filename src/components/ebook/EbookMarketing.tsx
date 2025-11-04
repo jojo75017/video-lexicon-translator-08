@@ -66,44 +66,7 @@ export const EbookMarketing: React.FC<EbookMarketingProps> = ({
   };
 
   const generateAdCampaigns = async () => {
-    if (!apiKey || !ebookTitle) {
-      toast.error('Clé API ou titre d\'ebook manquant');
-      return;
-    }
-
-    try {
-      toast.loading('Génération des publicités...', { id: 'ad-campaigns' });
-      
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [
-            {
-              role: 'system',
-              content: 'Tu es un expert en publicité digitale. Crée des campagnes publicitaires performantes.'
-            },
-            {
-              role: 'user',
-              content: `Crée 3 campagnes publicitaires pour l'ebook "${ebookTitle}". Une pour Facebook, une pour Amazon KDP, une pour Google Ads. Inclus titre, description, audience cible, mots-clés, budget suggéré de ${budget || '50€'}. Public cible: ${targetAudience || 'lecteurs intéressés'}.`
-            }
-          ],
-          temperature: 0.8,
-        }),
-      });
-
-      const data = await response.json();
-      const campaigns = data.choices[0]?.message?.content?.split('CAMPAGNE').filter((campaign: string) => campaign.trim());
-      setAdCampaigns(campaigns || []);
-      toast.success('Publicités générées !', { id: 'ad-campaigns' });
-    } catch (error) {
-      console.error('Erreur génération publicités:', error);
-      toast.error('Erreur lors de la génération', { id: 'ad-campaigns' });
-    }
+    toast.info('Fonctionnalité disponible prochainement');
   };
 
   const copyToClipboard = (text: string) => {
@@ -174,7 +137,7 @@ export const EbookMarketing: React.FC<EbookMarketingProps> = ({
         <CardContent className="space-y-4">
           <Button 
             onClick={generateSocialPosts}
-            disabled={!apiKey || !ebookTitle || isGenerating}
+            disabled={!ebookTitle || isGenerating}
             className="w-full"
           >
             Générer 5 Posts Réseaux Sociaux
@@ -215,7 +178,7 @@ export const EbookMarketing: React.FC<EbookMarketingProps> = ({
         <CardContent className="space-y-4">
           <Button 
             onClick={generateLandingPage}
-            disabled={!apiKey || !ebookTitle || isGenerating}
+            disabled={!ebookTitle || isGenerating}
             className="w-full"
           >
             Créer la Landing Page
@@ -261,7 +224,7 @@ export const EbookMarketing: React.FC<EbookMarketingProps> = ({
         <CardContent className="space-y-4">
           <Button 
             onClick={generateEmailCampaign}
-            disabled={!apiKey || !ebookTitle || isGenerating}
+            disabled={!ebookTitle || isGenerating}
             className="w-full"
           >
             Générer Séquence Email (5 emails)
@@ -305,7 +268,7 @@ export const EbookMarketing: React.FC<EbookMarketingProps> = ({
         <CardContent className="space-y-4">
           <Button 
             onClick={generateAdCampaigns}
-            disabled={!apiKey || !ebookTitle || isGenerating}
+            disabled={!ebookTitle || isGenerating}
             className="w-full"
           >
             Générer Campagnes Publicitaires

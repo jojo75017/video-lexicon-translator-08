@@ -273,16 +273,8 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail, su
     const chapter = chapters.find(c => c.id === chapterId);
     if (!chapter) return;
 
-    // Fonction splitChapterAutomatically retirée (pas dans le nouveau hook)
+  // Fonction splitChapterAutomatically retirée (pas dans le nouveau hook)
     toast.info('Fonction de division automatique non disponible');
-    return;
-    if (false) {
-      setChapters(chapters.map(c => 
-        c.id === chapterId 
-          ? { ...c, subChapters: [...c.subChapters, ...newSubChapters] }
-          : c
-      ));
-    }
   };
 
   // Générer automatiquement un plan d'ebook
@@ -317,68 +309,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail, su
 
   // Analyser un texte importé
   const analyzeImportedText = async () => {
-    if (!importText || !apiKey) {
-      toast.error('Ajoutez du texte et configurez votre clé API');
-      return;
-    }
-
-    try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-          model: 'gpt-4.1-2025-04-14',
-          messages: [{
-            role: 'user',
-            content: `Analyse ce texte et suggère une structure de chapitres et sous-chapitres :
-
-"${importText}"
-
-Réponds uniquement au format JSON:
-{
-  "suggestedTitle": "Titre suggéré pour l'ebook",
-  "chapters": [
-    {
-      "title": "Titre du chapitre 1",
-      "subChapters": ["Sous-chapitre 1", "Sous-chapitre 2"]
-    }
-  ]
-}`
-          }],
-          temperature: 0.7,
-          max_tokens: 1500
-        })
-      });
-
-      if (!response.ok) throw new Error('Erreur API');
-
-      const data = await response.json();
-      const result = JSON.parse(data.choices[0].message.content);
-      
-      if (!ebookTitle) {
-        setEbookTitle(result.suggestedTitle);
-      }
-      
-      const analyzedChapters = result.chapters.map((chapter: any, index: number) => ({
-        id: (Date.now() + index).toString(),
-        title: chapter.title,
-        content: '',
-        subChapters: chapter.subChapters.map((sub: string, subIndex: number) => ({
-          id: (Date.now() + index * 100 + subIndex).toString(),
-          title: sub,
-          content: ''
-        }))
-      }));
-      
-      setChapters(analyzedChapters);
-      toast.success('Structure générée à partir du texte !');
-      
-    } catch (error) {
-      toast.error('Erreur lors de l\'analyse du texte');
-    }
+    toast.info('Fonctionnalité disponible prochainement');
   };
 
   // Appliquer un template
@@ -1003,29 +934,15 @@ ${seoData.hashtags.join(' ')}
                       📝 Description KDP
                     </Button>
                     <Button 
-                      onClick={async () => {
-                        const keywords = await generateKDPKeywords(ebookTitle, chapters, apiKey);
-                        if (keywords) {
-                          const text = Array.isArray(keywords) ? keywords.join('\n') : String(keywords);
-                          setKdpKeywords(text);
-                          toast.success('Mots-clés KDP générés !');
-                        }
-                      }}
-                      disabled={!ebookTitle || !apiKey || isGenerating}
+                      onClick={() => toast.info('Fonctionnalité disponible prochainement')}
+                      disabled={!ebookTitle || isGenerating}
                       className="w-full"
                     >
                       🔑 Mots-clés KDP
                     </Button>
                     <Button 
-                      onClick={async () => {
-                        const categories = await generateKDPCategories(ebookTitle, chapters, apiKey);
-                        if (categories) {
-                          const text = Array.isArray(categories) ? categories.join('\n') : String(categories);
-                          setKdpCategories(text);
-                          toast.success('Catégories KDP générées !');
-                        }
-                      }}
-                      disabled={!ebookTitle || !apiKey || isGenerating}
+                      onClick={() => toast.info('Fonctionnalité disponible prochainement')}
+                      disabled={!ebookTitle || isGenerating}
                       className="w-full"
                     >
                       📂 Catégories KDP
@@ -1198,14 +1115,6 @@ ${seoData.hashtags.join(' ')}
                 <p>Plans créés: {subscriberData?.ebook_plans_generated || 0}</p>
               </div>
             </div>
-            <div className="hidden"
-              numberOfChapters={numberOfChapters}
-              onUpdateNumberOfChapters={setNumberOfChapters}
-              importText={importText}
-              onUpdateImportText={setImportText}
-              onAnalyzeImportedText={analyzeImportedText}
-              isGenerating={isGenerating}
-            />
           </TabsContent>
 
           <TabsContent value="images">

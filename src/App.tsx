@@ -49,7 +49,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Navigate to="/ebook-ideas" replace />} />
             <Route path="/ebook-ideas" element={<EbookIdeasPage />} />
-            <Route path="/ebook-planner" element={<EbookPlannerPage />} />
+            <Route path="/ebook-planner" element={<EbookPlannerPage subscriberEmail={subscriberEmail} subscriberData={subscriberData} />} />
             <Route path="/admin" element={<AdminPage />} />
           </Routes>
           <Toaster />
