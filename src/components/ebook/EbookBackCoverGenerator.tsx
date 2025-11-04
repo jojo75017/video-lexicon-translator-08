@@ -31,7 +31,8 @@ export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = (
   const [selectedVersion, setSelectedVersion] = useState<number | null>(null);
   const [shortVersion, setShortVersion] = useState<string>('');
   const [authorBio, setAuthorBio] = useState<string>('');
-  const [coverImage, setCoverImage] = useState<string>('');
+  const [coverImages, setCoverImages] = useState<string[]>([]);
+  const [selectedCover, setSelectedCover] = useState<number | null>(null);
   const [isGeneratingCover, setIsGeneratingCover] = useState(false);
   const [coverStyle, setCoverStyle] = useState<string>('moderne');
 
@@ -87,31 +88,58 @@ export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = (
   };
 
   const handleGenerateCover = async () => {
+    console.log('[CoverGen] Starting cover generation', { ebookTitle, authorName, coverStyle });
+    
     if (!ebookTitle || !authorName) {
       toast.error('Veuillez remplir le titre et l\'auteur');
       return;
     }
 
     setIsGeneratingCover(true);
+    const images: string[] = [];
+    
     try {
-      const { data, error } = await supabase.functions.invoke('generate-cover-image', {
-        body: {
-          ebookTitle,
-          authorName,
-          style: coverStyle,
-          genre: 'non-fiction'
+      // Générer 3 versions de couverture
+      for (let i = 0; i < 3; i++) {
+        console.log(`[CoverGen] Generating cover ${i + 1}/3`);
+        
+        const { data, error } = await supabase.functions.invoke('generate-cover-image', {
+          body: {
+            ebookTitle,
+            authorName,
+            style: coverStyle,
+            genre: 'non-fiction',
+            variation: i + 1
+          }
+        });
+
+        console.log(`[CoverGen] Response ${i + 1}:`, { data, error });
+
+        if (error) {
+          console.error(`[CoverGen] Error on version ${i + 1}:`, error);
+          throw error;
         }
-      });
 
-      if (error) throw error;
+        if (data?.imageUrl) {
+          images.push(data.imageUrl);
+          console.log(`[CoverGen] Image ${i + 1} generated successfully`);
+        } else {
+          console.warn(`[CoverGen] No imageUrl in response ${i + 1}`);
+        }
+      }
 
-      if (data?.imageUrl) {
-        setCoverImage(data.imageUrl);
-        toast.success('Couverture générée !');
+      console.log('[CoverGen] Total images generated:', images.length);
+      
+      if (images.length > 0) {
+        setCoverImages(images);
+        setSelectedCover(0);
+        toast.success(`${images.length} couvertures générées !`);
+      } else {
+        toast.error('Aucune image générée');
       }
     } catch (error) {
-      console.error('Error generating cover:', error);
-      toast.error('Erreur lors de la génération de la couverture');
+      console.error('[CoverGen] Error generating covers:', error);
+      toast.error('Erreur lors de la génération des couvertures');
     } finally {
       setIsGeneratingCover(false);
     }
@@ -170,16 +198,33 @@ export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = (
             </div>
           </div>
 
-          {coverImage && (
-            <div className="mt-4 space-y-2">
-              <Label>Aperçu de la couverture</Label>
-              <div className="relative w-full max-w-sm mx-auto">
-                <img
-                  src={coverImage}
-                  alt="Couverture générée"
-                  className="w-full rounded-lg shadow-lg border-2 border-purple-200"
-                />
+          {coverImages.length > 0 && (
+            <div className="mt-4 space-y-4">
+              <div className="flex gap-2 flex-wrap">
+                {coverImages.map((_, index) => (
+                  <Button
+                    key={index}
+                    variant={selectedCover === index ? "default" : "outline"}
+                    onClick={() => setSelectedCover(index)}
+                    size="sm"
+                  >
+                    Couverture {index + 1}
+                  </Button>
+                ))}
               </div>
+
+              {selectedCover !== null && (
+                <div className="space-y-2">
+                  <Label>Aperçu de la couverture sélectionnée</Label>
+                  <div className="relative w-full max-w-sm mx-auto">
+                    <img
+                      src={coverImages[selectedCover]}
+                      alt={`Couverture ${selectedCover + 1}`}
+                      className="w-full rounded-lg shadow-lg border-2 border-purple-200"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </CardContent>

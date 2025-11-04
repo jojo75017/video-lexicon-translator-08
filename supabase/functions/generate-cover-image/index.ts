@@ -11,7 +11,9 @@ serve(async (req) => {
   }
 
   try {
-    const { ebookTitle, authorName, genre, style } = await req.json();
+    const { ebookTitle, authorName, genre, style, variation } = await req.json();
+
+    console.log('Received request:', { ebookTitle, authorName, genre, style, variation });
 
     if (!ebookTitle) {
       return new Response(
@@ -31,20 +33,33 @@ serve(async (req) => {
 
     const styleText = style || 'moderne et professionnel';
     const genreText = genre || 'non-fiction';
+    const variationNum = variation || 1;
     
-    const imagePrompt = `Créez une couverture de livre ${styleText} pour un ebook ${genreText} intitulé "${ebookTitle}" par ${authorName || 'Auteur'}. 
+    // Variations de style pour chaque version
+    const styleVariations = [
+      'minimaliste avec typographie élégante',
+      'dynamique avec illustrations colorées',
+      'professionnel avec design épuré'
+    ];
+    
+    const currentStyle = styleVariations[(variationNum - 1) % 3];
+    
+    const imagePrompt = `Créez une couverture de livre ${currentStyle} pour un ebook ${genreText} intitulé "${ebookTitle}" par ${authorName || 'Auteur'}. 
     
 La couverture doit :
 - Être professionnelle et attrayante pour Amazon KDP
-- Inclure le titre "${ebookTitle}" de manière lisible et élégante
+- Inclure le titre "${ebookTitle}" de manière lisible et élégante au centre
+- Inclure l'auteur "${authorName}" de façon discrète en bas
 - Avoir un design moderne et vendeur
 - Utiliser des couleurs harmonieuses et professionnelles
 - Être optimisée pour une miniature Amazon (format portrait 6:9)
-- Style : ${styleText}
+- Style : ${currentStyle}
+- Version : ${variationNum}
 
-Format : Portrait vertical (1600x2400 pixels), haute qualité, style ${genreText}.`;
+Format : Portrait vertical (1600x2400 pixels), haute qualité, style ${genreText}.
+IMPORTANT : Le texte doit être LISIBLE et CLAIR sur la couverture.`;
 
-    console.log('Generating cover image with prompt:', imagePrompt);
+    console.log('Generating cover image with prompt for variation', variationNum);
 
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
