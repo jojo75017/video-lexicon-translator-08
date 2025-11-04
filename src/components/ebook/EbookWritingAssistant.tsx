@@ -9,7 +9,6 @@ import { toast } from 'sonner';
 
 interface EbookWritingAssistantProps {
   ebookTitle: string;
-  apiKey: string;
 }
 
 const writingPrompts = [
@@ -43,8 +42,7 @@ const writingPrompts = [
 ];
 
 export const EbookWritingAssistant: React.FC<EbookWritingAssistantProps> = ({
-  ebookTitle,
-  apiKey
+  ebookTitle
 }) => {
   const [synopsis, setSynopsis] = useState('');
   const [alternateTitles, setAlternateTitles] = useState<string[]>([]);
@@ -52,94 +50,19 @@ export const EbookWritingAssistant: React.FC<EbookWritingAssistantProps> = ({
   const [currentContext, setCurrentContext] = useState('');
 
   const generateSynopsis = async () => {
-    if (!ebookTitle || !apiKey) {
-      toast.error('Titre et clé API requis');
+    if (!ebookTitle) {
+      toast.error('Titre requis');
       return;
     }
-
-    setIsGenerating(true);
-    try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-          model: 'gpt-4.1-2025-04-14',
-          messages: [{
-            role: 'user',
-            content: `Génère un synopsis captivant de 150-200 mots pour un ebook intitulé "${ebookTitle}". 
-            Le synopsis doit être accrocheur, présenter le problème, la solution et les bénéfices pour le lecteur.
-            ${currentContext ? `Contexte supplémentaire: ${currentContext}` : ''}`
-          }],
-          max_completion_tokens: 300
-        })
-      });
-
-      if (!response.ok) throw new Error('Erreur API');
-
-      const data = await response.json();
-      const generatedSynopsis = data.choices[0].message.content;
-      setSynopsis(generatedSynopsis);
-      toast.success('Synopsis généré !');
-    } catch (error) {
-      console.error('Erreur synopsis:', error);
-      toast.error('Erreur lors de la génération du synopsis');
-    } finally {
-      setIsGenerating(false);
-    }
+    toast.info('Fonctionnalité disponible via la page de gestion');
   };
 
   const generateAlternateTitles = async () => {
-    if (!ebookTitle || !apiKey) {
-      toast.error('Titre et clé API requis');
+    if (!ebookTitle) {
+      toast.error('Titre requis');
       return;
     }
-
-    setIsGenerating(true);
-    try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-          model: 'gpt-4.1-2025-04-14',
-          messages: [{
-            role: 'user',
-            content: `Génère 8 titres alternatifs accrocheurs pour un ebook actuellement intitulé "${ebookTitle}".
-            
-            Les titres doivent être:
-            - Variés dans leur approche (certains courts, d'autres avec sous-titre)
-            - Optimisés pour attirer l'attention
-            - Clairs sur le bénéfice pour le lecteur
-            - Professionnels
-            
-            Retourne uniquement les titres, un par ligne, numérotés de 1 à 8.`
-          }],
-          max_completion_tokens: 500
-        })
-      });
-
-      if (!response.ok) throw new Error('Erreur API');
-
-      const data = await response.json();
-      const titlesText = data.choices[0].message.content;
-      const titles = titlesText
-        .split('\n')
-        .filter((line: string) => line.trim())
-        .map((line: string) => line.replace(/^\d+\.\s*/, '').trim());
-      
-      setAlternateTitles(titles);
-      toast.success(`${titles.length} titres alternatifs générés !`);
-    } catch (error) {
-      console.error('Erreur titres:', error);
-      toast.error('Erreur lors de la génération des titres');
-    } finally {
-      setIsGenerating(false);
-    }
+    toast.info('Fonctionnalité disponible via la page de gestion');
   };
 
   const copyToClipboard = (text: string) => {
@@ -222,7 +145,7 @@ export const EbookWritingAssistant: React.FC<EbookWritingAssistantProps> = ({
 
                 <Button 
                   onClick={generateSynopsis}
-                  disabled={isGenerating || !ebookTitle || !apiKey}
+                  disabled={isGenerating || !ebookTitle}
                   className="w-full"
                 >
                   {isGenerating ? (
@@ -272,7 +195,7 @@ export const EbookWritingAssistant: React.FC<EbookWritingAssistantProps> = ({
               <div className="space-y-4">
                 <Button 
                   onClick={generateAlternateTitles}
-                  disabled={isGenerating || !ebookTitle || !apiKey}
+                  disabled={isGenerating || !ebookTitle}
                   className="w-full"
                 >
                   {isGenerating ? (

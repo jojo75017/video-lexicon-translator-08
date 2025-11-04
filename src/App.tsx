@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Routes, Route, Navigate } from 'react-router-dom';
 import EbookPlannerPage from './pages/EbookPlannerPage';
 import EbookIdeasPage from './pages/EbookIdeasPage';
+import { AdminPage } from './pages/AdminPage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
 
 const queryClient = new QueryClient();
@@ -47,8 +48,9 @@ const App = () => {
         <div className="min-h-screen bg-background">
           <Routes>
             <Route path="/" element={<Navigate to="/ebook-ideas" replace />} />
-            <Route path="/ebook-ideas" element={<EbookIdeasPage subscriberEmail={subscriberEmail} subscriberData={subscriberData} />} />
-            <Route path="/ebook-planner" element={<EbookPlannerPage subscriberEmail={subscriberEmail} subscriberData={subscriberData} />} />
+            <Route path="/ebook-ideas" element={<EbookIdeasPage />} />
+            <Route path="/ebook-planner" element={<EbookPlannerPage />} />
+            <Route path="/admin" element={<AdminPage />} />
           </Routes>
           <Toaster />
         </div>

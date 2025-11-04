@@ -16,14 +16,12 @@ import { Chapter } from '@/hooks/useEbookGeneration';
 interface EbookAdvancedFeaturesProps {
   ebookTitle: string;
   chapters: Chapter[];
-  apiKey: string;
   isGenerating: boolean;
 }
 
 export const EbookAdvancedFeatures: React.FC<EbookAdvancedFeaturesProps> = ({
   ebookTitle,
   chapters,
-  apiKey,
   isGenerating
 }) => {
   const [targetAudience, setTargetAudience] = useState('');
@@ -38,87 +36,15 @@ export const EbookAdvancedFeatures: React.FC<EbookAdvancedFeaturesProps> = ({
   const [trailerScript, setTrailerScript] = useState('');
 
   const generateBookCover = async () => {
-    if (!apiKey) {
-      toast.error('Clé API OpenAI requise');
-      return;
-    }
-
-    try {
-      const response = await fetch('https://api.openai.com/v1/images/generations', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-          model: 'dall-e-3',
-          prompt: `Crée une couverture de livre professionnelle pour un ebook intitulé "${ebookTitle}". Style moderne, couleurs attractives, typographie claire, design commercial.`,
-          size: '1024x1024',
-          quality: 'standard',
-          n: 1
-        })
-      });
-
-      if (!response.ok) throw new Error('Erreur API DALL-E');
-
-      const data = await response.json();
-      const imageUrl = data.data[0].url;
-      
-      // Ouvrir l'image dans un nouvel onglet
-      window.open(imageUrl, '_blank');
-      toast.success('Couverture générée ! Image ouverte dans un nouvel onglet.');
-      
-    } catch (error) {
-      console.error('Erreur:', error);
-      toast.error('Erreur lors de la génération de la couverture');
-    }
+    toast.info('Fonctionnalité disponible via la page de gestion');
   };
 
   const analyzeCompetition = async () => {
-    if (!apiKey || !ebookTitle) {
-      toast.error('Titre et clé API requis');
+    if (!ebookTitle) {
+      toast.error('Titre requis');
       return;
     }
-
-    try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [{
-            role: 'user',
-            content: `Analyse la concurrence pour un ebook sur "${ebookTitle}". 
-
-Génère:
-1. 5 livres concurrents populaires
-2. Prix moyens du marché
-3. Points faibles des concurrents
-4. Opportunités de différenciation
-5. Stratégies recommandées
-
-Format de réponse structuré et détaillé.`
-          }],
-          temperature: 0.7,
-          max_tokens: 1000
-        })
-      });
-
-      if (!response.ok) throw new Error('Erreur API');
-
-      const data = await response.json();
-      const analysis = data.choices[0].message.content;
-      
-      setCompetitionAnalysis(analysis);
-      toast.success('Analyse concurrentielle générée !');
-      
-    } catch (error) {
-      console.error('Erreur:', error);
-      toast.error('Erreur lors de l\'analyse concurrentielle');
-    }
+    toast.info('Fonctionnalité disponible via la page de gestion');
   };
 
   const generateMarketingPlan = async () => {

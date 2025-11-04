@@ -26,7 +26,6 @@ interface EbookChapterProps {
   onGenerateSubChapterContent: (chapterId: string, subChapterId: string) => void;
   onRemoveChapter: (id: string) => void;
   isGenerating: boolean;
-  apiKey: string;
   totalChapters: number;
 }
 
@@ -47,7 +46,6 @@ export const EbookChapter: React.FC<EbookChapterProps> = ({
   onGenerateSubChapterContent,
   onRemoveChapter,
   isGenerating,
-  apiKey,
   totalChapters
 }) => {
   const {
@@ -127,7 +125,7 @@ export const EbookChapter: React.FC<EbookChapterProps> = ({
             variant="outline"
             size="sm"
             onClick={() => onSplitChapter(chapter.id)}
-            disabled={isGenerating || !apiKey}
+            disabled={isGenerating}
             title="Diviser automatiquement"
           >
             <Split className="h-4 w-4 mr-1" />
@@ -137,7 +135,7 @@ export const EbookChapter: React.FC<EbookChapterProps> = ({
             variant="default"
             size="sm"
             onClick={() => onGenerateChapterContent(chapter.id)}
-            disabled={isGenerating || !apiKey || !chapter.title}
+            disabled={isGenerating || !chapter.title}
             title="Rédiger le chapitre (350 mots)"
             className="bg-primary text-primary-foreground hover:bg-primary/90"
           >
@@ -204,7 +202,7 @@ export const EbookChapter: React.FC<EbookChapterProps> = ({
                 variant="default"
                 size="sm"
                 onClick={() => onGenerateSubChapterContent(chapter.id, subChapter.id)}
-                disabled={isGenerating || !apiKey || !subChapter.title}
+                disabled={isGenerating || !subChapter.title}
                 title="Rédiger le sous-chapitre (300 mots)"
                 className="bg-green-600 hover:bg-green-700 text-white"
               >

@@ -25,14 +25,12 @@ interface SubChapter {
 interface EbookMarketingProps {
   ebookTitle: string;
   chapters: Chapter[];
-  apiKey: string;
   isGenerating: boolean;
 }
 
 export const EbookMarketing: React.FC<EbookMarketingProps> = ({
   ebookTitle,
   chapters,
-  apiKey,
   isGenerating
 }) => {
   const [socialPosts, setSocialPosts] = useState<string[]>([]);
@@ -44,127 +42,27 @@ export const EbookMarketing: React.FC<EbookMarketingProps> = ({
   const [budget, setBudget] = useState('');
 
   const generateSocialPosts = async () => {
-    if (!apiKey || !ebookTitle) {
-      toast.error('Clé API ou titre d\'ebook manquant');
+    if (!ebookTitle) {
+      toast.error('Titre requis');
       return;
     }
-
-    try {
-      toast.loading('Génération des posts réseaux sociaux...', { id: 'social-posts' });
-      
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [
-            {
-              role: 'system',
-              content: 'Tu es un expert en marketing digital. Génère des posts engageants pour les réseaux sociaux.'
-            },
-            {
-              role: 'user',
-              content: `Génère 5 posts différents pour promouvoir l'ebook "${ebookTitle}" sur les réseaux sociaux. Inclus des hashtags pertinents et des call-to-action. Varie les formats : informatif, question, témoignage, bénéfice, urgence.`
-            }
-          ],
-          temperature: 0.8,
-        }),
-      });
-
-      const data = await response.json();
-      const posts = data.choices[0]?.message?.content?.split('\n\n').filter((post: string) => post.trim());
-      setSocialPosts(posts || []);
-      toast.success('Posts générés avec succès !', { id: 'social-posts' });
-    } catch (error) {
-      console.error('Erreur génération posts:', error);
-      toast.error('Erreur lors de la génération', { id: 'social-posts' });
-    }
+    toast.info('Fonctionnalité disponible via la page de gestion');
   };
 
   const generateLandingPage = async () => {
-    if (!apiKey || !ebookTitle) {
-      toast.error('Clé API ou titre d\'ebook manquant');
+    if (!ebookTitle) {
+      toast.error('Titre requis');
       return;
     }
-
-    try {
-      toast.loading('Création de la landing page...', { id: 'landing-page' });
-      
-      const chaptersText = chapters.map(ch => ch.title).join(', ');
-      
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [
-            {
-              role: 'system',
-              content: 'Tu es un expert en création de landing pages. Génère du HTML moderne et responsive.'
-            },
-            {
-              role: 'user',
-              content: `Crée une landing page HTML complète pour l'ebook "${ebookTitle}". Chapitres: ${chaptersText}. Inclus: hero section, bénéfices, table des matières, témoignages, FAQ, formulaire d'achat. Utilise Bootstrap et du CSS moderne.`
-            }
-          ],
-          temperature: 0.7,
-        }),
-      });
-
-      const data = await response.json();
-      setLandingPageHtml(data.choices[0]?.message?.content || '');
-      toast.success('Landing page créée !', { id: 'landing-page' });
-    } catch (error) {
-      console.error('Erreur création landing page:', error);
-      toast.error('Erreur lors de la création', { id: 'landing-page' });
-    }
+    toast.info('Fonctionnalité disponible via la page de gestion');
   };
 
   const generateEmailCampaign = async () => {
-    if (!apiKey || !ebookTitle) {
-      toast.error('Clé API ou titre d\'ebook manquant');
+    if (!ebookTitle) {
+      toast.error('Titre requis');
       return;
     }
-
-    try {
-      toast.loading('Génération de la campagne email...', { id: 'email-campaign' });
-      
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [
-            {
-              role: 'system',
-              content: 'Tu es un expert en email marketing. Crée des séquences d\'emails engageantes.'
-            },
-            {
-              role: 'user',
-              content: `Crée une séquence de 5 emails pour promouvoir l'ebook "${ebookTitle}". Inclus: email de bienvenue, présentation de l'auteur, aperçu du contenu, témoignages, offre spéciale. Chaque email avec objet accrocheur.`
-            }
-          ],
-          temperature: 0.8,
-        }),
-      });
-
-      const data = await response.json();
-      const emails = data.choices[0]?.message?.content?.split('EMAIL').filter((email: string) => email.trim());
-      setEmailTemplates(emails || []);
-      toast.success('Campagne email générée !', { id: 'email-campaign' });
-    } catch (error) {
-      console.error('Erreur génération emails:', error);
-      toast.error('Erreur lors de la génération', { id: 'email-campaign' });
-    }
+    toast.info('Fonctionnalité disponible via la page de gestion');
   };
 
   const generateAdCampaigns = async () => {

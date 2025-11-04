@@ -10,7 +10,6 @@ import { toast } from 'sonner';
 interface EbookCoverGeneratorProps {
   ebookTitle: string;
   authorName: string;
-  apiKey: string;
 }
 
 type CoverStyle = 'professional' | 'minimalist' | 'artistic' | 'modern' | 'vintage';
@@ -25,8 +24,7 @@ const styleDescriptions: Record<CoverStyle, string> = {
 
 export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
   ebookTitle,
-  authorName,
-  apiKey
+  authorName
 }) => {
   const [coverStyle, setCoverStyle] = useState<CoverStyle>('professional');
   const [customPrompt, setCustomPrompt] = useState('');
@@ -39,50 +37,7 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
       return;
     }
 
-    if (!apiKey) {
-      toast.error('Veuillez configurer votre clé API OpenAI');
-      return;
-    }
-
-    setIsGenerating(true);
-    
-    try {
-      const basePrompt = `Book cover design for "${ebookTitle}" by ${authorName || 'Author'}. ${styleDescriptions[coverStyle]}. High quality, professional book cover, suitable for Amazon KDP, 1600x2560 aspect ratio.`;
-      const finalPrompt = customPrompt ? `${basePrompt}\n\nAdditional details: ${customPrompt}` : basePrompt;
-
-      const response = await fetch('https://api.openai.com/v1/images/generations', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-          model: 'gpt-image-1',
-          prompt: finalPrompt,
-          n: 1,
-          size: '1024x1536',
-          quality: 'high',
-          output_format: 'png'
-        })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'Erreur lors de la génération');
-      }
-
-      const data = await response.json();
-      const imageData = data.data[0].b64_json;
-      const imageUrl = `data:image/png;base64,${imageData}`;
-      
-      setGeneratedCover(imageUrl);
-      toast.success('Couverture générée avec succès !');
-    } catch (error) {
-      console.error('Erreur génération couverture:', error);
-      toast.error(error instanceof Error ? error.message : 'Erreur lors de la génération de la couverture');
-    } finally {
-      setIsGenerating(false);
-    }
+    toast.info('Génération de couverture disponible via la page de gestion');
   };
 
   const downloadCover = () => {
@@ -144,7 +99,7 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
 
           <Button 
             onClick={generateCover}
-            disabled={isGenerating || !ebookTitle || !apiKey}
+            disabled={isGenerating || !ebookTitle}
             className="w-full"
           >
             {isGenerating ? (
