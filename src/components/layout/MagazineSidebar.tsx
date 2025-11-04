@@ -39,6 +39,7 @@ const sidebarItems: SidebarItem[] = [
   { id: 'writing', label: 'Rédaction', icon: PenTool, color: 'honey-gold' },
   { id: 'tools', label: 'Outils', icon: Wrench, color: 'royal-purple' },
   { id: 'kdp', label: 'KDP', icon: BookMarked, color: 'emerald-500' },
+  { id: 'back-cover', label: '4ème Couverture', icon: FileText, color: 'royal-purple', badge: 'IA' },
   { id: 'advanced', label: 'Business', icon: Briefcase, color: 'cobalt-blue' },
   { id: 'marketing', label: 'Marketing', icon: Megaphone, color: 'coral-pink' },
   { id: 'monetization', label: 'Monétisation', icon: DollarSign, color: 'honey-gold' },

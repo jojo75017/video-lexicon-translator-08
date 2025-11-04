@@ -41,6 +41,7 @@ import { EbookKdpTools } from '@/components/ebook/EbookKdpTools';
 import { EbookPreview } from '@/components/ebook/EbookPreview';
 import { EbookCoverGenerator } from '@/components/ebook/EbookCoverGenerator';
 import { EbookWritingAssistant } from '@/components/ebook/EbookWritingAssistant';
+import { EbookBackCoverGenerator } from '@/components/ebook/EbookBackCoverGenerator';
 import heroEbook from '@/assets/hero-ebook-robot.png';
 
 // Hooks et données
@@ -55,7 +56,7 @@ interface EbookPlannerPageProps {
 const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail, subscriberData }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isGenerating, generateChapterContent, generateSubChapterContent, generateEbookPlan, generateBookSummary, generateEbookCover, optimizeForSEO, generateKDPDescription, generateKDPKeywords, generateKDPCategories } = useSubscriptionGeneration(subscriberEmail);
+  const { isGenerating, generateChapterContent, generateSubChapterContent, generateEbookPlan, generateBookSummary, generateEbookCover, optimizeForSEO, generateKDPDescription, generateKDPKeywords, generateKDPCategories, generateBackCover } = useSubscriptionGeneration(subscriberEmail);
   
   // États principaux
   const [ebookTitle, setEbookTitle] = useState(location.state?.suggestedTitle || '');
@@ -779,6 +780,19 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail, su
             ebookTitle={ebookTitle}
             chapters={chapters}
             isGenerating={isGenerating}
+          />
+        );
+      
+      case 'back-cover':
+        return (
+          <EbookBackCoverGenerator
+            ebookTitle={ebookTitle}
+            authorName={authorName}
+            chapters={chapters}
+            isGenerating={isGenerating}
+            onGenerate={async (tone, audience, highlights) => {
+              return await generateBackCover(ebookTitle, authorName, chapters, tone, audience, highlights);
+            }}
           />
         );
       

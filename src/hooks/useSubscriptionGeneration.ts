@@ -228,6 +228,48 @@ Réponds avec un tableau JSON de catégories : ["catégorie1", "catégorie2",...
     return null;
   };
 
+  const generateBackCover = async (
+    ebookTitle: string, 
+    authorName: string, 
+    chapters: Chapter[], 
+    tone: string, 
+    audience: string, 
+    highlights: string
+  ) => {
+    const chaptersText = chapters.map(c => c.title).join(', ');
+    const highlightsText = highlights ? `Points forts à mettre en avant : ${highlights}` : '';
+    
+    const prompt = `Génère une 4ème de couverture professionnelle pour un ebook intitulé "${ebookTitle}" par ${authorName}.
+
+Chapitres : ${chaptersText}
+Ton : ${tone}
+Public : ${audience}
+${highlightsText}
+
+Structure attendue :
+1. **Hook** (1-2 phrases percutantes qui captent l'attention)
+2. **Problème** (quel défi ou besoin le livre résout)
+3. **Solution** (comment le livre y répond)
+4. **Contenu** (aperçu des chapitres principaux)
+5. **Bénéfices** (ce que le lecteur va gagner)
+6. **Call-to-Action** (appel à l'action persuasif)
+
+Contraintes :
+- Maximum 2000 caractères pour Amazon KDP
+- Style persuasif, professionnel, orienté bénéfices
+- Langage adapté au public cible
+- Utilise le ton demandé
+- Inclure les mots-clés naturellement
+
+Réponds avec la description complète uniquement, sans titre de section.`;
+
+    const content = await callGenerateContent('covers_generated', prompt);
+    if (content) {
+      toast.success('4ème de couverture générée !');
+    }
+    return content;
+  };
+
   return {
     isGenerating,
     generateChapterContent,
@@ -238,6 +280,7 @@ Réponds avec un tableau JSON de catégories : ["catégorie1", "catégorie2",...
     optimizeForSEO,
     generateKDPDescription,
     generateKDPKeywords,
-    generateKDPCategories
+    generateKDPCategories,
+    generateBackCover
   };
 };
