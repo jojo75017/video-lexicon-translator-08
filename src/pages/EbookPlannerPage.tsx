@@ -415,15 +415,15 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail, su
           <div className="space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-8">
-                <Card className="shadow-lg border-0 bg-white/95 backdrop-blur-sm">
-                  <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 rounded-t-lg">
-                    <CardTitle className="flex items-center gap-3 text-xl font-bold text-primary">
-                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <BookOpen className="h-5 w-5 text-primary" />
+                <Card className="shadow-lg border-2 bg-white/95 backdrop-blur-sm" style={{ borderColor: 'hsl(var(--coral-pink))' }}>
+                  <CardHeader className="rounded-t-lg" style={{ background: 'linear-gradient(135deg, hsl(var(--coral-pink) / 0.15) 0%, hsl(var(--royal-purple) / 0.15) 100%)' }}>
+                    <CardTitle className="flex items-center gap-3 text-xl font-bold" style={{ color: 'hsl(var(--royal-purple))' }}>
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, hsl(var(--coral-pink)) 0%, hsl(var(--royal-purple)) 100%)' }}>
+                        <BookOpen className="h-5 w-5 text-white" />
                       </div>
                       Informations générales
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription style={{ color: 'hsl(var(--royal-purple) / 0.8)' }}>
                       Définissez les informations de base de votre ebook
                     </CardDescription>
                   </CardHeader>
@@ -476,6 +476,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail, su
                         onClick={generateAutomaticPlan} 
                         disabled={!ebookTitle || isGenerating}
                         className="flex-1"
+                        style={{ background: 'linear-gradient(135deg, hsl(var(--cobalt-blue)) 0%, hsl(var(--royal-purple)) 100%)' }}
                       >
                         <Wand2 className="h-4 w-4 mr-2" />
                         {isGenerating ? 'Génération...' : '✨ Générer automatiquement'}
@@ -491,12 +492,12 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail, su
                   </CardContent>
                 </Card>
 
-                <Card className="shadow-lg border-0 bg-white/95 backdrop-blur-sm">
-                  <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 rounded-t-lg">
+                <Card className="shadow-lg border-2 bg-white/95 backdrop-blur-sm" style={{ borderColor: 'hsl(var(--cobalt-blue))' }}>
+                  <CardHeader className="rounded-t-lg" style={{ background: 'linear-gradient(135deg, hsl(var(--cobalt-blue) / 0.15) 0%, hsl(var(--royal-purple) / 0.1) 100%)' }}>
                     <div className="flex items-center justify-between">
-                      <CardTitle className="flex items-center gap-3 text-xl font-bold text-primary">
-                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                          <BookOpen className="h-5 w-5 text-primary" />
+                      <CardTitle className="flex items-center gap-3 text-xl font-bold" style={{ color: 'hsl(var(--cobalt-blue))' }}>
+                        <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, hsl(var(--cobalt-blue)) 0%, hsl(190 85% 65%) 100%)' }}>
+                          <BookOpen className="h-5 w-5 text-white" />
                         </div>
                         Structure des chapitres
                       </CardTitle>
@@ -506,12 +507,13 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail, su
                             onClick={mergeSelectedChapters}
                             variant="outline"
                             size="sm"
+                            style={{ borderColor: 'hsl(var(--cobalt-blue))', color: 'hsl(var(--cobalt-blue))' }}
                           >
                             <Merge className="h-3 w-3 mr-1" />
                             Fusionner ({selectedChapters.length})
                           </Button>
                         )}
-                        <Button onClick={addChapter} size="sm">
+                        <Button onClick={addChapter} size="sm" style={{ background: 'linear-gradient(135deg, hsl(var(--cobalt-blue)) 0%, hsl(190 85% 65%) 100%)' }}>
                           <Plus className="h-4 w-4 mr-2" />
                           Ajouter un chapitre
                         </Button>
@@ -608,13 +610,13 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail, su
               </div>
 
               {/* Résumé automatique */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+              <Card className="border-2" style={{ borderColor: 'hsl(var(--honey-gold))' }}>
+                <CardHeader style={{ background: 'linear-gradient(135deg, hsl(var(--honey-gold) / 0.15) 0%, hsl(150 75% 60% / 0.1) 100%)' }}>
+                  <CardTitle className="flex items-center gap-2" style={{ color: 'hsl(var(--honey-gold))' }}>
                     <Eye className="h-5 w-5" />
                     Résumé de l'Ebook
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription style={{ color: 'hsl(var(--honey-gold) / 0.8)' }}>
                     Génère un résumé attractif pour votre ebook
                   </CardDescription>
                 </CardHeader>
@@ -658,13 +660,13 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail, su
               </Card>
 
               {/* Concepts de couverture */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+              <Card className="border-2" style={{ borderColor: 'hsl(var(--royal-purple))' }}>
+                <CardHeader style={{ background: 'linear-gradient(135deg, hsl(var(--royal-purple) / 0.15) 0%, hsl(var(--coral-pink) / 0.1) 100%)' }}>
+                  <CardTitle className="flex items-center gap-2" style={{ color: 'hsl(var(--royal-purple))' }}>
                     <Palette className="h-5 w-5" />
                     Concepts de Couverture
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription style={{ color: 'hsl(var(--royal-purple) / 0.8)' }}>
                     5 idées créatives pour votre couverture
                   </CardDescription>
                 </CardHeader>
