@@ -37,29 +37,48 @@ serve(async (req) => {
     
     // Variations de style pour chaque version
     const styleVariations = [
-      'minimaliste avec typographie élégante',
-      'dynamique avec illustrations colorées',
-      'professionnel avec design épuré'
+      'minimaliste avec fond clair et sections délimitées',
+      'élégant avec texture subtile et typographie classique',
+      'moderne avec couleurs douces et design épuré'
     ];
     
     const currentStyle = styleVariations[(variationNum - 1) % 3];
     
-    const imagePrompt = `Create a professional book cover in ${currentStyle} style for a ${genreText} ebook titled "${ebookTitle}" by ${authorName || 'Author'}. 
+    const imagePrompt = `Create a professional BACK COVER (4ème de couverture) layout for Amazon KDP book.
 
-Requirements:
-- Professional and eye-catching design suitable for Amazon KDP
-- Title "${ebookTitle}" clearly visible and elegant in the center
-- Author name "${authorName}" subtly placed at the bottom
-- Modern and sales-oriented design
-- Harmonious and professional color palette
-- Optimized for Amazon thumbnail (portrait 6:9 ratio)
+CRITICAL LAYOUT - TWO SECTION DESIGN:
+
+SECTION 1 (TOP 65%):
+- Header: Small elegant text "À propos de ce livre" or decorative element
+- Main area for book description/summary
+- Light background (cream, light gray, or subtle texture)
+- Clear text zone with subtle borders or frame
+- Leave space for actual text to be added later
+
+SECTION 2 (BOTTOM 35%):
+- Header: "À propos de l'auteur" or "About the Author"
+- Area for author biography
+- Slightly different background shade to distinguish from top section
+- Small placeholder for author photo (left side)
+- Clear text zone for bio text
+
+GENERAL DESIGN:
+- Title reference: "${ebookTitle}"
+- Author: ${authorName || 'Author'}
 - Style: ${currentStyle}
-- Variation: ${variationNum}
-- FULL BLEED: The design must extend to all edges with NO WHITE BORDERS or margins
-- The entire canvas should be filled with the design
+- Genre: ${genreText}
+- Variation ${variationNum}/3 (make unique)
 
-Portrait format, high quality, ${genreText} style.
-CRITICAL: Text must be READABLE and CLEAR. NO white borders or empty margins around the cover.`;
+TECHNICAL REQUIREMENTS:
+- Portrait format 2:3 ratio (1024x1536)
+- Full bleed - NO WHITE BORDERS
+- Professional Amazon KDP back cover style
+- Clean, readable layout
+- ISBN barcode placeholder (bottom right corner)
+- Subtle design elements but keep it clean for text readability
+- Each section clearly separated with line or color variation
+
+This should look like a REAL book back cover template with TWO distinct zones for text.`;
 
     console.log('Generating cover image with OpenAI for variation', variationNum);
 

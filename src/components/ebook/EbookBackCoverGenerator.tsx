@@ -155,10 +155,10 @@ export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = (
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <ImageIcon className="w-5 h-5 text-purple-600" />
-            Générateur de Couverture IA
+            Générateur de 4ème de Couverture IA (Back Cover)
           </CardTitle>
           <CardDescription>
-            Créez une image de couverture professionnelle avec l'IA
+            Créez une image de 4ème de couverture professionnelle avec deux sections : description du livre + bio auteur
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -191,7 +191,7 @@ export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = (
                 ) : (
                   <>
                     <Sparkles className="w-4 h-4 mr-2" />
-                    Générer Couverture
+                    Générer 4ème de Couverture
                   </>
                 )}
               </Button>
@@ -208,18 +208,18 @@ export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = (
                     onClick={() => setSelectedCover(index)}
                     size="sm"
                   >
-                    Couverture {index + 1}
+                    4ème de Couv. {index + 1}
                   </Button>
                 ))}
               </div>
 
               {selectedCover !== null && (
                 <div className="space-y-2">
-                  <Label>Aperçu de la couverture sélectionnée</Label>
+                  <Label>Aperçu de la 4ème de couverture sélectionnée</Label>
                   <div className="relative w-full max-w-sm mx-auto bg-gradient-to-br from-gray-100 to-gray-200 p-4 rounded-lg">
                     <img
                       src={coverImages[selectedCover]}
-                      alt={`Couverture ${selectedCover + 1}`}
+                      alt={`4ème de couverture ${selectedCover + 1}`}
                       className="w-full rounded shadow-2xl"
                       style={{ objectFit: 'contain', aspectRatio: '2/3' }}
                     />
