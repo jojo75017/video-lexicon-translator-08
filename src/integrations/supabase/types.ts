@@ -14,7 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      subscribers: {
+        Row: {
+          chapters_generated: number
+          covers_generated: number
+          created_at: string
+          ebook_plans_generated: number
+          email: string
+          expires_at: string | null
+          id: string
+          plan_type: string
+          status: string
+          subchapters_generated: number
+          updated_at: string
+        }
+        Insert: {
+          chapters_generated?: number
+          covers_generated?: number
+          created_at?: string
+          ebook_plans_generated?: number
+          email: string
+          expires_at?: string | null
+          id?: string
+          plan_type?: string
+          status?: string
+          subchapters_generated?: number
+          updated_at?: string
+        }
+        Update: {
+          chapters_generated?: number
+          covers_generated?: number
+          created_at?: string
+          ebook_plans_generated?: number
+          email?: string
+          expires_at?: string | null
+          id?: string
+          plan_type?: string
+          status?: string
+          subchapters_generated?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
