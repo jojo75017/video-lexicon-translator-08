@@ -852,7 +852,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail, su
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream via-background to-cream/50 flex">
+    <div className="min-h-screen flex" style={{ background: 'linear-gradient(135deg, hsl(var(--cream)) 0%, hsl(var(--cobalt-blue) / 0.1) 50%, hsl(var(--coral-pink) / 0.05) 100%)' }}>
       {/* Magazine Sidebar */}
       <MagazineSidebar 
         activeTab={activeTab}
@@ -864,7 +864,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail, su
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
         {/* Hero Header */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-primary via-accent to-primary/80">
+        <div className="relative overflow-hidden" style={{ background: 'var(--gradient-magazine-hero)' }}>
           <div className="absolute inset-0 bg-grid-white/10"></div>
           {/* Image décorative du tableau de bord */}
           <img
@@ -888,7 +888,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail, su
             </Button>
             
             <div className="max-w-4xl mx-auto text-center mt-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 mb-6 rounded-2xl bg-gradient-to-br from-accent/30 to-primary/30 backdrop-blur-sm border border-white/20 shadow-lg">
+              <div className="inline-flex items-center justify-center w-16 h-16 mb-6 rounded-2xl backdrop-blur-sm border-2 border-white/30 shadow-2xl" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 100%)' }}>
                 <BookOpen className="w-8 h-8 text-white drop-shadow-lg" />
               </div>
               
