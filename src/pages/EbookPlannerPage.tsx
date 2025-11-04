@@ -40,7 +40,7 @@ import { EbookKdpTools } from '@/components/ebook/EbookKdpTools';
 import { EbookPreview } from '@/components/ebook/EbookPreview';
 import { EbookCoverGenerator } from '@/components/ebook/EbookCoverGenerator';
 import { EbookWritingAssistant } from '@/components/ebook/EbookWritingAssistant';
-import heroEbook from '@/assets/icons/ebook-ai.png';
+import heroEbook from '@/assets/hero-ebook-robot.png';
 
 // Hooks et données
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
