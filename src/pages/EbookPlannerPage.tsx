@@ -4,12 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   BookOpen, Plus, Wand2, RotateCcw, ArrowLeft, Merge, Sparkles, Eye, Search, Palette
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { MagazineSidebar } from '@/components/layout/MagazineSidebar';
 import EbookImageBank from '@/components/ebook/EbookImageBank';
 import { EbookMarketing } from '@/components/ebook/EbookMarketing';
 import { EbookMonetization } from '@/components/ebook/EbookMonetization';
@@ -73,6 +73,10 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail, su
   const [kdpDescription, setKdpDescription] = useState('');
   const [kdpKeywords, setKdpKeywords] = useState('');
   const [kdpCategories, setKdpCategories] = useState('');
+  
+  // Navigation state
+  const [activeTab, setActiveTab] = useState('planner');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   // Configuration du glisser-déposer
   const sensors = useSensors(
@@ -403,156 +407,11 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail, su
     toast.success('Image ajoutée à votre ebook !');
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-slate-50 to-blue-50">
-      {/* Hero Section Professionnel */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-primary/95 via-primary to-primary/90">
-        <div className="absolute inset-0 bg-grid-white/10"></div>
-        <div className="relative container mx-auto px-6 py-20">
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/ebook-ideas')}
-            className="absolute top-6 left-6 text-white/90 hover:text-white hover:bg-white/10 transition-all duration-200"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Retour aux idées
-          </Button>
-          
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 mb-8 rounded-2xl bg-white/10 backdrop-blur-sm">
-              <BookOpen className="w-8 h-8 text-white" />
-            </div>
-            
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-white">
-              Générateur d'Ebook
-              <span className="block text-3xl md:text-4xl lg:text-5xl text-white/80 font-medium mt-2">
-                Professionnel
-              </span>
-            </h1>
-            
-            <p className="text-lg md:text-xl text-white/90 mb-10 max-w-2xl mx-auto leading-relaxed">
-              Créez des livres numériques de qualité professionnelle avec l'intelligence artificielle. 
-              De l'idée à la publication sur Amazon KDP.
-            </p>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto">
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3 border border-white/20">
-                <div className="flex items-center justify-center gap-2 text-white font-medium">
-                  <Wand2 className="h-4 w-4" />
-                  <span>IA Avancée</span>
-                </div>
-              </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3 border border-white/20">
-                <div className="flex items-center justify-center gap-2 text-white font-medium">
-                  <BookOpen className="h-4 w-4" />
-                  <span>Export PDF</span>
-                </div>
-              </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3 border border-white/20">
-                <div className="flex items-center justify-center gap-2 text-white font-medium">
-                  <Sparkles className="h-4 w-4" />
-                  <span>Outils KDP</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="container mx-auto px-6 -mt-10 relative z-10">
-        {/* Navigation Professionnelle */}
-        <div className="mb-12">
-          <Tabs defaultValue="planner" className="space-y-8">
-            <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-1 shadow-lg border border-white/20">
-              <TabsList className="grid w-full grid-cols-6 lg:grid-cols-12 bg-transparent gap-1 p-1">
-                <TabsTrigger 
-                  value="planner" 
-                  className="text-xs lg:text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm rounded-lg transition-all duration-200 hover:bg-gray-100"
-                >
-                  <span className="hidden lg:inline">📝 Planificateur</span>
-                  <span className="lg:hidden">📝 Plan</span>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="templates" 
-                  className="text-xs lg:text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm rounded-lg transition-all duration-200 hover:bg-gray-100"
-                >
-                  <span className="hidden lg:inline">📋 Templates</span>
-                  <span className="lg:hidden">📋 Mod.</span>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="writing" 
-                  className="text-xs lg:text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm rounded-lg transition-all duration-200 hover:bg-gray-100"
-                >
-                  <span className="hidden lg:inline">✍️ Rédaction</span>
-                  <span className="lg:hidden">✍️ Écr.</span>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="tools" 
-                  className="text-xs lg:text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm rounded-lg transition-all duration-200 hover:bg-gray-100"
-                >
-                  <span className="hidden lg:inline">🛠️ Outils</span>
-                  <span className="lg:hidden">🛠️ Out.</span>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="kdp" 
-                  className="text-xs lg:text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm rounded-lg transition-all duration-200 hover:bg-gray-100"
-                >
-                  <span className="hidden lg:inline">📖 KDP</span>
-                  <span className="lg:hidden">📖 KDP</span>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="advanced" 
-                  className="text-xs lg:text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm rounded-lg transition-all duration-200 hover:bg-gray-100"
-                >
-                  <span className="hidden lg:inline">💼 Business</span>
-                  <span className="lg:hidden">💼 Biz</span>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="marketing" 
-                  className="text-xs lg:text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm rounded-lg transition-all duration-200 hover:bg-gray-100"
-                >
-                  <span className="hidden lg:inline">📢 Marketing</span>
-                  <span className="lg:hidden">📢 Mrk</span>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="monetization" 
-                  className="text-xs lg:text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm rounded-lg transition-all duration-200 hover:bg-gray-100"
-                >
-                  <span className="hidden lg:inline">💰 Monétisation</span>
-                  <span className="lg:hidden">💰 Mon</span>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="export" 
-                  className="text-xs lg:text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm rounded-lg transition-all duration-200 hover:bg-gray-100"
-                >
-                  <span className="hidden lg:inline">📤 Export</span>
-                  <span className="lg:hidden">📤 Exp</span>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="toc" 
-                  className="text-xs lg:text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm rounded-lg transition-all duration-200 hover:bg-gray-100"
-                >
-                  <span className="hidden lg:inline">📚 Sommaire</span>
-                  <span className="lg:hidden">📚 Som</span>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="images" 
-                  className="text-xs lg:text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm rounded-lg transition-all duration-200 hover:bg-gray-100"
-                >
-                  <span className="hidden lg:inline">🎨 Images</span>
-                  <span className="lg:hidden">🎨 Img</span>
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="settings" 
-                  className="text-xs lg:text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-sm rounded-lg transition-all duration-200 hover:bg-gray-100"
-                >
-                  <span className="hidden lg:inline">⚙️ Paramètres</span>
-                  <span className="lg:hidden">⚙️ Cfg</span>
-                </TabsTrigger>
-              </TabsList>
-            </div>
-
-          <TabsContent value="planner" className="space-y-8">
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'planner':
+        return (
+          <div className="space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-8">
                 <Card className="shadow-lg border-0 bg-white/95 backdrop-blur-sm">
@@ -712,21 +571,24 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail, su
                 />
               </div>
             </div>
-          </TabsContent>
-
-          <TabsContent value="templates">
-            <EbookTemplates onApplyTemplate={applyTemplate} />
-          </TabsContent>
-
-          <TabsContent value="writing">
-            <EbookWriting 
-              chapters={chapters}
-              onUpdateChapterContent={updateChapterContent}
-              onUpdateSubChapterContent={updateSubChapterContent}
-            />
-          </TabsContent>
-
-          <TabsContent value="tools" className="space-y-6">
+          </div>
+        );
+      
+      case 'templates':
+        return <EbookTemplates onApplyTemplate={applyTemplate} />;
+      
+      case 'writing':
+        return (
+          <EbookWriting 
+            chapters={chapters}
+            onUpdateChapterContent={updateChapterContent}
+            onUpdateSubChapterContent={updateSubChapterContent}
+          />
+        );
+      
+      case 'tools':
+        return (
+          <div className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               
               {/* Générateur de couverture IA */}
@@ -844,48 +706,34 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail, su
                 </CardContent>
               </Card>
 
-              {/* Optimisation SEO */}
-              <Card className="md:col-span-2">
+              {/* SEO Optimization */}
+              <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Search className="h-5 w-5" />
                     Optimisation SEO
                   </CardTitle>
                   <CardDescription>
-                    Mots-clés, titres alternatifs et meta descriptions
+                    Mots-clés et optimisation pour Amazon
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <Button 
                     onClick={async () => {
-                      const seoData = await optimizeForSEO(ebookTitle, chapters);
-                      if (seoData) {
-                        const formatted = `
-**Titres optimisés:**
-${seoData.titles.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')}
-
-**Mots-clés:**
-${seoData.keywords.join(', ')}
-
-**Meta Description:**
-${seoData.metaDescription}
-
-**Hashtags:**
-${seoData.hashtags.join(' ')}
-                        `.trim();
-                        setSeoOptimization(formatted);
+                      const seo = await optimizeForSEO(ebookTitle, chapters);
+                      if (seo) {
+                        setSeoOptimization(seo);
                         toast.success('Optimisation SEO générée !');
                       }
                     }}
                     disabled={!ebookTitle || !authorName || isGenerating}
                     className="w-full"
-                    size="lg"
                   >
                     <Search className="h-4 w-4 mr-2" />
-                    Analyser et optimiser pour le SEO
+                    Optimiser pour le SEO
                   </Button>
-                  <p className="text-sm text-muted-foreground">
-                    Obtenez des titres alternatifs, mots-clés et hashtags optimisés pour la visibilité
+                  <p className="text-xs text-muted-foreground">
+                    Améliorez votre visibilité en ligne
                   </p>
                   
                   {seoOptimization && (
@@ -907,272 +755,168 @@ ${seoData.hashtags.join(' ')}
                   )}
                 </CardContent>
               </Card>
-
-              {/* Amazon KDP Tools */}
-              <Card className="md:col-span-2">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    📚 Outils Amazon KDP
-                  </CardTitle>
-                  <CardDescription>
-                    Optimisez votre ebook pour la publication sur Amazon KDP
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <Button 
-                      onClick={async () => {
-                        const description = await generateKDPDescription(ebookTitle, chapters);
-                        if (description) {
-                          setKdpDescription(description);
-                          toast.success('Description KDP générée !');
-                        }
-                      }}
-                      disabled={!ebookTitle || isGenerating}
-                      className="w-full"
-                    >
-                      📝 Description KDP
-                    </Button>
-                    <Button 
-                      onClick={() => toast.info('Fonctionnalité disponible prochainement')}
-                      disabled={!ebookTitle || isGenerating}
-                      className="w-full"
-                    >
-                      🔑 Mots-clés KDP
-                    </Button>
-                    <Button 
-                      onClick={() => toast.info('Fonctionnalité disponible prochainement')}
-                      disabled={!ebookTitle || isGenerating}
-                      className="w-full"
-                    >
-                      📂 Catégories KDP
-                    </Button>
-                  </div>
-
-                  {kdpDescription && (
-                    <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
-                      <div className="flex justify-between items-start gap-2">
-                        <pre className="whitespace-pre-wrap text-sm flex-1">{kdpDescription}</pre>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            navigator.clipboard.writeText(kdpDescription);
-                            toast.success('Copié dans le presse-papier !');
-                          }}
-                        >
-                          Copier
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-
-                  {kdpKeywords && (
-                    <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
-                      <div className="flex justify-between items-start gap-2">
-                        <pre className="whitespace-pre-wrap text-sm flex-1">{kdpKeywords}</pre>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            navigator.clipboard.writeText(kdpKeywords);
-                            toast.success('Copié dans le presse-papier !');
-                          }}
-                        >
-                          Copier
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-
-                  {kdpCategories && (
-                    <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
-                      <div className="flex justify-between items-start gap-2">
-                        <pre className="whitespace-pre-wrap text-sm flex-1">{kdpCategories}</pre>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            navigator.clipboard.writeText(kdpCategories);
-                            toast.success('Copié dans le presse-papier !');
-                          }}
-                        >
-                          Copier
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-
-                  <p className="text-xs text-muted-foreground mt-2 text-center">
-                    Générez description, mots-clés et catégories optimisés pour Amazon KDP
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* Statistiques */}
-              <Card className="md:col-span-2">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Sparkles className="h-5 w-5" />
-                    Statistiques de l'Ebook
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="text-center p-4 bg-muted rounded-lg">
-                      <div className="text-2xl font-bold text-primary">{chapters.length}</div>
-                      <div className="text-sm text-muted-foreground">Chapitres</div>
-                    </div>
-                    <div className="text-center p-4 bg-muted rounded-lg">
-                      <div className="text-2xl font-bold text-primary">
-                        {chapters.reduce((acc, ch) => acc + ch.subChapters.length, 0)}
-                      </div>
-                      <div className="text-sm text-muted-foreground">Sous-chapitres</div>
-                    </div>
-                    <div className="text-center p-4 bg-muted rounded-lg">
-                      <div className="text-2xl font-bold text-primary">
-                        {chapters.filter(ch => ch.content && ch.content.trim().length > 0).length}
-                      </div>
-                      <div className="text-sm text-muted-foreground">Chapitres rédigés</div>
-                    </div>
-                    <div className="text-center p-4 bg-muted rounded-lg">
-                      <div className="text-2xl font-bold text-primary">
-                        {Math.round((chapters.filter(ch => ch.content && ch.content.trim().length > 0).length / Math.max(1, chapters.length)) * 100)}%
-                      </div>
-                      <div className="text-sm text-muted-foreground">Progression</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
             </div>
-          </TabsContent>
+          </div>
+        );
+      
+      case 'kdp':
+        return (
+          <EbookKdpTools
+            ebookTitle={ebookTitle}
+            chapters={chapters}
+            isGenerating={isGenerating}
+          />
+        );
+      
+      case 'advanced':
+        return (
+          <EbookAdvancedFeatures
+            ebookTitle={ebookTitle}
+            chapters={chapters}
+            isGenerating={isGenerating}
+          />
+        );
+      
+      case 'marketing':
+        return (
+          <EbookMarketing
+            ebookTitle={ebookTitle}
+            chapters={chapters}
+            isGenerating={isGenerating}
+          />
+        );
+      
+      case 'monetization':
+        return <EbookMonetization />;
+      
+      case 'export':
+        return (
+          <EbookExporter
+            ebookTitle={ebookTitle}
+            authorName={authorName}
+            preface={preface}
+            conclusion={conclusion}
+            chapters={chapters}
+          />
+        );
+      
+      case 'toc':
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle>Générer la table des matières</CardTitle>
+              <CardDescription>
+                Créez automatiquement une table des matières professionnelle
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button 
+                onClick={generateTableOfContents}
+                disabled={chapters.length === 0}
+                className="w-full"
+              >
+                Générer et copier la table des matières
+              </Button>
+            </CardContent>
+          </Card>
+        );
+      
+      case 'images':
+        return (
+          <EbookImageBank
+            onImageSelect={handleImageSelect}
+            ebookTitle={ebookTitle}
+            chapters={chapters}
+          />
+        );
+      
+      case 'settings':
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle>⚙️ Paramètres</CardTitle>
+              <CardDescription>
+                Configurez les paramètres de votre ebook
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">Options de configuration disponibles prochainement</p>
+            </CardContent>
+          </Card>
+        );
+      
+      default:
+        return null;
+    }
+  };
 
-          <TabsContent value="kdp">
-            <EbookKdpTools 
-              ebookTitle={ebookTitle}
-              chapters={chapters}
-              isGenerating={isGenerating}
-            />
-          </TabsContent>
+  return (
+    <div className="min-h-screen bg-cream flex">
+      {/* Magazine Sidebar */}
+      <MagazineSidebar 
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        isCollapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+      />
 
-          <TabsContent value="advanced">
-            <EbookAdvancedFeatures 
-              ebookTitle={ebookTitle}
-              chapters={chapters}
-              isGenerating={isGenerating}
-            />
-          </TabsContent>
-
-          <TabsContent value="export">
-            <EbookExporter
-              ebookTitle={ebookTitle}
-              authorName={authorName}
-              preface={preface}
-              conclusion={conclusion}
-              chapters={chapters}
-            />
-          </TabsContent>
-
-          <TabsContent value="toc">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BookOpen className="h-5 w-5" />
-                  Table des Matières Automatique
-                </CardTitle>
-                <CardDescription>
-                  Génération automatique avec numérotation et pagination
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button onClick={generateTableOfContents} className="w-full mb-4" size="lg">
-                  <BookOpen className="h-4 w-4 mr-2" />
-                  📖 Générer la table des matières
-                </Button>
-                <p className="text-sm text-muted-foreground text-center">
-                  La table des matières sera copiée dans votre presse-papiers
-                </p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="settings">
-            {/* Settings retirés - pas besoin de clé API */}
-            <div className="space-y-4">
-              <div>
-                <Label>Nombre de chapitres</Label>
-                <Input
-                  type="number"
-                  min="1"
-                  max="20"
-                  value={numberOfChapters}
-                  onChange={(e) => setNumberOfChapters(parseInt(e.target.value) || 8)}
-                />
-              </div>
-              <div className="text-sm text-muted-foreground">
-                <p>Plan: {subscriberData?.plan_type || 'starter'}</p>
-                <p>Chapitres générés: {subscriberData?.chapters_generated || 0}</p>
-                <p>Plans créés: {subscriberData?.ebook_plans_generated || 0}</p>
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="images">
-            <EbookImageBank 
-              onImageSelect={handleImageSelect}
-              ebookTitle={ebookTitle}
-              chapters={chapters}
-            />
+      {/* Main Content */}
+      <main className="flex-1 overflow-y-auto">
+        {/* Hero Header */}
+        <div className="relative overflow-hidden bg-gradient-magazine">
+          <div className="absolute inset-0 bg-grid-white/10"></div>
+          <div className="relative container mx-auto px-6 py-12">
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/ebook-ideas')}
+              className="absolute top-6 left-6 text-white/90 hover:text-white hover:bg-white/10 transition-all duration-200"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Retour aux idées
+            </Button>
             
-            {ebookImages.length > 0 && (
-              <Card className="mt-6 gradient-card glow-effect border-0">
-                <CardHeader>
-                  <CardTitle className="gradient-primary bg-clip-text text-transparent">
-                    📷 Images de votre Ebook
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {ebookImages.map((image, index) => (
-                      <div key={index} className="relative group">
-                        <img 
-                          src={image.url} 
-                          alt={image.title}
-                          className="w-full h-32 object-cover rounded-lg"
-                        />
-                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => setEbookImages(prev => prev.filter((_, i) => i !== index))}
-                          >
-                            Supprimer
-                          </Button>
-                        </div>
-                        <p className="text-xs text-gray-600 mt-1 line-clamp-2">{image.title}</p>
-                      </div>
-                    ))}
+            <div className="max-w-4xl mx-auto text-center mt-8">
+              <div className="inline-flex items-center justify-center w-16 h-16 mb-6 rounded-2xl bg-white/10 backdrop-blur-sm">
+                <BookOpen className="w-8 h-8 text-white" />
+              </div>
+              
+              <h1 className="font-playfair text-4xl md:text-5xl font-bold mb-4 text-white">
+                Studio de Création
+              </h1>
+              
+              <p className="font-inter text-lg text-white/90 mb-8 max-w-2xl mx-auto">
+                Créez des livres numériques de qualité professionnelle avec l'IA
+              </p>
+              
+              <div className="flex items-center justify-center gap-4 flex-wrap">
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-2 border border-white/20">
+                  <div className="flex items-center gap-2 text-white text-sm font-medium">
+                    <Wand2 className="h-4 w-4" />
+                    <span>IA Avancée</span>
                   </div>
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
-
-          <TabsContent value="marketing" className="space-y-6">
-            <EbookMarketing
-              ebookTitle={ebookTitle}
-              chapters={chapters}
-              isGenerating={isGenerating}
-            />
-          </TabsContent>
-
-          <TabsContent value="monetization" className="space-y-6">
-            <EbookMonetization />
-          </TabsContent>
-
-          </Tabs>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-2 border border-white/20">
+                  <div className="flex items-center gap-2 text-white text-sm font-medium">
+                    <BookOpen className="h-4 w-4" />
+                    <span>Export PDF</span>
+                  </div>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-2 border border-white/20">
+                  <div className="flex items-center gap-2 text-white text-sm font-medium">
+                    <Sparkles className="h-4 w-4" />
+                    <span>Outils KDP</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+
+        {/* Content Area */}
+        <div className="container mx-auto px-6 py-8">
+          {renderContent()}
+        </div>
+      </main>
     </div>
   );
 };
