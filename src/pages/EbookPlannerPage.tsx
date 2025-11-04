@@ -872,7 +872,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail, su
             alt="Illustration du tableau de bord ebook - Studio de Création"
             loading="lazy"
             aria-hidden="true"
-            className="pointer-events-none select-none absolute right-0 top-1/2 -translate-y-1/2 w-full h-auto opacity-20 hidden lg:block animate-[float_6s_ease-in-out_infinite]"
+            className="pointer-events-none select-none absolute right-0 top-1/2 -translate-y-1/2 w-full h-auto opacity-50 hidden lg:block animate-[float_6s_ease-in-out_infinite]"
             style={{
               animation: 'float 6s ease-in-out infinite'
             }}
