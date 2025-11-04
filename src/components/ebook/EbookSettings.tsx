@@ -2,8 +2,8 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { Settings } from 'lucide-react';
 
 interface EbookSettingsProps {
@@ -28,10 +28,13 @@ export const EbookSettings: React.FC<EbookSettingsProps> = ({
   isGenerating
 }) => {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>⚙️ Configuration API et Paramètres</CardTitle>
-        <CardDescription>
+    <Card className="border-2" style={{ borderColor: 'hsl(var(--gray-cool))' }}>
+      <CardHeader style={{ background: 'linear-gradient(135deg, hsl(var(--cobalt-blue) / 0.1) 0%, hsl(var(--royal-purple) / 0.05) 100%)' }}>
+        <CardTitle className="flex items-center gap-2" style={{ color: 'hsl(var(--cobalt-blue))' }}>
+          <Settings className="h-5 w-5" />
+          ⚙️ Configuration API et Paramètres
+        </CardTitle>
+        <CardDescription style={{ color: 'hsl(var(--cobalt-blue) / 0.8)' }}>
           Configurez votre clé API OpenAI et les paramètres avancés
         </CardDescription>
       </CardHeader>
