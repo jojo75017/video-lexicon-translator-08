@@ -1,1 +1,10 @@
 project_id = "xvdgazrewsuaqtalqxue"
+
+[functions.generate-content]
+verify_jwt = false
+
+[functions.validate-subscription]
+verify_jwt = false
+
+[functions.add-subscriber]
+verify_jwt = false

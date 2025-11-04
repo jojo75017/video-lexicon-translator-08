@@ -1,0 +1,243 @@
+import { useState } from 'react';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+
+export interface Chapter {
+  id: string;
+  title: string;
+  subChapters: SubChapter[];
+  content?: string;
+}
+
+export interface SubChapter {
+  id: string;
+  title: string;
+  content?: string;
+}
+
+export const useSubscriptionGeneration = (subscriberEmail: string) => {
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const callGenerateContent = async (actionType: string, prompt: string, additionalData?: any) => {
+    if (!subscriberEmail) {
+      toast.error('Email d\'abonné requis');
+      return null;
+    }
+
+    setIsGenerating(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-content', {
+        body: {
+          email: subscriberEmail,
+          actionType,
+          prompt,
+          ...additionalData
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data.error) {
+        toast.error(data.error);
+        return null;
+      }
+
+      return data.content;
+    } catch (error) {
+      console.error('Generation error:', error);
+      toast.error(error instanceof Error ? error.message : 'Erreur lors de la génération');
+      return null;
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const generateChapterContent = async (chapter: Chapter) => {
+    const prompt = `Rédige un chapitre complet de 350 mots exactement sur le sujet : "${chapter.title}".
+    
+Le contenu doit être :
+- Informatif et engageant sur le sujet donné
+- Bien structuré avec des paragraphes
+- Professionnel mais accessible
+- Exactement 350 mots
+- Inclure des mots ou phrases importantes en *italique* pour mettre l'accent
+- Technique et détaillé quand approprié
+
+Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajoutée aux lecteurs sur ce sujet spécifique.`;
+
+    const content = await callGenerateContent('chapters_generated', prompt);
+    if (content) {
+      toast.success('Chapitre généré avec succès !');
+    }
+    return content;
+  };
+
+  const generateSubChapterContent = async (subChapter: SubChapter) => {
+    const prompt = `Rédige le contenu pour le sous-chapitre : "${subChapter.title}".
+    
+Le contenu doit faire environ 200 mots et être :
+- Informatif et pertinent
+- Bien structuré
+- Engageant pour le lecteur
+- Utiliser l'italique (*) pour les points importants`;
+
+    const content = await callGenerateContent('subchapters_generated', prompt);
+    if (content) {
+      toast.success('Sous-chapitre généré !');
+    }
+    return content;
+  };
+
+  const generateEbookPlan = async (ebookTitle: string, authorName: string, numberOfChapters: number) => {
+    const prompt = `Crée un plan détaillé pour un ebook intitulé "${ebookTitle}" par ${authorName}.
+    
+Le plan doit contenir exactement ${numberOfChapters} chapitres principaux.
+
+Format JSON attendu :
+{
+  "preface": "Une préface captivante",
+  "chapters": [
+    {
+      "title": "Titre du chapitre 1",
+      "subChapters": [
+        "Sous-chapitre 1.1",
+        "Sous-chapitre 1.2"
+      ]
+    }
+  ],
+  "conclusion": "Une conclusion percutante"
+}
+
+Réponds UNIQUEMENT avec le JSON, sans texte additionnel.`;
+
+    const content = await callGenerateContent('ebook_plans_generated', prompt);
+    
+    if (content) {
+      try {
+        const parsed = JSON.parse(content);
+        toast.success('Plan généré avec succès !');
+        return parsed;
+      } catch {
+        toast.error('Erreur de format du plan généré');
+        return null;
+      }
+    }
+    return null;
+  };
+
+  const generateBookSummary = async (chapters: Chapter[], ebookTitle: string) => {
+    const chaptersText = chapters.map(c => c.title).join(', ');
+    const prompt = `Génère un résumé de 200 mots pour l'ebook "${ebookTitle}" qui contient ces chapitres : ${chaptersText}`;
+
+    return await callGenerateContent('chapters_generated', prompt);
+  };
+
+  const generateEbookCover = async (ebookTitle: string) => {
+    const prompt = `Génère 3 concepts créatifs de couverture pour l'ebook "${ebookTitle}". Pour chaque concept, décris :
+- Le style visuel
+- Les couleurs principales
+- Les éléments graphiques
+- La typographie suggérée`;
+
+    const content = await callGenerateContent('covers_generated', prompt);
+    if (content) {
+      toast.success('Concepts de couverture générés !');
+    }
+    return content;
+  };
+
+  const optimizeForSEO = async (ebookTitle: string, chapters: Chapter[]) => {
+    const chaptersText = chapters.map(c => c.title).join(', ');
+    const prompt = `Optimise pour le SEO l'ebook "${ebookTitle}" avec ces chapitres : ${chaptersText}.
+    
+Génère :
+1. 5 variantes de titres optimisés SEO
+2. 10 mots-clés principaux
+3. Une meta description de 160 caractères
+4. 15 hashtags pertinents
+
+Format JSON attendu:
+{
+  "titles": ["titre1", "titre2"...],
+  "keywords": ["mot1", "mot2"...],
+  "metaDescription": "description",
+  "hashtags": ["#tag1", "#tag2"...]
+}`;
+
+    const content = await callGenerateContent('chapters_generated', prompt);
+    
+    if (content) {
+      try {
+        return JSON.parse(content);
+      } catch {
+        toast.error('Erreur de format SEO');
+        return null;
+      }
+    }
+    return null;
+  };
+
+  const generateKDPDescription = async (title: string, chapters: Chapter[]) => {
+    const chaptersText = chapters.map(c => c.title).join(', ');
+    const prompt = `Crée une description Amazon KDP attractive pour le livre "${title}" avec ces chapitres : ${chaptersText}.
+    
+La description doit :
+- Faire 2000 caractères maximum
+- Être persuasive et engageante
+- Mettre en avant les bénéfices pour le lecteur
+- Inclure un appel à l'action`;
+
+    return await callGenerateContent('chapters_generated', prompt);
+  };
+
+  const generateKDPKeywords = async (title: string, chapters: Chapter[]) => {
+    const chaptersText = chapters.map(c => c.title).join(', ');
+    const prompt = `Génère 7 mots-clés Amazon KDP pour le livre "${title}" avec ces chapitres : ${chaptersText}.
+Chaque mot-clé doit faire moins de 50 caractères.
+Réponds avec un tableau JSON : ["mot1", "mot2",...]`;
+
+    const content = await callGenerateContent('chapters_generated', prompt);
+    
+    if (content) {
+      try {
+        return JSON.parse(content);
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  };
+
+  const generateKDPCategories = async (title: string, chapters: Chapter[]) => {
+    const chaptersText = chapters.map(c => c.title).join(', ');
+    const prompt = `Suggère 5 catégories Amazon KDP pour le livre "${title}" avec ces chapitres : ${chaptersText}.
+Réponds avec un tableau JSON de catégories : ["catégorie1", "catégorie2",...]`;
+
+    const content = await callGenerateContent('chapters_generated', prompt);
+    
+    if (content) {
+      try {
+        return JSON.parse(content);
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  };
+
+  return {
+    isGenerating,
+    generateChapterContent,
+    generateSubChapterContent,
+    generateEbookPlan,
+    generateBookSummary,
+    generateEbookCover,
+    optimizeForSEO,
+    generateKDPDescription,
+    generateKDPKeywords,
+    generateKDPCategories
+  };
+};

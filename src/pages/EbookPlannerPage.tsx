@@ -42,13 +42,18 @@ import { EbookCoverGenerator } from '@/components/ebook/EbookCoverGenerator';
 import { EbookWritingAssistant } from '@/components/ebook/EbookWritingAssistant';
 
 // Hooks et données
-import { useEbookGeneration, Chapter, SubChapter } from '@/hooks/useEbookGeneration';
+import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
 import { ebookTemplates } from '@/data/ebookTemplates';
 
-const EbookPlannerPage: React.FC = () => {
+interface EbookPlannerPageProps {
+  subscriberEmail: string;
+  subscriberData: any;
+}
+
+const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail, subscriberData }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isGenerating, generateChapterContent, generateSubChapterContent, generateEbookPlan, splitChapterAutomatically, generateBookSummary, generateEbookCover, optimizeForSEO, generateKDPDescription, generateKDPKeywords, generateKDPCategories } = useEbookGeneration();
+  const { isGenerating, generateChapterContent, generateSubChapterContent, generateEbookPlan, generateBookSummary, generateEbookCover, optimizeForSEO, generateKDPDescription, generateKDPKeywords, generateKDPCategories } = useSubscriptionGeneration(subscriberEmail);
   
   // États principaux
   const [ebookTitle, setEbookTitle] = useState(location.state?.suggestedTitle || '');
@@ -56,7 +61,6 @@ const EbookPlannerPage: React.FC = () => {
   const [preface, setPreface] = useState('');
   const [conclusion, setConclusion] = useState('');
   const [chapters, setChapters] = useState<Chapter[]>([]);
-  const [apiKey, setApiKey] = useState('');
   const [numberOfChapters, setNumberOfChapters] = useState(8);
   const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
   const [importText, setImportText] = useState('');
@@ -69,25 +73,6 @@ const EbookPlannerPage: React.FC = () => {
   const [kdpDescription, setKdpDescription] = useState('');
   const [kdpKeywords, setKdpKeywords] = useState('');
   const [kdpCategories, setKdpCategories] = useState('');
-
-  // Charger la clé API au démarrage
-  React.useEffect(() => {
-    const savedApiKey = localStorage.getItem('openai_api_key');
-    if (savedApiKey) {
-      setApiKey(savedApiKey);
-    }
-  }, []);
-
-  // Sauvegarder automatiquement la clé API
-  const updateApiKey = (newApiKey: string) => {
-    setApiKey(newApiKey);
-    if (newApiKey.trim()) {
-      localStorage.setItem('openai_api_key', newApiKey);
-      toast.success('Clé API sauvegardée !');
-    } else {
-      localStorage.removeItem('openai_api_key');
-    }
-  };
 
   // Configuration du glisser-déposer
   const sensors = useSensors(
@@ -263,7 +248,7 @@ const EbookPlannerPage: React.FC = () => {
     const chapter = chapters.find(c => c.id === chapterId);
     if (!chapter) return;
 
-    const content = await generateChapterContent(chapter, apiKey);
+    const content = await generateChapterContent(chapter);
     if (content) {
       updateChapterContent(chapterId, content);
     }
@@ -277,7 +262,7 @@ const EbookPlannerPage: React.FC = () => {
     const subChapter = chapter.subChapters.find(sc => sc.id === subChapterId);
     if (!subChapter) return;
 
-    const content = await generateSubChapterContent(subChapter, apiKey);
+    const content = await generateSubChapterContent(subChapter);
     if (content) {
       updateSubChapterContent(chapterId, subChapterId, content);
     }
@@ -288,8 +273,10 @@ const EbookPlannerPage: React.FC = () => {
     const chapter = chapters.find(c => c.id === chapterId);
     if (!chapter) return;
 
-    const newSubChapters = await splitChapterAutomatically(chapter, apiKey);
-    if (newSubChapters) {
+    // Fonction splitChapterAutomatically retirée (pas dans le nouveau hook)
+    toast.info('Fonction de division automatique non disponible');
+    return;
+    if (false) {
       setChapters(chapters.map(c => 
         c.id === chapterId 
           ? { ...c, subChapters: [...c.subChapters, ...newSubChapters] }
@@ -300,12 +287,12 @@ const EbookPlannerPage: React.FC = () => {
 
   // Générer automatiquement un plan d'ebook
   const generateAutomaticPlan = async () => {
-    if (!ebookTitle || !apiKey) {
-      toast.error('Veuillez entrer un titre et configurer votre clé API');
+    if (!ebookTitle) {
+      toast.error('Veuillez entrer un titre');
       return;
     }
 
-    const planData = await generateEbookPlan(ebookTitle, authorName, numberOfChapters, apiKey);
+    const planData = await generateEbookPlan(ebookTitle, authorName, numberOfChapters);
     if (planData) {
       if (!authorName) {
         setAuthorName(planData.author);
@@ -696,7 +683,7 @@ Réponds uniquement au format JSON:
                     <div className="flex gap-2">
                       <Button 
                         onClick={generateAutomaticPlan} 
-                        disabled={!ebookTitle || !apiKey || isGenerating}
+                        disabled={!ebookTitle || isGenerating}
                         className="flex-1"
                       >
                         <Wand2 className="h-4 w-4 mr-2" />
@@ -767,7 +754,6 @@ Réponds uniquement au format JSON:
                               onGenerateSubChapterContent={handleGenerateSubChapterContent}
                               onRemoveChapter={removeChapter}
                               isGenerating={isGenerating}
-                              apiKey={apiKey}
                               totalChapters={chapters.length}
                             />
                           ))}
@@ -817,7 +803,6 @@ Réponds uniquement au format JSON:
                 <EbookCoverGenerator
                   ebookTitle={ebookTitle}
                   authorName={authorName}
-                  apiKey={apiKey}
                 />
               </div>
 
@@ -825,7 +810,6 @@ Réponds uniquement au format JSON:
               <div className="lg:col-span-2">
                 <EbookWritingAssistant
                   ebookTitle={ebookTitle}
-                  apiKey={apiKey}
                 />
               </div>
 
@@ -843,13 +827,13 @@ Réponds uniquement au format JSON:
                 <CardContent className="space-y-4">
                   <Button 
                     onClick={async () => {
-                      const summary = await generateBookSummary(chapters, ebookTitle, apiKey);
+                      const summary = await generateBookSummary(chapters, ebookTitle);
                       if (summary) {
                         setBookSummary(summary);
                         toast.success('Résumé généré !');
                       }
                     }}
-                    disabled={!ebookTitle || !authorName || !apiKey || isGenerating}
+                    disabled={!ebookTitle || !authorName || isGenerating}
                     className="w-full"
                   >
                     <Eye className="h-4 w-4 mr-2" />
@@ -893,13 +877,13 @@ Réponds uniquement au format JSON:
                 <CardContent className="space-y-4">
                   <Button 
                     onClick={async () => {
-                      const concepts = await generateEbookCover(ebookTitle, apiKey);
+                      const concepts = await generateEbookCover(ebookTitle);
                       if (concepts) {
                         setCoverConcepts(concepts);
                         toast.success('Concepts générés !');
                       }
                     }}
-                    disabled={!ebookTitle || !authorName || !apiKey || isGenerating}
+                    disabled={!ebookTitle || !authorName || isGenerating}
                     className="w-full"
                   >
                     <Palette className="h-4 w-4 mr-2" />
@@ -943,29 +927,26 @@ Réponds uniquement au format JSON:
                 <CardContent className="space-y-4">
                   <Button 
                     onClick={async () => {
-                      const seoData = await optimizeForSEO(ebookTitle, chapters, apiKey);
+                      const seoData = await optimizeForSEO(ebookTitle, chapters);
                       if (seoData) {
                         const formatted = `
-🎯 TITRES OPTIMISÉS SEO:
-${seoData.optimizedTitles.map((title: string, i: number) => `${i+1}. ${title}`).join('\n')}
+**Titres optimisés:**
+${seoData.titles.map((t: string, i: number) => `${i + 1}. ${t}`).join('\n')}
 
-🔑 MOTS-CLÉS PRINCIPAUX:
+**Mots-clés:**
 ${seoData.keywords.join(', ')}
 
-📝 MOTS-CLÉS LONGUE TRAÎNE:
-${seoData.longTailKeywords.join(', ')}
-
-📄 META DESCRIPTION:
+**Meta Description:**
 ${seoData.metaDescription}
 
-#️⃣ HASHTAGS:
+**Hashtags:**
 ${seoData.hashtags.join(' ')}
-                        `;
+                        `.trim();
                         setSeoOptimization(formatted);
                         toast.success('Optimisation SEO générée !');
                       }
                     }}
-                    disabled={!ebookTitle || !authorName || !apiKey || isGenerating}
+                    disabled={!ebookTitle || !authorName || isGenerating}
                     className="w-full"
                     size="lg"
                   >
@@ -1010,13 +991,13 @@ ${seoData.hashtags.join(' ')}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <Button 
                       onClick={async () => {
-                        const description = await generateKDPDescription(ebookTitle, chapters, apiKey);
+                        const description = await generateKDPDescription(ebookTitle, chapters);
                         if (description) {
                           setKdpDescription(description);
                           toast.success('Description KDP générée !');
                         }
                       }}
-                      disabled={!ebookTitle || !apiKey || isGenerating}
+                      disabled={!ebookTitle || isGenerating}
                       className="w-full"
                     >
                       📝 Description KDP
@@ -1153,7 +1134,6 @@ ${seoData.hashtags.join(' ')}
             <EbookKdpTools 
               ebookTitle={ebookTitle}
               chapters={chapters}
-              apiKey={apiKey}
               isGenerating={isGenerating}
             />
           </TabsContent>
@@ -1162,7 +1142,6 @@ ${seoData.hashtags.join(' ')}
             <EbookAdvancedFeatures 
               ebookTitle={ebookTitle}
               chapters={chapters}
-              apiKey={apiKey}
               isGenerating={isGenerating}
             />
           </TabsContent>
@@ -1201,9 +1180,25 @@ ${seoData.hashtags.join(' ')}
           </TabsContent>
 
           <TabsContent value="settings">
-            <EbookSettings 
-              apiKey={apiKey}
-              onUpdateApiKey={updateApiKey}
+            {/* Settings retirés - pas besoin de clé API */}
+            <div className="space-y-4">
+              <div>
+                <Label>Nombre de chapitres</Label>
+                <Input
+                  type="number"
+                  min="1"
+                  max="20"
+                  value={numberOfChapters}
+                  onChange={(e) => setNumberOfChapters(parseInt(e.target.value) || 8)}
+                />
+              </div>
+              <div className="text-sm text-muted-foreground">
+                <p>Plan: {subscriberData?.plan_type || 'starter'}</p>
+                <p>Chapitres générés: {subscriberData?.chapters_generated || 0}</p>
+                <p>Plans créés: {subscriberData?.ebook_plans_generated || 0}</p>
+              </div>
+            </div>
+            <div className="hidden"
               numberOfChapters={numberOfChapters}
               onUpdateNumberOfChapters={setNumberOfChapters}
               importText={importText}
@@ -1258,7 +1253,6 @@ ${seoData.hashtags.join(' ')}
             <EbookMarketing
               ebookTitle={ebookTitle}
               chapters={chapters}
-              apiKey={apiKey}
               isGenerating={isGenerating}
             />
           </TabsContent>
