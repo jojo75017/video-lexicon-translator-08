@@ -31,16 +31,6 @@ const App = () => {
     setIsAuthenticated(true);
   };
 
-  if (!isAuthenticated) {
-    return (
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <SubscriptionAuth onAuthenticated={handleAuthenticated} />
-          <Toaster />
-        </TooltipProvider>
-      </QueryClientProvider>
-    );
-  }
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -48,8 +38,26 @@ const App = () => {
         <div className="min-h-screen bg-background">
           <Routes>
             <Route path="/" element={<Navigate to="/ebook-ideas" replace />} />
-            <Route path="/ebook-ideas" element={<EbookIdeasPage />} />
-            <Route path="/ebook-planner" element={<EbookPlannerPage subscriberEmail={subscriberEmail} subscriberData={subscriberData} />} />
+            <Route
+              path="/ebook-ideas"
+              element={
+                isAuthenticated ? (
+                  <EbookIdeasPage />
+                ) : (
+                  <SubscriptionAuth onAuthenticated={handleAuthenticated} />
+                )
+              }
+            />
+            <Route
+              path="/ebook-planner"
+              element={
+                isAuthenticated ? (
+                  <EbookPlannerPage subscriberEmail={subscriberEmail} subscriberData={subscriberData} />
+                ) : (
+                  <SubscriptionAuth onAuthenticated={handleAuthenticated} />
+                )
+              }
+            />
             <Route path="/admin" element={<AdminPage />} />
           </Routes>
           <Toaster />
