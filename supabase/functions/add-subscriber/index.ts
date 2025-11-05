@@ -1,4 +1,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.78.0';
+import { Resend } from 'npm:resend@2.0.0';
+
+const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,6 +15,144 @@ function generateAccessCode(): string {
     code += chars.charAt(Math.floor(Math.random() * chars.length));
   }
   return code;
+}
+
+function getPlanLimits(planType: string) {
+  const plans: any = {
+    starter: {
+      label: 'Starter',
+      ebooks: '3 ebooks par mois',
+      chapters: '10 chapitres maximum',
+      covers: '3 couvertures par mois',
+      features: ['Génération automatique', 'Export PDF/EPUB', 'Support email']
+    },
+    pro: {
+      label: 'Pro',
+      ebooks: '10 ebooks par mois',
+      chapters: '20 chapitres maximum',
+      covers: '10 couvertures par mois',
+      features: ['Tout de Starter', 'Images IA illimitées', 'Support prioritaire', 'Personnalisation avancée']
+    },
+    enterprise: {
+      label: 'Enterprise',
+      ebooks: 'Ebooks illimités',
+      chapters: 'Chapitres illimités',
+      covers: 'Couvertures illimitées',
+      features: ['Tout de Pro', 'API Access', 'Support dédié 24/7', 'Formation personnalisée']
+    }
+  };
+  return plans[planType] || plans.starter;
+}
+
+async function sendWelcomeEmail(email: string, accessCode: string, planType: string, isNewSubscriber: boolean) {
+  try {
+    const planDetails = getPlanLimits(planType);
+    const subject = isNewSubscriber 
+      ? '🎉 Bienvenue ! Votre accès au Générateur d\'Ebook'
+      : '✅ Votre abonnement a été mis à jour';
+
+    const welcomeMessage = isNewSubscriber
+      ? `<p>Bienvenue sur le <strong>Générateur d'Ebook IA</strong> ! 🎉</p>
+         <p>Votre compte a été créé avec succès et vous êtes maintenant prêt à créer des ebooks professionnels en quelques clics.</p>`
+      : `<p>Votre abonnement au <strong>Générateur d'Ebook IA</strong> a été mis à jour avec succès !</p>`;
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+            .code-box { background: white; border: 3px solid #667eea; border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center; }
+            .code { font-size: 32px; font-weight: bold; color: #667eea; letter-spacing: 4px; font-family: monospace; }
+            .info { background: #e3f2fd; border-left: 4px solid #2196f3; padding: 15px; margin: 20px 0; }
+            .plan-box { background: #f0f9ff; border: 2px solid #0ea5e9; border-radius: 8px; padding: 20px; margin: 20px 0; }
+            .feature-list { list-style: none; padding: 0; }
+            .feature-list li { padding: 8px 0; border-bottom: 1px solid #e0e0e0; }
+            .feature-list li:before { content: "✅ "; color: #10b981; }
+            .footer { text-align: center; margin-top: 30px; color: #666; font-size: 12px; }
+            .cta-button { display: inline-block; background: #667eea; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; font-weight: bold; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>${isNewSubscriber ? '🎉 Bienvenue !' : '✅ Abonnement mis à jour'}</h1>
+              <p style="margin: 10px 0 0 0; opacity: 0.9;">Générateur d'Ebook IA</p>
+            </div>
+            <div class="content">
+              ${welcomeMessage}
+              
+              <div class="code-box">
+                <div style="color: #666; font-size: 14px; margin-bottom: 10px;">Votre code d'accès personnel :</div>
+                <div class="code">${accessCode}</div>
+              </div>
+
+              <div class="info">
+                <strong>📧 Comment vous connecter ?</strong>
+                <ol style="margin: 10px 0 0 0; padding-left: 20px;">
+                  <li>Rendez-vous sur la page de connexion</li>
+                  <li>Entrez votre email : <strong>${email}</strong></li>
+                  <li>Entrez votre code d'accès : <strong>${accessCode}</strong></li>
+                  <li>Cliquez sur "Accéder au générateur"</li>
+                </ol>
+              </div>
+
+              <div class="plan-box">
+                <h2 style="margin: 0 0 15px 0; color: #0ea5e9;">📦 Votre Plan : ${planDetails.label}</h2>
+                <div style="margin-bottom: 15px;">
+                  <strong>Limites mensuelles :</strong>
+                  <ul style="margin: 10px 0; padding-left: 20px;">
+                    <li>📚 ${planDetails.ebooks}</li>
+                    <li>📄 ${planDetails.chapters}</li>
+                    <li>🎨 ${planDetails.covers}</li>
+                  </ul>
+                </div>
+                <strong>Fonctionnalités incluses :</strong>
+                <ul class="feature-list">
+                  ${planDetails.features.map((feature: string) => `<li>${feature}</li>`).join('')}
+                </ul>
+              </div>
+
+              <div style="text-align: center;">
+                <a href="#" class="cta-button">🚀 Commencer maintenant</a>
+              </div>
+
+              <p style="margin-top: 30px; padding: 15px; background: #fff3cd; border-left: 4px solid #ffc107; font-size: 14px;">
+                <strong>⚠️ Important :</strong> Ce code est personnel et confidentiel. Ne le partagez avec personne.
+              </p>
+
+              <p style="color: #666; font-size: 14px; margin-top: 20px;">
+                Besoin d'aide ? Répondez simplement à cet email ou contactez notre support.
+              </p>
+            </div>
+            <div class="footer">
+              <p><strong>Générateur d'Ebook IA</strong></p>
+              <p>Créez des ebooks professionnels en quelques clics grâce à l'intelligence artificielle</p>
+              <p style="margin-top: 15px;">Si vous n'avez pas demandé cet accès, ignorez cet email.</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+
+    console.log('Sending welcome email to:', email);
+
+    const emailResponse = await resend.emails.send({
+      from: 'Générateur Ebook <onboarding@resend.dev>',
+      to: [email],
+      subject: subject,
+      html: html,
+    });
+
+    console.log('Welcome email sent successfully to:', email, emailResponse);
+    return { success: true };
+  } catch (error: any) {
+    console.error('Failed to send welcome email:', error);
+    return { success: false, error: error.message };
+  }
 }
 
 Deno.serve(async (req) => {
@@ -99,6 +240,8 @@ Deno.serve(async (req) => {
     }
 
     let accessCode: string;
+    let emailSent = false;
+    let emailError = '';
 
     if (existingSubscriber) {
       // Update existing subscriber
@@ -122,6 +265,13 @@ Deno.serve(async (req) => {
 
       accessCode = existingSubscriber.access_code;
       console.log('Subscriber updated:', email);
+
+      // Send update email
+      const emailResult = await sendWelcomeEmail(email, accessCode, plan_type, false);
+      emailSent = emailResult.success;
+      if (!emailResult.success) {
+        emailError = emailResult.error || 'Erreur inconnue';
+      }
     } else {
       // Create new subscriber
       accessCode = generateAccessCode();
@@ -145,12 +295,21 @@ Deno.serve(async (req) => {
       }
 
       console.log('New subscriber created:', email);
+
+      // Send welcome email
+      const emailResult = await sendWelcomeEmail(email, accessCode, plan_type, true);
+      emailSent = emailResult.success;
+      if (!emailResult.success) {
+        emailError = emailResult.error || 'Erreur inconnue';
+      }
     }
 
     return new Response(
       JSON.stringify({
         success: true,
         accessCode,
+        emailSent,
+        emailError: emailSent ? undefined : emailError,
         message: existingSubscriber 
           ? 'Abonnement mis à jour avec succès' 
           : 'Nouvel abonné créé avec succès'

@@ -68,7 +68,19 @@ export const AdminPage = () => {
 
       if (data.success) {
         setGeneratedCode(data.accessCode);
-        toast.success(data.message || 'Abonné ajouté avec succès !');
+        
+        // Show different toast based on email status
+        if (data.emailSent) {
+          toast.success('✅ Abonné créé et email envoyé avec succès !');
+        } else {
+          toast.warning(`⚠️ Abonné créé mais l'email n'a pas pu être envoyé. Code: ${data.accessCode}`, {
+            duration: 10000,
+          });
+          if (data.emailError) {
+            console.error('Email error:', data.emailError);
+          }
+        }
+        
         setEmail('');
         loadSubscribers(); // Refresh list
       } else {
