@@ -62,21 +62,21 @@ export type Database = {
       user_roles: {
         Row: {
           created_at: string
-          email: string
           id: string
           role: Database["public"]["Enums"]["app_role"]
+          user_id: string | null
         }
         Insert: {
           created_at?: string
-          email: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string | null
         }
         Update: {
           created_at?: string
-          email?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -85,10 +85,21 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      has_role: {
-        Args: { _email: string; _role: Database["public"]["Enums"]["app_role"] }
-        Returns: boolean
-      }
+      has_role:
+        | {
+            Args: {
+              _role: Database["public"]["Enums"]["app_role"]
+              _user_id: string
+            }
+            Returns: boolean
+          }
+        | {
+            Args: {
+              _email: string
+              _role: Database["public"]["Enums"]["app_role"]
+            }
+            Returns: boolean
+          }
     }
     Enums: {
       app_role: "admin" | "user"

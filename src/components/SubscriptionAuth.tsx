@@ -127,22 +127,27 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
           </Button>
         </form>
 
-        <div className="text-center text-sm text-muted-foreground space-y-2">
-          <p>Pas encore abonné ?</p>
-          <a 
-            href="https://votre-tunnel-systeme.io" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="text-primary hover:underline font-medium"
-          >
-            Souscrire maintenant
-          </a>
-          <div className="pt-2">
-            <Link 
-              to="/admin"
-              className="text-xs text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+        <div className="text-center text-sm text-muted-foreground space-y-3">
+          <div>
+            <p>Pas encore abonné ?</p>
+            <a 
+              href="https://votre-tunnel-systeme.io" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-primary hover:underline font-medium"
             >
-              Administration
+              Souscrire maintenant
+            </a>
+          </div>
+          
+          <div className="pt-3 border-t">
+            <p className="mb-2">Administrateur ?</p>
+            <Link 
+              to="/auth"
+              className="inline-flex items-center gap-2 text-primary hover:underline font-medium"
+            >
+              <Lock className="w-4 h-4" />
+              Connexion Admin
             </Link>
           </div>
         </div>
