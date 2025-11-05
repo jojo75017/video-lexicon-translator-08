@@ -16,7 +16,8 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  CreditCard
+  CreditCard,
+  Shield
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -150,15 +151,23 @@ export function MagazineSidebar({
         })}
       </nav>
 
-      {/* Footer - Subscription Button */}
+      {/* Footer - Subscription & Admin Buttons */}
       {!isCollapsed && (
-        <div className="p-6 border-t border-gray-200">
+        <div className="p-6 border-t border-gray-200 space-y-2">
           <Button
             onClick={() => navigate('/subscription')}
             className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
           >
             <CreditCard className="w-4 h-4 mr-2" />
             Mon Abonnement
+          </Button>
+          <Button
+            onClick={() => navigate('/admin')}
+            variant="outline"
+            className="w-full"
+          >
+            <Shield className="w-4 h-4 mr-2" />
+            Admin Panel
           </Button>
         </div>
       )}
