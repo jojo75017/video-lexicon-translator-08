@@ -13,12 +13,20 @@ serve(async (req) => {
   }
 
   try {
-    const { email, actionType, prompt, numberOfChapters, ebookTitle, authorName } = await req.json();
+    const { email, actionType, prompt, numberOfChapters, ebookTitle, authorName, apiKey } = await req.json();
     console.log('Content generation request:', { email, actionType });
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const openaiKey = Deno.env.get('OPENAI_API_KEY')!;
+
+    if (!apiKey) {
+      return new Response(
+        JSON.stringify({ error: 'Clé API OpenAI requise' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const openaiKey = apiKey as string;
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 

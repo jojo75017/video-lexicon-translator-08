@@ -56,7 +56,8 @@ interface EbookPlannerPageProps {
 const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail, subscriberData }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isGenerating, generateChapterContent, generateSubChapterContent, generateEbookPlan, generateBookSummary, generateEbookCover, optimizeForSEO, generateKDPDescription, generateKDPKeywords, generateKDPCategories, generateBackCover } = useSubscriptionGeneration(subscriberEmail);
+  const [apiKey, setApiKey] = useState('');
+  const { isGenerating, generateChapterContent, generateSubChapterContent, generateEbookPlan, generateBookSummary, generateEbookCover, optimizeForSEO, generateKDPDescription, generateKDPKeywords, generateKDPCategories, generateBackCover } = useSubscriptionGeneration(subscriberEmail, apiKey);
   
   // États principaux
   const [ebookTitle, setEbookTitle] = useState(location.state?.suggestedTitle || '');
@@ -842,6 +843,8 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail, su
       case 'settings':
         return (
           <EbookSettings
+            apiKey={apiKey}
+            onUpdateApiKey={setApiKey}
             numberOfChapters={numberOfChapters}
             onUpdateNumberOfChapters={setNumberOfChapters}
             importText={importText}

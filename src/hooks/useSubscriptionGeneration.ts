@@ -15,12 +15,16 @@ export interface SubChapter {
   content?: string;
 }
 
-export const useSubscriptionGeneration = (subscriberEmail: string) => {
+export const useSubscriptionGeneration = (subscriberEmail: string, apiKey?: string) => {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const callGenerateContent = async (actionType: string, prompt: string, additionalData?: any) => {
     if (!subscriberEmail) {
       toast.error('Email d\'abonné requis');
+      return null;
+    }
+    if (!apiKey) {
+      toast.error('Clé API OpenAI requise');
       return null;
     }
 
@@ -32,6 +36,7 @@ export const useSubscriptionGeneration = (subscriberEmail: string) => {
           email: subscriberEmail,
           actionType,
           prompt,
+          apiKey,
           ...additionalData
         }
       });

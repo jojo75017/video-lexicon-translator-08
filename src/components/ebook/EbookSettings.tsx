@@ -7,6 +7,8 @@ import { Label } from '@/components/ui/label';
 import { Settings } from 'lucide-react';
 
 interface EbookSettingsProps {
+  apiKey: string;
+  onUpdateApiKey: (newApiKey: string) => void;
   numberOfChapters: number;
   onUpdateNumberOfChapters: (number: number) => void;
   importText: string;
@@ -16,6 +18,8 @@ interface EbookSettingsProps {
 }
 
 export const EbookSettings: React.FC<EbookSettingsProps> = ({
+  apiKey,
+  onUpdateApiKey,
   numberOfChapters,
   onUpdateNumberOfChapters,
   importText,
@@ -31,10 +35,25 @@ export const EbookSettings: React.FC<EbookSettingsProps> = ({
           ⚙️ Configuration API et Paramètres
         </CardTitle>
         <CardDescription style={{ color: 'hsl(var(--cobalt-blue) / 0.8)' }}>
-          Configurez les paramètres de génération de votre ebook
+          Configurez votre clé API OpenAI et les paramètres avancés
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        <div>
+          <Label htmlFor="apikey">Clé API OpenAI</Label>
+          <Input
+            id="apikey"
+            type="password"
+            placeholder="sk-..."
+            value={apiKey}
+            onChange={(e) => onUpdateApiKey(e.target.value)}
+            className="mt-1"
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            Chaque abonné doit entrer sa propre clé. Elle reste locale à son navigateur.
+          </p>
+        </div>
+        
         <div>
           <Label htmlFor="chapters">Nombre de chapitres pour la génération automatique</Label>
           <Input
@@ -60,7 +79,7 @@ export const EbookSettings: React.FC<EbookSettingsProps> = ({
           />
           <Button 
             onClick={onAnalyzeImportedText}
-            disabled={!importText || isGenerating}
+            disabled={!importText || !apiKey || isGenerating}
             className="mt-2 w-full"
           >
             {isGenerating ? 'Analyse en cours...' : '🔍 Analyser et créer la structure'}
