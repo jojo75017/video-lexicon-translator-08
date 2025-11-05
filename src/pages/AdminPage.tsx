@@ -2,10 +2,14 @@ import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Shield, UserPlus, Users, Copy, Mail, LogOut, Loader2 } from 'lucide-react';
+import { Shield, UserPlus, Users, Copy, Mail, LogOut, Loader2, Pause, Play, RotateCcw, Edit, Calendar, TrendingUp, Activity } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
 
 export const AdminPage = () => {
   const [email, setEmail] = useState('');
@@ -15,6 +19,11 @@ export const AdminPage = () => {
   const [subscribers, setSubscribers] = useState<any[]>([]);
   const [isLoadingSubscribers, setIsLoadingSubscribers] = useState(false);
   const [searchEmail, setSearchEmail] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
+  const [planFilter, setPlanFilter] = useState<'all' | 'starter' | 'pro' | 'enterprise'>('all');
+  const [selectedSubscriber, setSelectedSubscriber] = useState<any>(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [expirationDate, setExpirationDate] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -84,9 +93,57 @@ export const AdminPage = () => {
     navigate('/auth');
   };
 
-  const filteredSubscribers = subscribers.filter(sub => 
-    searchEmail === '' || sub.email.toLowerCase().includes(searchEmail.toLowerCase())
-  );
+  const handleManageSubscription = async (action: string, subscriberId: string, data?: any) => {
+    try {
+      const { error } = await supabase.functions.invoke('manage-subscription', {
+        body: { action, subscriberId, data }
+      });
+
+      if (error) throw error;
+
+      toast.success('Action effectuée avec succès');
+      loadSubscribers();
+    } catch (error) {
+      console.error('Manage subscription error:', error);
+      toast.error('Erreur lors de l\'action');
+    }
+  };
+
+  const getPlanLimits = (plan: string) => {
+    const limits: any = {
+      starter: { plans: 5, chapters: 20, subchapters: 50, covers: 3 },
+      pro: { plans: 20, chapters: 100, subchapters: 300, covers: 10 },
+      enterprise: { plans: -1, chapters: -1, subchapters: -1, covers: -1 }
+    };
+    return limits[plan] || limits.starter;
+  };
+
+  const getUsagePercentage = (used: number, limit: number) => {
+    if (limit === -1) return 0;
+    return Math.min((used / limit) * 100, 100);
+  };
+
+  const getProgressColor = (percentage: number) => {
+    if (percentage < 70) return 'bg-green-500';
+    if (percentage < 90) return 'bg-orange-500';
+    return 'bg-red-500';
+  };
+
+  const filteredSubscribers = subscribers.filter(sub => {
+    const emailMatch = searchEmail === '' || sub.email.toLowerCase().includes(searchEmail.toLowerCase());
+    const statusMatch = statusFilter === 'all' || sub.status === statusFilter;
+    const planMatch = planFilter === 'all' || sub.plan_type === planFilter;
+    return emailMatch && statusMatch && planMatch;
+  });
+
+  const stats = {
+    total: subscribers.length,
+    active: subscribers.filter(s => s.status === 'active').length,
+    inactive: subscribers.filter(s => s.status === 'inactive').length,
+    starter: subscribers.filter(s => s.plan_type === 'starter').length,
+    pro: subscribers.filter(s => s.plan_type === 'pro').length,
+    enterprise: subscribers.filter(s => s.plan_type === 'enterprise').length,
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 p-4">
@@ -186,6 +243,38 @@ export const AdminPage = () => {
           )}
         </Card>
 
+        {/* Statistics */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card className="p-6">
+            <div className="flex items-center gap-3">
+              <Activity className="w-8 h-8 text-primary" />
+              <div>
+                <p className="text-sm text-muted-foreground">Total Abonnés</p>
+                <p className="text-3xl font-bold">{stats.total}</p>
+              </div>
+            </div>
+          </Card>
+          <Card className="p-6">
+            <div className="flex items-center gap-3">
+              <TrendingUp className="w-8 h-8 text-green-500" />
+              <div>
+                <p className="text-sm text-muted-foreground">Actifs / Inactifs</p>
+                <p className="text-3xl font-bold">{stats.active} / {stats.inactive}</p>
+              </div>
+            </div>
+          </Card>
+          <Card className="p-6">
+            <div>
+              <p className="text-sm text-muted-foreground mb-2">Par Plan</p>
+              <div className="flex gap-2">
+                <Badge variant="secondary">{stats.starter} Starter</Badge>
+                <Badge variant="secondary">{stats.pro} Pro</Badge>
+                <Badge variant="secondary">{stats.enterprise} Enterprise</Badge>
+              </div>
+            </div>
+          </Card>
+        </div>
+
         {/* Subscribers List */}
         <Card className="p-6">
           <div className="flex items-center justify-between mb-6">
@@ -198,12 +287,31 @@ export const AdminPage = () => {
             </Button>
           </div>
 
-          <div className="mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <Input
               placeholder="Rechercher par email..."
               value={searchEmail}
               onChange={(e) => setSearchEmail(e.target.value)}
             />
+            <select
+              className="px-3 py-2 border rounded-md"
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as any)}
+            >
+              <option value="all">Tous les statuts</option>
+              <option value="active">Actif</option>
+              <option value="inactive">Inactif</option>
+            </select>
+            <select
+              className="px-3 py-2 border rounded-md"
+              value={planFilter}
+              onChange={(e) => setPlanFilter(e.target.value as any)}
+            >
+              <option value="all">Tous les plans</option>
+              <option value="starter">Starter</option>
+              <option value="pro">Pro</option>
+              <option value="enterprise">Enterprise</option>
+            </select>
           </div>
 
           {isLoadingSubscribers ? (
@@ -216,64 +324,200 @@ export const AdminPage = () => {
             </div>
           ) : (
             <div className="space-y-3">
-              {filteredSubscribers.map((subscriber) => (
-                <div 
-                  key={subscriber.id} 
-                  className="p-4 border rounded-lg hover:bg-accent/50 transition-colors"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <Mail className="w-4 h-4 text-muted-foreground" />
-                        <span className="font-medium">{subscriber.email}</span>
-                        <span className={`text-xs px-2 py-1 rounded-full ${
-                          subscriber.status === 'active' 
-                            ? 'bg-green-100 text-green-700' 
-                            : 'bg-red-100 text-red-700'
-                        }`}>
-                          {subscriber.status}
-                        </span>
-                        <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700">
-                          {subscriber.plan_type}
-                        </span>
+              {filteredSubscribers.map((subscriber) => {
+                const limits = getPlanLimits(subscriber.plan_type);
+                const plansPercentage = getUsagePercentage(subscriber.ebook_plans_generated, limits.plans);
+                const chaptersPercentage = getUsagePercentage(subscriber.chapters_generated, limits.chapters);
+                
+                return (
+                  <div 
+                    key={subscriber.id} 
+                    className="p-4 border rounded-lg hover:bg-accent/50 transition-colors space-y-3"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <Mail className="w-4 h-4 text-muted-foreground" />
+                          <span className="font-medium">{subscriber.email}</span>
+                          <Badge variant={subscriber.status === 'active' ? 'default' : 'destructive'}>
+                            {subscriber.status}
+                          </Badge>
+                          <Badge variant="outline">{subscriber.plan_type}</Badge>
+                        </div>
+                        <div className="mt-2 text-sm text-muted-foreground">
+                          Code: <span className="font-mono font-bold">{subscriber.access_code}</span>
+                          {subscriber.expires_at && (
+                            <span className="ml-4">
+                              Expire: {format(new Date(subscriber.expires_at), 'dd/MM/yyyy')}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <div className="mt-2 text-sm text-muted-foreground">
-                        Code: <span className="font-mono font-bold">{subscriber.access_code}</span>
-                      </div>
-                      <div className="mt-1 text-xs text-muted-foreground">
-                        Plans: {subscriber.ebook_plans_generated} | 
-                        Chapitres: {subscriber.chapters_generated} | 
-                        Sous-chapitres: {subscriber.subchapters_generated} | 
-                        Couvertures: {subscriber.covers_generated}
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={() => handleManageSubscription('toggle_status', subscriber.id)}
+                          variant="outline"
+                          size="sm"
+                          title={subscriber.status === 'active' ? 'Suspendre' : 'Activer'}
+                        >
+                          {subscriber.status === 'active' ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                        </Button>
+                        <Button
+                          onClick={() => handleManageSubscription('reset_quotas', subscriber.id)}
+                          variant="outline"
+                          size="sm"
+                          title="Réinitialiser les quotas"
+                        >
+                          <RotateCcw className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            setSelectedSubscriber(subscriber);
+                            setShowDetailModal(true);
+                          }}
+                          variant="outline"
+                          size="sm"
+                          title="Modifier"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          onClick={() => handleCopyCode(subscriber.access_code)}
+                          variant="outline" 
+                          size="sm"
+                          title="Copier le code"
+                        >
+                          <Copy className="w-4 h-4" />
+                        </Button>
                       </div>
                     </div>
-                    <div className="flex gap-2">
-                      <Button 
-                        onClick={() => handleCopyCode(subscriber.access_code)}
-                        variant="outline" 
-                        size="sm"
-                      >
-                        <Copy className="w-4 h-4" />
-                      </Button>
+
+                    {/* Usage Progress Bars */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <div className="flex justify-between text-xs mb-1">
+                          <span>Plans ebook</span>
+                          <span className={plansPercentage > 70 ? 'text-orange-600 font-bold' : ''}>
+                            {subscriber.ebook_plans_generated}/{limits.plans === -1 ? '∞' : limits.plans}
+                          </span>
+                        </div>
+                        <Progress value={plansPercentage} className="h-2" />
+                      </div>
+                      <div>
+                        <div className="flex justify-between text-xs mb-1">
+                          <span>Chapitres</span>
+                          <span className={chaptersPercentage > 70 ? 'text-orange-600 font-bold' : ''}>
+                            {subscriber.chapters_generated}/{limits.chapters === -1 ? '∞' : limits.chapters}
+                          </span>
+                        </div>
+                        <Progress value={chaptersPercentage} className="h-2" />
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </Card>
+
+        {/* Detail Modal */}
+        <Dialog open={showDetailModal} onOpenChange={setShowDetailModal}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Modifier l'abonné</DialogTitle>
+              <DialogDescription>
+                {selectedSubscriber?.email}
+              </DialogDescription>
+            </DialogHeader>
+            
+            {selectedSubscriber && (
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium">Plan</label>
+                  <select
+                    className="w-full px-3 py-2 border rounded-md mt-1"
+                    defaultValue={selectedSubscriber.plan_type}
+                    onChange={(e) => {
+                      handleManageSubscription('update_plan', selectedSubscriber.id, {
+                        plan_type: e.target.value
+                      });
+                      setShowDetailModal(false);
+                    }}
+                  >
+                    <option value="starter">Starter</option>
+                    <option value="pro">Pro</option>
+                    <option value="enterprise">Enterprise</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium">Date d'expiration</label>
+                  <div className="flex gap-2 mt-1">
+                    <Input
+                      type="date"
+                      value={expirationDate}
+                      onChange={(e) => setExpirationDate(e.target.value)}
+                    />
+                    <Button
+                      onClick={() => {
+                        if (expirationDate) {
+                          handleManageSubscription('set_expiration', selectedSubscriber.id, {
+                            expires_at: expirationDate
+                          });
+                          setShowDetailModal(false);
+                          setExpirationDate('');
+                        }
+                      }}
+                      size="sm"
+                    >
+                      <Calendar className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  {selectedSubscriber.expires_at && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Expire actuellement: {format(new Date(selectedSubscriber.expires_at), 'dd/MM/yyyy')}
+                    </p>
+                  )}
+                </div>
+
+                <div className="pt-4 border-t">
+                  <h4 className="font-medium mb-2">Statistiques d'utilisation</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span>Plans ebook:</span>
+                      <span className="font-mono">{selectedSubscriber.ebook_plans_generated}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Chapitres:</span>
+                      <span className="font-mono">{selectedSubscriber.chapters_generated}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Sous-chapitres:</span>
+                      <span className="font-mono">{selectedSubscriber.subchapters_generated}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Couvertures:</span>
+                      <span className="font-mono">{selectedSubscriber.covers_generated}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
 
         {/* Instructions */}
         <Card className="p-6">
           <div className="flex items-center gap-2 mb-4">
             <Shield className="w-5 h-5 text-primary" />
-            <h2 className="text-xl font-semibold">Instructions</h2>
+            <h2 className="text-xl font-semibold">Contrôles Admin</h2>
           </div>
           <div className="space-y-2 text-sm text-muted-foreground">
-            <p>• Ajoutez un email pour créer un nouvel abonné avec un code d'accès unique</p>
-            <p>• Si l'email existe déjà, l'abonnement sera mis à jour avec le nouveau plan</p>
-            <p>• Les abonnés se connectent avec leur email + code d'accès</p>
-            <p>• Vous pouvez copier le code d'accès directement depuis la liste</p>
+            <p>• <strong>Pause/Play:</strong> Suspendre ou réactiver un abonnement</p>
+            <p>• <strong>Réinitialiser:</strong> Remettre à zéro tous les compteurs de génération</p>
+            <p>• <strong>Modifier:</strong> Changer le plan ou définir une date d'expiration</p>
+            <p>• <strong>Barres de progression:</strong> Vert &lt;70%, Orange 70-90%, Rouge &gt;90%</p>
+            <p>• Les abonnés suspendus ne peuvent plus générer de contenu</p>
           </div>
         </Card>
       </div>
