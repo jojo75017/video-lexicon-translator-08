@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Routes, Route, Navigate } from 'react-router-dom';
 import EbookPlannerPage from './pages/EbookPlannerPage';
 import EbookIdeasPage from './pages/EbookIdeasPage';
+import SubscriptionPage from './pages/SubscriptionPage';
 import { AdminPage } from './pages/AdminPage';
 import AuthPage from './pages/AuthPage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
@@ -74,6 +75,12 @@ const App = () => {
     setIsAuthenticated(true);
   };
 
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setSubscriberEmail('');
+    setSubscriberData(null);
+  };
+
 
   if (isCheckingAuth) {
     return null;
@@ -101,6 +108,20 @@ const App = () => {
               element={
                 isAdmin || isAuthenticated ? (
                   <EbookPlannerPage subscriberEmail={subscriberEmail} subscriberData={subscriberData} />
+                ) : (
+                  <SubscriptionAuth onAuthenticated={handleAuthenticated} />
+                )
+              }
+            />
+            <Route 
+              path="/subscription" 
+              element={
+                isAuthenticated ? (
+                  <SubscriptionPage 
+                    subscriberEmail={subscriberEmail} 
+                    subscriberData={subscriberData}
+                    onLogout={handleLogout}
+                  />
                 ) : (
                   <SubscriptionAuth onAuthenticated={handleAuthenticated} />
                 )

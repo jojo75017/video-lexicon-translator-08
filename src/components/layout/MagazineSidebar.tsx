@@ -15,8 +15,10 @@ import {
   Image, 
   Settings,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  CreditCard
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface SidebarItem {
   id: string;
@@ -55,6 +57,8 @@ export function MagazineSidebar({
   isCollapsed = false,
   onToggleCollapse 
 }: MagazineSidebarProps) {
+  const navigate = useNavigate();
+
   return (
     <aside 
       className={cn(
@@ -146,24 +150,16 @@ export function MagazineSidebar({
         })}
       </nav>
 
-      {/* Footer Progress */}
+      {/* Footer - Subscription Button */}
       {!isCollapsed && (
         <div className="p-6 border-t border-gray-200">
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-600 font-medium">Progression</span>
-              <span className="text-primary font-bold">42%</span>
-            </div>
-            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-gradient-magazine rounded-full transition-all duration-500"
-                style={{ width: '42%' }}
-              />
-            </div>
-            <p className="text-xs text-gray-500 mt-1">
-              Continuez pour terminer votre ebook
-            </p>
-          </div>
+          <Button
+            onClick={() => navigate('/subscription')}
+            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+          >
+            <CreditCard className="w-4 h-4 mr-2" />
+            Mon Abonnement
+          </Button>
         </div>
       )}
     </aside>
