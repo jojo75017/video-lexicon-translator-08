@@ -68,7 +68,6 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail, su
   const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
   const [importText, setImportText] = useState('');
   const [ebookImages, setEbookImages] = useState<Array<{url: string, title: string, chapterIndex?: number}>>([]);
-  const [apiKey, setApiKey] = useState('');
   
   // États pour les résultats des outils
   const [bookSummary, setBookSummary] = useState('');
@@ -843,8 +842,6 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail, su
       case 'settings':
         return (
           <EbookSettings
-            apiKey={apiKey}
-            onUpdateApiKey={setApiKey}
             numberOfChapters={numberOfChapters}
             onUpdateNumberOfChapters={setNumberOfChapters}
             importText={importText}
