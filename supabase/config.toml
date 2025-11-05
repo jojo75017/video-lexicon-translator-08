@@ -23,3 +23,6 @@ verify_jwt = false
 
 [functions.manage-subscription]
 verify_jwt = true
+
+[functions.bootstrap-admin]
+verify_jwt = true

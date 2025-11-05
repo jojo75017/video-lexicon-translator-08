@@ -22,20 +22,30 @@ const App = () => {
 
   useEffect(() => {
     // Check admin auth
-    const checkAdminAuth = async () => {
+    const ensureAdmin = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      
+
       if (session) {
         try {
+          // First check
           const { data, error } = await supabase.functions.invoke('check-admin');
           if (!error && data?.isAdmin) {
             setIsAdmin(true);
+          } else {
+            // Attempt one-time bootstrap (only if no admin exists)
+            try {
+              await supabase.functions.invoke('bootstrap-admin');
+              const { data: recheck } = await supabase.functions.invoke('check-admin');
+              if (recheck?.isAdmin) setIsAdmin(true);
+            } catch (e) {
+              // ignore if already initialized
+            }
           }
         } catch (error) {
-          console.error('Error checking admin status:', error);
+          console.error('Error ensuring admin status:', error);
         }
       }
-      
+
       setIsCheckingAuth(false);
     };
 
@@ -48,19 +58,15 @@ const App = () => {
       setIsAuthenticated(true);
     }
 
-    checkAdminAuth();
+    ensureAdmin();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        try {
-          const { data, error } = await supabase.functions.invoke('check-admin');
-          if (!error && data?.isAdmin) {
-            setIsAdmin(true);
-          }
-        } catch (error) {
-          console.error('Error checking admin status:', error);
-        }
+        // Defer to avoid deadlocks per best practices
+        setTimeout(() => {
+          ensureAdmin();
+        }, 0);
       } else if (event === 'SIGNED_OUT') {
         setIsAdmin(false);
       }
