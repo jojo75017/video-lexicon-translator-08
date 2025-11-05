@@ -2,10 +2,19 @@ import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Mail, Lock, Unlock } from 'lucide-react';
+import { Mail, Lock, Unlock, HelpCircle, Loader2, Eye, EyeOff } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 interface SubscriptionAuthProps {
   onAuthenticated: (email: string, subscriber: any) => void;
@@ -15,6 +24,10 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
   const [email, setEmail] = useState('');
   const [accessCode, setAccessCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [isRecoveryOpen, setIsRecoveryOpen] = useState(false);
+  const [recoveryEmail, setRecoveryEmail] = useState('');
+  const [isRecovering, setIsRecovering] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -61,6 +74,43 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
     }
   };
 
+  const handleRecoverCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const normalizedEmail = recoveryEmail.trim().toLowerCase();
+    
+    if (!normalizedEmail || !normalizedEmail.includes('@')) {
+      toast.error('Veuillez entrer une adresse email valide');
+      return;
+    }
+
+    setIsRecovering(true);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('resend-access-code', {
+        body: { email: normalizedEmail }
+      });
+
+      if (error) throw error;
+
+      if (data.rateLimitExceeded) {
+        toast.error(data.error || 'Trop de tentatives');
+      } else if (data.success) {
+        toast.success('Email envoyé !', {
+          description: data.message
+        });
+        setIsRecoveryOpen(false);
+        setRecoveryEmail('');
+      } else {
+        toast.error(data.error || 'Erreur lors de la récupération');
+      }
+    } catch (error) {
+      console.error('Recovery error:', error);
+      toast.error('Erreur lors de l\'envoi de l\'email');
+    } finally {
+      setIsRecovering(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-secondary/10 p-4">
       <Card className="w-full max-w-md p-8 space-y-6">
@@ -93,31 +143,91 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Code d'accès</label>
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium">Code d'accès</label>
+              <Dialog open={isRecoveryOpen} onOpenChange={setIsRecoveryOpen}>
+                <DialogTrigger asChild>
+                  <Button 
+                    type="button"
+                    variant="link" 
+                    size="sm" 
+                    className="text-xs h-auto p-0"
+                  >
+                    <HelpCircle className="w-3 h-3 mr-1" />
+                    Code perdu ?
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Récupérer votre code d'accès</DialogTitle>
+                    <DialogDescription>
+                      Entrez votre email et nous vous enverrons votre code d'accès.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <form onSubmit={handleRecoverCode} className="space-y-4 mt-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="recovery-email">Email</Label>
+                      <Input
+                        id="recovery-email"
+                        type="email"
+                        placeholder="votre@email.com"
+                        value={recoveryEmail}
+                        onChange={(e) => setRecoveryEmail(e.target.value)}
+                        disabled={isRecovering}
+                      />
+                    </div>
+                    <Button 
+                      type="submit" 
+                      className="w-full"
+                      disabled={isRecovering}
+                    >
+                      {isRecovering ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Envoi en cours...
+                        </>
+                      ) : (
+                        'Recevoir mon code'
+                      )}
+                    </Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            </div>
             <div className="relative">
               <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
-                type="text"
+                type={showPassword ? "text" : "password"}
                 placeholder="EBK-XXXXXX"
                 value={accessCode}
                 onChange={(e) => setAccessCode(e.target.value.toUpperCase())}
-                className="pl-10 font-mono"
+                className="pl-10 pr-10 font-mono"
                 disabled={isLoading}
                 maxLength={10}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
             </div>
             <p className="text-xs text-muted-foreground">
-              Le code d'accès vous a été fourni lors de votre inscription
+              Format : EBK-XXXXXX (6 caractères)
             </p>
           </div>
 
           <Button
             type="submit" 
             className="w-full"
-            disabled={isLoading}
+            disabled={isLoading || !email || !accessCode}
           >
             {isLoading ? (
-              'Vérification...'
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Vérification...
+              </>
             ) : (
               <>
                 <Unlock className="w-4 h-4 mr-2" />

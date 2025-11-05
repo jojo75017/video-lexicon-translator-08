@@ -13,4 +13,10 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.add-subscriber]
+verify_jwt = true
+
+[functions.check-admin]
+verify_jwt = true
+
+[functions.resend-access-code]
 verify_jwt = false
