@@ -31,29 +31,36 @@ export const AuthPage = () => {
     setIsLoading(true);
 
     try {
-      if (isLogin) {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-        if (error) throw error;
-
-        // Check if user is admin
-        const { data: roleData, error: roleError } = await supabase.functions.invoke('check-admin');
-        
-        if (roleError || !roleData?.isAdmin) {
-          await supabase.auth.signOut();
-          toast.error("Accès refusé", {
-            description: "Vous n'avez pas les droits administrateur"
+        if (isLogin) {
+          const { error: signInError } = await supabase.auth.signInWithPassword({
+            email,
+            password,
           });
-          setIsLoading(false);
-          return;
-        }
 
-        toast.success("Connexion admin réussie");
-        navigate('/admin');
-      } else {
+          if (signInError) throw signInError;
+
+          // Tente d'initialiser automatiquement le premier admin (idempotent)
+          try {
+            await supabase.functions.invoke('bootstrap-admin');
+          } catch (e) {
+            // Ignorer: la fonction peut renvoyer 401/200 si déjà initialisé
+          }
+
+          // Vérifie le rôle admin
+          const { data: roleData, error: roleError } = await supabase.functions.invoke('check-admin');
+          
+          if (roleError || !roleData?.isAdmin) {
+            await supabase.auth.signOut();
+            toast.error("Accès refusé", {
+              description: "Votre compte n'a pas les droits administrateur. Contactez le support."
+            });
+            setIsLoading(false);
+            return;
+          }
+
+          toast.success("Connexion admin réussie");
+          navigate('/admin');
+        } else {
         const { error } = await supabase.auth.signUp({
           email,
           password,
