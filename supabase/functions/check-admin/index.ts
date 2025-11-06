@@ -34,22 +34,19 @@ Deno.serve(async (req) => {
 
     console.log('Checking admin status for user:', user.id);
 
-    // Check if user has admin role using the security definer function
-    const { data: roles, error: rolesError } = await supabaseClient
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', user.id)
-      .eq('role', 'admin');
+    // Check admin role via SECURITY DEFINER function to bypass RLS safely
+    const { data: hasRole, error: hasRoleError } = await supabaseClient
+      .rpc('has_role', { _user_id: user.id, _role: 'admin' });
 
-    if (rolesError) {
-      console.error('Roles error:', rolesError);
+    if (hasRoleError) {
+      console.error('has_role RPC error:', hasRoleError);
       return new Response(
         JSON.stringify({ isAdmin: false, error: 'Erreur lors de la vérification du rôle' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
       );
     }
 
-    const isAdmin = roles && roles.length > 0;
+    const isAdmin = hasRole === true;
     console.log('Admin status:', isAdmin);
 
     return new Response(
