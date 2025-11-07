@@ -26,3 +26,6 @@ verify_jwt = true
 
 [functions.bootstrap-admin]
 verify_jwt = true
+
+[functions.export-to-google-docs]
+verify_jwt = false

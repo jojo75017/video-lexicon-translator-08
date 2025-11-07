@@ -9,6 +9,7 @@ import { Download, FileText, Image, BookOpen, Printer } from 'lucide-react';
 import { toast } from 'sonner';
 import { Chapter } from '@/hooks/useEbookGeneration';
 import jsPDF from 'jspdf';
+import { supabase } from '@/integrations/supabase/client';
 
 interface EbookExporterProps {
   ebookTitle: string;
@@ -25,7 +26,7 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
   conclusion,
   chapters
 }) => {
-  const [exportFormat, setExportFormat] = useState<'pdf' | 'docx' | 'txt' | 'html' | 'epub'>('pdf');
+  const [exportFormat, setExportFormat] = useState<'pdf' | 'docx' | 'txt' | 'html' | 'epub' | 'googledocs'>('pdf');
   const [includeTableOfContents, setIncludeTableOfContents] = useState(true);
   const [includePageNumbers, setIncludePageNumbers] = useState(true);
   const [includeCoverPage, setIncludeCoverPage] = useState(true);
@@ -524,6 +525,35 @@ Paperback: 9.99€ - 19.99€
     URL.revokeObjectURL(url);
   };
 
+  const exportToGoogleDocs = async () => {
+    try {
+      const content = generateEbookContent();
+      
+      const { data, error } = await supabase.functions.invoke('export-to-google-docs', {
+        body: {
+          title: ebookTitle,
+          content: content,
+          authorName: authorName
+        }
+      });
+
+      if (error) throw error;
+
+      if (data?.success && data?.documentUrl) {
+        toast.success('Document créé sur Google Docs !', {
+          description: 'Cliquez pour ouvrir',
+          action: {
+            label: 'Ouvrir',
+            onClick: () => window.open(data.documentUrl, '_blank')
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Erreur export Google Docs:', error);
+      toast.error('Erreur lors de l\'export vers Google Docs');
+    }
+  };
+
   const handleExport = async () => {
     if (!ebookTitle) {
       toast.error('Veuillez ajouter un titre à votre ebook');
@@ -552,6 +582,9 @@ Paperback: 9.99€ - 19.99€
           break;
         case 'pdf':
           exportAsPDF();
+          break;
+        case 'googledocs':
+          await exportToGoogleDocs();
           break;
         case 'docx':
           // Export simple TXT formaté pour conversion
@@ -623,7 +656,8 @@ Paperback: 9.99€ - 19.99€
                 <SelectValue placeholder="Choisir un format" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="pdf">📄 PDF (Recommandé pour KDP)</SelectItem>
+                <SelectItem value="googledocs">📄 Google Docs (Recommandé)</SelectItem>
+                <SelectItem value="pdf">📄 PDF (Pour KDP)</SelectItem>
                 <SelectItem value="html">📄 HTML (Web)</SelectItem>
                 <SelectItem value="txt">📝 Texte (.txt)</SelectItem>
                 <SelectItem value="docx">📄 Word (.doc)</SelectItem>
