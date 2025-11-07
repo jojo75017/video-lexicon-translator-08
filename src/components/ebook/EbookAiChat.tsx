@@ -44,7 +44,7 @@ export const EbookAiChat: React.FC = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const saveApiKey = () => {
+  const saveApiKey = async () => {
     if (!tempApiKey.trim()) {
       toast.error('Veuillez entrer une clé API');
       return;
@@ -55,10 +55,28 @@ export const EbookAiChat: React.FC = () => {
       return;
     }
 
-    localStorage.setItem('user_openai_key', tempApiKey);
-    setApiKey(tempApiKey);
-    setShowSettings(false);
-    toast.success('Clé API OpenAI enregistrée avec succès');
+    // Test de la clé API avec un appel simple
+    toast.loading('Validation de la clé API en cours...', { id: 'api-test' });
+    
+    try {
+      const response = await fetch('https://api.openai.com/v1/models', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${tempApiKey}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Clé API invalide');
+      }
+
+      localStorage.setItem('user_openai_key', tempApiKey);
+      setApiKey(tempApiKey);
+      setShowSettings(false);
+      toast.success('✅ Clé API OpenAI validée et enregistrée avec succès !', { id: 'api-test', duration: 5000 });
+    } catch (error) {
+      toast.error('❌ Clé API invalide. Vérifiez votre clé et réessayez.', { id: 'api-test' });
+    }
   };
 
   const handleSend = async () => {
@@ -156,10 +174,23 @@ export const EbookAiChat: React.FC = () => {
                   onClick={() => setShowSettings(true)}
                   variant="outline"
                   size="sm"
-                  className="bg-white/10 border-white/30 text-white hover:bg-white/20"
+                  className={`${
+                    apiKey 
+                      ? 'bg-green-500/20 border-green-500/50 text-green-700 hover:bg-green-500/30' 
+                      : 'bg-white/10 border-white/30 text-white hover:bg-white/20'
+                  }`}
                 >
-                  <Settings className="h-4 w-4 mr-1" />
-                  {apiKey ? 'Configuré' : 'Config'}
+                  {apiKey ? (
+                    <>
+                      <span className="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></span>
+                      Clé configurée ✓
+                    </>
+                  ) : (
+                    <>
+                      <Settings className="h-4 w-4 mr-1" />
+                      Configurer
+                    </>
+                  )}
                 </Button>
                 {isExpanded && (
                   <Button
@@ -288,6 +319,17 @@ export const EbookAiChat: React.FC = () => {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
+            {apiKey && (
+              <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center gap-2 text-green-700">
+                  <span className="w-3 h-3 rounded-full bg-green-500 animate-pulse"></span>
+                  <span className="font-medium">✓ Clé API actuellement configurée et validée</span>
+                </div>
+                <p className="text-xs text-green-600 mt-2">
+                  Vous pouvez la remplacer en entrant une nouvelle clé ci-dessous.
+                </p>
+              </div>
+            )}
             <div>
               <label className="text-sm font-medium mb-2 block">
                 Clé API OpenAI (commençant par sk-)
@@ -314,7 +356,7 @@ export const EbookAiChat: React.FC = () => {
             <div className="flex gap-2">
               <Button onClick={saveApiKey} className="gap-2">
                 <Key className="h-4 w-4" />
-                Enregistrer la clé
+                Valider et enregistrer
               </Button>
               <Button onClick={() => setShowSettings(false)} variant="outline">
                 Annuler
