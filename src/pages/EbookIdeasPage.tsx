@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ebookThemes } from '@/data/ebookIdeas';
+import { EbookAiChat } from '@/components/ebook/EbookAiChat';
 
 const EbookIdeasPage: React.FC = () => {
   const navigate = useNavigate();
@@ -116,6 +117,11 @@ const EbookIdeasPage: React.FC = () => {
             ))}
           </div>
         </div>
+      </div>
+
+      {/* AI Chat - Premier */}
+      <div className="container mx-auto px-6 py-12">
+        <EbookAiChat />
       </div>
 
       {/* Main Content */}
