@@ -1,13 +1,44 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Sparkles, MessageSquare } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface HeroSectionProps {
   onCtaClick: () => void;
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ onCtaClick }) => {
+  const navigate = useNavigate();
+
   return (
     <div className="text-center mb-12">
+      {/* AI Chat CTA - Premier */}
+      <div className="mb-12 p-8 bg-gradient-to-r from-royal-purple/10 via-coral-pink/10 to-vibrant-blue/10 rounded-3xl border-2 border-primary/20">
+        <div className="flex items-center justify-center gap-3 mb-4">
+          <Sparkles className="h-8 w-8 text-primary" />
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+            Parlez avec l'IA
+          </h2>
+        </div>
+        <p className="text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
+          Découvrez les meilleures idées d'ebook avec notre assistant IA. 
+          Recherchez dans le <strong>top 50 Amazon</strong> et obtenez des conseils personnalisés.
+        </p>
+        <Button 
+          onClick={() => navigate('/ai-chat')}
+          size="lg"
+          className="bg-gradient-primary text-white text-lg px-8 py-6 rounded-full shadow-xl hover:shadow-2xl transition-all"
+        >
+          <MessageSquare className="h-5 w-5 mr-2" />
+          Commencer à discuter avec l'IA
+        </Button>
+        <p className="text-sm text-muted-foreground mt-4">
+          💡 Utilisez votre propre clé API OpenAI
+        </p>
+      </div>
+
+      {/* Original Hero Content */}
       <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6">
         🚀 Obtenez <span className="text-primary">100+ Prompts</span>
         <br />

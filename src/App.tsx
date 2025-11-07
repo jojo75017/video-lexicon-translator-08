@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Routes, Route, Navigate } from 'react-router-dom';
 import EbookPlannerPage from './pages/EbookPlannerPage';
 import EbookIdeasPage from './pages/EbookIdeasPage';
+import AiChatPage from './pages/AiChatPage';
 import SubscriptionPage from './pages/SubscriptionPage';
 import { AdminPage } from './pages/AdminPage';
 import AuthPage from './pages/AuthPage';
@@ -99,6 +100,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Navigate to="/ebook-ideas" replace />} />
             <Route path="/auth" element={<AuthPage />} />
+            <Route path="/ai-chat" element={<AiChatPage />} />
             <Route
               path="/ebook-ideas"
               element={
