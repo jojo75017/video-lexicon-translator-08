@@ -49,11 +49,11 @@ import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubsc
 import { ebookTemplates } from '@/data/ebookTemplates';
 
 interface EbookPlannerPageProps {
-  subscriberEmail: string;
-  subscriberData: any;
+  subscriberEmail?: string;
+  subscriberData?: any;
 }
 
-const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail, subscriberData }) => {
+const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '', subscriberData }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [apiKey, setApiKey] = useState('');
