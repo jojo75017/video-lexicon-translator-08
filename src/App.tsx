@@ -103,13 +103,7 @@ const App = () => {
             <Route path="/ai-chat" element={<AiChatPage />} />
             <Route
               path="/ebook-ideas"
-              element={
-                isAdmin || isAuthenticated ? (
-                  <EbookIdeasPage />
-                ) : (
-                  <SubscriptionAuth onAuthenticated={handleAuthenticated} />
-                )
-              }
+              element={<EbookIdeasPage />}
             />
             <Route
               path="/ebook-planner"
