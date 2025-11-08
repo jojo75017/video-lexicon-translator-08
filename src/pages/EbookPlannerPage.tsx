@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -57,29 +57,48 @@ interface EbookPlannerPageProps {
 const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '', subscriberData }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [apiKey, setApiKey] = useState('');
+  
+  // Clé de stockage localStorage
+  const STORAGE_KEY = 'ebook-planner-autosave';
+  
+  // Charger les données sauvegardées au montage
+  const loadSavedData = () => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des données:', error);
+    }
+    return null;
+  };
+  
+  const savedData = loadSavedData();
+  
+  const [apiKey, setApiKey] = useState(savedData?.apiKey || '');
   
   // États principaux
-  const [ebookTitle, setEbookTitle] = useState(location.state?.suggestedTitle || '');
-  const [targetAudience, setTargetAudience] = useState('Adultes');
-  const [tomeNumber, setTomeNumber] = useState<number | null>(null);
+  const [ebookTitle, setEbookTitle] = useState(location.state?.suggestedTitle || savedData?.ebookTitle || '');
+  const [targetAudience, setTargetAudience] = useState(savedData?.targetAudience || 'Adultes');
+  const [tomeNumber, setTomeNumber] = useState<number | null>(savedData?.tomeNumber || null);
   
   // États des paramètres avancés
-  const [writingStyle, setWritingStyle] = useState('narratif');
-  const [chapterLength, setChapterLength] = useState('moyen');
-  const [detailLevel, setDetailLevel] = useState('détaillé');
-  const [tone, setTone] = useState('professionnel');
-  const [narrativeFormat, setNarrativeFormat] = useState('troisième personne');
+  const [writingStyle, setWritingStyle] = useState(savedData?.writingStyle || 'narratif');
+  const [chapterLength, setChapterLength] = useState(savedData?.chapterLength || 'moyen');
+  const [detailLevel, setDetailLevel] = useState(savedData?.detailLevel || 'détaillé');
+  const [tone, setTone] = useState(savedData?.tone || 'professionnel');
+  const [narrativeFormat, setNarrativeFormat] = useState(savedData?.narrativeFormat || 'troisième personne');
   
   const { isGenerating, generateChapterContent, generateSubChapterContent, generateEbookPlan, generateBookSummary, generateEbookCover, optimizeForSEO, generateKDPDescription, generateKDPKeywords, generateKDPCategories, generateBackCover } = useSubscriptionGeneration(subscriberEmail, apiKey, ebookTitle, targetAudience, tomeNumber, writingStyle, chapterLength, detailLevel, tone, narrativeFormat);
-  const [authorName, setAuthorName] = useState('');
-  const [preface, setPreface] = useState('');
-  const [conclusion, setConclusion] = useState('');
-  const [chapters, setChapters] = useState<Chapter[]>([]);
-  const [numberOfChapters, setNumberOfChapters] = useState(8);
+  const [authorName, setAuthorName] = useState(savedData?.authorName || '');
+  const [preface, setPreface] = useState(savedData?.preface || '');
+  const [conclusion, setConclusion] = useState(savedData?.conclusion || '');
+  const [chapters, setChapters] = useState<Chapter[]>(savedData?.chapters || []);
+  const [numberOfChapters, setNumberOfChapters] = useState(savedData?.numberOfChapters || 8);
   const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
   const [importText, setImportText] = useState('');
-  const [ebookImages, setEbookImages] = useState<Array<{url: string, title: string, chapterIndex?: number}>>([]);
+  const [ebookImages, setEbookImages] = useState<Array<{url: string, title: string, chapterIndex?: number}>>(savedData?.ebookImages || []);
   
   // États pour les résultats des outils
   const [bookSummary, setBookSummary] = useState('');
@@ -92,6 +111,42 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   // Navigation state
   const [activeTab, setActiveTab] = useState('planner');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  // Sauvegarde automatique dans localStorage
+  useEffect(() => {
+    const dataToSave = {
+      apiKey,
+      ebookTitle,
+      authorName,
+      targetAudience,
+      tomeNumber,
+      writingStyle,
+      chapterLength,
+      detailLevel,
+      tone,
+      narrativeFormat,
+      preface,
+      conclusion,
+      chapters,
+      numberOfChapters,
+      ebookImages,
+      lastSaved: new Date().toISOString()
+    };
+    
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde:', error);
+    }
+  }, [apiKey, ebookTitle, authorName, targetAudience, tomeNumber, writingStyle, chapterLength, detailLevel, tone, narrativeFormat, preface, conclusion, chapters, numberOfChapters, ebookImages]);
+
+  // Notifier l'utilisateur au premier chargement si des données ont été restaurées
+  useEffect(() => {
+    if (savedData?.lastSaved) {
+      const lastSavedDate = new Date(savedData.lastSaved);
+      toast.success(`Plan restauré automatiquement (dernière sauvegarde: ${lastSavedDate.toLocaleString('fr-FR')})`);
+    }
+  }, []);
 
   // Configuration du glisser-déposer
   const sensors = useSensors(
@@ -413,7 +468,21 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
     setSelectedChapters([]);
     setImportText('');
     setEbookImages([]);
-    toast.success('Plan réinitialisé !');
+    setTargetAudience('Adultes');
+    setTomeNumber(null);
+    setWritingStyle('narratif');
+    setChapterLength('moyen');
+    setDetailLevel('détaillé');
+    setTone('professionnel');
+    setNarrativeFormat('troisième personne');
+    
+    // Effacer également le localStorage
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+      toast.success('Plan réinitialisé et sauvegarde effacée !');
+    } catch (error) {
+      toast.success('Plan réinitialisé !');
+    }
   };
 
   const handleImageSelect = (imageUrl: string, title: string) => {
