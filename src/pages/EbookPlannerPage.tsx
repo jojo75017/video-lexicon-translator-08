@@ -57,10 +57,10 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   const navigate = useNavigate();
   const location = useLocation();
   const [apiKey, setApiKey] = useState('');
-  const { isGenerating, generateChapterContent, generateSubChapterContent, generateEbookPlan, generateBookSummary, generateEbookCover, optimizeForSEO, generateKDPDescription, generateKDPKeywords, generateKDPCategories, generateBackCover } = useSubscriptionGeneration(subscriberEmail, apiKey);
   
   // États principaux
   const [ebookTitle, setEbookTitle] = useState(location.state?.suggestedTitle || '');
+  const { isGenerating, generateChapterContent, generateSubChapterContent, generateEbookPlan, generateBookSummary, generateEbookCover, optimizeForSEO, generateKDPDescription, generateKDPKeywords, generateKDPCategories, generateBackCover } = useSubscriptionGeneration(subscriberEmail, apiKey, ebookTitle);
   const [authorName, setAuthorName] = useState('');
   const [preface, setPreface] = useState('');
   const [conclusion, setConclusion] = useState('');

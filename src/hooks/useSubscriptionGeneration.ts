@@ -15,7 +15,7 @@ export interface SubChapter {
   content?: string;
 }
 
-export const useSubscriptionGeneration = (subscriberEmail: string, apiKey?: string) => {
+export const useSubscriptionGeneration = (subscriberEmail: string, apiKey?: string, ebookTitle?: string) => {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const callGenerateContent = async (actionType: string, prompt: string, additionalData?: any) => {
@@ -70,10 +70,13 @@ export const useSubscriptionGeneration = (subscriberEmail: string, apiKey?: stri
   };
 
   const generateChapterContent = async (chapter: Chapter) => {
-    const prompt = `Rédige un chapitre complet de 350 mots exactement sur le sujet : "${chapter.title}".
+    const contextLine = ebookTitle ? `\nCe chapitre fait partie de l'ebook intitulé "${ebookTitle}". Assure-toi que le contenu reste cohérent avec ce titre et traite des éléments/personnages/thèmes mentionnés dans le titre de l'ebook.` : '';
+    
+    const prompt = `Rédige un chapitre complet de 350 mots exactement sur le sujet : "${chapter.title}".${contextLine}
     
 Le contenu doit être :
 - Informatif et engageant sur le sujet donné
+- En lien direct avec le titre de l'ebook si fourni
 - Bien structuré avec des paragraphes
 - Professionnel mais accessible
 - Exactement 350 mots
@@ -90,10 +93,13 @@ Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajo
   };
 
   const generateSubChapterContent = async (subChapter: SubChapter) => {
-    const prompt = `Rédige le contenu pour le sous-chapitre : "${subChapter.title}".
+    const contextLine = ebookTitle ? `\nCe sous-chapitre fait partie de l'ebook intitulé "${ebookTitle}". Assure-toi que le contenu reste cohérent avec ce titre et traite des éléments/personnages/thèmes mentionnés dans le titre de l'ebook.` : '';
+    
+    const prompt = `Rédige le contenu pour le sous-chapitre : "${subChapter.title}".${contextLine}
     
 Le contenu doit faire environ 200 mots et être :
 - Informatif et pertinent
+- En lien direct avec le titre de l'ebook si fourni
 - Bien structuré
 - Engageant pour le lecteur
 - Utiliser l'italique (*) pour les points importants`;
