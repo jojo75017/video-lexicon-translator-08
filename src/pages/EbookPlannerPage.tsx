@@ -485,7 +485,34 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                       </Select>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="apikey">Clé API OpenAI</Label>
+                        <Input
+                          id="apikey"
+                          type="password"
+                          placeholder="sk-..."
+                          value={apiKey}
+                          onChange={(e) => setApiKey(e.target.value)}
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Nécessaire pour la génération automatique
+                        </p>
+                      </div>
+                      <div>
+                        <Label htmlFor="chapters">Nombre de chapitres</Label>
+                        <Input
+                          id="chapters"
+                          type="number"
+                          min="3"
+                          max="20"
+                          value={numberOfChapters}
+                          onChange={(e) => setNumberOfChapters(parseInt(e.target.value) || 8)}
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Pour la génération automatique (3-20)
+                        </p>
+                      </div>
                     </div>
                     
                     <div>
