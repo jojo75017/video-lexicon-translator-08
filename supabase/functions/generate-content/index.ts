@@ -28,62 +28,8 @@ serve(async (req) => {
 
     const openaiKey = apiKey as string;
 
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
-    // Vérifier l'abonnement
-    const { data: subscriber, error: subError } = await supabase
-      .from('subscribers')
-      .select('*')
-      .eq('email', email)
-      .single();
-
-    if (subError || !subscriber) {
-      console.error('Subscriber not found:', subError);
-      return new Response(
-        JSON.stringify({ error: 'Abonnement non trouvé. Veuillez contacter le support.' }),
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Vérifier le statut
-    if (subscriber.status !== 'active') {
-      return new Response(
-        JSON.stringify({ error: 'Votre abonnement a expiré. Veuillez renouveler.' }),
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Vérifier l'expiration
-    if (subscriber.expires_at && new Date(subscriber.expires_at) < new Date()) {
-      await supabase
-        .from('subscribers')
-        .update({ status: 'expired' })
-        .eq('id', subscriber.id);
-
-      return new Response(
-        JSON.stringify({ error: 'Votre abonnement a expiré. Veuillez renouveler.' }),
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Limites par plan
-    const limits: Record<string, Record<string, number>> = {
-      starter: { chapters_generated: 50, ebook_plans_generated: 5, subchapters_generated: 100, covers_generated: 10 },
-      pro: { chapters_generated: 200, ebook_plans_generated: 20, subchapters_generated: 500, covers_generated: 50 },
-      agency: { chapters_generated: 999999, ebook_plans_generated: 999999, subchapters_generated: 999999, covers_generated: 999999 }
-    };
-
-    const planLimits = limits[subscriber.plan_type];
-    const currentUsage = subscriber[actionType as keyof typeof subscriber] as number;
-
-    if (currentUsage >= planLimits[actionType]) {
-      return new Response(
-        JSON.stringify({ 
-          error: `Limite atteinte pour votre plan ${subscriber.plan_type}. Passez au plan supérieur pour continuer.` 
-        }),
-        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
+    // Utilisation directe avec la clé API fournie - pas de vérification d'abonnement
+    console.log('Using provided OpenAI API key for generation');
 
     // Appeler OpenAI
     console.log('Calling OpenAI API...');
@@ -119,18 +65,9 @@ serve(async (req) => {
     const data = await response.json();
     const generatedContent = data.choices[0].message.content;
 
-    // Incrémenter le compteur
-    const updateField: Record<string, number> = {};
-    updateField[actionType] = currentUsage + 1;
-
-    await supabase
-      .from('subscribers')
-      .update(updateField)
-      .eq('id', subscriber.id);
-
     console.log('Content generated successfully');
     return new Response(
-      JSON.stringify({ content: generatedContent, usage: currentUsage + 1, limit: planLimits[actionType] }),
+      JSON.stringify({ content: generatedContent }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
