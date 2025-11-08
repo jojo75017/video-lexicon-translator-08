@@ -472,12 +472,12 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
 
                     <div className="space-y-2">
                       <Label htmlFor="tome-number">Numéro de tome (optionnel)</Label>
-                      <Select value={tomeNumber?.toString() || ''} onValueChange={(val) => setTomeNumber(val ? parseInt(val) : null)}>
+                      <Select value={tomeNumber?.toString() || 'none'} onValueChange={(val) => setTomeNumber(val === 'none' ? null : parseInt(val))}>
                         <SelectTrigger id="tome-number">
                           <SelectValue placeholder="Ebook unique" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Ebook unique</SelectItem>
+                          <SelectItem value="none">Ebook unique</SelectItem>
                           {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
                             <SelectItem key={num} value={num.toString()}>Tome {num}</SelectItem>
                           ))}
