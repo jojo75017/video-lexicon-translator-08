@@ -15,7 +15,18 @@ export interface SubChapter {
   content?: string;
 }
 
-export const useSubscriptionGeneration = (subscriberEmail: string, apiKey?: string, ebookTitle?: string, targetAudience?: string, tomeNumber?: number | null) => {
+export const useSubscriptionGeneration = (
+  subscriberEmail: string, 
+  apiKey?: string, 
+  ebookTitle?: string, 
+  targetAudience?: string, 
+  tomeNumber?: number | null,
+  writingStyle?: string,
+  chapterLength?: string,
+  detailLevel?: string,
+  tone?: string,
+  narrativeFormat?: string
+) => {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const callGenerateContent = async (actionType: string, prompt: string, additionalData?: any) => {
@@ -73,8 +84,13 @@ export const useSubscriptionGeneration = (subscriberEmail: string, apiKey?: stri
     const contextLine = ebookTitle ? `\nCe chapitre fait partie de l'ebook intitulé "${ebookTitle}". Assure-toi que le contenu reste cohérent avec ce titre et traite des éléments/personnages/thèmes mentionnés dans le titre de l'ebook.` : '';
     const audienceLine = targetAudience ? `\nPublic cible : ${targetAudience}. Adapte le vocabulaire, le style d'écriture, la complexité des concepts et les exemples utilisés pour correspondre parfaitement à ce public.` : '';
     const tomeLine = tomeNumber ? `\nCeci est le Tome ${tomeNumber} d'une série. Assure-toi de maintenir la continuité avec les tomes précédents si applicable, et de laisser place à une suite si ce n'est pas le dernier tome.` : '';
+    const styleLine = writingStyle ? `\nStyle d'écriture : ${writingStyle}. Adopte ce style dans ta rédaction.` : '';
+    const lengthLine = chapterLength ? `\nLongueur souhaitée : ${chapterLength}.` : '';
+    const detailLine = detailLevel ? `\nNiveau de détail : ${detailLevel}. Fournis un contenu avec ce niveau de détail.` : '';
+    const toneLine = tone ? `\nTon : ${tone}. Utilise ce ton tout au long du texte.` : '';
+    const narrativeLine = narrativeFormat ? `\nFormat de narration : ${narrativeFormat}.` : '';
     
-    const prompt = `Rédige un chapitre complet de 350 mots exactement sur le sujet : "${chapter.title}".${contextLine}${audienceLine}${tomeLine}
+    const prompt = `Rédige un chapitre complet de 350 mots exactement sur le sujet : "${chapter.title}".${contextLine}${audienceLine}${tomeLine}${styleLine}${lengthLine}${detailLine}${toneLine}${narrativeLine}
     
 Le contenu doit être :
 - Informatif et engageant sur le sujet donné
@@ -97,8 +113,12 @@ Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajo
     const contextLine = ebookTitle ? `\nCe sous-chapitre fait partie de l'ebook intitulé "${ebookTitle}". Assure-toi que le contenu reste cohérent avec ce titre et traite des éléments/personnages/thèmes mentionnés dans le titre de l'ebook.` : '';
     const audienceLine = targetAudience ? `\nPublic cible : ${targetAudience}. Adapte le vocabulaire, le style d'écriture et les exemples pour ce public.` : '';
     const tomeLine = tomeNumber ? `\nCeci est le Tome ${tomeNumber} d'une série. Maintiens la cohérence avec les tomes précédents.` : '';
+    const styleLine = writingStyle ? `\nStyle d'écriture : ${writingStyle}.` : '';
+    const detailLine = detailLevel ? `\nNiveau de détail : ${detailLevel}.` : '';
+    const toneLine = tone ? `\nTon : ${tone}.` : '';
+    const narrativeLine = narrativeFormat ? `\nFormat de narration : ${narrativeFormat}.` : '';
     
-    const prompt = `Rédige le contenu pour le sous-chapitre : "${subChapter.title}".${contextLine}${audienceLine}${tomeLine}
+    const prompt = `Rédige le contenu pour le sous-chapitre : "${subChapter.title}".${contextLine}${audienceLine}${tomeLine}${styleLine}${detailLine}${toneLine}${narrativeLine}
     
 Le contenu doit faire environ 200 mots et être :
 - Informatif et pertinent
@@ -118,8 +138,10 @@ Le contenu doit faire environ 200 mots et être :
   const generateEbookPlan = async (ebookTitle: string, authorName: string, numberOfChapters: number) => {
     const audienceLine = targetAudience ? `\nPublic cible : ${targetAudience}. Les titres des chapitres et sous-chapitres doivent être adaptés à ce public.` : '';
     const tomeLine = tomeNumber ? `\nCeci est le Tome ${tomeNumber} d'une série. Structure le plan en conséquence, en tenant compte de l'arc narratif global de la série.` : '';
+    const styleLine = writingStyle ? `\nStyle d'écriture : ${writingStyle}. Les titres doivent refléter ce style.` : '';
+    const toneLine = tone ? `\nTon général : ${tone}. Le plan doit refléter ce ton.` : '';
     
-    const prompt = `Crée un plan détaillé pour un ebook intitulé "${ebookTitle}" par ${authorName}.${audienceLine}${tomeLine}
+    const prompt = `Crée un plan détaillé pour un ebook intitulé "${ebookTitle}" par ${authorName}.${audienceLine}${tomeLine}${styleLine}${toneLine}
     
 Le plan doit contenir exactement ${numberOfChapters} chapitres principaux.
 

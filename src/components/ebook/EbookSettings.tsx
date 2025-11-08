@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Settings } from 'lucide-react';
 
 interface EbookSettingsProps {
@@ -15,6 +16,16 @@ interface EbookSettingsProps {
   onUpdateImportText: (text: string) => void;
   onAnalyzeImportedText: () => void;
   isGenerating: boolean;
+  writingStyle: string;
+  onUpdateWritingStyle: (style: string) => void;
+  chapterLength: string;
+  onUpdateChapterLength: (length: string) => void;
+  detailLevel: string;
+  onUpdateDetailLevel: (level: string) => void;
+  tone: string;
+  onUpdateTone: (tone: string) => void;
+  narrativeFormat: string;
+  onUpdateNarrativeFormat: (format: string) => void;
 }
 
 export const EbookSettings: React.FC<EbookSettingsProps> = ({
@@ -25,46 +36,103 @@ export const EbookSettings: React.FC<EbookSettingsProps> = ({
   importText,
   onUpdateImportText,
   onAnalyzeImportedText,
-  isGenerating
+  isGenerating,
+  writingStyle,
+  onUpdateWritingStyle,
+  chapterLength,
+  onUpdateChapterLength,
+  detailLevel,
+  onUpdateDetailLevel,
+  tone,
+  onUpdateTone,
+  narrativeFormat,
+  onUpdateNarrativeFormat
 }) => {
   return (
     <Card className="border-2" style={{ borderColor: 'hsl(var(--gray-cool))' }}>
       <CardHeader style={{ background: 'linear-gradient(135deg, hsl(var(--cobalt-blue) / 0.1) 0%, hsl(var(--royal-purple) / 0.05) 100%)' }}>
         <CardTitle className="flex items-center gap-2" style={{ color: 'hsl(var(--cobalt-blue))' }}>
           <Settings className="h-5 w-5" />
-          ⚙️ Configuration API et Paramètres
+          ⚙️ Paramètres avancés de génération
         </CardTitle>
         <CardDescription style={{ color: 'hsl(var(--cobalt-blue) / 0.8)' }}>
-          Configurez votre clé API OpenAI et les paramètres avancés
+          Personnalisez le style et le format de votre ebook
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div>
-          <Label htmlFor="apikey">Clé API OpenAI</Label>
-          <Input
-            id="apikey"
-            type="password"
-            placeholder="sk-..."
-            value={apiKey}
-            onChange={(e) => onUpdateApiKey(e.target.value)}
-            className="mt-1"
-          />
-          <p className="text-xs text-muted-foreground mt-1">
-            Chaque abonné doit entrer sa propre clé. Elle reste locale à son navigateur.
-          </p>
-        </div>
-        
-        <div>
-          <Label htmlFor="chapters">Nombre de chapitres pour la génération automatique</Label>
-          <Input
-            id="chapters"
-            type="number"
-            min="3"
-            max="20"
-            value={numberOfChapters}
-            onChange={(e) => onUpdateNumberOfChapters(parseInt(e.target.value) || 8)}
-            className="mt-1"
-          />
+      <CardContent className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="writing-style">📝 Style d'écriture</Label>
+            <Select value={writingStyle} onValueChange={onUpdateWritingStyle}>
+              <SelectTrigger id="writing-style">
+                <SelectValue placeholder="Sélectionner" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="narratif">Narratif</SelectItem>
+                <SelectItem value="descriptif">Descriptif</SelectItem>
+                <SelectItem value="dialogues">Riche en dialogues</SelectItem>
+                <SelectItem value="mixte">Mixte</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="chapter-length">📏 Longueur des chapitres</Label>
+            <Select value={chapterLength} onValueChange={onUpdateChapterLength}>
+              <SelectTrigger id="chapter-length">
+                <SelectValue placeholder="Sélectionner" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="court">Court (500-1000 mots)</SelectItem>
+                <SelectItem value="moyen">Moyen (1000-2000 mots)</SelectItem>
+                <SelectItem value="long">Long (2000-3000 mots)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="detail-level">🎯 Niveau de détail</Label>
+            <Select value={detailLevel} onValueChange={onUpdateDetailLevel}>
+              <SelectTrigger id="detail-level">
+                <SelectValue placeholder="Sélectionner" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="basique">Basique</SelectItem>
+                <SelectItem value="détaillé">Détaillé</SelectItem>
+                <SelectItem value="très détaillé">Très détaillé</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="tone">🎨 Ton général</Label>
+            <Select value={tone} onValueChange={onUpdateTone}>
+              <SelectTrigger id="tone">
+                <SelectValue placeholder="Sélectionner" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="sérieux">Sérieux</SelectItem>
+                <SelectItem value="léger">Léger</SelectItem>
+                <SelectItem value="humoristique">Humoristique</SelectItem>
+                <SelectItem value="inspirant">Inspirant</SelectItem>
+                <SelectItem value="professionnel">Professionnel</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="narrative-format">📚 Format de narration</Label>
+            <Select value={narrativeFormat} onValueChange={onUpdateNarrativeFormat}>
+              <SelectTrigger id="narrative-format">
+                <SelectValue placeholder="Sélectionner" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="première personne">Première personne (je)</SelectItem>
+                <SelectItem value="troisième personne">Troisième personne (il/elle)</SelectItem>
+                <SelectItem value="deuxième personne">Deuxième personne (tu/vous)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <div className="border-t pt-4">

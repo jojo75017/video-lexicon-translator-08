@@ -63,7 +63,15 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   const [ebookTitle, setEbookTitle] = useState(location.state?.suggestedTitle || '');
   const [targetAudience, setTargetAudience] = useState('Adultes');
   const [tomeNumber, setTomeNumber] = useState<number | null>(null);
-  const { isGenerating, generateChapterContent, generateSubChapterContent, generateEbookPlan, generateBookSummary, generateEbookCover, optimizeForSEO, generateKDPDescription, generateKDPKeywords, generateKDPCategories, generateBackCover } = useSubscriptionGeneration(subscriberEmail, apiKey, ebookTitle, targetAudience, tomeNumber);
+  
+  // États des paramètres avancés
+  const [writingStyle, setWritingStyle] = useState('narratif');
+  const [chapterLength, setChapterLength] = useState('moyen');
+  const [detailLevel, setDetailLevel] = useState('détaillé');
+  const [tone, setTone] = useState('professionnel');
+  const [narrativeFormat, setNarrativeFormat] = useState('troisième personne');
+  
+  const { isGenerating, generateChapterContent, generateSubChapterContent, generateEbookPlan, generateBookSummary, generateEbookCover, optimizeForSEO, generateKDPDescription, generateKDPKeywords, generateKDPCategories, generateBackCover } = useSubscriptionGeneration(subscriberEmail, apiKey, ebookTitle, targetAudience, tomeNumber, writingStyle, chapterLength, detailLevel, tone, narrativeFormat);
   const [authorName, setAuthorName] = useState('');
   const [preface, setPreface] = useState('');
   const [conclusion, setConclusion] = useState('');
@@ -914,6 +922,16 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
             onUpdateImportText={setImportText}
             onAnalyzeImportedText={generateAutomaticPlan}
             isGenerating={isGenerating}
+            writingStyle={writingStyle}
+            onUpdateWritingStyle={setWritingStyle}
+            chapterLength={chapterLength}
+            onUpdateChapterLength={setChapterLength}
+            detailLevel={detailLevel}
+            onUpdateDetailLevel={setDetailLevel}
+            tone={tone}
+            onUpdateTone={setTone}
+            narrativeFormat={narrativeFormat}
+            onUpdateNarrativeFormat={setNarrativeFormat}
           />
         );
       
