@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   BookOpen, Plus, Wand2, RotateCcw, ArrowLeft, Merge, Sparkles, Eye, Search, Palette
 } from 'lucide-react';
@@ -60,7 +61,8 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   
   // États principaux
   const [ebookTitle, setEbookTitle] = useState(location.state?.suggestedTitle || '');
-  const { isGenerating, generateChapterContent, generateSubChapterContent, generateEbookPlan, generateBookSummary, generateEbookCover, optimizeForSEO, generateKDPDescription, generateKDPKeywords, generateKDPCategories, generateBackCover } = useSubscriptionGeneration(subscriberEmail, apiKey, ebookTitle);
+  const [targetAudience, setTargetAudience] = useState('Adultes');
+  const { isGenerating, generateChapterContent, generateSubChapterContent, generateEbookPlan, generateBookSummary, generateEbookCover, optimizeForSEO, generateKDPDescription, generateKDPKeywords, generateKDPCategories, generateBackCover } = useSubscriptionGeneration(subscriberEmail, apiKey, ebookTitle, targetAudience);
   const [authorName, setAuthorName] = useState('');
   const [preface, setPreface] = useState('');
   const [conclusion, setConclusion] = useState('');
@@ -431,7 +433,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6 p-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
                         <Label htmlFor="title">Titre de l'ebook</Label>
                         <Input
@@ -449,6 +451,21 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                           value={authorName}
                           onChange={(e) => setAuthorName(e.target.value)}
                         />
+                      </div>
+                      <div>
+                        <Label htmlFor="audience">Public cible</Label>
+                        <Select value={targetAudience} onValueChange={setTargetAudience}>
+                          <SelectTrigger id="audience">
+                            <SelectValue placeholder="Sélectionner" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Enfants (3-7 ans)">Enfants (3-7 ans)</SelectItem>
+                            <SelectItem value="Jeunes lecteurs (8-12 ans)">Jeunes lecteurs (8-12 ans)</SelectItem>
+                            <SelectItem value="Adolescents (13-17 ans)">Adolescents (13-17 ans)</SelectItem>
+                            <SelectItem value="Adultes">Adultes</SelectItem>
+                            <SelectItem value="Tout public">Tout public</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
                     </div>
                     
