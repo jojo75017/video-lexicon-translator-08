@@ -122,10 +122,13 @@ Réponds UNIQUEMENT avec le JSON, sans texte additionnel.`;
     
     if (content) {
       try {
-        const parsed = JSON.parse(content);
+        // Nettoyer le contenu pour enlever les balises markdown
+        const cleanContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        const parsed = JSON.parse(cleanContent);
         toast.success('Plan généré avec succès !');
         return parsed;
-      } catch {
+      } catch (error) {
+        console.error('Erreur parsing JSON:', error, 'Contenu reçu:', content);
         toast.error('Erreur de format du plan généré');
         return null;
       }
