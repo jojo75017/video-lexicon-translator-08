@@ -15,7 +15,7 @@ export interface SubChapter {
   content?: string;
 }
 
-export const useSubscriptionGeneration = (subscriberEmail: string, apiKey?: string, ebookTitle?: string, targetAudience?: string) => {
+export const useSubscriptionGeneration = (subscriberEmail: string, apiKey?: string, ebookTitle?: string, targetAudience?: string, tomeNumber?: number | null) => {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const callGenerateContent = async (actionType: string, prompt: string, additionalData?: any) => {
@@ -72,8 +72,9 @@ export const useSubscriptionGeneration = (subscriberEmail: string, apiKey?: stri
   const generateChapterContent = async (chapter: Chapter) => {
     const contextLine = ebookTitle ? `\nCe chapitre fait partie de l'ebook intitulé "${ebookTitle}". Assure-toi que le contenu reste cohérent avec ce titre et traite des éléments/personnages/thèmes mentionnés dans le titre de l'ebook.` : '';
     const audienceLine = targetAudience ? `\nPublic cible : ${targetAudience}. Adapte le vocabulaire, le style d'écriture, la complexité des concepts et les exemples utilisés pour correspondre parfaitement à ce public.` : '';
+    const tomeLine = tomeNumber ? `\nCeci est le Tome ${tomeNumber} d'une série. Assure-toi de maintenir la continuité avec les tomes précédents si applicable, et de laisser place à une suite si ce n'est pas le dernier tome.` : '';
     
-    const prompt = `Rédige un chapitre complet de 350 mots exactement sur le sujet : "${chapter.title}".${contextLine}${audienceLine}
+    const prompt = `Rédige un chapitre complet de 350 mots exactement sur le sujet : "${chapter.title}".${contextLine}${audienceLine}${tomeLine}
     
 Le contenu doit être :
 - Informatif et engageant sur le sujet donné
@@ -95,8 +96,9 @@ Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajo
   const generateSubChapterContent = async (subChapter: SubChapter) => {
     const contextLine = ebookTitle ? `\nCe sous-chapitre fait partie de l'ebook intitulé "${ebookTitle}". Assure-toi que le contenu reste cohérent avec ce titre et traite des éléments/personnages/thèmes mentionnés dans le titre de l'ebook.` : '';
     const audienceLine = targetAudience ? `\nPublic cible : ${targetAudience}. Adapte le vocabulaire, le style d'écriture et les exemples pour ce public.` : '';
+    const tomeLine = tomeNumber ? `\nCeci est le Tome ${tomeNumber} d'une série. Maintiens la cohérence avec les tomes précédents.` : '';
     
-    const prompt = `Rédige le contenu pour le sous-chapitre : "${subChapter.title}".${contextLine}${audienceLine}
+    const prompt = `Rédige le contenu pour le sous-chapitre : "${subChapter.title}".${contextLine}${audienceLine}${tomeLine}
     
 Le contenu doit faire environ 200 mots et être :
 - Informatif et pertinent
@@ -115,8 +117,9 @@ Le contenu doit faire environ 200 mots et être :
 
   const generateEbookPlan = async (ebookTitle: string, authorName: string, numberOfChapters: number) => {
     const audienceLine = targetAudience ? `\nPublic cible : ${targetAudience}. Les titres des chapitres et sous-chapitres doivent être adaptés à ce public.` : '';
+    const tomeLine = tomeNumber ? `\nCeci est le Tome ${tomeNumber} d'une série. Structure le plan en conséquence, en tenant compte de l'arc narratif global de la série.` : '';
     
-    const prompt = `Crée un plan détaillé pour un ebook intitulé "${ebookTitle}" par ${authorName}.${audienceLine}
+    const prompt = `Crée un plan détaillé pour un ebook intitulé "${ebookTitle}" par ${authorName}.${audienceLine}${tomeLine}
     
 Le plan doit contenir exactement ${numberOfChapters} chapitres principaux.
 

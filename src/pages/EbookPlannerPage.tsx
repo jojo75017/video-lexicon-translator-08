@@ -62,7 +62,8 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   // États principaux
   const [ebookTitle, setEbookTitle] = useState(location.state?.suggestedTitle || '');
   const [targetAudience, setTargetAudience] = useState('Adultes');
-  const { isGenerating, generateChapterContent, generateSubChapterContent, generateEbookPlan, generateBookSummary, generateEbookCover, optimizeForSEO, generateKDPDescription, generateKDPKeywords, generateKDPCategories, generateBackCover } = useSubscriptionGeneration(subscriberEmail, apiKey, ebookTitle, targetAudience);
+  const [tomeNumber, setTomeNumber] = useState<number | null>(null);
+  const { isGenerating, generateChapterContent, generateSubChapterContent, generateEbookPlan, generateBookSummary, generateEbookCover, optimizeForSEO, generateKDPDescription, generateKDPKeywords, generateKDPCategories, generateBackCover } = useSubscriptionGeneration(subscriberEmail, apiKey, ebookTitle, targetAudience, tomeNumber);
   const [authorName, setAuthorName] = useState('');
   const [preface, setPreface] = useState('');
   const [conclusion, setConclusion] = useState('');
@@ -467,6 +468,24 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                           </SelectContent>
                         </Select>
                       </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="tome-number">Numéro de tome (optionnel)</Label>
+                      <Select value={tomeNumber?.toString() || ''} onValueChange={(val) => setTomeNumber(val ? parseInt(val) : null)}>
+                        <SelectTrigger id="tome-number">
+                          <SelectValue placeholder="Ebook unique" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">Ebook unique</SelectItem>
+                          {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
+                            <SelectItem key={num} value={num.toString()}>Tome {num}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4">
                     </div>
                     
                     <div>
