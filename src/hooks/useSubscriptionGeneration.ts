@@ -19,10 +19,6 @@ export const useSubscriptionGeneration = (subscriberEmail: string, apiKey?: stri
   const [isGenerating, setIsGenerating] = useState(false);
 
   const callGenerateContent = async (actionType: string, prompt: string, additionalData?: any) => {
-    if (!subscriberEmail) {
-      toast.error('Email d\'abonné requis');
-      return null;
-    }
     if (!apiKey) {
       toast.error('Clé API OpenAI requise');
       return null;
@@ -31,26 +27,39 @@ export const useSubscriptionGeneration = (subscriberEmail: string, apiKey?: stri
     setIsGenerating(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke('generate-content', {
-        body: {
-          email: subscriberEmail,
-          actionType,
-          prompt,
-          apiKey,
-          ...additionalData
-        }
+      // Appel direct à l'API OpenAI sans vérification d'abonnement
+      console.log('Calling OpenAI directly with provided API key');
+      
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            { 
+              role: 'system', 
+              content: 'Vous êtes un expert en création de contenu pour ebooks. Répondez en français avec un contenu de haute qualité.' 
+            },
+            { role: 'user', content: prompt }
+          ],
+          max_tokens: 2000,
+          temperature: 0.7,
+        }),
       });
 
-      if (error) {
-        throw error;
-      }
-
-      if (data.error) {
-        toast.error(data.error);
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('OpenAI error:', errorText);
+        toast.error('Erreur lors de la génération du contenu');
         return null;
       }
 
-      return data.content;
+      const data = await response.json();
+      return data.choices[0].message.content;
+      
     } catch (error) {
       console.error('Generation error:', error);
       toast.error(error instanceof Error ? error.message : 'Erreur lors de la génération');
