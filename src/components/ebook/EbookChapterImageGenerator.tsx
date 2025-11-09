@@ -7,6 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { Image, Sparkles, Download, Copy, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { type Character } from './EbookCharacters';
 
 interface Chapter {
   id: string;
@@ -22,14 +23,17 @@ interface ChapterImage {
   style: string;
 }
 
+
 interface EbookChapterImageGeneratorProps {
   ebookTitle: string;
   chapters: Chapter[];
+  characters?: Character[];
 }
 
 export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProps> = ({
   ebookTitle,
-  chapters
+  chapters,
+  characters = []
 }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [imageStyle, setImageStyle] = useState<string>('professional illustration');
@@ -64,7 +68,11 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
             chapterTitle: chapter.title,
             chapterContent: chapter.content || '',
             ebookTitle,
-            style: imageStyle
+            style: imageStyle,
+            characters: characters.map(c => ({
+              name: c.name,
+              description: c.description
+            }))
           }
         });
 
@@ -109,7 +117,11 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
           chapterTitle: chapter.title,
           chapterContent: chapter.content || '',
           ebookTitle,
-          style: imageStyle
+          style: imageStyle,
+          characters: characters.map(c => ({
+            name: c.name,
+            description: c.description
+          }))
         }
       });
 

@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { chapterTitle, chapterContent, ebookTitle, style = "professional illustration" } = await req.json();
+    const { chapterTitle, chapterContent, ebookTitle, style = "professional illustration", characters = [] } = await req.json();
     
     if (!chapterTitle) {
       return new Response(
@@ -26,8 +26,20 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
+    // Ajouter les descriptions de personnages au prompt pour la cohérence
+    let charactersContext = '';
+    if (characters && characters.length > 0) {
+      charactersContext = '\n\nIMPORTANT - Personnages à représenter de manière cohérente:\n';
+      characters.forEach((char: any) => {
+        if (char.name && char.description) {
+          charactersContext += `- ${char.name}: ${char.description}\n`;
+        }
+      });
+      charactersContext += '\nCes personnages doivent TOUJOURS avoir exactement la même apparence physique dans toutes les images.';
+    }
+
     // Créer un prompt optimisé pour l'image du chapitre
-    const imagePrompt = `Create a ${style} for an ebook chapter titled "${chapterTitle}" from the book "${ebookTitle}". 
+    const imagePrompt = `Create a ${style} for an ebook chapter titled "${chapterTitle}" from the book "${ebookTitle}".${charactersContext}
     ${chapterContent ? `Chapter context: ${chapterContent.substring(0, 200)}...` : ''}
     Style: High quality, professional, suitable for an ebook illustration. Clear composition, engaging visual.`;
 

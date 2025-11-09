@@ -17,7 +17,8 @@ import {
   ChevronLeft,
   ChevronRight,
   CreditCard,
-  Shield
+  Shield,
+  Users
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -39,6 +40,8 @@ interface MagazineSidebarProps {
 const sidebarItems: SidebarItem[] = [
   { id: 'planner', label: 'Planificateur', icon: BookOpen, color: 'coral-pink' },
   { id: 'templates', label: 'Templates', icon: FileText, color: 'cobalt-blue' },
+  { id: 'settings', label: 'Paramètres', icon: Settings, color: 'gray-400' },
+  { id: 'characters', label: 'Personnages', icon: Users, color: 'emerald-500', badge: 'IA' },
   { id: 'writing', label: 'Rédaction', icon: PenTool, color: 'honey-gold' },
   { id: 'tools', label: 'Outils', icon: Wrench, color: 'royal-purple' },
   { id: 'kdp', label: 'KDP', icon: BookMarked, color: 'emerald-500' },
@@ -49,7 +52,6 @@ const sidebarItems: SidebarItem[] = [
   { id: 'export', label: 'Export', icon: Download, color: 'royal-purple' },
   { id: 'toc', label: 'Sommaire', icon: List, color: 'cobalt-blue' },
   { id: 'images', label: 'Images', icon: Image, color: 'coral-pink' },
-  { id: 'settings', label: 'Paramètres', icon: Settings, color: 'gray-400' },
 ];
 
 export function MagazineSidebar({ 

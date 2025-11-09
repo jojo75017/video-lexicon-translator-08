@@ -43,11 +43,13 @@ import { EbookPreview } from '@/components/ebook/EbookPreview';
 import { EbookCoverGenerator } from '@/components/ebook/EbookCoverGenerator';
 import { EbookWritingAssistant } from '@/components/ebook/EbookWritingAssistant';
 import { EbookBackCoverGenerator } from '@/components/ebook/EbookBackCoverGenerator';
+import { EbookCharacters, type Character } from '@/components/ebook/EbookCharacters';
 import heroEbook from '@/assets/hero-ebook-robot.png';
 
 // Hooks et données
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
 import { ebookTemplates } from '@/data/ebookTemplates';
+import { type Character as EbookCharacter } from '@/components/ebook/EbookCharacters';
 
 interface EbookPlannerPageProps {
   subscriberEmail?: string;
@@ -95,6 +97,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   const [preface, setPreface] = useState(savedData?.preface || '');
   const [conclusion, setConclusion] = useState(savedData?.conclusion || '');
   const [chapters, setChapters] = useState<Chapter[]>(savedData?.chapters || []);
+  const [characters, setCharacters] = useState<EbookCharacter[]>(savedData?.characters || []);
   const [numberOfChapters, setNumberOfChapters] = useState(savedData?.numberOfChapters || 8);
   const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
   const [importText, setImportText] = useState('');
@@ -130,6 +133,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
       chapters,
       numberOfChapters,
       ebookImages,
+      characters,
       lastSaved: new Date().toISOString()
     };
     
@@ -475,6 +479,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
     setDetailLevel('détaillé');
     setTone('professionnel');
     setNarrativeFormat('troisième personne');
+    setCharacters([]);
     
     // Effacer également le localStorage
     try {
@@ -1004,11 +1009,20 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
           />
         );
       
+      case 'characters':
+        return (
+          <EbookCharacters
+            characters={characters}
+            onUpdateCharacters={setCharacters}
+          />
+        );
+      
       case 'images':
         return (
           <EbookChapterImageGenerator
             ebookTitle={ebookTitle}
             chapters={chapters}
+            characters={characters}
           />
         );
       
