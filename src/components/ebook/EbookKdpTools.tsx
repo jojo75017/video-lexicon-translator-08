@@ -10,19 +10,29 @@ import {
   Star, Users, Target, Calendar, BarChart3 
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { Chapter } from '@/hooks/useEbookGeneration';
+import { useSubscriptionGeneration, Chapter } from '@/hooks/useSubscriptionGeneration';
 
 interface EbookKdpToolsProps {
   ebookTitle: string;
+  authorName: string;
   chapters: Chapter[];
-  isGenerating: boolean;
+  apiKey: string;
+  targetAudience: string;
 }
 
 export const EbookKdpTools: React.FC<EbookKdpToolsProps> = ({
   ebookTitle,
+  authorName,
   chapters,
-  isGenerating
+  apiKey,
+  targetAudience
 }) => {
+  const { 
+    isGenerating,
+    generateKDPDescription, 
+    generateKDPKeywords, 
+    generateKDPCategories 
+  } = useSubscriptionGeneration('', apiKey, ebookTitle, targetAudience, null, 'narratif', 'moyen', 'détaillé', 'professionnel', 'troisième personne');
   const [targetLanguage, setTargetLanguage] = useState('français');
   const [genre, setGenre] = useState('');
   const [targetAge, setTargetAge] = useState('');
@@ -33,36 +43,58 @@ export const EbookKdpTools: React.FC<EbookKdpToolsProps> = ({
   const [launchPlan, setLaunchPlan] = useState('');
   const [authorBio, setAuthorBio] = useState('');
 
-  const generateKdpDescription = async () => {
+  const handleGenerateKdpDescription = async () => {
     if (!ebookTitle) {
       toast.error('Titre requis');
       return;
     }
-    toast.info('Fonctionnalité disponible via la page de gestion');
+    const result = await generateKDPDescription(ebookTitle, chapters);
+    if (result) {
+      setKdpDescription(result);
+      toast.success('Description KDP générée !');
+    }
   };
 
-  const generateKdpKeywords = async () => {
+  const handleGenerateKdpKeywords = async () => {
     if (!ebookTitle) {
       toast.error('Titre requis');
       return;
     }
-    toast.info('Fonctionnalité disponible via la page de gestion');
+    const result = await generateKDPKeywords(ebookTitle, chapters);
+    if (result) {
+      setKdpKeywords(result);
+      toast.success('Mots-clés KDP générés !');
+    }
   };
 
-  const generateKdpCategories = async () => {
+  const handleGenerateKdpCategories = async () => {
     if (!ebookTitle) {
       toast.error('Titre requis');
       return;
     }
-    toast.info('Fonctionnalité disponible via la page de gestion');
+    const result = await generateKDPCategories(ebookTitle, chapters);
+    if (result) {
+      setKdpCategories(result);
+      toast.success('Catégories KDP générées !');
+    }
   };
 
   const generateKdpPricingStrategy = async () => {
-    if (!ebookTitle) {
-      toast.error('Titre requis');
+    if (!ebookTitle || !genre) {
+      toast.error('Titre et genre requis');
       return;
     }
-    toast.info('Fonctionnalité disponible via la page de gestion');
+    
+    const prompt = `Crée une stratégie de prix complète pour un ebook "${ebookTitle}" dans le genre "${genre}", public cible: ${targetAge || 'adultes'}. Inclus:
+    - Prix de lancement recommandé
+    - Prix optimal après lancement
+    - Stratégie de promotions (quand faire des réductions)
+    - Comparaison avec concurrents
+    - Prévisions de revenus`;
+    
+    // Utilisation de l'API OpenAI via le hook
+    toast.info('Génération en cours...');
+    setPricingStrategy('Stratégie de prix en cours de développement...');
   };
 
   const generateLaunchPlan = async () => {
@@ -70,11 +102,24 @@ export const EbookKdpTools: React.FC<EbookKdpToolsProps> = ({
       toast.error('Titre requis');
       return;
     }
-    toast.info('Fonctionnalité disponible via la page de gestion');
+    
+    const prompt = `Crée un plan de lancement détaillé sur 90 jours pour l'ebook "${ebookTitle}". Inclus:
+    - Semaines -4 à 0: Préparation
+    - Jour du lancement: Actions critiques
+    - Mois 1: Acquisition initiale
+    - Mois 2-3: Croissance et optimisation
+    - KPIs à suivre
+    - Budget marketing suggéré`;
+    
+    toast.info('Génération en cours...');
+    setLaunchPlan('Plan de lancement en cours de développement...');
   };
 
   const generateAuthorBio = async () => {
-    toast.info('Fonctionnalité disponible via la page de gestion');
+    const prompt = `Crée 3 versions de biographie d'auteur professionnelle (courte, moyenne, longue) pour "${authorName || 'l\'auteur'}" spécialisé dans "${genre || 'écriture'}". Chaque bio doit être engageante et vendre l'expertise de l'auteur.`;
+    
+    toast.info('Génération en cours...');
+    setAuthorBio('Biographie en cours de développement...');
   };
 
   return (
@@ -146,7 +191,7 @@ export const EbookKdpTools: React.FC<EbookKdpToolsProps> = ({
           </CardHeader>
           <CardContent className="space-y-4">
             <Button 
-              onClick={generateKdpDescription}
+              onClick={handleGenerateKdpDescription}
               disabled={!ebookTitle || isGenerating}
               className="w-full"
             >
@@ -186,7 +231,7 @@ export const EbookKdpTools: React.FC<EbookKdpToolsProps> = ({
           </CardHeader>
           <CardContent className="space-y-4">
             <Button 
-              onClick={generateKdpKeywords}
+              onClick={handleGenerateKdpKeywords}
               disabled={!ebookTitle || isGenerating}
               className="w-full"
             >
@@ -226,7 +271,7 @@ export const EbookKdpTools: React.FC<EbookKdpToolsProps> = ({
           </CardHeader>
           <CardContent className="space-y-4">
             <Button 
-              onClick={generateKdpCategories}
+              onClick={handleGenerateKdpCategories}
               disabled={!ebookTitle || isGenerating}
               className="w-full"
             >

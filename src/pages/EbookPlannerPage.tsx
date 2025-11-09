@@ -914,8 +914,10 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
         return (
           <EbookKdpTools
             ebookTitle={ebookTitle}
+            authorName={authorName}
             chapters={chapters}
-            isGenerating={isGenerating}
+            apiKey={apiKey}
+            targetAudience={targetAudience}
           />
         );
       
