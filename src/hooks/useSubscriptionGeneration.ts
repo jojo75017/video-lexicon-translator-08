@@ -255,7 +255,11 @@ Réponds avec un tableau JSON : ["mot1", "mot2",...]`;
     
     if (content) {
       try {
-        return JSON.parse(content);
+        // Nettoyage des balises markdown et extraction éventuelle du tableau JSON
+        let clean = content.trim().replace(/```json\s*|```/g, '').trim();
+        const match = clean.match(/\[[\s\S]*\]/);
+        const jsonText = match ? match[0] : clean;
+        return JSON.parse(jsonText);
       } catch {
         return null;
       }
@@ -272,7 +276,11 @@ Réponds avec un tableau JSON de catégories : ["catégorie1", "catégorie2",...
     
     if (content) {
       try {
-        return JSON.parse(content);
+        // Nettoyage des balises markdown et extraction éventuelle du tableau JSON
+        let clean = content.trim().replace(/```json\s*|```/g, '').trim();
+        const match = clean.match(/\[[\s\S]*\]/);
+        const jsonText = match ? match[0] : clean;
+        return JSON.parse(jsonText);
       } catch {
         return null;
       }

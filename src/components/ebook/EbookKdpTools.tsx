@@ -62,7 +62,8 @@ export const EbookKdpTools: React.FC<EbookKdpToolsProps> = ({
     }
     const result = await generateKDPKeywords(ebookTitle, chapters);
     if (result) {
-      setKdpKeywords(result);
+      const text = Array.isArray(result) ? JSON.stringify(result, null, 2) : String(result);
+      setKdpKeywords(text);
       toast.success('Mots-clés KDP générés !');
     }
   };
@@ -74,7 +75,8 @@ export const EbookKdpTools: React.FC<EbookKdpToolsProps> = ({
     }
     const result = await generateKDPCategories(ebookTitle, chapters);
     if (result) {
-      setKdpCategories(result);
+      const text = Array.isArray(result) ? JSON.stringify(result, null, 2) : String(result);
+      setKdpCategories(text);
       toast.success('Catégories KDP générées !');
     }
   };
