@@ -342,6 +342,63 @@ Réponds avec la description complète uniquement, sans titre de section.`;
     return content;
   };
 
+  const generatePricingStrategy = async (ebookTitle: string, genre: string, targetAge: string) => {
+    const prompt = `Crée une stratégie de prix complète pour un ebook "${ebookTitle}" dans le genre "${genre}", public cible: ${targetAge || 'adultes'}. Inclus:
+    - Prix de lancement recommandé (en €)
+    - Prix optimal après lancement
+    - Stratégie de promotions (quand faire des réductions)
+    - Comparaison avec concurrents du genre
+    - Prévisions de revenus réalistes
+    
+    Présente le tout de manière structurée et professionnelle.`;
+    
+    const content = await callGenerateContent('chapters_generated', prompt);
+    if (content) {
+      toast.success('Stratégie de prix générée !');
+    }
+    return content;
+  };
+
+  const generateLaunchPlan = async (ebookTitle: string) => {
+    const prompt = `Crée un plan de lancement détaillé sur 90 jours pour l'ebook "${ebookTitle}". Inclus:
+    - Semaines -4 à 0: Préparation (création contenu, mise en place, pre-launch)
+    - Jour du lancement: Actions critiques heure par heure
+    - Mois 1: Acquisition initiale (tactiques, canaux, objectifs)
+    - Mois 2-3: Croissance et optimisation
+    - KPIs à suivre chaque semaine
+    - Budget marketing suggéré par phase
+    
+    Présente le tout sous forme de plan d'action détaillé et actionnable.`;
+    
+    const content = await callGenerateContent('chapters_generated', prompt);
+    if (content) {
+      toast.success('Plan de lancement généré !');
+    }
+    return content;
+  };
+
+  const generateAuthorBio = async (authorName: string, genre: string) => {
+    const prompt = `Crée 3 versions de biographie d'auteur professionnelle pour "${authorName || 'l\'auteur'}" spécialisé dans "${genre || 'écriture'}":
+    
+    1. **Courte** (50 mots): Pour les réseaux sociaux
+    2. **Moyenne** (150 mots): Pour Amazon KDP
+    3. **Longue** (300 mots): Pour site web personnel
+    
+    Chaque bio doit :
+    - Être engageante et professionnelle
+    - Mettre en avant l'expertise
+    - Créer de la crédibilité
+    - Inclure un ton chaleureux et accessible
+    
+    Présente les 3 versions clairement séparées.`;
+    
+    const content = await callGenerateContent('chapters_generated', prompt);
+    if (content) {
+      toast.success('Biographie générée !');
+    }
+    return content;
+  };
+
   return {
     isGenerating,
     generateChapterContent,
@@ -353,6 +410,9 @@ Réponds avec la description complète uniquement, sans titre de section.`;
     generateKDPDescription,
     generateKDPKeywords,
     generateKDPCategories,
-    generateBackCover
+    generateBackCover,
+    generatePricingStrategy,
+    generateLaunchPlan,
+    generateAuthorBio
   };
 };
