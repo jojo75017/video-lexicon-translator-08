@@ -85,14 +85,20 @@ export const EbookKdpTools: React.FC<EbookKdpToolsProps> = ({
   };
 
   const handleGeneratePricingStrategy = async () => {
-    if (!ebookTitle || !genre) {
-      toast.error('Titre et genre requis');
+    if (!ebookTitle) {
+      toast.error('Titre de l\'ebook requis');
+      return;
+    }
+    
+    if (!genre) {
+      toast.error('Veuillez renseigner le genre de votre ebook');
       return;
     }
     
     const result = await generatePricingStrategy(ebookTitle, genre, targetAge);
     if (result) {
       setPricingStrategy(result);
+      toast.success('Stratégie de prix générée !');
     }
   };
 
