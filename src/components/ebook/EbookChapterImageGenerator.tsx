@@ -91,7 +91,15 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
         setProgress(((i + 1) / chapters.length) * 100);
       } catch (error: any) {
         console.error(`Error generating image for chapter ${chapter.title}:`, error);
-        toast.error(`Erreur pour "${chapter.title}": ${error.message}`);
+        
+        // Gestion spécifique des erreurs de crédits et rate limiting
+        if (error.message?.includes('402') || error.context?.body?.error?.includes('Crédits épuisés')) {
+          toast.error('⚠️ Crédits épuisés. Veuillez ajouter des crédits à votre espace de travail Lovable (Settings > Workspace > Usage).');
+        } else if (error.message?.includes('429') || error.context?.body?.error?.includes('Limite de requêtes')) {
+          toast.error('⏱️ Trop de requêtes. Veuillez patienter quelques instants avant de réessayer.');
+        } else {
+          toast.error(`Erreur pour "${chapter.title}": ${error.message || 'Erreur inconnue'}`);
+        }
       }
     }
 
@@ -144,7 +152,15 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
       }
     } catch (error: any) {
       console.error('Error generating chapter image:', error);
-      toast.error(`Erreur: ${error.message}`);
+      
+      // Gestion spécifique des erreurs de crédits et rate limiting
+      if (error.message?.includes('402') || error.context?.body?.error?.includes('Crédits épuisés')) {
+        toast.error('⚠️ Crédits épuisés. Veuillez ajouter des crédits à votre espace de travail Lovable (Settings > Workspace > Usage).');
+      } else if (error.message?.includes('429') || error.context?.body?.error?.includes('Limite de requêtes')) {
+        toast.error('⏱️ Trop de requêtes. Veuillez patienter quelques instants avant de réessayer.');
+      } else {
+        toast.error(`Erreur: ${error.message || 'Erreur inconnue'}`);
+      }
     } finally {
       setIsGenerating(false);
     }
