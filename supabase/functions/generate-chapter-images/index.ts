@@ -78,11 +78,15 @@ serve(async (req) => {
       );
     }
 
-    // Si useOpenAI est true, utiliser OpenAI, sinon Lovable AI
+    // Si useOpenAI est true, tenter OpenAI d'abord, sinon fallback vers Lovable AI
     if (useOpenAI && openaiApiKey) {
-      return await generateWithOpenAI(chapterTitle, chapterContent, ebookTitle, style, characters, openaiApiKey);
+      try {
+        return await generateWithOpenAI(chapterTitle, chapterContent, ebookTitle, style, characters, openaiApiKey);
+      } catch (err) {
+        console.error('OpenAI image generation failed, falling back to Lovable AI:', err);
+        // Poursuite vers génération Lovable AI ci-dessous
+      }
     }
-
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY is not configured');

@@ -215,12 +215,17 @@ serve(async (req) => {
       );
     }
 
-    // Si useOpenAI est true, utiliser OpenAI, sinon Lovable AI
+    // Si useOpenAI est true, tenter OpenAI, sinon Lovable AI (fallback automatique)
     if (useOpenAI && openaiApiKey) {
-      return await generateWithOpenAI(ebookTitle, authorName, genre, style, variation, openaiApiKey);
+      try {
+        return await generateWithOpenAI(ebookTitle, authorName, genre, style, variation, openaiApiKey);
+      } catch (err) {
+        console.error('OpenAI generation failed, falling back to Lovable AI:', err);
+        // Continue vers Lovable AI ci-dessous
+      }
     }
 
-    // Utiliser Lovable AI par défaut
+    // Utiliser Lovable AI par défaut (ou en fallback)
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
       console.error('LOVABLE_API_KEY not configured');
@@ -231,7 +236,6 @@ serve(async (req) => {
     }
 
     return await generateWithLovableAI(ebookTitle, authorName, genre, style, variation, LOVABLE_API_KEY);
-
   } catch (error) {
     console.error('Error in generate-cover-image:', error);
     return new Response(
