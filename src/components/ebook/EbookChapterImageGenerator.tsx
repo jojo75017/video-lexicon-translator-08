@@ -4,10 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
-import { Image, Sparkles, Download, Copy, Check } from 'lucide-react';
+import { Image, Sparkles, Download, Copy, Check, Settings } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { type Character } from './EbookCharacters';
+import { OpenAIConfigPanel } from '@/components/shared/OpenAIConfigPanel';
+import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 interface Chapter {
   id: string;
@@ -35,11 +38,13 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
   chapters,
   characters = []
 }) => {
+  const { hasValidApiKey, getConfig } = useOpenAIConfig();
   const [isGenerating, setIsGenerating] = useState(false);
   const [imageStyle, setImageStyle] = useState<string>('professional illustration');
   const [generatedImages, setGeneratedImages] = useState<ChapterImage[]>([]);
   const [progress, setProgress] = useState(0);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [showConfig, setShowConfig] = useState(false);
 
   const styleOptions = [
     { value: 'professional illustration', label: '🎨 Illustration professionnelle' },
@@ -55,6 +60,9 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
       toast.error('Titre et chapitres requis');
       return;
     }
+
+    const config = getConfig();
+    const useOpenAI = hasValidApiKey();
 
     setIsGenerating(true);
     setProgress(0);
@@ -72,7 +80,9 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
             characters: characters.map(c => ({
               name: c.name,
               description: c.description
-            }))
+            })),
+            useOpenAI,
+            openaiApiKey: useOpenAI ? config.apiKey : undefined
           }
         });
 
@@ -117,6 +127,9 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
       return;
     }
 
+    const config = getConfig();
+    const useOpenAI = hasValidApiKey();
+
     setIsGenerating(true);
 
     try {
@@ -129,7 +142,9 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
           characters: characters.map(c => ({
             name: c.name,
             description: c.description
-          }))
+          })),
+          useOpenAI,
+          openaiApiKey: useOpenAI ? config.apiKey : undefined
         }
       });
 
@@ -206,10 +221,28 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
             🎨 Générateur d'Images AI pour Chapitres
           </CardTitle>
           <CardDescription style={{ color: 'hsl(var(--royal-purple) / 0.8)' }}>
-            Créez des illustrations cohérentes et professionnelles pour chaque chapitre avec Lovable AI
+            {hasValidApiKey() 
+              ? "Utilise votre clé OpenAI personnelle pour générer des images" 
+              : "Créez des illustrations avec Lovable AI (crédits requis)"}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
+          <Collapsible open={showConfig} onOpenChange={setShowConfig}>
+            <CollapsibleTrigger asChild>
+              <Button variant="outline" className="w-full">
+                <Settings className="h-4 w-4 mr-2" />
+                {hasValidApiKey() ? '✓ Clé OpenAI configurée' : 'Configurer clé OpenAI (optionnel)'}
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="mt-4">
+              <OpenAIConfigPanel 
+                title="Configuration OpenAI pour Images"
+                description="Utilisez votre propre clé API OpenAI pour générer des images sans limite de crédits Lovable"
+                showModelSelection={false}
+                compact
+              />
+            </CollapsibleContent>
+          </Collapsible>
           <div>
             <Label htmlFor="style">Style d'illustration</Label>
             <Select value={imageStyle} onValueChange={setImageStyle}>

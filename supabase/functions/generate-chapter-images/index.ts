@@ -6,19 +6,81 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+async function generateWithOpenAI(chapterTitle: string, chapterContent: string, ebookTitle: string, style: string, characters: any[], apiKey: string) {
+  let charactersContext = '';
+  if (characters && characters.length > 0) {
+    charactersContext = '\n\nIMPORTANT - Personnages à représenter de manière cohérente:\n';
+    characters.forEach((char: any) => {
+      if (char.name && char.description) {
+        charactersContext += `- ${char.name}: ${char.description}\n`;
+      }
+    });
+    charactersContext += '\nCes personnages doivent TOUJOURS avoir exactement la même apparence physique dans toutes les images.';
+  }
+
+  const imagePrompt = `Create a ${style} for an ebook chapter titled "${chapterTitle}" from the book "${ebookTitle}".${charactersContext}
+  ${chapterContent ? `Chapter context: ${chapterContent.substring(0, 200)}...` : ''}
+  Style: High quality, professional, suitable for an ebook illustration. Clear composition, engaging visual.`;
+
+  console.log('Generating image with OpenAI:', imagePrompt);
+
+  const response = await fetch('https://api.openai.com/v1/images/generations', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'gpt-image-1',
+      prompt: imagePrompt,
+      n: 1,
+      size: '1024x1024',
+      quality: 'high',
+      output_format: 'png'
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('OpenAI error:', response.status, errorText);
+    throw new Error(`OpenAI API error: ${response.status}`);
+  }
+
+  const data = await response.json();
+  const imageUrl = data.data?.[0]?.b64_json ? `data:image/png;base64,${data.data[0].b64_json}` : null;
+
+  if (!imageUrl) {
+    throw new Error('No image URL in OpenAI response');
+  }
+
+  console.log('Image generated successfully with OpenAI');
+  return new Response(
+    JSON.stringify({ 
+      imageUrl,
+      chapterTitle 
+    }),
+    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+  );
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { chapterTitle, chapterContent, ebookTitle, style = "professional illustration", characters = [] } = await req.json();
+    const { chapterTitle, chapterContent, ebookTitle, style = "professional illustration", characters = [], useOpenAI = false, openaiApiKey } = await req.json();
     
     if (!chapterTitle) {
       return new Response(
         JSON.stringify({ error: 'Titre du chapitre requis' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
+    }
+
+    // Si useOpenAI est true, utiliser OpenAI, sinon Lovable AI
+    if (useOpenAI && openaiApiKey) {
+      return await generateWithOpenAI(chapterTitle, chapterContent, ebookTitle, style, characters, openaiApiKey);
     }
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');

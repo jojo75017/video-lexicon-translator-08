@@ -4,10 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileText, Copy, Download, RefreshCw, Sparkles, Image as ImageIcon } from 'lucide-react';
+import { FileText, Copy, Download, RefreshCw, Sparkles, Image as ImageIcon, Settings } from 'lucide-react';
 import { toast } from 'sonner';
 import { Chapter } from '@/hooks/useSubscriptionGeneration';
 import { supabase } from '@/integrations/supabase/client';
+import { OpenAIConfigPanel } from '@/components/shared/OpenAIConfigPanel';
+import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 interface EbookBackCoverGeneratorProps {
   ebookTitle: string;
@@ -24,6 +27,7 @@ export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = (
   isGenerating,
   onGenerate
 }) => {
+  const { hasValidApiKey, getConfig } = useOpenAIConfig();
   const [tone, setTone] = useState<string>('professionnel');
   const [audience, setAudience] = useState<string>('grand-public');
   const [highlights, setHighlights] = useState<string>('');
@@ -35,6 +39,7 @@ export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = (
   const [selectedCover, setSelectedCover] = useState<number | null>(null);
   const [isGeneratingCover, setIsGeneratingCover] = useState(false);
   const [coverStyle, setCoverStyle] = useState<string>('moderne');
+  const [showConfig, setShowConfig] = useState(false);
 
   const handleGenerate = async () => {
     console.log('[BackCover] handleGenerate called', { ebookTitle, authorName, chaptersLength: chapters.length });
@@ -95,6 +100,9 @@ export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = (
       return;
     }
 
+    const config = getConfig();
+    const useOpenAI = hasValidApiKey();
+
     setIsGeneratingCover(true);
     const images: string[] = [];
     
@@ -109,7 +117,9 @@ export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = (
             authorName,
             style: coverStyle,
             genre: 'non-fiction',
-            variation: i + 1
+            variation: i + 1,
+            useOpenAI,
+            openaiApiKey: useOpenAI ? config.apiKey : undefined
           }
         });
 
@@ -137,9 +147,17 @@ export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = (
       } else {
         toast.error('Aucune image générée');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('[CoverGen] Error generating covers:', error);
-      toast.error('Erreur lors de la génération des couvertures');
+      
+      // Gestion spécifique des erreurs de crédits et rate limiting
+      if (error.message?.includes('402') || error.context?.body?.error?.includes('Crédits épuisés')) {
+        toast.error('⚠️ Crédits épuisés. Veuillez ajouter des crédits ou configurer une clé OpenAI personnelle.');
+      } else if (error.message?.includes('429') || error.context?.body?.error?.includes('Limite de requêtes')) {
+        toast.error('⏱️ Trop de requêtes. Veuillez patienter quelques instants avant de réessayer.');
+      } else {
+        toast.error('Erreur lors de la génération des couvertures');
+      }
     } finally {
       setIsGeneratingCover(false);
     }
@@ -150,6 +168,28 @@ export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = (
 
   return (
     <div className="space-y-6">
+      {/* Configuration OpenAI */}
+      <Collapsible open={showConfig} onOpenChange={setShowConfig}>
+        <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50">
+          <CardContent className="pt-6">
+            <CollapsibleTrigger asChild>
+              <Button variant="outline" className="w-full mb-4">
+                <Settings className="h-4 w-4 mr-2" />
+                {hasValidApiKey() ? '✓ Clé OpenAI configurée - Génération illimitée' : 'Configurer clé OpenAI personnelle (optionnel)'}
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <OpenAIConfigPanel 
+                title="Configuration OpenAI pour 4ème de Couverture"
+                description="Utilisez votre propre clé API OpenAI pour générer des images sans limite de crédits Lovable"
+                showModelSelection={false}
+                compact
+              />
+            </CollapsibleContent>
+          </CardContent>
+        </Card>
+      </Collapsible>
+
       {/* Génération de couverture */}
       <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-indigo-50">
         <CardHeader>
@@ -158,7 +198,9 @@ export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = (
             Générateur de 4ème de Couverture IA (Back Cover)
           </CardTitle>
           <CardDescription>
-            Créez une image de 4ème de couverture professionnelle avec deux sections : description du livre + bio auteur
+            {hasValidApiKey() 
+              ? "Utilise votre clé OpenAI personnelle pour générer des images" 
+              : "Créez une image de 4ème de couverture avec Lovable AI (crédits requis)"}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
