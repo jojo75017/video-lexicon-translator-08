@@ -108,11 +108,11 @@ export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = (
     setIsGeneratingCover(true);
     const images: string[] = [];
     
-    try {
-      // Générer 3 versions de couverture
-      for (let i = 0; i < 3; i++) {
-        console.log(`[CoverGen] Generating cover ${i + 1}/3`);
-        
+    // Générer 3 versions de couverture
+    for (let i = 0; i < 3; i++) {
+      console.log(`[CoverGen] Generating cover ${i + 1}/3`);
+      
+      try {
         const { data, error } = await supabase.functions.invoke('generate-cover-image', {
           body: {
             ebookTitle,
@@ -129,35 +129,14 @@ export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = (
 
         if (error) {
           console.error(`[CoverGen] Error on version ${i + 1}:`, error);
-          throw error;
-        }
-
-        if (data?.imageUrl) {
-          images.push(data.imageUrl);
-          console.log(`[CoverGen] Image ${i + 1} generated successfully`);
-        } else {
-          console.warn(`[CoverGen] No imageUrl in response ${i + 1}`);
-        }
-      }
-
-      console.log('[CoverGen] Total images generated:', images.length);
-      
-      if (images.length > 0) {
-        setCoverImages(images);
-        setSelectedCover(0);
-        toast.success(`${images.length} couvertures générées !`);
-      } else {
-        toast.error('Aucune image générée');
-      }
-      } catch (error: any) {
-        console.error('[CoverGen] Error generating covers:', error);
-
-        // Si crédits Lovable épuisés et clé OpenAI disponible, réessayer immédiatement avec OpenAI
-        const creditsError = error?.message?.includes('402') || error?.context?.body?.error?.includes('Crédits épuisés');
-        if (creditsError && !useOpenAI && !!config.apiKey && !triedOpenAI) {
-          try {
-            console.warn('[CoverGen] Retrying with OpenAI API key after credits error');
+          
+          // Si crédits Lovable épuisés et clé OpenAI disponible, basculer vers OpenAI
+          const creditsError = error.message?.includes('402') || error.context?.body?.error?.includes('Crédits épuisés');
+          if (creditsError && !useOpenAI && !!config.apiKey && !triedOpenAI) {
+            console.warn('[CoverGen] Switching to OpenAI after credits exhausted');
             triedOpenAI = true;
+            useOpenAI = true;
+            
             const { data: retryData, error: retryError } = await supabase.functions.invoke('generate-cover-image', {
               body: {
                 ebookTitle,
@@ -169,28 +148,45 @@ export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = (
                 openaiApiKey: config.apiKey
               }
             });
-            if (retryError) throw retryError;
-            if (retryData?.imageUrl) {
+            
+            if (!retryError && retryData?.imageUrl) {
               images.push(retryData.imageUrl);
-              console.log(`[CoverGen] Image ${i + 1} generated successfully after OpenAI retry`);
+              console.log(`[CoverGen] Image ${i + 1} generated with OpenAI fallback`);
               continue;
             }
-          } catch (retryErr) {
-            console.error('[CoverGen] OpenAI retry failed:', retryErr);
           }
+          
+          throw error;
         }
-        
-        // Gestion spécifique des erreurs de crédits et rate limiting
-        if (error.message?.includes('402') || error.context?.body?.error?.includes('Crédits épuisés')) {
-          toast.error('⚠️ Crédits épuisés. Veuillez ajouter des crédits ou configurer une clé OpenAI personnelle.');
-        } else if (error.message?.includes('429') || error.context?.body?.error?.includes('Limite de requêtes')) {
-          toast.error('⏱️ Trop de requêtes. Veuillez patienter quelques instants avant de réessayer.');
+
+        if (data?.imageUrl) {
+          images.push(data.imageUrl);
+          console.log(`[CoverGen] Image ${i + 1} generated successfully`);
         } else {
-          toast.error('Erreur lors de la génération des couvertures');
+          console.warn(`[CoverGen] No imageUrl in response ${i + 1}`);
         }
-      } finally {
-        setIsGeneratingCover(false);
+      } catch (error: any) {
+        console.error(`[CoverGen] Failed to generate cover ${i + 1}:`, error);
+        
+        if (error.message?.includes('402') || error.context?.body?.error?.includes('Crédits épuisés')) {
+          toast.error('⚠️ Crédits épuisés. Veuillez configurer une clé OpenAI personnelle.');
+        } else if (error.message?.includes('429')) {
+          toast.error('⏱️ Trop de requêtes. Veuillez patienter.');
+        }
       }
+    }
+
+    console.log('[CoverGen] Total images generated:', images.length);
+    
+    if (images.length > 0) {
+      setCoverImages(images);
+      setSelectedCover(0);
+      toast.success(`${images.length} couvertures générées !`);
+    } else {
+      toast.error('Aucune image générée');
+    }
+    
+    setIsGeneratingCover(false);
   };
 
   const selectedText = selectedVersion !== null ? generatedVersions[selectedVersion] : '';

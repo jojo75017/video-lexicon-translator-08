@@ -16,11 +16,13 @@ export const AuthPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if already authenticated
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        navigate('/admin');
+        const { data } = await supabase.functions.invoke('check-admin');
+        if (data?.isAdmin) {
+          navigate('/admin');
+        }
       }
     };
     checkAuth();

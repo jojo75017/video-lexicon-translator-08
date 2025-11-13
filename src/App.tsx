@@ -22,51 +22,42 @@ const App = () => {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
-    // Check admin auth
-    const ensureAdmin = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+    const initAuth = async () => {
+      // Check subscriber auth
+      const savedEmail = localStorage.getItem('subscriber_email');
+      const savedData = localStorage.getItem('subscriber_data');
+      if (savedEmail && savedData) {
+        setSubscriberEmail(savedEmail);
+        setSubscriberData(JSON.parse(savedData));
+        setIsAuthenticated(true);
+      }
 
+      // Check admin session
+      const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         try {
-          // First check
-          const { data, error } = await supabase.functions.invoke('check-admin');
-          if (!error && data?.isAdmin) {
-            setIsAdmin(true);
-          } else {
-            // Attempt one-time bootstrap (only if no admin exists)
-            try {
-              await supabase.functions.invoke('bootstrap-admin');
-              const { data: recheck } = await supabase.functions.invoke('check-admin');
-              if (recheck?.isAdmin) setIsAdmin(true);
-            } catch (e) {
-              // ignore if already initialized
-            }
-          }
-        } catch (error) {
-          console.error('Error ensuring admin status:', error);
+          await supabase.functions.invoke('bootstrap-admin');
+        } catch (e) {
+          // Ignore - may already exist
+        }
+        
+        const { data } = await supabase.functions.invoke('check-admin');
+        if (data?.isAdmin) {
+          setIsAdmin(true);
         }
       }
 
       setIsCheckingAuth(false);
     };
 
-    // Check subscriber auth
-    const savedEmail = localStorage.getItem('subscriber_email');
-    const savedData = localStorage.getItem('subscriber_data');
-    if (savedEmail && savedData) {
-      setSubscriberEmail(savedEmail);
-      setSubscriberData(JSON.parse(savedData));
-      setIsAuthenticated(true);
-    }
-
-    ensureAdmin();
+    initAuth();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        // Defer to avoid deadlocks per best practices
-        setTimeout(() => {
-          ensureAdmin();
+        setTimeout(async () => {
+          const { data } = await supabase.functions.invoke('check-admin');
+          if (data?.isAdmin) setIsAdmin(true);
         }, 0);
       } else if (event === 'SIGNED_OUT') {
         setIsAdmin(false);
