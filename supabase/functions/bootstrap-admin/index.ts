@@ -52,6 +52,34 @@ Deno.serve(async (req) => {
 
     const adminExists = (existingAdmins?.length ?? 0) > 0;
     if (adminExists) {
+      // If a specific owner email logs in, ensure they are admin too (idempotent)
+      const ownerEmail = 'boubetgeorges@gmail.com';
+      if (user.email && user.email.toLowerCase() === ownerEmail) {
+        const { data: hasAdminRole } = await supabaseService
+          .from('user_roles')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('role', 'admin')
+          .maybeSingle();
+
+        if (!hasAdminRole) {
+          const { error: insertOwnerError } = await supabaseService
+            .from('user_roles')
+            .insert({ user_id: user.id, role: 'admin' });
+          if (insertOwnerError) {
+            console.error('Insert owner admin error:', insertOwnerError);
+            return new Response(
+              JSON.stringify({ success: false, error: 'Impossible d\'attribuer le rôle admin au propriétaire' }),
+              { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+            );
+          }
+        }
+        return new Response(
+          JSON.stringify({ success: true, initialized: true, ensuredOwnerAdmin: true }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+        );
+      }
+
       return new Response(
         JSON.stringify({ success: false, initialized: true }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
