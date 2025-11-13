@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Mail, Lock, Unlock, HelpCircle, Loader2, Eye, EyeOff, Shield } from 'lucide-react';
@@ -175,6 +176,13 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-secondary/10 p-4">
       <Card className="w-full max-w-md p-8 space-y-6">
         <div className="text-center space-y-2">
+          {hasAdminSession && (
+            <div className="flex justify-center">
+              <Badge className="mb-2">
+                Session admin active
+              </Badge>
+            </div>
+          )}
           <div className="flex justify-center mb-4">
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
               <Lock className="w-8 h-8 text-primary" />
