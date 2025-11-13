@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Mail, Lock, Unlock, HelpCircle, Loader2, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, Unlock, HelpCircle, Loader2, Eye, EyeOff, Shield } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Dialog,
@@ -28,7 +28,50 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
   const [isRecoveryOpen, setIsRecoveryOpen] = useState(false);
   const [recoveryEmail, setRecoveryEmail] = useState('');
   const [isRecovering, setIsRecovering] = useState(false);
+  const [hasAdminSession, setHasAdminSession] = useState(false);
+  const [isCheckingAdmin, setIsCheckingAdmin] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkAdminSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        setHasAdminSession(true);
+      }
+    };
+    checkAdminSession();
+  }, []);
+
+  const handleAdminAccess = async () => {
+    setIsCheckingAdmin(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error('Aucune session admin active', {
+          description: 'Veuillez vous connecter via "Connexion Admin"'
+        });
+        navigate('/auth');
+        return;
+      }
+
+      await supabase.functions.invoke('bootstrap-admin');
+      const { data } = await supabase.functions.invoke('check-admin');
+      
+      if (data?.isAdmin) {
+        toast.success('Accès admin confirmé');
+        navigate('/admin');
+      } else {
+        toast.error('Accès refusé', {
+          description: 'Votre compte n\'a pas les droits administrateur'
+        });
+      }
+    } catch (error) {
+      console.error('Admin access error:', error);
+      toast.error('Erreur lors de la vérification');
+    } finally {
+      setIsCheckingAdmin(false);
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -287,13 +330,35 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
           
           <div className="pt-3 border-t">
             <p className="mb-2">Administrateur ?</p>
-            <Link 
-              to="/auth"
-              className="inline-flex items-center gap-2 text-primary hover:underline font-medium"
-            >
-              <Lock className="w-4 h-4" />
-              Connexion Admin
-            </Link>
+            <div className="flex flex-col gap-2">
+              {hasAdminSession && (
+                <Button
+                  variant="default"
+                  className="w-full"
+                  onClick={handleAdminAccess}
+                  disabled={isCheckingAdmin}
+                >
+                  {isCheckingAdmin ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Vérification...
+                    </>
+                  ) : (
+                    <>
+                      <Shield className="w-4 h-4 mr-2" />
+                      Accès Admin direct
+                    </>
+                  )}
+                </Button>
+              )}
+              <Link 
+                to="/auth"
+                className="inline-flex items-center justify-center gap-2 text-primary hover:underline font-medium"
+              >
+                <Lock className="w-4 h-4" />
+                Connexion Admin
+              </Link>
+            </div>
           </div>
         </div>
       </Card>
