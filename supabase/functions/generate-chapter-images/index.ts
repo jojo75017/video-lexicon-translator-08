@@ -9,18 +9,28 @@ const corsHeaders = {
 async function generateWithOpenAI(chapterTitle: string, chapterContent: string, ebookTitle: string, style: string, characters: any[], apiKey: string) {
   let charactersContext = '';
   if (characters && characters.length > 0) {
-    charactersContext = '\n\nIMPORTANT - Personnages à représenter de manière cohérente:\n';
+    charactersContext = '\n\nIMPORTANT - Personnages principaux de l\'histoire (à représenter de manière STRICTEMENT cohérente):\n';
     characters.forEach((char: any) => {
       if (char.name && char.description) {
-        charactersContext += `- ${char.name}: ${char.description}\n`;
+        charactersContext += `- ${char.name}: ${char.description} [Cette apparence DOIT être identique dans TOUTES les images]\n`;
       }
     });
-    charactersContext += '\nCes personnages doivent TOUJOURS avoir exactement la même apparence physique dans toutes les images.';
+    charactersContext += '\n⚠️ RÈGLE ABSOLUE: Les mêmes personnages doivent avoir EXACTEMENT la même apparence physique, les mêmes vêtements, la même coiffure dans chaque image de l\'ebook. Continuité visuelle OBLIGATOIRE.';
   }
 
-  const imagePrompt = `Create a ${style} for an ebook chapter titled "${chapterTitle}" from the book "${ebookTitle}".${charactersContext}
-  ${chapterContent ? `Chapter context: ${chapterContent.substring(0, 200)}...` : ''}
-  Style: High quality, professional, suitable for an ebook illustration. Clear composition, engaging visual.`;
+  const imagePrompt = `Contexte de l'ebook: "${ebookTitle}"
+Chapitre à illustrer: "${chapterTitle}"
+${chapterContent ? `Résumé du chapitre: ${chapterContent.substring(0, 300)}...` : ''}
+${charactersContext}
+
+Style artistique demandé: ${style}
+
+Instructions de génération:
+- Créer une illustration de haute qualité adaptée à un ebook professionnel
+- Composition claire et visuellement engageante
+- Si des personnages sont mentionnés ci-dessus, les représenter avec EXACTEMENT les mêmes caractéristiques physiques que décrites
+- Cohérence visuelle absolue pour tous les personnages récurrents
+- L'illustration doit refléter le thème et l'atmosphère du titre de l'ebook "${ebookTitle}"`;
 
   console.log('Generating image with OpenAI:', imagePrompt);
 
@@ -95,19 +105,29 @@ serve(async (req) => {
     // Ajouter les descriptions de personnages au prompt pour la cohérence
     let charactersContext = '';
     if (characters && characters.length > 0) {
-      charactersContext = '\n\nIMPORTANT - Personnages à représenter de manière cohérente:\n';
+      charactersContext = '\n\nIMPORTANT - Personnages principaux de l\'histoire (à représenter de manière STRICTEMENT cohérente):\n';
       characters.forEach((char: any) => {
         if (char.name && char.description) {
-          charactersContext += `- ${char.name}: ${char.description}\n`;
+          charactersContext += `- ${char.name}: ${char.description} [Cette apparence DOIT être identique dans TOUTES les images]\n`;
         }
       });
-      charactersContext += '\nCes personnages doivent TOUJOURS avoir exactement la même apparence physique dans toutes les images.';
+      charactersContext += '\n⚠️ RÈGLE ABSOLUE: Les mêmes personnages doivent avoir EXACTEMENT la même apparence physique, les mêmes vêtements, la même coiffure dans chaque image de l\'ebook. Continuité visuelle OBLIGATOIRE.';
     }
 
     // Créer un prompt optimisé pour l'image du chapitre
-    const imagePrompt = `Create a ${style} for an ebook chapter titled "${chapterTitle}" from the book "${ebookTitle}".${charactersContext}
-    ${chapterContent ? `Chapter context: ${chapterContent.substring(0, 200)}...` : ''}
-    Style: High quality, professional, suitable for an ebook illustration. Clear composition, engaging visual.`;
+    const imagePrompt = `Contexte de l'ebook: "${ebookTitle}"
+Chapitre à illustrer: "${chapterTitle}"
+${chapterContent ? `Résumé du chapitre: ${chapterContent.substring(0, 300)}...` : ''}
+${charactersContext}
+
+Style artistique demandé: ${style}
+
+Instructions de génération:
+- Créer une illustration de haute qualité adaptée à un ebook professionnel
+- Composition claire et visuellement engageante
+- Si des personnages sont mentionnés ci-dessus, les représenter avec EXACTEMENT les mêmes caractéristiques physiques que décrites
+- Cohérence visuelle absolue pour tous les personnages récurrents
+- L'illustration doit refléter le thème et l'atmosphère du titre de l'ebook "${ebookTitle}"`;
 
     console.log('Generating image with prompt:', imagePrompt);
 
@@ -168,9 +188,19 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error in generate-chapter-images:', error);
+    
+    // Log détaillé pour déboguer
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown',
+      stack: error instanceof Error ? error.stack : undefined,
+      chapterTitle,
+      ebookTitle
+    });
+    
     return new Response(
       JSON.stringify({ 
-        error: error instanceof Error ? error.message : 'Erreur inconnue' 
+        error: error instanceof Error ? error.message : 'Erreur inconnue lors de la génération de l\'image',
+        details: 'Vérifiez vos crédits Lovable AI ou votre clé OpenAI'
       }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
