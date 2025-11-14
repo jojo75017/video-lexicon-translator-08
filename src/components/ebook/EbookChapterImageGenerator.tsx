@@ -102,13 +102,30 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
       } catch (error: any) {
         console.error(`Error generating image for chapter ${chapter.title}:`, error);
         
+        // Logging détaillé pour déboguer
+        console.error('Full error details:', {
+          message: error.message,
+          context: error.context,
+          chapter: chapter.title
+        });
+        
         // Gestion spécifique des erreurs de crédits et rate limiting
-        if (error.message?.includes('402') || error.context?.body?.error?.includes('Crédits épuisés')) {
-          toast.error('⚠️ Crédits épuisés. Veuillez ajouter des crédits à votre espace de travail Lovable (Settings > Workspace > Usage).');
-        } else if (error.message?.includes('429') || error.context?.body?.error?.includes('Limite de requêtes')) {
-          toast.error('⏱️ Trop de requêtes. Veuillez patienter quelques instants avant de réessayer.');
+        if (error.message?.includes('402') || error.context?.body?.error?.includes('Crédits épuisés') || error.context?.body?.error?.includes('crédits')) {
+          toast.error('⚠️ Crédits épuisés', {
+            description: 'Veuillez ajouter des crédits Lovable AI (Settings > Workspace > Usage) ou configurer une clé OpenAI.'
+          });
+        } else if (error.message?.includes('429') || error.context?.body?.error?.includes('Limite de requêtes') || error.context?.body?.error?.includes('rate limit')) {
+          toast.error('⏱️ Trop de requêtes', {
+            description: 'Veuillez patienter 1-2 minutes avant de réessayer.'
+          });
+        } else if (error.context?.body?.error) {
+          toast.error(`Erreur pour "${chapter.title}"`, {
+            description: error.context.body.error
+          });
         } else {
-          toast.error(`Erreur pour "${chapter.title}": ${error.message || 'Erreur inconnue'}`);
+          toast.error(`Erreur pour "${chapter.title}"`, {
+            description: error.message || 'Erreur de génération. Vérifiez votre connexion et vos crédits.'
+          });
         }
       }
     }
@@ -168,13 +185,30 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
     } catch (error: any) {
       console.error('Error generating chapter image:', error);
       
+      // Logging détaillé pour déboguer
+      console.error('Full error details:', {
+        message: error.message,
+        context: error.context,
+        chapter: chapter.title
+      });
+      
       // Gestion spécifique des erreurs de crédits et rate limiting
-      if (error.message?.includes('402') || error.context?.body?.error?.includes('Crédits épuisés')) {
-        toast.error('⚠️ Crédits épuisés. Veuillez ajouter des crédits à votre espace de travail Lovable (Settings > Workspace > Usage).');
-      } else if (error.message?.includes('429') || error.context?.body?.error?.includes('Limite de requêtes')) {
-        toast.error('⏱️ Trop de requêtes. Veuillez patienter quelques instants avant de réessayer.');
+      if (error.message?.includes('402') || error.context?.body?.error?.includes('Crédits épuisés') || error.context?.body?.error?.includes('crédits')) {
+        toast.error('⚠️ Crédits épuisés', {
+          description: 'Veuillez ajouter des crédits Lovable AI (Settings > Workspace > Usage) ou configurer une clé OpenAI.'
+        });
+      } else if (error.message?.includes('429') || error.context?.body?.error?.includes('Limite de requêtes') || error.context?.body?.error?.includes('rate limit')) {
+        toast.error('⏱️ Trop de requêtes', {
+          description: 'Veuillez patienter 1-2 minutes avant de réessayer.'
+        });
+      } else if (error.context?.body?.error) {
+        toast.error('Erreur de génération', {
+          description: error.context.body.error
+        });
       } else {
-        toast.error(`Erreur: ${error.message || 'Erreur inconnue'}`);
+        toast.error('Erreur de génération', {
+          description: error.message || 'Vérifiez votre connexion et vos crédits.'
+        });
       }
     } finally {
       setIsGenerating(false);
