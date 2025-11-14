@@ -150,18 +150,32 @@ Instructions de génération:
     });
 
     if (!response.ok) {
-      if (response.status === 429) {
+      // Si erreur 429 ou 402, tenter automatiquement le fallback vers OpenAI
+      if (response.status === 429 || response.status === 402) {
+        const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+        if (OPENAI_API_KEY) {
+          console.log('Lovable AI error, attempting automatic fallback to OpenAI...');
+          try {
+            return await generateWithOpenAI(chapterTitle, chapterContent, ebookTitle, style, characters, OPENAI_API_KEY);
+          } catch (openaiErr) {
+            console.error('OpenAI fallback failed:', openaiErr);
+            // Continuer vers l'erreur d'origine si le fallback échoue
+          }
+        }
+        
+        // Si pas de clé OpenAI ou fallback échoué, retourner l'erreur appropriée
+        if (response.status === 429) {
+          return new Response(
+            JSON.stringify({ error: 'Limite de requêtes atteinte. Veuillez réessayer dans quelques instants ou configurer une clé OpenAI.' }),
+            { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
         return new Response(
-          JSON.stringify({ error: 'Limite de requêtes atteinte. Veuillez réessayer dans quelques instants.' }),
-          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: 'Crédits épuisés. Veuillez ajouter des crédits à votre espace de travail Lovable.' }),
+          JSON.stringify({ error: 'Crédits épuisés. Veuillez ajouter des crédits ou configurer une clé OpenAI.' }),
           { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
+      
       const errorText = await response.text();
       console.error('AI Gateway error:', response.status, errorText);
       return new Response(
