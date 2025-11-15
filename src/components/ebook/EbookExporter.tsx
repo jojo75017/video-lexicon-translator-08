@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { Chapter } from '@/hooks/useEbookGeneration';
 import jsPDF from 'jspdf';
 import { supabase } from '@/integrations/supabase/client';
+import JSZip from 'jszip';
 
 interface EbookExporterProps {
   ebookTitle: string;
@@ -452,6 +453,269 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
     toast.success('Ebook exporté en format HTML !');
   };
 
+  const exportAsEPUB = async () => {
+    try {
+      const zip = new JSZip();
+      const uuid = `urn:uuid:${crypto.randomUUID()}`;
+      const now = new Date().toISOString();
+
+      // mimetype (doit être le premier fichier, non compressé)
+      zip.file('mimetype', 'application/epub+zip');
+
+      // META-INF/container.xml
+      zip.file('META-INF/container.xml', `<?xml version="1.0" encoding="UTF-8"?>
+<container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">
+  <rootfiles>
+    <rootfile full-path="OEBPS/content.opf" media-type="application/oebps-package+xml"/>
+  </rootfiles>
+</container>`);
+
+      // OEBPS/content.opf (métadonnées et manifest)
+      let manifestItems = '';
+      let spineItems = '';
+      
+      // Navigation
+      manifestItems += `    <item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/>\n`;
+      manifestItems += `    <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>\n`;
+      spineItems += `    <itemref idref="nav"/>\n`;
+
+      // Couverture
+      if (includeCoverPage) {
+        manifestItems += `    <item id="cover" href="cover.xhtml" media-type="application/xhtml+xml"/>\n`;
+        spineItems += `    <itemref idref="cover"/>\n`;
+      }
+
+      // Préface
+      if (preface) {
+        manifestItems += `    <item id="preface" href="preface.xhtml" media-type="application/xhtml+xml"/>\n`;
+        spineItems += `    <itemref idref="preface"/>\n`;
+      }
+
+      // Chapitres
+      chapters.forEach((_, index) => {
+        const chapterId = `chapter${index + 1}`;
+        manifestItems += `    <item id="${chapterId}" href="${chapterId}.xhtml" media-type="application/xhtml+xml"/>\n`;
+        spineItems += `    <itemref idref="${chapterId}"/>\n`;
+      });
+
+      // Conclusion
+      if (conclusion) {
+        manifestItems += `    <item id="conclusion" href="conclusion.xhtml" media-type="application/xhtml+xml"/>\n`;
+        spineItems += `    <itemref idref="conclusion"/>\n`;
+      }
+
+      const contentOpf = `<?xml version="1.0" encoding="UTF-8"?>
+<package version="3.0" xmlns="http://www.idpf.org/2007/opf" unique-identifier="book-id">
+  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <dc:identifier id="book-id">${uuid}</dc:identifier>
+    <dc:title>${ebookTitle}</dc:title>
+    <dc:language>fr</dc:language>
+    <dc:creator>${authorName || 'Auteur inconnu'}</dc:creator>
+    <dc:date>${now.split('T')[0]}</dc:date>
+    <meta property="dcterms:modified">${now}</meta>
+  </metadata>
+  <manifest>
+${manifestItems}  </manifest>
+  <spine toc="ncx">
+${spineItems}  </spine>
+</package>`;
+
+      zip.file('OEBPS/content.opf', contentOpf);
+
+      // OEBPS/toc.ncx
+      let navPoints = '';
+      let playOrder = 1;
+
+      if (includeCoverPage) {
+        navPoints += `    <navPoint id="nav-cover" playOrder="${playOrder++}">
+      <navLabel><text>Couverture</text></navLabel>
+      <content src="cover.xhtml"/>
+    </navPoint>\n`;
+      }
+
+      if (preface) {
+        navPoints += `    <navPoint id="nav-preface" playOrder="${playOrder++}">
+      <navLabel><text>Préface</text></navLabel>
+      <content src="preface.xhtml"/>
+    </navPoint>\n`;
+      }
+
+      chapters.forEach((chapter, index) => {
+        navPoints += `    <navPoint id="nav-chapter${index + 1}" playOrder="${playOrder++}">
+      <navLabel><text>${chapter.title}</text></navLabel>
+      <content src="chapter${index + 1}.xhtml"/>
+    </navPoint>\n`;
+      });
+
+      if (conclusion) {
+        navPoints += `    <navPoint id="nav-conclusion" playOrder="${playOrder++}">
+      <navLabel><text>Conclusion</text></navLabel>
+      <content src="conclusion.xhtml"/>
+    </navPoint>\n`;
+      }
+
+      const tocNcx = `<?xml version="1.0" encoding="UTF-8"?>
+<ncx version="2005-1" xmlns="http://www.daisy.org/z3986/2005/ncx/">
+  <head>
+    <meta name="dtb:uid" content="${uuid}"/>
+    <meta name="dtb:depth" content="1"/>
+    <meta name="dtb:totalPageCount" content="0"/>
+    <meta name="dtb:maxPageNumber" content="0"/>
+  </head>
+  <docTitle><text>${ebookTitle}</text></docTitle>
+  <navMap>
+${navPoints}  </navMap>
+</ncx>`;
+
+      zip.file('OEBPS/toc.ncx', tocNcx);
+
+      // OEBPS/nav.xhtml (EPUB 3 navigation)
+      let navContent = '';
+      if (includeCoverPage) navContent += `      <li><a href="cover.xhtml">Couverture</a></li>\n`;
+      if (preface) navContent += `      <li><a href="preface.xhtml">Préface</a></li>\n`;
+      chapters.forEach((chapter, index) => {
+        navContent += `      <li><a href="chapter${index + 1}.xhtml">${chapter.title}</a></li>\n`;
+      });
+      if (conclusion) navContent += `      <li><a href="conclusion.xhtml">Conclusion</a></li>\n`;
+
+      const navXhtml = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+<head>
+  <title>Table des matières</title>
+</head>
+<body>
+  <nav epub:type="toc" id="toc">
+    <h1>Table des matières</h1>
+    <ol>
+${navContent}    </ol>
+  </nav>
+</body>
+</html>`;
+
+      zip.file('OEBPS/nav.xhtml', navXhtml);
+
+      // OEBPS/cover.xhtml
+      if (includeCoverPage) {
+        const coverXhtml = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>${ebookTitle}</title>
+  <style>
+    body { text-align: center; padding: 2em; font-family: serif; }
+    h1 { font-size: 2.5em; margin-bottom: 0.5em; }
+    .author { font-size: 1.5em; font-style: italic; color: #666; }
+  </style>
+</head>
+<body>
+  <h1>${ebookTitle}</h1>
+  ${authorName ? `<p class="author">Par ${authorName}</p>` : ''}
+</body>
+</html>`;
+        zip.file('OEBPS/cover.xhtml', coverXhtml);
+      }
+
+      // OEBPS/preface.xhtml
+      if (preface) {
+        const prefaceXhtml = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Préface</title>
+  <style>
+    body { font-family: serif; line-height: 1.6; padding: 1em; max-width: 40em; margin: 0 auto; }
+    h1 { text-align: center; margin-bottom: 1em; }
+    p { text-align: justify; margin-bottom: 1em; }
+  </style>
+</head>
+<body>
+  <h1>Préface</h1>
+  ${preface.split('\n\n').map(p => `  <p>${p.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>`).join('\n')}
+</body>
+</html>`;
+        zip.file('OEBPS/preface.xhtml', prefaceXhtml);
+      }
+
+      // OEBPS/chapterX.xhtml
+      chapters.forEach((chapter, index) => {
+        let chapterHtml = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>${chapter.title}</title>
+  <style>
+    body { font-family: serif; line-height: 1.6; padding: 1em; max-width: 40em; margin: 0 auto; }
+    h1 { text-align: center; margin-bottom: 1em; border-bottom: 2px solid #333; padding-bottom: 0.5em; }
+    h2 { margin-top: 2em; margin-bottom: 1em; color: #444; }
+    p { text-align: justify; margin-bottom: 1em; }
+  </style>
+</head>
+<body>
+  <h1>Chapitre ${index + 1}: ${chapter.title}</h1>
+`;
+        if (chapter.content) {
+          chapterHtml += chapter.content.split('\n\n').map(p => `  <p>${p.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>`).join('\n');
+        }
+
+        chapter.subChapters.forEach((sub) => {
+          chapterHtml += `\n  <h2>${sub.title}</h2>\n`;
+          if (sub.content) {
+            chapterHtml += sub.content.split('\n\n').map(p => `  <p>${p.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>`).join('\n');
+          }
+        });
+
+        chapterHtml += `
+</body>
+</html>`;
+        zip.file(`OEBPS/chapter${index + 1}.xhtml`, chapterHtml);
+      });
+
+      // OEBPS/conclusion.xhtml
+      if (conclusion) {
+        const conclusionXhtml = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Conclusion</title>
+  <style>
+    body { font-family: serif; line-height: 1.6; padding: 1em; max-width: 40em; margin: 0 auto; }
+    h1 { text-align: center; margin-bottom: 1em; }
+    p { text-align: justify; margin-bottom: 1em; }
+  </style>
+</head>
+<body>
+  <h1>Conclusion</h1>
+  ${conclusion.split('\n\n').map(p => `  <p>${p.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>`).join('\n')}
+</body>
+</html>`;
+        zip.file('OEBPS/conclusion.xhtml', conclusionXhtml);
+      }
+
+      // Générer le fichier EPUB
+      const epubBlob = await zip.generateAsync({ 
+        type: 'blob',
+        mimeType: 'application/epub+zip',
+        compression: 'DEFLATE',
+        compressionOptions: { level: 9 }
+      });
+
+      const url = URL.createObjectURL(epubBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${ebookTitle || 'Mon-Ebook'}.epub`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast.success('Ebook exporté en format EPUB conforme !');
+    } catch (error) {
+      console.error('Erreur export EPUB:', error);
+      toast.error('Erreur lors de la génération de l\'EPUB');
+    }
+  };
+
   const exportKdpMetadata = () => {
     const metadata = `
 ═══════════════════════════════════════════════════════════
@@ -601,8 +865,7 @@ Paperback: 9.99€ - 19.99€
           toast.success('Fichier .doc créé (ouvrez-le dans Word pour le convertir en DOCX)');
           break;
         case 'epub':
-          toast.info('Export EPUB: Utilisez Calibre ou un service en ligne pour convertir votre PDF/HTML en EPUB');
-          exportAsHTML();
+          await exportAsEPUB();
           break;
         default:
           exportAsText();
