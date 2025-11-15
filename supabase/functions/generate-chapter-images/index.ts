@@ -152,11 +152,12 @@ Instructions de génération:
     if (!response.ok) {
       // Si erreur 429 ou 402, tenter automatiquement le fallback vers OpenAI
       if (response.status === 429 || response.status === 402) {
-        const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
-        if (OPENAI_API_KEY) {
-          console.log('Lovable AI error, attempting automatic fallback to OpenAI...');
+        const ENV_OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+        const FALLBACK_OPENAI_KEY = ENV_OPENAI_API_KEY || openaiApiKey;
+        if (FALLBACK_OPENAI_KEY) {
+          console.log('Lovable AI error, attempting automatic fallback to OpenAI using', ENV_OPENAI_API_KEY ? 'env' : 'client', 'key...');
           try {
-            return await generateWithOpenAI(chapterTitle, chapterContent, ebookTitle, style, characters, OPENAI_API_KEY);
+            return await generateWithOpenAI(chapterTitle, chapterContent, ebookTitle, style, characters, FALLBACK_OPENAI_KEY);
           } catch (openaiErr) {
             console.error('OpenAI fallback failed:', openaiErr);
             // Continuer vers l'erreur d'origine si le fallback échoue
