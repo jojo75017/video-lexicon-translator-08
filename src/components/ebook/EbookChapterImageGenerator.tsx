@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Image, Sparkles, Download, Copy, Check, Settings } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -277,6 +278,10 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
               />
             </CollapsibleContent>
           </Collapsible>
+          <div className="flex items-center gap-2 mb-3">
+            <Checkbox id="force-lovable" checked={forceLovable} onCheckedChange={(v) => setForceLovable(!!v)} />
+            <Label htmlFor="force-lovable" className="text-sm">Forcer Lovable AI (désactiver fallback OpenAI)</Label>
+          </div>
           <div>
             <Label htmlFor="style">Style d'illustration</Label>
             <Select value={imageStyle} onValueChange={setImageStyle}>
