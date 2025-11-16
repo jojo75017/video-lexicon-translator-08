@@ -79,7 +79,7 @@ serve(async (req) => {
   }
 
   try {
-    const { chapterTitle, chapterContent, ebookTitle, style = "professional illustration", characters = [], useOpenAI = false, openaiApiKey } = await req.json();
+    const { chapterTitle, chapterContent, ebookTitle, style = "professional illustration", characters = [], useOpenAI = false, openaiApiKey, disableOpenAIFallback = false, forceLovable = false } = await req.json();
     
     if (!chapterTitle) {
       return new Response(
@@ -88,8 +88,8 @@ serve(async (req) => {
       );
     }
 
-    // Si useOpenAI est true, tenter OpenAI d'abord, sinon fallback vers Lovable AI
-    if (useOpenAI && openaiApiKey) {
+    // Si useOpenAI est true et non forcé à Lovable, tenter OpenAI d'abord, sinon utiliser Lovable AI
+    if (useOpenAI && openaiApiKey && !forceLovable) {
       try {
         return await generateWithOpenAI(chapterTitle, chapterContent, ebookTitle, style, characters, openaiApiKey);
       } catch (err) {
@@ -150,37 +150,37 @@ Instructions de génération:
     });
 
     if (!response.ok) {
-      // Si erreur 429 ou 402, tenter automatiquement le fallback vers OpenAI
+      // Si erreur 429 ou 402, gérer clairement et fallback conditionnel vers OpenAI
       if (response.status === 429 || response.status === 402) {
-        const ENV_OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
-        const FALLBACK_OPENAI_KEY = ENV_OPENAI_API_KEY || openaiApiKey;
-        if (FALLBACK_OPENAI_KEY) {
-          console.log('Lovable AI error, attempting automatic fallback to OpenAI using', ENV_OPENAI_API_KEY ? 'env' : 'client', 'key...');
-          try {
-            return await generateWithOpenAI(chapterTitle, chapterContent, ebookTitle, style, characters, FALLBACK_OPENAI_KEY);
-          } catch (openaiErr) {
-            console.error('OpenAI fallback failed:', openaiErr);
-            // Continuer vers l'erreur d'origine si le fallback échoue
+        if (!disableOpenAIFallback) {
+          const ENV_OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+          const FALLBACK_OPENAI_KEY = ENV_OPENAI_API_KEY || openaiApiKey;
+          if (FALLBACK_OPENAI_KEY) {
+            console.log('Lovable AI error, attempting automatic fallback to OpenAI using', ENV_OPENAI_API_KEY ? 'env' : 'client', 'key...');
+            try {
+              return await generateWithOpenAI(chapterTitle, chapterContent, ebookTitle, style, characters, FALLBACK_OPENAI_KEY);
+            } catch (openaiErr) {
+              console.error('OpenAI fallback failed:', openaiErr);
+              // Continuer vers l'erreur d'origine si le fallback échoue
+            }
           }
         }
-        
-        // Si pas de clé OpenAI ou fallback échoué, retourner l'erreur appropriée
+        // Si pas de clé OpenAI ou fallback désactivé/échoué, retourner l'erreur appropriée
         if (response.status === 429) {
           return new Response(
-            JSON.stringify({ error: 'Limite de requêtes atteinte. Veuillez réessayer dans quelques instants ou configurer une clé OpenAI.' }),
+            JSON.stringify({ error: 'Limite de requêtes atteinte. Veuillez réessayer dans quelques instants.', code: 'RATE_LIMITED' }),
             { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
         }
         return new Response(
-          JSON.stringify({ error: 'Crédits épuisés. Veuillez ajouter des crédits ou configurer une clé OpenAI.' }),
+          JSON.stringify({ error: 'Crédits Lovable AI épuisés. Ajoutez des crédits ou utilisez une clé OpenAI.', code: 'PAYMENT_REQUIRED' }),
           { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
-      
       const errorText = await response.text();
       console.error('AI Gateway error:', response.status, errorText);
       return new Response(
-        JSON.stringify({ error: 'Erreur lors de la génération de l\'image' }),
+        JSON.stringify({ error: "Erreur lors de la génération de l'image" }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
