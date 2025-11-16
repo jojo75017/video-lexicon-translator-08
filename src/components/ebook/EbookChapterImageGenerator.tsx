@@ -46,6 +46,7 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
   const [progress, setProgress] = useState(0);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [showConfig, setShowConfig] = useState(false);
+  const [forceLovable, setForceLovable] = useState(false);
 
   const styleOptions = [
     { value: 'professional illustration', label: '🎨 Illustration professionnelle' },
@@ -69,73 +70,97 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
     setProgress(0);
     const newImages: ChapterImage[] = [];
 
+    const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
     for (let i = 0; i < chapters.length; i++) {
       const chapter = chapters[i];
-      try {
-        const { data, error } = await supabase.functions.invoke('generate-chapter-images', {
-          body: {
-            chapterTitle: chapter.title,
-            chapterContent: chapter.content || '',
-            ebookTitle,
-            style: imageStyle,
-            characters: characters.map(c => ({
-              name: c.name,
-              description: c.description
-            })),
-            useOpenAI,
-            openaiApiKey: useOpenAI ? config.apiKey : undefined
+      let attempt = 0;
+      const maxAttempts = 3;
+      let success = false;
+
+      while (attempt < maxAttempts && !success) {
+        try {
+          if (attempt > 0) {
+            const backoff = 1500 * Math.pow(2, attempt - 1);
+            toast.info(`Nouvelle tentative (${attempt + 1}/${maxAttempts}) pour "${chapter.title}" dans ${backoff/1000}s...`);
+            await delay(backoff);
           }
-        });
 
-        if (error) throw error;
-
-        if (data?.imageUrl) {
-          newImages.push({
-            chapterId: chapter.id,
-            chapterTitle: chapter.title,
-            imageUrl: data.imageUrl,
-            style: imageStyle
+          const { data, error } = await supabase.functions.invoke('generate-chapter-images', {
+            body: {
+              chapterTitle: chapter.title,
+              chapterContent: chapter.content || '',
+              ebookTitle,
+              style: imageStyle,
+              characters: characters.map(c => ({
+                name: c.name,
+                description: c.description
+              })),
+              useOpenAI,
+              openaiApiKey: useOpenAI ? config.apiKey : undefined,
+              disableOpenAIFallback: forceLovable,
+              forceLovable
+            }
           });
-          toast.success(`Image générée pour "${chapter.title}"`);
+
+          if (error) throw error;
+
+          if (data?.imageUrl) {
+            newImages.push({
+              chapterId: chapter.id,
+              chapterTitle: chapter.title,
+              imageUrl: data.imageUrl,
+              style: imageStyle
+            });
+            toast.success(`✅ Image générée pour "${chapter.title}"`);
+            success = true;
+          }
+        } catch (error: any) {
+          attempt++;
+          console.error(`Tentative ${attempt}/${maxAttempts} échouée pour ${chapter.title}:`, error);
+
+          if (attempt >= maxAttempts) {
+            // Dernière tentative échouée
+            if (error.message?.includes('402') || error.context?.body?.error?.includes('crédits') || error.context?.body?.code === 'PAYMENT_REQUIRED') {
+              toast.error('💳 Crédits Lovable AI épuisés', {
+                description: 'Ajoutez des crédits (Settings > Workspace > Usage) ou configurez une clé OpenAI.',
+                duration: 5000
+              });
+            } else if (error.message?.includes('429') || error.context?.body?.error?.includes('rate limit') || error.context?.body?.code === 'RATE_LIMITED') {
+              toast.error('⏱️ Limite de requêtes atteinte', {
+                description: 'Veuillez patienter 1-2 minutes avant de continuer.',
+                duration: 5000
+              });
+            } else if (error.context?.body?.error) {
+              toast.error(`❌ Échec pour "${chapter.title}"`, {
+                description: error.context.body.error,
+                duration: 4000
+              });
+            } else {
+              toast.error(`❌ Échec pour "${chapter.title}"`, {
+                description: error.message || 'Vérifiez votre connexion et vos crédits.',
+                duration: 4000
+              });
+            }
+          }
         }
 
-        setProgress(((i + 1) / chapters.length) * 100);
-      } catch (error: any) {
-        console.error(`Error generating image for chapter ${chapter.title}:`, error);
-        
-        // Logging détaillé pour déboguer
-        console.error('Full error details:', {
-          message: error.message,
-          context: error.context,
-          chapter: chapter.title
-        });
-        
-        // Gestion spécifique des erreurs de crédits et rate limiting
-        if (error.message?.includes('402') || error.context?.body?.error?.includes('Crédits épuisés') || error.context?.body?.error?.includes('crédits')) {
-          toast.error('⚠️ Crédits épuisés', {
-            description: 'Veuillez ajouter des crédits Lovable AI (Settings > Workspace > Usage) ou configurer une clé OpenAI.'
-          });
-        } else if (error.message?.includes('429') || error.context?.body?.error?.includes('Limite de requêtes') || error.context?.body?.error?.includes('rate limit')) {
-          toast.error('⏱️ Trop de requêtes', {
-            description: 'Veuillez patienter 1-2 minutes avant de réessayer.'
-          });
-        } else if (error.context?.body?.error) {
-          toast.error(`Erreur pour "${chapter.title}"`, {
-            description: error.context.body.error
-          });
-        } else {
-          toast.error(`Erreur pour "${chapter.title}"`, {
-            description: error.message || 'Erreur de génération. Vérifiez votre connexion et vos crédits.'
-          });
+        // Petit délai entre chapitres (même en succès) pour éviter le rate limit
+        if (success && i < chapters.length - 1) {
+          await delay(1500);
         }
       }
+
+      setProgress(((i + 1) / chapters.length) * 100);
     }
 
     setGeneratedImages(newImages);
     setIsGenerating(false);
     
     if (newImages.length > 0) {
-      toast.success(`${newImages.length} image(s) générée(s) avec succès !`);
+      toast.success(`🎉 ${newImages.length} image(s) générée(s) avec succès !`);
+    } else {
+      toast.error('Aucune image générée. Vérifiez vos crédits ou votre clé OpenAI.');
     }
   };
 
@@ -162,7 +187,9 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
             description: c.description
           })),
           useOpenAI,
-          openaiApiKey: useOpenAI ? config.apiKey : undefined
+          openaiApiKey: useOpenAI ? config.apiKey : undefined,
+          disableOpenAIFallback: forceLovable,
+          forceLovable
         }
       });
 
@@ -181,34 +208,30 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
           return [...filtered, newImage];
         });
 
-        toast.success(`Image générée pour "${chapter.title}"`);
+        toast.success(`✅ Image générée pour "${chapter.title}"`);
       }
     } catch (error: any) {
       console.error('Error generating chapter image:', error);
       
-      // Logging détaillé pour déboguer
-      console.error('Full error details:', {
-        message: error.message,
-        context: error.context,
-        chapter: chapter.title
-      });
-      
-      // Gestion spécifique des erreurs de crédits et rate limiting
-      if (error.message?.includes('402') || error.context?.body?.error?.includes('Crédits épuisés') || error.context?.body?.error?.includes('crédits')) {
-        toast.error('⚠️ Crédits épuisés', {
-          description: 'Veuillez ajouter des crédits Lovable AI (Settings > Workspace > Usage) ou configurer une clé OpenAI.'
+      if (error.message?.includes('402') || error.context?.body?.error?.includes('crédits') || error.context?.body?.code === 'PAYMENT_REQUIRED') {
+        toast.error('💳 Crédits Lovable AI épuisés', {
+          description: 'Ajoutez des crédits (Settings > Workspace > Usage) ou configurez une clé OpenAI.',
+          duration: 5000
         });
-      } else if (error.message?.includes('429') || error.context?.body?.error?.includes('Limite de requêtes') || error.context?.body?.error?.includes('rate limit')) {
-        toast.error('⏱️ Trop de requêtes', {
-          description: 'Veuillez patienter 1-2 minutes avant de réessayer.'
+      } else if (error.message?.includes('429') || error.context?.body?.error?.includes('rate limit') || error.context?.body?.code === 'RATE_LIMITED') {
+        toast.error('⏱️ Limite de requêtes atteinte', {
+          description: 'Veuillez patienter 1-2 minutes avant de réessayer.',
+          duration: 5000
         });
       } else if (error.context?.body?.error) {
-        toast.error('Erreur de génération', {
-          description: error.context.body.error
+        toast.error('❌ Erreur de génération', {
+          description: error.context.body.error,
+          duration: 4000
         });
       } else {
-        toast.error('Erreur de génération', {
-          description: error.message || 'Vérifiez votre connexion et vos crédits.'
+        toast.error('❌ Erreur de génération', {
+          description: error.message || 'Vérifiez votre connexion et vos crédits.',
+          duration: 4000
         });
       }
     } finally {
