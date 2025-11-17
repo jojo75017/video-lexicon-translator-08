@@ -86,6 +86,12 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
             await delay(backoff);
           }
 
+          console.log(`[BATCH ${i+1}/${chapters.length}] Génération pour "${chapter.title}"`, {
+            useOpenAI,
+            forceLovable,
+            hasApiKey: !!config.apiKey
+          });
+
           const { data, error } = await supabase.functions.invoke('generate-chapter-images', {
             body: {
               chapterTitle: chapter.title,
@@ -103,6 +109,8 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
             }
           });
 
+          console.log(`[BATCH ${i+1}/${chapters.length}] Réponse reçue:`, { data, error });
+
           if (error) throw error;
 
           if (data?.imageUrl) {
@@ -114,10 +122,12 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
             });
             toast.success(`✅ Image générée pour "${chapter.title}"`);
             success = true;
+          } else {
+            throw new Error('Pas d\'URL d\'image dans la réponse');
           }
         } catch (error: any) {
           attempt++;
-          console.error(`Tentative ${attempt}/${maxAttempts} échouée pour ${chapter.title}:`, error);
+          console.error(`[BATCH ${i+1}/${chapters.length}] Tentative ${attempt}/${maxAttempts} échouée:`, error);
 
           if (attempt >= maxAttempts) {
             // Dernière tentative échouée
@@ -176,6 +186,12 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
     setIsGenerating(true);
 
     try {
+      console.log(`[SINGLE] Génération pour "${chapter.title}"`, {
+        useOpenAI,
+        forceLovable,
+        hasApiKey: !!config.apiKey
+      });
+
       const { data, error } = await supabase.functions.invoke('generate-chapter-images', {
         body: {
           chapterTitle: chapter.title,
@@ -193,6 +209,8 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
         }
       });
 
+      console.log(`[SINGLE] Réponse reçue:`, { data, error });
+
       if (error) throw error;
 
       if (data?.imageUrl) {
@@ -209,9 +227,11 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
         });
 
         toast.success(`✅ Image générée pour "${chapter.title}"`);
+      } else {
+        throw new Error('Pas d\'URL d\'image dans la réponse');
       }
     } catch (error: any) {
-      console.error('Error generating chapter image:', error);
+      console.error('[SINGLE] Error generating chapter image:', error);
       
       if (error.message?.includes('402') || error.context?.body?.error?.includes('crédits') || error.context?.body?.code === 'PAYMENT_REQUIRED') {
         toast.error('💳 Crédits Lovable AI épuisés', {
