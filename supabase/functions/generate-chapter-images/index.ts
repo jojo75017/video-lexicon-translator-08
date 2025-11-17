@@ -34,26 +34,45 @@ Instructions de génération:
 
   console.log('Generating image with OpenAI:', imagePrompt);
 
-  const response = await fetch('https://api.openai.com/v1/images/generations', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'gpt-image-1',
-      prompt: imagePrompt,
-      n: 1,
-      size: '1024x1024',
-      quality: 'high',
-      output_format: 'png'
-    }),
-  });
+  const generateViaImagesAPI = async (model: string) => {
+    const resp = await fetch('https://api.openai.com/v1/images/generations', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model,
+        prompt: imagePrompt,
+        n: 1,
+        size: '1024x1024',
+        quality: 'high',
+        output_format: 'png'
+      }),
+    });
+    return resp;
+  };
+
+  // Try gpt-image-1 first, then automatically fall back to dall-e-3 on 403/permission issues
+  let response = await generateViaImagesAPI('gpt-image-1');
 
   if (!response.ok) {
+    const status = response.status;
     const errorText = await response.text();
-    console.error('OpenAI error:', response.status, errorText);
-    throw new Error(`OpenAI API error: ${response.status}`);
+    console.error('OpenAI error (gpt-image-1):', status, errorText);
+
+    // If org not verified or general 403, try dall-e-3 as a widely available fallback
+    if (status === 403 || /must be verified|permission/i.test(errorText)) {
+      console.log('Falling back to OpenAI dall-e-3 image generation...');
+      response = await generateViaImagesAPI('dall-e-3');
+    }
+  }
+
+  if (!response.ok) {
+    const finalStatus = response.status;
+    const finalError = await response.text();
+    console.error('OpenAI error (final):', finalStatus, finalError);
+    throw new Error(`OpenAI API error: ${finalStatus}`);
   }
 
   const data = await response.json();
