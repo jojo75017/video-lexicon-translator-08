@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -56,6 +56,32 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
     { value: 'photorealistic', label: '📸 Photoréaliste' },
     { value: 'abstract modern', label: '🌈 Abstrait moderne' }
   ];
+
+  // Charger les images depuis localStorage au montage
+  useEffect(() => {
+    if (ebookTitle) {
+      const storageKey = `ebook_chapter_images_${ebookTitle}`;
+      const saved = localStorage.getItem(storageKey);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          setGeneratedImages(parsed);
+          console.log(`📂 ${parsed.length} image(s) chargée(s) depuis localStorage`);
+        } catch (error) {
+          console.error('Erreur chargement images localStorage:', error);
+        }
+      }
+    }
+  }, [ebookTitle]);
+
+  // Sauvegarder les images dans localStorage à chaque changement
+  useEffect(() => {
+    if (ebookTitle && generatedImages.length > 0) {
+      const storageKey = `ebook_chapter_images_${ebookTitle}`;
+      localStorage.setItem(storageKey, JSON.stringify(generatedImages));
+      console.log(`💾 ${generatedImages.length} image(s) sauvegardée(s) dans localStorage`);
+    }
+  }, [generatedImages, ebookTitle]);
 
   const generateAllChapterImages = async () => {
     if (!ebookTitle || chapters.length === 0) {
