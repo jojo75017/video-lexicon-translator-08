@@ -5,12 +5,13 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Image, Sparkles, Download, Copy, Check, Settings, Trash2 } from 'lucide-react';
+import { Image, Sparkles, Download, Copy, Check, Settings, Trash2, FileArchive } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { type Character } from './EbookCharacters';
 import { OpenAIConfigPanel } from '@/components/shared/OpenAIConfigPanel';
 import { useOpenAIConfig } from '@/hooks/useOpenAIConfig';
+import JSZip from 'jszip';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 interface Chapter {
@@ -350,6 +351,57 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
     }
   };
 
+  const exportAllImagesToZip = async () => {
+    if (generatedImages.length === 0) {
+      toast.error('Aucune image à exporter');
+      return;
+    }
+
+    try {
+      const zip = new JSZip();
+      const folder = zip.folder('ebook-images');
+
+      if (!folder) {
+        throw new Error('Impossible de créer le dossier ZIP');
+      }
+
+      toast.info('📦 Création du fichier ZIP...', {
+        description: `Exportation de ${generatedImages.length} image(s)`
+      });
+
+      // Ajouter chaque image au ZIP
+      for (const img of generatedImages) {
+        // Convertir data URL en blob
+        const response = await fetch(img.imageUrl);
+        const blob = await response.blob();
+        
+        // Nom de fichier sécurisé
+        const fileName = `chapitre-${img.chapterId}-${img.chapterTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.png`;
+        folder.file(fileName, blob);
+      }
+
+      // Générer le ZIP et déclencher le téléchargement
+      const content = await zip.generateAsync({ type: 'blob' });
+      const url = URL.createObjectURL(content);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${ebookTitle?.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'ebook'}-images.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast.success('✅ ZIP créé avec succès!', {
+        description: `${generatedImages.length} image(s) exportée(s)`
+      });
+    } catch (error) {
+      console.error('Erreur lors de l\'export ZIP:', error);
+      toast.error('❌ Erreur lors de l\'export', {
+        description: 'Impossible de créer le fichier ZIP'
+      });
+    }
+  };
+
   const copyImageUrl = (imageUrl: string, chapterId: string) => {
     navigator.clipboard.writeText(imageUrl);
     setCopiedId(chapterId);
@@ -460,15 +512,26 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
             <h3 className="text-xl font-bold" style={{ color: 'hsl(var(--royal-purple))' }}>
               Images générées ({generatedImages.length})
             </h3>
-            <Button
-              onClick={clearAllImages}
-              variant="outline"
-              size="sm"
-              className="text-destructive hover:bg-destructive/10"
-            >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Tout effacer
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                onClick={exportAllImagesToZip}
+                variant="outline"
+                size="sm"
+                className="text-primary hover:bg-primary/10"
+              >
+                <FileArchive className="h-4 w-4 mr-2" />
+                Exporter en ZIP
+              </Button>
+              <Button
+                onClick={clearAllImages}
+                variant="outline"
+                size="sm"
+                className="text-destructive hover:bg-destructive/10"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Tout effacer
+              </Button>
+            </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {generatedImages.map((img) => (
