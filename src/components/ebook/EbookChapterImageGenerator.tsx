@@ -129,14 +129,41 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
           attempt++;
           console.error(`[BATCH ${i+1}/${chapters.length}] Tentative ${attempt}/${maxAttempts} échouée:`, error);
 
+          // Détection erreur 402 (crédits Lovable épuisés)
+          const is402 = error.message?.includes('402') || 
+                        error.context?.body?.error?.includes('crédits') || 
+                        error.context?.body?.code === 'PAYMENT_REQUIRED';
+
+          if (is402) {
+            console.log('🔴 Erreur 402 détectée - Crédits Lovable épuisés');
+            
+            // Ouvrir automatiquement le panneau de configuration
+            setShowConfig(true);
+            setIsGenerating(false);
+            
+            // Vérifier si une clé OpenAI est configurée
+            if (hasValidApiKey()) {
+              toast.info("Repli automatique vers OpenAI", {
+                description: "Lovable AI épuisé, relance avec votre clé OpenAI...",
+                duration: 3000
+              });
+              
+              // Relancer automatiquement avec OpenAI
+              await delay(1500);
+              await generateAllChapterImages();
+              return;
+            } else {
+              toast.error("Crédits Lovable AI épuisés", {
+                description: "Configurez votre clé OpenAI ci-dessous pour continuer",
+                duration: 6000
+              });
+              return;
+            }
+          }
+
           if (attempt >= maxAttempts) {
             // Dernière tentative échouée
-            if (error.message?.includes('402') || error.context?.body?.error?.includes('crédits') || error.context?.body?.code === 'PAYMENT_REQUIRED') {
-              toast.error('💳 Crédits Lovable AI épuisés', {
-                description: 'Ajoutez des crédits (Settings > Workspace > Usage) ou configurez une clé OpenAI.',
-                duration: 5000
-              });
-            } else if (error.message?.includes('429') || error.context?.body?.error?.includes('rate limit') || error.context?.body?.code === 'RATE_LIMITED') {
+            if (error.message?.includes('429') || error.context?.body?.error?.includes('rate limit') || error.context?.body?.code === 'RATE_LIMITED') {
               toast.error('⏱️ Limite de requêtes atteinte', {
                 description: 'Veuillez patienter 1-2 minutes avant de continuer.',
                 duration: 5000
@@ -233,12 +260,39 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
     } catch (error: any) {
       console.error('[SINGLE] Error generating chapter image:', error);
       
-      if (error.message?.includes('402') || error.context?.body?.error?.includes('crédits') || error.context?.body?.code === 'PAYMENT_REQUIRED') {
-        toast.error('💳 Crédits Lovable AI épuisés', {
-          description: 'Ajoutez des crédits (Settings > Workspace > Usage) ou configurez une clé OpenAI.',
-          duration: 5000
-        });
-      } else if (error.message?.includes('429') || error.context?.body?.error?.includes('rate limit') || error.context?.body?.code === 'RATE_LIMITED') {
+      // Détection erreur 402 (crédits Lovable épuisés)
+      const is402 = error.message?.includes('402') || 
+                    error.context?.body?.error?.includes('crédits') || 
+                    error.context?.body?.code === 'PAYMENT_REQUIRED';
+
+      if (is402) {
+        console.log('🔴 Erreur 402 détectée - Crédits Lovable épuisés');
+        
+        // Ouvrir automatiquement le panneau de configuration
+        setShowConfig(true);
+        setIsGenerating(false);
+        
+        // Vérifier si une clé OpenAI est configurée
+        if (hasValidApiKey()) {
+          toast.info("Repli automatique vers OpenAI", {
+            description: "Lovable AI épuisé, relance avec votre clé OpenAI...",
+            duration: 3000
+          });
+          
+          // Relancer automatiquement avec OpenAI
+          await new Promise(resolve => setTimeout(resolve, 1500));
+          await generateSingleChapterImage(chapter);
+          return;
+        } else {
+          toast.error("Crédits Lovable AI épuisés", {
+            description: "Configurez votre clé OpenAI ci-dessous pour continuer",
+            duration: 6000
+          });
+          return;
+        }
+      }
+      
+      if (error.message?.includes('429') || error.context?.body?.error?.includes('rate limit') || error.context?.body?.code === 'RATE_LIMITED') {
         toast.error('⏱️ Limite de requêtes atteinte', {
           description: 'Veuillez patienter 1-2 minutes avant de réessayer.',
           duration: 5000
