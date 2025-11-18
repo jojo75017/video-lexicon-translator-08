@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Image, Sparkles, Download, Copy, Check, Settings } from 'lucide-react';
+import { Image, Sparkles, Download, Copy, Check, Settings, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { type Character } from './EbookCharacters';
@@ -339,6 +339,17 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
     }
   };
 
+  const clearAllImages = () => {
+    if (ebookTitle) {
+      const storageKey = `ebook_chapter_images_${ebookTitle}`;
+      localStorage.removeItem(storageKey);
+      setGeneratedImages([]);
+      toast.success('🗑️ Toutes les images ont été effacées', {
+        description: 'Cache et interface nettoyés'
+      });
+    }
+  };
+
   const copyImageUrl = (imageUrl: string, chapterId: string) => {
     navigator.clipboard.writeText(imageUrl);
     setCopiedId(chapterId);
@@ -445,9 +456,20 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
       {/* Liste des images générées */}
       {generatedImages.length > 0 && (
         <div className="space-y-4">
-          <h3 className="text-xl font-bold" style={{ color: 'hsl(var(--royal-purple))' }}>
-            Images générées ({generatedImages.length})
-          </h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-bold" style={{ color: 'hsl(var(--royal-purple))' }}>
+              Images générées ({generatedImages.length})
+            </h3>
+            <Button
+              onClick={clearAllImages}
+              variant="outline"
+              size="sm"
+              className="text-destructive hover:bg-destructive/10"
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Tout effacer
+            </Button>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {generatedImages.map((img) => (
               <Card 
