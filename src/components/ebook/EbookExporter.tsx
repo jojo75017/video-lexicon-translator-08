@@ -603,9 +603,31 @@ ${navContent}    </ol>
 <head>
   <title>${ebookTitle}</title>
   <style>
-    body { text-align: center; padding: 2em; font-family: serif; }
-    h1 { font-size: 2.5em; margin-bottom: 0.5em; }
-    .author { font-size: 1.5em; font-style: italic; color: #666; }
+    body { 
+      text-align: center; 
+      padding: 3em 2em; 
+      font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    h1 { 
+      font-size: 3em; 
+      margin-bottom: 0.8em; 
+      color: #1a202c;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+      letter-spacing: 0.05em;
+    }
+    .author { 
+      font-size: 1.8em; 
+      font-style: italic; 
+      color: #4a5568;
+      margin-top: 1em;
+      font-weight: 300;
+    }
   </style>
 </head>
 <body>
@@ -624,9 +646,31 @@ ${navContent}    </ol>
 <head>
   <title>Préface</title>
   <style>
-    body { font-family: serif; line-height: 1.6; padding: 1em; max-width: 40em; margin: 0 auto; }
-    h1 { text-align: center; margin-bottom: 1em; }
-    p { text-align: justify; margin-bottom: 1em; }
+    body { 
+      font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif; 
+      line-height: 1.8; 
+      padding: 2em 1.5em; 
+      max-width: 38em; 
+      margin: 0 auto;
+      color: #2d3748;
+      font-size: 1.1em;
+    }
+    h1 { 
+      text-align: center; 
+      margin-bottom: 1.5em;
+      font-size: 2.2em;
+      color: #1a202c;
+      border-bottom: 3px solid #4299e1;
+      padding-bottom: 0.5em;
+    }
+    p { 
+      text-align: justify; 
+      margin-bottom: 1.2em;
+      text-indent: 1.5em;
+    }
+    p:first-of-type {
+      text-indent: 0;
+    }
   </style>
 </head>
 <body>
@@ -645,10 +689,39 @@ ${navContent}    </ol>
 <head>
   <title>${chapter.title}</title>
   <style>
-    body { font-family: serif; line-height: 1.6; padding: 1em; max-width: 40em; margin: 0 auto; }
-    h1 { text-align: center; margin-bottom: 1em; border-bottom: 2px solid #333; padding-bottom: 0.5em; }
-    h2 { margin-top: 2em; margin-bottom: 1em; color: #444; }
-    p { text-align: justify; margin-bottom: 1em; }
+    body { 
+      font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif; 
+      line-height: 1.8; 
+      padding: 2em 1.5em; 
+      max-width: 38em; 
+      margin: 0 auto;
+      color: #2d3748;
+      font-size: 1.1em;
+    }
+    h1 { 
+      text-align: center; 
+      margin-bottom: 1.5em;
+      font-size: 2.2em;
+      color: #1a202c;
+      border-bottom: 3px solid #4299e1;
+      padding-bottom: 0.5em;
+    }
+    h2 { 
+      margin-top: 2.5em; 
+      margin-bottom: 1em; 
+      color: #2c5282;
+      font-size: 1.6em;
+      border-left: 4px solid #4299e1;
+      padding-left: 0.8em;
+    }
+    p { 
+      text-align: justify; 
+      margin-bottom: 1.2em;
+      text-indent: 1.5em;
+    }
+    h1 + p, h2 + p {
+      text-indent: 0;
+    }
   </style>
 </head>
 <body>
@@ -679,9 +752,30 @@ ${navContent}    </ol>
 <head>
   <title>Conclusion</title>
   <style>
-    body { font-family: serif; line-height: 1.6; padding: 1em; max-width: 40em; margin: 0 auto; }
-    h1 { text-align: center; margin-bottom: 1em; }
-    p { text-align: justify; margin-bottom: 1em; }
+    body { 
+      font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif; 
+      line-height: 1.8; 
+      padding: 2em 1.5em; 
+      max-width: 38em; 
+      margin: 0 auto;
+      color: #2d3748;
+      font-size: 1.1em;
+    }
+    h1 { 
+      text-align: center; 
+      margin-bottom: 1.5em;
+      font-size: 2.2em;
+      color: #1a202c;
+      border-bottom: 3px solid #4299e1;
+      padding-bottom: 0.5em;
+    }
+    p { 
+      text-align: justify; 
+      margin-bottom: 1.2em;
+      text-indent: 1.5em;
+    }
+    p:first-of-type {
+      text-indent: 0;
   </style>
 </head>
 <body>
