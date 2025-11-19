@@ -180,9 +180,13 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
               await generateAllChapterImages();
               return;
             } else {
-              toast.error("Crédits Lovable AI épuisés", {
-                description: "Configurez votre clé OpenAI ci-dessous pour continuer",
-                duration: 6000
+              toast.error("💳 Crédits Lovable AI épuisés", {
+                description: "Options : 1️⃣ Ajoutez des crédits à votre workspace Lovable, ou 2️⃣ Configurez votre clé OpenAI ci-dessous pour continuer",
+                duration: 8000,
+                action: {
+                  label: 'En savoir plus',
+                  onClick: () => window.open('https://docs.lovable.dev/features/ai', '_blank')
+                }
               });
               return;
             }
