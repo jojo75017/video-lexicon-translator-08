@@ -35,21 +35,31 @@ Instructions de génération:
   console.log('Generating image with OpenAI:', imagePrompt);
 
   const generateViaImagesAPI = async (model: string) => {
+    const payload: any = {
+      model,
+      prompt: imagePrompt,
+      n: 1,
+      size: '1024x1024',
+    };
+
+    // Adapter les paramètres selon le modèle pour éviter les erreurs d'API
+    if (model === 'gpt-image-1') {
+      // gpt-image-1 : qualité textuelle "high" supportée, pas de output_format
+      payload.quality = 'high';
+    } else if (model === 'dall-e-3') {
+      // dall-e-3 : qualité "hd" ou "standard"
+      payload.quality = 'hd';
+    }
+
     const resp = await fetch('https://api.openai.com/v1/images/generations', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        model,
-        prompt: imagePrompt,
-        n: 1,
-        size: '1024x1024',
-        quality: 'high',
-        output_format: 'png'
-      }),
+      body: JSON.stringify(payload),
     });
+
     return resp;
   };
 
