@@ -17,7 +17,9 @@ export const validateOpenAIApiKey = async (apiKey: string, model: string): Promi
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: model,
+        // On utilise un modèle compatible pour la simple validation de clé,
+        // indépendamment du modèle choisi dans l'UI.
+        model: 'gpt-4o-mini',
         messages: [
           {
             role: 'system',
