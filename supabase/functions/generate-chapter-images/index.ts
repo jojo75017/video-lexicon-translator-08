@@ -40,11 +40,12 @@ Instructions de génération:
       prompt: imagePrompt,
       n: 1,
       size: '1024x1024',
+      response_format: 'b64_json', // Toujours demander le format base64
     };
 
     // Adapter les paramètres selon le modèle pour éviter les erreurs d'API
     if (model === 'gpt-image-1') {
-      // gpt-image-1 : qualité textuelle "high" supportée, pas de output_format
+      // gpt-image-1 : qualité textuelle "high" supportée
       payload.quality = 'high';
     } else if (model === 'dall-e-3') {
       // dall-e-3 : qualité "hd" ou "standard"
@@ -86,9 +87,17 @@ Instructions de génération:
   }
 
   const data = await response.json();
-  const imageUrl = data.data?.[0]?.b64_json ? `data:image/png;base64,${data.data[0].b64_json}` : null;
+  
+  // Gérer les deux formats possibles (base64 et URL)
+  let imageUrl: string | null = null;
+  if (data.data?.[0]?.b64_json) {
+    imageUrl = `data:image/png;base64,${data.data[0].b64_json}`;
+  } else if (data.data?.[0]?.url) {
+    imageUrl = data.data[0].url;
+  }
 
   if (!imageUrl) {
+    console.error('No image in OpenAI response:', JSON.stringify(data));
     throw new Error('No image URL in OpenAI response');
   }
 
