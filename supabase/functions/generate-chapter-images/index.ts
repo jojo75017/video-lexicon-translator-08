@@ -126,15 +126,30 @@ serve(async (req) => {
       );
     }
 
-    // Si useOpenAI est true et non forcé à Lovable, tenter OpenAI d'abord, sinon utiliser Lovable AI
+    // Si useOpenAI est true et non forcé à Lovable, utiliser EXCLUSIVEMENT OpenAI
     if (useOpenAI && openaiApiKey && !forceLovable) {
       try {
-        return await generateWithOpenAI(chapterTitle, chapterContent, ebookTitle, style, characters, openaiApiKey);
+        return await generateWithOpenAI(
+          chapterTitle,
+          chapterContent,
+          ebookTitle,
+          style,
+          characters,
+          openaiApiKey
+        );
       } catch (err) {
-        console.error('OpenAI image generation failed, falling back to Lovable AI:', err);
-        // Poursuite vers génération Lovable AI ci-dessous
+        console.error('OpenAI image generation failed (no Lovable fallback when clé perso utilisée):', err);
+        return new Response(
+          JSON.stringify({
+            error: "Erreur OpenAI lors de la génération de l'image",
+            details: err instanceof Error ? err.message : String(err),
+          }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
       }
     }
+
+    // Sinon, on utilise Lovable AI (crédits de votre workspace)
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY is not configured');
