@@ -638,15 +638,25 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                       </Button>
                     </div>
 
-                    <div className="pt-4 border-t">
-                      <Button
-                        onClick={() => navigate('/affiliation')}
-                        variant="outline"
-                        className="w-full gap-2 border-primary/30 hover:bg-primary/10"
-                      >
-                        <Users className="h-4 w-4" />
-                        💰 Formation Programme d'Affiliation - Gagnez 30%
-                      </Button>
+                    {/* Bouton Formation Affiliation - Très visible */}
+                    <div className="pt-6 border-t-2 border-dashed border-primary/30">
+                      <div className="bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-red-500/20 p-4 rounded-lg border-2 border-amber-500/40">
+                        <Button
+                          onClick={() => navigate('/affiliation')}
+                          size="lg"
+                          className="w-full gap-2 text-lg font-bold shadow-lg hover:scale-105 transition-transform"
+                          style={{ 
+                            background: 'linear-gradient(135deg, #f59e0b 0%, #ef4444 50%, #dc2626 100%)',
+                            color: 'white'
+                          }}
+                        >
+                          <Users className="h-5 w-5" />
+                          💰 Formation Affiliation - Gagnez 30% par Vente !
+                        </Button>
+                        <p className="text-xs text-center mt-2 text-muted-foreground font-medium">
+                          14€ - 29€ de commission par vente • Cookie 30 jours
+                        </p>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
