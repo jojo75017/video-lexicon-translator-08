@@ -9,6 +9,7 @@ import AiChatPage from './pages/AiChatPage';
 import SubscriptionPage from './pages/SubscriptionPage';
 import { AdminPage } from './pages/AdminPage';
 import AuthPage from './pages/AuthPage';
+import AffiliationFormationPage from './pages/AffiliationFormationPage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -92,6 +93,7 @@ const App = () => {
             <Route path="/" element={<Navigate to="/ebook-ideas" replace />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/ai-chat" element={<AiChatPage />} />
+            <Route path="/affiliation" element={<AffiliationFormationPage />} />
             <Route
               path="/ebook-ideas"
               element={<EbookIdeasPage />}
