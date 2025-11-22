@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
-  BookOpen, Plus, Wand2, RotateCcw, ArrowLeft, Merge, Sparkles, Eye, Search, Palette
+  BookOpen, Plus, Wand2, RotateCcw, ArrowLeft, Merge, Sparkles, Eye, Search, Palette, Users
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -635,6 +635,17 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                       >
                         <RotateCcw className="h-4 w-4 mr-2" />
                         Réinitialiser
+                      </Button>
+                    </div>
+
+                    <div className="pt-4 border-t">
+                      <Button
+                        onClick={() => navigate('/affiliation')}
+                        variant="outline"
+                        className="w-full gap-2 border-primary/30 hover:bg-primary/10"
+                      >
+                        <Users className="h-4 w-4" />
+                        💰 Formation Programme d'Affiliation - Gagnez 30%
                       </Button>
                     </div>
                   </CardContent>
