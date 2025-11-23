@@ -91,9 +91,9 @@ const App = () => {
         <div className="min-h-screen bg-background">
           <Routes>
             <Route path="/" element={<Navigate to="/ebook-ideas" replace />} />
+            <Route path="/affiliation" element={<AffiliationFormationPage />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/ai-chat" element={<AiChatPage />} />
-            <Route path="/affiliation" element={<AffiliationFormationPage />} />
             <Route
               path="/ebook-ideas"
               element={<EbookIdeasPage />}
