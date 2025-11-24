@@ -14,6 +14,90 @@ export type Database = {
   }
   public: {
     Tables: {
+      ebook_projects: {
+        Row: {
+          author_name: string | null
+          book_summary: string | null
+          chapter_length: string | null
+          chapters: Json | null
+          characters: Json | null
+          conclusion: string | null
+          cover_concepts: string | null
+          created_at: string
+          detail_level: string | null
+          ebook_images: Json | null
+          id: string
+          kdp_categories: string | null
+          kdp_description: string | null
+          kdp_keywords: string | null
+          narrative_format: string | null
+          number_of_chapters: number | null
+          preface: string | null
+          seo_optimization: string | null
+          target_audience: string | null
+          title: string
+          tome_number: number | null
+          tone: string | null
+          updated_at: string
+          user_id: string
+          writing_style: string | null
+        }
+        Insert: {
+          author_name?: string | null
+          book_summary?: string | null
+          chapter_length?: string | null
+          chapters?: Json | null
+          characters?: Json | null
+          conclusion?: string | null
+          cover_concepts?: string | null
+          created_at?: string
+          detail_level?: string | null
+          ebook_images?: Json | null
+          id?: string
+          kdp_categories?: string | null
+          kdp_description?: string | null
+          kdp_keywords?: string | null
+          narrative_format?: string | null
+          number_of_chapters?: number | null
+          preface?: string | null
+          seo_optimization?: string | null
+          target_audience?: string | null
+          title: string
+          tome_number?: number | null
+          tone?: string | null
+          updated_at?: string
+          user_id: string
+          writing_style?: string | null
+        }
+        Update: {
+          author_name?: string | null
+          book_summary?: string | null
+          chapter_length?: string | null
+          chapters?: Json | null
+          characters?: Json | null
+          conclusion?: string | null
+          cover_concepts?: string | null
+          created_at?: string
+          detail_level?: string | null
+          ebook_images?: Json | null
+          id?: string
+          kdp_categories?: string | null
+          kdp_description?: string | null
+          kdp_keywords?: string | null
+          narrative_format?: string | null
+          number_of_chapters?: number | null
+          preface?: string | null
+          seo_optimization?: string | null
+          target_audience?: string | null
+          title?: string
+          tome_number?: number | null
+          tone?: string | null
+          updated_at?: string
+          user_id?: string
+          writing_style?: string | null
+        }
+        Relationships: []
+      }
       subscribers: {
         Row: {
           access_code: string | null
