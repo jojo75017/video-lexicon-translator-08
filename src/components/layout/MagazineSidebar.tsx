@@ -38,6 +38,7 @@ interface MagazineSidebarProps {
 }
 
 const sidebarItems: SidebarItem[] = [
+  { id: 'projects', label: 'Mes Projets', icon: BookOpen, color: 'emerald-500', badge: 'NEW' },
   { id: 'planner', label: 'Planificateur', icon: BookOpen, color: 'coral-pink' },
   { id: 'templates', label: 'Templates', icon: FileText, color: 'cobalt-blue' },
   { id: 'settings', label: 'Paramètres', icon: Settings, color: 'gray-400' },
