@@ -45,6 +45,7 @@ import { EbookCoverGenerator } from '@/components/ebook/EbookCoverGenerator';
 import { EbookWritingAssistant } from '@/components/ebook/EbookWritingAssistant';
 import { EbookBackCoverGenerator } from '@/components/ebook/EbookBackCoverGenerator';
 import { EbookCharacters, type Character } from '@/components/ebook/EbookCharacters';
+import { EbookProjectsList } from '@/components/ebook/EbookProjectsList';
 import heroEbook from '@/assets/hero-ebook-robot.png';
 
 // Hooks et données
@@ -566,8 +567,36 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
     toast.success('Image ajoutée à votre ebook !');
   };
 
+  const handleProjectLoad = (project: any) => {
+    setEbookTitle(project.title);
+    setAuthorName(project.author_name || '');
+    setTargetAudience(project.target_audience || 'Adultes');
+    setTomeNumber(project.tome_number);
+    setWritingStyle(project.writing_style || 'narratif');
+    setChapterLength(project.chapter_length || 'moyen');
+    setDetailLevel(project.detail_level || 'détaillé');
+    setTone(project.tone || 'professionnel');
+    setNarrativeFormat(project.narrative_format || 'troisième personne');
+    setPreface(project.preface || '');
+    setConclusion(project.conclusion || '');
+    setChapters(Array.isArray(project.chapters) ? project.chapters as unknown as Chapter[] : []);
+    setCharacters(Array.isArray(project.characters) ? project.characters as unknown as EbookCharacter[] : []);
+    setEbookImages(Array.isArray(project.ebook_images) ? project.ebook_images as unknown as Array<{url: string, title: string, chapterIndex?: number}> : []);
+    setNumberOfChapters(project.number_of_chapters || 8);
+    setBookSummary(project.book_summary || '');
+    setCoverConcepts(project.cover_concepts || '');
+    setSeoOptimization(project.seo_optimization || '');
+    setKdpDescription(project.kdp_description || '');
+    setKdpKeywords(project.kdp_keywords || '');
+    setKdpCategories(project.kdp_categories || '');
+    setActiveTab('planner'); // Retour à l'onglet planificateur
+  };
+
   const renderContent = () => {
     switch (activeTab) {
+      case 'projects':
+        return <EbookProjectsList onProjectLoad={handleProjectLoad} />;
+      
       case 'planner':
         return (
           <div className="space-y-8">
