@@ -11,6 +11,7 @@ import {
 import { toast } from 'sonner';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { MagazineSidebar } from '@/components/layout/MagazineSidebar';
+import { useEbookDatabase } from '@/hooks/useEbookDatabase';
 import EbookImageBank from '@/components/ebook/EbookImageBank';
 import { EbookMarketing } from '@/components/ebook/EbookMarketing';
 import { EbookMonetization } from '@/components/ebook/EbookMonetization';
@@ -78,6 +79,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   
   const savedData = loadSavedData();
   
+  // Hook de base de données
+  const { saveProject, loadLatestProject, isSaving } = useEbookDatabase();
+  
   const [apiKey, setApiKey] = useState(savedData?.apiKey || '');
   
   // États principaux
@@ -115,7 +119,38 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   const [activeTab, setActiveTab] = useState('planner');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  // Sauvegarde automatique dans localStorage
+  // Charger le projet depuis la base de données au démarrage
+  useEffect(() => {
+    const loadFromDatabase = async () => {
+      const dbProject = await loadLatestProject();
+      if (dbProject) {
+        setEbookTitle(dbProject.title);
+        setAuthorName(dbProject.author_name || '');
+        setTargetAudience(dbProject.target_audience || 'Adultes');
+        setTomeNumber(dbProject.tome_number);
+        setWritingStyle(dbProject.writing_style || 'narratif');
+        setChapterLength(dbProject.chapter_length || 'moyen');
+        setDetailLevel(dbProject.detail_level || 'détaillé');
+        setTone(dbProject.tone || 'professionnel');
+        setNarrativeFormat(dbProject.narrative_format || 'troisième personne');
+        setPreface(dbProject.preface || '');
+        setConclusion(dbProject.conclusion || '');
+        setChapters(Array.isArray(dbProject.chapters) ? dbProject.chapters as unknown as Chapter[] : []);
+        setCharacters(Array.isArray(dbProject.characters) ? dbProject.characters as unknown as EbookCharacter[] : []);
+        setEbookImages(Array.isArray(dbProject.ebook_images) ? dbProject.ebook_images as unknown as Array<{url: string, title: string, chapterIndex?: number}> : []);
+        setNumberOfChapters(dbProject.number_of_chapters || 8);
+        setBookSummary(dbProject.book_summary || '');
+        setCoverConcepts(dbProject.cover_concepts || '');
+        setSeoOptimization(dbProject.seo_optimization || '');
+        setKdpDescription(dbProject.kdp_description || '');
+        setKdpKeywords(dbProject.kdp_keywords || '');
+        setKdpCategories(dbProject.kdp_categories || '');
+      }
+    };
+    loadFromDatabase();
+  }, []);
+
+  // Sauvegarde automatique dans la base de données ET localStorage
   useEffect(() => {
     const dataToSave = {
       apiKey,
@@ -137,12 +172,47 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
       lastSaved: new Date().toISOString()
     };
     
+    // Sauvegarder dans localStorage (backup)
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde:', error);
+      console.error('Erreur lors de la sauvegarde localStorage:', error);
     }
-  }, [apiKey, ebookTitle, authorName, targetAudience, tomeNumber, writingStyle, chapterLength, detailLevel, tone, narrativeFormat, preface, conclusion, chapters, numberOfChapters, ebookImages]);
+
+    // Sauvegarder dans la base de données (si titre existe)
+    if (ebookTitle) {
+      const projectData = {
+        title: ebookTitle,
+        author_name: authorName,
+        target_audience: targetAudience,
+        tome_number: tomeNumber,
+        writing_style: writingStyle,
+        chapter_length: chapterLength,
+        detail_level: detailLevel,
+        tone: tone,
+        narrative_format: narrativeFormat,
+        preface: preface,
+        conclusion: conclusion,
+        chapters: chapters,
+        characters: characters,
+        ebook_images: ebookImages,
+        number_of_chapters: numberOfChapters,
+        book_summary: bookSummary,
+        cover_concepts: coverConcepts,
+        seo_optimization: seoOptimization,
+        kdp_description: kdpDescription,
+        kdp_keywords: kdpKeywords,
+        kdp_categories: kdpCategories,
+      };
+
+      // Debounce pour éviter trop de sauvegardes
+      const timer = setTimeout(() => {
+        saveProject(projectData);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [apiKey, ebookTitle, authorName, targetAudience, tomeNumber, writingStyle, chapterLength, detailLevel, tone, narrativeFormat, preface, conclusion, chapters, numberOfChapters, ebookImages, characters, bookSummary, coverConcepts, seoOptimization, kdpDescription, kdpKeywords, kdpCategories]);
 
   // Notifier l'utilisateur au premier chargement si des données ont été restaurées
   useEffect(() => {
