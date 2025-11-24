@@ -595,7 +595,16 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   const renderContent = () => {
     switch (activeTab) {
       case 'projects':
-        return <EbookProjectsList onProjectLoad={handleProjectLoad} />;
+        return (
+          <EbookProjectsList 
+            onProjectLoad={handleProjectLoad}
+            onCreateNew={() => setActiveTab('planner')}
+            currentProject={{
+              title: ebookTitle,
+              hasContent: chapters.length > 0 || preface.length > 0 || conclusion.length > 0
+            }}
+          />
+        );
       
       case 'planner':
         return (
