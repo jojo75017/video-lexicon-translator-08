@@ -16,9 +16,14 @@ import {
 
 interface EbookProjectsListProps {
   onProjectLoad: (project: any) => void;
+  onCreateNew: () => void;
+  currentProject?: {
+    title: string;
+    hasContent: boolean;
+  };
 }
 
-export function EbookProjectsList({ onProjectLoad }: EbookProjectsListProps) {
+export function EbookProjectsList({ onProjectLoad, onCreateNew, currentProject }: EbookProjectsListProps) {
   const { loadAllProjects, deleteProject, currentProjectId } = useEbookDatabase();
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -67,14 +72,35 @@ export function EbookProjectsList({ onProjectLoad }: EbookProjectsListProps) {
 
   if (projects.length === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Aucun projet sauvegardé</CardTitle>
-          <CardDescription>
-            Créez votre premier projet dans l'onglet Planificateur
-          </CardDescription>
-        </CardHeader>
-      </Card>
+      <div className="space-y-6">
+        {currentProject?.hasContent && (
+          <Card className="bg-amber-50 border-amber-200">
+            <CardHeader>
+              <CardTitle className="text-amber-900">⚠️ Projet non sauvegardé</CardTitle>
+              <CardDescription className="text-amber-700">
+                Vous avez un projet en cours "{currentProject.title || 'Sans titre'}" qui n'est pas encore dans la base de données.
+                <br />
+                <strong>Pour le sauvegarder :</strong> Assurez-vous d'avoir un titre et attendez 2 secondes, ou retournez à l'onglet Planificateur.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        )}
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Aucun projet sauvegardé</CardTitle>
+            <CardDescription>
+              Créez votre premier projet dans l'onglet Planificateur
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={onCreateNew} className="w-full">
+              <BookOpen className="mr-2 h-4 w-4" />
+              Nouveau projet
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 

@@ -39,7 +39,7 @@ export const useEbookDatabase = () => {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
-        console.log('Aucun utilisateur connecté');
+        console.log('Aucun utilisateur connecté pour charger les projets');
         return null;
       }
 
@@ -49,18 +49,21 @@ export const useEbookDatabase = () => {
         .eq('user_id', user.id)
         .order('updated_at', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') {
+      if (error) {
+        console.error('Erreur lors du chargement:', error);
         throw error;
       }
 
       if (data) {
         setCurrentProjectId(data.id);
         toast.success('Projet chargé depuis la base de données');
+        console.log('Projet chargé:', data.title);
         return data;
       }
 
+      console.log('Aucun projet trouvé dans la base de données');
       return null;
     } catch (error) {
       console.error('Erreur lors du chargement:', error);
@@ -78,9 +81,11 @@ export const useEbookDatabase = () => {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
-        toast.error('Vous devez être connecté pour sauvegarder');
+        console.log('Impossible de sauvegarder: utilisateur non connecté');
         return null;
       }
+
+      console.log('Sauvegarde du projet:', projectData.title, 'ID actuel:', currentProjectId);
 
       if (currentProjectId) {
         // Mise à jour du projet existant
@@ -94,8 +99,12 @@ export const useEbookDatabase = () => {
           .select()
           .single();
 
-        if (error) throw error;
+        if (error) {
+          console.error('Erreur mise à jour:', error);
+          throw error;
+        }
         
+        console.log('Projet mis à jour avec succès');
         return data;
       } else {
         // Création d'un nouveau projet
@@ -108,10 +117,14 @@ export const useEbookDatabase = () => {
           .select()
           .single();
 
-        if (error) throw error;
+        if (error) {
+          console.error('Erreur création:', error);
+          throw error;
+        }
         
         setCurrentProjectId(data.id);
         toast.success('Projet sauvegardé dans la base de données');
+        console.log('Nouveau projet créé avec succès:', data.id);
         return data;
       }
     } catch (error) {
