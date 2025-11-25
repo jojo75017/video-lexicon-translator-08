@@ -182,6 +182,159 @@ export const useEbookDatabase = () => {
     }
   };
 
+  const duplicateProject = async (projectId: string): Promise<string | null> => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        console.error('User not authenticated');
+        toast.error("Vous devez être connecté pour dupliquer un projet");
+        return null;
+      }
+
+      const { data: originalProject, error: loadError } = await supabase
+        .from('ebook_projects')
+        .select('*')
+        .eq('id', projectId)
+        .single();
+
+      if (loadError || !originalProject) {
+        console.error('Error loading project to duplicate:', loadError);
+        toast.error("Erreur lors du chargement du projet");
+        return null;
+      }
+
+      const duplicatedProject = {
+        ...originalProject,
+        id: undefined,
+        title: `${originalProject.title} (Copie)`,
+        created_at: undefined,
+        updated_at: undefined,
+        user_id: user.id,
+      };
+
+      const { data: newProject, error: createError } = await supabase
+        .from('ebook_projects')
+        .insert(duplicatedProject)
+        .select()
+        .single();
+
+      if (createError) {
+        console.error('Error duplicating project:', createError);
+        toast.error("Erreur lors de la duplication du projet");
+        return null;
+      }
+
+      toast.success("Projet dupliqué avec succès");
+      return newProject.id;
+    } catch (error) {
+      console.error('Error in duplicateProject:', error);
+      toast.error("Erreur lors de la duplication du projet");
+      return null;
+    }
+  };
+
+  const saveVersion = async (projectId: string, project: any): Promise<boolean> => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return false;
+
+      const { data: versions } = await supabase
+        .from('ebook_project_versions')
+        .select('version_number')
+        .eq('project_id', projectId)
+        .order('version_number', { ascending: false })
+        .limit(1);
+
+      const nextVersion = versions && versions.length > 0 ? versions[0].version_number + 1 : 1;
+
+      const { error } = await supabase
+        .from('ebook_project_versions')
+        .insert({
+          project_id: projectId,
+          user_id: user.id,
+          version_number: nextVersion,
+          title: project.title,
+          author_name: project.author_name,
+          target_audience: project.target_audience,
+          cover_concepts: project.cover_concepts,
+          writing_style: project.writing_style,
+          chapter_length: project.chapter_length,
+          tone: project.tone,
+          narrative_format: project.narrative_format,
+          detail_level: project.detail_level,
+          number_of_chapters: project.number_of_chapters,
+          tome_number: project.tome_number,
+          preface: project.preface,
+          conclusion: project.conclusion,
+          seo_optimization: project.seo_optimization,
+          book_summary: project.book_summary,
+          kdp_description: project.kdp_description,
+          kdp_keywords: project.kdp_keywords,
+          kdp_categories: project.kdp_categories,
+          chapters: project.chapters,
+          characters: project.characters,
+          ebook_images: project.ebook_images,
+        });
+
+      if (error) {
+        console.error('Error saving version:', error);
+        return false;
+      }
+
+      toast.success(`Version ${nextVersion} sauvegardée`);
+      return true;
+    } catch (error) {
+      console.error('Error in saveVersion:', error);
+      return false;
+    }
+  };
+
+  const loadVersions = async (projectId: string) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
+      const { data, error } = await supabase
+        .from('ebook_project_versions')
+        .select('*')
+        .eq('project_id', projectId)
+        .order('version_number', { ascending: false });
+
+      if (error) {
+        console.error('Error loading versions:', error);
+        return [];
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error in loadVersions:', error);
+      return [];
+    }
+  };
+
+  const restoreVersion = async (versionId: string): Promise<any | null> => {
+    try {
+      const { data: version, error } = await supabase
+        .from('ebook_project_versions')
+        .select('*')
+        .eq('id', versionId)
+        .single();
+
+      if (error || !version) {
+        console.error('Error loading version:', error);
+        toast.error("Erreur lors du chargement de la version");
+        return null;
+      }
+
+      toast.success(`Version ${version.version_number} restaurée`);
+      return version;
+    } catch (error) {
+      console.error('Error in restoreVersion:', error);
+      toast.error("Erreur lors de la restauration de la version");
+      return null;
+    }
+  };
+
   return {
     currentProjectId,
     isSaving,
@@ -191,5 +344,9 @@ export const useEbookDatabase = () => {
     loadAllProjects,
     deleteProject,
     setCurrentProjectId,
+    duplicateProject,
+    saveVersion,
+    loadVersions,
+    restoreVersion,
   };
 };

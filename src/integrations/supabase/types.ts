@@ -14,6 +14,101 @@ export type Database = {
   }
   public: {
     Tables: {
+      ebook_project_versions: {
+        Row: {
+          author_name: string | null
+          book_summary: string | null
+          chapter_length: string | null
+          chapters: Json | null
+          characters: Json | null
+          conclusion: string | null
+          cover_concepts: string | null
+          created_at: string
+          detail_level: string | null
+          ebook_images: Json | null
+          id: string
+          kdp_categories: string | null
+          kdp_description: string | null
+          kdp_keywords: string | null
+          narrative_format: string | null
+          number_of_chapters: number | null
+          preface: string | null
+          project_id: string
+          seo_optimization: string | null
+          target_audience: string | null
+          title: string
+          tome_number: number | null
+          tone: string | null
+          user_id: string
+          version_number: number
+          writing_style: string | null
+        }
+        Insert: {
+          author_name?: string | null
+          book_summary?: string | null
+          chapter_length?: string | null
+          chapters?: Json | null
+          characters?: Json | null
+          conclusion?: string | null
+          cover_concepts?: string | null
+          created_at?: string
+          detail_level?: string | null
+          ebook_images?: Json | null
+          id?: string
+          kdp_categories?: string | null
+          kdp_description?: string | null
+          kdp_keywords?: string | null
+          narrative_format?: string | null
+          number_of_chapters?: number | null
+          preface?: string | null
+          project_id: string
+          seo_optimization?: string | null
+          target_audience?: string | null
+          title: string
+          tome_number?: number | null
+          tone?: string | null
+          user_id: string
+          version_number: number
+          writing_style?: string | null
+        }
+        Update: {
+          author_name?: string | null
+          book_summary?: string | null
+          chapter_length?: string | null
+          chapters?: Json | null
+          characters?: Json | null
+          conclusion?: string | null
+          cover_concepts?: string | null
+          created_at?: string
+          detail_level?: string | null
+          ebook_images?: Json | null
+          id?: string
+          kdp_categories?: string | null
+          kdp_description?: string | null
+          kdp_keywords?: string | null
+          narrative_format?: string | null
+          number_of_chapters?: number | null
+          preface?: string | null
+          project_id?: string
+          seo_optimization?: string | null
+          target_audience?: string | null
+          title?: string
+          tome_number?: number | null
+          tone?: string | null
+          user_id?: string
+          version_number?: number
+          writing_style?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ebook_project_versions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "ebook_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ebook_projects: {
         Row: {
           author_name: string | null
