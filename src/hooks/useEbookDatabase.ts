@@ -64,7 +64,7 @@ export const useEbookDatabase = () => {
       if (data) {
         const loadTime = Date.now() - startTime;
         setCurrentProjectId(data.id);
-        toast.success('Projet chargé depuis la base de données');
+        // Toast supprimé pour éviter les popups à chaque chargement automatique
         console.log(`✅ [loadLatestProject] Projet chargé en ${loadTime}ms:`, {
           id: data.id,
           titre: data.title,
@@ -127,6 +127,7 @@ export const useEbookDatabase = () => {
         }
         
         const saveTime = Date.now() - startTime;
+        // Toast supprimé - sauvegarde automatique silencieuse
         console.log(`✅ [saveProject] Projet mis à jour avec succès en ${saveTime}ms`);
         return data;
       } else {
@@ -147,7 +148,8 @@ export const useEbookDatabase = () => {
         }
         
         setCurrentProjectId(data.id);
-        toast.success('Projet sauvegardé dans la base de données');
+        // Toast uniquement pour la première création
+        toast.success('Nouveau projet créé');
         const saveTime = Date.now() - startTime;
         console.log(`✅ [saveProject] Nouveau projet créé avec succès en ${saveTime}ms:`, {
           id: data.id,
