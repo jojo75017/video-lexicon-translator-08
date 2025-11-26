@@ -217,9 +217,10 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
 
   // Notifier l'utilisateur au premier chargement si des données ont été restaurées
   useEffect(() => {
+    // Console log uniquement pour debug, pas de toast
     if (savedData?.lastSaved) {
       const lastSavedDate = new Date(savedData.lastSaved);
-      toast.success(`Plan restauré automatiquement (dernière sauvegarde: ${lastSavedDate.toLocaleString('fr-FR')})`);
+      console.log('✅ Plan restauré automatiquement:', lastSavedDate.toLocaleString('fr-FR'));
     }
   }, []);
 
@@ -316,7 +317,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
         const newIndex = chapters.findIndex(chapter => chapter.id === over?.id);
 
         const newChapters = arrayMove(chapters, oldIndex, newIndex);
-        toast.success('Chapitres réorganisés !');
+        // Toast supprimé - action visible sans notification
         return newChapters;
       });
     }
@@ -1206,6 +1207,20 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
               <h1 className="font-playfair text-4xl md:text-5xl font-bold mb-4 text-white">
                 Studio de Création
               </h1>
+              
+              {/* Indicateur de sauvegarde discret */}
+              {isSaving && (
+                <div className="inline-flex items-center gap-2 mb-4 px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/20">
+                  <div className="w-2 h-2 rounded-full bg-white animate-pulse"></div>
+                  <span className="text-white/90 text-xs font-medium">Sauvegarde en cours...</span>
+                </div>
+              )}
+              {!isSaving && ebookTitle && (
+                <div className="inline-flex items-center gap-2 mb-4 px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 opacity-0 hover:opacity-100 transition-opacity">
+                  <div className="w-2 h-2 rounded-full bg-green-400"></div>
+                  <span className="text-white/90 text-xs font-medium">Sauvegardé</span>
+                </div>
+              )}
               
               <p className="font-inter text-lg text-white/90 mb-8 max-w-2xl mx-auto">
                 Créez des livres numériques de qualité professionnelle avec l'IA
