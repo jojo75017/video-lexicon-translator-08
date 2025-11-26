@@ -128,30 +128,48 @@ export function EbookProjectsList({ onProjectLoad, onCreateNew, currentProject }
     return (
       <div className="space-y-6">
         {currentProject?.hasContent && (
-          <Card className="bg-amber-50 border-amber-200">
+          <Card className="bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800">
             <CardHeader>
-              <CardTitle className="text-amber-900">⚠️ Projet non sauvegardé</CardTitle>
-              <CardDescription className="text-amber-700">
-                Vous avez un projet en cours "{currentProject.title || 'Sans titre'}" qui n'est pas encore dans la base de données.
-                <br />
-                <strong>Pour le sauvegarder :</strong> Assurez-vous d'avoir un titre et attendez 2 secondes, ou retournez à l'onglet Planificateur.
+              <CardTitle className="text-amber-900 dark:text-amber-100 flex items-center gap-2">
+                ⚠️ Projet non sauvegardé
+              </CardTitle>
+              <CardDescription className="text-amber-700 dark:text-amber-300">
+                Vous avez un projet en cours <strong>"{currentProject.title || 'Sans titre'}"</strong> qui n'est pas encore dans la base de données.
               </CardDescription>
             </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="bg-white dark:bg-amber-900/20 p-4 rounded-lg border border-amber-200 dark:border-amber-700">
+                <h4 className="font-semibold text-amber-900 dark:text-amber-100 mb-2">📝 Comment sauvegarder ?</h4>
+                <ol className="text-sm text-amber-700 dark:text-amber-300 space-y-1 list-decimal list-inside">
+                  <li>Assurez-vous que votre projet a un <strong>titre</strong></li>
+                  <li>Attendez 2 secondes (sauvegarde automatique)</li>
+                  <li>Ou retournez à l'onglet <strong>Planificateur</strong></li>
+                </ol>
+              </div>
+            </CardContent>
           </Card>
         )}
         
-        <Card>
-          <CardHeader>
+        <Card className="border-2 border-dashed">
+          <CardHeader className="text-center">
             <CardTitle>Aucun projet sauvegardé</CardTitle>
             <CardDescription>
-              Créez votre premier projet dans l'onglet Planificateur
+              Créez votre premier projet d'ebook en quelques clics
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <Button onClick={onCreateNew} className="w-full">
-              <BookOpen className="mr-2 h-4 w-4" />
-              Nouveau projet
+          <CardContent className="space-y-4">
+            <Button onClick={onCreateNew} className="w-full" size="lg">
+              <BookOpen className="mr-2 h-5 w-5" />
+              Créer mon premier projet
             </Button>
+            <div className="bg-muted p-4 rounded-lg text-sm">
+              <h4 className="font-semibold mb-2">💡 Bon à savoir :</h4>
+              <ul className="space-y-1 text-muted-foreground">
+                <li>✅ Sauvegarde automatique toutes les 2 secondes</li>
+                <li>✅ Tous vos projets sont sécurisés dans le cloud</li>
+                <li>✅ Accédez à vos projets depuis n'importe quel appareil</li>
+              </ul>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -160,6 +178,20 @@ export function EbookProjectsList({ onProjectLoad, onCreateNew, currentProject }
 
   return (
     <div className="space-y-4">
+      {currentProject?.hasContent && !currentProjectId && (
+        <Card className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
+          <CardHeader>
+            <CardTitle className="text-blue-900 dark:text-blue-100 text-base flex items-center gap-2">
+              💡 Projet en cours de création
+            </CardTitle>
+            <CardDescription className="text-blue-700 dark:text-blue-300">
+              Vous travaillez sur <strong>"{currentProject.title || 'Sans titre'}"</strong>. 
+              La sauvegarde automatique se déclenche toutes les 2 secondes dès que vous ajoutez un titre.
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      )}
+      
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-playfair font-bold text-navy-deep mb-2">
@@ -169,8 +201,8 @@ export function EbookProjectsList({ onProjectLoad, onCreateNew, currentProject }
             {filteredProjects.length} projet{filteredProjects.length > 1 ? 's' : ''} trouvé{filteredProjects.length > 1 ? 's' : ''}
           </p>
         </div>
-        <Button onClick={onCreateNew}>
-          <BookOpen className="mr-2 h-4 w-4" />
+        <Button onClick={onCreateNew} size="lg">
+          <BookOpen className="mr-2 h-5 w-5" />
           Nouveau projet
         </Button>
       </div>

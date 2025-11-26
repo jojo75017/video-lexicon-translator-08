@@ -34,14 +34,19 @@ export const useEbookDatabase = () => {
 
   // Charger le projet le plus récent au démarrage
   const loadLatestProject = async () => {
+    const startTime = Date.now();
+    console.log('🔄 [loadLatestProject] Démarrage du chargement du dernier projet...');
+    
     try {
       setIsLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
-        console.log('Aucun utilisateur connecté pour charger les projets');
+        console.log('⚠️ [loadLatestProject] Aucun utilisateur connecté');
         return null;
       }
+
+      console.log(`👤 [loadLatestProject] Utilisateur connecté: ${user.email}`);
 
       const { data, error } = await supabase
         .from('ebook_projects')
@@ -52,43 +57,60 @@ export const useEbookDatabase = () => {
         .maybeSingle();
 
       if (error) {
-        console.error('Erreur lors du chargement:', error);
+        console.error('❌ [loadLatestProject] Erreur Supabase:', error);
         throw error;
       }
 
       if (data) {
+        const loadTime = Date.now() - startTime;
         setCurrentProjectId(data.id);
         toast.success('Projet chargé depuis la base de données');
-        console.log('Projet chargé:', data.title);
+        console.log(`✅ [loadLatestProject] Projet chargé en ${loadTime}ms:`, {
+          id: data.id,
+          titre: data.title,
+          chapitres: Array.isArray(data.chapters) ? data.chapters.length : 0,
+          derniere_maj: data.updated_at
+        });
         return data;
       }
 
-      console.log('Aucun projet trouvé dans la base de données');
+      console.log('📭 [loadLatestProject] Aucun projet trouvé dans la base de données');
       return null;
     } catch (error) {
-      console.error('Erreur lors du chargement:', error);
+      console.error('❌ [loadLatestProject] Exception:', error);
       toast.error('Erreur lors du chargement du projet');
       return null;
     } finally {
       setIsLoading(false);
+      const totalTime = Date.now() - startTime;
+      console.log(`⏱️ [loadLatestProject] Terminé en ${totalTime}ms`);
     }
   };
 
   // Sauvegarder ou mettre à jour le projet
   const saveProject = async (projectData: EbookProject) => {
+    const startTime = Date.now();
+    console.log('💾 [saveProject] Début de la sauvegarde:', {
+      titre: projectData.title,
+      mode: currentProjectId ? 'MISE À JOUR' : 'CRÉATION',
+      currentProjectId,
+      chapitres: Array.isArray(projectData.chapters) ? projectData.chapters.length : 0
+    });
+    
     try {
       setIsSaving(true);
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
-        console.log('Impossible de sauvegarder: utilisateur non connecté');
+        console.log('⚠️ [saveProject] Impossible de sauvegarder: utilisateur non connecté');
         return null;
       }
 
-      console.log('Sauvegarde du projet:', projectData.title, 'ID actuel:', currentProjectId);
+      console.log(`👤 [saveProject] Utilisateur: ${user.email}`);
 
       if (currentProjectId) {
         // Mise à jour du projet existant
+        console.log(`🔄 [saveProject] Mise à jour du projet ID: ${currentProjectId}`);
         const { data, error } = await supabase
           .from('ebook_projects')
           .update({
@@ -100,14 +122,16 @@ export const useEbookDatabase = () => {
           .single();
 
         if (error) {
-          console.error('Erreur mise à jour:', error);
+          console.error('❌ [saveProject] Erreur mise à jour:', error);
           throw error;
         }
         
-        console.log('Projet mis à jour avec succès');
+        const saveTime = Date.now() - startTime;
+        console.log(`✅ [saveProject] Projet mis à jour avec succès en ${saveTime}ms`);
         return data;
       } else {
         // Création d'un nouveau projet
+        console.log('✨ [saveProject] Création d\'un nouveau projet');
         const { data, error } = await supabase
           .from('ebook_projects')
           .insert({
@@ -118,21 +142,27 @@ export const useEbookDatabase = () => {
           .single();
 
         if (error) {
-          console.error('Erreur création:', error);
+          console.error('❌ [saveProject] Erreur création:', error);
           throw error;
         }
         
         setCurrentProjectId(data.id);
         toast.success('Projet sauvegardé dans la base de données');
-        console.log('Nouveau projet créé avec succès:', data.id);
+        const saveTime = Date.now() - startTime;
+        console.log(`✅ [saveProject] Nouveau projet créé avec succès en ${saveTime}ms:`, {
+          id: data.id,
+          titre: data.title
+        });
         return data;
       }
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde:', error);
+      console.error('❌ [saveProject] Exception:', error);
       toast.error('Erreur lors de la sauvegarde du projet');
       return null;
     } finally {
       setIsSaving(false);
+      const totalTime = Date.now() - startTime;
+      console.log(`⏱️ [saveProject] Terminé en ${totalTime}ms`);
     }
   };
 
