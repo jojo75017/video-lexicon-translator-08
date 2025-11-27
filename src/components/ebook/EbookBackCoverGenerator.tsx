@@ -72,7 +72,7 @@ export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = (
       setShortVersion(short);
       setAuthorBio(`${authorName} est l'auteur de "${ebookTitle}". Expert dans son domaine, il partage son expertise à travers cet ouvrage.`);
       
-      toast.success(`${versions.length} versions générées !`);
+      // Toast supprimé - génération silencieuse
     }
   };
 
@@ -181,7 +181,7 @@ export const EbookBackCoverGenerator: React.FC<EbookBackCoverGeneratorProps> = (
     if (images.length > 0) {
       setCoverImages(images);
       setSelectedCover(0);
-      toast.success(`${images.length} couvertures générées !`);
+      // Toast supprimé - génération silencieuse
     } else {
       toast.error('Aucune image générée');
     }

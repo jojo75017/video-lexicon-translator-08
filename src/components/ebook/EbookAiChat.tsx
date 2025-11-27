@@ -73,7 +73,7 @@ export const EbookAiChat: React.FC = () => {
       localStorage.setItem('user_openai_key', tempApiKey);
       setApiKey(tempApiKey);
       setShowSettings(false);
-      toast.success('✅ Clé API OpenAI validée et enregistrée avec succès !', { id: 'api-test', duration: 5000 });
+      toast.dismiss('api-test'); // Suppression du toast loading au lieu d'afficher un succès
     } catch (error) {
       toast.error('❌ Clé API invalide. Vérifiez votre clé et réessayez.', { id: 'api-test' });
     }

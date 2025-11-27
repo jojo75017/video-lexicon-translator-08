@@ -103,9 +103,7 @@ Le contenu doit être :
 Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajoutée aux lecteurs sur ce sujet spécifique.`;
 
     const content = await callGenerateContent('chapters_generated', prompt);
-    if (content) {
-      toast.success('Chapitre généré avec succès !');
-    }
+    // Toast supprimé - génération silencieuse
     return content;
   };
 
@@ -129,9 +127,7 @@ Le contenu doit faire environ 200 mots et être :
 - Utiliser l'italique (*) pour les points importants`;
 
     const content = await callGenerateContent('subchapters_generated', prompt);
-    if (content) {
-      toast.success('Sous-chapitre généré !');
-    }
+    // Toast supprimé - génération silencieuse
     return content;
   };
 
@@ -169,7 +165,7 @@ Réponds UNIQUEMENT avec le JSON, sans texte additionnel.`;
         // Nettoyer le contenu pour enlever les balises markdown
         const cleanContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
         const parsed = JSON.parse(cleanContent);
-        toast.success('Plan généré avec succès !');
+        // Toast supprimé - génération silencieuse
         return parsed;
       } catch (error) {
         console.error('Erreur parsing JSON:', error, 'Contenu reçu:', content);
@@ -195,9 +191,7 @@ Réponds UNIQUEMENT avec le JSON, sans texte additionnel.`;
 - La typographie suggérée`;
 
     const content = await callGenerateContent('covers_generated', prompt);
-    if (content) {
-      toast.success('Concepts de couverture générés !');
-    }
+    // Toast supprimé - génération silencieuse
     return content;
   };
 
@@ -336,9 +330,7 @@ Réponds avec la description complète uniquement, sans titre de section.`;
     const content = await callGenerateContent('covers_generated', prompt);
     console.log('[useSubscriptionGeneration] Content received:', content ? 'Success' : 'Failed');
     
-    if (content) {
-      toast.success('4ème de couverture générée !');
-    }
+    // Toast supprimé - génération silencieuse
     return content;
   };
 
@@ -353,9 +345,7 @@ Réponds avec la description complète uniquement, sans titre de section.`;
     Présente le tout de manière structurée et professionnelle.`;
     
     const content = await callGenerateContent('chapters_generated', prompt);
-    if (content) {
-      toast.success('Stratégie de prix générée !');
-    }
+    // Toast supprimé - génération silencieuse
     return content;
   };
 
@@ -371,9 +361,7 @@ Réponds avec la description complète uniquement, sans titre de section.`;
     Présente le tout sous forme de plan d'action détaillé et actionnable.`;
     
     const content = await callGenerateContent('chapters_generated', prompt);
-    if (content) {
-      toast.success('Plan de lancement généré !');
-    }
+    // Toast supprimé - génération silencieuse
     return content;
   };
 
@@ -393,9 +381,7 @@ Réponds avec la description complète uniquement, sans titre de section.`;
     Présente les 3 versions clairement séparées.`;
     
     const content = await callGenerateContent('chapters_generated', prompt);
-    if (content) {
-      toast.success('Biographie générée !');
-    }
+    // Toast supprimé - génération silencieuse
     return content;
   };
 
