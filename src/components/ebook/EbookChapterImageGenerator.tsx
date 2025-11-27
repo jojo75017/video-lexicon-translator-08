@@ -147,7 +147,7 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
               imageUrl: data.imageUrl,
               style: imageStyle
             });
-            toast.success(`✅ Image générée pour "${chapter.title}"`);
+            // Toast supprimé - génération silencieuse
             success = true;
           } else {
             throw new Error('Pas d\'URL d\'image dans la réponse');
@@ -225,9 +225,8 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
     setGeneratedImages(newImages);
     setIsGenerating(false);
     
-    if (newImages.length > 0) {
-      toast.success(`🎉 ${newImages.length} image(s) générée(s) avec succès !`);
-    } else {
+    // Toast uniquement en cas d'échec total
+    if (newImages.length === 0) {
       toast.error('Aucune image générée. Vérifiez vos crédits ou votre clé OpenAI.');
     }
   };
@@ -284,7 +283,7 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
           return [...filtered, newImage];
         });
 
-        toast.success(`✅ Image générée pour "${chapter.title}"`);
+        // Toast supprimé - génération silencieuse
       } else {
         throw new Error('Pas d\'URL d\'image dans la réponse');
       }

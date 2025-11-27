@@ -148,8 +148,7 @@ export const useEbookDatabase = () => {
         }
         
         setCurrentProjectId(data.id);
-        // Toast uniquement pour la première création
-        toast.success('Nouveau projet créé');
+        // Toast supprimé - création silencieuse
         const saveTime = Date.now() - startTime;
         console.log(`✅ [saveProject] Nouveau projet créé avec succès en ${saveTime}ms:`, {
           id: data.id,

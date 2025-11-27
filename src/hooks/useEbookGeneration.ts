@@ -79,7 +79,7 @@ Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajo
         throw new Error('Contenu généré trop court ou vide');
       }
       
-      toast.success('Chapitre généré avec succès !');
+      // Toast supprimé - génération silencieuse
       return content;
 
     } catch (error) {
@@ -145,7 +145,7 @@ Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajo
       const data = await response.json();
       const content = data.choices[0].message.content;
       
-      toast.success('Sous-chapitre généré avec succès !');
+      // Toast supprimé - génération silencieuse
       return content;
 
     } catch (error) {
@@ -216,7 +216,7 @@ Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajo
       const cleanContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
       const planData = JSON.parse(cleanContent);
       
-      toast.success('Plan d\'ebook généré automatiquement !');
+      // Toast supprimé - génération silencieuse
       return planData;
 
     } catch (error) {
@@ -285,7 +285,7 @@ Réponds uniquement au format JSON:
         content: sub.content
       }));
 
-      toast.success(`Chapitre divisé en ${newSubChapters.length} sous-chapitres !`);
+      // Toast supprimé - génération silencieuse
       return newSubChapters;
 
     } catch (error) {
@@ -337,7 +337,7 @@ Le résumé doit:
       const data = await response.json();
       const summary = data.choices[0].message.content;
       
-      toast.success('Résumé généré avec succès !');
+      // Toast supprimé - génération silencieuse
       return summary;
 
     } catch (error) {
@@ -395,7 +395,7 @@ Ambiance: ...`
       const data = await response.json();
       const concepts = data.choices[0].message.content;
       
-      toast.success('Concepts de couverture générés !');
+      // Toast supprimé - génération silencieuse
       return concepts;
 
     } catch (error) {
@@ -457,7 +457,7 @@ Réponds au format JSON:
       const cleanContent = data.choices[0].message.content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
       const seoData = JSON.parse(cleanContent);
       
-      toast.success('Optimisation SEO générée !');
+      // Toast supprimé - génération silencieuse
       return seoData;
 
     } catch (error) {
