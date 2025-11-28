@@ -941,9 +941,6 @@ Paperback: 9.99€ - 19.99€
         case 'pdf':
           exportAsPDF();
           break;
-        case 'googledocs':
-          await exportToGoogleDocs();
-          break;
         case 'docx':
           // Export simple TXT formaté pour conversion
           const docContent = generateEbookContent();
@@ -1013,7 +1010,6 @@ Paperback: 9.99€ - 19.99€
                 <SelectValue placeholder="Choisir un format" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="googledocs">📄 Google Docs (Recommandé)</SelectItem>
                 <SelectItem value="pdf">📄 PDF (Pour KDP)</SelectItem>
                 <SelectItem value="html">📄 HTML (Web)</SelectItem>
                 <SelectItem value="txt">📝 Texte (.txt)</SelectItem>
