@@ -1,9 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { FileText } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { FileText, Image as ImageIcon, Plus, Trash2 } from 'lucide-react';
 import { Chapter } from '@/hooks/useEbookGeneration';
+import { toast } from 'sonner';
+
+interface ChapterImage {
+  id: string;
+  url: string;
+  alt: string;
+  position: number;
+}
 
 interface EbookWritingProps {
   chapters: Chapter[];
@@ -16,6 +27,103 @@ export const EbookWriting: React.FC<EbookWritingProps> = ({
   onUpdateChapterContent,
   onUpdateSubChapterContent
 }) => {
+  const [chapterImages, setChapterImages] = useState<Record<string, ChapterImage[]>>({});
+  const [imageUrl, setImageUrl] = useState('');
+  const [imageAlt, setImageAlt] = useState('');
+  const [currentChapterId, setCurrentChapterId] = useState<string | null>(null);
+  const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
+
+  const addImageToChapter = (chapterId: string) => {
+    if (!imageUrl.trim()) {
+      toast.error('Veuillez entrer une URL d\'image');
+      return;
+    }
+
+    const newImage: ChapterImage = {
+      id: Date.now().toString(),
+      url: imageUrl,
+      alt: imageAlt || 'Image du chapitre',
+      position: chapterImages[chapterId]?.length || 0
+    };
+
+    setChapterImages(prev => ({
+      ...prev,
+      [chapterId]: [...(prev[chapterId] || []), newImage]
+    }));
+
+    // Insérer le marqueur d'image dans le contenu
+    const chapter = chapters.find(c => c.id === chapterId);
+    if (chapter) {
+      const imageMarker = `\n\n[IMAGE:${newImage.id}:${imageUrl}]\n\n`;
+      onUpdateChapterContent(chapterId, (chapter.content || '') + imageMarker);
+    }
+
+    toast.success('Image ajoutée au chapitre');
+    setImageUrl('');
+    setImageAlt('');
+    setIsImageDialogOpen(false);
+  };
+
+  const removeImageFromChapter = (chapterId: string, imageId: string) => {
+    setChapterImages(prev => ({
+      ...prev,
+      [chapterId]: prev[chapterId]?.filter(img => img.id !== imageId) || []
+    }));
+
+    // Supprimer le marqueur d'image du contenu
+    const chapter = chapters.find(c => c.id === chapterId);
+    if (chapter && chapter.content) {
+      const regex = new RegExp(`\\[IMAGE:${imageId}:.*?\\]`, 'g');
+      onUpdateChapterContent(chapterId, chapter.content.replace(regex, ''));
+    }
+
+    toast.success('Image supprimée');
+  };
+
+  const renderContentWithImages = (content: string, chapterId: string) => {
+    const images = chapterImages[chapterId] || [];
+    if (images.length === 0) return null;
+
+    return (
+      <div className="mt-4 space-y-4 border-t pt-4">
+        <h4 className="font-medium text-sm flex items-center gap-2">
+          <ImageIcon className="w-4 h-4" />
+          Images insérées dans ce chapitre:
+        </h4>
+        <div className="grid grid-cols-2 gap-4">
+          {images.map((image) => (
+            <Card key={image.id} className="overflow-hidden">
+              <div className="aspect-video bg-muted relative">
+                <img 
+                  src={image.url} 
+                  alt={image.alt}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = 'https://via.placeholder.com/400x300?text=Image+non+disponible';
+                  }}
+                />
+              </div>
+              <div className="p-2 flex items-center justify-between">
+                <p className="text-xs text-muted-foreground truncate">{image.alt}</p>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => removeImageFromChapter(chapterId, image.id)}
+                  className="h-6 w-6 p-0"
+                >
+                  <Trash2 className="w-3 h-3" />
+                </Button>
+              </div>
+            </Card>
+          ))}
+        </div>
+        <p className="text-xs text-muted-foreground">
+          💡 Les marqueurs [IMAGE:...] dans votre texte seront remplacés par les images lors de l'export
+        </p>
+      </div>
+    );
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -45,10 +153,59 @@ export const EbookWriting: React.FC<EbookWritingProps> = ({
               </CardHeader>
               <CardContent className="p-6">
                 <div className="space-y-4">
-                  <div>
+                  <div className="flex items-center justify-between mb-2">
                     <Label htmlFor={`chapter-${chapter.id}`} className="text-sm font-medium">
                       Contenu du chapitre
                     </Label>
+                    <Dialog open={isImageDialogOpen && currentChapterId === chapter.id} onOpenChange={setIsImageDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setCurrentChapterId(chapter.id);
+                            setIsImageDialogOpen(true);
+                          }}
+                        >
+                          <ImageIcon className="w-4 h-4 mr-2" />
+                          Ajouter une image
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Ajouter une image au chapitre</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div>
+                            <Label htmlFor="image-url">URL de l'image</Label>
+                            <Input
+                              id="image-url"
+                              placeholder="https://example.com/image.jpg"
+                              value={imageUrl}
+                              onChange={(e) => setImageUrl(e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="image-alt">Description de l'image (optionnel)</Label>
+                            <Input
+                              id="image-alt"
+                              placeholder="Description de l'image"
+                              value={imageAlt}
+                              onChange={(e) => setImageAlt(e.target.value)}
+                            />
+                          </div>
+                          <Button
+                            onClick={() => addImageToChapter(chapter.id)}
+                            className="w-full"
+                          >
+                            <Plus className="w-4 h-4 mr-2" />
+                            Insérer l'image
+                          </Button>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                  <div>
                     <Textarea
                       id={`chapter-${chapter.id}`}
                       placeholder="Commencez à rédiger votre chapitre ici..."
@@ -71,7 +228,18 @@ export const EbookWriting: React.FC<EbookWritingProps> = ({
                     <span>
                       Caractères: {chapter.content ? chapter.content.length : 0}
                     </span>
+                    {chapterImages[chapter.id]?.length > 0 && (
+                      <>
+                        <span>•</span>
+                        <span className="flex items-center gap-1">
+                          <ImageIcon className="w-3 h-3" />
+                          {chapterImages[chapter.id].length} image{chapterImages[chapter.id].length > 1 ? 's' : ''}
+                        </span>
+                      </>
+                    )}
                   </div>
+
+                  {renderContentWithImages(chapter.content || '', chapter.id)}
 
                   {chapter.subChapters.length > 0 && (
                     <div className="space-y-4 border-t pt-4">
