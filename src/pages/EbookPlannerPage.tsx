@@ -864,6 +864,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
             chapters={chapters}
             onUpdateChapterContent={updateChapterContent}
             onUpdateSubChapterContent={updateSubChapterContent}
+            ebookTitle={ebookTitle}
           />
         );
       
