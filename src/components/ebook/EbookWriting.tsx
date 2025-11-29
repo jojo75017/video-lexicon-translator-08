@@ -5,9 +5,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FileText, Image as ImageIcon, Plus, Trash2 } from 'lucide-react';
 import { Chapter } from '@/hooks/useEbookGeneration';
 import { toast } from 'sonner';
+import EbookImageBank from './EbookImageBank';
 
 interface ChapterImage {
   id: string;
@@ -20,12 +22,14 @@ interface EbookWritingProps {
   chapters: Chapter[];
   onUpdateChapterContent: (chapterId: string, content: string) => void;
   onUpdateSubChapterContent: (chapterId: string, subChapterId: string, content: string) => void;
+  ebookTitle?: string;
 }
 
 export const EbookWriting: React.FC<EbookWritingProps> = ({
   chapters,
   onUpdateChapterContent,
-  onUpdateSubChapterContent
+  onUpdateSubChapterContent,
+  ebookTitle = 'Mon Ebook'
 }) => {
   const [chapterImages, setChapterImages] = useState<Record<string, ChapterImage[]>>({});
   const [imageUrl, setImageUrl] = useState('');
@@ -33,16 +37,19 @@ export const EbookWriting: React.FC<EbookWritingProps> = ({
   const [currentChapterId, setCurrentChapterId] = useState<string | null>(null);
   const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
 
-  const addImageToChapter = (chapterId: string) => {
-    if (!imageUrl.trim()) {
+  const addImageToChapter = (chapterId: string, url?: string, alt?: string) => {
+    const finalUrl = url || imageUrl;
+    const finalAlt = alt || imageAlt;
+
+    if (!finalUrl.trim()) {
       toast.error('Veuillez entrer une URL d\'image');
       return;
     }
 
     const newImage: ChapterImage = {
       id: Date.now().toString(),
-      url: imageUrl,
-      alt: imageAlt || 'Image du chapitre',
+      url: finalUrl,
+      alt: finalAlt || 'Image du chapitre',
       position: chapterImages[chapterId]?.length || 0
     };
 
@@ -54,7 +61,7 @@ export const EbookWriting: React.FC<EbookWritingProps> = ({
     // Insérer le marqueur d'image dans le contenu
     const chapter = chapters.find(c => c.id === chapterId);
     if (chapter) {
-      const imageMarker = `\n\n[IMAGE:${newImage.id}:${imageUrl}]\n\n`;
+      const imageMarker = `\n\n[IMAGE:${newImage.id}:${finalUrl}]\n\n`;
       onUpdateChapterContent(chapterId, (chapter.content || '') + imageMarker);
     }
 
@@ -62,6 +69,12 @@ export const EbookWriting: React.FC<EbookWritingProps> = ({
     setImageUrl('');
     setImageAlt('');
     setIsImageDialogOpen(false);
+  };
+
+  const handleImageSelect = (imageUrl: string, title: string) => {
+    if (currentChapterId) {
+      addImageToChapter(currentChapterId, imageUrl, title || 'Image générée par IA');
+    }
   };
 
   const removeImageFromChapter = (chapterId: string, imageId: string) => {
@@ -171,37 +184,52 @@ export const EbookWriting: React.FC<EbookWritingProps> = ({
                           Ajouter une image
                         </Button>
                       </DialogTrigger>
-                      <DialogContent>
+                      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
                         <DialogHeader>
                           <DialogTitle>Ajouter une image au chapitre</DialogTitle>
                         </DialogHeader>
-                        <div className="space-y-4">
-                          <div>
-                            <Label htmlFor="image-url">URL de l'image</Label>
-                            <Input
-                              id="image-url"
-                              placeholder="https://example.com/image.jpg"
-                              value={imageUrl}
-                              onChange={(e) => setImageUrl(e.target.value)}
+                        <Tabs defaultValue="ai" className="w-full">
+                          <TabsList className="grid w-full grid-cols-2">
+                            <TabsTrigger value="ai">Générer avec IA</TabsTrigger>
+                            <TabsTrigger value="url">URL manuelle</TabsTrigger>
+                          </TabsList>
+                          <TabsContent value="ai" className="mt-4">
+                            <EbookImageBank
+                              onImageSelect={handleImageSelect}
+                              ebookTitle={ebookTitle}
+                              chapters={chapters}
                             />
-                          </div>
-                          <div>
-                            <Label htmlFor="image-alt">Description de l'image (optionnel)</Label>
-                            <Input
-                              id="image-alt"
-                              placeholder="Description de l'image"
-                              value={imageAlt}
-                              onChange={(e) => setImageAlt(e.target.value)}
-                            />
-                          </div>
-                          <Button
-                            onClick={() => addImageToChapter(chapter.id)}
-                            className="w-full"
-                          >
-                            <Plus className="w-4 h-4 mr-2" />
-                            Insérer l'image
-                          </Button>
-                        </div>
+                          </TabsContent>
+                          <TabsContent value="url" className="mt-4">
+                            <div className="space-y-4">
+                              <div>
+                                <Label htmlFor="image-url">URL de l'image</Label>
+                                <Input
+                                  id="image-url"
+                                  placeholder="https://example.com/image.jpg"
+                                  value={imageUrl}
+                                  onChange={(e) => setImageUrl(e.target.value)}
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor="image-alt">Description de l'image (optionnel)</Label>
+                                <Input
+                                  id="image-alt"
+                                  placeholder="Description de l'image"
+                                  value={imageAlt}
+                                  onChange={(e) => setImageAlt(e.target.value)}
+                                />
+                              </div>
+                              <Button
+                                onClick={() => addImageToChapter(chapter.id)}
+                                className="w-full"
+                              >
+                                <Plus className="w-4 h-4 mr-2" />
+                                Insérer l'image
+                              </Button>
+                            </div>
+                          </TabsContent>
+                        </Tabs>
                       </DialogContent>
                     </Dialog>
                   </div>
