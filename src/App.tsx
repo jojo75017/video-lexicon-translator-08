@@ -34,18 +34,25 @@ const App = () => {
       }
 
       // Check admin session
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        try {
-          await supabase.functions.invoke('bootstrap-admin');
-        } catch (e) {
-          // Ignore - may already exist
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          console.log('Session admin trouvée dans App.tsx');
+          const { data, error } = await supabase.functions.invoke('check-admin');
+          
+          if (error) {
+            console.error('Erreur check-admin dans App.tsx:', error);
+          } else if (data?.isAdmin) {
+            console.log('Statut admin confirmé dans App.tsx');
+            setIsAdmin(true);
+          } else {
+            console.log('Utilisateur non-admin dans App.tsx');
+          }
+        } else {
+          console.log('Aucune session admin trouvée dans App.tsx');
         }
-        
-        const { data } = await supabase.functions.invoke('check-admin');
-        if (data?.isAdmin) {
-          setIsAdmin(true);
-        }
+      } catch (error) {
+        console.error('Erreur lors de la vérification de la session admin:', error);
       }
 
       setIsCheckingAuth(false);
@@ -55,12 +62,19 @@ const App = () => {
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state changed:', event);
       if (event === 'SIGNED_IN' && session) {
         setTimeout(async () => {
-          const { data } = await supabase.functions.invoke('check-admin');
-          if (data?.isAdmin) setIsAdmin(true);
+          const { data, error } = await supabase.functions.invoke('check-admin');
+          if (error) {
+            console.error('Erreur check-admin lors du changement d\'état:', error);
+          } else if (data?.isAdmin) {
+            console.log('Admin confirmé lors du changement d\'état');
+            setIsAdmin(true);
+          }
         }, 0);
       } else if (event === 'SIGNED_OUT') {
+        console.log('Déconnexion détectée');
         setIsAdmin(false);
       }
     });
