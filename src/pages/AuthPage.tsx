@@ -17,12 +17,26 @@ export const AuthPage = () => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        const { data } = await supabase.functions.invoke('check-admin');
-        if (data?.isAdmin) {
-          navigate('/admin');
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          console.log('Session existante trouvée, vérification du rôle admin...');
+          const { data, error } = await supabase.functions.invoke('check-admin');
+          
+          if (error) {
+            console.error('Erreur lors de la vérification admin:', error);
+            return;
+          }
+          
+          if (data?.isAdmin) {
+            console.log('Utilisateur admin confirmé, redirection...');
+            navigate('/admin');
+          } else {
+            console.log('Utilisateur non-admin, reste sur la page de connexion');
+          }
         }
+      } catch (error) {
+        console.error('Erreur dans checkAuth:', error);
       }
     };
     checkAuth();
@@ -34,32 +48,46 @@ export const AuthPage = () => {
 
     try {
         if (isLogin) {
-          const { error: signInError } = await supabase.auth.signInWithPassword({
+          console.log('Tentative de connexion pour:', email);
+          
+          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
             email,
             password,
           });
 
-          if (signInError) throw signInError;
-
-          // Tente d'initialiser automatiquement le premier admin (idempotent)
-          try {
-            await supabase.functions.invoke('bootstrap-admin');
-          } catch (e) {
-            // Ignorer: la fonction peut renvoyer 401/200 si déjà initialisé
+          if (signInError) {
+            console.error('Erreur de connexion:', signInError);
+            throw signInError;
           }
 
+          console.log('Connexion réussie, vérification du rôle admin...');
+          
           // Vérifie le rôle admin
           const { data: roleData, error: roleError } = await supabase.functions.invoke('check-admin');
           
-          if (roleError || !roleData?.isAdmin) {
+          console.log('Résultat vérification admin:', { roleData, roleError });
+          
+          if (roleError) {
+            console.error('Erreur lors de la vérification du rôle:', roleError);
+            await supabase.auth.signOut();
+            toast.error("Erreur de vérification", {
+              description: "Impossible de vérifier les droits administrateur."
+            });
+            setIsLoading(false);
+            return;
+          }
+          
+          if (!roleData?.isAdmin) {
+            console.log('Utilisateur non-admin détecté');
             await supabase.auth.signOut();
             toast.error("Accès refusé", {
-              description: "Votre compte n'a pas les droits administrateur. Contactez le support."
+              description: "Votre compte n'a pas les droits administrateur."
             });
             setIsLoading(false);
             return;
           }
 
+          console.log('Utilisateur admin confirmé');
           toast.success("Connexion admin réussie");
           navigate('/admin');
         } else {
