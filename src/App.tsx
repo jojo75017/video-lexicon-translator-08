@@ -9,6 +9,7 @@ import AiChatPage from './pages/AiChatPage';
 import SubscriptionPage from './pages/SubscriptionPage';
 import { AdminPage } from './pages/AdminPage';
 import AuthPage from './pages/AuthPage';
+import AdminProfilePage from './pages/AdminProfilePage';
 import AffiliationFormationPage from './pages/AffiliationFormationPage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -139,6 +140,10 @@ const App = () => {
             <Route 
               path="/admin" 
               element={isAdmin ? <AdminPage /> : <Navigate to="/auth" replace />} 
+            />
+            <Route 
+              path="/admin/profile" 
+              element={isAdmin ? <AdminProfilePage /> : <Navigate to="/auth" replace />} 
             />
           </Routes>
           <Toaster />
