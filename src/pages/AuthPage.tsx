@@ -13,6 +13,7 @@ export const AuthPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -41,6 +42,31 @@ export const AuthPage = () => {
     };
     checkAuth();
   }, [navigate]);
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth`,
+      });
+
+      if (error) throw error;
+
+      toast.success("Email envoyé", {
+        description: "Vérifiez votre boîte email pour réinitialiser votre mot de passe"
+      });
+      setIsForgotPassword(false);
+    } catch (error: any) {
+      console.error('Reset password error:', error);
+      toast.error("Erreur", {
+        description: error.message || "Impossible d'envoyer l'email"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -115,6 +141,55 @@ export const AuthPage = () => {
     }
   };
 
+  if (isForgotPassword) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle>Mot de passe oublié</CardTitle>
+            <CardDescription>
+              Entrez votre email pour recevoir un lien de réinitialisation
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleResetPassword} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Envoi...
+                  </>
+                ) : (
+                  'Envoyer le lien'
+                )}
+              </Button>
+            </form>
+            <div className="mt-4 text-center">
+              <Button
+                variant="link"
+                onClick={() => setIsForgotPassword(false)}
+                disabled={isLoading}
+              >
+                Retour à la connexion
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
@@ -160,6 +235,18 @@ export const AuthPage = () => {
               )}
             </Button>
           </form>
+          {isLogin && (
+            <div className="mt-2 text-center">
+              <Button
+                variant="link"
+                onClick={() => setIsForgotPassword(true)}
+                disabled={isLoading}
+                className="text-sm"
+              >
+                Mot de passe oublié ?
+              </Button>
+            </div>
+          )}
           <div className="mt-4 text-center">
             <Button
               variant="link"
