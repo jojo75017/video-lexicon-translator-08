@@ -1079,6 +1079,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
             conclusion={conclusion}
             epilogue={epilogue}
             chapters={chapters}
+            characters={characters}
             apiKey={apiKey}
             onTranslate={(translatedData) => {
               setPreface(translatedData.preface);
