@@ -433,317 +433,247 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                 { label: 'Images', value: ebookImages.length, icon: Palette, color: 'from-amber-500 to-orange-500' },
                 { label: 'Mots', value: chapters.reduce((acc, c) => acc + (c.content?.split(' ').length || 0), 0), icon: FileText, color: 'from-emerald-500 to-teal-500' },
               ].map((stat, i) => (
-                <div key={i} className="relative group">
-                  <div className={`absolute inset-0 bg-gradient-to-r ${stat.color} rounded-2xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity`} />
-                  <Card className="relative glass-card border-0 overflow-hidden">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-xl bg-gradient-to-r ${stat.color} flex items-center justify-center shadow-lg`}>
-                          <stat.icon className="w-5 h-5 text-white" />
-                        </div>
-                        <div>
-                          <p className="text-2xl font-bold text-foreground">{stat.value}</p>
-                          <p className="text-xs text-muted-foreground">{stat.label}</p>
-                        </div>
+                <Card key={i} className="border border-border/50 bg-card">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-xl bg-gradient-to-r ${stat.color} flex items-center justify-center`}>
+                        <stat.icon className="w-5 h-5 text-white" />
                       </div>
-                    </CardContent>
-                  </Card>
-                </div>
+                      <div>
+                        <p className="text-2xl font-bold">{stat.value}</p>
+                        <p className="text-xs text-muted-foreground">{stat.label}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
 
-            {/* Main Form */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 space-y-6">
-                {/* General Info Card */}
-                <Card className="glass-card border-0 overflow-hidden">
-                  <CardHeader className="bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 border-b border-border/50">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-violet-500/30">
-                        <BookOpen className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <CardTitle className="text-xl">Informations générales</CardTitle>
-                        <CardDescription>Définissez les bases de votre ebook</CardDescription>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-6 space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium">Titre de l'ebook</Label>
-                        <Input
-                          placeholder="Mon Ebook Extraordinaire"
-                          value={ebookTitle}
-                          onChange={(e) => setEbookTitle(e.target.value)}
-                          className="h-11 bg-background/50 border-border/50 focus:border-violet-500 transition-colors"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium">Nom de l'auteur</Label>
-                        <Input
-                          placeholder="Votre nom"
-                          value={authorName}
-                          onChange={(e) => setAuthorName(e.target.value)}
-                          className="h-11 bg-background/50 border-border/50 focus:border-violet-500 transition-colors"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium">Public cible</Label>
-                        <Select value={targetAudience} onValueChange={setTargetAudience}>
-                          <SelectTrigger className="h-11 bg-background/50 border-border/50">
-                            <SelectValue placeholder="Sélectionner" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Enfants (3-7 ans)">Enfants (3-7 ans)</SelectItem>
-                            <SelectItem value="Jeunes lecteurs (8-12 ans)">Jeunes lecteurs (8-12 ans)</SelectItem>
-                            <SelectItem value="Adolescents (13-17 ans)">Adolescents (13-17 ans)</SelectItem>
-                            <SelectItem value="Adultes">Adultes</SelectItem>
-                            <SelectItem value="Tout public">Tout public</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium">Nombre de chapitres</Label>
-                        <Input
-                          type="number"
-                          min="3"
-                          max="100"
-                          value={numberOfChapters}
-                          onChange={(e) => setNumberOfChapters(parseInt(e.target.value) || 8)}
-                          className="h-11 bg-background/50 border-border/50"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="text-sm font-medium">Clé API OpenAI</Label>
-                        <Input
-                          type="password"
-                          placeholder="sk-..."
-                          value={apiKey}
-                          onChange={(e) => setApiKey(e.target.value)}
-                          className="h-11 bg-background/50 border-border/50"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium">Préface / Introduction</Label>
-                      <Textarea
-                        placeholder="Écrivez une préface engageante..."
-                        value={preface}
-                        onChange={(e) => setPreface(e.target.value)}
-                        rows={3}
-                        className="bg-background/50 border-border/50 resize-none"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium">Conclusion / Mot de la fin</Label>
-                      <Textarea
-                        placeholder="Rédigez une conclusion mémorable..."
-                        value={conclusion}
-                        onChange={(e) => setConclusion(e.target.value)}
-                        rows={3}
-                        className="bg-background/50 border-border/50 resize-none"
-                      />
-                    </div>
-
-                    <div className="flex flex-wrap gap-3 pt-2">
-                      <Button 
-                        onClick={generateAutomaticPlan} 
-                        disabled={!ebookTitle || isGenerating}
-                        className="flex-1 h-12 btn-gradient rounded-xl font-semibold"
-                      >
-                        <Wand2 className="h-5 w-5 mr-2" />
-                        {isGenerating ? 'Génération...' : 'Générer avec l\'IA'}
-                      </Button>
-                      <Button 
-                        onClick={resetPlan}
-                        variant="outline"
-                        className="h-12 px-6 rounded-xl border-border/50 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50"
-                      >
-                        <RotateCcw className="h-4 w-4 mr-2" />
-                        Réinitialiser
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Chapters Card */}
-                <Card className="glass-card border-0 overflow-hidden">
-                  <CardHeader className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border-b border-border/50">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/30">
-                          <FileText className="w-5 h-5 text-white" />
-                        </div>
-                        <div>
-                          <CardTitle className="text-xl">Structure des chapitres</CardTitle>
-                          <CardDescription>Organisez et rédigez vos chapitres</CardDescription>
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        {selectedChapters.length > 1 && (
-                          <Button onClick={mergeSelectedChapters} variant="outline" size="sm" className="rounded-lg">
-                            <Merge className="h-4 w-4 mr-1" />
-                            Fusionner ({selectedChapters.length})
-                          </Button>
-                        )}
-                        <Button onClick={addChapter} size="sm" className="rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 hover:opacity-90">
-                          <Plus className="h-4 w-4 mr-1" />
-                          Ajouter
-                        </Button>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-6">
-                    {chapters.length === 0 ? (
-                      <div className="text-center py-12">
-                        <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-r from-cyan-500/20 to-blue-500/20 flex items-center justify-center">
-                          <BookOpen className="w-8 h-8 text-cyan-500" />
-                        </div>
-                        <h3 className="text-lg font-semibold mb-2">Aucun chapitre</h3>
-                        <p className="text-muted-foreground text-sm mb-4">
-                          Commencez par générer un plan automatique ou ajoutez des chapitres manuellement
-                        </p>
-                        <Button onClick={addChapter} variant="outline" className="rounded-xl">
-                          <Plus className="h-4 w-4 mr-2" />
-                          Ajouter un chapitre
-                        </Button>
-                      </div>
-                    ) : (
-                      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                        <SortableContext items={chapters.map(c => c.id)} strategy={verticalListSortingStrategy}>
-                          <div className="space-y-3">
-                            {chapters.map((chapter, index) => (
-                              <EbookChapter
-                                key={chapter.id}
-                                chapter={chapter}
-                                index={index}
-                                isSelected={selectedChapters.includes(chapter.id)}
-                                onSelect={toggleChapterSelection}
-                                onUpdateTitle={updateChapterTitle}
-                                onUpdateContent={updateChapterContent}
-                                onAddSubChapter={addSubChapter}
-                                onRemoveSubChapter={removeSubChapter}
-                                onUpdateSubChapterTitle={updateSubChapterTitle}
-                                onMoveChapter={moveChapter}
-                                onDuplicateChapter={duplicateChapter}
-                                onSplitChapter={handleSplitChapter}
-                                onGenerateChapterContent={handleGenerateChapterContent}
-                                onGenerateSubChapterContent={handleGenerateSubChapterContent}
-                                onRemoveChapter={removeChapter}
-                                isGenerating={isGenerating}
-                                totalChapters={chapters.length}
-                              />
-                            ))}
-                          </div>
-                        </SortableContext>
-                      </DndContext>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Sidebar Tools */}
-              <div className="space-y-6">
-                {/* Templates */}
-                <Card className="glass-card border-0 overflow-hidden">
-                  <CardHeader className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-b border-border/50 pb-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 flex items-center justify-center">
-                        <Crown className="w-4 h-4 text-white" />
-                      </div>
-                      <CardTitle className="text-base">Templates</CardTitle>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-4">
-                    <EbookTemplates onApplyTemplate={applyTemplate} />
-                  </CardContent>
-                </Card>
-
-                {/* Quick Actions */}
-                <Card className="glass-card border-0 overflow-hidden">
-                  <CardHeader className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border-b border-border/50 pb-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 flex items-center justify-center">
-                        <Zap className="w-4 h-4 text-white" />
-                      </div>
-                      <CardTitle className="text-base">Actions rapides</CardTitle>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-4 space-y-3">
-                    <Button 
-                      onClick={generateTableOfContents}
-                      disabled={chapters.length === 0}
-                      variant="outline"
-                      className="w-full justify-start h-10 rounded-lg"
-                    >
-                      <FileText className="h-4 w-4 mr-2" />
-                      Table des matières
-                    </Button>
-                    <Button 
-                      onClick={async () => {
-                        const summary = await generateBookSummary(chapters, ebookTitle);
-                        if (summary) { setBookSummary(summary); toast.success('Résumé généré !'); }
-                      }}
-                      disabled={!ebookTitle || isGenerating}
-                      variant="outline"
-                      className="w-full justify-start h-10 rounded-lg"
-                    >
-                      <Eye className="h-4 w-4 mr-2" />
-                      Générer résumé
-                    </Button>
-                    <Button 
-                      onClick={async () => {
-                        const concepts = await generateEbookCover(ebookTitle);
-                        if (concepts) { setCoverConcepts(concepts); toast.success('Concepts générés !'); }
-                      }}
-                      disabled={!ebookTitle || isGenerating}
-                      variant="outline"
-                      className="w-full justify-start h-10 rounded-lg"
-                    >
-                      <Palette className="h-4 w-4 mr-2" />
-                      Concepts couverture
-                    </Button>
-                    <Button 
-                      onClick={async () => {
-                        const seo = await optimizeForSEO(ebookTitle, chapters);
-                        if (seo) { setSeoOptimization(seo); toast.success('SEO généré !'); }
-                      }}
-                      disabled={!ebookTitle || isGenerating}
-                      variant="outline"
-                      className="w-full justify-start h-10 rounded-lg"
-                    >
-                      <Search className="h-4 w-4 mr-2" />
-                      Optimisation SEO
-                    </Button>
-                  </CardContent>
-                </Card>
-
-                {/* Save Status */}
-                <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-muted/50 border border-border/50">
-                  {isSaving ? (
-                    <>
-                      <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-                      <span className="text-sm text-muted-foreground">Sauvegarde...</span>
-                    </>
-                  ) : ebookTitle ? (
-                    <>
-                      <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                      <span className="text-sm text-muted-foreground">Sauvegardé</span>
-                    </>
-                  ) : (
-                    <>
-                      <div className="w-2 h-2 rounded-full bg-muted-foreground/50" />
-                      <span className="text-sm text-muted-foreground">En attente</span>
-                    </>
-                  )}
+            {/* General Info Card */}
+            <Card className="border border-border/50">
+              <CardHeader className="border-b border-border/50">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-500 flex items-center justify-center">
+                    <BookOpen className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle>Informations générales</CardTitle>
+                    <CardDescription>Définissez les bases de votre ebook</CardDescription>
+                  </div>
                 </div>
-              </div>
+              </CardHeader>
+              <CardContent className="p-6 space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Titre de l'ebook</Label>
+                    <Input
+                      placeholder="Mon Ebook Extraordinaire"
+                      value={ebookTitle}
+                      onChange={(e) => setEbookTitle(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Nom de l'auteur</Label>
+                    <Input
+                      placeholder="Votre nom"
+                      value={authorName}
+                      onChange={(e) => setAuthorName(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label>Public cible</Label>
+                    <Select value={targetAudience} onValueChange={setTargetAudience}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Enfants (3-7 ans)">Enfants (3-7 ans)</SelectItem>
+                        <SelectItem value="Jeunes lecteurs (8-12 ans)">Jeunes lecteurs (8-12 ans)</SelectItem>
+                        <SelectItem value="Adolescents (13-17 ans)">Adolescents (13-17 ans)</SelectItem>
+                        <SelectItem value="Adultes">Adultes</SelectItem>
+                        <SelectItem value="Tout public">Tout public</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Nombre de chapitres</Label>
+                    <Input
+                      type="number"
+                      min="3"
+                      max="100"
+                      value={numberOfChapters}
+                      onChange={(e) => setNumberOfChapters(parseInt(e.target.value) || 8)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Clé API OpenAI</Label>
+                    <Input
+                      type="password"
+                      placeholder="sk-..."
+                      value={apiKey}
+                      onChange={(e) => setApiKey(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Préface / Introduction</Label>
+                  <Textarea
+                    placeholder="Écrivez une préface engageante..."
+                    value={preface}
+                    onChange={(e) => setPreface(e.target.value)}
+                    rows={3}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Conclusion / Mot de la fin</Label>
+                  <Textarea
+                    placeholder="Rédigez une conclusion mémorable..."
+                    value={conclusion}
+                    onChange={(e) => setConclusion(e.target.value)}
+                    rows={3}
+                  />
+                </div>
+
+                <div className="flex flex-wrap gap-3 pt-2">
+                  <Button 
+                    onClick={generateAutomaticPlan} 
+                    disabled={!ebookTitle || isGenerating}
+                    className="flex-1 bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:opacity-90"
+                  >
+                    <Wand2 className="h-5 w-5 mr-2" />
+                    {isGenerating ? 'Génération...' : 'Générer avec l\'IA'}
+                  </Button>
+                  <Button 
+                    onClick={resetPlan}
+                    variant="outline"
+                  >
+                    <RotateCcw className="h-4 w-4 mr-2" />
+                    Réinitialiser
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Chapters Card - NOW PROMINENT */}
+            <Card className="border border-border/50">
+              <CardHeader className="border-b border-border/50">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center">
+                      <FileText className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <CardTitle>Structure des chapitres</CardTitle>
+                      <CardDescription>Organisez et rédigez vos chapitres ({chapters.length} chapitres)</CardDescription>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button onClick={generateTableOfContents} variant="outline" size="sm" disabled={chapters.length === 0}>
+                      <FileText className="h-4 w-4 mr-1" />
+                      Sommaire
+                    </Button>
+                    {selectedChapters.length > 1 && (
+                      <Button onClick={mergeSelectedChapters} variant="outline" size="sm">
+                        <Merge className="h-4 w-4 mr-1" />
+                        Fusionner ({selectedChapters.length})
+                      </Button>
+                    )}
+                    <Button onClick={addChapter} size="sm" className="bg-gradient-to-r from-cyan-500 to-blue-500">
+                      <Plus className="h-4 w-4 mr-1" />
+                      Ajouter
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6">
+                {chapters.length === 0 ? (
+                  <div className="text-center py-12">
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-r from-cyan-500/20 to-blue-500/20 flex items-center justify-center">
+                      <BookOpen className="w-8 h-8 text-cyan-500" />
+                    </div>
+                    <h3 className="text-lg font-semibold mb-2">Aucun chapitre</h3>
+                    <p className="text-muted-foreground text-sm mb-4">
+                      Commencez par générer un plan automatique ou ajoutez des chapitres manuellement
+                    </p>
+                    <Button onClick={addChapter} variant="outline">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Ajouter un chapitre
+                    </Button>
+                  </div>
+                ) : (
+                  <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                    <SortableContext items={chapters.map(c => c.id)} strategy={verticalListSortingStrategy}>
+                      <div className="space-y-3">
+                        {chapters.map((chapter, index) => (
+                          <EbookChapter
+                            key={chapter.id}
+                            chapter={chapter}
+                            index={index}
+                            isSelected={selectedChapters.includes(chapter.id)}
+                            onSelect={toggleChapterSelection}
+                            onUpdateTitle={updateChapterTitle}
+                            onUpdateContent={updateChapterContent}
+                            onAddSubChapter={addSubChapter}
+                            onRemoveSubChapter={removeSubChapter}
+                            onUpdateSubChapterTitle={updateSubChapterTitle}
+                            onMoveChapter={moveChapter}
+                            onDuplicateChapter={duplicateChapter}
+                            onSplitChapter={handleSplitChapter}
+                            onGenerateChapterContent={handleGenerateChapterContent}
+                            onGenerateSubChapterContent={handleGenerateSubChapterContent}
+                            onRemoveChapter={removeChapter}
+                            isGenerating={isGenerating}
+                            totalChapters={chapters.length}
+                          />
+                        ))}
+                      </div>
+                    </SortableContext>
+                  </DndContext>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Templates at the bottom */}
+            <Card className="border border-border/50">
+              <CardHeader className="border-b border-border/50">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 flex items-center justify-center">
+                    <Crown className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle>Templates</CardTitle>
+                    <CardDescription>Appliquez un modèle pré-défini</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-6">
+                <EbookTemplates onApplyTemplate={applyTemplate} />
+              </CardContent>
+            </Card>
+
+            {/* Save Status */}
+            <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-muted/50 border border-border/50">
+              {isSaving ? (
+                <>
+                  <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                  <span className="text-sm text-muted-foreground">Sauvegarde...</span>
+                </>
+              ) : ebookTitle ? (
+                <>
+                  <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                  <span className="text-sm text-muted-foreground">Sauvegardé automatiquement</span>
+                </>
+              ) : (
+                <>
+                  <div className="w-2 h-2 rounded-full bg-muted-foreground/50" />
+                  <span className="text-sm text-muted-foreground">En attente d'un titre</span>
+                </>
+              )}
             </div>
           </div>
         );
