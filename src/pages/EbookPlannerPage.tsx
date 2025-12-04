@@ -51,6 +51,9 @@ import { EbookProjectsList } from '@/components/ebook/EbookProjectsList';
 import { EbookAiChat } from '@/components/ebook/EbookAiChat';
 import { EbookVersionHistory } from '@/components/ebook/EbookVersionHistory';
 import { EbookStatisticsTools } from '@/components/ebook/EbookStatisticsTools';
+import { EbookVoiceDictation } from '@/components/ebook/EbookVoiceDictation';
+import { EbookSeriesManager } from '@/components/ebook/EbookSeriesManager';
+import { EbookKdpMarketAnalysis } from '@/components/ebook/EbookKdpMarketAnalysis';
 
 // Hooks et données
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
@@ -1089,6 +1092,33 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
               toast.success('Traduction appliquée !');
             }}
           />
+        );
+      
+      case 'voice':
+        return (
+          <EbookVoiceDictation
+            chapters={chapters}
+            onUpdateChapterContent={updateChapterContent}
+            onUpdateSubChapterContent={updateSubChapterContent}
+            apiKey={apiKey}
+          />
+        );
+      
+      case 'series':
+        return (
+          <EbookSeriesManager
+            currentTomeNumber={tomeNumber || undefined}
+            ebookTitle={ebookTitle}
+            onApplyToCurrentBook={(data) => {
+              setTomeNumber(data.tomeNumber);
+              toast.success(`Tome ${data.tomeNumber} configuré pour "${data.seriesTitle}"`);
+            }}
+          />
+        );
+      
+      case 'market':
+        return (
+          <EbookKdpMarketAnalysis />
         );
       
       case 'affiliation':

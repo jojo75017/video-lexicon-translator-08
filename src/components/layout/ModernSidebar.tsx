@@ -152,12 +152,36 @@ const menuItems = [
     activeGradient: 'from-green-500 to-emerald-500'
   },
   { 
-    id: 'kdp', 
+  id: 'kdp', 
     label: 'Amazon KDP', 
     icon: TrendingUp,
     color: 'text-sky-500',
     bgColor: 'bg-sky-500/10',
     activeGradient: 'from-sky-500 to-blue-500'
+  },
+  { 
+    id: 'voice', 
+    label: 'Dictée Vocale', 
+    icon: Volume2,
+    color: 'text-rose-500',
+    bgColor: 'bg-rose-500/10',
+    activeGradient: 'from-rose-500 to-pink-500'
+  },
+  { 
+    id: 'series', 
+    label: 'Série Multi-Tomes', 
+    icon: BookCopy,
+    color: 'text-indigo-500',
+    bgColor: 'bg-indigo-500/10',
+    activeGradient: 'from-indigo-500 to-purple-500'
+  },
+  { 
+    id: 'market', 
+    label: 'Analyse Marché', 
+    icon: BarChart3,
+    color: 'text-emerald-500',
+    bgColor: 'bg-emerald-500/10',
+    activeGradient: 'from-emerald-500 to-green-500'
   },
   { 
     id: 'statistics', 
