@@ -696,12 +696,12 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                           id="chapters"
                           type="number"
                           min="3"
-                          max="20"
+                          max="100"
                           value={numberOfChapters}
                           onChange={(e) => setNumberOfChapters(parseInt(e.target.value) || 8)}
                         />
                         <p className="text-xs text-muted-foreground mt-1">
-                          Pour la génération automatique (3-20)
+                          Pour la génération automatique (3-100)
                         </p>
                       </div>
                     </div>
