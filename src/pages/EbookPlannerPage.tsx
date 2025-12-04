@@ -861,6 +861,19 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
             ebookTitle={ebookTitle}
             chapters={chapters}
             characters={characters}
+            ebookImages={ebookImages.map(img => ({
+              chapterId: img.chapterIndex?.toString() || '',
+              chapterTitle: img.title,
+              imageUrl: img.url,
+              style: ''
+            }))}
+            onImagesUpdate={(images) => {
+              setEbookImages(images.map(img => ({
+                url: img.imageUrl,
+                title: img.chapterTitle,
+                chapterIndex: parseInt(img.chapterId) || undefined
+              })));
+            }}
           />
         );
       
