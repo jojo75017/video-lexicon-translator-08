@@ -879,6 +879,29 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
           />
         );
       
+      case 'imagebank':
+        return (
+          <EbookImageBank
+            ebookTitle={ebookTitle}
+            chapters={chapters}
+            onImageSelect={(url, title) => setEbookImages([...ebookImages, { url, title }])}
+          />
+        );
+      
+      case 'marketing':
+        return (
+          <EbookMarketing
+            ebookTitle={ebookTitle}
+            chapters={chapters}
+            isGenerating={isGenerating}
+          />
+        );
+      
+      case 'monetization':
+        return (
+          <EbookMonetization />
+        );
+      
       default:
         return null;
     }
