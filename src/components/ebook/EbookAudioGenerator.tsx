@@ -6,9 +6,11 @@ import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
+import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Volume2, Play, Pause, Square, Download, Loader2, 
-  Headphones, Music, Mic2, Settings2, BookOpen
+  Headphones, Music, Mic2, Settings2, BookOpen, FileText
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -64,6 +66,12 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
   const [currentPlaying, setCurrentPlaying] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  
+  // Texte libre
+  const [customText, setCustomText] = useState('');
+  const [customAudioBlob, setCustomAudioBlob] = useState<Blob | null>(null);
+  const [customAudioUrl, setCustomAudioUrl] = useState<string | null>(null);
+  const [isGeneratingCustom, setIsGeneratingCustom] = useState(false);
 
   // Préparer toutes les sections de l'ebook
   const prepareSections = (): AudioSection[] => {
@@ -297,6 +305,89 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
 
   const estimatedDuration = Math.ceil(totalWords / 150); // ~150 mots/minute
 
+  // Génération audio pour texte libre
+  const generateCustomAudio = async () => {
+    if (!apiKey) {
+      toast.error('Veuillez entrer votre clé API OpenAI');
+      return;
+    }
+
+    if (!customText.trim()) {
+      toast.error('Veuillez entrer du texte à convertir');
+      return;
+    }
+
+    setIsGeneratingCustom(true);
+
+    try {
+      let textToSpeak = customText;
+      if (textToSpeak.length > 4096) {
+        textToSpeak = textToSpeak.substring(0, 4096);
+        toast.info('Texte tronqué à 4096 caractères (limite API)');
+      }
+
+      const response = await fetch('https://api.openai.com/v1/audio/speech', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'tts-1-hd',
+          input: textToSpeak,
+          voice: selectedVoice,
+          speed: speed[0],
+          response_format: 'mp3',
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Erreur génération audio');
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      
+      setCustomAudioBlob(blob);
+      setCustomAudioUrl(url);
+      
+      // Jouer automatiquement
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+      const audio = new Audio(url);
+      audio.onended = () => {
+        setIsPlaying(false);
+        setCurrentPlaying(null);
+      };
+      audioRef.current = audio;
+      audio.play();
+      setIsPlaying(true);
+      setCurrentPlaying('custom');
+      
+      toast.success('Audio généré !');
+    } catch (error) {
+      console.error('TTS error:', error);
+      toast.error('Erreur lors de la génération');
+    } finally {
+      setIsGeneratingCustom(false);
+    }
+  };
+
+  const downloadCustomAudio = () => {
+    if (!customAudioBlob) return;
+    
+    const url = URL.createObjectURL(customAudioBlob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'audio_personnalise.mp3';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success('Audio téléchargé !');
+  };
+
   return (
     <div className="space-y-6">
       <Card>
@@ -306,112 +397,247 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
             Générateur de Livre Audio
           </CardTitle>
           <CardDescription>
-            Convertissez votre ebook en fichiers audio MP3 avec des voix IA
+            Convertissez du texte en audio MP3 avec des voix IA
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Statistiques */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center p-4 bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10 rounded-lg">
-              <BookOpen className="h-6 w-6 mx-auto mb-2 text-violet-500" />
-              <div className="text-xl font-bold">{chapters.length}</div>
-              <div className="text-xs text-muted-foreground">Chapitres</div>
-            </div>
-            <div className="text-center p-4 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 rounded-lg">
-              <Music className="h-6 w-6 mx-auto mb-2 text-cyan-500" />
-              <div className="text-xl font-bold">{totalWords.toLocaleString()}</div>
-              <div className="text-xs text-muted-foreground">Mots</div>
-            </div>
-            <div className="text-center p-4 bg-gradient-to-br from-amber-500/10 to-orange-500/10 rounded-lg">
-              <Volume2 className="h-6 w-6 mx-auto mb-2 text-amber-500" />
-              <div className="text-xl font-bold">~{estimatedDuration} min</div>
-              <div className="text-xs text-muted-foreground">Durée estimée</div>
-            </div>
-            <div className="text-center p-4 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 rounded-lg">
-              <Mic2 className="h-6 w-6 mx-auto mb-2 text-emerald-500" />
-              <div className="text-xl font-bold">{audioSections.filter(s => s.status === 'done').length}</div>
-              <div className="text-xs text-muted-foreground">Sections générées</div>
-            </div>
-          </div>
+          <Tabs defaultValue="custom" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="custom">
+                <FileText className="h-4 w-4 mr-2" />
+                Texte libre
+              </TabsTrigger>
+              <TabsTrigger value="ebook">
+                <BookOpen className="h-4 w-4 mr-2" />
+                Ebook complet
+              </TabsTrigger>
+            </TabsList>
 
-          {/* Configuration */}
-          <Card className="bg-muted/30">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm flex items-center gap-2">
-                <Settings2 className="h-4 w-4" />
-                Configuration audio
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label>Voix</Label>
-                  <Select value={selectedVoice} onValueChange={setSelectedVoice}>
-                    <SelectTrigger className="mt-1">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {voices.map(voice => (
-                        <SelectItem key={voice.id} value={voice.id}>
-                          <div className="flex flex-col">
-                            <span>{voice.name}</span>
-                            <span className="text-xs text-muted-foreground">{voice.description}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label>Vitesse de lecture: {speed[0].toFixed(1)}x</Label>
-                  <Slider
-                    value={speed}
-                    onValueChange={setSpeed}
-                    min={0.5}
-                    max={2.0}
-                    step={0.1}
-                    className="mt-3"
-                  />
+            {/* Texte libre */}
+            <TabsContent value="custom" className="space-y-4 mt-4">
+              <div className="space-y-3">
+                <Label>Entrez votre texte à convertir en audio</Label>
+                <Textarea
+                  value={customText}
+                  onChange={(e) => setCustomText(e.target.value)}
+                  placeholder="Collez ou tapez votre texte ici... L'IA le lira à voix haute pour vous."
+                  className="min-h-[200px] font-serif"
+                  style={{ fontFamily: 'Georgia, serif', lineHeight: '1.8' }}
+                />
+                <div className="flex items-center justify-between text-sm text-muted-foreground">
+                  <span>{customText.length} / 4096 caractères</span>
+                  <span>~{Math.ceil(customText.split(/\s+/).filter(w => w).length / 150)} min d'audio</span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
 
-          {/* Bouton de génération */}
-          <Button
-            onClick={generateFullAudiobook}
-            disabled={isGenerating || !apiKey || totalWords === 0}
-            className="w-full h-12 text-lg"
-            size="lg"
-          >
-            {isGenerating ? (
-              <>
-                <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                Génération en cours...
-              </>
-            ) : (
-              <>
-                <Volume2 className="h-5 w-5 mr-2" />
-                Générer le Livre Audio Complet
-              </>
-            )}
-          </Button>
+              {/* Configuration voix */}
+              <Card className="bg-muted/30">
+                <CardContent className="pt-4 space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label>Voix</Label>
+                      <Select value={selectedVoice} onValueChange={setSelectedVoice}>
+                        <SelectTrigger className="mt-1">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {voices.map(voice => (
+                            <SelectItem key={voice.id} value={voice.id}>
+                              <div className="flex flex-col">
+                                <span>{voice.name}</span>
+                                <span className="text-xs text-muted-foreground">{voice.description}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>Vitesse: {speed[0].toFixed(1)}x</Label>
+                      <Slider
+                        value={speed}
+                        onValueChange={setSpeed}
+                        min={0.5}
+                        max={2.0}
+                        step={0.1}
+                        className="mt-3"
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-          {!apiKey && (
-            <p className="text-sm text-center text-amber-500">
-              ⚠️ Entrez votre clé API OpenAI dans les paramètres pour utiliser cette fonction
-            </p>
-          )}
+              <Button
+                onClick={generateCustomAudio}
+                disabled={isGeneratingCustom || !apiKey || !customText.trim()}
+                className="w-full h-12"
+                size="lg"
+              >
+                {isGeneratingCustom ? (
+                  <>
+                    <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                    Génération en cours...
+                  </>
+                ) : (
+                  <>
+                    <Volume2 className="h-5 w-5 mr-2" />
+                    Convertir en Audio
+                  </>
+                )}
+              </Button>
 
-          {/* Progress */}
-          {isGenerating && (
-            <div className="space-y-2">
-              <Progress value={progress} className="h-3" />
-              <p className="text-sm text-center text-muted-foreground">
-                {Math.round(progress)}% - Génération de l'audio...
-              </p>
-            </div>
-          )}
+              {/* Lecteur audio personnalisé */}
+              {customAudioUrl && (
+                <Card className="bg-primary/5 border-primary/20">
+                  <CardContent className="pt-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => {
+                            if (audioRef.current) {
+                              if (isPlaying && currentPlaying === 'custom') {
+                                audioRef.current.pause();
+                                setIsPlaying(false);
+                              } else {
+                                audioRef.current.play();
+                                setIsPlaying(true);
+                                setCurrentPlaying('custom');
+                              }
+                            }
+                          }}
+                        >
+                          {isPlaying && currentPlaying === 'custom' ? (
+                            <Pause className="h-4 w-4" />
+                          ) : (
+                            <Play className="h-4 w-4" />
+                          )}
+                        </Button>
+                        <span className="text-sm font-medium">Audio prêt</span>
+                      </div>
+                      <Button size="sm" variant="outline" onClick={downloadCustomAudio}>
+                        <Download className="h-4 w-4 mr-2" />
+                        Télécharger MP3
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {!apiKey && (
+                <p className="text-sm text-center text-amber-500">
+                  ⚠️ Entrez votre clé API OpenAI dans les paramètres pour utiliser cette fonction
+                </p>
+              )}
+            </TabsContent>
+
+            {/* Ebook complet */}
+            <TabsContent value="ebook" className="space-y-4 mt-4">
+              {/* Statistiques */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center p-4 bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10 rounded-lg">
+                  <BookOpen className="h-6 w-6 mx-auto mb-2 text-violet-500" />
+                  <div className="text-xl font-bold">{chapters.length}</div>
+                  <div className="text-xs text-muted-foreground">Chapitres</div>
+                </div>
+                <div className="text-center p-4 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 rounded-lg">
+                  <Music className="h-6 w-6 mx-auto mb-2 text-cyan-500" />
+                  <div className="text-xl font-bold">{totalWords.toLocaleString()}</div>
+                  <div className="text-xs text-muted-foreground">Mots</div>
+                </div>
+                <div className="text-center p-4 bg-gradient-to-br from-amber-500/10 to-orange-500/10 rounded-lg">
+                  <Volume2 className="h-6 w-6 mx-auto mb-2 text-amber-500" />
+                  <div className="text-xl font-bold">~{estimatedDuration} min</div>
+                  <div className="text-xs text-muted-foreground">Durée estimée</div>
+                </div>
+                <div className="text-center p-4 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 rounded-lg">
+                  <Mic2 className="h-6 w-6 mx-auto mb-2 text-emerald-500" />
+                  <div className="text-xl font-bold">{audioSections.filter(s => s.status === 'done').length}</div>
+                  <div className="text-xs text-muted-foreground">Sections générées</div>
+                </div>
+              </div>
+
+              {/* Configuration */}
+              <Card className="bg-muted/30">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <Settings2 className="h-4 w-4" />
+                    Configuration audio
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label>Voix</Label>
+                      <Select value={selectedVoice} onValueChange={setSelectedVoice}>
+                        <SelectTrigger className="mt-1">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {voices.map(voice => (
+                            <SelectItem key={voice.id} value={voice.id}>
+                              <div className="flex flex-col">
+                                <span>{voice.name}</span>
+                                <span className="text-xs text-muted-foreground">{voice.description}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>Vitesse de lecture: {speed[0].toFixed(1)}x</Label>
+                      <Slider
+                        value={speed}
+                        onValueChange={setSpeed}
+                        min={0.5}
+                        max={2.0}
+                        step={0.1}
+                        className="mt-3"
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Bouton de génération */}
+              <Button
+                onClick={generateFullAudiobook}
+                disabled={isGenerating || !apiKey || totalWords === 0}
+                className="w-full h-12 text-lg"
+                size="lg"
+              >
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                    Génération en cours...
+                  </>
+                ) : (
+                  <>
+                    <Volume2 className="h-5 w-5 mr-2" />
+                    Générer le Livre Audio Complet
+                  </>
+                )}
+              </Button>
+
+              {!apiKey && (
+                <p className="text-sm text-center text-amber-500">
+                  ⚠️ Entrez votre clé API OpenAI dans les paramètres pour utiliser cette fonction
+                </p>
+              )}
+
+              {/* Progress */}
+              {isGenerating && (
+                <div className="space-y-2">
+                  <Progress value={progress} className="h-3" />
+                  <p className="text-sm text-center text-muted-foreground">
+                    {Math.round(progress)}% - Génération de l'audio...
+                  </p>
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
 
