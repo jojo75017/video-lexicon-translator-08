@@ -24,7 +24,8 @@ import {
   Handshake,
   BarChart3,
   Globe,
-  Volume2
+  Volume2,
+  Shield
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -197,6 +198,14 @@ const menuItems = [
     color: 'text-slate-500',
     bgColor: 'bg-slate-500/10',
     activeGradient: 'from-slate-500 to-gray-500'
+  },
+  { 
+    id: 'admin', 
+    label: 'Admin / Abonnés', 
+    icon: Shield,
+    color: 'text-red-500',
+    bgColor: 'bg-red-500/10',
+    activeGradient: 'from-red-500 to-orange-500'
   },
 ];
 
