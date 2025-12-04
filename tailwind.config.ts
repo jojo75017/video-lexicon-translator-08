@@ -37,6 +37,13 @@ export default {
         indigo: "hsl(var(--indigo))",
         sky: "hsl(var(--sky))",
         
+        // Legacy colors
+        "coral-pink": "hsl(var(--coral-pink))",
+        "royal-purple": "hsl(var(--royal-purple))",
+        "navy-deep": "hsl(var(--navy-deep))",
+        cream: "hsl(var(--cream))",
+        "gray-cool": "hsl(var(--gray-cool))",
+        
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
@@ -74,6 +81,7 @@ export default {
         'gradient-subtle': 'var(--gradient-subtle)',
         'gradient-card': 'var(--gradient-card)',
         'gradient-glass': 'var(--gradient-glass)',
+        'gradient-magazine-hero': 'linear-gradient(135deg, hsl(271 81% 56%) 0%, hsl(12 76% 61%) 100%)',
       },
       fontFamily: {
         'sans': ['Inter', 'system-ui', 'sans-serif'],
