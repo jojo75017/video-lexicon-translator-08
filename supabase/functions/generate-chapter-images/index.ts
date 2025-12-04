@@ -12,7 +12,12 @@ async function generateWithOpenAI(chapterTitle: string, chapterContent: string, 
     charactersContext = '\n\nIMPORTANT - Personnages principaux de l\'histoire (à représenter de manière STRICTEMENT cohérente):\n';
     characters.forEach((char: any) => {
       if (char.name && char.description) {
-        charactersContext += `- ${char.name}: ${char.description} [Cette apparence DOIT être identique dans TOUTES les images]\n`;
+        charactersContext += `\n🎭 ${char.name}:\n`;
+        charactersContext += `   Description: ${char.description}\n`;
+        if (char.referenceImageUrl) {
+          charactersContext += `   [IMAGE DE RÉFÉRENCE FOURNIE - REPRODUIRE EXACTEMENT cette apparence]\n`;
+        }
+        charactersContext += `   ⚠️ Cette apparence DOIT être identique dans TOUTES les images\n`;
       }
     });
     charactersContext += '\n⚠️ RÈGLE ABSOLUE: Les mêmes personnages doivent avoir EXACTEMENT la même apparence physique, les mêmes vêtements, la même coiffure dans chaque image de l\'ebook. Continuité visuelle OBLIGATOIRE.';
@@ -29,7 +34,7 @@ Instructions de génération:
 - Créer une illustration de haute qualité adaptée à un ebook professionnel
 - Composition claire et visuellement engageante
 - Si des personnages sont mentionnés ci-dessus, les représenter avec EXACTEMENT les mêmes caractéristiques physiques que décrites
-- Cohérence visuelle absolue pour tous les personnages récurrents
+- COHÉRENCE VISUELLE ABSOLUE pour tous les personnages récurrents
 - L'illustration doit refléter le thème et l'atmosphère du titre de l'ebook "${ebookTitle}"`;
 
   console.log('Generating image with OpenAI:', imagePrompt);
@@ -161,7 +166,12 @@ serve(async (req) => {
       charactersContext = '\n\nIMPORTANT - Personnages principaux de l\'histoire (à représenter de manière STRICTEMENT cohérente):\n';
       characters.forEach((char: any) => {
         if (char.name && char.description) {
-          charactersContext += `- ${char.name}: ${char.description} [Cette apparence DOIT être identique dans TOUTES les images]\n`;
+          charactersContext += `\n🎭 ${char.name}:\n`;
+          charactersContext += `   Description: ${char.description}\n`;
+          if (char.referenceImageUrl) {
+            charactersContext += `   [IMAGE DE RÉFÉRENCE FOURNIE - REPRODUIRE EXACTEMENT cette apparence]\n`;
+          }
+          charactersContext += `   ⚠️ Cette apparence DOIT être identique dans TOUTES les images\n`;
         }
       });
       charactersContext += '\n⚠️ RÈGLE ABSOLUE: Les mêmes personnages doivent avoir EXACTEMENT la même apparence physique, les mêmes vêtements, la même coiffure dans chaque image de l\'ebook. Continuité visuelle OBLIGATOIRE.';
@@ -179,7 +189,7 @@ Instructions de génération:
 - Créer une illustration de haute qualité adaptée à un ebook professionnel
 - Composition claire et visuellement engageante
 - Si des personnages sont mentionnés ci-dessus, les représenter avec EXACTEMENT les mêmes caractéristiques physiques que décrites
-- Cohérence visuelle absolue pour tous les personnages récurrents
+- COHÉRENCE VISUELLE ABSOLUE pour tous les personnages récurrents
 - L'illustration doit refléter le thème et l'atmosphère du titre de l'ebook "${ebookTitle}"`;
 
     console.log('Generating image with prompt:', imagePrompt);
