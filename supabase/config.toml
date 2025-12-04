@@ -9,6 +9,9 @@ verify_jwt = false
 [functions.generate-cover-image]
 verify_jwt = false
 
+[functions.generate-character-reference]
+verify_jwt = false
+
 [functions.validate-subscription]
 verify_jwt = false
 
