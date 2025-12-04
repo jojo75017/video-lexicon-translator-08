@@ -21,7 +21,10 @@ import {
   History,
   LayoutTemplate,
   FileEdit,
-  Handshake
+  Handshake,
+  BarChart3,
+  Globe,
+  Volume2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -154,6 +157,14 @@ const menuItems = [
     color: 'text-sky-500',
     bgColor: 'bg-sky-500/10',
     activeGradient: 'from-sky-500 to-blue-500'
+  },
+  { 
+    id: 'statistics', 
+    label: 'Stats & Outils', 
+    icon: BarChart3,
+    color: 'text-slate-500',
+    bgColor: 'bg-slate-500/10',
+    activeGradient: 'from-slate-500 to-gray-500'
   },
   { 
     id: 'versions', 

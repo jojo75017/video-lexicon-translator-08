@@ -400,8 +400,110 @@ Réponds avec la description complète uniquement, sans titre de section.`;
     Présente les 3 versions clairement séparées.`;
     
     const content = await callGenerateContent('chapters_generated', prompt);
-    // Toast supprimé - génération silencieuse
     return content;
+  };
+
+  const generatePreface = async (title: string, chapters: Chapter[], audience: string) => {
+    const chapterTitles = chapters.map(c => c.title).join(', ');
+    const prompt = `Génère une préface engageante et professionnelle pour un ebook intitulé "${title}".
+
+Public cible: ${audience}
+Chapitres du livre: ${chapterTitles}
+
+La préface doit:
+- Accrocher le lecteur dès les premières lignes
+- Expliquer pourquoi ce livre a été écrit
+- Donner un aperçu de ce que le lecteur va apprendre/découvrir
+- Créer de l'enthousiasme et de l'anticipation
+- Faire environ 300-400 mots
+- Être écrite de manière personnelle et authentique
+
+Écris UNIQUEMENT la préface, sans titre ni commentaires.`;
+    
+    const content = await callGenerateContent('chapters_generated', prompt);
+    return content;
+  };
+
+  const generateConclusion = async (title: string, chapters: Chapter[], audience: string) => {
+    const chapterTitles = chapters.map(c => c.title).join(', ');
+    const prompt = `Génère une conclusion mémorable pour un ebook intitulé "${title}".
+
+Public cible: ${audience}
+Chapitres du livre: ${chapterTitles}
+
+La conclusion doit:
+- Résumer les points clés abordés
+- Rappeler les enseignements principaux
+- Motiver le lecteur à passer à l'action
+- Laisser une impression durable et positive
+- Remercier le lecteur pour son temps
+- Faire environ 300-400 mots
+
+Écris UNIQUEMENT la conclusion, sans titre ni commentaires.`;
+    
+    const content = await callGenerateContent('chapters_generated', prompt);
+    return content;
+  };
+
+  const generateEpilogue = async (title: string, chapters: Chapter[], audience: string) => {
+    const chapterTitles = chapters.map(c => c.title).join(', ');
+    const prompt = `Génère un épilogue touchant pour un ebook intitulé "${title}".
+
+Public cible: ${audience}
+Chapitres du livre: ${chapterTitles}
+
+L'épilogue doit:
+- Offrir une réflexion finale sur le sujet
+- Partager une perspective personnelle ou une anecdote
+- Ouvrir sur l'avenir ou donner de l'espoir
+- Créer une connexion émotionnelle avec le lecteur
+- Faire environ 200-300 mots
+
+Écris UNIQUEMENT l'épilogue, sans titre ni commentaires.`;
+    
+    const content = await callGenerateContent('chapters_generated', prompt);
+    return content;
+  };
+
+  const translateContent = async (content: string, targetLanguage: string) => {
+    const prompt = `Traduis le texte suivant en ${targetLanguage}. Conserve le style, le ton et la mise en forme originale. Ne fais que traduire, sans ajouter de commentaires.
+
+Texte à traduire:
+${content}`;
+    
+    const translatedContent = await callGenerateContent('chapters_generated', prompt);
+    return translatedContent;
+  };
+
+  const analyzeTextStatistics = async (text: string) => {
+    const prompt = `Analyse ce texte et fournis des statistiques détaillées au format JSON:
+
+${text.substring(0, 5000)}
+
+Retourne UNIQUEMENT un objet JSON valide avec ces propriétés:
+{
+  "wordCount": nombre de mots,
+  "sentenceCount": nombre de phrases,
+  "paragraphCount": nombre de paragraphes,
+  "avgWordsPerSentence": moyenne de mots par phrase,
+  "readingTimeMinutes": temps de lecture estimé en minutes,
+  "readabilityScore": score de lisibilité (0-100, 100 = très facile),
+  "readabilityLevel": "Très facile" | "Facile" | "Moyen" | "Difficile" | "Très difficile",
+  "vocabularyRichness": richesse du vocabulaire (0-100),
+  "topKeywords": ["mot1", "mot2", "mot3", "mot4", "mot5"]
+}`;
+    
+    const result = await callGenerateContent('chapters_generated', prompt);
+    try {
+      // Extract JSON from the response
+      const jsonMatch = result?.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        return JSON.parse(jsonMatch[0]);
+      }
+    } catch (e) {
+      console.error('Failed to parse statistics:', e);
+    }
+    return null;
   };
 
   return {
@@ -418,6 +520,11 @@ Réponds avec la description complète uniquement, sans titre de section.`;
     generateBackCover,
     generatePricingStrategy,
     generateLaunchPlan,
-    generateAuthorBio
+    generateAuthorBio,
+    generatePreface,
+    generateConclusion,
+    generateEpilogue,
+    translateContent,
+    analyzeTextStatistics
   };
 };
