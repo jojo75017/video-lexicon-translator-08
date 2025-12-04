@@ -291,6 +291,86 @@ export const AdminPage = () => {
           </Card>
         </div>
 
+        {/* Quick Access Codes - Pour donner rapidement les codes */}
+        <Card className="p-6 border-2 border-primary/20 bg-primary/5">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Copy className="w-5 h-5 text-primary" />
+              <h2 className="text-xl font-semibold">📋 Codes d'accès à donner</h2>
+            </div>
+            <Badge variant="outline" className="text-lg px-4 py-1">
+              {subscribers.filter(s => s.status === 'active').length} actifs
+            </Badge>
+          </div>
+          
+          <div className="bg-background rounded-lg border overflow-hidden">
+            <table className="w-full">
+              <thead className="bg-muted/50">
+                <tr>
+                  <th className="text-left p-3 font-semibold">Email</th>
+                  <th className="text-left p-3 font-semibold">Code d'accès</th>
+                  <th className="text-left p-3 font-semibold">Plan</th>
+                  <th className="text-center p-3 font-semibold">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {subscribers
+                  .filter(s => s.status === 'active')
+                  .map((subscriber) => (
+                    <tr key={subscriber.id} className="border-t hover:bg-muted/30">
+                      <td className="p-3">
+                        <span className="font-medium">{subscriber.email}</span>
+                      </td>
+                      <td className="p-3">
+                        <span className="font-mono text-lg font-bold text-primary bg-primary/10 px-3 py-1 rounded">
+                          {subscriber.access_code}
+                        </span>
+                      </td>
+                      <td className="p-3">
+                        <Badge variant="outline">{subscriber.plan_type}</Badge>
+                      </td>
+                      <td className="p-3 text-center">
+                        <div className="flex justify-center gap-2">
+                          <Button
+                            onClick={() => {
+                              navigator.clipboard.writeText(subscriber.access_code);
+                              toast.success('Code copié !');
+                            }}
+                            variant="outline"
+                            size="sm"
+                          >
+                            <Copy className="w-4 h-4 mr-1" />
+                            Code
+                          </Button>
+                          <Button
+                            onClick={() => {
+                              navigator.clipboard.writeText(`Email: ${subscriber.email}\nCode: ${subscriber.access_code}`);
+                              toast.success('Email + Code copiés !');
+                            }}
+                            variant="default"
+                            size="sm"
+                          >
+                            <Copy className="w-4 h-4 mr-1" />
+                            Tout
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+            {subscribers.filter(s => s.status === 'active').length === 0 && (
+              <div className="text-center py-8 text-muted-foreground">
+                Aucun abonné actif
+              </div>
+            )}
+          </div>
+          
+          <p className="text-sm text-muted-foreground mt-4">
+            💡 <strong>Lors d'un achat sur Systeme.io :</strong> Ajoutez l'abonné ci-dessus, puis copiez son code pour le lui envoyer manuellement.
+          </p>
+        </Card>
+
         {/* Subscribers List */}
         <Card className="p-6">
           <div className="flex items-center justify-between mb-6">
