@@ -41,12 +41,12 @@ interface EbookAudioGeneratorProps {
 }
 
 const voices = [
-  { id: 'alloy', name: 'Alloy', description: 'Neutre et polyvalente' },
-  { id: 'echo', name: 'Echo', description: 'Masculine et profonde' },
-  { id: 'fable', name: 'Fable', description: 'Narrative et expressive' },
-  { id: 'onyx', name: 'Onyx', description: 'Grave et autoritaire' },
-  { id: 'nova', name: 'Nova', description: 'Féminine et chaleureuse' },
-  { id: 'shimmer', name: 'Shimmer', description: 'Claire et dynamique' },
+  { id: 'alloy', name: 'Alloy', description: 'Neutre et polyvalente', forKids: true },
+  { id: 'echo', name: 'Echo', description: 'Masculine et profonde', forKids: false },
+  { id: 'fable', name: 'Fable', description: '⭐ Narratif - Idéal contes enfants', forKids: true },
+  { id: 'onyx', name: 'Onyx', description: 'Grave et autoritaire', forKids: false },
+  { id: 'nova', name: 'Nova', description: 'Féminine et chaleureuse', forKids: true },
+  { id: 'shimmer', name: 'Shimmer', description: '⭐ Doux - Parfait histoires enfants', forKids: true },
 ];
 
 export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
@@ -58,7 +58,8 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
   chapters,
   apiKey
 }) => {
-  const [selectedVoice, setSelectedVoice] = useState('nova');
+  const [selectedVoice, setSelectedVoice] = useState('fable');
+  const [showKidsVoices, setShowKidsVoices] = useState(false);
   const [speed, setSpeed] = useState([1.0]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -433,18 +434,32 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
               {/* Configuration voix */}
               <Card className="bg-muted/30">
                 <CardContent className="pt-4 space-y-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <input
+                      type="checkbox"
+                      id="kidsVoices"
+                      checked={showKidsVoices}
+                      onChange={(e) => setShowKidsVoices(e.target.checked)}
+                      className="rounded border-primary"
+                    />
+                    <Label htmlFor="kidsVoices" className="cursor-pointer text-sm">
+                      🧒 Voix adaptées aux enfants uniquement
+                    </Label>
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label>Voix</Label>
+                      <Label>Voix {showKidsVoices && '(enfants)'}</Label>
                       <Select value={selectedVoice} onValueChange={setSelectedVoice}>
                         <SelectTrigger className="mt-1">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          {voices.map(voice => (
+                          {voices
+                            .filter(v => !showKidsVoices || v.forKids)
+                            .map(voice => (
                             <SelectItem key={voice.id} value={voice.id}>
                               <div className="flex flex-col">
-                                <span>{voice.name}</span>
+                                <span>{voice.name} {voice.forKids && '🧒'}</span>
                                 <span className="text-xs text-muted-foreground">{voice.description}</span>
                               </div>
                             </SelectItem>
