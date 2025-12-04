@@ -24,6 +24,7 @@ export const AdminPage = () => {
   const [selectedSubscriber, setSelectedSubscriber] = useState<any>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [expirationDate, setExpirationDate] = useState('');
+  const [sendingEmailTo, setSendingEmailTo] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -46,6 +47,32 @@ export const AdminPage = () => {
       toast.error('Erreur lors du chargement des abonnés');
     } finally {
       setIsLoadingSubscribers(false);
+    }
+  };
+
+  const sendAccessCodeByEmail = async (subscriber: any) => {
+    setSendingEmailTo(subscriber.id);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-access-code', {
+        body: {
+          email: subscriber.email,
+          accessCode: subscriber.access_code,
+          planType: subscriber.plan_type
+        }
+      });
+
+      if (error) throw error;
+
+      if (data.success) {
+        toast.success(`✅ Code envoyé à ${subscriber.email} !`);
+      } else {
+        throw new Error(data.error || 'Erreur inconnue');
+      }
+    } catch (error: any) {
+      console.error('Error sending email:', error);
+      toast.error(`Erreur: ${error.message || 'Impossible d\'envoyer l\'email'}`);
+    } finally {
+      setSendingEmailTo(null);
     }
   };
 
@@ -330,7 +357,21 @@ export const AdminPage = () => {
                         <Badge variant="outline">{subscriber.plan_type}</Badge>
                       </td>
                       <td className="p-3 text-center">
-                        <div className="flex justify-center gap-2">
+                        <div className="flex justify-center gap-2 flex-wrap">
+                          <Button
+                            onClick={() => sendAccessCodeByEmail(subscriber)}
+                            disabled={sendingEmailTo === subscriber.id}
+                            variant="default"
+                            size="sm"
+                            className="bg-green-600 hover:bg-green-700"
+                          >
+                            {sendingEmailTo === subscriber.id ? (
+                              <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                            ) : (
+                              <Mail className="w-4 h-4 mr-1" />
+                            )}
+                            Envoyer
+                          </Button>
                           <Button
                             onClick={() => {
                               navigator.clipboard.writeText(subscriber.access_code);
@@ -341,17 +382,6 @@ export const AdminPage = () => {
                           >
                             <Copy className="w-4 h-4 mr-1" />
                             Code
-                          </Button>
-                          <Button
-                            onClick={() => {
-                              navigator.clipboard.writeText(`Email: ${subscriber.email}\nCode: ${subscriber.access_code}`);
-                              toast.success('Email + Code copiés !');
-                            }}
-                            variant="default"
-                            size="sm"
-                          >
-                            <Copy className="w-4 h-4 mr-1" />
-                            Tout
                           </Button>
                         </div>
                       </td>
@@ -367,7 +397,7 @@ export const AdminPage = () => {
           </div>
           
           <p className="text-sm text-muted-foreground mt-4">
-            💡 <strong>Lors d'un achat sur Systeme.io :</strong> Ajoutez l'abonné ci-dessus, puis copiez son code pour le lui envoyer manuellement.
+            💡 <strong>Lors d'un achat (27€) sur Systeme.io :</strong> Ajoutez l'abonné ci-dessus, puis cliquez sur "Envoyer" pour lui envoyer son code par email automatiquement.
           </p>
         </Card>
 
