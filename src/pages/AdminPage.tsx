@@ -64,7 +64,7 @@ export const AdminPage = () => {
       if (error) throw error;
 
       if (data.success) {
-        toast.success(`✅ Code envoyé à ${subscriber.email} !`);
+        toast.success(`✅ Code envoyé à ${subscriber.email} ! Pensez à vérifier les spams.`, { duration: 6000 });
       } else {
         throw new Error(data.error || 'Erreur inconnue');
       }
@@ -98,7 +98,7 @@ export const AdminPage = () => {
         
         // Show different toast based on email status
         if (data.emailSent) {
-          toast.success('✅ Abonné créé et email envoyé avec succès !');
+          toast.success('✅ Abonné créé et email envoyé ! Demandez à l\'utilisateur de vérifier ses spams.', { duration: 8000 });
         } else {
           toast.warning(`⚠️ Abonné créé mais l'email n'a pas pu être envoyé. Code: ${data.accessCode}`, {
             duration: 10000,
