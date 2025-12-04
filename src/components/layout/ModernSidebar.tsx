@@ -20,7 +20,8 @@ import {
   BookCopy,
   History,
   LayoutTemplate,
-  FileEdit
+  FileEdit,
+  Handshake
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -169,6 +170,14 @@ const menuItems = [
     color: 'text-teal-500',
     bgColor: 'bg-teal-500/10',
     activeGradient: 'from-teal-500 to-cyan-500'
+  },
+  { 
+    id: 'affiliation', 
+    label: 'Affiliation', 
+    icon: Handshake,
+    color: 'text-amber-500',
+    bgColor: 'bg-amber-500/10',
+    activeGradient: 'from-amber-500 to-yellow-500'
   },
   { 
     id: 'settings', 
