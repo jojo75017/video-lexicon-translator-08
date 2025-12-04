@@ -11,6 +11,13 @@ import {
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Chapter } from '@/hooks/useSubscriptionGeneration';
+import EbookNarrativeChecker from './EbookNarrativeChecker';
+
+interface Character {
+  id: string;
+  name: string;
+  description: string;
+}
 
 interface EbookStatisticsToolsProps {
   ebookTitle: string;
@@ -18,6 +25,7 @@ interface EbookStatisticsToolsProps {
   conclusion: string;
   epilogue?: string;
   chapters: Chapter[];
+  characters?: Character[];
   apiKey: string;
   onTranslate?: (translatedData: { preface: string; conclusion: string; epilogue: string; chapters: Chapter[] }) => void;
 }
@@ -42,6 +50,7 @@ export const EbookStatisticsTools: React.FC<EbookStatisticsToolsProps> = ({
   conclusion,
   epilogue,
   chapters,
+  characters = [],
   apiKey,
   onTranslate
 }) => {
@@ -514,6 +523,15 @@ export const EbookStatisticsTools: React.FC<EbookStatisticsToolsProps> = ({
           </p>
         </CardContent>
       </Card>
+
+      {/* Narrative Consistency Checker */}
+      <EbookNarrativeChecker
+        chapters={chapters}
+        characters={characters}
+        preface={preface}
+        conclusion={conclusion}
+        title={ebookTitle}
+      />
     </div>
   );
 };
