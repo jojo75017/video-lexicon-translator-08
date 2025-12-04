@@ -17,6 +17,7 @@ interface EbookExporterProps {
   authorName: string;
   preface: string;
   conclusion: string;
+  epilogue?: string;
   chapters: Chapter[];
 }
 
@@ -25,6 +26,7 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
   authorName,
   preface,
   conclusion,
+  epilogue,
   chapters
 }) => {
   const [exportFormat, setExportFormat] = useState<'pdf' | 'docx' | 'txt' | 'html' | 'epub' | 'googledocs'>('pdf');

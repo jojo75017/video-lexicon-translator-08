@@ -19,6 +19,7 @@ interface EbookPreviewProps {
   authorName: string;
   preface: string;
   conclusion: string;
+  epilogue?: string;
   chapters: Chapter[];
 }
 
@@ -53,6 +54,7 @@ export const EbookPreview: React.FC<EbookPreviewProps> = React.memo(({
   authorName,
   preface,
   conclusion,
+  epilogue,
   chapters,
 }) => {
   const [theme, setTheme] = useState<Theme>('light');

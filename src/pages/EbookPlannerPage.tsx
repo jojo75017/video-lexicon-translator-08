@@ -95,6 +95,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   const [authorName, setAuthorName] = useState(savedData?.authorName || '');
   const [preface, setPreface] = useState(savedData?.preface || '');
   const [conclusion, setConclusion] = useState(savedData?.conclusion || '');
+  const [epilogue, setEpilogue] = useState(savedData?.epilogue || '');
   const [chapters, setChapters] = useState<Chapter[]>(savedData?.chapters || []);
   const [characters, setCharacters] = useState<EbookCharacter[]>(savedData?.characters || []);
   const [numberOfChapters, setNumberOfChapters] = useState(savedData?.numberOfChapters || 8);
@@ -145,7 +146,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   useEffect(() => {
     const dataToSave = {
       apiKey, ebookTitle, authorName, targetAudience, tomeNumber, writingStyle,
-      chapterLength, detailLevel, tone, narrativeFormat, preface, conclusion,
+      chapterLength, detailLevel, tone, narrativeFormat, preface, conclusion, epilogue,
       chapters, numberOfChapters, ebookImages, characters, lastSaved: new Date().toISOString()
     };
     
@@ -169,7 +170,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
       const timer = setTimeout(() => saveProject(projectData), 2000);
       return () => clearTimeout(timer);
     }
-  }, [apiKey, ebookTitle, authorName, targetAudience, tomeNumber, writingStyle, chapterLength, detailLevel, tone, narrativeFormat, preface, conclusion, chapters, numberOfChapters, ebookImages, characters, bookSummary, coverConcepts, seoOptimization, kdpDescription, kdpKeywords, kdpCategories]);
+  }, [apiKey, ebookTitle, authorName, targetAudience, tomeNumber, writingStyle, chapterLength, detailLevel, tone, narrativeFormat, preface, conclusion, epilogue, chapters, numberOfChapters, ebookImages, characters, bookSummary, coverConcepts, seoOptimization, kdpDescription, kdpKeywords, kdpCategories]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -369,7 +370,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   };
 
   const resetPlan = () => {
-    setEbookTitle(''); setAuthorName(''); setPreface(''); setConclusion('');
+    setEbookTitle(''); setAuthorName(''); setPreface(''); setConclusion(''); setEpilogue('');
     setChapters([]); setNumberOfChapters(8); setSelectedChapters([]);
     setImportText(''); setEbookImages([]); setTargetAudience('Adultes');
     setTomeNumber(null); setWritingStyle('narratif'); setChapterLength('moyen');
@@ -526,20 +527,33 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                 <div className="space-y-2">
                   <Label>Préface / Introduction</Label>
                   <Textarea
-                    placeholder="Écrivez une préface engageante..."
+                    placeholder="Écrivez une préface engageante qui accroche le lecteur dès les premières lignes..."
                     value={preface}
                     onChange={(e) => setPreface(e.target.value)}
-                    rows={3}
+                    rows={6}
+                    className="resize-y min-h-[120px]"
                   />
                 </div>
 
                 <div className="space-y-2">
                   <Label>Conclusion / Mot de la fin</Label>
                   <Textarea
-                    placeholder="Rédigez une conclusion mémorable..."
+                    placeholder="Rédigez une conclusion mémorable qui laisse une impression durable..."
                     value={conclusion}
                     onChange={(e) => setConclusion(e.target.value)}
-                    rows={3}
+                    rows={6}
+                    className="resize-y min-h-[120px]"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Épilogue (optionnel)</Label>
+                  <Textarea
+                    placeholder="Ajoutez un épilogue pour conclure votre histoire ou offrir une perspective future..."
+                    value={epilogue}
+                    onChange={(e) => setEpilogue(e.target.value)}
+                    rows={4}
+                    className="resize-y min-h-[80px]"
                   />
                 </div>
 
@@ -688,6 +702,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                 authorName={authorName}
                 preface={preface}
                 conclusion={conclusion}
+                epilogue={epilogue}
                 chapters={chapters}
               />
             </div>
@@ -853,6 +868,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
             authorName={authorName}
             preface={preface}
             conclusion={conclusion}
+            epilogue={epilogue}
             chapters={chapters}
           />
         );
