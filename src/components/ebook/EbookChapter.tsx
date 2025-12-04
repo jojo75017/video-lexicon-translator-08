@@ -157,22 +157,37 @@ export const EbookChapter: React.FC<EbookChapterProps> = ({
       <div className="ml-6">
         {chapter.content ? (
           <div className="bg-muted p-3 rounded-lg mb-3 text-sm leading-relaxed whitespace-pre-wrap">
-            {chapter.content.split('\n').map((line, lineIndex) => (
-              <p key={lineIndex} className="mb-2">
-                {line.split(/(\*[^*]+\*|"[^"]+"|(\([^)]+\)))/).map((part, partIndex) => {
-                  if (part && part.startsWith && part.startsWith('*') && part.endsWith('*')) {
-                    return <em key={partIndex} className="font-medium text-primary">{part.slice(1, -1)}</em>;
-                  }
-                  if (part && part.startsWith && part.startsWith('"') && part.endsWith('"')) {
-                    return <span key={partIndex} className="text-accent-foreground font-medium">"{part.slice(1, -1)}"</span>;
-                  }
-                  if (part && part.startsWith && part.startsWith('(') && part.endsWith(')')) {
-                    return <span key={partIndex} className="text-muted-foreground italic">{part}</span>;
-                  }
-                  return part;
-                })}
-              </p>
-            ))}
+            {chapter.content.split('\n').map((line, lineIndex) => {
+              // Titres ### en gras
+              if (line.startsWith('### ')) {
+                return <h3 key={lineIndex} className="text-base font-bold text-primary mb-2 mt-3">{line.slice(4)}</h3>;
+              }
+              if (line.startsWith('## ')) {
+                return <h2 key={lineIndex} className="text-lg font-bold text-primary mb-2 mt-3">{line.slice(3)}</h2>;
+              }
+              if (line.startsWith('# ')) {
+                return <h1 key={lineIndex} className="text-xl font-bold text-primary mb-3 mt-3">{line.slice(2)}</h1>;
+              }
+              return (
+                <p key={lineIndex} className="mb-2">
+                  {line.split(/(\*\*[^*]+\*\*|\*[^*]+\*|"[^"]+"|(\([^)]+\)))/).map((part, partIndex) => {
+                    if (part && part.startsWith && part.startsWith('**') && part.endsWith('**')) {
+                      return <strong key={partIndex} className="font-bold">{part.slice(2, -2)}</strong>;
+                    }
+                    if (part && part.startsWith && part.startsWith('*') && part.endsWith('*')) {
+                      return <em key={partIndex} className="font-medium text-primary">{part.slice(1, -1)}</em>;
+                    }
+                    if (part && part.startsWith && part.startsWith('"') && part.endsWith('"')) {
+                      return <span key={partIndex} className="text-accent-foreground font-medium">"{part.slice(1, -1)}"</span>;
+                    }
+                    if (part && part.startsWith && part.startsWith('(') && part.endsWith(')')) {
+                      return <span key={partIndex} className="text-muted-foreground italic">{part}</span>;
+                    }
+                    return part;
+                  })}
+                </p>
+              );
+            })}
           </div>
         ) : (
           <Textarea
@@ -221,22 +236,36 @@ export const EbookChapter: React.FC<EbookChapterProps> = ({
             </div>
             {subChapter.content && (
               <div className="ml-8 bg-muted/50 p-3 rounded-lg text-sm leading-relaxed whitespace-pre-wrap">
-                {subChapter.content.split('\n').map((line, lineIndex) => (
-                  <p key={lineIndex} className="mb-2">
-                    {line.split(/(\*[^*]+\*|"[^"]+"|(\([^)]+\)))/).map((part, partIndex) => {
-                      if (part && part.startsWith && part.startsWith('*') && part.endsWith('*')) {
-                        return <em key={partIndex} className="font-medium text-primary">{part.slice(1, -1)}</em>;
-                      }
-                      if (part && part.startsWith && part.startsWith('"') && part.endsWith('"')) {
-                        return <span key={partIndex} className="text-accent-foreground font-medium">"{part.slice(1, -1)}"</span>;
-                      }
-                      if (part && part.startsWith && part.startsWith('(') && part.endsWith(')')) {
-                        return <span key={partIndex} className="text-muted-foreground italic">{part}</span>;
-                      }
-                      return part;
-                    })}
-                  </p>
-                ))}
+                {subChapter.content.split('\n').map((line, lineIndex) => {
+                  if (line.startsWith('### ')) {
+                    return <h3 key={lineIndex} className="text-base font-bold text-primary mb-2 mt-3">{line.slice(4)}</h3>;
+                  }
+                  if (line.startsWith('## ')) {
+                    return <h2 key={lineIndex} className="text-lg font-bold text-primary mb-2 mt-3">{line.slice(3)}</h2>;
+                  }
+                  if (line.startsWith('# ')) {
+                    return <h1 key={lineIndex} className="text-xl font-bold text-primary mb-3 mt-3">{line.slice(2)}</h1>;
+                  }
+                  return (
+                    <p key={lineIndex} className="mb-2">
+                      {line.split(/(\*\*[^*]+\*\*|\*[^*]+\*|"[^"]+"|(\([^)]+\)))/).map((part, partIndex) => {
+                        if (part && part.startsWith && part.startsWith('**') && part.endsWith('**')) {
+                          return <strong key={partIndex} className="font-bold">{part.slice(2, -2)}</strong>;
+                        }
+                        if (part && part.startsWith && part.startsWith('*') && part.endsWith('*')) {
+                          return <em key={partIndex} className="font-medium text-primary">{part.slice(1, -1)}</em>;
+                        }
+                        if (part && part.startsWith && part.startsWith('"') && part.endsWith('"')) {
+                          return <span key={partIndex} className="text-accent-foreground font-medium">"{part.slice(1, -1)}"</span>;
+                        }
+                        if (part && part.startsWith && part.startsWith('(') && part.endsWith(')')) {
+                          return <span key={partIndex} className="text-muted-foreground italic">{part}</span>;
+                        }
+                        return part;
+                      })}
+                    </p>
+                  );
+                })}
               </div>
             )}
           </div>

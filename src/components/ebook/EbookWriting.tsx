@@ -28,22 +28,54 @@ interface EbookWritingProps {
 
 // Fonction de rendu du texte avec style (identique au planificateur)
 const renderStyledText = (content: string) => {
-  return content.split('\n').map((line, lineIndex) => (
-    <p key={lineIndex} className="mb-2">
-      {line.split(/(\*[^*]+\*|"[^"]+"|(\([^)]+\)))/).map((part, partIndex) => {
-        if (part && part.startsWith && part.startsWith('*') && part.endsWith('*')) {
-          return <em key={partIndex} className="font-medium text-primary">{part.slice(1, -1)}</em>;
-        }
-        if (part && part.startsWith && part.startsWith('"') && part.endsWith('"')) {
-          return <span key={partIndex} className="text-accent-foreground font-medium">"{part.slice(1, -1)}"</span>;
-        }
-        if (part && part.startsWith && part.startsWith('(') && part.endsWith(')')) {
-          return <span key={partIndex} className="text-muted-foreground italic">{part}</span>;
-        }
-        return part;
-      })}
-    </p>
-  ));
+  return content.split('\n').map((line, lineIndex) => {
+    // Titres ### en gras
+    if (line.startsWith('### ')) {
+      return (
+        <h3 key={lineIndex} className="text-lg font-bold text-primary mb-3 mt-4">
+          {line.slice(4)}
+        </h3>
+      );
+    }
+    if (line.startsWith('## ')) {
+      return (
+        <h2 key={lineIndex} className="text-xl font-bold text-primary mb-3 mt-4">
+          {line.slice(3)}
+        </h2>
+      );
+    }
+    if (line.startsWith('# ')) {
+      return (
+        <h1 key={lineIndex} className="text-2xl font-bold text-primary mb-4 mt-4">
+          {line.slice(2)}
+        </h1>
+      );
+    }
+    
+    return (
+      <p key={lineIndex} className="mb-2">
+        {line.split(/(\*\*[^*]+\*\*|\*[^*]+\*|"[^"]+"|(\([^)]+\)))/).map((part, partIndex) => {
+          // **gras**
+          if (part && part.startsWith && part.startsWith('**') && part.endsWith('**')) {
+            return <strong key={partIndex} className="font-bold">{part.slice(2, -2)}</strong>;
+          }
+          // *italique*
+          if (part && part.startsWith && part.startsWith('*') && part.endsWith('*')) {
+            return <em key={partIndex} className="font-medium text-primary italic">{part.slice(1, -1)}</em>;
+          }
+          // "dialogues"
+          if (part && part.startsWith && part.startsWith('"') && part.endsWith('"')) {
+            return <span key={partIndex} className="text-accent-foreground font-medium">"{part.slice(1, -1)}"</span>;
+          }
+          // (parenthèses)
+          if (part && part.startsWith && part.startsWith('(') && part.endsWith(')')) {
+            return <span key={partIndex} className="text-muted-foreground italic">{part}</span>;
+          }
+          return part;
+        })}
+      </p>
+    );
+  });
 };
 
 export const EbookWriting: React.FC<EbookWritingProps> = ({
