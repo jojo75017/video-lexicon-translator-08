@@ -75,12 +75,31 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
     }
   }, [ebookTitle]);
 
-  // Sauvegarder les images dans localStorage à chaque changement
+  // Sauvegarder les images dans localStorage à chaque changement (avec gestion quota)
   useEffect(() => {
     if (ebookTitle && generatedImages.length > 0) {
       const storageKey = `ebook_chapter_images_${ebookTitle}`;
-      localStorage.setItem(storageKey, JSON.stringify(generatedImages));
-      console.log(`💾 ${generatedImages.length} image(s) sauvegardée(s) dans localStorage`);
+      try {
+        // Limiter à 10 images max pour éviter le dépassement de quota
+        const imagesToSave = generatedImages.slice(-10);
+        localStorage.setItem(storageKey, JSON.stringify(imagesToSave));
+        console.log(`💾 ${imagesToSave.length} image(s) sauvegardée(s) dans localStorage`);
+      } catch (error) {
+        console.warn('⚠️ Quota localStorage dépassé, nettoyage en cours...');
+        // Nettoyer les anciennes clés d'images ebook
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('ebook_chapter_images_')) {
+            localStorage.removeItem(key);
+          }
+        });
+        // Réessayer avec seulement les 5 dernières images
+        try {
+          const reducedImages = generatedImages.slice(-5);
+          localStorage.setItem(storageKey, JSON.stringify(reducedImages));
+        } catch (e) {
+          console.error('❌ Impossible de sauvegarder les images');
+        }
+      }
     }
   }, [generatedImages, ebookTitle]);
 
