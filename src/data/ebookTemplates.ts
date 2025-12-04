@@ -74,6 +74,24 @@ export const ebookTemplates: Record<string, EbookTemplate> = {
     borderColor: "border-l-emerald-500",
     icon: "✈️"
   },
+  enfants: {
+    id: 'enfants',
+    title: "Livre pour Enfants",
+    author: "Auteur Jeunesse",
+    preface: "Bienvenue dans un monde merveilleux où l'imagination n'a pas de limites ! Cette histoire est faite pour rêver, rire et apprendre.",
+    conclusion: "Et voilà, l'aventure se termine... mais les rêves, eux, continuent ! À bientôt pour de nouvelles histoires !",
+    chapters: [
+      { title: "La rencontre magique", subChapters: ["Un personnage attachant", "Un monde coloré", "Une amitié naissante"] },
+      { title: "L'aventure commence", subChapters: ["Le défi inattendu", "Les premiers obstacles", "Des alliés surprenants"] },
+      { title: "Le grand voyage", subChapters: ["Découvertes étonnantes", "Moments rigolos", "Une leçon importante"] },
+      { title: "L'épreuve finale", subChapters: ["Le courage du héros", "L'entraide", "La victoire du cœur"] },
+      { title: "Le retour à la maison", subChapters: ["La joie du retour", "Les souvenirs précieux", "Et après..."] }
+    ],
+    image: templateFiction,
+    description: "Histoires enchantées pour les petits et grands enfants",
+    borderColor: "border-l-yellow-400",
+    icon: "🧸"
+  },
   roman: {
     id: 'roman',
     title: "Roman Contemporain",
