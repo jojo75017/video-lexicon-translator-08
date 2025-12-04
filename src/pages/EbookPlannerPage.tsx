@@ -50,6 +50,7 @@ import { EbookCharacters, type Character } from '@/components/ebook/EbookCharact
 import { EbookProjectsList } from '@/components/ebook/EbookProjectsList';
 import { EbookAiChat } from '@/components/ebook/EbookAiChat';
 import { EbookVersionHistory } from '@/components/ebook/EbookVersionHistory';
+import { EbookStatisticsTools } from '@/components/ebook/EbookStatisticsTools';
 
 // Hooks et données
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
@@ -90,7 +91,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   const [tone, setTone] = useState(savedData?.tone || 'professionnel');
   const [narrativeFormat, setNarrativeFormat] = useState(savedData?.narrativeFormat || 'troisième personne');
   
-  const { isGenerating, generateChapterContent, generateSubChapterContent, generateEbookPlan, generateBookSummary, generateEbookCover, optimizeForSEO, generateKDPDescription, generateKDPKeywords, generateKDPCategories, generateBackCover } = useSubscriptionGeneration(subscriberEmail, apiKey, ebookTitle, targetAudience, tomeNumber, writingStyle, chapterLength, detailLevel, tone, narrativeFormat);
+  const { isGenerating, generateChapterContent, generateSubChapterContent, generateEbookPlan, generateBookSummary, generateEbookCover, optimizeForSEO, generateKDPDescription, generateKDPKeywords, generateKDPCategories, generateBackCover, generatePreface, generateConclusion, generateEpilogue, translateContent, analyzeTextStatistics } = useSubscriptionGeneration(subscriberEmail, apiKey, ebookTitle, targetAudience, tomeNumber, writingStyle, chapterLength, detailLevel, tone, narrativeFormat);
   
   const [authorName, setAuthorName] = useState(savedData?.authorName || '');
   const [preface, setPreface] = useState(savedData?.preface || '');
@@ -528,7 +529,25 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Préface / Introduction</Label>
+                  <div className="flex items-center justify-between">
+                    <Label>Préface / Introduction</Label>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={async () => {
+                        const result = await generatePreface(ebookTitle, chapters, targetAudience);
+                        if (result) {
+                          setPreface(result);
+                          toast.success('Préface générée !');
+                        }
+                      }}
+                      disabled={isGenerating || !ebookTitle}
+                      className="text-xs"
+                    >
+                      <Sparkles className="h-3 w-3 mr-1" />
+                      Générer avec l'IA
+                    </Button>
+                  </div>
                   <Textarea
                     placeholder="Écrivez une préface engageante qui accroche le lecteur dès les premières lignes..."
                     value={preface}
@@ -539,7 +558,25 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Conclusion / Mot de la fin</Label>
+                  <div className="flex items-center justify-between">
+                    <Label>Conclusion / Mot de la fin</Label>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={async () => {
+                        const result = await generateConclusion(ebookTitle, chapters, targetAudience);
+                        if (result) {
+                          setConclusion(result);
+                          toast.success('Conclusion générée !');
+                        }
+                      }}
+                      disabled={isGenerating || !ebookTitle}
+                      className="text-xs"
+                    >
+                      <Sparkles className="h-3 w-3 mr-1" />
+                      Générer avec l'IA
+                    </Button>
+                  </div>
                   <Textarea
                     placeholder="Rédigez une conclusion mémorable qui laisse une impression durable..."
                     value={conclusion}
@@ -550,7 +587,25 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Épilogue (optionnel)</Label>
+                  <div className="flex items-center justify-between">
+                    <Label>Épilogue (optionnel)</Label>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={async () => {
+                        const result = await generateEpilogue(ebookTitle, chapters, targetAudience);
+                        if (result) {
+                          setEpilogue(result);
+                          toast.success('Épilogue généré !');
+                        }
+                      }}
+                      disabled={isGenerating || !ebookTitle}
+                      className="text-xs"
+                    >
+                      <Sparkles className="h-3 w-3 mr-1" />
+                      Générer avec l'IA
+                    </Button>
+                  </div>
                   <Textarea
                     placeholder="Ajoutez un épilogue pour conclure votre histoire ou offrir une perspective future..."
                     value={epilogue}
@@ -1012,6 +1067,25 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                   conclusion
                 });
               }
+            }}
+          />
+        );
+      
+      case 'statistics':
+        return (
+          <EbookStatisticsTools
+            ebookTitle={ebookTitle}
+            preface={preface}
+            conclusion={conclusion}
+            epilogue={epilogue}
+            chapters={chapters}
+            apiKey={apiKey}
+            onTranslate={(translatedData) => {
+              setPreface(translatedData.preface);
+              setConclusion(translatedData.conclusion);
+              setEpilogue(translatedData.epilogue);
+              setChapters(translatedData.chapters);
+              toast.success('Traduction appliquée !');
             }}
           />
         );
