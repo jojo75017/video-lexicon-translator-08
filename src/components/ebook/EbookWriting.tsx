@@ -160,9 +160,9 @@ export const EbookWriting: React.FC<EbookWritingProps> = ({
           </div>
         ) : (
           chapters.map((chapter, index) => (
-            <Card key={chapter.id} className="border-2">
+            <Card key={chapter.id} className="border-2 border-border">
               <CardHeader className="bg-muted/50">
-                <CardTitle className="text-lg">
+                <CardTitle className="text-lg text-primary underline decoration-2 underline-offset-4">
                   Chapitre {index + 1}: {chapter.title || 'Sans titre'}
                 </CardTitle>
               </CardHeader>
@@ -247,11 +247,12 @@ export const EbookWriting: React.FC<EbookWritingProps> = ({
                       placeholder="Commencez à rédiger votre chapitre ici..."
                       value={chapter.content || ''}
                       onChange={(e) => onUpdateChapterContent(chapter.id, e.target.value)}
-                      className="min-h-[300px] font-serif text-base leading-relaxed rounded-t-none border-t-0 bg-background text-foreground"
+                      className="min-h-[300px] font-serif text-base leading-relaxed rounded-t-none border-t-0 bg-card text-card-foreground"
                       style={{
                         fontFamily: 'Georgia, serif',
                         lineHeight: '1.8',
-                        fontSize: '16px'
+                        fontSize: '16px',
+                        color: 'hsl(var(--foreground))'
                       }}
                     />
                   </div>
@@ -282,7 +283,7 @@ export const EbookWriting: React.FC<EbookWritingProps> = ({
                       <h4 className="font-medium text-sm text-muted-foreground">Sous-chapitres:</h4>
                       {chapter.subChapters.map((subChapter, subIndex) => (
                         <div key={subChapter.id} className="space-y-2">
-                          <Label className="text-sm font-medium">
+                          <Label className="text-sm font-medium text-primary underline decoration-1 underline-offset-2">
                             {index + 1}.{subIndex + 1} {subChapter.title || 'Sans titre'}
                           </Label>
                           <EbookFormattingToolbar
@@ -295,11 +296,12 @@ export const EbookWriting: React.FC<EbookWritingProps> = ({
                             placeholder="Contenu du sous-chapitre..."
                             value={subChapter.content || ''}
                             onChange={(e) => onUpdateSubChapterContent(chapter.id, subChapter.id, e.target.value)}
-                            className="min-h-[200px] font-serif text-base leading-relaxed rounded-t-none border-t-0 bg-background text-foreground"
+                            className="min-h-[200px] font-serif text-base leading-relaxed rounded-t-none border-t-0 bg-card text-card-foreground"
                             style={{
                               fontFamily: 'Georgia, serif',
                               lineHeight: '1.8',
-                              fontSize: '16px'
+                              fontSize: '16px',
+                              color: 'hsl(var(--foreground))'
                             }}
                           />
                           <div className="text-xs text-muted-foreground">
