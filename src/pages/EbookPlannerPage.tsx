@@ -1096,6 +1096,11 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
         navigate('/affiliation');
         return null;
       
+      case 'admin':
+        // Rediriger vers la page admin
+        navigate('/admin');
+        return null;
+      
       default:
         return null;
     }
