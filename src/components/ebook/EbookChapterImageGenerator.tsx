@@ -373,6 +373,20 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
     }
   };
 
+  const clearAllImageCache = () => {
+    let count = 0;
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('ebook_chapter_images_')) {
+        localStorage.removeItem(key);
+        count++;
+      }
+    });
+    setGeneratedImages([]);
+    toast.success(`🧹 Cache vidé: ${count} projet(s) nettoyé(s)`, {
+      description: 'Tout le cache d\'images a été supprimé'
+    });
+  };
+
   const exportAllImagesToZip = async () => {
     if (generatedImages.length === 0) {
       toast.error('Aucune image à exporter');
@@ -506,15 +520,26 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
             </Select>
           </div>
 
-          <Button
-            onClick={generateAllChapterImages}
-            disabled={isGenerating || chapters.length === 0 || !ebookTitle}
-            className="w-full"
-            style={{ background: 'linear-gradient(135deg, hsl(var(--coral-pink)) 0%, hsl(var(--royal-purple)) 100%)' }}
-          >
-            <Image className="h-4 w-4 mr-2" />
-            {isGenerating ? 'Génération en cours...' : `Générer toutes les images (${chapters.length})`}
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={generateAllChapterImages}
+              disabled={isGenerating || chapters.length === 0 || !ebookTitle}
+              className="flex-1"
+              style={{ background: 'linear-gradient(135deg, hsl(var(--coral-pink)) 0%, hsl(var(--royal-purple)) 100%)' }}
+            >
+              <Image className="h-4 w-4 mr-2" />
+              {isGenerating ? 'Génération en cours...' : `Générer toutes les images (${chapters.length})`}
+            </Button>
+            <Button
+              onClick={clearAllImageCache}
+              variant="outline"
+              size="icon"
+              title="Vider tout le cache d'images"
+              className="text-destructive hover:bg-destructive/10"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
 
           {isGenerating && progress > 0 && (
             <div className="space-y-2">
