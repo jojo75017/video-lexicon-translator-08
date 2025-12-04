@@ -424,30 +424,32 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
       
       case 'planner':
         return (
-          <div className="space-y-6 animate-fade-in">
-            {/* Quick Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {[
-                { label: 'Chapitres', value: chapters.length, icon: BookOpen, color: 'from-violet-500 to-fuchsia-500' },
-                { label: 'Personnages', value: characters.length, icon: Users, color: 'from-cyan-500 to-blue-500' },
-                { label: 'Images', value: ebookImages.length, icon: Palette, color: 'from-amber-500 to-orange-500' },
-                { label: 'Mots', value: chapters.reduce((acc, c) => acc + (c.content?.split(' ').length || 0), 0), icon: FileText, color: 'from-emerald-500 to-teal-500' },
-              ].map((stat, i) => (
-                <Card key={i} className="border border-border/50 bg-card">
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-xl bg-gradient-to-r ${stat.color} flex items-center justify-center`}>
-                        <stat.icon className="w-5 h-5 text-white" />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in">
+            {/* Colonne principale (2/3) */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Quick Stats */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                  { label: 'Chapitres', value: chapters.length, icon: BookOpen, color: 'from-violet-500 to-fuchsia-500' },
+                  { label: 'Personnages', value: characters.length, icon: Users, color: 'from-cyan-500 to-blue-500' },
+                  { label: 'Images', value: ebookImages.length, icon: Palette, color: 'from-amber-500 to-orange-500' },
+                  { label: 'Mots', value: chapters.reduce((acc, c) => acc + (c.content?.split(' ').length || 0), 0), icon: FileText, color: 'from-emerald-500 to-teal-500' },
+                ].map((stat, i) => (
+                  <Card key={i} className="border border-border/50 bg-card">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-xl bg-gradient-to-r ${stat.color} flex items-center justify-center`}>
+                          <stat.icon className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-2xl font-bold">{stat.value}</p>
+                          <p className="text-xs text-muted-foreground">{stat.label}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-2xl font-bold">{stat.value}</p>
-                        <p className="text-xs text-muted-foreground">{stat.label}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
 
             {/* General Info Card */}
             <Card className="border border-border/50">
@@ -674,6 +676,18 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                   <span className="text-sm text-muted-foreground">En attente d'un titre</span>
                 </>
               )}
+            </div>
+            </div>
+
+            {/* Colonne droite - Aperçu (1/3) */}
+            <div className="space-y-6">
+              <EbookPreview
+                ebookTitle={ebookTitle}
+                authorName={authorName}
+                preface={preface}
+                conclusion={conclusion}
+                chapters={chapters}
+              />
             </div>
           </div>
         );
