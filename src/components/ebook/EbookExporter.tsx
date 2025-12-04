@@ -885,9 +885,57 @@ Paperback: 9.99€ - 19.99€
     URL.revokeObjectURL(url);
   };
 
+  // Génère un contenu propre et formaté pour Google Docs (optimisé KDP)
+  const generateKdpContent = () => {
+    let content = '';
+    
+    // Préface
+    if (preface) {
+      content += `PRÉFACE\n\n`;
+      content += `${preface}\n\n\n`;
+    }
+
+    // Chapitres
+    chapters.forEach((chapter, index) => {
+      const chapterNumber = index + 1;
+      
+      content += `CHAPITRE ${chapterNumber}\n${chapter.title.toUpperCase()}\n\n`;
+      
+      if (chapter.content) {
+        content += `${chapter.content}\n\n`;
+      }
+      
+      // Sous-chapitres
+      chapter.subChapters.forEach((subChapter, subIndex) => {
+        const subNumber = `${chapterNumber}.${subIndex + 1}`;
+        content += `${subNumber}. ${subChapter.title}\n\n`;
+        
+        if (subChapter.content) {
+          content += `${subChapter.content}\n\n`;
+        }
+      });
+      
+      content += '\n';
+    });
+
+    // Conclusion
+    if (conclusion) {
+      content += `CONCLUSION\n\n`;
+      content += `${conclusion}\n\n`;
+    }
+
+    // Épilogue
+    if (epilogue) {
+      content += `ÉPILOGUE\n\n`;
+      content += `${epilogue}\n\n`;
+    }
+
+    return content;
+  };
+
   const exportToGoogleDocs = async () => {
     try {
-      const content = generateEbookContent();
+      const content = generateKdpContent();
       
       const { data, error } = await supabase.functions.invoke('export-to-google-docs', {
         body: {
