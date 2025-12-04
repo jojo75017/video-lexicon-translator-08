@@ -116,32 +116,24 @@ serve(async (req) => {
       );
     }
 
+    // Construire le texte complet dans le bon ordre
+    let fullText = `${title}\n\n`;
+    let titleEndIndex = fullText.length;
+    
+    if (authorName) {
+      fullText += `Par ${authorName}\n\n`;
+    }
+    
+    fullText += content;
+
     // Préparer les requêtes pour ajouter le contenu
     const requests = [];
     
-    // Ajouter le titre
+    // Insérer tout le texte d'un coup
     requests.push({
       insertText: {
         location: { index: 1 },
-        text: `${title}\n\n`,
-      },
-    });
-
-    // Ajouter l'auteur si fourni
-    if (authorName) {
-      requests.push({
-        insertText: {
-          location: { index: 1 },
-          text: `Par ${authorName}\n\n`,
-        },
-      });
-    }
-
-    // Ajouter le contenu
-    requests.push({
-      insertText: {
-        location: { index: 1 },
-        text: content,
+        text: fullText,
       },
     });
 
@@ -150,7 +142,7 @@ serve(async (req) => {
       updateParagraphStyle: {
         range: {
           startIndex: 1,
-          endIndex: title.length + 1,
+          endIndex: titleEndIndex,
         },
         paragraphStyle: {
           namedStyleType: 'TITLE',
