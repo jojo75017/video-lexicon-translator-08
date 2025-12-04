@@ -25,7 +25,8 @@ import {
   BarChart3,
   Globe,
   Volume2,
-  Shield
+  Shield,
+  Headphones
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -160,12 +161,20 @@ const menuItems = [
     activeGradient: 'from-sky-500 to-blue-500'
   },
   { 
-    id: 'voice', 
+  id: 'voice', 
     label: 'Dictée Vocale', 
     icon: Volume2,
     color: 'text-rose-500',
     bgColor: 'bg-rose-500/10',
     activeGradient: 'from-rose-500 to-pink-500'
+  },
+  { 
+    id: 'audiobook', 
+    label: 'Livre Audio', 
+    icon: Headphones,
+    color: 'text-purple-500',
+    bgColor: 'bg-purple-500/10',
+    activeGradient: 'from-purple-500 to-violet-500'
   },
   { 
     id: 'series', 
