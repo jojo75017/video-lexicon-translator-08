@@ -984,6 +984,11 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
           />
         );
       
+      case 'affiliation':
+        // Rediriger vers la page affiliation
+        navigate('/affiliation');
+        return null;
+      
       default:
         return null;
     }
