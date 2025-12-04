@@ -48,6 +48,8 @@ import { EbookWritingAssistant } from '@/components/ebook/EbookWritingAssistant'
 import { EbookBackCoverGenerator } from '@/components/ebook/EbookBackCoverGenerator';
 import { EbookCharacters, type Character } from '@/components/ebook/EbookCharacters';
 import { EbookProjectsList } from '@/components/ebook/EbookProjectsList';
+import { EbookAiChat } from '@/components/ebook/EbookAiChat';
+import { EbookVersionHistory } from '@/components/ebook/EbookVersionHistory';
 
 // Hooks et données
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
@@ -76,7 +78,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   };
   
   const savedData = loadSavedData();
-  const { saveProject, loadLatestProject, isSaving } = useEbookDatabase();
+  const { saveProject, loadLatestProject, isSaving, currentProjectId, saveVersion, loadVersions, restoreVersion } = useEbookDatabase();
   
   const [apiKey, setApiKey] = useState(savedData?.apiKey || '');
   const [ebookTitle, setEbookTitle] = useState(location.state?.suggestedTitle || savedData?.ebookTitle || '');
@@ -900,6 +902,66 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
       case 'monetization':
         return (
           <EbookMonetization />
+        );
+      
+      case 'templates':
+        return (
+          <EbookTemplates
+            onApplyTemplate={(templateType) => {
+              const template = ebookTemplates[templateType];
+              if (template) {
+                setEbookTitle(template.title);
+                toast.success(`Template "${template.title}" appliqué !`);
+              }
+            }}
+          />
+        );
+      
+      case 'assistant':
+        return (
+          <EbookWritingAssistant
+            ebookTitle={ebookTitle}
+          />
+        );
+      
+      case 'aichat':
+        return (
+          <EbookAiChat />
+        );
+      
+      case 'backcover':
+        return (
+          <EbookBackCoverGenerator
+            ebookTitle={ebookTitle}
+            authorName={authorName}
+            chapters={chapters}
+            isGenerating={isGenerating}
+            onGenerate={async (tone, audience, highlights) => {
+              return await generateBackCover(ebookTitle, authorName, chapters, tone, audience, highlights);
+            }}
+          />
+        );
+      
+      case 'versions':
+        return (
+          <EbookVersionHistory
+            projectId={currentProjectId || ''}
+            onRestore={async (versionId) => {
+              await restoreVersion(versionId);
+            }}
+            loadVersions={loadVersions}
+            onSaveVersion={async () => {
+              if (currentProjectId) {
+                await saveVersion(currentProjectId, {
+                  title: ebookTitle,
+                  author_name: authorName,
+                  chapters,
+                  preface,
+                  conclusion
+                });
+              }
+            }}
+          />
         );
       
       default:
