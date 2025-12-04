@@ -54,6 +54,7 @@ import { EbookStatisticsTools } from '@/components/ebook/EbookStatisticsTools';
 import { EbookVoiceDictation } from '@/components/ebook/EbookVoiceDictation';
 import { EbookSeriesManager } from '@/components/ebook/EbookSeriesManager';
 import { EbookKdpMarketAnalysis } from '@/components/ebook/EbookKdpMarketAnalysis';
+import { EbookAudioGenerator } from '@/components/ebook/EbookAudioGenerator';
 
 // Hooks et données
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
@@ -1100,6 +1101,19 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
             chapters={chapters}
             onUpdateChapterContent={updateChapterContent}
             onUpdateSubChapterContent={updateSubChapterContent}
+            apiKey={apiKey}
+          />
+        );
+      
+      case 'audiobook':
+        return (
+          <EbookAudioGenerator
+            ebookTitle={ebookTitle}
+            authorName={authorName}
+            preface={preface}
+            conclusion={conclusion}
+            epilogue={epilogue}
+            chapters={chapters}
             apiKey={apiKey}
           />
         );
