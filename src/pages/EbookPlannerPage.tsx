@@ -495,11 +495,14 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                         <SelectValue placeholder="Sélectionner" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Enfants (3-7 ans)">Enfants (3-7 ans)</SelectItem>
-                        <SelectItem value="Jeunes lecteurs (8-12 ans)">Jeunes lecteurs (8-12 ans)</SelectItem>
-                        <SelectItem value="Adolescents (13-17 ans)">Adolescents (13-17 ans)</SelectItem>
-                        <SelectItem value="Adultes">Adultes</SelectItem>
-                        <SelectItem value="Tout public">Tout public</SelectItem>
+                        <SelectItem value="Enfants (3-6 ans)">🧒 Enfants (3-6 ans)</SelectItem>
+                        <SelectItem value="Enfants (6-10 ans)">👦 Enfants (6-10 ans)</SelectItem>
+                        <SelectItem value="Enfants (10-12 ans)">📚 Pré-ados (10-12 ans)</SelectItem>
+                        <SelectItem value="Adolescents">🎮 Adolescents (13-17 ans)</SelectItem>
+                        <SelectItem value="Jeunes adultes">🎓 Jeunes adultes (18-25 ans)</SelectItem>
+                        <SelectItem value="Adultes">👔 Adultes</SelectItem>
+                        <SelectItem value="Seniors">🌟 Seniors</SelectItem>
+                        <SelectItem value="Tout public">🌍 Tout public</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

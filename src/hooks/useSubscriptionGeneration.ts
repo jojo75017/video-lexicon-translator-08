@@ -132,18 +132,37 @@ Le contenu doit faire environ 200 mots et être :
   };
 
   const generateEbookPlan = async (ebookTitle: string, authorName: string, numberOfChapters: number) => {
-    const audienceLine = targetAudience ? `\nPublic cible : ${targetAudience}. Les titres des chapitres et sous-chapitres doivent être adaptés à ce public.` : '';
-    const tomeLine = tomeNumber ? `\nCeci est le Tome ${tomeNumber} d'une série. Structure le plan en conséquence, en tenant compte de l'arc narratif global de la série.` : '';
-    const styleLine = writingStyle ? `\nStyle d'écriture : ${writingStyle}. Les titres doivent refléter ce style.` : '';
-    const toneLine = tone ? `\nTon général : ${tone}. Le plan doit refléter ce ton.` : '';
+    // Instructions spécifiques selon le public cible
+    let audienceInstructions = '';
+    if (targetAudience) {
+      const audienceGuides: Record<string, string> = {
+        'Enfants (3-6 ans)': `Public: Enfants 3-6 ans. Utilise un vocabulaire très simple, des phrases courtes (max 10 mots), des répétitions ludiques, des onomatopées, et des thèmes adaptés (animaux, famille, jeux). Évite tout contenu effrayant ou complexe.`,
+        'Enfants (6-10 ans)': `Public: Enfants 6-10 ans. Vocabulaire accessible, phrases simples mais plus élaborées, aventures légères, leçons de vie positives, personnages auxquels ils peuvent s'identifier. Évite les thèmes matures.`,
+        'Enfants (10-12 ans)': `Public: Pré-adolescents 10-12 ans. Vocabulaire plus riche, intrigues plus complexes, thèmes comme l'amitié, l'école, les premiers défis. Pas de contenu romantique ou violent.`,
+        'Adolescents': `Public: Adolescents 13-17 ans. Thèmes qui résonnent avec eux (identité, relations, défis sociaux), style moderne, personnages ados, évite le côté moralisateur.`,
+        'Jeunes adultes': `Public: Jeunes adultes 18-25 ans. Thèmes matures (carrière, relations amoureuses, indépendance), style contemporain, références culturelles actuelles.`,
+        'Adultes': `Public: Adultes. Contenu approfondi, vocabulaire riche, thèmes complexes, analyses nuancées.`,
+        'Seniors': `Public: Seniors. Thèmes pertinents (sagesse, mémoires, santé, loisirs), style respectueux et accessible, évite le jargon technologique excessif.`,
+        'Tout public': `Public: Tout public. Contenu accessible à tous les âges, évite les thèmes exclusivement adultes, vocabulaire universel.`
+      };
+      audienceInstructions = audienceGuides[targetAudience] || `\nPublic cible : ${targetAudience}. Adapte le vocabulaire, le style et les thèmes à ce public.`;
+    }
     
-    const prompt = `Crée un plan détaillé pour un ebook intitulé "${ebookTitle}" par ${authorName}.${audienceLine}${tomeLine}${styleLine}${toneLine}
+    const tomeLine = tomeNumber ? `\nCeci est le Tome ${tomeNumber} d'une série. Structure le plan en conséquence.` : '';
+    const styleLine = writingStyle ? `\nStyle d'écriture : ${writingStyle}.` : '';
+    const toneLine = tone ? `\nTon général : ${tone}.` : '';
+    
+    const prompt = `Crée un plan détaillé pour un ebook intitulé "${ebookTitle}" par ${authorName}.
+
+${audienceInstructions}${tomeLine}${styleLine}${toneLine}
+
+IMPORTANT: Le contenu DOIT être parfaitement adapté au public cible. Les titres, thèmes et vocabulaire doivent correspondre à l'âge et au niveau de compréhension du public.
     
 Le plan doit contenir exactement ${numberOfChapters} chapitres principaux.
 
 Format JSON attendu :
 {
-  "preface": "Une préface captivante",
+  "preface": "Une préface captivante adaptée au public",
   "chapters": [
     {
       "title": "Titre du chapitre 1",
@@ -153,7 +172,7 @@ Format JSON attendu :
       ]
     }
   ],
-  "conclusion": "Une conclusion percutante"
+  "conclusion": "Une conclusion percutante adaptée au public"
 }
 
 Réponds UNIQUEMENT avec le JSON, sans texte additionnel.`;
