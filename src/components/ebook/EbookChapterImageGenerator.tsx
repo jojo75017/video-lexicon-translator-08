@@ -543,11 +543,17 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
                 className="border-2 overflow-hidden"
                 style={{ borderColor: 'hsl(var(--cobalt-blue) / 0.3)' }}
               >
-                <div className="aspect-video relative bg-gradient-to-br from-gray-100 to-gray-200">
+                <div className="aspect-video relative bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                   <img 
                     src={img.imageUrl} 
                     alt={img.chapterTitle}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      console.error('Image load error for:', img.chapterTitle);
+                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.parentElement!.innerHTML = '<div class="flex flex-col items-center justify-center h-full text-muted-foreground"><span class="text-4xl mb-2">🖼️</span><span class="text-sm">Image non disponible</span></div>';
+                    }}
+                    onLoad={() => console.log('Image loaded:', img.chapterTitle)}
                   />
                 </div>
                 <CardContent className="pt-4">
