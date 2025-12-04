@@ -3,7 +3,6 @@ import {
   BookOpen, 
   Wand2, 
   Settings, 
-  FileText, 
   Image, 
   Users, 
   Download, 
@@ -16,7 +15,12 @@ import {
   FolderOpen,
   MessageSquare,
   DollarSign,
-  ImagePlus
+  ImagePlus,
+  Bot,
+  BookCopy,
+  History,
+  LayoutTemplate,
+  FileEdit
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -47,12 +51,36 @@ const menuItems = [
     activeGradient: 'from-fuchsia-500 to-pink-500'
   },
   { 
+    id: 'templates', 
+    label: 'Templates', 
+    icon: LayoutTemplate,
+    color: 'text-cyan-500',
+    bgColor: 'bg-cyan-500/10',
+    activeGradient: 'from-cyan-500 to-teal-500'
+  },
+  { 
     id: 'writing', 
     label: 'Rédaction', 
     icon: PenTool,
     color: 'text-blue-500',
     bgColor: 'bg-blue-500/10',
     activeGradient: 'from-blue-500 to-cyan-500'
+  },
+  { 
+    id: 'assistant', 
+    label: 'Assistant IA', 
+    icon: FileEdit,
+    color: 'text-purple-500',
+    bgColor: 'bg-purple-500/10',
+    activeGradient: 'from-purple-500 to-violet-500'
+  },
+  { 
+    id: 'aichat', 
+    label: 'Chat IA', 
+    icon: Bot,
+    color: 'text-orange-500',
+    bgColor: 'bg-orange-500/10',
+    activeGradient: 'from-orange-500 to-amber-500'
   },
   { 
     id: 'characters', 
@@ -87,6 +115,14 @@ const menuItems = [
     activeGradient: 'from-rose-500 to-red-500'
   },
   { 
+    id: 'backcover', 
+    label: '4e Couverture', 
+    icon: BookCopy,
+    color: 'text-red-500',
+    bgColor: 'bg-red-500/10',
+    activeGradient: 'from-red-500 to-rose-500'
+  },
+  { 
     id: 'tools', 
     label: 'Outils IA', 
     icon: Wand2,
@@ -117,6 +153,14 @@ const menuItems = [
     color: 'text-sky-500',
     bgColor: 'bg-sky-500/10',
     activeGradient: 'from-sky-500 to-blue-500'
+  },
+  { 
+    id: 'versions', 
+    label: 'Historique', 
+    icon: History,
+    color: 'text-yellow-500',
+    bgColor: 'bg-yellow-500/10',
+    activeGradient: 'from-yellow-500 to-amber-500'
   },
   { 
     id: 'export', 
