@@ -33,17 +33,21 @@ interface EbookChapterImageGeneratorProps {
   ebookTitle: string;
   chapters: Chapter[];
   characters?: Character[];
+  ebookImages?: ChapterImage[];
+  onImagesUpdate?: (images: ChapterImage[]) => void;
 }
 
 export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProps> = ({
   ebookTitle,
   chapters,
-  characters = []
+  characters = [],
+  ebookImages = [],
+  onImagesUpdate
 }) => {
   const { hasValidApiKey, getConfig } = useOpenAIConfig();
   const [isGenerating, setIsGenerating] = useState(false);
   const [imageStyle, setImageStyle] = useState<string>('professional illustration');
-  const [generatedImages, setGeneratedImages] = useState<ChapterImage[]>([]);
+  const [generatedImages, setGeneratedImages] = useState<ChapterImage[]>(ebookImages);
   const [progress, setProgress] = useState(0);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [showConfig, setShowConfig] = useState(false);
@@ -58,50 +62,21 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
     { value: 'abstract modern', label: '🌈 Abstrait moderne' }
   ];
 
-  // Charger les images depuis localStorage au montage
+  // Synchroniser avec les images passées en props
   useEffect(() => {
-    if (ebookTitle) {
-      const storageKey = `ebook_chapter_images_${ebookTitle}`;
-      const saved = localStorage.getItem(storageKey);
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          setGeneratedImages(parsed);
-          console.log(`📂 ${parsed.length} image(s) chargée(s) depuis localStorage`);
-        } catch (error) {
-          console.error('Erreur chargement images localStorage:', error);
-        }
-      }
+    if (ebookImages.length > 0 && generatedImages.length === 0) {
+      setGeneratedImages(ebookImages);
+      console.log(`📂 ${ebookImages.length} image(s) chargée(s) depuis la base de données`);
     }
-  }, [ebookTitle]);
+  }, [ebookImages]);
 
-  // Sauvegarder les images dans localStorage à chaque changement (avec gestion quota)
+  // Notifier le parent quand les images changent (pour sauvegarde en BDD)
   useEffect(() => {
-    if (ebookTitle && generatedImages.length > 0) {
-      const storageKey = `ebook_chapter_images_${ebookTitle}`;
-      try {
-        // Limiter à 10 images max pour éviter le dépassement de quota
-        const imagesToSave = generatedImages.slice(-10);
-        localStorage.setItem(storageKey, JSON.stringify(imagesToSave));
-        console.log(`💾 ${imagesToSave.length} image(s) sauvegardée(s) dans localStorage`);
-      } catch (error) {
-        console.warn('⚠️ Quota localStorage dépassé, nettoyage en cours...');
-        // Nettoyer les anciennes clés d'images ebook
-        Object.keys(localStorage).forEach(key => {
-          if (key.startsWith('ebook_chapter_images_')) {
-            localStorage.removeItem(key);
-          }
-        });
-        // Réessayer avec seulement les 5 dernières images
-        try {
-          const reducedImages = generatedImages.slice(-5);
-          localStorage.setItem(storageKey, JSON.stringify(reducedImages));
-        } catch (e) {
-          console.error('❌ Impossible de sauvegarder les images');
-        }
-      }
+    if (onImagesUpdate && generatedImages.length > 0) {
+      onImagesUpdate(generatedImages);
+      console.log(`💾 ${generatedImages.length} image(s) synchronisée(s) avec la base de données`);
     }
-  }, [generatedImages, ebookTitle]);
+  }, [generatedImages, onImagesUpdate]);
 
   const generateAllChapterImages = async () => {
     if (!ebookTitle || chapters.length === 0) {
@@ -363,14 +338,17 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
   };
 
   const clearAllImages = () => {
-    if (ebookTitle) {
-      const storageKey = `ebook_chapter_images_${ebookTitle}`;
-      localStorage.removeItem(storageKey);
-      setGeneratedImages([]);
-      toast.success('🗑️ Toutes les images ont été effacées', {
-        description: 'Cache et interface nettoyés'
-      });
+    setGeneratedImages([]);
+    if (onImagesUpdate) {
+      onImagesUpdate([]);
     }
+    // Nettoyer aussi le localStorage pour rétrocompatibilité
+    if (ebookTitle) {
+      localStorage.removeItem(`ebook_chapter_images_${ebookTitle}`);
+    }
+    toast.success('🗑️ Toutes les images ont été effacées', {
+      description: 'Base de données et cache nettoyés'
+    });
   };
 
   const clearAllImageCache = () => {
@@ -382,8 +360,11 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
       }
     });
     setGeneratedImages([]);
+    if (onImagesUpdate) {
+      onImagesUpdate([]);
+    }
     toast.success(`🧹 Cache vidé: ${count} projet(s) nettoyé(s)`, {
-      description: 'Tout le cache d\'images a été supprimé'
+      description: 'Tout le cache local a été supprimé'
     });
   };
 
