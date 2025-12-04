@@ -910,8 +910,28 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
             onApplyTemplate={(templateType) => {
               const template = ebookTemplates[templateType];
               if (template) {
+                // Appliquer tout le contenu du template
                 setEbookTitle(template.title);
-                toast.success(`Template "${template.title}" appliqué !`);
+                setAuthorName(template.author);
+                setPreface(template.preface);
+                setConclusion(template.conclusion);
+                
+                // Convertir les chapitres du template au format attendu
+                const newChapters: Chapter[] = template.chapters.map((ch, index) => ({
+                  id: `chapter-${Date.now()}-${index}`,
+                  title: ch.title,
+                  content: '',
+                  subChapters: ch.subChapters.map((sub, subIndex) => ({
+                    id: `subchapter-${Date.now()}-${index}-${subIndex}`,
+                    title: sub,
+                    content: ''
+                  }))
+                }));
+                setChapters(newChapters);
+                
+                // Naviguer vers le planificateur pour voir le résultat
+                setActiveTab('planner');
+                toast.success(`Template "${template.title}" appliqué avec ${template.chapters.length} chapitres !`);
               }
             }}
           />
