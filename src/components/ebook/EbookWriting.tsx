@@ -6,11 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { FileText, Image as ImageIcon, Plus, Trash2 } from 'lucide-react';
+import { FileText, Image as ImageIcon, Plus, Trash2, Eye, Edit3, Columns } from 'lucide-react';
 import { Chapter } from '@/hooks/useEbookGeneration';
 import { toast } from 'sonner';
 import EbookImageBank from './EbookImageBank';
 import { EbookFormattingToolbar } from './EbookFormattingToolbar';
+import { MarkdownPreview } from './MarkdownPreview';
 
 interface ChapterImage {
   id: string;
@@ -37,6 +38,7 @@ export const EbookWriting: React.FC<EbookWritingProps> = ({
   const [imageAlt, setImageAlt] = useState('');
   const [currentChapterId, setCurrentChapterId] = useState<string | null>(null);
   const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<'edit' | 'preview' | 'split'>('split');
   const textareaRefs = useRef<Record<string, HTMLTextAreaElement | null>>({});
 
   const addImageToChapter = (chapterId: string, url?: string, alt?: string) => {
@@ -142,13 +144,46 @@ export const EbookWriting: React.FC<EbookWritingProps> = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <FileText className="h-5 w-5" />
-          Espace de Rédaction
-        </CardTitle>
-        <CardDescription>
-          Rédigez vos chapitres avec des modèles de mise en forme professionnels
-        </CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Espace de Rédaction
+            </CardTitle>
+            <CardDescription>
+              Rédigez vos chapitres avec des modèles de mise en forme professionnels
+            </CardDescription>
+          </div>
+          <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
+            <Button
+              variant={viewMode === 'edit' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('edit')}
+              className="h-8"
+            >
+              <Edit3 className="h-4 w-4 mr-1" />
+              Éditer
+            </Button>
+            <Button
+              variant={viewMode === 'split' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('split')}
+              className="h-8"
+            >
+              <Columns className="h-4 w-4 mr-1" />
+              Les deux
+            </Button>
+            <Button
+              variant={viewMode === 'preview' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('preview')}
+              className="h-8"
+            >
+              <Eye className="h-4 w-4 mr-1" />
+              Aperçu
+            </Button>
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
         {chapters.length === 0 ? (
@@ -235,26 +270,41 @@ export const EbookWriting: React.FC<EbookWritingProps> = ({
                       </DialogContent>
                     </Dialog>
                   </div>
-                  <div>
-                    <EbookFormattingToolbar
-                      textareaRef={{ current: textareaRefs.current[chapter.id] }}
-                      value={chapter.content || ''}
-                      onChange={(value) => onUpdateChapterContent(chapter.id, value)}
-                    />
-                    <Textarea
-                      ref={(el) => { textareaRefs.current[chapter.id] = el; }}
-                      id={`chapter-${chapter.id}`}
-                      placeholder="Commencez à rédiger votre chapitre ici..."
-                      value={chapter.content || ''}
-                      onChange={(e) => onUpdateChapterContent(chapter.id, e.target.value)}
-                      className="min-h-[300px] font-serif text-base leading-relaxed rounded-t-none border-t-0 bg-card text-card-foreground"
-                      style={{
-                        fontFamily: 'Georgia, serif',
-                        lineHeight: '1.8',
-                        fontSize: '16px',
-                        color: 'hsl(var(--foreground))'
-                      }}
-                    />
+                  <div className={viewMode === 'split' ? 'grid grid-cols-2 gap-4' : ''}>
+                    {/* Zone d'édition */}
+                    {(viewMode === 'edit' || viewMode === 'split') && (
+                      <div className={viewMode === 'split' ? '' : ''}>
+                        <EbookFormattingToolbar
+                          textareaRef={{ current: textareaRefs.current[chapter.id] }}
+                          value={chapter.content || ''}
+                          onChange={(value) => onUpdateChapterContent(chapter.id, value)}
+                        />
+                        <Textarea
+                          ref={(el) => { textareaRefs.current[chapter.id] = el; }}
+                          id={`chapter-${chapter.id}`}
+                          placeholder="Commencez à rédiger votre chapitre ici..."
+                          value={chapter.content || ''}
+                          onChange={(e) => onUpdateChapterContent(chapter.id, e.target.value)}
+                          className="min-h-[300px] font-serif text-base leading-relaxed rounded-t-none border-t-0 bg-card"
+                          style={{
+                            fontFamily: 'Georgia, serif',
+                            lineHeight: '1.8',
+                            fontSize: '16px',
+                            color: 'hsl(var(--foreground))'
+                          }}
+                        />
+                      </div>
+                    )}
+                    
+                    {/* Zone de prévisualisation */}
+                    {(viewMode === 'preview' || viewMode === 'split') && (
+                      <div className="min-h-[300px] p-4 border rounded-md bg-card overflow-auto">
+                        <MarkdownPreview 
+                          content={chapter.content || '*Commencez à écrire pour voir l\'aperçu...*'} 
+                          className="font-serif"
+                        />
+                      </div>
+                    )}
                   </div>
                   
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -286,24 +336,38 @@ export const EbookWriting: React.FC<EbookWritingProps> = ({
                           <Label className="text-sm font-medium text-primary underline decoration-1 underline-offset-2">
                             {index + 1}.{subIndex + 1} {subChapter.title || 'Sans titre'}
                           </Label>
-                          <EbookFormattingToolbar
-                            textareaRef={{ current: textareaRefs.current[`${chapter.id}-${subChapter.id}`] }}
-                            value={subChapter.content || ''}
-                            onChange={(value) => onUpdateSubChapterContent(chapter.id, subChapter.id, value)}
-                          />
-                          <Textarea
-                            ref={(el) => { textareaRefs.current[`${chapter.id}-${subChapter.id}`] = el; }}
-                            placeholder="Contenu du sous-chapitre..."
-                            value={subChapter.content || ''}
-                            onChange={(e) => onUpdateSubChapterContent(chapter.id, subChapter.id, e.target.value)}
-                            className="min-h-[200px] font-serif text-base leading-relaxed rounded-t-none border-t-0 bg-card text-card-foreground"
-                            style={{
-                              fontFamily: 'Georgia, serif',
-                              lineHeight: '1.8',
-                              fontSize: '16px',
-                              color: 'hsl(var(--foreground))'
-                            }}
-                          />
+                          <div className={viewMode === 'split' ? 'grid grid-cols-2 gap-4' : ''}>
+                            {(viewMode === 'edit' || viewMode === 'split') && (
+                              <div>
+                                <EbookFormattingToolbar
+                                  textareaRef={{ current: textareaRefs.current[`${chapter.id}-${subChapter.id}`] }}
+                                  value={subChapter.content || ''}
+                                  onChange={(value) => onUpdateSubChapterContent(chapter.id, subChapter.id, value)}
+                                />
+                                <Textarea
+                                  ref={(el) => { textareaRefs.current[`${chapter.id}-${subChapter.id}`] = el; }}
+                                  placeholder="Contenu du sous-chapitre..."
+                                  value={subChapter.content || ''}
+                                  onChange={(e) => onUpdateSubChapterContent(chapter.id, subChapter.id, e.target.value)}
+                                  className="min-h-[200px] font-serif text-base leading-relaxed rounded-t-none border-t-0 bg-card"
+                                  style={{
+                                    fontFamily: 'Georgia, serif',
+                                    lineHeight: '1.8',
+                                    fontSize: '16px',
+                                    color: 'hsl(var(--foreground))'
+                                  }}
+                                />
+                              </div>
+                            )}
+                            {(viewMode === 'preview' || viewMode === 'split') && (
+                              <div className="min-h-[200px] p-4 border rounded-md bg-card overflow-auto">
+                                <MarkdownPreview 
+                                  content={subChapter.content || '*Commencez à écrire...*'} 
+                                  className="font-serif"
+                                />
+                              </div>
+                            )}
+                          </div>
                           <div className="text-xs text-muted-foreground">
                             Mots: {subChapter.content ? subChapter.content.split(/\s+/).filter(word => word.length > 0).length : 0}
                           </div>
