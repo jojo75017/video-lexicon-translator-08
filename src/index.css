@@ -38,6 +38,13 @@
     --indigo: 239 84% 67%;
     --sky: 199 89% 48%;
     
+    /* Legacy Colors (for existing pages) */
+    --coral-pink: 12 76% 61%;
+    --royal-purple: 271 81% 56%;
+    --navy-deep: 220 43% 11%;
+    --cream: 40 40% 97%;
+    --gray-cool: 214 32% 60%;
+    
     /* Gradients Premium */
     --gradient-primary: linear-gradient(135deg, hsl(262 83% 58%) 0%, hsl(292 84% 61%) 100%);
     --gradient-secondary: linear-gradient(135deg, hsl(189 94% 43%) 0%, hsl(160 84% 39%) 100%);

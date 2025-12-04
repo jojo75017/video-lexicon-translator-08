@@ -35,9 +35,9 @@ const EbookIdeasPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream via-background to-cream/50 font-inter">
+    <div className="min-h-screen bg-background font-sans">
       {/* Hero Section - Magazine Style */}
-      <div className="relative overflow-hidden bg-gradient-magazine-hero text-white">
+      <div className="relative overflow-hidden text-white" style={{background: 'linear-gradient(135deg, #7c3aed 0%, #ec4899 100%)'}}>
         <div className="absolute inset-0 bg-grid-white/10"></div>
         <div className="container mx-auto px-6 py-16 relative z-10">
           <Button 
@@ -51,7 +51,7 @@ const EbookIdeasPage: React.FC = () => {
           </Button>
 
           <div className="max-w-4xl">
-            <h1 className="text-6xl md:text-7xl font-playfair font-bold mb-6 leading-tight">
+            <h1 className="text-6xl md:text-7xl font-bold mb-6 leading-tight">
               {totalIdeas}+ Idées de<br />Bestsellers à Créer
             </h1>
             <p className="text-xl md:text-2xl text-white/90 mb-8 font-light">
@@ -60,7 +60,7 @@ const EbookIdeasPage: React.FC = () => {
 
             {/* Search Bar */}
             <div className="relative max-w-2xl">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-cool" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
                 placeholder="Rechercher une idée, un thème..."
                 value={searchQuery}
