@@ -55,6 +55,7 @@ import { EbookVoiceDictation } from '@/components/ebook/EbookVoiceDictation';
 import { EbookSeriesManager } from '@/components/ebook/EbookSeriesManager';
 import { EbookKdpMarketAnalysis } from '@/components/ebook/EbookKdpMarketAnalysis';
 import { EbookAudioGenerator } from '@/components/ebook/EbookAudioGenerator';
+import { EbookFormationPDF } from '@/components/ebook/EbookFormationPDF';
 
 // Hooks et données
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
@@ -1133,6 +1134,11 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
       case 'market':
         return (
           <EbookKdpMarketAnalysis />
+        );
+      
+      case 'formation-pdf':
+        return (
+          <EbookFormationPDF />
         );
       
       case 'affiliation':

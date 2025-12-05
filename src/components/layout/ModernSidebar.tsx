@@ -26,7 +26,8 @@ import {
   Globe,
   Volume2,
   Shield,
-  Headphones
+  Headphones,
+  FileText
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -223,6 +224,14 @@ const menuItems = [
     color: 'text-amber-500',
     bgColor: 'bg-amber-500/10',
     activeGradient: 'from-amber-500 to-yellow-500'
+  },
+  { 
+    id: 'formation-pdf', 
+    label: 'Formation PDF', 
+    icon: FileText,
+    color: 'text-orange-500',
+    bgColor: 'bg-orange-500/10',
+    activeGradient: 'from-orange-500 to-red-500'
   },
   { 
     id: 'settings', 
