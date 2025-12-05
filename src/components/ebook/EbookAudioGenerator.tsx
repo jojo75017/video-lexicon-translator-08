@@ -41,16 +41,30 @@ interface EbookAudioGeneratorProps {
   apiKey?: string;
 }
 
-// ElevenLabs voices avec voice IDs
+// ElevenLabs voices avec voice IDs - 20 voix disponibles
 const voices = [
+  // Voix féminines
   { id: '9BWtsMINqrJLrRacOk9x', name: 'Aria', description: 'Claire et polyvalente', forKids: true },
   { id: 'EXAVITQu4vr4xnSDxMaL', name: 'Sarah', description: 'Douce et expressive', forKids: true },
   { id: 'FGY2WhTYpPnrIDTdsKH5', name: 'Laura', description: '⭐ Chaleureuse - Idéale contes', forKids: true },
   { id: 'XB0fDUnXU5powFXDhCwa', name: 'Charlotte', description: 'Élégante et sophistiquée', forKids: true },
   { id: 'pFZP5JQG7iQjIQuC4Bku', name: 'Lily', description: '⭐ Douce - Parfaite histoires enfants', forKids: true },
+  { id: 'Xb7hH8MSUJpSbSDYk0k2', name: 'Alice', description: 'Naturelle et engageante', forKids: true },
+  { id: 'XrExE9yKIg1WjnnlVkGX', name: 'Matilda', description: 'Chaleureuse et amicale', forKids: true },
+  { id: 'cgSgspJ2msm6clMCkdW9', name: 'Jessica', description: 'Expressive et dynamique', forKids: true },
+  { id: 'SAz9YHcvj6GT2YYXdXww', name: 'River', description: 'Calme et apaisante', forKids: true },
+  // Voix masculines
+  { id: 'CwhRBWXzGAHq8TQ4Fs17', name: 'Roger', description: 'Narrateur professionnel', forKids: false },
   { id: 'JBFqnCBsd6RMkjVDRZzb', name: 'George', description: 'Narrateur masculin profond', forKids: false },
-  { id: 'onwK4e9ZLuTAKqWW03F9', name: 'Daniel', description: 'Voix masculine autoritaire', forKids: false },
+  { id: 'IKne3meq5aSn9XLyUdCD', name: 'Charlie', description: 'Décontracté et naturel', forKids: true },
+  { id: 'N2lVS1w4EtoT3dr4eOWO', name: 'Callum', description: 'Jeune et énergique', forKids: true },
+  { id: 'TX3LPaxmHKxFdv7VOQHJ', name: 'Liam', description: 'Chaleureux et accessible', forKids: true },
+  { id: 'bIHbv24MWmeRgasZH58o', name: 'Will', description: 'Amical et conversationnel', forKids: true },
+  { id: 'cjVigY5qzO86Huf0OWal', name: 'Eric', description: 'Clair et articulé', forKids: false },
+  { id: 'iP95p4xoKVk53GoZ742B', name: 'Chris', description: 'Dynamique et engageant', forKids: false },
   { id: 'nPczCjzI2devNBz1zQrb', name: 'Brian', description: 'Narrateur anglais classique', forKids: false },
+  { id: 'onwK4e9ZLuTAKqWW03F9', name: 'Daniel', description: 'Voix masculine autoritaire', forKids: false },
+  { id: 'pqHfZKP75CvOlQylNhV4', name: 'Bill', description: 'Mature et rassurant', forKids: false },
 ];
 
 export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
