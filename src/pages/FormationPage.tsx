@@ -2,12 +2,15 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Copy, Download, BookOpen, ChevronRight } from 'lucide-react';
+import { Copy, Download, BookOpen, ChevronRight, Eye, X, ChevronLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const FormationPage = () => {
   const [selectedModule, setSelectedModule] = useState<number | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewPage, setPreviewPage] = useState(0);
 
   const modules = [
     {
@@ -566,7 +569,82 @@ ${module.content}
 
     pdf.save('Formation_Complete_Generateur_Ebook.pdf');
     toast.success('Formation exportée en PDF !');
+    setShowPreview(false);
   };
+
+  // Données de prévisualisation des pages
+  const previewPages = [
+    {
+      title: "Page de Couverture",
+      content: (
+        <div className="bg-gradient-to-br from-primary/20 to-primary/5 h-full flex flex-col items-center justify-center p-8 rounded-lg">
+          <h2 className="text-2xl font-bold text-center mb-4">Formation Complète</h2>
+          <h3 className="text-xl text-primary mb-2">Générateur d'Ebook IA</h3>
+          <p className="text-muted-foreground text-sm">Guide complet de toutes les fonctionnalités</p>
+        </div>
+      )
+    },
+    {
+      title: "Table des Matières",
+      content: (
+        <div className="p-6 h-full overflow-auto">
+          <h3 className="text-lg font-bold mb-4 border-b pb-2">TABLE DES MATIÈRES</h3>
+          <ul className="space-y-2 text-sm">
+            {modules.map((module, index) => (
+              <li key={module.id} className="flex gap-2">
+                <span className="font-semibold text-primary">Module {index + 1}:</span>
+                <span>{module.title}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )
+    },
+    ...modules.map((module, index) => ({
+      title: `Module ${index + 1}: ${module.title}`,
+      content: (
+        <div className="p-6 h-full overflow-auto">
+          <Badge variant="secondary" className="mb-2">Module {index + 1}</Badge>
+          <h3 className="text-lg font-bold mb-2">{module.title.toUpperCase()}</h3>
+          <p className="text-xs text-muted-foreground mb-4">{module.description}</p>
+          <div className="text-xs space-y-1 overflow-hidden">
+            {module.content.split('\n').slice(0, 15).map((line, i) => (
+              <p key={i} className={`${line.startsWith('#') ? 'font-bold' : ''} ${line.startsWith('-') ? 'pl-2' : ''}`}>
+                {line.replace(/[#*]/g, '').trim() || '\u00A0'}
+              </p>
+            ))}
+            <p className="text-muted-foreground italic">...</p>
+          </div>
+        </div>
+      )
+    })),
+    {
+      title: "Récapitulatif",
+      content: (
+        <div className="p-6 h-full">
+          <h3 className="text-lg font-bold mb-4">RÉCAPITULATIF DES COMPÉTENCES</h3>
+          <ul className="space-y-2 text-sm mb-6">
+            <li>✓ Maîtrise complète du générateur</li>
+            <li>✓ Création d'ebooks professionnels</li>
+            <li>✓ Optimisation pour Amazon KDP</li>
+            <li>✓ Stratégies de marketing digital</li>
+            <li>✓ Techniques de monétisation</li>
+            <li>✓ Export multi-format</li>
+            <li>✓ Automatisation des processus</li>
+          </ul>
+          <h4 className="font-semibold mb-2">Prochaines Étapes</h4>
+          <ol className="text-xs space-y-1 list-decimal pl-4">
+            <li>Créer votre premier ebook</li>
+            <li>Publier sur Amazon KDP</li>
+            <li>Développer votre marketing</li>
+            <li>Scaler votre business</li>
+          </ol>
+        </div>
+      )
+    }
+  ];
+
+  const totalPages = previewPages.length;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/50 p-6">
@@ -587,11 +665,79 @@ ${module.content}
               <Copy className="h-4 w-4" />
               Copier la Formation Complète
             </Button>
-            <Button onClick={exportFormationPDF} variant="outline" size="lg" className="gap-2">
-              <Download className="h-4 w-4" />
-              Télécharger PDF
+            <Button onClick={() => { setPreviewPage(0); setShowPreview(true); }} variant="outline" size="lg" className="gap-2">
+              <Eye className="h-4 w-4" />
+              Prévisualiser PDF
             </Button>
           </div>
+
+          {/* Dialog de prévisualisation PDF */}
+          <Dialog open={showPreview} onOpenChange={setShowPreview}>
+            <DialogContent className="max-w-4xl max-h-[90vh]">
+              <DialogHeader>
+                <DialogTitle className="flex items-center justify-between">
+                  <span>Prévisualisation du PDF - {previewPages[previewPage]?.title}</span>
+                  <span className="text-sm font-normal text-muted-foreground">
+                    Page {previewPage + 1} / {totalPages}
+                  </span>
+                </DialogTitle>
+              </DialogHeader>
+              
+              {/* Aperçu de la page */}
+              <div className="border rounded-lg bg-white text-foreground min-h-[400px] shadow-inner">
+                {previewPages[previewPage]?.content}
+              </div>
+
+              {/* Navigation et actions */}
+              <div className="flex items-center justify-between mt-4">
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setPreviewPage(Math.max(0, previewPage - 1))}
+                    disabled={previewPage === 0}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    Précédent
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setPreviewPage(Math.min(totalPages - 1, previewPage + 1))}
+                    disabled={previewPage === totalPages - 1}
+                  >
+                    Suivant
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                {/* Miniatures */}
+                <div className="flex gap-1 overflow-x-auto max-w-xs">
+                  {previewPages.slice(0, 6).map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setPreviewPage(idx)}
+                      className={`w-8 h-10 rounded border text-xs flex items-center justify-center transition-all ${
+                        previewPage === idx 
+                          ? 'border-primary bg-primary/10 text-primary font-bold' 
+                          : 'border-muted hover:border-primary/50'
+                      }`}
+                    >
+                      {idx + 1}
+                    </button>
+                  ))}
+                  {previewPages.length > 6 && (
+                    <span className="text-xs text-muted-foreground self-center">+{previewPages.length - 6}</span>
+                  )}
+                </div>
+
+                <Button onClick={exportFormationPDF} className="gap-2">
+                  <Download className="h-4 w-4" />
+                  Télécharger PDF
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
