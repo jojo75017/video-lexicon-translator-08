@@ -10,10 +10,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Volume2, Play, Pause, Square, Download, Loader2, 
-  Headphones, Music, Mic2, Settings2, BookOpen, FileText
+  Headphones, Music, Mic2, Settings2, BookOpen, FileText, GraduationCap
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import jsPDF from 'jspdf';
 
 interface Chapter {
   id: string;
@@ -454,18 +455,148 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
     toast.success('Audio téléchargé !');
   };
 
+  // Exporter la formation livre audio en PDF
+  const exportFormationPDF = () => {
+    const pdf = new jsPDF();
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const margin = 20;
+    const maxWidth = pageWidth - margin * 2;
+    let yPos = 20;
+
+    const addText = (text: string, fontSize: number = 10, isBold: boolean = false, isTitle: boolean = false) => {
+      pdf.setFontSize(fontSize);
+      pdf.setFont('helvetica', isBold ? 'bold' : 'normal');
+      
+      const lines = pdf.splitTextToSize(text, maxWidth);
+      
+      for (const line of lines) {
+        if (yPos > 270) {
+          pdf.addPage();
+          yPos = 20;
+        }
+        pdf.text(line, margin, yPos);
+        yPos += fontSize * 0.5;
+      }
+      yPos += isTitle ? 8 : 4;
+    };
+
+    // Titre principal
+    addText('🎧 Formation Complète - Générateur de Livres Audio', 18, true, true);
+    yPos += 5;
+
+    // Vue d'ensemble
+    addText('Vue d\'ensemble', 14, true, true);
+    addText('Le générateur de livres audio utilise la technologie ElevenLabs pour transformer vos textes en audio haute définition avec des voix ultra-réalistes.', 10);
+    yPos += 5;
+
+    // Fonctionnalités
+    addText('📋 Fonctionnalités principales', 14, true, true);
+    addText('1. Génération audio illimitée', 12, true);
+    addText('• Aucune limite de caractères : Les textes longs sont automatiquement découpés en parties de ~4500 caractères', 10);
+    addText('• Assemblage automatique : Toutes les parties sont fusionnées en un seul fichier audio', 10);
+    addText('• Qualité HD : Audio généré en qualité professionnelle (MP3)', 10);
+    yPos += 3;
+
+    addText('2. 20 Voix disponibles', 12, true);
+    addText('Voix Féminines (9): Aria, Sarah, Laura, Charlotte, Lily, Alice, Matilda, Jessica, River', 10);
+    addText('Voix Masculines (11): Roger, George, Charlie, Callum, Liam, Will, Eric, Chris, Brian, Daniel, Bill', 10);
+    yPos += 5;
+
+    // Guide d'utilisation
+    addText('🚀 Guide d\'utilisation', 14, true, true);
+    addText('Étape 1: Accédez au générateur via l\'onglet "Audio" du planificateur', 10);
+    addText('Étape 2: Choisissez le type de contenu (Sections prédéfinies, Ebook complet, ou Texte personnalisé)', 10);
+    addText('Étape 3: Sélectionnez une voix parmi les 20 disponibles', 10);
+    addText('Étape 4: Cliquez sur "Générer l\'audio" et attendez la génération', 10);
+    addText('Étape 5: Utilisez le lecteur intégré pour écouter et télécharger en MP3', 10);
+    yPos += 5;
+
+    // Conseils
+    addText('💡 Conseils et bonnes pratiques', 14, true, true);
+    addText('Optimiser la qualité audio:', 11, true);
+    addText('• Utilisez des points pour des pauses longues, virgules pour pauses courtes', 10);
+    addText('• Évitez les émojis (non prononcés) et les phrases trop longues', 10);
+    addText('• Divisez en paragraphes logiques', 10);
+    yPos += 3;
+
+    addText('Choisir la bonne voix:', 11, true);
+    addText('• Roman/Fiction: Sarah, Lily, George', 10);
+    addText('• Guide pratique: Aria, Brian, Liam', 10);
+    addText('• Livre enfant: Matilda, Will, George', 10);
+    addText('• Business: Roger, Daniel, Charlotte', 10);
+    yPos += 5;
+
+    // Spécifications techniques
+    addText('⚙️ Spécifications techniques', 14, true, true);
+    addText('• Limite par requête: 5000 caractères (géré automatiquement)', 10);
+    addText('• Format de sortie: MP3 haute qualité', 10);
+    addText('• Modèle utilisé: ElevenLabs Multilingual v2', 10);
+    yPos += 5;
+
+    // Temps de génération
+    addText('Temps de génération estimés:', 11, true);
+    addText('• < 5000 caractères: 2-5 secondes', 10);
+    addText('• 10 000 caractères: 5-10 secondes', 10);
+    addText('• 50 000 caractères: 30-60 secondes', 10);
+    addText('• 100 000 caractères: 1-2 minutes', 10);
+    yPos += 5;
+
+    // Plateformes
+    addText('📚 Plateformes de distribution', 14, true, true);
+    addText('Audible (Amazon), Apple Books, Google Play Livres, Kobo, Spotify, Votre propre site web', 10);
+    yPos += 5;
+
+    // FAQ
+    addText('❓ FAQ', 14, true, true);
+    addText('Q: Puis-je générer un livre audio complet?', 10, true);
+    addText('R: Oui! Collez tout votre texte dans l\'onglet "Ebook complet" ou "Texte personnalisé".', 10);
+    yPos += 3;
+    addText('Q: L\'audio est-il de qualité professionnelle?', 10, true);
+    addText('R: Oui, ElevenLabs produit une qualité studio utilisée par des éditeurs professionnels.', 10);
+    yPos += 3;
+    addText('Q: Comment améliorer la prononciation d\'un mot?', 10, true);
+    addText('R: Écrivez le mot phonétiquement. Ex: "Lovable" → "Loveabeul"', 10);
+
+    // Footer
+    pdf.addPage();
+    yPos = 20;
+    addText('🎯 Workflow recommandé', 14, true, true);
+    addText('1. Finalisez votre texte écrit', 10);
+    addText('2. Relisez pour la ponctuation', 10);
+    addText('3. Testez avec un court extrait', 10);
+    addText('4. Choisissez la voix définitive', 10);
+    addText('5. Générez l\'ebook complet', 10);
+    addText('6. Téléchargez et vérifiez', 10);
+    addText('7. Publiez sur les plateformes', 10);
+    yPos += 10;
+
+    addText('Documentation mise à jour: Décembre 2024', 9);
+    addText('Version du générateur: 2.0 avec découpage automatique', 9);
+
+    pdf.save('Formation_Livre_Audio.pdf');
+    toast.success('Formation exportée en PDF !');
+  };
+
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Headphones className="h-5 w-5 text-primary" />
-            Générateur de Livre Audio
-            <Badge variant="secondary" className="ml-2">ElevenLabs</Badge>
-          </CardTitle>
-          <CardDescription>
-            Convertissez votre ebook complet en audio HD - textes longs découpés automatiquement
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Headphones className="h-5 w-5 text-primary" />
+                Générateur de Livre Audio
+                <Badge variant="secondary" className="ml-2">ElevenLabs</Badge>
+              </CardTitle>
+              <CardDescription>
+                Convertissez votre ebook complet en audio HD - textes longs découpés automatiquement
+              </CardDescription>
+            </div>
+            <Button variant="outline" size="sm" onClick={exportFormationPDF}>
+              <GraduationCap className="h-4 w-4 mr-2" />
+              Formation PDF
+            </Button>
+          </div>
         </CardHeader>
         <CardContent className="space-y-6">
           <Tabs defaultValue="custom" className="w-full">
