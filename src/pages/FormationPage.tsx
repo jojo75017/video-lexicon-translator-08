@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Copy, Download, BookOpen, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
+import jsPDF from 'jspdf';
 
 const FormationPage = () => {
   const [selectedModule, setSelectedModule] = useState<number | null>(null);
@@ -452,6 +453,121 @@ ${module.content}
     copyToClipboard(fullContent);
   };
 
+  const exportFormationPDF = () => {
+    const pdf = new jsPDF();
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const margin = 15;
+    const maxWidth = pageWidth - margin * 2;
+    let yPos = 20;
+
+    const addText = (text: string, fontSize: number = 10, isBold: boolean = false, isTitle: boolean = false) => {
+      pdf.setFontSize(fontSize);
+      pdf.setFont('helvetica', isBold ? 'bold' : 'normal');
+      
+      const lines = pdf.splitTextToSize(text, maxWidth);
+      
+      for (const line of lines) {
+        if (yPos > 275) {
+          pdf.addPage();
+          yPos = 20;
+        }
+        pdf.text(line, margin, yPos);
+        yPos += fontSize * 0.45;
+      }
+      yPos += isTitle ? 6 : 3;
+    };
+
+    // Page de titre
+    pdf.setFontSize(24);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('Formation Complete', pageWidth / 2, 60, { align: 'center' });
+    pdf.setFontSize(18);
+    pdf.text('Generateur d\'Ebook IA', pageWidth / 2, 75, { align: 'center' });
+    pdf.setFontSize(12);
+    pdf.setFont('helvetica', 'normal');
+    pdf.text('Guide complet de toutes les fonctionnalites', pageWidth / 2, 90, { align: 'center' });
+    
+    // Table des matières
+    pdf.addPage();
+    yPos = 20;
+    addText('TABLE DES MATIERES', 16, true, true);
+    yPos += 5;
+    
+    modules.forEach((module, index) => {
+      addText(`Module ${index + 1}: ${module.title}`, 11);
+      addText(`   ${module.description}`, 9);
+      yPos += 2;
+    });
+
+    // Contenu des modules
+    modules.forEach((module, index) => {
+      pdf.addPage();
+      yPos = 20;
+      
+      addText(`MODULE ${index + 1}`, 14, true, true);
+      addText(module.title.toUpperCase(), 16, true, true);
+      yPos += 5;
+      
+      // Parser le contenu markdown simplifié
+      const lines = module.content.split('\n');
+      
+      for (const line of lines) {
+        if (line.startsWith('# ')) {
+          addText(line.replace('# ', ''), 14, true, true);
+        } else if (line.startsWith('## ')) {
+          yPos += 3;
+          addText(line.replace('## ', ''), 12, true, true);
+        } else if (line.startsWith('### ')) {
+          yPos += 2;
+          addText(line.replace('### ', ''), 11, true);
+        } else if (line.startsWith('**') && line.endsWith('**')) {
+          addText(line.replace(/\*\*/g, ''), 10, true);
+        } else if (line.startsWith('- ')) {
+          addText('• ' + line.replace('- ', ''), 10);
+        } else if (line.match(/^\d+\./)) {
+          addText(line, 10);
+        } else if (line.trim()) {
+          addText(line.replace(/\*\*/g, ''), 10);
+        }
+      }
+    });
+
+    // Page finale - Récapitulatif
+    pdf.addPage();
+    yPos = 20;
+    addText('RECAPITULATIF DES COMPETENCES', 16, true, true);
+    yPos += 5;
+    
+    const competences = [
+      'Maitrise complete du generateur d\'ebook IA',
+      'Creation d\'ebooks professionnels en minutes',
+      'Optimisation pour Amazon KDP',
+      'Strategies de marketing digital',
+      'Techniques de monetisation avancees',
+      'Export multi-format professionnel',
+      'Automatisation des processus'
+    ];
+    
+    competences.forEach(comp => {
+      addText('✓ ' + comp, 11);
+    });
+    
+    yPos += 10;
+    addText('PROCHAINES ETAPES', 14, true, true);
+    yPos += 3;
+    addText('1. Creer votre premier ebook avec les templates fournis', 10);
+    addText('2. Publier sur Amazon KDP en suivant les optimisations', 10);
+    addText('3. Developper votre marketing avec les outils integres', 10);
+    addText('4. Scaler votre business avec l\'automatisation', 10);
+    
+    yPos += 15;
+    pdf.setFontSize(9);
+    pdf.text('Formation Generateur d\'Ebook IA - Tous droits reserves', pageWidth / 2, 280, { align: 'center' });
+
+    pdf.save('Formation_Complete_Generateur_Ebook.pdf');
+    toast.success('Formation exportée en PDF !');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/50 p-6">
       <div className="max-w-7xl mx-auto">
@@ -471,7 +587,7 @@ ${module.content}
               <Copy className="h-4 w-4" />
               Copier la Formation Complète
             </Button>
-            <Button variant="outline" size="lg" className="gap-2">
+            <Button onClick={exportFormationPDF} variant="outline" size="lg" className="gap-2">
               <Download className="h-4 w-4" />
               Télécharger PDF
             </Button>
