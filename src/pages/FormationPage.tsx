@@ -665,7 +665,7 @@ ${module.content}
               <Copy className="h-4 w-4" />
               Copier la Formation Complète
             </Button>
-            <Button onClick={() => { setPreviewPage(0); setShowPreview(true); }} variant="outline" size="lg" className="gap-2">
+            <Button onClick={() => { setPreviewPage(0); setShowPreview(true); }} size="lg" className="gap-2 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white border-0">
               <Eye className="h-4 w-4" />
               Prévisualiser PDF
             </Button>
