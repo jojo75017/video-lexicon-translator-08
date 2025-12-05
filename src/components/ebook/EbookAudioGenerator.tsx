@@ -13,6 +13,7 @@ import {
   Headphones, Music, Mic2, Settings2, BookOpen, FileText
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Chapter {
   id: string;
@@ -40,13 +41,16 @@ interface EbookAudioGeneratorProps {
   apiKey?: string;
 }
 
+// ElevenLabs voices avec voice IDs
 const voices = [
-  { id: 'alloy', name: 'Alloy', description: 'Neutre et polyvalente', forKids: true },
-  { id: 'echo', name: 'Echo', description: 'Masculine et profonde', forKids: false },
-  { id: 'fable', name: 'Fable', description: '⭐ Narratif - Idéal contes enfants', forKids: true },
-  { id: 'onyx', name: 'Onyx', description: 'Grave et autoritaire', forKids: false },
-  { id: 'nova', name: 'Nova', description: 'Féminine et chaleureuse', forKids: true },
-  { id: 'shimmer', name: 'Shimmer', description: '⭐ Doux - Parfait histoires enfants', forKids: true },
+  { id: '9BWtsMINqrJLrRacOk9x', name: 'Aria', description: 'Claire et polyvalente', forKids: true },
+  { id: 'EXAVITQu4vr4xnSDxMaL', name: 'Sarah', description: 'Douce et expressive', forKids: true },
+  { id: 'FGY2WhTYpPnrIDTdsKH5', name: 'Laura', description: '⭐ Chaleureuse - Idéale contes', forKids: true },
+  { id: 'XB0fDUnXU5powFXDhCwa', name: 'Charlotte', description: 'Élégante et sophistiquée', forKids: true },
+  { id: 'pFZP5JQG7iQjIQuC4Bku', name: 'Lily', description: '⭐ Douce - Parfaite histoires enfants', forKids: true },
+  { id: 'JBFqnCBsd6RMkjVDRZzb', name: 'George', description: 'Narrateur masculin profond', forKids: false },
+  { id: 'onwK4e9ZLuTAKqWW03F9', name: 'Daniel', description: 'Voix masculine autoritaire', forKids: false },
+  { id: 'nPczCjzI2devNBz1zQrb', name: 'Brian', description: 'Narrateur anglais classique', forKids: false },
 ];
 
 export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
@@ -56,9 +60,8 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
   conclusion,
   epilogue,
   chapters,
-  apiKey
 }) => {
-  const [selectedVoice, setSelectedVoice] = useState('fable');
+  const [selectedVoice, setSelectedVoice] = useState('FGY2WhTYpPnrIDTdsKH5'); // Laura par défaut
   const [showKidsVoices, setShowKidsVoices] = useState(false);
   const [speed, setSpeed] = useState([1.0]);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -141,51 +144,43 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
     return sections;
   };
 
-  const generateAudioForSection = async (section: AudioSection): Promise<Blob | null> => {
-    if (!apiKey) {
-      toast.error('Clé API OpenAI requise');
-      return null;
-    }
-
-    // Limiter à 4096 caractères par requête (limite OpenAI TTS)
-    let textToSpeak = section.content;
-    if (textToSpeak.length > 4096) {
-      textToSpeak = textToSpeak.substring(0, 4096);
-    }
-
+  const generateAudioWithElevenLabs = async (text: string): Promise<Blob | null> => {
     try {
-      const response = await fetch('https://api.openai.com/v1/audio/speech', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'tts-1-hd',
-          input: textToSpeak,
-          voice: selectedVoice,
-          speed: speed[0],
-          response_format: 'mp3',
-        }),
+      const { data, error } = await supabase.functions.invoke('elevenlabs-tts', {
+        body: {
+          text: text.substring(0, 5000), // ElevenLabs limit
+          voiceId: selectedVoice,
+          modelId: 'eleven_multilingual_v2'
+        }
       });
 
-      if (!response.ok) {
-        throw new Error('Erreur génération audio');
+      if (error) {
+        console.error('ElevenLabs edge function error:', error);
+        throw error;
       }
 
-      return await response.blob();
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      // Convertir base64 en blob
+      const binaryString = atob(data.audioContent);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      return new Blob([bytes], { type: 'audio/mpeg' });
     } catch (error) {
       console.error('TTS error:', error);
       return null;
     }
   };
 
-  const generateFullAudiobook = async () => {
-    if (!apiKey) {
-      toast.error('Veuillez entrer votre clé API OpenAI');
-      return;
-    }
+  const generateAudioForSection = async (section: AudioSection): Promise<Blob | null> => {
+    return generateAudioWithElevenLabs(section.content);
+  };
 
+  const generateFullAudiobook = async () => {
     const sections = prepareSections();
     if (sections.length === 0) {
       toast.error('Aucun contenu à convertir en audio');
@@ -218,11 +213,11 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
       setAudioSections([...updatedSections]);
       
       // Petit délai pour éviter le rate limiting
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
     setIsGenerating(false);
-    toast.success('Livre audio généré !');
+    toast.success('Livre audio généré avec ElevenLabs !');
   };
 
   const playSection = (sectionId: string) => {
@@ -308,11 +303,6 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
 
   // Génération audio pour texte libre
   const generateCustomAudio = async () => {
-    if (!apiKey) {
-      toast.error('Veuillez entrer votre clé API OpenAI');
-      return;
-    }
-
     if (!customText.trim()) {
       toast.error('Veuillez entrer du texte à convertir');
       return;
@@ -321,35 +311,15 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
     setIsGeneratingCustom(true);
 
     try {
-      let textToSpeak = customText;
-      if (textToSpeak.length > 4096) {
-        textToSpeak = textToSpeak.substring(0, 4096);
-        toast.info('Texte tronqué à 4096 caractères (limite API)');
-      }
-
-      const response = await fetch('https://api.openai.com/v1/audio/speech', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'tts-1-hd',
-          input: textToSpeak,
-          voice: selectedVoice,
-          speed: speed[0],
-          response_format: 'mp3',
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Erreur génération audio');
-      }
-
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
+      const audioBlob = await generateAudioWithElevenLabs(customText);
       
-      setCustomAudioBlob(blob);
+      if (!audioBlob) {
+        throw new Error('Échec de la génération');
+      }
+
+      const url = URL.createObjectURL(audioBlob);
+      
+      setCustomAudioBlob(audioBlob);
       setCustomAudioUrl(url);
       
       // Jouer automatiquement
@@ -366,7 +336,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
       setIsPlaying(true);
       setCurrentPlaying('custom');
       
-      toast.success('Audio généré !');
+      toast.success('Audio généré avec ElevenLabs !');
     } catch (error) {
       console.error('TTS error:', error);
       toast.error('Erreur lors de la génération');
@@ -396,9 +366,10 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
           <CardTitle className="flex items-center gap-2">
             <Headphones className="h-5 w-5 text-primary" />
             Générateur de Livre Audio
+            <Badge variant="secondary" className="ml-2">ElevenLabs</Badge>
           </CardTitle>
           <CardDescription>
-            Convertissez du texte en audio MP3 avec des voix IA
+            Convertissez votre texte en audio haute qualité avec les voix IA d'ElevenLabs
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -426,7 +397,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                   style={{ fontFamily: 'Georgia, serif', lineHeight: '1.8' }}
                 />
                 <div className="flex items-center justify-between text-sm text-muted-foreground">
-                  <span>{customText.length} / 4096 caractères</span>
+                  <span>{customText.length} / 5000 caractères</span>
                   <span>~{Math.ceil(customText.split(/\s+/).filter(w => w).length / 150)} min d'audio</span>
                 </div>
               </div>
@@ -448,7 +419,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label>Voix {showKidsVoices && '(enfants)'}</Label>
+                      <Label>Voix ElevenLabs {showKidsVoices && '(enfants)'}</Label>
                       <Select value={selectedVoice} onValueChange={setSelectedVoice}>
                         <SelectTrigger className="mt-1">
                           <SelectValue />
@@ -468,15 +439,10 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                       </Select>
                     </div>
                     <div>
-                      <Label>Vitesse: {speed[0].toFixed(1)}x</Label>
-                      <Slider
-                        value={speed}
-                        onValueChange={setSpeed}
-                        min={0.5}
-                        max={2.0}
-                        step={0.1}
-                        className="mt-3"
-                      />
+                      <Label>Qualité audio</Label>
+                      <div className="mt-2 p-2 bg-primary/10 rounded text-sm text-center">
+                        🎵 Multilingual v2 (HD)
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -484,14 +450,14 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
 
               <Button
                 onClick={generateCustomAudio}
-                disabled={isGeneratingCustom || !apiKey || !customText.trim()}
+                disabled={isGeneratingCustom || !customText.trim()}
                 className="w-full h-12"
                 size="lg"
               >
                 {isGeneratingCustom ? (
                   <>
                     <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                    Génération en cours...
+                    Génération ElevenLabs...
                   </>
                 ) : (
                   <>
@@ -539,12 +505,6 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                   </CardContent>
                 </Card>
               )}
-
-              {!apiKey && (
-                <p className="text-sm text-center text-amber-500">
-                  ⚠️ Entrez votre clé API OpenAI dans les paramètres pour utiliser cette fonction
-                </p>
-              )}
             </TabsContent>
 
             {/* Ebook complet */}
@@ -578,7 +538,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                 <CardHeader className="pb-3">
                   <CardTitle className="text-sm flex items-center gap-2">
                     <Settings2 className="h-4 w-4" />
-                    Configuration audio
+                    Configuration audio ElevenLabs
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -602,15 +562,10 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                       </Select>
                     </div>
                     <div>
-                      <Label>Vitesse de lecture: {speed[0].toFixed(1)}x</Label>
-                      <Slider
-                        value={speed}
-                        onValueChange={setSpeed}
-                        min={0.5}
-                        max={2.0}
-                        step={0.1}
-                        className="mt-3"
-                      />
+                      <Label>Modèle audio</Label>
+                      <div className="mt-2 p-2 bg-primary/10 rounded text-sm text-center">
+                        🎵 Multilingual v2 (29 langues)
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -619,14 +574,14 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
               {/* Bouton de génération */}
               <Button
                 onClick={generateFullAudiobook}
-                disabled={isGenerating || !apiKey || totalWords === 0}
+                disabled={isGenerating || totalWords === 0}
                 className="w-full h-12 text-lg"
                 size="lg"
               >
                 {isGenerating ? (
                   <>
                     <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                    Génération en cours...
+                    Génération ElevenLabs en cours...
                   </>
                 ) : (
                   <>
@@ -636,18 +591,12 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                 )}
               </Button>
 
-              {!apiKey && (
-                <p className="text-sm text-center text-amber-500">
-                  ⚠️ Entrez votre clé API OpenAI dans les paramètres pour utiliser cette fonction
-                </p>
-              )}
-
               {/* Progress */}
               {isGenerating && (
                 <div className="space-y-2">
                   <Progress value={progress} className="h-3" />
                   <p className="text-sm text-center text-muted-foreground">
-                    {Math.round(progress)}% - Génération de l'audio...
+                    {Math.round(progress)}% - Génération de l'audio avec ElevenLabs...
                   </p>
                 </div>
               )}
@@ -748,14 +697,14 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
       {/* Conseils */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">💡 Conseils</CardTitle>
+          <CardTitle className="text-base">💡 Conseils ElevenLabs</CardTitle>
         </CardHeader>
         <CardContent>
           <ul className="text-sm text-muted-foreground space-y-2">
-            <li>• La voix **Nova** est recommandée pour le français</li>
-            <li>• Chaque section est limitée à ~4000 caractères (limite API)</li>
-            <li>• Les fichiers MP3 sont en haute qualité (TTS-1-HD)</li>
-            <li>• Téléchargez chaque chapitre séparément ou tous à la fois</li>
+            <li>• Les voix **Laura** et **Lily** sont recommandées pour les contes enfants</li>
+            <li>• Modèle Multilingual v2 : support de 29 langues dont le français</li>
+            <li>• Qualité audio professionnelle, idéale pour les livres audio</li>
+            <li>• Chaque section est limitée à ~5000 caractères</li>
           </ul>
         </CardContent>
       </Card>
