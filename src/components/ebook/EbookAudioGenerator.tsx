@@ -158,11 +158,46 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
     return sections;
   };
 
-  const generateAudioWithElevenLabs = async (text: string): Promise<Blob | null> => {
+  // Découper le texte en morceaux de ~4500 caractères (marge de sécurité)
+  const chunkText = (text: string, maxLength: number = 4500): string[] => {
+    const chunks: string[] = [];
+    let remaining = text;
+    
+    while (remaining.length > 0) {
+      if (remaining.length <= maxLength) {
+        chunks.push(remaining);
+        break;
+      }
+      
+      // Trouver un point de coupure naturel (fin de phrase)
+      let cutPoint = maxLength;
+      const searchArea = remaining.substring(maxLength - 500, maxLength);
+      
+      // Chercher la dernière fin de phrase dans la zone de recherche
+      const lastPeriod = searchArea.lastIndexOf('. ');
+      const lastQuestion = searchArea.lastIndexOf('? ');
+      const lastExclaim = searchArea.lastIndexOf('! ');
+      const lastNewline = searchArea.lastIndexOf('\n');
+      
+      const bestCut = Math.max(lastPeriod, lastQuestion, lastExclaim, lastNewline);
+      
+      if (bestCut > 0) {
+        cutPoint = maxLength - 500 + bestCut + 1;
+      }
+      
+      chunks.push(remaining.substring(0, cutPoint).trim());
+      remaining = remaining.substring(cutPoint).trim();
+    }
+    
+    return chunks;
+  };
+
+  // Générer l'audio pour un seul chunk
+  const generateAudioChunk = async (text: string): Promise<Blob | null> => {
     try {
       const { data, error } = await supabase.functions.invoke('elevenlabs-tts', {
         body: {
-          text: text.substring(0, 5000), // ElevenLabs limit
+          text: text,
           voiceId: selectedVoice,
           modelId: 'eleven_multilingual_v2'
         }
@@ -188,6 +223,52 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
       console.error('TTS error:', error);
       return null;
     }
+  };
+
+  // Combiner plusieurs blobs audio en un seul
+  const combineAudioBlobs = async (blobs: Blob[]): Promise<Blob> => {
+    const arrayBuffers = await Promise.all(blobs.map(blob => blob.arrayBuffer()));
+    const totalLength = arrayBuffers.reduce((acc, buf) => acc + buf.byteLength, 0);
+    const combined = new Uint8Array(totalLength);
+    
+    let offset = 0;
+    for (const buffer of arrayBuffers) {
+      combined.set(new Uint8Array(buffer), offset);
+      offset += buffer.byteLength;
+    }
+    
+    return new Blob([combined], { type: 'audio/mpeg' });
+  };
+
+  // Générer l'audio pour un texte long (avec découpage automatique)
+  const generateAudioWithElevenLabs = async (text: string, onChunkProgress?: (current: number, total: number) => void): Promise<Blob | null> => {
+    const chunks = chunkText(text);
+    
+    if (chunks.length === 1) {
+      return generateAudioChunk(chunks[0]);
+    }
+    
+    // Générer l'audio pour chaque chunk
+    const audioBlobs: Blob[] = [];
+    
+    for (let i = 0; i < chunks.length; i++) {
+      onChunkProgress?.(i + 1, chunks.length);
+      
+      const blob = await generateAudioChunk(chunks[i]);
+      if (!blob) {
+        console.error(`Failed to generate chunk ${i + 1}/${chunks.length}`);
+        return null;
+      }
+      audioBlobs.push(blob);
+      
+      // Délai entre les chunks pour éviter le rate limiting
+      if (i < chunks.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 1500));
+      }
+    }
+    
+    // Combiner tous les blobs
+    return combineAudioBlobs(audioBlobs);
   };
 
   const generateAudioForSection = async (section: AudioSection): Promise<Blob | null> => {
@@ -383,7 +464,7 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
             <Badge variant="secondary" className="ml-2">ElevenLabs</Badge>
           </CardTitle>
           <CardDescription>
-            Convertissez votre texte en audio haute qualité avec les voix IA d'ElevenLabs
+            Convertissez votre ebook complet en audio HD - textes longs découpés automatiquement
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -406,12 +487,12 @@ export const EbookAudioGenerator: React.FC<EbookAudioGeneratorProps> = ({
                 <Textarea
                   value={customText}
                   onChange={(e) => setCustomText(e.target.value)}
-                  placeholder="Collez ou tapez votre texte ici... L'IA le lira à voix haute pour vous."
+                  placeholder="Collez ou tapez votre texte ici (illimité)... Les textes longs seront automatiquement découpés et assemblés."
                   className="min-h-[200px] font-serif"
                   style={{ fontFamily: 'Georgia, serif', lineHeight: '1.8' }}
                 />
                 <div className="flex items-center justify-between text-sm text-muted-foreground">
-                  <span>{customText.length} / 5000 caractères</span>
+                  <span>{customText.length} caractères ({Math.ceil(customText.length / 4500)} partie{Math.ceil(customText.length / 4500) > 1 ? 's' : ''})</span>
                   <span>~{Math.ceil(customText.split(/\s+/).filter(w => w).length / 150)} min d'audio</span>
                 </div>
               </div>
