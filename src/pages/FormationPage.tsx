@@ -753,11 +753,10 @@ ${module.content}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
-          {modules.map((module) => (
+          {modules.map((module, index) => (
             <Card 
               key={module.id} 
-              className="cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-105 border-2 hover:border-primary/50"
-              onClick={() => setSelectedModule(selectedModule === module.id ? null : module.id)}
+              className="transition-all duration-200 hover:shadow-lg hover:scale-105 border-2 hover:border-primary/50"
             >
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -771,7 +770,31 @@ ${module.content}
                   />
                 </div>
                 <CardTitle className="text-lg">{module.title}</CardTitle>
-                <p className="text-sm text-muted-foreground">{module.description}</p>
+                <p className="text-sm text-muted-foreground mb-4">{module.description}</p>
+                
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex-1 gap-1"
+                    onClick={() => setSelectedModule(selectedModule === module.id ? null : module.id)}
+                  >
+                    <BookOpen className="h-3 w-3" />
+                    Détails
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    className="flex-1 gap-1 bg-gradient-to-r from-primary to-primary/80"
+                    onClick={() => {
+                      // Index dans previewPages: 0=couverture, 1=table, puis modules à partir de 2
+                      setPreviewPage(index + 2);
+                      setShowPreview(true);
+                    }}
+                  >
+                    <Eye className="h-3 w-3" />
+                    Prévisualiser
+                  </Button>
+                </div>
               </CardHeader>
             </Card>
           ))}
