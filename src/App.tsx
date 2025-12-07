@@ -11,6 +11,7 @@ import { AdminPage } from './pages/AdminPage';
 import AuthPage from './pages/AuthPage';
 import AdminProfilePage from './pages/AdminProfilePage';
 import AffiliationFormationPage from './pages/AffiliationFormationPage';
+import FormationPage from './pages/FormationPage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -144,6 +145,16 @@ const App = () => {
             <Route 
               path="/admin/profile" 
               element={isAdmin ? <AdminProfilePage /> : <Navigate to="/auth" replace />} 
+            />
+            <Route 
+              path="/formation" 
+              element={
+                isAdmin || isAuthenticated ? (
+                  <FormationPage />
+                ) : (
+                  <SubscriptionAuth onAuthenticated={handleAuthenticated} />
+                )
+              }
             />
           </Routes>
           <Toaster />
