@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   BookOpen, 
   Wand2, 
@@ -27,7 +28,8 @@ import {
   Volume2,
   Shield,
   Headphones,
-  FileText
+  FileText,
+  GraduationCap
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -234,6 +236,16 @@ const menuItems = [
     activeGradient: 'from-orange-500 to-red-500'
   },
   { 
+    id: 'formation-complete', 
+    label: 'Formation Complète', 
+    icon: GraduationCap,
+    color: 'text-emerald-500',
+    bgColor: 'bg-emerald-500/10',
+    activeGradient: 'from-emerald-500 to-teal-500',
+    isLink: true,
+    href: '/formation'
+  },
+  { 
     id: 'settings', 
     label: 'Paramètres', 
     icon: Settings,
@@ -257,6 +269,16 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
   isCollapsed,
   onToggleCollapse
 }) => {
+  const navigate = useNavigate();
+
+  const handleItemClick = (item: typeof menuItems[0]) => {
+    if ('isLink' in item && item.isLink && 'href' in item) {
+      navigate(item.href as string);
+    } else {
+      onTabChange(item.id);
+    }
+  };
+
   return (
     <TooltipProvider delayDuration={0}>
       <aside 
@@ -288,10 +310,11 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
           {menuItems.map((item) => {
             const isActive = activeTab === item.id;
             const Icon = item.icon;
+            const isLink = 'isLink' in item && item.isLink;
             
             const button = (
               <button
-                onClick={() => onTabChange(item.id)}
+                onClick={() => handleItemClick(item)}
                 className={cn(
                   "group relative w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-all duration-200",
                   isActive 
@@ -313,6 +336,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                     isActive ? "text-white" : ""
                   )}>
                     {item.label}
+                    {isLink && <span className="ml-1 text-[10px] opacity-60">↗</span>}
                   </span>
                 )}
               </button>

@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Copy, Download, BookOpen, ChevronRight, Eye, X, ChevronLeft } from 'lucide-react';
+import { Copy, Download, BookOpen, ChevronRight, Eye, X, ChevronLeft, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const FormationPage = () => {
+  const navigate = useNavigate();
   const [selectedModule, setSelectedModule] = useState<number | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [previewPage, setPreviewPage] = useState(0);
@@ -649,6 +651,16 @@ ${module.content}
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/50 p-6">
       <div className="max-w-7xl mx-auto">
+        {/* Bouton retour */}
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate('/ebook-planner')} 
+          className="mb-4 gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Retour au Générateur
+        </Button>
+
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
             <BookOpen className="h-10 w-10 text-primary" />
