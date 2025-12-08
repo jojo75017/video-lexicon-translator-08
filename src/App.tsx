@@ -12,6 +12,7 @@ import AuthPage from './pages/AuthPage';
 import AdminProfilePage from './pages/AdminProfilePage';
 import AffiliationFormationPage from './pages/AffiliationFormationPage';
 import FormationPage from './pages/FormationPage';
+import FormationAudioPage from './pages/FormationAudioPage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -151,6 +152,16 @@ const App = () => {
               element={
                 isAdmin || isAuthenticated ? (
                   <FormationPage />
+                ) : (
+                  <SubscriptionAuth onAuthenticated={handleAuthenticated} />
+                )
+              }
+            />
+            <Route 
+              path="/formation-audio" 
+              element={
+                isAdmin || isAuthenticated ? (
+                  <FormationAudioPage />
                 ) : (
                   <SubscriptionAuth onAuthenticated={handleAuthenticated} />
                 )
