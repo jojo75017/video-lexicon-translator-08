@@ -246,6 +246,16 @@ const menuItems = [
     href: '/formation'
   },
   { 
+    id: 'formation-audio', 
+    label: 'Formation Audio', 
+    icon: Headphones,
+    color: 'text-purple-500',
+    bgColor: 'bg-purple-500/10',
+    activeGradient: 'from-purple-500 to-violet-500',
+    isLink: true,
+    href: '/formation-audio'
+  },
+  { 
     id: 'settings', 
     label: 'Paramètres', 
     icon: Settings,
