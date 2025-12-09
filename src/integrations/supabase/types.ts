@@ -14,6 +14,53 @@ export type Database = {
   }
   public: {
     Tables: {
+      book_tracking_history: {
+        Row: {
+          book_id: string
+          bsr: number | null
+          estimated_daily_sales: number | null
+          estimated_monthly_revenue: number | null
+          estimated_monthly_sales: number | null
+          id: string
+          rating: number | null
+          reviews_count: number | null
+          tracked_at: string
+          user_id: string
+        }
+        Insert: {
+          book_id: string
+          bsr?: number | null
+          estimated_daily_sales?: number | null
+          estimated_monthly_revenue?: number | null
+          estimated_monthly_sales?: number | null
+          id?: string
+          rating?: number | null
+          reviews_count?: number | null
+          tracked_at?: string
+          user_id: string
+        }
+        Update: {
+          book_id?: string
+          bsr?: number | null
+          estimated_daily_sales?: number | null
+          estimated_monthly_revenue?: number | null
+          estimated_monthly_sales?: number | null
+          id?: string
+          rating?: number | null
+          reviews_count?: number | null
+          tracked_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "book_tracking_history_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "published_books"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ebook_project_versions: {
         Row: {
           author_name: string | null
@@ -190,6 +237,60 @@ export type Database = {
           updated_at?: string
           user_id?: string
           writing_style?: string | null
+        }
+        Relationships: []
+      }
+      published_books: {
+        Row: {
+          asin: string | null
+          author_name: string | null
+          category: string | null
+          cover_url: string | null
+          created_at: string
+          id: string
+          isbn: string | null
+          keywords: string[] | null
+          pages: number | null
+          price: number | null
+          publication_date: string | null
+          status: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          asin?: string | null
+          author_name?: string | null
+          category?: string | null
+          cover_url?: string | null
+          created_at?: string
+          id?: string
+          isbn?: string | null
+          keywords?: string[] | null
+          pages?: number | null
+          price?: number | null
+          publication_date?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          asin?: string | null
+          author_name?: string | null
+          category?: string | null
+          cover_url?: string | null
+          created_at?: string
+          id?: string
+          isbn?: string | null
+          keywords?: string[] | null
+          pages?: number | null
+          price?: number | null
+          publication_date?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
