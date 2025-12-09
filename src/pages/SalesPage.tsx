@@ -191,7 +191,7 @@ const SalesPage = () => {
                     <p className="text-muted-foreground mb-6">
                       Découvrez l'interface et testez la génération de plans
                     </p>
-                    <Button size="lg" onClick={() => navigate('/ebook-ideas')}>
+                    <Button size="lg" onClick={() => navigate('/demo')}>
                       Accéder à la Démo
                       <ArrowRight className="w-5 h-5 ml-2" />
                     </Button>
