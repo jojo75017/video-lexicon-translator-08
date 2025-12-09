@@ -414,11 +414,11 @@ const SalesPage = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Footer with hidden admin access */}
+      {/* Footer with hidden admin access - double click required */}
       <footer className="py-6 text-center border-t border-border/50">
         <p 
           className="text-xs text-muted-foreground/50 cursor-default select-none"
-          onClick={() => navigate('/auth')}
+          onDoubleClick={() => navigate('/auth')}
         >
           © 2024
         </p>
