@@ -21,11 +21,13 @@ import {
   Download,
   Filter,
   Sparkles,
-  GitCompare
+  GitCompare,
+  Library
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import EbookAmazonComparator from './EbookAmazonComparator';
+import EbookPublishedBooksDashboard from './EbookPublishedBooksDashboard';
 
 interface KeywordData {
   keyword: string;
@@ -73,7 +75,7 @@ interface NicheAnalysis {
 }
 
 const EbookKdpAnalytics: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('keywords');
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [keyword, setKeyword] = useState('');
   const [keywordResults, setKeywordResults] = useState<KeywordData[]>([]);
   const [bsrInput, setBsrInput] = useState('');
@@ -316,12 +318,16 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4 bg-background/50 border border-border/50">
+        <TabsList className="grid w-full grid-cols-5 bg-background/50 border border-border/50">
+          <TabsTrigger value="dashboard" className="data-[state=active]:bg-green-500/20">
+            <Library className="h-4 w-4 mr-2" />
+            Mes Livres
+          </TabsTrigger>
           <TabsTrigger value="keywords" className="data-[state=active]:bg-purple-500/20">
             <Search className="h-4 w-4 mr-2" />
             Mots-clés
           </TabsTrigger>
-          <TabsTrigger value="bsr" className="data-[state=active]:bg-green-500/20">
+          <TabsTrigger value="bsr" className="data-[state=active]:bg-amber-500/20">
             <DollarSign className="h-4 w-4 mr-2" />
             BSR
           </TabsTrigger>
@@ -334,6 +340,11 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
             Comparateur
           </TabsTrigger>
         </TabsList>
+
+        {/* Onglet Dashboard Livres Publiés */}
+        <TabsContent value="dashboard" className="space-y-4">
+          <EbookPublishedBooksDashboard />
+        </TabsContent>
 
         {/* Onglet Mots-clés */}
         <TabsContent value="keywords" className="space-y-4">
