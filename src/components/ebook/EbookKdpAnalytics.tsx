@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Progress } from '@/components/ui/progress';
 import { 
   Search, 
   TrendingUp, 
@@ -22,12 +23,40 @@ import {
   Filter,
   Sparkles,
   GitCompare,
-  Library
+  Library,
+  PieChart,
+  LineChart,
+  Award,
+  Trophy,
+  Flame,
+  Eye
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import EbookAmazonComparator from './EbookAmazonComparator';
 import EbookPublishedBooksDashboard from './EbookPublishedBooksDashboard';
+import {
+  LineChart as RechartsLineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  PieChart as RechartsPieChart,
+  Pie,
+  Cell,
+  AreaChart,
+  Area,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  Radar,
+  Legend
+} from 'recharts';
 
 interface KeywordData {
   keyword: string;
@@ -72,7 +101,10 @@ interface NicheAnalysis {
   bestSellingCategories: string[];
   keywordSuggestions: string[];
   contentGaps: string[];
+  marketTrends?: { month: string; demand: number; competition: number }[];
 }
+
+const CHART_COLORS = ['#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#ec4899'];
 
 const EbookKdpAnalytics: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -85,9 +117,35 @@ const EbookKdpAnalytics: React.FC = () => {
   const [nicheAnalysis, setNicheAnalysis] = useState<NicheAnalysis | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Generate projection data for charts
+  const revenueProjection = useMemo(() => {
+    if (!bsrEstimate) return [];
+    const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
+    return months.map((month, index) => {
+      // Simulate seasonal variations
+      const seasonalMultiplier = [0.8, 0.85, 0.9, 0.95, 1, 1.1, 0.9, 0.85, 1.05, 1.1, 1.3, 1.5][index];
+      return {
+        month,
+        revenus: Math.round(bsrEstimate.monthlyRevenue * seasonalMultiplier),
+        ventes: Math.round(bsrEstimate.monthlySales * seasonalMultiplier)
+      };
+    });
+  }, [bsrEstimate]);
+
+  const bsrRangeData = useMemo(() => {
+    const ranges = [
+      { range: '1-100', sales: 150, label: 'Bestseller' },
+      { range: '100-500', sales: 55, label: 'Très bon' },
+      { range: '500-1K', sales: 30, label: 'Bon' },
+      { range: '1K-5K', sales: 15, label: 'Moyen' },
+      { range: '5K-10K', sales: 7, label: 'Faible' },
+      { range: '10K-50K', sales: 3, label: 'Très faible' },
+      { range: '50K+', sales: 1, label: 'Minimal' }
+    ];
+    return ranges;
+  }, []);
+
   const calculateBSRtoSales = (bsr: number, price: number): BSREstimate => {
-    // Formule d'estimation basée sur les données Amazon KDP
-    // Plus le BSR est bas, plus les ventes sont élevées
     let dailySales: number;
     
     if (bsr <= 100) {
@@ -109,8 +167,6 @@ const EbookKdpAnalytics: React.FC = () => {
     }
 
     const monthlySales = Math.round(dailySales * 30);
-    
-    // Calcul des royalties (70% pour prix >= 2.99€, sinon 35%)
     const royaltyRate = price >= 2.99 ? 0.70 : 0.35;
     const monthlyRevenue = Math.round(monthlySales * price * royaltyRate * 100) / 100;
     const yearlyRevenue = Math.round(monthlyRevenue * 12 * 100) / 100;
@@ -142,7 +198,7 @@ const EbookKdpAnalytics: React.FC = () => {
 
     const estimate = calculateBSRtoSales(bsr, price);
     setBsrEstimate(estimate);
-    toast.success('Estimation calculée !');
+    toast.success('Estimation calculée avec projections !');
   };
 
   const analyzeKeywords = async () => {
@@ -200,7 +256,7 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
       if (jsonMatch) {
         const parsed = JSON.parse(jsonMatch[0]);
         setKeywordResults(parsed.keywords || []);
-        toast.success('Analyse terminée !');
+        toast.success('Analyse terminée avec graphiques !');
       }
     } catch (error) {
       console.error('Erreur analyse:', error);
@@ -218,7 +274,7 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
 
     setIsLoading(true);
     try {
-      const prompt = `Analyse la niche "${nicheInput}" pour Amazon KDP. Génère une analyse détaillée du marché.
+      const prompt = `Analyse la niche "${nicheInput}" pour Amazon KDP. Génère une analyse détaillée du marché avec tendances.
 
 IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
 
@@ -232,7 +288,15 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
   "avgPrice": [prix moyen],
   "bestSellingCategories": ["catégorie 1", "catégorie 2", "catégorie 3"],
   "keywordSuggestions": ["mot-clé 1", "mot-clé 2", "mot-clé 3", "mot-clé 4", "mot-clé 5"],
-  "contentGaps": ["opportunité 1", "opportunité 2", "opportunité 3"]
+  "contentGaps": ["opportunité 1", "opportunité 2", "opportunité 3"],
+  "marketTrends": [
+    { "month": "Jan", "demand": 65, "competition": 40 },
+    { "month": "Fév", "demand": 70, "competition": 42 },
+    { "month": "Mar", "demand": 75, "competition": 45 },
+    { "month": "Avr", "demand": 72, "competition": 48 },
+    { "month": "Mai", "demand": 78, "competition": 50 },
+    { "month": "Juin", "demand": 80, "competition": 52 }
+  ]
 }`;
 
       const { data, error } = await supabase.functions.invoke('generate-content', {
@@ -249,7 +313,7 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
       if (jsonMatch) {
         const parsed = JSON.parse(jsonMatch[0]);
         setNicheAnalysis(parsed);
-        toast.success('Analyse de niche terminée !');
+        toast.success('Analyse de niche terminée avec graphiques !');
       }
     } catch (error) {
       console.error('Erreur analyse niche:', error);
@@ -282,6 +346,13 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
     return 'text-red-400';
   };
 
+  const getBSRBadge = (bsr: number) => {
+    if (bsr <= 1000) return { icon: Trophy, color: 'text-yellow-400', label: 'Top Seller' };
+    if (bsr <= 5000) return { icon: Award, color: 'text-purple-400', label: 'Excellent' };
+    if (bsr <= 20000) return { icon: Flame, color: 'text-orange-400', label: 'Bon' };
+    return { icon: Eye, color: 'text-blue-400', label: 'À surveiller' };
+  };
+
   const exportResults = () => {
     const data = {
       keywords: keywordResults,
@@ -299,84 +370,133 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
     toast.success('Données exportées !');
   };
 
+  // Keyword comparison chart data
+  const keywordComparisonData = useMemo(() => {
+    return keywordResults.map(kw => ({
+      name: kw.keyword.substring(0, 15) + (kw.keyword.length > 15 ? '...' : ''),
+      volume: kw.searchVolume,
+      opportunity: kw.opportunity,
+      competition: kw.competitionScore
+    }));
+  }, [keywordResults]);
+
   return (
     <div className="space-y-6">
+      {/* Header with gradient */}
       <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent flex items-center gap-2">
-            <BarChart3 className="h-6 w-6 text-purple-400" />
-            KDP Analytics
+        <div className="space-y-1">
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400 bg-clip-text text-transparent flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30">
+              <BarChart3 className="h-7 w-7 text-purple-400" />
+            </div>
+            KDP Analytics Pro
           </h2>
-          <p className="text-muted-foreground text-sm">
-            Analysez le marché Amazon KDP comme un pro
+          <p className="text-muted-foreground">
+            Analysez le marché Amazon KDP avec des données et graphiques avancés
           </p>
         </div>
-        <Button onClick={exportResults} variant="outline" size="sm">
-          <Download className="h-4 w-4 mr-2" />
+        <Button onClick={exportResults} variant="outline" size="sm" className="gap-2 hover:bg-purple-500/10 hover:border-purple-500/50">
+          <Download className="h-4 w-4" />
           Exporter
         </Button>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5 bg-background/50 border border-border/50">
-          <TabsTrigger value="dashboard" className="data-[state=active]:bg-green-500/20">
-            <Library className="h-4 w-4 mr-2" />
-            Mes Livres
+        <TabsList className="grid w-full grid-cols-5 bg-background/80 backdrop-blur border border-border/50 p-1 rounded-xl">
+          <TabsTrigger value="dashboard" className="rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500/20 data-[state=active]:to-emerald-500/20 data-[state=active]:border-green-500/30 gap-2">
+            <Library className="h-4 w-4" />
+            <span className="hidden sm:inline">Mes Livres</span>
           </TabsTrigger>
-          <TabsTrigger value="keywords" className="data-[state=active]:bg-purple-500/20">
-            <Search className="h-4 w-4 mr-2" />
-            Mots-clés
+          <TabsTrigger value="keywords" className="rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500/20 data-[state=active]:to-violet-500/20 data-[state=active]:border-purple-500/30 gap-2">
+            <Search className="h-4 w-4" />
+            <span className="hidden sm:inline">Mots-clés</span>
           </TabsTrigger>
-          <TabsTrigger value="bsr" className="data-[state=active]:bg-amber-500/20">
-            <DollarSign className="h-4 w-4 mr-2" />
-            BSR
+          <TabsTrigger value="bsr" className="rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-500/20 data-[state=active]:to-orange-500/20 data-[state=active]:border-amber-500/30 gap-2">
+            <DollarSign className="h-4 w-4" />
+            <span className="hidden sm:inline">BSR</span>
           </TabsTrigger>
-          <TabsTrigger value="niche" className="data-[state=active]:bg-blue-500/20">
-            <Target className="h-4 w-4 mr-2" />
-            Niche
+          <TabsTrigger value="niche" className="rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500/20 data-[state=active]:to-cyan-500/20 data-[state=active]:border-blue-500/30 gap-2">
+            <Target className="h-4 w-4" />
+            <span className="hidden sm:inline">Niche</span>
           </TabsTrigger>
-          <TabsTrigger value="comparator" className="data-[state=active]:bg-orange-500/20">
-            <GitCompare className="h-4 w-4 mr-2" />
-            Comparateur
+          <TabsTrigger value="comparator" className="rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500/20 data-[state=active]:to-red-500/20 data-[state=active]:border-orange-500/30 gap-2">
+            <GitCompare className="h-4 w-4" />
+            <span className="hidden sm:inline">Comparateur</span>
           </TabsTrigger>
         </TabsList>
 
-        {/* Onglet Dashboard Livres Publiés */}
+        {/* Dashboard Tab */}
         <TabsContent value="dashboard" className="space-y-4">
           <EbookPublishedBooksDashboard />
         </TabsContent>
 
-        {/* Onglet Mots-clés */}
+        {/* Keywords Tab */}
         <TabsContent value="keywords" className="space-y-4">
-          <Card className="bg-card/50 border-border/50">
+          <Card className="bg-gradient-to-br from-purple-500/5 to-violet-500/5 border-purple-500/20">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-purple-400" />
+                <div className="p-1.5 rounded-lg bg-purple-500/20">
+                  <Sparkles className="h-5 w-5 text-purple-400" />
+                </div>
                 Recherche de mots-clés KDP
               </CardTitle>
               <CardDescription>
-                Analysez le volume de recherche, la concurrence et le potentiel de revenus
+                Analysez le volume de recherche, la concurrence et le potentiel de revenus avec graphiques
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
               <div className="flex gap-2">
                 <Input
                   value={keyword}
                   onChange={(e) => setKeyword(e.target.value)}
                   placeholder="Ex: développement personnel, romance paranormale..."
-                  className="flex-1"
+                  className="flex-1 bg-background/50"
                   onKeyDown={(e) => e.key === 'Enter' && analyzeKeywords()}
                 />
-                <Button onClick={analyzeKeywords} disabled={isLoading}>
+                <Button onClick={analyzeKeywords} disabled={isLoading} className="bg-gradient-to-r from-purple-500 to-violet-500 hover:from-purple-600 hover:to-violet-600">
                   {isLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
                   Analyser
                 </Button>
               </div>
 
+              {/* Keywords Comparison Chart */}
               {keywordResults.length > 0 && (
-                <div className="space-y-4">
+                <div className="space-y-6">
+                  {/* Chart Section */}
+                  <Card className="bg-background/50 border-border/30">
+                    <CardHeader>
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <BarChart3 className="h-4 w-4 text-purple-400" />
+                        Comparaison des mots-clés
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="h-64">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={keywordComparisonData}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                            <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={10} />
+                            <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} />
+                            <Tooltip
+                              contentStyle={{
+                                backgroundColor: 'hsl(var(--card))',
+                                border: '1px solid hsl(var(--border))',
+                                borderRadius: '8px'
+                              }}
+                            />
+                            <Legend />
+                            <Bar dataKey="volume" name="Volume" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+                            <Bar dataKey="opportunity" name="Opportunité" fill="#10b981" radius={[4, 4, 0, 0]} />
+                            <Bar dataKey="competition" name="Concurrence" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Keywords Cards */}
                   {keywordResults.map((kw, idx) => (
-                    <Card key={idx} className="bg-background/30 border-border/30">
+                    <Card key={idx} className="bg-background/30 border-border/30 hover:border-purple-500/30 transition-colors">
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-2">
@@ -389,45 +509,56 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
                         </div>
 
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                          <div className="text-center p-2 bg-purple-500/10 rounded-lg">
+                          <div className="text-center p-3 bg-gradient-to-br from-purple-500/10 to-purple-500/5 rounded-lg border border-purple-500/20">
                             <div className="text-xs text-muted-foreground">Volume</div>
-                            <div className="font-bold text-purple-400">{kw.searchVolume?.toLocaleString()}</div>
+                            <div className="font-bold text-purple-400 text-xl">{kw.searchVolume?.toLocaleString()}</div>
                           </div>
-                          <div className="text-center p-2 bg-blue-500/10 rounded-lg">
+                          <div className="text-center p-3 bg-gradient-to-br from-blue-500/10 to-blue-500/5 rounded-lg border border-blue-500/20">
                             <div className="text-xs text-muted-foreground">Prix moyen</div>
-                            <div className="font-bold text-blue-400">{kw.avgPrice?.toFixed(2)}€</div>
+                            <div className="font-bold text-blue-400 text-xl">{kw.avgPrice?.toFixed(2)}€</div>
                           </div>
-                          <div className="text-center p-2 bg-green-500/10 rounded-lg">
+                          <div className="text-center p-3 bg-gradient-to-br from-green-500/10 to-green-500/5 rounded-lg border border-green-500/20">
                             <div className="text-xs text-muted-foreground">Ventes/mois</div>
-                            <div className="font-bold text-green-400">{kw.estimatedMonthlySales}</div>
+                            <div className="font-bold text-green-400 text-xl">{kw.estimatedMonthlySales}</div>
                           </div>
-                          <div className="text-center p-2 bg-amber-500/10 rounded-lg">
+                          <div className="text-center p-3 bg-gradient-to-br from-amber-500/10 to-amber-500/5 rounded-lg border border-amber-500/20">
                             <div className="text-xs text-muted-foreground">Opportunité</div>
-                            <div className={`font-bold ${getOpportunityColor(kw.opportunity)}`}>{kw.opportunity}/100</div>
+                            <div className={`font-bold text-xl ${getOpportunityColor(kw.opportunity)}`}>{kw.opportunity}/100</div>
+                            <Progress value={kw.opportunity} className="h-1 mt-1" />
                           </div>
                         </div>
 
                         {kw.topBooks && kw.topBooks.length > 0 && (
                           <div className="space-y-2">
-                            <div className="text-sm font-medium text-muted-foreground">Top livres concurrents:</div>
+                            <div className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                              <BookOpen className="h-4 w-4" />
+                              Top livres concurrents:
+                            </div>
                             <div className="grid gap-2">
-                              {kw.topBooks.slice(0, 3).map((book, bookIdx) => (
-                                <div key={bookIdx} className="flex items-center justify-between text-sm bg-background/50 p-2 rounded">
-                                  <div className="flex-1 truncate">
-                                    <span className="font-medium">{book.title}</span>
-                                    <span className="text-muted-foreground ml-2">par {book.author}</span>
-                                  </div>
-                                  <div className="flex items-center gap-3 text-xs">
-                                    <span className="text-purple-400">#{book.bsr}</span>
-                                    <span className="text-green-400">{book.price}€</span>
-                                    <div className="flex items-center gap-1">
-                                      <Star className="h-3 w-3 text-yellow-400 fill-yellow-400" />
-                                      {book.rating}
+                              {kw.topBooks.slice(0, 3).map((book, bookIdx) => {
+                                const badge = getBSRBadge(book.bsr);
+                                const BadgeIcon = badge.icon;
+                                return (
+                                  <div key={bookIdx} className="flex items-center justify-between text-sm bg-background/50 p-3 rounded-lg border border-border/30">
+                                    <div className="flex-1 truncate">
+                                      <span className="font-medium">{book.title}</span>
+                                      <span className="text-muted-foreground ml-2">par {book.author}</span>
                                     </div>
-                                    <span className="text-muted-foreground">({book.reviews} avis)</span>
+                                    <div className="flex items-center gap-4 text-xs">
+                                      <div className="flex items-center gap-1">
+                                        <BadgeIcon className={`h-3 w-3 ${badge.color}`} />
+                                        <span className="text-purple-400">#{book.bsr}</span>
+                                      </div>
+                                      <span className="text-green-400 font-medium">{book.price}€</span>
+                                      <div className="flex items-center gap-1">
+                                        <Star className="h-3 w-3 text-yellow-400 fill-yellow-400" />
+                                        {book.rating}
+                                      </div>
+                                      <span className="text-muted-foreground">({book.reviews} avis)</span>
+                                    </div>
                                   </div>
-                                </div>
-                              ))}
+                                );
+                              })}
                             </div>
                           </div>
                         )}
@@ -440,124 +571,206 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
           </Card>
         </TabsContent>
 
-        {/* Onglet Calculateur BSR */}
+        {/* BSR Calculator Tab */}
         <TabsContent value="bsr" className="space-y-4">
-          <Card className="bg-card/50 border-border/50">
-            <CardHeader>
-              <CardTitle className="text-lg flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-green-400" />
-                Calculateur BSR → Ventes
-              </CardTitle>
-              <CardDescription>
-                Estimez les ventes et revenus à partir du rang Amazon
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Rang BSR (Best Seller Rank)</Label>
-                  <Input
-                    type="number"
-                    value={bsrInput}
-                    onChange={(e) => setBsrInput(e.target.value)}
-                    placeholder="Ex: 15000"
-                    min="1"
-                  />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Calculator Card */}
+            <Card className="bg-gradient-to-br from-amber-500/5 to-orange-500/5 border-amber-500/20">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-amber-500/20">
+                    <TrendingUp className="h-5 w-5 text-amber-400" />
+                  </div>
+                  Calculateur BSR → Ventes
+                </CardTitle>
+                <CardDescription>
+                  Estimez les ventes et revenus à partir du rang Amazon
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Rang BSR</Label>
+                    <Input
+                      type="number"
+                      value={bsrInput}
+                      onChange={(e) => setBsrInput(e.target.value)}
+                      placeholder="Ex: 15000"
+                      min="1"
+                      className="bg-background/50"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Prix de vente (€)</Label>
+                    <Input
+                      type="number"
+                      value={priceInput}
+                      onChange={(e) => setPriceInput(e.target.value)}
+                      placeholder="Ex: 4.99"
+                      min="0.99"
+                      step="0.01"
+                      className="bg-background/50"
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label>Prix de vente (€)</Label>
-                  <Input
-                    type="number"
-                    value={priceInput}
-                    onChange={(e) => setPriceInput(e.target.value)}
-                    placeholder="Ex: 4.99"
-                    min="0.99"
-                    step="0.01"
-                  />
-                </div>
-              </div>
 
-              <Button onClick={handleBSRCalculation} className="w-full">
-                <Zap className="h-4 w-4 mr-2" />
-                Calculer les estimations
-              </Button>
+                <Button onClick={handleBSRCalculation} className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600">
+                  <Zap className="h-4 w-4 mr-2" />
+                  Calculer les estimations
+                </Button>
 
-              {bsrEstimate && (
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6">
-                  <Card className="bg-purple-500/10 border-purple-500/30">
-                    <CardContent className="p-4 text-center">
-                      <BookOpen className="h-6 w-6 mx-auto mb-2 text-purple-400" />
-                      <div className="text-xs text-muted-foreground">Ventes/jour</div>
-                      <div className="text-2xl font-bold text-purple-400">{bsrEstimate.dailySales}</div>
-                    </CardContent>
-                  </Card>
+                {bsrEstimate && (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      <Card className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 border-purple-500/30">
+                        <CardContent className="p-4 text-center">
+                          <BookOpen className="h-6 w-6 mx-auto mb-2 text-purple-400" />
+                          <div className="text-xs text-muted-foreground">Ventes/jour</div>
+                          <div className="text-2xl font-bold text-purple-400">{bsrEstimate.dailySales}</div>
+                        </CardContent>
+                      </Card>
 
-                  <Card className="bg-blue-500/10 border-blue-500/30">
-                    <CardContent className="p-4 text-center">
-                      <TrendingUp className="h-6 w-6 mx-auto mb-2 text-blue-400" />
-                      <div className="text-xs text-muted-foreground">Ventes/mois</div>
-                      <div className="text-2xl font-bold text-blue-400">{bsrEstimate.monthlySales}</div>
-                    </CardContent>
-                  </Card>
+                      <Card className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 border-blue-500/30">
+                        <CardContent className="p-4 text-center">
+                          <TrendingUp className="h-6 w-6 mx-auto mb-2 text-blue-400" />
+                          <div className="text-xs text-muted-foreground">Ventes/mois</div>
+                          <div className="text-2xl font-bold text-blue-400">{bsrEstimate.monthlySales}</div>
+                        </CardContent>
+                      </Card>
 
-                  <Card className="bg-green-500/10 border-green-500/30">
-                    <CardContent className="p-4 text-center">
-                      <DollarSign className="h-6 w-6 mx-auto mb-2 text-green-400" />
-                      <div className="text-xs text-muted-foreground">Revenus/mois</div>
-                      <div className="text-2xl font-bold text-green-400">{bsrEstimate.monthlyRevenue.toFixed(2)}€</div>
-                    </CardContent>
-                  </Card>
+                      <Card className="bg-gradient-to-br from-green-500/10 to-green-500/5 border-green-500/30">
+                        <CardContent className="p-4 text-center">
+                          <DollarSign className="h-6 w-6 mx-auto mb-2 text-green-400" />
+                          <div className="text-xs text-muted-foreground">Revenus/mois</div>
+                          <div className="text-2xl font-bold text-green-400">{bsrEstimate.monthlyRevenue.toFixed(2)}€</div>
+                        </CardContent>
+                      </Card>
 
-                  <Card className="bg-amber-500/10 border-amber-500/30">
-                    <CardContent className="p-4 text-center">
-                      <Star className="h-6 w-6 mx-auto mb-2 text-amber-400" />
-                      <div className="text-xs text-muted-foreground">Revenus/an</div>
-                      <div className="text-2xl font-bold text-amber-400">{bsrEstimate.yearlyRevenue.toFixed(2)}€</div>
-                    </CardContent>
-                  </Card>
+                      <Card className="bg-gradient-to-br from-amber-500/10 to-amber-500/5 border-amber-500/30">
+                        <CardContent className="p-4 text-center">
+                          <Star className="h-6 w-6 mx-auto mb-2 text-amber-400" />
+                          <div className="text-xs text-muted-foreground">Revenus/an</div>
+                          <div className="text-2xl font-bold text-amber-400">{bsrEstimate.yearlyRevenue.toFixed(2)}€</div>
+                        </CardContent>
+                      </Card>
+                    </div>
 
-                  <Card className="bg-pink-500/10 border-pink-500/30 col-span-2">
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="text-xs text-muted-foreground">Taux de royalties</div>
-                          <div className="text-lg font-bold text-pink-400">{bsrEstimate.royaltyRate}%</div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-xs text-muted-foreground">Prix unitaire</div>
-                          <div className="text-lg font-bold">{bsrEstimate.price.toFixed(2)}€</div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-xs text-muted-foreground">Royalties/vente</div>
-                          <div className="text-lg font-bold text-green-400">
-                            {(bsrEstimate.price * bsrEstimate.royaltyRate / 100).toFixed(2)}€
+                    <Card className="bg-gradient-to-r from-pink-500/10 to-rose-500/10 border-pink-500/30">
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between text-sm">
+                          <div>
+                            <div className="text-xs text-muted-foreground">Taux royalties</div>
+                            <div className="text-lg font-bold text-pink-400">{bsrEstimate.royaltyRate}%</div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-xs text-muted-foreground">Prix unitaire</div>
+                            <div className="text-lg font-bold">{bsrEstimate.price.toFixed(2)}€</div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-xs text-muted-foreground">Royalties/vente</div>
+                            <div className="text-lg font-bold text-green-400">
+                              {(bsrEstimate.price * bsrEstimate.royaltyRate / 100).toFixed(2)}€
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Charts Card */}
+            <div className="space-y-4">
+              {/* Revenue Projection Chart */}
+              {bsrEstimate && (
+                <Card className="bg-background/50 border-border/30">
+                  <CardHeader>
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <LineChart className="h-4 w-4 text-green-400" />
+                      Projection des revenus sur 12 mois
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-48">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={revenueProjection}>
+                          <defs>
+                            <linearGradient id="colorRevenu" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+                              <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                          <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={10} />
+                          <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} />
+                          <Tooltip
+                            contentStyle={{
+                              backgroundColor: 'hsl(var(--card))',
+                              border: '1px solid hsl(var(--border))',
+                              borderRadius: '8px'
+                            }}
+                            formatter={(value: number) => [`${value}€`, 'Revenus']}
+                          />
+                          <Area type="monotone" dataKey="revenus" stroke="#10b981" fillOpacity={1} fill="url(#colorRevenu)" />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </CardContent>
+                </Card>
               )}
 
-              <div className="text-xs text-muted-foreground bg-muted/20 p-3 rounded-lg">
-                <strong>Note:</strong> Ces estimations sont basées sur des formules approximatives. 
-                Les ventes réelles peuvent varier en fonction de nombreux facteurs (saisonnalité, promotions, etc.).
-                Le taux de 70% s'applique aux ebooks de 2.99€ à 9.99€, sinon 35%.
-              </div>
-            </CardContent>
-          </Card>
+              {/* BSR Range Reference Chart */}
+              <Card className="bg-background/50 border-border/30">
+                <CardHeader>
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <BarChart3 className="h-4 w-4 text-purple-400" />
+                    Référence BSR → Ventes journalières
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-48">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={bsrRangeData} layout="vertical">
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                        <XAxis type="number" stroke="hsl(var(--muted-foreground))" fontSize={10} />
+                        <YAxis dataKey="range" type="category" stroke="hsl(var(--muted-foreground))" fontSize={10} width={60} />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: 'hsl(var(--card))',
+                            border: '1px solid hsl(var(--border))',
+                            borderRadius: '8px'
+                          }}
+                          formatter={(value: number) => [`${value} ventes/jour`, 'Estimation']}
+                        />
+                        <Bar dataKey="sales" fill="#8b5cf6" radius={[0, 4, 4, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          <div className="text-xs text-muted-foreground bg-muted/20 p-3 rounded-lg">
+            <strong>Note:</strong> Ces estimations sont basées sur des formules approximatives. 
+            Les ventes réelles varient selon la saisonnalité, promotions, etc.
+            Le taux de 70% s'applique aux ebooks de 2.99€ à 9.99€, sinon 35%.
+          </div>
         </TabsContent>
 
-        {/* Onglet Analyse Niche */}
+        {/* Niche Analysis Tab */}
         <TabsContent value="niche" className="space-y-4">
-          <Card className="bg-card/50 border-border/50">
+          <Card className="bg-gradient-to-br from-blue-500/5 to-cyan-500/5 border-blue-500/20">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <Target className="h-5 w-5 text-blue-400" />
-                Analyse de Niche
+                <div className="p-1.5 rounded-lg bg-blue-500/20">
+                  <Target className="h-5 w-5 text-blue-400" />
+                </div>
+                Analyse de Niche Avancée
               </CardTitle>
               <CardDescription>
-                Évaluez le potentiel d'une niche avant de vous lancer
+                Évaluez le potentiel d'une niche avec graphiques de tendances
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -566,10 +779,10 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
                   value={nicheInput}
                   onChange={(e) => setNicheInput(e.target.value)}
                   placeholder="Ex: fitness pour seniors, thriller psychologique..."
-                  className="flex-1"
+                  className="flex-1 bg-background/50"
                   onKeyDown={(e) => e.key === 'Enter' && analyzeNiche()}
                 />
-                <Button onClick={analyzeNiche} disabled={isLoading}>
+                <Button onClick={analyzeNiche} disabled={isLoading} className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600">
                   {isLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Filter className="h-4 w-4" />}
                   Analyser
                 </Button>
@@ -577,44 +790,82 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
 
               {nicheAnalysis && (
                 <div className="space-y-4 mt-4">
+                  {/* Score Cards */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <Card className="bg-purple-500/10 border-purple-500/30">
-                      <CardContent className="p-3 text-center">
-                        <div className="text-xs text-muted-foreground">Score demande</div>
-                        <div className={`text-xl font-bold ${getOpportunityColor(nicheAnalysis.demandScore)}`}>
+                    <Card className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 border-purple-500/30">
+                      <CardContent className="p-4 text-center">
+                        <div className="text-xs text-muted-foreground mb-1">Score demande</div>
+                        <div className={`text-2xl font-bold ${getOpportunityColor(nicheAnalysis.demandScore)}`}>
                           {nicheAnalysis.demandScore}/100
                         </div>
+                        <Progress value={nicheAnalysis.demandScore} className="h-1 mt-2" />
                       </CardContent>
                     </Card>
-                    <Card className="bg-blue-500/10 border-blue-500/30">
-                      <CardContent className="p-3 text-center">
-                        <div className="text-xs text-muted-foreground">Concurrence</div>
+                    <Card className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 border-blue-500/30">
+                      <CardContent className="p-4 text-center">
+                        <div className="text-xs text-muted-foreground mb-1">Concurrence</div>
                         <div className="text-xl font-bold text-blue-400">{nicheAnalysis.competitionLevel}</div>
                       </CardContent>
                     </Card>
-                    <Card className="bg-green-500/10 border-green-500/30">
-                      <CardContent className="p-3 text-center">
-                        <div className="text-xs text-muted-foreground">Potentiel profit</div>
+                    <Card className="bg-gradient-to-br from-green-500/10 to-green-500/5 border-green-500/30">
+                      <CardContent className="p-4 text-center">
+                        <div className="text-xs text-muted-foreground mb-1">Potentiel profit</div>
                         <div className="text-xl font-bold text-green-400">{nicheAnalysis.profitPotential}</div>
                       </CardContent>
                     </Card>
-                    <Card className="bg-amber-500/10 border-amber-500/30">
-                      <CardContent className="p-3 text-center">
-                        <div className="text-xs text-muted-foreground">Prix moyen</div>
+                    <Card className="bg-gradient-to-br from-amber-500/10 to-amber-500/5 border-amber-500/30">
+                      <CardContent className="p-4 text-center">
+                        <div className="text-xs text-muted-foreground mb-1">Prix moyen</div>
                         <div className="text-xl font-bold text-amber-400">{nicheAnalysis.avgPrice?.toFixed(2)}€</div>
                       </CardContent>
                     </Card>
                   </div>
 
+                  {/* Market Trends Chart */}
+                  {nicheAnalysis.marketTrends && (
+                    <Card className="bg-background/50 border-border/30">
+                      <CardHeader>
+                        <CardTitle className="text-sm flex items-center gap-2">
+                          <LineChart className="h-4 w-4 text-blue-400" />
+                          Tendances du marché (6 derniers mois)
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="h-48">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <RechartsLineChart data={nicheAnalysis.marketTrends}>
+                              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                              <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={10} />
+                              <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} />
+                              <Tooltip
+                                contentStyle={{
+                                  backgroundColor: 'hsl(var(--card))',
+                                  border: '1px solid hsl(var(--border))',
+                                  borderRadius: '8px'
+                                }}
+                              />
+                              <Legend />
+                              <Line type="monotone" dataKey="demand" name="Demande" stroke="#10b981" strokeWidth={2} dot={{ fill: '#10b981' }} />
+                              <Line type="monotone" dataKey="competition" name="Concurrence" stroke="#f59e0b" strokeWidth={2} dot={{ fill: '#f59e0b' }} />
+                            </RechartsLineChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Card className="bg-background/30 border-border/30">
                       <CardHeader className="pb-2">
-                        <CardTitle className="text-sm">Meilleures catégories</CardTitle>
+                        <CardTitle className="text-sm flex items-center gap-2">
+                          <PieChart className="h-4 w-4 text-purple-400" />
+                          Meilleures catégories
+                        </CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="flex flex-wrap gap-2">
                           {nicheAnalysis.bestSellingCategories?.map((cat, idx) => (
-                            <Badge key={idx} variant="outline" className="bg-purple-500/10">
+                            <Badge key={idx} variant="outline" className="bg-purple-500/10 border-purple-500/30">
                               {cat}
                             </Badge>
                           ))}
@@ -624,13 +875,20 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
 
                     <Card className="bg-background/30 border-border/30">
                       <CardHeader className="pb-2">
-                        <CardTitle className="text-sm">Mots-clés suggérés</CardTitle>
+                        <CardTitle className="text-sm flex items-center gap-2">
+                          <Search className="h-4 w-4 text-blue-400" />
+                          Mots-clés suggérés
+                        </CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="flex flex-wrap gap-2">
                           {nicheAnalysis.keywordSuggestions?.map((kw, idx) => (
-                            <Badge key={idx} variant="outline" className="bg-blue-500/10 cursor-pointer hover:bg-blue-500/20"
-                              onClick={() => { setKeyword(kw); setActiveTab('keywords'); }}>
+                            <Badge 
+                              key={idx} 
+                              variant="outline" 
+                              className="bg-blue-500/10 border-blue-500/30 cursor-pointer hover:bg-blue-500/20 transition-colors"
+                              onClick={() => { setKeyword(kw); setActiveTab('keywords'); }}
+                            >
                               {kw}
                             </Badge>
                           ))}
@@ -649,8 +907,8 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
                     <CardContent>
                       <ul className="space-y-2">
                         {nicheAnalysis.contentGaps?.map((gap, idx) => (
-                          <li key={idx} className="flex items-start gap-2 text-sm">
-                            <span className="text-green-400 mt-1">•</span>
+                          <li key={idx} className="flex items-start gap-2 text-sm p-2 bg-green-500/5 rounded-lg">
+                            <span className="text-green-400 mt-0.5">💡</span>
                             <span>{gap}</span>
                           </li>
                         ))}
@@ -663,7 +921,7 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
           </Card>
         </TabsContent>
 
-        {/* Onglet Comparateur Amazon */}
+        {/* Comparator Tab */}
         <TabsContent value="comparator" className="space-y-4">
           <EbookAmazonComparator />
         </TabsContent>
