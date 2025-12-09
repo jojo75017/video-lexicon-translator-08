@@ -106,6 +106,16 @@ interface NicheAnalysis {
 
 const CHART_COLORS = ['#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#ec4899'];
 
+interface TitleVolumeData {
+  title: string;
+  searchVolume: number;
+  monthlyTrend: number;
+  competitionIndex: number;
+  suggestedKeywords: string[];
+  estimatedClicks: number;
+  relevanceScore: number;
+}
+
 const EbookKdpAnalytics: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [keyword, setKeyword] = useState('');
@@ -116,6 +126,9 @@ const EbookKdpAnalytics: React.FC = () => {
   const [nicheInput, setNicheInput] = useState('');
   const [nicheAnalysis, setNicheAnalysis] = useState<NicheAnalysis | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [titleSearch, setTitleSearch] = useState('');
+  const [titleVolumeResults, setTitleVolumeResults] = useState<TitleVolumeData[]>([]);
+  const [isLoadingTitle, setIsLoadingTitle] = useState(false);
 
   // Generate projection data for charts
   const revenueProjection = useMemo(() => {
@@ -323,6 +336,94 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
     }
   };
 
+  const analyzeTitleVolume = async () => {
+    if (!titleSearch.trim()) {
+      toast.error('Veuillez entrer un titre ou mot-clé');
+      return;
+    }
+
+    setIsLoadingTitle(true);
+    try {
+      const prompt = `Analyse le volume de recherche pour le titre/mot-clé "${titleSearch}" sur Amazon KDP.
+
+IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
+
+{
+  "results": [
+    {
+      "title": "${titleSearch}",
+      "searchVolume": [nombre entre 500 et 100000],
+      "monthlyTrend": [pourcentage variation -30 à +50],
+      "competitionIndex": [score 1-100],
+      "suggestedKeywords": ["keyword1", "keyword2", "keyword3", "keyword4", "keyword5"],
+      "estimatedClicks": [clics estimés par mois],
+      "relevanceScore": [score 1-100]
+    },
+    {
+      "title": "[variante du titre 1]",
+      "searchVolume": [nombre],
+      "monthlyTrend": [pourcentage],
+      "competitionIndex": [score],
+      "suggestedKeywords": ["kw1", "kw2", "kw3"],
+      "estimatedClicks": [clics],
+      "relevanceScore": [score]
+    },
+    {
+      "title": "[variante du titre 2]",
+      "searchVolume": [nombre],
+      "monthlyTrend": [pourcentage],
+      "competitionIndex": [score],
+      "suggestedKeywords": ["kw1", "kw2", "kw3"],
+      "estimatedClicks": [clics],
+      "relevanceScore": [score]
+    },
+    {
+      "title": "[variante du titre 3]",
+      "searchVolume": [nombre],
+      "monthlyTrend": [pourcentage],
+      "competitionIndex": [score],
+      "suggestedKeywords": ["kw1", "kw2", "kw3"],
+      "estimatedClicks": [clics],
+      "relevanceScore": [score]
+    }
+  ]
+}`;
+
+      const { data, error } = await supabase.functions.invoke('generate-content', {
+        body: { 
+          prompt,
+          type: 'title-volume-analysis'
+        }
+      });
+
+      if (error) throw error;
+
+      const content = data?.content || data?.generatedText || '';
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        setTitleVolumeResults(parsed.results || []);
+        toast.success('Analyse de volume terminée !');
+      }
+    } catch (error) {
+      console.error('Erreur analyse volume:', error);
+      toast.error('Erreur lors de l\'analyse');
+    } finally {
+      setIsLoadingTitle(false);
+    }
+  };
+
+  // Title volume chart data
+  const titleVolumeChartData = useMemo(() => {
+    return titleVolumeResults.map(item => ({
+      name: item.title.substring(0, 20) + (item.title.length > 20 ? '...' : ''),
+      volume: item.searchVolume,
+      clics: item.estimatedClicks,
+      competition: item.competitionIndex,
+      relevance: item.relevanceScore
+    }));
+  }, [titleVolumeResults]);
+
   const getTrendIcon = (trend: string) => {
     switch (trend) {
       case 'up': return <ArrowUp className="h-4 w-4 text-green-500" />;
@@ -402,10 +503,14 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5 bg-background/80 backdrop-blur border border-border/50 p-1 rounded-xl">
+        <TabsList className="grid w-full grid-cols-6 bg-background/80 backdrop-blur border border-border/50 p-1 rounded-xl">
           <TabsTrigger value="dashboard" className="rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500/20 data-[state=active]:to-emerald-500/20 data-[state=active]:border-green-500/30 gap-2">
             <Library className="h-4 w-4" />
-            <span className="hidden sm:inline">Mes Livres</span>
+            <span className="hidden sm:inline">Livres</span>
+          </TabsTrigger>
+          <TabsTrigger value="volume" className="rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500/20 data-[state=active]:to-teal-500/20 data-[state=active]:border-cyan-500/30 gap-2">
+            <TrendingUp className="h-4 w-4" />
+            <span className="hidden sm:inline">Volume</span>
           </TabsTrigger>
           <TabsTrigger value="keywords" className="rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500/20 data-[state=active]:to-violet-500/20 data-[state=active]:border-purple-500/30 gap-2">
             <Search className="h-4 w-4" />
@@ -421,13 +526,169 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
           </TabsTrigger>
           <TabsTrigger value="comparator" className="rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500/20 data-[state=active]:to-red-500/20 data-[state=active]:border-orange-500/30 gap-2">
             <GitCompare className="h-4 w-4" />
-            <span className="hidden sm:inline">Comparateur</span>
+            <span className="hidden sm:inline">Comparer</span>
           </TabsTrigger>
         </TabsList>
 
         {/* Dashboard Tab */}
         <TabsContent value="dashboard" className="space-y-4">
           <EbookPublishedBooksDashboard />
+        </TabsContent>
+
+        {/* Volume Search Tab */}
+        <TabsContent value="volume" className="space-y-4">
+          <Card className="bg-gradient-to-br from-cyan-500/5 to-teal-500/5 border-cyan-500/20">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-cyan-500/20">
+                  <TrendingUp className="h-5 w-5 text-cyan-400" />
+                </div>
+                Volume de recherche - Titres & Mots-clés
+              </CardTitle>
+              <CardDescription>
+                Analysez le potentiel de recherche d'un titre ou mot-clé sur Amazon
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex gap-2">
+                <Input
+                  value={titleSearch}
+                  onChange={(e) => setTitleSearch(e.target.value)}
+                  placeholder="Ex: Comment perdre du poids, Guide pratique du jardinage..."
+                  className="flex-1 bg-background/50"
+                  onKeyDown={(e) => e.key === 'Enter' && analyzeTitleVolume()}
+                />
+                <Button onClick={analyzeTitleVolume} disabled={isLoadingTitle} className="bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600">
+                  {isLoadingTitle ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                  Analyser
+                </Button>
+              </div>
+
+              {/* Volume Results Chart */}
+              {titleVolumeResults.length > 0 && (
+                <div className="space-y-6">
+                  {/* Chart */}
+                  <Card className="bg-background/50 border-border/30">
+                    <CardHeader>
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <BarChart3 className="h-4 w-4 text-cyan-400" />
+                        Comparaison des volumes
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="h-64">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={titleVolumeChartData}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                            <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={10} />
+                            <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} />
+                            <Tooltip
+                              contentStyle={{
+                                backgroundColor: 'hsl(var(--card))',
+                                border: '1px solid hsl(var(--border))',
+                                borderRadius: '8px'
+                              }}
+                            />
+                            <Legend />
+                            <Bar dataKey="volume" name="Volume" fill="#06b6d4" radius={[4, 4, 0, 0]} />
+                            <Bar dataKey="clics" name="Clics estimés" fill="#14b8a6" radius={[4, 4, 0, 0]} />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Radar Chart */}
+                  <Card className="bg-background/50 border-border/30">
+                    <CardHeader>
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <PieChart className="h-4 w-4 text-teal-400" />
+                        Analyse multi-critères
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="h-64">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <RadarChart data={titleVolumeChartData}>
+                            <PolarGrid stroke="hsl(var(--border))" />
+                            <PolarAngleAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={10} />
+                            <PolarRadiusAxis stroke="hsl(var(--muted-foreground))" fontSize={8} />
+                            <Radar name="Compétition" dataKey="competition" stroke="#ef4444" fill="#ef4444" fillOpacity={0.3} />
+                            <Radar name="Pertinence" dataKey="relevance" stroke="#22c55e" fill="#22c55e" fillOpacity={0.3} />
+                            <Legend />
+                          </RadarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Results Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {titleVolumeResults.map((item, index) => (
+                      <Card key={index} className="bg-background/50 border-border/30 hover:border-cyan-500/30 transition-colors">
+                        <CardContent className="p-4 space-y-3">
+                          <div className="flex items-start justify-between">
+                            <h4 className="font-semibold text-sm line-clamp-2">{item.title}</h4>
+                            <Badge className={item.monthlyTrend >= 0 ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}>
+                              {item.monthlyTrend >= 0 ? '+' : ''}{item.monthlyTrend}%
+                            </Badge>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-2 text-xs">
+                            <div className="bg-cyan-500/10 rounded p-2">
+                              <div className="text-muted-foreground">Volume</div>
+                              <div className="text-lg font-bold text-cyan-400">{item.searchVolume.toLocaleString()}</div>
+                            </div>
+                            <div className="bg-teal-500/10 rounded p-2">
+                              <div className="text-muted-foreground">Clics/mois</div>
+                              <div className="text-lg font-bold text-teal-400">{item.estimatedClicks.toLocaleString()}</div>
+                            </div>
+                          </div>
+
+                          <div className="space-y-1">
+                            <div className="flex justify-between text-xs">
+                              <span className="text-muted-foreground">Compétition</span>
+                              <span className={item.competitionIndex > 70 ? 'text-red-400' : item.competitionIndex > 40 ? 'text-yellow-400' : 'text-green-400'}>
+                                {item.competitionIndex}/100
+                              </span>
+                            </div>
+                            <Progress value={item.competitionIndex} className="h-1.5" />
+                          </div>
+
+                          <div className="space-y-1">
+                            <div className="flex justify-between text-xs">
+                              <span className="text-muted-foreground">Pertinence</span>
+                              <span className={item.relevanceScore > 70 ? 'text-green-400' : item.relevanceScore > 40 ? 'text-yellow-400' : 'text-red-400'}>
+                                {item.relevanceScore}/100
+                              </span>
+                            </div>
+                            <Progress value={item.relevanceScore} className="h-1.5" />
+                          </div>
+
+                          {item.suggestedKeywords.length > 0 && (
+                            <div className="flex flex-wrap gap-1 pt-2">
+                              {item.suggestedKeywords.slice(0, 4).map((kw, kwIndex) => (
+                                <Badge key={kwIndex} variant="outline" className="text-[10px] bg-background/50">
+                                  {kw}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {titleVolumeResults.length === 0 && !isLoadingTitle && (
+                <div className="text-center py-12 text-muted-foreground">
+                  <TrendingUp className="h-12 w-12 mx-auto mb-4 opacity-30" />
+                  <p>Entrez un titre ou mot-clé pour analyser son volume de recherche</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* Keywords Tab */}
