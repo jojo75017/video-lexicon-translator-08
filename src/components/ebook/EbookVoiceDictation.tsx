@@ -127,13 +127,29 @@ export const EbookVoiceDictation: React.FC<EbookVoiceDictationProps> = ({
     return recognition;
   }, [hasSpeechRecognition, selectedLanguage, isRecording]);
 
+  // Get supported mime type for recording
+  const getSupportedMimeType = () => {
+    const types = [
+      'audio/webm;codecs=opus',
+      'audio/webm',
+      'audio/ogg;codecs=opus',
+      'audio/mp4',
+      'audio/mpeg'
+    ];
+    for (const type of types) {
+      if (MediaRecorder.isTypeSupported(type)) {
+        console.log('Using mime type:', type);
+        return type;
+      }
+    }
+    return 'audio/webm'; // fallback
+  };
+
   // Start recording with real-time or batch mode
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
-          sampleRate: 24000,
-          channelCount: 1,
           echoCancellation: true,
           noiseSuppression: true,
           autoGainControl: true
@@ -161,26 +177,29 @@ export const EbookVoiceDictation: React.FC<EbookVoiceDictationProps> = ({
         }
       }
       
+      // Get supported mime type
+      const mimeType = getSupportedMimeType();
+      
       // Also record for Whisper backup/enhancement
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: 'audio/webm;codecs=opus'
-      });
+      const mediaRecorder = new MediaRecorder(stream, { mimeType });
       
       audioChunksRef.current = [];
       
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           audioChunksRef.current.push(event.data);
+          console.log('Audio chunk received:', event.data.size, 'bytes');
         }
       };
       
       mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
+        console.log('Audio blob created:', audioBlob.size, 'bytes, type:', audioBlob.type);
         setAudioBlob(audioBlob);
       };
       
       mediaRecorderRef.current = mediaRecorder;
-      mediaRecorder.start(1000);
+      mediaRecorder.start(500); // Collect data every 500ms
       setIsRecording(true);
       setRecordingDuration(0);
       setInterimText('');
@@ -370,23 +389,35 @@ export const EbookVoiceDictation: React.FC<EbookVoiceDictationProps> = ({
 
   // Audio playback functions
   const togglePlayback = () => {
-    if (!audioRef.current || !audioUrl) return;
+    if (!audioRef.current || !audioUrl) {
+      console.log('No audio ref or URL available');
+      return;
+    }
     
     if (isPlaying) {
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
-      audioRef.current.play();
-      setIsPlaying(true);
+      audioRef.current.play().then(() => {
+        console.log('Audio playing');
+        setIsPlaying(true);
+      }).catch(err => {
+        console.error('Audio play error:', err);
+        toast.error('Erreur de lecture audio');
+      });
     }
   };
 
   // Create audio URL when blob changes
   useEffect(() => {
-    if (audioBlob) {
+    if (audioBlob && audioBlob.size > 0) {
       const url = URL.createObjectURL(audioBlob);
+      console.log('Audio URL created:', url, 'blob size:', audioBlob.size);
       setAudioUrl(url);
-      return () => URL.revokeObjectURL(url);
+      return () => {
+        URL.revokeObjectURL(url);
+        setAudioUrl(null);
+      };
     }
   }, [audioBlob]);
 
@@ -554,10 +585,13 @@ export const EbookVoiceDictation: React.FC<EbookVoiceDictationProps> = ({
                 </Button>
                 <audio 
                   ref={audioRef}
-                  src={audioUrl}
+                  src={audioUrl || undefined}
                   onEnded={() => setIsPlaying(false)}
-                  className="flex-1 h-8"
+                  onError={(e) => console.error('Audio error:', e)}
+                  onLoadedData={() => console.log('Audio loaded successfully')}
+                  className="flex-1 h-10"
                   controls
+                  preload="auto"
                 />
                 <Badge variant="outline" className="text-xs">
                   <Volume2 className="h-3 w-3 mr-1" />
