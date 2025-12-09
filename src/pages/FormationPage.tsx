@@ -1,24 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Copy, Download, BookOpen, ChevronRight, Eye, X, ChevronLeft, ArrowLeft } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Progress } from '@/components/ui/progress';
+import { 
+  Copy, Download, BookOpen, ChevronRight, Eye, ChevronLeft, ArrowLeft,
+  Search, Star, StarOff, CheckCircle2, Circle, Play, Clock, Filter,
+  Sparkles, GraduationCap, Trophy, Target, Zap, Layers, Settings,
+  Image, TrendingUp, Megaphone, DollarSign, FileOutput, Rocket
+} from 'lucide-react';
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import ReactMarkdown from 'react-markdown';
+
+interface Module {
+  id: number;
+  title: string;
+  description: string;
+  content: string;
+  category: 'basics' | 'creation' | 'advanced' | 'marketing';
+  icon: React.ElementType;
+  duration: string;
+  difficulty: 'débutant' | 'intermédiaire' | 'avancé';
+}
 
 const FormationPage = () => {
   const navigate = useNavigate();
   const [selectedModule, setSelectedModule] = useState<number | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [previewPage, setPreviewPage] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [favorites, setFavorites] = useState<number[]>(() => {
+    const saved = localStorage.getItem('formation-favorites');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [completedModules, setCompletedModules] = useState<number[]>(() => {
+    const saved = localStorage.getItem('formation-completed');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
-  const modules = [
+  const modules: Module[] = [
     {
       id: 1,
       title: "Configuration et Démarrage",
       description: "Installation, configuration API OpenAI, générateur d'idées",
+      category: 'basics',
+      icon: Settings,
+      duration: '15 min',
+      difficulty: 'débutant',
       content: `# Module 1 : Configuration et Démarrage
 
 ## 1.1 Installation et Configuration Initiale
@@ -48,18 +84,16 @@ const FormationPage = () => {
 **Actions à effectuer :**
 1. Explorer les catégories d'idées
 2. Sélectionner une idée qui vous inspire
-3. Transférer automatiquement vers le planificateur
-
-### Captures d'écran à inclure :
-- Grille des idées d'ebooks
-- Catégories colorées par domaine
-- Boutons d'action pour chaque idée
-- Page de détail d'une idée sélectionnée`
+3. Transférer automatiquement vers le planificateur`
     },
     {
       id: 2,
       title: "Planificateur d'Ebook",
       description: "Création du plan, gestion des chapitres, structure",
+      category: 'creation',
+      icon: Layers,
+      duration: '25 min',
+      difficulty: 'débutant',
       content: `# Module 2 : Planificateur d'Ebook
 
 ## 2.1 Création du Plan Initial
@@ -76,12 +110,6 @@ const FormationPage = () => {
 3. Générer la structure automatiquement
 4. Personnaliser la préface et la conclusion
 
-### Captures d'écran à inclure :
-- Formulaire de création d'ebook
-- Génération automatique de la structure
-- Interface de modification des chapitres
-- Aperçu de la structure générée
-
 ## 2.2 Gestion Avancée des Chapitres
 
 **Fonctionnalités principales :**
@@ -89,24 +117,21 @@ const FormationPage = () => {
 - Fusion et division de chapitres
 - Duplication de chapitres
 - Ajout de sous-chapitres
-- Suppression et modification
 
 **Actions à effectuer :**
 1. Réorganiser les chapitres par glisser-déposer
 2. Diviser un chapitre en plusieurs parties
 3. Fusionner des chapitres similaires
-4. Ajouter des sous-chapitres détaillés
-
-### Captures d'écran à inclure :
-- Interface de drag & drop
-- Outils de gestion des chapitres
-- Édition de chapitre en cours
-- Prévisualisation de la structure`
+4. Ajouter des sous-chapitres détaillés`
     },
     {
       id: 3,
       title: "Templates Professionnels",
       description: "Galerie de templates, personnalisation",
+      category: 'creation',
+      icon: BookOpen,
+      duration: '20 min',
+      difficulty: 'débutant',
       content: `# Module 3 : Templates Professionnels
 
 ## 3.1 Galerie de Templates
@@ -123,12 +148,6 @@ const FormationPage = () => {
 3. Appliquer un template à votre ebook
 4. Personnaliser selon vos besoins
 
-### Captures d'écran à inclure :
-- Galerie complète des templates
-- Aperçu de chaque type de template
-- Application d'un template
-- Interface de personnalisation
-
 ## 3.2 Personnalisation des Templates
 
 **Fonctionnalités principales :**
@@ -141,6 +160,10 @@ const FormationPage = () => {
       id: 4,
       title: "Génération de Contenu IA",
       description: "Rédaction automatique, outils d'écriture avancés",
+      category: 'creation',
+      icon: Sparkles,
+      duration: '30 min',
+      difficulty: 'intermédiaire',
       content: `# Module 4 : Génération de Contenu IA
 
 ## 4.1 Rédaction Automatique
@@ -157,24 +180,23 @@ const FormationPage = () => {
 3. Optimiser pour le SEO
 4. Réviser et affiner le contenu
 
-### Captures d'écran à inclure :
-- Interface de génération de contenu
-- Progression de la génération IA
-- Éditeur de contenu intégré
-- Options d'amélioration du style
-
 ## 4.2 Outils d'Écriture Avancés
 
 **Fonctionnalités principales :**
 - Analyse de texte existant
 - Génération de table des matières
 - Compteur de mots automatique
-- Sauvegarde automatique`
+- Sauvegarde automatique
+- Dictaphone IA avec transcription`
     },
     {
       id: 5,
       title: "Outils Avancés",
       description: "Générateur de couverture IA, outils de productivité",
+      category: 'advanced',
+      icon: Zap,
+      duration: '25 min',
+      difficulty: 'intermédiaire',
       content: `# Module 5 : Outils Avancés
 
 ## 5.1 Générateur de Couverture IA
@@ -191,12 +213,6 @@ const FormationPage = () => {
 3. Personnaliser les couleurs
 4. Télécharger en haute résolution
 
-### Captures d'écran à inclure :
-- Interface de génération de couverture
-- Galerie de styles disponibles
-- Options de personnalisation
-- Résultat final de la couverture
-
 ## 5.2 Outils de Productivité
 
 **Fonctionnalités principales :**
@@ -209,6 +225,10 @@ const FormationPage = () => {
       id: 6,
       title: "Banque d'Images IA",
       description: "Génération d'illustrations, optimisation visuelle",
+      category: 'advanced',
+      icon: Image,
+      duration: '20 min',
+      difficulty: 'intermédiaire',
       content: `# Module 6 : Banque d'Images IA
 
 ## 6.1 Génération d'Illustrations
@@ -225,12 +245,6 @@ const FormationPage = () => {
 3. Optimiser les images pour différents formats
 4. Intégrer automatiquement dans l'ebook
 
-### Captures d'écran à inclure :
-- Interface de génération d'images
-- Galerie d'images générées
-- Options de style et personnalisation
-- Intégration dans l'ebook
-
 ## 6.2 Optimisation Visuelle
 
 **Fonctionnalités principales :**
@@ -243,6 +257,10 @@ const FormationPage = () => {
       id: 7,
       title: "Optimisation KDP",
       description: "Préparation Amazon KDP, analyse concurrentielle",
+      category: 'marketing',
+      icon: Target,
+      duration: '35 min',
+      difficulty: 'avancé',
       content: `# Module 7 : Optimisation KDP
 
 ## 7.1 Préparation pour Amazon KDP
@@ -259,12 +277,6 @@ const FormationPage = () => {
 3. Sélectionner les catégories optimales
 4. Définir le prix de vente
 
-### Captures d'écran à inclure :
-- Interface d'optimisation KDP
-- Générateur de descriptions
-- Outil de recherche de mots-clés
-- Sélecteur de catégories
-
 ## 7.2 Analyse Concurrentielle
 
 **Fonctionnalités principales :**
@@ -277,6 +289,10 @@ const FormationPage = () => {
       id: 8,
       title: "Marketing et Promotion",
       description: "Réseaux sociaux, email marketing, landing pages",
+      category: 'marketing',
+      icon: Megaphone,
+      duration: '40 min',
+      difficulty: 'avancé',
       content: `# Module 8 : Marketing et Promotion
 
 ## 8.1 Contenu pour Réseaux Sociaux
@@ -292,12 +308,6 @@ const FormationPage = () => {
 2. Planifier les publications
 3. Créer des visuels attractifs
 4. Suivre les performances
-
-### Captures d'écran à inclure :
-- Interface de génération social media
-- Exemples de posts générés
-- Calendrier de publication
-- Statistiques de performance
 
 ## 8.2 Email Marketing
 
@@ -319,6 +329,10 @@ const FormationPage = () => {
       id: 9,
       title: "Monétisation",
       description: "Stratégies de prix, diversification des revenus",
+      category: 'marketing',
+      icon: DollarSign,
+      duration: '30 min',
+      difficulty: 'avancé',
       content: `# Module 9 : Monétisation
 
 ## 9.1 Stratégies de Prix
@@ -335,12 +349,6 @@ const FormationPage = () => {
 3. Créer des bundles attractifs
 4. Mettre en place l'affiliation
 
-### Captures d'écran à inclure :
-- Calculateur de ROI
-- Interface de gestion des prix
-- Création de bundles
-- Tableau de bord affiliés
-
 ## 9.2 Diversification des Revenus
 
 **Fonctionnalités principales :**
@@ -353,6 +361,10 @@ const FormationPage = () => {
       id: 10,
       title: "Export Multi-Format",
       description: "Formats disponibles, optimisation par format",
+      category: 'advanced',
+      icon: FileOutput,
+      duration: '25 min',
+      difficulty: 'intermédiaire',
       content: `# Module 10 : Export Multi-Format
 
 ## 10.1 Formats Disponibles
@@ -363,18 +375,13 @@ const FormationPage = () => {
 - **MOBI** : Format Kindle
 - **DOCX** : Édition Microsoft Word
 - **HTML** : Version web interactive
+- **InDesign (IDML)** : Format professionnel
 
 **Actions à effectuer :**
 1. Choisir le format d'export
 2. Configurer les options avancées
 3. Générer l'ebook final
 4. Télécharger et vérifier
-
-### Captures d'écran à inclure :
-- Interface de sélection de format
-- Options d'export avancées
-- Progression de génération
-- Aperçu des fichiers générés
 
 ## 10.2 Optimisation par Format
 
@@ -388,6 +395,10 @@ const FormationPage = () => {
       id: 11,
       title: "Stratégies Avancées",
       description: "Automatisation, scaling et growth hacking",
+      category: 'advanced',
+      icon: Rocket,
+      duration: '45 min',
+      difficulty: 'avancé',
       content: `# Module 11 : Stratégies Avancées
 
 ## 11.1 Automatisation Complète
@@ -406,13 +417,58 @@ const FormationPage = () => {
 - Optimisation continue
 - Expansion internationale
 
-### Captures d'écran à inclure :
-- Dashboard de performance
-- Outils d'automatisation
-- Métriques de croissance
-- Interface de scaling`
+## 11.3 Livre Audio
+
+**Fonctionnalités principales :**
+- Conversion texte vers audio avec ElevenLabs
+- Voix naturelles et expressives
+- Export MP3 haute qualité
+- Chapitrage automatique`
     }
   ];
+
+  const categories = [
+    { id: 'all', label: 'Tous', icon: Layers, count: modules.length },
+    { id: 'basics', label: 'Bases', icon: GraduationCap, count: modules.filter(m => m.category === 'basics').length },
+    { id: 'creation', label: 'Création', icon: Sparkles, count: modules.filter(m => m.category === 'creation').length },
+    { id: 'advanced', label: 'Avancé', icon: Zap, count: modules.filter(m => m.category === 'advanced').length },
+    { id: 'marketing', label: 'Marketing', icon: TrendingUp, count: modules.filter(m => m.category === 'marketing').length },
+  ];
+
+  const filteredModules = useMemo(() => {
+    return modules.filter(module => {
+      const matchesSearch = module.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           module.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = selectedCategory === 'all' || module.category === selectedCategory;
+      const matchesFavorites = !showFavoritesOnly || favorites.includes(module.id);
+      return matchesSearch && matchesCategory && matchesFavorites;
+    });
+  }, [searchQuery, selectedCategory, showFavoritesOnly, favorites]);
+
+  const progressPercentage = (completedModules.length / modules.length) * 100;
+
+  const toggleFavorite = (moduleId: number) => {
+    const newFavorites = favorites.includes(moduleId)
+      ? favorites.filter(id => id !== moduleId)
+      : [...favorites, moduleId];
+    setFavorites(newFavorites);
+    localStorage.setItem('formation-favorites', JSON.stringify(newFavorites));
+    toast.success(favorites.includes(moduleId) ? 'Retiré des favoris' : 'Ajouté aux favoris');
+  };
+
+  const toggleCompleted = (moduleId: number) => {
+    const newCompleted = completedModules.includes(moduleId)
+      ? completedModules.filter(id => id !== moduleId)
+      : [...completedModules, moduleId];
+    setCompletedModules(newCompleted);
+    localStorage.setItem('formation-completed', JSON.stringify(newCompleted));
+    
+    if (!completedModules.includes(moduleId)) {
+      toast.success('Module terminé !', {
+        description: `Progression : ${Math.round(((newCompleted.length) / modules.length) * 100)}%`
+      });
+    }
+  };
 
   const copyToClipboard = (content: string) => {
     navigator.clipboard.writeText(content);
@@ -424,7 +480,7 @@ const FormationPage = () => {
 
 ## Table des Matières
 
-${modules.map((module, index) => `${index + 1}. [${module.title}](#module-${index + 1}-${module.title.toLowerCase().replace(/\s+/g, '-')})`).join('\n')}
+${modules.map((module, index) => `${index + 1}. ${module.title}`).join('\n')}
 
 ---
 
@@ -432,28 +488,7 @@ ${modules.map((module, index) => `## Module ${index + 1} : ${module.title}
 
 ${module.content}
 
----`).join('\n\n')}
-
-## Conclusion et Certification
-
-### Récapitulatif des Compétences Acquises
-
-✅ Maîtrise complète du générateur d'ebook IA  
-✅ Création d'ebooks professionnels en minutes  
-✅ Optimisation pour Amazon KDP  
-✅ Stratégies de marketing digital  
-✅ Techniques de monétisation avancées  
-✅ Export multi-format professionnel  
-✅ Automatisation des processus  
-
-### Prochaines Étapes
-
-1. **Créer votre premier ebook** avec les templates fournis
-2. **Publier sur Amazon KDP** en suivant les optimisations
-3. **Développer votre marketing** avec les outils intégrés
-4. **Scaler votre business** avec l'automatisation
-
-© Formation Générateur d'Ebook IA - Tous droits réservés`;
+---`).join('\n\n')}`;
 
     copyToClipboard(fullContent);
   };
@@ -482,17 +517,12 @@ ${module.content}
       yPos += isTitle ? 6 : 3;
     };
 
-    // Page de titre
     pdf.setFontSize(24);
     pdf.setFont('helvetica', 'bold');
     pdf.text('Formation Complete', pageWidth / 2, 60, { align: 'center' });
     pdf.setFontSize(18);
-    pdf.text('Generateur d\'Ebook IA', pageWidth / 2, 75, { align: 'center' });
-    pdf.setFontSize(12);
-    pdf.setFont('helvetica', 'normal');
-    pdf.text('Guide complet de toutes les fonctionnalites', pageWidth / 2, 90, { align: 'center' });
+    pdf.text("Generateur d'Ebook IA", pageWidth / 2, 75, { align: 'center' });
     
-    // Table des matières
     pdf.addPage();
     yPos = 20;
     addText('TABLE DES MATIERES', 16, true, true);
@@ -500,11 +530,9 @@ ${module.content}
     
     modules.forEach((module, index) => {
       addText(`Module ${index + 1}: ${module.title}`, 11);
-      addText(`   ${module.description}`, 9);
       yPos += 2;
     });
 
-    // Contenu des modules
     modules.forEach((module, index) => {
       pdf.addPage();
       yPos = 20;
@@ -513,7 +541,6 @@ ${module.content}
       addText(module.title.toUpperCase(), 16, true, true);
       yPos += 5;
       
-      // Parser le contenu markdown simplifié
       const lines = module.content.split('\n');
       
       for (const line of lines) {
@@ -537,44 +564,11 @@ ${module.content}
       }
     });
 
-    // Page finale - Récapitulatif
-    pdf.addPage();
-    yPos = 20;
-    addText('RECAPITULATIF DES COMPETENCES', 16, true, true);
-    yPos += 5;
-    
-    const competences = [
-      'Maitrise complete du generateur d\'ebook IA',
-      'Creation d\'ebooks professionnels en minutes',
-      'Optimisation pour Amazon KDP',
-      'Strategies de marketing digital',
-      'Techniques de monetisation avancees',
-      'Export multi-format professionnel',
-      'Automatisation des processus'
-    ];
-    
-    competences.forEach(comp => {
-      addText('✓ ' + comp, 11);
-    });
-    
-    yPos += 10;
-    addText('PROCHAINES ETAPES', 14, true, true);
-    yPos += 3;
-    addText('1. Creer votre premier ebook avec les templates fournis', 10);
-    addText('2. Publier sur Amazon KDP en suivant les optimisations', 10);
-    addText('3. Developper votre marketing avec les outils integres', 10);
-    addText('4. Scaler votre business avec l\'automatisation', 10);
-    
-    yPos += 15;
-    pdf.setFontSize(9);
-    pdf.text('Formation Generateur d\'Ebook IA - Tous droits reserves', pageWidth / 2, 280, { align: 'center' });
-
     pdf.save('Formation_Complete_Generateur_Ebook.pdf');
     toast.success('Formation exportée en PDF !');
     setShowPreview(false);
   };
 
-  // Données de prévisualisation des pages
   const previewPages = [
     {
       title: "Page de Couverture",
@@ -619,258 +613,494 @@ ${module.content}
           </div>
         </div>
       )
-    })),
-    {
-      title: "Récapitulatif",
-      content: (
-        <div className="p-6 h-full">
-          <h3 className="text-lg font-bold mb-4">RÉCAPITULATIF DES COMPÉTENCES</h3>
-          <ul className="space-y-2 text-sm mb-6">
-            <li>✓ Maîtrise complète du générateur</li>
-            <li>✓ Création d'ebooks professionnels</li>
-            <li>✓ Optimisation pour Amazon KDP</li>
-            <li>✓ Stratégies de marketing digital</li>
-            <li>✓ Techniques de monétisation</li>
-            <li>✓ Export multi-format</li>
-            <li>✓ Automatisation des processus</li>
-          </ul>
-          <h4 className="font-semibold mb-2">Prochaines Étapes</h4>
-          <ol className="text-xs space-y-1 list-decimal pl-4">
-            <li>Créer votre premier ebook</li>
-            <li>Publier sur Amazon KDP</li>
-            <li>Développer votre marketing</li>
-            <li>Scaler votre business</li>
-          </ol>
-        </div>
-      )
-    }
+    }))
   ];
 
   const totalPages = previewPages.length;
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted/50 p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Bouton retour */}
-        <Button 
-          variant="ghost" 
-          onClick={() => navigate('/ebook-planner')} 
-          className="mb-4 gap-2"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Retour au Générateur
-        </Button>
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case 'débutant': return 'bg-green-500/10 text-green-600 border-green-500/20';
+      case 'intermédiaire': return 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20';
+      case 'avancé': return 'bg-red-500/10 text-red-600 border-red-500/20';
+      default: return 'bg-muted text-muted-foreground';
+    }
+  };
 
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <BookOpen className="h-10 w-10 text-primary" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-              Formation Complète
-            </h1>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30">
+      {/* Header avec progression */}
+      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-lg border-b">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between mb-4">
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate('/ebook-planner')} 
+              className="gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Retour
+            </Button>
+            
+            <div className="flex items-center gap-4">
+              <div className="hidden md:flex items-center gap-2 text-sm">
+                <Trophy className="h-4 w-4 text-yellow-500" />
+                <span className="text-muted-foreground">{completedModules.length}/{modules.length} modules</span>
+              </div>
+              <div className="w-32 hidden md:block">
+                <Progress value={progressPercentage} className="h-2" />
+              </div>
+              <Button onClick={copyAllModules} size="sm" variant="outline" className="gap-2">
+                <Copy className="h-4 w-4" />
+                <span className="hidden sm:inline">Copier tout</span>
+              </Button>
+              <Button 
+                onClick={() => { setPreviewPage(0); setShowPreview(true); }} 
+                size="sm" 
+                className="gap-2"
+              >
+                <Download className="h-4 w-4" />
+                <span className="hidden sm:inline">PDF</span>
+              </Button>
+            </div>
           </div>
-          <p className="text-xl text-muted-foreground mb-6">
-            Générateur d'Ebook IA - Toutes les fonctionnalités
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Hero section */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-12"
+        >
+          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm mb-4">
+            <GraduationCap className="h-4 w-4" />
+            Formation Complète
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
+            Maîtrisez le Générateur d'Ebook IA
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            {modules.length} modules • {modules.reduce((acc, m) => acc + parseInt(m.duration), 0)} minutes de contenu
           </p>
           
-          <div className="flex gap-4 justify-center">
-            <Button onClick={copyAllModules} size="lg" className="gap-2">
-              <Copy className="h-4 w-4" />
-              Copier la Formation Complète
-            </Button>
-            <Button onClick={() => { setPreviewPage(0); setShowPreview(true); }} size="lg" className="gap-2 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white border-0">
-              <Eye className="h-4 w-4" />
-              Prévisualiser PDF
+          {/* Statistiques de progression */}
+          <div className="flex justify-center gap-6 mt-8">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-primary">{completedModules.length}</div>
+              <div className="text-sm text-muted-foreground">Terminés</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-yellow-500">{favorites.length}</div>
+              <div className="text-sm text-muted-foreground">Favoris</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-green-500">{Math.round(progressPercentage)}%</div>
+              <div className="text-sm text-muted-foreground">Progression</div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Filtres et recherche */}
+        <div className="mb-8 space-y-4">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input 
+                placeholder="Rechercher un module..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Button 
+              variant={showFavoritesOnly ? "default" : "outline"}
+              onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+              className="gap-2"
+            >
+              <Star className="h-4 w-4" />
+              Favoris ({favorites.length})
             </Button>
           </div>
 
-          {/* Dialog de prévisualisation PDF */}
-          <Dialog open={showPreview} onOpenChange={setShowPreview}>
-            <DialogContent className="max-w-4xl max-h-[90vh]">
-              <DialogHeader>
-                <DialogTitle className="flex items-center justify-between">
-                  <span>Prévisualisation du PDF - {previewPages[previewPage]?.title}</span>
-                  <span className="text-sm font-normal text-muted-foreground">
-                    Page {previewPage + 1} / {totalPages}
-                  </span>
-                </DialogTitle>
-              </DialogHeader>
-              
-              {/* Aperçu de la page */}
-              <div className="border rounded-lg bg-white text-foreground min-h-[400px] shadow-inner">
-                {previewPages[previewPage]?.content}
-              </div>
-
-              {/* Navigation et actions */}
-              <div className="flex items-center justify-between mt-4">
-                <div className="flex gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => setPreviewPage(Math.max(0, previewPage - 1))}
-                    disabled={previewPage === 0}
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                    Précédent
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => setPreviewPage(Math.min(totalPages - 1, previewPage + 1))}
-                    disabled={previewPage === totalPages - 1}
-                  >
-                    Suivant
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                {/* Miniatures */}
-                <div className="flex gap-1 overflow-x-auto max-w-xs">
-                  {previewPages.slice(0, 6).map((_, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setPreviewPage(idx)}
-                      className={`w-8 h-10 rounded border text-xs flex items-center justify-center transition-all ${
-                        previewPage === idx 
-                          ? 'border-primary bg-primary/10 text-primary font-bold' 
-                          : 'border-muted hover:border-primary/50'
-                      }`}
-                    >
-                      {idx + 1}
-                    </button>
-                  ))}
-                  {previewPages.length > 6 && (
-                    <span className="text-xs text-muted-foreground self-center">+{previewPages.length - 6}</span>
-                  )}
-                </div>
-
-                <Button onClick={exportFormationPDF} className="gap-2">
-                  <Download className="h-4 w-4" />
-                  Télécharger PDF
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
-          {modules.map((module, index) => (
-            <Card 
-              key={module.id} 
-              className="transition-all duration-200 hover:shadow-lg hover:scale-105 border-2 hover:border-primary/50"
-            >
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <Badge variant="secondary" className="text-xs">
-                    Module {module.id}
-                  </Badge>
-                  <ChevronRight 
-                    className={`h-4 w-4 transition-transform ${
-                      selectedModule === module.id ? 'rotate-90' : ''
-                    }`} 
-                  />
-                </div>
-                <CardTitle className="text-lg">{module.title}</CardTitle>
-                <p className="text-sm text-muted-foreground mb-4">{module.description}</p>
-                
-                <div className="flex gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="flex-1 gap-1"
-                    onClick={() => setSelectedModule(selectedModule === module.id ? null : module.id)}
-                  >
-                    <BookOpen className="h-3 w-3" />
-                    Détails
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    className="flex-1 gap-1 bg-gradient-to-r from-primary to-primary/80"
-                    onClick={() => {
-                      // Index dans previewPages: 0=couverture, 1=table, puis modules à partir de 2
-                      setPreviewPage(index + 2);
-                      setShowPreview(true);
-                    }}
-                  >
-                    <Eye className="h-3 w-3" />
-                    Prévisualiser
-                  </Button>
-                </div>
-              </CardHeader>
-            </Card>
-          ))}
-        </div>
-
-        {selectedModule && (
-          <Card className="mb-8">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-2xl">
-                  Module {selectedModule} : {modules.find(m => m.id === selectedModule)?.title}
-                </CardTitle>
-                <Button 
-                  onClick={() => copyToClipboard(modules.find(m => m.id === selectedModule)?.content || '')}
+          {/* Catégories */}
+          <div className="flex flex-wrap gap-2">
+            {categories.map(cat => {
+              const Icon = cat.icon;
+              return (
+                <Button
+                  key={cat.id}
+                  variant={selectedCategory === cat.id ? "default" : "outline"}
                   size="sm"
+                  onClick={() => setSelectedCategory(cat.id)}
                   className="gap-2"
                 >
-                  <Copy className="h-4 w-4" />
-                  Copier ce module
+                  <Icon className="h-4 w-4" />
+                  {cat.label}
+                  <Badge variant="secondary" className="ml-1 h-5 px-1.5">
+                    {cat.count}
+                  </Badge>
                 </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="prose prose-slate max-w-none">
-                <pre className="whitespace-pre-wrap text-sm leading-relaxed">
-                  {modules.find(m => m.id === selectedModule)?.content}
-                </pre>
-              </div>
-            </CardContent>
-          </Card>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Grille des modules */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
+          <AnimatePresence mode="popLayout">
+            {filteredModules.map((module, index) => {
+              const Icon = module.icon;
+              const isCompleted = completedModules.includes(module.id);
+              const isFavorite = favorites.includes(module.id);
+              
+              return (
+                <motion.div
+                  key={module.id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ delay: index * 0.05 }}
+                >
+                  <Card className={`group relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 border-2 ${
+                    isCompleted ? 'border-green-500/50 bg-green-500/5' : 'hover:border-primary/50'
+                  }`}>
+                    {/* Badge de complétion */}
+                    {isCompleted && (
+                      <div className="absolute top-0 right-0 bg-green-500 text-white text-xs px-2 py-1 rounded-bl-lg">
+                        <CheckCircle2 className="h-3 w-3 inline mr-1" />
+                        Terminé
+                      </div>
+                    )}
+                    
+                    <CardHeader className="pb-2">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className={`p-2 rounded-lg bg-primary/10 text-primary`}>
+                          <Icon className="h-5 w-5" />
+                        </div>
+                        <div className="flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => toggleFavorite(module.id)}
+                          >
+                            {isFavorite ? (
+                              <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
+                            ) : (
+                              <StarOff className="h-4 w-4 text-muted-foreground" />
+                            )}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => toggleCompleted(module.id)}
+                          >
+                            {isCompleted ? (
+                              <CheckCircle2 className="h-4 w-4 text-green-500" />
+                            ) : (
+                              <Circle className="h-4 w-4 text-muted-foreground" />
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge variant="outline" className="text-xs">
+                          Module {module.id}
+                        </Badge>
+                        <Badge variant="outline" className={`text-xs ${getDifficultyColor(module.difficulty)}`}>
+                          {module.difficulty}
+                        </Badge>
+                      </div>
+                      
+                      <CardTitle className="text-lg group-hover:text-primary transition-colors">
+                        {module.title}
+                      </CardTitle>
+                      <p className="text-sm text-muted-foreground">{module.description}</p>
+                      
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground mt-2">
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {module.duration}
+                        </span>
+                      </div>
+                    </CardHeader>
+                    
+                    <CardContent className="pt-2">
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="flex-1 gap-1"
+                          onClick={() => setSelectedModule(selectedModule === module.id ? null : module.id)}
+                        >
+                          <Play className="h-3 w-3" />
+                          {selectedModule === module.id ? 'Fermer' : 'Voir'}
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          className="flex-1 gap-1"
+                          onClick={() => {
+                            setPreviewPage(modules.findIndex(m => m.id === module.id) + 2);
+                            setShowPreview(true);
+                          }}
+                        >
+                          <Eye className="h-3 w-3" />
+                          PDF
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
+        </div>
+
+        {filteredModules.length === 0 && (
+          <div className="text-center py-12">
+            <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground">Aucun module trouvé</p>
+          </div>
         )}
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Checklist de Lancement d'Ebook</CardTitle>
+        {/* Module sélectionné */}
+        <AnimatePresence>
+          {selectedModule && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+            >
+              <Card className="mb-8 overflow-hidden">
+                <CardHeader className="bg-gradient-to-r from-primary/10 to-transparent">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      {(() => {
+                        const mod = modules.find(m => m.id === selectedModule);
+                        const Icon = mod?.icon || BookOpen;
+                        return <Icon className="h-6 w-6 text-primary" />;
+                      })()}
+                      <CardTitle className="text-2xl">
+                        Module {selectedModule} : {modules.find(m => m.id === selectedModule)?.title}
+                      </CardTitle>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button 
+                        onClick={() => copyToClipboard(modules.find(m => m.id === selectedModule)?.content || '')}
+                        size="sm"
+                        variant="outline"
+                        className="gap-2"
+                      >
+                        <Copy className="h-4 w-4" />
+                        Copier
+                      </Button>
+                      <Button 
+                        onClick={() => toggleCompleted(selectedModule)}
+                        size="sm"
+                        variant={completedModules.includes(selectedModule) ? "default" : "outline"}
+                        className="gap-2"
+                      >
+                        <CheckCircle2 className="h-4 w-4" />
+                        {completedModules.includes(selectedModule) ? 'Terminé' : 'Marquer terminé'}
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="prose prose-slate dark:prose-invert max-w-none">
+                    <ReactMarkdown>
+                      {modules.find(m => m.id === selectedModule)?.content || ''}
+                    </ReactMarkdown>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Checklist améliorée */}
+        <Card className="overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10">
+            <div className="flex items-center gap-3">
+              <Trophy className="h-6 w-6 text-yellow-500" />
+              <CardTitle>Checklist de Lancement d'Ebook</CardTitle>
+            </div>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h4 className="font-semibold mb-3">Pré-production :</h4>
-                <ul className="space-y-2 text-sm">
-                  <li>☐ Idée validée et recherche effectuée</li>
-                  <li>☐ Structure détaillée créée</li>
-                  <li>☐ Template sélectionné et personnalisé</li>
-                </ul>
+          <CardContent className="pt-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-6">
+                <div>
+                  <h4 className="font-semibold mb-3 flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-blue-500" />
+                    Pré-production
+                  </h4>
+                  <ul className="space-y-2 text-sm pl-4">
+                    <li className="flex items-center gap-2">
+                      <input type="checkbox" className="rounded" />
+                      Idée validée et recherche effectuée
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <input type="checkbox" className="rounded" />
+                      Structure détaillée créée
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <input type="checkbox" className="rounded" />
+                      Template sélectionné et personnalisé
+                    </li>
+                  </ul>
+                </div>
                 
-                <h4 className="font-semibold mb-3 mt-6">Production :</h4>
-                <ul className="space-y-2 text-sm">
-                  <li>☐ Contenu généré et optimisé</li>
-                  <li>☐ Couverture créée et finalisée</li>
-                  <li>☐ Images intégrées et optimisées</li>
-                  <li>☐ Relecture et corrections effectuées</li>
-                </ul>
+                <div>
+                  <h4 className="font-semibold mb-3 flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-green-500" />
+                    Production
+                  </h4>
+                  <ul className="space-y-2 text-sm pl-4">
+                    <li className="flex items-center gap-2">
+                      <input type="checkbox" className="rounded" />
+                      Contenu généré et optimisé
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <input type="checkbox" className="rounded" />
+                      Couverture créée et finalisée
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <input type="checkbox" className="rounded" />
+                      Images intégrées et optimisées
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <input type="checkbox" className="rounded" />
+                      Relecture et corrections effectuées
+                    </li>
+                  </ul>
+                </div>
               </div>
               
-              <div>
-                <h4 className="font-semibold mb-3">Optimisation KDP :</h4>
-                <ul className="space-y-2 text-sm">
-                  <li>☐ Description accrocheuse rédigée</li>
-                  <li>☐ Mots-clés recherchés et sélectionnés</li>
-                  <li>☐ Catégories optimales choisies</li>
-                  <li>☐ Prix compétitif défini</li>
-                </ul>
+              <div className="space-y-6">
+                <div>
+                  <h4 className="font-semibold mb-3 flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-purple-500" />
+                    Optimisation KDP
+                  </h4>
+                  <ul className="space-y-2 text-sm pl-4">
+                    <li className="flex items-center gap-2">
+                      <input type="checkbox" className="rounded" />
+                      Description accrocheuse rédigée
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <input type="checkbox" className="rounded" />
+                      Mots-clés recherchés et sélectionnés
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <input type="checkbox" className="rounded" />
+                      Catégories optimales choisies
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <input type="checkbox" className="rounded" />
+                      Prix compétitif défini
+                    </li>
+                  </ul>
+                </div>
                 
-                <h4 className="font-semibold mb-3 mt-6">Marketing :</h4>
-                <ul className="space-y-2 text-sm">
-                  <li>☐ Contenu social media préparé</li>
-                  <li>☐ Campagne email configurée</li>
-                  <li>☐ Landing page créée</li>
-                  <li>☐ Stratégie de lancement planifiée</li>
-                </ul>
+                <div>
+                  <h4 className="font-semibold mb-3 flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-orange-500" />
+                    Marketing
+                  </h4>
+                  <ul className="space-y-2 text-sm pl-4">
+                    <li className="flex items-center gap-2">
+                      <input type="checkbox" className="rounded" />
+                      Contenu social media préparé
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <input type="checkbox" className="rounded" />
+                      Campagne email configurée
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <input type="checkbox" className="rounded" />
+                      Landing page créée
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <input type="checkbox" className="rounded" />
+                      Stratégie de lancement planifiée
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Dialog de prévisualisation PDF */}
+      <Dialog open={showPreview} onOpenChange={setShowPreview}>
+        <DialogContent className="max-w-4xl max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <span>Prévisualisation du PDF - {previewPages[previewPage]?.title}</span>
+              <span className="text-sm font-normal text-muted-foreground">
+                Page {previewPage + 1} / {totalPages}
+              </span>
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="border rounded-lg bg-white text-foreground min-h-[400px] shadow-inner">
+            {previewPages[previewPage]?.content}
+          </div>
+
+          <div className="flex items-center justify-between mt-4">
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setPreviewPage(Math.max(0, previewPage - 1))}
+                disabled={previewPage === 0}
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Précédent
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setPreviewPage(Math.min(totalPages - 1, previewPage + 1))}
+                disabled={previewPage === totalPages - 1}
+              >
+                Suivant
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+
+            <div className="flex gap-1 overflow-x-auto max-w-xs">
+              {previewPages.slice(0, 6).map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setPreviewPage(idx)}
+                  className={`w-8 h-10 rounded border text-xs flex items-center justify-center transition-all ${
+                    previewPage === idx 
+                      ? 'border-primary bg-primary/10 text-primary font-bold' 
+                      : 'border-muted hover:border-primary/50'
+                  }`}
+                >
+                  {idx + 1}
+                </button>
+              ))}
+              {previewPages.length > 6 && (
+                <span className="text-xs text-muted-foreground self-center">+{previewPages.length - 6}</span>
+              )}
+            </div>
+
+            <Button onClick={exportFormationPDF} className="gap-2">
+              <Download className="h-4 w-4" />
+              Télécharger PDF
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
