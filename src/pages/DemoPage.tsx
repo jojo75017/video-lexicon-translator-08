@@ -11,7 +11,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const DEMO_STORAGE_KEY = "ebook_demo_used";
+const DEMO_STORAGE_KEY = "ebook_demo_count";
+const MAX_DEMO_TRIES = 2;
 
 const DemoPage = () => {
   const navigate = useNavigate();
@@ -22,22 +23,23 @@ const DemoPage = () => {
   const [numberOfChapters, setNumberOfChapters] = useState("5");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedPlan, setGeneratedPlan] = useState<string | null>(null);
-  const [demoUsed, setDemoUsed] = useState(false);
+  const [demoCount, setDemoCount] = useState(0);
+
+  const remainingTries = MAX_DEMO_TRIES - demoCount;
+  const demoUsed = demoCount >= MAX_DEMO_TRIES;
 
   useEffect(() => {
     // Reset demo if ?reset=true in URL
     if (searchParams.get("reset") === "true") {
       localStorage.removeItem(DEMO_STORAGE_KEY);
-      setDemoUsed(false);
+      setDemoCount(0);
       toast.success("Démo réinitialisée !");
       navigate("/demo", { replace: true });
       return;
     }
     
-    const used = localStorage.getItem(DEMO_STORAGE_KEY);
-    if (used === "true") {
-      setDemoUsed(true);
-    }
+    const count = parseInt(localStorage.getItem(DEMO_STORAGE_KEY) || "0");
+    setDemoCount(count);
   }, [searchParams, navigate]);
 
   const handleGenerate = async () => {
@@ -47,7 +49,7 @@ const DemoPage = () => {
     }
 
     if (demoUsed) {
-      toast.error("Vous avez déjà utilisé votre essai gratuit");
+      toast.error("Vous avez utilisé vos 2 essais gratuits");
       return;
     }
 
@@ -68,9 +70,14 @@ const DemoPage = () => {
 
       if (data?.plan) {
         setGeneratedPlan(data.plan);
-        localStorage.setItem(DEMO_STORAGE_KEY, "true");
-        setDemoUsed(true);
-        toast.success("Plan généré avec succès !");
+        const newCount = demoCount + 1;
+        localStorage.setItem(DEMO_STORAGE_KEY, newCount.toString());
+        setDemoCount(newCount);
+        if (newCount >= MAX_DEMO_TRIES) {
+          toast.success("Plan généré ! Vous avez utilisé vos 2 essais gratuits.");
+        } else {
+          toast.success(`Plan généré ! Il vous reste ${MAX_DEMO_TRIES - newCount} essai(s).`);
+        }
       } else {
         throw new Error("Aucun plan généré");
       }
@@ -148,7 +155,7 @@ const DemoPage = () => {
           </h1>
           <p className="text-muted-foreground max-w-xl mx-auto">
             Générez gratuitement un plan complet pour votre ebook. 
-            <span className="text-primary font-medium"> Essai limité à 1 génération.</span>
+            <span className="text-primary font-medium"> {remainingTries > 0 ? `Il vous reste ${remainingTries} essai(s) gratuit(s).` : "Essais épuisés."}</span>
           </p>
         </div>
 
@@ -238,12 +245,12 @@ const DemoPage = () => {
                 ) : demoUsed ? (
                   <>
                     <Lock className="w-4 h-4 mr-2" />
-                    Essai utilisé
+                    Essais utilisés (0/{MAX_DEMO_TRIES})
                   </>
                 ) : (
                   <>
                     <Sparkles className="w-4 h-4 mr-2" />
-                    Générer mon plan
+                    Générer mon plan ({remainingTries}/{MAX_DEMO_TRIES} restant)
                   </>
                 )}
               </Button>
@@ -251,7 +258,7 @@ const DemoPage = () => {
               {demoUsed && !generatedPlan && (
                 <div className="text-center pt-4 border-t">
                   <p className="text-sm text-muted-foreground mb-3">
-                    Vous avez déjà utilisé votre essai gratuit
+                    Vous avez utilisé vos 2 essais gratuits
                   </p>
                   <Button variant="outline" onClick={() => navigate("/offres")}>
                     Voir les offres
