@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BookOpen, Sparkles, Loader2, Lock, ArrowRight, CheckCircle2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -15,6 +15,7 @@ const DEMO_STORAGE_KEY = "ebook_demo_used";
 
 const DemoPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [title, setTitle] = useState("");
   const [genre, setGenre] = useState("");
   const [targetAudience, setTargetAudience] = useState("");
@@ -24,11 +25,20 @@ const DemoPage = () => {
   const [demoUsed, setDemoUsed] = useState(false);
 
   useEffect(() => {
+    // Reset demo if ?reset=true in URL
+    if (searchParams.get("reset") === "true") {
+      localStorage.removeItem(DEMO_STORAGE_KEY);
+      setDemoUsed(false);
+      toast.success("Démo réinitialisée !");
+      navigate("/demo", { replace: true });
+      return;
+    }
+    
     const used = localStorage.getItem(DEMO_STORAGE_KEY);
     if (used === "true") {
       setDemoUsed(true);
     }
-  }, []);
+  }, [searchParams, navigate]);
 
   const handleGenerate = async () => {
     if (!title.trim()) {
