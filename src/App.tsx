@@ -13,6 +13,7 @@ import AdminProfilePage from './pages/AdminProfilePage';
 import AffiliationFormationPage from './pages/AffiliationFormationPage';
 import FormationPage from './pages/FormationPage';
 import FormationAudioPage from './pages/FormationAudioPage';
+import SalesPage from './pages/SalesPage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -107,7 +108,8 @@ const App = () => {
       <TooltipProvider>
         <div className="min-h-screen bg-background">
           <Routes>
-            <Route path="/" element={<Navigate to="/ebook-ideas" replace />} />
+            <Route path="/" element={<Navigate to="/offres" replace />} />
+            <Route path="/offres" element={<SalesPage />} />
             <Route path="/affiliation" element={<AffiliationFormationPage />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/ai-chat" element={<AiChatPage />} />
