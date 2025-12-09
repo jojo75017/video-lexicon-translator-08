@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +16,19 @@ const SalesPage = () => {
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  // Secret admin access: Ctrl+Shift+A (or Cmd+Shift+A on Mac)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'a') {
+        e.preventDefault();
+        navigate('/auth');
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [navigate]);
 
   const features = [
     { icon: Sparkles, title: "Génération IA", description: "Plans d'ebook complets générés par intelligence artificielle" },
@@ -414,12 +427,9 @@ const SalesPage = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Footer with hidden admin access - double click required */}
+      {/* Footer */}
       <footer className="py-6 text-center border-t border-border/50">
-        <p 
-          className="text-xs text-muted-foreground/50 cursor-default select-none"
-          onDoubleClick={() => navigate('/auth')}
-        >
+        <p className="text-xs text-muted-foreground/50">
           © 2024
         </p>
       </footer>
