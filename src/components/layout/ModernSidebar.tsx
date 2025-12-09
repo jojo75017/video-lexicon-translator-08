@@ -196,6 +196,14 @@ const menuItems = [
     activeGradient: 'from-emerald-500 to-green-500'
   },
   { 
+    id: 'kdp-analytics', 
+    label: '📊 KDP Analytics', 
+    icon: TrendingUp,
+    color: 'text-cyan-500',
+    bgColor: 'bg-cyan-500/10',
+    activeGradient: 'from-cyan-500 to-blue-500'
+  },
+  { 
     id: 'statistics', 
     label: 'Stats & Outils', 
     icon: BarChart3,
