@@ -16,8 +16,27 @@ const SalesPage = () => {
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [clickCount, setClickCount] = useState(0);
+  const [lastClickTime, setLastClickTime] = useState(0);
 
-  // Secret admin access: Ctrl+Shift+A (or Cmd+Shift+A on Mac)
+  // Secret admin access: 5 rapid clicks on copyright
+  const handleSecretClick = () => {
+    const now = Date.now();
+    if (now - lastClickTime > 2000) {
+      // Reset if more than 2 seconds since last click
+      setClickCount(1);
+    } else {
+      setClickCount(prev => prev + 1);
+    }
+    setLastClickTime(now);
+    
+    if (clickCount >= 4) {
+      navigate('/auth');
+      setClickCount(0);
+    }
+  };
+
+  // Also keep keyboard shortcut as backup: Ctrl+Shift+A
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'a') {
@@ -427,9 +446,12 @@ const SalesPage = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Footer */}
+      {/* Footer with secret admin access - 5 rapid clicks */}
       <footer className="py-6 text-center border-t border-border/50">
-        <p className="text-xs text-muted-foreground/50">
+        <p 
+          className="text-xs text-muted-foreground/50 cursor-default select-none"
+          onClick={handleSecretClick}
+        >
           © 2024
         </p>
       </footer>
