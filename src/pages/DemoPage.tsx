@@ -83,12 +83,45 @@ const DemoPage = () => {
     "Business & Entrepreneuriat",
     "Finance & Investissement",
     "Santé & Bien-être",
+    "Cuisine & Recettes",
+    "Voyage & Aventure",
+    "Livres pour enfants (3-6 ans)",
+    "Livres pour enfants (6-9 ans)",
+    "Livres pour enfants (9-12 ans)",
+    "Jeunesse / Young Adult",
     "Romance",
-    "Thriller",
+    "Thriller & Policier",
     "Science-Fiction",
     "Fantasy",
+    "Horreur",
+    "Biographie & Mémoires",
+    "Histoire",
     "Guide pratique",
+    "Éducation & Formation",
+    "Spiritualité & Religion",
+    "Art & Design",
     "Autre",
+  ];
+
+  const audiences = [
+    "Grand public",
+    "Enfants (3-6 ans)",
+    "Enfants (6-9 ans)",
+    "Enfants (9-12 ans)",
+    "Adolescents (12-18 ans)",
+    "Jeunes adultes (18-25 ans)",
+    "Adultes (25-45 ans)",
+    "Seniors (45+)",
+    "Entrepreneurs débutants",
+    "Entrepreneurs expérimentés",
+    "Étudiants",
+    "Professionnels en reconversion",
+    "Parents",
+    "Femmes",
+    "Hommes",
+    "Couples",
+    "Managers & Cadres",
+    "Indépendants & Freelances",
   ];
 
   return (
@@ -151,13 +184,18 @@ const DemoPage = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="audience">Public cible</Label>
-                <Input
-                  id="audience"
-                  placeholder="Ex: Entrepreneurs débutants"
-                  value={targetAudience}
-                  onChange={(e) => setTargetAudience(e.target.value)}
-                  disabled={demoUsed || isGenerating}
-                />
+                <Select value={targetAudience} onValueChange={setTargetAudience} disabled={demoUsed || isGenerating}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sélectionnez un public" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {audiences.map((a) => (
+                      <SelectItem key={a} value={a}>
+                        {a}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">
