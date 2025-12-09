@@ -60,6 +60,14 @@ const menuItems = [
     activeGradient: 'from-fuchsia-500 to-pink-500'
   },
   { 
+    id: 'series', 
+    label: '📚 Série / Saga', 
+    icon: BookCopy,
+    color: 'text-indigo-500',
+    bgColor: 'bg-indigo-500/10',
+    activeGradient: 'from-indigo-500 to-purple-500'
+  },
+  { 
     id: 'templates', 
     label: 'Templates', 
     icon: LayoutTemplate,
@@ -178,14 +186,6 @@ const menuItems = [
     color: 'text-purple-500',
     bgColor: 'bg-purple-500/10',
     activeGradient: 'from-purple-500 to-violet-500'
-  },
-  { 
-    id: 'series', 
-    label: 'Série Multi-Tomes', 
-    icon: BookCopy,
-    color: 'text-indigo-500',
-    bgColor: 'bg-indigo-500/10',
-    activeGradient: 'from-indigo-500 to-purple-500'
   },
   { 
     id: 'market', 
