@@ -119,6 +119,18 @@ const SalesPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+      {/* Admin Access Button */}
+      <div className="absolute top-4 right-4 z-50">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => navigate('/auth')}
+          className="text-muted-foreground hover:text-foreground"
+        >
+          Admin
+        </Button>
+      </div>
+
       {/* Hero Section */}
       <section className="relative overflow-hidden py-20 px-4">
         <div className="absolute inset-0 bg-grid-pattern opacity-5" />
