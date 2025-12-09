@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,10 +9,24 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   BookOpen, Plus, Trash2, Save, Wand2, Loader2, 
-  Library, Users, MapPin, Scroll, Crown, Sparkles, Copy
+  Library, Users, MapPin, Scroll, Crown, Sparkles, Copy,
+  AlertTriangle, CheckCircle, Link2, ArrowRight, Heart, Swords
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+
+interface CharacterRelation {
+  characterId: string;
+  type: 'ally' | 'enemy' | 'family' | 'romantic' | 'mentor' | 'rival';
+  description: string;
+}
+
+interface CharacterArcPerTome {
+  tome: number;
+  status: string;
+  development: string;
+  keyMoments: string[];
+}
 
 interface SeriesCharacter {
   id: string;
@@ -21,6 +35,12 @@ interface SeriesCharacter {
   description: string;
   arc: string;
   appearances: number[];
+  relations: CharacterRelation[];
+  arcPerTome: CharacterArcPerTome[];
+  physicalDescription?: string;
+  personality?: string;
+  motivations?: string;
+  secrets?: string;
 }
 
 interface SeriesLocation {
@@ -28,6 +48,7 @@ interface SeriesLocation {
   name: string;
   description: string;
   significance: string;
+  appearancesByTome: number[];
 }
 
 interface SeriesTimeline {
@@ -36,6 +57,16 @@ interface SeriesTimeline {
   tome: number;
   chapter?: string;
   date?: string;
+  charactersInvolved?: string[];
+}
+
+interface PlotThread {
+  id: string;
+  name: string;
+  description: string;
+  introducedTome: number;
+  resolvedTome?: number;
+  status: 'open' | 'resolved' | 'ongoing';
 }
 
 interface SeriesTome {
@@ -45,6 +76,16 @@ interface SeriesTome {
   synopsis: string;
   status: 'planned' | 'writing' | 'complete';
   wordCount: number;
+  mainPlotPoints: string[];
+  cliffhanger?: string;
+  previousTomeConnection?: string;
+}
+
+interface CoherenceIssue {
+  type: 'character' | 'plot' | 'timeline' | 'location';
+  severity: 'warning' | 'error';
+  message: string;
+  tomeNumber?: number;
 }
 
 interface SeriesBible {
@@ -58,6 +99,7 @@ interface SeriesBible {
   timeline: SeriesTimeline[];
   tomes: SeriesTome[];
   writingRules: string;
+  plotThreads: PlotThread[];
 }
 
 interface EbookSeriesManagerProps {
@@ -82,11 +124,94 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
     locations: [],
     timeline: [],
     tomes: [],
-    writingRules: ''
+    writingRules: '',
+    plotThreads: []
   });
 
   const [newTheme, setNewTheme] = useState('');
   const [activeTab, setActiveTab] = useState('overview');
+
+  // Vérification automatique de cohérence
+  const coherenceIssues = useMemo((): CoherenceIssue[] => {
+    const issues: CoherenceIssue[] = [];
+
+    // Vérifier les personnages sans apparitions définies
+    seriesBible.characters.forEach(char => {
+      if (char.appearances.length === 0) {
+        issues.push({
+          type: 'character',
+          severity: 'warning',
+          message: `${char.name} n'apparaît dans aucun tome`
+        });
+      }
+      
+      // Vérifier la cohérence des arcs par tome
+      if (char.arcPerTome && char.arcPerTome.length > 0) {
+        const missingTomes = char.appearances.filter(
+          tome => !char.arcPerTome.some(arc => arc.tome === tome)
+        );
+        if (missingTomes.length > 0) {
+          issues.push({
+            type: 'character',
+            severity: 'warning',
+            message: `${char.name}: arc non défini pour tome(s) ${missingTomes.join(', ')}`
+          });
+        }
+      }
+    });
+
+    // Vérifier les fils narratifs non résolus
+    seriesBible.plotThreads?.forEach(thread => {
+      if (thread.status === 'open' && thread.introducedTome < seriesBible.totalTomes) {
+        issues.push({
+          type: 'plot',
+          severity: 'warning',
+          message: `Fil narratif "${thread.name}" introduit au tome ${thread.introducedTome} non résolu`
+        });
+      }
+    });
+
+    // Vérifier les connexions entre tomes
+    seriesBible.tomes.forEach((tome, index) => {
+      if (index > 0 && !tome.previousTomeConnection) {
+        issues.push({
+          type: 'plot',
+          severity: 'warning',
+          message: `Tome ${tome.number}: pas de lien explicite avec le tome précédent`,
+          tomeNumber: tome.number
+        });
+      }
+    });
+
+    // Vérifier la timeline pour les incohérences
+    const sortedTimeline = [...seriesBible.timeline].sort((a, b) => a.tome - b.tome);
+    for (let i = 1; i < sortedTimeline.length; i++) {
+      if (sortedTimeline[i].date && sortedTimeline[i-1].date) {
+        // Vérification basique des dates
+        if (sortedTimeline[i].date! < sortedTimeline[i-1].date!) {
+          issues.push({
+            type: 'timeline',
+            severity: 'error',
+            message: `Incohérence temporelle: "${sortedTimeline[i].event}" avant "${sortedTimeline[i-1].event}"`
+          });
+        }
+      }
+    }
+
+    return issues;
+  }, [seriesBible]);
+
+  const getRelationIcon = (type: CharacterRelation['type']) => {
+    switch (type) {
+      case 'ally': return <Users className="h-3 w-3" />;
+      case 'enemy': return <Swords className="h-3 w-3" />;
+      case 'romantic': return <Heart className="h-3 w-3" />;
+      case 'family': return <Link2 className="h-3 w-3" />;
+      case 'mentor': return <Crown className="h-3 w-3" />;
+      case 'rival': return <Swords className="h-3 w-3" />;
+      default: return <Link2 className="h-3 w-3" />;
+    }
+  };
 
   const generateSeriesBible = async () => {
     if (!seriesBible.seriesTitle) {
@@ -100,29 +225,59 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
       const { data, error } = await supabase.functions.invoke('generate-content', {
         body: {
           type: 'series-bible',
-          prompt: `Crée une bible complète pour une série de ${seriesBible.totalTomes} tomes intitulée "${seriesBible.seriesTitle}".
+          prompt: `Crée une bible COMPLÈTE et COHÉRENTE pour une série de ${seriesBible.totalTomes} tomes intitulée "${seriesBible.seriesTitle}".
           Genre: ${seriesBible.genre || 'à déterminer selon le titre'}
+          
+          IMPORTANT: Assure une cohérence parfaite entre les tomes avec:
+          - Des arcs narratifs progressifs pour chaque personnage
+          - Des liens clairs entre chaque tome
+          - Des fils narratifs qui se développent sur plusieurs tomes
+          - Des cliffhangers et résolutions cohérents
           
           Génère en JSON:
           {
-            "synopsis": "Synopsis général de la série (200 mots)",
+            "synopsis": "Synopsis général de la série (200 mots) avec l'arc global",
             "themes": ["thème1", "thème2", "thème3"],
             "characters": [
-              {"name": "", "role": "protagonist/antagonist/supporting", "description": "", "arc": "évolution du personnage", "appearances": [1,2,3]}
+              {
+                "name": "",
+                "role": "protagonist/antagonist/supporting",
+                "description": "description physique et psychologique",
+                "physicalDescription": "apparence détaillée",
+                "personality": "traits de caractère",
+                "motivations": "ce qui le pousse à agir",
+                "secrets": "secrets du personnage révélés progressivement",
+                "arc": "évolution globale sur la série",
+                "appearances": [1,2,3],
+                "relations": [{"characterId": "", "type": "ally/enemy/family/romantic/mentor/rival", "description": "nature de la relation"}],
+                "arcPerTome": [{"tome": 1, "status": "état du personnage", "development": "évolution dans ce tome", "keyMoments": ["moment clé 1"]}]
+              }
             ],
             "locations": [
-              {"name": "", "description": "", "significance": "importance pour l'intrigue"}
+              {"name": "", "description": "", "significance": "importance pour l'intrigue", "appearancesByTome": [1,2]}
             ],
             "timeline": [
-              {"event": "", "tome": 1, "chapter": "optionnel", "date": "optionnel"}
+              {"event": "", "tome": 1, "chapter": "optionnel", "date": "optionnel", "charactersInvolved": ["nom1", "nom2"]}
             ],
             "tomes": [
-              {"number": 1, "title": "", "synopsis": "résumé du tome (100 mots)", "status": "planned", "wordCount": 0}
+              {
+                "number": 1,
+                "title": "",
+                "synopsis": "résumé du tome (150 mots)",
+                "status": "planned",
+                "wordCount": 0,
+                "mainPlotPoints": ["point 1", "point 2", "point 3"],
+                "cliffhanger": "fin du tome et accroche",
+                "previousTomeConnection": "lien avec le tome précédent (null pour tome 1)"
+              }
             ],
-            "writingRules": "Règles de cohérence narrative pour la série"
+            "plotThreads": [
+              {"name": "nom du fil narratif", "description": "description", "introducedTome": 1, "resolvedTome": 3, "status": "open/resolved/ongoing"}
+            ],
+            "writingRules": "Règles de cohérence narrative détaillées: style, ton, vocabulaire récurrent, éléments à maintenir"
           }
           
-          Crée 3-5 personnages principaux, 3-4 lieux importants, 5-8 événements majeurs dans la timeline, et un plan pour chaque tome.`
+          Crée 4-6 personnages principaux avec relations entre eux, 4-5 lieux importants, 8-12 événements majeurs dans la timeline, 3-5 fils narratifs, et un plan détaillé pour chaque tome avec connexions explicites.`
         }
       });
 
@@ -142,24 +297,39 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
         themes: parsedData.themes || [],
         characters: (parsedData.characters || []).map((c: any, i: number) => ({
           ...c,
-          id: `char-${Date.now()}-${i}`
+          id: `char-${Date.now()}-${i}`,
+          relations: c.relations || [],
+          arcPerTome: c.arcPerTome || [],
+          physicalDescription: c.physicalDescription || '',
+          personality: c.personality || '',
+          motivations: c.motivations || '',
+          secrets: c.secrets || ''
         })),
         locations: (parsedData.locations || []).map((l: any, i: number) => ({
           ...l,
-          id: `loc-${Date.now()}-${i}`
+          id: `loc-${Date.now()}-${i}`,
+          appearancesByTome: l.appearancesByTome || []
         })),
         timeline: (parsedData.timeline || []).map((t: any, i: number) => ({
           ...t,
-          id: `time-${Date.now()}-${i}`
+          id: `time-${Date.now()}-${i}`,
+          charactersInvolved: t.charactersInvolved || []
         })),
         tomes: (parsedData.tomes || []).map((t: any, i: number) => ({
           ...t,
-          id: `tome-${Date.now()}-${i}`
+          id: `tome-${Date.now()}-${i}`,
+          mainPlotPoints: t.mainPlotPoints || [],
+          cliffhanger: t.cliffhanger || '',
+          previousTomeConnection: t.previousTomeConnection || ''
+        })),
+        plotThreads: (parsedData.plotThreads || []).map((p: any, i: number) => ({
+          ...p,
+          id: `plot-${Date.now()}-${i}`
         })),
         writingRules: parsedData.writingRules || ''
       }));
 
-      toast.success('Bible de série générée !');
+      toast.success('Bible de série générée avec cohérence inter-tomes !');
     } catch (error) {
       console.error('Erreur génération:', error);
       toast.error('Erreur lors de la génération');
@@ -270,7 +440,9 @@ ${parsedData.characterDevelopments?.map((d: any) => `- ${d.character}: ${d.devel
       role: 'supporting',
       description: '',
       arc: '',
-      appearances: [1]
+      appearances: [1],
+      relations: [],
+      arcPerTome: []
     };
     setSeriesBible(prev => ({
       ...prev,
@@ -294,13 +466,17 @@ ${parsedData.characterDevelopments?.map((d: any) => `- ${d.character}: ${d.devel
 
   const addTome = () => {
     const nextNumber = seriesBible.tomes.length + 1;
+    const previousTome = seriesBible.tomes[seriesBible.tomes.length - 1];
     const newTome: SeriesTome = {
       id: `tome-${Date.now()}`,
       number: nextNumber,
       title: `Tome ${nextNumber}`,
       synopsis: '',
       status: 'planned',
-      wordCount: 0
+      wordCount: 0,
+      mainPlotPoints: [],
+      cliffhanger: '',
+      previousTomeConnection: previousTome ? `Suite de "${previousTome.title}"` : undefined
     };
     setSeriesBible(prev => ({
       ...prev,
@@ -439,12 +615,23 @@ ${seriesBible.writingRules}
 
       {seriesBible.synopsis && (
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-5 w-full">
+          <TabsList className="grid grid-cols-6 w-full">
             <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
             <TabsTrigger value="characters">Personnages</TabsTrigger>
             <TabsTrigger value="world">Univers</TabsTrigger>
             <TabsTrigger value="tomes">Tomes</TabsTrigger>
             <TabsTrigger value="timeline">Timeline</TabsTrigger>
+            <TabsTrigger value="coherence" className="relative">
+              Cohérence
+              {coherenceIssues.length > 0 && (
+                <Badge 
+                  variant={coherenceIssues.some(i => i.severity === 'error') ? 'destructive' : 'secondary'}
+                  className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center text-xs"
+                >
+                  {coherenceIssues.length}
+                </Badge>
+              )}
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-4">
@@ -514,10 +701,13 @@ ${seriesBible.writingRules}
                   <Users className="h-5 w-5" />
                   Personnages récurrents
                 </CardTitle>
+                <CardDescription>
+                  Gérez les personnages et leurs relations pour maintenir la cohérence
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {seriesBible.characters.map((char) => (
-                  <Card key={char.id} className="p-4">
+                  <Card key={char.id} className="p-4 border-l-4 border-l-primary">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div>
                         <Label>Nom</Label>
@@ -534,21 +724,118 @@ ${seriesBible.writingRules}
                         />
                       </div>
                       <div className="md:col-span-2">
-                        <Label>Description</Label>
+                        <Label>Description physique</Label>
                         <Textarea
-                          value={char.description}
-                          onChange={(e) => updateCharacter(char.id, { description: e.target.value })}
+                          value={char.physicalDescription || ''}
+                          onChange={(e) => updateCharacter(char.id, { physicalDescription: e.target.value })}
+                          placeholder="Apparence, traits distinctifs..."
+                          className="min-h-[50px]"
+                        />
+                      </div>
+                      <div>
+                        <Label>Personnalité</Label>
+                        <Textarea
+                          value={char.personality || ''}
+                          onChange={(e) => updateCharacter(char.id, { personality: e.target.value })}
+                          placeholder="Traits de caractère..."
+                          className="min-h-[50px]"
+                        />
+                      </div>
+                      <div>
+                        <Label>Motivations</Label>
+                        <Textarea
+                          value={char.motivations || ''}
+                          onChange={(e) => updateCharacter(char.id, { motivations: e.target.value })}
+                          placeholder="Ce qui le pousse à agir..."
+                          className="min-h-[50px]"
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <Label>Arc narratif global</Label>
+                        <Textarea
+                          value={char.arc}
+                          onChange={(e) => updateCharacter(char.id, { arc: e.target.value })}
+                          placeholder="Évolution du personnage sur l'ensemble de la série..."
                           className="min-h-[60px]"
                         />
                       </div>
                       <div className="md:col-span-2">
-                        <Label>Arc narratif</Label>
+                        <Label>Secrets (révélés progressivement)</Label>
                         <Textarea
-                          value={char.arc}
-                          onChange={(e) => updateCharacter(char.id, { arc: e.target.value })}
-                          className="min-h-[60px]"
+                          value={char.secrets || ''}
+                          onChange={(e) => updateCharacter(char.id, { secrets: e.target.value })}
+                          placeholder="Secrets du personnage et quand ils sont révélés..."
+                          className="min-h-[50px]"
                         />
                       </div>
+                      
+                      {/* Apparitions par tome */}
+                      <div className="md:col-span-2">
+                        <Label className="mb-2 block">Apparitions dans les tomes</Label>
+                        <div className="flex flex-wrap gap-2">
+                          {Array.from({ length: seriesBible.totalTomes }, (_, i) => i + 1).map(tomeNum => (
+                            <Badge
+                              key={tomeNum}
+                              variant={char.appearances.includes(tomeNum) ? 'default' : 'outline'}
+                              className="cursor-pointer"
+                              onClick={() => {
+                                const newAppearances = char.appearances.includes(tomeNum)
+                                  ? char.appearances.filter(t => t !== tomeNum)
+                                  : [...char.appearances, tomeNum].sort((a, b) => a - b);
+                                updateCharacter(char.id, { appearances: newAppearances });
+                              }}
+                            >
+                              Tome {tomeNum}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Relations avec autres personnages */}
+                      {char.relations && char.relations.length > 0 && (
+                        <div className="md:col-span-2">
+                          <Label className="mb-2 block">Relations</Label>
+                          <div className="flex flex-wrap gap-2">
+                            {char.relations.map((rel, idx) => {
+                              const relatedChar = seriesBible.characters.find(c => c.id === rel.characterId || c.name === rel.characterId);
+                              return (
+                                <Badge key={idx} variant="secondary" className="flex items-center gap-1">
+                                  {getRelationIcon(rel.type)}
+                                  {relatedChar?.name || rel.characterId}: {rel.description}
+                                </Badge>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Arc par tome */}
+                      {char.arcPerTome && char.arcPerTome.length > 0 && (
+                        <div className="md:col-span-2 bg-muted/50 p-3 rounded-lg">
+                          <Label className="mb-2 block flex items-center gap-2">
+                            <ArrowRight className="h-4 w-4" />
+                            Évolution par tome
+                          </Label>
+                          <div className="space-y-2">
+                            {char.arcPerTome.map((arc, idx) => (
+                              <div key={idx} className="text-sm border-l-2 border-primary/50 pl-3">
+                                <span className="font-semibold">Tome {arc.tome}:</span>{' '}
+                                <span className="text-muted-foreground">{arc.status}</span>
+                                <p className="text-xs mt-1">{arc.development}</p>
+                                {arc.keyMoments && arc.keyMoments.length > 0 && (
+                                  <div className="flex flex-wrap gap-1 mt-1">
+                                    {arc.keyMoments.map((moment, mIdx) => (
+                                      <Badge key={mIdx} variant="outline" className="text-xs">
+                                        {moment}
+                                      </Badge>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                     <Button
                       variant="ghost"
@@ -630,7 +917,7 @@ ${seriesBible.writingRules}
               </CardHeader>
               <CardContent className="space-y-4">
                 {seriesBible.tomes.map((tome) => (
-                  <Card key={tome.id} className="p-4">
+                  <Card key={tome.id} className="p-4 border-l-4 border-l-primary">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-2">
                         <Badge variant={
@@ -655,6 +942,23 @@ ${seriesBible.writingRules}
                         )}
                       </Button>
                     </div>
+                    
+                    {/* Lien avec tome précédent */}
+                    {tome.number > 1 && (
+                      <div className="mb-3 p-2 bg-muted/50 rounded-lg text-sm">
+                        <Label className="text-xs flex items-center gap-1 mb-1">
+                          <Link2 className="h-3 w-3" />
+                          Lien avec le tome précédent
+                        </Label>
+                        <Input
+                          value={tome.previousTomeConnection || ''}
+                          onChange={(e) => updateTome(tome.id, { previousTomeConnection: e.target.value })}
+                          placeholder="Comment ce tome s'enchaîne avec le précédent..."
+                          className="text-sm"
+                        />
+                      </div>
+                    )}
+                    
                     <div className="space-y-3">
                       <Input
                         value={tome.title}
@@ -668,6 +972,30 @@ ${seriesBible.writingRules}
                         placeholder="Synopsis du tome..."
                         className="min-h-[80px]"
                       />
+                      
+                      {/* Points clés de l'intrigue */}
+                      <div>
+                        <Label className="text-xs mb-1 block">Points clés de l'intrigue</Label>
+                        <div className="flex flex-wrap gap-1">
+                          {tome.mainPlotPoints?.map((point, idx) => (
+                            <Badge key={idx} variant="outline" className="text-xs">
+                              {point}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      {/* Cliffhanger */}
+                      {tome.cliffhanger && (
+                        <div className="p-2 bg-destructive/10 border border-destructive/20 rounded-lg">
+                          <Label className="text-xs flex items-center gap-1 text-destructive">
+                            <Sparkles className="h-3 w-3" />
+                            Cliffhanger
+                          </Label>
+                          <p className="text-sm mt-1">{tome.cliffhanger}</p>
+                        </div>
+                      )}
+                      
                       <Progress value={(tome.wordCount / 50000) * 100} className="h-2" />
                       <p className="text-xs text-muted-foreground">
                         {tome.wordCount.toLocaleString()} / 50,000 mots
@@ -679,6 +1007,112 @@ ${seriesBible.writingRules}
                   <Plus className="h-4 w-4 mr-2" />
                   Ajouter un tome
                 </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Onglet Cohérence */}
+          <TabsContent value="coherence" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  {coherenceIssues.length === 0 ? (
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                  ) : (
+                    <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                  )}
+                  Vérification de cohérence
+                </CardTitle>
+                <CardDescription>
+                  Analyse automatique de la cohérence entre les tomes
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {coherenceIssues.length === 0 ? (
+                  <div className="text-center py-8">
+                    <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
+                    <p className="text-lg font-medium text-green-600">Aucun problème détecté</p>
+                    <p className="text-sm text-muted-foreground">
+                      Votre série semble cohérente. Continuez à enrichir la bible !
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {coherenceIssues.map((issue, index) => (
+                      <div
+                        key={index}
+                        className={`p-3 rounded-lg border-l-4 ${
+                          issue.severity === 'error' 
+                            ? 'bg-destructive/10 border-l-destructive' 
+                            : 'bg-yellow-500/10 border-l-yellow-500'
+                        }`}
+                      >
+                        <div className="flex items-start gap-2">
+                          {issue.severity === 'error' ? (
+                            <AlertTriangle className="h-4 w-4 text-destructive mt-0.5" />
+                          ) : (
+                            <AlertTriangle className="h-4 w-4 text-yellow-500 mt-0.5" />
+                          )}
+                          <div>
+                            <Badge variant="outline" className="text-xs mb-1">
+                              {issue.type === 'character' && 'Personnage'}
+                              {issue.type === 'plot' && 'Intrigue'}
+                              {issue.type === 'timeline' && 'Timeline'}
+                              {issue.type === 'location' && 'Lieu'}
+                            </Badge>
+                            <p className="text-sm">{issue.message}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Statistiques de cohérence */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                  <Card className="p-3 text-center">
+                    <p className="text-2xl font-bold text-primary">{seriesBible.characters.length}</p>
+                    <p className="text-xs text-muted-foreground">Personnages</p>
+                  </Card>
+                  <Card className="p-3 text-center">
+                    <p className="text-2xl font-bold text-primary">{seriesBible.locations.length}</p>
+                    <p className="text-xs text-muted-foreground">Lieux</p>
+                  </Card>
+                  <Card className="p-3 text-center">
+                    <p className="text-2xl font-bold text-primary">{seriesBible.timeline.length}</p>
+                    <p className="text-xs text-muted-foreground">Événements</p>
+                  </Card>
+                  <Card className="p-3 text-center">
+                    <p className="text-2xl font-bold text-primary">{seriesBible.plotThreads?.length || 0}</p>
+                    <p className="text-xs text-muted-foreground">Fils narratifs</p>
+                  </Card>
+                </div>
+
+                {/* Fils narratifs */}
+                {seriesBible.plotThreads && seriesBible.plotThreads.length > 0 && (
+                  <div className="mt-4">
+                    <Label className="mb-2 block">Fils narratifs</Label>
+                    <div className="space-y-2">
+                      {seriesBible.plotThreads.map((thread) => (
+                        <div key={thread.id} className="flex items-center justify-between p-2 bg-muted/50 rounded-lg">
+                          <div>
+                            <span className="font-medium">{thread.name}</span>
+                            <p className="text-xs text-muted-foreground">{thread.description}</p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline">Tome {thread.introducedTome}</Badge>
+                            <ArrowRight className="h-3 w-3" />
+                            {thread.resolvedTome ? (
+                              <Badge variant="default">Tome {thread.resolvedTome}</Badge>
+                            ) : (
+                              <Badge variant="secondary">{thread.status === 'ongoing' ? 'En cours' : 'Ouvert'}</Badge>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
