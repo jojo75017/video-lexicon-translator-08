@@ -114,6 +114,13 @@ interface TitleVolumeData {
   suggestedKeywords: string[];
   estimatedClicks: number;
   relevanceScore: number;
+  cpc: number;
+  seasonalTrends: { month: string; volume: number }[];
+  searchIntent: 'informational' | 'commercial' | 'transactional' | 'navigational';
+  difficulty: number;
+  opportunityScore: number;
+  avgBookPrice: number;
+  estimatedRevenue: number;
 }
 
 const EbookKdpAnalytics: React.FC = () => {
@@ -344,7 +351,7 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
 
     setIsLoadingTitle(true);
     try {
-      const prompt = `Analyse le volume de recherche pour le titre/mot-clé "${titleSearch}" sur Amazon KDP.
+      const prompt = `Analyse le volume de recherche SEO pour le titre/mot-clé "${titleSearch}" sur Amazon KDP.
 
 IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
 
@@ -357,34 +364,59 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
       "competitionIndex": [score 1-100],
       "suggestedKeywords": ["keyword1", "keyword2", "keyword3", "keyword4", "keyword5"],
       "estimatedClicks": [clics estimés par mois],
-      "relevanceScore": [score 1-100]
+      "relevanceScore": [score 1-100],
+      "cpc": [coût par clic en euros entre 0.05 et 3.50],
+      "seasonalTrends": [
+        {"month": "Jan", "volume": [volume]},
+        {"month": "Fév", "volume": [volume]},
+        {"month": "Mar", "volume": [volume]},
+        {"month": "Avr", "volume": [volume]},
+        {"month": "Mai", "volume": [volume]},
+        {"month": "Juin", "volume": [volume]},
+        {"month": "Juil", "volume": [volume]},
+        {"month": "Aoû", "volume": [volume]},
+        {"month": "Sep", "volume": [volume]},
+        {"month": "Oct", "volume": [volume]},
+        {"month": "Nov", "volume": [volume]},
+        {"month": "Déc", "volume": [volume]}
+      ],
+      "searchIntent": "[informational/commercial/transactional/navigational]",
+      "difficulty": [score SEO difficulté 1-100],
+      "opportunityScore": [score opportunité 1-100],
+      "avgBookPrice": [prix moyen des livres sur ce sujet entre 2.99 et 19.99],
+      "estimatedRevenue": [revenu mensuel estimé si top 10]
     },
     {
-      "title": "[variante du titre 1]",
+      "title": "[variante optimisée 1]",
       "searchVolume": [nombre],
       "monthlyTrend": [pourcentage],
       "competitionIndex": [score],
       "suggestedKeywords": ["kw1", "kw2", "kw3"],
       "estimatedClicks": [clics],
-      "relevanceScore": [score]
+      "relevanceScore": [score],
+      "cpc": [cpc],
+      "seasonalTrends": [12 mois],
+      "searchIntent": "[intent]",
+      "difficulty": [score],
+      "opportunityScore": [score],
+      "avgBookPrice": [prix],
+      "estimatedRevenue": [revenu]
     },
     {
-      "title": "[variante du titre 2]",
+      "title": "[variante optimisée 2]",
       "searchVolume": [nombre],
       "monthlyTrend": [pourcentage],
       "competitionIndex": [score],
       "suggestedKeywords": ["kw1", "kw2", "kw3"],
       "estimatedClicks": [clics],
-      "relevanceScore": [score]
-    },
-    {
-      "title": "[variante du titre 3]",
-      "searchVolume": [nombre],
-      "monthlyTrend": [pourcentage],
-      "competitionIndex": [score],
-      "suggestedKeywords": ["kw1", "kw2", "kw3"],
-      "estimatedClicks": [clics],
-      "relevanceScore": [score]
+      "relevanceScore": [score],
+      "cpc": [cpc],
+      "seasonalTrends": [12 mois],
+      "searchIntent": "[intent]",
+      "difficulty": [score],
+      "opportunityScore": [score],
+      "avgBookPrice": [prix],
+      "estimatedRevenue": [revenu]
     }
   ]
 }`;
@@ -403,7 +435,7 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
       if (jsonMatch) {
         const parsed = JSON.parse(jsonMatch[0]);
         setTitleVolumeResults(parsed.results || []);
-        toast.success('Analyse de volume terminée !');
+        toast.success('Analyse SEO complète terminée !');
       }
     } catch (error) {
       console.error('Erreur analyse volume:', error);
@@ -420,9 +452,37 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
       volume: item.searchVolume,
       clics: item.estimatedClicks,
       competition: item.competitionIndex,
-      relevance: item.relevanceScore
+      relevance: item.relevanceScore,
+      cpc: (item.cpc || 0) * 100,
+      opportunity: item.opportunityScore || 0
     }));
   }, [titleVolumeResults]);
+
+  // Seasonal trends chart data
+  const seasonalChartData = useMemo(() => {
+    if (titleVolumeResults.length === 0 || !titleVolumeResults[0]?.seasonalTrends) return [];
+    return titleVolumeResults[0].seasonalTrends;
+  }, [titleVolumeResults]);
+
+  const getIntentColor = (intent: string) => {
+    switch (intent) {
+      case 'commercial': return 'bg-green-500/20 text-green-400 border-green-500/30';
+      case 'transactional': return 'bg-purple-500/20 text-purple-400 border-purple-500/30';
+      case 'informational': return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+      case 'navigational': return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
+      default: return 'bg-muted text-muted-foreground';
+    }
+  };
+
+  const getIntentLabel = (intent: string) => {
+    switch (intent) {
+      case 'commercial': return 'Commercial';
+      case 'transactional': return 'Transactionnel';
+      case 'informational': return 'Informationnel';
+      case 'navigational': return 'Navigation';
+      default: return intent;
+    }
+  };
 
   const getTrendIcon = (trend: string) => {
     switch (trend) {
@@ -567,43 +627,83 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
               {/* Volume Results Chart */}
               {titleVolumeResults.length > 0 && (
                 <div className="space-y-6">
-                  {/* Chart */}
-                  <Card className="bg-background/50 border-border/30">
-                    <CardHeader>
-                      <CardTitle className="text-sm flex items-center gap-2">
-                        <BarChart3 className="h-4 w-4 text-cyan-400" />
-                        Comparaison des volumes
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="h-64">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={titleVolumeChartData}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                            <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={10} />
-                            <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} />
-                            <Tooltip
-                              contentStyle={{
-                                backgroundColor: 'hsl(var(--card))',
-                                border: '1px solid hsl(var(--border))',
-                                borderRadius: '8px'
-                              }}
-                            />
-                            <Legend />
-                            <Bar dataKey="volume" name="Volume" fill="#06b6d4" radius={[4, 4, 0, 0]} />
-                            <Bar dataKey="clics" name="Clics estimés" fill="#14b8a6" radius={[4, 4, 0, 0]} />
-                          </BarChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  {/* Charts Row */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {/* Volume Chart */}
+                    <Card className="bg-background/50 border-border/30">
+                      <CardHeader>
+                        <CardTitle className="text-sm flex items-center gap-2">
+                          <BarChart3 className="h-4 w-4 text-cyan-400" />
+                          Comparaison des volumes
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="h-56">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={titleVolumeChartData}>
+                              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                              <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={10} />
+                              <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} />
+                              <Tooltip
+                                contentStyle={{
+                                  backgroundColor: 'hsl(var(--card))',
+                                  border: '1px solid hsl(var(--border))',
+                                  borderRadius: '8px'
+                                }}
+                              />
+                              <Legend />
+                              <Bar dataKey="volume" name="Volume" fill="#06b6d4" radius={[4, 4, 0, 0]} />
+                              <Bar dataKey="clics" name="Clics" fill="#14b8a6" radius={[4, 4, 0, 0]} />
+                            </BarChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Seasonal Trends Chart */}
+                    {seasonalChartData.length > 0 && (
+                      <Card className="bg-background/50 border-border/30">
+                        <CardHeader>
+                          <CardTitle className="text-sm flex items-center gap-2">
+                            <LineChart className="h-4 w-4 text-amber-400" />
+                            Tendances saisonnières
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="h-56">
+                            <ResponsiveContainer width="100%" height="100%">
+                              <AreaChart data={seasonalChartData}>
+                                <defs>
+                                  <linearGradient id="seasonalGradient" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3}/>
+                                    <stop offset="95%" stopColor="#f59e0b" stopOpacity={0}/>
+                                  </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                                <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={10} />
+                                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} />
+                                <Tooltip
+                                  contentStyle={{
+                                    backgroundColor: 'hsl(var(--card))',
+                                    border: '1px solid hsl(var(--border))',
+                                    borderRadius: '8px'
+                                  }}
+                                />
+                                <Area type="monotone" dataKey="volume" stroke="#f59e0b" fill="url(#seasonalGradient)" strokeWidth={2} />
+                              </AreaChart>
+                            </ResponsiveContainer>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </div>
 
                   {/* Radar Chart */}
                   <Card className="bg-background/50 border-border/30">
                     <CardHeader>
                       <CardTitle className="text-sm flex items-center gap-2">
                         <PieChart className="h-4 w-4 text-teal-400" />
-                        Analyse multi-critères
+                        Analyse multi-critères SEO
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -613,8 +713,9 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
                             <PolarGrid stroke="hsl(var(--border))" />
                             <PolarAngleAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={10} />
                             <PolarRadiusAxis stroke="hsl(var(--muted-foreground))" fontSize={8} />
-                            <Radar name="Compétition" dataKey="competition" stroke="#ef4444" fill="#ef4444" fillOpacity={0.3} />
-                            <Radar name="Pertinence" dataKey="relevance" stroke="#22c55e" fill="#22c55e" fillOpacity={0.3} />
+                            <Radar name="Compétition" dataKey="competition" stroke="#ef4444" fill="#ef4444" fillOpacity={0.2} />
+                            <Radar name="Opportunité" dataKey="opportunity" stroke="#22c55e" fill="#22c55e" fillOpacity={0.2} />
+                            <Radar name="CPC (x100)" dataKey="cpc" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.2} />
                             <Legend />
                           </RadarChart>
                         </ResponsiveContainer>
@@ -627,47 +728,79 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
                     {titleVolumeResults.map((item, index) => (
                       <Card key={index} className="bg-background/50 border-border/30 hover:border-cyan-500/30 transition-colors">
                         <CardContent className="p-4 space-y-3">
-                          <div className="flex items-start justify-between">
-                            <h4 className="font-semibold text-sm line-clamp-2">{item.title}</h4>
-                            <Badge className={item.monthlyTrend >= 0 ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}>
-                              {item.monthlyTrend >= 0 ? '+' : ''}{item.monthlyTrend}%
-                            </Badge>
+                          <div className="flex items-start justify-between gap-2">
+                            <h4 className="font-semibold text-sm line-clamp-2 flex-1">{item.title}</h4>
+                            <div className="flex gap-1">
+                              <Badge className={item.monthlyTrend >= 0 ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}>
+                                {item.monthlyTrend >= 0 ? '+' : ''}{item.monthlyTrend}%
+                              </Badge>
+                              {item.searchIntent && (
+                                <Badge className={getIntentColor(item.searchIntent)}>
+                                  {getIntentLabel(item.searchIntent)}
+                                </Badge>
+                              )}
+                            </div>
                           </div>
                           
-                          <div className="grid grid-cols-2 gap-2 text-xs">
+                          <div className="grid grid-cols-4 gap-2 text-xs">
                             <div className="bg-cyan-500/10 rounded p-2">
-                              <div className="text-muted-foreground">Volume</div>
-                              <div className="text-lg font-bold text-cyan-400">{item.searchVolume.toLocaleString()}</div>
+                              <div className="text-muted-foreground text-[10px]">Volume</div>
+                              <div className="text-sm font-bold text-cyan-400">{(item.searchVolume || 0).toLocaleString()}</div>
                             </div>
                             <div className="bg-teal-500/10 rounded p-2">
-                              <div className="text-muted-foreground">Clics/mois</div>
-                              <div className="text-lg font-bold text-teal-400">{item.estimatedClicks.toLocaleString()}</div>
+                              <div className="text-muted-foreground text-[10px]">Clics</div>
+                              <div className="text-sm font-bold text-teal-400">{(item.estimatedClicks || 0).toLocaleString()}</div>
+                            </div>
+                            <div className="bg-purple-500/10 rounded p-2">
+                              <div className="text-muted-foreground text-[10px]">CPC</div>
+                              <div className="text-sm font-bold text-purple-400">{(item.cpc || 0).toFixed(2)}€</div>
+                            </div>
+                            <div className="bg-amber-500/10 rounded p-2">
+                              <div className="text-muted-foreground text-[10px]">Prix moy.</div>
+                              <div className="text-sm font-bold text-amber-400">{(item.avgBookPrice || 0).toFixed(2)}€</div>
                             </div>
                           </div>
 
-                          <div className="space-y-1">
-                            <div className="flex justify-between text-xs">
-                              <span className="text-muted-foreground">Compétition</span>
-                              <span className={item.competitionIndex > 70 ? 'text-red-400' : item.competitionIndex > 40 ? 'text-yellow-400' : 'text-green-400'}>
-                                {item.competitionIndex}/100
-                              </span>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div className="space-y-1">
+                              <div className="flex justify-between text-xs">
+                                <span className="text-muted-foreground">Compétition</span>
+                                <span className={(item.competitionIndex || 0) > 70 ? 'text-red-400' : (item.competitionIndex || 0) > 40 ? 'text-yellow-400' : 'text-green-400'}>
+                                  {item.competitionIndex || 0}/100
+                                </span>
+                              </div>
+                              <Progress value={item.competitionIndex || 0} className="h-1.5" />
                             </div>
-                            <Progress value={item.competitionIndex} className="h-1.5" />
+                            <div className="space-y-1">
+                              <div className="flex justify-between text-xs">
+                                <span className="text-muted-foreground">Difficulté SEO</span>
+                                <span className={(item.difficulty || 0) > 70 ? 'text-red-400' : (item.difficulty || 0) > 40 ? 'text-yellow-400' : 'text-green-400'}>
+                                  {item.difficulty || 0}/100
+                                </span>
+                              </div>
+                              <Progress value={item.difficulty || 0} className="h-1.5" />
+                            </div>
                           </div>
 
-                          <div className="space-y-1">
-                            <div className="flex justify-between text-xs">
-                              <span className="text-muted-foreground">Pertinence</span>
-                              <span className={item.relevanceScore > 70 ? 'text-green-400' : item.relevanceScore > 40 ? 'text-yellow-400' : 'text-red-400'}>
-                                {item.relevanceScore}/100
-                              </span>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div className="space-y-1">
+                              <div className="flex justify-between text-xs">
+                                <span className="text-muted-foreground">Opportunité</span>
+                                <span className={(item.opportunityScore || 0) > 70 ? 'text-green-400' : (item.opportunityScore || 0) > 40 ? 'text-yellow-400' : 'text-red-400'}>
+                                  {item.opportunityScore || 0}/100
+                                </span>
+                              </div>
+                              <Progress value={item.opportunityScore || 0} className="h-1.5" />
                             </div>
-                            <Progress value={item.relevanceScore} className="h-1.5" />
+                            <div className="bg-green-500/10 rounded p-2 text-center">
+                              <div className="text-muted-foreground text-[10px]">Rev. estimé</div>
+                              <div className="text-sm font-bold text-green-400">{(item.estimatedRevenue || 0).toLocaleString()}€/mois</div>
+                            </div>
                           </div>
 
-                          {item.suggestedKeywords.length > 0 && (
+                          {item.suggestedKeywords && item.suggestedKeywords.length > 0 && (
                             <div className="flex flex-wrap gap-1 pt-2">
-                              {item.suggestedKeywords.slice(0, 4).map((kw, kwIndex) => (
+                              {item.suggestedKeywords.slice(0, 5).map((kw, kwIndex) => (
                                 <Badge key={kwIndex} variant="outline" className="text-[10px] bg-background/50">
                                   {kw}
                                 </Badge>
