@@ -20,10 +20,12 @@ import {
   RefreshCw,
   Download,
   Filter,
-  Sparkles
+  Sparkles,
+  GitCompare
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import EbookAmazonComparator from './EbookAmazonComparator';
 
 interface KeywordData {
   keyword: string;
@@ -314,18 +316,22 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3 bg-background/50 border border-border/50">
+        <TabsList className="grid w-full grid-cols-4 bg-background/50 border border-border/50">
           <TabsTrigger value="keywords" className="data-[state=active]:bg-purple-500/20">
             <Search className="h-4 w-4 mr-2" />
             Mots-clés
           </TabsTrigger>
           <TabsTrigger value="bsr" className="data-[state=active]:bg-green-500/20">
             <DollarSign className="h-4 w-4 mr-2" />
-            Calculateur BSR
+            BSR
           </TabsTrigger>
           <TabsTrigger value="niche" className="data-[state=active]:bg-blue-500/20">
             <Target className="h-4 w-4 mr-2" />
-            Analyse Niche
+            Niche
+          </TabsTrigger>
+          <TabsTrigger value="comparator" className="data-[state=active]:bg-orange-500/20">
+            <GitCompare className="h-4 w-4 mr-2" />
+            Comparateur
           </TabsTrigger>
         </TabsList>
 
@@ -644,6 +650,11 @@ IMPORTANT: Réponds UNIQUEMENT avec un JSON valide, sans texte avant ou après.
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Onglet Comparateur Amazon */}
+        <TabsContent value="comparator" className="space-y-4">
+          <EbookAmazonComparator />
         </TabsContent>
       </Tabs>
     </div>
