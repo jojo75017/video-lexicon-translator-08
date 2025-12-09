@@ -40,6 +40,8 @@ export const EbookVoiceDictation: React.FC<EbookVoiceDictationProps> = ({
   const [selectedTarget, setSelectedTarget] = useState<string>('new');
   const [recordingDuration, setRecordingDuration] = useState(0);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [isEnhancing, setIsEnhancing] = useState(false);
   const [useRealtimeMode, setUseRealtimeMode] = useState(true);
   const [audioLevel, setAudioLevel] = useState(0);
@@ -53,6 +55,7 @@ export const EbookVoiceDictation: React.FC<EbookVoiceDictationProps> = ({
   const animationRef = useRef<number | null>(null);
   const recognitionRef = useRef<any>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Check for Web Speech API support
   const hasSpeechRecognition = typeof window !== 'undefined' && 
@@ -352,6 +355,11 @@ export const EbookVoiceDictation: React.FC<EbookVoiceDictationProps> = ({
     setTranscribedText('');
     setAudioBlob(null);
     setInterimText('');
+    if (audioUrl) {
+      URL.revokeObjectURL(audioUrl);
+      setAudioUrl(null);
+    }
+    setIsPlaying(false);
     toast.info('Texte effacé');
   };
 
@@ -359,6 +367,28 @@ export const EbookVoiceDictation: React.FC<EbookVoiceDictationProps> = ({
   const insertPunctuation = (text: string) => {
     setTranscribedText(prev => prev + text);
   };
+
+  // Audio playback functions
+  const togglePlayback = () => {
+    if (!audioRef.current || !audioUrl) return;
+    
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current.play();
+      setIsPlaying(true);
+    }
+  };
+
+  // Create audio URL when blob changes
+  useEffect(() => {
+    if (audioBlob) {
+      const url = URL.createObjectURL(audioBlob);
+      setAudioUrl(url);
+      return () => URL.revokeObjectURL(url);
+    }
+  }, [audioBlob]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -372,8 +402,11 @@ export const EbookVoiceDictation: React.FC<EbookVoiceDictationProps> = ({
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(track => track.stop());
       }
+      if (audioUrl) {
+        URL.revokeObjectURL(audioUrl);
+      }
     };
-  }, []);
+  }, [audioUrl]);
 
   return (
     <div className="space-y-6">
@@ -496,6 +529,46 @@ export const EbookVoiceDictation: React.FC<EbookVoiceDictationProps> = ({
               }
             </p>
           </div>
+
+          {/* Lecteur audio - écouter l'enregistrement */}
+          {audioUrl && !isRecording && (
+            <div className="p-4 bg-muted/50 rounded-lg">
+              <div className="flex items-center gap-3">
+                <Button
+                  size="sm"
+                  variant={isPlaying ? "secondary" : "default"}
+                  onClick={togglePlayback}
+                  className="flex items-center gap-2"
+                >
+                  {isPlaying ? (
+                    <>
+                      <Pause className="h-4 w-4" />
+                      Pause
+                    </>
+                  ) : (
+                    <>
+                      <Play className="h-4 w-4" />
+                      Écouter
+                    </>
+                  )}
+                </Button>
+                <audio 
+                  ref={audioRef}
+                  src={audioUrl}
+                  onEnded={() => setIsPlaying(false)}
+                  className="flex-1 h-8"
+                  controls
+                />
+                <Badge variant="outline" className="text-xs">
+                  <Volume2 className="h-3 w-3 mr-1" />
+                  {formatDuration(recordingDuration)}
+                </Badge>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                🎧 Écoutez votre enregistrement avant de transcrire ou améliorer le texte
+              </p>
+            </div>
+          )}
 
           {/* Raccourcis ponctuation */}
           <div className="flex flex-wrap gap-2 justify-center">
