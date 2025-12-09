@@ -2,12 +2,20 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, Sparkles, BookOpen, Zap, Download, Star, ArrowRight, Play } from "lucide-react";
+import { Check, Sparkles, BookOpen, Zap, Download, Star, ArrowRight, Play, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const SalesPage = () => {
   const navigate = useNavigate();
   const [showDemo, setShowDemo] = useState(false);
+  const [showEmailDialog, setShowEmailDialog] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+  const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const features = [
     { icon: Sparkles, title: "Génération IA", description: "Plans d'ebook complets générés par intelligence artificielle" },
@@ -24,68 +32,88 @@ const SalesPage = () => {
 
   const plans = [
     {
-      name: "Mensuel",
+      id: "starter",
+      name: "Starter",
       price: "27",
       period: "/mois",
-      description: "Accès complet + mises à jour",
+      description: "Pour commencer",
       features: [
-        "Générateur de plans IA illimité",
-        "300+ idées de titres",
-        "Export PDF/EPUB",
-        "Outils Amazon KDP",
-        "Formation PDF incluse",
+        "5 ebooks/mois",
+        "Fonctions de base",
+        "Export PDF",
         "Support email",
       ],
-      cta: "Commencer maintenant",
+      cta: "Commencer",
       popular: false,
-      link: "https://www.trafic-affiliation.com/pagedeventeebook",
-      external: true,
     },
     {
-      name: "Annuel",
-      price: "197",
-      period: "/an",
-      originalPrice: "324",
-      description: "Économisez 40% - ~16€/mois",
+      id: "pro",
+      name: "Pro",
+      price: "67",
+      period: "/mois",
+      description: "Le plus populaire",
       features: [
-        "Tout du plan Mensuel",
-        "Formation Audio complète",
-        "Templates premium",
-        "Accès prioritaire nouveautés",
+        "Ebooks illimités",
+        "Toutes les fonctions",
+        "Export PDF/EPUB",
+        "Formation incluse",
         "Support prioritaire",
-        "2 mois offerts",
       ],
-      cta: "Économiser 40%",
+      cta: "Choisir Pro",
       popular: true,
-      link: null,
-      external: false,
     },
     {
+      id: "lifetime",
       name: "Lifetime",
-      price: "297",
+      price: "147",
       period: " une fois",
       description: "Achat unique - Accès à vie",
       features: [
-        "Tout du plan Annuel",
         "Accès à vie garanti",
-        "Toutes les futures mises à jour",
-        "Licence commerciale",
-        "Coaching de démarrage",
-        "Communauté privée",
+        "Toutes les fonctions Pro",
+        "Mises à jour gratuites",
+        "Support VIP",
+        "Formation complète",
       ],
       cta: "Accès à vie",
       popular: false,
-      link: null,
-      external: false,
     },
   ];
 
-  const handlePlanClick = (plan: typeof plans[0]) => {
-    if (plan.external && plan.link) {
-      window.open(plan.link, "_blank");
-    } else {
-      // TODO: Implement Stripe checkout for annual and lifetime
-      alert("Paiement Stripe bientôt disponible ! En attendant, choisissez l'offre mensuelle.");
+  const handlePlanClick = (planId: string) => {
+    setSelectedPlan(planId);
+    setShowEmailDialog(true);
+  };
+
+  const handleCheckout = async () => {
+    if (!email || !selectedPlan) {
+      toast.error("Veuillez entrer votre email");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("stripe-checkout", {
+        body: {
+          planId: selectedPlan,
+          email,
+          successUrl: `${window.location.origin}/paiement-succes`,
+          cancelUrl: `${window.location.origin}/offres`,
+        },
+      });
+
+      if (error) throw error;
+
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error("URL de paiement non reçue");
+      }
+    } catch (error: any) {
+      console.error("Checkout error:", error);
+      toast.error(error.message || "Erreur lors de la création du paiement");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -283,11 +311,6 @@ const SalesPage = () => {
                 <CardHeader className="text-center pb-2">
                   <CardTitle className="text-xl">{plan.name}</CardTitle>
                   <div className="mt-4">
-                    {plan.originalPrice && (
-                      <span className="text-lg text-muted-foreground line-through mr-2">
-                        {plan.originalPrice}€
-                      </span>
-                    )}
                     <span className="text-4xl font-bold">{plan.price}€</span>
                     <span className="text-muted-foreground">{plan.period}</span>
                   </div>
@@ -308,7 +331,7 @@ const SalesPage = () => {
                     className="w-full" 
                     size="lg"
                     variant={plan.popular ? "default" : "outline"}
-                    onClick={() => handlePlanClick(plan)}
+                    onClick={() => handlePlanClick(plan.id)}
                   >
                     {plan.cta}
                     <ArrowRight className="w-4 h-4 ml-2" />
@@ -338,7 +361,7 @@ const SalesPage = () => {
           <Button 
             size="lg" 
             className="text-lg px-8 py-6"
-            onClick={() => window.open("https://www.trafic-affiliation.com/pagedeventeebook", "_blank")}
+            onClick={() => handlePlanClick("starter")}
           >
             Commencer à 27€/mois
             <ArrowRight className="w-5 h-5 ml-2" />
@@ -348,6 +371,48 @@ const SalesPage = () => {
           </p>
         </div>
       </section>
+
+      {/* Email Dialog */}
+      <Dialog open={showEmailDialog} onOpenChange={setShowEmailDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Finaliser votre commande</DialogTitle>
+            <DialogDescription>
+              Entrez votre email pour accéder au paiement sécurisé
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <Input
+              type="email"
+              placeholder="votre@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={isLoading}
+            />
+            <Button 
+              className="w-full" 
+              size="lg"
+              onClick={handleCheckout}
+              disabled={isLoading || !email}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Redirection...
+                </>
+              ) : (
+                <>
+                  Passer au paiement
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </>
+              )}
+            </Button>
+            <p className="text-xs text-muted-foreground text-center">
+              Paiement sécurisé par Stripe • Garantie 30 jours
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

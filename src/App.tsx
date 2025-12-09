@@ -14,6 +14,7 @@ import AffiliationFormationPage from './pages/AffiliationFormationPage';
 import FormationPage from './pages/FormationPage';
 import FormationAudioPage from './pages/FormationAudioPage';
 import SalesPage from './pages/SalesPage';
+import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -110,6 +111,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Navigate to="/offres" replace />} />
             <Route path="/offres" element={<SalesPage />} />
+            <Route path="/paiement-succes" element={<PaymentSuccessPage />} />
             <Route path="/affiliation" element={<AffiliationFormationPage />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/ai-chat" element={<AiChatPage />} />
