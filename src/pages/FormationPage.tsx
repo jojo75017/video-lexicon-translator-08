@@ -9,7 +9,7 @@ import {
   Copy, Download, BookOpen, ChevronRight, Eye, ChevronLeft, ArrowLeft,
   Search, Star, StarOff, CheckCircle2, Circle, Play, Clock, Filter,
   Sparkles, GraduationCap, Trophy, Target, Zap, Layers, Settings,
-  Image, TrendingUp, Megaphone, DollarSign, FileOutput, Rocket
+  Image, TrendingUp, Megaphone, DollarSign, FileOutput, Rocket, HelpCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
@@ -17,6 +17,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { motion, AnimatePresence } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ReactMarkdown from 'react-markdown';
+import FormationQuiz from '@/components/formation/FormationQuiz';
+import FormationBadges from '@/components/formation/FormationBadges';
 
 interface Module {
   id: number;
@@ -36,6 +38,8 @@ const FormationPage = () => {
   const [previewPage, setPreviewPage] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [quizModule, setQuizModule] = useState<number | null>(null);
+  const [showBadges, setShowBadges] = useState(false);
   const [favorites, setFavorites] = useState<number[]>(() => {
     const saved = localStorage.getItem('formation-favorites');
     return saved ? JSON.parse(saved) : [];
@@ -43,6 +47,10 @@ const FormationPage = () => {
   const [completedModules, setCompletedModules] = useState<number[]>(() => {
     const saved = localStorage.getItem('formation-completed');
     return saved ? JSON.parse(saved) : [];
+  });
+  const [quizScores, setQuizScores] = useState<Record<number, number>>(() => {
+    const saved = localStorage.getItem('formation-quiz-scores');
+    return saved ? JSON.parse(saved) : {};
   });
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
@@ -470,6 +478,22 @@ const FormationPage = () => {
     }
   };
 
+  const handleQuizComplete = (moduleId: number, score: number) => {
+    const newScores = { ...quizScores, [moduleId]: score };
+    setQuizScores(newScores);
+    localStorage.setItem('formation-quiz-scores', JSON.stringify(newScores));
+    
+    if (score >= 70 && !completedModules.includes(moduleId)) {
+      toggleCompleted(moduleId);
+    }
+    
+    if (score === 100) {
+      toast.success('Score parfait !', {
+        description: 'Vous avez débloqué le badge Perfectionniste !'
+      });
+    }
+  };
+
   const copyToClipboard = (content: string) => {
     navigator.clipboard.writeText(content);
     toast.success('Contenu copié dans le presse-papiers !');
@@ -650,6 +674,15 @@ ${module.content}
               <div className="w-32 hidden md:block">
                 <Progress value={progressPercentage} className="h-2" />
               </div>
+              <Button 
+                onClick={() => setShowBadges(!showBadges)} 
+                size="sm" 
+                variant={showBadges ? "default" : "outline"}
+                className="gap-2"
+              >
+                <Trophy className="h-4 w-4" />
+                <span className="hidden sm:inline">Trophées</span>
+              </Button>
               <Button onClick={copyAllModules} size="sm" variant="outline" className="gap-2">
                 <Copy className="h-4 w-4" />
                 <span className="hidden sm:inline">Copier tout</span>
@@ -701,6 +734,44 @@ ${module.content}
             </div>
           </div>
         </motion.div>
+
+        {/* Section Badges */}
+        <AnimatePresence>
+          {showBadges && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mb-8"
+            >
+              <FormationBadges 
+                completedModules={completedModules}
+                quizScores={quizScores}
+                favorites={favorites}
+                totalModules={modules.length}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Section Quiz active */}
+        <AnimatePresence>
+          {quizModule !== null && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="mb-8"
+            >
+              <FormationQuiz
+                moduleId={quizModule}
+                moduleTitle={modules.find(m => m.id === quizModule)?.title || ''}
+                onComplete={handleQuizComplete}
+                onClose={() => setQuizModule(null)}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Filtres et recherche */}
         <div className="mb-8 space-y-4">
@@ -827,6 +898,12 @@ ${module.content}
                           <Clock className="h-3 w-3" />
                           {module.duration}
                         </span>
+                        {quizScores[module.id] !== undefined && (
+                          <span className={`flex items-center gap-1 ${quizScores[module.id] >= 70 ? 'text-green-500' : 'text-orange-500'}`}>
+                            <HelpCircle className="h-3 w-3" />
+                            Quiz: {quizScores[module.id]}%
+                          </span>
+                        )}
                       </div>
                     </CardHeader>
                     
@@ -843,14 +920,23 @@ ${module.content}
                         </Button>
                         <Button 
                           size="sm" 
+                          variant="outline"
                           className="flex-1 gap-1"
+                          onClick={() => setQuizModule(module.id)}
+                        >
+                          <HelpCircle className="h-3 w-3" />
+                          Quiz
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="ghost"
+                          className="gap-1 px-2"
                           onClick={() => {
                             setPreviewPage(modules.findIndex(m => m.id === module.id) + 2);
                             setShowPreview(true);
                           }}
                         >
                           <Eye className="h-3 w-3" />
-                          PDF
                         </Button>
                       </div>
                     </CardContent>
