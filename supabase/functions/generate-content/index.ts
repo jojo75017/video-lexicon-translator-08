@@ -131,6 +131,107 @@ serve(async (req) => {
       );
     }
 
+    // Handle style analysis (uses Lovable AI - no API key needed)
+    if (type === 'style-analysis') {
+      console.log('Processing style analysis...');
+      const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+      
+      if (!LOVABLE_API_KEY) {
+        return new Response(
+          JSON.stringify({ error: 'Lovable API key not configured' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash',
+          messages: [
+            { role: 'system', content: 'Tu es un expert en écriture et style littéraire. Tu analyses le texte et fournis des suggestions concrètes pour améliorer le style. Réponds toujours en JSON valide.' },
+            { role: 'user', content: prompt }
+          ],
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Lovable AI error:', errorText);
+        return new Response(
+          JSON.stringify({ error: 'Erreur lors de l\'analyse de style' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const data = await response.json();
+      const analysisText = data.choices[0].message.content;
+      
+      // Try to extract JSON, or return raw text
+      let cleanContent = analysisText;
+      try {
+        cleanContent = analysisText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        JSON.parse(cleanContent); // validate
+      } catch {
+        // Keep as is if not valid JSON
+      }
+
+      console.log('Style analysis completed');
+      return new Response(
+        JSON.stringify({ content: cleanContent }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Handle enhance-dictation (uses Lovable AI - no API key needed)
+    if (type === 'enhance-dictation') {
+      console.log('Processing dictation enhancement...');
+      const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+      
+      if (!LOVABLE_API_KEY) {
+        return new Response(
+          JSON.stringify({ error: 'Lovable API key not configured' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash',
+          messages: [
+            { role: 'system', content: 'Tu es un éditeur littéraire expert. Améliore le texte dicté en corrigeant la grammaire, la ponctuation et en améliorant le style tout en conservant le sens original. Ne fournis que le texte amélioré, sans commentaires.' },
+            { role: 'user', content: prompt }
+          ],
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Lovable AI error:', errorText);
+        return new Response(
+          JSON.stringify({ error: 'Erreur lors de l\'amélioration du texte' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const data = await response.json();
+      const enhancedText = data.choices[0].message.content;
+
+      console.log('Dictation enhancement completed');
+      return new Response(
+        JSON.stringify({ content: enhancedText }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Handle niche analysis (uses Lovable AI - no API key needed)
     if (type === 'niche-analysis') {
       console.log('Processing niche analysis...');

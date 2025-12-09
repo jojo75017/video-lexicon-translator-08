@@ -29,7 +29,7 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
   epilogue,
   chapters
 }) => {
-  const [exportFormat, setExportFormat] = useState<'pdf' | 'docx' | 'txt' | 'html' | 'epub' | 'googledocs'>('pdf');
+  const [exportFormat, setExportFormat] = useState<'pdf' | 'docx' | 'txt' | 'html' | 'epub' | 'googledocs' | 'idml'>('pdf');
   const [includeTableOfContents, setIncludeTableOfContents] = useState(true);
   const [includePageNumbers, setIncludePageNumbers] = useState(true);
   const [includeCoverPage, setIncludeCoverPage] = useState(true);
@@ -812,6 +812,198 @@ ${navContent}    </ol>
     }
   };
 
+  // Export InDesign IDML (format interchange)
+  const exportAsIDML = async () => {
+    try {
+      const zip = new JSZip();
+
+      // Mimetype
+      zip.file('mimetype', 'application/vnd.adobe.indesign-idml-package');
+
+      // META-INF/container.xml
+      zip.file('META-INF/container.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<container xmlns="http://www.idpf.org/2007/opf">
+  <rootfiles>
+    <rootfile full-path="designmap.xml"/>
+  </rootfiles>
+</container>`);
+
+      // Generate unique IDs
+      const generateId = () => Math.random().toString(36).substring(2, 15);
+      const storyId = generateId();
+
+      // Resources/Fonts.xml
+      zip.file('Resources/Fonts.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<idPkg:Fonts xmlns:idPkg="http://ns.adobe.com/AdobeInDesign/idml/1.0/packaging" DOMVersion="18.0">
+  <FontFamily Self="di${generateId()}" Name="Adobe Garamond Pro">
+    <Font Self="di${generateId()}" Name="Adobe Garamond Pro" FontFamily="Adobe Garamond Pro" FontStyleName="Regular" FontType="TrueType" WritingScript="0"/>
+  </FontFamily>
+  <FontFamily Self="di${generateId()}" Name="Helvetica Neue">
+    <Font Self="di${generateId()}" Name="Helvetica Neue" FontFamily="Helvetica Neue" FontStyleName="Bold" FontType="TrueType" WritingScript="0"/>
+  </FontFamily>
+</idPkg:Fonts>`);
+
+      // Resources/Styles.xml
+      const titleStyleId = generateId();
+      const chapterStyleId = generateId();
+      const subchapterStyleId = generateId();
+      const bodyStyleId = generateId();
+
+      zip.file('Resources/Styles.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<idPkg:Styles xmlns:idPkg="http://ns.adobe.com/AdobeInDesign/idml/1.0/packaging" DOMVersion="18.0">
+  <RootParagraphStyleGroup Self="di${generateId()}">
+    <ParagraphStyle Self="ParagraphStyle/${titleStyleId}" Name="Titre Livre" PointSize="36" FontStyle="Bold" Justification="CenterAlign" SpaceBefore="72" SpaceAfter="36"/>
+    <ParagraphStyle Self="ParagraphStyle/${chapterStyleId}" Name="Titre Chapitre" PointSize="24" FontStyle="Bold" Justification="LeftAlign" SpaceBefore="48" SpaceAfter="24"/>
+    <ParagraphStyle Self="ParagraphStyle/${subchapterStyleId}" Name="Sous-Chapitre" PointSize="16" FontStyle="Bold" Justification="LeftAlign" SpaceBefore="24" SpaceAfter="12"/>
+    <ParagraphStyle Self="ParagraphStyle/${bodyStyleId}" Name="Corps Texte" PointSize="11" FontStyle="Regular" Justification="LeftJustify" FirstLineIndent="14" SpaceAfter="6" Leading="15"/>
+  </RootParagraphStyleGroup>
+</idPkg:Styles>`);
+
+      // Build story content
+      let storyContent = '';
+      
+      // Title
+      if (includeCoverPage) {
+        storyContent += `<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/${titleStyleId}">
+  <Content>${escapeXml(ebookTitle)}</Content>
+  <Br/>
+</ParagraphStyleRange>
+`;
+        if (authorName) {
+          storyContent += `<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/${bodyStyleId}">
+  <Content>Par ${escapeXml(authorName)}</Content>
+  <Br/>
+</ParagraphStyleRange>
+`;
+        }
+      }
+
+      // Preface
+      if (preface) {
+        storyContent += `<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/${chapterStyleId}">
+  <Content>Préface</Content>
+  <Br/>
+</ParagraphStyleRange>
+`;
+        preface.split('\n\n').forEach(para => {
+          if (para.trim()) {
+            storyContent += `<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/${bodyStyleId}">
+  <Content>${escapeXml(para)}</Content>
+  <Br/>
+</ParagraphStyleRange>
+`;
+          }
+        });
+      }
+
+      // Chapters
+      chapters.forEach((chapter, index) => {
+        storyContent += `<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/${chapterStyleId}">
+  <Content>Chapitre ${index + 1}: ${escapeXml(chapter.title)}</Content>
+  <Br/>
+</ParagraphStyleRange>
+`;
+        if (chapter.content) {
+          chapter.content.split('\n\n').forEach(para => {
+            if (para.trim()) {
+              storyContent += `<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/${bodyStyleId}">
+  <Content>${escapeXml(para)}</Content>
+  <Br/>
+</ParagraphStyleRange>
+`;
+            }
+          });
+        }
+
+        chapter.subChapters.forEach((sub, subIndex) => {
+          storyContent += `<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/${subchapterStyleId}">
+  <Content>${index + 1}.${subIndex + 1} ${escapeXml(sub.title)}</Content>
+  <Br/>
+</ParagraphStyleRange>
+`;
+          if (sub.content) {
+            sub.content.split('\n\n').forEach(para => {
+              if (para.trim()) {
+                storyContent += `<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/${bodyStyleId}">
+  <Content>${escapeXml(para)}</Content>
+  <Br/>
+</ParagraphStyleRange>
+`;
+              }
+            });
+          }
+        });
+      });
+
+      // Conclusion
+      if (conclusion) {
+        storyContent += `<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/${chapterStyleId}">
+  <Content>Conclusion</Content>
+  <Br/>
+</ParagraphStyleRange>
+`;
+        conclusion.split('\n\n').forEach(para => {
+          if (para.trim()) {
+            storyContent += `<ParagraphStyleRange AppliedParagraphStyle="ParagraphStyle/${bodyStyleId}">
+  <Content>${escapeXml(para)}</Content>
+  <Br/>
+</ParagraphStyleRange>
+`;
+          }
+        });
+      }
+
+      // Stories/Story.xml
+      zip.file(`Stories/Story_${storyId}.xml`, `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<idPkg:Story xmlns:idPkg="http://ns.adobe.com/AdobeInDesign/idml/1.0/packaging" DOMVersion="18.0">
+  <Story Self="u${storyId}" AppliedTOCStyle="n" TrackChanges="false" StoryTitle="${escapeXml(ebookTitle)}">
+    ${storyContent}
+  </Story>
+</idPkg:Story>`);
+
+      // designmap.xml (main document reference)
+      zip.file('designmap.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Document xmlns:idPkg="http://ns.adobe.com/AdobeInDesign/idml/1.0/packaging" DOMVersion="18.0" Self="d${generateId()}">
+  <idPkg:Fonts src="Resources/Fonts.xml"/>
+  <idPkg:Styles src="Resources/Styles.xml"/>
+  <idPkg:Story src="Stories/Story_${storyId}.xml"/>
+  <DocumentPreference PageWidth="612" PageHeight="792" FacingPages="true" PageBinding="LeftToRight" DocumentBleedBottomOffset="9" DocumentBleedTopOffset="9" DocumentBleedInsideOrLeftOffset="9" DocumentBleedOutsideOrRightOffset="9"/>
+  <Language Self="Language/$ID/French" Name="$ID/French" ICULocaleName="fr_FR" HyphenationVendor="Hunspell" SpellingVendor="Hunspell"/>
+</Document>`);
+
+      // Generate IDML file
+      const idmlBlob = await zip.generateAsync({ 
+        type: 'blob',
+        mimeType: 'application/vnd.adobe.indesign-idml-package',
+        compression: 'DEFLATE'
+      });
+
+      const url = URL.createObjectURL(idmlBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${ebookTitle || 'Mon-Ebook'}.idml`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast.success('Fichier InDesign IDML exporté ! Ouvrez-le dans InDesign pour la mise en page professionnelle.');
+    } catch (error) {
+      console.error('Erreur export IDML:', error);
+      toast.error('Erreur lors de la génération du fichier IDML');
+    }
+  };
+
+  // Escape XML special characters
+  const escapeXml = (text: string): string => {
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;');
+  }
+
   const exportKdpMetadata = () => {
     const metadata = `
 ═══════════════════════════════════════════════════════════
@@ -1008,6 +1200,9 @@ Paperback: 9.99€ - 19.99€
         case 'epub':
           await exportAsEPUB();
           break;
+        case 'idml':
+          await exportAsIDML();
+          break;
         default:
           exportAsText();
       }
@@ -1065,6 +1260,7 @@ Paperback: 9.99€ - 19.99€
                 <SelectItem value="txt">📝 Texte (.txt)</SelectItem>
                 <SelectItem value="docx">📄 Word (.doc)</SelectItem>
                 <SelectItem value="epub">📘 EPUB (Info uniquement)</SelectItem>
+                <SelectItem value="idml">🎨 InDesign IDML (Print Pro)</SelectItem>
               </SelectContent>
             </Select>
           </div>
