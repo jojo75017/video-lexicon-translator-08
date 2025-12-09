@@ -754,25 +754,6 @@ ${module.content}
           )}
         </AnimatePresence>
 
-        {/* Section Quiz active */}
-        <AnimatePresence>
-          {quizModule !== null && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="mb-8"
-            >
-              <FormationQuiz
-                moduleId={quizModule}
-                moduleTitle={modules.find(m => m.id === quizModule)?.title || ''}
-                onComplete={handleQuizComplete}
-                onClose={() => setQuizModule(null)}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-
         {/* Filtres et recherche */}
         <div className="mb-8 space-y-4">
           <div className="flex flex-col md:flex-row gap-4">
@@ -1185,6 +1166,20 @@ ${module.content}
               Télécharger PDF
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog Quiz */}
+      <Dialog open={quizModule !== null} onOpenChange={(open) => !open && setQuizModule(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0">
+          {quizModule !== null && (
+            <FormationQuiz
+              moduleId={quizModule}
+              moduleTitle={modules.find(m => m.id === quizModule)?.title || ''}
+              onComplete={handleQuizComplete}
+              onClose={() => setQuizModule(null)}
+            />
+          )}
         </DialogContent>
       </Dialog>
     </div>
