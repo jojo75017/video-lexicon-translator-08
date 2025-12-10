@@ -44,8 +44,9 @@ serve(async (req) => {
         console.log("Checkout completed for:", email, "plan:", planId);
 
         if (email) {
-          // Generate access code
-          const accessCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+          // Generate access code with correct format EBK-XXXXXX
+          const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase();
+          const accessCode = `EBK-${randomPart}`;
           
           // Determine plan type and expiration
           let planType = "starter";
@@ -86,6 +87,36 @@ serve(async (req) => {
               .eq("email", email);
             
             console.log("Updated existing subscriber:", email);
+
+            // Send reminder email with existing access code
+            const resendKey = Deno.env.get("RESEND_API_KEY");
+            if (resendKey && existingSubscriber.access_code) {
+              try {
+                await fetch("https://api.resend.com/emails", {
+                  method: "POST",
+                  headers: {
+                    "Authorization": `Bearer ${resendKey}`,
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    from: "Ebook Generator <onboarding@resend.dev>",
+                    to: [email],
+                    subject: "Votre abonnement a été renouvelé !",
+                    html: `
+                      <h1>Merci pour votre renouvellement !</h1>
+                      <p>Votre abonnement au Générateur d'Ebooks a été mis à jour.</p>
+                      <p><strong>Email :</strong> ${email}</p>
+                      <p><strong>Votre code d'accès :</strong> ${existingSubscriber.access_code}</p>
+                      <p><strong>Nouveau plan :</strong> ${planType.charAt(0).toUpperCase() + planType.slice(1)}</p>
+                      <p><a href="https://xvdgazrewsuaqtalqxue.lovableproject.com/ebook-planner">Accéder à l'application</a></p>
+                    `,
+                  }),
+                });
+                console.log("Renewal email sent to:", email);
+              } catch (emailError) {
+                console.error("Failed to send renewal email:", emailError);
+              }
+            }
           } else {
             // Create new subscriber
             await supabase
