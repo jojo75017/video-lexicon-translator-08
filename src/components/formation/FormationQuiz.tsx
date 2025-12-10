@@ -4,8 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, XCircle, HelpCircle, Trophy, RotateCcw, ArrowRight } from 'lucide-react';
+import { CheckCircle2, XCircle, HelpCircle, Trophy, RotateCcw, ArrowRight, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
+import confetti from 'canvas-confetti';
 
 interface Question {
   id: number;
@@ -249,6 +250,37 @@ const FormationQuiz: React.FC<QuizProps> = ({ moduleId, moduleTitle, onComplete,
     }
   };
 
+  const triggerConfetti = () => {
+    const duration = 3000;
+    const animationEnd = Date.now() + duration;
+    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
+
+    const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
+
+    const interval = setInterval(() => {
+      const timeLeft = animationEnd - Date.now();
+
+      if (timeLeft <= 0) {
+        return clearInterval(interval);
+      }
+
+      const particleCount = 50 * (timeLeft / duration);
+
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+        colors: ['#FFD700', '#FFA500', '#FF6B6B', '#4ECDC4', '#A855F7']
+      });
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+        colors: ['#FFD700', '#FFA500', '#FF6B6B', '#4ECDC4', '#A855F7']
+      });
+    }, 250);
+  };
+
   const handleNext = () => {
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(prev => prev + 1);
@@ -257,6 +289,15 @@ const FormationQuiz: React.FC<QuizProps> = ({ moduleId, moduleTitle, onComplete,
     } else {
       const finalScore = Math.round((correctAnswers / questions.length) * 100);
       setIsComplete(true);
+      
+      // Déclencher les confettis pour un score parfait (100%)
+      if (finalScore === 100) {
+        triggerConfetti();
+        toast.success('🎊 Score parfait ! Vous êtes un expert !', {
+          duration: 5000
+        });
+      }
+      
       onComplete(moduleId, finalScore);
     }
   };
@@ -272,17 +313,25 @@ const FormationQuiz: React.FC<QuizProps> = ({ moduleId, moduleTitle, onComplete,
   if (isComplete) {
     const score = Math.round((correctAnswers / questions.length) * 100);
     const isPassed = score >= 70;
+    const isPerfect = score === 100;
 
     return (
       <Card className="border-primary/20 overflow-hidden">
-        <CardHeader className={`${isPassed ? 'bg-gradient-to-r from-green-500/20 to-emerald-500/20' : 'bg-gradient-to-r from-orange-500/20 to-red-500/20'}`}>
+        <CardHeader className={`${isPerfect ? 'bg-gradient-to-r from-yellow-500/30 via-amber-500/20 to-orange-500/30' : isPassed ? 'bg-gradient-to-r from-green-500/20 to-emerald-500/20' : 'bg-gradient-to-r from-orange-500/20 to-red-500/20'}`}>
           <CardTitle className="flex items-center gap-2">
-            {isPassed ? (
+            {isPerfect ? (
+              <>
+                <Sparkles className="h-6 w-6 text-yellow-500 animate-pulse" />
+                <span className="bg-gradient-to-r from-yellow-500 to-amber-500 bg-clip-text text-transparent">
+                  Score Parfait !
+                </span>
+              </>
+            ) : isPassed ? (
               <Trophy className="h-6 w-6 text-yellow-500" />
             ) : (
               <RotateCcw className="h-6 w-6 text-orange-500" />
             )}
-            Résultats du Quiz
+            {!isPerfect && 'Résultats du Quiz'}
           </CardTitle>
         </CardHeader>
         <CardContent className="py-8 text-center">
@@ -291,7 +340,7 @@ const FormationQuiz: React.FC<QuizProps> = ({ moduleId, moduleTitle, onComplete,
             animate={{ scale: 1 }}
             transition={{ type: "spring", duration: 0.5 }}
           >
-            <div className={`text-7xl font-bold mb-4 ${isPassed ? 'text-green-500' : 'text-orange-500'}`}>
+            <div className={`text-7xl font-bold mb-4 ${isPerfect ? 'bg-gradient-to-r from-yellow-500 via-amber-500 to-orange-500 bg-clip-text text-transparent' : isPassed ? 'text-green-500' : 'text-orange-500'}`}>
               {score}%
             </div>
           </motion.div>
@@ -300,8 +349,8 @@ const FormationQuiz: React.FC<QuizProps> = ({ moduleId, moduleTitle, onComplete,
             {correctAnswers} / {questions.length} réponses correctes
           </p>
           
-          <p className={`text-lg mb-6 ${isPassed ? 'text-green-600' : 'text-orange-600'}`}>
-            {isPassed ? '🎉 Félicitations ! Module validé !' : '💪 Continuez à réviser pour améliorer votre score !'}
+          <p className={`text-lg mb-6 ${isPerfect ? 'text-yellow-600 font-semibold' : isPassed ? 'text-green-600' : 'text-orange-600'}`}>
+            {isPerfect ? '🏆✨ Incroyable ! Vous êtes un véritable expert ! ✨🏆' : isPassed ? '🎉 Félicitations ! Module validé !' : '💪 Continuez à réviser pour améliorer votre score !'}
           </p>
           
           <div className="flex gap-4 justify-center">

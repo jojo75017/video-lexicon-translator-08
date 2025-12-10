@@ -51,6 +51,7 @@
     "@types/leaflet-draw": "^1.0.11",
     "@types/react-world-flags": "^1.6.0",
     "axios": "^1.7.9",
+    "canvas-confetti": "^1.9.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
