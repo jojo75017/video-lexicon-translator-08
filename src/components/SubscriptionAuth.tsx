@@ -327,9 +327,7 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
           <div>
             <p>Pas encore abonné ?</p>
             <a 
-              href="https://votre-tunnel-systeme.io" 
-              target="_blank" 
-              rel="noopener noreferrer"
+              href="/offres" 
               className="text-primary hover:underline font-medium"
             >
               Souscrire maintenant
