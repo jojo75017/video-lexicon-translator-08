@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -7,7 +7,8 @@ import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Shield, UserPlus, Users, Copy, Mail, LogOut, Loader2, Pause, Play, RotateCcw, Edit, Calendar, TrendingUp, Activity, User } from 'lucide-react';
+import { Shield, UserPlus, Users, Copy, Mail, LogOut, Loader2, Pause, Play, RotateCcw, Edit, Calendar, TrendingUp, Activity, User, DollarSign, CreditCard, BarChart3, Clock } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 
@@ -182,7 +183,65 @@ export const AdminPage = () => {
     starter: subscribers.filter(s => s.plan_type === 'starter').length,
     pro: subscribers.filter(s => s.plan_type === 'pro').length,
     enterprise: subscribers.filter(s => s.plan_type === 'enterprise').length,
+    lifetime: subscribers.filter(s => s.plan_type === 'lifetime').length,
   };
+
+  // Prix des plans pour calcul des revenus
+  const planPrices: Record<string, number> = {
+    starter: 27,
+    pro: 47,
+    enterprise: 97,
+    lifetime: 197,
+  };
+
+  // Calcul des revenus
+  const revenueStats = useMemo(() => {
+    let totalRevenue = 0;
+    let monthlyRecurring = 0;
+    
+    subscribers.forEach(sub => {
+      const price = planPrices[sub.plan_type] || 27;
+      totalRevenue += price;
+      
+      if (sub.status === 'active' && sub.plan_type !== 'lifetime') {
+        monthlyRecurring += price;
+      }
+    });
+
+    return { totalRevenue, monthlyRecurring };
+  }, [subscribers]);
+
+  // Données pour le graphique par plan
+  const planChartData = useMemo(() => [
+    { name: 'Starter', value: stats.starter, color: '#6366f1', revenue: stats.starter * planPrices.starter },
+    { name: 'Pro', value: stats.pro, color: '#8b5cf6', revenue: stats.pro * planPrices.pro },
+    { name: 'Enterprise', value: stats.enterprise, color: '#ec4899', revenue: stats.enterprise * planPrices.enterprise },
+    { name: 'Lifetime', value: stats.lifetime, color: '#f59e0b', revenue: stats.lifetime * planPrices.lifetime },
+  ].filter(d => d.value > 0), [stats]);
+
+  // Données pour le graphique d'inscriptions par mois
+  const monthlySignups = useMemo(() => {
+    const months: Record<string, { name: string; count: number; revenue: number }> = {};
+    
+    subscribers.forEach(sub => {
+      const date = new Date(sub.created_at);
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      const monthName = date.toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' });
+      
+      if (!months[monthKey]) {
+        months[monthKey] = { name: monthName, count: 0, revenue: 0 };
+      }
+      months[monthKey].count++;
+      months[monthKey].revenue += planPrices[sub.plan_type] || 27;
+    });
+
+    return Object.entries(months)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .slice(-6)
+      .map(([, data]) => data);
+  }, [subscribers]);
+
+  const COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b'];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 p-4">
@@ -286,6 +345,138 @@ export const AdminPage = () => {
           )}
         </Card>
 
+        {/* Revenue Dashboard */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card className="p-6 bg-gradient-to-br from-green-500/10 to-green-600/5 border-green-500/20">
+            <div className="flex items-center gap-3">
+              <div className="p-3 rounded-full bg-green-500/20">
+                <DollarSign className="w-6 h-6 text-green-600" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Revenu Total</p>
+                <p className="text-2xl font-bold text-green-600">{revenueStats.totalRevenue}€</p>
+              </div>
+            </div>
+          </Card>
+          <Card className="p-6 bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/20">
+            <div className="flex items-center gap-3">
+              <div className="p-3 rounded-full bg-blue-500/20">
+                <CreditCard className="w-6 h-6 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">MRR (Récurrent)</p>
+                <p className="text-2xl font-bold text-blue-600">{revenueStats.monthlyRecurring}€</p>
+              </div>
+            </div>
+          </Card>
+          <Card className="p-6 bg-gradient-to-br from-purple-500/10 to-purple-600/5 border-purple-500/20">
+            <div className="flex items-center gap-3">
+              <div className="p-3 rounded-full bg-purple-500/20">
+                <Users className="w-6 h-6 text-purple-600" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Total Clients</p>
+                <p className="text-2xl font-bold text-purple-600">{stats.total}</p>
+              </div>
+            </div>
+          </Card>
+          <Card className="p-6 bg-gradient-to-br from-orange-500/10 to-orange-600/5 border-orange-500/20">
+            <div className="flex items-center gap-3">
+              <div className="p-3 rounded-full bg-orange-500/20">
+                <TrendingUp className="w-6 h-6 text-orange-600" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Taux Actifs</p>
+                <p className="text-2xl font-bold text-orange-600">
+                  {stats.total > 0 ? Math.round((stats.active / stats.total) * 100) : 0}%
+                </p>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Revenue by Month */}
+          <Card className="p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <BarChart3 className="w-5 h-5 text-primary" />
+              <h3 className="font-semibold">Ventes par mois</h3>
+            </div>
+            {monthlySignups.length > 0 ? (
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart data={monthlySignups}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                  <XAxis dataKey="name" className="text-xs" />
+                  <YAxis className="text-xs" />
+                  <Tooltip 
+                    formatter={(value: number, name: string) => [
+                      name === 'revenue' ? `${value}€` : value,
+                      name === 'revenue' ? 'Revenu' : 'Inscriptions'
+                    ]}
+                    contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}
+                  />
+                  <Bar dataKey="count" fill="#6366f1" radius={[4, 4, 0, 0]} name="Inscriptions" />
+                  <Bar dataKey="revenue" fill="#10b981" radius={[4, 4, 0, 0]} name="Revenu" />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-[250px] text-muted-foreground">
+                Pas encore de données
+              </div>
+            )}
+          </Card>
+
+          {/* Distribution by Plan */}
+          <Card className="p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Activity className="w-5 h-5 text-primary" />
+              <h3 className="font-semibold">Répartition par plan</h3>
+            </div>
+            {planChartData.length > 0 ? (
+              <div className="flex items-center">
+                <ResponsiveContainer width="50%" height={200}>
+                  <PieChart>
+                    <Pie
+                      data={planChartData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={50}
+                      outerRadius={80}
+                      paddingAngle={2}
+                      dataKey="value"
+                    >
+                      {planChartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip 
+                      formatter={(value: number, name: string, props: any) => [
+                        `${value} clients (${props.payload.revenue}€)`,
+                        props.payload.name
+                      ]}
+                      contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="space-y-2">
+                  {planChartData.map((plan, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: plan.color }} />
+                      <span className="text-sm">{plan.name}: {plan.value}</span>
+                      <Badge variant="outline" className="text-xs">{plan.revenue}€</Badge>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center h-[200px] text-muted-foreground">
+                Pas encore de données
+              </div>
+            )}
+          </Card>
+        </div>
+
         {/* Statistics */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card className="p-6">
@@ -309,10 +500,11 @@ export const AdminPage = () => {
           <Card className="p-6">
             <div>
               <p className="text-sm text-muted-foreground mb-2">Par Plan</p>
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap">
                 <Badge variant="secondary">{stats.starter} Starter</Badge>
                 <Badge variant="secondary">{stats.pro} Pro</Badge>
                 <Badge variant="secondary">{stats.enterprise} Enterprise</Badge>
+                {stats.lifetime > 0 && <Badge variant="secondary">{stats.lifetime} Lifetime</Badge>}
               </div>
             </div>
           </Card>
