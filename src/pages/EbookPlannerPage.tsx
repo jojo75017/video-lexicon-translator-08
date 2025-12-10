@@ -377,18 +377,25 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   };
 
   const resetPlan = () => {
+    if (!confirm('Êtes-vous sûr de vouloir réinitialiser ? Toutes les données seront perdues et vous pourrez commencer un nouvel ebook.')) {
+      return;
+    }
+    
     setEbookTitle(''); setAuthorName(''); setPreface(''); setConclusion(''); setEpilogue('');
     setChapters([]); setNumberOfChapters(8); setSelectedChapters([]);
     setImportText(''); setEbookImages([]); setTargetAudience('Adultes');
     setTomeNumber(null); setWritingStyle('narratif'); setChapterLength('moyen');
     setDetailLevel('détaillé'); setTone('professionnel');
     setNarrativeFormat('troisième personne'); setCharacters([]);
+    setBookSummary(''); setCoverConcepts(''); setSeoOptimization('');
+    setKdpDescription(''); setKdpKeywords(''); setKdpCategories('');
+    
     try {
       localStorage.removeItem(STORAGE_KEY);
-      toast.success('Plan réinitialisé !');
     } catch (error) {
-      toast.success('Plan réinitialisé !');
+      console.error('Erreur localStorage:', error);
     }
+    toast.success('Planificateur réinitialisé ! Vous pouvez commencer un nouvel ebook.');
   };
 
   const handleImageSelect = (imageUrl: string, title: string) => {
