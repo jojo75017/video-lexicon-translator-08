@@ -85,7 +85,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   };
   
   const savedData = loadSavedData();
-  const { saveProject, loadLatestProject, isSaving, currentProjectId, saveVersion, loadVersions, restoreVersion } = useEbookDatabase();
+  const { saveProject, loadLatestProject, isSaving, currentProjectId, setCurrentProjectId, saveVersion, loadVersions, restoreVersion } = useEbookDatabase();
   
   const [apiKey, setApiKey] = useState(savedData?.apiKey || '');
   const [ebookTitle, setEbookTitle] = useState(location.state?.suggestedTitle || savedData?.ebookTitle || '');
@@ -381,6 +381,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
       return;
     }
     
+    // Réinitialiser tous les états
     setEbookTitle(''); setAuthorName(''); setPreface(''); setConclusion(''); setEpilogue('');
     setChapters([]); setNumberOfChapters(8); setSelectedChapters([]);
     setImportText(''); setEbookImages([]); setTargetAudience('Adultes');
@@ -389,6 +390,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
     setNarrativeFormat('troisième personne'); setCharacters([]);
     setBookSummary(''); setCoverConcepts(''); setSeoOptimization('');
     setKdpDescription(''); setKdpKeywords(''); setKdpCategories('');
+    
+    // IMPORTANT: Réinitialiser l'ID du projet pour créer un nouveau projet lors de la prochaine sauvegarde
+    setCurrentProjectId(null);
     
     try {
       localStorage.removeItem(STORAGE_KEY);
