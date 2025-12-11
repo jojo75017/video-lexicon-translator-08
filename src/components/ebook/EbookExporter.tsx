@@ -31,7 +31,8 @@ import {
   BorderStyle,
   Tab,
   TabStopType,
-  TabStopPosition
+  TabStopPosition,
+  UnderlineType
 } from 'docx';
 
 interface EbookExporterProps {
@@ -1059,59 +1060,104 @@ ${navContent}    </ol>
     }
   };
 
-  // Fonction pour parser le markdown en TextRuns Word
+  // Fonction pour parser le markdown en TextRuns Word avec gras, italique et souligné
   const parseMarkdownToTextRuns = (text: string, baseSize: number = 24): TextRun[] => {
+    if (!text || text.trim() === '') {
+      return [new TextRun({ text: '', size: baseSize, font: 'Georgia' })];
+    }
+
     const runs: TextRun[] = [];
-    // Regex pour détecter **gras**, *italique*, ***gras italique***, __gras__, _italique_
-    const regex = /(\*\*\*(.+?)\*\*\*|\*\*(.+?)\*\*|__(.+?)__|_(.+?)_|\*(.+?)\*|([^*_]+))/g;
+    
+    // Tokenizer amélioré pour gérer tous les formats
+    // Ordre: ***gras italique***, **gras**, __gras__, ~~souligné~~, <u>souligné</u>, *italique*, _italique_
+    const tokenRegex = /(\*\*\*[\s\S]+?\*\*\*|\*\*[\s\S]+?\*\*|__[\s\S]+?__|~~[\s\S]+?~~|<u>[\s\S]+?<\/u>|\*[^*\n]+?\*|_[^_\n]+?_)/g;
+    
+    let lastIndex = 0;
     let match;
     
-    while ((match = regex.exec(text)) !== null) {
-      if (match[2]) {
+    while ((match = tokenRegex.exec(text)) !== null) {
+      // Ajouter le texte normal avant le match
+      if (match.index > lastIndex) {
+        const normalText = text.substring(lastIndex, match.index);
+        if (normalText) {
+          runs.push(new TextRun({
+            text: normalText,
+            size: baseSize,
+            font: 'Georgia',
+          }));
+        }
+      }
+      
+      const matchedText = match[0];
+      
+      if (matchedText.startsWith('***') && matchedText.endsWith('***')) {
         // ***gras italique***
         runs.push(new TextRun({
-          text: match[2],
+          text: matchedText.slice(3, -3),
           bold: true,
           italics: true,
           size: baseSize,
           font: 'Georgia',
         }));
-      } else if (match[3]) {
+      } else if (matchedText.startsWith('**') && matchedText.endsWith('**')) {
         // **gras**
         runs.push(new TextRun({
-          text: match[3],
+          text: matchedText.slice(2, -2),
           bold: true,
           size: baseSize,
           font: 'Georgia',
         }));
-      } else if (match[4]) {
+      } else if (matchedText.startsWith('__') && matchedText.endsWith('__')) {
         // __gras__
         runs.push(new TextRun({
-          text: match[4],
+          text: matchedText.slice(2, -2),
           bold: true,
           size: baseSize,
           font: 'Georgia',
         }));
-      } else if (match[5]) {
-        // _italique_
+      } else if (matchedText.startsWith('~~') && matchedText.endsWith('~~')) {
+        // ~~souligné~~
         runs.push(new TextRun({
-          text: match[5],
-          italics: true,
+          text: matchedText.slice(2, -2),
+          underline: { type: UnderlineType.SINGLE },
           size: baseSize,
           font: 'Georgia',
         }));
-      } else if (match[6]) {
+      } else if (matchedText.startsWith('<u>') && matchedText.endsWith('</u>')) {
+        // <u>souligné</u>
+        runs.push(new TextRun({
+          text: matchedText.slice(3, -4),
+          underline: { type: UnderlineType.SINGLE },
+          size: baseSize,
+          font: 'Georgia',
+        }));
+      } else if (matchedText.startsWith('*') && matchedText.endsWith('*')) {
         // *italique*
         runs.push(new TextRun({
-          text: match[6],
+          text: matchedText.slice(1, -1),
           italics: true,
           size: baseSize,
           font: 'Georgia',
         }));
-      } else if (match[7]) {
-        // texte normal
+      } else if (matchedText.startsWith('_') && matchedText.endsWith('_')) {
+        // _italique_
         runs.push(new TextRun({
-          text: match[7],
+          text: matchedText.slice(1, -1),
+          italics: true,
+          size: baseSize,
+          font: 'Georgia',
+        }));
+      }
+      
+      lastIndex = match.index + matchedText.length;
+    }
+    
+    // Ajouter le texte restant après le dernier match
+    if (lastIndex < text.length) {
+      const remainingText = text.substring(lastIndex);
+      if (remainingText) {
+        runs.push(new TextRun({
+          text: remainingText,
           size: baseSize,
           font: 'Georgia',
         }));
