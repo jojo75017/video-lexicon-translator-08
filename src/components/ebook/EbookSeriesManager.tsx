@@ -167,6 +167,7 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
     plotThreads: []
   });
   const [newGenre, setNewGenre] = useState('');
+  const [targetWordsPerChapter, setTargetWordsPerChapter] = useState<number>(2500);
 
   const [newTheme, setNewTheme] = useState('');
   const [activeTab, setActiveTab] = useState('overview');
@@ -937,7 +938,7 @@ ${tome.mainPlotPoints?.map((p, i) => `${i + 1}. ${p}`).join('\n') || 'Non défin
 
 ${tome.cliffhanger ? `CLIFFHANGER: ${tome.cliffhanger}` : ''}
 
-IMPORTANT: Génère EXACTEMENT 8 chapitres pour un livre de 80 pages.
+IMPORTANT: Génère EXACTEMENT 8 chapitres pour un livre de ${Math.round(targetWordsPerChapter * 8 / 250)} pages (~${targetWordsPerChapter.toLocaleString()} mots par chapitre).
 
 Génère en JSON:
 {
@@ -945,7 +946,8 @@ Génère en JSON:
   "chapters": [
     {
       "title": "Titre du chapitre",
-      "subChapters": ["Sous-chapitre 1", "Sous-chapitre 2"]
+      "subChapters": ["Sous-chapitre 1", "Sous-chapitre 2"],
+      "targetWords": ${targetWordsPerChapter}
     }
   ],
   "conclusion": "Une conclusion de 100-150 mots"
@@ -954,6 +956,7 @@ Génère en JSON:
 RÈGLES STRICTES:
 - Génère EXACTEMENT 8 chapitres (pas plus, pas moins)
 - Chaque chapitre doit avoir 2-3 sous-chapitres maximum
+- Chaque chapitre doit viser ${targetWordsPerChapter.toLocaleString()} mots
 - Progression narrative cohérente`
         }
       });
@@ -992,7 +995,7 @@ RÈGLES STRICTES:
         conclusion: parsedData.conclusion || ''
       });
 
-      toast.success(`Tome ${tome.number} importé dans le planificateur !`);
+      toast.success(`Tome ${tome.number} importé ! (8 chapitres × ${targetWordsPerChapter.toLocaleString()} mots = ~${Math.round(targetWordsPerChapter * 8 / 250)} pages)`);
     } catch (error) {
       console.error('Erreur import tome:', error);
       toast.error('Erreur lors de l\'import du tome');
@@ -1621,10 +1624,33 @@ RÈGLES STRICTES:
 
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BookOpen className="h-5 w-5" />
-                  Tomes de la série
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <BookOpen className="h-5 w-5" />
+                    Tomes de la série
+                  </CardTitle>
+                  <div className="flex items-center gap-2">
+                    <Label className="text-sm whitespace-nowrap">Mots/chapitre:</Label>
+                    <Select 
+                      value={targetWordsPerChapter.toString()} 
+                      onValueChange={(v) => setTargetWordsPerChapter(parseInt(v))}
+                    >
+                      <SelectTrigger className="w-[120px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1500">1 500 (~6p)</SelectItem>
+                        <SelectItem value="2000">2 000 (~8p)</SelectItem>
+                        <SelectItem value="2500">2 500 (~10p)</SelectItem>
+                        <SelectItem value="3000">3 000 (~12p)</SelectItem>
+                        <SelectItem value="3500">3 500 (~14p)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <CardDescription className="text-xs">
+                  8 chapitres × {targetWordsPerChapter.toLocaleString()} mots = ~{(targetWordsPerChapter * 8 / 250).toFixed(0)} pages
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {seriesBible.tomes.map((tome) => (
