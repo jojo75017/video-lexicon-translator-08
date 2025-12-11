@@ -385,6 +385,59 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
     toast.success(`Template ${templateType} appliqué !`);
   };
 
+  // Fonction pour insérer une image dans le contenu d'un chapitre
+  const handleInsertImageToChapter = (chapterId: string, imageUrl: string) => {
+    const chapter = chapters.find(c => c.id === chapterId);
+    if (!chapter) {
+      toast.error('Chapitre non trouvé');
+      return;
+    }
+    
+    const imageTag = `\n\n[IMAGE_URL:${imageUrl}]\n\n`;
+    const newContent = (chapter.content || '') + imageTag;
+    updateChapterContent(chapterId, newContent);
+    toast.success(`Image insérée dans "${chapter.title}"`);
+  };
+
+  // Fonction de sauvegarde manuelle
+  const handleManualSave = async () => {
+    if (!ebookTitle) {
+      toast.error('Veuillez entrer un titre pour sauvegarder');
+      return;
+    }
+    
+    const projectData = {
+      title: ebookTitle, author_name: authorName, target_audience: targetAudience,
+      tome_number: tomeNumber, writing_style: writingStyle, chapter_length: chapterLength,
+      detail_level: detailLevel, tone, narrative_format: narrativeFormat,
+      preface, conclusion, chapters, characters, ebook_images: ebookImages,
+      number_of_chapters: numberOfChapters, book_summary: bookSummary,
+      cover_concepts: coverConcepts, seo_optimization: seoOptimization,
+      kdp_description: kdpDescription, kdp_keywords: kdpKeywords, kdp_categories: kdpCategories,
+    };
+    
+    await saveProject(projectData);
+    toast.success('Projet sauvegardé !');
+  };
+
+  // Fonction de changement d'onglet avec sauvegarde
+  const handleTabChange = async (newTab: string) => {
+    // Sauvegarder avant de changer d'onglet si on a un titre
+    if (ebookTitle) {
+      const projectData = {
+        title: ebookTitle, author_name: authorName, target_audience: targetAudience,
+        tome_number: tomeNumber, writing_style: writingStyle, chapter_length: chapterLength,
+        detail_level: detailLevel, tone, narrative_format: narrativeFormat,
+        preface, conclusion, chapters, characters, ebook_images: ebookImages,
+        number_of_chapters: numberOfChapters, book_summary: bookSummary,
+        cover_concepts: coverConcepts, seo_optimization: seoOptimization,
+        kdp_description: kdpDescription, kdp_keywords: kdpKeywords, kdp_categories: kdpCategories,
+      };
+      await saveProject(projectData);
+    }
+    setActiveTab(newTab);
+  };
+
   const generateTableOfContents = () => {
     if (chapters.length === 0) {
       toast.error('Ajoutez des chapitres pour générer la table des matières');
@@ -1067,6 +1120,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                 chapterIndex: parseInt(img.chapterId) || undefined
               })));
             }}
+            onInsertImageToChapter={handleInsertImageToChapter}
           />
         );
       
@@ -1324,7 +1378,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
     <div className="min-h-screen flex bg-gradient-subtle">
       <ModernSidebar 
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={handleTabChange}
         isCollapsed={sidebarCollapsed}
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
       />
@@ -1347,14 +1401,24 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
               </Button>
             </div>
             
-            {/* Bouton Nouveau Projet - bien visible */}
-            <Button
-              onClick={resetPlan}
-              className="absolute top-4 right-4 bg-white text-primary hover:bg-white/90 shadow-lg font-semibold"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Nouveau projet
-            </Button>
+            {/* Boutons d'action - bien visibles */}
+            <div className="absolute top-4 right-4 flex gap-2">
+              <Button
+                onClick={handleManualSave}
+                disabled={isSaving || !ebookTitle}
+                className="bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg font-semibold"
+              >
+                <Save className="h-4 w-4 mr-2" />
+                {isSaving ? 'Sauvegarde...' : 'Sauvegarder'}
+              </Button>
+              <Button
+                onClick={resetPlan}
+                className="bg-white text-primary hover:bg-white/90 shadow-lg font-semibold"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Nouveau projet
+              </Button>
+            </div>
             
             <div className="max-w-3xl mx-auto text-center pt-8 pb-4">
               <div className="inline-flex items-center justify-center w-14 h-14 mb-4 rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 shadow-xl">
