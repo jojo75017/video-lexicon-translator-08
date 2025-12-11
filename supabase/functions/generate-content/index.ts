@@ -475,19 +475,32 @@ Le score overall_score doit être entre 0 et 100 (100 = parfaitement cohérent).
         );
       }
 
-      const charactersPrompt = `Tu es un expert en analyse littéraire. Analyse le contenu suivant et extrait TOUS les personnages mentionnés avec leurs rôles et descriptions.
+      const hasContent = content && content.trim().length > 50;
+      
+      const charactersPrompt = hasContent 
+        ? `Tu es un expert en analyse littéraire. Analyse le contenu suivant et extrait TOUS les personnages mentionnés avec leurs rôles et descriptions.
 
 TITRE: ${ebookTitle || 'Sans titre'}
 
 CONTENU:
-${content || 'Pas de contenu disponible'}
+${content}
 
 Pour chaque personnage trouvé, identifie:
 - Son nom exact
 - Son rôle dans l'histoire (protagonist, antagonist, secondary, mentor, ally, love_interest, comic_relief, narrator, other)
-- Une brève description de qui il est et ce qu'il fait
+- Une brève description de qui il est et ce qu'il fait`
+        : `Tu es un expert en création littéraire. Basé sur le titre suivant, PROPOSE une liste de personnages pertinents pour cette histoire.
 
-Réponds UNIQUEMENT avec un JSON valide (sans markdown) dans ce format:
+TITRE DE L'EBOOK: ${ebookTitle}
+
+Crée 4 à 6 personnages intéressants et cohérents avec le thème du titre. Pour chaque personnage, fournis:
+- Un nom approprié au genre/thème
+- Son rôle dans l'histoire (protagonist, antagonist, secondary, mentor, ally, love_interest, comic_relief, narrator, other)
+- Une description détaillée de qui il est, sa personnalité, ses motivations`;
+
+      const jsonInstruction = `
+
+Réponds UNIQUEMENT avec un JSON valide (sans markdown, sans \`\`\`) dans ce format exact:
 {
   "characters": [
     {
@@ -496,10 +509,7 @@ Réponds UNIQUEMENT avec un JSON valide (sans markdown) dans ce format:
       "description": "Description du personnage et de son rôle dans l'histoire"
     }
   ]
-}
-
-Si aucun personnage n'est trouvé ou le contenu est insuffisant, retourne:
-{ "characters": [] }`;
+}`;
 
       const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
         method: 'POST',
@@ -510,7 +520,7 @@ Si aucun personnage n'est trouvé ou le contenu est insuffisant, retourne:
         body: JSON.stringify({
           model: 'google/gemini-2.5-flash',
           messages: [
-            { role: 'user', content: charactersPrompt }
+            { role: 'user', content: charactersPrompt + jsonInstruction }
           ],
         }),
       });

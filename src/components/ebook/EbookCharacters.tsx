@@ -62,6 +62,11 @@ export const EbookCharacters = ({ characters, onUpdateCharacters, ebookTitle = '
   };
 
   const generateCharactersFromContent = async () => {
+    if (!ebookTitle.trim()) {
+      toast.error('Ajoutez un titre à votre ebook pour générer les personnages');
+      return;
+    }
+
     const content = chapters.map(ch => {
       let text = `Chapitre: ${ch.title}\n${ch.content || ''}`;
       if (ch.subChapters) {
@@ -69,11 +74,6 @@ export const EbookCharacters = ({ characters, onUpdateCharacters, ebookTitle = '
       }
       return text;
     }).join('\n\n');
-
-    if (!content.trim() && !ebookTitle) {
-      toast.error('Ajoutez du contenu à vos chapitres pour générer les personnages');
-      return;
-    }
 
     setIsGeneratingAll(true);
 
