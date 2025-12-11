@@ -40,8 +40,8 @@ export const EbookKdpTools: React.FC<EbookKdpToolsProps> = ({
   const [genre, setGenre] = useState('');
   const [targetAge, setTargetAge] = useState('');
   const [kdpDescription, setKdpDescription] = useState('');
-  const [kdpKeywords, setKdpKeywords] = useState('');
-  const [kdpCategories, setKdpCategories] = useState('');
+  const [kdpKeywords, setKdpKeywords] = useState<any[]>([]);
+  const [kdpCategories, setKdpCategories] = useState<any[]>([]);
   const [pricingStrategy, setPricingStrategy] = useState('');
   const [launchPlan, setLaunchPlan] = useState('');
   const [authorBio, setAuthorBio] = useState('');
@@ -65,8 +65,7 @@ export const EbookKdpTools: React.FC<EbookKdpToolsProps> = ({
     }
     const result = await generateKDPKeywords(ebookTitle, chapters);
     if (result) {
-      const text = Array.isArray(result) ? JSON.stringify(result, null, 2) : String(result);
-      setKdpKeywords(text);
+      setKdpKeywords(result);
       toast.success('Mots-clés KDP générés !');
     }
   };
@@ -78,8 +77,7 @@ export const EbookKdpTools: React.FC<EbookKdpToolsProps> = ({
     }
     const result = await generateKDPCategories(ebookTitle, chapters);
     if (result) {
-      const text = Array.isArray(result) ? JSON.stringify(result, null, 2) : String(result);
-      setKdpCategories(text);
+      setKdpCategories(result);
       toast.success('Catégories KDP générées !');
     }
   };
@@ -222,10 +220,10 @@ export const EbookKdpTools: React.FC<EbookKdpToolsProps> = ({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Tag className="h-5 w-5" />
-              Mots-clés KDP
+              Mots-clés KDP (A9)
             </CardTitle>
             <CardDescription>
-              7 mots-clés optimaux pour le SEO
+              7 mots-clés optimisés pour l'algorithme Amazon A9
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -238,21 +236,40 @@ export const EbookKdpTools: React.FC<EbookKdpToolsProps> = ({
               🏷️ Générer mots-clés
             </Button>
             
-            {kdpKeywords && (
-              <div className="p-4 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
-                <div className="flex justify-between items-start gap-2">
-                  <pre className="whitespace-pre-wrap text-sm flex-1">{kdpKeywords}</pre>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      navigator.clipboard.writeText(kdpKeywords);
-                      toast.success('Copié dans le presse-papier !');
-                    }}
-                  >
-                    Copier
-                  </Button>
-                </div>
+            {kdpKeywords.length > 0 && (
+              <div className="space-y-2">
+                {kdpKeywords.map((kw: any, idx: number) => (
+                  <div key={idx} className="p-3 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium text-green-800 dark:text-green-200">{kw.keyword || kw}</span>
+                      <div className="flex items-center gap-2">
+                        {kw.chars && <span className="text-xs text-muted-foreground">{kw.chars} car.</span>}
+                        {kw.relevance && (
+                          <span className={`text-xs px-2 py-0.5 rounded-full ${
+                            kw.relevance === 'haute' ? 'bg-green-500 text-white' :
+                            kw.relevance === 'moyenne' ? 'bg-yellow-500 text-white' :
+                            'bg-gray-400 text-white'
+                          }`}>
+                            {kw.relevance}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    {kw.tip && <p className="text-xs text-muted-foreground mt-1">💡 {kw.tip}</p>}
+                  </div>
+                ))}
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    const text = kdpKeywords.map((kw: any) => kw.keyword || kw).join('\n');
+                    navigator.clipboard.writeText(text);
+                    toast.success('Mots-clés copiés !');
+                  }}
+                >
+                  Copier tous les mots-clés
+                </Button>
               </div>
             )}
           </CardContent>
@@ -265,7 +282,7 @@ export const EbookKdpTools: React.FC<EbookKdpToolsProps> = ({
               Catégories KDP
             </CardTitle>
             <CardDescription>
-              Placement optimal dans les catégories
+              Catégories BISAC avec niveau de concurrence
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -278,21 +295,48 @@ export const EbookKdpTools: React.FC<EbookKdpToolsProps> = ({
               📊 Analyser catégories
             </Button>
             
-            {kdpCategories && (
-              <div className="p-4 bg-purple-50 dark:bg-purple-950/20 rounded-lg border border-purple-200 dark:border-purple-800">
-                <div className="flex justify-between items-start gap-2">
-                  <pre className="whitespace-pre-wrap text-sm flex-1">{kdpCategories}</pre>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      navigator.clipboard.writeText(kdpCategories);
-                      toast.success('Copié dans le presse-papier !');
-                    }}
-                  >
-                    Copier
-                  </Button>
-                </div>
+            {kdpCategories.length > 0 && (
+              <div className="space-y-3">
+                {kdpCategories.map((cat: any, idx: number) => (
+                  <div key={idx} className="p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1">
+                        <p className="font-medium text-purple-800 dark:text-purple-200">{cat.category || cat}</p>
+                        {cat.books_estimate && (
+                          <p className="text-xs text-muted-foreground mt-1">📚 ~{cat.books_estimate} livres</p>
+                        )}
+                        {cat.recommendation && (
+                          <p className="text-xs text-muted-foreground mt-1">💡 {cat.recommendation}</p>
+                        )}
+                        {cat.ranking_potential && (
+                          <p className="text-xs text-green-600 dark:text-green-400 mt-1">🎯 {cat.ranking_potential}</p>
+                        )}
+                      </div>
+                      {cat.competition && (
+                        <span className={`text-xs px-2 py-1 rounded-full shrink-0 ${
+                          cat.competition === 'faible' ? 'bg-green-500 text-white' :
+                          cat.competition === 'moyenne' ? 'bg-yellow-500 text-white' :
+                          cat.competition === 'élevée' ? 'bg-orange-500 text-white' :
+                          'bg-red-500 text-white'
+                        }`}>
+                          {cat.competition}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    const text = kdpCategories.map((cat: any) => cat.category || cat).join('\n');
+                    navigator.clipboard.writeText(text);
+                    toast.success('Catégories copiées !');
+                  }}
+                >
+                  Copier toutes les catégories
+                </Button>
               </div>
             )}
           </CardContent>

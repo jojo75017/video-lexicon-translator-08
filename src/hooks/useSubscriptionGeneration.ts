@@ -260,15 +260,30 @@ La description doit :
 
   const generateKDPKeywords = async (title: string, chapters: Chapter[]) => {
     const chaptersText = chapters.map(c => c.title).join(', ');
-    const prompt = `Génère 7 mots-clés Amazon KDP pour le livre "${title}" avec ces chapitres : ${chaptersText}.
-Chaque mot-clé doit faire moins de 50 caractères.
-Réponds avec un tableau JSON : ["mot1", "mot2",...]`;
+    const prompt = `Tu es un expert en optimisation Amazon KDP et algorithme A9.
+
+Génère exactement 7 mots-clés Amazon KDP pour le livre "${title}" avec ces chapitres : ${chaptersText}.
+
+RÈGLES STRICTES pour chaque mot-clé :
+- Maximum 50 caractères
+- Pertinent pour la recherche Amazon
+- Pas de répétition du titre exact
+- Inclure des variantes longue traîne
+
+Réponds UNIQUEMENT avec ce format JSON (pas de texte avant/après) :
+[
+  {"keyword": "mot clé 1", "chars": 12, "relevance": "haute", "tip": "conseil A9"},
+  {"keyword": "mot clé 2", "chars": 15, "relevance": "haute", "tip": "conseil A9"},
+  ...
+]
+
+Les niveaux de relevance sont : "haute", "moyenne", "faible"
+Le tip doit expliquer pourquoi ce mot-clé est efficace pour A9.`;
 
     const content = await callGenerateContent('chapters_generated', prompt);
     
     if (content) {
       try {
-        // Nettoyage des balises markdown et extraction éventuelle du tableau JSON
         let clean = content.trim().replace(/```json\s*|```/g, '').trim();
         const match = clean.match(/\[[\s\S]*\]/);
         const jsonText = match ? match[0] : clean;
@@ -282,14 +297,33 @@ Réponds avec un tableau JSON : ["mot1", "mot2",...]`;
 
   const generateKDPCategories = async (title: string, chapters: Chapter[]) => {
     const chaptersText = chapters.map(c => c.title).join(', ');
-    const prompt = `Suggère 5 catégories Amazon KDP pour le livre "${title}" avec ces chapitres : ${chaptersText}.
-Réponds avec un tableau JSON de catégories : ["catégorie1", "catégorie2",...]`;
+    const prompt = `Tu es un expert en catégories Amazon KDP et BISAC.
+
+Suggère les 5 meilleures catégories Amazon KDP pour le livre "${title}" avec ces chapitres : ${chaptersText}.
+
+Pour chaque catégorie, fournis :
+- Le chemin BISAC complet (ex: "Fiction > Romance > Contemporary")
+- Le niveau de concurrence estimé
+- Une recommandation stratégique
+
+Réponds UNIQUEMENT avec ce format JSON (pas de texte avant/après) :
+[
+  {
+    "category": "Chemin > Complet > Catégorie",
+    "competition": "faible",
+    "books_estimate": "500-1000",
+    "recommendation": "Excellente niche avec peu de concurrence",
+    "ranking_potential": "Top 100 accessible"
+  },
+  ...
+]
+
+Les niveaux de competition sont : "faible", "moyenne", "élevée", "très élevée"`;
 
     const content = await callGenerateContent('chapters_generated', prompt);
     
     if (content) {
       try {
-        // Nettoyage des balises markdown et extraction éventuelle du tableau JSON
         let clean = content.trim().replace(/```json\s*|```/g, '').trim();
         const match = clean.match(/\[[\s\S]*\]/);
         const jsonText = match ? match[0] : clean;
