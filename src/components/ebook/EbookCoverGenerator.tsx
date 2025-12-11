@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Palette, Download, Wand2, RefreshCw, Loader2, Sparkles, Image as ImageIcon, BookOpen, Ruler, Info, FileText } from 'lucide-react';
+import { Palette, Download, Wand2, RefreshCw, Loader2, Sparkles, Image as ImageIcon, BookOpen, Ruler, Info, FileText, Upload, X, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import jsPDF from 'jspdf';
@@ -104,6 +104,33 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
   const [paperType, setPaperType] = useState<PaperType>('white');
   const [bindingType, setBindingType] = useState<BindingType>('paperback');
   const [coverType, setCoverType] = useState<CoverType>('front');
+  
+  // Author photo
+  const [authorPhoto, setAuthorPhoto] = useState<string | null>(null);
+  const authorPhotoInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAuthorPhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('La photo ne doit pas dépasser 5 Mo');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setAuthorPhoto(event.target?.result as string);
+        toast.success('Photo de l\'auteur ajoutée');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeAuthorPhoto = () => {
+    setAuthorPhoto(null);
+    if (authorPhotoInputRef.current) {
+      authorPhotoInputRef.current.value = '';
+    }
+  };
 
   // Calculate spine width based on page count and paper type
   const spineWidth = useMemo(() => {
@@ -196,7 +223,71 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
     }
   };
 
-  const downloadCover = (format: 'jpeg' | 'pdf' = 'jpeg') => {
+  // Helper function to composite author photo onto cover
+  const compositeWithAuthorPhoto = async (coverUrl: string): Promise<string> => {
+    if (!authorPhoto || coverType !== 'full') {
+      return coverUrl;
+    }
+
+    return new Promise((resolve, reject) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        reject(new Error('Canvas context not available'));
+        return;
+      }
+
+      const coverImg = new Image();
+      coverImg.crossOrigin = 'anonymous';
+      
+      coverImg.onload = () => {
+        canvas.width = coverImg.width;
+        canvas.height = coverImg.height;
+        
+        // Draw the cover
+        ctx.drawImage(coverImg, 0, 0);
+        
+        // Load and draw author photo
+        const authorImg = new Image();
+        authorImg.onload = () => {
+          // Position author photo on back cover (left side)
+          // Back cover is approximately the left third of the full cover
+          const backCoverWidth = coverImg.width * 0.4; // Approximate back cover area
+          const photoSize = Math.min(backCoverWidth * 0.3, coverImg.height * 0.15); // Photo size
+          const photoX = backCoverWidth * 0.1; // 10% from left edge
+          const photoY = coverImg.height * 0.6; // 60% from top
+          
+          // Draw circular clipping path
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(photoX + photoSize / 2, photoY + photoSize / 2, photoSize / 2, 0, Math.PI * 2);
+          ctx.closePath();
+          ctx.clip();
+          
+          // Draw author photo
+          ctx.drawImage(authorImg, photoX, photoY, photoSize, photoSize);
+          ctx.restore();
+          
+          // Add a subtle border around the photo
+          ctx.beginPath();
+          ctx.arc(photoX + photoSize / 2, photoY + photoSize / 2, photoSize / 2, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+          ctx.lineWidth = photoSize * 0.03;
+          ctx.stroke();
+          
+          resolve(canvas.toDataURL('image/jpeg', 0.95));
+        };
+        
+        authorImg.onerror = () => resolve(coverUrl); // Fallback to original
+        authorImg.src = authorPhoto;
+      };
+      
+      coverImg.onerror = () => reject(new Error('Failed to load cover image'));
+      coverImg.src = coverUrl;
+    });
+  };
+
+  const downloadCover = async (format: 'jpeg' | 'pdf' = 'jpeg') => {
     const coverUrl = generatedCovers[selectedCover];
     if (!coverUrl) return;
 
@@ -205,14 +296,22 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
       return;
     }
 
-    const link = document.createElement('a');
-    link.href = coverUrl;
-    const suffix = coverType === 'full' ? 'full_cover' : 'front_cover';
-    link.download = `${ebookTitle.replace(/[^a-z0-9]/gi, '_')}_${suffix}_${selectedCover + 1}.jpg`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    toast.success('Couverture JPEG téléchargée !');
+    try {
+      toast.info('Préparation de la couverture...');
+      const finalCoverUrl = await compositeWithAuthorPhoto(coverUrl);
+      
+      const link = document.createElement('a');
+      link.href = finalCoverUrl;
+      const suffix = coverType === 'full' ? 'full_cover' : 'front_cover';
+      link.download = `${ebookTitle.replace(/[^a-z0-9]/gi, '_')}_${suffix}_${selectedCover + 1}.jpg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast.success('Couverture JPEG téléchargée !');
+    } catch (error) {
+      console.error('Erreur téléchargement:', error);
+      toast.error('Erreur lors du téléchargement');
+    }
   };
 
   const downloadAsPDF = async () => {
@@ -222,6 +321,9 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
     toast.info('Création du PDF en cours...');
 
     try {
+      // First composite author photo if needed
+      const finalCoverUrl = await compositeWithAuthorPhoto(coverUrl);
+      
       // Create image element to get dimensions
       const img = new Image();
       img.crossOrigin = 'anonymous';
@@ -229,7 +331,7 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
       await new Promise<void>((resolve, reject) => {
         img.onload = () => resolve();
         img.onerror = () => reject(new Error('Impossible de charger l\'image'));
-        img.src = coverUrl;
+        img.src = finalCoverUrl;
       });
 
       // Calculate PDF dimensions based on cover type and format
@@ -255,7 +357,7 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
       });
 
       // Add image to fill the entire page
-      pdf.addImage(coverUrl, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+      pdf.addImage(finalCoverUrl, 'JPEG', 0, 0, pdfWidth, pdfHeight);
 
       // Save PDF
       const suffix = coverType === 'full' ? 'full_cover' : 'front_cover';
@@ -387,14 +489,55 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
                     className="mt-1"
                   />
                 </div>
-                <div className="p-3 bg-amber-50 border border-amber-200 rounded-md">
-                  <p className="text-sm text-amber-800 flex items-start gap-2">
-                    <Info className="w-4 h-4 mt-0.5 shrink-0" />
-                    <span>
-                      <strong>Photo de l'auteur :</strong> L'IA va générer un espace réservé pour votre photo. 
-                      Vous devrez ajouter votre propre photo manuellement avec un logiciel de retouche (Canva, Photoshop...) après téléchargement.
-                    </span>
+                
+                {/* Author Photo Upload */}
+                <div>
+                  <Label className="text-sm font-medium flex items-center gap-2">
+                    <User className="w-4 h-4" />
+                    Photo de l'auteur (optionnel)
+                  </Label>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Votre photo sera ajoutée sur la 4ème de couverture lors du téléchargement
                   </p>
+                  
+                  <input
+                    type="file"
+                    ref={authorPhotoInputRef}
+                    accept="image/*"
+                    onChange={handleAuthorPhotoUpload}
+                    className="hidden"
+                  />
+                  
+                  {authorPhoto ? (
+                    <div className="flex items-center gap-3 p-3 bg-white rounded-lg border">
+                      <img 
+                        src={authorPhoto} 
+                        alt="Photo auteur" 
+                        className="w-16 h-16 rounded-full object-cover border-2 border-purple-200"
+                      />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-green-700">Photo ajoutée ✓</p>
+                        <p className="text-xs text-muted-foreground">Sera intégrée à la couverture</p>
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={removeAuthorPhoto}
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      onClick={() => authorPhotoInputRef.current?.click()}
+                      className="w-full border-dashed"
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      Ajouter votre photo
+                    </Button>
+                  )}
                 </div>
               </div>
             )}
