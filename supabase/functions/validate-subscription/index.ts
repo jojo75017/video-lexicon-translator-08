@@ -13,9 +13,15 @@ serve(async (req) => {
 
   try {
     const { email, access_code } = await req.json();
-    console.log('Validating subscription for:', email);
+    
+    // Normalize inputs
+    const normalizedEmail = email?.trim().toLowerCase();
+    const normalizedCode = access_code?.trim().toUpperCase();
+    
+    console.log('Validating subscription for:', normalizedEmail);
+    console.log('Access code provided:', normalizedCode);
 
-    if (!access_code) {
+    if (!normalizedCode) {
       return new Response(
         JSON.stringify({ valid: false, message: 'Code d\'accès requis' }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -26,17 +32,29 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    // First, find subscriber by email only
     const { data: subscriber, error } = await supabase
       .from('subscribers')
       .select('*')
-      .eq('email', email)
-      .eq('access_code', access_code)
+      .ilike('email', normalizedEmail)
       .single();
 
     if (error || !subscriber) {
-      console.log('Subscriber not found or invalid access code');
+      console.log('Subscriber not found for email:', normalizedEmail);
       return new Response(
-        JSON.stringify({ valid: false, message: 'Email ou code d\'accès incorrect' }),
+        JSON.stringify({ valid: false, message: 'Aucun abonnement trouvé pour cet email' }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log('Found subscriber, stored code:', subscriber.access_code);
+    
+    // Compare access codes (case-insensitive)
+    const storedCode = subscriber.access_code?.trim().toUpperCase();
+    if (storedCode !== normalizedCode) {
+      console.log('Code mismatch. Expected:', storedCode, 'Got:', normalizedCode);
+      return new Response(
+        JSON.stringify({ valid: false, message: 'Code d\'accès incorrect' }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -49,7 +67,7 @@ serve(async (req) => {
         .eq('id', subscriber.id);
 
       return new Response(
-        JSON.stringify({ valid: false, message: 'Abonnement expiré' }),
+        JSON.stringify({ valid: false, message: 'Abonnement expiré. Veuillez renouveler.' }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -61,7 +79,7 @@ serve(async (req) => {
       );
     }
 
-    console.log('Subscription valid');
+    console.log('Subscription valid for:', normalizedEmail);
     return new Response(
       JSON.stringify({ 
         valid: true, 
