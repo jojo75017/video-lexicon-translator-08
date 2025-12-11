@@ -1147,6 +1147,16 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
               setTomeNumber(data.tomeNumber);
               toast.success(`Tome ${data.tomeNumber} configuré pour "${data.seriesTitle}"`);
             }}
+            onImportTome={(data) => {
+              setEbookTitle(data.title);
+              setAuthorName(data.authorName);
+              setTomeNumber(data.tomeNumber);
+              setPreface(data.preface);
+              setConclusion(data.conclusion);
+              setChapters(data.chapters);
+              setActiveTab('planner');
+              toast.success(`"${data.title}" importé avec ${data.chapters.length} chapitres !`);
+            }}
           />
         );
       
