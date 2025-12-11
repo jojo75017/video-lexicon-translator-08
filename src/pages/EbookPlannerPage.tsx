@@ -1068,6 +1068,8 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
           <EbookCharacters
             characters={characters}
             onUpdateCharacters={setCharacters}
+            ebookTitle={ebookTitle}
+            chapters={chapters}
           />
         );
       

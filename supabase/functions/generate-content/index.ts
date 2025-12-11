@@ -463,6 +463,86 @@ Le score overall_score doit être entre 0 et 100 (100 = parfaitement cohérent).
       }
     }
 
+    // Handle characters extraction (uses Lovable AI - no API key needed)
+    if (type === 'characters') {
+      console.log('Processing characters extraction...');
+      const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+      
+      if (!LOVABLE_API_KEY) {
+        return new Response(
+          JSON.stringify({ error: 'Lovable API key not configured' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const charactersPrompt = `Tu es un expert en analyse littéraire. Analyse le contenu suivant et extrait TOUS les personnages mentionnés avec leurs rôles et descriptions.
+
+TITRE: ${ebookTitle || 'Sans titre'}
+
+CONTENU:
+${content || 'Pas de contenu disponible'}
+
+Pour chaque personnage trouvé, identifie:
+- Son nom exact
+- Son rôle dans l'histoire (protagonist, antagonist, secondary, mentor, ally, love_interest, comic_relief, narrator, other)
+- Une brève description de qui il est et ce qu'il fait
+
+Réponds UNIQUEMENT avec un JSON valide (sans markdown) dans ce format:
+{
+  "characters": [
+    {
+      "name": "Nom du personnage",
+      "role": "protagonist",
+      "description": "Description du personnage et de son rôle dans l'histoire"
+    }
+  ]
+}
+
+Si aucun personnage n'est trouvé ou le contenu est insuffisant, retourne:
+{ "characters": [] }`;
+
+      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash',
+          messages: [
+            { role: 'user', content: charactersPrompt }
+          ],
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Lovable AI error:', errorText);
+        return new Response(
+          JSON.stringify({ error: 'Erreur lors de l\'extraction des personnages' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const data = await response.json();
+      const resultText = data.choices[0].message.content;
+      
+      let result;
+      try {
+        const cleanJson = resultText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        result = JSON.parse(cleanJson);
+      } catch (parseError) {
+        console.error('JSON parse error:', parseError, 'Raw:', resultText);
+        result = { characters: [] };
+      }
+
+      console.log('Characters extraction completed:', result.characters?.length || 0, 'found');
+      return new Response(
+        JSON.stringify(result),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Handle next-tome generation (uses Lovable AI - no API key needed)
     if (type === 'next-tome') {
       console.log('Processing next tome generation...');
