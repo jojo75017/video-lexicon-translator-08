@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -125,6 +125,27 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   
   const [activeTab, setActiveTab] = useState('planner');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  // Ref pour toujours avoir les dernières données (évite les problèmes de closure)
+  const currentDataRef = useRef({
+    ebookTitle, authorName, targetAudience, tomeNumber, writingStyle, chapterLength,
+    detailLevel, tone, narrativeFormat, preface, conclusion, chapters, characters,
+    ebookImages, numberOfChapters, bookSummary, coverConcepts, seoOptimization,
+    kdpDescription, kdpKeywords, kdpCategories
+  });
+
+  // Mettre à jour la ref quand les données changent
+  useEffect(() => {
+    currentDataRef.current = {
+      ebookTitle, authorName, targetAudience, tomeNumber, writingStyle, chapterLength,
+      detailLevel, tone, narrativeFormat, preface, conclusion, chapters, characters,
+      ebookImages, numberOfChapters, bookSummary, coverConcepts, seoOptimization,
+      kdpDescription, kdpKeywords, kdpCategories
+    };
+  }, [ebookTitle, authorName, targetAudience, tomeNumber, writingStyle, chapterLength,
+      detailLevel, tone, narrativeFormat, preface, conclusion, chapters, characters,
+      ebookImages, numberOfChapters, bookSummary, coverConcepts, seoOptimization,
+      kdpDescription, kdpKeywords, kdpCategories]);
 
   useEffect(() => {
     const loadFromDatabase = async () => {
@@ -434,18 +455,21 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
     toast.success('Projet sauvegardé !');
   };
 
-  // Fonction de changement d'onglet avec sauvegarde
+  // Fonction de changement d'onglet avec sauvegarde (utilise la ref pour avoir les dernières données)
   const handleTabChange = async (newTab: string) => {
     // Sauvegarder avant de changer d'onglet si on a un titre
-    if (ebookTitle) {
+    const data = currentDataRef.current;
+    if (data.ebookTitle) {
+      console.log('💾 Sauvegarde avant changement onglet - chapters:', data.chapters.map(c => ({ id: c.id, title: c.title, hasContent: !!c.content, contentPreview: c.content?.slice(-50) })));
       const projectData = {
-        title: ebookTitle, author_name: authorName, target_audience: targetAudience,
-        tome_number: tomeNumber, writing_style: writingStyle, chapter_length: chapterLength,
-        detail_level: detailLevel, tone, narrative_format: narrativeFormat,
-        preface, conclusion, chapters, characters, ebook_images: ebookImages,
-        number_of_chapters: numberOfChapters, book_summary: bookSummary,
-        cover_concepts: coverConcepts, seo_optimization: seoOptimization,
-        kdp_description: kdpDescription, kdp_keywords: kdpKeywords, kdp_categories: kdpCategories,
+        title: data.ebookTitle, author_name: data.authorName, target_audience: data.targetAudience,
+        tome_number: data.tomeNumber, writing_style: data.writingStyle, chapter_length: data.chapterLength,
+        detail_level: data.detailLevel, tone: data.tone, narrative_format: data.narrativeFormat,
+        preface: data.preface, conclusion: data.conclusion, chapters: data.chapters, 
+        characters: data.characters, ebook_images: data.ebookImages,
+        number_of_chapters: data.numberOfChapters, book_summary: data.bookSummary,
+        cover_concepts: data.coverConcepts, seo_optimization: data.seoOptimization,
+        kdp_description: data.kdpDescription, kdp_keywords: data.kdpKeywords, kdp_categories: data.kdpCategories,
       };
       await saveProject(projectData);
     }
