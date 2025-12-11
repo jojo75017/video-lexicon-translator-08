@@ -7,9 +7,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Palette, Download, Wand2, RefreshCw, Loader2, Sparkles, Image as ImageIcon, BookOpen, Ruler, Info } from 'lucide-react';
+import { Palette, Download, Wand2, RefreshCw, Loader2, Sparkles, Image as ImageIcon, BookOpen, Ruler, Info, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import jsPDF from 'jspdf';
 
 interface EbookCoverGeneratorProps {
   ebookTitle: string;
@@ -179,9 +180,14 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
     }
   };
 
-  const downloadCover = () => {
+  const downloadCover = (format: 'jpeg' | 'pdf' = 'jpeg') => {
     const coverUrl = generatedCovers[selectedCover];
     if (!coverUrl) return;
+
+    if (format === 'pdf') {
+      downloadAsPDF();
+      return;
+    }
 
     const link = document.createElement('a');
     link.href = coverUrl;
@@ -190,7 +196,62 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    toast.success('Couverture téléchargée !');
+    toast.success('Couverture JPEG téléchargée !');
+  };
+
+  const downloadAsPDF = async () => {
+    const coverUrl = generatedCovers[selectedCover];
+    if (!coverUrl) return;
+
+    toast.info('Création du PDF en cours...');
+
+    try {
+      // Create image element to get dimensions
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve();
+        img.onerror = () => reject(new Error('Impossible de charger l\'image'));
+        img.src = coverUrl;
+      });
+
+      // Calculate PDF dimensions based on cover type and format
+      const dpi = 300;
+      let pdfWidth: number;
+      let pdfHeight: number;
+
+      if (coverType === 'full') {
+        // Full cover - use calculated dimensions
+        pdfWidth = coverDimensions.totalWidthIn * 72; // Convert inches to points (72 points per inch)
+        pdfHeight = coverDimensions.heightIn * 72;
+      } else {
+        // Front cover only
+        pdfWidth = (currentFormat.width + BLEED) * 72;
+        pdfHeight = (currentFormat.height + BLEED * 2) * 72;
+      }
+
+      // Create PDF with exact KDP dimensions
+      const pdf = new jsPDF({
+        orientation: pdfWidth > pdfHeight ? 'landscape' : 'portrait',
+        unit: 'pt',
+        format: [pdfWidth, pdfHeight]
+      });
+
+      // Add image to fill the entire page
+      pdf.addImage(coverUrl, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+
+      // Save PDF
+      const suffix = coverType === 'full' ? 'full_cover' : 'front_cover';
+      pdf.save(`${ebookTitle.replace(/[^a-z0-9]/gi, '_')}_${suffix}_${selectedCover + 1}.pdf`);
+
+      toast.success('Couverture PDF téléchargée !', {
+        description: `Dimensions: ${coverType === 'full' ? coverDimensions.totalWidthIn.toFixed(2) : currentFormat.width}"x${coverType === 'full' ? coverDimensions.heightIn.toFixed(2) : currentFormat.height}" à 300 DPI`
+      });
+    } catch (error) {
+      console.error('Erreur export PDF:', error);
+      toast.error('Erreur lors de la création du PDF');
+    }
   };
 
   const currentCover = generatedCovers[selectedCover];
@@ -539,14 +600,24 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
                       </div>
                     )}
                     
-                    <Button 
-                      onClick={downloadCover}
-                      variant="outline"
-                      className="w-full"
-                    >
-                      <Download className="h-4 w-4 mr-2" />
-                      Télécharger JPEG
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button 
+                        onClick={() => downloadCover('jpeg')}
+                        variant="outline"
+                        className="flex-1"
+                      >
+                        <Download className="h-4 w-4 mr-2" />
+                        JPEG
+                      </Button>
+                      <Button 
+                        onClick={() => downloadCover('pdf')}
+                        variant="outline"
+                        className="flex-1"
+                      >
+                        <FileText className="h-4 w-4 mr-2" />
+                        PDF
+                      </Button>
+                    </div>
                   </>
                 ) : (
                   <div className="border-2 border-dashed border-purple-200 rounded-xl h-80 flex flex-col items-center justify-center bg-purple-50/50">
