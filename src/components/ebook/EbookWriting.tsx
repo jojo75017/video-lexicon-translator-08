@@ -92,7 +92,50 @@ export const EbookWriting: React.FC<EbookWritingProps> = ({
   const [currentChapterId, setCurrentChapterId] = useState<string | null>(null);
   const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const [isValidatingUrl, setIsValidatingUrl] = useState(false);
   const textareaRefs = useRef<Record<string, HTMLTextAreaElement | null>>({});
+
+  // Placeholder image en SVG data URI (ne nécessite pas de requête externe)
+  const placeholderImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect fill='%23f3f4f6' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%239ca3af' font-size='16'%3EImage non disponible%3C/text%3E%3C/svg%3E";
+
+  // Validation et prévisualisation de l'URL
+  const validateAndPreviewImage = (url: string) => {
+    setImageUrl(url);
+    setImageError(null);
+    setImagePreview(null);
+    
+    if (!url.trim()) return;
+    
+    // Vérification basique du format URL
+    try {
+      const parsed = new URL(url);
+      if (!['http:', 'https:', 'data:'].includes(parsed.protocol)) {
+        setImageError('URL invalide: utilisez http:// ou https://');
+        return;
+      }
+    } catch {
+      setImageError('Format URL invalide');
+      return;
+    }
+    
+    setIsValidatingUrl(true);
+    
+    // Tester si l'image se charge
+    const img = new Image();
+    img.onload = () => {
+      setImagePreview(url);
+      setImageError(null);
+      setIsValidatingUrl(false);
+    };
+    img.onerror = () => {
+      setImageError('Impossible de charger l\'image. Vérifiez l\'URL ou essayez une autre source.');
+      setImagePreview(null);
+      setIsValidatingUrl(false);
+    };
+    img.src = url;
+  };
 
   const addImageToChapter = (chapterId: string, url?: string, alt?: string) => {
     const finalUrl = url || imageUrl;
@@ -169,7 +212,7 @@ export const EbookWriting: React.FC<EbookWritingProps> = ({
                   alt={image.alt}
                   className="w-full h-full object-cover"
                   onError={(e) => {
-                    e.currentTarget.src = 'https://via.placeholder.com/400x300?text=Image+non+disponible';
+                    e.currentTarget.src = placeholderImage;
                   }}
                 />
               </div>
@@ -235,6 +278,10 @@ export const EbookWriting: React.FC<EbookWritingProps> = ({
                           onClick={() => {
                             setCurrentChapterId(chapter.id);
                             setIsImageDialogOpen(true);
+                            setImageUrl('');
+                            setImageAlt('');
+                            setImagePreview(null);
+                            setImageError(null);
                           }}
                         >
                           <ImageIcon className="w-4 h-4 mr-2" />
@@ -265,9 +312,28 @@ export const EbookWriting: React.FC<EbookWritingProps> = ({
                                   id="image-url"
                                   placeholder="https://example.com/image.jpg"
                                   value={imageUrl}
-                                  onChange={(e) => setImageUrl(e.target.value)}
+                                  onChange={(e) => validateAndPreviewImage(e.target.value)}
                                 />
+                                {isValidatingUrl && (
+                                  <p className="text-xs text-muted-foreground mt-1">Vérification de l'image...</p>
+                                )}
+                                {imageError && (
+                                  <p className="text-xs text-destructive mt-1">{imageError}</p>
+                                )}
                               </div>
+                              
+                              {/* Prévisualisation de l'image */}
+                              {imagePreview && (
+                                <div className="border rounded-lg p-2 bg-muted/50">
+                                  <p className="text-xs text-muted-foreground mb-2">Prévisualisation :</p>
+                                  <img 
+                                    src={imagePreview} 
+                                    alt="Prévisualisation" 
+                                    className="max-h-48 mx-auto rounded object-contain"
+                                  />
+                                </div>
+                              )}
+                              
                               <div>
                                 <Label htmlFor="image-alt">Description de l'image (optionnel)</Label>
                                 <Input
@@ -280,10 +346,15 @@ export const EbookWriting: React.FC<EbookWritingProps> = ({
                               <Button
                                 onClick={() => addImageToChapter(chapter.id)}
                                 className="w-full"
+                                disabled={!imagePreview || isValidatingUrl}
                               >
                                 <Plus className="w-4 h-4 mr-2" />
                                 Insérer l'image
                               </Button>
+                              
+                              <p className="text-xs text-muted-foreground">
+                                💡 Assurez-vous que l'URL pointe directement vers une image (terminant par .jpg, .png, .gif, etc.)
+                              </p>
                             </div>
                           </TabsContent>
                         </Tabs>
