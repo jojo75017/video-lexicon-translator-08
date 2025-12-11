@@ -649,6 +649,75 @@ ${parsedData.characterDevelopments?.map((d: any) => `- ${d.character}: ${d.devel
     }
   };
 
+  const [isGeneratingAllCovers, setIsGeneratingAllCovers] = useState(false);
+  const [coverGenerationProgress, setCoverGenerationProgress] = useState(0);
+
+  const generateAllCovers = async () => {
+    if (!seriesBible.seriesTitle || seriesBible.tomes.length === 0) {
+      toast.error('Créez d\'abord une série avec des tomes');
+      return;
+    }
+
+    setIsGeneratingAllCovers(true);
+    setCoverGenerationProgress(0);
+    
+    const totalCovers = seriesBible.tomes.length + 1; // +1 pour la couverture de série
+    let generatedCount = 0;
+
+    try {
+      // Générer la couverture de série d'abord
+      toast.info('Génération de la couverture de série...');
+      await generateSingleCover(0, undefined);
+      generatedCount++;
+      setCoverGenerationProgress((generatedCount / totalCovers) * 100);
+
+      // Générer les couvertures des tomes avec un délai pour éviter le rate limit
+      for (const tome of seriesBible.tomes) {
+        toast.info(`Génération de la couverture du Tome ${tome.number}...`);
+        await generateSingleCover(tome.number, tome.title);
+        generatedCount++;
+        setCoverGenerationProgress((generatedCount / totalCovers) * 100);
+        
+        // Petit délai entre chaque génération pour éviter le rate limit
+        if (generatedCount < totalCovers) {
+          await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+      }
+
+      toast.success(`${totalCovers} couvertures générées avec succès !`);
+    } catch (error: any) {
+      console.error('Erreur génération couvertures:', error);
+      toast.error(`Erreur après ${generatedCount} couvertures. ${error.message || ''}`);
+    } finally {
+      setIsGeneratingAllCovers(false);
+      setCoverGenerationProgress(0);
+    }
+  };
+
+  const generateSingleCover = async (tomeNumber: number, tomeTitle?: string) => {
+    const coverKey = tomeNumber === 0 ? 'series' : `tome-${tomeNumber}`;
+
+    const { data, error } = await supabase.functions.invoke('generate-series-cover', {
+      body: {
+        seriesTitle: seriesBible.seriesTitle,
+        tomeNumber: tomeNumber === 0 ? null : tomeNumber,
+        tomeTitle: tomeTitle || (tomeNumber === 0 ? null : `Tome ${tomeNumber}`),
+        genre: seriesBible.genre || 'fiction',
+        synopsis: seriesBible.synopsis?.substring(0, 300),
+        style: coverStyle,
+        authorName: ''
+      }
+    });
+
+    if (error) throw error;
+
+    if (data?.imageUrl) {
+      setTomeCoverUrls(prev => ({ ...prev, [coverKey]: data.imageUrl }));
+    } else {
+      throw new Error('Aucune image reçue');
+    }
+  };
+
   const downloadCover = (coverKey: string) => {
     const coverUrl = tomeCoverUrls[coverKey];
     if (!coverUrl) return;
@@ -1272,7 +1341,8 @@ ${seriesBible.writingRules}
                   </div>
                   <Button
                     onClick={() => generateTomeCover(0)}
-                    disabled={isGeneratingCover !== null || !seriesBible.seriesTitle}
+                    disabled={isGeneratingCover !== null || isGeneratingAllCovers || !seriesBible.seriesTitle}
+                    variant="outline"
                   >
                     {isGeneratingCover === 'series' ? (
                       <>
@@ -1281,12 +1351,39 @@ ${seriesBible.writingRules}
                       </>
                     ) : (
                       <>
-                        <Wand2 className="h-4 w-4 mr-2" />
-                        Couverture de série
+                        <Image className="h-4 w-4 mr-2" />
+                        Série
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    onClick={generateAllCovers}
+                    disabled={isGeneratingCover !== null || isGeneratingAllCovers || !seriesBible.seriesTitle || seriesBible.tomes.length === 0}
+                    className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90"
+                  >
+                    {isGeneratingAllCovers ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        {Math.round(coverGenerationProgress)}%
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-4 w-4 mr-2" />
+                        Toutes les couvertures
                       </>
                     )}
                   </Button>
                 </div>
+
+                {/* Barre de progression pour génération en masse */}
+                {isGeneratingAllCovers && (
+                  <div className="space-y-2">
+                    <Progress value={coverGenerationProgress} className="h-2" />
+                    <p className="text-xs text-muted-foreground text-center">
+                      Génération en cours... {Math.round(coverGenerationProgress)}% ({Math.round((coverGenerationProgress / 100) * (seriesBible.tomes.length + 1))}/{seriesBible.tomes.length + 1} couvertures)
+                    </p>
+                  </div>
+                )}
 
                 {/* Affichage couverture de série */}
                 {tomeCoverUrls['series'] && (
