@@ -55,37 +55,80 @@ serve(async (req) => {
 
     const genreStyle = genreStyles[genre?.toLowerCase()] || genreStyles['default'];
 
+    // Variations uniques par tome pour créer des couvertures différentes
+    const tomeVariations = [
+      { mood: 'aube, lumière dorée du matin, début d\'aventure, espoir', scene: 'personnage face à l\'horizon, nouveau départ' },
+      { mood: 'crépuscule, couleurs orangées et violettes, tension montante', scene: 'personnage en action, moment de décision' },
+      { mood: 'nuit étoilée, mystère, atmosphère intense', scene: 'confrontation, moment dramatique' },
+      { mood: 'tempête, éclairs, climax épique', scene: 'bataille ou moment crucial' },
+      { mood: 'lumière divine, révélation, conclusion majestueuse', scene: 'triomphe ou transformation' },
+      { mood: 'brume mystérieuse, secrets révélés', scene: 'découverte importante' },
+      { mood: 'feu et flammes, passion et danger', scene: 'épreuve de force' },
+      { mood: 'glace et neige, isolation, survie', scene: 'voyage périlleux' },
+      { mood: 'forêt enchantée, nature sauvage', scene: 'exploration mystique' },
+      { mood: 'ville nocturne, lumières urbaines', scene: 'intrigue moderne' }
+    ];
+
+    const tomeIndex = tomeNumber ? (tomeNumber - 1) % tomeVariations.length : 0;
+    const tomeVariation = tomeNumber ? tomeVariations[tomeIndex] : null;
+
     const tomeText = tomeNumber ? `Tome ${tomeNumber}${tomeTitle ? ` : ${tomeTitle}` : ''}` : '';
     
-    const imagePrompt = `Crée une couverture de livre PROFESSIONNELLE (première de couverture) pour une série de livres ${genre || 'fiction'}.
+    // Prompt différent selon si c'est la couverture de série ou d'un tome spécifique
+    let imagePrompt: string;
+    
+    if (tomeNumber && tomeNumber > 0) {
+      // Couverture spécifique pour un tome
+      imagePrompt = `Crée une couverture de livre UNIQUE pour le TOME ${tomeNumber} d'une série ${genre || 'fiction'}.
 
-DÉTAILS DE LA SÉRIE :
-- Titre de la série : "${seriesTitle}"
-${tomeText ? `- Ceci est : ${tomeText}` : '- Ceci est la couverture principale de la série'}
-${synopsis ? `- Thème/Synopsis : ${synopsis.substring(0, 200)}` : ''}
-${authorName ? `- Auteur : ${authorName}` : ''}
+SÉRIE : "${seriesTitle}"
+TOME ${tomeNumber}${tomeTitle ? ` - "${tomeTitle}"` : ''}
+${synopsis ? `Contexte : ${synopsis.substring(0, 150)}` : ''}
+
+AMBIANCE SPÉCIFIQUE TOME ${tomeNumber} :
+- Atmosphère : ${tomeVariation?.mood}
+- Scène suggérée : ${tomeVariation?.scene}
+- Cette couverture doit être DISTINCTE des autres tomes mais garder une cohérence visuelle
 
 STYLE VISUEL :
 - ${genreStyle}
-- ${style === 'minimalist' ? 'Design minimaliste épuré avec imagerie symbolique' : 
-    style === 'illustrated' ? 'Illustration détaillée avec imagerie riche et personnages' :
+- ${style === 'minimalist' ? 'Design minimaliste avec symbole unique pour ce tome' : 
+    style === 'illustrated' ? 'Illustration détaillée montrant une scène clé de ce tome' :
     style === 'photorealistic' ? 'Style photoréaliste avec composition dramatique' :
-    'Composition visuelle cinématique et épique'}
+    'Composition cinématique épique'}
 
-EXIGENCES CRITIQUES :
-- Format portrait ratio 2:3 pour Amazon KDP (1024x1536)
-- Design plein bord - PAS de bordures blanches
-- Qualité édition professionnelle
-- Imagerie accrocheuse représentant l'histoire
-- Espace en haut pour le titre de la série et numéro de tome
-- Espace en bas pour le nom de l'auteur
-- Palette de couleurs cohérente
-- Contraste élevé pour les zones de texte lisibles
-- NE PAS inclure de texte - laisser des zones propres pour superposition de texte
+EXIGENCES :
+- Format portrait 2:3 (1024x1536) pour Amazon KDP
+- Design plein bord sans bordures
+- Image UNIQUE représentant l'essence du Tome ${tomeNumber}
+- Espace pour titre en haut et auteur en bas
+- PAS DE TEXTE sur l'image - zones propres pour superposition
+- Couleurs cohérentes avec la série mais nuances uniques pour ce tome`;
+    } else {
+      // Couverture générale de la série
+      imagePrompt = `Crée une couverture EMBLÉMATIQUE pour la série de livres "${seriesTitle}".
 
-Rends cette couverture mémorable et appropriée au genre, adaptée à une série de livres bestseller.`;
+DÉTAILS :
+- Genre : ${genre || 'fiction'}
+${synopsis ? `- Synopsis : ${synopsis.substring(0, 200)}` : ''}
+- Ceci est la couverture PRINCIPALE de la série (pas un tome spécifique)
 
-    console.log('Calling Lovable AI for series cover generation');
+STYLE VISUEL :
+- ${genreStyle}
+- ${style === 'minimalist' ? 'Design minimaliste iconique' : 
+    style === 'illustrated' ? 'Illustration majestueuse représentant l\'univers' :
+    style === 'photorealistic' ? 'Style photoréaliste épique' :
+    'Composition cinématique grandiose'}
+
+EXIGENCES :
+- Format portrait 2:3 (1024x1536) pour Amazon KDP
+- Design plein bord sans bordures
+- Image ICONIQUE représentant l'essence de toute la série
+- Espace pour titre en haut et auteur en bas
+- PAS DE TEXTE - zones propres pour superposition`;
+    }
+
+    console.log(`Generating ${tomeNumber ? `Tome ${tomeNumber}` : 'series'} cover with Lovable AI`);
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
