@@ -1267,7 +1267,15 @@ RÈGLES STRICTES:
               className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:opacity-90"
             >
               <BookOpen className="h-4 w-4 mr-2" />
-              Formation Séries
+              Formation Texte
+            </Button>
+            <Button 
+              onClick={() => navigate('/formation-series-audio')}
+              variant="outline"
+              className="border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/10"
+            >
+              <Crown className="h-4 w-4 mr-2" />
+              Formation Audio
             </Button>
           </div>
         </CardContent>

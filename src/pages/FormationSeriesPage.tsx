@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   BookOpen, CheckCircle, Play, Clock, Award, ArrowRight, 
   Users, MapPin, Scroll, Crown, Sparkles, Target, Lightbulb,
-  BookMarked, Layers, Link2, AlertTriangle, Zap, Star
+  BookMarked, Layers, Link2, AlertTriangle, Zap, Star, Headphones
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ModernSidebar } from '@/components/layout/ModernSidebar';
@@ -567,9 +567,19 @@ const FormationSeriesPage: React.FC = () => {
                 Maîtrisez l'art d'écrire des séries et sagas captivantes
               </p>
             </div>
-            <Button variant="outline" onClick={() => navigate('/ebook-planner')}>
-              Retour au planificateur
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                onClick={() => navigate('/formation-series-audio')}
+                className="border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/10"
+              >
+                <Headphones className="h-4 w-4 mr-2" />
+                Version Audio
+              </Button>
+              <Button variant="outline" onClick={() => navigate('/ebook-planner')}>
+                Retour au planificateur
+              </Button>
+            </div>
           </div>
 
           {/* Progress */}
