@@ -1252,6 +1252,35 @@ RÈGLES STRICTES:
         </CardContent>
       </Card>
 
+      {/* Formation toujours visible */}
+      <Card className="bg-gradient-to-br from-emerald-500/5 to-teal-500/5 border-emerald-500/20">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <GraduationCap className="h-5 w-5 text-emerald-500" />
+            Formation - Créer une Série à Succès
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-3">
+            <Button 
+              onClick={() => navigate('/formation')}
+              className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:opacity-90"
+            >
+              <BookOpen className="h-4 w-4 mr-2" />
+              Formation Texte
+            </Button>
+            <Button 
+              onClick={() => navigate('/formation-audio')}
+              variant="outline"
+              className="border-purple-500/30 text-purple-600 hover:bg-purple-500/10"
+            >
+              <Crown className="h-4 w-4 mr-2" />
+              Formation Audio
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {seriesBible.synopsis && (
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid grid-cols-7 w-full">
