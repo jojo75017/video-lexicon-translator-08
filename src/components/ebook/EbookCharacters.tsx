@@ -62,8 +62,10 @@ export const EbookCharacters = ({ characters, onUpdateCharacters, ebookTitle = '
   };
 
   const generateCharactersFromContent = async () => {
-    if (!ebookTitle.trim()) {
-      toast.error('Ajoutez un titre à votre ebook pour générer les personnages');
+    console.log('Generate characters called with title:', ebookTitle, 'chapters:', chapters.length);
+    
+    if (!ebookTitle || !ebookTitle.trim()) {
+      toast.error(`Ajoutez un titre à votre ebook pour générer les personnages (reçu: "${ebookTitle}")`);
       return;
     }
 
