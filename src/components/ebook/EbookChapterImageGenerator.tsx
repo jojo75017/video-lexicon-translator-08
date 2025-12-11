@@ -95,9 +95,12 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
       category: '📸 Réalisme',
       styles: [
         { value: 'photorealistic', label: 'Photoréaliste', preview: '📸' },
+        { value: 'hyperrealistic portrait', label: '👤 Portrait ultra-réaliste', preview: '🧑' },
+        { value: 'realistic human cinematic', label: '🎬 Humains cinématiques', preview: '🎥' },
         { value: 'cinematic movie scene', label: 'Scène cinématique', preview: '🎬' },
         { value: 'documentary style', label: 'Documentaire', preview: '📽️' },
         { value: 'portrait photography', label: 'Portrait photo', preview: '🖼️' },
+        { value: 'fashion editorial', label: 'Editorial mode', preview: '👗' },
         { value: 'landscape photography', label: 'Paysage photo', preview: '🏔️' },
         { value: 'noir black white', label: 'Noir et blanc', preview: '🎭' },
       ]

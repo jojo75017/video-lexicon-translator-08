@@ -32,6 +32,35 @@ const COLOR_SCHEME_PROMPTS: Record<string, string> = {
   'sepia': 'Appliquer un effet sépia vintage avec des tons bruns et beiges.',
 };
 
+// Styles optimisés pour le photoréalisme humain
+const PHOTOREALISTIC_STYLES = [
+  'photorealistic',
+  'cinematic movie scene',
+  'portrait photography',
+  'documentary style',
+  'hyperrealistic portrait',
+  'realistic human',
+  'photo portrait',
+];
+
+const getPhotorealisticEnhancement = (style: string): string => {
+  if (PHOTOREALISTIC_STYLES.some(s => style.toLowerCase().includes(s.toLowerCase()))) {
+    return `
+INSTRUCTIONS CRITIQUES POUR RÉALISME HUMAIN:
+- Générer des êtres humains PHOTORÉALISTES avec une qualité de photographie professionnelle
+- Peau avec texture naturelle: pores, imperfections subtiles, rides d'expression
+- Yeux réalistes avec reflets de lumière, iris détaillé, cils individuels
+- Cheveux avec mèches individuelles, reflets naturels, volume réaliste
+- Éclairage cinématographique: lumière principale, fill light, rim light
+- Profondeur de champ photographique avec bokeh naturel
+- Expression faciale authentique et émotionnelle
+- Proportions anatomiques parfaites
+- Qualité équivalente à une photo prise avec un Canon EOS R5 ou Sony A7R IV
+- Résolution 8K, netteté maximale sur le sujet principal`;
+  }
+  return '';
+};
+
 async function generateWithOpenAI(
   chapterTitle: string, 
   chapterContent: string, 
@@ -62,6 +91,7 @@ async function generateWithOpenAI(
   const colorPrompt = COLOR_SCHEME_PROMPTS[colorScheme] || '';
   const qualityDesc = QUALITY_MAP[quality]?.description || QUALITY_MAP['high'].description;
   const size = RATIO_SIZES[ratio]?.openai || '1024x1024';
+  const photorealisticEnhancement = getPhotorealisticEnhancement(style);
 
   const imagePrompt = `Contexte de l'ebook: "${ebookTitle}"
 Chapitre à illustrer: "${chapterTitle}"
@@ -71,6 +101,7 @@ ${charactersContext}
 Style artistique demandé: ${style}
 Qualité: ${qualityDesc}
 ${colorPrompt ? `Palette de couleurs: ${colorPrompt}` : ''}
+${photorealisticEnhancement}
 
 Instructions de génération:
 - Créer une illustration de haute qualité adaptée à un ebook professionnel
@@ -235,6 +266,7 @@ serve(async (req) => {
     // Créer un prompt optimisé pour l'image du chapitre
     const colorPrompt = COLOR_SCHEME_PROMPTS[colorScheme] || '';
     const qualityDesc = QUALITY_MAP[quality]?.description || QUALITY_MAP['high'].description;
+    const photorealisticEnhancement = getPhotorealisticEnhancement(style);
 
     const imagePrompt = `Contexte de l'ebook: "${ebookTitle}"
 Chapitre à illustrer: "${chapterTitle}"
@@ -244,6 +276,7 @@ ${charactersContext}
 Style artistique demandé: ${style}
 Qualité: ${qualityDesc}
 ${colorPrompt ? `Palette de couleurs: ${colorPrompt}` : ''}
+${photorealisticEnhancement}
 
 Instructions de génération:
 - Créer une illustration de haute qualité adaptée à un ebook professionnel
@@ -251,7 +284,6 @@ Instructions de génération:
 - Si des personnages sont mentionnés ci-dessus, les représenter avec EXACTEMENT les mêmes caractéristiques physiques que décrites
 - COHÉRENCE VISUELLE ABSOLUE pour tous les personnages récurrents
 - L'illustration doit refléter le thème et l'atmosphère du titre de l'ebook "${ebookTitle}"`;
-
     console.log('Generating image with prompt:', imagePrompt);
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
