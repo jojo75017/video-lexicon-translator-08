@@ -135,7 +135,7 @@ Instructions de génération:
   // Gérer les deux formats possibles (base64 et URL)
   let imageUrl: string | null = null;
   if (data.data?.[0]?.b64_json) {
-    imageUrl = `data:image/png;base64,${data.data[0].b64_json}`;
+    imageUrl = `data:image/jpeg;base64,${data.data[0].b64_json}`;
   } else if (data.data?.[0]?.url) {
     imageUrl = data.data[0].url;
   }
