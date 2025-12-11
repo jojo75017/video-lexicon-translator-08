@@ -87,14 +87,15 @@ export const useEbookDatabase = () => {
     }
   };
 
-  // Sauvegarder ou mettre à jour le projet
-  const saveProject = async (projectData: EbookProject) => {
+  // Sauvegarder ou mettre à jour le projet (avec version automatique)
+  const saveProject = async (projectData: EbookProject, autoVersion: boolean = true) => {
     const startTime = Date.now();
     console.log('💾 [saveProject] Début de la sauvegarde:', {
       titre: projectData.title,
       mode: currentProjectId ? 'MISE À JOUR' : 'CRÉATION',
       currentProjectId,
-      chapitres: Array.isArray(projectData.chapters) ? projectData.chapters.length : 0
+      chapitres: Array.isArray(projectData.chapters) ? projectData.chapters.length : 0,
+      autoVersion
     });
     
     try {
@@ -107,6 +108,8 @@ export const useEbookDatabase = () => {
       }
 
       console.log(`👤 [saveProject] Utilisateur: ${user.email}`);
+
+      let savedData = null;
 
       if (currentProjectId) {
         // Mise à jour du projet existant
@@ -126,10 +129,9 @@ export const useEbookDatabase = () => {
           throw error;
         }
         
+        savedData = data;
         const saveTime = Date.now() - startTime;
-        // Toast supprimé - sauvegarde automatique silencieuse
         console.log(`✅ [saveProject] Projet mis à jour avec succès en ${saveTime}ms`);
-        return data;
       } else {
         // Création d'un nouveau projet
         console.log('✨ [saveProject] Création d\'un nouveau projet');
@@ -148,14 +150,20 @@ export const useEbookDatabase = () => {
         }
         
         setCurrentProjectId(data.id);
-        // Toast supprimé - création silencieuse
+        savedData = data;
         const saveTime = Date.now() - startTime;
         console.log(`✅ [saveProject] Nouveau projet créé avec succès en ${saveTime}ms:`, {
           id: data.id,
           titre: data.title
         });
-        return data;
       }
+
+      // Auto-sauvegarde de version si activée
+      if (autoVersion && savedData) {
+        await autoSaveVersion(savedData.id, savedData);
+      }
+
+      return savedData;
     } catch (error) {
       console.error('❌ [saveProject] Exception:', error);
       toast.error('Erreur lors de la sauvegarde du projet');
@@ -164,6 +172,77 @@ export const useEbookDatabase = () => {
       setIsSaving(false);
       const totalTime = Date.now() - startTime;
       console.log(`⏱️ [saveProject] Terminé en ${totalTime}ms`);
+    }
+  };
+
+  // Auto-sauvegarde de version (ne crée une version que si 5 min depuis la dernière)
+  const autoSaveVersion = async (projectId: string, project: any): Promise<boolean> => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return false;
+
+      // Vérifier la dernière version
+      const { data: lastVersion } = await supabase
+        .from('ebook_project_versions')
+        .select('created_at, version_number')
+        .eq('project_id', projectId)
+        .order('version_number', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      // Si une version existe et date de moins de 5 minutes, ne pas en créer une nouvelle
+      if (lastVersion) {
+        const lastVersionTime = new Date(lastVersion.created_at).getTime();
+        const now = Date.now();
+        const fiveMinutes = 5 * 60 * 1000;
+        
+        if (now - lastVersionTime < fiveMinutes) {
+          console.log('📝 [autoSaveVersion] Version récente existe, mise à jour ignorée');
+          return false;
+        }
+      }
+
+      const nextVersion = lastVersion ? lastVersion.version_number + 1 : 1;
+
+      const { error } = await supabase
+        .from('ebook_project_versions')
+        .insert({
+          project_id: projectId,
+          user_id: user.id,
+          version_number: nextVersion,
+          title: project.title,
+          author_name: project.author_name,
+          target_audience: project.target_audience,
+          cover_concepts: project.cover_concepts,
+          writing_style: project.writing_style,
+          chapter_length: project.chapter_length,
+          tone: project.tone,
+          narrative_format: project.narrative_format,
+          detail_level: project.detail_level,
+          number_of_chapters: project.number_of_chapters,
+          tome_number: project.tome_number,
+          preface: project.preface,
+          conclusion: project.conclusion,
+          seo_optimization: project.seo_optimization,
+          book_summary: project.book_summary,
+          kdp_description: project.kdp_description,
+          kdp_keywords: project.kdp_keywords,
+          kdp_categories: project.kdp_categories,
+          chapters: project.chapters,
+          characters: project.characters,
+          ebook_images: project.ebook_images,
+        });
+
+      if (error) {
+        console.error('Error auto-saving version:', error);
+        return false;
+      }
+
+      console.log(`📚 [autoSaveVersion] Version ${nextVersion} créée automatiquement`);
+      return true;
+    } catch (error) {
+      console.error('Error in autoSaveVersion:', error);
+      return false;
     }
   };
 

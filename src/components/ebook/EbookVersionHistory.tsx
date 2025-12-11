@@ -88,9 +88,16 @@ export function EbookVersionHistory({
         </DialogHeader>
 
         <div className="space-y-4">
+          <div className="p-3 bg-green-50 border border-green-200 rounded-md">
+            <p className="text-sm text-green-700">
+              ✓ Les versions sont sauvegardées automatiquement toutes les 5 minutes lors des modifications.
+            </p>
+          </div>
+
           <Button 
             onClick={handleSaveVersion} 
             disabled={isSavingVersion}
+            variant="outline"
             className="w-full"
           >
             {isSavingVersion ? (
@@ -99,7 +106,7 @@ export function EbookVersionHistory({
                 Sauvegarde en cours...
               </>
             ) : (
-              "Créer une nouvelle version"
+              "Créer une version maintenant"
             )}
           </Button>
 
@@ -109,7 +116,8 @@ export function EbookVersionHistory({
             </div>
           ) : versions.length === 0 ? (
             <Card className="p-6 text-center text-muted-foreground">
-              Aucune version sauvegardée pour ce projet
+              <p>Aucune version sauvegardée pour ce projet.</p>
+              <p className="text-sm mt-2">Les versions seront créées automatiquement lors de vos prochaines modifications.</p>
             </Card>
           ) : (
             <div className="space-y-2">
