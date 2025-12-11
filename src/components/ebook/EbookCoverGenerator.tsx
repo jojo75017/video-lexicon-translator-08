@@ -18,8 +18,8 @@ interface EbookCoverGeneratorProps {
   onCoverGenerated?: (coverUrl: string) => void;
 }
 
-type CoverStyle = 'professional' | 'minimalist' | 'artistic' | 'modern' | 'vintage' | 'fantasy' | 'thriller' | 'romance';
-type CoverGenre = 'non-fiction' | 'fiction' | 'business' | 'self-help' | 'fantasy' | 'romance' | 'thriller' | 'sci-fi' | 'children';
+type CoverStyle = 'professional' | 'minimalist' | 'artistic' | 'modern' | 'vintage' | 'fantasy' | 'thriller' | 'romance' | 'horror' | 'detective' | 'historical' | 'literary' | 'comedy' | 'adventure' | 'dystopian' | 'western' | 'spiritual' | 'cookbook';
+type CoverGenre = 'non-fiction' | 'fiction' | 'business' | 'self-help' | 'fantasy' | 'romance' | 'thriller' | 'sci-fi' | 'children' | 'horror' | 'mystery' | 'historical' | 'biography' | 'cooking' | 'travel' | 'poetry' | 'health';
 type BookFormat = '6x9' | '5x8' | '5.5x8.5' | '8.5x11' | '7x10' | '8x10';
 type PaperType = 'white' | 'cream';
 type BindingType = 'paperback' | 'hardcover';
@@ -33,7 +33,17 @@ const styleDescriptions: Record<CoverStyle, string> = {
   vintage: 'Style vintage rétro, textures anciennes, typographie classique',
   fantasy: 'Univers fantastique, éléments magiques, atmosphère mystérieuse',
   thriller: 'Sombre et intense, contrastes forts, ambiance suspense',
-  romance: 'Doux et élégant, couleurs chaudes, atmosphère romantique'
+  romance: 'Doux et élégant, couleurs chaudes, atmosphère romantique',
+  horror: 'Effrayant et sombre, atmosphère angoissante, éléments macabres',
+  detective: 'Style policier noir, mystère, indices visuels, ambiance enquête',
+  historical: 'Époque historique, textures anciennes, éléments période',
+  literary: 'Littéraire et raffiné, typographie élégante, sobre et classique',
+  comedy: 'Léger et coloré, illustrations amusantes, ambiance joyeuse',
+  adventure: 'Dynamique et épique, paysages grandioses, action',
+  dystopian: 'Futuriste sombre, décor post-apocalyptique, atmosphère oppressante',
+  western: 'Far West américain, tons sépia, ambiance cowboy',
+  spiritual: 'Spirituel et apaisant, lumière douce, symboles sacrés',
+  cookbook: 'Culinaire appétissant, photos de plats, style gourmand'
 };
 
 const genreOptions: { value: CoverGenre; label: string }[] = [
@@ -45,7 +55,15 @@ const genreOptions: { value: CoverGenre; label: string }[] = [
   { value: 'romance', label: '💕 Romance' },
   { value: 'thriller', label: '🔪 Thriller' },
   { value: 'sci-fi', label: '🚀 Science-fiction' },
-  { value: 'children', label: '🧸 Jeunesse' }
+  { value: 'children', label: '🧸 Jeunesse' },
+  { value: 'horror', label: '👻 Horreur' },
+  { value: 'mystery', label: '🔍 Policier / Mystère' },
+  { value: 'historical', label: '🏰 Historique' },
+  { value: 'biography', label: '👤 Biographie' },
+  { value: 'cooking', label: '🍳 Cuisine' },
+  { value: 'travel', label: '✈️ Voyage' },
+  { value: 'poetry', label: '✒️ Poésie' },
+  { value: 'health', label: '💪 Santé / Bien-être' }
 ];
 
 const bookFormats: { value: BookFormat; label: string; width: number; height: number }[] = [
@@ -316,7 +334,7 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
                   <SelectTrigger className="mt-1">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="max-h-80">
                     <SelectItem value="professional">📊 Professionnel</SelectItem>
                     <SelectItem value="minimalist">⚪ Minimaliste</SelectItem>
                     <SelectItem value="artistic">🎨 Artistique</SelectItem>
@@ -325,6 +343,16 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
                     <SelectItem value="fantasy">🧙 Fantasy</SelectItem>
                     <SelectItem value="thriller">🔪 Thriller</SelectItem>
                     <SelectItem value="romance">💕 Romance</SelectItem>
+                    <SelectItem value="horror">👻 Horreur</SelectItem>
+                    <SelectItem value="detective">🔍 Policier / Détective</SelectItem>
+                    <SelectItem value="historical">🏰 Historique</SelectItem>
+                    <SelectItem value="literary">📖 Littéraire</SelectItem>
+                    <SelectItem value="comedy">😄 Comédie</SelectItem>
+                    <SelectItem value="adventure">⚔️ Aventure</SelectItem>
+                    <SelectItem value="dystopian">🌆 Dystopie</SelectItem>
+                    <SelectItem value="western">🤠 Western</SelectItem>
+                    <SelectItem value="spiritual">🕊️ Spirituel</SelectItem>
+                    <SelectItem value="cookbook">🍳 Cuisine</SelectItem>
                   </SelectContent>
                 </Select>
                 <p className="text-xs text-muted-foreground mt-1">
@@ -359,9 +387,6 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
                     className="mt-1"
                   />
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  💡 Le code-barres ISBN sera ajouté automatiquement par la plateforme de publication (KDP, IngramSpark, etc.)
-                </p>
               </div>
             )}
 
