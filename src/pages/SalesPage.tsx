@@ -35,6 +35,7 @@ const SalesPage = () => {
       id: "starter",
       name: "Starter",
       price: "27",
+      originalPrice: null,
       period: "/mois",
       description: "Pour débuter",
       features: [
@@ -52,6 +53,7 @@ const SalesPage = () => {
       id: "pro",
       name: "Pro",
       price: "67",
+      originalPrice: null,
       period: "/mois",
       description: "Le plus populaire",
       features: [
@@ -70,9 +72,11 @@ const SalesPage = () => {
     {
       id: "lifetime",
       name: "Lifetime",
-      price: "147",
-      period: " une fois",
+      price: "597",
+      originalPrice: "897",
+      period: " (lancement)",
       description: "Accès à vie - Tout inclus",
+      discount: "300€ de réduction",
       features: [
         "Ebooks illimités à vie",
         "Chapitres illimités",
@@ -318,16 +322,24 @@ const SalesPage = () => {
             {plans.map((plan, index) => (
               <Card 
                 key={index} 
-                className={`relative border-2 ${plan.popular ? 'border-primary shadow-lg scale-105' : 'border-border'}`}
+                className={`relative border-2 ${plan.popular ? 'border-primary shadow-lg scale-105' : plan.id === 'lifetime' ? 'border-orange-500 bg-gradient-to-br from-yellow-50 to-orange-50' : 'border-border'}`}
               >
                 {plan.popular && (
                   <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary">
                     Plus Populaire
                   </Badge>
                 )}
+                {plan.discount && (
+                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-red-500 to-orange-500">
+                    {plan.discount}
+                  </Badge>
+                )}
                 <CardHeader className="text-center pb-2">
                   <CardTitle className="text-xl">{plan.name}</CardTitle>
                   <div className="mt-4">
+                    {plan.originalPrice && (
+                      <span className="text-lg text-muted-foreground line-through mr-2">{plan.originalPrice}€</span>
+                    )}
                     <span className="text-4xl font-bold">{plan.price}€</span>
                     <span className="text-muted-foreground">{plan.period}</span>
                   </div>
@@ -345,9 +357,9 @@ const SalesPage = () => {
                 </CardContent>
                 <CardFooter>
                   <Button 
-                    className="w-full" 
+                    className={`w-full ${plan.id === 'lifetime' ? 'bg-gradient-to-r from-yellow-500 to-orange-500 hover:opacity-90 text-white' : ''}`}
                     size="lg"
-                    variant={plan.popular ? "default" : "outline"}
+                    variant={plan.popular ? "default" : plan.id === 'lifetime' ? "default" : "outline"}
                     onClick={() => handlePlanClick(plan.id)}
                   >
                     {plan.cta}
