@@ -129,7 +129,7 @@ SPINE (CENTER - NARROW VERTICAL STRIP):
 
 BACK COVER (LEFT SIDE):
 ${backCoverText ? `1. Marketing text/synopsis: "${backCoverText.substring(0, 300)}"` : '1. Space for marketing copy/synopsis'}
-2. Author bio area
+2. AUTHOR PHOTO PLACEHOLDER: Create a clearly visible empty circle or square frame (approximately 1.5 inches) labeled "AUTHOR PHOTO" - DO NOT generate a face or person, just an empty placeholder frame where the author will add their own photo
 3. Price area (bottom left)
 
 DESIGN REQUIREMENTS:
