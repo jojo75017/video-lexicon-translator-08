@@ -75,10 +75,10 @@ const SubscriptionPage = ({ subscriberEmail, subscriberData, onLogout }: Subscri
     }
   };
 
-  const planPrices: Record<string, { price: string; period: string }> = {
+  const planPrices: Record<string, { price: string; period: string; originalPrice?: string }> = {
     starter: { price: '27€', period: '/mois' },
     pro: { price: '67€', period: '/mois' },
-    lifetime: { price: '147€', period: ' (une fois)' }
+    lifetime: { price: '597€', period: ' (lancement)', originalPrice: '897€' }
   };
 
   const currentLimits = planLimits[subscriberData?.plan_type] || planLimits.starter;
@@ -436,11 +436,17 @@ const SubscriptionPage = ({ subscriberEmail, subscriberData, onLogout }: Subscri
               </div>
               
               {/* Lifetime */}
-              <div className={`border rounded-lg p-4 space-y-3 bg-gradient-to-br from-yellow-50 to-orange-50 ${subscriberData?.plan_type === 'lifetime' ? 'border-yellow-500' : ''}`}>
+              <div className={`border rounded-lg p-4 space-y-3 bg-gradient-to-br from-yellow-50 to-orange-50 ${subscriberData?.plan_type === 'lifetime' ? 'border-yellow-500' : 'border-orange-500'}`}>
                 <div className="flex items-center justify-between">
                   <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500">LIFETIME</Badge>
-                  <span className="font-bold">147€</span>
+                  <div className="text-right">
+                    <span className="text-sm text-muted-foreground line-through mr-1">897€</span>
+                    <span className="font-bold text-orange-600">597€</span>
+                  </div>
                 </div>
+                <Badge variant="outline" className="w-full justify-center text-red-500 border-red-200 bg-red-50">
+                  🔥 -300€ Prix lancement
+                </Badge>
                 <ul className="space-y-2 text-sm">
                   <li>✅ Ebooks illimités à vie</li>
                   <li>✅ Chapitres illimités</li>
