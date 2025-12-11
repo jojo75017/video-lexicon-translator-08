@@ -81,13 +81,13 @@ export const EbookChapter: React.FC<EbookChapterProps> = ({
           onChange={() => onSelect(chapter.id)}
           className="mr-2"
         />
-        <span className="font-medium">Chapitre {index + 1}:</span>
+        <h3 className="font-semibold text-base text-foreground whitespace-nowrap">Chapitre {index + 1}:</h3>
         <Input
           placeholder="Titre du chapitre"
           value={chapter.title}
           onClick={() => onSelect(chapter.id)}
           onChange={(e) => onUpdateTitle(chapter.id, e.target.value)}
-          className={`flex-1 cursor-pointer transition-colors ${
+          className={`flex-1 cursor-pointer transition-colors text-base ${
             isSelected ? 'border-blue-500 bg-blue-50 text-blue-900' : ''
           }`}
         />
@@ -204,14 +204,14 @@ export const EbookChapter: React.FC<EbookChapterProps> = ({
         {chapter.subChapters.map((subChapter, subIndex) => (
           <div key={subChapter.id} className="space-y-2">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-sm text-muted-foreground">
+              <h4 className="text-sm font-medium text-muted-foreground whitespace-nowrap">
                 {index + 1}.{subIndex + 1}:
-              </span>
+              </h4>
               <Input
                 placeholder="Titre du sous-chapitre"
                 value={subChapter.title}
                 onChange={(e) => onUpdateSubChapterTitle(chapter.id, subChapter.id, e.target.value)}
-                className="flex-1 min-w-[200px]"
+                className="flex-1 min-w-[200px] text-sm"
               />
               <Button
                 variant="default"
