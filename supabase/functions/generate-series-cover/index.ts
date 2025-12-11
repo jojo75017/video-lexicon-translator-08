@@ -17,12 +17,13 @@ serve(async (req) => {
       tomeNumber, 
       tomeTitle,
       genre, 
+      ageCategory = 'adult',
       synopsis,
       style = 'cinematic',
       authorName
     } = await req.json();
 
-    console.log('Generating series cover:', { seriesTitle, tomeNumber, tomeTitle, genre, style });
+    console.log('Generating series cover:', { seriesTitle, tomeNumber, tomeTitle, genre, ageCategory, style, authorName });
 
     if (!seriesTitle) {
       return new Response(
@@ -50,8 +51,21 @@ serve(async (req) => {
       'horreur': 'atmosphère d\'horreur sombre, éclairage inquiétant, éléments gothiques',
       'aventure': 'scène d\'aventure dynamique, action, couleurs vibrantes',
       'policier': 'style polar noir, décor urbain, atmosphère mystérieuse',
+      'dystopie': 'atmosphère post-apocalyptique, tons désaturés, ambiance oppressante',
+      'urban fantasy': 'mélange urbain moderne et éléments magiques, néons et magie',
+      'paranormal': 'atmosphère surnaturelle mystérieuse, jeux d\'ombres et de lumière',
       'default': 'style couverture de livre professionnel, éclairage cinématique, haute qualité'
     };
+
+    // Age category adaptations
+    const ageStyles: Record<string, string> = {
+      'children': 'style illustration colorée adaptée aux enfants, personnages expressifs et mignons, couleurs vives et joyeuses',
+      'young-adult': 'style dynamique pour adolescents, couleurs contrastées, ambiance moderne',
+      'adult': 'style mature et sophistiqué, composition élégante',
+      'all-ages': 'style universel accessible à tous, équilibré et accueillant'
+    };
+
+    const ageStyle = ageStyles[ageCategory] || ageStyles['adult'];
 
     const genreStyle = genreStyles[genre?.toLowerCase()] || genreStyles['default'];
 
@@ -76,12 +90,13 @@ serve(async (req) => {
     
     // Prompt différent selon si c'est la couverture de série ou d'un tome spécifique
     let imagePrompt: string;
+    const authorInfo = authorName ? `\nAuteur: ${authorName}` : '';
     
     if (tomeNumber && tomeNumber > 0) {
       // Couverture spécifique pour un tome
       imagePrompt = `Crée une couverture de livre UNIQUE pour le TOME ${tomeNumber} d'une série ${genre || 'fiction'}.
 
-SÉRIE : "${seriesTitle}"
+SÉRIE : "${seriesTitle}"${authorInfo}
 TOME ${tomeNumber}${tomeTitle ? ` - "${tomeTitle}"` : ''}
 ${synopsis ? `Contexte : ${synopsis.substring(0, 150)}` : ''}
 
@@ -92,6 +107,7 @@ AMBIANCE SPÉCIFIQUE TOME ${tomeNumber} :
 
 STYLE VISUEL :
 - ${genreStyle}
+- ${ageStyle}
 - ${style === 'minimalist' ? 'Design minimaliste avec symbole unique pour ce tome' : 
     style === 'illustrated' ? 'Illustration détaillée montrant une scène clé de ce tome' :
     style === 'photorealistic' ? 'Style photoréaliste avec composition dramatique' :
@@ -106,7 +122,7 @@ EXIGENCES :
 - Couleurs cohérentes avec la série mais nuances uniques pour ce tome`;
     } else {
       // Couverture générale de la série
-      imagePrompt = `Crée une couverture EMBLÉMATIQUE pour la série de livres "${seriesTitle}".
+      imagePrompt = `Crée une couverture EMBLÉMATIQUE pour la série de livres "${seriesTitle}".${authorInfo}
 
 DÉTAILS :
 - Genre : ${genre || 'fiction'}
@@ -115,6 +131,7 @@ ${synopsis ? `- Synopsis : ${synopsis.substring(0, 200)}` : ''}
 
 STYLE VISUEL :
 - ${genreStyle}
+- ${ageStyle}
 - ${style === 'minimalist' ? 'Design minimaliste iconique' : 
     style === 'illustrated' ? 'Illustration majestueuse représentant l\'univers' :
     style === 'photorealistic' ? 'Style photoréaliste épique' :
