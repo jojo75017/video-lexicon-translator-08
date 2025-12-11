@@ -30,76 +30,77 @@ interface EbookWritingProps {
 
 // Fonction de rendu du texte avec style (identique au planificateur)
 const renderStyledText = (content: string) => {
-  return content.split('\n').map((line, lineIndex) => {
+  // Séparer d'abord par les images pour les traiter correctement
+  const parts = content.split(/(\[IMAGE_URL:[^\]]+\])/g);
+  
+  return parts.flatMap((part, partIndex) => {
     // Images [IMAGE_URL:url]
-    if (line.includes('[IMAGE_URL:')) {
-      const match = line.match(/\[IMAGE_URL:(https?:\/\/[^\]]+)\]/);
-      if (match) {
+    const imageMatch = part.match(/\[IMAGE_URL:(https?:\/\/[^\]]+)\]/);
+    if (imageMatch) {
+      return (
+        <div key={`img-${partIndex}`} className="my-4">
+          <img 
+            src={imageMatch[1]} 
+            alt="Image du chapitre"
+            className="max-w-full h-auto rounded-lg shadow-md border"
+            onError={(e) => {
+              console.error('Erreur chargement image:', imageMatch[1]);
+              e.currentTarget.style.display = 'none';
+            }}
+          />
+        </div>
+      );
+    }
+    
+    // Sinon, traiter le texte ligne par ligne
+    return part.split('\n').map((line, lineIndex) => {
+      // Titres ### en gras
+      if (line.startsWith('### ')) {
         return (
-          <div key={lineIndex} className="my-4">
-            <img 
-              src={match[1]} 
-              alt="Image du chapitre"
-              className="max-w-full h-auto rounded-lg shadow-md border"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-                const parent = e.currentTarget.parentElement;
-                if (parent) {
-                  parent.innerHTML = '<div class="p-4 bg-muted rounded-lg text-center text-muted-foreground">Image non disponible</div>';
-                }
-              }}
-            />
-          </div>
+          <h3 key={`${partIndex}-${lineIndex}`} className="text-lg font-bold text-primary mb-3 mt-4">
+            {line.slice(4)}
+          </h3>
         );
       }
-    }
-    
-    // Titres ### en gras
-    if (line.startsWith('### ')) {
+      if (line.startsWith('## ')) {
+        return (
+          <h2 key={`${partIndex}-${lineIndex}`} className="text-xl font-bold text-primary mb-3 mt-4">
+            {line.slice(3)}
+          </h2>
+        );
+      }
+      if (line.startsWith('# ')) {
+        return (
+          <h1 key={`${partIndex}-${lineIndex}`} className="text-2xl font-bold text-primary mb-4 mt-4">
+            {line.slice(2)}
+          </h1>
+        );
+      }
+      
       return (
-        <h3 key={lineIndex} className="text-lg font-bold text-primary mb-3 mt-4">
-          {line.slice(4)}
-        </h3>
+        <p key={`${partIndex}-${lineIndex}`} className="mb-2">
+          {line.split(/(\*\*[^*]+\*\*|\*[^*]+\*|"[^"]+"|(\([^)]+\)))/).map((textPart, textPartIndex) => {
+            // **gras**
+            if (textPart && textPart.startsWith && textPart.startsWith('**') && textPart.endsWith('**')) {
+              return <strong key={textPartIndex} className="font-bold">{textPart.slice(2, -2)}</strong>;
+            }
+            // *italique*
+            if (textPart && textPart.startsWith && textPart.startsWith('*') && textPart.endsWith('*')) {
+              return <em key={textPartIndex} className="font-medium text-primary italic">{textPart.slice(1, -1)}</em>;
+            }
+            // "dialogues"
+            if (textPart && textPart.startsWith && textPart.startsWith('"') && textPart.endsWith('"')) {
+              return <span key={textPartIndex} className="text-accent-foreground font-medium">"{textPart.slice(1, -1)}"</span>;
+            }
+            // (parenthèses)
+            if (textPart && textPart.startsWith && textPart.startsWith('(') && textPart.endsWith(')')) {
+              return <span key={textPartIndex} className="text-muted-foreground italic">{textPart}</span>;
+            }
+            return textPart;
+          })}
+        </p>
       );
-    }
-    if (line.startsWith('## ')) {
-      return (
-        <h2 key={lineIndex} className="text-xl font-bold text-primary mb-3 mt-4">
-          {line.slice(3)}
-        </h2>
-      );
-    }
-    if (line.startsWith('# ')) {
-      return (
-        <h1 key={lineIndex} className="text-2xl font-bold text-primary mb-4 mt-4">
-          {line.slice(2)}
-        </h1>
-      );
-    }
-    
-    return (
-      <p key={lineIndex} className="mb-2">
-        {line.split(/(\*\*[^*]+\*\*|\*[^*]+\*|"[^"]+"|(\([^)]+\)))/).map((part, partIndex) => {
-          // **gras**
-          if (part && part.startsWith && part.startsWith('**') && part.endsWith('**')) {
-            return <strong key={partIndex} className="font-bold">{part.slice(2, -2)}</strong>;
-          }
-          // *italique*
-          if (part && part.startsWith && part.startsWith('*') && part.endsWith('*')) {
-            return <em key={partIndex} className="font-medium text-primary italic">{part.slice(1, -1)}</em>;
-          }
-          // "dialogues"
-          if (part && part.startsWith && part.startsWith('"') && part.endsWith('"')) {
-            return <span key={partIndex} className="text-accent-foreground font-medium">"{part.slice(1, -1)}"</span>;
-          }
-          // (parenthèses)
-          if (part && part.startsWith && part.startsWith('(') && part.endsWith(')')) {
-            return <span key={partIndex} className="text-muted-foreground italic">{part}</span>;
-          }
-          return part;
-        })}
-      </p>
-    );
+    });
   });
 };
 

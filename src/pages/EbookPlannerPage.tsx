@@ -387,9 +387,22 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
 
   // Fonction pour insérer une image dans le contenu d'un chapitre
   const handleInsertImageToChapter = (chapterId: string, imageUrl: string) => {
+    console.log('🖼️ Insertion image - chapterId:', chapterId, 'chapters:', chapters.map(c => ({ id: c.id, title: c.title })));
+    
     const chapter = chapters.find(c => c.id === chapterId);
     if (!chapter) {
-      toast.error('Chapitre non trouvé');
+      // Essayer avec l'index si l'ID ne correspond pas
+      const chapterIndex = parseInt(chapterId);
+      const fallbackChapter = !isNaN(chapterIndex) && chapters[chapterIndex];
+      if (fallbackChapter) {
+        const imageTag = `\n\n[IMAGE_URL:${imageUrl}]\n\n`;
+        const newContent = (fallbackChapter.content || '') + imageTag;
+        updateChapterContent(fallbackChapter.id, newContent);
+        toast.success(`Image insérée dans "${fallbackChapter.title}"`);
+        console.log('✅ Image insérée (via index) dans:', fallbackChapter.title);
+        return;
+      }
+      toast.error('Chapitre non trouvé - ID: ' + chapterId);
       return;
     }
     
@@ -397,6 +410,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
     const newContent = (chapter.content || '') + imageTag;
     updateChapterContent(chapterId, newContent);
     toast.success(`Image insérée dans "${chapter.title}"`);
+    console.log('✅ Image insérée dans:', chapter.title, 'Nouveau contenu (fin):', newContent.slice(-100));
   };
 
   // Fonction de sauvegarde manuelle
