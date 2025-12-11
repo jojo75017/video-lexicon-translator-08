@@ -1705,22 +1705,14 @@ Paperback: 9.99€ - 19.99€
     URL.revokeObjectURL(url);
   };
 
-  // Nettoie le contenu des marqueurs d'images base64
-  const cleanContentForGoogleDocs = (text: string): string => {
-    if (!text) return '';
-    // Supprime les marqueurs d'images [IMAGE:...] avec leur contenu base64
-    return text.replace(/\[IMAGE:\d+:data:image\/[^;]+;base64,[^\]]+\]/g, '[Image]')
-               .replace(/\[IMAGE:[^\]]+\]/g, '[Image]');
-  };
-
-  // Génère un contenu propre et formaté pour Google Docs (optimisé KDP)
+  // Génère un contenu formaté pour Google Docs (optimisé KDP) avec images base64 pour l'edge function
   const generateKdpContent = () => {
     let content = '';
     
     // Préface
     if (preface) {
       content += `PRÉFACE\n\n`;
-      content += `${cleanContentForGoogleDocs(preface)}\n\n\n`;
+      content += `${preface}\n\n\n`;
     }
 
     // Chapitres
@@ -1730,7 +1722,7 @@ Paperback: 9.99€ - 19.99€
       content += `CHAPITRE ${chapterNumber}\n${chapter.title.toUpperCase()}\n\n`;
       
       if (chapter.content) {
-        content += `${cleanContentForGoogleDocs(chapter.content)}\n\n`;
+        content += `${chapter.content}\n\n`;
       }
       
       // Sous-chapitres
@@ -1739,7 +1731,7 @@ Paperback: 9.99€ - 19.99€
         content += `${subNumber}. ${subChapter.title}\n\n`;
         
         if (subChapter.content) {
-          content += `${cleanContentForGoogleDocs(subChapter.content)}\n\n`;
+          content += `${subChapter.content}\n\n`;
         }
       });
       
@@ -1749,13 +1741,13 @@ Paperback: 9.99€ - 19.99€
     // Conclusion
     if (conclusion) {
       content += `CONCLUSION\n\n`;
-      content += `${cleanContentForGoogleDocs(conclusion)}\n\n`;
+      content += `${conclusion}\n\n`;
     }
 
     // Épilogue
     if (epilogue) {
       content += `ÉPILOGUE\n\n`;
-      content += `${cleanContentForGoogleDocs(epilogue)}\n\n`;
+      content += `${epilogue}\n\n`;
     }
 
     return content;
