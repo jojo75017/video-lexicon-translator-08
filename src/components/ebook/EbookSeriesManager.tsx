@@ -88,6 +88,8 @@ interface CoherenceIssue {
   severity: 'warning' | 'error';
   message: string;
   tomeNumber?: number;
+  // Pour les issues de timeline qu'on peut corriger
+  eventIds?: [string, string]; // [eventId1, eventId2] à inverser
 }
 
 interface SeriesBible {
@@ -420,7 +422,8 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
           issues.push({
             type: 'timeline',
             severity: 'error',
-            message: `Incohérence temporelle: "${sortedTimeline[i].event}" avant "${sortedTimeline[i-1].event}"`
+            message: `Incohérence temporelle: "${sortedTimeline[i].event}" avant "${sortedTimeline[i-1].event}"`,
+            eventIds: [sortedTimeline[i-1].id, sortedTimeline[i].id]
           });
         }
       }
@@ -428,6 +431,29 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
 
     return issues;
   }, [seriesBible]);
+
+  // Fonction pour corriger automatiquement les incohérences de timeline
+  const fixTimelineIssue = (eventIds: [string, string]) => {
+    const [eventId1, eventId2] = eventIds;
+    const event1 = seriesBible.timeline.find(e => e.id === eventId1);
+    const event2 = seriesBible.timeline.find(e => e.id === eventId2);
+    
+    if (event1 && event2) {
+      // Échanger les dates des deux événements
+      const updatedTimeline = seriesBible.timeline.map(event => {
+        if (event.id === eventId1) {
+          return { ...event, date: event2.date };
+        }
+        if (event.id === eventId2) {
+          return { ...event, date: event1.date };
+        }
+        return event;
+      });
+      
+      setSeriesBible(prev => ({ ...prev, timeline: updatedTimeline }));
+      toast.success('Timeline corrigée ! Les dates ont été inversées.');
+    }
+  };
 
   const getRelationIcon = (type: CharacterRelation['type']) => {
     switch (type) {
@@ -1853,21 +1879,34 @@ RÈGLES STRICTES:
                             : 'bg-yellow-500/10 border-l-yellow-500'
                         }`}
                       >
-                        <div className="flex items-start gap-2">
-                          {issue.severity === 'error' ? (
-                            <AlertTriangle className="h-4 w-4 text-destructive mt-0.5" />
-                          ) : (
-                            <AlertTriangle className="h-4 w-4 text-yellow-500 mt-0.5" />
-                          )}
-                          <div>
-                            <Badge variant="outline" className="text-xs mb-1">
-                              {issue.type === 'character' && 'Personnage'}
-                              {issue.type === 'plot' && 'Intrigue'}
-                              {issue.type === 'timeline' && 'Timeline'}
-                              {issue.type === 'location' && 'Lieu'}
-                            </Badge>
-                            <p className="text-sm">{issue.message}</p>
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-start gap-2">
+                            {issue.severity === 'error' ? (
+                              <AlertTriangle className="h-4 w-4 text-destructive mt-0.5" />
+                            ) : (
+                              <AlertTriangle className="h-4 w-4 text-yellow-500 mt-0.5" />
+                            )}
+                            <div>
+                              <Badge variant="outline" className="text-xs mb-1">
+                                {issue.type === 'character' && 'Personnage'}
+                                {issue.type === 'plot' && 'Intrigue'}
+                                {issue.type === 'timeline' && 'Timeline'}
+                                {issue.type === 'location' && 'Lieu'}
+                              </Badge>
+                              <p className="text-sm">{issue.message}</p>
+                            </div>
                           </div>
+                          {issue.type === 'timeline' && issue.eventIds && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => fixTimelineIssue(issue.eventIds!)}
+                              className="shrink-0 text-xs"
+                            >
+                              <RefreshCw className="h-3 w-3 mr-1" />
+                              Corriger
+                            </Button>
+                          )}
                         </div>
                       </div>
                     ))}
