@@ -387,6 +387,15 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
                     className="mt-1"
                   />
                 </div>
+                <div className="p-3 bg-amber-50 border border-amber-200 rounded-md">
+                  <p className="text-sm text-amber-800 flex items-start gap-2">
+                    <Info className="w-4 h-4 mt-0.5 shrink-0" />
+                    <span>
+                      <strong>Photo de l'auteur :</strong> L'IA va générer un espace réservé pour votre photo. 
+                      Vous devrez ajouter votre propre photo manuellement avec un logiciel de retouche (Canva, Photoshop...) après téléchargement.
+                    </span>
+                  </p>
+                </div>
               </div>
             )}
 
