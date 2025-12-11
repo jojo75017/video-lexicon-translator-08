@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -61,6 +62,69 @@ INSTRUCTIONS CRITIQUES POUR RÉALISME HUMAIN:
   return '';
 };
 
+// Upload une image (base64 ou URL) vers Supabase Storage et retourne l'URL publique
+async function uploadImageToStorage(imageData: string, chapterTitle: string): Promise<string> {
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+  const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+  const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+  let imageBytes: Uint8Array;
+  let contentType = 'image/png';
+
+  if (imageData.startsWith('data:image/')) {
+    // Image base64
+    const matches = imageData.match(/^data:image\/(\w+);base64,(.+)$/);
+    if (!matches) throw new Error('Invalid base64 image format');
+    contentType = `image/${matches[1]}`;
+    const base64Data = matches[2];
+    const binaryString = atob(base64Data);
+    imageBytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      imageBytes[i] = binaryString.charCodeAt(i);
+    }
+  } else if (imageData.startsWith('http')) {
+    // URL externe - télécharger l'image
+    const response = await fetch(imageData);
+    if (!response.ok) throw new Error('Failed to download image from URL');
+    const blob = await response.blob();
+    imageBytes = new Uint8Array(await blob.arrayBuffer());
+    contentType = blob.type || 'image/png';
+  } else {
+    throw new Error('Unsupported image format');
+  }
+
+  // Générer un nom de fichier unique
+  const timestamp = Date.now();
+  const safeTitle = chapterTitle.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 30);
+  const extension = contentType.split('/')[1] || 'png';
+  const fileName = `chapter-images/${timestamp}-${safeTitle}.${extension}`;
+
+  console.log(`Uploading image to storage: ${fileName}`);
+
+  const { data, error } = await supabase.storage
+    .from('ebook-images')
+    .upload(fileName, imageBytes, {
+      contentType,
+      upsert: true,
+    });
+
+  if (error) {
+    console.error('Storage upload error:', error);
+    throw new Error(`Failed to upload image: ${error.message}`);
+  }
+
+  // Obtenir l'URL publique
+  const { data: publicData } = supabase.storage
+    .from('ebook-images')
+    .getPublicUrl(fileName);
+
+  const publicUrl = publicData?.publicUrl;
+  if (!publicUrl) throw new Error('Failed to get public URL');
+
+  console.log(`Image uploaded successfully: ${publicUrl}`);
+  return publicUrl;
+}
+
 async function generateWithOpenAI(
   chapterTitle: string, 
   chapterContent: string, 
@@ -71,7 +135,7 @@ async function generateWithOpenAI(
   ratio: string = 'square',
   quality: string = 'high',
   colorScheme: string = 'auto'
-) {
+): Promise<string> {
   let charactersContext = '';
   if (characters && characters.length > 0) {
     charactersContext = '\n\nIMPORTANT - Personnages principaux de l\'histoire (à représenter de manière STRICTEMENT cohérente):\n';
@@ -177,13 +241,7 @@ Instructions de génération:
   }
 
   console.log('Image generated successfully with OpenAI');
-  return new Response(
-    JSON.stringify({ 
-      imageUrl,
-      chapterTitle 
-    }),
-    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-  );
+  return imageUrl;
 }
 
 serve(async (req) => {
@@ -204,7 +262,8 @@ serve(async (req) => {
       useOpenAI = false, 
       openaiApiKey, 
       disableOpenAIFallback = false, 
-      forceLovable = false 
+      forceLovable = false,
+      uploadToStorage = true // Nouveau paramètre pour activer l'upload vers Storage
     } = await req.json();
     
     if (!chapterTitle) {
@@ -214,10 +273,12 @@ serve(async (req) => {
       );
     }
 
+    let generatedImageUrl: string;
+
     // Si useOpenAI est true et non forcé à Lovable, utiliser EXCLUSIVEMENT OpenAI
     if (useOpenAI && openaiApiKey && !forceLovable) {
       try {
-        return await generateWithOpenAI(
+        generatedImageUrl = await generateWithOpenAI(
           chapterTitle,
           chapterContent,
           ebookTitle,
@@ -229,7 +290,7 @@ serve(async (req) => {
           colorScheme
         );
       } catch (err) {
-        console.error('OpenAI image generation failed (no Lovable fallback when clé perso utilisée):', err);
+        console.error('OpenAI image generation failed:', err);
         return new Response(
           JSON.stringify({
             error: "Erreur OpenAI lors de la génération de l'image",
@@ -238,37 +299,36 @@ serve(async (req) => {
           { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
-    }
+    } else {
+      // Utiliser Lovable AI
+      const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+      if (!LOVABLE_API_KEY) {
+        throw new Error('LOVABLE_API_KEY is not configured');
+      }
 
-    // Sinon, on utilise Lovable AI (crédits de votre workspace)
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY is not configured');
-    }
-
-    // Ajouter les descriptions de personnages au prompt pour la cohérence
-    let charactersContext = '';
-    if (characters && characters.length > 0) {
-      charactersContext = '\n\nIMPORTANT - Personnages principaux de l\'histoire (à représenter de manière STRICTEMENT cohérente):\n';
-      characters.forEach((char: any) => {
-        if (char.name && char.description) {
-          charactersContext += `\n🎭 ${char.name}:\n`;
-          charactersContext += `   Description: ${char.description}\n`;
-          if (char.referenceImageUrl) {
-            charactersContext += `   [IMAGE DE RÉFÉRENCE FOURNIE - REPRODUIRE EXACTEMENT cette apparence]\n`;
+      // Ajouter les descriptions de personnages au prompt pour la cohérence
+      let charactersContext = '';
+      if (characters && characters.length > 0) {
+        charactersContext = '\n\nIMPORTANT - Personnages principaux de l\'histoire (à représenter de manière STRICTEMENT cohérente):\n';
+        characters.forEach((char: any) => {
+          if (char.name && char.description) {
+            charactersContext += `\n🎭 ${char.name}:\n`;
+            charactersContext += `   Description: ${char.description}\n`;
+            if (char.referenceImageUrl) {
+              charactersContext += `   [IMAGE DE RÉFÉRENCE FOURNIE - REPRODUIRE EXACTEMENT cette apparence]\n`;
+            }
+            charactersContext += `   ⚠️ Cette apparence DOIT être identique dans TOUTES les images\n`;
           }
-          charactersContext += `   ⚠️ Cette apparence DOIT être identique dans TOUTES les images\n`;
-        }
-      });
-      charactersContext += '\n⚠️ RÈGLE ABSOLUE: Les mêmes personnages doivent avoir EXACTEMENT la même apparence physique, les mêmes vêtements, la même coiffure dans chaque image de l\'ebook. Continuité visuelle OBLIGATOIRE.';
-    }
+        });
+        charactersContext += '\n⚠️ RÈGLE ABSOLUE: Les mêmes personnages doivent avoir EXACTEMENT la même apparence physique, les mêmes vêtements, la même coiffure dans chaque image de l\'ebook. Continuité visuelle OBLIGATOIRE.';
+      }
 
-    // Créer un prompt optimisé pour l'image du chapitre
-    const colorPrompt = COLOR_SCHEME_PROMPTS[colorScheme] || '';
-    const qualityDesc = QUALITY_MAP[quality]?.description || QUALITY_MAP['high'].description;
-    const photorealisticEnhancement = getPhotorealisticEnhancement(style);
+      // Créer un prompt optimisé pour l'image du chapitre
+      const colorPrompt = COLOR_SCHEME_PROMPTS[colorScheme] || '';
+      const qualityDesc = QUALITY_MAP[quality]?.description || QUALITY_MAP['high'].description;
+      const photorealisticEnhancement = getPhotorealisticEnhancement(style);
 
-    const imagePrompt = `Contexte de l'ebook: "${ebookTitle}"
+      const imagePrompt = `Contexte de l'ebook: "${ebookTitle}"
 Chapitre à illustrer: "${chapterTitle}"
 ${chapterContent ? `Résumé du chapitre: ${chapterContent.substring(0, 300)}...` : ''}
 ${charactersContext}
@@ -284,88 +344,97 @@ Instructions de génération:
 - Si des personnages sont mentionnés ci-dessus, les représenter avec EXACTEMENT les mêmes caractéristiques physiques que décrites
 - COHÉRENCE VISUELLE ABSOLUE pour tous les personnages récurrents
 - L'illustration doit refléter le thème et l'atmosphère du titre de l'ebook "${ebookTitle}"`;
-    console.log('Generating image with prompt:', imagePrompt);
+      console.log('Generating image with prompt:', imagePrompt);
 
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-2.5-flash-image-preview',
-        messages: [
-          {
-            role: 'user',
-            content: imagePrompt
-          }
-        ],
-        modalities: ['image', 'text']
-      }),
-    });
+      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash-image-preview',
+          messages: [
+            {
+              role: 'user',
+              content: imagePrompt
+            }
+          ],
+          modalities: ['image', 'text']
+        }),
+      });
 
-    if (!response.ok) {
-      // Si erreur 429 ou 402, gérer clairement et fallback conditionnel vers OpenAI
-      if (response.status === 429 || response.status === 402) {
-        if (!disableOpenAIFallback) {
-          const ENV_OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
-          const FALLBACK_OPENAI_KEY = ENV_OPENAI_API_KEY || openaiApiKey;
-          if (FALLBACK_OPENAI_KEY) {
-            console.log('Lovable AI error, attempting automatic fallback to OpenAI using', ENV_OPENAI_API_KEY ? 'env' : 'client', 'key...');
-            try {
-              return await generateWithOpenAI(chapterTitle, chapterContent, ebookTitle, style, characters, FALLBACK_OPENAI_KEY, ratio, quality, colorScheme);
-            } catch (openaiErr) {
-              console.error('OpenAI fallback failed:', openaiErr);
-              // Continuer vers l'erreur d'origine si le fallback échoue
+      if (!response.ok) {
+        // Si erreur 429 ou 402, gérer clairement et fallback conditionnel vers OpenAI
+        if (response.status === 429 || response.status === 402) {
+          if (!disableOpenAIFallback) {
+            const ENV_OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+            const FALLBACK_OPENAI_KEY = ENV_OPENAI_API_KEY || openaiApiKey;
+            if (FALLBACK_OPENAI_KEY) {
+              console.log('Lovable AI error, attempting automatic fallback to OpenAI...');
+              try {
+                generatedImageUrl = await generateWithOpenAI(chapterTitle, chapterContent, ebookTitle, style, characters, FALLBACK_OPENAI_KEY, ratio, quality, colorScheme);
+              } catch (openaiErr) {
+                console.error('OpenAI fallback failed:', openaiErr);
+                throw openaiErr;
+              }
+            } else {
+              if (response.status === 429) {
+                return new Response(
+                  JSON.stringify({ error: 'Limite de requêtes atteinte. Veuillez réessayer dans quelques instants.', code: 'RATE_LIMITED' }),
+                  { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+                );
+              }
+              return new Response(
+                JSON.stringify({ error: 'Crédits Lovable AI épuisés. Ajoutez des crédits ou utilisez une clé OpenAI.', code: 'PAYMENT_REQUIRED' }),
+                { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+              );
             }
           }
-        }
-        // Si pas de clé OpenAI ou fallback désactivé/échoué, retourner l'erreur appropriée
-        if (response.status === 429) {
+        } else {
+          const errorText = await response.text();
+          console.error('AI Gateway error:', response.status, errorText);
           return new Response(
-            JSON.stringify({ error: 'Limite de requêtes atteinte. Veuillez réessayer dans quelques instants.', code: 'RATE_LIMITED' }),
-            { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            JSON.stringify({ error: "Erreur lors de la génération de l'image" }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
         }
-        return new Response(
-          JSON.stringify({ error: 'Crédits Lovable AI épuisés. Ajoutez des crédits ou utilisez une clé OpenAI.', code: 'PAYMENT_REQUIRED' }),
-          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
       }
-      const errorText = await response.text();
-      console.error('AI Gateway error:', response.status, errorText);
-      return new Response(
-        JSON.stringify({ error: "Erreur lors de la génération de l'image" }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+
+      if (!generatedImageUrl!) {
+        const data = await response.json();
+        generatedImageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+
+        if (!generatedImageUrl) {
+          throw new Error('No image URL in response');
+        }
+      }
     }
 
-    const data = await response.json();
-    const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-
-    if (!imageUrl) {
-      throw new Error('No image URL in response');
+    // Upload vers Supabase Storage si activé
+    let finalImageUrl = generatedImageUrl;
+    if (uploadToStorage) {
+      try {
+        finalImageUrl = await uploadImageToStorage(generatedImageUrl, chapterTitle);
+        console.log('Image uploaded to storage:', finalImageUrl);
+      } catch (uploadErr) {
+        console.error('Failed to upload to storage, returning original URL:', uploadErr);
+        // En cas d'erreur d'upload, on retourne quand même l'image générée
+      }
     }
 
     console.log('Image generated successfully');
     return new Response(
       JSON.stringify({ 
-        imageUrl,
-        chapterTitle 
+        imageUrl: finalImageUrl,
+        chapterTitle,
+        storedInCloud: uploadToStorage && finalImageUrl !== generatedImageUrl
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
     console.error('Error in generate-chapter-images:', error);
-    
-    // Log détaillé pour déboguer
-    console.error('Error details:', {
-      message: error instanceof Error ? error.message : 'Unknown',
-      stack: error instanceof Error ? error.stack : undefined,
-      chapterTitle,
-      ebookTitle
-    });
     
     return new Response(
       JSON.stringify({ 
