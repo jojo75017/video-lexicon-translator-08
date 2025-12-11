@@ -86,7 +86,6 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
   const [paperType, setPaperType] = useState<PaperType>('white');
   const [bindingType, setBindingType] = useState<BindingType>('paperback');
   const [coverType, setCoverType] = useState<CoverType>('front');
-  const [isbn, setIsbn] = useState('');
 
   // Calculate spine width based on page count and paper type
   const spineWidth = useMemo(() => {
@@ -147,8 +146,7 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
           bindingType,
           spineWidth: spineWidth.toFixed(4),
           dimensions: coverDimensions,
-          backCoverText,
-          isbn
+          backCoverText
         }
       });
 
@@ -361,15 +359,9 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
                     className="mt-1"
                   />
                 </div>
-                <div>
-                  <Label className="text-sm font-medium">ISBN (optionnel)</Label>
-                  <Input
-                    placeholder="978-X-XXXX-XXXX-X"
-                    value={isbn}
-                    onChange={(e) => setIsbn(e.target.value)}
-                    className="mt-1"
-                  />
-                </div>
+                <p className="text-xs text-muted-foreground">
+                  💡 Le code-barres ISBN sera ajouté automatiquement par la plateforme de publication (KDP, IngramSpark, etc.)
+                </p>
               </div>
             )}
 

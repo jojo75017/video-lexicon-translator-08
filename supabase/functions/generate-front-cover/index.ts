@@ -51,8 +51,7 @@ serve(async (req) => {
       bindingType = 'paperback',
       spineWidth = '0.45',
       dimensions = null,
-      backCoverText = '',
-      isbn = ''
+      backCoverText = ''
     } = await req.json();
 
     console.log('Generating cover:', { ebookTitle, authorName, genre, style, coverType, bookFormat, pageCount });
@@ -113,8 +112,8 @@ SPINE (CENTER - NARROW VERTICAL STRIP):
 BACK COVER (LEFT SIDE):
 ${backCoverText ? `1. Marketing text/synopsis: "${backCoverText.substring(0, 300)}"` : '1. Space for marketing copy/synopsis'}
 2. Author bio area
-${isbn ? `3. ISBN barcode area: ${isbn}` : '3. Space for ISBN barcode (bottom right)'}
-4. Price area (bottom)
+3. Leave empty white rectangle area (bottom right) for ISBN barcode - will be added by publisher
+4. Price area (bottom left)
 
 DESIGN REQUIREMENTS:
 - Seamless design that flows across all three sections
