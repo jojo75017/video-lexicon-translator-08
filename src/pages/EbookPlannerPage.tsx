@@ -157,18 +157,20 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   }, []);
 
   // Fonction pour nettoyer les images base64 volumineuses du contenu avant localStorage
-  const stripImagesFromContent = (text: string): string => {
+  // Garde les URLs cloud [IMAGE_URL:https://...] mais supprime les base64
+  const stripBase64ImagesFromContent = (text: string): string => {
     if (!text) return '';
+    // Supprime seulement les images base64, garde les URLs
     return text.replace(/\[IMAGE:\d+:data:image\/[^;]+;base64,[^\]]+\]/g, '[IMAGE_REMOVED]');
   };
 
-  const stripImagesFromChapters = (chaps: Chapter[]): Chapter[] => {
+  const stripBase64ImagesFromChapters = (chaps: Chapter[]): Chapter[] => {
     return chaps.map(ch => ({
       ...ch,
-      content: stripImagesFromContent(ch.content || ''),
+      content: stripBase64ImagesFromContent(ch.content || ''),
       subChapters: ch.subChapters.map(sub => ({
         ...sub,
-        content: stripImagesFromContent(sub.content || '')
+        content: stripBase64ImagesFromContent(sub.content || '')
       }))
     }));
   };
@@ -178,10 +180,10 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
     const dataToSave = {
       apiKey, ebookTitle, authorName, targetAudience, tomeNumber, writingStyle,
       chapterLength, detailLevel, tone, narrativeFormat, 
-      preface: stripImagesFromContent(preface), 
-      conclusion: stripImagesFromContent(conclusion), 
-      epilogue: stripImagesFromContent(epilogue),
-      chapters: stripImagesFromChapters(chapters), 
+      preface: stripBase64ImagesFromContent(preface), 
+      conclusion: stripBase64ImagesFromContent(conclusion), 
+      epilogue: stripBase64ImagesFromContent(epilogue),
+      chapters: stripBase64ImagesFromChapters(chapters), 
       numberOfChapters, targetWordsPerChapter, 
       ebookImages: [], // Ne pas sauvegarder les images dans localStorage
       characters, 

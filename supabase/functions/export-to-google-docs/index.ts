@@ -5,14 +5,33 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Nettoie le contenu des marqueurs d'images pour l'export Google Docs
-function cleanImagesFromContent(content: string): string {
-  if (!content) return '';
-  // Supprime les marqueurs [IMAGE:...] avec leur contenu base64
-  return content
-    .replace(/\[IMAGE:\d+:data:image\/[^;]+;base64,[^\]]+\]/g, '\n[Image à insérer manuellement]\n')
-    .replace(/\[IMAGE:[^\]]+\]/g, '\n[Image à insérer manuellement]\n')
-    .replace(/\[IMAGE_REMOVED\]/g, '\n[Image à insérer manuellement]\n');
+// Extrait les URLs d'images du contenu
+function extractImageUrls(content: string): { cleanContent: string; imageUrls: Array<{ position: number; url: string }> } {
+  const imageUrls: Array<{ position: number; url: string }> = [];
+  let cleanContent = content;
+  let offset = 0;
+  
+  // Pattern pour [IMAGE_URL:https://...]
+  const urlRegex = /\[IMAGE_URL:(https?:\/\/[^\]]+)\]/g;
+  let match;
+  
+  while ((match = urlRegex.exec(content)) !== null) {
+    const fullMatch = match[0];
+    const url = match[1];
+    const position = match.index - offset;
+    
+    imageUrls.push({ position, url });
+    offset += fullMatch.length;
+  }
+  
+  // Nettoyer le contenu
+  cleanContent = content
+    .replace(/\[IMAGE_URL:https?:\/\/[^\]]+\]/g, '\n')
+    .replace(/\[IMAGE:\d+:data:image\/[^;]+;base64,[^\]]+\]/g, '\n')
+    .replace(/\[IMAGE:[^\]]+\]/g, '\n')
+    .replace(/\[IMAGE_REMOVED\]/g, '\n');
+  
+  return { cleanContent, imageUrls };
 }
 
 serve(async (req) => {
@@ -40,8 +59,9 @@ serve(async (req) => {
 
     const credentials = JSON.parse(serviceAccountKey);
 
-    // Nettoyer le contenu des images base64
-    const cleanContent = cleanImagesFromContent(content);
+    // Extraire les URLs d'images et nettoyer le contenu
+    const { cleanContent, imageUrls } = extractImageUrls(content);
+    console.log(`Images trouvées: ${imageUrls.length}`);
 
     // Créer le JWT pour l'authentification Google
     const header = {
@@ -140,7 +160,7 @@ serve(async (req) => {
     fullText += cleanContent;
 
     // Préparer les requêtes pour ajouter le contenu
-    const requests = [];
+    const requests: any[] = [];
     
     // Insérer tout le texte d'un coup
     requests.push({
@@ -187,6 +207,80 @@ serve(async (req) => {
       );
     }
 
+    // Insérer les images si des URLs sont disponibles
+    let imagesInserted = 0;
+    if (imageUrls.length > 0) {
+      console.log(`Insertion de ${imageUrls.length} images...`);
+      
+      // Insérer les images à la fin du document pour simplifier
+      const imageRequests: any[] = [];
+      
+      // Récupérer la longueur actuelle du document
+      const getDocResponse = await fetch(
+        `https://docs.googleapis.com/v1/documents/${documentId}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        }
+      );
+      
+      const currentDoc = await getDocResponse.json();
+      let insertIndex = 1; // Position par défaut
+      
+      if (currentDoc.body?.content) {
+        const lastElement = currentDoc.body.content[currentDoc.body.content.length - 1];
+        if (lastElement?.endIndex) {
+          insertIndex = lastElement.endIndex - 1;
+        }
+      }
+      
+      // Ajouter chaque image
+      for (const img of imageUrls) {
+        try {
+          imageRequests.push({
+            insertInlineImage: {
+              location: { index: insertIndex },
+              uri: img.url,
+              objectSize: {
+                width: { magnitude: 400, unit: 'PT' },
+                height: { magnitude: 300, unit: 'PT' },
+              },
+            },
+          });
+          insertIndex += 1; // L'image prend 1 caractère
+          imagesInserted++;
+        } catch (imgErr) {
+          console.error('Error preparing image request:', imgErr);
+        }
+      }
+      
+      if (imageRequests.length > 0) {
+        try {
+          const imageUpdateResponse = await fetch(
+            `https://docs.googleapis.com/v1/documents/${documentId}:batchUpdate`,
+            {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ requests: imageRequests }),
+            }
+          );
+          
+          if (!imageUpdateResponse.ok) {
+            const imageError = await imageUpdateResponse.json();
+            console.error('Erreur lors de l\'insertion des images:', imageError);
+          } else {
+            console.log(`${imagesInserted} images insérées avec succès`);
+          }
+        } catch (batchErr) {
+          console.error('Batch image insert error:', batchErr);
+        }
+      }
+    }
+
     // Rendre le document accessible (permission de lecture pour tous)
     await fetch(
       `https://www.googleapis.com/drive/v3/files/${documentId}/permissions`,
@@ -210,7 +304,8 @@ serve(async (req) => {
         success: true,
         documentId,
         documentUrl,
-        message: 'Document créé avec succès sur Google Docs',
+        imagesInserted,
+        message: `Document créé avec succès (${imagesInserted} images)`,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

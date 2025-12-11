@@ -160,9 +160,13 @@ export const EbookWriting: React.FC<EbookWritingProps> = ({
     }));
 
     // Insérer le marqueur d'image dans le contenu
+    // Utiliser [IMAGE_URL:...] pour les URLs cloud, [IMAGE:id:...] pour base64
     const chapter = chapters.find(c => c.id === chapterId);
     if (chapter) {
-      const imageMarker = `\n\n[IMAGE:${newImage.id}:${finalUrl}]\n\n`;
+      const isCloudUrl = finalUrl.startsWith('http');
+      const imageMarker = isCloudUrl 
+        ? `\n\n[IMAGE_URL:${finalUrl}]\n\n`
+        : `\n\n[IMAGE:${newImage.id}:${finalUrl}]\n\n`;
       onUpdateChapterContent(chapterId, (chapter.content || '') + imageMarker);
     }
 
