@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Image, Sparkles, Download, Copy, Check, Settings, Trash2, FileArchive, FolderOpen } from 'lucide-react';
+import { Image, Sparkles, Download, Copy, Check, Settings, Trash2, FileArchive, FolderOpen, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { type Character } from './EbookCharacters';
@@ -35,6 +35,7 @@ interface EbookChapterImageGeneratorProps {
   characters?: Character[];
   ebookImages?: ChapterImage[];
   onImagesUpdate?: (images: ChapterImage[]) => void;
+  onInsertImageToChapter?: (chapterId: string, imageUrl: string) => void;
 }
 
 export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProps> = ({
@@ -42,7 +43,8 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
   chapters,
   characters = [],
   ebookImages = [],
-  onImagesUpdate
+  onImagesUpdate,
+  onInsertImageToChapter
 }) => {
   const { hasValidApiKey, getConfig } = useOpenAIConfig();
   const [isGenerating, setIsGenerating] = useState(false);
@@ -843,7 +845,18 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
                 <CardContent className="pt-4">
                   <h4 className="font-semibold mb-2 line-clamp-1">{img.chapterTitle}</h4>
                   <p className="text-xs text-muted-foreground mb-3">Style: {img.style}</p>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
+                    {onInsertImageToChapter && (
+                      <Button
+                        size="sm"
+                        variant="default"
+                        onClick={() => onInsertImageToChapter(img.chapterId, img.imageUrl)}
+                        className="flex-1"
+                      >
+                        <FileText className="h-3 w-3 mr-1" />
+                        Insérer
+                      </Button>
+                    )}
                     <Button
                       size="sm"
                       variant="outline"
