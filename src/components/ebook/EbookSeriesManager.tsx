@@ -1263,19 +1263,11 @@ RÈGLES STRICTES:
         <CardContent>
           <div className="flex flex-wrap gap-3">
             <Button 
-              onClick={() => navigate('/formation')}
+              onClick={() => navigate('/formation-series')}
               className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:opacity-90"
             >
               <BookOpen className="h-4 w-4 mr-2" />
-              Formation Texte
-            </Button>
-            <Button 
-              onClick={() => navigate('/formation-audio')}
-              variant="outline"
-              className="border-purple-500/30 text-purple-600 hover:bg-purple-500/10"
-            >
-              <Crown className="h-4 w-4 mr-2" />
-              Formation Audio
+              Formation Séries
             </Button>
           </div>
         </CardContent>

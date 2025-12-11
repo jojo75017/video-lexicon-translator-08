@@ -12,6 +12,7 @@ import AuthPage from './pages/AuthPage';
 import AdminProfilePage from './pages/AdminProfilePage';
 import AffiliationFormationPage from './pages/AffiliationFormationPage';
 import FormationPage from './pages/FormationPage';
+import FormationSeriesPage from './pages/FormationSeriesPage';
 import FormationAudioPage from './pages/FormationAudioPage';
 import SalesPage from './pages/SalesPage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
@@ -168,6 +169,16 @@ const App = () => {
               element={
                 isAdmin || isAuthenticated ? (
                   <FormationAudioPage />
+                ) : (
+                  <SubscriptionAuth onAuthenticated={handleAuthenticated} />
+                )
+              }
+            />
+            <Route 
+              path="/formation-series" 
+              element={
+                isAdmin || isAuthenticated ? (
+                  <FormationSeriesPage />
                 ) : (
                   <SubscriptionAuth onAuthenticated={handleAuthenticated} />
                 )
