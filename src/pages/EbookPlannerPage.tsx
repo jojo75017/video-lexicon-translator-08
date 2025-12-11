@@ -114,7 +114,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   const [targetWordsPerChapter, setTargetWordsPerChapter] = useState(savedData?.targetWordsPerChapter || 2500);
   const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
   const [importText, setImportText] = useState('');
-  const [ebookImages, setEbookImages] = useState<Array<{url: string, title: string, chapterIndex?: number}>>(savedData?.ebookImages || []);
+  const [ebookImages, setEbookImages] = useState<Array<{url: string, title: string, chapterId?: string}>>(savedData?.ebookImages || []);
   
   const [bookSummary, setBookSummary] = useState('');
   const [coverConcepts, setCoverConcepts] = useState('');
@@ -1108,7 +1108,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
             chapters={chapters}
             characters={characters}
             ebookImages={ebookImages.map(img => ({
-              chapterId: img.chapterIndex?.toString() || '',
+              chapterId: img.chapterId || '',
               chapterTitle: img.title,
               imageUrl: img.url,
               style: ''
@@ -1117,7 +1117,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
               setEbookImages(images.map(img => ({
                 url: img.imageUrl,
                 title: img.chapterTitle,
-                chapterIndex: parseInt(img.chapterId) || undefined
+                chapterId: img.chapterId
               })));
             }}
             onInsertImageToChapter={handleInsertImageToChapter}

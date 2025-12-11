@@ -31,6 +31,29 @@ interface EbookWritingProps {
 // Fonction de rendu du texte avec style (identique au planificateur)
 const renderStyledText = (content: string) => {
   return content.split('\n').map((line, lineIndex) => {
+    // Images [IMAGE_URL:url]
+    if (line.includes('[IMAGE_URL:')) {
+      const match = line.match(/\[IMAGE_URL:(https?:\/\/[^\]]+)\]/);
+      if (match) {
+        return (
+          <div key={lineIndex} className="my-4">
+            <img 
+              src={match[1]} 
+              alt="Image du chapitre"
+              className="max-w-full h-auto rounded-lg shadow-md border"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                const parent = e.currentTarget.parentElement;
+                if (parent) {
+                  parent.innerHTML = '<div class="p-4 bg-muted rounded-lg text-center text-muted-foreground">Image non disponible</div>';
+                }
+              }}
+            />
+          </div>
+        );
+      }
+    }
+    
     // Titres ### en gras
     if (line.startsWith('### ')) {
       return (
