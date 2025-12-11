@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, Sparkles, BookOpen, Zap, Download, Star, ArrowRight, Play, Loader2 } from "lucide-react";
+import { Check, Sparkles, BookOpen, Zap, Download, Star, ArrowRight, Play, Loader2, Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -16,6 +16,30 @@ const SalesPage = () => {
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+  // Countdown to March 31, 2026
+  useEffect(() => {
+    const targetDate = new Date('2026-03-31T23:59:59');
+    
+    const updateCountdown = () => {
+      const now = new Date();
+      const difference = targetDate.getTime() - now.getTime();
+      
+      if (difference > 0) {
+        setCountdown({
+          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
+          seconds: Math.floor((difference % (1000 * 60)) / 1000)
+        });
+      }
+    };
+    
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const features = [
     { icon: Sparkles, title: "Génération IA", description: "Plans d'ebook complets générés par intelligence artificielle" },
@@ -314,9 +338,38 @@ const SalesPage = () => {
       <section id="pricing" className="py-20 px-4 bg-muted/30">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-4">Choisissez votre formule</h2>
-          <p className="text-muted-foreground text-center mb-12">
+          <p className="text-muted-foreground text-center mb-6">
             Commencez maintenant et créez vos premiers ebooks dès aujourd'hui
           </p>
+          
+          {/* Countdown Timer */}
+          <div className="max-w-2xl mx-auto mb-12">
+            <div className="bg-gradient-to-r from-red-500 to-orange-500 rounded-xl p-6 text-white text-center shadow-lg">
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <Clock className="w-5 h-5 animate-pulse" />
+                <span className="font-bold text-lg">🔥 Offre de lancement - Économisez 300€ sur Lifetime</span>
+              </div>
+              <div className="grid grid-cols-4 gap-4 max-w-md mx-auto">
+                <div className="bg-white/20 rounded-lg p-3">
+                  <div className="text-3xl font-bold">{countdown.days}</div>
+                  <div className="text-xs uppercase tracking-wide">Jours</div>
+                </div>
+                <div className="bg-white/20 rounded-lg p-3">
+                  <div className="text-3xl font-bold">{countdown.hours}</div>
+                  <div className="text-xs uppercase tracking-wide">Heures</div>
+                </div>
+                <div className="bg-white/20 rounded-lg p-3">
+                  <div className="text-3xl font-bold">{countdown.minutes}</div>
+                  <div className="text-xs uppercase tracking-wide">Minutes</div>
+                </div>
+                <div className="bg-white/20 rounded-lg p-3">
+                  <div className="text-3xl font-bold">{countdown.seconds}</div>
+                  <div className="text-xs uppercase tracking-wide">Secondes</div>
+                </div>
+              </div>
+              <p className="text-sm mt-3 text-white/80">Offre valable jusqu'au 31 mars 2026</p>
+            </div>
+          </div>
           
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {plans.map((plan, index) => (
