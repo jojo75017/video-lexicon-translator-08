@@ -105,7 +105,15 @@ const SalesPage = () => {
       if (error) throw error;
 
       if (data?.url) {
-        window.location.href = data.url;
+        // Ouvrir dans nouvel onglet pour une meilleure expérience
+        const newWindow = window.open(data.url, '_blank');
+        if (!newWindow) {
+          // Fallback si popup bloqué
+          window.location.href = data.url;
+        } else {
+          setShowEmailDialog(false);
+          toast.success("Page de paiement ouverte dans un nouvel onglet");
+        }
       } else {
         throw new Error("URL de paiement non reçue");
       }
