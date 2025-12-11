@@ -133,6 +133,14 @@ const menuItems = [
     activeGradient: 'from-lime-500 to-green-500'
   },
   { 
+    id: 'library', 
+    label: '📁 Bibliothèque', 
+    icon: FolderOpen,
+    color: 'text-teal-500',
+    bgColor: 'bg-teal-500/10',
+    activeGradient: 'from-teal-500 to-cyan-500'
+  },
+  { 
     id: 'cover', 
     label: 'Couverture', 
     icon: Palette,
