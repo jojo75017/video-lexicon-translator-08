@@ -1277,6 +1277,17 @@ RÈGLES STRICTES:
               <Crown className="h-4 w-4 mr-2" />
               Formation Audio
             </Button>
+            <Button 
+              disabled
+              variant="outline"
+              className="border-amber-500/30 text-amber-600 opacity-70 cursor-not-allowed"
+            >
+              <GraduationCap className="h-4 w-4 mr-2" />
+              Formation Avancée
+              <Badge variant="secondary" className="ml-2 bg-amber-500/20 text-amber-600 text-xs">
+                Bientôt
+              </Badge>
+            </Button>
           </div>
         </CardContent>
       </Card>
