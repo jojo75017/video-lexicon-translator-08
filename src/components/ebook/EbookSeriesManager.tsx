@@ -12,7 +12,7 @@ import {
   BookOpen, Plus, Trash2, Save, Wand2, Loader2, 
   Library, Users, MapPin, Scroll, Crown, Sparkles, Copy,
   AlertTriangle, CheckCircle, Link2, ArrowRight, Heart, Swords,
-  FolderOpen, FileText, Image, Download, RefreshCw
+  FolderOpen, FileText, Image, Download, RefreshCw, Import
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -119,12 +119,28 @@ interface EbookSeriesManagerProps {
   currentTomeNumber?: number;
   ebookTitle?: string;
   onApplyToCurrentBook?: (data: { tomeNumber: number; seriesTitle: string }) => void;
+  onImportTome?: (data: {
+    title: string;
+    authorName: string;
+    tomeNumber: number;
+    seriesTitle: string;
+    synopsis: string;
+    chapters: Array<{
+      id: string;
+      title: string;
+      content: string;
+      subChapters: Array<{ id: string; title: string; content: string }>;
+    }>;
+    preface: string;
+    conclusion: string;
+  }) => void;
 }
 
 export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
   currentTomeNumber,
   ebookTitle,
-  onApplyToCurrentBook
+  onApplyToCurrentBook,
+  onImportTome
 }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -890,6 +906,96 @@ ${seriesBible.writingRules}
     toast.success('Bible de série copiée !');
   };
 
+  const [isImportingTome, setIsImportingTome] = useState<number | null>(null);
+
+  const importTomeToPlanner = async (tome: SeriesTome) => {
+    if (!onImportTome) {
+      toast.error('Fonction d\'import non disponible');
+      return;
+    }
+
+    setIsImportingTome(tome.number);
+
+    try {
+      // Générer les chapitres détaillés pour ce tome via l'IA
+      const { data, error } = await supabase.functions.invoke('generate-content', {
+        body: {
+          type: 'tome-chapters',
+          prompt: `Génère la structure complète des chapitres pour le livre suivant:
+
+TITRE: "${tome.title}" (Tome ${tome.number} de la série "${seriesBible.seriesTitle}")
+AUTEUR: ${seriesBible.authorName || 'Non défini'}
+SYNOPSIS: ${tome.synopsis}
+
+CONTEXTE DE LA SÉRIE:
+- Genre: ${seriesBible.genres.join(', ') || 'Fiction'}
+- Public: ${seriesBible.ageCategory === 'children' ? 'Enfants' : seriesBible.ageCategory === 'young-adult' ? 'Jeunes adultes' : seriesBible.ageCategory === 'all-ages' ? 'Tous publics' : 'Adultes'}
+- Thèmes: ${seriesBible.themes.join(', ')}
+
+POINTS CLÉS DU TOME:
+${tome.mainPlotPoints?.map((p, i) => `${i + 1}. ${p}`).join('\n') || 'Non définis'}
+
+${tome.cliffhanger ? `CLIFFHANGER: ${tome.cliffhanger}` : ''}
+
+Génère en JSON:
+{
+  "preface": "Une préface engageante de 100-150 mots",
+  "chapters": [
+    {
+      "title": "Titre du chapitre",
+      "subChapters": ["Sous-chapitre 1", "Sous-chapitre 2", "Sous-chapitre 3"]
+    }
+  ],
+  "conclusion": "Une conclusion de 100-150 mots"
+}
+
+Génère 8-12 chapitres avec 3-5 sous-chapitres chacun, suivant une progression narrative cohérente.`
+        }
+      });
+
+      if (error) throw error;
+
+      let parsedData;
+      try {
+        const cleanContent = data.content.replace(/\`\`\`json\n?/g, '').replace(/\`\`\`\n?/g, '').trim();
+        parsedData = JSON.parse(cleanContent);
+      } catch {
+        throw new Error('Erreur de parsing des chapitres');
+      }
+
+      // Formater les chapitres
+      const formattedChapters = (parsedData.chapters || []).map((ch: any, index: number) => ({
+        id: `chapter-${Date.now()}-${index}`,
+        title: ch.title,
+        content: '',
+        subChapters: (ch.subChapters || []).map((sub: string, subIndex: number) => ({
+          id: `subchapter-${Date.now()}-${index}-${subIndex}`,
+          title: sub,
+          content: ''
+        }))
+      }));
+
+      // Appeler le callback pour importer dans le planificateur
+      onImportTome({
+        title: tome.title,
+        authorName: seriesBible.authorName,
+        tomeNumber: tome.number,
+        seriesTitle: seriesBible.seriesTitle,
+        synopsis: tome.synopsis,
+        chapters: formattedChapters,
+        preface: parsedData.preface || '',
+        conclusion: parsedData.conclusion || ''
+      });
+
+      toast.success(`Tome ${tome.number} importé dans le planificateur !`);
+    } catch (error) {
+      console.error('Erreur import tome:', error);
+      toast.error('Erreur lors de l\'import du tome');
+    } finally {
+      setIsImportingTome(null);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Saved Series Panel */}
@@ -1530,6 +1636,21 @@ ${seriesBible.writingRules}
                         <span className="font-bold">Tome {tome.number}</span>
                       </div>
                       <div className="flex gap-2">
+                        {onImportTome && (
+                          <Button
+                            size="sm"
+                            className="bg-gradient-to-r from-green-500 to-emerald-500 hover:opacity-90 text-white"
+                            onClick={() => importTomeToPlanner(tome)}
+                            disabled={isImportingTome !== null || isGenerating}
+                            title="Importer dans le planificateur"
+                          >
+                            {isImportingTome === tome.number ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Import className="h-4 w-4" />
+                            )}
+                          </Button>
+                        )}
                         <Button
                           size="sm"
                           variant="outline"
