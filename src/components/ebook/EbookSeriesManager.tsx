@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,7 +13,7 @@ import {
   BookOpen, Plus, Trash2, Save, Wand2, Loader2, 
   Library, Users, MapPin, Scroll, Crown, Sparkles, Copy,
   AlertTriangle, CheckCircle, Link2, ArrowRight, Heart, Swords,
-  FolderOpen, FileText, Image, Download, RefreshCw, Import
+  FolderOpen, FileText, Image, Download, RefreshCw, Import, GraduationCap
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -145,6 +146,7 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
   onApplyToCurrentBook,
   onImportTome
 }) => {
+  const navigate = useNavigate();
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -1252,7 +1254,7 @@ RÈGLES STRICTES:
 
       {seriesBible.synopsis && (
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-6 w-full">
+          <TabsList className="grid grid-cols-7 w-full">
             <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
             <TabsTrigger value="characters">Personnages</TabsTrigger>
             <TabsTrigger value="world">Univers</TabsTrigger>
@@ -1268,6 +1270,10 @@ RÈGLES STRICTES:
                   {coherenceIssues.length}
                 </Badge>
               )}
+            </TabsTrigger>
+            <TabsTrigger value="formation" className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10">
+              <GraduationCap className="h-4 w-4 mr-1" />
+              Formation
             </TabsTrigger>
           </TabsList>
 
@@ -1986,6 +1992,75 @@ RÈGLES STRICTES:
                     </div>
                   ))}
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="formation" className="space-y-4">
+            <Card className="bg-gradient-to-br from-emerald-500/5 to-teal-500/5 border-emerald-500/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <GraduationCap className="h-5 w-5 text-emerald-500" />
+                  Formation Complète - Créer une Série à Succès
+                </CardTitle>
+                <CardDescription>
+                  Apprenez toutes les techniques pour créer et gérer une série de livres cohérente et captivante
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate('/formation')}>
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 flex items-center justify-center">
+                        <BookOpen className="h-5 w-5 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold">Formation Texte</h4>
+                        <p className="text-sm text-muted-foreground">Guide complet avec exemples et exercices pratiques</p>
+                      </div>
+                    </div>
+                  </Card>
+                  
+                  <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate('/formation-audio')}>
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-purple-500 to-violet-500 flex items-center justify-center">
+                        <Crown className="h-5 w-5 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold">Formation Audio</h4>
+                        <p className="text-sm text-muted-foreground">Écoutez les leçons en audio pour apprendre en déplacement</p>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+
+                <div className="border-t pt-4">
+                  <h4 className="font-semibold mb-3">Ce que vous allez apprendre :</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {[
+                      '📚 Structurer une série multi-tomes cohérente',
+                      '👥 Créer des personnages mémorables avec des arcs narratifs',
+                      '🗺️ Construire un univers riche et immersif',
+                      '📈 Gérer la progression et les cliffhangers',
+                      '✅ Maintenir la cohérence sur plusieurs livres',
+                      '💡 Techniques des auteurs à succès',
+                    ].map((item, index) => (
+                      <div key={index} className="flex items-center gap-2 text-sm">
+                        <CheckCircle className="h-4 w-4 text-emerald-500" />
+                        <span>{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <Button 
+                  onClick={() => navigate('/formation')}
+                  className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:opacity-90"
+                  size="lg"
+                >
+                  <GraduationCap className="h-5 w-5 mr-2" />
+                  Accéder à la Formation Complète
+                </Button>
               </CardContent>
             </Card>
           </TabsContent>
