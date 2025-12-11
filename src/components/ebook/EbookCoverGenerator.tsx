@@ -574,11 +574,11 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
               <div className="space-y-4">
                 {currentCover ? (
                   <>
-                    <div className="border-2 border-purple-200 rounded-xl overflow-hidden bg-gray-100 shadow-xl">
+                    <div className="rounded-xl overflow-hidden shadow-xl">
                       <img 
                         src={currentCover} 
                         alt="Couverture générée"
-                        className="w-full h-auto"
+                        className="w-full h-auto block"
                       />
                     </div>
                     
