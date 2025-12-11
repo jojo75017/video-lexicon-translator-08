@@ -84,23 +84,42 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
 
       if (error) throw error;
 
-      // Get folders (directories)
+      console.log('📂 Dossiers trouvés:', data);
+
+      // Get folders (directories) - filter out files at root level
       const folderList: EbookFolder[] = [];
       const seenFolders = new Set<string>();
 
       for (const item of data || []) {
-        if (item.name && !seenFolders.has(item.name)) {
+        // Skip placeholder files and non-folder items
+        if (!item.name || item.name.startsWith('.') || item.name.includes('.')) continue;
+        
+        if (!seenFolders.has(item.name)) {
           seenFolders.add(item.name);
           
           // Count images in folder
-          const { data: folderImages } = await supabase.storage
+          const { data: folderImages, error: listError } = await supabase.storage
             .from('ebook-images')
-            .list(`${user.id}/${item.name}`);
+            .list(`${user.id}/${item.name}`, { limit: 500 });
+          
+          if (listError) {
+            console.error(`Erreur listing ${item.name}:`, listError);
+            continue;
+          }
+
+          // Count only image files (exclude .placeholder and other non-image files)
+          const imageCount = folderImages?.filter(f => 
+            f.name && 
+            !f.name.startsWith('.') && 
+            f.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)
+          )?.length || 0;
+
+          console.log(`📁 ${item.name}: ${imageCount} image(s)`, folderImages);
           
           folderList.push({
             id: item.name,
             name: item.name,
-            imageCount: folderImages?.filter(f => f.name.match(/\.(jpg|jpeg|png|gif|webp)$/i))?.length || 0
+            imageCount
           });
         }
       }
