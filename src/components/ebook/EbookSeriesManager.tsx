@@ -133,6 +133,7 @@ interface EbookSeriesManagerProps {
     }>;
     preface: string;
     conclusion: string;
+    targetWordsPerChapter: number;
   }) => void;
 }
 
@@ -992,7 +993,8 @@ RÈGLES STRICTES:
         synopsis: tome.synopsis,
         chapters: formattedChapters,
         preface: parsedData.preface || '',
-        conclusion: parsedData.conclusion || ''
+        conclusion: parsedData.conclusion || '',
+        targetWordsPerChapter
       });
 
       toast.success(`Tome ${tome.number} importé ! (8 chapitres × ${targetWordsPerChapter.toLocaleString()} mots = ~${Math.round(targetWordsPerChapter * 8 / 250)} pages)`);
