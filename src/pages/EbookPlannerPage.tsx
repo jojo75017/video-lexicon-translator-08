@@ -156,11 +156,36 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
     loadFromDatabase();
   }, []);
 
+  // Fonction pour nettoyer les images base64 volumineuses du contenu avant localStorage
+  const stripImagesFromContent = (text: string): string => {
+    if (!text) return '';
+    return text.replace(/\[IMAGE:\d+:data:image\/[^;]+;base64,[^\]]+\]/g, '[IMAGE_REMOVED]');
+  };
+
+  const stripImagesFromChapters = (chaps: Chapter[]): Chapter[] => {
+    return chaps.map(ch => ({
+      ...ch,
+      content: stripImagesFromContent(ch.content || ''),
+      subChapters: ch.subChapters.map(sub => ({
+        ...sub,
+        content: stripImagesFromContent(sub.content || '')
+      }))
+    }));
+  };
+
   useEffect(() => {
+    // Sauvegarder dans localStorage SANS les images base64 volumineuses
     const dataToSave = {
       apiKey, ebookTitle, authorName, targetAudience, tomeNumber, writingStyle,
-      chapterLength, detailLevel, tone, narrativeFormat, preface, conclusion, epilogue,
-      chapters, numberOfChapters, targetWordsPerChapter, ebookImages, characters, lastSaved: new Date().toISOString()
+      chapterLength, detailLevel, tone, narrativeFormat, 
+      preface: stripImagesFromContent(preface), 
+      conclusion: stripImagesFromContent(conclusion), 
+      epilogue: stripImagesFromContent(epilogue),
+      chapters: stripImagesFromChapters(chapters), 
+      numberOfChapters, targetWordsPerChapter, 
+      ebookImages: [], // Ne pas sauvegarder les images dans localStorage
+      characters, 
+      lastSaved: new Date().toISOString()
     };
     
     try {
