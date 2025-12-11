@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -5,7 +6,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Trash2, Users, Sparkles, Loader2, Image as ImageIcon, Wand2, RefreshCw } from "lucide-react";
-import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useOpenAIConfig } from "@/hooks/useOpenAIConfig";
@@ -48,7 +48,15 @@ export const EbookCharacters = ({ characters, onUpdateCharacters, ebookTitle = '
   const [editingId, setEditingId] = useState<string | null>(null);
   const [generatingId, setGeneratingId] = useState<string | null>(null);
   const [isGeneratingAll, setIsGeneratingAll] = useState(false);
+  const [localTitle, setLocalTitle] = useState(ebookTitle);
   const { hasValidApiKey, getConfig } = useOpenAIConfig();
+
+  // Sync with parent title when it changes
+  useEffect(() => {
+    if (ebookTitle) {
+      setLocalTitle(ebookTitle);
+    }
+  }, [ebookTitle]);
 
   const addCharacter = () => {
     const newCharacter: Character = {
@@ -62,10 +70,10 @@ export const EbookCharacters = ({ characters, onUpdateCharacters, ebookTitle = '
   };
 
   const generateCharactersFromContent = async () => {
-    console.log('Generate characters called with title:', ebookTitle, 'chapters:', chapters.length);
+    const titleToUse = localTitle.trim() || ebookTitle.trim();
     
-    if (!ebookTitle || !ebookTitle.trim()) {
-      toast.error(`Ajoutez un titre à votre ebook pour générer les personnages (reçu: "${ebookTitle}")`);
+    if (!titleToUse) {
+      toast.error('Entrez un titre pour générer les personnages');
       return;
     }
 
@@ -83,7 +91,7 @@ export const EbookCharacters = ({ characters, onUpdateCharacters, ebookTitle = '
       const { data, error } = await supabase.functions.invoke('generate-content', {
         body: {
           type: 'characters',
-          ebookTitle,
+          ebookTitle: titleToUse,
           content: content.slice(0, 15000), // Limit content size
         }
       });
@@ -176,28 +184,44 @@ export const EbookCharacters = ({ characters, onUpdateCharacters, ebookTitle = '
           <Users className="h-5 w-5 text-primary" />
           <h3 className="text-lg font-semibold">Personnages ({characters.length})</h3>
         </div>
-        <Button
-          onClick={generateCharactersFromContent}
-          disabled={isGeneratingAll}
-          className="bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:opacity-90"
-        >
-          {isGeneratingAll ? (
-            <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Analyse en cours...
-            </>
-          ) : (
-            <>
-              <Wand2 className="h-4 w-4 mr-2" />
-              Générer avec l'IA
-            </>
-          )}
-        </Button>
       </div>
       
       <p className="text-sm text-muted-foreground mb-4">
-        L'IA analyse votre contenu et extrait automatiquement les personnages avec leurs rôles. Vous pouvez aussi les ajouter manuellement.
+        L'IA génère des personnages basés sur le titre de votre ebook. Vous pouvez aussi les ajouter manuellement.
       </p>
+
+      {/* Zone de génération IA */}
+      <div className="bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 border border-violet-500/20 rounded-lg p-4 mb-6">
+        <div className="flex flex-col md:flex-row gap-3 items-end">
+          <div className="flex-1">
+            <Label htmlFor="ebook-title-for-characters">Titre de l'ebook</Label>
+            <Input
+              id="ebook-title-for-characters"
+              value={localTitle}
+              onChange={(e) => setLocalTitle(e.target.value)}
+              placeholder="Entrez le titre de votre ebook..."
+              className="mt-1"
+            />
+          </div>
+          <Button
+            onClick={generateCharactersFromContent}
+            disabled={isGeneratingAll || !localTitle.trim()}
+            className="bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:opacity-90 whitespace-nowrap"
+          >
+            {isGeneratingAll ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Génération...
+              </>
+            ) : (
+              <>
+                <Wand2 className="h-4 w-4 mr-2" />
+                Générer les personnages
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
 
       <div className="space-y-4">
         {characters.map((character) => (
