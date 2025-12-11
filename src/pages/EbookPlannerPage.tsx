@@ -59,6 +59,9 @@ import { EbookAudioGenerator } from '@/components/ebook/EbookAudioGenerator';
 import { EbookFormationPDF } from '@/components/ebook/EbookFormationPDF';
 import EbookKdpAnalytics from '@/components/ebook/EbookKdpAnalytics';
 import { EbookImageLibrary } from '@/components/ebook/EbookImageLibrary';
+import { EbookAnalyticsDashboard } from '@/components/ebook/EbookAnalyticsDashboard';
+import { EbookBookMockup3D } from '@/components/ebook/EbookBookMockup3D';
+import { useConfetti } from '@/hooks/useConfetti';
 
 // Hooks et données
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
@@ -1251,6 +1254,23 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
       case 'kdp-analytics':
         return (
           <EbookKdpAnalytics />
+        );
+      
+      case 'analytics':
+        return (
+          <div className="space-y-6">
+            <EbookAnalyticsDashboard
+              chapters={chapters}
+              targetWordsPerChapter={targetWordsPerChapter}
+              ebookTitle={ebookTitle}
+            />
+            <div className="grid md:grid-cols-2 gap-6">
+              <EbookBookMockup3D
+                title={ebookTitle}
+                author={authorName}
+              />
+            </div>
+          </div>
         );
       
       case 'formation-pdf':
