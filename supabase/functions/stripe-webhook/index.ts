@@ -41,18 +41,25 @@ serve(async (req) => {
 
     let event: Stripe.Event;
     
-    // Verify webhook signature
+    // Verify webhook signature using async method (required for Deno)
     if (webhookSecret && signature) {
       try {
-        // Use constructEvent (synchronous) instead of constructEventAsync
-        event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+        event = await stripe.webhooks.constructEventAsync(body, signature, webhookSecret);
         console.log("Webhook signature verified successfully");
       } catch (err: any) {
         console.error("Webhook signature verification failed:", err.message);
         // In test mode, allow processing without valid signature for debugging
-        if (Deno.env.get("STRIPE_SECRET_KEY")?.startsWith("sk_test_")) {
+        if (stripeKey.startsWith("sk_test_")) {
           console.warn("Test mode: Processing event without signature verification");
-          event = JSON.parse(body);
+          try {
+            event = JSON.parse(body);
+          } catch (parseErr) {
+            console.error("Failed to parse body:", parseErr);
+            return new Response(
+              JSON.stringify({ error: "Invalid body" }),
+              { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
         } else {
           return new Response(
             JSON.stringify({ error: "Invalid signature" }),
