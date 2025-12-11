@@ -537,6 +537,80 @@ Le score overall_score doit être entre 0 et 100 (100 = parfaitement cohérent).
       }
     }
 
+    // Handle tome-chapters generation (uses Lovable AI - no API key needed)
+    if (type === 'tome-chapters') {
+      console.log('Processing tome chapters generation...');
+      const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+      
+      if (!LOVABLE_API_KEY) {
+        console.error('LOVABLE_API_KEY not found');
+        return new Response(
+          JSON.stringify({ error: 'Lovable API key not configured' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      console.log('Calling Lovable AI for tome-chapters...');
+      
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 min timeout
+        
+        const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'google/gemini-2.5-flash',
+            messages: [
+              { role: 'system', content: 'Tu es un expert en création littéraire et planification de livres. Génère uniquement du JSON valide sans balises markdown.' },
+              { role: 'user', content: prompt }
+            ],
+          }),
+          signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        console.log('Lovable AI response status:', response.status);
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Lovable AI error:', response.status, errorText);
+          return new Response(
+            JSON.stringify({ error: `Erreur API: ${response.status}` }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        const data = await response.json();
+        console.log('Lovable AI data received');
+        const generatedContent = data.choices?.[0]?.message?.content;
+        
+        if (!generatedContent) {
+          console.error('No content in response:', JSON.stringify(data));
+          return new Response(
+            JSON.stringify({ error: 'Réponse vide de l\'IA' }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        console.log('Tome chapters generated successfully');
+        return new Response(
+          JSON.stringify({ content: generatedContent }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      } catch (err) {
+        console.error('Tome chapters error:', err);
+        const errorMessage = err.name === 'AbortError' ? 'Timeout - génération trop longue' : err.message;
+        return new Response(
+          JSON.stringify({ error: errorMessage }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
