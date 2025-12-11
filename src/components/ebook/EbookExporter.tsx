@@ -5,13 +5,34 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Download, FileText, Image, BookOpen, Printer } from 'lucide-react';
+import { Download, FileText, Image, BookOpen, Printer, Settings } from 'lucide-react';
 import { toast } from 'sonner';
 import { Chapter } from '@/hooks/useEbookGeneration';
 import jsPDF from 'jspdf';
 import { supabase } from '@/integrations/supabase/client';
 import JSZip from 'jszip';
 import { Character } from './EbookCharacters';
+import { 
+  Document, 
+  Packer, 
+  Paragraph, 
+  TextRun, 
+  HeadingLevel, 
+  AlignmentType, 
+  PageBreak,
+  Header,
+  Footer,
+  PageNumber,
+  NumberFormat,
+  TableOfContents,
+  StyleLevel,
+  convertInchesToTwip,
+  SectionType,
+  BorderStyle,
+  Tab,
+  TabStopType,
+  TabStopPosition
+} from 'docx';
 
 interface EbookExporterProps {
   ebookTitle: string;
@@ -1038,7 +1059,492 @@ ${navContent}    </ol>
     }
   };
 
-  // Escape XML special characters
+  // Export DOCX formaté KDP professionnel
+  const exportAsKdpDocx = async () => {
+    try {
+      const children: any[] = [];
+
+      // === PAGE DE TITRE ===
+      if (includeCoverPage) {
+        // Espace avant le titre
+        children.push(new Paragraph({ spacing: { before: 4000 } }));
+        
+        // Titre principal
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: ebookTitle,
+                bold: true,
+                size: 72, // 36pt
+                font: 'Georgia',
+              }),
+            ],
+            alignment: AlignmentType.CENTER,
+            spacing: { after: 400 },
+          })
+        );
+
+        // Sous-titre ou ligne décorative
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: '───────────────────',
+                size: 24,
+                color: '666666',
+              }),
+            ],
+            alignment: AlignmentType.CENTER,
+            spacing: { after: 600 },
+          })
+        );
+
+        // Nom de l'auteur
+        if (authorName) {
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: authorName,
+                  italics: true,
+                  size: 36, // 18pt
+                  font: 'Georgia',
+                }),
+              ],
+              alignment: AlignmentType.CENTER,
+              spacing: { after: 200 },
+            })
+          );
+        }
+
+        // Saut de page après couverture
+        children.push(new Paragraph({ children: [new PageBreak()] }));
+      }
+
+      // === TABLE DES MATIÈRES ===
+      if (includeTableOfContents) {
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: 'TABLE DES MATIÈRES',
+                bold: true,
+                size: 32, // 16pt
+                font: 'Georgia',
+              }),
+            ],
+            alignment: AlignmentType.CENTER,
+            spacing: { after: 600 },
+          })
+        );
+
+        // Entrées de la TDM
+        if (preface) {
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({ text: 'Préface', size: 24, font: 'Georgia' }),
+              ],
+              spacing: { after: 120 },
+            })
+          );
+        }
+
+        chapters.forEach((chapter, index) => {
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: `Chapitre ${index + 1} : ${chapter.title}`,
+                  size: 24,
+                  font: 'Georgia',
+                }),
+              ],
+              spacing: { after: 80 },
+            })
+          );
+
+          chapter.subChapters.forEach((sub, subIdx) => {
+            children.push(
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: `    ${index + 1}.${subIdx + 1} ${sub.title}`,
+                    size: 22,
+                    font: 'Georgia',
+                    color: '555555',
+                  }),
+                ],
+                spacing: { after: 60 },
+              })
+            );
+          });
+        });
+
+        if (conclusion) {
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({ text: 'Conclusion', size: 24, font: 'Georgia' }),
+              ],
+              spacing: { after: 120 },
+            })
+          );
+        }
+
+        children.push(new Paragraph({ children: [new PageBreak()] }));
+      }
+
+      // === PRÉFACE ===
+      if (preface) {
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: 'PRÉFACE',
+                bold: true,
+                size: 36,
+                font: 'Georgia',
+              }),
+            ],
+            alignment: AlignmentType.CENTER,
+            spacing: { before: 600, after: 400 },
+          })
+        );
+
+        preface.split('\n\n').forEach((para) => {
+          if (para.trim()) {
+            children.push(
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: para.trim(),
+                    size: 24, // 12pt
+                    font: 'Georgia',
+                  }),
+                ],
+                alignment: AlignmentType.JUSTIFIED,
+                spacing: { after: 240, line: 360 }, // Interligne 1.5
+                indent: { firstLine: convertInchesToTwip(0.3) },
+              })
+            );
+          }
+        });
+
+        children.push(new Paragraph({ children: [new PageBreak()] }));
+      }
+
+      // === CHAPITRES ===
+      chapters.forEach((chapter, index) => {
+        // Titre du chapitre
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: `CHAPITRE ${index + 1}`,
+                bold: true,
+                size: 28,
+                font: 'Georgia',
+                color: '666666',
+              }),
+            ],
+            alignment: AlignmentType.CENTER,
+            spacing: { before: 800, after: 200 },
+          })
+        );
+
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: chapter.title.toUpperCase(),
+                bold: true,
+                size: 36,
+                font: 'Georgia',
+              }),
+            ],
+            alignment: AlignmentType.CENTER,
+            spacing: { after: 600 },
+          })
+        );
+
+        // Contenu du chapitre
+        if (chapter.content) {
+          chapter.content.split('\n\n').forEach((para) => {
+            if (para.trim()) {
+              children.push(
+                new Paragraph({
+                  children: [
+                    new TextRun({
+                      text: para.trim(),
+                      size: 24,
+                      font: 'Georgia',
+                    }),
+                  ],
+                  alignment: AlignmentType.JUSTIFIED,
+                  spacing: { after: 240, line: 360 },
+                  indent: { firstLine: convertInchesToTwip(0.3) },
+                })
+              );
+            }
+          });
+        }
+
+        // Sous-chapitres
+        chapter.subChapters.forEach((sub, subIdx) => {
+          // Titre du sous-chapitre
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: `${index + 1}.${subIdx + 1}  ${sub.title}`,
+                  bold: true,
+                  size: 28,
+                  font: 'Georgia',
+                }),
+              ],
+              spacing: { before: 480, after: 240 },
+            })
+          );
+
+          // Contenu du sous-chapitre
+          if (sub.content) {
+            sub.content.split('\n\n').forEach((para) => {
+              if (para.trim()) {
+                children.push(
+                  new Paragraph({
+                    children: [
+                      new TextRun({
+                        text: para.trim(),
+                        size: 24,
+                        font: 'Georgia',
+                      }),
+                    ],
+                    alignment: AlignmentType.JUSTIFIED,
+                    spacing: { after: 240, line: 360 },
+                    indent: { firstLine: convertInchesToTwip(0.3) },
+                  })
+                );
+              }
+            });
+          }
+        });
+
+        // Saut de page entre chapitres
+        if (index < chapters.length - 1) {
+          children.push(new Paragraph({ children: [new PageBreak()] }));
+        }
+      });
+
+      // === CONCLUSION ===
+      if (conclusion) {
+        children.push(new Paragraph({ children: [new PageBreak()] }));
+        
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: 'CONCLUSION',
+                bold: true,
+                size: 36,
+                font: 'Georgia',
+              }),
+            ],
+            alignment: AlignmentType.CENTER,
+            spacing: { before: 600, after: 400 },
+          })
+        );
+
+        conclusion.split('\n\n').forEach((para) => {
+          if (para.trim()) {
+            children.push(
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: para.trim(),
+                    size: 24,
+                    font: 'Georgia',
+                  }),
+                ],
+                alignment: AlignmentType.JUSTIFIED,
+                spacing: { after: 240, line: 360 },
+                indent: { firstLine: convertInchesToTwip(0.3) },
+              })
+            );
+          }
+        });
+      }
+
+      // === ÉPILOGUE ===
+      if (epilogue) {
+        children.push(new Paragraph({ children: [new PageBreak()] }));
+        
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: 'ÉPILOGUE',
+                bold: true,
+                size: 36,
+                font: 'Georgia',
+              }),
+            ],
+            alignment: AlignmentType.CENTER,
+            spacing: { before: 600, after: 400 },
+          })
+        );
+
+        epilogue.split('\n\n').forEach((para) => {
+          if (para.trim()) {
+            children.push(
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: para.trim(),
+                    size: 24,
+                    font: 'Georgia',
+                  }),
+                ],
+                alignment: AlignmentType.JUSTIFIED,
+                spacing: { after: 240, line: 360 },
+                indent: { firstLine: convertInchesToTwip(0.3) },
+              })
+            );
+          }
+        });
+      }
+
+      // === LISTE DES PERSONNAGES ===
+      if (includeCharacterList && characters.length > 0) {
+        children.push(new Paragraph({ children: [new PageBreak()] }));
+        
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: 'PERSONNAGES',
+                bold: true,
+                size: 36,
+                font: 'Georgia',
+              }),
+            ],
+            alignment: AlignmentType.CENTER,
+            spacing: { before: 600, after: 400 },
+          })
+        );
+
+        characters.forEach((character) => {
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: character.name || 'Personnage',
+                  bold: true,
+                  size: 26,
+                  font: 'Georgia',
+                }),
+              ],
+              spacing: { before: 240, after: 80 },
+            })
+          );
+
+          if (character.description) {
+            children.push(
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: character.description,
+                    italics: true,
+                    size: 22,
+                    font: 'Georgia',
+                    color: '555555',
+                  }),
+                ],
+                spacing: { after: 160 },
+              })
+            );
+          }
+        });
+      }
+
+      // Créer le document avec les paramètres KDP
+      // Format 6x9 pouces (standard KDP)
+      const doc = new Document({
+        creator: authorName || 'Auteur',
+        title: ebookTitle,
+        description: `Ebook généré - ${ebookTitle}`,
+        sections: [
+          {
+            properties: {
+              page: {
+                size: {
+                  width: convertInchesToTwip(6), // 6 pouces largeur (KDP standard)
+                  height: convertInchesToTwip(9), // 9 pouces hauteur (KDP standard)
+                },
+                margin: {
+                  top: convertInchesToTwip(0.75),
+                  right: convertInchesToTwip(0.5),
+                  bottom: convertInchesToTwip(0.75),
+                  left: convertInchesToTwip(0.75), // Marge plus grande pour reliure
+                },
+              },
+            },
+            headers: {
+              default: new Header({
+                children: [
+                  new Paragraph({
+                    children: [
+                      new TextRun({
+                        text: ebookTitle,
+                        size: 18,
+                        font: 'Georgia',
+                        color: '888888',
+                      }),
+                    ],
+                    alignment: AlignmentType.CENTER,
+                  }),
+                ],
+              }),
+            },
+            footers: {
+              default: new Footer({
+                children: [
+                  new Paragraph({
+                    children: [
+                      new TextRun({
+                        children: [PageNumber.CURRENT],
+                        size: 20,
+                        font: 'Georgia',
+                      }),
+                    ],
+                    alignment: AlignmentType.CENTER,
+                  }),
+                ],
+              }),
+            },
+            children: children,
+          },
+        ],
+      });
+
+      // Générer et télécharger le fichier
+      const blob = await Packer.toBlob(doc);
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${ebookTitle || 'Mon-Ebook'}_KDP.docx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast.success('DOCX formaté KDP exporté ! Prêt pour Amazon KDP.');
+    } catch (error) {
+      console.error('Erreur export DOCX KDP:', error);
+      toast.error('Erreur lors de la génération du fichier DOCX');
+    }
+  }
   const escapeXml = (text: string): string => {
     return text
       .replace(/&/g, '&amp;')
@@ -1228,18 +1734,7 @@ Paperback: 9.99€ - 19.99€
           exportAsPDF();
           break;
         case 'docx':
-          // Export simple TXT formaté pour conversion
-          const docContent = generateEbookContent();
-          const docBlob = new Blob([docContent], { type: 'application/msword' });
-          const docUrl = URL.createObjectURL(docBlob);
-          const docLink = document.createElement('a');
-          docLink.href = docUrl;
-          docLink.download = `${ebookTitle || 'Mon-Ebook'}.doc`;
-          document.body.appendChild(docLink);
-          docLink.click();
-          document.body.removeChild(docLink);
-          URL.revokeObjectURL(docUrl);
-          toast.success('Fichier .doc créé (ouvrez-le dans Word pour le convertir en DOCX)');
+          await exportAsKdpDocx();
           break;
         case 'epub':
           await exportAsEPUB();
@@ -1299,15 +1794,32 @@ Paperback: 9.99€ - 19.99€
                 <SelectValue placeholder="Choisir un format" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="docx">📄 Word DOCX (KDP Ready - Recommandé)</SelectItem>
                 <SelectItem value="pdf">📄 PDF (Pour KDP)</SelectItem>
-                <SelectItem value="html">📄 HTML (Web)</SelectItem>
+                <SelectItem value="epub">📘 EPUB (Kindle)</SelectItem>
+                <SelectItem value="html">🌐 HTML (Web)</SelectItem>
                 <SelectItem value="txt">📝 Texte (.txt)</SelectItem>
-                <SelectItem value="docx">📄 Word (.doc)</SelectItem>
-                <SelectItem value="epub">📘 EPUB (Info uniquement)</SelectItem>
                 <SelectItem value="idml">🎨 InDesign IDML (Print Pro)</SelectItem>
               </SelectContent>
             </Select>
           </div>
+
+          {exportFormat === 'docx' && (
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 border border-green-200 dark:border-green-800 rounded-lg p-4">
+              <h4 className="font-semibold text-green-800 dark:text-green-200 mb-2 flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                Format KDP Professionnel
+              </h4>
+              <ul className="text-sm text-green-700 dark:text-green-300 space-y-1">
+                <li>✓ Format 6x9 pouces (standard KDP)</li>
+                <li>✓ Marges optimisées pour reliure</li>
+                <li>✓ Police Georgia (lisibilité)</li>
+                <li>✓ Interligne 1.5 (confort lecture)</li>
+                <li>✓ En-têtes et numérotation</li>
+                <li>✓ Table des matières formatée</li>
+              </ul>
+            </div>
+          )}
 
           <div className="space-y-3">
             <Label>Options d'export</Label>
