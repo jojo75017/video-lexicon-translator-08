@@ -42,14 +42,24 @@ serve(async (req) => {
       genre = 'non-fiction', 
       style = 'professional', 
       customPrompt = '',
-      variation = 1 
+      variation = 1,
+      // KDP specific options
+      coverType = 'front',
+      bookFormat = '6x9',
+      pageCount = 200,
+      paperType = 'white',
+      bindingType = 'paperback',
+      spineWidth = '0.45',
+      dimensions = null,
+      backCoverText = '',
+      isbn = ''
     } = await req.json();
 
-    console.log('Generating front cover:', { ebookTitle, authorName, genre, style, variation });
+    console.log('Generating cover:', { ebookTitle, authorName, genre, style, coverType, bookFormat, pageCount });
 
     if (!ebookTitle) {
       return new Response(
-        JSON.stringify({ error: 'Titre de l\'ebook requis' }),
+        JSON.stringify({ error: "Titre de l'ebook requis" }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -66,7 +76,11 @@ serve(async (req) => {
     const styleDesc = stylePrompts[style] || stylePrompts.professional;
     const genreDesc = genrePrompts[genre] || genrePrompts['non-fiction'];
 
-    const imagePrompt = `Create a stunning professional FRONT BOOK COVER for Amazon KDP publication.
+    let imagePrompt = '';
+
+    if (coverType === 'full') {
+      // Full cover (front + spine + back)
+      imagePrompt = `Create a COMPLETE BOOK COVER for Amazon KDP print publication. This must include FRONT COVER, SPINE, and BACK COVER in a single horizontal image.
 
 BOOK DETAILS:
 - Title: "${ebookTitle}"
@@ -74,18 +88,71 @@ BOOK DETAILS:
 ${subtitle ? `- Subtitle: "${subtitle}"` : ''}
 - Genre: ${genreDesc}
 - Style: ${styleDesc}
+- Binding: ${bindingType === 'paperback' ? 'Paperback' : 'Hardcover'}
+
+TECHNICAL SPECIFICATIONS (CRITICAL):
+- This is a FULL WRAP-AROUND COVER layout
+- Image must be LANDSCAPE/HORIZONTAL orientation
+- Layout from LEFT to RIGHT: BACK COVER | SPINE | FRONT COVER
+- Spine width: ${spineWidth} inches (based on ${pageCount} pages on ${paperType} paper)
+- Book format: ${bookFormat}
+${dimensions ? `- Total dimensions: approximately ${dimensions.totalWidthIn}" x ${dimensions.heightIn}"` : ''}
+
+FRONT COVER (RIGHT SIDE):
+1. TITLE "${ebookTitle}" - Large, prominent, clearly readable
+2. Author name "${authorName}" - At bottom, smaller but visible
+${subtitle ? `3. Subtitle "${subtitle}" - Below title` : ''}
+4. Compelling visual illustration for the ${genre} genre
+
+SPINE (CENTER - NARROW VERTICAL STRIP):
+1. Title "${ebookTitle}" - Rotated vertically, readable from bottom to top
+2. Author name "${authorName}" - At bottom of spine
+3. Small decorative element or publisher logo area
+4. Width proportional to ${pageCount} pages
+
+BACK COVER (LEFT SIDE):
+${backCoverText ? `1. Marketing text/synopsis: "${backCoverText.substring(0, 300)}"` : '1. Space for marketing copy/synopsis'}
+2. Author bio area
+${isbn ? `3. ISBN barcode area: ${isbn}` : '3. Space for ISBN barcode (bottom right)'}
+4. Price area (bottom)
 
 DESIGN REQUIREMENTS:
-1. TITLE must be prominently displayed, large and clearly readable
-2. AUTHOR NAME at the bottom, smaller but visible
-${subtitle ? '3. SUBTITLE below the main title, medium size' : ''}
-4. Create a compelling visual illustration that represents the book's theme
+- Seamless design that flows across all three sections
+- Professional ${style} aesthetic throughout
+- Consistent color palette and typography
+- Full bleed design - NO white borders
+- The spine must be clearly visible but naturally integrated
+- Background/imagery should wrap smoothly from back to front
+
+${customPrompt ? `ADDITIONAL CUSTOMIZATION: ${customPrompt}` : ''}
+
+VARIATION ${variation}: Create a unique version while maintaining the layout structure.
+
+This MUST look like a REAL, PRINT-READY Amazon KDP book cover.`;
+
+    } else {
+      // Front cover only
+      imagePrompt = `Create a stunning professional FRONT BOOK COVER for Amazon KDP publication.
+
+BOOK DETAILS:
+- Title: "${ebookTitle}"
+- Author: "${authorName}"
+${subtitle ? `- Subtitle: "${subtitle}"` : ''}
+- Genre: ${genreDesc}
+- Style: ${styleDesc}
+- Book format: ${bookFormat}
+
+DESIGN REQUIREMENTS:
+1. TITLE "${ebookTitle}" must be prominently displayed, large and clearly readable
+2. AUTHOR NAME "${authorName}" at the bottom, smaller but visible
+${subtitle ? `3. SUBTITLE "${subtitle}" below the main title, medium size` : ''}
+4. Create a compelling visual illustration that represents the book theme
 5. Use appropriate color palette for the ${genre} genre
 6. Professional typography that fits the ${style} style
 7. High-quality book cover composition
 
 TECHNICAL SPECIFICATIONS:
-- Portrait format 2:3 ratio (book cover standard)
+- Portrait format (book cover standard ratio 2:3)
 - Full bleed design - NO white borders
 - Clear visual hierarchy: Image > Title > Subtitle > Author
 - Text must be integrated naturally into the design
@@ -96,6 +163,7 @@ ${customPrompt ? `ADDITIONAL CUSTOMIZATION: ${customPrompt}` : ''}
 VARIATION ${variation}: Make this unique while maintaining the core design principles.
 
 This must look like a REAL publishable book cover that would sell on Amazon.`;
+    }
 
     console.log('Calling Lovable AI for image generation...');
 
@@ -145,10 +213,14 @@ This must look like a REAL publishable book cover that would sell on Amazon.`;
       throw new Error('Aucune image générée dans la réponse');
     }
 
-    console.log('Front cover generated successfully');
+    console.log('Cover generated successfully, type:', coverType);
     
     return new Response(
-      JSON.stringify({ imageUrl }),
+      JSON.stringify({ 
+        imageUrl,
+        coverType,
+        dimensions: dimensions || null
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
