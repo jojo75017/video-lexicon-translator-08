@@ -1063,6 +1063,14 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
           <EbookAiChat />
         );
       
+      case 'characters':
+        return (
+          <EbookCharacters
+            characters={characters}
+            onUpdateCharacters={setCharacters}
+          />
+        );
+      
       case 'backcover':
         return (
           <EbookBackCoverGenerator
