@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Image, Sparkles, Download, Copy, Check, Settings, Trash2, FileArchive } from 'lucide-react';
+import { Image, Sparkles, Download, Copy, Check, Settings, Trash2, FileArchive, FolderOpen } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { type Character } from './EbookCharacters';
@@ -168,6 +168,44 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
     }
   }, [generatedImages, onImagesUpdate]);
 
+  // Auto-save image to library storage
+  const saveImageToLibrary = async (imageUrl: string, chapterTitle: string) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        console.log('❌ Utilisateur non connecté - sauvegarde bibliothèque ignorée');
+        return;
+      }
+
+      // Create folder name from ebook title (sanitize)
+      const folderName = ebookTitle.replace(/[^a-zA-Z0-9À-ÿ\s-]/g, '').trim().replace(/\s+/g, '-').substring(0, 50) || 'Sans-titre';
+      
+      // Create unique filename
+      const timestamp = Date.now();
+      const safeName = chapterTitle.replace(/[^a-zA-Z0-9À-ÿ\s-]/g, '').trim().replace(/\s+/g, '-').substring(0, 30);
+      const fileName = `${timestamp}-${safeName}.png`;
+      const filePath = `${user.id}/${folderName}/${fileName}`;
+
+      // Fetch image and convert to blob
+      const response = await fetch(imageUrl);
+      if (!response.ok) throw new Error('Impossible de télécharger l\'image');
+      const blob = await response.blob();
+
+      // Upload to storage
+      const { error } = await supabase.storage
+        .from('ebook-images')
+        .upload(filePath, blob, { contentType: 'image/png' });
+
+      if (error && !error.message.includes('already exists')) {
+        console.error('❌ Erreur upload bibliothèque:', error);
+      } else {
+        console.log(`✅ Image sauvegardée dans la bibliothèque: ${folderName}/${fileName}`);
+      }
+    } catch (error) {
+      console.error('❌ Erreur sauvegarde bibliothèque:', error);
+    }
+  };
+
   const generateAllChapterImages = async () => {
     if (!ebookTitle || chapters.length === 0) {
       toast.error('Titre et chapitres requis');
@@ -234,7 +272,8 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
               imageUrl: data.imageUrl,
               style: imageStyle
             });
-            // Toast supprimé - génération silencieuse
+            // Auto-save to library
+            saveImageToLibrary(data.imageUrl, chapter.title);
             success = true;
           } else {
             throw new Error('Pas d\'URL d\'image dans la réponse');
@@ -373,7 +412,8 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
           return [...filtered, newImage];
         });
 
-        // Toast supprimé - génération silencieuse
+        // Auto-save to library
+        saveImageToLibrary(data.imageUrl, chapter.title);
       } else {
         throw new Error('Pas d\'URL d\'image dans la réponse');
       }
@@ -461,6 +501,36 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
     }
     toast.success(`🧹 Cache vidé: ${count} projet(s) nettoyé(s)`, {
       description: 'Tout le cache local a été supprimé'
+    });
+  };
+
+  // Sync existing images to library
+  const syncImagesToLibrary = async () => {
+    if (generatedImages.length === 0) {
+      toast.error('Aucune image à synchroniser');
+      return;
+    }
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast.error('Connectez-vous pour utiliser la bibliothèque');
+      return;
+    }
+
+    toast.info(`📤 Synchronisation de ${generatedImages.length} image(s)...`);
+    let successCount = 0;
+
+    for (const img of generatedImages) {
+      try {
+        await saveImageToLibrary(img.imageUrl, img.chapterTitle);
+        successCount++;
+      } catch (e) {
+        console.error('Erreur sync image:', e);
+      }
+    }
+
+    toast.success(`✅ ${successCount}/${generatedImages.length} image(s) synchronisée(s)`, {
+      description: `Dossier: ${ebookTitle}`
     });
   };
 
@@ -718,6 +788,15 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
               Images générées ({generatedImages.length})
             </h3>
             <div className="flex gap-2">
+              <Button
+                onClick={syncImagesToLibrary}
+                variant="outline"
+                size="sm"
+                className="text-emerald-600 hover:bg-emerald-50"
+              >
+                <FolderOpen className="h-4 w-4 mr-2" />
+                Sync bibliothèque
+              </Button>
               <Button
                 onClick={exportAllImagesToZip}
                 variant="outline"
