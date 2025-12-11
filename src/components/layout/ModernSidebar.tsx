@@ -19,7 +19,7 @@ import {
   ImagePlus,
   Bot,
   BookCopy,
-  History,
+  
   LayoutTemplate,
   FileEdit,
   Handshake,
@@ -210,14 +210,6 @@ const menuItems = [
     color: 'text-slate-500',
     bgColor: 'bg-slate-500/10',
     activeGradient: 'from-slate-500 to-gray-500'
-  },
-  { 
-    id: 'versions', 
-    label: 'Historique', 
-    icon: History,
-    color: 'text-yellow-500',
-    bgColor: 'bg-yellow-500/10',
-    activeGradient: 'from-yellow-500 to-amber-500'
   },
   { 
     id: 'export', 

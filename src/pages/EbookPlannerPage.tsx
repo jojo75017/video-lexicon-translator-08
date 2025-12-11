@@ -49,7 +49,7 @@ import { EbookBackCoverGenerator } from '@/components/ebook/EbookBackCoverGenera
 import { EbookCharacters, type Character } from '@/components/ebook/EbookCharacters';
 import { EbookProjectsList } from '@/components/ebook/EbookProjectsList';
 import { EbookAiChat } from '@/components/ebook/EbookAiChat';
-import { EbookVersionHistory } from '@/components/ebook/EbookVersionHistory';
+
 import { EbookStatisticsTools } from '@/components/ebook/EbookStatisticsTools';
 import { EbookVoiceDictation } from '@/components/ebook/EbookVoiceDictation';
 import { EbookSeriesManager } from '@/components/ebook/EbookSeriesManager';
@@ -1082,28 +1082,6 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
             isGenerating={isGenerating}
             onGenerate={async (tone, audience, highlights) => {
               return await generateBackCover(ebookTitle, authorName, chapters, tone, audience, highlights);
-            }}
-          />
-        );
-      
-      case 'versions':
-        return (
-          <EbookVersionHistory
-            projectId={currentProjectId || ''}
-            onRestore={async (versionId) => {
-              await restoreVersion(versionId);
-            }}
-            loadVersions={loadVersions}
-            onSaveVersion={async () => {
-              if (currentProjectId) {
-                await saveVersion(currentProjectId, {
-                  title: ebookTitle,
-                  author_name: authorName,
-                  chapters,
-                  preface,
-                  conclusion
-                });
-              }
             }}
           />
         );
