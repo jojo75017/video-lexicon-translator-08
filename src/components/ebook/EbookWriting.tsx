@@ -24,6 +24,7 @@ interface EbookWritingProps {
   onUpdateChapterContent: (chapterId: string, content: string) => void;
   onUpdateSubChapterContent: (chapterId: string, subChapterId: string, content: string) => void;
   ebookTitle?: string;
+  targetWordsPerChapter?: number;
 }
 
 // Fonction de rendu du texte avec style (identique au planificateur)
@@ -82,7 +83,8 @@ export const EbookWriting: React.FC<EbookWritingProps> = ({
   chapters,
   onUpdateChapterContent,
   onUpdateSubChapterContent,
-  ebookTitle = 'Mon Ebook'
+  ebookTitle = 'Mon Ebook',
+  targetWordsPerChapter = 2500
 }) => {
   const [chapterImages, setChapterImages] = useState<Record<string, ChapterImage[]>>({});
   const [imageUrl, setImageUrl] = useState('');
@@ -339,24 +341,43 @@ export const EbookWriting: React.FC<EbookWritingProps> = ({
                     </div>
                   )}
                   
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <span>
-                      Mots: {chapter.content ? chapter.content.split(/\s+/).filter(word => word.length > 0).length : 0}
-                    </span>
-                    <span>•</span>
-                    <span>
-                      Caractères: {chapter.content ? chapter.content.length : 0}
-                    </span>
-                    {chapterImages[chapter.id]?.length > 0 && (
-                      <>
-                        <span>•</span>
-                        <span className="flex items-center gap-1">
-                          <ImageIcon className="w-3 h-3" />
-                          {chapterImages[chapter.id].length} image{chapterImages[chapter.id].length > 1 ? 's' : ''}
-                        </span>
-                      </>
-                    )}
-                  </div>
+                  {/* Word count progress indicator */}
+                  {(() => {
+                    const wordCount = chapter.content ? chapter.content.split(/\s+/).filter(word => word.length > 0).length : 0;
+                    const targetWords = targetWordsPerChapter;
+                    const progress = Math.min((wordCount / targetWords) * 100, 100);
+                    const isComplete = wordCount >= targetWords;
+                    
+                    return (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className={`font-medium ${isComplete ? 'text-green-600' : 'text-muted-foreground'}`}>
+                            {wordCount.toLocaleString()} / {targetWords.toLocaleString()} mots
+                            {isComplete && ' ✓'}
+                          </span>
+                          <span className="text-muted-foreground text-xs">
+                            ~{Math.round(wordCount / 250)} pages • {chapter.content ? chapter.content.length.toLocaleString() : 0} caractères
+                          </span>
+                        </div>
+                        <div className="h-2 bg-muted rounded-full overflow-hidden">
+                          <div 
+                            className={`h-full transition-all duration-300 ${
+                              isComplete ? 'bg-green-500' : 
+                              progress >= 75 ? 'bg-yellow-500' : 
+                              progress >= 50 ? 'bg-orange-500' : 'bg-red-500'
+                            }`}
+                            style={{ width: `${progress}%` }}
+                          />
+                        </div>
+                        {chapterImages[chapter.id]?.length > 0 && (
+                          <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                            <ImageIcon className="w-3 h-3" />
+                            {chapterImages[chapter.id].length} image{chapterImages[chapter.id].length > 1 ? 's' : ''}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })()}
 
                   {renderContentWithImages(chapter.content || '', chapter.id)}
 

@@ -106,6 +106,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   const [chapters, setChapters] = useState<Chapter[]>(savedData?.chapters || []);
   const [characters, setCharacters] = useState<EbookCharacter[]>(savedData?.characters || []);
   const [numberOfChapters, setNumberOfChapters] = useState(savedData?.numberOfChapters || 8);
+  const [targetWordsPerChapter, setTargetWordsPerChapter] = useState(savedData?.targetWordsPerChapter || 2500);
   const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
   const [importText, setImportText] = useState('');
   const [ebookImages, setEbookImages] = useState<Array<{url: string, title: string, chapterIndex?: number}>>(savedData?.ebookImages || []);
@@ -154,7 +155,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
     const dataToSave = {
       apiKey, ebookTitle, authorName, targetAudience, tomeNumber, writingStyle,
       chapterLength, detailLevel, tone, narrativeFormat, preface, conclusion, epilogue,
-      chapters, numberOfChapters, ebookImages, characters, lastSaved: new Date().toISOString()
+      chapters, numberOfChapters, targetWordsPerChapter, ebookImages, characters, lastSaved: new Date().toISOString()
     };
     
     try {
@@ -797,6 +798,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
             chapters={chapters}
             onUpdateChapterContent={updateChapterContent}
             onUpdateSubChapterContent={updateSubChapterContent}
+            targetWordsPerChapter={targetWordsPerChapter}
           />
         );
       
@@ -1154,8 +1156,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
               setPreface(data.preface);
               setConclusion(data.conclusion);
               setChapters(data.chapters);
+              setTargetWordsPerChapter(data.targetWordsPerChapter);
               setActiveTab('planner');
-              toast.success(`"${data.title}" importé avec ${data.chapters.length} chapitres !`);
+              toast.success(`"${data.title}" importé avec ${data.chapters.length} chapitres ! (~${data.targetWordsPerChapter.toLocaleString()} mots/chapitre)`);
             }}
           />
         );
