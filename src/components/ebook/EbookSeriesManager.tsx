@@ -92,7 +92,9 @@ interface CoherenceIssue {
 
 interface SeriesBible {
   seriesTitle: string;
-  genre: string;
+  authorName: string;
+  genres: string[];
+  ageCategory: 'children' | 'young-adult' | 'adult' | 'all-ages';
   totalTomes: number;
   synopsis: string;
   themes: string[];
@@ -135,7 +137,9 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
   const [showSavedSeries, setShowSavedSeries] = useState(false);
   const [seriesBible, setSeriesBible] = useState<SeriesBible>({
     seriesTitle: '',
-    genre: '',
+    authorName: '',
+    genres: [],
+    ageCategory: 'adult',
     totalTomes: 3,
     synopsis: '',
     themes: [],
@@ -146,6 +150,7 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
     writingRules: '',
     plotThreads: []
   });
+  const [newGenre, setNewGenre] = useState('');
 
   const [newTheme, setNewTheme] = useState('');
   const [activeTab, setActiveTab] = useState('overview');
@@ -190,7 +195,7 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
       const seriesData = {
         user_id: user.id,
         title: seriesBible.seriesTitle,
-        genre: seriesBible.genre || null,
+        genre: seriesBible.genres.join(', ') || null,
         total_tomes: seriesBible.totalTomes,
         main_themes: JSON.parse(JSON.stringify(seriesBible.themes)),
         characters: JSON.parse(JSON.stringify(seriesBible.characters)),
@@ -242,9 +247,21 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
 
       if (error) throw error;
 
+      // Parse genre - support both old string format and new array format
+      let genres: string[] = [];
+      if (data.genre) {
+        if (Array.isArray(data.genre)) {
+          genres = data.genre;
+        } else if (typeof data.genre === 'string') {
+          genres = data.genre.split(',').map((g: string) => g.trim()).filter(Boolean);
+        }
+      }
+      
       setSeriesBible({
         seriesTitle: data.title,
-        genre: data.genre || '',
+        authorName: (data as any).author_name || '',
+        genres,
+        ageCategory: (data as any).age_category || 'adult',
         totalTomes: data.total_tomes || 3,
         synopsis: data.narrative_style || '',
         themes: (data.main_themes as unknown as string[]) || [],
@@ -281,7 +298,9 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
         setCurrentSeriesId(null);
         setSeriesBible({
           seriesTitle: '',
-          genre: '',
+          authorName: '',
+          genres: [],
+          ageCategory: 'adult',
           totalTomes: 3,
           synopsis: '',
           themes: [],
@@ -306,7 +325,9 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
     setCurrentSeriesId(null);
     setSeriesBible({
       seriesTitle: '',
-      genre: '',
+      authorName: '',
+      genres: [],
+      ageCategory: 'adult',
       totalTomes: 3,
       synopsis: '',
       themes: [],
@@ -415,7 +436,8 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
         body: {
           type: 'series-bible',
           prompt: `Crée une bible COMPLÈTE et COHÉRENTE pour une série de ${seriesBible.totalTomes} tomes intitulée "${seriesBible.seriesTitle}".
-          Genre: ${seriesBible.genre || 'à déterminer selon le titre'}
+          Genre: ${seriesBible.genres.length > 0 ? seriesBible.genres.join(', ') : 'à déterminer selon le titre'}
+          Public cible: ${seriesBible.ageCategory === 'children' ? 'Enfants' : seriesBible.ageCategory === 'young-adult' ? 'Jeunes adultes' : seriesBible.ageCategory === 'all-ages' ? 'Tous publics' : 'Adultes'}
           
           IMPORTANT: Assure une cohérence parfaite entre les tomes avec:
           - Des arcs narratifs progressifs pour chaque personnage
@@ -620,10 +642,11 @@ ${parsedData.characterDevelopments?.map((d: any) => `- ${d.character}: ${d.devel
           seriesTitle: seriesBible.seriesTitle,
           tomeNumber: tomeNumber === 0 ? null : tomeNumber,
           tomeTitle: tomeTitle || (tomeNumber === 0 ? null : `Tome ${tomeNumber}`),
-          genre: seriesBible.genre || 'fiction',
+          genre: seriesBible.genres.length > 0 ? seriesBible.genres.join(', ') : 'fiction',
+          ageCategory: seriesBible.ageCategory,
           synopsis: seriesBible.synopsis?.substring(0, 300),
           style: coverStyle,
-          authorName: ''
+          authorName: seriesBible.authorName
         }
       });
 
@@ -702,10 +725,11 @@ ${parsedData.characterDevelopments?.map((d: any) => `- ${d.character}: ${d.devel
         seriesTitle: seriesBible.seriesTitle,
         tomeNumber: tomeNumber === 0 ? null : tomeNumber,
         tomeTitle: tomeTitle || (tomeNumber === 0 ? null : `Tome ${tomeNumber}`),
-        genre: seriesBible.genre || 'fiction',
+        genre: seriesBible.genres.length > 0 ? seriesBible.genres.join(', ') : 'fiction',
+        ageCategory: seriesBible.ageCategory,
         synopsis: seriesBible.synopsis?.substring(0, 300),
         style: coverStyle,
-        authorName: ''
+        authorName: seriesBible.authorName
       }
     });
 
@@ -968,7 +992,7 @@ ${seriesBible.writingRules}
             )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label>Titre de la série</Label>
               <Input
@@ -978,12 +1002,79 @@ ${seriesBible.writingRules}
               />
             </div>
             <div>
-              <Label>Genre</Label>
+              <Label>Nom de l'auteur</Label>
               <Input
-                value={seriesBible.genre}
-                onChange={(e) => setSeriesBible(prev => ({ ...prev, genre: e.target.value }))}
-                placeholder="Ex: Fantasy, Science-Fiction..."
+                value={seriesBible.authorName}
+                onChange={(e) => setSeriesBible(prev => ({ ...prev, authorName: e.target.value }))}
+                placeholder="Ex: Marie Dupont"
               />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <Label>Genres (cliquez pour ajouter)</Label>
+              <div className="flex flex-wrap gap-1 mb-2 min-h-[32px]">
+                {seriesBible.genres.map((genre, index) => (
+                  <Badge
+                    key={index}
+                    variant="secondary"
+                    className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground"
+                    onClick={() => setSeriesBible(prev => ({ ...prev, genres: prev.genres.filter((_, i) => i !== index) }))}
+                  >
+                    {genre} ×
+                  </Badge>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <Select 
+                  value="" 
+                  onValueChange={(value) => {
+                    if (value && !seriesBible.genres.includes(value)) {
+                      setSeriesBible(prev => ({ ...prev, genres: [...prev.genres, value] }));
+                    }
+                  }}
+                >
+                  <SelectTrigger className="flex-1">
+                    <SelectValue placeholder="Ajouter un genre..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Fantasy">Fantasy</SelectItem>
+                    <SelectItem value="Science-Fiction">Science-Fiction</SelectItem>
+                    <SelectItem value="Romance">Romance</SelectItem>
+                    <SelectItem value="Thriller">Thriller</SelectItem>
+                    <SelectItem value="Policier">Policier</SelectItem>
+                    <SelectItem value="Horreur">Horreur</SelectItem>
+                    <SelectItem value="Aventure">Aventure</SelectItem>
+                    <SelectItem value="Historique">Historique</SelectItem>
+                    <SelectItem value="Contemporain">Contemporain</SelectItem>
+                    <SelectItem value="Dystopie">Dystopie</SelectItem>
+                    <SelectItem value="Urban Fantasy">Urban Fantasy</SelectItem>
+                    <SelectItem value="Paranormal">Paranormal</SelectItem>
+                    <SelectItem value="Comédie">Comédie</SelectItem>
+                    <SelectItem value="Drame">Drame</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div>
+              <Label>Public cible</Label>
+              <Select 
+                value={seriesBible.ageCategory} 
+                onValueChange={(value: 'children' | 'young-adult' | 'adult' | 'all-ages') => 
+                  setSeriesBible(prev => ({ ...prev, ageCategory: value }))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="children">Enfants (6-12 ans)</SelectItem>
+                  <SelectItem value="young-adult">Jeunes adultes (12-18 ans)</SelectItem>
+                  <SelectItem value="adult">Adultes (18+)</SelectItem>
+                  <SelectItem value="all-ages">Tous publics</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label>Nombre de tomes</Label>
