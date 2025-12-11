@@ -11,6 +11,7 @@ import { Chapter } from '@/hooks/useEbookGeneration';
 import { toast } from 'sonner';
 import EbookImageBank from './EbookImageBank';
 import { EbookFormattingToolbar } from './EbookFormattingToolbar';
+import { EbookImageLibrary } from './EbookImageLibrary';
 
 interface ChapterImage {
   id: string;
@@ -292,11 +293,18 @@ export const EbookWriting: React.FC<EbookWritingProps> = ({
                         <DialogHeader>
                           <DialogTitle>Ajouter une image au chapitre</DialogTitle>
                         </DialogHeader>
-                        <Tabs defaultValue="ai" className="w-full">
-                          <TabsList className="grid w-full grid-cols-2">
-                            <TabsTrigger value="ai">Générer avec IA</TabsTrigger>
-                            <TabsTrigger value="url">URL manuelle</TabsTrigger>
+                        <Tabs defaultValue="library" className="w-full">
+                          <TabsList className="grid w-full grid-cols-3">
+                            <TabsTrigger value="library">📚 Bibliothèque</TabsTrigger>
+                            <TabsTrigger value="ai">🤖 Générer IA</TabsTrigger>
+                            <TabsTrigger value="url">🔗 URL</TabsTrigger>
                           </TabsList>
+                          <TabsContent value="library" className="mt-4">
+                            <EbookImageLibrary
+                              ebookTitle={ebookTitle}
+                              onImageSelect={(url) => handleImageSelect(url, 'Image de la bibliothèque')}
+                            />
+                          </TabsContent>
                           <TabsContent value="ai" className="mt-4">
                             <EbookImageBank
                               onImageSelect={handleImageSelect}
