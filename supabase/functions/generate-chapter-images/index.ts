@@ -6,7 +6,43 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-async function generateWithOpenAI(chapterTitle: string, chapterContent: string, ebookTitle: string, style: string, characters: any[], apiKey: string) {
+// Mapping des ratios vers les tailles
+const RATIO_SIZES: Record<string, { openai: string; lovable: string }> = {
+  'square': { openai: '1024x1024', lovable: '1024x1024' },
+  'landscape': { openai: '1792x1024', lovable: '1792x1024' },
+  'portrait': { openai: '1024x1792', lovable: '1024x1792' },
+  'wide': { openai: '1792x1024', lovable: '1536x768' },
+};
+
+// Mapping des qualités
+const QUALITY_MAP: Record<string, { openai: string; description: string }> = {
+  'standard': { openai: 'standard', description: 'bonne qualité' },
+  'high': { openai: 'hd', description: 'haute qualité avec détails fins' },
+  'ultra': { openai: 'hd', description: 'ultra haute définition, maximum de détails et netteté' },
+};
+
+// Mapping des palettes de couleurs
+const COLOR_SCHEME_PROMPTS: Record<string, string> = {
+  'auto': '',
+  'vibrant': 'Utiliser une palette de couleurs vives, saturées et énergiques.',
+  'muted': 'Utiliser des tons doux, pastel et subtils.',
+  'monochrome': 'Utiliser des nuances monochromatiques d\'une seule couleur.',
+  'warm': 'Utiliser des tons chauds: oranges, rouges, dorés, ambrés.',
+  'cool': 'Utiliser des tons froids: bleus, verts, cyans, argentés.',
+  'sepia': 'Appliquer un effet sépia vintage avec des tons bruns et beiges.',
+};
+
+async function generateWithOpenAI(
+  chapterTitle: string, 
+  chapterContent: string, 
+  ebookTitle: string, 
+  style: string, 
+  characters: any[], 
+  apiKey: string,
+  ratio: string = 'square',
+  quality: string = 'high',
+  colorScheme: string = 'auto'
+) {
   let charactersContext = '';
   if (characters && characters.length > 0) {
     charactersContext = '\n\nIMPORTANT - Personnages principaux de l\'histoire (à représenter de manière STRICTEMENT cohérente):\n';
@@ -23,12 +59,18 @@ async function generateWithOpenAI(chapterTitle: string, chapterContent: string, 
     charactersContext += '\n⚠️ RÈGLE ABSOLUE: Les mêmes personnages doivent avoir EXACTEMENT la même apparence physique, les mêmes vêtements, la même coiffure dans chaque image de l\'ebook. Continuité visuelle OBLIGATOIRE.';
   }
 
+  const colorPrompt = COLOR_SCHEME_PROMPTS[colorScheme] || '';
+  const qualityDesc = QUALITY_MAP[quality]?.description || QUALITY_MAP['high'].description;
+  const size = RATIO_SIZES[ratio]?.openai || '1024x1024';
+
   const imagePrompt = `Contexte de l'ebook: "${ebookTitle}"
 Chapitre à illustrer: "${chapterTitle}"
 ${chapterContent ? `Résumé du chapitre: ${chapterContent.substring(0, 300)}...` : ''}
 ${charactersContext}
 
 Style artistique demandé: ${style}
+Qualité: ${qualityDesc}
+${colorPrompt ? `Palette de couleurs: ${colorPrompt}` : ''}
 
 Instructions de génération:
 - Créer une illustration de haute qualité adaptée à un ebook professionnel
@@ -44,17 +86,14 @@ Instructions de génération:
       model,
       prompt: imagePrompt,
       n: 1,
-      size: '1024x1024',
-      response_format: 'b64_json', // Toujours demander le format base64
+      size,
+      response_format: 'b64_json',
     };
 
-    // Adapter les paramètres selon le modèle pour éviter les erreurs d'API
     if (model === 'gpt-image-1') {
-      // gpt-image-1 : qualité textuelle "high" supportée
-      payload.quality = 'high';
+      payload.quality = quality === 'standard' ? 'medium' : 'high';
     } else if (model === 'dall-e-3') {
-      // dall-e-3 : qualité "hd" ou "standard"
-      payload.quality = 'hd';
+      payload.quality = QUALITY_MAP[quality]?.openai || 'hd';
     }
 
     const resp = await fetch('https://api.openai.com/v1/images/generations', {
@@ -122,7 +161,20 @@ serve(async (req) => {
   }
 
   try {
-    const { chapterTitle, chapterContent, ebookTitle, style = "professional illustration", characters = [], useOpenAI = false, openaiApiKey, disableOpenAIFallback = false, forceLovable = false } = await req.json();
+    const { 
+      chapterTitle, 
+      chapterContent, 
+      ebookTitle, 
+      style = "professional illustration", 
+      ratio = "square",
+      quality = "high",
+      colorScheme = "auto",
+      characters = [], 
+      useOpenAI = false, 
+      openaiApiKey, 
+      disableOpenAIFallback = false, 
+      forceLovable = false 
+    } = await req.json();
     
     if (!chapterTitle) {
       return new Response(
@@ -140,7 +192,10 @@ serve(async (req) => {
           ebookTitle,
           style,
           characters,
-          openaiApiKey
+          openaiApiKey,
+          ratio,
+          quality,
+          colorScheme
         );
       } catch (err) {
         console.error('OpenAI image generation failed (no Lovable fallback when clé perso utilisée):', err);
@@ -178,12 +233,17 @@ serve(async (req) => {
     }
 
     // Créer un prompt optimisé pour l'image du chapitre
+    const colorPrompt = COLOR_SCHEME_PROMPTS[colorScheme] || '';
+    const qualityDesc = QUALITY_MAP[quality]?.description || QUALITY_MAP['high'].description;
+
     const imagePrompt = `Contexte de l'ebook: "${ebookTitle}"
 Chapitre à illustrer: "${chapterTitle}"
 ${chapterContent ? `Résumé du chapitre: ${chapterContent.substring(0, 300)}...` : ''}
 ${charactersContext}
 
 Style artistique demandé: ${style}
+Qualité: ${qualityDesc}
+${colorPrompt ? `Palette de couleurs: ${colorPrompt}` : ''}
 
 Instructions de génération:
 - Créer une illustration de haute qualité adaptée à un ebook professionnel
@@ -221,7 +281,7 @@ Instructions de génération:
           if (FALLBACK_OPENAI_KEY) {
             console.log('Lovable AI error, attempting automatic fallback to OpenAI using', ENV_OPENAI_API_KEY ? 'env' : 'client', 'key...');
             try {
-              return await generateWithOpenAI(chapterTitle, chapterContent, ebookTitle, style, characters, FALLBACK_OPENAI_KEY);
+              return await generateWithOpenAI(chapterTitle, chapterContent, ebookTitle, style, characters, FALLBACK_OPENAI_KEY, ratio, quality, colorScheme);
             } catch (openaiErr) {
               console.error('OpenAI fallback failed:', openaiErr);
               // Continuer vers l'erreur d'origine si le fallback échoue
