@@ -11,6 +11,7 @@ import { Chapter } from '@/hooks/useEbookGeneration';
 import jsPDF from 'jspdf';
 import { supabase } from '@/integrations/supabase/client';
 import JSZip from 'jszip';
+import { Character } from './EbookCharacters';
 
 interface EbookExporterProps {
   ebookTitle: string;
@@ -19,6 +20,7 @@ interface EbookExporterProps {
   conclusion: string;
   epilogue?: string;
   chapters: Chapter[];
+  characters?: Character[];
 }
 
 export const EbookExporter: React.FC<EbookExporterProps> = ({
@@ -27,7 +29,8 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
   preface,
   conclusion,
   epilogue,
-  chapters
+  chapters,
+  characters = []
 }) => {
   const [exportFormat, setExportFormat] = useState<'pdf' | 'docx' | 'txt' | 'html' | 'epub' | 'googledocs' | 'idml'>('pdf');
   const [includeTableOfContents, setIncludeTableOfContents] = useState(true);
@@ -35,6 +38,7 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
   const [includeCoverPage, setIncludeCoverPage] = useState(true);
   const [isExporting, setIsExporting] = useState(false);
   const [generateKdpMetadata, setGenerateKdpMetadata] = useState(false);
+  const [includeCharacterList, setIncludeCharacterList] = useState(true);
 
   const generateEbookContent = () => {
     let content = '';
@@ -333,6 +337,46 @@ export const EbookExporter: React.FC<EbookExporterProps> = ({
         checkPageBreak(6);
         pdf.text(line, marginLeft, yPosition);
         yPosition += 6;
+      });
+    }
+
+    // Liste des personnages (Dramatis Personae)
+    if (includeCharacterList && characters.length > 0) {
+      pdf.addPage();
+      yPosition = 20;
+      
+      pdf.setFontSize(18);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('PERSONNAGES', marginLeft, yPosition);
+      yPosition += 15;
+      
+      pdf.setFontSize(11);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text('Liste des personnages et leurs rôles dans cette histoire', marginLeft, yPosition);
+      yPosition += 20;
+
+      characters.forEach((character) => {
+        checkPageBreak(40);
+        
+        // Nom du personnage
+        pdf.setFontSize(13);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(character.name || 'Personnage sans nom', marginLeft, yPosition);
+        yPosition += 8;
+        
+        // Description/Rôle
+        if (character.description) {
+          pdf.setFontSize(11);
+          pdf.setFont('helvetica', 'italic');
+          const descLines = splitTextToSize(character.description, pageWidth, 11);
+          descLines.forEach((line: string) => {
+            checkPageBreak(6);
+            pdf.text(line, marginLeft, yPosition);
+            yPosition += 6;
+          });
+        }
+        
+        yPosition += 10;
       });
     }
 
@@ -1302,6 +1346,18 @@ Paperback: 9.99€ - 19.99€
                 onCheckedChange={(checked) => setGenerateKdpMetadata(checked === true)}
               />
               <Label htmlFor="kdp-metadata">Générer fichier métadonnées KDP</Label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="character-list"
+                checked={includeCharacterList}
+                onCheckedChange={(checked) => setIncludeCharacterList(checked === true)}
+                disabled={characters.length === 0}
+              />
+              <Label htmlFor="character-list" className={characters.length === 0 ? 'text-muted-foreground' : ''}>
+                Inclure la liste des personnages ({characters.length})
+              </Label>
             </div>
           </div>
 
