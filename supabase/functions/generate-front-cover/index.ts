@@ -130,8 +130,7 @@ SPINE (CENTER - NARROW VERTICAL STRIP):
 BACK COVER (LEFT SIDE):
 ${backCoverText ? `1. Marketing text/synopsis: "${backCoverText.substring(0, 300)}"` : '1. Space for marketing copy/synopsis'}
 2. Author bio area
-3. Leave empty white rectangle area (bottom right) for ISBN barcode - will be added by publisher
-4. Price area (bottom left)
+3. Price area (bottom left)
 
 DESIGN REQUIREMENTS:
 - Seamless design that flows across all three sections
