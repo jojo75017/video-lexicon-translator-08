@@ -1,35 +1,105 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Plan configurations
+// Plan configurations with cached price IDs (will be populated on first run)
 const PLANS = {
   starter: {
-    name: "Starter",
-    price: 2700, // in cents
+    name: "Ebook Generator - Starter",
+    price: 2700,
     type: "subscription" as const,
     interval: "month" as const,
     features: ["5 ebooks/mois", "Fonctions de base", "Export PDF", "Support email"],
   },
   pro: {
-    name: "Pro",
+    name: "Ebook Generator - Pro",
     price: 6700,
     type: "subscription" as const,
     interval: "month" as const,
     features: ["Ebooks illimités", "Toutes les fonctions", "Export PDF/EPUB", "Formation incluse", "Support prioritaire"],
   },
   lifetime: {
-    name: "Lifetime",
+    name: "Ebook Generator - Lifetime",
     price: 14700,
     type: "one_time" as const,
     features: ["Accès à vie", "Toutes les fonctions", "Mises à jour gratuites", "Support VIP", "Formation complète"],
   },
 };
+
+// Cache for price IDs to avoid repeated API calls
+const priceCache: Record<string, string> = {};
+
+async function getOrCreatePrice(stripe: Stripe, planId: string, plan: typeof PLANS.starter): Promise<string> {
+  // Check cache first
+  if (priceCache[planId]) {
+    console.log("Using cached price for", planId);
+    return priceCache[planId];
+  }
+
+  // Search for existing price by looking up the product
+  const products = await stripe.products.search({
+    query: `name:'${plan.name}'`,
+    limit: 1,
+  });
+
+  let productId: string;
+
+  if (products.data.length > 0) {
+    productId = products.data[0].id;
+    console.log("Found existing product:", productId);
+    
+    // Get prices for this product
+    const prices = await stripe.prices.list({ 
+      product: productId, 
+      active: true,
+      limit: 10 
+    });
+    
+    const matchingPrice = prices.data.find(p => 
+      p.unit_amount === plan.price && 
+      (plan.type === "subscription" ? p.recurring?.interval === plan.interval : p.type === "one_time")
+    );
+
+    if (matchingPrice) {
+      console.log("Found existing price:", matchingPrice.id);
+      priceCache[planId] = matchingPrice.id;
+      return matchingPrice.id;
+    }
+  } else {
+    // Create product
+    const product = await stripe.products.create({
+      name: plan.name,
+      description: plan.features.join(", "),
+    });
+    productId = product.id;
+    console.log("Created product:", productId);
+  }
+
+  // Create price
+  let price: Stripe.Price;
+  if (plan.type === "subscription") {
+    price = await stripe.prices.create({
+      product: productId,
+      unit_amount: plan.price,
+      currency: "eur",
+      recurring: { interval: plan.interval },
+    });
+  } else {
+    price = await stripe.prices.create({
+      product: productId,
+      unit_amount: plan.price,
+      currency: "eur",
+    });
+  }
+  
+  console.log("Created price:", price.id);
+  priceCache[planId] = price.id;
+  return price.id;
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -61,60 +131,22 @@ serve(async (req) => {
 
     const plan = PLANS[planId as keyof typeof PLANS];
 
-    // Check if customer exists
-    let customerId: string | undefined;
-    const existingCustomers = await stripe.customers.list({ email, limit: 1 });
-    
-    if (existingCustomers.data.length > 0) {
-      customerId = existingCustomers.data[0].id;
+    // Run customer lookup and price lookup in parallel
+    const [customersResult, priceId] = await Promise.all([
+      stripe.customers.list({ email, limit: 1 }),
+      getOrCreatePrice(stripe, planId, plan),
+    ]);
+
+    // Get or create customer
+    let customerId: string;
+    if (customersResult.data.length > 0) {
+      customerId = customersResult.data[0].id;
       console.log("Found existing customer:", customerId);
     } else {
       const newCustomer = await stripe.customers.create({ email });
       customerId = newCustomer.id;
       console.log("Created new customer:", customerId);
     }
-
-    // Create or get product and price
-    let priceId: string;
-    
-    // Search for existing product
-    const products = await stripe.products.list({ limit: 100 });
-    let product = products.data.find(p => p.name === `Ebook Generator - ${plan.name}`);
-    
-    if (!product) {
-      product = await stripe.products.create({
-        name: `Ebook Generator - ${plan.name}`,
-        description: plan.features.join(", "),
-      });
-      console.log("Created product:", product.id);
-    }
-
-    // Search for existing price
-    const prices = await stripe.prices.list({ product: product.id, limit: 10 });
-    let price = prices.data.find(p => 
-      p.unit_amount === plan.price && 
-      (plan.type === "subscription" ? p.recurring?.interval === plan.interval : p.type === "one_time")
-    );
-
-    if (!price) {
-      if (plan.type === "subscription") {
-        price = await stripe.prices.create({
-          product: product.id,
-          unit_amount: plan.price,
-          currency: "eur",
-          recurring: { interval: plan.interval },
-        });
-      } else {
-        price = await stripe.prices.create({
-          product: product.id,
-          unit_amount: plan.price,
-          currency: "eur",
-        });
-      }
-      console.log("Created price:", price.id);
-    }
-
-    priceId = price.id;
 
     // Create checkout session
     const sessionConfig: Stripe.Checkout.SessionCreateParams = {
