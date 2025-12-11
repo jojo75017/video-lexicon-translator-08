@@ -1189,13 +1189,24 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/20" />
           
           <div className="relative container mx-auto px-6 py-8">
+            <div className="absolute top-4 left-4 flex gap-2">
+              <Button
+                variant="ghost"
+                onClick={() => navigate('/ebook-ideas')}
+                className="text-white/80 hover:text-white hover:bg-white/10"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Retour
+              </Button>
+            </div>
+            
+            {/* Bouton Nouveau Projet - bien visible */}
             <Button
-              variant="ghost"
-              onClick={() => navigate('/ebook-ideas')}
-              className="absolute top-4 left-4 text-white/80 hover:text-white hover:bg-white/10"
+              onClick={resetPlan}
+              className="absolute top-4 right-4 bg-white text-primary hover:bg-white/90 shadow-lg font-semibold"
             >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Retour
+              <Plus className="h-4 w-4 mr-2" />
+              Nouveau projet
             </Button>
             
             <div className="max-w-3xl mx-auto text-center pt-8 pb-4">
