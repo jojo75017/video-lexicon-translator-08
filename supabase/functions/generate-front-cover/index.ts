@@ -14,7 +14,17 @@ const stylePrompts: Record<string, string> = {
   vintage: 'vintage retro style, aged textures, classic typography, sepia tones, nostalgic feel',
   fantasy: 'fantasy magical style, mystical elements, ethereal lighting, enchanted atmosphere, otherworldly',
   thriller: 'dark intense style, high contrast, dramatic shadows, suspenseful mood, noir aesthetic',
-  romance: 'soft romantic style, warm colors, elegant flowing elements, dreamy atmosphere, emotional depth'
+  romance: 'soft romantic style, warm colors, elegant flowing elements, dreamy atmosphere, emotional depth',
+  horror: 'dark terrifying style, horror elements, eerie atmosphere, macabre imagery, haunting shadows, blood red accents',
+  detective: 'noir detective style, mystery elements, magnifying glass, clues, dark alleys, shadowy figures, crime scene feel',
+  historical: 'historical period style, antique textures, period-accurate elements, aged parchment feel, classic elegance',
+  literary: 'literary refined style, sophisticated typography, subtle elegance, classic book design, intellectual feel',
+  comedy: 'bright cheerful style, playful illustrations, fun colors, humorous elements, light-hearted mood',
+  adventure: 'epic adventure style, dramatic landscapes, action scenes, bold typography, exciting atmosphere',
+  dystopian: 'dystopian dark style, post-apocalyptic elements, ruined cityscapes, oppressive atmosphere, muted colors',
+  western: 'wild west style, desert landscapes, cowboy elements, sepia and brown tones, rustic textures',
+  spiritual: 'spiritual serene style, soft light, sacred symbols, peaceful atmosphere, ethereal glow',
+  cookbook: 'culinary appetizing style, food photography aesthetic, warm kitchen tones, delicious presentation'
 };
 
 const genrePrompts: Record<string, string> = {
@@ -26,7 +36,15 @@ const genrePrompts: Record<string, string> = {
   'romance': 'romance novel, love story, emotional connection',
   'thriller': 'thriller book, suspense, mystery, danger',
   'sci-fi': 'science fiction, futuristic, technology, space',
-  'children': 'children book, playful, colorful, friendly characters'
+  'children': 'children book, playful, colorful, friendly characters',
+  'horror': 'horror book, scary, supernatural, dark themes',
+  'mystery': 'mystery detective book, crime investigation, clues, suspense',
+  'historical': 'historical fiction, period drama, past eras',
+  'biography': 'biography memoir, real life story, personal journey',
+  'cooking': 'cookbook, recipes, food, culinary arts',
+  'travel': 'travel book, adventures, destinations, exploration',
+  'poetry': 'poetry book, verses, lyrical, emotional expression',
+  'health': 'health wellness book, fitness, wellbeing, lifestyle'
 };
 
 serve(async (req) => {
