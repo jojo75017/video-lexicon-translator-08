@@ -7,11 +7,12 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   BookOpen, Plus, Trash2, Save, Wand2, Loader2, 
   Library, Users, MapPin, Scroll, Crown, Sparkles, Copy,
   AlertTriangle, CheckCircle, Link2, ArrowRight, Heart, Swords,
-  FolderOpen, FileText
+  FolderOpen, FileText, Image, Download, RefreshCw
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -126,6 +127,9 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isGeneratingCover, setIsGeneratingCover] = useState<string | null>(null);
+  const [tomeCoverUrls, setTomeCoverUrls] = useState<Record<string, string>>({});
+  const [coverStyle, setCoverStyle] = useState<string>('cinematic');
   const [currentSeriesId, setCurrentSeriesId] = useState<string | null>(null);
   const [savedSeries, setSavedSeries] = useState<SavedSeriesBible[]>([]);
   const [showSavedSeries, setShowSavedSeries] = useState(false);
@@ -599,6 +603,63 @@ ${parsedData.characterDevelopments?.map((d: any) => `- ${d.character}: ${d.devel
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const generateTomeCover = async (tomeNumber: number, tomeTitle?: string) => {
+    if (!seriesBible.seriesTitle) {
+      toast.error('Entrez un titre de série');
+      return;
+    }
+
+    const coverKey = tomeNumber === 0 ? 'series' : `tome-${tomeNumber}`;
+    setIsGeneratingCover(coverKey);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-series-cover', {
+        body: {
+          seriesTitle: seriesBible.seriesTitle,
+          tomeNumber: tomeNumber === 0 ? null : tomeNumber,
+          tomeTitle: tomeTitle || (tomeNumber === 0 ? null : `Tome ${tomeNumber}`),
+          genre: seriesBible.genre || 'fiction',
+          synopsis: seriesBible.synopsis?.substring(0, 300),
+          style: coverStyle,
+          authorName: ''
+        }
+      });
+
+      if (error) throw error;
+
+      if (data?.imageUrl) {
+        setTomeCoverUrls(prev => ({ ...prev, [coverKey]: data.imageUrl }));
+        toast.success(`Couverture ${tomeNumber === 0 ? 'de la série' : `du Tome ${tomeNumber}`} générée !`);
+      } else {
+        throw new Error('Aucune image reçue');
+      }
+    } catch (error: any) {
+      console.error('Erreur génération couverture:', error);
+      if (error.message?.includes('429') || error.message?.includes('limite')) {
+        toast.error('Limite de requêtes atteinte. Réessayez dans quelques instants.');
+      } else if (error.message?.includes('402') || error.message?.includes('crédits')) {
+        toast.error('Crédits épuisés. Veuillez ajouter des crédits.');
+      } else {
+        toast.error('Erreur lors de la génération de la couverture');
+      }
+    } finally {
+      setIsGeneratingCover(null);
+    }
+  };
+
+  const downloadCover = (coverKey: string) => {
+    const coverUrl = tomeCoverUrls[coverKey];
+    if (!coverUrl) return;
+
+    const link = document.createElement('a');
+    link.href = coverUrl;
+    link.download = `${seriesBible.seriesTitle.replace(/[^a-z0-9]/gi, '_')}_${coverKey}_cover.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success('Couverture téléchargée !');
   };
 
   const addTheme = () => {
@@ -1182,6 +1243,83 @@ ${seriesBible.writingRules}
           </TabsContent>
 
           <TabsContent value="tomes" className="space-y-4">
+            {/* Générateur de couverture de série */}
+            <Card className="border-2 border-primary/20 bg-gradient-to-r from-primary/5 to-purple-500/5">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Image className="h-5 w-5 text-primary" />
+                  Couvertures IA
+                </CardTitle>
+                <CardDescription>
+                  Générez des couvertures professionnelles pour votre série
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex gap-4 items-end">
+                  <div className="flex-1">
+                    <Label>Style de couverture</Label>
+                    <Select value={coverStyle} onValueChange={setCoverStyle}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="cinematic">🎬 Cinématique</SelectItem>
+                        <SelectItem value="minimalist">⚪ Minimaliste</SelectItem>
+                        <SelectItem value="illustrated">🎨 Illustré</SelectItem>
+                        <SelectItem value="photorealistic">📷 Photoréaliste</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button
+                    onClick={() => generateTomeCover(0)}
+                    disabled={isGeneratingCover !== null || !seriesBible.seriesTitle}
+                  >
+                    {isGeneratingCover === 'series' ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Génération...
+                      </>
+                    ) : (
+                      <>
+                        <Wand2 className="h-4 w-4 mr-2" />
+                        Couverture de série
+                      </>
+                    )}
+                  </Button>
+                </div>
+
+                {/* Affichage couverture de série */}
+                {tomeCoverUrls['series'] && (
+                  <div className="flex gap-4 items-start">
+                    <div className="w-32 rounded-lg overflow-hidden shadow-lg border">
+                      <img 
+                        src={tomeCoverUrls['series']} 
+                        alt="Couverture de série"
+                        className="w-full h-auto"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <p className="text-sm font-medium">Couverture de la série</p>
+                      <div className="flex gap-2">
+                        <Button size="sm" variant="outline" onClick={() => downloadCover('series')}>
+                          <Download className="h-4 w-4 mr-1" />
+                          Télécharger
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="ghost"
+                          onClick={() => generateTomeCover(0)}
+                          disabled={isGeneratingCover !== null}
+                        >
+                          <RefreshCw className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -1203,19 +1341,71 @@ ${seriesBible.writingRules}
                         </Badge>
                         <span className="font-bold">Tome {tome.number}</span>
                       </div>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => generateNextTome(tome.number)}
-                        disabled={isGenerating}
-                      >
-                        {isGenerating ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Wand2 className="h-4 w-4" />
-                        )}
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => generateTomeCover(tome.number, tome.title)}
+                          disabled={isGeneratingCover !== null}
+                          title="Générer couverture"
+                        >
+                          {isGeneratingCover === `tome-${tome.number}` ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Image className="h-4 w-4" />
+                          )}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => generateNextTome(tome.number)}
+                          disabled={isGenerating}
+                          title="Générer plan"
+                        >
+                          {isGenerating ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Wand2 className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
                     </div>
+
+                    {/* Couverture générée pour ce tome */}
+                    {tomeCoverUrls[`tome-${tome.number}`] && (
+                      <div className="mb-3 flex gap-3 items-start p-3 bg-muted/50 rounded-lg">
+                        <div className="w-20 rounded overflow-hidden shadow border">
+                          <img 
+                            src={tomeCoverUrls[`tome-${tome.number}`]} 
+                            alt={`Couverture Tome ${tome.number}`}
+                            className="w-full h-auto"
+                          />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <p className="text-xs font-medium">Couverture générée</p>
+                          <div className="flex gap-1">
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="h-7 text-xs"
+                              onClick={() => downloadCover(`tome-${tome.number}`)}
+                            >
+                              <Download className="h-3 w-3 mr-1" />
+                              Télécharger
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="ghost"
+                              className="h-7"
+                              onClick={() => generateTomeCover(tome.number, tome.title)}
+                              disabled={isGeneratingCover !== null}
+                            >
+                              <RefreshCw className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                     
                     {/* Lien avec tome précédent */}
                     {tome.number > 1 && (
