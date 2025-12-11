@@ -58,6 +58,7 @@ import { EbookKdpMarketAnalysis } from '@/components/ebook/EbookKdpMarketAnalysi
 import { EbookAudioGenerator } from '@/components/ebook/EbookAudioGenerator';
 import { EbookFormationPDF } from '@/components/ebook/EbookFormationPDF';
 import EbookKdpAnalytics from '@/components/ebook/EbookKdpAnalytics';
+import { EbookImageLibrary } from '@/components/ebook/EbookImageLibrary';
 
 // Hooks et données
 import { useSubscriptionGeneration, Chapter, SubChapter } from '@/hooks/useSubscriptionGeneration';
@@ -1082,6 +1083,15 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
             ebookTitle={ebookTitle}
             chapters={chapters}
             onImageSelect={(url, title) => setEbookImages([...ebookImages, { url, title }])}
+          />
+        );
+      
+      case 'library':
+        return (
+          <EbookImageLibrary
+            ebookId={currentProjectId || undefined}
+            ebookTitle={ebookTitle}
+            onImageSelect={(url) => setEbookImages([...ebookImages, { url, title: 'Image sélectionnée' }])}
           />
         );
       
