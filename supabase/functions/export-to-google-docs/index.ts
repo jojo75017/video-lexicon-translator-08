@@ -20,18 +20,117 @@ function extractImageUrls(content: string): { cleanContent: string; imageUrls: A
     const url = match[1];
     const position = match.index - offset;
     
+    console.log(`📷 Image trouvée à position ${position}: ${url.substring(0, 100)}...`);
     imageUrls.push({ position, url });
     offset += fullMatch.length;
   }
   
   // Nettoyer le contenu
   cleanContent = content
-    .replace(/\[IMAGE_URL:https?:\/\/[^\]]+\]/g, '\n')
+    .replace(/\[IMAGE_URL:https?:\/\/[^\]]+\]/g, '\n[IMAGE SERA INSÉRÉE ICI]\n')
     .replace(/\[IMAGE:\d+:data:image\/[^;]+;base64,[^\]]+\]/g, '\n')
     .replace(/\[IMAGE:[^\]]+\]/g, '\n')
     .replace(/\[IMAGE_REMOVED\]/g, '\n');
   
   return { cleanContent, imageUrls };
+}
+
+// Télécharger une image et l'uploader vers Google Drive
+async function uploadImageToDrive(imageUrl: string, accessToken: string): Promise<string | null> {
+  try {
+    console.log(`📥 Téléchargement de l'image: ${imageUrl.substring(0, 80)}...`);
+    
+    // Télécharger l'image
+    const imageResponse = await fetch(imageUrl);
+    if (!imageResponse.ok) {
+      console.error(`❌ Impossible de télécharger l'image: ${imageResponse.status} ${imageResponse.statusText}`);
+      return null;
+    }
+    
+    const imageBlob = await imageResponse.blob();
+    const contentType = imageResponse.headers.get('content-type') || 'image/png';
+    console.log(`✅ Image téléchargée: ${imageBlob.size} bytes, type: ${contentType}`);
+    
+    // Créer les métadonnées du fichier
+    const metadata = {
+      name: `ebook-image-${Date.now()}.png`,
+      mimeType: contentType,
+    };
+    
+    // Créer le form data pour l'upload multipart
+    const boundary = '-------314159265358979323846';
+    const delimiter = "\r\n--" + boundary + "\r\n";
+    const closeDelimiter = "\r\n--" + boundary + "--";
+    
+    const metadataPart = delimiter +
+      'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
+      JSON.stringify(metadata);
+    
+    const arrayBuffer = await imageBlob.arrayBuffer();
+    const uint8Array = new Uint8Array(arrayBuffer);
+    
+    // Construire le body manuellement
+    const encoder = new TextEncoder();
+    const metadataBytes = encoder.encode(metadataPart);
+    const mediaHeader = encoder.encode('\r\n--' + boundary + '\r\nContent-Type: ' + contentType + '\r\n\r\n');
+    const closeBytes = encoder.encode(closeDelimiter);
+    
+    const bodyLength = metadataBytes.length + mediaHeader.length + uint8Array.length + closeBytes.length;
+    const body = new Uint8Array(bodyLength);
+    
+    let offset = 0;
+    body.set(metadataBytes, offset); offset += metadataBytes.length;
+    body.set(mediaHeader, offset); offset += mediaHeader.length;
+    body.set(uint8Array, offset); offset += uint8Array.length;
+    body.set(closeBytes, offset);
+    
+    // Upload vers Google Drive
+    const uploadResponse = await fetch(
+      'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': `multipart/related; boundary=${boundary}`,
+        },
+        body: body,
+      }
+    );
+    
+    if (!uploadResponse.ok) {
+      const errorData = await uploadResponse.text();
+      console.error(`❌ Erreur upload Drive: ${uploadResponse.status}`, errorData);
+      return null;
+    }
+    
+    const fileData = await uploadResponse.json();
+    console.log(`✅ Image uploadée vers Drive: ${fileData.id}`);
+    
+    // Rendre l'image accessible publiquement
+    await fetch(
+      `https://www.googleapis.com/drive/v3/files/${fileData.id}/permissions`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          role: 'reader',
+          type: 'anyone',
+        }),
+      }
+    );
+    
+    // Retourner l'URL publique de l'image Google Drive
+    const publicUrl = `https://drive.google.com/uc?export=view&id=${fileData.id}`;
+    console.log(`🔗 URL publique: ${publicUrl}`);
+    return publicUrl;
+    
+  } catch (error) {
+    console.error(`❌ Erreur lors de l'upload de l'image:`, error);
+    return null;
+  }
 }
 
 serve(async (req) => {
@@ -41,6 +140,9 @@ serve(async (req) => {
 
   try {
     const { title, content, authorName } = await req.json();
+    
+    console.log(`📄 Export Google Docs demandé pour: "${title}"`);
+    console.log(`📝 Longueur du contenu: ${content?.length || 0} caractères`);
 
     if (!title || !content) {
       return new Response(
@@ -61,7 +163,10 @@ serve(async (req) => {
 
     // Extraire les URLs d'images et nettoyer le contenu
     const { cleanContent, imageUrls } = extractImageUrls(content);
-    console.log(`Images trouvées: ${imageUrls.length}`);
+    console.log(`🖼️ Total images trouvées: ${imageUrls.length}`);
+    if (imageUrls.length > 0) {
+      console.log(`📷 URLs des images:`, imageUrls.map(i => i.url.substring(0, 60) + '...'));
+    }
 
     // Créer le JWT pour l'authentification Google
     const header = {
@@ -72,7 +177,7 @@ serve(async (req) => {
     const now = Math.floor(Date.now() / 1000);
     const claim = {
       iss: credentials.client_email,
-      scope: 'https://www.googleapis.com/auth/documents https://www.googleapis.com/auth/drive.file',
+      scope: 'https://www.googleapis.com/auth/documents https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive',
       aud: 'https://oauth2.googleapis.com/token',
       exp: now + 3600,
       iat: now,
@@ -119,12 +224,14 @@ serve(async (req) => {
     const accessToken = tokenData.access_token;
 
     if (!accessToken) {
-      console.error('Erreur d\'authentification:', tokenData);
+      console.error('❌ Erreur d\'authentification:', tokenData);
       return new Response(
         JSON.stringify({ error: 'Erreur d\'authentification avec Google' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+    
+    console.log('✅ Authentification Google réussie');
 
     // Créer le document Google Docs
     const createDocResponse = await fetch('https://docs.googleapis.com/v1/documents', {
@@ -142,12 +249,14 @@ serve(async (req) => {
     const documentId = docData.documentId;
 
     if (!documentId) {
-      console.error('Erreur de création du document:', docData);
+      console.error('❌ Erreur de création du document:', docData);
       return new Response(
         JSON.stringify({ error: 'Erreur lors de la création du document Google Docs' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+    
+    console.log(`✅ Document créé: ${documentId}`);
 
     // Construire le texte complet dans le bon ordre
     let fullText = `${title}\n\n`;
@@ -200,20 +309,21 @@ serve(async (req) => {
     const updateData = await updateResponse.json();
 
     if (!updateResponse.ok) {
-      console.error('Erreur de mise à jour du document:', updateData);
+      console.error('❌ Erreur de mise à jour du document:', updateData);
       return new Response(
         JSON.stringify({ error: 'Erreur lors de l\'ajout du contenu au document' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+    
+    console.log('✅ Contenu textuel ajouté');
 
     // Insérer les images si des URLs sont disponibles
     let imagesInserted = 0;
+    let imageErrors: string[] = [];
+    
     if (imageUrls.length > 0) {
-      console.log(`Insertion de ${imageUrls.length} images...`);
-      
-      // Insérer les images à la fin du document pour simplifier
-      const imageRequests: any[] = [];
+      console.log(`🖼️ Début de l'insertion de ${imageUrls.length} images...`);
       
       // Récupérer la longueur actuelle du document
       const getDocResponse = await fetch(
@@ -226,7 +336,7 @@ serve(async (req) => {
       );
       
       const currentDoc = await getDocResponse.json();
-      let insertIndex = 1; // Position par défaut
+      let insertIndex = 1;
       
       if (currentDoc.body?.content) {
         const lastElement = currentDoc.body.content[currentDoc.body.content.length - 1];
@@ -235,29 +345,29 @@ serve(async (req) => {
         }
       }
       
-      // Ajouter chaque image
-      for (const img of imageUrls) {
-        try {
-          imageRequests.push({
-            insertInlineImage: {
-              location: { index: insertIndex },
-              uri: img.url,
-              objectSize: {
-                width: { magnitude: 400, unit: 'PT' },
-                height: { magnitude: 300, unit: 'PT' },
-              },
-            },
-          });
-          insertIndex += 1; // L'image prend 1 caractère
-          imagesInserted++;
-        } catch (imgErr) {
-          console.error('Error preparing image request:', imgErr);
-        }
-      }
+      console.log(`📍 Position d'insertion des images: ${insertIndex}`);
       
-      if (imageRequests.length > 0) {
+      // Traiter chaque image
+      for (let i = 0; i < imageUrls.length; i++) {
+        const img = imageUrls[i];
+        console.log(`🖼️ Traitement image ${i + 1}/${imageUrls.length}: ${img.url.substring(0, 60)}...`);
+        
         try {
-          const imageUpdateResponse = await fetch(
+          // D'abord, essayer d'uploader vers Google Drive pour avoir une URL accessible
+          let imageUrlToUse = img.url;
+          
+          // Si l'URL n'est pas de Google, on l'upload vers Drive
+          if (!img.url.includes('google.com') && !img.url.includes('googleapis.com')) {
+            const driveUrl = await uploadImageToDrive(img.url, accessToken);
+            if (driveUrl) {
+              imageUrlToUse = driveUrl;
+            } else {
+              console.log(`⚠️ Utilisation de l'URL originale car upload Drive échoué`);
+            }
+          }
+          
+          // Ajouter un saut de ligne avant l'image
+          const addNewlineResponse = await fetch(
             `https://docs.googleapis.com/v1/documents/${documentId}:batchUpdate`,
             {
               method: 'POST',
@@ -265,20 +375,65 @@ serve(async (req) => {
                 'Authorization': `Bearer ${accessToken}`,
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify({ requests: imageRequests }),
+              body: JSON.stringify({
+                requests: [{
+                  insertText: {
+                    location: { index: insertIndex },
+                    text: '\n\n',
+                  },
+                }],
+              }),
             }
           );
           
-          if (!imageUpdateResponse.ok) {
-            const imageError = await imageUpdateResponse.json();
-            console.error('Erreur lors de l\'insertion des images:', imageError);
-          } else {
-            console.log(`${imagesInserted} images insérées avec succès`);
+          if (addNewlineResponse.ok) {
+            insertIndex += 2;
           }
-        } catch (batchErr) {
-          console.error('Batch image insert error:', batchErr);
+          
+          // Insérer l'image
+          const imageInsertResponse = await fetch(
+            `https://docs.googleapis.com/v1/documents/${documentId}:batchUpdate`,
+            {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                requests: [{
+                  insertInlineImage: {
+                    location: { index: insertIndex },
+                    uri: imageUrlToUse,
+                    objectSize: {
+                      width: { magnitude: 400, unit: 'PT' },
+                      height: { magnitude: 300, unit: 'PT' },
+                    },
+                  },
+                }],
+              }),
+            }
+          );
+          
+          if (!imageInsertResponse.ok) {
+            const imageError = await imageInsertResponse.json();
+            console.error(`❌ Erreur insertion image ${i + 1}:`, JSON.stringify(imageError));
+            imageErrors.push(`Image ${i + 1}: ${imageError.error?.message || 'Erreur inconnue'}`);
+          } else {
+            console.log(`✅ Image ${i + 1} insérée avec succès`);
+            imagesInserted++;
+            insertIndex += 1;
+          }
+          
+        } catch (imgErr) {
+          console.error(`❌ Exception pour image ${i + 1}:`, imgErr);
+          imageErrors.push(`Image ${i + 1}: ${imgErr.message}`);
         }
       }
+    }
+    
+    console.log(`📊 Résultat: ${imagesInserted}/${imageUrls.length} images insérées`);
+    if (imageErrors.length > 0) {
+      console.log(`⚠️ Erreurs: ${imageErrors.join(', ')}`);
     }
 
     // Rendre le document accessible (permission de lecture pour tous)
@@ -305,12 +460,14 @@ serve(async (req) => {
         documentId,
         documentUrl,
         imagesInserted,
-        message: `Document créé avec succès (${imagesInserted} images)`,
+        totalImages: imageUrls.length,
+        imageErrors: imageErrors.length > 0 ? imageErrors : undefined,
+        message: `Document créé avec succès (${imagesInserted}/${imageUrls.length} images)`,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
-    console.error('Erreur:', error);
+    console.error('❌ Erreur globale:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
