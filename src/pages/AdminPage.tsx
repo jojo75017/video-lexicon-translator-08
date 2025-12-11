@@ -151,8 +151,9 @@ export const AdminPage = () => {
 
   const getPlanLimits = (plan: string) => {
     const limits: any = {
-      starter: { plans: 5, chapters: 20, subchapters: 50, covers: 3 },
-      pro: { plans: 20, chapters: 100, subchapters: 300, covers: 10 },
+      starter: { plans: 5, chapters: 50, subchapters: 100, covers: 3 },
+      pro: { plans: 20, chapters: 200, subchapters: 400, covers: 10 },
+      lifetime: { plans: -1, chapters: -1, subchapters: -1, covers: -1 },
       enterprise: { plans: -1, chapters: -1, subchapters: -1, covers: -1 }
     };
     return limits[plan] || limits.starter;

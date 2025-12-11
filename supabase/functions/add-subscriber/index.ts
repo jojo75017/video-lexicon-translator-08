@@ -20,18 +20,25 @@ function generateAccessCode(): string {
 function getPlanLimits(planType: string) {
   const plans: any = {
     starter: {
-      label: 'Starter',
-      ebooks: '3 ebooks par mois',
-      chapters: '10 chapitres maximum',
+      label: 'Starter - 27€/mois',
+      ebooks: '5 ebooks par mois',
+      chapters: '50 chapitres maximum',
       covers: '3 couvertures par mois',
-      features: ['Génération automatique', 'Export PDF/EPUB', 'Support email']
+      features: ['Génération automatique', 'Export PDF', 'Formation Ebook incluse', 'Support email']
     },
     pro: {
-      label: 'Pro',
-      ebooks: '10 ebooks par mois',
-      chapters: '20 chapitres maximum',
+      label: 'Pro - 67€/mois',
+      ebooks: '20 ebooks par mois',
+      chapters: '200 chapitres maximum',
       covers: '10 couvertures par mois',
-      features: ['Tout de Starter', 'Images IA illimitées', 'Support prioritaire', 'Personnalisation avancée']
+      features: ['Tout de Starter', '3 Formations incluses', 'Gestionnaire Séries/Sagas', 'Export PDF/EPUB', 'Support prioritaire']
+    },
+    lifetime: {
+      label: 'Lifetime - Accès à vie',
+      ebooks: 'Ebooks illimités à vie',
+      chapters: 'Chapitres illimités',
+      covers: 'Couvertures illimitées',
+      features: ['Toutes les fonctionnalités', 'Toutes les formations', 'Mises à jour à vie', 'Support VIP 24/7']
     },
     enterprise: {
       label: 'Enterprise',
