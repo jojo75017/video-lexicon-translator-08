@@ -16,10 +16,12 @@ import {
   Copy,
   Check,
   Loader2,
-  FolderPlus
+  FolderPlus,
+  FileArchive
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import JSZip from 'jszip';
 
 interface EbookFolder {
   id: string;
@@ -209,6 +211,71 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
     }
   };
 
+  const handleZipUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !currentFolder) return;
+
+    if (!file.name.endsWith('.zip')) {
+      toast.error('Veuillez sélectionner un fichier ZIP');
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error('Vous devez être connecté');
+        return;
+      }
+
+      toast.info('📦 Extraction du ZIP en cours...');
+      
+      const zip = await JSZip.loadAsync(file);
+      const imageFiles: { name: string; blob: Blob }[] = [];
+
+      // Extract all images from ZIP
+      for (const [relativePath, zipEntry] of Object.entries(zip.files)) {
+        if (zipEntry.dir) continue;
+        
+        // Check if it's an image
+        const lowerName = relativePath.toLowerCase();
+        if (lowerName.match(/\.(jpg|jpeg|png|gif|webp)$/)) {
+          const blob = await zipEntry.async('blob');
+          // Get just the filename, not the full path
+          const fileName = relativePath.split('/').pop() || relativePath;
+          imageFiles.push({ name: fileName, blob });
+        }
+      }
+
+      if (imageFiles.length === 0) {
+        toast.error('Aucune image trouvée dans le ZIP');
+        return;
+      }
+
+      toast.info(`📤 Upload de ${imageFiles.length} image(s)...`);
+
+      let successCount = 0;
+      for (const img of imageFiles) {
+        const fileName = `${Date.now()}-${img.name}`;
+        const { error } = await supabase.storage
+          .from('ebook-images')
+          .upload(`${user.id}/${currentFolder}/${fileName}`, img.blob);
+
+        if (!error) successCount++;
+      }
+
+      toast.success(`✅ ${successCount}/${imageFiles.length} image(s) importée(s) !`);
+      loadImages(currentFolder);
+    } catch (error) {
+      console.error('ZIP upload error:', error);
+      toast.error('Erreur lors de l\'import du ZIP');
+    } finally {
+      setIsUploading(false);
+      // Reset input
+      e.target.value = '';
+    }
+  };
+
   const deleteImage = async (imageName: string) => {
     if (!currentFolder) return;
 
@@ -350,7 +417,26 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
                     ) : (
                       <Upload className="h-4 w-4 mr-2" />
                     )}
-                    Uploader
+                    Images
+                  </span>
+                </Button>
+              </label>
+              <input
+                type="file"
+                id="zip-upload"
+                accept=".zip"
+                className="hidden"
+                onChange={handleZipUpload}
+              />
+              <label htmlFor="zip-upload">
+                <Button variant="outline" disabled={isUploading} asChild>
+                  <span className="cursor-pointer">
+                    {isUploading ? (
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    ) : (
+                      <FileArchive className="h-4 w-4 mr-2" />
+                    )}
+                    ZIP
                   </span>
                 </Button>
               </label>
