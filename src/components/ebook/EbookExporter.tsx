@@ -1059,6 +1059,68 @@ ${navContent}    </ol>
     }
   };
 
+  // Fonction pour parser le markdown en TextRuns Word
+  const parseMarkdownToTextRuns = (text: string, baseSize: number = 24): TextRun[] => {
+    const runs: TextRun[] = [];
+    // Regex pour détecter **gras**, *italique*, ***gras italique***, __gras__, _italique_
+    const regex = /(\*\*\*(.+?)\*\*\*|\*\*(.+?)\*\*|__(.+?)__|_(.+?)_|\*(.+?)\*|([^*_]+))/g;
+    let match;
+    
+    while ((match = regex.exec(text)) !== null) {
+      if (match[2]) {
+        // ***gras italique***
+        runs.push(new TextRun({
+          text: match[2],
+          bold: true,
+          italics: true,
+          size: baseSize,
+          font: 'Georgia',
+        }));
+      } else if (match[3]) {
+        // **gras**
+        runs.push(new TextRun({
+          text: match[3],
+          bold: true,
+          size: baseSize,
+          font: 'Georgia',
+        }));
+      } else if (match[4]) {
+        // __gras__
+        runs.push(new TextRun({
+          text: match[4],
+          bold: true,
+          size: baseSize,
+          font: 'Georgia',
+        }));
+      } else if (match[5]) {
+        // _italique_
+        runs.push(new TextRun({
+          text: match[5],
+          italics: true,
+          size: baseSize,
+          font: 'Georgia',
+        }));
+      } else if (match[6]) {
+        // *italique*
+        runs.push(new TextRun({
+          text: match[6],
+          italics: true,
+          size: baseSize,
+          font: 'Georgia',
+        }));
+      } else if (match[7]) {
+        // texte normal
+        runs.push(new TextRun({
+          text: match[7],
+          size: baseSize,
+          font: 'Georgia',
+        }));
+      }
+    }
+    
+    return runs.length > 0 ? runs : [new TextRun({ text, size: baseSize, font: 'Georgia' })];
+  };
+
   // Export DOCX formaté KDP professionnel
   const exportAsKdpDocx = async () => {
     try {
@@ -1217,13 +1279,7 @@ ${navContent}    </ol>
           if (para.trim()) {
             children.push(
               new Paragraph({
-                children: [
-                  new TextRun({
-                    text: para.trim(),
-                    size: 24, // 12pt
-                    font: 'Georgia',
-                  }),
-                ],
+                children: parseMarkdownToTextRuns(para.trim(), 24),
                 alignment: AlignmentType.JUSTIFIED,
                 spacing: { after: 240, line: 360 }, // Interligne 1.5
                 indent: { firstLine: convertInchesToTwip(0.3) },
@@ -1275,13 +1331,7 @@ ${navContent}    </ol>
             if (para.trim()) {
               children.push(
                 new Paragraph({
-                  children: [
-                    new TextRun({
-                      text: para.trim(),
-                      size: 24,
-                      font: 'Georgia',
-                    }),
-                  ],
+                  children: parseMarkdownToTextRuns(para.trim(), 24),
                   alignment: AlignmentType.JUSTIFIED,
                   spacing: { after: 240, line: 360 },
                   indent: { firstLine: convertInchesToTwip(0.3) },
@@ -1314,13 +1364,7 @@ ${navContent}    </ol>
               if (para.trim()) {
                 children.push(
                   new Paragraph({
-                    children: [
-                      new TextRun({
-                        text: para.trim(),
-                        size: 24,
-                        font: 'Georgia',
-                      }),
-                    ],
+                    children: parseMarkdownToTextRuns(para.trim(), 24),
                     alignment: AlignmentType.JUSTIFIED,
                     spacing: { after: 240, line: 360 },
                     indent: { firstLine: convertInchesToTwip(0.3) },
@@ -1360,13 +1404,7 @@ ${navContent}    </ol>
           if (para.trim()) {
             children.push(
               new Paragraph({
-                children: [
-                  new TextRun({
-                    text: para.trim(),
-                    size: 24,
-                    font: 'Georgia',
-                  }),
-                ],
+                children: parseMarkdownToTextRuns(para.trim(), 24),
                 alignment: AlignmentType.JUSTIFIED,
                 spacing: { after: 240, line: 360 },
                 indent: { firstLine: convertInchesToTwip(0.3) },
@@ -1399,13 +1437,7 @@ ${navContent}    </ol>
           if (para.trim()) {
             children.push(
               new Paragraph({
-                children: [
-                  new TextRun({
-                    text: para.trim(),
-                    size: 24,
-                    font: 'Georgia',
-                  }),
-                ],
+                children: parseMarkdownToTextRuns(para.trim(), 24),
                 alignment: AlignmentType.JUSTIFIED,
                 spacing: { after: 240, line: 360 },
                 indent: { firstLine: convertInchesToTwip(0.3) },
