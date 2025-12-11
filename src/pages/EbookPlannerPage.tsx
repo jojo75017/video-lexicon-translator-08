@@ -925,6 +925,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
             chapters={chapters}
             apiKey={apiKey}
             targetAudience={targetAudience}
+            bookSummary={bookSummary}
           />
         );
       
