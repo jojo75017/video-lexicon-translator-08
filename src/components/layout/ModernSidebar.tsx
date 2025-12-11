@@ -61,6 +61,14 @@ const menuItems = [
     activeGradient: 'from-cyan-500 to-blue-500'
   },
   { 
+    id: 'analytics', 
+    label: '📈 Analytics Pro', 
+    icon: BarChart3,
+    color: 'text-emerald-500',
+    bgColor: 'bg-emerald-500/10',
+    activeGradient: 'from-emerald-500 to-teal-500'
+  },
+  { 
     id: 'planner', 
     label: 'Planificateur', 
     icon: BookOpen,
