@@ -540,6 +540,109 @@ Retourne UNIQUEMENT un objet JSON valide avec ces propriétés:
     return null;
   };
 
+  const generateAPlusContent = async (title: string, authorName: string, chapters: Chapter[], bookSummary?: string) => {
+    const chaptersText = chapters.map(c => c.title).join(', ');
+    const summaryContext = bookSummary ? `\nRésumé du livre : ${bookSummary}` : '';
+    
+    const prompt = `Tu es un expert en création de contenu A+ Amazon (Enhanced Brand Content).
+
+CONTEXTE DU LIVRE :
+- Titre : "${title}"
+- Auteur : ${authorName || 'Non spécifié'}
+- Chapitres : ${chaptersText}${summaryContext}
+
+MISSION : Génère un contenu A+ complet et COHÉRENT pour ce livre. Tous les textes doivent :
+- Utiliser le même ton et style
+- Faire référence aux mêmes thèmes et points clés
+- Se compléter sans redondance
+- Créer une progression logique pour convaincre l'acheteur
+
+Réponds UNIQUEMENT avec ce format JSON (pas de texte avant/après) :
+{
+  "brand_story": {
+    "headline": "Titre accrocheur de la marque/auteur (max 60 car.)",
+    "body": "Histoire de l'auteur et sa mission en 150 mots max. Pourquoi ce livre existe."
+  },
+  "hero_module": {
+    "headline": "Accroche principale du livre (max 50 car.)",
+    "body": "Proposition de valeur unique en 100 mots. Qu'apporte ce livre au lecteur ?"
+  },
+  "key_features": [
+    {
+      "icon_suggestion": "📖",
+      "title": "Caractéristique 1 (max 30 car.)",
+      "description": "Description en 50 mots max"
+    },
+    {
+      "icon_suggestion": "✨",
+      "title": "Caractéristique 2 (max 30 car.)",
+      "description": "Description en 50 mots max"
+    },
+    {
+      "icon_suggestion": "🎯",
+      "title": "Caractéristique 3 (max 30 car.)",
+      "description": "Description en 50 mots max"
+    },
+    {
+      "icon_suggestion": "💡",
+      "title": "Caractéristique 4 (max 30 car.)",
+      "description": "Description en 50 mots max"
+    }
+  ],
+  "comparison_chart": {
+    "title": "Ce que vous trouverez dans ce livre",
+    "items": [
+      {"feature": "Aspect 1", "included": true, "detail": "Détail court"},
+      {"feature": "Aspect 2", "included": true, "detail": "Détail court"},
+      {"feature": "Aspect 3", "included": true, "detail": "Détail court"},
+      {"feature": "Aspect 4", "included": true, "detail": "Détail court"},
+      {"feature": "Aspect 5", "included": true, "detail": "Détail court"}
+    ]
+  },
+  "ideal_reader": {
+    "headline": "Ce livre est fait pour vous si...",
+    "points": [
+      "Profil lecteur idéal 1",
+      "Profil lecteur idéal 2",
+      "Profil lecteur idéal 3",
+      "Profil lecteur idéal 4"
+    ]
+  },
+  "testimonial_templates": [
+    {
+      "quote": "Citation fictive de lecteur satisfait (style authentique)",
+      "attribution": "Type de lecteur"
+    },
+    {
+      "quote": "Deuxième citation de style différent",
+      "attribution": "Type de lecteur"
+    }
+  ],
+  "call_to_action": {
+    "headline": "Prêt à commencer votre lecture ?",
+    "body": "Texte d'incitation à l'achat en 50 mots max",
+    "button_text": "Texte du bouton (max 20 car.)"
+  }
+}
+
+IMPORTANT : Tous les modules doivent être cohérents entre eux et refléter fidèlement le contenu réel du livre.`;
+
+    const content = await callGenerateContent('chapters_generated', prompt);
+    
+    if (content) {
+      try {
+        let clean = content.trim().replace(/```json\s*|```/g, '').trim();
+        const match = clean.match(/\{[\s\S]*\}/);
+        const jsonText = match ? match[0] : clean;
+        return JSON.parse(jsonText);
+      } catch (e) {
+        console.error('Error parsing A+ content JSON:', e);
+        return null;
+      }
+    }
+    return null;
+  };
+
   return {
     isGenerating,
     generateChapterContent,
@@ -559,6 +662,7 @@ Retourne UNIQUEMENT un objet JSON valide avec ces propriétés:
     generateConclusion,
     generateEpilogue,
     translateContent,
-    analyzeTextStatistics
+    analyzeTextStatistics,
+    generateAPlusContent
   };
 };
