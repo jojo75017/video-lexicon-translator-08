@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,7 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   BookOpen, Plus, Trash2, Save, Wand2, Loader2, 
   Library, Users, MapPin, Scroll, Crown, Sparkles, Copy,
-  AlertTriangle, CheckCircle, Link2, ArrowRight, Heart, Swords
+  AlertTriangle, CheckCircle, Link2, ArrowRight, Heart, Swords,
+  FolderOpen, FileText
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -102,6 +103,15 @@ interface SeriesBible {
   plotThreads: PlotThread[];
 }
 
+interface SavedSeriesBible {
+  id: string;
+  title: string;
+  genre: string | null;
+  total_tomes: number;
+  created_at: string;
+  updated_at: string;
+}
+
 interface EbookSeriesManagerProps {
   currentTomeNumber?: number;
   ebookTitle?: string;
@@ -114,6 +124,11 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
   onApplyToCurrentBook
 }) => {
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentSeriesId, setCurrentSeriesId] = useState<string | null>(null);
+  const [savedSeries, setSavedSeries] = useState<SavedSeriesBible[]>([]);
+  const [showSavedSeries, setShowSavedSeries] = useState(false);
   const [seriesBible, setSeriesBible] = useState<SeriesBible>({
     seriesTitle: '',
     genre: '',
@@ -130,6 +145,176 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
 
   const [newTheme, setNewTheme] = useState('');
   const [activeTab, setActiveTab] = useState('overview');
+
+  // Load saved series on mount
+  useEffect(() => {
+    loadSavedSeriesList();
+  }, []);
+
+  const loadSavedSeriesList = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('series_bibles')
+        .select('id, title, genre, total_tomes, created_at, updated_at')
+        .eq('user_id', user.id)
+        .order('updated_at', { ascending: false });
+
+      if (error) throw error;
+      setSavedSeries(data || []);
+    } catch (error) {
+      console.error('Erreur chargement séries:', error);
+    }
+  };
+
+  const saveSeriesBible = async () => {
+    if (!seriesBible.seriesTitle) {
+      toast.error('Entrez un titre de série');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error('Connectez-vous pour sauvegarder');
+        return;
+      }
+
+      const seriesData = {
+        user_id: user.id,
+        title: seriesBible.seriesTitle,
+        genre: seriesBible.genre || null,
+        total_tomes: seriesBible.totalTomes,
+        main_themes: JSON.parse(JSON.stringify(seriesBible.themes)),
+        characters: JSON.parse(JSON.stringify(seriesBible.characters)),
+        locations: JSON.parse(JSON.stringify(seriesBible.locations)),
+        timeline: JSON.parse(JSON.stringify(seriesBible.timeline)),
+        plot_threads: JSON.parse(JSON.stringify(seriesBible.plotThreads)),
+        tomes: JSON.parse(JSON.stringify(seriesBible.tomes)),
+        world_rules: seriesBible.writingRules,
+        narrative_style: seriesBible.synopsis
+      };
+
+      if (currentSeriesId) {
+        const { error } = await supabase
+          .from('series_bibles')
+          .update(seriesData)
+          .eq('id', currentSeriesId);
+
+        if (error) throw error;
+        toast.success('Série mise à jour !');
+      } else {
+        const { data, error } = await supabase
+          .from('series_bibles')
+          .insert(seriesData)
+          .select('id')
+          .single();
+
+        if (error) throw error;
+        setCurrentSeriesId(data.id);
+        toast.success('Série sauvegardée !');
+      }
+
+      loadSavedSeriesList();
+    } catch (error) {
+      console.error('Erreur sauvegarde:', error);
+      toast.error('Erreur lors de la sauvegarde');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const loadSeriesBible = async (id: string) => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('series_bibles')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+
+      setSeriesBible({
+        seriesTitle: data.title,
+        genre: data.genre || '',
+        totalTomes: data.total_tomes || 3,
+        synopsis: data.narrative_style || '',
+        themes: (data.main_themes as unknown as string[]) || [],
+        characters: (data.characters as unknown as SeriesCharacter[]) || [],
+        locations: (data.locations as unknown as SeriesLocation[]) || [],
+        timeline: (data.timeline as unknown as SeriesTimeline[]) || [],
+        tomes: (data.tomes as unknown as SeriesTome[]) || [],
+        writingRules: data.world_rules || '',
+        plotThreads: (data.plot_threads as unknown as PlotThread[]) || []
+      });
+      setCurrentSeriesId(id);
+      setShowSavedSeries(false);
+      toast.success('Série chargée !');
+    } catch (error) {
+      console.error('Erreur chargement:', error);
+      toast.error('Erreur lors du chargement');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const deleteSeriesBible = async (id: string) => {
+    if (!confirm('Supprimer cette série ?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('series_bibles')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      if (currentSeriesId === id) {
+        setCurrentSeriesId(null);
+        setSeriesBible({
+          seriesTitle: '',
+          genre: '',
+          totalTomes: 3,
+          synopsis: '',
+          themes: [],
+          characters: [],
+          locations: [],
+          timeline: [],
+          tomes: [],
+          writingRules: '',
+          plotThreads: []
+        });
+      }
+
+      loadSavedSeriesList();
+      toast.success('Série supprimée !');
+    } catch (error) {
+      console.error('Erreur suppression:', error);
+      toast.error('Erreur lors de la suppression');
+    }
+  };
+
+  const newSeriesBible = () => {
+    setCurrentSeriesId(null);
+    setSeriesBible({
+      seriesTitle: '',
+      genre: '',
+      totalTomes: 3,
+      synopsis: '',
+      themes: [],
+      characters: [],
+      locations: [],
+      timeline: [],
+      tomes: [],
+      writingRules: '',
+      plotThreads: []
+    });
+    setShowSavedSeries(false);
+  };
 
   // Vérification automatique de cohérence
   const coherenceIssues = useMemo((): CoherenceIssue[] => {
@@ -553,17 +738,106 @@ ${seriesBible.writingRules}
 
   return (
     <div className="space-y-6">
+      {/* Saved Series Panel */}
+      {showSavedSeries && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FolderOpen className="h-5 w-5 text-primary" />
+              Mes Séries Sauvegardées
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {savedSeries.length === 0 ? (
+              <p className="text-muted-foreground text-center py-4">Aucune série sauvegardée</p>
+            ) : (
+              <div className="space-y-2">
+                {savedSeries.map((series) => (
+                  <div key={series.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50">
+                    <div className="flex-1">
+                      <p className="font-medium">{series.title}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {series.genre || 'Genre non défini'} • {series.total_tomes} tomes • 
+                        Modifié le {new Date(series.updated_at).toLocaleDateString('fr-FR')}
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => loadSeriesBible(series.id)}
+                        disabled={isLoading}
+                      >
+                        {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <FolderOpen className="h-4 w-4" />}
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="destructive"
+                        onClick={() => deleteSeriesBible(series.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="flex gap-2 mt-4">
+              <Button variant="outline" onClick={() => setShowSavedSeries(false)} className="flex-1">
+                Fermer
+              </Button>
+              <Button onClick={newSeriesBible} className="flex-1">
+                <Plus className="h-4 w-4 mr-2" />
+                Nouvelle série
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Library className="h-5 w-5 text-primary" />
             Gestionnaire de Série Multi-Tomes
+            {currentSeriesId && <Badge variant="secondary" className="ml-2">Sauvegardé</Badge>}
           </CardTitle>
           <CardDescription>
             Créez et gérez une série cohérente avec une bible complète
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Action buttons for saved series */}
+          <div className="flex gap-2 flex-wrap">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowSavedSeries(true)}
+              className="flex-1"
+            >
+              <FolderOpen className="h-4 w-4 mr-2" />
+              Mes séries ({savedSeries.length})
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={saveSeriesBible}
+              disabled={isSaving || !seriesBible.seriesTitle}
+              className="flex-1"
+            >
+              {isSaving ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4 mr-2" />
+              )}
+              {currentSeriesId ? 'Mettre à jour' : 'Sauvegarder'}
+            </Button>
+            {currentSeriesId && (
+              <Button variant="outline" onClick={newSeriesBible}>
+                <FileText className="h-4 w-4 mr-2" />
+                Nouveau
+              </Button>
+            )}
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <Label>Titre de la série</Label>

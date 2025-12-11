@@ -294,6 +294,60 @@ export type Database = {
         }
         Relationships: []
       }
+      series_bibles: {
+        Row: {
+          characters: Json | null
+          created_at: string
+          genre: string | null
+          id: string
+          locations: Json | null
+          main_themes: Json | null
+          narrative_style: string | null
+          plot_threads: Json | null
+          timeline: Json | null
+          title: string
+          tomes: Json | null
+          total_tomes: number | null
+          updated_at: string
+          user_id: string
+          world_rules: string | null
+        }
+        Insert: {
+          characters?: Json | null
+          created_at?: string
+          genre?: string | null
+          id?: string
+          locations?: Json | null
+          main_themes?: Json | null
+          narrative_style?: string | null
+          plot_threads?: Json | null
+          timeline?: Json | null
+          title: string
+          tomes?: Json | null
+          total_tomes?: number | null
+          updated_at?: string
+          user_id: string
+          world_rules?: string | null
+        }
+        Update: {
+          characters?: Json | null
+          created_at?: string
+          genre?: string | null
+          id?: string
+          locations?: Json | null
+          main_themes?: Json | null
+          narrative_style?: string | null
+          plot_threads?: Json | null
+          timeline?: Json | null
+          title?: string
+          tomes?: Json | null
+          total_tomes?: number | null
+          updated_at?: string
+          user_id?: string
+          world_rules?: string | null
+        }
+        Relationships: []
+      }
       subscribers: {
         Row: {
           access_code: string | null
