@@ -394,12 +394,19 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
     // IMPORTANT: Réinitialiser l'ID du projet pour créer un nouveau projet lors de la prochaine sauvegarde
     setCurrentProjectId(null);
     
+    // Rediriger vers l'onglet planificateur
+    setActiveTab('planner');
+    
     try {
       localStorage.removeItem(STORAGE_KEY);
     } catch (error) {
       console.error('Erreur localStorage:', error);
     }
-    toast.success('Planificateur réinitialisé ! Vous pouvez commencer un nouvel ebook.');
+    
+    toast.success('🎉 Nouveau projet créé !', {
+      description: 'Vous pouvez maintenant commencer votre nouvel ebook.',
+      duration: 4000,
+    });
   };
 
   const handleImageSelect = (imageUrl: string, title: string) => {
