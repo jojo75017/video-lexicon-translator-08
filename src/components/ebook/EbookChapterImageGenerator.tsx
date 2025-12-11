@@ -53,14 +53,104 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
   const [showConfig, setShowConfig] = useState(false);
   const [forceLovable, setForceLovable] = useState(false);
 
-  const styleOptions = [
-    { value: 'professional illustration', label: '🎨 Illustration professionnelle' },
-    { value: 'modern minimalist', label: '✨ Minimaliste moderne' },
-    { value: 'watercolor artistic', label: '🖌️ Aquarelle artistique' },
-    { value: 'digital art concept', label: '🎯 Art digital conceptuel' },
-    { value: 'photorealistic', label: '📸 Photoréaliste' },
-    { value: 'abstract modern', label: '🌈 Abstrait moderne' }
+  const [imageRatio, setImageRatio] = useState<string>('square');
+  const [imageQuality, setImageQuality] = useState<string>('high');
+  const [colorScheme, setColorScheme] = useState<string>('auto');
+
+  const styleCategories = [
+    {
+      category: '🎨 Illustration',
+      styles: [
+        { value: 'professional illustration', label: 'Illustration professionnelle', preview: '🎨' },
+        { value: 'childrens book illustration', label: 'Livre pour enfants', preview: '🧸' },
+        { value: 'manga anime style', label: 'Manga / Anime', preview: '🎌' },
+        { value: 'comic book style', label: 'Bande dessinée', preview: '💥' },
+        { value: 'vintage retro illustration', label: 'Vintage rétro', preview: '📺' },
+        { value: 'line art sketch', label: 'Dessin au trait', preview: '✏️' },
+      ]
+    },
+    {
+      category: '🖌️ Peinture',
+      styles: [
+        { value: 'watercolor artistic', label: 'Aquarelle', preview: '💧' },
+        { value: 'oil painting classical', label: 'Peinture à l\'huile', preview: '🖼️' },
+        { value: 'impressionist style', label: 'Impressionniste', preview: '🌸' },
+        { value: 'acrylic pop art', label: 'Pop Art acrylique', preview: '🎪' },
+        { value: 'gouache illustration', label: 'Gouache', preview: '🎨' },
+        { value: 'pastel soft colors', label: 'Pastels doux', preview: '🌈' },
+      ]
+    },
+    {
+      category: '🎯 Digital Art',
+      styles: [
+        { value: 'digital art concept', label: 'Concept Art', preview: '🎯' },
+        { value: 'modern minimalist', label: 'Minimaliste moderne', preview: '✨' },
+        { value: '3d rendered scene', label: 'Rendu 3D', preview: '🎮' },
+        { value: 'pixel art retro', label: 'Pixel Art', preview: '👾' },
+        { value: 'vector flat design', label: 'Design vectoriel', preview: '📐' },
+        { value: 'isometric illustration', label: 'Isométrique', preview: '🏗️' },
+      ]
+    },
+    {
+      category: '📸 Réalisme',
+      styles: [
+        { value: 'photorealistic', label: 'Photoréaliste', preview: '📸' },
+        { value: 'cinematic movie scene', label: 'Scène cinématique', preview: '🎬' },
+        { value: 'documentary style', label: 'Documentaire', preview: '📽️' },
+        { value: 'portrait photography', label: 'Portrait photo', preview: '🖼️' },
+        { value: 'landscape photography', label: 'Paysage photo', preview: '🏔️' },
+        { value: 'noir black white', label: 'Noir et blanc', preview: '🎭' },
+      ]
+    },
+    {
+      category: '✨ Fantaisie',
+      styles: [
+        { value: 'fantasy epic', label: 'Fantasy épique', preview: '🐉' },
+        { value: 'sci-fi futuristic', label: 'Science-fiction', preview: '🚀' },
+        { value: 'steampunk victorian', label: 'Steampunk', preview: '⚙️' },
+        { value: 'gothic dark', label: 'Gothique sombre', preview: '🦇' },
+        { value: 'magical fairytale', label: 'Conte de fées', preview: '🧚' },
+        { value: 'surrealist dreamscape', label: 'Surréaliste', preview: '🌙' },
+      ]
+    },
+    {
+      category: '🌈 Abstrait',
+      styles: [
+        { value: 'abstract modern', label: 'Abstrait moderne', preview: '🌈' },
+        { value: 'geometric patterns', label: 'Géométrique', preview: '🔷' },
+        { value: 'fluid organic shapes', label: 'Formes fluides', preview: '🌊' },
+        { value: 'psychedelic colorful', label: 'Psychédélique', preview: '🍄' },
+        { value: 'glitch digital art', label: 'Glitch Art', preview: '📺' },
+        { value: 'neon cyberpunk', label: 'Néon cyberpunk', preview: '💜' },
+      ]
+    }
   ];
+
+  const ratioOptions = [
+    { value: 'square', label: 'Carré (1:1)', dimensions: '1024x1024' },
+    { value: 'landscape', label: 'Paysage (16:9)', dimensions: '1792x1024' },
+    { value: 'portrait', label: 'Portrait (9:16)', dimensions: '1024x1792' },
+    { value: 'wide', label: 'Panoramique (2:1)', dimensions: '1536x768' },
+  ];
+
+  const qualityOptions = [
+    { value: 'standard', label: 'Standard', description: 'Rapide, bonne qualité' },
+    { value: 'high', label: 'Haute qualité', description: 'Détaillé, plus lent' },
+    { value: 'ultra', label: 'Ultra HD', description: 'Maximum de détails' },
+  ];
+
+  const colorSchemeOptions = [
+    { value: 'auto', label: 'Automatique', description: 'Adapté au contenu' },
+    { value: 'vibrant', label: 'Vibrant', description: 'Couleurs vives et saturées' },
+    { value: 'muted', label: 'Sobre', description: 'Tons doux et subtils' },
+    { value: 'monochrome', label: 'Monochrome', description: 'Nuances d\'une couleur' },
+    { value: 'warm', label: 'Chaud', description: 'Tons orangés et dorés' },
+    { value: 'cool', label: 'Froid', description: 'Tons bleus et verts' },
+    { value: 'sepia', label: 'Sépia', description: 'Style vintage brun' },
+  ];
+
+  // Flatten styles for select
+  const allStyles = styleCategories.flatMap(cat => cat.styles);
 
   // Synchroniser avec les images passées en props
   useEffect(() => {
@@ -119,6 +209,9 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
               chapterContent: chapter.content || '',
               ebookTitle,
               style: imageStyle,
+              ratio: imageRatio,
+              quality: imageQuality,
+              colorScheme: colorScheme,
               characters: characters.map(c => ({
                 name: c.name,
                 description: c.description
@@ -249,6 +342,9 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
           chapterContent: chapter.content || '',
           ebookTitle,
           style: imageStyle,
+          ratio: imageRatio,
+          quality: imageQuality,
+          colorScheme: colorScheme,
           characters: characters.map(c => ({
             name: c.name,
             description: c.description
@@ -485,20 +581,101 @@ export const EbookChapterImageGenerator: React.FC<EbookChapterImageGeneratorProp
             <Checkbox id="force-lovable" checked={forceLovable} onCheckedChange={(v) => setForceLovable(!!v)} />
             <Label htmlFor="force-lovable" className="text-sm">Forcer Lovable AI (désactiver fallback OpenAI)</Label>
           </div>
-          <div>
-            <Label htmlFor="style">Style d'illustration</Label>
+          {/* Style Selection avec catégories */}
+          <div className="space-y-3">
+            <Label>Style d'illustration</Label>
             <Select value={imageStyle} onValueChange={setImageStyle}>
-              <SelectTrigger id="style" className="mt-2">
-                <SelectValue />
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Choisir un style" />
               </SelectTrigger>
-              <SelectContent>
-                {styleOptions.map(option => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
+              <SelectContent className="max-h-80">
+                {styleCategories.map(category => (
+                  <div key={category.category}>
+                    <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground bg-muted/50">
+                      {category.category}
+                    </div>
+                    {category.styles.map(style => (
+                      <SelectItem key={style.value} value={style.value}>
+                        <span className="flex items-center gap-2">
+                          <span>{style.preview}</span>
+                          <span>{style.label}</span>
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </div>
                 ))}
               </SelectContent>
             </Select>
+            
+            {/* Aperçu du style sélectionné */}
+            <div className="flex items-center gap-2 p-2 rounded-md bg-muted/30 text-sm">
+              <span className="text-lg">{allStyles.find(s => s.value === imageStyle)?.preview || '🎨'}</span>
+              <span className="text-muted-foreground">Style actuel:</span>
+              <span className="font-medium">{allStyles.find(s => s.value === imageStyle)?.label || imageStyle}</span>
+            </div>
+          </div>
+
+          {/* Options avancées */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Format d'image */}
+            <div className="space-y-2">
+              <Label>Format</Label>
+              <Select value={imageRatio} onValueChange={setImageRatio}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {ratioOptions.map(option => (
+                    <SelectItem key={option.value} value={option.value}>
+                      <span className="flex flex-col">
+                        <span>{option.label}</span>
+                        <span className="text-xs text-muted-foreground">{option.dimensions}</span>
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Qualité */}
+            <div className="space-y-2">
+              <Label>Qualité</Label>
+              <Select value={imageQuality} onValueChange={setImageQuality}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {qualityOptions.map(option => (
+                    <SelectItem key={option.value} value={option.value}>
+                      <span className="flex flex-col">
+                        <span>{option.label}</span>
+                        <span className="text-xs text-muted-foreground">{option.description}</span>
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Palette de couleurs */}
+            <div className="space-y-2">
+              <Label>Palette</Label>
+              <Select value={colorScheme} onValueChange={setColorScheme}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {colorSchemeOptions.map(option => (
+                    <SelectItem key={option.value} value={option.value}>
+                      <span className="flex flex-col">
+                        <span>{option.label}</span>
+                        <span className="text-xs text-muted-foreground">{option.description}</span>
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="flex gap-2">
