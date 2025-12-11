@@ -226,21 +226,27 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
   // Helper function to composite author photo onto cover
   const compositeWithAuthorPhoto = async (coverUrl: string): Promise<string> => {
     if (!authorPhoto || coverType !== 'full') {
+      console.log('Skipping photo composite: no photo or not full cover');
       return coverUrl;
     }
+
+    console.log('Starting photo composition...');
 
     return new Promise((resolve, reject) => {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       if (!ctx) {
+        console.error('Canvas context not available');
         reject(new Error('Canvas context not available'));
         return;
       }
 
       const coverImg = new Image();
+      // Important: set crossOrigin before src for base64 images
       coverImg.crossOrigin = 'anonymous';
       
       coverImg.onload = () => {
+        console.log('Cover image loaded:', coverImg.width, 'x', coverImg.height);
         canvas.width = coverImg.width;
         canvas.height = coverImg.height;
         
@@ -250,39 +256,61 @@ export const EbookCoverGenerator: React.FC<EbookCoverGeneratorProps> = ({
         // Load and draw author photo
         const authorImg = new Image();
         authorImg.onload = () => {
-          // Position author photo on back cover (left side)
-          // Back cover is approximately the left third of the full cover
-          const backCoverWidth = coverImg.width * 0.4; // Approximate back cover area
-          const photoSize = Math.min(backCoverWidth * 0.3, coverImg.height * 0.15); // Photo size
-          const photoX = backCoverWidth * 0.1; // 10% from left edge
-          const photoY = coverImg.height * 0.6; // 60% from top
+          console.log('Author photo loaded, compositing...');
           
-          // Draw circular clipping path
+          // Position author photo on back cover (left side of full cover)
+          // Back cover takes approximately 48% of full width (front cover + spine = ~52%)
+          const backCoverWidth = coverImg.width * 0.45;
+          
+          // Make photo more prominent - 20% of back cover width
+          const photoSize = Math.min(backCoverWidth * 0.25, coverImg.height * 0.18);
+          
+          // Position in lower portion of back cover
+          const photoX = backCoverWidth * 0.15; // 15% from left edge
+          const photoY = coverImg.height * 0.65; // 65% from top
+          
+          // Draw circular clipping path for author photo
           ctx.save();
           ctx.beginPath();
           ctx.arc(photoX + photoSize / 2, photoY + photoSize / 2, photoSize / 2, 0, Math.PI * 2);
           ctx.closePath();
           ctx.clip();
           
-          // Draw author photo
+          // Draw author photo fitted in circle
           ctx.drawImage(authorImg, photoX, photoY, photoSize, photoSize);
           ctx.restore();
           
-          // Add a subtle border around the photo
+          // Add a white border around the photo for visibility
           ctx.beginPath();
           ctx.arc(photoX + photoSize / 2, photoY + photoSize / 2, photoSize / 2, 0, Math.PI * 2);
-          ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
-          ctx.lineWidth = photoSize * 0.03;
+          ctx.strokeStyle = 'white';
+          ctx.lineWidth = Math.max(4, photoSize * 0.04);
           ctx.stroke();
           
-          resolve(canvas.toDataURL('image/jpeg', 0.95));
+          // Add subtle shadow
+          ctx.beginPath();
+          ctx.arc(photoX + photoSize / 2, photoY + photoSize / 2, photoSize / 2 + 2, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          
+          console.log('Photo composited at:', photoX, photoY, 'size:', photoSize);
+          
+          const result = canvas.toDataURL('image/jpeg', 0.95);
+          resolve(result);
         };
         
-        authorImg.onerror = () => resolve(coverUrl); // Fallback to original
+        authorImg.onerror = (e) => {
+          console.error('Failed to load author photo:', e);
+          resolve(coverUrl); // Fallback to original
+        };
         authorImg.src = authorPhoto;
       };
       
-      coverImg.onerror = () => reject(new Error('Failed to load cover image'));
+      coverImg.onerror = (e) => {
+        console.error('Failed to load cover image:', e);
+        reject(new Error('Failed to load cover image'));
+      };
       coverImg.src = coverUrl;
     });
   };
