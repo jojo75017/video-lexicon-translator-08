@@ -8,6 +8,7 @@ import {
   Users, 
   Download, 
   TrendingUp,
+  LayoutDashboard,
   Palette,
   ChevronLeft,
   ChevronRight,
@@ -50,6 +51,14 @@ const menuItems = [
     color: 'text-violet-500',
     bgColor: 'bg-violet-500/10',
     activeGradient: 'from-violet-500 to-purple-500'
+  },
+  { 
+    id: 'dashboard', 
+    label: '📊 Dashboard', 
+    icon: LayoutDashboard,
+    color: 'text-cyan-500',
+    bgColor: 'bg-cyan-500/10',
+    activeGradient: 'from-cyan-500 to-blue-500'
   },
   { 
     id: 'planner', 

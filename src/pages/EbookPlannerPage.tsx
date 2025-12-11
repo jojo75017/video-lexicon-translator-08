@@ -49,6 +49,7 @@ import { EbookBackCoverGenerator } from '@/components/ebook/EbookBackCoverGenera
 import { EbookCharacters, type Character } from '@/components/ebook/EbookCharacters';
 import { EbookProjectsList } from '@/components/ebook/EbookProjectsList';
 import { EbookAiChat } from '@/components/ebook/EbookAiChat';
+import { EbookDashboard } from '@/components/ebook/EbookDashboard';
 
 import { EbookStatisticsTools } from '@/components/ebook/EbookStatisticsTools';
 import { EbookVoiceDictation } from '@/components/ebook/EbookVoiceDictation';
@@ -448,6 +449,20 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
             onProjectLoad={handleProjectLoad}
             onCreateNew={() => setActiveTab('planner')}
             currentProject={{ title: ebookTitle, hasContent: chapters.length > 0 || preface.length > 0 || conclusion.length > 0 }}
+          />
+        );
+      
+      case 'dashboard':
+        return (
+          <EbookDashboard
+            ebookTitle={ebookTitle}
+            authorName={authorName}
+            chapters={chapters}
+            preface={preface}
+            conclusion={conclusion}
+            targetWordsPerChapter={targetWordsPerChapter}
+            kdpDescription={kdpDescription}
+            kdpKeywords={kdpKeywords}
           />
         );
       
