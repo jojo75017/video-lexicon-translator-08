@@ -35,6 +35,10 @@ interface StoredImage {
   url: string;
   createdAt: string;
   size?: number;
+  chapterInfo?: {
+    chapterNumber: number;
+    chapterTitle: string;
+  };
 }
 
 interface EbookImageLibraryProps {
@@ -133,6 +137,19 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
     }
   };
 
+  // Parse chapter info from filename
+  const parseChapterInfo = (filename: string): { chapterNumber: number; chapterTitle: string } | undefined => {
+    // Pattern: timestamp-chapitre-chapter-chapterId-index-title.png
+    // Example: 1765471603633-chapitre-chapter-1765458729834-0-le_retour_inattendu.png
+    const match = filename.match(/chapitre-chapter-\d+-(\d+)-(.+)\.(png|jpg|jpeg|gif|webp)$/i);
+    if (match) {
+      const chapterNumber = parseInt(match[1], 10) + 1; // +1 car index commence à 0
+      const chapterTitle = match[2].replace(/_/g, ' ').replace(/%20/g, ' ');
+      return { chapterNumber, chapterTitle };
+    }
+    return undefined;
+  };
+
   const loadImages = async (folderId: string) => {
     setIsLoading(true);
     try {
@@ -152,15 +169,28 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
             .from('ebook-images')
             .getPublicUrl(`${user.id}/${folderId}/${file.name}`);
 
+          const chapterInfo = parseChapterInfo(file.name);
+
           imageList.push({
             id: file.id || file.name,
             name: file.name,
             url: urlData.publicUrl,
             createdAt: file.created_at || new Date().toISOString(),
-            size: file.metadata?.size
+            size: file.metadata?.size,
+            chapterInfo
           });
         }
       }
+
+      // Trier par numéro de chapitre si disponible
+      imageList.sort((a, b) => {
+        if (a.chapterInfo && b.chapterInfo) {
+          return a.chapterInfo.chapterNumber - b.chapterInfo.chapterNumber;
+        }
+        if (a.chapterInfo) return -1;
+        if (b.chapterInfo) return 1;
+        return 0;
+      });
 
       setImages(imageList);
     } catch (error) {
@@ -552,17 +582,36 @@ export const EbookImageLibrary: React.FC<EbookImageLibraryProps> = ({
                     viewMode === 'list' ? 'flex items-center p-3 gap-4' : ''
                   }`}
                 >
-                  <div className={viewMode === 'grid' ? 'aspect-square' : 'w-16 h-16 flex-shrink-0'}>
+                  <div className={`relative ${viewMode === 'grid' ? 'aspect-square' : 'w-16 h-16 flex-shrink-0'}`}>
                     <img
                       src={image.url}
                       alt={image.name}
                       className="w-full h-full object-cover rounded-lg"
                       loading="lazy"
                     />
+                    {/* Badge numéro de chapitre en mode grille */}
+                    {viewMode === 'grid' && image.chapterInfo && (
+                      <div className="absolute top-2 left-2 bg-primary text-primary-foreground text-xs font-bold px-2 py-1 rounded-full shadow-lg z-10">
+                        Ch. {image.chapterInfo.chapterNumber}
+                      </div>
+                    )}
                   </div>
                   
                   <div className={viewMode === 'list' ? 'flex-1 min-w-0' : 'p-3'}>
-                    <p className="text-sm font-medium truncate">{image.name}</p>
+                    {image.chapterInfo ? (
+                      <>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="bg-primary/20 text-primary text-xs font-bold px-2 py-0.5 rounded">
+                            Chapitre {image.chapterInfo.chapterNumber}
+                          </span>
+                        </div>
+                        <p className="text-sm font-medium truncate capitalize">
+                          {image.chapterInfo.chapterTitle}
+                        </p>
+                      </>
+                    ) : (
+                      <p className="text-sm font-medium truncate">{image.name}</p>
+                    )}
                     <p className="text-xs text-muted-foreground">
                       {new Date(image.createdAt).toLocaleDateString('fr-FR')}
                     </p>
