@@ -9,6 +9,9 @@ verify_jwt = false
 [functions.generate-cover-image]
 verify_jwt = false
 
+[functions.generate-front-cover]
+verify_jwt = false
+
 [functions.generate-series-cover]
 verify_jwt = false
 
