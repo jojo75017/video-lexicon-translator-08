@@ -99,52 +99,53 @@ serve(async (req) => {
       // Full cover (front + spine + back)
       imagePrompt = `Create a COMPLETE BOOK COVER for Amazon KDP print publication. This must include FRONT COVER, SPINE, and BACK COVER in a single horizontal image.
 
+CRITICAL - TEXT REQUIREMENTS (MOST IMPORTANT):
+- The TITLE "${ebookTitle}" MUST be clearly visible and readable on the front cover
+- The AUTHOR NAME "${authorName}" MUST appear on both the front cover and spine
+- All text must be LARGE, BOLD, and HIGH CONTRAST against the background
+- Use professional typography that stands out
+
 BOOK DETAILS:
 - Title: "${ebookTitle}"
 - Author: "${authorName}"
 ${subtitle ? `- Subtitle: "${subtitle}"` : ''}
 - Genre: ${genreDesc}
 - Style: ${styleDesc}
-- Binding: ${bindingType === 'paperback' ? 'Paperback' : 'Hardcover'}
 
-TECHNICAL SPECIFICATIONS (CRITICAL):
-- This is a FULL WRAP-AROUND COVER layout
-- Image must be LANDSCAPE/HORIZONTAL orientation
-- Layout from LEFT to RIGHT: BACK COVER | SPINE | FRONT COVER
-- Spine width: ${spineWidth} inches (based on ${pageCount} pages on ${paperType} paper)
-- Book format: ${bookFormat}
-${dimensions ? `- Total dimensions: approximately ${dimensions.totalWidthIn}" x ${dimensions.heightIn}"` : ''}
+LAYOUT (LEFT TO RIGHT):
+BACK COVER (LEFT) | SPINE (CENTER) | FRONT COVER (RIGHT)
 
-FRONT COVER (RIGHT SIDE):
-1. TITLE "${ebookTitle}" - Large, prominent, clearly readable
-2. Author name "${authorName}" - At bottom, smaller but visible
+FRONT COVER (RIGHT SIDE - Most Important):
+1. TITLE "${ebookTitle}" - LARGE, PROMINENT, TOP OR CENTER, must be clearly readable
+2. Author name "${authorName}" - At bottom, clearly visible
 ${subtitle ? `3. Subtitle "${subtitle}" - Below title` : ''}
-4. Compelling visual illustration for the ${genre} genre
+4. Compelling visual illustration matching the ${genre} genre and ${style} style
 
 SPINE (CENTER - NARROW VERTICAL STRIP):
-1. Title "${ebookTitle}" - Rotated vertically, readable from bottom to top
+1. Title "${ebookTitle}" - Rotated vertically
 2. Author name "${authorName}" - At bottom of spine
-3. Small decorative element or publisher logo area
-4. Width proportional to ${pageCount} pages
 
 BACK COVER (LEFT SIDE):
-${backCoverText ? `1. Marketing text/synopsis: "${backCoverText.substring(0, 300)}"` : '1. Space for marketing copy/synopsis'}
-2. Author bio area - leave a clean space for author information, DO NOT generate any person or face
-3. Price area (bottom left)
+${backCoverText ? `1. Synopsis/marketing text: "${backCoverText.substring(0, 200)}"` : '1. Clean space for synopsis'}
+2. Leave empty space for author bio (NO faces, NO people)
 
-DESIGN REQUIREMENTS:
-- Seamless design that flows across all three sections
-- Professional ${style} aesthetic throughout
-- Consistent color palette and typography
-- Full bleed design - NO white borders
-- The spine must be clearly visible but naturally integrated
-- Background/imagery should wrap smoothly from back to front
+CRITICAL PROHIBITIONS - DO NOT INCLUDE:
+- NO ISBN barcode
+- NO barcode of any kind
+- NO QR codes
+- NO price tags
+- NO fictitious faces or people
+- NO publisher logos
 
-${customPrompt ? `ADDITIONAL CUSTOMIZATION: ${customPrompt}` : ''}
+DESIGN:
+- Professional ${style} aesthetic
+- Seamless design flowing across all sections
+- Full bleed - NO white borders
+- High contrast for readability
 
-VARIATION ${variation}: Create a unique version while maintaining the layout structure.
+${customPrompt ? `CUSTOMIZATION: ${customPrompt}` : ''}
 
-This MUST look like a REAL, PRINT-READY Amazon KDP book cover.`;
+This MUST be a print-ready cover with CLEARLY READABLE title and author name.`;
 
     } else {
       // Front cover only
