@@ -937,19 +937,24 @@ ${tome.mainPlotPoints?.map((p, i) => `${i + 1}. ${p}`).join('\n') || 'Non défin
 
 ${tome.cliffhanger ? `CLIFFHANGER: ${tome.cliffhanger}` : ''}
 
+IMPORTANT: Génère EXACTEMENT 8 chapitres pour un livre de 80 pages.
+
 Génère en JSON:
 {
   "preface": "Une préface engageante de 100-150 mots",
   "chapters": [
     {
       "title": "Titre du chapitre",
-      "subChapters": ["Sous-chapitre 1", "Sous-chapitre 2", "Sous-chapitre 3"]
+      "subChapters": ["Sous-chapitre 1", "Sous-chapitre 2"]
     }
   ],
   "conclusion": "Une conclusion de 100-150 mots"
 }
 
-Génère 8-12 chapitres avec 3-5 sous-chapitres chacun, suivant une progression narrative cohérente.`
+RÈGLES STRICTES:
+- Génère EXACTEMENT 8 chapitres (pas plus, pas moins)
+- Chaque chapitre doit avoir 2-3 sous-chapitres maximum
+- Progression narrative cohérente`
         }
       });
 
