@@ -40,50 +40,50 @@ serve(async (req) => {
       );
     }
 
-    // Style variations based on genre
+    // Style variations based on genre (in French)
     const genreStyles: Record<string, string> = {
-      'fantasy': 'epic fantasy art style, magical atmosphere, mystical lighting, enchanted landscapes',
-      'science-fiction': 'futuristic sci-fi style, neon lights, space atmosphere, technological elements',
-      'romance': 'romantic soft lighting, warm colors, elegant and emotional atmosphere',
-      'thriller': 'dark and suspenseful atmosphere, dramatic shadows, noir style',
-      'historique': 'period-appropriate art style, vintage aesthetic, historical accuracy',
-      'horreur': 'dark horror atmosphere, eerie lighting, gothic elements',
-      'aventure': 'adventurous dynamic scene, action-packed, vibrant colors',
-      'policier': 'crime noir style, urban setting, mysterious atmosphere',
-      'default': 'professional book cover style, cinematic lighting, high quality'
+      'fantasy': 'style art fantasy épique, atmosphère magique, éclairage mystique, paysages enchantés',
+      'science-fiction': 'style futuriste sci-fi, néons, atmosphère spatiale, éléments technologiques',
+      'romance': 'éclairage romantique doux, couleurs chaudes, atmosphère élégante et émotionnelle',
+      'thriller': 'atmosphère sombre et suspense, ombres dramatiques, style noir',
+      'historique': 'style artistique d\'époque, esthétique vintage, précision historique',
+      'horreur': 'atmosphère d\'horreur sombre, éclairage inquiétant, éléments gothiques',
+      'aventure': 'scène d\'aventure dynamique, action, couleurs vibrantes',
+      'policier': 'style polar noir, décor urbain, atmosphère mystérieuse',
+      'default': 'style couverture de livre professionnel, éclairage cinématique, haute qualité'
     };
 
     const genreStyle = genreStyles[genre?.toLowerCase()] || genreStyles['default'];
 
-    const tomeText = tomeNumber ? `Tome ${tomeNumber}${tomeTitle ? `: ${tomeTitle}` : ''}` : '';
+    const tomeText = tomeNumber ? `Tome ${tomeNumber}${tomeTitle ? ` : ${tomeTitle}` : ''}` : '';
     
-    const imagePrompt = `Create a stunning professional BOOK COVER (front cover) for a ${genre || 'fiction'} book series.
+    const imagePrompt = `Crée une couverture de livre PROFESSIONNELLE (première de couverture) pour une série de livres ${genre || 'fiction'}.
 
-SERIES DETAILS:
-- Series Title: "${seriesTitle}"
-${tomeText ? `- This is: ${tomeText}` : '- This is the main series cover'}
-${synopsis ? `- Theme/Synopsis: ${synopsis.substring(0, 200)}` : ''}
-${authorName ? `- Author: ${authorName}` : ''}
+DÉTAILS DE LA SÉRIE :
+- Titre de la série : "${seriesTitle}"
+${tomeText ? `- Ceci est : ${tomeText}` : '- Ceci est la couverture principale de la série'}
+${synopsis ? `- Thème/Synopsis : ${synopsis.substring(0, 200)}` : ''}
+${authorName ? `- Auteur : ${authorName}` : ''}
 
-VISUAL STYLE:
+STYLE VISUEL :
 - ${genreStyle}
-- ${style === 'minimalist' ? 'Clean minimalist design with symbolic imagery' : 
-    style === 'illustrated' ? 'Detailed illustration with rich imagery and characters' :
-    style === 'photorealistic' ? 'Photorealistic style with dramatic composition' :
-    'Cinematic and epic visual composition'}
+- ${style === 'minimalist' ? 'Design minimaliste épuré avec imagerie symbolique' : 
+    style === 'illustrated' ? 'Illustration détaillée avec imagerie riche et personnages' :
+    style === 'photorealistic' ? 'Style photoréaliste avec composition dramatique' :
+    'Composition visuelle cinématique et épique'}
 
-CRITICAL REQUIREMENTS:
-- Portrait format 2:3 ratio for Amazon KDP (1024x1536)
-- Full bleed design - NO white borders
-- Professional publishing quality
-- Eye-catching imagery that represents the story
-- Space at top for series title and tome number
-- Space at bottom for author name
-- Cohesive color palette
-- High contrast for text readability areas
-- DO NOT include any text - leave clean areas for text overlay
+EXIGENCES CRITIQUES :
+- Format portrait ratio 2:3 pour Amazon KDP (1024x1536)
+- Design plein bord - PAS de bordures blanches
+- Qualité édition professionnelle
+- Imagerie accrocheuse représentant l'histoire
+- Espace en haut pour le titre de la série et numéro de tome
+- Espace en bas pour le nom de l'auteur
+- Palette de couleurs cohérente
+- Contraste élevé pour les zones de texte lisibles
+- NE PAS inclure de texte - laisser des zones propres pour superposition de texte
 
-Make this cover memorable and genre-appropriate, suitable for a bestselling book series.`;
+Rends cette couverture mémorable et appropriée au genre, adaptée à une série de livres bestseller.`;
 
     console.log('Calling Lovable AI for series cover generation');
 
