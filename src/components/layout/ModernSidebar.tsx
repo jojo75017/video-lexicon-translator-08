@@ -189,6 +189,14 @@ const menuItems = [
     activeGradient: 'from-green-500 to-emerald-500'
   },
   { 
+    id: 'price-estimator', 
+    label: 'Estimations Prix', 
+    icon: DollarSign,
+    color: 'text-yellow-500',
+    bgColor: 'bg-yellow-500/10',
+    activeGradient: 'from-yellow-500 to-amber-500'
+  },
+  { 
   id: 'kdp', 
     label: 'Amazon KDP', 
     icon: TrendingUp,

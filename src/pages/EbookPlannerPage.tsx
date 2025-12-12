@@ -61,6 +61,7 @@ import EbookKdpAnalytics from '@/components/ebook/EbookKdpAnalytics';
 import { EbookImageLibrary } from '@/components/ebook/EbookImageLibrary';
 import { EbookAnalyticsDashboard } from '@/components/ebook/EbookAnalyticsDashboard';
 import { EbookBookMockup3D } from '@/components/ebook/EbookBookMockup3D';
+import EbookPriceEstimator from '@/components/ebook/EbookPriceEstimator';
 import { useConfetti } from '@/hooks/useConfetti';
 
 // Hooks et données
@@ -1229,6 +1230,11 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
       case 'monetization':
         return (
           <EbookMonetization />
+        );
+      
+      case 'price-estimator':
+        return (
+          <EbookPriceEstimator />
         );
       
       case 'templates':
