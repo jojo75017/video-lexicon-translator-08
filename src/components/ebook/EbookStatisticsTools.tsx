@@ -31,6 +31,7 @@ interface EbookStatisticsToolsProps {
 }
 
 const languages = [
+  { value: 'français', label: '🇫🇷 Français' },
   { value: 'anglais', label: '🇬🇧 Anglais' },
   { value: 'espagnol', label: '🇪🇸 Espagnol' },
   { value: 'allemand', label: '🇩🇪 Allemand' },
