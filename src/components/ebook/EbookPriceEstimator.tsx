@@ -2,11 +2,13 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
-  DollarSign, 
   BookOpen, 
-  TrendingUp, 
-  Calculator,
-  Info
+  AlertTriangle,
+  CheckCircle2,
+  XCircle,
+  Info,
+  FileText,
+  Layers
 } from 'lucide-react';
 import {
   Tooltip,
@@ -15,112 +17,130 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-interface PageEstimate {
+interface KdpRequirement {
   pages: number;
-  minPrice: number;
-  maxPrice: number;
-  recommendedPrice: number;
-  royalty70: number;
-  royalty35: number;
-  printCost: number;
-  printRoyalty: number;
+  minChapters: number;
+  minWordsPerChapter: number;
+  totalWords: number;
+  status: 'danger' | 'warning' | 'ok' | 'ideal';
+  kdpStatus: string;
+  recommendation: string;
   category: string;
 }
 
 const EbookPriceEstimator: React.FC = () => {
-  // Estimations basées sur les standards KDP Amazon
-  const estimates: PageEstimate[] = [
+  // Exigences KDP pour éviter le blocage
+  const requirements: KdpRequirement[] = [
     {
       pages: 20,
-      minPrice: 0.99,
-      maxPrice: 2.99,
-      recommendedPrice: 1.99,
-      royalty70: 1.39, // 70% de 1.99
-      royalty35: 0.70, // 35% de 1.99
-      printCost: 2.15, // Coût impression minimal
-      printRoyalty: 0.50,
-      category: 'Court / Guide rapide'
+      minChapters: 3,
+      minWordsPerChapter: 1500,
+      totalWords: 5000,
+      status: 'danger',
+      kdpStatus: 'RISQUE ÉLEVÉ',
+      recommendation: 'Trop court - risque de rejet pour "contenu insuffisant"',
+      category: 'Non recommandé'
+    },
+    {
+      pages: 30,
+      minChapters: 4,
+      minWordsPerChapter: 1800,
+      totalWords: 7500,
+      status: 'warning',
+      kdpStatus: 'LIMITE',
+      recommendation: 'Minimum absolu - ajoutez du contenu si possible',
+      category: 'Minimum KDP'
     },
     {
       pages: 50,
-      minPrice: 2.99,
-      maxPrice: 4.99,
-      recommendedPrice: 3.99,
-      royalty70: 2.79,
-      royalty35: 1.40,
-      printCost: 2.85,
-      printRoyalty: 1.50,
+      minChapters: 5,
+      minWordsPerChapter: 2000,
+      totalWords: 12500,
+      status: 'ok',
+      kdpStatus: 'ACCEPTÉ',
+      recommendation: 'Acceptable pour guides courts et ebooks pratiques',
+      category: 'Guide court'
+    },
+    {
+      pages: 75,
+      minChapters: 6,
+      minWordsPerChapter: 2500,
+      totalWords: 18750,
+      status: 'ok',
+      kdpStatus: 'ACCEPTÉ',
+      recommendation: 'Bon format pour ebooks pratiques et tutoriels',
       category: 'Ebook standard'
     },
     {
       pages: 100,
-      minPrice: 4.99,
-      maxPrice: 7.99,
-      recommendedPrice: 5.99,
-      royalty70: 4.19,
-      royalty35: 2.10,
-      printCost: 3.85,
-      printRoyalty: 3.00,
+      minChapters: 8,
+      minWordsPerChapter: 2500,
+      totalWords: 25000,
+      status: 'ideal',
+      kdpStatus: 'IDÉAL',
+      recommendation: 'Format parfait pour la plupart des genres',
       category: 'Livre complet'
     },
     {
       pages: 150,
-      minPrice: 5.99,
-      maxPrice: 9.99,
-      recommendedPrice: 7.99,
-      royalty70: 5.59,
-      royalty35: 2.80,
-      printCost: 4.65,
-      printRoyalty: 4.00,
+      minChapters: 10,
+      minWordsPerChapter: 3000,
+      totalWords: 37500,
+      status: 'ideal',
+      kdpStatus: 'IDÉAL',
+      recommendation: 'Excellent pour romans et guides approfondis',
       category: 'Ouvrage approfondi'
     },
     {
       pages: 200,
-      minPrice: 7.99,
-      maxPrice: 12.99,
-      recommendedPrice: 9.99,
-      royalty70: 6.99,
-      royalty35: 3.50,
-      printCost: 5.45,
-      printRoyalty: 5.50,
-      category: 'Ouvrage expert'
+      minChapters: 12,
+      minWordsPerChapter: 3500,
+      totalWords: 50000,
+      status: 'ideal',
+      kdpStatus: 'IDÉAL',
+      recommendation: 'Parfait pour romans et manuels complets',
+      category: 'Roman / Manuel'
     },
     {
       pages: 300,
-      minPrice: 9.99,
-      maxPrice: 14.99,
-      recommendedPrice: 12.99,
-      royalty70: 9.09,
-      royalty35: 4.55,
-      printCost: 7.05,
-      printRoyalty: 6.50,
-      category: 'Roman / Manuel complet'
-    },
-    {
-      pages: 400,
-      minPrice: 12.99,
-      maxPrice: 17.99,
-      recommendedPrice: 14.99,
-      royalty70: 10.49,
-      royalty35: 5.25,
-      printCost: 8.65,
-      printRoyalty: 7.50,
+      minChapters: 15,
+      minWordsPerChapter: 4000,
+      totalWords: 75000,
+      status: 'ideal',
+      kdpStatus: 'IDÉAL',
+      recommendation: 'Format idéal pour sagas et encyclopédies',
       category: 'Ouvrage majeur'
-    },
-    {
-      pages: 500,
-      minPrice: 14.99,
-      maxPrice: 19.99,
-      recommendedPrice: 17.99,
-      royalty70: 12.59,
-      royalty35: 6.30,
-      printCost: 10.25,
-      printRoyalty: 8.50,
-      category: 'Encyclopédie / Saga'
     }
   ];
 
-  const formatPrice = (price: number) => `${price.toFixed(2)} €`;
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'danger':
+        return <XCircle className="h-5 w-5 text-red-500" />;
+      case 'warning':
+        return <AlertTriangle className="h-5 w-5 text-amber-500" />;
+      case 'ok':
+        return <CheckCircle2 className="h-5 w-5 text-emerald-500" />;
+      case 'ideal':
+        return <CheckCircle2 className="h-5 w-5 text-primary" />;
+      default:
+        return null;
+    }
+  };
+
+  const getStatusBadge = (status: string, kdpStatus: string) => {
+    const variants: Record<string, string> = {
+      danger: 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300',
+      warning: 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300',
+      ok: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300',
+      ideal: 'bg-primary/10 text-primary'
+    };
+    return (
+      <Badge className={variants[status]}>
+        {kdpStatus}
+      </Badge>
+    );
+  };
 
   return (
     <TooltipProvider>
@@ -130,16 +150,35 @@ const EbookPriceEstimator: React.FC = () => {
           <CardHeader>
             <div className="flex items-center gap-3">
               <div className="p-3 rounded-xl bg-primary/20">
-                <Calculator className="h-6 w-6 text-primary" />
+                <Layers className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <CardTitle className="text-xl">Estimations de Prix par Pages</CardTitle>
+                <CardTitle className="text-xl">Exigences KDP - Chapitres & Pages</CardTitle>
                 <CardDescription>
-                  Guide de tarification pour vos ebooks sur Amazon KDP
+                  Nombre minimum de chapitres et pages pour éviter le blocage Amazon KDP
                 </CardDescription>
               </div>
             </div>
           </CardHeader>
+        </Card>
+
+        {/* Alerte importante */}
+        <Card className="bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800">
+          <CardContent className="pt-6">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="h-6 w-6 text-red-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <h3 className="font-semibold text-red-800 dark:text-red-200">Règles KDP à respecter</h3>
+                <ul className="mt-2 text-sm text-red-700 dark:text-red-300 space-y-1">
+                  <li>• <strong>Minimum 24 pages</strong> pour les ebooks Kindle</li>
+                  <li>• <strong>Minimum 72 pages</strong> pour les livres brochés (print)</li>
+                  <li>• Contenu original et de qualité requise</li>
+                  <li>• Évitez le contenu généré par IA sans révision humaine</li>
+                  <li>• Chapitres trop courts = risque de rejet</li>
+                </ul>
+              </div>
+            </div>
+          </CardContent>
         </Card>
 
         {/* Légende */}
@@ -147,31 +186,31 @@ const EbookPriceEstimator: React.FC = () => {
           <CardContent className="pt-6">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-emerald-500" />
-                <span>Royalties 70% (2.99€-9.99€)</span>
+                <XCircle className="h-4 w-4 text-red-500" />
+                <span>Risque de blocage</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-amber-500" />
-                <span>Royalties 35% (autres prix)</span>
+                <AlertTriangle className="h-4 w-4 text-amber-500" />
+                <span>Limite acceptable</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-blue-500" />
-                <span>Format Kindle</span>
+                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                <span>Accepté KDP</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-purple-500" />
-                <span>Format Broché (Print)</span>
+                <CheckCircle2 className="h-4 w-4 text-primary" />
+                <span>Format idéal</span>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Tableau des estimations */}
+        {/* Tableau des exigences */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BookOpen className="h-5 w-5" />
-              Tableau des Estimations
+              Tableau des Exigences par Nombre de Pages
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -179,138 +218,74 @@ const EbookPriceEstimator: React.FC = () => {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border">
-                    <th className="text-left py-3 px-4 font-semibold">Pages</th>
-                    <th className="text-left py-3 px-4 font-semibold">Catégorie</th>
-                    <th className="text-center py-3 px-4 font-semibold">
-                      <div className="flex items-center justify-center gap-1">
-                        Prix Min
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <Info className="h-3 w-3 text-muted-foreground" />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            Prix minimum recommandé
-                          </TooltipContent>
-                        </Tooltip>
-                      </div>
-                    </th>
+                    <th className="text-left py-3 px-4 font-semibold">Status</th>
+                    <th className="text-center py-3 px-4 font-semibold">Pages</th>
                     <th className="text-center py-3 px-4 font-semibold bg-primary/5">
                       <div className="flex items-center justify-center gap-1">
-                        Prix Recommandé
+                        Chapitres Min
                         <Tooltip>
                           <TooltipTrigger>
                             <Info className="h-3 w-3 text-muted-foreground" />
                           </TooltipTrigger>
                           <TooltipContent>
-                            Prix optimal pour maximiser les ventes et revenus
+                            Nombre minimum de chapitres recommandé
                           </TooltipContent>
                         </Tooltip>
                       </div>
                     </th>
-                    <th className="text-center py-3 px-4 font-semibold">Prix Max</th>
-                    <th className="text-center py-3 px-4 font-semibold text-emerald-600">
+                    <th className="text-center py-3 px-4 font-semibold">
                       <div className="flex items-center justify-center gap-1">
-                        Royalties 70%
+                        Mots/Chapitre
                         <Tooltip>
                           <TooltipTrigger>
                             <Info className="h-3 w-3 text-muted-foreground" />
                           </TooltipTrigger>
                           <TooltipContent>
-                            Royalties si prix entre 2.99€ et 9.99€
+                            Nombre de mots minimum par chapitre
                           </TooltipContent>
                         </Tooltip>
                       </div>
                     </th>
-                    <th className="text-center py-3 px-4 font-semibold text-amber-600">
-                      <div className="flex items-center justify-center gap-1">
-                        Royalties 35%
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <Info className="h-3 w-3 text-muted-foreground" />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            Royalties pour prix hors zone 2.99€-9.99€
-                          </TooltipContent>
-                        </Tooltip>
-                      </div>
-                    </th>
-                    <th className="text-center py-3 px-4 font-semibold text-purple-600">
-                      <div className="flex items-center justify-center gap-1">
-                        Coût Print
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <Info className="h-3 w-3 text-muted-foreground" />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            Coût d'impression KDP pour broché
-                          </TooltipContent>
-                        </Tooltip>
-                      </div>
-                    </th>
-                    <th className="text-center py-3 px-4 font-semibold text-purple-600">
-                      <div className="flex items-center justify-center gap-1">
-                        Royalties Print
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <Info className="h-3 w-3 text-muted-foreground" />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            Royalties estimées pour version brochée
-                          </TooltipContent>
-                        </Tooltip>
-                      </div>
-                    </th>
+                    <th className="text-center py-3 px-4 font-semibold">Total Mots</th>
+                    <th className="text-center py-3 px-4 font-semibold">Statut KDP</th>
+                    <th className="text-left py-3 px-4 font-semibold">Catégorie</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {estimates.map((estimate, index) => (
+                  {requirements.map((req, index) => (
                     <tr 
-                      key={estimate.pages} 
+                      key={req.pages} 
                       className={`border-b border-border/50 hover:bg-muted/50 transition-colors ${
+                        req.status === 'danger' ? 'bg-red-50/50 dark:bg-red-950/10' :
+                        req.status === 'warning' ? 'bg-amber-50/50 dark:bg-amber-950/10' :
+                        req.status === 'ideal' ? 'bg-primary/5' :
                         index % 2 === 0 ? 'bg-muted/20' : ''
                       }`}
                     >
                       <td className="py-4 px-4">
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="font-bold">
-                            {estimate.pages}
-                          </Badge>
-                          <span className="text-muted-foreground">pages</span>
-                        </div>
+                        {getStatusIcon(req.status)}
                       </td>
-                      <td className="py-4 px-4">
-                        <span className="font-medium">{estimate.category}</span>
-                      </td>
-                      <td className="py-4 px-4 text-center text-muted-foreground">
-                        {formatPrice(estimate.minPrice)}
-                      </td>
-                      <td className="py-4 px-4 text-center bg-primary/5">
-                        <Badge className="bg-primary text-primary-foreground font-bold">
-                          {formatPrice(estimate.recommendedPrice)}
+                      <td className="py-4 px-4 text-center">
+                        <Badge variant="outline" className="font-bold">
+                          {req.pages}
                         </Badge>
                       </td>
+                      <td className="py-4 px-4 text-center bg-primary/5">
+                        <span className="font-bold text-lg text-primary">
+                          {req.minChapters}
+                        </span>
+                      </td>
+                      <td className="py-4 px-4 text-center font-medium">
+                        {req.minWordsPerChapter.toLocaleString()}
+                      </td>
                       <td className="py-4 px-4 text-center text-muted-foreground">
-                        {formatPrice(estimate.maxPrice)}
+                        {req.totalWords.toLocaleString()}
                       </td>
                       <td className="py-4 px-4 text-center">
-                        <span className="text-emerald-600 font-semibold">
-                          {formatPrice(estimate.royalty70)}
-                        </span>
+                        {getStatusBadge(req.status, req.kdpStatus)}
                       </td>
-                      <td className="py-4 px-4 text-center">
-                        <span className="text-amber-600 font-medium">
-                          {formatPrice(estimate.royalty35)}
-                        </span>
-                      </td>
-                      <td className="py-4 px-4 text-center">
-                        <span className="text-purple-600 font-medium">
-                          {formatPrice(estimate.printCost)}
-                        </span>
-                      </td>
-                      <td className="py-4 px-4 text-center">
-                        <span className="text-purple-600 font-semibold">
-                          {formatPrice(estimate.printRoyalty)}
-                        </span>
+                      <td className="py-4 px-4">
+                        <span className="font-medium">{req.category}</span>
                       </td>
                     </tr>
                   ))}
@@ -320,80 +295,57 @@ const EbookPriceEstimator: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Revenus estimés par mois */}
+        {/* Recommandations détaillées */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
-              Revenus Mensuels Estimés (par ventes/mois)
+              <FileText className="h-5 w-5" />
+              Recommandations par Format
             </CardTitle>
-            <CardDescription>
-              Simulation basée sur le prix recommandé avec royalties 70%
-            </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border">
-                    <th className="text-left py-3 px-4 font-semibold">Pages</th>
-                    <th className="text-center py-3 px-4 font-semibold">10 ventes/mois</th>
-                    <th className="text-center py-3 px-4 font-semibold">25 ventes/mois</th>
-                    <th className="text-center py-3 px-4 font-semibold">50 ventes/mois</th>
-                    <th className="text-center py-3 px-4 font-semibold">100 ventes/mois</th>
-                    <th className="text-center py-3 px-4 font-semibold bg-emerald-50 dark:bg-emerald-950/30">250 ventes/mois</th>
-                    <th className="text-center py-3 px-4 font-semibold">500 ventes/mois</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {estimates.map((estimate, index) => (
-                    <tr 
-                      key={estimate.pages} 
-                      className={`border-b border-border/50 hover:bg-muted/50 transition-colors ${
-                        index % 2 === 0 ? 'bg-muted/20' : ''
-                      }`}
-                    >
-                      <td className="py-4 px-4 font-medium">{estimate.pages} pages</td>
-                      <td className="py-4 px-4 text-center">
-                        {formatPrice(estimate.royalty70 * 10)}
-                      </td>
-                      <td className="py-4 px-4 text-center">
-                        {formatPrice(estimate.royalty70 * 25)}
-                      </td>
-                      <td className="py-4 px-4 text-center">
-                        {formatPrice(estimate.royalty70 * 50)}
-                      </td>
-                      <td className="py-4 px-4 text-center font-medium">
-                        {formatPrice(estimate.royalty70 * 100)}
-                      </td>
-                      <td className="py-4 px-4 text-center font-semibold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30">
-                        {formatPrice(estimate.royalty70 * 250)}
-                      </td>
-                      <td className="py-4 px-4 text-center font-bold text-primary">
-                        {formatPrice(estimate.royalty70 * 500)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="grid md:grid-cols-2 gap-4">
+              {requirements.map((req) => (
+                <div 
+                  key={req.pages}
+                  className={`p-4 rounded-lg border ${
+                    req.status === 'danger' ? 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/20' :
+                    req.status === 'warning' ? 'border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/20' :
+                    req.status === 'ideal' ? 'border-primary/30 bg-primary/5' :
+                    'border-border bg-muted/20'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-bold">{req.pages} pages</span>
+                    {getStatusBadge(req.status, req.kdpStatus)}
+                  </div>
+                  <p className="text-sm text-muted-foreground">{req.recommendation}</p>
+                  <div className="mt-2 text-xs space-y-1">
+                    <p>→ {req.minChapters} chapitres minimum</p>
+                    <p>→ {req.minWordsPerChapter.toLocaleString()} mots/chapitre</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
 
-        {/* Notes importantes */}
-        <Card className="bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800">
+        {/* Conseils pour éviter le blocage */}
+        <Card className="bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-amber-800 dark:text-amber-200">
-              <Info className="h-5 w-5" />
-              Notes Importantes
+            <CardTitle className="flex items-center gap-2 text-emerald-800 dark:text-emerald-200">
+              <CheckCircle2 className="h-5 w-5" />
+              Conseils pour Éviter le Blocage KDP
             </CardTitle>
           </CardHeader>
-          <CardContent className="text-amber-900 dark:text-amber-100 text-sm space-y-2">
-            <p>• <strong>Zone 70%</strong> : Disponible uniquement pour les prix entre 2.99€ et 9.99€ sur Amazon KDP.</p>
-            <p>• <strong>Coûts Print</strong> : Basés sur un format 15x23cm, noir & blanc, couverture brillante. Varient selon le format.</p>
-            <p>• <strong>Prix recommandés</strong> : Suggestions basées sur les standards du marché, ajustez selon votre niche.</p>
-            <p>• <strong>Pages</strong> : Estimation à ~250 mots/page pour format Kindle standard.</p>
-            <p>• <strong>TVA</strong> : Les royalties affichées sont avant déduction de la TVA (selon pays).</p>
+          <CardContent className="text-emerald-900 dark:text-emerald-100 text-sm space-y-2">
+            <p>✅ <strong>Visez minimum 50 pages</strong> pour les ebooks et 100 pages pour le broché</p>
+            <p>✅ <strong>5+ chapitres minimum</strong> avec contenu substantiel par chapitre</p>
+            <p>✅ <strong>2000+ mots par chapitre</strong> pour un contenu de qualité</p>
+            <p>✅ <strong>Ajoutez une introduction et conclusion</strong> détaillées</p>
+            <p>✅ <strong>Incluez des sous-chapitres</strong> pour structurer le contenu</p>
+            <p>✅ <strong>Relisez et éditez</strong> le contenu généré par IA</p>
+            <p>✅ <strong>Ajoutez de la valeur unique</strong> : exemples, études de cas, exercices</p>
           </CardContent>
         </Card>
       </div>
