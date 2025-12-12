@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
 import { 
   BookOpen, 
   AlertTriangle,
@@ -8,7 +11,9 @@ import {
   XCircle,
   Info,
   FileText,
-  Layers
+  Layers,
+  Calculator,
+  Zap
 } from 'lucide-react';
 import {
   Tooltip,
@@ -29,102 +34,122 @@ interface KdpRequirement {
 }
 
 const EbookPriceEstimator: React.FC = () => {
-  // Exigences KDP pour éviter le blocage
-  const requirements: KdpRequirement[] = [
-    {
-      pages: 20,
-      minChapters: 3,
-      minWordsPerChapter: 1500,
-      totalWords: 5000,
-      status: 'danger',
-      kdpStatus: 'RISQUE ÉLEVÉ',
-      recommendation: 'Trop court - risque de rejet pour "contenu insuffisant"',
-      category: 'Non recommandé'
-    },
-    {
-      pages: 30,
-      minChapters: 4,
-      minWordsPerChapter: 1800,
-      totalWords: 7500,
-      status: 'warning',
-      kdpStatus: 'LIMITE',
-      recommendation: 'Minimum absolu - ajoutez du contenu si possible',
-      category: 'Minimum KDP'
-    },
-    {
-      pages: 50,
-      minChapters: 5,
-      minWordsPerChapter: 2000,
-      totalWords: 12500,
-      status: 'ok',
-      kdpStatus: 'ACCEPTÉ',
-      recommendation: 'Acceptable pour guides courts et ebooks pratiques',
-      category: 'Guide court'
-    },
-    {
-      pages: 75,
-      minChapters: 6,
-      minWordsPerChapter: 2500,
-      totalWords: 18750,
-      status: 'ok',
-      kdpStatus: 'ACCEPTÉ',
-      recommendation: 'Bon format pour ebooks pratiques et tutoriels',
-      category: 'Ebook standard'
-    },
-    {
-      pages: 100,
-      minChapters: 8,
-      minWordsPerChapter: 2500,
-      totalWords: 25000,
-      status: 'ideal',
-      kdpStatus: 'IDÉAL',
-      recommendation: 'Format parfait pour la plupart des genres',
-      category: 'Livre complet'
-    },
-    {
-      pages: 150,
-      minChapters: 10,
-      minWordsPerChapter: 3000,
-      totalWords: 37500,
-      status: 'ideal',
-      kdpStatus: 'IDÉAL',
-      recommendation: 'Excellent pour romans et guides approfondis',
-      category: 'Ouvrage approfondi'
-    },
-    {
-      pages: 200,
-      minChapters: 12,
-      minWordsPerChapter: 3500,
-      totalWords: 50000,
-      status: 'ideal',
-      kdpStatus: 'IDÉAL',
-      recommendation: 'Parfait pour romans et manuels complets',
-      category: 'Roman / Manuel'
-    },
-    {
-      pages: 300,
-      minChapters: 15,
-      minWordsPerChapter: 4000,
-      totalWords: 75000,
-      status: 'ideal',
-      kdpStatus: 'IDÉAL',
-      recommendation: 'Format idéal pour sagas et encyclopédies',
-      category: 'Ouvrage majeur'
+  const [customPages, setCustomPages] = useState<number>(100);
+
+  // Calcul dynamique des exigences basé sur le nombre de pages
+  const calculateRequirements = useMemo(() => {
+    const pages = customPages;
+    
+    // Formules de calcul
+    let minChapters: number;
+    let minWordsPerChapter: number;
+    let status: 'danger' | 'warning' | 'ok' | 'ideal';
+    let kdpStatus: string;
+    let recommendation: string;
+    let category: string;
+
+    if (pages < 24) {
+      minChapters = Math.max(2, Math.floor(pages / 8));
+      minWordsPerChapter = 1000;
+      status = 'danger';
+      kdpStatus = 'REJETÉ';
+      recommendation = 'En dessous du minimum KDP (24 pages). Votre ebook sera rejeté.';
+      category = 'Non publiable';
+    } else if (pages < 30) {
+      minChapters = 3;
+      minWordsPerChapter = 1500;
+      status = 'danger';
+      kdpStatus = 'RISQUE ÉLEVÉ';
+      recommendation = 'Très court - fort risque de rejet pour "contenu insuffisant"';
+      category = 'Non recommandé';
+    } else if (pages < 50) {
+      minChapters = 4;
+      minWordsPerChapter = 1800;
+      status = 'warning';
+      kdpStatus = 'LIMITE';
+      recommendation = 'Minimum absolu - ajoutez du contenu si possible';
+      category = 'Minimum KDP';
+    } else if (pages < 75) {
+      minChapters = 5;
+      minWordsPerChapter = 2000;
+      status = 'ok';
+      kdpStatus = 'ACCEPTÉ';
+      recommendation = 'Acceptable pour guides courts et ebooks pratiques';
+      category = 'Guide court';
+    } else if (pages < 100) {
+      minChapters = 6;
+      minWordsPerChapter = 2500;
+      status = 'ok';
+      kdpStatus = 'ACCEPTÉ';
+      recommendation = 'Bon format pour ebooks pratiques et tutoriels';
+      category = 'Ebook standard';
+    } else if (pages < 150) {
+      minChapters = 8;
+      minWordsPerChapter = 2500;
+      status = 'ideal';
+      kdpStatus = 'IDÉAL';
+      recommendation = 'Format parfait pour la plupart des genres';
+      category = 'Livre complet';
+    } else if (pages < 200) {
+      minChapters = 10;
+      minWordsPerChapter = 3000;
+      status = 'ideal';
+      kdpStatus = 'IDÉAL';
+      recommendation = 'Excellent pour romans et guides approfondis';
+      category = 'Ouvrage approfondi';
+    } else if (pages < 300) {
+      minChapters = 12;
+      minWordsPerChapter = 3500;
+      status = 'ideal';
+      kdpStatus = 'IDÉAL';
+      recommendation = 'Parfait pour romans et manuels complets';
+      category = 'Roman / Manuel';
+    } else {
+      minChapters = Math.min(20, Math.floor(pages / 20));
+      minWordsPerChapter = 4000;
+      status = 'ideal';
+      kdpStatus = 'IDÉAL';
+      recommendation = 'Format idéal pour sagas et encyclopédies';
+      category = 'Ouvrage majeur';
     }
+
+    const totalWords = pages * 250; // ~250 mots par page
+    const pagesPerChapter = Math.ceil(pages / minChapters);
+    const wordsPerChapter = pagesPerChapter * 250;
+
+    return {
+      pages,
+      minChapters,
+      minWordsPerChapter,
+      totalWords,
+      status,
+      kdpStatus,
+      recommendation,
+      category,
+      pagesPerChapter,
+      wordsPerChapter
+    };
+  }, [customPages]);
+
+  // Exigences de référence
+  const requirements: KdpRequirement[] = [
+    { pages: 20, minChapters: 3, minWordsPerChapter: 1500, totalWords: 5000, status: 'danger', kdpStatus: 'RISQUE ÉLEVÉ', recommendation: 'Trop court - risque de rejet', category: 'Non recommandé' },
+    { pages: 30, minChapters: 4, minWordsPerChapter: 1800, totalWords: 7500, status: 'warning', kdpStatus: 'LIMITE', recommendation: 'Minimum absolu', category: 'Minimum KDP' },
+    { pages: 50, minChapters: 5, minWordsPerChapter: 2000, totalWords: 12500, status: 'ok', kdpStatus: 'ACCEPTÉ', recommendation: 'Guides courts', category: 'Guide court' },
+    { pages: 75, minChapters: 6, minWordsPerChapter: 2500, totalWords: 18750, status: 'ok', kdpStatus: 'ACCEPTÉ', recommendation: 'Ebooks pratiques', category: 'Ebook standard' },
+    { pages: 100, minChapters: 8, minWordsPerChapter: 2500, totalWords: 25000, status: 'ideal', kdpStatus: 'IDÉAL', recommendation: 'Format parfait', category: 'Livre complet' },
+    { pages: 150, minChapters: 10, minWordsPerChapter: 3000, totalWords: 37500, status: 'ideal', kdpStatus: 'IDÉAL', recommendation: 'Romans et guides', category: 'Ouvrage approfondi' },
+    { pages: 200, minChapters: 12, minWordsPerChapter: 3500, totalWords: 50000, status: 'ideal', kdpStatus: 'IDÉAL', recommendation: 'Romans et manuels', category: 'Roman / Manuel' },
+    { pages: 300, minChapters: 15, minWordsPerChapter: 4000, totalWords: 75000, status: 'ideal', kdpStatus: 'IDÉAL', recommendation: 'Sagas et encyclopédies', category: 'Ouvrage majeur' }
   ];
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'danger':
-        return <XCircle className="h-5 w-5 text-red-500" />;
-      case 'warning':
-        return <AlertTriangle className="h-5 w-5 text-amber-500" />;
-      case 'ok':
-        return <CheckCircle2 className="h-5 w-5 text-emerald-500" />;
-      case 'ideal':
-        return <CheckCircle2 className="h-5 w-5 text-primary" />;
-      default:
-        return null;
+      case 'danger': return <XCircle className="h-5 w-5 text-red-500" />;
+      case 'warning': return <AlertTriangle className="h-5 w-5 text-amber-500" />;
+      case 'ok': return <CheckCircle2 className="h-5 w-5 text-emerald-500" />;
+      case 'ideal': return <CheckCircle2 className="h-5 w-5 text-primary" />;
+      default: return null;
     }
   };
 
@@ -135,11 +160,17 @@ const EbookPriceEstimator: React.FC = () => {
       ok: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300',
       ideal: 'bg-primary/10 text-primary'
     };
-    return (
-      <Badge className={variants[status]}>
-        {kdpStatus}
-      </Badge>
-    );
+    return <Badge className={variants[status]}>{kdpStatus}</Badge>;
+  };
+
+  const getStatusCardClass = (status: string) => {
+    switch (status) {
+      case 'danger': return 'border-red-300 bg-red-50 dark:border-red-800 dark:bg-red-950/30';
+      case 'warning': return 'border-amber-300 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30';
+      case 'ok': return 'border-emerald-300 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950/30';
+      case 'ideal': return 'border-primary/50 bg-primary/10';
+      default: return '';
+    }
   };
 
   return (
@@ -155,11 +186,96 @@ const EbookPriceEstimator: React.FC = () => {
               <div>
                 <CardTitle className="text-xl">Exigences KDP - Chapitres & Pages</CardTitle>
                 <CardDescription>
-                  Nombre minimum de chapitres et pages pour éviter le blocage Amazon KDP
+                  Calculez le nombre de chapitres et mots requis pour votre ebook
                 </CardDescription>
               </div>
             </div>
           </CardHeader>
+        </Card>
+
+        {/* Calculateur interactif */}
+        <Card className="border-2 border-primary/30 shadow-lg">
+          <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5">
+            <CardTitle className="flex items-center gap-2">
+              <Calculator className="h-5 w-5 text-primary" />
+              Calculateur Interactif
+            </CardTitle>
+            <CardDescription>
+              Entrez votre nombre de pages cible pour voir les exigences KDP
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-6 space-y-6">
+            {/* Input et Slider */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-4">
+                <Label htmlFor="pages" className="text-lg font-semibold min-w-[140px]">
+                  Nombre de pages :
+                </Label>
+                <Input
+                  id="pages"
+                  type="number"
+                  min={10}
+                  max={500}
+                  value={customPages}
+                  onChange={(e) => setCustomPages(Math.max(10, Math.min(500, parseInt(e.target.value) || 10)))}
+                  className="w-24 text-center text-lg font-bold"
+                />
+              </div>
+              <Slider
+                value={[customPages]}
+                onValueChange={(value) => setCustomPages(value[0])}
+                min={10}
+                max={500}
+                step={5}
+                className="w-full"
+              />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>10 pages</span>
+                <span>100 pages</span>
+                <span>200 pages</span>
+                <span>300 pages</span>
+                <span>500 pages</span>
+              </div>
+            </div>
+
+            {/* Résultat du calcul */}
+            <div className={`p-6 rounded-xl border-2 transition-all ${getStatusCardClass(calculateRequirements.status)}`}>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  {getStatusIcon(calculateRequirements.status)}
+                  <span className="text-2xl font-bold">{calculateRequirements.pages} pages</span>
+                </div>
+                {getStatusBadge(calculateRequirements.status, calculateRequirements.kdpStatus)}
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                <div className="text-center p-3 bg-background/80 rounded-lg">
+                  <div className="text-3xl font-bold text-primary">{calculateRequirements.minChapters}</div>
+                  <div className="text-xs text-muted-foreground">Chapitres minimum</div>
+                </div>
+                <div className="text-center p-3 bg-background/80 rounded-lg">
+                  <div className="text-3xl font-bold text-primary">{calculateRequirements.pagesPerChapter}</div>
+                  <div className="text-xs text-muted-foreground">Pages/chapitre</div>
+                </div>
+                <div className="text-center p-3 bg-background/80 rounded-lg">
+                  <div className="text-2xl font-bold text-primary">{calculateRequirements.wordsPerChapter.toLocaleString()}</div>
+                  <div className="text-xs text-muted-foreground">Mots/chapitre</div>
+                </div>
+                <div className="text-center p-3 bg-background/80 rounded-lg">
+                  <div className="text-2xl font-bold text-primary">{calculateRequirements.totalWords.toLocaleString()}</div>
+                  <div className="text-xs text-muted-foreground">Total mots</div>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2 p-3 bg-background/80 rounded-lg">
+                <Zap className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <div className="font-semibold">{calculateRequirements.category}</div>
+                  <div className="text-sm text-muted-foreground">{calculateRequirements.recommendation}</div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
         </Card>
 
         {/* Alerte importante */}
@@ -205,12 +321,12 @@ const EbookPriceEstimator: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Tableau des exigences */}
+        {/* Tableau des exigences de référence */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BookOpen className="h-5 w-5" />
-              Tableau des Exigences par Nombre de Pages
+              Tableau de Référence
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -220,32 +336,8 @@ const EbookPriceEstimator: React.FC = () => {
                   <tr className="border-b border-border">
                     <th className="text-left py-3 px-4 font-semibold">Status</th>
                     <th className="text-center py-3 px-4 font-semibold">Pages</th>
-                    <th className="text-center py-3 px-4 font-semibold bg-primary/5">
-                      <div className="flex items-center justify-center gap-1">
-                        Chapitres Min
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <Info className="h-3 w-3 text-muted-foreground" />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            Nombre minimum de chapitres recommandé
-                          </TooltipContent>
-                        </Tooltip>
-                      </div>
-                    </th>
-                    <th className="text-center py-3 px-4 font-semibold">
-                      <div className="flex items-center justify-center gap-1">
-                        Mots/Chapitre
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <Info className="h-3 w-3 text-muted-foreground" />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            Nombre de mots minimum par chapitre
-                          </TooltipContent>
-                        </Tooltip>
-                      </div>
-                    </th>
+                    <th className="text-center py-3 px-4 font-semibold bg-primary/5">Chapitres Min</th>
+                    <th className="text-center py-3 px-4 font-semibold">Mots/Chapitre</th>
                     <th className="text-center py-3 px-4 font-semibold">Total Mots</th>
                     <th className="text-center py-3 px-4 font-semibold">Statut KDP</th>
                     <th className="text-left py-3 px-4 font-semibold">Catégorie</th>
@@ -255,82 +347,39 @@ const EbookPriceEstimator: React.FC = () => {
                   {requirements.map((req, index) => (
                     <tr 
                       key={req.pages} 
-                      className={`border-b border-border/50 hover:bg-muted/50 transition-colors ${
+                      className={`border-b border-border/50 hover:bg-muted/50 transition-colors cursor-pointer ${
+                        req.pages === customPages ? 'ring-2 ring-primary' : ''
+                      } ${
                         req.status === 'danger' ? 'bg-red-50/50 dark:bg-red-950/10' :
                         req.status === 'warning' ? 'bg-amber-50/50 dark:bg-amber-950/10' :
                         req.status === 'ideal' ? 'bg-primary/5' :
                         index % 2 === 0 ? 'bg-muted/20' : ''
                       }`}
+                      onClick={() => setCustomPages(req.pages)}
                     >
-                      <td className="py-4 px-4">
-                        {getStatusIcon(req.status)}
-                      </td>
+                      <td className="py-4 px-4">{getStatusIcon(req.status)}</td>
                       <td className="py-4 px-4 text-center">
-                        <Badge variant="outline" className="font-bold">
-                          {req.pages}
-                        </Badge>
+                        <Badge variant="outline" className="font-bold">{req.pages}</Badge>
                       </td>
                       <td className="py-4 px-4 text-center bg-primary/5">
-                        <span className="font-bold text-lg text-primary">
-                          {req.minChapters}
-                        </span>
+                        <span className="font-bold text-lg text-primary">{req.minChapters}</span>
                       </td>
-                      <td className="py-4 px-4 text-center font-medium">
-                        {req.minWordsPerChapter.toLocaleString()}
-                      </td>
-                      <td className="py-4 px-4 text-center text-muted-foreground">
-                        {req.totalWords.toLocaleString()}
-                      </td>
-                      <td className="py-4 px-4 text-center">
-                        {getStatusBadge(req.status, req.kdpStatus)}
-                      </td>
-                      <td className="py-4 px-4">
-                        <span className="font-medium">{req.category}</span>
-                      </td>
+                      <td className="py-4 px-4 text-center font-medium">{req.minWordsPerChapter.toLocaleString()}</td>
+                      <td className="py-4 px-4 text-center text-muted-foreground">{req.totalWords.toLocaleString()}</td>
+                      <td className="py-4 px-4 text-center">{getStatusBadge(req.status, req.kdpStatus)}</td>
+                      <td className="py-4 px-4"><span className="font-medium">{req.category}</span></td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
+            <p className="text-xs text-muted-foreground mt-2 text-center">
+              💡 Cliquez sur une ligne pour charger les valeurs dans le calculateur
+            </p>
           </CardContent>
         </Card>
 
-        {/* Recommandations détaillées */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              Recommandations par Format
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-2 gap-4">
-              {requirements.map((req) => (
-                <div 
-                  key={req.pages}
-                  className={`p-4 rounded-lg border ${
-                    req.status === 'danger' ? 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/20' :
-                    req.status === 'warning' ? 'border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/20' :
-                    req.status === 'ideal' ? 'border-primary/30 bg-primary/5' :
-                    'border-border bg-muted/20'
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-bold">{req.pages} pages</span>
-                    {getStatusBadge(req.status, req.kdpStatus)}
-                  </div>
-                  <p className="text-sm text-muted-foreground">{req.recommendation}</p>
-                  <div className="mt-2 text-xs space-y-1">
-                    <p>→ {req.minChapters} chapitres minimum</p>
-                    <p>→ {req.minWordsPerChapter.toLocaleString()} mots/chapitre</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Conseils pour éviter le blocage */}
+        {/* Conseils */}
         <Card className="bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-800">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-emerald-800 dark:text-emerald-200">
