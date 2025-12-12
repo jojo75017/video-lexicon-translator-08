@@ -74,7 +74,53 @@ serve(async (req) => {
       );
     }
 
-    // Handle title volume analysis (uses Lovable AI - no API key needed)
+    // Handle KDP market analysis (uses Lovable AI - no API key needed)
+    if (type === 'kdp-market-analysis') {
+      console.log('Processing KDP market analysis...');
+      const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+      
+      if (!LOVABLE_API_KEY) {
+        return new Response(
+          JSON.stringify({ error: 'Lovable API key not configured' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash',
+          messages: [
+            { role: 'system', content: 'Tu es un expert en analyse de marché Amazon KDP. Tu fournis des analyses détaillées basées sur les tendances du marché ebook. Réponds toujours en JSON valide sans markdown.' },
+            { role: 'user', content: prompt }
+          ],
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Lovable AI error:', errorText);
+        return new Response(
+          JSON.stringify({ error: 'Erreur lors de l\'analyse du marché KDP' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const data = await response.json();
+      const analysisText = data.choices[0].message.content;
+      
+      // Return the content directly - the client will parse it
+      console.log('KDP market analysis completed');
+      return new Response(
+        JSON.stringify({ content: analysisText }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     if (type === 'title-volume-analysis') {
       console.log('Processing title volume analysis...');
       const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
