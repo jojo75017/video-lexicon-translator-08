@@ -20,7 +20,7 @@ import {
   ImagePlus,
   Bot,
   BookCopy,
-  
+  CreditCard,
   LayoutTemplate,
   FileEdit,
   Handshake,
@@ -251,6 +251,26 @@ const menuItems = [
     color: 'text-teal-500',
     bgColor: 'bg-teal-500/10',
     activeGradient: 'from-teal-500 to-cyan-500'
+  },
+  { 
+    id: 'subscription', 
+    label: '💳 Mon Abonnement', 
+    icon: CreditCard,
+    color: 'text-purple-500',
+    bgColor: 'bg-purple-500/10',
+    activeGradient: 'from-purple-500 to-pink-500',
+    isLink: true,
+    href: '/subscription'
+  },
+  { 
+    id: 'offres', 
+    label: '🎁 Voir les Offres', 
+    icon: Sparkles,
+    color: 'text-gradient',
+    bgColor: 'bg-gradient-to-r from-yellow-500/10 to-orange-500/10',
+    activeGradient: 'from-yellow-500 to-orange-500',
+    isLink: true,
+    href: '/offres'
   },
   { 
     id: 'affiliation', 
