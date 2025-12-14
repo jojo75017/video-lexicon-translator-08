@@ -6,12 +6,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BookOpen, Sparkles, Loader2, Lock, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { BookOpen, Sparkles, Loader2, Lock, ArrowRight, CheckCircle2, Mail, Gift, X } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const DEMO_STORAGE_KEY = "ebook_demo_count";
+const EMAIL_CAPTURED_KEY = "ebook_demo_email_captured";
 const MAX_DEMO_TRIES = 2;
 
 const DemoPage = () => {
@@ -24,6 +26,10 @@ const DemoPage = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedPlan, setGeneratedPlan] = useState<string | null>(null);
   const [demoCount, setDemoCount] = useState(0);
+  const [showEmailPopup, setShowEmailPopup] = useState(false);
+  const [captureEmail, setCaptureEmail] = useState("");
+  const [isSubmittingEmail, setIsSubmittingEmail] = useState(false);
+  const [emailCaptured, setEmailCaptured] = useState(false);
 
   const remainingTries = MAX_DEMO_TRIES - demoCount;
   const demoUsed = demoCount >= MAX_DEMO_TRIES;
@@ -32,7 +38,9 @@ const DemoPage = () => {
     // Reset demo if ?reset=true in URL
     if (searchParams.get("reset") === "true") {
       localStorage.removeItem(DEMO_STORAGE_KEY);
+      localStorage.removeItem(EMAIL_CAPTURED_KEY);
       setDemoCount(0);
+      setEmailCaptured(false);
       toast.success("Démo réinitialisée !");
       navigate("/demo", { replace: true });
       return;
@@ -40,6 +48,7 @@ const DemoPage = () => {
     
     const count = parseInt(localStorage.getItem(DEMO_STORAGE_KEY) || "0");
     setDemoCount(count);
+    setEmailCaptured(localStorage.getItem(EMAIL_CAPTURED_KEY) === "true");
   }, [searchParams, navigate]);
 
   const handleGenerate = async () => {
@@ -73,6 +82,12 @@ const DemoPage = () => {
         const newCount = demoCount + 1;
         localStorage.setItem(DEMO_STORAGE_KEY, newCount.toString());
         setDemoCount(newCount);
+        
+        // Show email popup after first generation if email not already captured
+        if (!emailCaptured) {
+          setTimeout(() => setShowEmailPopup(true), 1500);
+        }
+        
         if (newCount >= MAX_DEMO_TRIES) {
           toast.success("Plan généré ! Vous avez utilisé vos 2 essais gratuits.");
         } else {
@@ -92,6 +107,44 @@ const DemoPage = () => {
       }
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const handleEmailSubmit = async () => {
+    if (!captureEmail.trim() || !captureEmail.includes("@")) {
+      toast.error("Veuillez entrer un email valide");
+      return;
+    }
+
+    setIsSubmittingEmail(true);
+    try {
+      // Save email to subscribers table
+      const { error } = await supabase.from("subscribers").insert({
+        email: captureEmail.trim().toLowerCase(),
+        plan_type: "demo",
+        status: "demo_lead"
+      });
+
+      if (error && !error.message.includes("duplicate")) {
+        throw error;
+      }
+
+      localStorage.setItem(EMAIL_CAPTURED_KEY, "true");
+      setEmailCaptured(true);
+      setShowEmailPopup(false);
+      toast.success("🎁 Merci ! Vous recevrez nos meilleures astuces par email !");
+    } catch (error: any) {
+      console.error("Email capture error:", error);
+      if (error.message?.includes("duplicate")) {
+        localStorage.setItem(EMAIL_CAPTURED_KEY, "true");
+        setEmailCaptured(true);
+        setShowEmailPopup(false);
+        toast.success("Email déjà enregistré !");
+      } else {
+        toast.error("Erreur lors de l'inscription");
+      }
+    } finally {
+      setIsSubmittingEmail(false);
     }
   };
 
@@ -343,6 +396,83 @@ const DemoPage = () => {
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         </div>
+
+        {/* Email Capture Popup */}
+        <Dialog open={showEmailPopup} onOpenChange={setShowEmailPopup}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-xl">
+                <Gift className="w-6 h-6 text-primary" />
+                🎉 Bravo, votre plan est prêt !
+              </DialogTitle>
+              <DialogDescription className="text-base pt-2">
+                Recevez <span className="font-semibold text-foreground">gratuitement</span> nos meilleures astuces pour écrire et vendre votre ebook sur Amazon KDP.
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4 py-4">
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="secondary" className="text-xs">📚 Guide KDP offert</Badge>
+                <Badge variant="secondary" className="text-xs">💡 Astuces d'écriture</Badge>
+                <Badge variant="secondary" className="text-xs">🚀 Stratégies de vente</Badge>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="capture-email">Votre email</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="capture-email"
+                    type="email"
+                    placeholder="votre@email.com"
+                    value={captureEmail}
+                    onChange={(e) => setCaptureEmail(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleEmailSubmit()}
+                    disabled={isSubmittingEmail}
+                    className="flex-1"
+                  />
+                  <Button 
+                    onClick={handleEmailSubmit} 
+                    disabled={isSubmittingEmail || !captureEmail.trim()}
+                  >
+                    {isSubmittingEmail ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Mail className="w-4 h-4" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              <p className="text-xs text-muted-foreground text-center">
+                🔒 Pas de spam, désinscription en 1 clic
+              </p>
+            </div>
+
+            <div className="flex justify-between items-center pt-2 border-t">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setShowEmailPopup(false)}
+                className="text-muted-foreground"
+              >
+                Non merci
+              </Button>
+              <Button onClick={handleEmailSubmit} disabled={isSubmittingEmail || !captureEmail.trim()}>
+                {isSubmittingEmail ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Inscription...
+                  </>
+                ) : (
+                  <>
+                    <Gift className="w-4 h-4 mr-2" />
+                    Recevoir les astuces
+                  </>
+                )}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
