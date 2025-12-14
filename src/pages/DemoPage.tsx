@@ -118,9 +118,11 @@ const DemoPage = () => {
 
     setIsSubmittingEmail(true);
     try {
+      const emailLower = captureEmail.trim().toLowerCase();
+      
       // Save email to subscribers table
       const { error } = await supabase.from("subscribers").insert({
-        email: captureEmail.trim().toLowerCase(),
+        email: emailLower,
         plan_type: "demo",
         status: "demo_lead"
       });
@@ -129,10 +131,20 @@ const DemoPage = () => {
         throw error;
       }
 
+      // Send welcome email with KDP guide
+      const { error: emailError } = await supabase.functions.invoke("send-welcome-email", {
+        body: { email: emailLower }
+      });
+
+      if (emailError) {
+        console.error("Welcome email error:", emailError);
+        // Don't fail the whole flow if email fails
+      }
+
       localStorage.setItem(EMAIL_CAPTURED_KEY, "true");
       setEmailCaptured(true);
       setShowEmailPopup(false);
-      toast.success("🎁 Merci ! Vous recevrez nos meilleures astuces par email !");
+      toast.success("🎁 Merci ! Votre guide KDP a été envoyé par email !");
     } catch (error: any) {
       console.error("Email capture error:", error);
       if (error.message?.includes("duplicate")) {
