@@ -21,6 +21,7 @@ import {
   Bot,
   BookCopy,
   CreditCard,
+  Play,
   LayoutTemplate,
   FileEdit,
   Handshake,
@@ -261,6 +262,16 @@ const menuItems = [
     activeGradient: 'from-purple-500 to-pink-500',
     isLink: true,
     href: '/subscription'
+  },
+  { 
+    id: 'demo', 
+    label: '🎮 Essai Gratuit', 
+    icon: Play,
+    color: 'text-green-500',
+    bgColor: 'bg-green-500/10',
+    activeGradient: 'from-green-500 to-emerald-500',
+    isLink: true,
+    href: '/demo'
   },
   { 
     id: 'offres', 
