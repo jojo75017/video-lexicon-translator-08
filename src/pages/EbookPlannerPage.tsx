@@ -437,7 +437,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
             total: totalItems, 
             currentItem: `Chapitre ${i + 1}: ${chapter.title}` 
           });
-          const chapterContent = await generateChapterContent(chapter);
+          const chapterContent = await generateChapterContent(chapter, targetWordsPerChapter);
           if (chapterContent) {
             updateChapterContent(chapter.id, chapterContent);
             currentChapters[i] = { ...chapter, content: chapterContent };
@@ -454,7 +454,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
               total: totalItems, 
               currentItem: `Sous-chapitre: ${subChapter.title}` 
             });
-            const subContent = await generateSubChapterContent(subChapter);
+            const subContent = await generateSubChapterContent(subChapter, Math.round(targetWordsPerChapter * 0.6));
             if (subContent) {
               setChapters(prev => prev.map(ch => {
                 if (ch.id === chapter.id) {
@@ -882,52 +882,81 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                       </div>
 
                       {/* Bouton Générer l'ebook complet */}
-                      <Card className="border-2 border-dashed border-emerald-300 bg-gradient-to-r from-emerald-50 to-teal-50">
+                      <Card className="border-2 border-dashed border-green-400 bg-gradient-to-r from-green-50 to-emerald-50">
                         <CardContent className="p-6">
-                          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                            <div className="flex items-center gap-4">
-                              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/30">
-                                <Zap className="w-7 h-7 text-white" />
+                          <div className="flex flex-col gap-4">
+                            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                              <div className="flex items-center gap-4">
+                                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg shadow-green-500/30">
+                                  <Zap className="w-7 h-7 text-white" />
+                                </div>
+                                <div>
+                                  <h3 className="text-lg font-bold text-green-800">Générer l'ebook complet</h3>
+                                  <p className="text-sm text-green-600">
+                                    Génère automatiquement le plan, tous les chapitres, sous-chapitres, préface et conclusion
+                                  </p>
+                                </div>
                               </div>
-                              <div>
-                                <h3 className="text-lg font-bold text-emerald-800">Générer l'ebook complet</h3>
-                                <p className="text-sm text-emerald-600">
-                                  Génère automatiquement le plan, tous les chapitres, sous-chapitres, préface et conclusion
+                              <Button
+                                onClick={generateCompleteEbook}
+                                disabled={isGeneratingComplete || isGenerating || !ebookTitle || !apiKey}
+                                size="lg"
+                                className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5 min-w-[200px]"
+                              >
+                                {isGeneratingComplete ? (
+                                  <>
+                                    <Sparkles className="h-5 w-5 mr-2 animate-spin" />
+                                    Génération...
+                                  </>
+                                ) : (
+                                  <>
+                                    <Wand2 className="h-5 w-5 mr-2" />
+                                    Générer tout l'ebook
+                                  </>
+                                )}
+                              </Button>
+                            </div>
+                            
+                            {/* Options de génération */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-green-200">
+                              <div className="space-y-2">
+                                <Label className="text-sm font-medium text-green-700">Mots par chapitre</Label>
+                                <Select value={targetWordsPerChapter.toString()} onValueChange={(v) => setTargetWordsPerChapter(parseInt(v))}>
+                                  <SelectTrigger className="h-10 border-green-200 focus:border-green-500">
+                                    <SelectValue placeholder="Mots par chapitre" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="250">250 mots (court)</SelectItem>
+                                    <SelectItem value="350">350 mots (standard)</SelectItem>
+                                    <SelectItem value="500">500 mots (moyen)</SelectItem>
+                                    <SelectItem value="750">750 mots (long)</SelectItem>
+                                    <SelectItem value="1000">1000 mots (très long)</SelectItem>
+                                    <SelectItem value="1500">1500 mots (détaillé)</SelectItem>
+                                    <SelectItem value="2000">2000 mots (complet)</SelectItem>
+                                    <SelectItem value="2500">2500 mots (exhaustif)</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="flex items-end">
+                                <p className="text-xs text-green-600 italic">
+                                  📖 Estimation: ~{Math.round(targetWordsPerChapter * numberOfChapters / 250)} pages pour {numberOfChapters} chapitres
                                 </p>
                               </div>
                             </div>
-                            <Button
-                              onClick={generateCompleteEbook}
-                              disabled={isGeneratingComplete || isGenerating || !ebookTitle || !apiKey}
-                              size="lg"
-                              className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5 min-w-[200px]"
-                            >
-                              {isGeneratingComplete ? (
-                                <>
-                                  <Sparkles className="h-5 w-5 mr-2 animate-spin" />
-                                  Génération...
-                                </>
-                              ) : (
-                                <>
-                                  <Wand2 className="h-5 w-5 mr-2" />
-                                  Générer tout l'ebook
-                                </>
-                              )}
-                            </Button>
                           </div>
                           
                           {/* Barre de progression */}
                           {isGeneratingComplete && generationProgress.total > 0 && (
                             <div className="mt-4 space-y-2">
                               <div className="flex justify-between text-sm">
-                                <span className="text-emerald-700 font-medium">{generationProgress.currentItem}</span>
-                                <span className="text-emerald-600">
+                                <span className="text-green-700 font-medium">{generationProgress.currentItem}</span>
+                                <span className="text-green-600">
                                   {generationProgress.current}/{generationProgress.total}
                                 </span>
                               </div>
-                              <div className="w-full h-3 bg-emerald-100 rounded-full overflow-hidden">
+                              <div className="w-full h-3 bg-green-100 rounded-full overflow-hidden">
                                 <div 
-                                  className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 transition-all duration-500 ease-out"
+                                  className="h-full bg-gradient-to-r from-green-500 to-green-600 transition-all duration-500 ease-out"
                                   style={{ width: `${(generationProgress.current / generationProgress.total) * 100}%` }}
                                 />
                               </div>

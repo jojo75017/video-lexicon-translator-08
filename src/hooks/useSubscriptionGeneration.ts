@@ -80,7 +80,7 @@ export const useSubscriptionGeneration = (
     }
   };
 
-  const generateChapterContent = async (chapter: Chapter) => {
+  const generateChapterContent = async (chapter: Chapter, wordsPerChapter: number = 350) => {
     const contextLine = ebookTitle ? `\nCe chapitre fait partie de l'ebook intitulé "${ebookTitle}". Assure-toi que le contenu reste cohérent avec ce titre et traite des éléments/personnages/thèmes mentionnés dans le titre de l'ebook.` : '';
     const audienceLine = targetAudience ? `\nPublic cible : ${targetAudience}. Adapte le vocabulaire, le style d'écriture, la complexité des concepts et les exemples utilisés pour correspondre parfaitement à ce public.` : '';
     const tomeLine = tomeNumber ? `\nCeci est le Tome ${tomeNumber} d'une série. Assure-toi de maintenir la continuité avec les tomes précédents si applicable, et de laisser place à une suite si ce n'est pas le dernier tome.` : '';
@@ -90,14 +90,14 @@ export const useSubscriptionGeneration = (
     const toneLine = tone ? `\nTon : ${tone}. Utilise ce ton tout au long du texte.` : '';
     const narrativeLine = narrativeFormat ? `\nFormat de narration : ${narrativeFormat}.` : '';
     
-    const prompt = `Rédige un chapitre complet de 350 mots exactement sur le sujet : "${chapter.title}".${contextLine}${audienceLine}${tomeLine}${styleLine}${lengthLine}${detailLine}${toneLine}${narrativeLine}
+    const prompt = `Rédige un chapitre complet de ${wordsPerChapter} mots exactement sur le sujet : "${chapter.title}".${contextLine}${audienceLine}${tomeLine}${styleLine}${lengthLine}${detailLine}${toneLine}${narrativeLine}
     
 Le contenu doit être :
 - Informatif et engageant sur le sujet donné
 - En lien direct avec le titre de l'ebook si fourni
 - Parfaitement adapté au public cible spécifié (vocabulaire, ton, exemples)
 - Bien structuré avec des paragraphes
-- Exactement 350 mots
+- Exactement ${wordsPerChapter} mots
 - Inclure des mots ou phrases importantes en *italique* pour mettre l'accent
 
 Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajoutée aux lecteurs sur ce sujet spécifique.`;
@@ -107,7 +107,7 @@ Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajo
     return content;
   };
 
-  const generateSubChapterContent = async (subChapter: SubChapter) => {
+  const generateSubChapterContent = async (subChapter: SubChapter, wordsPerSubChapter: number = 200) => {
     const contextLine = ebookTitle ? `\nCe sous-chapitre fait partie de l'ebook intitulé "${ebookTitle}". Assure-toi que le contenu reste cohérent avec ce titre et traite des éléments/personnages/thèmes mentionnés dans le titre de l'ebook.` : '';
     const audienceLine = targetAudience ? `\nPublic cible : ${targetAudience}. Adapte le vocabulaire, le style d'écriture et les exemples pour ce public.` : '';
     const tomeLine = tomeNumber ? `\nCeci est le Tome ${tomeNumber} d'une série. Maintiens la cohérence avec les tomes précédents.` : '';
@@ -118,7 +118,7 @@ Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajo
     
     const prompt = `Rédige le contenu pour le sous-chapitre : "${subChapter.title}".${contextLine}${audienceLine}${tomeLine}${styleLine}${detailLine}${toneLine}${narrativeLine}
     
-Le contenu doit faire environ 200 mots et être :
+Le contenu doit faire environ ${wordsPerSubChapter} mots et être :
 - Informatif et pertinent
 - En lien direct avec le titre de l'ebook si fourni
 - Parfaitement adapté au public cible (vocabulaire, ton, exemples)
