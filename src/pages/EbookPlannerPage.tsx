@@ -92,6 +92,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   
   const savedData = loadSavedData();
   const { saveProject, loadLatestProject, isSaving, currentProjectId, setCurrentProjectId, saveVersion, loadVersions, restoreVersion } = useEbookDatabase();
+  const { fireStars } = useConfetti();
   
   const [apiKey, setApiKey] = useState(savedData?.apiKey || '');
   const [ebookTitle, setEbookTitle] = useState(location.state?.suggestedTitle || savedData?.ebookTitle || '');
@@ -360,6 +361,136 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
 
   const handleSplitChapter = async (chapterId: string) => {
     toast.info('Fonction de division automatique non disponible');
+  };
+
+  // État pour la génération complète
+  const [generationProgress, setGenerationProgress] = useState({ current: 0, total: 0, currentItem: '' });
+  const [isGeneratingComplete, setIsGeneratingComplete] = useState(false);
+
+  // Générer l'ebook complet en une seule action
+  const generateCompleteEbook = async () => {
+    if (!ebookTitle) {
+      toast.error('Veuillez entrer un titre');
+      return;
+    }
+    if (!apiKey) {
+      toast.error('Clé API OpenAI requise');
+      return;
+    }
+
+    setIsGeneratingComplete(true);
+    
+    try {
+      // Étape 1: Générer le plan si pas de chapitres
+      let currentChapters = chapters;
+      if (chapters.length === 0) {
+        toast.info('Génération du plan en cours...');
+        const planData = await generateEbookPlan(ebookTitle, authorName, numberOfChapters);
+        if (planData) {
+          if (!authorName) setAuthorName(planData.author);
+          setPreface(planData.preface);
+          setConclusion(planData.conclusion);
+          const generatedChapters = planData.chapters.map((chapter: any, index: number) => ({
+            id: (Date.now() + index).toString(),
+            title: chapter.title,
+            content: '',
+            subChapters: chapter.subChapters.map((sub: string, subIndex: number) => ({
+              id: (Date.now() + index * 100 + subIndex).toString(),
+              title: sub,
+              content: ''
+            }))
+          }));
+          setChapters(generatedChapters);
+          currentChapters = generatedChapters;
+        } else {
+          toast.error('Erreur lors de la génération du plan');
+          setIsGeneratingComplete(false);
+          return;
+        }
+      }
+
+      // Calculer le total d'éléments à générer
+      const totalSubChapters = currentChapters.reduce((acc, ch) => acc + ch.subChapters.length, 0);
+      const totalItems = currentChapters.length + totalSubChapters + 2; // +2 pour préface et conclusion
+      let currentProgress = 0;
+
+      setGenerationProgress({ current: 0, total: totalItems, currentItem: 'Préface' });
+
+      // Étape 2: Générer la préface si vide
+      if (!preface) {
+        setGenerationProgress({ current: currentProgress, total: totalItems, currentItem: 'Préface' });
+        const prefaceResult = await generatePreface(ebookTitle, currentChapters, targetAudience);
+        if (prefaceResult) setPreface(prefaceResult);
+        currentProgress++;
+      } else {
+        currentProgress++;
+      }
+
+      // Étape 3: Générer le contenu de chaque chapitre et sous-chapitre
+      for (let i = 0; i < currentChapters.length; i++) {
+        const chapter = currentChapters[i];
+        
+        // Générer le contenu du chapitre principal si vide
+        if (!chapter.content) {
+          setGenerationProgress({ 
+            current: currentProgress, 
+            total: totalItems, 
+            currentItem: `Chapitre ${i + 1}: ${chapter.title}` 
+          });
+          const chapterContent = await generateChapterContent(chapter);
+          if (chapterContent) {
+            updateChapterContent(chapter.id, chapterContent);
+            currentChapters[i] = { ...chapter, content: chapterContent };
+          }
+        }
+        currentProgress++;
+
+        // Générer le contenu de chaque sous-chapitre si vide
+        for (let j = 0; j < chapter.subChapters.length; j++) {
+          const subChapter = chapter.subChapters[j];
+          if (!subChapter.content) {
+            setGenerationProgress({ 
+              current: currentProgress, 
+              total: totalItems, 
+              currentItem: `Sous-chapitre: ${subChapter.title}` 
+            });
+            const subContent = await generateSubChapterContent(subChapter);
+            if (subContent) {
+              setChapters(prev => prev.map(ch => {
+                if (ch.id === chapter.id) {
+                  return {
+                    ...ch,
+                    subChapters: ch.subChapters.map(sub => 
+                      sub.id === subChapter.id ? { ...sub, content: subContent } : sub
+                    )
+                  };
+                }
+                return ch;
+              }));
+            }
+          }
+          currentProgress++;
+        }
+      }
+
+      // Étape 4: Générer la conclusion si vide
+      if (!conclusion) {
+        setGenerationProgress({ current: currentProgress, total: totalItems, currentItem: 'Conclusion' });
+        const conclusionResult = await generateConclusion(ebookTitle, currentChapters, targetAudience);
+        if (conclusionResult) setConclusion(conclusionResult);
+      }
+
+      setGenerationProgress({ current: totalItems, total: totalItems, currentItem: 'Terminé !' });
+      toast.success('🎉 Ebook complet généré avec succès !');
+      fireStars();
+      
+    } catch (error) {
+      console.error('Erreur génération complète:', error);
+      toast.error('Erreur lors de la génération');
+    } finally {
+      setIsGeneratingComplete(false);
+      setGenerationProgress({ current: 0, total: 0, currentItem: '' });
+    }
   };
 
   const generateAutomaticPlan = async () => {
@@ -749,6 +880,61 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                           />
                         </div>
                       </div>
+
+                      {/* Bouton Générer l'ebook complet */}
+                      <Card className="border-2 border-dashed border-emerald-300 bg-gradient-to-r from-emerald-50 to-teal-50">
+                        <CardContent className="p-6">
+                          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                            <div className="flex items-center gap-4">
+                              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                                <Zap className="w-7 h-7 text-white" />
+                              </div>
+                              <div>
+                                <h3 className="text-lg font-bold text-emerald-800">Générer l'ebook complet</h3>
+                                <p className="text-sm text-emerald-600">
+                                  Génère automatiquement le plan, tous les chapitres, sous-chapitres, préface et conclusion
+                                </p>
+                              </div>
+                            </div>
+                            <Button
+                              onClick={generateCompleteEbook}
+                              disabled={isGeneratingComplete || isGenerating || !ebookTitle || !apiKey}
+                              size="lg"
+                              className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5 min-w-[200px]"
+                            >
+                              {isGeneratingComplete ? (
+                                <>
+                                  <Sparkles className="h-5 w-5 mr-2 animate-spin" />
+                                  Génération...
+                                </>
+                              ) : (
+                                <>
+                                  <Wand2 className="h-5 w-5 mr-2" />
+                                  Générer tout l'ebook
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                          
+                          {/* Barre de progression */}
+                          {isGeneratingComplete && generationProgress.total > 0 && (
+                            <div className="mt-4 space-y-2">
+                              <div className="flex justify-between text-sm">
+                                <span className="text-emerald-700 font-medium">{generationProgress.currentItem}</span>
+                                <span className="text-emerald-600">
+                                  {generationProgress.current}/{generationProgress.total}
+                                </span>
+                              </div>
+                              <div className="w-full h-3 bg-emerald-100 rounded-full overflow-hidden">
+                                <div 
+                                  className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 transition-all duration-500 ease-out"
+                                  style={{ width: `${(generationProgress.current / generationProgress.total) * 100}%` }}
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
 
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
