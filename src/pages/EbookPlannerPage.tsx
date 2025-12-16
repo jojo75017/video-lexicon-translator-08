@@ -409,9 +409,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
         }
       }
 
-      // Calculer le total d'éléments à générer (+1 pour synopsis)
+      // Calculer le total d'éléments à générer
       const totalSubChapters = currentChapters.reduce((acc, ch) => acc + ch.subChapters.length, 0);
-      const totalItems = currentChapters.length + totalSubChapters + 3; // +3 pour synopsis, préface et conclusion
+      const totalItems = currentChapters.length + totalSubChapters + 4; // +4 pour synopsis, préface, conclusion et épilogue
       let currentProgress = 0;
 
       // NOUVELLE ÉTAPE: Générer la synopsis pour assurer la cohérence
@@ -507,6 +507,14 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
         setGenerationProgress({ current: currentProgress, total: totalItems, currentItem: '🎯 Conclusion' });
         const conclusionResult = await generateConclusion(ebookTitle, currentChapters, targetAudience, synopsis || undefined);
         if (conclusionResult) setConclusion(conclusionResult);
+      }
+      currentProgress++;
+
+      // Étape 5: Générer l'épilogue si vide (avec synopsis)
+      if (!epilogue) {
+        setGenerationProgress({ current: currentProgress, total: totalItems, currentItem: '✨ Épilogue' });
+        const epilogueResult = await generateEpilogue(ebookTitle, currentChapters, targetAudience, synopsis || undefined);
+        if (epilogueResult) setEpilogue(epilogueResult);
       }
 
       setGenerationProgress({ current: totalItems, total: totalItems, currentItem: '✅ Terminé !' });
