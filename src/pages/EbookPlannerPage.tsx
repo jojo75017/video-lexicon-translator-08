@@ -104,7 +104,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   const [tone, setTone] = useState(savedData?.tone || 'professionnel');
   const [narrativeFormat, setNarrativeFormat] = useState(savedData?.narrativeFormat || 'troisième personne');
   
-  const { isGenerating, generateChapterContent, generateSubChapterContent, generateEbookPlan, generateBookSummary, generateEbookCover, optimizeForSEO, generateKDPDescription, generateKDPKeywords, generateKDPCategories, generateBackCover, generatePreface, generateConclusion, generateEpilogue, translateContent, analyzeTextStatistics } = useSubscriptionGeneration(subscriberEmail, apiKey, ebookTitle, targetAudience, tomeNumber, writingStyle, chapterLength, detailLevel, tone, narrativeFormat);
+  const { isGenerating, generateChapterContent, generateSubChapterContent, generateEbookPlan, generateBookSummary, generateBookSynopsis, generateEbookCover, optimizeForSEO, generateKDPDescription, generateKDPKeywords, generateKDPCategories, generateBackCover, generatePreface, generateConclusion, generateEpilogue, translateContent, analyzeTextStatistics } = useSubscriptionGeneration(subscriberEmail, apiKey, ebookTitle, targetAudience, tomeNumber, writingStyle, chapterLength, detailLevel, tone, narrativeFormat);
   
   const [authorName, setAuthorName] = useState(savedData?.authorName || '');
   const [preface, setPreface] = useState(savedData?.preface || '');
@@ -409,52 +409,81 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
         }
       }
 
-      // Calculer le total d'éléments à générer
+      // Calculer le total d'éléments à générer (+1 pour synopsis)
       const totalSubChapters = currentChapters.reduce((acc, ch) => acc + ch.subChapters.length, 0);
-      const totalItems = currentChapters.length + totalSubChapters + 2; // +2 pour préface et conclusion
+      const totalItems = currentChapters.length + totalSubChapters + 3; // +3 pour synopsis, préface et conclusion
       let currentProgress = 0;
 
-      setGenerationProgress({ current: 0, total: totalItems, currentItem: 'Préface' });
+      // NOUVELLE ÉTAPE: Générer la synopsis pour assurer la cohérence
+      setGenerationProgress({ current: 0, total: totalItems, currentItem: '📋 Synopsis (fil conducteur)' });
+      toast.info('Génération de la synopsis pour la cohérence...');
+      const synopsis = await generateBookSynopsis(ebookTitle, currentChapters, targetAudience);
+      if (!synopsis) {
+        toast.warning('Synopsis non générée, génération sans fil conducteur');
+      } else {
+        console.log('Synopsis générée:', synopsis.substring(0, 200) + '...');
+      }
+      currentProgress++;
 
-      // Étape 2: Générer la préface si vide
+      setGenerationProgress({ current: currentProgress, total: totalItems, currentItem: 'Préface' });
+
+      // Étape 2: Générer la préface si vide (avec synopsis)
       if (!preface) {
-        setGenerationProgress({ current: currentProgress, total: totalItems, currentItem: 'Préface' });
-        const prefaceResult = await generatePreface(ebookTitle, currentChapters, targetAudience);
+        setGenerationProgress({ current: currentProgress, total: totalItems, currentItem: '📖 Préface' });
+        const prefaceResult = await generatePreface(ebookTitle, currentChapters, targetAudience, synopsis || undefined);
         if (prefaceResult) setPreface(prefaceResult);
         currentProgress++;
       } else {
         currentProgress++;
       }
 
-      // Étape 3: Générer le contenu de chaque chapitre et sous-chapitre
+      // Étape 3: Générer le contenu de chaque chapitre et sous-chapitre (avec synopsis et contexte)
+      let previousChapterSummary = '';
+      
       for (let i = 0; i < currentChapters.length; i++) {
         const chapter = currentChapters[i];
         
-        // Générer le contenu du chapitre principal si vide
+        // Générer le contenu du chapitre principal si vide (avec synopsis et contexte)
         if (!chapter.content) {
           setGenerationProgress({ 
             current: currentProgress, 
             total: totalItems, 
-            currentItem: `Chapitre ${i + 1}: ${chapter.title}` 
+            currentItem: `📝 Chapitre ${i + 1}/${currentChapters.length}: ${chapter.title}` 
           });
-          const chapterContent = await generateChapterContent(chapter, targetWordsPerChapter);
+          const chapterContent = await generateChapterContent(
+            chapter, 
+            targetWordsPerChapter, 
+            synopsis || undefined, 
+            i, 
+            currentChapters.length, 
+            previousChapterSummary || undefined
+          );
           if (chapterContent) {
             updateChapterContent(chapter.id, chapterContent);
             currentChapters[i] = { ...chapter, content: chapterContent };
+            // Créer un résumé du chapitre pour le suivant
+            previousChapterSummary = chapterContent.substring(0, 500) + '...';
           }
+        } else {
+          previousChapterSummary = chapter.content.substring(0, 500) + '...';
         }
         currentProgress++;
 
-        // Générer le contenu de chaque sous-chapitre si vide
+        // Générer le contenu de chaque sous-chapitre si vide (avec synopsis)
         for (let j = 0; j < chapter.subChapters.length; j++) {
           const subChapter = chapter.subChapters[j];
           if (!subChapter.content) {
             setGenerationProgress({ 
               current: currentProgress, 
               total: totalItems, 
-              currentItem: `Sous-chapitre: ${subChapter.title}` 
+              currentItem: `📄 Sous-chapitre: ${subChapter.title}` 
             });
-            const subContent = await generateSubChapterContent(subChapter, Math.round(targetWordsPerChapter * 0.6));
+            const subContent = await generateSubChapterContent(
+              subChapter, 
+              Math.round(targetWordsPerChapter * 0.6),
+              synopsis || undefined,
+              chapter.title
+            );
             if (subContent) {
               setChapters(prev => prev.map(ch => {
                 if (ch.id === chapter.id) {
@@ -473,15 +502,15 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
         }
       }
 
-      // Étape 4: Générer la conclusion si vide
+      // Étape 4: Générer la conclusion si vide (avec synopsis)
       if (!conclusion) {
-        setGenerationProgress({ current: currentProgress, total: totalItems, currentItem: 'Conclusion' });
-        const conclusionResult = await generateConclusion(ebookTitle, currentChapters, targetAudience);
+        setGenerationProgress({ current: currentProgress, total: totalItems, currentItem: '🎯 Conclusion' });
+        const conclusionResult = await generateConclusion(ebookTitle, currentChapters, targetAudience, synopsis || undefined);
         if (conclusionResult) setConclusion(conclusionResult);
       }
 
-      setGenerationProgress({ current: totalItems, total: totalItems, currentItem: 'Terminé !' });
-      toast.success('🎉 Ebook complet généré avec succès !');
+      setGenerationProgress({ current: totalItems, total: totalItems, currentItem: '✅ Terminé !' });
+      toast.success('🎉 Ebook complet généré avec cohérence !');
       fireStars();
       
     } catch (error) {
