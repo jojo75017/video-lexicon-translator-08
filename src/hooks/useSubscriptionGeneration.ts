@@ -80,35 +80,50 @@ export const useSubscriptionGeneration = (
     }
   };
 
-  const generateChapterContent = async (chapter: Chapter, wordsPerChapter: number = 350) => {
-    const contextLine = ebookTitle ? `\nCe chapitre fait partie de l'ebook intitulé "${ebookTitle}". Assure-toi que le contenu reste cohérent avec ce titre et traite des éléments/personnages/thèmes mentionnés dans le titre de l'ebook.` : '';
+  const generateChapterContent = async (chapter: Chapter, wordsPerChapter: number = 350, synopsis?: string, chapterIndex?: number, totalChapters?: number, previousChapterSummary?: string) => {
+    const contextLine = ebookTitle ? `\nCe chapitre fait partie de l'ebook intitulé "${ebookTitle}".` : '';
     const audienceLine = targetAudience ? `\nPublic cible : ${targetAudience}. Adapte le vocabulaire, le style d'écriture, la complexité des concepts et les exemples utilisés pour correspondre parfaitement à ce public.` : '';
-    const tomeLine = tomeNumber ? `\nCeci est le Tome ${tomeNumber} d'une série. Assure-toi de maintenir la continuité avec les tomes précédents si applicable, et de laisser place à une suite si ce n'est pas le dernier tome.` : '';
+    const tomeLine = tomeNumber ? `\nCeci est le Tome ${tomeNumber} d'une série.` : '';
     const styleLine = writingStyle ? `\nStyle d'écriture : ${writingStyle}. Adopte ce style dans ta rédaction.` : '';
     const lengthLine = chapterLength ? `\nLongueur souhaitée : ${chapterLength}.` : '';
     const detailLine = detailLevel ? `\nNiveau de détail : ${detailLevel}. Fournis un contenu avec ce niveau de détail.` : '';
     const toneLine = tone ? `\nTon : ${tone}. Utilise ce ton tout au long du texte.` : '';
     const narrativeLine = narrativeFormat ? `\nFormat de narration : ${narrativeFormat}.` : '';
     
-    const prompt = `Rédige un chapitre complet de ${wordsPerChapter} mots exactement sur le sujet : "${chapter.title}".${contextLine}${audienceLine}${tomeLine}${styleLine}${lengthLine}${detailLine}${toneLine}${narrativeLine}
+    // Contexte de position dans le livre
+    const positionContext = (chapterIndex !== undefined && totalChapters) 
+      ? `\nCeci est le chapitre ${chapterIndex + 1} sur ${totalChapters}. ${chapterIndex === 0 ? 'C\'est le premier chapitre, introduis bien le sujet.' : ''} ${chapterIndex === totalChapters - 1 ? 'C\'est le dernier chapitre, prépare la conclusion.' : ''}` 
+      : '';
+    
+    // Synopsis pour la cohérence globale
+    const synopsisContext = synopsis 
+      ? `\n\n=== SYNOPSIS DU LIVRE (à suivre impérativement pour la cohérence) ===\n${synopsis}\n=== FIN SYNOPSIS ===\n\nRespects strictement cette synopsis: utilise les mêmes personnages/concepts, le même vocabulaire, et assure-toi que ce chapitre s'inscrit dans la progression narrative définie.` 
+      : '';
+    
+    // Résumé du chapitre précédent pour la continuité
+    const previousContext = previousChapterSummary 
+      ? `\n\nRésumé du chapitre précédent (pour assurer la continuité):\n${previousChapterSummary}\n\nAssure une transition fluide depuis ce qui précède.` 
+      : '';
+    
+    const prompt = `Rédige un chapitre complet de ${wordsPerChapter} mots exactement sur le sujet : "${chapter.title}".${contextLine}${audienceLine}${tomeLine}${styleLine}${lengthLine}${detailLine}${toneLine}${narrativeLine}${positionContext}${synopsisContext}${previousContext}
     
 Le contenu doit être :
 - Informatif et engageant sur le sujet donné
-- En lien direct avec le titre de l'ebook si fourni
+- PARFAITEMENT COHÉRENT avec la synopsis et le fil conducteur du livre
 - Parfaitement adapté au public cible spécifié (vocabulaire, ton, exemples)
 - Bien structuré avec des paragraphes
 - Exactement ${wordsPerChapter} mots
 - Inclure des mots ou phrases importantes en *italique* pour mettre l'accent
+- Faire référence aux éléments établis dans les chapitres précédents si pertinent
 
-Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajoutée aux lecteurs sur ce sujet spécifique.`;
+Assure-toi que le contenu soit riche, détaillé et s'intègre parfaitement dans l'ensemble du livre.`;
 
     const content = await callGenerateContent('chapters_generated', prompt);
-    // Toast supprimé - génération silencieuse
     return content;
   };
 
-  const generateSubChapterContent = async (subChapter: SubChapter, wordsPerSubChapter: number = 200) => {
-    const contextLine = ebookTitle ? `\nCe sous-chapitre fait partie de l'ebook intitulé "${ebookTitle}". Assure-toi que le contenu reste cohérent avec ce titre et traite des éléments/personnages/thèmes mentionnés dans le titre de l'ebook.` : '';
+  const generateSubChapterContent = async (subChapter: SubChapter, wordsPerSubChapter: number = 200, synopsis?: string, parentChapterTitle?: string) => {
+    const contextLine = ebookTitle ? `\nCe sous-chapitre fait partie de l'ebook intitulé "${ebookTitle}" et du chapitre "${parentChapterTitle || 'non spécifié'}".` : '';
     const audienceLine = targetAudience ? `\nPublic cible : ${targetAudience}. Adapte le vocabulaire, le style d'écriture et les exemples pour ce public.` : '';
     const tomeLine = tomeNumber ? `\nCeci est le Tome ${tomeNumber} d'une série. Maintiens la cohérence avec les tomes précédents.` : '';
     const styleLine = writingStyle ? `\nStyle d'écriture : ${writingStyle}.` : '';
@@ -116,18 +131,21 @@ Assure-toi que le contenu soit riche, détaillé et apporte une vraie valeur ajo
     const toneLine = tone ? `\nTon : ${tone}.` : '';
     const narrativeLine = narrativeFormat ? `\nFormat de narration : ${narrativeFormat}.` : '';
     
-    const prompt = `Rédige le contenu pour le sous-chapitre : "${subChapter.title}".${contextLine}${audienceLine}${tomeLine}${styleLine}${detailLine}${toneLine}${narrativeLine}
+    const synopsisContext = synopsis 
+      ? `\n\n=== SYNOPSIS DU LIVRE ===\n${synopsis}\n=== FIN SYNOPSIS ===\n\nRespects strictement cette synopsis pour la cohérence globale.` 
+      : '';
+    
+    const prompt = `Rédige le contenu pour le sous-chapitre : "${subChapter.title}".${contextLine}${audienceLine}${tomeLine}${styleLine}${detailLine}${toneLine}${narrativeLine}${synopsisContext}
     
 Le contenu doit faire environ ${wordsPerSubChapter} mots et être :
 - Informatif et pertinent
-- En lien direct avec le titre de l'ebook si fourni
+- COHÉRENT avec la synopsis globale du livre
 - Parfaitement adapté au public cible (vocabulaire, ton, exemples)
 - Bien structuré
 - Engageant pour le lecteur
 - Utiliser l'italique (*) pour les points importants`;
 
     const content = await callGenerateContent('subchapters_generated', prompt);
-    // Toast supprimé - génération silencieuse
     return content;
   };
 
@@ -200,6 +218,45 @@ Réponds UNIQUEMENT avec le JSON, sans texte additionnel.`;
     const prompt = `Génère un résumé de 200 mots pour l'ebook "${ebookTitle}" qui contient ces chapitres : ${chaptersText}`;
 
     return await callGenerateContent('chapters_generated', prompt);
+  };
+
+  // Génère une synopsis détaillée pour assurer la cohérence de tout l'ebook
+  const generateBookSynopsis = async (title: string, chapters: Chapter[], audience: string) => {
+    const chapterTitles = chapters.map((c, i) => `${i + 1}. ${c.title}`).join('\n');
+    const subChaptersList = chapters.map((c, i) => 
+      c.subChapters.map((sub, j) => `  ${i + 1}.${j + 1} ${sub.title}`).join('\n')
+    ).join('\n');
+    
+    const styleLine = writingStyle ? `Style d'écriture: ${writingStyle}` : '';
+    const toneLine = tone ? `Ton: ${tone}` : '';
+    const narrativeLine = narrativeFormat ? `Format de narration: ${narrativeFormat}` : '';
+    
+    const prompt = `Crée une SYNOPSIS DÉTAILLÉE pour l'ebook "${title}" qui servira de fil conducteur pour TOUTE la rédaction.
+
+Public cible: ${audience}
+${styleLine}
+${toneLine}
+${narrativeLine}
+
+Structure du livre:
+${chapterTitles}
+
+Sous-chapitres:
+${subChaptersList}
+
+La synopsis doit définir:
+1. Le THÈME CENTRAL et le message principal du livre
+2. Le FIL CONDUCTEUR narratif qui relie tous les chapitres
+3. La PROGRESSION LOGIQUE: comment chaque chapitre s'enchaîne avec le suivant
+4. Les PERSONNAGES/CONCEPTS CLÉS récurrents (noms, caractéristiques)
+5. Le VOCABULAIRE SPÉCIFIQUE à utiliser de manière cohérente
+6. L'ARC NARRATIF: situation initiale → développement → résolution
+7. Les ÉLÉMENTS À RAPPELER entre les parties (références croisées)
+
+Format ta réponse de manière structurée. Cette synopsis sera utilisée pour garantir que la préface, tous les chapitres, la conclusion et l'épilogue forment un ensemble cohérent et fluide.`;
+    
+    const content = await callGenerateContent('chapters_generated', prompt);
+    return content;
   };
 
   const generateEbookCover = async (ebookTitle: string) => {
@@ -437,17 +494,22 @@ Réponds avec la description complète uniquement, sans titre de section.`;
     return content;
   };
 
-  const generatePreface = async (title: string, chapters: Chapter[], audience: string) => {
+  const generatePreface = async (title: string, chapters: Chapter[], audience: string, synopsis?: string) => {
     const chapterTitles = chapters.map(c => c.title).join(', ');
+    const synopsisContext = synopsis 
+      ? `\n\n=== SYNOPSIS DU LIVRE (à suivre impérativement) ===\n${synopsis}\n=== FIN SYNOPSIS ===\n\nLa préface DOIT être cohérente avec cette synopsis. Utilise le même vocabulaire, les mêmes thèmes et annonce l'arc narratif défini.` 
+      : '';
+    
     const prompt = `Génère une préface engageante et professionnelle pour un ebook intitulé "${title}".
 
 Public cible: ${audience}
-Chapitres du livre: ${chapterTitles}
+Chapitres du livre: ${chapterTitles}${synopsisContext}
 
 La préface doit:
 - Accrocher le lecteur dès les premières lignes
 - Expliquer pourquoi ce livre a été écrit
 - Donner un aperçu de ce que le lecteur va apprendre/découvrir
+- ANNONCER les thèmes et le fil conducteur définis dans la synopsis
 - Créer de l'enthousiasme et de l'anticipation
 - Faire environ 300-400 mots
 - Être écrite de manière personnelle et authentique
@@ -458,16 +520,20 @@ La préface doit:
     return content;
   };
 
-  const generateConclusion = async (title: string, chapters: Chapter[], audience: string) => {
+  const generateConclusion = async (title: string, chapters: Chapter[], audience: string, synopsis?: string) => {
     const chapterTitles = chapters.map(c => c.title).join(', ');
+    const synopsisContext = synopsis 
+      ? `\n\n=== SYNOPSIS DU LIVRE ===\n${synopsis}\n=== FIN SYNOPSIS ===\n\nLa conclusion DOIT reprendre et conclure le fil conducteur établi dans la synopsis. Rappelle les éléments clés et les personnages/concepts introduits.` 
+      : '';
+    
     const prompt = `Génère une conclusion mémorable pour un ebook intitulé "${title}".
 
 Public cible: ${audience}
-Chapitres du livre: ${chapterTitles}
+Chapitres du livre: ${chapterTitles}${synopsisContext}
 
 La conclusion doit:
-- Résumer les points clés abordés
-- Rappeler les enseignements principaux
+- Résumer les points clés abordés EN COHÉRENCE avec la synopsis
+- Rappeler les enseignements principaux et le fil conducteur
 - Motiver le lecteur à passer à l'action
 - Laisser une impression durable et positive
 - Remercier le lecteur pour son temps
@@ -479,15 +545,19 @@ La conclusion doit:
     return content;
   };
 
-  const generateEpilogue = async (title: string, chapters: Chapter[], audience: string) => {
+  const generateEpilogue = async (title: string, chapters: Chapter[], audience: string, synopsis?: string) => {
     const chapterTitles = chapters.map(c => c.title).join(', ');
+    const synopsisContext = synopsis 
+      ? `\n\n=== SYNOPSIS DU LIVRE ===\n${synopsis}\n=== FIN SYNOPSIS ===\n\nL'épilogue DOIT s'inscrire dans la continuité du fil conducteur et clôturer l'arc narratif défini dans la synopsis.` 
+      : '';
+    
     const prompt = `Génère un épilogue touchant pour un ebook intitulé "${title}".
 
 Public cible: ${audience}
-Chapitres du livre: ${chapterTitles}
+Chapitres du livre: ${chapterTitles}${synopsisContext}
 
 L'épilogue doit:
-- Offrir une réflexion finale sur le sujet
+- Offrir une réflexion finale sur le sujet EN LIEN avec la synopsis
 - Partager une perspective personnelle ou une anecdote
 - Ouvrir sur l'avenir ou donner de l'espoir
 - Créer une connexion émotionnelle avec le lecteur
@@ -649,6 +719,7 @@ IMPORTANT : Tous les modules doivent être cohérents entre eux et refléter fid
     generateSubChapterContent,
     generateEbookPlan,
     generateBookSummary,
+    generateBookSynopsis,
     generateEbookCover,
     optimizeForSEO,
     generateKDPDescription,
