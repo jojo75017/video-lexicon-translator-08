@@ -31,9 +31,9 @@ import {
   Shield,
   Headphones,
   FileText,
-  GraduationCap,
-  LucideIcon
+  GraduationCap
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
