@@ -6,27 +6,25 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Plan configurations with cached price IDs (will be populated on first run)
+// Plan configurations - All one-time payments
 const PLANS = {
   starter: {
     name: "Ebook Generator - Starter",
-    price: 2700,
-    type: "subscription" as const,
-    interval: "month" as const,
-    features: ["5 ebooks/mois", "Fonctions de base", "Export PDF", "Support email"],
+    price: 2700, // 27€
+    type: "one_time" as const,
+    features: ["5 ebooks", "10 chapitres max/ebook", "3 couvertures", "Export PDF", "Formation Ebook incluse", "Support email"],
   },
   pro: {
     name: "Ebook Generator - Pro",
-    price: 6700,
-    type: "subscription" as const,
-    interval: "month" as const,
-    features: ["Ebooks illimités", "Toutes les fonctions", "Export PDF/EPUB", "Formation incluse", "Support prioritaire"],
+    price: 6700, // 67€
+    type: "one_time" as const,
+    features: ["20 ebooks", "20 chapitres max/ebook", "10 couvertures", "Export PDF/EPUB", "3 Formations incluses", "Gestionnaire Séries/Sagas", "Outils KDP avancés", "Support prioritaire"],
   },
   lifetime: {
     name: "Ebook Generator - Lifetime",
-    price: 14700,
+    price: 39700, // 397€
     type: "one_time" as const,
-    features: ["Accès à vie", "Toutes les fonctions", "Mises à jour gratuites", "Support VIP", "Formation complète"],
+    features: ["Ebooks illimités à vie", "Chapitres illimités", "Couvertures illimitées", "Export PDF/EPUB/Word", "Toutes les formations", "Outils KDP Premium", "Mises à jour gratuites à vie", "Support VIP 24/7"],
   },
 };
 
@@ -60,8 +58,7 @@ async function getOrCreatePrice(stripe: Stripe, planId: string, plan: typeof PLA
     });
     
     const matchingPrice = prices.data.find(p => 
-      p.unit_amount === plan.price && 
-      (plan.type === "subscription" ? p.recurring?.interval === plan.interval : p.type === "one_time")
+      p.unit_amount === plan.price && p.type === "one_time"
     );
 
     if (matchingPrice) {
@@ -79,22 +76,12 @@ async function getOrCreatePrice(stripe: Stripe, planId: string, plan: typeof PLA
     console.log("Created product:", productId);
   }
 
-  // Create price
-  let price: Stripe.Price;
-  if (plan.type === "subscription") {
-    price = await stripe.prices.create({
-      product: productId,
-      unit_amount: plan.price,
-      currency: "eur",
-      recurring: { interval: plan.interval },
-    });
-  } else {
-    price = await stripe.prices.create({
-      product: productId,
-      unit_amount: plan.price,
-      currency: "eur",
-    });
-  }
+  // Create price (all one-time payments)
+  const price = await stripe.prices.create({
+    product: productId,
+    unit_amount: plan.price,
+    currency: "eur",
+  });
   
   console.log("Created price:", price.id);
   priceCache[planId] = price.id;
@@ -152,7 +139,7 @@ serve(async (req) => {
     const sessionConfig: Stripe.Checkout.SessionCreateParams = {
       customer: customerId,
       line_items: [{ price: priceId, quantity: 1 }],
-      mode: plan.type === "subscription" ? "subscription" : "payment",
+      mode: "payment", // All one-time payments
       success_url: successUrl || `${req.headers.get("origin")}/paiement-succes?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: cancelUrl || `${req.headers.get("origin")}/offres`,
       metadata: {
