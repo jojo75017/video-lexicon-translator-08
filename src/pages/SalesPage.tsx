@@ -60,60 +60,66 @@ const SalesPage = () => {
       name: "Starter",
       price: "27",
       originalPrice: null,
-      period: "/mois",
+      period: "",
       description: "Pour débuter",
+      badge: null,
       features: [
-        "5 ebooks/mois",
-        "10 chapitres maximum",
-        "3 couvertures/mois",
+        "5 ebooks (crédits inclus)",
+        "10 chapitres maximum par ebook",
+        "3 couvertures incluses",
         "Export PDF",
         "🎓 Formation Ebook incluse",
         "Support email",
       ],
       cta: "Commencer",
       popular: false,
+      footnote: "📌 Accès immédiat – aucun abonnement",
     },
     {
       id: "pro",
       name: "Pro",
       price: "67",
       originalPrice: null,
-      period: "/mois",
-      description: "Le plus populaire",
+      period: "",
+      description: "⭐ Le plus populaire",
+      badge: "Plus populaire",
       features: [
-        "20 ebooks/mois",
-        "20 chapitres maximum",
-        "10 couvertures/mois",
-        "Export PDF/EPUB",
-        "🎓 3 Formations incluses",
-        "📚 Gestionnaire de Séries/Sagas",
+        "20 ebooks",
+        "20 chapitres maximum par ebook",
+        "10 couvertures",
+        "Export PDF + EPUB",
+        "🎓 3 formations incluses",
+        "📚 Gestionnaire de Séries / Sagas",
         "Outils KDP avancés",
         "Support prioritaire",
       ],
       cta: "Choisir Pro",
       popular: true,
+      footnote: "📌 Paiement unique – accès complet aux fonctionnalités Pro",
     },
     {
       id: "lifetime",
       name: "Lifetime",
-      price: "597",
+      price: "397",
       originalPrice: "897",
-      period: " (lancement)",
-      description: "Accès à vie - Tout inclus",
-      discount: "300€ de réduction",
+      period: "",
+      description: "Accès à vie — Tout inclus",
+      badge: "OFFRE DE LANCEMENT",
+      discount: "🎯 Économie immédiate : 500 €",
       features: [
         "Ebooks illimités à vie",
         "Chapitres illimités",
         "Couvertures illimitées",
-        "Export PDF/EPUB/Word",
+        "Export PDF / EPUB / Word",
         "🎓 Toutes les formations (texte + audio)",
-        "📚 Séries/Sagas complet",
+        "📚 Séries / Sagas complet",
         "Outils KDP Premium",
         "Mises à jour gratuites à vie",
         "Support VIP 24/7",
       ],
-      cta: "Accès à vie",
+      cta: "Accéder à vie",
       popular: false,
+      footnote: null,
     },
   ];
 
@@ -337,9 +343,9 @@ const SalesPage = () => {
       {/* Pricing Section */}
       <section id="pricing" className="py-20 px-4 bg-muted/30">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-4">Choisissez votre formule</h2>
+          <h2 className="text-3xl font-bold text-center mb-4">Une offre simple, sans abonnement</h2>
           <p className="text-muted-foreground text-center mb-6">
-            Commencez maintenant et créez vos premiers ebooks dès aujourd'hui
+            3 niveaux en paiement unique – Commencez maintenant et créez vos premiers ebooks dès aujourd'hui
           </p>
           
           {/* Countdown Timer */}
@@ -347,7 +353,7 @@ const SalesPage = () => {
             <div className="bg-gradient-to-r from-red-500 to-orange-500 rounded-xl p-6 text-white text-center shadow-lg">
               <div className="flex items-center justify-center gap-2 mb-3">
                 <Clock className="w-5 h-5 animate-pulse" />
-                <span className="font-bold text-lg">🔥 Offre de lancement - Économisez 300€ sur Lifetime</span>
+                <span className="font-bold text-lg">🔥 Offre de lancement - Économisez 500€ sur Lifetime</span>
               </div>
               <div className="grid grid-cols-4 gap-4 max-w-md mx-auto">
                 <div className="bg-white/20 rounded-lg p-3">
@@ -375,30 +381,27 @@ const SalesPage = () => {
             {plans.map((plan, index) => (
               <Card 
                 key={index} 
-                className={`relative border-2 ${plan.popular ? 'border-primary shadow-lg scale-105' : plan.id === 'lifetime' ? 'border-orange-500 bg-gradient-to-br from-yellow-50 to-orange-50' : 'border-border'}`}
+                className={`relative border-2 flex flex-col ${plan.popular ? 'border-primary shadow-xl scale-105 z-10' : plan.id === 'lifetime' ? 'border-orange-500 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-950/30 dark:to-orange-950/30' : 'border-border'}`}
               >
-                {plan.popular && (
-                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary">
-                    Plus Populaire
-                  </Badge>
-                )}
-                {plan.discount && (
-                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-red-500 to-orange-500">
-                    {plan.discount}
+                {plan.badge && (
+                  <Badge className={`absolute -top-3 left-1/2 -translate-x-1/2 ${plan.id === 'lifetime' ? 'bg-gradient-to-r from-red-500 to-orange-500' : 'bg-primary'}`}>
+                    {plan.badge}
                   </Badge>
                 )}
                 <CardHeader className="text-center pb-2">
                   <CardTitle className="text-xl">{plan.name}</CardTitle>
                   <div className="mt-4">
                     {plan.originalPrice && (
-                      <span className="text-lg text-muted-foreground line-through mr-2">{plan.originalPrice}€</span>
+                      <span className="text-xl text-muted-foreground line-through mr-2">{plan.originalPrice} €</span>
                     )}
-                    <span className="text-4xl font-bold">{plan.price}€</span>
-                    <span className="text-muted-foreground">{plan.period}</span>
+                    <span className="text-4xl font-bold">{plan.price} €</span>
+                    {plan.id !== 'lifetime' && (
+                      <div className="text-sm text-muted-foreground mt-1">(paiement unique)</div>
+                    )}
                   </div>
-                  <CardDescription className="mt-2">{plan.description}</CardDescription>
+                  <CardDescription className="mt-2 font-medium">{plan.description}</CardDescription>
                 </CardHeader>
-                <CardContent className="pt-4">
+                <CardContent className="pt-4 flex-1">
                   <ul className="space-y-3">
                     {plan.features.map((feature, i) => (
                       <li key={i} className="flex items-start gap-2">
@@ -407,8 +410,13 @@ const SalesPage = () => {
                       </li>
                     ))}
                   </ul>
+                  {plan.discount && (
+                    <div className="mt-4 p-3 bg-gradient-to-r from-red-500/10 to-orange-500/10 rounded-lg text-center">
+                      <span className="font-bold text-orange-600 dark:text-orange-400">{plan.discount}</span>
+                    </div>
+                  )}
                 </CardContent>
-                <CardFooter>
+                <CardFooter className="flex flex-col gap-3">
                   <Button 
                     className={`w-full ${plan.id === 'lifetime' ? 'bg-gradient-to-r from-yellow-500 to-orange-500 hover:opacity-90 text-white' : ''}`}
                     size="lg"
@@ -418,6 +426,9 @@ const SalesPage = () => {
                     {plan.cta}
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
+                  {plan.footnote && (
+                    <p className="text-xs text-muted-foreground text-center">{plan.footnote}</p>
+                  )}
                 </CardFooter>
               </Card>
             ))}
