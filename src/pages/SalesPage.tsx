@@ -2,12 +2,13 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, Sparkles, BookOpen, Zap, Download, Star, ArrowRight, Play, Loader2, Clock } from "lucide-react";
+import { Check, Sparkles, BookOpen, Zap, Download, Star, ArrowRight, Play, Loader2, Clock, HelpCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const SalesPage = () => {
   const navigate = useNavigate();
@@ -444,6 +445,102 @@ const SalesPage = () => {
         </div>
       </section>
 
+      {/* FAQ Section */}
+      <section className="py-20 px-4">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-12">
+            <Badge className="mb-4 bg-primary/10 text-primary border-primary/20 px-4 py-2">
+              <HelpCircle className="w-4 h-4 mr-2" />
+              Questions Fréquentes
+            </Badge>
+            <h2 className="text-3xl font-bold mb-4">Tout ce que vous devez savoir</h2>
+            <p className="text-muted-foreground">
+              Réponses aux questions les plus courantes sur notre générateur
+            </p>
+          </div>
+
+          <Accordion type="single" collapsible className="w-full space-y-4">
+            <AccordionItem value="item-1" className="border rounded-lg px-6 bg-card">
+              <AccordionTrigger className="text-left font-semibold hover:no-underline">
+                Comment fonctionne la garantie satisfait ou remboursé ?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground pb-4">
+                Vous disposez de 30 jours après votre achat pour demander un remboursement complet, sans condition. 
+                Il vous suffit de nous contacter par email et nous procédons au remboursement sous 48h. 
+                Nous sommes convaincus que vous allez adorer notre outil !
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-2" className="border rounded-lg px-6 bg-card">
+              <AccordionTrigger className="text-left font-semibold hover:no-underline">
+                Comment accéder à mon compte après achat ?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground pb-4">
+                Après votre paiement, vous recevez immédiatement un email avec votre code d'accès personnel. 
+                Connectez-vous sur la plateforme avec votre email et ce code pour accéder à tous vos outils. 
+                L'accès est instantané, vous pouvez commencer à créer vos ebooks dans les minutes qui suivent !
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-3" className="border rounded-lg px-6 bg-card">
+              <AccordionTrigger className="text-left font-semibold hover:no-underline">
+                Les mises à jour sont-elles incluses ?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground pb-4">
+                Oui ! Toutes les mises à jour sont gratuites et automatiques. Nous améliorons constamment 
+                l'outil avec de nouvelles fonctionnalités, modèles et optimisations. Avec l'offre Lifetime, 
+                vous bénéficiez de toutes les évolutions futures sans frais supplémentaires.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-4" className="border rounded-lg px-6 bg-card">
+              <AccordionTrigger className="text-left font-semibold hover:no-underline">
+                Puis-je publier mes ebooks sur Amazon KDP ?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground pb-4">
+                Absolument ! Les ebooks générés vous appartiennent à 100%. Vous pouvez les publier sur 
+                Amazon KDP, Kobo, Apple Books ou toute autre plateforme. Notre outil inclut même des 
+                fonctionnalités spécifiques pour optimiser vos publications KDP (mots-clés, catégories, descriptions).
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-5" className="border rounded-lg px-6 bg-card">
+              <AccordionTrigger className="text-left font-semibold hover:no-underline">
+                Quelle est la différence entre les offres ?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground pb-4">
+                <strong>Starter (27€)</strong> : Idéal pour débuter avec 5 ebooks et les fonctions essentielles.<br/>
+                <strong>Pro (67€)</strong> : Pour les auteurs sérieux avec 20 ebooks, formations complètes et outils avancés.<br/>
+                <strong>Lifetime (397€)</strong> : Accès illimité à vie, toutes les fonctionnalités premium et support VIP. 
+                C'est l'option la plus rentable sur le long terme.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-6" className="border rounded-lg px-6 bg-card">
+              <AccordionTrigger className="text-left font-semibold hover:no-underline">
+                Que se passe-t-il si j'épuise mes crédits ?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground pb-4">
+                Les crédits des offres Starter et Pro sont valables à vie (pas de renouvellement mensuel). 
+                Une fois épuisés, vous pouvez soit upgrader vers une offre supérieure, soit racheter des 
+                crédits supplémentaires. L'offre Lifetime vous donne un accès illimité sans aucune restriction.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-7" className="border rounded-lg px-6 bg-card">
+              <AccordionTrigger className="text-left font-semibold hover:no-underline">
+                Comment fonctionne le support ?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground pb-4">
+                Tous les utilisateurs ont accès au support par email. Les membres Pro bénéficient d'un 
+                support prioritaire avec réponse sous 24h. Les membres Lifetime ont un support VIP 24/7 
+                avec assistance personnalisée et accès à notre communauté privée.
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
+      </section>
+
       {/* Final CTA */}
       <section className="py-20 px-4">
         <div className="max-w-3xl mx-auto text-center">
@@ -456,11 +553,11 @@ const SalesPage = () => {
             className="text-lg px-8 py-6"
             onClick={() => handlePlanClick("starter")}
           >
-            Commencer à 27€/mois
+            Commencer à 27€
             <ArrowRight className="w-5 h-5 ml-2" />
           </Button>
           <p className="text-sm text-muted-foreground mt-4">
-            Annulez à tout moment • Support inclus • Mises à jour gratuites
+            Paiement unique • Support inclus • Mises à jour gratuites
           </p>
         </div>
       </section>
