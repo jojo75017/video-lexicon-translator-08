@@ -104,6 +104,21 @@ serve(async (req) => {
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Lovable AI error:', errorText);
+        
+        // Handle specific error codes
+        if (response.status === 402) {
+          return new Response(
+            JSON.stringify({ error: 'Crédits AI épuisés. Veuillez recharger vos crédits dans les paramètres du workspace.', code: 'CREDITS_EXHAUSTED' }),
+            { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        if (response.status === 429) {
+          return new Response(
+            JSON.stringify({ error: 'Trop de requêtes. Veuillez réessayer dans quelques instants.', code: 'RATE_LIMITED' }),
+            { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        
         return new Response(
           JSON.stringify({ error: 'Erreur lors de l\'analyse du marché KDP' }),
           { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
