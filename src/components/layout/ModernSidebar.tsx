@@ -31,12 +31,16 @@ import {
   Shield,
   Headphones,
   FileText,
-  GraduationCap
+  GraduationCap,
+  Zap,
+  Crown
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Progress } from '@/components/ui/progress';
+import { useUserQuotas, getQuotaPercentage } from '@/hooks/useUserQuotas';
 
 interface ModernSidebarProps {
   activeTab: string;
@@ -157,6 +161,120 @@ const categories: Category[] = [
     ]
   },
 ];
+
+// Composant d'affichage des quotas compact
+const QuotaDisplay: React.FC<{ isCollapsed: boolean }> = ({ isCollapsed }) => {
+  const navigate = useNavigate();
+  const { quotas, isLoading, hasSubscription } = useUserQuotas();
+
+  if (isLoading) {
+    return null;
+  }
+
+  if (!hasSubscription || !quotas) {
+    return (
+      <div className={cn(
+        "border-t border-border/50 p-2",
+        isCollapsed && "flex justify-center"
+      )}>
+        {isCollapsed ? (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/offres')}
+                className="w-8 h-8 p-0"
+              >
+                <Crown className="w-4 h-4 text-amber-500" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              <p className="text-xs">Souscrire à une offre</p>
+            </TooltipContent>
+          </Tooltip>
+        ) : (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/offres')}
+            className="w-full justify-start text-xs text-amber-500 hover:text-amber-600"
+          >
+            <Crown className="w-3.5 h-3.5 mr-2" />
+            Souscrire à une offre
+          </Button>
+        )}
+      </div>
+    );
+  }
+
+  const ebookPercentage = getQuotaPercentage(quotas.ebook_plans);
+  const isUnlimited = quotas.ebook_plans.limit === -1;
+
+  return (
+    <div className={cn(
+      "border-t border-border/50 p-2",
+      isCollapsed && "flex justify-center"
+    )}>
+      {isCollapsed ? (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center cursor-pointer" onClick={() => navigate('/offres')}>
+              <Zap className="w-4 h-4 text-primary" />
+            </div>
+          </TooltipTrigger>
+          <TooltipContent side="right" className="text-xs">
+            <p className="font-medium">{quotas.plan.toUpperCase()}</p>
+            <p>{isUnlimited ? '∞ Illimité' : `${quotas.ebook_plans.remaining} ebooks restants`}</p>
+          </TooltipContent>
+        </Tooltip>
+      ) : (
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <Zap className="w-3.5 h-3.5 text-primary" />
+              <span className="text-[10px] font-medium text-muted-foreground">Quotas</span>
+            </div>
+            <span className={cn(
+              "text-[10px] font-semibold px-1.5 py-0.5 rounded",
+              quotas.plan === 'lifetime' ? 'bg-purple-500/20 text-purple-500' :
+              quotas.plan === 'pro' ? 'bg-amber-500/20 text-amber-500' :
+              'bg-green-500/20 text-green-500'
+            )}>
+              {quotas.plan.toUpperCase()}
+            </span>
+          </div>
+          
+          {isUnlimited ? (
+            <div className="text-[10px] text-center py-1 bg-purple-500/10 rounded text-purple-500 font-medium">
+              ∞ Accès illimité
+            </div>
+          ) : (
+            <>
+              <div className="flex items-center justify-between text-[10px]">
+                <span className="text-muted-foreground">Ebooks</span>
+                <span className="font-medium">{quotas.ebook_plans.remaining}/{quotas.ebook_plans.limit}</span>
+              </div>
+              <Progress value={ebookPercentage} className="h-1" />
+            </>
+          )}
+          
+          {quotas.plan !== 'lifetime' && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/offres')}
+              className="w-full h-6 text-[10px] text-primary hover:text-primary/80"
+            >
+              <Crown className="w-3 h-3 mr-1" />
+              Upgrade
+            </Button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
 
 export const ModernSidebar: React.FC<ModernSidebarProps> = ({
   activeTab,
@@ -334,6 +452,9 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
             );
           })}
         </nav>
+
+        {/* Quota Display */}
+        <QuotaDisplay isCollapsed={isCollapsed} />
 
         {/* Collapse Toggle */}
         <div className="p-2 border-t border-border/50">
