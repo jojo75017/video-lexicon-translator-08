@@ -182,7 +182,18 @@ Crée 4-5 concurrents fictifs réalistes, 4-5 recommandations stratégiques, 4 l
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        // Check for specific error codes from edge function
+        const errorMessage = error.message || 'Erreur lors de l\'analyse';
+        if (errorMessage.includes('402') || errorMessage.includes('CREDITS_EXHAUSTED')) {
+          toast.error('Crédits AI épuisés. Veuillez recharger vos crédits.');
+        } else if (errorMessage.includes('429') || errorMessage.includes('RATE_LIMITED')) {
+          toast.error('Trop de requêtes. Réessayez dans quelques instants.');
+        } else {
+          toast.error(errorMessage);
+        }
+        throw error;
+      }
 
       let parsedData;
       try {
@@ -194,9 +205,12 @@ Crée 4-5 concurrents fictifs réalistes, 4-5 recommandations stratégiques, 4 l
 
       setAnalysis(parsedData);
       toast.success('Analyse du marché terminée avec graphiques !');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur analyse:', error);
-      toast.error('Erreur lors de l\'analyse');
+      // Only show generic error if not already shown
+      if (!error?.message?.includes('402') && !error?.message?.includes('429')) {
+        // Error already shown above
+      }
     } finally {
       setIsAnalyzing(false);
     }
