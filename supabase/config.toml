@@ -62,3 +62,9 @@ verify_jwt = false
 
 [functions.send-welcome-email]
 verify_jwt = false
+
+[functions.check-quota]
+verify_jwt = false
+
+[functions.increment-quota]
+verify_jwt = false
