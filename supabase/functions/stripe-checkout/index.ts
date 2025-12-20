@@ -6,25 +6,13 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Plan configurations - All one-time payments
+// Plan configurations - Single plan at 37€
 const PLANS = {
-  starter: {
-    name: "Ebook Generator - Starter",
-    price: 2700, // 27€
-    type: "one_time" as const,
-    features: ["5 ebooks", "10 chapitres max/ebook", "3 couvertures", "Export PDF", "Formation Ebook incluse", "Support email"],
-  },
-  pro: {
-    name: "Ebook Generator - Pro",
-    price: 6700, // 67€
-    type: "one_time" as const,
-    features: ["20 ebooks", "20 chapitres max/ebook", "10 couvertures", "Export PDF/EPUB", "3 Formations incluses", "Gestionnaire Séries/Sagas", "Outils KDP avancés", "Support prioritaire"],
-  },
   lifetime: {
-    name: "Ebook Generator - Lifetime",
-    price: 39700, // 397€
+    name: "Ebook Generator - Accès Complet",
+    price: 3700, // 37€
     type: "one_time" as const,
-    features: ["Ebooks illimités à vie", "Chapitres illimités", "Couvertures illimitées", "Export PDF/EPUB/Word", "Toutes les formations", "Outils KDP Premium", "Mises à jour gratuites à vie", "Support VIP 24/7"],
+    features: ["Ebooks illimités à vie", "Chapitres illimités", "Couvertures illimitées", "Export PDF/EPUB/Word", "Toutes les formations", "Outils KDP Premium", "Mises à jour gratuites à vie", "Support prioritaire"],
   },
 };
 
