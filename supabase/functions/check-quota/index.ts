@@ -6,19 +6,20 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Limites par plan
+// Limites par plan - Tous les plans ont accès illimité
 const PLAN_LIMITS = {
+  // Anciens plans gardent aussi l'illimité (migration douce)
   starter: {
-    ebook_plans: 5,
-    chapters: 50,      // 5 ebooks x 10 chapitres
-    subchapters: 100,  // 5 ebooks x 20 sous-chapitres
-    covers: 3,
+    ebook_plans: -1,   // illimité
+    chapters: -1,
+    subchapters: -1,
+    covers: -1,
   },
   pro: {
-    ebook_plans: 20,
-    chapters: 400,     // 20 ebooks x 20 chapitres
-    subchapters: 800,  // 20 ebooks x 40 sous-chapitres
-    covers: 10,
+    ebook_plans: -1,   // illimité
+    chapters: -1,
+    subchapters: -1,
+    covers: -1,
   },
   lifetime: {
     ebook_plans: -1,   // illimité

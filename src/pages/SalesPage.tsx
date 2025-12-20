@@ -60,70 +60,28 @@ const SalesPage = () => {
 
   const plans = [
     {
-      id: "starter",
-      name: "Starter",
-      price: "27",
-      originalPrice: null,
-      period: "",
-      description: "Pour débuter",
-      badge: null,
-      features: [
-        "5 ebooks (crédits inclus)",
-        "10 chapitres maximum par ebook",
-        "3 couvertures incluses",
-        "Export PDF",
-        "🎓 Formation Ebook incluse",
-        "Support email",
-      ],
-      cta: "Commencer",
-      popular: false,
-      footnote: "📌 Accès immédiat – aucun abonnement",
-    },
-    {
-      id: "pro",
-      name: "Pro",
-      price: "67",
-      originalPrice: null,
-      period: "",
-      description: "⭐ Le plus populaire",
-      badge: "Plus populaire",
-      features: [
-        "20 ebooks",
-        "20 chapitres maximum par ebook",
-        "10 couvertures",
-        "Export PDF + EPUB",
-        "🎓 3 formations incluses",
-        "📚 Gestionnaire de Séries / Sagas",
-        "Outils KDP avancés",
-        "Support prioritaire",
-      ],
-      cta: "Choisir Pro",
-      popular: true,
-      footnote: "📌 Paiement unique – accès complet aux fonctionnalités Pro",
-    },
-    {
       id: "lifetime",
-      name: "Lifetime",
-      price: "397",
-      originalPrice: "897",
+      name: "Accès Complet",
+      price: "37",
+      originalPrice: "97",
       period: "",
-      description: "Accès à vie — Tout inclus",
+      description: "Tout inclus – Sans limite",
       badge: "OFFRE DE LANCEMENT",
-      discount: "🎯 Économie immédiate : 500 €",
+      discount: "🎯 Économie immédiate : 60 €",
       features: [
         "Ebooks illimités à vie",
         "Chapitres illimités",
         "Couvertures illimitées",
         "Export PDF / EPUB / Word",
         "🎓 Toutes les formations (texte + audio)",
-        "📚 Séries / Sagas complet",
+        "📚 Gestionnaire Séries / Sagas",
         "Outils KDP Premium",
         "Mises à jour gratuites à vie",
-        "Support VIP 24/7",
+        "Support prioritaire",
       ],
-      cta: "Accéder à vie",
-      popular: false,
-      footnote: null,
+      cta: "Accéder Maintenant",
+      popular: true,
+      footnote: "📌 Paiement unique – Accès immédiat et illimité",
     },
   ];
 
@@ -359,9 +317,9 @@ const SalesPage = () => {
       {/* Pricing Section */}
       <section id="pricing" className="py-20 px-4 bg-muted/30">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-4">Une offre simple, sans abonnement</h2>
+          <h2 className="text-3xl font-bold text-center mb-4">Une offre simple, tout inclus</h2>
           <p className="text-muted-foreground text-center mb-6">
-            3 niveaux en paiement unique – Commencez maintenant et créez vos premiers ebooks dès aujourd'hui
+            Paiement unique – Accès illimité à vie
           </p>
           
           {/* Countdown Timer */}
@@ -369,7 +327,7 @@ const SalesPage = () => {
             <div className="bg-gradient-to-r from-red-500 to-orange-500 rounded-xl p-6 text-white text-center shadow-lg">
               <div className="flex items-center justify-center gap-2 mb-3">
                 <Clock className="w-5 h-5 animate-pulse" />
-                <span className="font-bold text-lg">🔥 Offre de lancement - Économisez 500€ sur Lifetime</span>
+                <span className="font-bold text-lg">🔥 Offre de lancement – Économisez 60€</span>
               </div>
               <div className="grid grid-cols-4 gap-4 max-w-md mx-auto">
                 <div className="bg-white/20 rounded-lg p-3">
@@ -393,11 +351,11 @@ const SalesPage = () => {
             </div>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          <div className="flex justify-center">
             {plans.map((plan, index) => (
               <Card 
                 key={index} 
-                className={`relative border-2 flex flex-col ${plan.popular ? 'border-primary shadow-xl scale-105 z-10' : plan.id === 'lifetime' ? 'border-orange-500 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-950/30 dark:to-orange-950/30' : 'border-border'}`}
+                className="relative border-2 flex flex-col max-w-md w-full border-primary shadow-xl bg-gradient-to-br from-primary/5 to-primary/10"
               >
                 {plan.badge && (
                   <Badge className={`absolute -top-3 left-1/2 -translate-x-1/2 ${plan.id === 'lifetime' ? 'bg-gradient-to-r from-red-500 to-orange-500' : 'bg-primary'}`}>
@@ -411,9 +369,7 @@ const SalesPage = () => {
                       <span className="text-xl text-muted-foreground line-through mr-2">{plan.originalPrice} €</span>
                     )}
                     <span className="text-4xl font-bold">{plan.price} €</span>
-                    {plan.id !== 'lifetime' && (
-                      <div className="text-sm text-muted-foreground mt-1">(paiement unique)</div>
-                    )}
+                    <div className="text-sm text-muted-foreground mt-1">(paiement unique)</div>
                   </div>
                   <CardDescription className="mt-2 font-medium">{plan.description}</CardDescription>
                 </CardHeader>
@@ -521,35 +477,22 @@ const SalesPage = () => {
 
             <AccordionItem value="item-5" className="border rounded-lg px-6 bg-card">
               <AccordionTrigger className="text-left font-semibold hover:no-underline">
-                Quelle est la différence entre les offres ?
+                Que comprend l'offre à 37€ ?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground pb-4">
-                <strong>Starter (27€)</strong> : Idéal pour débuter avec 5 ebooks et les fonctions essentielles.<br/>
-                <strong>Pro (67€)</strong> : Pour les auteurs sérieux avec 20 ebooks, formations complètes et outils avancés.<br/>
-                <strong>Lifetime (397€)</strong> : Accès illimité à vie, toutes les fonctionnalités premium et support VIP. 
-                C'est l'option la plus rentable sur le long terme.
+                L'offre à 37€ vous donne un accès complet et illimité à vie : ebooks illimités, chapitres illimités, 
+                couvertures illimitées, toutes les formations (texte et audio), tous les outils KDP, 
+                et toutes les mises à jour futures. C'est l'accès le plus complet possible.
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-6" className="border rounded-lg px-6 bg-card">
               <AccordionTrigger className="text-left font-semibold hover:no-underline">
-                Que se passe-t-il si j'épuise mes crédits ?
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground pb-4">
-                Les crédits des offres Starter et Pro sont valables à vie (pas de renouvellement mensuel). 
-                Une fois épuisés, vous pouvez soit upgrader vers une offre supérieure, soit racheter des 
-                crédits supplémentaires. L'offre Lifetime vous donne un accès illimité sans aucune restriction.
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="item-7" className="border rounded-lg px-6 bg-card">
-              <AccordionTrigger className="text-left font-semibold hover:no-underline">
                 Comment fonctionne le support ?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground pb-4">
-                Tous les utilisateurs ont accès au support par email. Les membres Pro bénéficient d'un 
-                support prioritaire avec réponse sous 24h. Les membres Lifetime ont un support VIP 24/7 
-                avec assistance personnalisée et accès à notre communauté privée.
+                Tous les utilisateurs bénéficient d'un support prioritaire par email avec réponse rapide. 
+                Nous sommes là pour vous aider à tirer le meilleur parti de l'outil.
               </AccordionContent>
             </AccordionItem>
           </Accordion>
@@ -566,13 +509,13 @@ const SalesPage = () => {
           <Button 
             size="lg" 
             className="text-lg px-8 py-6"
-            onClick={() => handlePlanClick("starter")}
+            onClick={() => handlePlanClick("lifetime")}
           >
-            Commencer à 27€
+            Accéder Maintenant – 37€
             <ArrowRight className="w-5 h-5 ml-2" />
           </Button>
           <p className="text-sm text-muted-foreground mt-4">
-            Paiement unique • Support inclus • Mises à jour gratuites
+            Paiement unique • Accès illimité à vie • Mises à jour gratuites
           </p>
         </div>
       </section>
