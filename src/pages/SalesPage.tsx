@@ -329,9 +329,9 @@ const SalesPage = () => {
                 💎 Pourquoi seulement <span className="text-emerald-600 dark:text-emerald-400 font-bold">37€</span> ?
               </p>
               <p className="text-muted-foreground text-sm leading-relaxed max-w-xl mx-auto">
-                Nous avons passé des mois à développer cet outil complet. Formations, générateur IA, outils KDP...
+                Toutes les formations sont intégrées directement dans le générateur : vous ne serez jamais perdu.
                 <br />
-                <span className="font-medium text-foreground">À ce prix, c{"'"}est un cadeau.</span> Notre objectif : vous aider à réussir, pas à vous ruiner.
+                <span className="font-medium text-foreground">Support inclus + mises à jour gratuites à vie.</span> À ce prix, c{"'"}est un cadeau.
               </p>
             </div>
           </div>
