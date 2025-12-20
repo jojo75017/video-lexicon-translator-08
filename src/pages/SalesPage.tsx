@@ -19,9 +19,9 @@ const SalesPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
-  // Countdown to March 31, 2026
+  // Countdown to January 31, 2025
   useEffect(() => {
-    const targetDate = new Date('2026-03-31T23:59:59');
+    const targetDate = new Date('2025-01-31T23:59:59');
     
     const updateCountdown = () => {
       const now = new Date();
@@ -322,12 +322,26 @@ const SalesPage = () => {
             Paiement unique – Accès illimité à vie
           </p>
           
+          {/* Why 37€ Banner */}
+          <div className="max-w-3xl mx-auto mb-8">
+            <div className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/30 rounded-xl p-5 text-center">
+              <p className="text-lg font-medium text-foreground mb-2">
+                💎 Pourquoi seulement <span className="text-emerald-600 dark:text-emerald-400 font-bold">37€</span> ?
+              </p>
+              <p className="text-muted-foreground text-sm leading-relaxed max-w-xl mx-auto">
+                Nous avons passé des mois à développer cet outil complet. Formations, générateur IA, outils KDP...
+                <br />
+                <span className="font-medium text-foreground">À ce prix, c{"'"}est un cadeau.</span> Notre objectif : vous aider à réussir, pas à vous ruiner.
+              </p>
+            </div>
+          </div>
+
           {/* Countdown Timer */}
           <div className="max-w-2xl mx-auto mb-12">
             <div className="bg-gradient-to-r from-red-500 to-orange-500 rounded-xl p-6 text-white text-center shadow-lg">
               <div className="flex items-center justify-center gap-2 mb-3">
                 <Clock className="w-5 h-5 animate-pulse" />
-                <span className="font-bold text-lg">🔥 Offre de lancement – Économisez 60€</span>
+                <span className="font-bold text-lg">🔥 Tarif de lancement – Après le 31 janvier : 97€</span>
               </div>
               <div className="grid grid-cols-4 gap-4 max-w-md mx-auto">
                 <div className="bg-white/20 rounded-lg p-3">
@@ -347,7 +361,7 @@ const SalesPage = () => {
                   <div className="text-xs uppercase tracking-wide">Secondes</div>
                 </div>
               </div>
-              <p className="text-sm mt-3 text-white/80">Offre valable jusqu'au 31 mars 2026</p>
+              <p className="text-sm mt-3 text-white/80">Offre valable jusqu{"'"}au 31 janvier 2025</p>
             </div>
           </div>
           
