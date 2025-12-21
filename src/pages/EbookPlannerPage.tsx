@@ -103,8 +103,10 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   const [detailLevel, setDetailLevel] = useState(savedData?.detailLevel || 'détaillé');
   const [tone, setTone] = useState(savedData?.tone || 'professionnel');
   const [narrativeFormat, setNarrativeFormat] = useState(savedData?.narrativeFormat || 'troisième personne');
+  const [bookDescription, setBookDescription] = useState(savedData?.bookDescription || '');
+  const [genre, setGenre] = useState(savedData?.genre || '');
   
-  const { isGenerating, generateChapterContent, generateSubChapterContent, generateEbookPlan, generateBookSummary, generateBookSynopsis, generateEbookCover, optimizeForSEO, generateKDPDescription, generateKDPKeywords, generateKDPCategories, generateBackCover, generatePreface, generateConclusion, generateEpilogue, translateContent, analyzeTextStatistics } = useSubscriptionGeneration(subscriberEmail, apiKey, ebookTitle, targetAudience, tomeNumber, writingStyle, chapterLength, detailLevel, tone, narrativeFormat);
+  const { isGenerating, generateChapterContent, generateSubChapterContent, generateEbookPlan, generateBookSummary, generateBookSynopsis, generateEbookCover, optimizeForSEO, generateKDPDescription, generateKDPKeywords, generateKDPCategories, generateBackCover, generatePreface, generateConclusion, generateEpilogue, translateContent, analyzeTextStatistics } = useSubscriptionGeneration(subscriberEmail, apiKey, ebookTitle, targetAudience, tomeNumber, writingStyle, chapterLength, detailLevel, tone, narrativeFormat, bookDescription, genre);
   
   const [authorName, setAuthorName] = useState(savedData?.authorName || '');
   const [preface, setPreface] = useState(savedData?.preface || '');
@@ -132,7 +134,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   const currentDataRef = useRef({
     ebookTitle, authorName, targetAudience, tomeNumber, writingStyle, chapterLength,
     detailLevel, tone, narrativeFormat, preface, conclusion, chapters, characters,
-    ebookImages, numberOfChapters, bookSummary, coverConcepts, seoOptimization,
+    ebookImages, numberOfChapters, bookSummary, coverConcepts, seoOptimization, bookDescription, genre,
     kdpDescription, kdpKeywords, kdpCategories
   });
 
@@ -141,12 +143,12 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
     currentDataRef.current = {
       ebookTitle, authorName, targetAudience, tomeNumber, writingStyle, chapterLength,
       detailLevel, tone, narrativeFormat, preface, conclusion, chapters, characters,
-      ebookImages, numberOfChapters, bookSummary, coverConcepts, seoOptimization,
+      ebookImages, numberOfChapters, bookSummary, coverConcepts, seoOptimization, bookDescription, genre,
       kdpDescription, kdpKeywords, kdpCategories
     };
   }, [ebookTitle, authorName, targetAudience, tomeNumber, writingStyle, chapterLength,
       detailLevel, tone, narrativeFormat, preface, conclusion, chapters, characters,
-      ebookImages, numberOfChapters, bookSummary, coverConcepts, seoOptimization,
+      ebookImages, numberOfChapters, bookSummary, coverConcepts, seoOptimization, bookDescription, genre,
       kdpDescription, kdpKeywords, kdpCategories]);
 
   useEffect(() => {
@@ -202,7 +204,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
     // Sauvegarder dans localStorage SANS les images base64 volumineuses
     const dataToSave = {
       apiKey, ebookTitle, authorName, targetAudience, tomeNumber, writingStyle,
-      chapterLength, detailLevel, tone, narrativeFormat, 
+      chapterLength, detailLevel, tone, narrativeFormat, bookDescription, genre,
       preface: stripBase64ImagesFromContent(preface), 
       conclusion: stripBase64ImagesFromContent(conclusion), 
       epilogue: stripBase64ImagesFromContent(epilogue),
@@ -233,7 +235,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
       const timer = setTimeout(() => saveProject(projectData), 2000);
       return () => clearTimeout(timer);
     }
-  }, [apiKey, ebookTitle, authorName, targetAudience, tomeNumber, writingStyle, chapterLength, detailLevel, tone, narrativeFormat, preface, conclusion, epilogue, chapters, numberOfChapters, ebookImages, characters, bookSummary, coverConcepts, seoOptimization, kdpDescription, kdpKeywords, kdpCategories]);
+  }, [apiKey, ebookTitle, authorName, targetAudience, tomeNumber, writingStyle, chapterLength, detailLevel, tone, narrativeFormat, bookDescription, genre, preface, conclusion, epilogue, chapters, numberOfChapters, ebookImages, characters, bookSummary, coverConcepts, seoOptimization, kdpDescription, kdpKeywords, kdpCategories]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -876,7 +878,52 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {/* Description du livre - NOUVEAU */}
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-amber-500" />
+                          📋 Description / Sujet du livre (important pour la cohérence)
+                        </Label>
+                        <Textarea
+                          placeholder="Décrivez en quelques phrases le sujet de votre livre, l'histoire que vous voulez raconter, les thèmes principaux, les personnages clés... Plus vous donnez de détails, plus l'IA sera cohérente."
+                          value={bookDescription}
+                          onChange={(e) => setBookDescription(e.target.value)}
+                          rows={4}
+                          className="resize-y min-h-[100px] border-2 focus:border-amber-500 transition-colors"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          💡 Astuce: Indiquez le genre, le contexte, les personnages principaux et l'intrigue souhaitée pour des résultats plus cohérents.
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium">Genre / Catégorie</Label>
+                          <Select value={genre} onValueChange={setGenre}>
+                            <SelectTrigger className="h-12 border-2 focus:border-violet-500">
+                              <SelectValue placeholder="Sélectionner" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="roman">📖 Roman</SelectItem>
+                              <SelectItem value="thriller">🔪 Thriller/Policier</SelectItem>
+                              <SelectItem value="romance">💕 Romance</SelectItem>
+                              <SelectItem value="fantasy">🧙 Fantasy</SelectItem>
+                              <SelectItem value="science-fiction">🚀 Science-Fiction</SelectItem>
+                              <SelectItem value="horreur">👻 Horreur</SelectItem>
+                              <SelectItem value="developpement-personnel">🧠 Développement personnel</SelectItem>
+                              <SelectItem value="business">💼 Business/Entrepreneuriat</SelectItem>
+                              <SelectItem value="guide-pratique">📚 Guide pratique</SelectItem>
+                              <SelectItem value="cuisine">🍳 Cuisine</SelectItem>
+                              <SelectItem value="voyage">✈️ Voyage</SelectItem>
+                              <SelectItem value="biographie">📝 Biographie</SelectItem>
+                              <SelectItem value="enfant">🧒 Livre pour enfants</SelectItem>
+                              <SelectItem value="education">🎓 Éducation</SelectItem>
+                              <SelectItem value="sante">❤️ Santé/Bien-être</SelectItem>
+                              <SelectItem value="spiritualite">🙏 Spiritualité</SelectItem>
+                              <SelectItem value="autre">📋 Autre</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
                         <div className="space-y-2">
                           <Label className="text-sm font-medium">Public cible</Label>
                           <Select value={targetAudience} onValueChange={setTargetAudience}>
