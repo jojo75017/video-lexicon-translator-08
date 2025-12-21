@@ -25,7 +25,9 @@ export const useSubscriptionGeneration = (
   chapterLength?: string,
   detailLevel?: string,
   tone?: string,
-  narrativeFormat?: string
+  narrativeFormat?: string,
+  bookDescription?: string,
+  genre?: string
 ) => {
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -89,10 +91,16 @@ export const useSubscriptionGeneration = (
     const detailLine = detailLevel ? `\nNiveau de détail : ${detailLevel}. Fournis un contenu avec ce niveau de détail.` : '';
     const toneLine = tone ? `\nTon : ${tone}. Utilise ce ton tout au long du texte.` : '';
     const narrativeLine = narrativeFormat ? `\nFormat de narration : ${narrativeFormat}.` : '';
+    const genreLine = genre ? `\nGenre du livre : ${genre}.` : '';
+    
+    // Description du livre fournie par l'utilisateur
+    const descriptionContext = bookDescription 
+      ? `\n\n=== CONTEXTE DU LIVRE (INFORMATIONS À RESPECTER) ===\n${bookDescription}\n=== FIN CONTEXTE ===\n\nCe chapitre doit s'inscrire parfaitement dans ce contexte.` 
+      : '';
     
     // Contexte de position dans le livre
     const positionContext = (chapterIndex !== undefined && totalChapters) 
-      ? `\nCeci est le chapitre ${chapterIndex + 1} sur ${totalChapters}. ${chapterIndex === 0 ? 'C\'est le premier chapitre, introduis bien le sujet.' : ''} ${chapterIndex === totalChapters - 1 ? 'C\'est le dernier chapitre, prépare la conclusion.' : ''}` 
+      ? `\nCeci est le chapitre ${chapterIndex + 1} sur ${totalChapters}. ${chapterIndex === 0 ? 'C\'est le premier chapitre, introduis bien le sujet et pose les bases.' : ''} ${chapterIndex === totalChapters - 1 ? 'C\'est le dernier chapitre, prépare la conclusion et boucle l\'histoire.' : ''}` 
       : '';
     
     // Synopsis pour la cohérence globale
@@ -105,18 +113,17 @@ export const useSubscriptionGeneration = (
       ? `\n\nRésumé du chapitre précédent (pour assurer la continuité):\n${previousChapterSummary}\n\nAssure une transition fluide depuis ce qui précède.` 
       : '';
     
-    const prompt = `Rédige un chapitre complet de ${wordsPerChapter} mots exactement sur le sujet : "${chapter.title}".${contextLine}${audienceLine}${tomeLine}${styleLine}${lengthLine}${detailLine}${toneLine}${narrativeLine}${positionContext}${synopsisContext}${previousContext}
+    const prompt = `Tu es un auteur expert. Rédige un chapitre complet d'environ ${wordsPerChapter} mots sur le sujet : "${chapter.title}".${contextLine}${audienceLine}${tomeLine}${genreLine}${styleLine}${lengthLine}${detailLine}${toneLine}${narrativeLine}${positionContext}${descriptionContext}${synopsisContext}${previousContext}
     
-Le contenu doit être :
-- Informatif et engageant sur le sujet donné
-- PARFAITEMENT COHÉRENT avec la synopsis et le fil conducteur du livre
-- Parfaitement adapté au public cible spécifié (vocabulaire, ton, exemples)
-- Bien structuré avec des paragraphes
-- Exactement ${wordsPerChapter} mots
-- Inclure des mots ou phrases importantes en *italique* pour mettre l'accent
-- Faire référence aux éléments établis dans les chapitres précédents si pertinent
+INSTRUCTIONS CRITIQUES:
+- Le contenu doit être informatif, engageant et COHÉRENT avec l'ensemble du livre
+- Adapte parfaitement le vocabulaire et le ton au public cible
+- Structure bien le texte avec des paragraphes distincts
+- Utilise l'*italique* pour les mots/phrases importantes
+- Fais référence aux éléments établis précédemment si pertinent
+- ${bookDescription ? 'RESPECTE LE CONTEXTE DU LIVRE fourni ci-dessus' : 'Sois créatif tout en restant cohérent'}
 
-Assure-toi que le contenu soit riche, détaillé et s'intègre parfaitement dans l'ensemble du livre.`;
+Rédige directement le contenu du chapitre, sans titre ni numérotation.`;
 
     const content = await callGenerateContent('chapters_generated', prompt);
     return content;
@@ -169,31 +176,44 @@ Le contenu doit faire environ ${wordsPerSubChapter} mots et être :
     const tomeLine = tomeNumber ? `\nCeci est le Tome ${tomeNumber} d'une série. Structure le plan en conséquence.` : '';
     const styleLine = writingStyle ? `\nStyle d'écriture : ${writingStyle}.` : '';
     const toneLine = tone ? `\nTon général : ${tone}.` : '';
+    const genreLine = genre ? `\nGenre/Catégorie : ${genre}.` : '';
     
-    const prompt = `Crée un plan détaillé pour un ebook intitulé "${ebookTitle}" par ${authorName}.
+    // Description fournie par l'utilisateur - CRUCIAL pour la cohérence
+    const descriptionContext = bookDescription ? `
 
-${audienceInstructions}${tomeLine}${styleLine}${toneLine}
+=== DESCRIPTION DU LIVRE (INFORMATIONS CRUCIALES À RESPECTER) ===
+${bookDescription}
+=== FIN DESCRIPTION ===
 
-IMPORTANT: Le contenu DOIT être parfaitement adapté au public cible. Les titres, thèmes et vocabulaire doivent correspondre à l'âge et au niveau de compréhension du public.
+IMPORTANT: Le plan DOIT correspondre exactement à cette description. Utilise les éléments mentionnés (personnages, lieux, intrigue, thèmes) comme base pour structurer les chapitres.` : '';
     
+    const prompt = `Tu es un auteur expert en création de livres. Crée un plan détaillé et COHÉRENT pour un ebook intitulé "${ebookTitle}" par ${authorName || 'l\'auteur'}.
+
+${audienceInstructions}${tomeLine}${styleLine}${toneLine}${genreLine}${descriptionContext}
+
+INSTRUCTIONS CRITIQUES:
+1. Le contenu DOIT être parfaitement adapté au public cible
+2. Les titres de chapitres doivent former une progression logique et narrative
+3. Chaque chapitre doit avoir un objectif clair et s'enchaîner naturellement avec le suivant
+4. Les sous-chapitres doivent détailler le contenu de manière cohérente
+5. ${bookDescription ? 'RESPECTE IMPÉRATIVEMENT la description fournie ci-dessus' : 'Crée une structure originale et engageante basée sur le titre'}
+
 Le plan doit contenir exactement ${numberOfChapters} chapitres principaux.
 
-Format JSON attendu :
+Format JSON attendu (réponds UNIQUEMENT avec le JSON, sans texte additionnel):
 {
-  "preface": "Une préface captivante adaptée au public",
+  "preface": "Une préface captivante de 150-200 mots qui présente le livre, son contexte, et donne envie de lire. Personnalisée selon le genre et le sujet.",
   "chapters": [
     {
-      "title": "Titre du chapitre 1",
+      "title": "Titre du chapitre 1 (clair et engageant)",
       "subChapters": [
-        "Sous-chapitre 1.1",
-        "Sous-chapitre 1.2"
+        "Sous-chapitre 1.1 (détaillé)",
+        "Sous-chapitre 1.2 (détaillé)"
       ]
     }
   ],
-  "conclusion": "Une conclusion percutante adaptée au public"
-}
-
-Réponds UNIQUEMENT avec le JSON, sans texte additionnel.`;
+  "conclusion": "Une conclusion percutante de 100-150 mots adaptée au genre et au public"
+}`;
 
     const content = await callGenerateContent('ebook_plans_generated', prompt);
     
@@ -230,13 +250,21 @@ Réponds UNIQUEMENT avec le JSON, sans texte additionnel.`;
     const styleLine = writingStyle ? `Style d'écriture: ${writingStyle}` : '';
     const toneLine = tone ? `Ton: ${tone}` : '';
     const narrativeLine = narrativeFormat ? `Format de narration: ${narrativeFormat}` : '';
+    const genreLine = genre ? `Genre: ${genre}` : '';
     
-    const prompt = `Crée une SYNOPSIS DÉTAILLÉE pour l'ebook "${title}" qui servira de fil conducteur pour TOUTE la rédaction.
+    // Description fournie par l'utilisateur
+    const descriptionContext = bookDescription 
+      ? `\n\n=== DESCRIPTION FOURNIE PAR L'AUTEUR (À RESPECTER IMPÉRATIVEMENT) ===\n${bookDescription}\n=== FIN DESCRIPTION ===\n\nCette description doit être la BASE de toute la synopsis. Reprends les éléments mentionnés (personnages, lieux, intrigue, thèmes) et développe-les.` 
+      : '';
+    
+    const prompt = `Tu es un éditeur expert. Crée une SYNOPSIS DÉTAILLÉE pour l'ebook "${title}" qui servira de fil conducteur pour TOUTE la rédaction.
 
 Public cible: ${audience}
+${genreLine}
 ${styleLine}
 ${toneLine}
 ${narrativeLine}
+${descriptionContext}
 
 Structure du livre:
 ${chapterTitles}
@@ -244,16 +272,18 @@ ${chapterTitles}
 Sous-chapitres:
 ${subChaptersList}
 
-La synopsis doit définir:
+La synopsis DOIT définir PRÉCISÉMENT:
 1. Le THÈME CENTRAL et le message principal du livre
-2. Le FIL CONDUCTEUR narratif qui relie tous les chapitres
-3. La PROGRESSION LOGIQUE: comment chaque chapitre s'enchaîne avec le suivant
-4. Les PERSONNAGES/CONCEPTS CLÉS récurrents (noms, caractéristiques)
-5. Le VOCABULAIRE SPÉCIFIQUE à utiliser de manière cohérente
-6. L'ARC NARRATIF: situation initiale → développement → résolution
-7. Les ÉLÉMENTS À RAPPELER entre les parties (références croisées)
+2. Le FIL CONDUCTEUR narratif qui relie TOUS les chapitres de manière logique
+3. La PROGRESSION: comment chaque chapitre s'enchaîne avec le suivant
+4. Les PERSONNAGES/CONCEPTS CLÉS récurrents avec leurs noms et caractéristiques exactes
+5. Le VOCABULAIRE SPÉCIFIQUE à utiliser de manière cohérente partout
+6. L'ARC NARRATIF complet: situation initiale → développement → climax → résolution
+7. Les ÉLÉMENTS À RAPPELER entre les chapitres (références croisées, running gags, thèmes récurrents)
 
-Format ta réponse de manière structurée. Cette synopsis sera utilisée pour garantir que la préface, tous les chapitres, la conclusion et l'épilogue forment un ensemble cohérent et fluide.`;
+${bookDescription ? 'IMPORTANT: Respecte la description fournie par l\'auteur comme base principale.' : 'Sois créatif mais cohérent.'}
+
+Cette synopsis sera utilisée pour garantir que la préface, tous les chapitres, la conclusion et l'épilogue forment un ensemble parfaitement cohérent.`;
     
     const content = await callGenerateContent('chapters_generated', prompt);
     return content;
