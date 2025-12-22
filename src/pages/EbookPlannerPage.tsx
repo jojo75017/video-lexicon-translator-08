@@ -106,15 +106,15 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   const [narrativeFormat, setNarrativeFormat] = useState(savedData?.narrativeFormat || 'troisième personne');
   const [bookDescription, setBookDescription] = useState(savedData?.bookDescription || '');
   const [genre, setGenre] = useState(savedData?.genre || '');
+  const [characters, setCharacters] = useState<EbookCharacter[]>(savedData?.characters || []);
   
-  const { isGenerating, generateChapterContent, generateSubChapterContent, generateEbookPlan, generateBookSummary, generateBookSynopsis, generateEbookCover, optimizeForSEO, generateKDPDescription, generateKDPKeywords, generateKDPCategories, generateBackCover, generatePreface, generateConclusion, generateEpilogue, translateContent, analyzeTextStatistics } = useSubscriptionGeneration(subscriberEmail, apiKey, ebookTitle, targetAudience, tomeNumber, writingStyle, chapterLength, detailLevel, tone, narrativeFormat, bookDescription, genre);
+  const { isGenerating, generateChapterContent, generateSubChapterContent, generateEbookPlan, generateBookSummary, generateBookSynopsis, generateEbookCover, optimizeForSEO, generateKDPDescription, generateKDPKeywords, generateKDPCategories, generateBackCover, generatePreface, generateConclusion, generateEpilogue, translateContent, analyzeTextStatistics } = useSubscriptionGeneration(subscriberEmail, apiKey, ebookTitle, targetAudience, tomeNumber, writingStyle, chapterLength, detailLevel, tone, narrativeFormat, bookDescription, genre, characters);
   
   const [authorName, setAuthorName] = useState(savedData?.authorName || '');
   const [preface, setPreface] = useState(savedData?.preface || '');
   const [conclusion, setConclusion] = useState(savedData?.conclusion || '');
   const [epilogue, setEpilogue] = useState(savedData?.epilogue || '');
   const [chapters, setChapters] = useState<Chapter[]>(savedData?.chapters || []);
-  const [characters, setCharacters] = useState<EbookCharacter[]>(savedData?.characters || []);
   const [numberOfChapters, setNumberOfChapters] = useState(savedData?.numberOfChapters || 8);
   const [targetWordsPerChapter, setTargetWordsPerChapter] = useState(savedData?.targetWordsPerChapter || 2500);
   const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
