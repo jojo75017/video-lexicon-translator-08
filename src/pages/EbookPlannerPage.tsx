@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { 
   BookOpen, Plus, Wand2, RotateCcw, ArrowLeft, Merge, Sparkles, Eye, Search, Palette, Users,
-  Save, Zap, Target, FileText, Crown
+  Save, Zap, Target, FileText, Crown, Trash2
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -964,6 +964,97 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                           />
                         </div>
                       </div>
+
+                      {/* Section Personnages Principaux */}
+                      <Card className="border-2 border-dashed border-purple-300 bg-gradient-to-r from-purple-50 to-fuchsia-50">
+                        <CardContent className="p-6">
+                          <div className="flex items-center gap-3 mb-4">
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-fuchsia-500 flex items-center justify-center shadow-md">
+                              <Users className="w-5 h-5 text-white" />
+                            </div>
+                            <div>
+                              <h3 className="text-lg font-bold text-purple-800">Personnages principaux</h3>
+                              <p className="text-sm text-purple-600">Définissez vos personnages pour une histoire cohérente</p>
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-4">
+                            {characters.map((character, index) => (
+                              <div key={character.id} className="p-4 bg-white/70 rounded-xl border border-purple-200 space-y-3">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-sm font-semibold text-purple-700">Personnage {index + 1}</span>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setCharacters(prev => prev.filter(c => c.id !== character.id))}
+                                    className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                  <Input
+                                    placeholder="Nom du personnage"
+                                    value={character.name}
+                                    onChange={(e) => {
+                                      setCharacters(prev => prev.map(c => 
+                                        c.id === character.id ? { ...c, name: e.target.value } : c
+                                      ));
+                                    }}
+                                    className="border-purple-200 focus:border-purple-400"
+                                  />
+                                  <Select 
+                                    value={character.role || ''} 
+                                    onValueChange={(value) => {
+                                      setCharacters(prev => prev.map(c => 
+                                        c.id === character.id ? { ...c, role: value } : c
+                                      ));
+                                    }}
+                                  >
+                                    <SelectTrigger className="border-purple-200 focus:border-purple-400">
+                                      <SelectValue placeholder="Rôle" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="protagonist">🦸 Protagoniste</SelectItem>
+                                      <SelectItem value="antagonist">😈 Antagoniste</SelectItem>
+                                      <SelectItem value="sidekick">🤝 Acolyte</SelectItem>
+                                      <SelectItem value="mentor">🧙 Mentor</SelectItem>
+                                      <SelectItem value="love-interest">💕 Intérêt amoureux</SelectItem>
+                                      <SelectItem value="secondary">👤 Secondaire</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <Textarea
+                                  placeholder="Description détaillée : apparence physique, personnalité, motivations, histoire personnelle, particularités..."
+                                  value={character.description}
+                                  onChange={(e) => {
+                                    setCharacters(prev => prev.map(c => 
+                                      c.id === character.id ? { ...c, description: e.target.value } : c
+                                    ));
+                                  }}
+                                  className="min-h-[100px] border-purple-200 focus:border-purple-400"
+                                />
+                              </div>
+                            ))}
+                            
+                            <Button
+                              variant="outline"
+                              onClick={() => {
+                                setCharacters(prev => [...prev, {
+                                  id: Date.now().toString(),
+                                  name: '',
+                                  description: '',
+                                  role: ''
+                                }]);
+                              }}
+                              className="w-full border-purple-300 text-purple-700 hover:bg-purple-100"
+                            >
+                              <Plus className="h-4 w-4 mr-2" />
+                              Ajouter un personnage
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
 
                       {/* Bouton Générer l'ebook complet */}
                       <Card className="border-2 border-dashed border-green-400 bg-gradient-to-r from-green-50 to-emerald-50">
