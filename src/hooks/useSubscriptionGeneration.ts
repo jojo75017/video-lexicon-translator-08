@@ -15,6 +15,14 @@ export interface SubChapter {
   content?: string;
 }
 
+interface CharacterInfo {
+  id: string;
+  name: string;
+  description: string;
+  role?: string;
+  referenceImageUrl?: string;
+}
+
 export const useSubscriptionGeneration = (
   subscriberEmail: string, 
   apiKey?: string, 
@@ -27,7 +35,8 @@ export const useSubscriptionGeneration = (
   tone?: string,
   narrativeFormat?: string,
   bookDescription?: string,
-  genre?: string
+  genre?: string,
+  characters?: CharacterInfo[]
 ) => {
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -82,6 +91,42 @@ export const useSubscriptionGeneration = (
     }
   };
 
+  // Génère le contexte des personnages pour les prompts
+  const getCharactersContext = () => {
+    if (!characters || characters.length === 0) return '';
+    
+    const roleLabels: Record<string, string> = {
+      'protagonist': 'Protagoniste',
+      'antagonist': 'Antagoniste', 
+      'sidekick': 'Acolyte',
+      'mentor': 'Mentor',
+      'love-interest': 'Intérêt amoureux',
+      'secondary': 'Personnage secondaire'
+    };
+    
+    const characterDescriptions = characters
+      .filter(c => c.name && c.description)
+      .map(c => {
+        const role = c.role ? ` (${roleLabels[c.role] || c.role})` : '';
+        const hasImage = c.referenceImageUrl ? ' [Image de référence disponible]' : '';
+        return `- **${c.name}**${role}${hasImage}: ${c.description}`;
+      })
+      .join('\n');
+    
+    if (!characterDescriptions) return '';
+    
+    return `\n\n=== PERSONNAGES DU LIVRE (À UTILISER DE MANIÈRE COHÉRENTE) ===
+${characterDescriptions}
+
+INSTRUCTIONS POUR LES PERSONNAGES:
+- Utilise EXACTEMENT les noms des personnages tels qu'ils sont définis ci-dessus
+- Respecte scrupuleusement les descriptions physiques et psychologiques de chaque personnage
+- Maintiens la cohérence des traits de caractère, motivations et particularités de chaque personnage
+- Les personnages doivent agir de manière cohérente avec leur rôle (protagoniste, antagoniste, etc.)
+- Fais référence aux personnages de manière naturelle dans le récit
+=== FIN PERSONNAGES ===\n`;
+  };
+
   const generateChapterContent = async (chapter: Chapter, wordsPerChapter: number = 350, synopsis?: string, chapterIndex?: number, totalChapters?: number, previousChapterSummary?: string) => {
     const contextLine = ebookTitle ? `\nCe chapitre fait partie de l'ebook intitulé "${ebookTitle}".` : '';
     const audienceLine = targetAudience ? `\nPublic cible : ${targetAudience}. Adapte le vocabulaire, le style d'écriture, la complexité des concepts et les exemples utilisés pour correspondre parfaitement à ce public.` : '';
@@ -98,6 +143,9 @@ export const useSubscriptionGeneration = (
       ? `\n\n=== CONTEXTE DU LIVRE (INFORMATIONS À RESPECTER) ===\n${bookDescription}\n=== FIN CONTEXTE ===\n\nCe chapitre doit s'inscrire parfaitement dans ce contexte.` 
       : '';
     
+    // Contexte des personnages
+    const charactersContext = getCharactersContext();
+    
     // Contexte de position dans le livre
     const positionContext = (chapterIndex !== undefined && totalChapters) 
       ? `\nCeci est le chapitre ${chapterIndex + 1} sur ${totalChapters}. ${chapterIndex === 0 ? 'C\'est le premier chapitre, introduis bien le sujet et pose les bases.' : ''} ${chapterIndex === totalChapters - 1 ? 'C\'est le dernier chapitre, prépare la conclusion et boucle l\'histoire.' : ''}` 
@@ -113,7 +161,7 @@ export const useSubscriptionGeneration = (
       ? `\n\nRésumé du chapitre précédent (pour assurer la continuité):\n${previousChapterSummary}\n\nAssure une transition fluide depuis ce qui précède.` 
       : '';
     
-    const prompt = `Tu es un auteur expert. Rédige un chapitre complet d'environ ${wordsPerChapter} mots sur le sujet : "${chapter.title}".${contextLine}${audienceLine}${tomeLine}${genreLine}${styleLine}${lengthLine}${detailLine}${toneLine}${narrativeLine}${positionContext}${descriptionContext}${synopsisContext}${previousContext}
+    const prompt = `Tu es un auteur expert. Rédige un chapitre complet d'environ ${wordsPerChapter} mots sur le sujet : "${chapter.title}".${contextLine}${audienceLine}${tomeLine}${genreLine}${styleLine}${lengthLine}${detailLine}${toneLine}${narrativeLine}${positionContext}${descriptionContext}${charactersContext}${synopsisContext}${previousContext}
     
 INSTRUCTIONS CRITIQUES:
 - Le contenu doit être informatif, engageant et COHÉRENT avec l'ensemble du livre
@@ -122,6 +170,7 @@ INSTRUCTIONS CRITIQUES:
 - Utilise l'*italique* pour les mots/phrases importantes
 - Fais référence aux éléments établis précédemment si pertinent
 - ${bookDescription ? 'RESPECTE LE CONTEXTE DU LIVRE fourni ci-dessus' : 'Sois créatif tout en restant cohérent'}
+- ${characters && characters.length > 0 ? 'UTILISE LES PERSONNAGES définis ci-dessus de manière cohérente et fidèle à leurs descriptions' : ''}
 
 Rédige directement le contenu du chapitre, sans titre ni numérotation.`;
 
@@ -138,11 +187,14 @@ Rédige directement le contenu du chapitre, sans titre ni numérotation.`;
     const toneLine = tone ? `\nTon : ${tone}.` : '';
     const narrativeLine = narrativeFormat ? `\nFormat de narration : ${narrativeFormat}.` : '';
     
+    // Contexte des personnages
+    const charactersContext = getCharactersContext();
+    
     const synopsisContext = synopsis 
       ? `\n\n=== SYNOPSIS DU LIVRE ===\n${synopsis}\n=== FIN SYNOPSIS ===\n\nRespects strictement cette synopsis pour la cohérence globale.` 
       : '';
     
-    const prompt = `Rédige le contenu pour le sous-chapitre : "${subChapter.title}".${contextLine}${audienceLine}${tomeLine}${styleLine}${detailLine}${toneLine}${narrativeLine}${synopsisContext}
+    const prompt = `Rédige le contenu pour le sous-chapitre : "${subChapter.title}".${contextLine}${audienceLine}${tomeLine}${styleLine}${detailLine}${toneLine}${narrativeLine}${charactersContext}${synopsisContext}
     
 Le contenu doit faire environ ${wordsPerSubChapter} mots et être :
 - Informatif et pertinent
@@ -150,7 +202,8 @@ Le contenu doit faire environ ${wordsPerSubChapter} mots et être :
 - Parfaitement adapté au public cible (vocabulaire, ton, exemples)
 - Bien structuré
 - Engageant pour le lecteur
-- Utiliser l'italique (*) pour les points importants`;
+- Utiliser l'italique (*) pour les points importants
+${characters && characters.length > 0 ? '- UTILISER LES PERSONNAGES définis de manière cohérente et fidèle à leurs descriptions' : ''}`;
 
     const content = await callGenerateContent('subchapters_generated', prompt);
     return content;
