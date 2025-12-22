@@ -8,10 +8,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { 
   BookOpen, Plus, Wand2, RotateCcw, ArrowLeft, Merge, Sparkles, Eye, Search, Palette, Users,
-  Save, Zap, Target, FileText, Crown, Trash2
+  Save, Zap, Target, FileText, Crown, Trash2, ImageIcon, Loader2
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 import { ModernSidebar } from '@/components/layout/ModernSidebar';
 import { useEbookDatabase } from '@/hooks/useEbookDatabase';
 import EbookImageBank from '@/components/ebook/EbookImageBank';
@@ -119,6 +120,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
   const [importText, setImportText] = useState('');
   const [ebookImages, setEbookImages] = useState<Array<{url: string, title: string, chapterId?: string}>>(savedData?.ebookImages || []);
+  const [generatingImageForCharacter, setGeneratingImageForCharacter] = useState<string | null>(null);
   
   const [bookSummary, setBookSummary] = useState('');
   const [coverConcepts, setCoverConcepts] = useState('');
@@ -363,6 +365,42 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
 
   const handleSplitChapter = async (chapterId: string) => {
     toast.info('Fonction de division automatique non disponible');
+  };
+
+  // Générer une image de référence pour un personnage
+  const generateCharacterImage = async (characterId: string) => {
+    const character = characters.find(c => c.id === characterId);
+    if (!character || !character.name || !character.description) {
+      toast.error('Le personnage doit avoir un nom et une description');
+      return;
+    }
+
+    setGeneratingImageForCharacter(characterId);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-character-reference', {
+        body: {
+          characterName: character.name,
+          characterDescription: character.description,
+          useOpenAI: !!apiKey,
+          openaiApiKey: apiKey || undefined
+        }
+      });
+
+      if (error) throw error;
+      
+      if (data?.imageUrl) {
+        setCharacters(prev => prev.map(c => 
+          c.id === characterId ? { ...c, referenceImageUrl: data.imageUrl } : c
+        ));
+        toast.success(`Image générée pour ${character.name}`);
+      }
+    } catch (error) {
+      console.error('Erreur génération image:', error);
+      toast.error('Erreur lors de la génération de l\'image');
+    } finally {
+      setGeneratingImageForCharacter(null);
+    }
   };
 
   // État pour la génération complète
@@ -1034,6 +1072,57 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                                   }}
                                   className="min-h-[100px] border-purple-200 focus:border-purple-400"
                                 />
+                                
+                                {/* Image de référence */}
+                                <div className="flex items-start gap-3 pt-2 border-t border-purple-100">
+                                  {character.referenceImageUrl ? (
+                                    <div className="relative group">
+                                      <img 
+                                        src={character.referenceImageUrl} 
+                                        alt={`Portrait de ${character.name}`}
+                                        className="w-24 h-24 object-cover rounded-lg border-2 border-purple-300 shadow-md"
+                                      />
+                                      <Button
+                                        variant="destructive"
+                                        size="sm"
+                                        onClick={() => {
+                                          setCharacters(prev => prev.map(c => 
+                                            c.id === character.id ? { ...c, referenceImageUrl: undefined } : c
+                                          ));
+                                        }}
+                                        className="absolute -top-2 -right-2 h-6 w-6 p-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                      >
+                                        <Trash2 className="h-3 w-3" />
+                                      </Button>
+                                    </div>
+                                  ) : (
+                                    <div className="w-24 h-24 rounded-lg border-2 border-dashed border-purple-200 flex items-center justify-center bg-purple-50">
+                                      <ImageIcon className="h-8 w-8 text-purple-300" />
+                                    </div>
+                                  )}
+                                  <div className="flex-1">
+                                    <p className="text-xs text-purple-600 mb-2">Image de référence IA</p>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => generateCharacterImage(character.id)}
+                                      disabled={generatingImageForCharacter === character.id || !character.name || !character.description}
+                                      className="border-purple-300 text-purple-700 hover:bg-purple-100"
+                                    >
+                                      {generatingImageForCharacter === character.id ? (
+                                        <>
+                                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                          Génération...
+                                        </>
+                                      ) : (
+                                        <>
+                                          <Sparkles className="h-4 w-4 mr-2" />
+                                          {character.referenceImageUrl ? 'Régénérer' : 'Générer portrait'}
+                                        </>
+                                      )}
+                                    </Button>
+                                  </div>
+                                </div>
                               </div>
                             ))}
                             
