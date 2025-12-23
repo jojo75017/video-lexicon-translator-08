@@ -26,6 +26,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import LifetimeBadge from '@/components/ui/lifetime-badge';
 
 interface SubscriptionPageProps {
   subscriberEmail: string;
@@ -92,15 +93,17 @@ const SubscriptionPage = ({ subscriberEmail, subscriberData, onLogout }: Subscri
   };
 
   const getPlanBadge = (plan: string) => {
+    if (plan === 'lifetime') {
+      return <LifetimeBadge size="md" />;
+    }
+    
     const colors: Record<string, string> = {
       starter: 'bg-blue-500',
       pro: 'bg-purple-500',
-      lifetime: 'bg-gradient-to-r from-yellow-500 to-orange-500'
     };
     const labels: Record<string, string> = {
       starter: 'STARTER - 27€/mois',
       pro: 'PRO - 67€/mois',
-      lifetime: 'LIFETIME - Accès à vie'
     };
     return <Badge className={colors[plan] || 'bg-gray-500'}>{labels[plan] || plan.toUpperCase()}</Badge>;
   };

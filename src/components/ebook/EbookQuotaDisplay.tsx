@@ -6,6 +6,7 @@ import { BookOpen, FileText, Image, Layers, Crown, Zap, AlertCircle } from 'luci
 import { useUserQuotas, formatQuotaDisplay, getQuotaPercentage } from '@/hooks/useUserQuotas';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import LifetimeBadge from '@/components/ui/lifetime-badge';
 
 const EbookQuotaDisplay: React.FC = () => {
   const { quotas, isLoading, hasSubscription } = useUserQuotas();
@@ -92,9 +93,13 @@ const EbookQuotaDisplay: React.FC = () => {
             <Zap className="w-5 h-5 text-primary" />
             Vos Quotas
           </CardTitle>
-          <Badge className={`${planColors[quotas.plan as keyof typeof planColors] || planColors.starter} text-white`}>
-            {planNames[quotas.plan as keyof typeof planNames] || quotas.plan}
-          </Badge>
+          {quotas.plan === 'lifetime' ? (
+            <LifetimeBadge size="sm" />
+          ) : (
+            <Badge className={`${planColors[quotas.plan as keyof typeof planColors] || planColors.starter} text-white`}>
+              {planNames[quotas.plan as keyof typeof planNames] || quotas.plan}
+            </Badge>
+          )}
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
