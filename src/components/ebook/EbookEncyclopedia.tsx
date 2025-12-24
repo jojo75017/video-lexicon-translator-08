@@ -316,11 +316,12 @@ ${card.funFacts}
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="3">3 fiches</SelectItem>
                     <SelectItem value="5">5 fiches</SelectItem>
-                    <SelectItem value="8">8 fiches</SelectItem>
                     <SelectItem value="10">10 fiches</SelectItem>
                     <SelectItem value="15">15 fiches</SelectItem>
+                    <SelectItem value="20">20 fiches</SelectItem>
+                    <SelectItem value="30">30 fiches</SelectItem>
+                    <SelectItem value="50">50 fiches</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
