@@ -762,6 +762,99 @@ Réponds UNIQUEMENT avec un JSON valide (sans markdown, sans \`\`\`) dans ce for
       }
     }
 
+    // Handle encyclopedia generation (uses Lovable AI - no API key needed)
+    if (type === 'encyclopedia' || type === 'atlas') {
+      console.log(`Processing ${type} generation...`);
+      const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+      
+      if (!LOVABLE_API_KEY) {
+        console.error('LOVABLE_API_KEY not found');
+        return new Response(
+          JSON.stringify({ error: 'Lovable API key not configured' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      console.log(`Calling Lovable AI for ${type}...`);
+      
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 180000); // 3 min timeout for large requests
+        
+        const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'google/gemini-2.5-flash',
+            messages: [
+              { 
+                role: 'system', 
+                content: type === 'encyclopedia' 
+                  ? 'Tu es un expert naturaliste. Génère des fiches encyclopédiques détaillées et précises. Réponds UNIQUEMENT avec un tableau JSON valide, sans texte avant ou après, sans balises markdown.'
+                  : 'Tu es un expert en géographie naturelle et écologie. Génère des fiches atlas détaillées. Réponds UNIQUEMENT avec un tableau JSON valide, sans texte avant ou après, sans balises markdown.'
+              },
+              { role: 'user', content: prompt }
+            ],
+          }),
+          signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        console.log('Lovable AI response status:', response.status);
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Lovable AI error:', response.status, errorText);
+          
+          if (response.status === 402) {
+            return new Response(
+              JSON.stringify({ error: 'Crédits AI épuisés. Veuillez recharger vos crédits.', code: 'CREDITS_EXHAUSTED' }),
+              { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+          }
+          if (response.status === 429) {
+            return new Response(
+              JSON.stringify({ error: 'Trop de requêtes. Veuillez réessayer dans quelques instants.', code: 'RATE_LIMITED' }),
+              { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+          }
+          
+          return new Response(
+            JSON.stringify({ error: `Erreur lors de la génération: ${response.status}` }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        const data = await response.json();
+        console.log('Lovable AI data received');
+        const generatedContent = data.choices?.[0]?.message?.content;
+        
+        if (!generatedContent) {
+          console.error('No content in response:', JSON.stringify(data));
+          return new Response(
+            JSON.stringify({ error: 'Réponse vide de l\'IA' }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        console.log(`${type} generated successfully`);
+        return new Response(
+          JSON.stringify({ content: generatedContent }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      } catch (err) {
+        console.error(`${type} generation error:`, err);
+        const errorMessage = err.name === 'AbortError' ? 'Timeout - génération trop longue' : err.message;
+        return new Response(
+          JSON.stringify({ error: errorMessage }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
