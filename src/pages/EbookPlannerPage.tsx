@@ -63,6 +63,8 @@ import { EbookImageLibrary } from '@/components/ebook/EbookImageLibrary';
 import { EbookAnalyticsDashboard } from '@/components/ebook/EbookAnalyticsDashboard';
 import { EbookBookMockup3D } from '@/components/ebook/EbookBookMockup3D';
 import EbookPriceEstimator from '@/components/ebook/EbookPriceEstimator';
+import EbookEncyclopedia from '@/components/ebook/EbookEncyclopedia';
+import EbookAtlas from '@/components/ebook/EbookAtlas';
 import { useConfetti } from '@/hooks/useConfetti';
 
 // Hooks et données
@@ -1744,6 +1746,41 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                 // Naviguer vers le planificateur pour voir le résultat
                 setActiveTab('planner');
                 toast.success(`Template "${template.title}" appliqué avec ${template.chapters.length} chapitres !`);
+              }
+            }}
+          />
+        );
+      
+      case 'encyclopedia':
+        return (
+          <EbookEncyclopedia
+            onInsertContent={(content) => {
+              // Ajouter le contenu à la préface ou au premier chapitre disponible
+              if (chapters.length > 0) {
+                const updatedChapters = [...chapters];
+                updatedChapters[0].content = (updatedChapters[0].content || '') + '\n\n' + content;
+                setChapters(updatedChapters);
+                toast.success('Contenu ajouté au premier chapitre');
+              } else {
+                setPreface((prev) => prev + '\n\n' + content);
+                toast.success('Contenu ajouté à la préface');
+              }
+            }}
+          />
+        );
+      
+      case 'atlas':
+        return (
+          <EbookAtlas
+            onInsertContent={(content) => {
+              if (chapters.length > 0) {
+                const updatedChapters = [...chapters];
+                updatedChapters[0].content = (updatedChapters[0].content || '') + '\n\n' + content;
+                setChapters(updatedChapters);
+                toast.success('Contenu ajouté au premier chapitre');
+              } else {
+                setPreface((prev) => prev + '\n\n' + content);
+                toast.success('Contenu ajouté à la préface');
               }
             }}
           />

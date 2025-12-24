@@ -33,7 +33,9 @@ import {
   FileText,
   GraduationCap,
   Zap,
-  Crown
+  Crown,
+  BookMarked,
+  Map
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -89,6 +91,8 @@ const categories: Category[] = [
     items: [
       { id: 'planner', label: 'Planificateur', icon: BookOpen, color: 'text-fuchsia-500', bgColor: 'bg-fuchsia-500/10', activeGradient: 'from-fuchsia-500 to-pink-500' },
       { id: 'templates', label: 'Templates', icon: LayoutTemplate, color: 'text-cyan-500', bgColor: 'bg-cyan-500/10', activeGradient: 'from-cyan-500 to-teal-500' },
+      { id: 'encyclopedia', label: 'Encyclopédie', icon: BookMarked, color: 'text-amber-500', bgColor: 'bg-amber-500/10', activeGradient: 'from-amber-500 to-orange-500' },
+      { id: 'atlas', label: 'Atlas', icon: Map, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', activeGradient: 'from-emerald-500 to-teal-500' },
       { id: 'writing', label: 'Rédaction', icon: PenTool, color: 'text-blue-500', bgColor: 'bg-blue-500/10', activeGradient: 'from-blue-500 to-cyan-500' },
       { id: 'assistant', label: 'Assistant IA', icon: FileEdit, color: 'text-purple-500', bgColor: 'bg-purple-500/10', activeGradient: 'from-purple-500 to-violet-500' },
       { id: 'aichat', label: 'Chat IA', icon: Bot, color: 'text-orange-500', bgColor: 'bg-orange-500/10', activeGradient: 'from-orange-500 to-amber-500' },
