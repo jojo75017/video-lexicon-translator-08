@@ -762,80 +762,65 @@ Réponds UNIQUEMENT avec un JSON valide (sans markdown, sans \`\`\`) dans ce for
       }
     }
 
-    // Handle encyclopedia generation (uses Lovable AI - no API key needed)
+    // Handle encyclopedia / atlas generation
+    // We use OpenAI here (via OPENAI_API_KEY secret) to avoid Lovable AI credit issues.
     if (type === 'encyclopedia' || type === 'atlas') {
-      console.log(`Processing ${type} generation...`);
-      const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-      
-      if (!LOVABLE_API_KEY) {
-        console.error('LOVABLE_API_KEY not found');
+      console.log(`Processing ${type} generation (OpenAI)...`);
+
+      const openaiKey = (apiKey as string | undefined) ?? Deno.env.get('OPENAI_API_KEY');
+      if (!openaiKey) {
         return new Response(
-          JSON.stringify({ error: 'Lovable API key not configured' }),
-          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          JSON.stringify({ error: 'Clé API OpenAI requise' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
-      console.log(`Calling Lovable AI for ${type}...`);
-      
+      const systemPrompt =
+        type === 'encyclopedia'
+          ? "Tu es un expert naturaliste. Génère des fiches encyclopédiques détaillées et précises. Réponds UNIQUEMENT avec un tableau JSON valide, sans texte avant ou après, sans balises markdown."
+          : "Tu es un expert en géographie naturelle et écologie. Génère des fiches atlas détaillées. Réponds UNIQUEMENT avec un tableau JSON valide, sans texte avant ou après, sans balises markdown.";
+
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 180000); // 3 min timeout for large requests
-        
-        const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        const timeoutId = setTimeout(() => controller.abort(), 180000);
+
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+            Authorization: `Bearer ${openaiKey}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            model: 'google/gemini-2.5-flash',
+            model: 'gpt-4o-mini',
             messages: [
-              { 
-                role: 'system', 
-                content: type === 'encyclopedia' 
-                  ? 'Tu es un expert naturaliste. Génère des fiches encyclopédiques détaillées et précises. Réponds UNIQUEMENT avec un tableau JSON valide, sans texte avant ou après, sans balises markdown.'
-                  : 'Tu es un expert en géographie naturelle et écologie. Génère des fiches atlas détaillées. Réponds UNIQUEMENT avec un tableau JSON valide, sans texte avant ou après, sans balises markdown.'
-              },
-              { role: 'user', content: prompt }
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: prompt },
             ],
+            // 50 fiches peuvent être longues
+            max_tokens: 6000,
+            temperature: 0.4,
           }),
-          signal: controller.signal
+          signal: controller.signal,
         });
-        
+
         clearTimeout(timeoutId);
-        console.log('Lovable AI response status:', response.status);
 
         if (!response.ok) {
           const errorText = await response.text();
-          console.error('Lovable AI error:', response.status, errorText);
-          
-          if (response.status === 402) {
-            return new Response(
-              JSON.stringify({ error: 'Crédits AI épuisés. Veuillez recharger vos crédits.', code: 'CREDITS_EXHAUSTED' }),
-              { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-            );
-          }
-          if (response.status === 429) {
-            return new Response(
-              JSON.stringify({ error: 'Trop de requêtes. Veuillez réessayer dans quelques instants.', code: 'RATE_LIMITED' }),
-              { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-            );
-          }
-          
+          console.error('OpenAI error:', response.status, errorText);
           return new Response(
-            JSON.stringify({ error: `Erreur lors de la génération: ${response.status}` }),
+            JSON.stringify({ error: 'Erreur lors de la génération du contenu' }),
             { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
         }
 
         const data = await response.json();
-        console.log('Lovable AI data received');
-        const generatedContent = data.choices?.[0]?.message?.content;
-        
+        const generatedContent = data?.choices?.[0]?.message?.content;
+
         if (!generatedContent) {
-          console.error('No content in response:', JSON.stringify(data));
+          console.error('No content in OpenAI response:', JSON.stringify(data));
           return new Response(
-            JSON.stringify({ error: 'Réponse vide de l\'IA' }),
+            JSON.stringify({ error: "Réponse vide de l'IA" }),
             { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
         }
@@ -847,9 +832,9 @@ Réponds UNIQUEMENT avec un JSON valide (sans markdown, sans \`\`\`) dans ce for
         );
       } catch (err) {
         console.error(`${type} generation error:`, err);
-        const errorMessage = err.name === 'AbortError' ? 'Timeout - génération trop longue' : err.message;
+        const errorMessage = err?.name === 'AbortError' ? 'Timeout - génération trop longue' : err?.message;
         return new Response(
-          JSON.stringify({ error: errorMessage }),
+          JSON.stringify({ error: errorMessage || 'Erreur inconnue' }),
           { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
@@ -858,14 +843,17 @@ Réponds UNIQUEMENT avec un JSON valide (sans markdown, sans \`\`\`) dans ce for
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
-    if (!apiKey) {
+    // Use provided API key if present, otherwise fallback to project secret
+    const openaiKey = (apiKey as string | undefined) ?? Deno.env.get('OPENAI_API_KEY');
+
+    if (!openaiKey) {
       return new Response(
         JSON.stringify({ error: 'Clé API OpenAI requise' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const openaiKey = apiKey as string;
+    console.log(apiKey ? 'Using provided OpenAI API key for generation' : 'Using OPENAI_API_KEY secret for generation');
 
     // Utilisation directe avec la clé API fournie - pas de vérification d'abonnement
     console.log('Using provided OpenAI API key for generation');
