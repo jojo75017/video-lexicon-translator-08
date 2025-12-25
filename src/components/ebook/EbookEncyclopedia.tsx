@@ -53,6 +53,19 @@ const encyclopediaTypes = [
   }
 ];
 
+// Helper to safely render any value (handles objects returned by AI)
+const safeString = (value: unknown): string => {
+  if (value === null || value === undefined) return '';
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object') {
+    // Convert object to readable string
+    return Object.entries(value as Record<string, unknown>)
+      .map(([k, v]) => `${k}: ${typeof v === 'object' ? JSON.stringify(v) : v}`)
+      .join(' | ');
+  }
+  return String(value);
+};
+
 const EbookEncyclopedia: React.FC<EbookEncyclopediaProps> = ({ onInsertContent }) => {
   const [selectedType, setSelectedType] = useState<string>('');
   const [speciesName, setSpeciesName] = useState('');
@@ -60,6 +73,7 @@ const EbookEncyclopedia: React.FC<EbookEncyclopediaProps> = ({ onInsertContent }
   const [cards, setCards] = useState<SpeciesCard[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [customPrompt, setCustomPrompt] = useState('');
+
 
   const generateCards = async () => {
     if (!selectedType) {
@@ -170,30 +184,30 @@ Retourne UNIQUEMENT un tableau JSON valide, sans texte avant ou après.`;
   };
 
   const formatCardAsText = (card: SpeciesCard): string => {
-    return `# ${card.name} (${card.scientificName})
+    return `# ${safeString(card.name)} (${safeString(card.scientificName)})
 
-**Famille:** ${card.category}
+**Famille:** ${safeString(card.category)}
 
 ## Description
-${card.description}
+${safeString(card.description)}
 
 ## Caractéristiques
-${card.characteristics}
+${safeString(card.characteristics)}
 
 ## Habitat
-${card.habitat}
+${safeString(card.habitat)}
 
 ## Comportement
-${card.behavior}
+${safeString(card.behavior)}
 
-${card.care ? `## Entretien en aquarium\n${card.care}\n\n` : ''}## Alimentation
-${card.diet}
+${card.care ? `## Entretien en aquarium\n${safeString(card.care)}\n\n` : ''}## Alimentation
+${safeString(card.diet)}
 
 ## Reproduction
-${card.reproduction}
+${safeString(card.reproduction)}
 
 ## Le saviez-vous ?
-${card.funFacts}
+${safeString(card.funFacts)}
 
 ---
 `;
@@ -380,9 +394,9 @@ ${card.funFacts}
                   <CardHeader className="pb-2">
                     <div className="flex items-start justify-between">
                       <div>
-                        <CardTitle className="text-lg">{card.name}</CardTitle>
-                        <p className="text-sm italic text-muted-foreground">{card.scientificName}</p>
-                        <Badge variant="secondary" className="mt-1">{card.category}</Badge>
+                        <CardTitle className="text-lg">{safeString(card.name)}</CardTitle>
+                        <p className="text-sm italic text-muted-foreground">{safeString(card.scientificName)}</p>
+                        <Badge variant="secondary" className="mt-1">{safeString(card.category)}</Badge>
                       </div>
                       <div className="flex gap-1">
                         <Button variant="ghost" size="icon" onClick={() => copyCardContent(card)}>
@@ -402,25 +416,25 @@ ${card.funFacts}
                   <CardContent className="space-y-3 text-sm">
                     <div>
                       <h4 className="font-semibold text-primary">Description</h4>
-                      <p className="text-muted-foreground">{card.description}</p>
+                      <p className="text-muted-foreground">{safeString(card.description)}</p>
                     </div>
                     <div>
                       <h4 className="font-semibold text-primary">Caractéristiques</h4>
-                      <p className="text-muted-foreground">{card.characteristics}</p>
+                      <p className="text-muted-foreground">{safeString(card.characteristics)}</p>
                     </div>
                     <div>
                       <h4 className="font-semibold text-primary">Habitat</h4>
-                      <p className="text-muted-foreground">{card.habitat}</p>
+                      <p className="text-muted-foreground">{safeString(card.habitat)}</p>
                     </div>
                     {card.care && (
                       <div>
                         <h4 className="font-semibold text-primary">Entretien</h4>
-                        <p className="text-muted-foreground">{card.care}</p>
+                        <p className="text-muted-foreground">{safeString(card.care)}</p>
                       </div>
                     )}
                     <div className="bg-amber-500/10 p-2 rounded-lg">
                       <h4 className="font-semibold text-amber-700 dark:text-amber-400">💡 Le saviez-vous ?</h4>
-                      <p className="text-muted-foreground">{card.funFacts}</p>
+                      <p className="text-muted-foreground">{safeString(card.funFacts)}</p>
                     </div>
                   </CardContent>
                 </Card>
