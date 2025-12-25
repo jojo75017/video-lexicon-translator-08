@@ -61,6 +61,18 @@ const atlasTypes = [
   }
 ];
 
+// Helper to safely render any value (handles objects returned by AI)
+const safeString = (value: unknown): string => {
+  if (value === null || value === undefined) return '';
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object') {
+    return Object.entries(value as Record<string, unknown>)
+      .map(([k, v]) => `${k}: ${typeof v === 'object' ? JSON.stringify(v) : v}`)
+      .join(' | ');
+  }
+  return String(value);
+};
+
 const EbookAtlas: React.FC<EbookAtlasProps> = ({ onInsertContent }) => {
   const [selectedType, setSelectedType] = useState<string>('');
   const [locationName, setLocationName] = useState('');
@@ -189,31 +201,31 @@ Retourne UNIQUEMENT un tableau JSON valide, sans texte avant ou après.`;
   };
 
   const formatCardAsText = (card: LocationCard): string => {
-    return `# ${card.name}
+    return `# ${safeString(card.name)}
 
-**Région:** ${card.region}, ${card.country}
-**Type:** ${card.type}
+**Région:** ${safeString(card.region)}, ${safeString(card.country)}
+**Type:** ${safeString(card.type)}
 
 ## Description
-${card.description}
+${safeString(card.description)}
 
 ## Géographie
-${card.geography}
+${safeString(card.geography)}
 
 ## Climat
-${card.climate}
+${safeString(card.climate)}
 
 ## Flore
-${card.flora}
+${safeString(card.flora)}
 
 ## Faune
-${card.fauna}
+${safeString(card.fauna)}
 
 ## Meilleure période
-${card.bestTime}
+${safeString(card.bestTime)}
 
 ## Informations pratiques
-${card.practicalInfo}
+${safeString(card.practicalInfo)}
 
 ---
 `;
@@ -399,9 +411,9 @@ ${card.practicalInfo}
                   <CardHeader className="pb-2">
                     <div className="flex items-start justify-between">
                       <div>
-                        <CardTitle className="text-lg">{card.name}</CardTitle>
-                        <p className="text-sm text-muted-foreground">{card.region}, {card.country}</p>
-                        <Badge variant="secondary" className="mt-1">{card.type}</Badge>
+                        <CardTitle className="text-lg">{safeString(card.name)}</CardTitle>
+                        <p className="text-sm text-muted-foreground">{safeString(card.region)}, {safeString(card.country)}</p>
+                        <Badge variant="secondary" className="mt-1">{safeString(card.type)}</Badge>
                       </div>
                       <div className="flex gap-1">
                         <Button variant="ghost" size="icon" onClick={() => copyCardContent(card)}>
@@ -421,15 +433,15 @@ ${card.practicalInfo}
                   <CardContent className="space-y-3 text-sm">
                     <div>
                       <h4 className="font-semibold text-primary">Description</h4>
-                      <p className="text-muted-foreground">{card.description}</p>
+                      <p className="text-muted-foreground">{safeString(card.description)}</p>
                     </div>
                     <div>
                       <h4 className="font-semibold text-primary">Faune</h4>
-                      <p className="text-muted-foreground">{card.fauna}</p>
+                      <p className="text-muted-foreground">{safeString(card.fauna)}</p>
                     </div>
                     <div className="bg-emerald-500/10 p-2 rounded-lg">
                       <h4 className="font-semibold text-emerald-700 dark:text-emerald-400">📍 Meilleure période</h4>
-                      <p className="text-muted-foreground">{card.bestTime}</p>
+                      <p className="text-muted-foreground">{safeString(card.bestTime)}</p>
                     </div>
                   </CardContent>
                 </Card>
