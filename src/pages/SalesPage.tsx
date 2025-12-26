@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, Sparkles, BookOpen, Zap, Download, Star, ArrowRight, Play, Loader2, Clock, HelpCircle, CheckCircle } from "lucide-react";
+import { Check, Sparkles, BookOpen, Zap, Download, Star, ArrowRight, Play, Loader2, Clock, HelpCircle, CheckCircle, Calculator } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -328,11 +328,20 @@ const SalesPage = () => {
               <p className="text-lg font-medium text-foreground mb-2">
                 💎 Pourquoi seulement <span className="text-emerald-600 dark:text-emerald-400 font-bold">37€</span> ?
               </p>
-              <p className="text-muted-foreground text-sm leading-relaxed max-w-xl mx-auto">
+              <p className="text-muted-foreground text-sm leading-relaxed max-w-xl mx-auto mb-3">
                 Toutes les formations sont intégrées directement dans le générateur : vous ne serez jamais perdu.
                 <br />
                 <span className="font-medium text-foreground">Support inclus + mises à jour gratuites à vie.</span> À ce prix, c{"'"}est un cadeau.
               </p>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/10"
+                onClick={() => navigate('/valeur-offre')}
+              >
+                <Calculator className="w-4 h-4 mr-2" />
+                Voir le détail de la valeur (12 modules + 5 bonus)
+              </Button>
             </div>
           </div>
 
