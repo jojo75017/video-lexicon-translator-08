@@ -20,9 +20,16 @@ import {
   Gift,
   Calculator,
   Zap,
-  Crown
+  Crown,
+  HelpCircle
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 interface ModuleValue {
   icon: React.ElementType;
@@ -412,6 +419,121 @@ const OfferValuePage = () => {
             <br />
             Avec notre générateur, créez des <strong className="text-primary">ebooks illimités</strong> pour seulement <strong className="text-green-500">37€</strong>.
           </p>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-16 px-4">
+        <div className="max-w-3xl mx-auto">
+          <div className="flex items-center justify-center gap-3 mb-8">
+            <HelpCircle className="w-8 h-8 text-primary" />
+            <h2 className="text-3xl font-bold text-center">Questions Fréquentes</h2>
+          </div>
+
+          <Accordion type="single" collapsible className="space-y-4">
+            <AccordionItem value="item-1" className="border rounded-lg px-4 bg-card">
+              <AccordionTrigger className="text-left font-medium hover:no-underline">
+                Est-ce vraiment un paiement unique sans abonnement ?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                Oui, absolument ! Vous payez une seule fois 37€ et vous avez accès à vie à tous les modules, bonus et mises à jour futures. Aucun abonnement, aucun frais caché, aucune limite d'utilisation.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-2" className="border rounded-lg px-4 bg-card">
+              <AccordionTrigger className="text-left font-medium hover:no-underline">
+                Combien d'ebooks puis-je créer avec le générateur ?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                Vous pouvez créer un nombre illimité d'ebooks ! Que vous souhaitiez en créer 1, 10 ou 100, il n'y a aucune restriction. Vous pouvez également générer autant de chapitres, couvertures et contenus que vous le souhaitez.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-3" className="border rounded-lg px-4 bg-card">
+              <AccordionTrigger className="text-left font-medium hover:no-underline">
+                Ai-je besoin de compétences techniques pour utiliser l'outil ?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                Aucune compétence technique n'est requise ! L'interface est intuitive et les formations incluses vous guident pas à pas. En quelques clics, vous pouvez générer un plan complet d'ebook et le rédiger avec l'aide de l'IA.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-4" className="border rounded-lg px-4 bg-card">
+              <AccordionTrigger className="text-left font-medium hover:no-underline">
+                Comment fonctionnent les mises à jour gratuites à vie ?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                Chaque nouvelle fonctionnalité que nous ajoutons est automatiquement disponible pour vous, sans frais supplémentaires. Vous bénéficiez des améliorations, nouveaux modules et optimisations tant que le service existe.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-5" className="border rounded-lg px-4 bg-card">
+              <AccordionTrigger className="text-left font-medium hover:no-underline">
+                Puis-je vendre les ebooks générés sur Amazon KDP ?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                Oui ! Les ebooks que vous créez vous appartiennent à 100%. Vous pouvez les publier sur Amazon KDP, les vendre sur votre site, les offrir comme lead magnets, ou les utiliser de toute autre manière commerciale.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-6" className="border rounded-lg px-4 bg-card">
+              <AccordionTrigger className="text-left font-medium hover:no-underline">
+                Les formations audio sont-elles vraiment incluses ?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                Oui, les formations audio premium (plus de 5 heures de contenu) sont incluses dans votre accès. Vous pouvez les écouter en ligne ou les télécharger pour les écouter hors connexion.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-7" className="border rounded-lg px-4 bg-card">
+              <AccordionTrigger className="text-left font-medium hover:no-underline">
+                Y a-t-il une garantie de remboursement ?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                Oui, nous offrons une garantie satisfait ou remboursé de 30 jours. Si le générateur ne répond pas à vos attentes, contactez-nous et nous vous rembourserons intégralement, sans questions.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-8" className="border rounded-lg px-4 bg-card">
+              <AccordionTrigger className="text-left font-medium hover:no-underline">
+                Comment accéder au générateur après l'achat ?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                Immédiatement après votre paiement, vous recevez un email avec vos identifiants d'accès. Vous pouvez commencer à créer votre premier ebook dans les 5 minutes qui suivent votre achat.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-9" className="border rounded-lg px-4 bg-card">
+              <AccordionTrigger className="text-left font-medium hover:no-underline">
+                Pourquoi le prix passera-t-il à 97€ ?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                Le tarif actuel de 37€ est un prix de lancement exceptionnel pour remercier nos premiers utilisateurs. Une fois la période de lancement terminée, le prix reviendra à sa valeur normale de 97€ pour refléter la valeur réelle de l'outil.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-10" className="border rounded-lg px-4 bg-card">
+              <AccordionTrigger className="text-left font-medium hover:no-underline">
+                Proposez-vous un support client ?
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                Oui, un support prioritaire est inclus. Vous pouvez nous contacter par email et nous répondons généralement sous 24-48h. Nous sommes là pour vous aider à tirer le meilleur parti du générateur.
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+
+          {/* CTA after FAQ */}
+          <div className="mt-12 text-center">
+            <p className="text-muted-foreground mb-4">Encore des questions ? Passez à l'action !</p>
+            <Button 
+              size="lg" 
+              className="text-lg px-8"
+              onClick={() => navigate('/offres')}
+            >
+              <Sparkles className="w-5 h-5 mr-2" />
+              Accéder pour 37€
+            </Button>
+          </div>
         </div>
       </section>
     </div>
