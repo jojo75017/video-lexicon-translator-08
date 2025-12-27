@@ -74,44 +74,38 @@ serve(async (req) => {
       );
     }
 
-    // Handle KDP market analysis (uses Lovable AI - no API key needed)
+    // Handle KDP market analysis (uses OpenAI for reliability)
     if (type === 'kdp-market-analysis') {
       console.log('Processing KDP market analysis...');
-      const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+      const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
       
-      if (!LOVABLE_API_KEY) {
+      if (!OPENAI_API_KEY) {
         return new Response(
-          JSON.stringify({ error: 'Lovable API key not configured' }),
+          JSON.stringify({ error: 'OpenAI API key not configured' }),
           { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
-      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+          'Authorization': `Bearer ${OPENAI_API_KEY}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'google/gemini-2.5-flash',
+          model: 'gpt-4o-mini',
           messages: [
             { role: 'system', content: 'Tu es un expert en analyse de marché Amazon KDP. Tu fournis des analyses détaillées basées sur les tendances du marché ebook. Réponds toujours en JSON valide sans markdown.' },
             { role: 'user', content: prompt }
           ],
+          max_tokens: 4000,
         }),
       });
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Lovable AI error:', errorText);
+        console.error('OpenAI error:', errorText);
         
-        // Handle specific error codes
-        if (response.status === 402) {
-          return new Response(
-            JSON.stringify({ error: 'Crédits AI épuisés. Veuillez recharger vos crédits dans les paramètres du workspace.', code: 'CREDITS_EXHAUSTED' }),
-            { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          );
-        }
         if (response.status === 429) {
           return new Response(
             JSON.stringify({ error: 'Trop de requêtes. Veuillez réessayer dans quelques instants.', code: 'RATE_LIMITED' }),
