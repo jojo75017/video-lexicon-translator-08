@@ -120,6 +120,7 @@ const categories: Category[] = [
     icon: '📤',
     color: 'from-teal-500 to-cyan-500',
     items: [
+      { id: 'editor-audit', label: 'Audit Éditeur', icon: FileEdit, color: 'text-violet-500', bgColor: 'bg-violet-500/10', activeGradient: 'from-violet-500 to-purple-500' },
       { id: 'export', label: 'Exporter', icon: Download, color: 'text-teal-500', bgColor: 'bg-teal-500/10', activeGradient: 'from-teal-500 to-cyan-500' },
       { id: 'kdp', label: 'Amazon KDP', icon: TrendingUp, color: 'text-sky-500', bgColor: 'bg-sky-500/10', activeGradient: 'from-sky-500 to-blue-500' },
       { id: 'kdp-analytics', label: 'KDP Analytics', icon: TrendingUp, color: 'text-cyan-500', bgColor: 'bg-cyan-500/10', activeGradient: 'from-cyan-500 to-blue-500' },

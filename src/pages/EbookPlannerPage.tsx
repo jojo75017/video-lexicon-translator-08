@@ -65,6 +65,7 @@ import { EbookBookMockup3D } from '@/components/ebook/EbookBookMockup3D';
 import EbookPriceEstimator from '@/components/ebook/EbookPriceEstimator';
 import EbookEncyclopedia from '@/components/ebook/EbookEncyclopedia';
 import EbookAtlas from '@/components/ebook/EbookAtlas';
+import { EbookEditorAudit } from '@/components/ebook/EbookEditorAudit';
 import { useConfetti } from '@/hooks/useConfetti';
 
 // Hooks et données
@@ -1912,6 +1913,11 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
               />
             </div>
           </div>
+        );
+      
+      case 'editor-audit':
+        return (
+          <EbookEditorAudit />
         );
       
       case 'formation-pdf':
