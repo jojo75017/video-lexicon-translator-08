@@ -2,7 +2,7 @@ import React, { useState, useRef, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
+
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
@@ -40,38 +40,105 @@ export const EbookEditorAudit: React.FC = () => {
     const allowedTypes = [
       'application/pdf',
       'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'text/plain'
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
     ];
 
     if (!allowedTypes.includes(file.type)) {
       toast.error('Format non supporté', {
-        description: 'Veuillez uploader un fichier PDF, DOC, DOCX ou TXT'
+        description: 'Veuillez uploader un fichier PDF ou DOC/DOCX uniquement'
       });
       return;
     }
 
     setUploadedFileName(file.name);
 
-    // Pour les fichiers texte, lire directement
-    if (file.type === 'text/plain') {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const content = e.target?.result as string;
-        setTextContent(content);
-        toast.success('Fichier chargé', {
-          description: `${file.name} prêt pour l'audit`
+    // Lire le fichier et extraire le texte
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const arrayBuffer = e.target?.result as ArrayBuffer;
+      
+      // Pour les fichiers DOC/DOCX, on extrait le texte basique
+      if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        try {
+          const text = await extractDocxText(arrayBuffer);
+          setTextContent(text);
+          toast.success('Document chargé', {
+            description: `${file.name} prêt pour l'audit`
+          });
+        } catch {
+          toast.error('Erreur de lecture', {
+            description: 'Impossible de lire le fichier DOCX'
+          });
+        }
+      } else if (file.type === 'application/pdf') {
+        // Pour PDF, on utilise une extraction basique
+        try {
+          const text = await extractPdfText(arrayBuffer);
+          if (text.trim()) {
+            setTextContent(text);
+            toast.success('PDF chargé', {
+              description: `${file.name} prêt pour l'audit`
+            });
+          } else {
+            toast.warning('PDF scanné détecté', {
+              description: 'Ce PDF semble être une image. L\'extraction du texte est limitée.'
+            });
+          }
+        } catch {
+          toast.error('Erreur de lecture', {
+            description: 'Impossible de lire le fichier PDF'
+          });
+        }
+      } else {
+        toast.error('Format non supporté', {
+          description: 'Utilisez un fichier PDF ou DOCX'
         });
-      };
-      reader.readAsText(file);
-      return;
-    }
-
-    // Pour PDF/DOC, informer l'utilisateur de coller le texte
-    toast.info('Fichier détecté', {
-      description: 'Copiez-collez le contenu de votre document dans la zone de texte ci-dessous pour l\'analyser.'
-    });
+      }
+    };
+    reader.readAsArrayBuffer(file);
   }, []);
+
+  // Extraction basique du texte DOCX (XML)
+  const extractDocxText = async (arrayBuffer: ArrayBuffer): Promise<string> => {
+    const JSZip = (await import('jszip')).default;
+    const zip = await JSZip.loadAsync(arrayBuffer);
+    const documentXml = await zip.file('word/document.xml')?.async('string');
+    
+    if (!documentXml) return '';
+    
+    // Extraire le texte des balises <w:t>
+    const textMatches = documentXml.match(/<w:t[^>]*>([^<]*)<\/w:t>/g) || [];
+    const text = textMatches
+      .map(match => match.replace(/<[^>]+>/g, ''))
+      .join(' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    
+    return text;
+  };
+
+  // Extraction basique du texte PDF
+  const extractPdfText = async (arrayBuffer: ArrayBuffer): Promise<string> => {
+    // Conversion en string pour chercher le texte brut
+    const uint8Array = new Uint8Array(arrayBuffer);
+    let text = '';
+    
+    // Chercher les streams de texte dans le PDF
+    const decoder = new TextDecoder('utf-8', { fatal: false });
+    const pdfString = decoder.decode(uint8Array);
+    
+    // Extraire le texte entre parenthèses (format PDF basique)
+    const textMatches = pdfString.match(/\(([^)]+)\)/g) || [];
+    text = textMatches
+      .map(match => match.slice(1, -1))
+      .filter(t => t.length > 2 && /[a-zA-ZàâäéèêëïîôùûüçÀÂÄÉÈÊËÏÎÔÙÛÜÇ]/.test(t))
+      .join(' ')
+      .replace(/\\[nrt]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    
+    return text;
+  };
 
   const runAudit = useCallback(async () => {
     if (!textContent.trim()) {
@@ -273,36 +340,39 @@ export const EbookEditorAudit: React.FC = () => {
           <CardContent className="space-y-4">
             {/* Upload */}
             <div 
-              className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center hover:border-primary/50 transition-colors cursor-pointer"
+              className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center hover:border-primary/50 transition-colors cursor-pointer"
               onClick={() => fileInputRef.current?.click()}
             >
               <input
                 ref={fileInputRef}
                 type="file"
-                accept=".pdf,.doc,.docx,.txt"
+                accept=".pdf,.doc,.docx"
                 onChange={handleFileUpload}
                 className="hidden"
               />
-              <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">
-                {uploadedFileName || 'Cliquez pour uploader un fichier (PDF, DOC, TXT)'}
+              <Upload className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />
+              <p className="text-sm font-medium">
+                {uploadedFileName || 'Cliquez pour uploader votre manuscrit'}
               </p>
-              <p className="text-xs text-muted-foreground/70 mt-1">
-                ou collez directement votre texte ci-dessous
+              <p className="text-xs text-muted-foreground mt-2">
+                Formats acceptés : PDF, DOC, DOCX
               </p>
             </div>
 
-            {/* Textarea */}
-            <Textarea
-              value={textContent}
-              onChange={(e) => setTextContent(e.target.value)}
-              placeholder="Collez votre texte ici pour l'analyser...&#10;&#10;L'audit vérifiera : lisibilité, structure, vocabulaire, engagement et cohérence."
-              className="min-h-[300px] resize-none font-mono text-sm"
-            />
+            {/* Aperçu du texte extrait */}
+            {textContent && (
+              <div className="p-4 rounded-lg bg-muted/50 max-h-[250px] overflow-y-auto">
+                <p className="text-xs text-muted-foreground mb-2 font-medium">Texte extrait :</p>
+                <p className="text-sm text-muted-foreground whitespace-pre-wrap line-clamp-[12]">
+                  {textContent.slice(0, 1500)}
+                  {textContent.length > 1500 && '...'}
+                </p>
+              </div>
+            )}
 
             <div className="flex items-center justify-between">
               <span className="text-xs text-muted-foreground">
-                {textContent.length.toLocaleString()} caractères
+                {textContent.length.toLocaleString()} caractères extraits
               </span>
               <Button 
                 onClick={runAudit}
