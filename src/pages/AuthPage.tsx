@@ -16,19 +16,29 @@ export const AuthPage = () => {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const navigate = useNavigate();
 
+  const checkAdmin = async (accessToken?: string) => {
+    // Important: after sign-in, the client token can take a tick to propagate.
+    // Passing the access token explicitly avoids false "non-admin" results.
+    return supabase.functions.invoke('check-admin',
+      accessToken
+        ? { headers: { Authorization: `Bearer ${accessToken}` } }
+        : undefined
+    );
+  };
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
           console.log('Session existante trouvée, vérification du rôle admin...');
-          const { data, error } = await supabase.functions.invoke('check-admin');
-          
+          const { data, error } = await checkAdmin(session.access_token);
+
           if (error) {
             console.error('Erreur lors de la vérification admin:', error);
             return;
           }
-          
+
           if (data?.isAdmin) {
             console.log('Utilisateur admin confirmé, redirection...');
             navigate('/admin');
@@ -73,68 +83,70 @@ export const AuthPage = () => {
     setIsLoading(true);
 
     try {
-        if (isLogin) {
-          console.log('Tentative de connexion pour:', email);
-          
-          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-            email,
-            password,
+      if (isLogin) {
+        console.log('Tentative de connexion pour:', email);
+
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (signInError) {
+          console.error('Erreur de connexion:', signInError);
+          throw signInError;
+        }
+
+        const accessToken = signInData?.session?.access_token;
+
+        console.log('Connexion réussie, vérification du rôle admin...');
+
+        // Vérifie le rôle admin (passe le token explicitement pour éviter les faux négatifs)
+        const { data: roleData, error: roleError } = await checkAdmin(accessToken);
+
+        console.log('Résultat vérification admin:', { roleData, roleError });
+
+        if (roleError) {
+          console.error('Erreur lors de la vérification du rôle:', roleError);
+          await supabase.auth.signOut();
+          toast.error('Erreur de vérification', {
+            description: 'Impossible de vérifier les droits administrateur.',
           });
+          setIsLoading(false);
+          return;
+        }
 
-          if (signInError) {
-            console.error('Erreur de connexion:', signInError);
-            throw signInError;
-          }
+        if (!roleData?.isAdmin) {
+          console.log('Utilisateur non-admin détecté');
+          await supabase.auth.signOut();
+          toast.error('Accès refusé', {
+            description: "Votre compte n'a pas les droits administrateur.",
+          });
+          setIsLoading(false);
+          return;
+        }
 
-          console.log('Connexion réussie, vérification du rôle admin...');
-          
-          // Vérifie le rôle admin
-          const { data: roleData, error: roleError } = await supabase.functions.invoke('check-admin');
-          
-          console.log('Résultat vérification admin:', { roleData, roleError });
-          
-          if (roleError) {
-            console.error('Erreur lors de la vérification du rôle:', roleError);
-            await supabase.auth.signOut();
-            toast.error("Erreur de vérification", {
-              description: "Impossible de vérifier les droits administrateur."
-            });
-            setIsLoading(false);
-            return;
-          }
-          
-          if (!roleData?.isAdmin) {
-            console.log('Utilisateur non-admin détecté');
-            await supabase.auth.signOut();
-            toast.error("Accès refusé", {
-              description: "Votre compte n'a pas les droits administrateur."
-            });
-            setIsLoading(false);
-            return;
-          }
-
-          console.log('Utilisateur admin confirmé');
-          toast.success("Connexion admin réussie");
-          navigate('/admin');
-        } else {
+        console.log('Utilisateur admin confirmé');
+        toast.success('Connexion admin réussie');
+        navigate('/admin');
+      } else {
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/auth`
-          }
+            emailRedirectTo: `${window.location.origin}/auth`,
+          },
         });
 
         if (error) throw error;
 
-        toast.success("Compte créé", {
-          description: "Veuillez vérifier votre email pour confirmer votre compte"
+        toast.success('Compte créé', {
+          description: 'Veuillez vérifier votre email pour confirmer votre compte',
         });
       }
     } catch (error: any) {
       console.error('Auth error:', error);
-      toast.error("Erreur", {
-        description: error.message || "Une erreur est survenue"
+      toast.error('Erreur', {
+        description: error.message || 'Une erreur est survenue',
       });
     } finally {
       setIsLoading(false);
