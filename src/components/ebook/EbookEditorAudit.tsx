@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +12,10 @@ import {
   Loader2, Sparkles, BookOpen, PenTool, Languages, 
   BarChart3, Lightbulb, RefreshCw, Eye
 } from 'lucide-react';
+import * as pdfjsLib from 'pdfjs-dist';
+
+// Configuration du worker PDF.js
+pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.mjs`;
 
 interface AuditResult {
   category: string;
@@ -29,6 +33,7 @@ interface FullAuditResult {
 export const EbookEditorAudit: React.FC = () => {
   const [textContent, setTextContent] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isExtracting, setIsExtracting] = useState(false);
   const [auditResult, setAuditResult] = useState<FullAuditResult | null>(null);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -51,54 +56,52 @@ export const EbookEditorAudit: React.FC = () => {
     }
 
     setUploadedFileName(file.name);
+    setIsExtracting(true);
+    setTextContent('');
 
-    // Lire le fichier et extraire le texte
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      const arrayBuffer = e.target?.result as ArrayBuffer;
+    try {
+      const arrayBuffer = await file.arrayBuffer();
       
-      // Pour les fichiers DOC/DOCX, on extrait le texte basique
       if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-        try {
-          const text = await extractDocxText(arrayBuffer);
+        const text = await extractDocxText(arrayBuffer);
+        if (text.trim()) {
           setTextContent(text);
-          toast.success('Document chargé', {
-            description: `${file.name} prêt pour l'audit`
+          toast.success('Document DOCX chargé', {
+            description: `${text.length.toLocaleString()} caractères extraits`
           });
-        } catch {
-          toast.error('Erreur de lecture', {
-            description: 'Impossible de lire le fichier DOCX'
+        } else {
+          toast.error('Échec extraction DOCX', {
+            description: 'Le document semble vide ou corrompu'
           });
         }
       } else if (file.type === 'application/pdf') {
-        // Pour PDF, on utilise une extraction basique
-        try {
-          const text = await extractPdfText(arrayBuffer);
-          if (text.trim()) {
-            setTextContent(text);
-            toast.success('PDF chargé', {
-              description: `${file.name} prêt pour l'audit`
-            });
-          } else {
-            toast.warning('PDF scanné détecté', {
-              description: 'Ce PDF semble être une image. L\'extraction du texte est limitée.'
-            });
-          }
-        } catch {
-          toast.error('Erreur de lecture', {
-            description: 'Impossible de lire le fichier PDF'
+        const text = await extractPdfText(arrayBuffer);
+        if (text.trim()) {
+          setTextContent(text);
+          toast.success('PDF chargé', {
+            description: `${text.length.toLocaleString()} caractères extraits`
+          });
+        } else {
+          toast.warning('PDF scanné ou vide', {
+            description: 'Aucun texte extractible. Ce PDF est peut-être une image scannée.'
           });
         }
-      } else {
-        toast.error('Format non supporté', {
-          description: 'Utilisez un fichier PDF ou DOCX'
+      } else if (file.type === 'application/msword') {
+        toast.error('Format .doc non supporté', {
+          description: 'Veuillez convertir votre fichier en .docx ou .pdf'
         });
       }
-    };
-    reader.readAsArrayBuffer(file);
+    } catch (error) {
+      console.error('Extraction error:', error);
+      toast.error('Erreur de lecture', {
+        description: 'Impossible de lire le fichier. Vérifiez qu\'il n\'est pas corrompu.'
+      });
+    } finally {
+      setIsExtracting(false);
+    }
   }, []);
 
-  // Extraction basique du texte DOCX (XML)
+  // Extraction du texte DOCX via JSZip
   const extractDocxText = async (arrayBuffer: ArrayBuffer): Promise<string> => {
     const JSZip = (await import('jszip')).default;
     const zip = await JSZip.loadAsync(arrayBuffer);
@@ -117,27 +120,26 @@ export const EbookEditorAudit: React.FC = () => {
     return text;
   };
 
-  // Extraction basique du texte PDF
+  // Extraction du texte PDF via pdf.js
   const extractPdfText = async (arrayBuffer: ArrayBuffer): Promise<string> => {
-    // Conversion en string pour chercher le texte brut
-    const uint8Array = new Uint8Array(arrayBuffer);
-    let text = '';
-    
-    // Chercher les streams de texte dans le PDF
-    const decoder = new TextDecoder('utf-8', { fatal: false });
-    const pdfString = decoder.decode(uint8Array);
-    
-    // Extraire le texte entre parenthèses (format PDF basique)
-    const textMatches = pdfString.match(/\(([^)]+)\)/g) || [];
-    text = textMatches
-      .map(match => match.slice(1, -1))
-      .filter(t => t.length > 2 && /[a-zA-ZàâäéèêëïîôùûüçÀÂÄÉÈÊËÏÎÔÙÛÜÇ]/.test(t))
-      .join(' ')
-      .replace(/\\[nrt]/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
-    
-    return text;
+    try {
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      const textParts: string[] = [];
+
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items
+          .map((item: any) => item.str)
+          .join(' ');
+        textParts.push(pageText);
+      }
+
+      return textParts.join('\n\n').replace(/\s+/g, ' ').trim();
+    } catch (error) {
+      console.error('PDF extraction error:', error);
+      throw error;
+    }
   };
 
   const runAudit = useCallback(async () => {
@@ -340,8 +342,12 @@ export const EbookEditorAudit: React.FC = () => {
           <CardContent className="space-y-4">
             {/* Upload */}
             <div 
-              className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center hover:border-primary/50 transition-colors cursor-pointer"
-              onClick={() => fileInputRef.current?.click()}
+              className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer ${
+                isExtracting 
+                  ? 'border-violet-500/50 bg-violet-500/5' 
+                  : 'border-muted-foreground/25 hover:border-primary/50'
+              }`}
+              onClick={() => !isExtracting && fileInputRef.current?.click()}
             >
               <input
                 ref={fileInputRef}
@@ -349,14 +355,26 @@ export const EbookEditorAudit: React.FC = () => {
                 accept=".pdf,.doc,.docx"
                 onChange={handleFileUpload}
                 className="hidden"
+                disabled={isExtracting}
               />
-              <Upload className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />
-              <p className="text-sm font-medium">
-                {uploadedFileName || 'Cliquez pour uploader votre manuscrit'}
-              </p>
-              <p className="text-xs text-muted-foreground mt-2">
-                Formats acceptés : PDF, DOC, DOCX
-              </p>
+              {isExtracting ? (
+                <>
+                  <Loader2 className="w-10 h-10 mx-auto mb-3 text-violet-500 animate-spin" />
+                  <p className="text-sm font-medium text-violet-500">
+                    Extraction du texte en cours...
+                  </p>
+                </>
+              ) : (
+                <>
+                  <Upload className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />
+                  <p className="text-sm font-medium">
+                    {uploadedFileName || 'Cliquez pour uploader votre manuscrit'}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Formats acceptés : PDF, DOCX
+                  </p>
+                </>
+              )}
             </div>
 
             {/* Aperçu du texte extrait */}
