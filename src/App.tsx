@@ -32,6 +32,13 @@ const App = () => {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
+    const invokeCheckAdmin = (accessToken?: string) => {
+      return supabase.functions.invoke(
+        'check-admin',
+        accessToken ? { headers: { Authorization: `Bearer ${accessToken}` } } : undefined
+      );
+    };
+
     const initAuth = async () => {
       // Check subscriber auth
       const savedEmail = localStorage.getItem('subscriber_email');
@@ -44,11 +51,14 @@ const App = () => {
 
       // Check admin session
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
         if (session) {
           console.log('Session admin trouvée dans App.tsx');
-          const { data, error } = await supabase.functions.invoke('check-admin');
-          
+          const { data, error } = await invokeCheckAdmin(session.access_token);
+
           if (error) {
             console.error('Erreur check-admin dans App.tsx:', error);
           } else if (data?.isAdmin) {
@@ -70,13 +80,16 @@ const App = () => {
     initAuth();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
       console.log('Auth state changed:', event);
+
       if (event === 'SIGNED_IN' && session) {
         setTimeout(async () => {
-          const { data, error } = await supabase.functions.invoke('check-admin');
+          const { data, error } = await invokeCheckAdmin(session.access_token);
           if (error) {
-            console.error('Erreur check-admin lors du changement d\'état:', error);
+            console.error("Erreur check-admin lors du changement d'état:", error);
           } else if (data?.isAdmin) {
             console.log('Admin confirmé lors du changement d\'état');
             setIsAdmin(true);

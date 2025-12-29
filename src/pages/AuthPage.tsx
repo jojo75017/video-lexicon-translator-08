@@ -78,6 +78,38 @@ export const AuthPage = () => {
     }
   };
 
+  const handlePasswordlessLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      if (!email) {
+        toast.error('Email requis', { description: "Entrez votre email pour recevoir un lien de connexion." });
+        return;
+      }
+
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth`,
+        },
+      });
+
+      if (error) throw error;
+
+      toast.success('Lien envoyé', {
+        description: 'Ouvrez le lien reçu par email pour vous connecter en admin.',
+      });
+    } catch (error: any) {
+      console.error('Passwordless login error:', error);
+      toast.error('Erreur', {
+        description: error.message || "Impossible d'envoyer le lien",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -247,6 +279,24 @@ export const AuthPage = () => {
               )}
             </Button>
           </form>
+
+          {isLogin && (
+            <div className="mt-3">
+              <div className="text-center text-sm text-muted-foreground">ou</div>
+              <form onSubmit={handlePasswordlessLogin} className="mt-3">
+                <Button type="submit" variant="secondary" className="w-full" disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Envoi...
+                    </>
+                  ) : (
+                    'Connexion sans mot de passe (lien email)'
+                  )}
+                </Button>
+              </form>
+            </div>
+          )}
           {isLogin && (
             <div className="mt-2 text-center">
               <Button
