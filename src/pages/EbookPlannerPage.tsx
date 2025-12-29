@@ -1614,14 +1614,6 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
           />
         );
       
-      case 'characters':
-        return (
-          <EbookCharacters
-            characters={characters}
-            onUpdateCharacters={setCharacters}
-          />
-        );
-      
       case 'images':
         return (
           <EbookChapterImageGenerator

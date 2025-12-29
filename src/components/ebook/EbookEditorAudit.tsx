@@ -1,21 +1,16 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { 
-  Upload, FileText, CheckCircle2, AlertTriangle, XCircle, 
-  Loader2, Sparkles, BookOpen, PenTool, Languages, 
-  BarChart3, Lightbulb, RefreshCw, Eye
+  Upload, FileText, AlertTriangle, XCircle, 
+  Loader2, Sparkles, CheckCircle2, BookOpen,
+  BarChart3, Lightbulb, Eye, RefreshCw, PenTool
 } from 'lucide-react';
-import * as pdfjsLib from 'pdfjs-dist';
-
-// Configuration du worker PDF.js
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.mjs`;
 
 interface AuditResult {
   category: string;
@@ -120,22 +115,28 @@ export const EbookEditorAudit: React.FC = () => {
     return text;
   };
 
-  // Extraction du texte PDF via pdf.js
+  // Extraction du texte PDF - extraction basique via TextDecoder
   const extractPdfText = async (arrayBuffer: ArrayBuffer): Promise<string> => {
     try {
-      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-      const textParts: string[] = [];
-
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i);
-        const textContent = await page.getTextContent();
-        const pageText = textContent.items
-          .map((item: any) => item.str)
-          .join(' ');
-        textParts.push(pageText);
-      }
-
-      return textParts.join('\n\n').replace(/\s+/g, ' ').trim();
+      // Conversion en string pour extraire le texte brut visible
+      const uint8Array = new Uint8Array(arrayBuffer);
+      const decoder = new TextDecoder('utf-8', { fatal: false });
+      const rawContent = decoder.decode(uint8Array);
+      
+      // Extraire les objets texte entre parenthèses (format PDF basique)
+      const textMatches = rawContent.match(/\(([^)]+)\)/g) || [];
+      const extractedTexts = textMatches
+        .map(match => match.slice(1, -1))
+        .filter(text => text.length > 2 && /[a-zA-ZÀ-ÿ]/.test(text))
+        .join(' ');
+      
+      // Nettoyer le texte
+      const cleanText = extractedTexts
+        .replace(/\\[nrt]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      
+      return cleanText;
     } catch (error) {
       console.error('PDF extraction error:', error);
       throw error;
