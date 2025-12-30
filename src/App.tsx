@@ -85,17 +85,27 @@ const App = () => {
     } = supabase.auth.onAuthStateChange((event, session) => {
       console.log('Auth state changed:', event);
 
-      if (event === 'SIGNED_IN' && session) {
+      // IMPORTANT: INITIAL_SESSION happens on refresh when a session already exists.
+      // We must treat it like SIGNED_IN to keep isAdmin in sync.
+      const shouldRecheckAdmin =
+        (event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') &&
+        !!session;
+
+      if (shouldRecheckAdmin && session) {
         setTimeout(async () => {
           const { data, error } = await invokeCheckAdmin(session.access_token);
           if (error) {
             console.error("Erreur check-admin lors du changement d'état:", error);
-          } else if (data?.isAdmin) {
-            console.log('Admin confirmé lors du changement d\'état');
-            setIsAdmin(true);
+            setIsAdmin(false);
+            return;
           }
+
+          setIsAdmin(!!data?.isAdmin);
         }, 0);
-      } else if (event === 'SIGNED_OUT') {
+        return;
+      }
+
+      if (!session || event === 'SIGNED_OUT') {
         console.log('Déconnexion détectée');
         setIsAdmin(false);
       }
