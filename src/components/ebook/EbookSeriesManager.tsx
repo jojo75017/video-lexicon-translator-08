@@ -469,6 +469,35 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
     }
   };
 
+  const parseJsonFromModel = (raw: string) => {
+    const cleaned = raw
+      .replace(/```json\n?/g, '')
+      .replace(/```\n?/g, '')
+      .trim();
+
+    // Try direct parse first
+    try {
+      return JSON.parse(cleaned);
+    } catch {
+      // Fallback: extract the first JSON object/array from mixed text
+      const firstObj = cleaned.indexOf('{');
+      const lastObj = cleaned.lastIndexOf('}');
+      const firstArr = cleaned.indexOf('[');
+      const lastArr = cleaned.lastIndexOf(']');
+
+      const hasObj = firstObj !== -1 && lastObj !== -1 && lastObj > firstObj;
+      const hasArr = firstArr !== -1 && lastArr !== -1 && lastArr > firstArr;
+
+      const slice = hasObj
+        ? cleaned.slice(firstObj, lastObj + 1)
+        : hasArr
+          ? cleaned.slice(firstArr, lastArr + 1)
+          : cleaned;
+
+      return JSON.parse(slice);
+    }
+  };
+
   const generateSeriesBible = async () => {
     if (!seriesBible.seriesTitle) {
       toast.error('Entrez un titre de série');
@@ -542,8 +571,7 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
 
       let parsedData;
       try {
-        const cleanContent = data.content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-        parsedData = JSON.parse(cleanContent);
+        parsedData = parseJsonFromModel(data.content);
       } catch {
         throw new Error('Erreur de parsing');
       }
@@ -628,8 +656,7 @@ export const EbookSeriesManager: React.FC<EbookSeriesManagerProps> = ({
 
       let parsedData;
       try {
-        const cleanContent = data.content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-        parsedData = JSON.parse(cleanContent);
+        parsedData = parseJsonFromModel(data.content);
       } catch {
         throw new Error('Erreur de parsing');
       }
