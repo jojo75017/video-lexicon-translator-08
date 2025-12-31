@@ -5,9 +5,9 @@ export class ProxyService {
   private static proxyList = [
     "https://corsproxy.io/?",
     "https://api.allorigins.win/raw?url=",
-    "https://cors-anywhere.herokuapp.com/",
-    "https://thingproxy.freeboard.io/fetch/",
-    "https://crossorigin.me/"
+    // NOTE: we intentionally avoid cors-anywhere.herokuapp.com because it triggers
+    // browser auth/demo popups and is frequently blocked.
+    "https://thingproxy.freeboard.io/fetch/"
   ];
   
   private static proxyEnabled = true;

@@ -51,11 +51,11 @@ export const useIndexabilityAnalysis = () => {
         console.log("Accès direct échoué, tentative via proxy CORS:", directError);
       }
       
-      // Si l'accès direct échoue, essayer via le proxy CORS
-      const response = await fetch(`https://cors-anywhere.herokuapp.com/${formattedUrl}`);
-      
-      if (response.status === 403 && response.statusText === "Forbidden") {
-        throw new Error("CORS error: Access to the resource is forbidden. Please activate CORS demo first.");
+      // Si l'accès direct échoue, essayer via un proxy CORS public (sans popup)
+      const response = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(formattedUrl)}`);
+
+      if (!response.ok) {
+        throw new Error(`Proxy error: ${response.status}`);
       }
       
       const html = await response.text();
@@ -89,7 +89,9 @@ export const useIndexabilityAnalysis = () => {
   };
 
   const handleOpenCorsDemo = () => {
-    window.open("https://cors-anywhere.herokuapp.com/corsdemo", "_blank");
+    toast.info('Proxy automatique', {
+      description: "Aucune activation manuelle n'est nécessaire."
+    });
   };
 
   const downloadReport = () => {
