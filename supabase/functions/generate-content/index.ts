@@ -7,6 +7,16 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const lovableAiHttpError = (status: number) => {
+  if (status === 402) {
+    return { status, error: 'Crédits épuisés. Veuillez ajouter des crédits.' };
+  }
+  if (status === 429) {
+    return { status, error: 'Limite de requêtes atteinte. Veuillez réessayer dans quelques instants.' };
+  }
+  return { status: 500, error: `Erreur API: ${status}` };
+};
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -485,9 +495,10 @@ Le score overall_score doit être entre 0 et 100 (100 = parfaitement cohérent).
         if (!response.ok) {
           const errorText = await response.text();
           console.error('Lovable AI error:', response.status, errorText);
+          const mapped = lovableAiHttpError(response.status);
           return new Response(
-            JSON.stringify({ error: `Erreur API: ${response.status}` }),
-            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            JSON.stringify({ error: mapped.error }),
+            { status: mapped.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
         }
 
@@ -649,9 +660,10 @@ Réponds UNIQUEMENT avec un JSON valide (sans markdown, sans \`\`\`) dans ce for
         if (!response.ok) {
           const errorText = await response.text();
           console.error('Lovable AI error:', response.status, errorText);
+          const mapped = lovableAiHttpError(response.status);
           return new Response(
-            JSON.stringify({ error: `Erreur API: ${response.status}` }),
-            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            JSON.stringify({ error: mapped.error }),
+            { status: mapped.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
         }
 
@@ -723,9 +735,10 @@ Réponds UNIQUEMENT avec un JSON valide (sans markdown, sans \`\`\`) dans ce for
         if (!response.ok) {
           const errorText = await response.text();
           console.error('Lovable AI error:', response.status, errorText);
+          const mapped = lovableAiHttpError(response.status);
           return new Response(
-            JSON.stringify({ error: `Erreur API: ${response.status}` }),
-            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            JSON.stringify({ error: mapped.error }),
+            { status: mapped.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
         }
 
