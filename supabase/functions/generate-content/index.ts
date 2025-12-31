@@ -454,56 +454,62 @@ Le score overall_score doit être entre 0 et 100 (100 = parfaitement cohérent).
       );
     }
 
-    // Handle series-bible generation (uses Lovable AI - no API key needed)
+    // Handle series-bible generation (uses OpenAI for reliability)
     if (type === 'series-bible') {
-      console.log('Processing series bible generation...');
-      const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+      console.log('Processing series bible generation (OpenAI)...');
+      const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
       
-      if (!LOVABLE_API_KEY) {
-        console.error('LOVABLE_API_KEY not found');
+      if (!OPENAI_API_KEY) {
+        console.error('OPENAI_API_KEY not found');
         return new Response(
-          JSON.stringify({ error: 'Lovable API key not configured' }),
+          JSON.stringify({ error: 'Clé API OpenAI non configurée' }),
           { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
-      console.log('Calling Lovable AI for series-bible...');
+      console.log('Calling OpenAI for series-bible...');
       
       try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 min timeout
         
-        const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+            'Authorization': `Bearer ${OPENAI_API_KEY}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            model: 'google/gemini-2.5-flash',
+            model: 'gpt-4o-mini',
             messages: [
               { role: 'system', content: 'Tu es un expert en création littéraire. Génère uniquement du JSON valide sans markdown.' },
               { role: 'user', content: prompt }
             ],
+            max_tokens: 4000,
           }),
           signal: controller.signal
         });
         
         clearTimeout(timeoutId);
-        console.log('Lovable AI response status:', response.status);
+        console.log('OpenAI response status:', response.status);
 
         if (!response.ok) {
           const errorText = await response.text();
-          console.error('Lovable AI error:', response.status, errorText);
-          const mapped = lovableAiHttpError(response.status);
+          console.error('OpenAI error:', response.status, errorText);
+          if (response.status === 429) {
+            return new Response(
+              JSON.stringify({ error: 'Trop de requêtes. Réessayez dans quelques instants.' }),
+              { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+          }
           return new Response(
-            JSON.stringify({ error: mapped.error }),
-            { status: mapped.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            JSON.stringify({ error: `Erreur API: ${response.status}` }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
         }
 
         const data = await response.json();
-        console.log('Lovable AI data received');
+        console.log('OpenAI data received');
         const generatedContent = data.choices?.[0]?.message?.content;
         
         if (!generatedContent) {
@@ -619,56 +625,62 @@ Réponds UNIQUEMENT avec un JSON valide (sans markdown, sans \`\`\`) dans ce for
       );
     }
 
-    // Handle next-tome generation (uses Lovable AI - no API key needed)
+    // Handle next-tome generation (uses OpenAI for reliability)
     if (type === 'next-tome') {
-      console.log('Processing next tome generation...');
-      const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+      console.log('Processing next tome generation (OpenAI)...');
+      const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
       
-      if (!LOVABLE_API_KEY) {
-        console.error('LOVABLE_API_KEY not found');
+      if (!OPENAI_API_KEY) {
+        console.error('OPENAI_API_KEY not found');
         return new Response(
-          JSON.stringify({ error: 'Lovable API key not configured' }),
+          JSON.stringify({ error: 'Clé API OpenAI non configurée' }),
           { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
-      console.log('Calling Lovable AI for next-tome...');
+      console.log('Calling OpenAI for next-tome...');
       
       try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 min timeout
         
-        const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+            'Authorization': `Bearer ${OPENAI_API_KEY}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            model: 'google/gemini-2.5-flash',
+            model: 'gpt-4o-mini',
             messages: [
               { role: 'system', content: 'Tu es un expert en création littéraire. Génère uniquement du JSON valide sans markdown.' },
               { role: 'user', content: prompt }
             ],
+            max_tokens: 4000,
           }),
           signal: controller.signal
         });
         
         clearTimeout(timeoutId);
-        console.log('Lovable AI response status:', response.status);
+        console.log('OpenAI response status:', response.status);
 
         if (!response.ok) {
           const errorText = await response.text();
-          console.error('Lovable AI error:', response.status, errorText);
-          const mapped = lovableAiHttpError(response.status);
+          console.error('OpenAI error:', response.status, errorText);
+          if (response.status === 429) {
+            return new Response(
+              JSON.stringify({ error: 'Trop de requêtes. Réessayez dans quelques instants.' }),
+              { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+          }
           return new Response(
-            JSON.stringify({ error: mapped.error }),
-            { status: mapped.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            JSON.stringify({ error: `Erreur API: ${response.status}` }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
         }
 
         const data = await response.json();
-        console.log('Lovable AI data received');
+        console.log('OpenAI data received');
         const generatedContent = data.choices?.[0]?.message?.content;
         
         if (!generatedContent) {
@@ -694,56 +706,62 @@ Réponds UNIQUEMENT avec un JSON valide (sans markdown, sans \`\`\`) dans ce for
       }
     }
 
-    // Handle tome-chapters generation (uses Lovable AI - no API key needed)
+    // Handle tome-chapters generation (uses OpenAI for reliability)
     if (type === 'tome-chapters') {
-      console.log('Processing tome chapters generation...');
-      const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+      console.log('Processing tome chapters generation (OpenAI)...');
+      const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
       
-      if (!LOVABLE_API_KEY) {
-        console.error('LOVABLE_API_KEY not found');
+      if (!OPENAI_API_KEY) {
+        console.error('OPENAI_API_KEY not found');
         return new Response(
-          JSON.stringify({ error: 'Lovable API key not configured' }),
+          JSON.stringify({ error: 'Clé API OpenAI non configurée' }),
           { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
-      console.log('Calling Lovable AI for tome-chapters...');
+      console.log('Calling OpenAI for tome-chapters...');
       
       try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 min timeout
         
-        const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+            'Authorization': `Bearer ${OPENAI_API_KEY}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            model: 'google/gemini-2.5-flash',
+            model: 'gpt-4o-mini',
             messages: [
               { role: 'system', content: 'Tu es un expert en création littéraire et planification de livres. Génère uniquement du JSON valide sans balises markdown.' },
               { role: 'user', content: prompt }
             ],
+            max_tokens: 4000,
           }),
           signal: controller.signal
         });
         
         clearTimeout(timeoutId);
-        console.log('Lovable AI response status:', response.status);
+        console.log('OpenAI response status:', response.status);
 
         if (!response.ok) {
           const errorText = await response.text();
-          console.error('Lovable AI error:', response.status, errorText);
-          const mapped = lovableAiHttpError(response.status);
+          console.error('OpenAI error:', response.status, errorText);
+          if (response.status === 429) {
+            return new Response(
+              JSON.stringify({ error: 'Trop de requêtes. Réessayez dans quelques instants.' }),
+              { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            );
+          }
           return new Response(
-            JSON.stringify({ error: mapped.error }),
-            { status: mapped.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            JSON.stringify({ error: `Erreur API: ${response.status}` }),
+            { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
         }
 
         const data = await response.json();
-        console.log('Lovable AI data received');
+        console.log('OpenAI data received');
         const generatedContent = data.choices?.[0]?.message?.content;
         
         if (!generatedContent) {
