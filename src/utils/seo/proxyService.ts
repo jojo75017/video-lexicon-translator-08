@@ -3,11 +3,8 @@
 
 export class ProxyService {
   private static proxyList = [
-    "https://corsproxy.io/?",
-    "https://api.allorigins.win/raw?url=",
-    // NOTE: we intentionally avoid cors-anywhere.herokuapp.com because it triggers
-    // browser auth/demo popups and is frequently blocked.
-    "https://thingproxy.freeboard.io/fetch/"
+    // Single safe proxy (no auth popup / no demo activation)
+    "https://api.allorigins.win/raw?url="
   ];
   
   private static proxyEnabled = true;

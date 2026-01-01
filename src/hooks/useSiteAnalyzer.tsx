@@ -25,27 +25,23 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
   const [seoAnalysis, setSeoAnalysis] = useState<any>(null);
   const [resources, setResources] = useState<any>(null);
   const [siteStructure, setSiteStructure] = useState<any>(null);
-  const [proxyEnabled, setProxyEnabled] = useState<boolean>(true); // Always set to true by default
+  const [proxyEnabled, setProxyEnabled] = useState<boolean>(false);
   const [openaiApiKey, setOpenaiApiKey] = useState<string | null>(null);
 
-  // Check proxy status and load API key on mount
+  // Load API key on mount (no proxy/network calls here to avoid browser auth popups)
   useEffect(() => {
-    // Ensure all proxies are enabled by default
-    FirecrawlService.enableProxy();
-    OpenAIService.enableProxy();
-    ProxyService.enableProxy();
-    setProxyEnabled(true);
-    
-    // Force reset proxy rotation to start with first proxy
-    ProxyService.resetProxyRotation();
-    
-    // Load OpenAI API key from localStorage
     const apiKey = localStorage.getItem('openaiKey');
     setOpenaiApiKey(apiKey);
-    
+
+    // Disable proxies by default; they will be enabled only when running an analysis
+    FirecrawlService.disableProxy?.();
+    OpenAIService.disableProxy?.();
+    ProxyService.disableProxy();
+    setProxyEnabled(false);
+
     console.log("Initial useSiteAnalyzer hook state:", {
-      proxyEnabled: true,
-      openAIKeyExists: !!apiKey
+      proxyEnabled: false,
+      openAIKeyExists: !!apiKey,
     });
   }, []);
 
@@ -55,32 +51,18 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
     FirecrawlService.enableProxy();
     OpenAIService.enableProxy();
     ProxyService.enableProxy();
-    
+
     // Reset proxy rotation
     ProxyService.resetProxyRotation();
-    
+
     setProxyEnabled(true);
     setShowCorsWarning(false);
-    
+
     toast.success("Proxy CORS activé", {
       description: "Les requêtes utiliseront désormais un proxy pour contourner les restrictions CORS",
     });
-    
-    // Test proxies to find the best one
-    ProxyService.testAllProxies()
-      .then(results => {
-        const working = results.filter(r => r.working);
-        if (working.length > 0) {
-          toast.success(`${working.length} proxy(s) fonctionnels trouvés`);
-        } else {
-          toast.warning("Aucun proxy fonctionnel trouvé");
-        }
-      })
-      .catch(err => {
-        console.error("Error testing proxies:", err);
-      });
-    
-    console.log("All proxies activated and tested");
+
+    console.log("Proxy activated");
   }, []);
 
   // Analyze the site
@@ -114,16 +96,16 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
 
     console.log(`Analyzing site: ${formattedUrl}`);
     
-    // Force enable proxy before analysis
+    // Enable proxy only for this analysis
     FirecrawlService.enableProxy();
     OpenAIService.enableProxy();
     ProxyService.enableProxy();
-    
+
     // Reset proxy rotation to start fresh
     ProxyService.resetProxyRotation();
-    
+
     setProxyEnabled(true);
-    
+
     // Check for OpenAI API key
     const currentApiKey = localStorage.getItem('openaiKey');
     if (currentApiKey) {
@@ -138,13 +120,10 @@ export const useSiteAnalyzer = (): SiteAnalyzerResult => {
     try {
       console.log("Starting analysis with FirecrawlService...");
       toast.info(`Analyse de ${formattedUrl}`, {
-        description: "Tentative d'extraction du contenu via proxies..."
+        description: "Tentative d'extraction du contenu via proxy...",
       });
-      
-      // Pre-test proxies to find the best one
-      await ProxyService.testAllProxies();
-      
-      // Use FirecrawlService for analysis with proxy ALWAYS enabled
+
+      // Use FirecrawlService for analysis with proxy enabled
       const result = await FirecrawlService.crawlWebsite(formattedUrl, true);
       console.log("Analysis result:", result);
       
