@@ -10,6 +10,7 @@ import SubscriptionPage from './pages/SubscriptionPage';
 import { AdminPage } from './pages/AdminPage';
 import AuthPage from './pages/AuthPage';
 import AdminProfilePage from './pages/AdminProfilePage';
+import AdminDirectPage from './pages/AdminDirectPage';
 import AffiliationFormationPage from './pages/AffiliationFormationPage';
 import FormationPage from './pages/FormationPage';
 import FormationSeriesPage from './pages/FormationSeriesPage';
@@ -143,6 +144,7 @@ const App = () => {
             <Route path="/paiement-succes" element={<PaymentSuccessPage />} />
             <Route path="/affiliation" element={<AffiliationFormationPage />} />
             <Route path="/auth" element={<AuthPage />} />
+            <Route path="/admin-direct" element={<AdminDirectPage />} />
             <Route path="/ai-chat" element={<AiChatPage />} />
             <Route
               path="/ebook-ideas"
