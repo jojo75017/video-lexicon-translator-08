@@ -7,7 +7,8 @@ export class ProxyService {
     "https://api.allorigins.win/raw?url="
   ];
   
-  private static proxyEnabled = true;
+  // IMPORTANT: keep disabled by default to avoid any unexpected browser auth popups
+  private static proxyEnabled = false;
   private static currentProxyIndex = 0;
   private static bestProxyIndex = 0;
   
