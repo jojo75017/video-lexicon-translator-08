@@ -254,6 +254,80 @@ Crée 4-5 concurrents fictifs réalistes, 4-5 recommandations stratégiques, 4 l
 
   return (
     <div className="space-y-6">
+      {/* Features Overview - Always visible */}
+      {!analysis && (
+        <Card className="bg-gradient-to-br from-emerald-500/5 via-teal-500/5 to-cyan-500/5 border-emerald-500/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-500/30">
+                <Sparkles className="h-6 w-6 text-emerald-400" />
+              </div>
+              <div>
+                <span className="text-xl bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+                  Ce que vous pouvez découvrir
+                </span>
+                <p className="text-sm text-muted-foreground font-normal mt-0.5">
+                  Notre plugin d'étude de marché "en un clic"
+                </p>
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="flex items-start gap-3 p-3 rounded-lg bg-background/50 border border-border/30">
+                <div className="p-2 rounded-lg bg-emerald-500/20 shrink-0">
+                  <DollarSign className="h-4 w-4 text-emerald-400" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Livres qui se vendent</p>
+                  <p className="text-xs text-muted-foreground">Découvrez quels livres se vendent actuellement sur Amazon, avec des estimations de revenus</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3 p-3 rounded-lg bg-background/50 border border-border/30">
+                <div className="p-2 rounded-lg bg-teal-500/20 shrink-0">
+                  <Target className="h-4 w-4 text-teal-400" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Niches rentables</p>
+                  <p className="text-xs text-muted-foreground">Trouvez les niches, sous-genres et mots-clés "rentables" pour améliorer vos ventes</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3 p-3 rounded-lg bg-background/50 border border-border/30">
+                <div className="p-2 rounded-lg bg-cyan-500/20 shrink-0">
+                  <BarChart3 className="h-4 w-4 text-cyan-400" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">+25 000 catégories</p>
+                  <p className="text-xs text-muted-foreground">Analysez les meilleures ventes dans n'importe quelle catégorie Kindle, pages d'auteurs et recherches par mot-clé</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3 p-3 rounded-lg bg-background/50 border border-border/30">
+                <div className="p-2 rounded-lg bg-amber-500/20 shrink-0">
+                  <TrendingUp className="h-4 w-4 text-amber-400" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Ventes régulières</p>
+                  <p className="text-xs text-muted-foreground">Développez votre lectorat en écrivant des livres que les gens désirent vraiment</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3 p-3 rounded-lg bg-background/50 border border-border/30 md:col-span-2">
+                <div className="p-2 rounded-lg bg-purple-500/20 shrink-0">
+                  <Zap className="h-4 w-4 text-purple-400" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Gain de temps</p>
+                  <p className="text-xs text-muted-foreground">Gagnez du temps sur vos recherches de livres grâce à notre analyse de marché instantanée</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Search Card */}
       <Card className="bg-gradient-to-br from-indigo-500/5 to-purple-500/5 border-indigo-500/20">
         <CardHeader>
