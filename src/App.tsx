@@ -23,6 +23,13 @@ import OfferValuePage from './pages/OfferValuePage';
 import { SubscriptionAuth } from '@/components/SubscriptionAuth';
 import { supabase } from '@/integrations/supabase/client';
 
+// SaaS Pages
+import { SaasLayout } from '@/components/saas/SaasLayout';
+import SaasDashboard from '@/pages/saas/SaasDashboard';
+import SaasAnalytics from '@/pages/saas/SaasAnalytics';
+import SaasBilling from '@/pages/saas/SaasBilling';
+import SaasSettings from '@/pages/saas/SaasSettings';
+import SaasAuthPage from '@/pages/saas/SaasAuthPage';
 const queryClient = new QueryClient();
 
 const App = () => {
@@ -222,6 +229,15 @@ const App = () => {
                 )
               }
             />
+            
+            {/* SaaS Routes */}
+            <Route path="/saas/login" element={<SaasAuthPage />} />
+            <Route path="/saas" element={<SaasLayout userRole={isAdmin ? 'admin' : 'pro'} />}>
+              <Route index element={<SaasDashboard />} />
+              <Route path="analytics" element={<SaasAnalytics />} />
+              <Route path="billing" element={<SaasBilling />} />
+              <Route path="settings" element={<SaasSettings />} />
+            </Route>
           </Routes>
           <Toaster />
         </div>
