@@ -1,19 +1,20 @@
 import React, { useState } from 'react';
-import { 
-  CreditCard, 
-  Check, 
-  Zap, 
-  Crown, 
-  Shield, 
-  Download,
-  ExternalLink,
-  AlertCircle
-} from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { 
+  CreditCard, 
+  Download, 
+  Check, 
+  Crown, 
+  Zap, 
+  Building2,
+  Receipt,
+  Calendar,
+  Shield,
+  Star
+} from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -23,6 +24,20 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
+interface Invoice {
+  id: string;
+  date: string;
+  amount: string;
+  status: 'payée' | 'en_attente' | 'échouée';
+}
+
+const invoices: Invoice[] = [
+  { id: 'INV-001', date: '1 Jan 2024', amount: '347€', status: 'payée' },
+  { id: 'INV-002', date: '1 Déc 2023', amount: '347€', status: 'payée' },
+  { id: 'INV-003', date: '1 Nov 2023', amount: '347€', status: 'payée' },
+  { id: 'INV-004', date: '1 Oct 2023', amount: '347€', status: 'payée' },
+];
+
 interface PlanFeature {
   name: string;
   free: boolean | string;
@@ -31,253 +46,90 @@ interface PlanFeature {
 }
 
 const planFeatures: PlanFeature[] = [
-  { name: 'Projects', free: '3', pro: '25', enterprise: 'Unlimited' },
-  { name: 'Team Members', free: '1', pro: '10', enterprise: 'Unlimited' },
-  { name: 'API Requests/month', free: '1,000', pro: '50,000', enterprise: 'Unlimited' },
-  { name: 'Storage', free: '1 GB', pro: '25 GB', enterprise: '500 GB' },
-  { name: 'AI Credits/month', free: '100', pro: '5,000', enterprise: 'Unlimited' },
-  { name: 'Priority Support', free: false, pro: true, enterprise: true },
-  { name: 'Custom Integrations', free: false, pro: true, enterprise: true },
-  { name: 'SSO Authentication', free: false, pro: false, enterprise: true },
-  { name: 'Dedicated Account Manager', free: false, pro: false, enterprise: true },
-  { name: 'SLA Guarantee', free: false, pro: false, enterprise: true },
+  { name: 'Appels API', free: '1 000/mois', pro: '50 000/mois', enterprise: 'Illimité' },
+  { name: 'Stockage', free: '500 Mo', pro: '50 Go', enterprise: 'Illimité' },
+  { name: 'Membres équipe', free: '1', pro: '10', enterprise: 'Illimité' },
+  { name: 'Projets', free: '3', pro: '25', enterprise: 'Illimité' },
+  { name: 'Support prioritaire', free: false, pro: true, enterprise: true },
+  { name: 'Domaine personnalisé', free: false, pro: true, enterprise: true },
+  { name: 'Analytiques avancées', free: false, pro: true, enterprise: true },
+  { name: 'Accès API', free: false, pro: true, enterprise: true },
+  { name: 'Intégrations', free: '3', pro: '20', enterprise: 'Illimité' },
+  { name: 'SSO & SAML', free: false, pro: false, enterprise: true },
+  { name: 'SLA Garanti', free: false, pro: false, enterprise: true },
+  { name: 'Account Manager', free: false, pro: false, enterprise: true },
 ];
 
-interface Invoice {
-  id: string;
-  date: string;
-  amount: string;
-  status: 'paid' | 'pending' | 'failed';
-  description: string;
-}
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case 'payée': return 'bg-green-100 text-green-800';
+    case 'en_attente': return 'bg-yellow-100 text-yellow-800';
+    case 'échouée': return 'bg-red-100 text-red-800';
+    default: return 'bg-gray-100 text-gray-800';
+  }
+};
 
-const invoices: Invoice[] = [
-  { id: 'INV-001', date: '2024-01-01', amount: '$49.00', status: 'paid', description: 'Pro Plan - January' },
-  { id: 'INV-002', date: '2023-12-01', amount: '$49.00', status: 'paid', description: 'Pro Plan - December' },
-  { id: 'INV-003', date: '2023-11-01', amount: '$49.00', status: 'paid', description: 'Pro Plan - November' },
-  { id: 'INV-004', date: '2023-10-01', amount: '$49.00', status: 'paid', description: 'Pro Plan - October' },
-];
+const getStatusLabel = (status: string) => {
+  switch (status) {
+    case 'payée': return 'Payée';
+    case 'en_attente': return 'En attente';
+    case 'échouée': return 'Échouée';
+    default: return status;
+  }
+};
 
 export const SaasBilling: React.FC = () => {
-  const [currentPlan] = useState<'free' | 'pro' | 'enterprise'>('pro');
-  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'paid':
-        return <Badge className="bg-green-500/10 text-green-500 hover:bg-green-500/20">Paid</Badge>;
-      case 'pending':
-        return <Badge className="bg-amber-500/10 text-amber-500 hover:bg-amber-500/20">Pending</Badge>;
-      case 'failed':
-        return <Badge className="bg-red-500/10 text-red-500 hover:bg-red-500/20">Failed</Badge>;
-      default:
-        return <Badge variant="secondary">{status}</Badge>;
-    }
-  };
+  const [billingPeriod, setBillingPeriod] = useState<'mensuel' | 'annuel'>('mensuel');
+  const currentPlan = 'pro';
 
   return (
     <div className="space-y-6">
       {/* Page Header */}
       <div>
-        <h1 className="text-3xl font-bold">Billing & Subscription</h1>
-        <p className="text-muted-foreground">Manage your subscription and billing information</p>
+        <h1 className="text-3xl font-bold">Facturation</h1>
+        <p className="text-muted-foreground">Gérez votre abonnement et les méthodes de paiement</p>
       </div>
 
       {/* Current Plan Overview */}
-      <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
+      <Card className="border-primary">
         <CardHeader>
-          <div className="flex items-start justify-between">
-            <div className="space-y-1">
-              <CardTitle className="flex items-center gap-2">
-                <Crown className="h-5 w-5 text-amber-500" />
-                Pro Plan
-              </CardTitle>
-              <CardDescription>Your current subscription</CardDescription>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
+                <Crown className="h-6 w-6 text-primary-foreground" />
+              </div>
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  Plan Pro
+                  <Badge variant="secondary">Actuel</Badge>
+                </CardTitle>
+                <CardDescription>Accès complet à toutes les fonctionnalités Pro</CardDescription>
+              </div>
             </div>
-            <Badge className="bg-gradient-to-r from-amber-500 to-orange-500">Active</Badge>
+            <Button variant="outline">Changer de plan</Button>
           </div>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">Monthly Cost</p>
-              <p className="text-2xl font-bold">$49<span className="text-sm font-normal text-muted-foreground">/mo</span></p>
+              <p className="text-sm text-muted-foreground">Coût</p>
+              <p className="text-2xl font-bold">347€<span className="text-sm font-normal text-muted-foreground"> unique</span></p>
             </div>
             <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">Next Billing Date</p>
-              <p className="text-lg font-semibold">February 1, 2024</p>
+              <p className="text-sm text-muted-foreground">Date d'achat</p>
+              <p className="text-lg font-semibold">1 Janvier 2024</p>
             </div>
             <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">Payment Method</p>
+              <p className="text-sm text-muted-foreground">Moyen de paiement</p>
               <div className="flex items-center gap-2">
                 <CreditCard className="h-4 w-4" />
                 <span>•••• 4242</span>
               </div>
             </div>
-            <div className="flex items-end">
-              <Button variant="outline">
-                Manage Subscription
-              </Button>
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">Statut</p>
+              <Badge className="bg-green-100 text-green-800">Actif</Badge>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Usage Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">API Requests</span>
-                <span className="text-sm text-muted-foreground">32,450 / 50,000</span>
-              </div>
-              <Progress value={65} className="h-2" />
-              <p className="text-xs text-muted-foreground">Resets in 12 days</p>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="pt-6">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Storage Used</span>
-                <span className="text-sm text-muted-foreground">18.5 GB / 25 GB</span>
-              </div>
-              <Progress value={74} className="h-2" />
-              <p className="text-xs text-muted-foreground">74% of plan limit</p>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="pt-6">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">AI Credits</span>
-                <span className="text-sm text-muted-foreground">3,200 / 5,000</span>
-              </div>
-              <Progress value={64} className="h-2" />
-              <p className="text-xs text-muted-foreground">Resets in 12 days</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Plans Comparison */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Available Plans</CardTitle>
-              <CardDescription>Compare features and choose the right plan for you</CardDescription>
-            </div>
-            <Tabs value={billingPeriod} onValueChange={(v) => setBillingPeriod(v as 'monthly' | 'yearly')}>
-              <TabsList>
-                <TabsTrigger value="monthly">Monthly</TabsTrigger>
-                <TabsTrigger value="yearly">
-                  Yearly
-                  <Badge variant="secondary" className="ml-2 text-xs">-20%</Badge>
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Free Plan */}
-            <Card className="relative">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Zap className="h-5 w-5 text-gray-500" />
-                  Free
-                </CardTitle>
-                <div className="mt-4">
-                  <span className="text-4xl font-bold">$0</span>
-                  <span className="text-muted-foreground">/month</span>
-                </div>
-                <CardDescription>Perfect for getting started</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3">
-                  {planFeatures.slice(0, 5).map((feature) => (
-                    <li key={feature.name} className="flex items-center gap-2 text-sm">
-                      <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span>{feature.name}: {feature.free}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-              <CardFooter>
-                <Button variant="outline" className="w-full" disabled={currentPlan === 'free'}>
-                  {currentPlan === 'free' ? 'Current Plan' : 'Downgrade'}
-                </Button>
-              </CardFooter>
-            </Card>
-
-            {/* Pro Plan */}
-            <Card className="relative border-primary shadow-lg">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <Badge className="bg-gradient-to-r from-primary to-primary/70">Most Popular</Badge>
-              </div>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Crown className="h-5 w-5 text-amber-500" />
-                  Pro
-                </CardTitle>
-                <div className="mt-4">
-                  <span className="text-4xl font-bold">${billingPeriod === 'yearly' ? '39' : '49'}</span>
-                  <span className="text-muted-foreground">/month</span>
-                </div>
-                <CardDescription>For growing teams and businesses</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3">
-                  {planFeatures.slice(0, 7).map((feature) => (
-                    <li key={feature.name} className="flex items-center gap-2 text-sm">
-                      <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span>{feature.name}: {typeof feature.pro === 'boolean' ? (feature.pro ? '✓' : '✗') : feature.pro}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-              <CardFooter>
-                <Button className="w-full" disabled={currentPlan === 'pro'}>
-                  {currentPlan === 'pro' ? 'Current Plan' : 'Upgrade to Pro'}
-                </Button>
-              </CardFooter>
-            </Card>
-
-            {/* Enterprise Plan */}
-            <Card className="relative">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Shield className="h-5 w-5 text-violet-500" />
-                  Enterprise
-                </CardTitle>
-                <div className="mt-4">
-                  <span className="text-4xl font-bold">Custom</span>
-                </div>
-                <CardDescription>For large organizations</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3">
-                  {planFeatures.map((feature) => (
-                    <li key={feature.name} className="flex items-center gap-2 text-sm">
-                      <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span>{feature.name}: {typeof feature.enterprise === 'boolean' ? (feature.enterprise ? '✓' : '✗') : feature.enterprise}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-              <CardFooter>
-                <Button variant="outline" className="w-full">
-                  Contact Sales
-                  <ExternalLink className="ml-2 h-4 w-4" />
-                </Button>
-              </CardFooter>
-            </Card>
           </div>
         </CardContent>
       </Card>
@@ -285,18 +137,28 @@ export const SaasBilling: React.FC = () => {
       {/* Billing History */}
       <Card>
         <CardHeader>
-          <CardTitle>Billing History</CardTitle>
-          <CardDescription>View and download your past invoices</CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Receipt className="h-5 w-5" />
+                Historique de facturation
+              </CardTitle>
+              <CardDescription>Téléchargez vos factures passées</CardDescription>
+            </div>
+            <Button variant="outline" size="sm">
+              <Download className="h-4 w-4 mr-2" />
+              Tout télécharger
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Invoice</TableHead>
+                <TableHead>Facture</TableHead>
                 <TableHead>Date</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>Montant</TableHead>
+                <TableHead>Statut</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -305,9 +167,12 @@ export const SaasBilling: React.FC = () => {
                 <TableRow key={invoice.id}>
                   <TableCell className="font-medium">{invoice.id}</TableCell>
                   <TableCell>{invoice.date}</TableCell>
-                  <TableCell>{invoice.description}</TableCell>
                   <TableCell>{invoice.amount}</TableCell>
-                  <TableCell>{getStatusBadge(invoice.status)}</TableCell>
+                  <TableCell>
+                    <Badge className={getStatusColor(invoice.status)} variant="secondary">
+                      {getStatusLabel(invoice.status)}
+                    </Badge>
+                  </TableCell>
                   <TableCell className="text-right">
                     <Button variant="ghost" size="sm">
                       <Download className="h-4 w-4" />
@@ -320,35 +185,159 @@ export const SaasBilling: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Payment Method */}
+      {/* Plan Comparison */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold">Comparer les Plans</h2>
+            <p className="text-muted-foreground">Choisissez le plan parfait pour votre équipe</p>
+          </div>
+          <Tabs value={billingPeriod} onValueChange={(value) => setBillingPeriod(value as 'mensuel' | 'annuel')}>
+            <TabsList>
+              <TabsTrigger value="mensuel">Mensuel</TabsTrigger>
+              <TabsTrigger value="annuel">
+                Annuel
+                <Badge variant="secondary" className="ml-2 text-xs">-20%</Badge>
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-3">
+          {/* Free Plan */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Zap className="h-5 w-5 text-muted-foreground" />
+                Gratuit
+              </CardTitle>
+              <div className="mt-4">
+                <span className="text-4xl font-bold">0€</span>
+                <span className="text-muted-foreground">/mois</span>
+              </div>
+              <CardDescription>Parfait pour débuter</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-3">
+                {planFeatures.slice(0, 5).map((feature) => (
+                  <li key={feature.name} className="flex items-center gap-2 text-sm">
+                    {feature.free ? (
+                      <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
+                    ) : (
+                      <div className="h-4 w-4 flex-shrink-0" />
+                    )}
+                    <span className={!feature.free ? 'text-muted-foreground' : ''}>
+                      {feature.name}: {typeof feature.free === 'boolean' ? (feature.free ? '✓' : '✗') : feature.free}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+            <CardFooter>
+              <Button variant="outline" className="w-full">
+                Rétrograder
+              </Button>
+            </CardFooter>
+          </Card>
+
+          {/* Pro Plan */}
+          <Card className="relative border-primary shadow-lg">
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+              <Badge className="bg-gradient-to-r from-primary to-primary/70">Le plus populaire</Badge>
+            </div>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Crown className="h-5 w-5 text-amber-500" />
+                Pro
+              </CardTitle>
+              <div className="mt-4">
+                <span className="text-4xl font-bold">347€</span>
+                <span className="text-muted-foreground"> unique</span>
+              </div>
+              <CardDescription>Pour les équipes en croissance</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-3">
+                {planFeatures.slice(0, 7).map((feature) => (
+                  <li key={feature.name} className="flex items-center gap-2 text-sm">
+                    <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
+                    <span>{feature.name}: {typeof feature.pro === 'boolean' ? (feature.pro ? '✓' : '✗') : feature.pro}</span>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+            <CardFooter>
+              <Button className="w-full" disabled={currentPlan === 'pro'}>
+                {currentPlan === 'pro' ? 'Plan actuel' : 'Passer au Pro'}
+              </Button>
+            </CardFooter>
+          </Card>
+
+          {/* Enterprise Plan */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Building2 className="h-5 w-5 text-primary" />
+                Entreprise
+              </CardTitle>
+              <div className="mt-4">
+                <span className="text-4xl font-bold">Personnalisé</span>
+              </div>
+              <CardDescription>Pour les grandes organisations</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-3">
+                {planFeatures.slice(0, 7).map((feature) => (
+                  <li key={feature.name} className="flex items-center gap-2 text-sm">
+                    <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
+                    <span>{feature.name}: {typeof feature.enterprise === 'boolean' ? (feature.enterprise ? '✓' : '✗') : feature.enterprise}</span>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+            <CardFooter>
+              <Button variant="outline" className="w-full">
+                Contacter les ventes
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
+      </div>
+
+      {/* Payment Methods */}
       <Card>
         <CardHeader>
-          <CardTitle>Payment Method</CardTitle>
-          <CardDescription>Manage your payment information</CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="h-5 w-5" />
+                Moyens de paiement
+              </CardTitle>
+              <CardDescription>Gérez vos cartes et modes de paiement</CardDescription>
+            </div>
+            <Button>
+              <CreditCard className="h-4 w-4 mr-2" />
+              Ajouter une carte
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between p-4 border rounded-lg">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-8 bg-gradient-to-r from-blue-600 to-blue-800 rounded flex items-center justify-center">
-                <span className="text-white text-xs font-bold">VISA</span>
+              <div className="h-12 w-16 rounded bg-gradient-to-r from-blue-600 to-blue-400 flex items-center justify-center">
+                <CreditCard className="h-6 w-6 text-white" />
               </div>
               <div>
-                <p className="font-medium">Visa ending in 4242</p>
-                <p className="text-sm text-muted-foreground">Expires 12/2025</p>
+                <p className="font-medium">Visa se terminant par 4242</p>
+                <p className="text-sm text-muted-foreground">Expire 12/2025</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Badge variant="secondary">Default</Badge>
-              <Button variant="outline" size="sm">Update</Button>
+              <Badge variant="secondary">Par défaut</Badge>
+              <Button variant="ghost" size="sm">Modifier</Button>
             </div>
           </div>
         </CardContent>
-        <CardFooter>
-          <Button variant="outline">
-            <CreditCard className="mr-2 h-4 w-4" />
-            Add Payment Method
-          </Button>
-        </CardFooter>
       </Card>
     </div>
   );
