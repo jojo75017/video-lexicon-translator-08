@@ -290,9 +290,18 @@ export const EbookEditorialDirector = ({
                         {analysis.titreOriginalScore.scoreKdp}/100
                       </span>
                     </div>
-                    <div className="relative h-2 w-full overflow-hidden rounded-full bg-muted">
+                    {/* Affichage du titre analysé */}
+                    <p className="text-base font-semibold text-foreground truncate">{sujet}</p>
+                    {/* Barre de progression colorée selon le score */}
+                    <div className="relative h-3 w-full overflow-hidden rounded-full bg-muted">
                       <div 
-                        className={`h-full transition-all ${getProgressColor(analysis.titreOriginalScore.scoreKdp)}`}
+                        className={`h-full transition-all duration-500 ${
+                          analysis.titreOriginalScore.scoreKdp >= 85 
+                            ? 'bg-green-500' 
+                            : analysis.titreOriginalScore.scoreKdp >= 70 
+                              ? 'bg-yellow-500' 
+                              : 'bg-red-500'
+                        }`}
                         style={{ width: `${analysis.titreOriginalScore.scoreKdp}%` }}
                       />
                     </div>
