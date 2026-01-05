@@ -716,6 +716,88 @@ ${module.content}
           </div>
         </motion.div>
 
+        {/* Section EbookiaPro.V2 - Les 14 points */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="mb-12"
+        >
+          <Card className="overflow-hidden border-2 border-primary/20 bg-gradient-to-br from-primary/5 via-background to-primary/10">
+            <CardHeader className="text-center pb-4">
+              <div className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4 mx-auto">
+                <Sparkles className="h-4 w-4" />
+                Moteur IA Éditorial
+              </div>
+              <CardTitle className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary via-amber-500 to-orange-500 bg-clip-text text-transparent">
+                Ce que vous découvrirez dans EbookiaPro.V2
+              </CardTitle>
+              <p className="text-muted-foreground mt-2 text-lg">
+                14 outils IA professionnels pour créer des ebooks de qualité éditoriale
+              </p>
+            </CardHeader>
+            <CardContent className="px-6 pb-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[
+                  { num: 'P1', title: 'Directeur Éditorial', desc: 'Analyse stratégique de votre projet', icon: Target, color: 'from-blue-500 to-blue-600' },
+                  { num: 'P2', title: 'Analyse de Marché', desc: 'Positionnement et niche idéale', icon: TrendingUp, color: 'from-green-500 to-green-600' },
+                  { num: 'P3', title: 'Architecte de Contenu', desc: 'Structure optimale de votre livre', icon: Layers, color: 'from-purple-500 to-purple-600' },
+                  { num: 'P4', title: 'Rédaction Experte', desc: 'Écriture professionnelle IA', icon: BookOpen, color: 'from-indigo-500 to-indigo-600' },
+                  { num: 'P5', title: 'Réécriture Naturelle', desc: 'Humanisation du texte', icon: Sparkles, color: 'from-pink-500 to-pink-600' },
+                  { num: 'P6', title: 'Qualité Éditoriale', desc: 'Vérification orthographe & style', icon: CheckCircle2, color: 'from-teal-500 to-teal-600' },
+                  { num: 'P7', title: 'Packaging Éditorial', desc: 'Couverture, titre, 4ème de couverture', icon: Image, color: 'from-orange-500 to-orange-600' },
+                  { num: 'P8', title: 'Diagnostic Final', desc: 'Analyse complète avant publication', icon: Target, color: 'from-red-500 to-red-600' },
+                  { num: 'P9', title: 'Mémoire Éditoriale', desc: 'Conservation de votre voix unique', icon: BookOpen, color: 'from-cyan-500 to-cyan-600' },
+                  { num: 'P10', title: 'Cohérence Globale', desc: 'Vérification narrative inter-chapitres', icon: Layers, color: 'from-amber-500 to-amber-600' },
+                  { num: 'P11', title: 'Auto-Critique IA', desc: 'Détection des faiblesses', icon: HelpCircle, color: 'from-rose-500 to-rose-600' },
+                  { num: 'P12', title: 'Boucle Itérative', desc: 'Amélioration continue automatique', icon: Zap, color: 'from-violet-500 to-violet-600' },
+                  { num: 'P13', title: 'Signature de Style', desc: 'Votre empreinte unique', icon: Sparkles, color: 'from-emerald-500 to-emerald-600' },
+                  { num: 'P14', title: 'Verdict Ultime', desc: 'Validation finale professionnelle', icon: Trophy, color: 'from-yellow-500 to-yellow-600' },
+                ].map((item, index) => {
+                  const Icon = item.icon;
+                  return (
+                    <motion.div
+                      key={item.num}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.5 + index * 0.05 }}
+                      className="flex items-center gap-4 p-4 rounded-xl bg-card/50 border border-border/50 hover:border-primary/30 hover:bg-card transition-all duration-300 group"
+                    >
+                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center text-white font-bold text-sm shadow-lg group-hover:scale-110 transition-transform`}>
+                        {item.num}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <Icon className="h-4 w-4 text-primary" />
+                          <h4 className="font-semibold text-foreground">{item.title}</h4>
+                        </div>
+                        <p className="text-sm text-muted-foreground">{item.desc}</p>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+
+              <motion.div 
+                className="mt-8 text-center"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.2 }}
+              >
+                <Button 
+                  size="lg" 
+                  onClick={() => navigate('/ebook-planner')}
+                  className="gap-3 px-8 py-6 text-lg font-semibold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 shadow-lg shadow-orange-500/25"
+                >
+                  <Rocket className="h-5 w-5" />
+                  Accéder à EbookiaPro.V2
+                  <ChevronRight className="h-5 w-5" />
+                </Button>
+              </motion.div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
         {/* Section Badges */}
         <AnimatePresence>
           {showBadges && (
