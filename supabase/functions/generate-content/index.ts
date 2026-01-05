@@ -629,6 +629,98 @@ Réponds UNIQUEMENT avec un JSON valide (sans markdown, sans \`\`\`) dans ce for
       );
     }
 
+    // Handle character profile generation (uses Lovable AI)
+    if (type === 'character-profile') {
+      console.log('Processing character profile generation...');
+      const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+      
+      if (!LOVABLE_API_KEY) {
+        return new Response(
+          JSON.stringify({ error: 'Lovable API key not configured' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const characterName = body.characterName || 'Sans nom';
+      const characterRole = body.characterRole || 'secondary';
+      const characterDescription = body.characterDescription || '';
+      const otherCharacters = body.otherCharacters || '';
+
+      const roleLabels: Record<string, string> = {
+        protagonist: 'Protagoniste principal',
+        antagonist: 'Antagoniste',
+        secondary: 'Personnage secondaire',
+        mentor: 'Mentor / Guide',
+        ally: 'Allié',
+        love_interest: 'Intérêt amoureux',
+        comic_relief: 'Comic relief',
+        narrator: 'Narrateur',
+        other: 'Autre'
+      };
+
+      const profilePrompt = `Tu es un expert en création de personnages littéraires. Génère une fiche complète pour ce personnage.
+
+PERSONNAGE: ${characterName}
+RÔLE: ${roleLabels[characterRole] || characterRole}
+DESCRIPTION EXISTANTE: ${characterDescription || 'Aucune'}
+TITRE DU LIVRE: ${ebookTitle || 'Non spécifié'}
+AUTRES PERSONNAGES DU LIVRE: ${otherCharacters || 'Aucun'}
+
+Crée une fiche détaillée et cohérente avec les informations existantes. Sois créatif mais réaliste.
+
+Réponds UNIQUEMENT avec un JSON valide (sans markdown, sans \`\`\`) dans ce format exact:
+{
+  "profile": {
+    "physicalDescription": "Description physique détaillée (apparence, taille, traits distinctifs, style vestimentaire)",
+    "psychology": "Traits de personnalité, forces, faiblesses, peurs profondes, motivations internes",
+    "narrativeArc": "Évolution du personnage au fil de l'histoire: point de départ, transformation, point d'arrivée",
+    "objectives": "Objectifs principaux (ce qu'il veut consciemment) et besoins profonds (ce dont il a vraiment besoin)",
+    "relationships": "Relations avec les autres personnages (alliés, ennemis, tensions, liens affectifs)"
+  }
+}`;
+
+      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash',
+          messages: [
+            { role: 'user', content: profilePrompt }
+          ],
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Lovable AI error:', errorText);
+        return new Response(
+          JSON.stringify({ error: 'Erreur lors de la génération du profil' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const data = await response.json();
+      const resultText = data.choices[0].message.content;
+      
+      let result;
+      try {
+        const cleanJson = resultText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        result = JSON.parse(cleanJson);
+      } catch (parseError) {
+        console.error('JSON parse error:', parseError, 'Raw:', resultText);
+        result = { profile: {} };
+      }
+
+      console.log('Character profile generated for:', characterName);
+      return new Response(
+        JSON.stringify(result),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Handle next-tome generation (uses OpenAI for reliability)
     if (type === 'next-tome') {
       console.log('Processing next tome generation (OpenAI)...');
