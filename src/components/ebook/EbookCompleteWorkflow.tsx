@@ -297,8 +297,17 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     }
     
     // Récupérer le contexte existant ou en créer un nouveau
+    // NOTE: en cas de pause après P3 (validation des personnages), React peut ne pas avoir flushé `allContext`.
+    // On ré-hydrate donc depuis `stepResults` pour éviter un blocage à P4.
     const context: Record<string, any> = isResuming ? { ...allContext } : {};
 
+    if (isResuming) {
+      Object.entries(stepResults).forEach(([stepId, data]) => {
+        if (context[stepId] === undefined) {
+          context[stepId] = data.result;
+        }
+      });
+    }
     toast.info(isResuming 
       ? `🔄 Reprise à l'étape ${workflowSteps[resumeFromIndex].id}...` 
       : '🚀 Le Directeur Éditorial lance le workflow complet...'
