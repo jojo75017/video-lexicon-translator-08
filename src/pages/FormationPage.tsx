@@ -463,6 +463,215 @@ ${module.content}
               Choisissez • Générez • Validez
             </p>
           </div>
+
+          {/* Animation Onboarding 3 étapes */}
+          <div className="mt-10 mb-8">
+            <div className="relative max-w-4xl mx-auto">
+              {/* Ligne de connexion animée */}
+              <div className="hidden md:block absolute top-16 left-[16%] right-[16%] h-1 bg-muted rounded-full overflow-hidden">
+                <motion.div 
+                  className="h-full bg-gradient-to-r from-primary via-primary to-primary/50 rounded-full"
+                  initial={{ width: "0%" }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: 2, delay: 0.5, ease: "easeInOut" }}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
+                {/* Étape 1 - Choisir */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                  className="group"
+                >
+                  <div className="relative">
+                    <motion.div 
+                      className="w-32 h-32 mx-auto rounded-2xl bg-gradient-to-br from-blue-500/20 to-blue-600/30 border-2 border-blue-500/40 flex items-center justify-center shadow-lg shadow-blue-500/10"
+                      whileHover={{ scale: 1.05, rotate: 2 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                    >
+                      <motion.div
+                        animate={{ 
+                          y: [0, -5, 0],
+                        }}
+                        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                      >
+                        <Target className="h-14 w-14 text-blue-500" />
+                      </motion.div>
+                    </motion.div>
+                    <motion.div 
+                      className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-blue-500 text-white font-bold flex items-center justify-center text-sm shadow-lg"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 0.8, type: "spring" }}
+                    >
+                      1
+                    </motion.div>
+                  </div>
+                  <motion.div 
+                    className="mt-6 text-center"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.5 }}
+                  >
+                    <h3 className="text-xl font-bold text-blue-600 dark:text-blue-400 mb-2">Choisir</h3>
+                    <p className="text-sm text-muted-foreground">Votre sujet, lecteur et objectif</p>
+                    <motion.div 
+                      className="mt-3 flex flex-wrap justify-center gap-1"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 1 }}
+                    >
+                      {['Sujet', 'Lecteur', 'Objectif'].map((tag, i) => (
+                        <motion.span 
+                          key={tag}
+                          className="px-2 py-0.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-full text-xs"
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 1 + i * 0.1 }}
+                        >
+                          {tag}
+                        </motion.span>
+                      ))}
+                    </motion.div>
+                  </motion.div>
+                </motion.div>
+
+                {/* Étape 2 - Générer */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.6 }}
+                  className="group"
+                >
+                  <div className="relative">
+                    <motion.div 
+                      className="w-32 h-32 mx-auto rounded-2xl bg-gradient-to-br from-primary/20 to-primary/30 border-2 border-primary/40 flex items-center justify-center shadow-lg shadow-primary/10"
+                      whileHover={{ scale: 1.05, rotate: -2 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                    >
+                      <motion.div
+                        animate={{ 
+                          rotate: [0, 10, -10, 0],
+                          scale: [1, 1.1, 1]
+                        }}
+                        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                      >
+                        <Sparkles className="h-14 w-14 text-primary" />
+                      </motion.div>
+                    </motion.div>
+                    <motion.div 
+                      className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-primary text-primary-foreground font-bold flex items-center justify-center text-sm shadow-lg"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 1.2, type: "spring" }}
+                    >
+                      2
+                    </motion.div>
+                    {/* Particules animées */}
+                    <motion.div 
+                      className="absolute top-4 right-4"
+                      animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1.2, 0.8] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      <div className="w-2 h-2 rounded-full bg-primary/60" />
+                    </motion.div>
+                    <motion.div 
+                      className="absolute bottom-6 left-4"
+                      animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.3, 1] }}
+                      transition={{ duration: 2.5, repeat: Infinity, delay: 0.5 }}
+                    >
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary/50" />
+                    </motion.div>
+                  </div>
+                  <motion.div 
+                    className="mt-6 text-center"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.9 }}
+                  >
+                    <h3 className="text-xl font-bold text-primary mb-2">Générer</h3>
+                    <p className="text-sm text-muted-foreground">Structure et rédaction automatiques</p>
+                    <motion.div 
+                      className="mt-3"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 1.3 }}
+                    >
+                      <motion.div 
+                        className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-full text-xs"
+                        animate={{ boxShadow: ["0 0 0 0 rgba(var(--primary), 0.2)", "0 0 0 8px rgba(var(--primary), 0)", "0 0 0 0 rgba(var(--primary), 0)"] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      >
+                        <Zap className="h-3 w-3" />
+                        Automatique
+                      </motion.div>
+                    </motion.div>
+                  </motion.div>
+                </motion.div>
+
+                {/* Étape 3 - Valider */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 1 }}
+                  className="group"
+                >
+                  <div className="relative">
+                    <motion.div 
+                      className="w-32 h-32 mx-auto rounded-2xl bg-gradient-to-br from-green-500/20 to-green-600/30 border-2 border-green-500/40 flex items-center justify-center shadow-lg shadow-green-500/10"
+                      whileHover={{ scale: 1.05, rotate: 2 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                    >
+                      <motion.div
+                        initial={{ scale: 0.8 }}
+                        animate={{ scale: [0.8, 1, 0.8] }}
+                        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                      >
+                        <CheckCircle2 className="h-14 w-14 text-green-500" />
+                      </motion.div>
+                    </motion.div>
+                    <motion.div 
+                      className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-green-500 text-white font-bold flex items-center justify-center text-sm shadow-lg"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 1.6, type: "spring" }}
+                    >
+                      3
+                    </motion.div>
+                  </div>
+                  <motion.div 
+                    className="mt-6 text-center"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 1.3 }}
+                  >
+                    <h3 className="text-xl font-bold text-green-600 dark:text-green-400 mb-2">Valider</h3>
+                    <p className="text-sm text-muted-foreground">Verdict éditorial et export</p>
+                    <motion.div 
+                      className="mt-3 flex flex-wrap justify-center gap-1"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 1.7 }}
+                    >
+                      {['PDF', 'EPUB', 'KDP'].map((format, i) => (
+                        <motion.span 
+                          key={format}
+                          className="px-2 py-0.5 bg-green-500/10 text-green-600 dark:text-green-400 rounded-full text-xs"
+                          initial={{ opacity: 0, x: 10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 1.7 + i * 0.1 }}
+                        >
+                          {format}
+                        </motion.span>
+                      ))}
+                    </motion.div>
+                  </motion.div>
+                </motion.div>
+              </div>
+            </div>
+          </div>
           
           {/* Statistiques de progression */}
           <div className="flex justify-center gap-6 mt-8">
