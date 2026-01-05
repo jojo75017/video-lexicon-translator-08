@@ -17,7 +17,6 @@ import { supabase } from '@/integrations/supabase/client';
 interface BestSeller {
   rank: number;
   title: string;
-  author: string;
   price: number;
   reviews: number;
   rating: number;
@@ -295,28 +294,28 @@ Génère 5 top books, 5 titres suggérés, 5 catégories, 4 lacunes et 5 recomma
       
       switch (type) {
         case 'bestsellers':
-          prompt = `Analyse les best-sellers Amazon KDP pour la niche "${searchQuery}".
+          prompt = `Analyse les tendances des best-sellers Amazon KDP pour la niche "${searchQuery}".
 
-Génère une liste de 8 best-sellers fictifs mais réalistes en JSON:
+Génère une liste de 8 IDÉES de livres basées sur ce qui fonctionne dans cette niche en JSON:
 {
   "bestSellers": [
     {
       "rank": 1,
-      "title": "Titre du livre best-seller",
-      "author": "Nom de l'auteur",
+      "title": "Idée de titre optimisé SEO",
       "price": 12.99,
       "reviews": 1500,
       "rating": 4.5,
-      "category": "Catégorie principale",
+      "category": "Catégorie Amazon recommandée",
       "estimatedSales": 500,
       "estimatedRevenue": 3500,
       "keywords": ["mot-clé 1", "mot-clé 2", "mot-clé 3"],
-      "strengths": ["Point fort 1", "Point fort 2"]
+      "strengths": ["Point fort stratégique 1", "Point fort stratégique 2"]
     }
   ]
 }
 
-Crée des livres variés avec des prix entre 4.99€ et 19.99€, des rangs entre 1 et 10000, des ventes estimées réalistes.`;
+IMPORTANT: Ce sont des SUGGESTIONS de titres originaux que l'utilisateur peut créer, PAS des livres existants.
+Crée des idées variées avec des prix entre 4.99€ et 19.99€, des estimations de ventes réalistes pour cette niche.`;
           break;
 
         case 'titles':
@@ -698,13 +697,12 @@ Génère 5 top books, 5 titres suggérés, 5 catégories, 4 lacunes et 5 recomma
                   <CardContent className="py-4">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
+                        <div className="flex items-center gap-2 mb-2">
                           <Badge variant="outline" className="text-amber-500 border-amber-500/30">
                             #{book.rank}
                           </Badge>
                           <h4 className="font-semibold">{book.title}</h4>
                         </div>
-                        <p className="text-sm text-muted-foreground mb-2">par {book.author}</p>
                         
                         <div className="flex flex-wrap gap-2 mb-2">
                           <Badge variant="secondary" className="text-xs">
