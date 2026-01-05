@@ -224,7 +224,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             <Sparkles className="h-4 w-4" />
             Workflow IA Éditorial Complet
           </div>
-          <CardTitle className="text-2xl font-bold">
+          <CardTitle className="text-2xl font-bold text-foreground">
             Créer votre livre en 1 clic
           </CardTitle>
           <p className="text-muted-foreground mt-2">
