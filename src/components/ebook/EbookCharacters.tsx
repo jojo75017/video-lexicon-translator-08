@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Trash2, Users, Sparkles, Loader2, Image as ImageIcon, Wand2, RefreshCw, FileUser, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, Trash2, Users, Sparkles, Loader2, Image as ImageIcon, Wand2, RefreshCw, FileUser, ChevronDown, ChevronUp, Eraser } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useOpenAIConfig } from "@/hooks/useOpenAIConfig";
@@ -283,6 +283,37 @@ export const EbookCharacters = ({ characters, onUpdateCharacters, ebookTitle = '
     return !!(character.physicalDescription || character.psychology || character.narrativeArc || character.objectives || character.relationships);
   };
 
+  const cleanDuplicates = () => {
+    const normalizeName = (name: string) =>
+      name
+        .normalize('NFD')
+        .replace(/\p{Diacritic}/gu, '')
+        .toLowerCase()
+        .trim();
+
+    const seen = new Set<string>();
+    const deduped: Character[] = [];
+
+    for (const ch of characters) {
+      const key = normalizeName(ch.name || '');
+      if (!key) {
+        deduped.push(ch);
+        continue;
+      }
+      if (seen.has(key)) continue;
+      seen.add(key);
+      deduped.push(ch);
+    }
+
+    const removed = characters.length - deduped.length;
+    if (removed > 0) {
+      onUpdateCharacters(deduped);
+      toast.success(`${removed} doublon(s) supprimé(s)`);
+    } else {
+      toast.info('Aucun doublon détecté');
+    }
+  };
+
   return (
     <Card className="p-6">
       <div className="flex items-center justify-between mb-4">
@@ -290,6 +321,17 @@ export const EbookCharacters = ({ characters, onUpdateCharacters, ebookTitle = '
           <Users className="h-5 w-5 text-primary" />
           <h3 className="text-lg font-semibold">Personnages ({characters.length})</h3>
         </div>
+        {characters.length > 1 && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={cleanDuplicates}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <Eraser className="h-4 w-4 mr-2" />
+            Nettoyer les doublons
+          </Button>
+        )}
       </div>
       
       <p className="text-sm text-muted-foreground mb-4">
