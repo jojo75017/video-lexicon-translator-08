@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -33,6 +34,8 @@ interface Module {
 
 const FormationPage = () => {
   const navigate = useNavigate();
+  const { isAuthenticated, role } = useAuth();
+  const isSubscriber = isAuthenticated && (role === 'pro' || role === 'admin');
   const [selectedModule, setSelectedModule] = useState<number | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [previewPage, setPreviewPage] = useState(0);
@@ -743,16 +746,16 @@ ${module.content}
               >
                 <Button 
                   size="lg" 
-                  onClick={() => navigate('/ebook-planner', { state: { fromFormation: true } })}
+                  onClick={() => navigate(isSubscriber ? '/ebook-planner' : '/offres', { state: { fromFormation: true } })}
                   className="gap-3 px-8 py-6 text-lg font-semibold bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300"
                 >
                   <Rocket className="h-5 w-5" />
-                  Commencer maintenant
+                  {isSubscriber ? 'Accéder au générateur' : 'Essayer le générateur'}
                   <ChevronRight className="h-5 w-5" />
                 </Button>
               </motion.div>
               <p className="mt-3 text-sm text-muted-foreground">
-                Créez votre premier livre en quelques clics
+                {isSubscriber ? 'Accédez à votre espace de création' : 'Découvrez nos offres pour débloquer toutes les fonctionnalités'}
               </p>
             </motion.div>
           </div>
