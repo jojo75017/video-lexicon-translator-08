@@ -1074,14 +1074,25 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                   {/* General Info Card */}
                   <Card className="overflow-hidden border-0 shadow-xl bg-card/80 backdrop-blur-sm">
                     <CardHeader className="bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10 border-b border-border/50">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-violet-500/30">
-                          <BookOpen className="w-6 h-6 text-white" />
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center shadow-lg shadow-violet-500/30">
+                            <BookOpen className="w-6 h-6 text-white" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-xl">Informations générales</CardTitle>
+                            <CardDescription>Définissez les bases de votre ebook</CardDescription>
+                          </div>
                         </div>
-                        <div>
-                          <CardTitle className="text-xl">Informations générales</CardTitle>
-                          <CardDescription>Définissez les bases de votre ebook</CardDescription>
-                        </div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={resetPlan}
+                          className="border-red-300 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-400"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Réinitialiser tout
+                        </Button>
                       </div>
                     </CardHeader>
                     <CardContent className="p-6 space-y-6">
