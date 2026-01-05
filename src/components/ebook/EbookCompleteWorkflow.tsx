@@ -52,6 +52,8 @@ interface WorkflowProgress {
   stepResults: Record<string, { result: any; displayContent: string }>;
   allContext: Record<string, any>;
   savedAt: string;
+  generatedCharacters?: GeneratedCharacter[];
+  waitingForCharacterValidation?: boolean;
 }
 
 const workflowSteps = [
@@ -132,7 +134,9 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       currentStepIndex,
       stepResults,
       allContext,
-      savedAt: new Date().toISOString()
+      savedAt: new Date().toISOString(),
+      generatedCharacters,
+      waitingForCharacterValidation
     };
     
     try {
@@ -141,7 +145,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     } catch (e) {
       console.error('Error saving progress:', e);
     }
-  }, [title, subtitle, category, authorName, numberOfChapters, currentStepIndex, stepResults, allContext]);
+  }, [title, subtitle, category, authorName, numberOfChapters, currentStepIndex, stepResults, allContext, generatedCharacters, waitingForCharacterValidation]);
 
   // Auto-save whenever stepResults changes
   useEffect(() => {
@@ -173,6 +177,14 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
         setAllContext(data.allContext);
         setHasReadSteps(true);
         setHasSavedProgress(false);
+        
+        // Restaurer les personnages si sauvegardés
+        if (data.generatedCharacters && data.generatedCharacters.length > 0) {
+          setGeneratedCharacters(data.generatedCharacters);
+        }
+        if (data.waitingForCharacterValidation) {
+          setWaitingForCharacterValidation(true);
+        }
         
         // Expand all completed steps
         const expanded: Record<string, boolean> = {};
