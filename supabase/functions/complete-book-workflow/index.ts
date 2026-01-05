@@ -644,8 +644,14 @@ Format JSON (VERDICT HONNÊTE - pas de flatterie) :
 }`
         );
         result = parseJSON(content) || { raw: content };
+        
+        // Sécurisation : s'assurer que les tableaux sont bien des tableaux
+        const forces = Array.isArray(result.forcesFinales) ? result.forcesFinales : [];
+        const reserves = Array.isArray(result.reservesRestantes) ? result.reservesRestantes : 
+          (typeof result.reservesRestantes === 'string' ? [result.reservesRestantes] : []);
+        
         displayContent = result.verdict
-          ? `# VERDICT FINAL\n\n**${result.recommandationFinale}**\n\n**Score final : ${result.scoreFinal}/10**\n\n${result.verdict}\n\n**Forces :**\n${(result.forcesFinales || []).map((f: string) => `✓ ${f}`).join('\n')}\n\n**Réserves :**\n${(result.reservesRestantes || []).map((r: string) => `• ${r}`).join('\n')}\n\n**Potentiel commercial :** ${result.potentielCommercial}\n\n---\n_${result.certificat}_`
+          ? `# VERDICT FINAL\n\n**${result.recommandationFinale}**\n\n**Score final : ${result.scoreFinal}/10**\n\n${result.verdict}\n\n**Forces :**\n${forces.map((f: string) => `✓ ${f}`).join('\n')}\n\n**Réserves :**\n${reserves.map((r: string) => `• ${r}`).join('\n')}\n\n**Potentiel commercial :** ${result.potentielCommercial}\n\n---\n_${result.certificat}_`
           : content;
         break;
       }
