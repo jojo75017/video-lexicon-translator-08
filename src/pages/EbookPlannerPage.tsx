@@ -81,6 +81,7 @@ import EbookSelfCritique from '@/components/ebook/EbookSelfCritique';
 import EbookIterativeLoop from '@/components/ebook/EbookIterativeLoop';
 import EbookStyleSignature from '@/components/ebook/EbookStyleSignature';
 import EbookUltimateVerdict from '@/components/ebook/EbookUltimateVerdict';
+import EbookCompleteWorkflow from '@/components/ebook/EbookCompleteWorkflow';
 import { EbookInteractiveTutorial } from '@/components/ebook/EbookInteractiveTutorial';
 import { useConfetti } from '@/hooks/useConfetti';
 import { useDemoMode } from '@/hooks/useDemoMode';
@@ -866,6 +867,46 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
             targetWordsPerChapter={targetWordsPerChapter}
             kdpDescription={kdpDescription}
             kdpKeywords={kdpKeywords}
+          />
+        );
+      
+      case 'complete-workflow':
+        return (
+          <EbookCompleteWorkflow
+            title={ebookTitle}
+            authorName={authorName}
+            targetAudience={targetAudience}
+            genre={genre}
+            numberOfChapters={numberOfChapters}
+            onComplete={(bookData) => {
+              // Update all the state with the generated book data
+              if (bookData.preface) setPreface(bookData.preface);
+              if (bookData.conclusion) setConclusion(bookData.conclusion);
+              if (bookData.epilogue) setEpilogue(bookData.epilogue);
+              if (bookData.bookSynopsis) setBookSummary(bookData.bookSynopsis);
+              if (bookData.marketPositioning?.motsClésKDP) {
+                setKdpKeywords(bookData.marketPositioning.motsClésKDP.join(', '));
+              }
+              if (bookData.marketPositioning?.categoriesKDP) {
+                setKdpCategories(bookData.marketPositioning.categoriesKDP.join(', '));
+              }
+              if (bookData.backCover?.description) {
+                setKdpDescription(bookData.backCover.description);
+              }
+              if (bookData.chapters && Array.isArray(bookData.chapters)) {
+                const formattedChapters: Chapter[] = bookData.chapters.map((ch: any, idx: number) => ({
+                  id: `chapter-${idx + 1}`,
+                  title: ch.title || `Chapitre ${ch.number || idx + 1}`,
+                  content: ch.content || '',
+                  subChapters: []
+                }));
+                setChapters(formattedChapters);
+              }
+              // Switch to planner tab to see results
+              setActiveTab('planner');
+              fireStars();
+              toast.success('🎉 Votre livre complet a été généré !');
+            }}
           />
         );
       
