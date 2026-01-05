@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Trash2, Users, Sparkles, Loader2, Image as ImageIcon, Wand2, RefreshCw } from "lucide-react";
+import { Plus, Trash2, Users, Sparkles, Loader2, Image as ImageIcon, Wand2, RefreshCw, FileUser, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useOpenAIConfig } from "@/hooks/useOpenAIConfig";
@@ -16,6 +16,12 @@ export interface Character {
   description: string;
   role?: string;
   referenceImageUrl?: string;
+  // Fiche complète
+  physicalDescription?: string;
+  psychology?: string;
+  narrativeArc?: string;
+  objectives?: string;
+  relationships?: string;
 }
 
 interface Chapter {
@@ -47,6 +53,8 @@ const CHARACTER_ROLES = [
 export const EbookCharacters = ({ characters, onUpdateCharacters, ebookTitle = '', chapters = [] }: EbookCharactersProps) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [generatingId, setGeneratingId] = useState<string | null>(null);
+  const [generatingProfileId, setGeneratingProfileId] = useState<string | null>(null);
+  const [expandedProfiles, setExpandedProfiles] = useState<Set<string>>(new Set());
   const [isGeneratingAll, setIsGeneratingAll] = useState(false);
   const [localTitle, setLocalTitle] = useState(ebookTitle);
   const { hasValidApiKey, getConfig } = useOpenAIConfig();
@@ -175,6 +183,80 @@ export const EbookCharacters = ({ characters, onUpdateCharacters, ebookTitle = '
   const removeReferenceImage = (id: string) => {
     updateCharacter(id, 'referenceImageUrl', '');
     toast.success('Image de référence supprimée');
+  };
+
+  const toggleProfileExpanded = (id: string) => {
+    setExpandedProfiles(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
+
+  const generateFullProfile = async (character: Character) => {
+    if (!character.name) {
+      toast.error('Entrez le nom du personnage');
+      return;
+    }
+
+    setGeneratingProfileId(character.id);
+
+    try {
+      const otherCharacters = characters
+        .filter(c => c.id !== character.id && c.name)
+        .map(c => c.name)
+        .join(', ');
+
+      const { data, error } = await supabase.functions.invoke('generate-content', {
+        body: {
+          type: 'character-profile',
+          characterName: character.name,
+          characterRole: character.role || 'secondary',
+          characterDescription: character.description || '',
+          ebookTitle: localTitle || ebookTitle,
+          otherCharacters,
+        }
+      });
+
+      if (error) throw error;
+
+      if (data?.profile) {
+        const profile = data.profile;
+        onUpdateCharacters(
+          characters.map(char =>
+            char.id === character.id
+              ? {
+                  ...char,
+                  physicalDescription: profile.physicalDescription || '',
+                  psychology: profile.psychology || '',
+                  narrativeArc: profile.narrativeArc || '',
+                  objectives: profile.objectives || '',
+                  relationships: profile.relationships || '',
+                }
+              : char
+          )
+        );
+        setExpandedProfiles(prev => new Set(prev).add(character.id));
+        toast.success(`Fiche complète générée pour ${character.name}`);
+      } else {
+        throw new Error('Format de réponse invalide');
+      }
+    } catch (error: any) {
+      console.error('Error generating profile:', error);
+      toast.error('Erreur lors de la génération', {
+        description: error.message || 'Réessayez'
+      });
+    } finally {
+      setGeneratingProfileId(null);
+    }
+  };
+
+  const hasFullProfile = (character: Character) => {
+    return !!(character.physicalDescription || character.psychology || character.narrativeArc || character.objectives || character.relationships);
   };
 
   return (
@@ -343,6 +425,125 @@ export const EbookCharacters = ({ characters, onUpdateCharacters, ebookTitle = '
                     </>
                   )}
                 </Button>
+              )}
+            </div>
+
+            {/* Fiche personnage complète */}
+            <div className="border-t pt-3">
+              <div className="flex items-center justify-between mb-2">
+                <Label className="flex items-center gap-2">
+                  <FileUser className="h-4 w-4" />
+                  Fiche personnage complète
+                </Label>
+                {hasFullProfile(character) && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => toggleProfileExpanded(character.id)}
+                  >
+                    {expandedProfiles.has(character.id) ? (
+                      <ChevronUp className="h-4 w-4" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4" />
+                    )}
+                  </Button>
+                )}
+              </div>
+
+              {!hasFullProfile(character) ? (
+                <Button
+                  variant="outline"
+                  onClick={() => generateFullProfile(character)}
+                  disabled={generatingProfileId === character.id || !character.name}
+                  className="w-full bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-amber-500/30 hover:border-amber-500/50"
+                >
+                  {generatingProfileId === character.id ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      Génération de la fiche...
+                    </>
+                  ) : (
+                    <>
+                      <FileUser className="h-4 w-4 mr-2" />
+                      Générer fiche complète
+                    </>
+                  )}
+                </Button>
+              ) : (
+                <>
+                  <div className="flex gap-2 mb-3">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => generateFullProfile(character)}
+                      disabled={generatingProfileId === character.id}
+                    >
+                      {generatingProfileId === character.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin mr-1" />
+                      ) : (
+                        <RefreshCw className="h-4 w-4 mr-1" />
+                      )}
+                      Régénérer
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => toggleProfileExpanded(character.id)}
+                    >
+                      {expandedProfiles.has(character.id) ? 'Masquer' : 'Voir la fiche'}
+                    </Button>
+                  </div>
+
+                  {expandedProfiles.has(character.id) && (
+                    <div className="space-y-3 bg-muted/50 rounded-lg p-3">
+                      <div>
+                        <Label className="text-xs font-medium text-muted-foreground">🎭 Physique</Label>
+                        <Textarea
+                          value={character.physicalDescription || ''}
+                          onChange={(e) => updateCharacter(character.id, 'physicalDescription', e.target.value)}
+                          placeholder="Apparence physique..."
+                          className="mt-1 min-h-[60px] text-sm"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-xs font-medium text-muted-foreground">🧠 Psychologie</Label>
+                        <Textarea
+                          value={character.psychology || ''}
+                          onChange={(e) => updateCharacter(character.id, 'psychology', e.target.value)}
+                          placeholder="Traits de caractère, peurs, motivations..."
+                          className="mt-1 min-h-[60px] text-sm"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-xs font-medium text-muted-foreground">📈 Arc narratif</Label>
+                        <Textarea
+                          value={character.narrativeArc || ''}
+                          onChange={(e) => updateCharacter(character.id, 'narrativeArc', e.target.value)}
+                          placeholder="Évolution du personnage au fil de l'histoire..."
+                          className="mt-1 min-h-[60px] text-sm"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-xs font-medium text-muted-foreground">🎯 Objectifs</Label>
+                        <Textarea
+                          value={character.objectives || ''}
+                          onChange={(e) => updateCharacter(character.id, 'objectives', e.target.value)}
+                          placeholder="Ce que le personnage cherche à accomplir..."
+                          className="mt-1 min-h-[60px] text-sm"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-xs font-medium text-muted-foreground">🤝 Relations</Label>
+                        <Textarea
+                          value={character.relationships || ''}
+                          onChange={(e) => updateCharacter(character.id, 'relationships', e.target.value)}
+                          placeholder="Liens avec les autres personnages..."
+                          className="mt-1 min-h-[60px] text-sm"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>
