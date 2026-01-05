@@ -113,12 +113,35 @@ Donne ta vision éditoriale en JSON :
       }
 
       case 'P2': {
-        // ANALYSE DE MARCHÉ
+        // ANALYSE DE MARCHÉ + 7 MOTS-CLÉS KDP OPTIMISÉS
         const content = await callAI(
-          `Tu es un expert en analyse de marché Amazon KDP. Tu connais les tendances, les niches rentables, la concurrence. Parle comme un consultant business pragmatique.`,
-          `Analyse le marché pour ce livre :
-TITRE : "${title}"
+          `Tu es un expert en SEO Amazon KDP et en analyse d'intention de recherche. Tu connais les tendances, les niches rentables, la concurrence. Parle comme un consultant business pragmatique.`,
+          `Analyse le marché pour ce livre et génère 7 mots-clés KDP très performants :
+
+TITRE EXACT DE L'EBOOK : "${title}"
 VISION ÉDITORIALE : ${JSON.stringify(previousContext.P1 || {})}
+
+MISSION MOTS-CLÉS KDP :
+Trouve 7 mots-clés très performants pour Amazon KDP France basés EXCLUSIVEMENT sur le TITRE EXACT.
+
+CONTRAINTES OBLIGATOIRES pour les mots-clés :
+- Correspondre à des recherches réelles d'internautes (Amazon + Google)
+- Avoir un bon potentiel de visibilité (volume réel + concurrence raisonnable)
+- Être strictement cohérents avec le titre et la promesse implicite
+- Être adaptés à Amazon KDP (ni trop génériques, ni trop vagues)
+- Un seul mot-clé par entrée (pas de phrases longues)
+- Pas de répétition exacte du titre
+- Pas de hashtags, pas de virgules
+
+OBJECTIF MOTS-CLÉS :
+- Maximiser la découvrabilité sur Amazon.fr
+- Déclencher des catégories Amazon secondaires (dites "cachées")
+- Attirer une audience qualifiée et réellement intéressée
+
+MÉTHODE :
+1. Analyse sémantique du titre
+2. Identification des intentions de recherche principales et secondaires
+3. Sélection de mots-clés orientés problème, solution, action ou bénéfice
 
 Donne ton analyse marché en JSON :
 {
@@ -126,15 +149,17 @@ Donne ton analyse marché en JSON :
   "tailleMarche": "estimation de la taille (grand/moyen/niche)",
   "concurrenceNiveau": "faible/moyenne/forte",
   "opportunite": "l'opportunité identifiée",
-  "motsClésKDP": ["7 mots-clés optimisés pour Amazon"],
+  "motsClésKDP": ["7 mots-clés classés du plus stratégique au plus secondaire"],
+  "justificationMotsCles": ["justification pour chaque mot-clé"],
   "categoriesKDP": ["2 catégories recommandées"],
+  "categoriesSecondaires": ["3 catégories cachées potentielles"],
   "prixOptimal": "prix suggéré avec justification",
   "potentielVentes": "estimation réaliste"
 }`
         );
         result = parseJSON(content) || { raw: content };
         displayContent = result.nichePrincipale
-          ? `**Niche :** ${result.nichePrincipale}\n\n**Concurrence :** ${result.concurrenceNiveau}\n\n**Opportunité :** ${result.opportunite}\n\n**Prix optimal :** ${result.prixOptimal}\n\n**Mots-clés KDP :** ${(result.motsClésKDP || []).join(', ')}`
+          ? `**Niche :** ${result.nichePrincipale}\n\n**Concurrence :** ${result.concurrenceNiveau}\n\n**Opportunité :** ${result.opportunite}\n\n**Prix optimal :** ${result.prixOptimal}\n\n**🔑 7 Mots-clés KDP stratégiques :**\n${(result.motsClésKDP || []).map((kw: string, i: number) => `${i + 1}. ${kw}`).join('\n')}\n\n**Catégories :** ${(result.categoriesKDP || []).join(', ')}\n**Catégories secondaires :** ${(result.categoriesSecondaires || []).join(', ')}`
           : content;
         break;
       }
