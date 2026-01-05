@@ -182,8 +182,12 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
       // Build final book data
       const bookData = {
         title,
+        subtitle,
         authorName,
+        category,
         numberOfChapters,
+        // Description auto-générée par P1 (à réinjecter dans le planner)
+        bookDescription: context.P1?.descriptionGeneree || '',
         preface: context.P7?.descriptionKDP || '',
         bookSynopsis: context.P1?.promesseCentrale || '',
         chapters: (context.P4?.chapitres || context.P5?.chapitresFinal || []).map((ch: any, idx: number) => ({

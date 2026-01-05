@@ -2186,6 +2186,9 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
               // Appliquer le résultat au projet courant
               if (bookData?.title) setEbookTitle(bookData.title);
               if (bookData?.authorName) setAuthorName(bookData.authorName);
+              if (typeof bookData?.bookDescription === 'string' && bookData.bookDescription.trim()) {
+                setBookDescription(bookData.bookDescription);
+              }
               if (typeof bookData?.preface === 'string') setPreface(bookData.preface);
               if (typeof bookData?.conclusion === 'string') setConclusion(bookData.conclusion);
 
