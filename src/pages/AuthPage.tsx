@@ -14,50 +14,55 @@ export const AuthPage = () => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
-  const [isCheckingSession, setIsCheckingSession] = useState(true);
+  // Évite le “popup/loader” systématique: on ne l'affiche que s'il y a une session à vérifier
+  const [isCheckingSession, setIsCheckingSession] = useState(false);
   const navigate = useNavigate();
 
   const checkAdmin = async (accessToken?: string) => {
     // Important: after sign-in, the client token can take a tick to propagate.
     // Passing the access token explicitly avoids false "non-admin" results.
-    return supabase.functions.invoke('check-admin',
-      accessToken
-        ? { headers: { Authorization: `Bearer ${accessToken}` } }
-        : undefined
+    return supabase.functions.invoke(
+      'check-admin',
+      accessToken ? { headers: { Authorization: `Bearer ${accessToken}` } } : undefined
     );
   };
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
-          console.log('Session existante trouvée, vérification du rôle admin...');
-          const { data, error } = await checkAdmin(session.access_token);
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
 
-          if (error) {
-            console.error('Erreur lors de la vérification admin:', error);
-            setIsCheckingSession(false);
-            return;
-          }
+        // Pas de session admin -> on ne bloque pas l'écran
+        if (!session) return;
 
-          if (data?.isAdmin) {
-            console.log('Utilisateur admin confirmé, redirection automatique...');
-            navigate('/admin', { replace: true });
-            return;
-          } else {
-            console.log('Utilisateur non-admin, reste sur la page de connexion');
-          }
+        setIsCheckingSession(true);
+        console.log('Session existante trouvée, vérification du rôle admin...');
+        const { data, error } = await checkAdmin(session.access_token);
+
+        if (error) {
+          console.error('Erreur lors de la vérification admin:', error);
+          return;
+        }
+
+        if (data?.isAdmin) {
+          console.log('Utilisateur admin confirmé, redirection automatique...');
+          navigate('/admin', { replace: true });
+        } else {
+          console.log('Utilisateur non-admin, reste sur la page de connexion');
         }
       } catch (error) {
         console.error('Erreur dans checkAuth:', error);
+      } finally {
+        setIsCheckingSession(false);
       }
-      setIsCheckingSession(false);
     };
+
     checkAuth();
   }, [navigate]);
 
-  // Afficher un loader pendant la vérification de session admin
+  // Afficher un loader seulement pendant une vérification réelle de session admin
   if (isCheckingSession) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
