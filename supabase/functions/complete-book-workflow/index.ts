@@ -73,6 +73,7 @@ serve(async (req) => {
       category = '',
       authorName,
       numberOfChapters = 8,
+      characters = [],
       previousContext = {},
       chapter,
     } = payload;
@@ -89,16 +90,21 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
+    // Construire la liste des personnages pour le contexte
+    const charactersContext = characters.length > 0
+      ? `\n\nPERSONNAGES DU LIVRE (OBLIGATOIRES À UTILISER) :\n${characters.map((c: any) => `- ${c.name} (${c.role || 'personnage'}): ${c.description}`).join('\n')}`
+      : '';
+
     // Construire le contexte complet du livre
     const fullTitle = subtitle ? `${title} : ${subtitle}` : title;
     const bookContext = `
 TITRE COMPLET : "${fullTitle}"
 CATÉGORIE : ${category || 'Non spécifiée'}
 AUTEUR : ${authorName}
-CHAPITRES PRÉVUS : ${numberOfChapters}
+CHAPITRES PRÉVUS : ${numberOfChapters}${charactersContext}
 `.trim();
 
-    console.log(`Step ${step} for: "${fullTitle}" (Category: ${category})`);
+    console.log(`Step ${step} for: "${fullTitle}" (Category: ${category}, Characters: ${characters.length})`);
 
     let result: any = {};
     let displayContent = '';
@@ -247,6 +253,11 @@ Crée la structure en JSON :
         const tonEditorial = previousContext.P1?.tonEditorial || '';
         const lecteurCible = previousContext.P1?.lecteurCible || '';
 
+        // Construire la section personnages pour P4
+        const personnagesSection = characters.length > 0
+          ? `\n\nPERSONNAGES À UTILISER OBLIGATOIREMENT :\n${characters.map((c: any) => `- **${c.name}** (${c.role || 'personnage'}): ${c.description}`).join('\n')}\n\nATTENTION : Tu DOIS utiliser ces personnages et UNIQUEMENT ces personnages. N'invente PAS d'autres personnages principaux.`
+          : '';
+
         // Nouveau: génération par chapitre (évite le timeout)
         // `chapter` peut être soit un chapitre complet (numero/titre/...), soit juste { numero }
         // Dans ce cas, on le retrouve depuis P3.
@@ -263,7 +274,7 @@ Crée la structure en JSON :
             );
           }
 
-          console.log(`Step P4 (single): Generating chapter ${chapitre.numero}: ${chapitre.titre}`);
+          console.log(`Step P4 (single): Generating chapter ${chapitre.numero}: ${chapitre.titre} with ${characters.length} characters`);
 
           const chapterContent = await callAI(
             `Tu es un AUTEUR PROFESSIONNEL avec 20 ans d'expérience. Tu rédiges des chapitres COMPLETS, captivants, dans le style du genre "${category}".
@@ -274,13 +285,13 @@ RÈGLES D'ÉCRITURE :
 - Dialogues si approprié au genre
 - Descriptions vivantes et immersives
 - Transitions fluides entre paragraphes
-- TON : ${tonEditorial}`,
+- TON : ${tonEditorial}${personnagesSection}`,
             `Rédige le CHAPITRE COMPLET suivant (environ 2500-3500 mots) :
 
 LIVRE : "${fullTitle}"
 CATÉGORIE : ${category}
 DESCRIPTION : ${descriptionGeneree}
-LECTEUR CIBLE : ${lecteurCible}
+LECTEUR CIBLE : ${lecteurCible}${personnagesSection}
 
 CHAPITRE ${chapitre.numero} : "${chapitre.titre}"
 OBJECTIF DU CHAPITRE : ${chapitre.objectif || ''}
@@ -290,6 +301,7 @@ ACCROCHE : ${chapitre.accroche || ''}
 
 IMPORTANT :
 - Écris le contenu COMPLET du chapitre
+- Utilise UNIQUEMENT les personnages définis ci-dessus
 - Inclus des exemples concrets, anecdotes, ou dialogues selon le genre
 - Termine par une transition vers le chapitre suivant
 
@@ -323,15 +335,15 @@ Retourne le contenu en JSON :
         }
 
         // Mode legacy: tout générer dans une seule requête (peut timeout sur de gros livres)
-        console.log(`Step P4 (legacy): Generating FULL CONTENT for ${structure.length} chapters`);
+        console.log(`Step P4 (legacy): Generating FULL CONTENT for ${structure.length} chapters with ${characters.length} characters`);
 
         const chapitresComplets: any[] = [];
         for (const chapitre of structure) {
           console.log(`Generating chapter ${chapitre.numero}: ${chapitre.titre}`);
 
           const chapterContent = await callAI(
-            `Tu es un AUTEUR PROFESSIONNEL avec 20 ans d'expérience. Tu rédiges des chapitres COMPLETS, captivants, dans le style du genre "${category}".\n\nTON : ${tonEditorial}`,
-            `Rédige le CHAPITRE COMPLET suivant :\n\nLIVRE : "${fullTitle}"\nCATÉGORIE : ${category}\nDESCRIPTION : ${descriptionGeneree}\nLECTEUR CIBLE : ${lecteurCible}\n\nCHAPITRE ${chapitre.numero} : "${chapitre.titre}"\nSOUS-SECTIONS : ${(chapitre.sousSections || []).join(', ')}\n\nRetourne le contenu en JSON :\n{\n  "numero": ${chapitre.numero},\n  "titre": "${chapitre.titre}",\n  "contenu": "...",\n  "nombreMots": 3000\n}`,
+            `Tu es un AUTEUR PROFESSIONNEL avec 20 ans d'expérience. Tu rédiges des chapitres COMPLETS, captivants, dans le style du genre "${category}".\n\nTON : ${tonEditorial}${personnagesSection}`,
+            `Rédige le CHAPITRE COMPLET suivant :\n\nLIVRE : "${fullTitle}"\nCATÉGORIE : ${category}\nDESCRIPTION : ${descriptionGeneree}\nLECTEUR CIBLE : ${lecteurCible}${personnagesSection}\n\nCHAPITRE ${chapitre.numero} : "${chapitre.titre}"\nSOUS-SECTIONS : ${(chapitre.sousSections || []).join(', ')}\n\nIMPORTANT : Utilise UNIQUEMENT les personnages définis ci-dessus.\n\nRetourne le contenu en JSON :\n{\n  "numero": ${chapitre.numero},\n  "titre": "${chapitre.titre}",\n  "contenu": "...",\n  "nombreMots": 3000\n}`,
             6000
           );
 

@@ -19,8 +19,16 @@ import { supabase } from '@/integrations/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
+interface Character {
+  id: string;
+  name: string;
+  description: string;
+  role?: string;
+}
+
 interface EbookCompleteWorkflowProps {
   onComplete: (bookData: any) => void;
+  characters?: Character[];
 }
 
 const STORAGE_KEY = 'ebook_workflow_progress';
@@ -54,7 +62,7 @@ const workflowSteps = [
   { id: 'P14', name: 'Verdict Ultime', icon: CheckCircle2, description: 'Validation finale par l\'éditeur professionnel' },
 ];
 
-const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplete }) => {
+const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplete, characters: externalCharacters = [] }) => {
   // Form state
   const [title, setTitle] = useState('');
   const [subtitle, setSubtitle] = useState('');
@@ -177,6 +185,15 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
     extraBody: Record<string, any> = {}
   ): Promise<{ result: any; displayContent: string } | null> => {
     try {
+      // Préparer les personnages pour l'envoi
+      const charactersForAI = externalCharacters.length > 0 
+        ? externalCharacters.map(c => ({
+            name: c.name,
+            description: c.description,
+            role: c.role || 'secondary'
+          }))
+        : [];
+
       const { data, error: fnError } = await supabase.functions.invoke('complete-book-workflow', {
         body: {
           step: stepId,
@@ -185,6 +202,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
           category,
           authorName,
           numberOfChapters,
+          characters: charactersForAI,
           previousContext: context,
           ...extraBody,
         }

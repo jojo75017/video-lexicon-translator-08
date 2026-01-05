@@ -2194,6 +2194,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
 
         return (
           <EbookCompleteWorkflow
+            characters={characters}
             onComplete={(bookData) => {
               // Appliquer le résultat au projet courant
               if (bookData?.title) setEbookTitle(bookData.title);
