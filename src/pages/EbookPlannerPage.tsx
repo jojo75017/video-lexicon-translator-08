@@ -8,7 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { 
   BookOpen, Plus, Wand2, RotateCcw, ArrowLeft, Merge, Sparkles, Eye, Search, Palette, Users,
-  Save, Zap, Target, FileText, Crown, Trash2, ImageIcon, Loader2, X, ChevronRight, Rocket, CheckCircle2
+  Save, Zap, Target, FileText, Crown, Trash2, ImageIcon, Loader2, X, ChevronRight, Rocket, CheckCircle2,
+  HelpCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -80,6 +81,7 @@ import EbookSelfCritique from '@/components/ebook/EbookSelfCritique';
 import EbookIterativeLoop from '@/components/ebook/EbookIterativeLoop';
 import EbookStyleSignature from '@/components/ebook/EbookStyleSignature';
 import EbookUltimateVerdict from '@/components/ebook/EbookUltimateVerdict';
+import { EbookInteractiveTutorial } from '@/components/ebook/EbookInteractiveTutorial';
 import { useConfetti } from '@/hooks/useConfetti';
 
 // Hooks et données
@@ -149,6 +151,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
   const [activeTab, setActiveTab] = useState('planner');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showWelcome, setShowWelcome] = useState(location.state?.fromFormation || false);
+  const [showTutorial, setShowTutorial] = useState(location.state?.fromFormation || false);
 
   // Ref pour toujours avoir les dernières données (évite les problèmes de closure)
   const currentDataRef = useRef({
@@ -913,6 +916,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                       onClick={generateAutomaticPlan} 
                       disabled={!ebookTitle || isGenerating}
                       className="bg-white text-violet-600 hover:bg-white/90 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                      data-tutorial="generate-button"
                     >
                       <Wand2 className="h-5 w-5 mr-2" />
                       {isGenerating ? 'Génération...' : 'Générer avec l\'IA'}
@@ -924,6 +928,14 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                     >
                       <RotateCcw className="h-4 w-4 mr-2" />
                       Nouveau
+                    </Button>
+                    <Button 
+                      onClick={() => setShowTutorial(true)}
+                      variant="outline"
+                      className="border-white/30 text-white hover:bg-white/20 backdrop-blur-sm"
+                    >
+                      <HelpCircle className="h-4 w-4 mr-2" />
+                      Aide
                     </Button>
                   </div>
                 </div>
@@ -982,6 +994,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                             value={ebookTitle}
                             onChange={(e) => setEbookTitle(e.target.value)}
                             className="h-12 text-lg border-2 focus:border-violet-500 transition-colors"
+                            data-tutorial="title-input"
                           />
                         </div>
                         <div className="space-y-2">
@@ -1014,7 +1027,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div className="space-y-2">
+                        <div className="space-y-2" data-tutorial="genre-select">
                           <Label className="text-sm font-medium">Genre / Catégorie</Label>
                           <Select value={genre} onValueChange={setGenre}>
                             <SelectTrigger className="h-12 border-2 focus:border-violet-500">
@@ -2167,6 +2180,16 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({ subscriberEmail = '
           {renderContent()}
         </div>
       </main>
+
+      {/* Tutoriel interactif */}
+      <EbookInteractiveTutorial
+        isOpen={showTutorial}
+        onClose={() => setShowTutorial(false)}
+        onComplete={() => {
+          setShowTutorial(false);
+          toast.success('🎉 Tutoriel terminé ! Vous êtes prêt à créer votre ebook.');
+        }}
+      />
     </div>
   );
 };
