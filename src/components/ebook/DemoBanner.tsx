@@ -8,11 +8,17 @@ interface DemoBannerProps {
   plansGenerated: number;
   maxPlans: number;
   isAuthenticated?: boolean;
+  userName?: string;
 }
 
-export const DemoBanner: React.FC<DemoBannerProps> = ({ plansGenerated, maxPlans, isAuthenticated = false }) => {
+export const DemoBanner: React.FC<DemoBannerProps> = ({ plansGenerated, maxPlans, isAuthenticated = false, userName }) => {
   const navigate = useNavigate();
   const remaining = maxPlans - plansGenerated;
+
+  // Extraire le prénom de l'email ou utiliser un nom générique
+  const displayName = userName 
+    ? userName.split('@')[0].charAt(0).toUpperCase() + userName.split('@')[0].slice(1)
+    : 'Créateur';
 
   // Mode connecté = bannière "Accès Complet"
   if (isAuthenticated) {
@@ -42,7 +48,7 @@ export const DemoBanner: React.FC<DemoBannerProps> = ({ plansGenerated, maxPlans
             </motion.div>
             <div>
               <p className="font-medium text-foreground flex items-center gap-2">
-                ✨ Accès Complet Activé
+                👋 Bienvenue {displayName} !
                 <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full">
                   Lifetime
                 </span>
