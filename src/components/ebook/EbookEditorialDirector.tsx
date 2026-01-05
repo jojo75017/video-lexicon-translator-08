@@ -107,7 +107,11 @@ export const EbookEditorialDirector = ({
 
   const useTitle = (title: string) => {
     setSujet(title);
-    toast.success("Titre appliqué ! Relancez l'analyse pour affiner.");
+    // Important: l'analyse affichée correspond à l'ancien titre tant qu'on ne relance pas.
+    // Ici on relance automatiquement pour que le score/ligne se mette à jour immédiatement.
+    setAnalysis(null);
+    toast.success("Titre appliqué ! Analyse en cours...");
+    void analyzeSubject(title);
   };
 
   const getScoreColor = (score: number) => {
@@ -122,18 +126,23 @@ export const EbookEditorialDirector = ({
     return "bg-red-500";
   };
 
-  const analyzeSubject = async () => {
-    if (!sujet.trim()) {
+  const analyzeSubject = async (overrideSujet?: string) => {
+    const subjectToAnalyze = (overrideSujet ?? sujet).trim();
+
+    if (!subjectToAnalyze) {
       toast.error("Veuillez entrer un sujet à analyser");
       return;
     }
 
+    // Évite de lancer plusieurs analyses en parallèle si l'utilisateur clique vite
+    if (isAnalyzing) return;
+
     setIsAnalyzing(true);
     try {
       const { data, error } = await supabase.functions.invoke("editorial-director", {
-        body: { 
-          sujet, 
-          contexte: `Analyse automatique complète pour un ebook sur "${sujet}". Identifier le positionnement optimal, la cible idéale et les opportunités de différenciation.`
+        body: {
+          sujet: subjectToAnalyze,
+          contexte: `Analyse automatique complète pour un ebook sur "${subjectToAnalyze}". Identifier le positionnement optimal, la cible idéale et les opportunités de différenciation.`,
         },
       });
 
@@ -178,7 +187,7 @@ export const EbookEditorialDirector = ({
           </div>
 
           <Button
-            onClick={analyzeSubject}
+            onClick={() => analyzeSubject()}
             disabled={isAnalyzing || !sujet.trim()}
             className="w-full"
             size="lg"
