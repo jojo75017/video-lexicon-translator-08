@@ -439,10 +439,68 @@ ${module.content}
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Logo EbookiaPro.V2 Premium */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-8"
+        >
+          <div className="relative inline-block">
+            {/* Glow effect */}
+            <div className="absolute inset-0 blur-3xl bg-gradient-to-r from-amber-500/30 via-orange-500/30 to-red-500/30 rounded-full scale-150" />
+            
+            {/* Logo container */}
+            <motion.div
+              className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl p-8 border border-amber-500/30 shadow-2xl shadow-amber-500/20"
+              whileHover={{ scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              {/* Premium badge */}
+              <motion.div
+                className="absolute -top-3 -right-3 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg"
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                V2.0
+              </motion.div>
+              
+              {/* Main logo text */}
+              <div className="flex items-center gap-3">
+                <motion.div
+                  className="w-16 h-16 rounded-xl bg-gradient-to-br from-amber-400 via-orange-500 to-red-500 flex items-center justify-center shadow-lg"
+                  animate={{ rotate: [0, 5, -5, 0] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <BookOpen className="h-8 w-8 text-white" />
+                </motion.div>
+                <div className="text-left">
+                  <h1 className="text-3xl md:text-4xl font-black tracking-tight">
+                    <span className="bg-gradient-to-r from-amber-300 via-orange-400 to-amber-300 bg-clip-text text-transparent">
+                      Ebookia
+                    </span>
+                    <span className="bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
+                      Pro
+                    </span>
+                  </h1>
+                  <p className="text-slate-400 text-sm font-medium tracking-widest">
+                    MOTEUR IA ÉDITORIAL
+                  </p>
+                </div>
+              </div>
+              
+              {/* Decorative elements */}
+              <div className="absolute top-2 left-2 w-2 h-2 rounded-full bg-amber-400/50" />
+              <div className="absolute bottom-2 right-2 w-2 h-2 rounded-full bg-orange-400/50" />
+            </motion.div>
+          </div>
+        </motion.div>
+
         {/* Hero section */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
           className="text-center mb-12"
         >
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm mb-4">
