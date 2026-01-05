@@ -25,12 +25,22 @@ serve(async (req) => {
       throw new Error("OPENAI_API_KEY non configurée");
     }
 
-    const systemPrompt = `Tu es un consultant expert en édition numérique et analyse de marché pour ebooks.
+const systemPrompt = `Tu es un expert en SEO Amazon KDP et en analyse de marché pour ebooks numériques.
 
-Tu dois analyser un sujet d'ebook et fournir une analyse de marché détaillée et actionnable.
+Tu dois analyser un sujet d'ebook et fournir une analyse de marché détaillée AVEC 7 MOTS-CLÉS KDP OPTIMISÉS.
 
 IMPORTANT: Réponds UNIQUEMENT en JSON valide avec cette structure exacte:
 {
+  "nichePrincipale": "la niche KDP précise identifiée",
+  "tailleMarche": "grand|moyen|niche",
+  "concurrenceNiveau": "faible|moyenne|forte",
+  "opportunite": "l'opportunité identifiée",
+  "motsClésKDP": ["7 mots-clés stratégiques pour Amazon KDP"],
+  "justificationMotsCles": ["justification courte pour chaque mot-clé"],
+  "categoriesKDP": ["2 catégories Amazon principales"],
+  "categoriesSecondaires": ["3 catégories cachées potentielles"],
+  "prixOptimal": "prix suggéré avec justification",
+  "potentielVentes": "estimation réaliste",
   "attentesLecteurs": [
     { "element": "description de l'attente", "impact": "élevé|moyen|faible" }
   ],
@@ -45,21 +55,28 @@ IMPORTANT: Réponds UNIQUEMENT en JSON valide avec cette structure exacte:
   ]
 }
 
-Fournis 3-5 éléments par catégorie, classés par potentiel d'impact.
+Pour les mots-clés KDP:
+- Correspondre à des recherches réelles d'internautes (Amazon + Google France)
+- Être adaptés à Amazon KDP (ni trop génériques, ni trop vagues)
+- Pas de répétition exacte du titre
+
+Fournis 3-5 éléments par catégorie d'analyse, classés par potentiel d'impact.
 Sois concret, actionnable et orienté valeur commerciale.`;
 
-    const userPrompt = `Analyse ce sujet comme un consultant en édition numérique:
+    const userPrompt = `Analyse ce sujet d'ebook et génère 7 mots-clés KDP stratégiques:
 
-SUJET: ${sujet}
+SUJET/TITRE: ${sujet}
 ${contexte ? `CONTEXTE: ${contexte}` : ""}
 
 Fournis:
-– les attentes principales des lecteurs
-– les frustrations non résolues
-– les angles éditoriaux sous-exploités  
-– les erreurs fréquentes des contenus concurrents
-
-Classe chaque élément par potentiel d'impact (élevé, moyen, faible).`;
+1. L'analyse de niche et positionnement marché
+2. 7 MOTS-CLÉS KDP très performants pour Amazon France
+3. Les catégories Amazon recommandées
+4. Le prix optimal suggéré
+5. Les attentes des lecteurs
+6. Les frustrations non résolues par la concurrence
+7. Les angles sous-exploités
+8. Les erreurs fréquentes des concurrents`;
 
     console.log("Analyse de marché pour:", sujet);
 
@@ -103,8 +120,18 @@ Classe chaque élément par potentiel d'impact (élevé, moyen, faible).`;
       analysis = JSON.parse(cleanContent);
     } catch (parseError) {
       console.error("Erreur parsing JSON:", parseError);
-      // Fallback avec structure par défaut
+      // Fallback avec structure par défaut incluant mots-clés
       analysis = {
+        nichePrincipale: "Non déterminée",
+        tailleMarche: "moyen",
+        concurrenceNiveau: "moyenne",
+        opportunite: "Analyse complète requise",
+        motsClésKDP: ["mot-clé 1", "mot-clé 2", "mot-clé 3", "mot-clé 4", "mot-clé 5", "mot-clé 6", "mot-clé 7"],
+        justificationMotsCles: [],
+        categoriesKDP: ["Catégorie principale"],
+        categoriesSecondaires: [],
+        prixOptimal: "À déterminer",
+        potentielVentes: "À évaluer",
         attentesLecteurs: [
           { element: "Contenu pratique et actionnable", impact: "élevé" },
           { element: "Exemples concrets et cas d'usage", impact: "élevé" },

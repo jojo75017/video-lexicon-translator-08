@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Search, Users, Frown, Lightbulb, AlertTriangle } from "lucide-react";
+import { Loader2, Search, Users, Frown, Lightbulb, AlertTriangle, Key, Tag, DollarSign, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -14,6 +14,16 @@ interface MarketInsight {
 }
 
 interface MarketAnalysis {
+  nichePrincipale?: string;
+  tailleMarche?: string;
+  concurrenceNiveau?: string;
+  opportunite?: string;
+  motsClésKDP?: string[];
+  justificationMotsCles?: string[];
+  categoriesKDP?: string[];
+  categoriesSecondaires?: string[];
+  prixOptimal?: string;
+  potentielVentes?: string;
   attentesLecteurs: MarketInsight[];
   frustrationsNonResolues: MarketInsight[];
   anglesSousExploites: MarketInsight[];
@@ -112,102 +122,185 @@ export const EbookMarketAnalysis = ({ onAnalysisComplete }: EbookMarketAnalysisP
       </Card>
 
       {analysis && (
-        <div className="grid gap-4 md:grid-cols-2">
-          <Card className="border-blue-500/30 bg-blue-500/5">
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2 text-lg text-blue-700 dark:text-blue-400">
-                <Users className="h-5 w-5" />
-                Attentes des Lecteurs
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {analysis.attentesLecteurs.map((insight, index) => (
-                  <div key={index} className="flex items-start gap-2">
+        <div className="space-y-6">
+          {/* Mots-clés KDP - Section prioritaire */}
+          {analysis.motsClésKDP && analysis.motsClésKDP.length > 0 && (
+            <Card className="border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-lg text-emerald-700 dark:text-emerald-400">
+                  <Key className="h-5 w-5" />
+                  🔑 7 Mots-clés KDP Stratégiques
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {analysis.motsClésKDP.map((keyword, index) => (
                     <Badge 
-                      variant="outline" 
-                      className={`text-[10px] shrink-0 ${impactColors[insight.impact]}`}
+                      key={index}
+                      className="bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/50 px-3 py-1.5 text-sm font-medium"
                     >
-                      {insight.impact}
+                      {index + 1}. {keyword}
                     </Badge>
-                    <p className="text-sm leading-relaxed">{insight.element}</p>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                  ))}
+                </div>
+                {analysis.justificationMotsCles && analysis.justificationMotsCles.length > 0 && (
+                  <details className="text-xs text-muted-foreground">
+                    <summary className="cursor-pointer hover:text-foreground">Voir les justifications</summary>
+                    <ul className="mt-2 space-y-1 pl-4">
+                      {analysis.justificationMotsCles.map((justif, i) => (
+                        <li key={i} className="list-disc">{justif}</li>
+                      ))}
+                    </ul>
+                  </details>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
-          <Card className="border-red-500/30 bg-red-500/5">
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2 text-lg text-red-700 dark:text-red-400">
-                <Frown className="h-5 w-5" />
-                Frustrations Non Résolues
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {analysis.frustrationsNonResolues.map((insight, index) => (
-                  <div key={index} className="flex items-start gap-2">
-                    <Badge 
-                      variant="outline" 
-                      className={`text-[10px] shrink-0 ${impactColors[insight.impact]}`}
-                    >
-                      {insight.impact}
-                    </Badge>
-                    <p className="text-sm leading-relaxed">{insight.element}</p>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          {/* Résumé marché */}
+          {(analysis.nichePrincipale || analysis.prixOptimal) && (
+            <div className="grid gap-4 md:grid-cols-3">
+              {analysis.nichePrincipale && (
+                <Card className="border-violet-500/30 bg-violet-500/5">
+                  <CardContent className="pt-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <TrendingUp className="h-4 w-4 text-violet-600" />
+                      <span className="text-xs font-medium text-violet-600">Niche</span>
+                    </div>
+                    <p className="text-sm font-medium">{analysis.nichePrincipale}</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Concurrence: {analysis.concurrenceNiveau || 'N/A'}
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+              {analysis.prixOptimal && (
+                <Card className="border-green-500/30 bg-green-500/5">
+                  <CardContent className="pt-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <DollarSign className="h-4 w-4 text-green-600" />
+                      <span className="text-xs font-medium text-green-600">Prix optimal</span>
+                    </div>
+                    <p className="text-sm font-medium">{analysis.prixOptimal}</p>
+                  </CardContent>
+                </Card>
+              )}
+              {analysis.categoriesKDP && analysis.categoriesKDP.length > 0 && (
+                <Card className="border-blue-500/30 bg-blue-500/5">
+                  <CardContent className="pt-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Tag className="h-4 w-4 text-blue-600" />
+                      <span className="text-xs font-medium text-blue-600">Catégories KDP</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {analysis.categoriesKDP.map((cat, i) => (
+                        <Badge key={i} variant="outline" className="text-xs">{cat}</Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
 
-          <Card className="border-purple-500/30 bg-purple-500/5">
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2 text-lg text-purple-700 dark:text-purple-400">
-                <Lightbulb className="h-5 w-5" />
-                Angles Sous-Exploités
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {analysis.anglesSousExploites.map((insight, index) => (
-                  <div key={index} className="flex items-start gap-2">
-                    <Badge 
-                      variant="outline" 
-                      className={`text-[10px] shrink-0 ${impactColors[insight.impact]}`}
-                    >
-                      {insight.impact}
-                    </Badge>
-                    <p className="text-sm leading-relaxed">{insight.element}</p>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          {/* Analyse détaillée */}
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card className="border-blue-500/30 bg-blue-500/5">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-lg text-blue-700 dark:text-blue-400">
+                  <Users className="h-5 w-5" />
+                  Attentes des Lecteurs
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {analysis.attentesLecteurs?.map((insight, index) => (
+                    <div key={index} className="flex items-start gap-2">
+                      <Badge 
+                        variant="outline" 
+                        className={`text-[10px] shrink-0 ${impactColors[insight.impact]}`}
+                      >
+                        {insight.impact}
+                      </Badge>
+                      <p className="text-sm leading-relaxed">{insight.element}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
 
-          <Card className="border-orange-500/30 bg-orange-500/5">
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2 text-lg text-orange-700 dark:text-orange-400">
-                <AlertTriangle className="h-5 w-5" />
-                Erreurs des Concurrents
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {analysis.erreursFrequentes.map((insight, index) => (
-                  <div key={index} className="flex items-start gap-2">
-                    <Badge 
-                      variant="outline" 
-                      className={`text-[10px] shrink-0 ${impactColors[insight.impact]}`}
-                    >
-                      {insight.impact}
-                    </Badge>
-                    <p className="text-sm leading-relaxed">{insight.element}</p>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+            <Card className="border-red-500/30 bg-red-500/5">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-lg text-red-700 dark:text-red-400">
+                  <Frown className="h-5 w-5" />
+                  Frustrations Non Résolues
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {analysis.frustrationsNonResolues?.map((insight, index) => (
+                    <div key={index} className="flex items-start gap-2">
+                      <Badge 
+                        variant="outline" 
+                        className={`text-[10px] shrink-0 ${impactColors[insight.impact]}`}
+                      >
+                        {insight.impact}
+                      </Badge>
+                      <p className="text-sm leading-relaxed">{insight.element}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-purple-500/30 bg-purple-500/5">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-lg text-purple-700 dark:text-purple-400">
+                  <Lightbulb className="h-5 w-5" />
+                  Angles Sous-Exploités
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {analysis.anglesSousExploites?.map((insight, index) => (
+                    <div key={index} className="flex items-start gap-2">
+                      <Badge 
+                        variant="outline" 
+                        className={`text-[10px] shrink-0 ${impactColors[insight.impact]}`}
+                      >
+                        {insight.impact}
+                      </Badge>
+                      <p className="text-sm leading-relaxed">{insight.element}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-orange-500/30 bg-orange-500/5">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-lg text-orange-700 dark:text-orange-400">
+                  <AlertTriangle className="h-5 w-5" />
+                  Erreurs des Concurrents
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {analysis.erreursFrequentes?.map((insight, index) => (
+                    <div key={index} className="flex items-start gap-2">
+                      <Badge 
+                        variant="outline" 
+                        className={`text-[10px] shrink-0 ${impactColors[insight.impact]}`}
+                      >
+                        {insight.impact}
+                      </Badge>
+                      <p className="text-sm leading-relaxed">{insight.element}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       )}
     </div>
