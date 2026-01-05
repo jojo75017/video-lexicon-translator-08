@@ -65,7 +65,7 @@ serve(async (req) => {
   }
 
   try {
-    const { step, title, subtitle = '', category = '', description = '', authorName, numberOfChapters = 8, previousContext = {} } = await req.json();
+    const { step, title, subtitle = '', category = '', authorName, numberOfChapters = 8, previousContext = {} } = await req.json();
 
     if (!title) {
       return new Response(
@@ -84,7 +84,6 @@ serve(async (req) => {
     const bookContext = `
 TITRE COMPLET : "${fullTitle}"
 CATÉGORIE : ${category || 'Non spécifiée'}
-DESCRIPTION : ${description || 'Non fournie'}
 AUTEUR : ${authorName}
 CHAPITRES PRÉVUS : ${numberOfChapters}
 `.trim();
@@ -96,16 +95,26 @@ CHAPITRES PRÉVUS : ${numberOfChapters}
 
     switch (step) {
       case 'P1': {
-        // DIRECTEUR ÉDITORIAL - Vision stratégique
+        // DIRECTEUR ÉDITORIAL - Génère AUTOMATIQUEMENT la description + vision stratégique
         const content = await callAI(
-          `Tu es un DIRECTEUR ÉDITORIAL avec 20 ans d'expérience. Tu analyses un projet de livre et donnes ta vision stratégique. Sois direct, incisif, comme un vrai pro. UTILISE LA CATÉGORIE ET LA DESCRIPTION FOURNIES pour comprendre le sujet exact du livre.`,
+          `Tu es un DIRECTEUR ÉDITORIAL avec 20 ans d'expérience. Tu analyses un projet de livre et donnes ta vision stratégique. 
+MISSION CRITIQUE : À partir du TITRE, SOUS-TITRE et CATÉGORIE, tu dois DEVINER et CRÉER une description précise du livre. 
+Sois direct, incisif, comme un vrai pro.`,
           `Analyse ce projet de livre :
 ${bookContext}
 
-IMPORTANT : Base ton analyse sur la CATÉGORIE et la DESCRIPTION fournies. Ne devine pas le sujet.
+ÉTAPE 1 - INTERPRÉTATION DU TITRE :
+Analyse le titre "${fullTitle}" dans la catégorie "${category}".
+Devine quel est le VRAI sujet du livre. Par exemple :
+- "Elle faisait partie de la famille" + catégorie "Animaux" = histoire émouvante d'un animal de compagnie
+- "Les secrets du marketing digital" + catégorie "Business" = guide pratique sur le marketing en ligne
+
+ÉTAPE 2 - GÉNÈRE UNE DESCRIPTION (tu dois la créer, personne ne te l'a fournie) :
+Crée une description de 2-3 phrases qui explique clairement le sujet du livre basée sur ton interprétation.
 
 Donne ta vision éditoriale en JSON :
 {
+  "descriptionGeneree": "La description que TU as créée pour ce livre (2-3 phrases précises expliquant le sujet)",
   "promesseCentrale": "la promesse unique de ce livre pour le lecteur",
   "angleUnique": "ce qui le différencie de la concurrence",
   "lecteurCible": "profil précis du lecteur idéal (qui il est, ses frustrations, ses désirs)",
@@ -116,10 +125,10 @@ Donne ta vision éditoriale en JSON :
 }`
         );
         result = parseJSON(content) || { raw: content };
-        displayContent = result.promesseCentrale 
-          ? `**Promesse centrale :** ${result.promesseCentrale}\n\n**Angle unique :** ${result.angleUnique}\n\n**Lecteur cible :** ${result.lecteurCible}\n\n**Ton éditorial :** ${result.tonEditorial}\n\n**Recommandation :** ${result.recommandation}`
+        displayContent = result.descriptionGeneree 
+          ? `**📖 Description générée :** ${result.descriptionGeneree}\n\n**Promesse centrale :** ${result.promesseCentrale}\n\n**Angle unique :** ${result.angleUnique}\n\n**Lecteur cible :** ${result.lecteurCible}\n\n**Ton éditorial :** ${result.tonEditorial}\n\n**Recommandation :** ${result.recommandation}`
           : content;
-        console.log('Step P1 completed successfully');
+        console.log('Step P1 completed successfully - Description auto-générée');
         break;
       }
 
@@ -168,13 +177,15 @@ Donne ton analyse marché en JSON :
         const wordsPerChapter = 3500; // Estimation réaliste : 3500 mots = ~14 pages par chapitre
         const totalWords = numberOfChapters * wordsPerChapter;
         const estimatedPages = Math.ceil(totalWords / 250);
+        const descriptionGeneree = previousContext.P1?.descriptionGeneree || '';
         
         console.log(`Step P3: Structuring ${numberOfChapters} chapters (~${estimatedPages} pages)`);
         
         const content = await callAI(
-          `Tu es un ARCHITECTE DE CONTENU expert. Tu structures des livres pour maximiser l'impact et la rétention du lecteur. Tu penses progression pédagogique, storytelling, points de bascule. UTILISE LA CATÉGORIE ET LA DESCRIPTION pour créer une structure adaptée.`,
+          `Tu es un ARCHITECTE DE CONTENU expert. Tu structures des livres pour maximiser l'impact et la rétention du lecteur. Tu penses progression pédagogique, storytelling, points de bascule.`,
           `Structure ce livre en ${numberOfChapters} chapitres :
 ${bookContext}
+DESCRIPTION DU LIVRE (générée en P1): ${descriptionGeneree}
 VISION : ${JSON.stringify(previousContext.P1 || {})}
 MARCHÉ : ${JSON.stringify(previousContext.P2 || {})}
 
@@ -219,13 +230,15 @@ Crée la structure en JSON :
         // RÉDACTION EXPERTE - Génère un APERÇU et les INTRODUCTIONS de chaque chapitre
         // Le contenu complet sera généré séparément via le module EbookWriting
         const structure = previousContext.P3?.chapitres || [];
+        const descriptionGeneree = previousContext.P1?.descriptionGeneree || '';
         console.log(`Step P4: Generating chapter previews for ${structure.length} chapters`);
         
         const content = await callAI(
-          `Tu es un AUTEUR PROFESSIONNEL. Tu prépares le plan de rédaction détaillé de chaque chapitre avec une introduction captivante. PAS DE STYLE ROBOT. Écris comme un vrai auteur humain passionné. UTILISE LA CATÉGORIE ET LA DESCRIPTION pour adapter ton style.`,
+          `Tu es un AUTEUR PROFESSIONNEL. Tu prépares le plan de rédaction détaillé de chaque chapitre avec une introduction captivante. PAS DE STYLE ROBOT. Écris comme un vrai auteur humain passionné.`,
           `Prépare le plan de rédaction pour ce livre :
 
 ${bookContext}
+DESCRIPTION DU LIVRE : ${descriptionGeneree}
 VISION : ${JSON.stringify(previousContext.P1 || {})}
 
 CHAPITRES PRÉVUS (${structure.length}) :

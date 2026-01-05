@@ -45,7 +45,8 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
   const [title, setTitle] = useState('');
   const [subtitle, setSubtitle] = useState('');
   const [category, setCategory] = useState('');
-  const [description, setDescription] = useState('');
+  const [generatedDescription, setGeneratedDescription] = useState('');
+  // Description sera générée automatiquement
   const [authorName, setAuthorName] = useState('');
   const [numberOfChapters, setNumberOfChapters] = useState(8);
   const [hasReadSteps, setHasReadSteps] = useState(false);
@@ -73,7 +74,6 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
           title,
           subtitle,
           category,
-          description,
           authorName,
           numberOfChapters,
           previousContext: context
@@ -316,23 +316,11 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({ onComplet
             </div>
           </div>
 
-          {/* Description field */}
-          <div className="space-y-2">
-            <Label htmlFor="description" className="flex items-center gap-2">
-              <FileText className="h-4 w-4 text-primary" />
-              Description courte (optionnel mais recommandé)
-            </Label>
-            <Textarea
-              id="description"
-              placeholder="Ex: L'histoire vraie de Luna, une chienne adoptée qui a transformé la vie de notre famille pendant 15 ans. Un récit émouvant sur l'amour inconditionnel entre un animal et ses humains."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              disabled={isGenerating}
-              rows={3}
-              className="resize-none"
-            />
-            <p className="text-xs text-muted-foreground">
-              💡 Plus vous décrivez votre livre, mieux l'IA comprendra votre vision
+          {/* Info description auto-générée */}
+          <div className="p-3 bg-primary/5 border border-primary/20 rounded-lg">
+            <p className="text-sm text-muted-foreground flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-primary" />
+              💡 La description sera générée automatiquement par l'IA à partir du titre, sous-titre et catégorie
             </p>
           </div>
 
