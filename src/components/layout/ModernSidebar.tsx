@@ -71,7 +71,35 @@ interface Category {
   items: MenuItem[];
 }
 
-const categories: Category[] = [
+// Items du workflow IA éditorial avec style premium
+interface PremiumMenuItem extends MenuItem {
+  isPremium?: boolean;
+  promptNumber?: number;
+}
+
+interface PremiumCategory extends Omit<Category, 'items'> {
+  items: PremiumMenuItem[];
+  isPremiumCategory?: boolean;
+}
+
+const categories: PremiumCategory[] = [
+  {
+    id: 'workflow-ia',
+    label: 'Workflow IA Éditorial',
+    icon: '🚀',
+    color: 'from-amber-400 via-orange-500 to-red-500',
+    isPremiumCategory: true,
+    items: [
+      { id: 'editorial-director', label: '1. Directeur Éditorial', icon: Crown, color: 'text-amber-500', bgColor: 'bg-amber-500/10', activeGradient: 'from-amber-400 to-orange-500', isPremium: true, promptNumber: 1 },
+      { id: 'market-analysis', label: '2. Analyse Marché', icon: Search, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', activeGradient: 'from-emerald-400 to-teal-500', isPremium: true, promptNumber: 2 },
+      { id: 'content-architect', label: '3. Architecte Contenu', icon: LayoutDashboard, color: 'text-violet-500', bgColor: 'bg-violet-500/10', activeGradient: 'from-violet-400 to-purple-500', isPremium: true, promptNumber: 3 },
+      { id: 'expert-writing', label: '4. Rédaction Experte', icon: PenTool, color: 'text-blue-500', bgColor: 'bg-blue-500/10', activeGradient: 'from-blue-400 to-cyan-500', isPremium: true, promptNumber: 4 },
+      { id: 'natural-rewrite', label: '5. Réécriture Naturelle', icon: Sparkles, color: 'text-pink-500', bgColor: 'bg-pink-500/10', activeGradient: 'from-pink-400 to-rose-500', isPremium: true, promptNumber: 5 },
+      { id: 'editorial-quality', label: '6. Cohérence & Qualité', icon: FileEdit, color: 'text-teal-500', bgColor: 'bg-teal-500/10', activeGradient: 'from-teal-400 to-cyan-500', isPremium: true, promptNumber: 6 },
+      { id: 'editorial-packaging', label: '7. Packaging Éditorial', icon: FileText, color: 'text-green-500', bgColor: 'bg-green-500/10', activeGradient: 'from-green-400 to-emerald-500', isPremium: true, promptNumber: 7 },
+      { id: 'final-diagnosis', label: '8. Diagnostic Final', icon: Shield, color: 'text-purple-500', bgColor: 'bg-purple-500/10', activeGradient: 'from-purple-400 to-fuchsia-500', isPremium: true, promptNumber: 8 },
+    ]
+  },
   {
     id: 'gestion',
     label: 'Gestion & Projet',
@@ -90,12 +118,6 @@ const categories: Category[] = [
     icon: '✍️',
     color: 'from-fuchsia-500 to-pink-500',
     items: [
-      { id: 'editorial-director', label: 'Directeur Éditorial', icon: Crown, color: 'text-amber-500', bgColor: 'bg-amber-500/10', activeGradient: 'from-amber-500 to-yellow-500' },
-      { id: 'market-analysis', label: 'Analyse Marché', icon: Search, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10', activeGradient: 'from-emerald-500 to-teal-500' },
-      { id: 'content-architect', label: 'Architecte Contenu', icon: LayoutDashboard, color: 'text-violet-500', bgColor: 'bg-violet-500/10', activeGradient: 'from-violet-500 to-purple-500' },
-      { id: 'expert-writing', label: 'Rédaction Experte', icon: PenTool, color: 'text-blue-500', bgColor: 'bg-blue-500/10', activeGradient: 'from-blue-500 to-cyan-500' },
-      { id: 'natural-rewrite', label: 'Réécriture Naturelle', icon: Sparkles, color: 'text-pink-500', bgColor: 'bg-pink-500/10', activeGradient: 'from-pink-500 to-rose-500' },
-      { id: 'editorial-packaging', label: 'Packaging Éditorial', icon: FileText, color: 'text-green-500', bgColor: 'bg-green-500/10', activeGradient: 'from-green-500 to-emerald-500' },
       { id: 'planner', label: 'Planificateur', icon: BookOpen, color: 'text-fuchsia-500', bgColor: 'bg-fuchsia-500/10', activeGradient: 'from-fuchsia-500 to-pink-500' },
       { id: 'templates', label: 'Templates', icon: LayoutTemplate, color: 'text-cyan-500', bgColor: 'bg-cyan-500/10', activeGradient: 'from-cyan-500 to-teal-500' },
       { id: 'encyclopedia', label: 'Encyclopédie', icon: BookMarked, color: 'text-amber-500', bgColor: 'bg-amber-500/10', activeGradient: 'from-amber-500 to-orange-500' },
@@ -351,24 +373,35 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
           {categories.map((category) => {
             const isExpanded = expandedCategories.includes(category.id);
             const hasActiveItem = category.items.some(item => item.id === activeTab);
+            const isPremium = category.isPremiumCategory;
             
             return (
-              <div key={category.id} className="mb-1">
+              <div key={category.id} className={cn(
+                "mb-1",
+                isPremium && !isCollapsed && "mx-2 mb-3 rounded-xl bg-gradient-to-br from-amber-500/10 via-orange-500/5 to-red-500/10 border border-amber-500/20 overflow-hidden"
+              )}>
                 {/* Category Header */}
                 {!isCollapsed ? (
                   <button
                     onClick={() => toggleCategory(category.id)}
                     className={cn(
                       "w-full flex items-center justify-between px-3 py-2 text-xs font-semibold transition-all duration-200",
-                      hasActiveItem 
-                        ? "text-foreground" 
-                        : "text-muted-foreground hover:text-foreground"
+                      isPremium 
+                        ? "bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-600 dark:text-amber-400"
+                        : hasActiveItem 
+                          ? "text-foreground" 
+                          : "text-muted-foreground hover:text-foreground"
                     )}
                   >
                     <div className="flex items-center gap-2">
                       <span className="text-sm">{category.icon}</span>
                       <span>{category.label}</span>
-                      {hasActiveItem && (
+                      {isPremium && (
+                        <span className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-gradient-to-r from-amber-500 to-orange-500 text-white uppercase tracking-wider">
+                          PRO
+                        </span>
+                      )}
+                      {hasActiveItem && !isPremium && (
                         <span className={cn(
                           "w-1.5 h-1.5 rounded-full bg-gradient-to-r",
                           category.color
@@ -386,14 +419,18 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <div className={cn(
-                        "flex justify-center py-2 mb-1",
-                        hasActiveItem && "border-l-2 border-primary"
+                        "flex justify-center py-2 mb-1 relative",
+                        hasActiveItem && "border-l-2 border-primary",
+                        isPremium && "bg-gradient-to-r from-amber-500/20 to-orange-500/20"
                       )}>
                         <span className="text-sm">{category.icon}</span>
+                        {isPremium && (
+                          <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
+                        )}
                       </div>
                     </TooltipTrigger>
                     <TooltipContent side="right" className="font-medium text-xs">
-                      {category.label}
+                      {category.label} {isPremium && '⭐'}
                     </TooltipContent>
                   </Tooltip>
                 )}
@@ -403,15 +440,17 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                   "overflow-hidden transition-all duration-200",
                   !isCollapsed && !isExpanded && "max-h-0",
                   !isCollapsed && isExpanded && "max-h-[500px]",
-                  !isCollapsed && "px-2"
+                  !isCollapsed && !isPremium && "px-2"
                 )}>
                   <div className={cn(
                     "space-y-0.5",
-                    !isCollapsed && isExpanded && "pb-2 max-h-[200px] overflow-y-auto scrollbar-thin scrollbar-thumb-border/50 scrollbar-track-transparent pr-1"
+                    !isCollapsed && isExpanded && "pb-2 max-h-[280px] overflow-y-auto scrollbar-thin scrollbar-thumb-border/50 scrollbar-track-transparent pr-1",
+                    isPremium && "px-2"
                   )}>
                     {category.items.map((item) => {
                       const isActive = activeTab === item.id;
                       const Icon = item.icon;
+                      const premiumItem = item as PremiumMenuItem;
                       
                       const button = (
                         <button
@@ -420,7 +459,9 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                             "group relative w-full flex items-center gap-2 px-2 py-1.5 rounded-lg transition-all duration-200",
                             isActive 
                               ? `bg-gradient-to-r ${item.activeGradient} text-white shadow-md` 
-                              : `hover:${item.bgColor} ${item.color}`,
+                              : premiumItem.isPremium
+                                ? `hover:bg-amber-500/10 ${item.color}`
+                                : `hover:${item.bgColor} ${item.color}`,
                             isCollapsed && "justify-center px-2"
                           )}
                         >
@@ -433,11 +474,18 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                           
                           {!isCollapsed && (
                             <span className={cn(
-                              "text-xs font-medium truncate",
+                              "text-xs font-medium truncate flex items-center gap-1",
                               isActive ? "text-white" : ""
                             )}>
                               {item.label}
                               {item.isLink && <span className="ml-1 text-[10px] opacity-60">↗</span>}
+                            </span>
+                          )}
+                          
+                          {/* Indicateur de numéro pour les prompts premium */}
+                          {premiumItem.isPremium && premiumItem.promptNumber && !isCollapsed && !isActive && (
+                            <span className="ml-auto text-[9px] font-bold text-amber-500/60">
+                              P{premiumItem.promptNumber}
                             </span>
                           )}
                         </button>
@@ -450,7 +498,7 @@ export const ModernSidebar: React.FC<ModernSidebarProps> = ({
                               {button}
                             </TooltipTrigger>
                             <TooltipContent side="right" className="font-medium text-xs">
-                              {item.label}
+                              {premiumItem.isPremium && `${premiumItem.promptNumber}. `}{item.label}
                             </TooltipContent>
                           </Tooltip>
                         );

@@ -86,3 +86,9 @@ verify_jwt = false
 
 [functions.editorial-packaging]
 verify_jwt = false
+
+[functions.editorial-quality]
+verify_jwt = false
+
+[functions.final-diagnosis]
+verify_jwt = false
